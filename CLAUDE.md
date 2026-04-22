@@ -289,6 +289,21 @@ The canonical BSC namespace prefixes:
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
 ```
 
+**Namespace convention — two IRI roots, one rule each.**
+
+- `https://w3id.org/sstim` (`/sstim#`, `/sstim/vocab#`, `/sstim/shapes#`) — the
+  **ontology**: OWL classes and properties, SKOS vocabulary concepts, SHACL
+  shapes. This is the reusable, citable scientific artifact. Every `.ttl` file
+  in `ontology/` declares its prefixes here.
+- `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` — **BSC
+  product instances**: preset IRIs, session records, user annotations, evidence
+  chain nodes specific to the BSC/BioSynCare catalog. These live under a
+  product-scoped namespace so the ontology stays reusable by other projects.
+
+Never publish a BSC preset or session under `w3id.org/sstim`; never declare an
+OWL class or SKOS concept under `w3id.org/bsc`. If you are unsure which root
+applies to something new, ask — do not guess.
+
 ### 5.2 Dual-typing pattern for vocabulary concepts
 
 SKOS concepts in `sstim-vocab.ttl` are dual-typed: they are both `skos:Concept` and
@@ -553,6 +568,11 @@ for worklet files — that triggers Vite's module bundling.
 ---
 
 ## 10. Testing Requirements
+
+> **Phase 0 note.** The pyshacl command below is live and runnable today. The
+> remaining items in this section — `schemas/preset.schema.json`, the `tests/`
+> subtree, and `hooks/pre-commit` — are **planned (Phase 1)** and do not yet
+> exist in the repo.
 
 Before any PR or commit that modifies `ontology/`, run:
 ```bash

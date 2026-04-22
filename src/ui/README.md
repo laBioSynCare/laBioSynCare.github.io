@@ -1,5 +1,8 @@
 # src/ui — User Interface Layer
 
+> **Status: planned — Phase 1.** No Svelte components in this directory exist
+> yet. This document describes the target UI surface.
+
 All UI components use Svelte 5 with runes syntax exclusively. See `CLAUDE.md`
 section 2 for the runes syntax mandate and the list of prohibited Svelte 4
 patterns.

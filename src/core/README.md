@@ -1,5 +1,8 @@
 # src/core — Orchestration Layer
 
+> **Status: planned — Phase 1.** No source files in this directory exist yet.
+> This document describes the target design.
+
 The core layer connects the engine interfaces to the preset data model.
 It translates preset JSON into scheduled audio events, coordinates the
 three-clock architecture, manages the session lifecycle, and records

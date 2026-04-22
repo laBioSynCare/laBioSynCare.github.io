@@ -1,5 +1,11 @@
 # src — Software Architecture
 
+> **Status: planned — Phase 1.** This document describes the target architecture
+> for the BSC Lab application. None of the source files (`.js`, `.svelte`) or
+> companion directories (`public/worklets/`, `schemas/`, `tests/`, `dist/`)
+> referenced below exist yet. The repo is in Phase 0 (docs + ontology). See
+> `ROADMAP.md` for phase definitions.
+
 This directory contains the BSC Lab application: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL
 interface, and annotation system.

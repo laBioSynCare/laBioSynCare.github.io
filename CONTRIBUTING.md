@@ -31,7 +31,8 @@ these invariants will cause your PR to be rejected regardless of code quality.
 For evidence claims: `docs/concept/EVIDENCE_FRAMEWORK.md`. For ontology work:
 `ontology/README.md`. For the domain concept: `docs/concept/SENSORY_STIMULATION.md`.
 
-**Run the pre-commit hooks locally** before submitting:
+**Run the pre-commit hooks locally** before submitting (planned — Phase 1; the
+`hooks/` directory, `schemas/`, `tests/`, and CI do not yet exist):
 ```bash
 # Install hooks
 cp hooks/pre-commit .git/hooks/pre-commit
@@ -41,8 +42,8 @@ chmod +x .git/hooks/pre-commit
 .git/hooks/pre-commit
 ```
 
-The hook runs SHACL validation, JSON Schema validation, and Turtle syntax
-checks. If it fails locally, the CI will also fail.
+The hook will run SHACL validation, JSON Schema validation, and Turtle syntax
+checks. Until it lands, run the pyshacl commands from `CLAUDE.md` §10 manually.
 
 ---
 

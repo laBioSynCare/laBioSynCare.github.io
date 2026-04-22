@@ -1,5 +1,9 @@
 # src/engines — Stimulation Engine Layer
 
+> **Status: planned — Phase 1.** No engine source files or AudioWorklets in
+> `public/worklets/` exist yet; the interfaces and test suites described below
+> are targets for Phase 1.
+
 The engines layer provides pluggable implementations of audio, visual, and
 haptic stimulation delivery. All three engine types expose interface contracts;
 the `StimulationOrchestrator` calls only interface methods, never

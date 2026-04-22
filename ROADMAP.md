@@ -20,9 +20,10 @@ or cognitive state.
 The long-term goal is a self-sustaining ecosystem with three mutually
 reinforcing layers:
 
-**Knowledge layer:** A published, open ontology (`w3id.org/bsc`) that
+**Knowledge layer:** A published, open ontology (`w3id.org/sstim`) that
 formalizes the vocabulary, evidence tiers, protocol types, and technique
-taxonomy of sensory stimulation. Machine-readable, citable, linked to
+taxonomy of sensory stimulation. BSC-specific instances (presets, sessions,
+annotations) live under the product namespace `w3id.org/bsc/`. Machine-readable, citable, linked to
 Wikidata and OBO Foundry. The foundation for scientific discussion and
 nomenclature standardization.
 
@@ -97,38 +98,47 @@ build in subsequent phases.
 ### Deliverables
 
 - [x] `CLAUDE.md` — AI agent directive, invariants, architecture constraints
-- [ ] `ROADMAP.md` — this file
-- [ ] `TODO.md` — full tracked task list
-- [ ] `docs/concept/SENSORY_STIMULATION.md` — term definition and first ontology classes
-- [ ] `docs/concept/SCOPE.md` — what we claim and what we do not
-- [ ] `docs/concept/EVIDENCE_FRAMEWORK.md` — six-tier evidence system
-- [ ] `docs/concept/FACILITATING_DEDICATION.md` — primary validated use case
-- [ ] `docs/technical/PRESET_FORMAT.md` — preset schema specification with gaps documented
-- [ ] `docs/technical/SESSION_MODEL.md` — preset vs. session instance distinction
-- [ ] `docs/technical/BREATHING_MODEL.md` — Martigli system spec (defensive publication)
-- [ ] `docs/technical/SYMMETRY_SYSTEM.md` — Symmetry permutation spec (defensive publication)
-- [ ] `docs/technical/MARTIGLI_BINAURAL.md` — hybrid voice type spec (defensive publication)
-- [ ] `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` — pluggable engine design
-- [ ] `docs/technical/VISUAL_ENGINE_ARCHITECTURE.md` — visual engine design
-- [ ] `docs/ecosystem/IP_STRATEGY.md` — defensive publication over patents, trademark plan
-- [ ] `docs/ecosystem/ADVISORY_BOARD.md` — named members and roles
-- [ ] `docs/ecosystem/PARTNERS.md` — named partners with interest letters
-- [ ] `docs/ecosystem/W3C_CG_CHARTER.md` — draft charter, ready to submit
-- [ ] `docs/ecosystem/CONSORTIUM_INVITATION.md` — outreach template
-- [ ] `ontology/README.md` — OWL/SKOS design decisions
-- [ ] `ontology/sstim-core.ttl` — OWL skeleton
-- [ ] `ontology/sstim-vocab.ttl` — SKOS vocabulary, multilingual
-- [ ] `ontology/sstim-shapes.ttl` — SHACL shapes
-- [ ] `ontology/sstim-alignments.ttl` — Wikidata/DBpedia links
-- [ ] `src/README.md` — full software architecture
-- [ ] `src/engines/README.md`, `src/core/README.md`, `src/rdf/README.md`, `src/ui/README.md`
-- [ ] `README.md`, `CONTRIBUTING.md`
+- [x] `ROADMAP.md` — this file
+- [x] `TODO.md` — full tracked task list
+- [x] `docs/concept/SENSORY_STIMULATION.md` — term definition and first ontology classes
+- [x] `docs/concept/SCOPE.md` — what we claim and what we do not
+- [x] `docs/concept/EVIDENCE_FRAMEWORK.md` — six-tier evidence system
+- [x] `docs/concept/FACILITATING_DEDICATION.md` — primary validated use case
+- [x] `docs/technical/PRESET_FORMAT.md` — preset schema specification with gaps documented
+- [x] `docs/technical/SESSION_MODEL.md` — preset vs. session instance distinction
+- [x] `docs/technical/BREATHING_MODEL.md` — Martigli system spec (defensive publication)
+- [x] `docs/technical/SYMMETRY_SYSTEM.md` — Symmetry permutation spec (defensive publication)
+- [x] `docs/technical/MARTIGLI_BINAURAL.md` — hybrid voice type spec (defensive publication)
+- [x] `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` — pluggable engine design
+- [x] `docs/technical/VISUAL_ENGINE_ARCHITECTURE.md` — visual engine design
+- [x] `docs/ecosystem/IP_STRATEGY.md` — defensive publication over patents, trademark plan
+- [x] `docs/ecosystem/ADVISORY_BOARD.md` — named members and roles
+- [x] `docs/ecosystem/PARTNERS.md` — named partners with interest letters
+- [x] `docs/ecosystem/W3C_CG_CHARTER.md` — draft charter, ready to submit
+- [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` — outreach template
+- [x] `ontology/README.md` — OWL/SKOS design decisions
+- [x] `ontology/sstim-core.ttl` — OWL skeleton
+- [x] `ontology/sstim-vocab.ttl` — SKOS vocabulary, multilingual
+- [x] `ontology/sstim-shapes.ttl` — SHACL shapes
+- [x] `ontology/sstim-alignments.ttl` — Wikidata/DBpedia links
+- [x] `src/README.md` — full software architecture
+- [x] `src/engines/README.md`, `src/core/README.md`, `src/rdf/README.md`, `src/ui/README.md`
+- [~] `README.md`, [x] `CONTRIBUTING.md`
 
 ### Phase 0 is complete when
 
 All 31 reference documents exist in the repository. The ontology skeleton
 is valid Turtle and passes basic SHACL validation. The repo is public on
 GitHub. Nothing is deployed yet.
+
+**Status (2026-04-21):** all 31 reference documents are committed. The
+core ontology (`sstim-core.ttl`) conforms against `sstim-shapes.ttl`;
+`sstim-vocab.ttl` has one known SHACL failure on `sstim-v:allFrequencyBands`
+(missing `hzMin`/`hzMax`) — tracked in `TODO.md` as a blocked known issue.
+The repo is public on GitHub. A "Public Foundation Pass" (root README
+rewrite, namespace convention lock-in, `docs/README.md` and
+`ontology/instances/README.md` indexes, reality-sync of ROADMAP/TODO) is
+in flight and closes out Phase 0.
 
 ---
 
@@ -161,10 +171,13 @@ the knowledge navigation layer.
 
 ### Ontology and IP
 
-- [ ] Register `https://w3id.org/bsc` namespace (PR to perma-id/w3id.org)
+- [ ] Register `https://w3id.org/sstim` namespace for the ontology
+      (PR to perma-id/w3id.org)
+- [ ] Register `https://w3id.org/bsc` namespace for BSC product instances
+      (presets, sessions, annotations) (PR to perma-id/w3id.org)
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
-- [ ] Publish `ontology/sstim-core.ttl` and `sstim-vocab.ttl` at w3id.org/bsc
+- [ ] Publish `ontology/sstim-core.ttl` and `sstim-vocab.ttl` at w3id.org/sstim
       with content negotiation
 - [ ] WIDOCO documentation generated and deployed to GitHub Pages
 
@@ -335,7 +348,7 @@ single maintainer. Evidence gathering reaches institutional scale.
   full-time contributor
 - W3C CG vocabulary recommendation used by at least one external platform
   or research project
-- The `w3id.org/bsc` ontology is cited in at least one peer-reviewed
+- The `w3id.org/sstim` ontology is cited in at least one peer-reviewed
   publication
 - BSC Lab's evidence tier framework is used or referenced by researchers
   outside the BSC ecosystem

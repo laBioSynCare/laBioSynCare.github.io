@@ -18,7 +18,9 @@ knowledge layer of BSC Lab — the part that makes the preset catalog
 machine-readable, queryable, citable, and interoperable with external
 biomedical vocabularies.
 
-The ontology is published at `https://w3id.org/bsc` under CC BY 4.0.
+The ontology is published at `https://w3id.org/sstim` under CC BY 4.0.
+BSC product instances (presets, sessions, annotations) use the separate
+product namespace `https://w3id.org/bsc/`.
 It is designed to be used by:
 
 - The BSC Lab RDF browser and SPARQL interface (knowledge navigation)
@@ -84,7 +86,7 @@ from `src/rdf/namespaces.js`. Never hardcode IRI strings.
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
-@prefix bsc-inst: <https://w3id.org/bsc/instance/> .
+@prefix bsc-inst: <https://w3id.org/bsc/preset/> .
 
 # Upper ontology
 @prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
@@ -108,10 +110,16 @@ from `src/rdf/namespaces.js`. Never hardcode IRI strings.
 @prefix wdt:      <http://www.wikidata.org/prop/direct/> .
 ```
 
-The persistent namespace `https://w3id.org/bsc` is registered at
-[perma-id/w3id.org](https://github.com/perma-id/w3id.org). Content
-negotiation rules are in the `bsc/` folder of that repository
-(see Section 10).
+Two persistent namespaces are registered at
+[perma-id/w3id.org](https://github.com/perma-id/w3id.org):
+
+- `https://w3id.org/sstim` — the ontology (classes, properties, SKOS
+  vocabulary, SHACL shapes). Content-negotiated to Turtle or WIDOCO HTML.
+- `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` —
+  BSC product instance data.
+
+Content negotiation rules live in the respective `sstim/` and `bsc/` folders
+of that repository (see Section 10).
 
 ---
 
@@ -479,14 +487,14 @@ The ontology uses `owl:versionIRI` for immutable version snapshots:
 
 ```turtle
 # In sstim-core.ttl header
-<https://w3id.org/bsc> a owl:Ontology ;
-    owl:versionIRI <https://w3id.org/bsc/0.1.0> ;
+<https://w3id.org/sstim> a owl:Ontology ;
+    owl:versionIRI <https://w3id.org/sstim/0.1.0> ;
     owl:versionInfo "0.1.0" ;
     dct:modified "2026-04-12"^^xsd:date .
 ```
 
 Version IRIs point to immutable snapshots hosted on GitHub Pages:
-`https://w3id.org/bsc/0.1.0/sstim-core.ttl`
+`https://w3id.org/sstim/0.1.0/sstim-core.ttl`
 
 **Versioning policy:**
 - **Patch (0.1.x):** Adds new instances, corrects labels, adds
@@ -506,10 +514,10 @@ pointing to the replacement.
 
 ## Content negotiation
 
-The persistent URI `https://w3id.org/bsc` delivers different
-representations based on the HTTP `Accept` header. This is
-configured in the `.htaccess` file at
-[perma-id/w3id.org/bsc/.htaccess](https://github.com/perma-id/w3id.org):
+The persistent URI `https://w3id.org/sstim` delivers different
+representations based on the HTTP `Accept` header. This is configured
+in the `.htaccess` file at
+[perma-id/w3id.org/sstim/.htaccess](https://github.com/perma-id/w3id.org):
 
 ```
 # Accept: text/turtle → raw TTL (GitHub raw)
@@ -518,15 +526,19 @@ RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.ttl [R=303,L]
 
 # Accept: application/rdf+xml → GitHub raw (RDF/XML export)
 RewriteCond %{HTTP_ACCEPT} application/rdf+xml
-RewriteRule ^$ https://raw.githubusercontent.com/.../bsc-core.rdf [R=303,L]
+RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.rdf [R=303,L]
 
 # Accept: application/ld+json → JSON-LD (CDN or GitHub raw)
 RewriteCond %{HTTP_ACCEPT} application/ld+json
-RewriteRule ^$ https://raw.githubusercontent.com/.../bsc-core.jsonld [R=303,L]
+RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.jsonld [R=303,L]
 
 # Default (browsers, curl without Accept) → WIDOCO HTML docs
 RewriteRule ^$ https://bsc-lab.github.io/bsc-lab/ontology/ [R=303,L]
 ```
+
+A parallel `.htaccess` at `perma-id/w3id.org/bsc/` routes the product
+instance namespace (`https://w3id.org/bsc/preset/...`, `/session/...`,
+`/annotation/...`, `/evidence/...`).
 
 Full content negotiation includes sub-paths:
 - `https://w3id.org/sstim#alpha` → term documentation
@@ -635,7 +647,7 @@ please cite:
   author    = {Fabbri, Renato},
   title     = {{BSC} Ontology: A Knowledge Representation for Sensory Stimulation},
   year      = {2026},
-  url       = {https://w3id.org/bsc},
+  url       = {https://w3id.org/sstim},
   note      = {CC BY 4.0}
 }
 ```
@@ -658,4 +670,5 @@ preset descriptions require coordination with the BioSynCare repository
 *Version: 0.1.0 (April 2026)*  
 *Maintained by: Renato Fabbri*  
 *License: CC BY 4.0*  
-*Namespace: `https://w3id.org/bsc`*
+*Namespace (ontology): `https://w3id.org/sstim`*  
+*Namespace (BSC instances): `https://w3id.org/bsc/`*

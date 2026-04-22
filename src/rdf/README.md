@@ -1,5 +1,9 @@
 # src/rdf — Knowledge Graph Layer
 
+> **Status: planned — Phase 1.** No source files in this directory exist yet,
+> and `dist/presets.json` is not produced. This document describes the target
+> API and pipeline.
+
 The RDF subsystem loads the SSTIM ontology and BSC preset instances into an
 in-browser N3.js triple store, executes SPARQL queries via Comunica, validates
 data with SHACL, and exports the preset catalog to JSON for BioSynCare.
