@@ -3,7 +3,7 @@
   const { children } = $props()
 </script>
 
-<nav class="container">
+<nav class="container-fluid" style="padding:0.5rem 1rem">
   <ul>
     <li><strong>BSC Lab</strong></li>
   </ul>
@@ -13,6 +13,6 @@
   </ul>
 </nav>
 
-<main class="container">
+<div style="overflow:hidden">
   {@render children()}
-</main>
+</div>
