@@ -149,10 +149,10 @@ prior art records. They are never modified by AI agents without an explicit
 human instruction in the current session that says "modify [filename]":
 
 ```
-ontology/sstim-core.ttl
-ontology/sstim-vocab.ttl
-ontology/sstim-shapes.ttl
-ontology/sstim-alignments.ttl
+public/ontology/sstim-core.ttl
+public/ontology/sstim-vocab.ttl
+public/ontology/sstim-shapes.ttl
+public/ontology/sstim-alignments.ttl
 docs/technical/BREATHING_MODEL.md
 docs/technical/SYMMETRY_SYSTEM.md
 docs/technical/MARTIGLI_BINAURAL.md
@@ -463,12 +463,18 @@ docs/
   ecosystem/                  ← IP_STRATEGY, W3C_CG_CHARTER, ADVISORY_BOARD,
                                 PARTNERS, CONSORTIUM_INVITATION
 
-ontology/
-  sstim-core.ttl                ← OWL ontology
-  sstim-vocab.ttl               ← SKOS vocabulary (multilingual)
-  sstim-shapes.ttl              ← SHACL validation shapes
-  sstim-alignments.ttl          ← external links (Wikidata, DBpedia, OBO)
-  instances/                  ← preset and reference instances as RDF
+public/
+  _headers                    ← COOP/COEP/CORP headers (Netlify)
+  worklets/                   ← AudioWorklet processors (never bundled by Vite)
+    binaural.worklet.js
+    martigli.worklet.js
+    symmetry.worklet.js
+  ontology/                   ← Turtle files served same-origin (copied to dist/)
+    sstim-core.ttl              ← OWL ontology
+    sstim-vocab.ttl             ← SKOS vocabulary (multilingual)
+    sstim-shapes.ttl            ← SHACL validation shapes
+    sstim-alignments.ttl        ← external links (Wikidata, DBpedia, OBO)
+    instances/                ← preset and reference instances as RDF
 
 schemas/
   preset.schema.json          ← JSON Schema for preset validation
@@ -488,11 +494,6 @@ src/
   ui/sparql/                  ← power user SPARQL interface
   data/presets/               ← JSON preset files (source until RDF pipeline complete)
 
-public/
-  worklets/                   ← AudioWorklet processors (never bundled)
-    binaural.worklet.js
-    martigli.worklet.js
-    symmetry.worklet.js
 
 tests/
   rdf/                        ← ontology consistency, SHACL validation
@@ -585,11 +586,12 @@ for worklet files — that triggers Vite's module bundling.
 > subtree, and `hooks/pre-commit` — are **planned (Phase 1)** and do not yet
 > exist in the repo.
 
-Before any PR or commit that modifies `ontology/`, run:
+Before any PR or commit that modifies `public/ontology/`, run:
 ```bash
-python -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/sstim-core.ttl
-python -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/instances/presets/
+python -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-core.ttl
+python -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/instances/presets/
 ```
+Or simply: `make shacl`
 
 Before any PR or commit that modifies `src/data/presets/`, run:
 ```bash

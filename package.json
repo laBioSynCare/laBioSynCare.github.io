@@ -1,0 +1,29 @@
+{
+  "name": "bsc-lab",
+  "version": "0.1.0",
+  "description": "BSC Lab — open sensory stimulation platform and RDF knowledge graph browser",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "validate": "make shacl",
+    "check": "svelte-kit sync && svelte-check"
+  },
+  "dependencies": {
+    "@comunica/query-sparql-rdfjs": "^3.3.0",
+    "@picocss/pico": "^2.0.6",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.57.1",
+    "cytoscape": "^3.30.0",
+    "n3": "^1.17.3",
+    "rdf-validate-shacl": "^0.5.6"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.0.0",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

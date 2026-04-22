@@ -27,8 +27,8 @@ The repository is in **Phase 0: Public Foundation**. What exists today:
 
 What does **not** yet exist (planned — Phase 1 and later):
 
-- Any runnable application code (no `package.json`, no Vite scaffold,
-  no Svelte components)
+- A working runnable UI (the SvelteKit scaffold and initial routes exist but
+  the app is not yet deployed)
 - AudioWorklet processors (`public/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
@@ -54,18 +54,21 @@ docs/
   technical/            Preset format, engine architectures, defensive pubs
   ecosystem/            IP strategy, W3C CG charter, advisory board, partners
 
-ontology/
-  sstim-core.ttl        OWL classes and properties
-  sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
-  sstim-shapes.ttl      SHACL validation shapes
-  sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
-  instances/            Preset/session/evidence RDF instances (planned)
+public/
+  ontology/             Turtle files served same-origin by Netlify / Vite dev
+    sstim-core.ttl        OWL classes and properties
+    sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
+    sstim-shapes.ttl      SHACL validation shapes
+    sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
+    instances/            Preset/session/evidence RDF instances (planned)
+  worklets/             AudioWorklet processors (planned — Phase 2)
 
-src/                    Target architecture for BSC Lab app (planned — Phase 1)
-  core/, engines/, rdf/, ui/
+src/                    SvelteKit app scaffold (Phase 1 — in progress)
+  rdf/                  Loader, SPARQL wrapper, namespace IRI helpers
+  routes/               SvelteKit pages (ontology browser, SPARQL interface)
+  core/, engines/, ui/  Engine and UI modules (planned)
 
 schemas/                JSON Schemas (planned — Phase 1)
-public/worklets/        AudioWorklet processors (planned — Phase 2)
 tests/                  Test suites (planned — Phase 1)
 ```
 
@@ -75,7 +78,7 @@ tests/                  Test suites (planned — Phase 1)
 
 - **First-time readers:** [`docs/concept/SCOPE.md`](docs/concept/SCOPE.md) —
   what BSC Lab claims and explicitly does not claim.
-- **Ontology / knowledge graph:** [`ontology/README.md`](ontology/README.md).
+- **Ontology / knowledge graph:** [`public/ontology/README.md`](public/ontology/README.md).
 - **Software architecture:** [`src/README.md`](src/README.md) (targets only).
 - **AI coding agents (Claude, Copilot, Cursor, Gemini):**
   [`CLAUDE.md`](CLAUDE.md) — absolute invariants and project conventions.
@@ -91,10 +94,13 @@ The only runnable validation today is SHACL over the ontology, via
 
 ```bash
 # Core ontology — conforms
-python3 -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/sstim-core.ttl
+python3 -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-core.ttl
 
-# Vocabulary — one known failure on sstim-v:allFrequencyBands (see TODO.md)
-python3 -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/sstim-vocab.ttl
+# Vocabulary — conforms (sstim:FrequencyBandGroup resolves the allFrequencyBands shape)
+python3 -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-vocab.ttl
+
+# Or run all at once:
+make shacl
 ```
 
 A JS-side validation pass (same N3.js parser the runtime will use) and a
@@ -114,7 +120,7 @@ Two persistent IRI roots, one rule each:
   ontology stays reusable.
 
 Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
-[`ontology/README.md`](ontology/README.md).
+[`public/ontology/README.md`](public/ontology/README.md).
 
 ---
 

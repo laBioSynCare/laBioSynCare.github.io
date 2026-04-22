@@ -1,10 +1,10 @@
 PYTHON     := python3
 PYSHACL    := $(PYTHON) -m pyshacl
-SHAPES     := ontology/sstim-shapes.ttl
-ONTOLOGY   := ontology/sstim-core.ttl
-VOCAB      := ontology/sstim-vocab.ttl
-ALIGNMENTS := ontology/sstim-alignments.ttl
-INSTANCES  := ontology/instances/presets/
+SHAPES     := public/ontology/sstim-shapes.ttl
+ONTOLOGY   := public/ontology/sstim-core.ttl
+VOCAB      := public/ontology/sstim-vocab.ttl
+ALIGNMENTS := public/ontology/sstim-alignments.ttl
+INSTANCES  := public/ontology/instances/presets/
 
 .PHONY: shacl shacl-core shacl-vocab shacl-instances help
 
@@ -33,4 +33,4 @@ help:
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
-	@echo "  make shacl-instances  Validate ontology/instances/presets/ (skipped if empty)"
+	@echo "  make shacl-instances  Validate public/ontology/instances/presets/ (skipped if empty)"
