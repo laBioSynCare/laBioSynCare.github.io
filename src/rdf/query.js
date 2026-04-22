@@ -27,7 +27,7 @@ export async function select(store, sparql) {
   const bindings = await engine.queryBindings(sparql, { sources: [store] })
   const rows = await bindings.toArray()
   return rows.map(b => Object.fromEntries(
-    [...b.entries()].map(([k, v]) => [k, v])
+    [...b].map(([k, v]) => [k.value, v])
   ))
 }
 
