@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BSC Lab — Open Sensory Stimulation Platform</title>
+  <meta name="description" content="Open-source scientific and technical foundation for sensory stimulation: a multi-engine audiovisual stimulation platform and an open RDF knowledge graph.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    main { max-width: 52rem; padding: 2rem 1rem; }
+    h1 { margin-bottom: 0; }
+    .tagline { color: var(--pico-muted-color); margin-top: 0.25rem; }
+    .status {
+      background: var(--pico-card-background-color);
+      border-left: 3px solid var(--pico-primary);
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    ul.cards { list-style: none; padding: 0; }
+    ul.cards li { margin: 0.35rem 0; }
+    code { font-size: 0.9em; }
+    footer { margin-top: 3rem; font-size: 0.85rem; color: var(--pico-muted-color); }
+  </style>
+</head>
+<body>
+<main class="container">
+  <h1>BSC Lab</h1>
+  <p class="tagline">Open-source sensory stimulation platform — stimulation engine + RDF knowledge graph.</p>
+
+  <div class="status">
+    <strong>Phase 0</strong> — foundation documents and ontology skeleton are
+    committed; no runnable application yet. See the
+    <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/ROADMAP.md">ROADMAP</a>
+    for phase definitions.
+  </div>
+
+  <p>
+    BSC Lab pairs a precision multi-engine audiovisual stimulation application
+    (Web Audio, AudioWorklets, PixiJS, haptics) with an open RDF knowledge
+    graph — OWL classes, SKOS vocabulary, SHACL shapes, evidence chains —
+    that describes what the platform does, why, and on what evidence.
+  </p>
+
+  <p>
+    BSC Lab is the research/infrastructure project. The related commercial
+    application <strong>BioSynCare</strong> (React Native, closed source) is
+    a separate repository that will consume BSC Lab's exported preset catalog.
+  </p>
+
+  <h2>Start here</h2>
+  <ul class="cards">
+    <li>📄 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/README.md">README</a> — project overview, repo map, validation commands</li>
+    <li>🗺️ <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/ROADMAP.md">ROADMAP</a> — strategic phases</li>
+    <li>✅ <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/TODO.md">TODO</a> — tracked task list and current focus</li>
+    <li>🤖 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CLAUDE.md">CLAUDE.md</a> — AI-agent directive and absolute invariants</li>
+    <li>🧭 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SCOPE.md">SCOPE</a> — what BSC Lab claims and explicitly does not claim</li>
+    <li>🤝 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CONTRIBUTING.md">CONTRIBUTING</a> — governance and contribution guide</li>
+  </ul>
+
+  <h2>Ontology</h2>
+  <p>
+    The SSTIM ontology lives under
+    <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/ontology"><code>ontology/</code></a>.
+    Persistent IRIs will resolve at <code>https://w3id.org/sstim</code> once
+    the namespace is registered (Phase 1).
+  </p>
+  <ul class="cards">
+    <li>📘 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/ontology/README.md">ontology/README.md</a> — OWL/SKOS design decisions</li>
+    <li>🟢 <a href="ontology/sstim-core.ttl"><code>sstim-core.ttl</code></a> — OWL classes and properties</li>
+    <li>🟢 <a href="ontology/sstim-vocab.ttl"><code>sstim-vocab.ttl</code></a> — SKOS vocabulary (en/it/pt/es)</li>
+    <li>🟢 <a href="ontology/sstim-shapes.ttl"><code>sstim-shapes.ttl</code></a> — SHACL validation shapes</li>
+    <li>🟢 <a href="ontology/sstim-alignments.ttl"><code>sstim-alignments.ttl</code></a> — external alignments (Wikidata, BFO, OBI, IAO)</li>
+  </ul>
+
+  <h2>Architecture (planned — Phase 1+)</h2>
+  <ul class="cards">
+    <li>🎚️ <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/AUDIO_ENGINE_ARCHITECTURE.md">Audio engine architecture</a></li>
+    <li>🎨 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/VISUAL_ENGINE_ARCHITECTURE.md">Visual engine architecture</a></li>
+    <li>🎵 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PRESET_FORMAT.md">Preset format specification</a></li>
+    <li>📐 <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/SESSION_MODEL.md">Session instance model</a></li>
+  </ul>
+
+  <footer>
+    <p>
+      Maintained by Renato Fabbri (<a href="mailto:renato.fabbri@gmail.com">renato.fabbri@gmail.com</a>) ·
+      Scientific advisor: Juliana Braga de Salles Andrade ·
+      <a href="https://github.com/laBioSynCare/laBioSynCare.github.io">source on GitHub</a>
+    </p>
+  </footer>
+</main>
+</body>
+</html>
