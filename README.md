@@ -135,6 +135,7 @@ require coordination between both.
   working assumption is a permissive OSI-approved license for code and
   CC-BY-4.0 for the ontology/docs. Do not assume any specific license until
   this file is updated.)
-- **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com`
+- **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com` —
+  ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)
 - **Contributions:** see [`CONTRIBUTING.md`](CONTRIBUTING.md). Bug reports
   and discussion: GitHub issues on this repository.

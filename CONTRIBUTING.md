@@ -356,5 +356,5 @@ under the applicable license for the layer you are contributing to.
 
 ---
 
-*Maintained by: Renato Fabbri*
+*Maintained by: Renato Fabbri — renato.fabbri@gmail.com — ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)*
 *Last updated: April 2026*

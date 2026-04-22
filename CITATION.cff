@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: >-
+  If you use BSC Lab, the SSTIM ontology, or any of its documents in
+  research or derivative work, please cite as follows.
+title: "BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology"
+abstract: >-
+  BSC Lab is the open-source scientific and technical foundation for
+  sensory stimulation. It pairs a precision multi-engine audiovisual
+  stimulation platform (Web Audio, AudioWorklets, PixiJS, haptics) with
+  an open RDF knowledge graph — OWL classes, SKOS vocabulary, SHACL
+  shapes, and linked evidence chains — describing stimulation
+  protocols, parameters, and supporting evidence.
+type: software
+authors:
+  - family-names: Fabbri
+    given-names: Renato
+    email: renato.fabbri@gmail.com
+    orcid: "https://orcid.org/0000-0002-9699-629X"
+repository-code: "https://github.com/laBioSynCare/laBioSynCare.github.io"
+url: "https://labiosyncare.github.io/"
+license: CC-BY-4.0
+keywords:
+  - sensory stimulation
+  - ontology
+  - OWL
+  - SKOS
+  - SHACL
+  - audio entrainment
+  - binaural beats
+  - isochronic
+  - Martigli
+  - knowledge graph
+  - semantic web
