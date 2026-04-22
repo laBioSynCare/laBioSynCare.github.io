@@ -165,7 +165,7 @@ indexed, examiner-searchable records.
       *Same process: `bsc/` folder with routing for the sub-paths
       used by BSC preset/session/annotation IRIs.*
 - [ ] Register `sstim:` and `bsc:` prefixes at https://prefix.cc `P1`
-- [ ] Add `public/_headers` with COOP/COEP for Netlify (required for
+- [ ] Add `static/_headers` with COOP/COEP for Netlify (required for
       SharedArrayBuffer and WASM threading) `P1`
 
 ---
@@ -247,7 +247,7 @@ Do not start these until all Phase 0 documents are committed.
       validation `P1`
 - [ ] Configure GitHub Actions: `validate-rdf.yml`, `widoco-docs.yml`,
       `lint.yml` `P1`
-- [ ] `netlify.toml` and `public/_headers` configuration `P1`
+- [ ] `netlify.toml` and `static/_headers` configuration `P1`
 - [ ] Initial `public/index.html` and `public/manifest.json` `P1`
 
 ### RDF layer
@@ -314,12 +314,12 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] `src/engines/haptic/VibrationApiEngine.js` `P2`
 - [ ] `src/engines/haptic/NullHapticEngine.js` — silent fallback `P2`
 
-### AudioWorklet processors (in public/worklets/, never bundled)
-- [ ] `public/worklets/binaural.worklet.js` — stereo oscillators, beat
+### AudioWorklet processors (in static/worklets/, never bundled)
+- [ ] `static/worklets/binaural.worklet.js` — stereo oscillators, beat
       frequency, panning modes `P2`
-- [ ] `public/worklets/martigli.worklet.js` — sinusoidal frequency sweep,
+- [ ] `static/worklets/martigli.worklet.js` — sinusoidal frequency sweep,
       breathing arc interpolation `P2`
-- [ ] `public/worklets/symmetry.worklet.js` — permuted note sequence
+- [ ] `static/worklets/symmetry.worklet.js` — permuted note sequence
       scheduling, isochronic mode `P2`
 
 ### Core orchestration
@@ -525,7 +525,7 @@ something that assumes an answer.
 - [x] **Firebase role**: resolved 2026-04-22. Firebase is not used.
   App hosting moved to **Netlify** (`lab.biosyncare.com`) — already used
   for BioSynCare, free tier is generous (100 GB/month vs Firebase's 10 GB),
-  and supports `public/_headers` for COOP/COEP without a configuration
+  and supports `static/_headers` for COOP/COEP without a configuration
   surface. Annotation and session persistence: IndexedDB locally; a
   server-side sync backend (if ever needed) is deferred to Phase 3 and
   will be evaluated then without Firebase assumed.

@@ -400,20 +400,20 @@ representation of the BSC operational taxonomy, not an error.
 ```bash
 # Validate core ontology
 python -m pyshacl \
-  -s public/ontology/sstim-shapes.ttl \
-  -d public/ontology/sstim-core.ttl \
+  -s static/ontology/sstim-shapes.ttl \
+  -d static/ontology/sstim-core.ttl \
   --inference rdfs \
   --format turtle
 
 # Validate vocabulary
 python -m pyshacl \
-  -s public/ontology/sstim-shapes.ttl \
-  -d public/ontology/sstim-vocab.ttl
+  -s static/ontology/sstim-shapes.ttl \
+  -d static/ontology/sstim-vocab.ttl
 
 # Validate all preset instances
 python -m pyshacl \
-  -s public/ontology/sstim-shapes.ttl \
-  -d public/ontology/instances/presets/ \
+  -s static/ontology/sstim-shapes.ttl \
+  -d static/ontology/instances/presets/ \
   --format turtle
 ```
 

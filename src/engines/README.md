@@ -1,7 +1,7 @@
 # src/engines — Stimulation Engine Layer
 
 > **Status: planned — Phase 1.** No engine source files or AudioWorklets in
-> `public/worklets/` exist yet; the interfaces and test suites described below
+> `static/worklets/` exist yet; the interfaces and test suites described below
 > are targets for Phase 1.
 
 The engines layer provides pluggable implementations of audio, visual, and
@@ -54,7 +54,7 @@ generation. No third-party audio library.
 
 **Key constraints from `CLAUDE.md`:**
 - `AudioContext.currentTime` is the only timing authority
-- AudioWorklet files in `public/worklets/` are never bundled
+- AudioWorklet files in `static/worklets/` are never bundled
 - No allocation inside `AudioWorkletProcessor.process()`
 - `AudioContext.resume()` must be called inside a user gesture handler
 

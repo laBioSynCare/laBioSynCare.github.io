@@ -2,7 +2,7 @@
 
 > **Status: planned — Phase 1.** This document describes the target architecture
 > for the BSC Lab application. None of the source files (`.js`, `.svelte`) or
-> companion directories (`public/worklets/`, `schemas/`, `tests/`, `dist/`)
+> companion directories (`static/worklets/`, `schemas/`, `tests/`, `dist/`)
 > referenced below exist yet. The repo is in Phase 0 (docs + ontology). See
 > `ROADMAP.md` for phase definitions.
 
@@ -94,7 +94,7 @@ ontology/instances/presets/    →      ↓
                                Annotation editor
 ```
 
-**Ontology files are bundled as static assets** (`public/ontology/`), not fetched
+**Ontology files are bundled as static assets** (`static/ontology/`), not fetched
 from `labiosyncare.github.io` at runtime. This is required by
 `Cross-Origin-Embedder-Policy: require-corp` (needed for WASM audio). The Vite
 build copies `ontology/*.ttl` and `ontology/instances/**/*.ttl` into `dist/` so
@@ -134,7 +134,7 @@ npm run validate # SHACL + JSON Schema validation
 
 ### AudioWorklet files
 
-`public/worklets/` files are served as static assets. Vite must never
+`static/worklets/` files are served as static assets. Vite must never
 process them. They are loaded at runtime:
 
 ```javascript
@@ -158,7 +158,7 @@ const { QueryEngine } = await import('@comunica/query-sparql-rdfjs')
 ## Deployment
 
 ```
-lab.biosyncare.com    Netlify — BSC Lab app; COOP/COEP headers via public/_headers
+lab.biosyncare.com    Netlify — BSC Lab app; COOP/COEP headers via static/_headers
 labiosyncare.github.io  GitHub Pages — citable ontology .ttl files + WIDOCO docs
 ```
 

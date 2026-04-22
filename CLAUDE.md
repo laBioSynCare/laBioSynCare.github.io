@@ -31,7 +31,7 @@ BioSynCare. Do not conflate them.
 - `docs/concept/SENSORY_STIMULATION.md` — what the domain is
 - `docs/concept/SCOPE.md` — what we claim and explicitly do not claim
 - `docs/technical/PRESET_FORMAT.md` — the preset data format specification
-- `ontology/README.md` — OWL/SKOS design decisions
+- `static/ontology/README.md` — OWL/SKOS design decisions
 - `src/README.md` — full software architecture
 
 ---
@@ -103,7 +103,7 @@ deltas. Always compute absolute position from the audio clock.
 
 ### 3.2 AudioWorklet files are never bundled
 
-Files in `public/worklets/` are loaded by `AudioWorkletNode` at runtime via URL.
+Files in `static/worklets/` are loaded by `AudioWorkletNode` at runtime via URL.
 They run in an isolated audio rendering thread with no access to the main thread
 DOM or module system.
 
@@ -116,7 +116,7 @@ import BinauralWorklet from './worklets/binaural.worklet.js';
 ```
 
 Never import worklet files. Never add them to Vite's module graph. They must remain
-plain ES5-compatible scripts in `public/worklets/`.
+plain ES5-compatible scripts in `static/worklets/`.
 
 ### 3.3 No allocation inside AudioWorkletProcessor.process()
 
@@ -149,10 +149,10 @@ prior art records. They are never modified by AI agents without an explicit
 human instruction in the current session that says "modify [filename]":
 
 ```
-public/ontology/sstim-core.ttl
-public/ontology/sstim-vocab.ttl
-public/ontology/sstim-shapes.ttl
-public/ontology/sstim-alignments.ttl
+static/ontology/sstim-core.ttl
+static/ontology/sstim-vocab.ttl
+static/ontology/sstim-shapes.ttl
+static/ontology/sstim-alignments.ttl
 docs/technical/BREATHING_MODEL.md
 docs/technical/SYMMETRY_SYSTEM.md
 docs/technical/MARTIGLI_BINAURAL.md
@@ -463,7 +463,7 @@ docs/
   ecosystem/                  ← IP_STRATEGY, W3C_CG_CHARTER, ADVISORY_BOARD,
                                 PARTNERS, CONSORTIUM_INVITATION
 
-public/
+static/
   _headers                    ← COOP/COEP/CORP headers (Netlify)
   worklets/                   ← AudioWorklet processors (never bundled by Vite)
     binaural.worklet.js
@@ -513,7 +513,7 @@ legal, regulatory, or architectural requirements.
 | Modify `ontology/bsc-*.ttl` without explicit instruction | Vocabulary changes require scientific review |
 | Modify the three defensive publication files | They are timestamped prior art records |
 | Use `Date.now()` or `setTimeout()` for AV sync | Only `AudioContext.currentTime` is authoritative |
-| Bundle files in `public/worklets/` | AudioWorklets must load as plain static scripts |
+| Bundle files in `static/worklets/` | AudioWorklets must load as plain static scripts |
 | Allocate inside `AudioWorkletProcessor.process()` | GC in the audio thread causes glitches |
 | Write health, medical, or treatment claims | Regulatory compliance; see `docs/concept/SCOPE.md` |
 | Use Svelte 4 syntax (`export let`, `$:`, `on:click`) | This project uses Svelte 5 runes only |
@@ -540,7 +540,7 @@ documentation at `pixijs.com/8.x/`.
 
 **SharedArrayBuffer requires COOP/COEP headers.** WASM audio with threading and
 ring buffers requires `Cross-Origin-Opener-Policy: same-origin` and
-`Cross-Origin-Embedder-Policy: require-corp`. These are set in `public/_headers`
+`Cross-Origin-Embedder-Policy: require-corp`. These are set in `static/_headers`
 (Netlify) and must be present on every response from `lab.biosyncare.com`. Without
 them, `SharedArrayBuffer` is undefined. GitHub Pages cannot serve these headers —
 this is why the app is hosted on Netlify, not GitHub Pages.
@@ -548,7 +548,7 @@ this is why the app is hosted on Netlify, not GitHub Pages.
 **COEP blocks cross-origin RDF fetches.** `Cross-Origin-Embedder-Policy: require-corp`
 means every resource the app loads must be same-origin or carry
 `Cross-Origin-Resource-Policy: cross-origin`. The ontology `.ttl` files are
-therefore bundled as static assets in `public/ontology/` and served from the same
+therefore bundled as static assets in `static/ontology/` and served from the same
 Netlify origin — the app never fetches them from `labiosyncare.github.io` at
 runtime. GitHub Pages hosts the citable/stable copies; Netlify hosts the runtime
 copies. Both come from the same source files in the repo.
@@ -572,7 +572,7 @@ load Comunica when the SPARQL interface is first opened.
 before writing. Prefixes not registered in the writer produce full IRIs in output.
 Always initialize the writer with the full prefix map from `src/rdf/namespaces.js`.
 
-**Vite and AudioWorklet static paths.** In development, Vite serves `public/`
+**Vite and AudioWorklet static paths.** In development, Vite serves `static/`
 at the root. In production builds, the same path applies. Use a relative path from
 the app root: `/worklets/binaural.worklet.js`. Never use `new URL(..., import.meta.url)`
 for worklet files — that triggers Vite's module bundling.
@@ -586,10 +586,10 @@ for worklet files — that triggers Vite's module bundling.
 > subtree, and `hooks/pre-commit` — are **planned (Phase 1)** and do not yet
 > exist in the repo.
 
-Before any PR or commit that modifies `public/ontology/`, run:
+Before any PR or commit that modifies `static/ontology/`, run:
 ```bash
-python -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-core.ttl
-python -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/instances/presets/
+python -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-core.ttl
+python -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/instances/presets/
 ```
 Or simply: `make shacl`
 

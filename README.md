@@ -29,7 +29,7 @@ What does **not** yet exist (planned — Phase 1 and later):
 
 - A working runnable UI (the SvelteKit scaffold and initial routes exist but
   the app is not yet deployed)
-- AudioWorklet processors (`public/worklets/`)
+- AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
 - Pre-commit hooks (`hooks/`) and CI (`.github/workflows/`)
@@ -54,7 +54,7 @@ docs/
   technical/            Preset format, engine architectures, defensive pubs
   ecosystem/            IP strategy, W3C CG charter, advisory board, partners
 
-public/
+static/
   ontology/             Turtle files served same-origin by Netlify / Vite dev
     sstim-core.ttl        OWL classes and properties
     sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
@@ -78,7 +78,7 @@ tests/                  Test suites (planned — Phase 1)
 
 - **First-time readers:** [`docs/concept/SCOPE.md`](docs/concept/SCOPE.md) —
   what BSC Lab claims and explicitly does not claim.
-- **Ontology / knowledge graph:** [`public/ontology/README.md`](public/ontology/README.md).
+- **Ontology / knowledge graph:** [`static/ontology/README.md`](static/ontology/README.md).
 - **Software architecture:** [`src/README.md`](src/README.md) (targets only).
 - **AI coding agents (Claude, Copilot, Cursor, Gemini):**
   [`CLAUDE.md`](CLAUDE.md) — absolute invariants and project conventions.
@@ -94,10 +94,10 @@ The only runnable validation today is SHACL over the ontology, via
 
 ```bash
 # Core ontology — conforms
-python3 -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-core.ttl
+python3 -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-core.ttl
 
 # Vocabulary — conforms (sstim:FrequencyBandGroup resolves the allFrequencyBands shape)
-python3 -m pyshacl -s public/ontology/sstim-shapes.ttl -d public/ontology/sstim-vocab.ttl
+python3 -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-vocab.ttl
 
 # Or run all at once:
 make shacl
@@ -120,7 +120,7 @@ Two persistent IRI roots, one rule each:
   ontology stays reusable.
 
 Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
-[`public/ontology/README.md`](public/ontology/README.md).
+[`static/ontology/README.md`](static/ontology/README.md).
 
 ---
 

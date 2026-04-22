@@ -64,7 +64,7 @@ checks. Until it lands, run the pyshacl commands from `CLAUDE.md` §10 manually.
 - Anything that calls `Date.now()` or `setTimeout()` for AV synchronization
 - Svelte 4 syntax (`export let`, `$:`, `on:click`, `<slot />`) — this repo
   uses Svelte 5 runes exclusively
-- Bundled AudioWorklet files — `public/worklets/` files must remain unbundled
+- Bundled AudioWorklet files — `static/worklets/` files must remain unbundled
 - Imports inside `AudioWorkletProcessor.process()` — no allocation, no imports
 - User-facing strings that contain health, treatment, or medical claims
 
@@ -334,7 +334,7 @@ expressed through the Issue process, not through social pressure.
 
 ## 9. License
 
-**Software** (`src/`, `public/`, `schemas/`, `hooks/`): MIT License.
+**Software** (`src/`, `static/`, `schemas/`, `hooks/`): MIT License.
 
 **Ontology and vocabulary** (`ontology/`): CC BY 4.0. You may use, adapt,
 and redistribute with attribution to BSC Lab and the SSTIM contributors.

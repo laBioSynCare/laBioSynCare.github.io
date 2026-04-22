@@ -29,7 +29,7 @@ export function parseIntoStore(text, format = 'text/turtle') {
  * In dev mode Vite serves public/ at the root, same behaviour.
  *
  * For predecessor-namespace files during development you can pass a file://
- * URL via a Vite plugin or a relative path under public/.
+ * URL via a Vite plugin or a relative path under static/.
  *
  * @param {string} url  Absolute or root-relative URL.
  * @returns {Promise<Store>}
@@ -61,7 +61,7 @@ export async function loadMerged(urls) {
 
 /**
  * Standard BSC Lab ontology URLs served from the same Netlify origin.
- * These constants mirror the files copied from public/ into dist/ at build time.
+ * These constants mirror the files copied from static/ into dist/ at build time.
  */
 export const ONTOLOGY_URLS = {
   core:       '/ontology/sstim-core.ttl',

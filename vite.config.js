@@ -6,7 +6,7 @@ export default defineConfig({
 
   // SvelteKit sets publicDir automatically; explicit override is not needed.
   // public/ is served at the root in both dev and production (dist/).
-  // Ontology .ttl files placed in public/ontology/ are served same-origin,
+  // Ontology .ttl files placed in static/ontology/ are served same-origin,
   // satisfying COEP (require-corp). See CLAUDE.md §9 and src/README.md.
 
   server: {

@@ -167,7 +167,7 @@ the knowledge navigation layer.
 - [ ] Basic annotation: add a text note to any ontology node, stored in
       named graph in IndexedDB
 - [ ] Netlify hosting deployment: `lab.biosyncare.com` (CNAME at Keliweb;
-      `public/_headers` sets COOP/COEP for SharedArrayBuffer)
+      `static/_headers` sets COOP/COEP for SharedArrayBuffer)
 - [ ] GitHub Pages deployment: WIDOCO-generated ontology HTML docs
 
 ### Ontology and IP
@@ -227,7 +227,7 @@ concrete rather than abstract.
 - [ ] Pluggable audio engine: IAudioEngine interface with VanillaWebAudio
       and ToneJs implementations
 - [ ] AudioWorklet processors: binaural, Martigli, Symmetry (in
-      `public/worklets/`, never bundled)
+      `static/worklets/`, never bundled)
 - [ ] Three-clock architecture: AudioContext master, Worker scheduler,
       rAF renderer
 - [ ] PixiJS v8 visual engine: breathing animation, entrainment visuals
