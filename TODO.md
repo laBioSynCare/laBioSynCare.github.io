@@ -165,7 +165,7 @@ indexed, examiner-searchable records.
       *Same process: `bsc/` folder with routing for the sub-paths
       used by BSC preset/session/annotation IRIs.*
 - [ ] Register `sstim:` and `bsc:` prefixes at https://prefix.cc `P1`
-- [ ] Configure Firebase hosting headers for COOP/COEP (required for
+- [ ] Add `public/_headers` with COOP/COEP for Netlify (required for
       SharedArrayBuffer and WASM threading) `P1`
 
 ---
@@ -247,7 +247,7 @@ Do not start these until all Phase 0 documents are committed.
       validation `P1`
 - [ ] Configure GitHub Actions: `validate-rdf.yml`, `widoco-docs.yml`,
       `lint.yml` `P1`
-- [ ] `firebase.json` and `.firebaserc` configuration `P1`
+- [ ] `netlify.toml` and `public/_headers` configuration `P1`
 - [ ] Initial `public/index.html` and `public/manifest.json` `P1`
 
 ### RDF layer
@@ -292,7 +292,7 @@ Do not start these until all Phase 0 documents are committed.
       CONSTRUCT results as graph `P1`
 
 ### Deployment
-- [ ] Deploy BSC Lab v0.1 to Firebase: `lab.biosyncare.com` `P1`
+- [ ] Deploy BSC Lab v0.1 to Netlify: `lab.biosyncare.com` (CNAME at Keliweb) `P1`
 - [ ] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
       HTML for browser `P1`
 - [ ] Verify WIDOCO docs are live on GitHub Pages `P1`
@@ -379,8 +379,9 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] WASM audio engine: Rust → WASM Martigli and Symmetry processors
       *Note: requires wasm-pack, Rust toolchain, nightly for atomics.
       SharedArrayBuffer ring buffer pattern.* `P3`
-- [ ] Expanded annotation: multi-user named graphs via Firebase Firestore
-      (review Firebase role decision in `src/README.md` first) `P3`
+- [ ] Expanded annotation: multi-user named graphs with server-side sync;
+      backend technology TBD in Phase 3 (Firebase/Firestore ruled out
+      as primary hosting; evaluate alternatives at that point) `P3`
 
 ---
 
@@ -521,11 +522,13 @@ These require human judgment before tasks can proceed. Flagged here
 to prevent AI agents from making the decision implicitly by building
 something that assumes an answer.
 
-- [?] **Firebase role**: is Firebase used only for static hosting, or
-  also Firestore for annotation storage and session records? Affects
-  `src/firebase/README.md` and all Phase 3 data architecture. Decide
-  before Phase 2 starts. *Currently assumed: hosting only in Phase 1;
-  Firestore evaluated in Phase 2.*
+- [x] **Firebase role**: resolved 2026-04-22. Firebase is not used.
+  App hosting moved to **Netlify** (`lab.biosyncare.com`) — already used
+  for BioSynCare, free tier is generous (100 GB/month vs Firebase's 10 GB),
+  and supports `public/_headers` for COOP/COEP without a configuration
+  surface. Annotation and session persistence: IndexedDB locally; a
+  server-side sync backend (if ever needed) is deferred to Phase 3 and
+  will be evaluated then without Firebase assumed.
 
 - [?] **UI framework final confirmation**: Svelte 5 is the stated
   choice. Riccardo works in React Native (BioSynCare). If he

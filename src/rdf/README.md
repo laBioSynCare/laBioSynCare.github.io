@@ -227,8 +227,9 @@ const annotations = await store.getFor(SSTIM_V('alpha'))
 // Named graph IRI: https://w3id.org/sstim/annotations/{userId}
 ```
 
-Annotations are stored in IndexedDB locally and optionally synced to
-Firebase (opt-in, requires auth). The default graph is never modified.
+Annotations are stored in IndexedDB locally. Optional server-side sync
+is deferred to Phase 3; the backend technology is TBD at that point.
+The default graph is never modified.
 
 ---
 

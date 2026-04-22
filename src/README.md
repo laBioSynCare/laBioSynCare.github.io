@@ -94,6 +94,14 @@ ontology/instances/presets/    →      ↓
                                Annotation editor
 ```
 
+**Ontology files are bundled as static assets** (`public/ontology/`), not fetched
+from `labiosyncare.github.io` at runtime. This is required by
+`Cross-Origin-Embedder-Policy: require-corp` (needed for WASM audio). The Vite
+build copies `ontology/*.ttl` and `ontology/instances/**/*.ttl` into `dist/` so
+they are served from the same Netlify origin as the app. GitHub Pages hosts the
+canonical citable copies; Netlify hosts the runtime copies. Both come from the
+same source files — no duplication of truth.
+
 ---
 
 ## Shared data contract
@@ -147,12 +155,20 @@ const { QueryEngine } = await import('@comunica/query-sparql-rdfjs')
 
 ---
 
+## Deployment
+
+```
+lab.biosyncare.com    Netlify — BSC Lab app; COOP/COEP headers via public/_headers
+labiosyncare.github.io  GitHub Pages — citable ontology .ttl files + WIDOCO docs
+```
+
+Netlify deploy: `npm run build` → `dist/` → Netlify CI picks up `main` branch.
+Custom domain `lab.biosyncare.com` via CNAME at Keliweb DNS.
+
 ## Environment variables
 
 ```
-VITE_FIREBASE_API_KEY       Firebase hosting config
-VITE_FIREBASE_PROJECT_ID    Firebase project ID
-VITE_SSTIM_ONTOLOGY_URL     Override ontology URL for local dev
+VITE_SSTIM_ONTOLOGY_URL     Override ontology base URL for local dev (default: /ontology/)
 VITE_DEBUG_AUDIO            Enable audio timing debug overlay
 ```
 

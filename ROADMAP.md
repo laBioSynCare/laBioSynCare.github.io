@@ -166,7 +166,8 @@ the knowledge navigation layer.
       and SKOS concept scheme (lazy-loaded)
 - [ ] Basic annotation: add a text note to any ontology node, stored in
       named graph in IndexedDB
-- [ ] Firebase hosting deployment: `lab.biosyncare.com`
+- [ ] Netlify hosting deployment: `lab.biosyncare.com` (CNAME at Keliweb;
+      `public/_headers` sets COOP/COEP for SharedArrayBuffer)
 - [ ] GitHub Pages deployment: WIDOCO-generated ontology HTML docs
 
 ### Ontology and IP
