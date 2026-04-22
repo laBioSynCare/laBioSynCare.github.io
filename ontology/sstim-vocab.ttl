@@ -41,7 +41,7 @@ sstim-v:FrequencyBandScheme a skos:ConceptScheme ;
     skos:hasTopConcept sstim-v:allFrequencyBands .
 
 
-sstim-v:allFrequencyBands a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
+sstim-v:allFrequencyBands a owl:NamedIndividual, sstim:FrequencyBandGroup, skos:Concept ;
     skos:inScheme sstim-v:FrequencyBandScheme ;
     skos:topConceptOf sstim-v:FrequencyBandScheme ;
     skos:prefLabel "All Frequency Bands"@en ;

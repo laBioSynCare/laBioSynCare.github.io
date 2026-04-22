@@ -164,6 +164,16 @@ sstim:FrequencyBand a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
+sstim:FrequencyBandGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Frequency Band Group"@en,
+               "Gruppo di Bande di Frequenza"@it,
+               "Grupo de Bandas de Frequência"@pt,
+               "Grupo de Bandas de Frecuencia"@es ;
+    skos:definition "A named collection of frequency bands used as a SKOS scheme root or aggregate grouping concept. Not a band with a specific Hz range; used for SKOS hierarchy navigation (skos:narrower* traversal) rather than for range arithmetic."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
 sstim:PresetGroup a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Preset Group"@en ;
