@@ -40,15 +40,11 @@ convention enforcement, reality-sync of this file and ROADMAP.md,
 and resolution of the known SHACL vocab failure (see Known Issues).
 
 ### Known issues (Phase 0)
-- [!] `ontology/sstim-vocab.ttl` does not fully SHACL-conform against
-      `sstim-shapes.ttl`: `sstim-v:allFrequencyBands` is missing
-      `sstim:hzMin` / `sstim:hzMax` (a container concept hitting a
-      shape designed for individual bands). Both files are protected
-      per `CLAUDE.md` §3.4 — blocked on explicit authorization from
-      Renato to edit either the shape (relax cardinality with
-      `sh:severity` or a dedicated `Container` class) or the vocab
-      (split `allFrequencyBands` out of the `FrequencyBand` type).
-      Reproduce: `python3 -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/sstim-vocab.ttl`
+- [x] ~~`ontology/sstim-vocab.ttl` SHACL non-conformance on
+      `sstim-v:allFrequencyBands`~~ — resolved 2026-04-22. Introduced
+      `sstim:FrequencyBandGroup` in `sstim-core.ttl`; retyped
+      `allFrequencyBands` away from `sstim:FrequencyBand`. Both files
+      now fully conform against `sstim-shapes.ttl`.
 
 ---
 
