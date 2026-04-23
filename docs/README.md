@@ -39,6 +39,23 @@ anything adjacent to it. Keep them self-contained.
 - [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md) —
   pluggable visual engine design (PixiJS v8 default, CSS fallback).
 
+## `decisions/` — architecture decision records
+
+Lightweight ADRs capturing non-obvious architectural choices with context,
+alternatives, and consequences. See
+[`decisions/README.md`](decisions/README.md) for the index and format.
+
+- [0001](decisions/0001-namespace-split.md) — two-root namespace split
+  (`sstim` vs `bsc`).
+- [0002](decisions/0002-dual-typing-owl-skos.md) — dual-typing of SKOS
+  concepts and OWL classes (Pattern 2).
+- [0003](decisions/0003-named-graphs-for-modules.md) — named graphs for
+  runtime module isolation.
+- [0004](decisions/0004-protected-ontology-files.md) — protected ontology
+  files policy.
+- [0005](decisions/0005-binaural-carrier-pair-only.md) — binaural beat
+  parameterized as carrier pair only.
+
 ## `ecosystem/` — IP, governance, outreach
 
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
