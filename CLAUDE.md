@@ -2,7 +2,7 @@
 
 > **Read this file completely before touching any other file in this repository.**
 > This directive applies to Claude Code, GitHub Copilot, Cursor, and all AI coding agents.
-> Last updated: 2026-04-12. Maintained by Renato Fabbri.
+> Last updated: 2026-04-23. Maintained by Renato Fabbri.
 
 ---
 
@@ -71,6 +71,21 @@ npx @sveltejs/mcp
 And ensure `.cursor/rules/rdf.mdc` and `.cursor/rules/audio-engine.mdc` are loaded.
 If an AI agent generates Svelte 4 syntax (`export let`, `$:`, `on:click`, `<slot />`),
 reject it and regenerate with explicit runes instruction.
+
+### Local dev server
+
+When an AI agent needs to inspect routes, reproduce a UI bug, or run browser
+automation, start the Vite dev server from the repository root:
+
+```bash
+npm install
+npm run dev -- --host 127.0.0.1 --port 4173
+```
+
+Use `http://127.0.0.1:4173/` as the local app URL unless the human explicitly
+requests a different host or port. Reuse an existing Vite process if one is
+already running; do not start duplicate dev servers. For documentation-only or
+ontology-only edits, a dev server is not required.
 
 ---
 

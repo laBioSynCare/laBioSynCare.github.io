@@ -5,8 +5,14 @@ ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
 INSTANCES  := static/ontology/instances/presets/
+DEV_HOST   ?= 127.0.0.1
+DEV_PORT   ?= 4173
 
-.PHONY: shacl shacl-core shacl-vocab shacl-instances help
+.PHONY: dev shacl shacl-core shacl-vocab shacl-instances help
+
+## Start the local Vite dev server on the standard host/port
+dev:
+	npm run dev -- --host $(DEV_HOST) --port $(DEV_PORT)
 
 ## Validate core ontology against shapes
 shacl-core:
@@ -30,6 +36,7 @@ shacl: shacl-core shacl-vocab
 
 help:
 	@echo "Available targets:"
+	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
