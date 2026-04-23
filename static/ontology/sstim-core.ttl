@@ -248,49 +248,54 @@ sstim:PublicSafeReference a owl:Class ;
 
 
 ###########################################################################
-# Part 6 — Voice Specification Classes
+# Part 6 — Voice Classes
+#
+# Each class serves both as the technique (a kind of stimulation method)
+# and as the parameter bundle (the datatype properties that specify a
+# particular voice in a particular preset). See ADR 0006.
 ###########################################################################
 
-sstim:VoiceSpecification a owl:Class ;
+sstim:Voice a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
-    rdfs:label "Voice Specification"@en ;
-    skos:definition "A component specification within a BSC preset defining one audio layer's type and parameters. A preset contains 1–6 voice specifications; each is one of four types."@en ;
+    rdfs:label "Voice"@en ;
+    skos:definition "An audio layer within a BSC preset, identified by its technique type (Binaural, Martigli, Martigli-Binaural, Symmetry) and carrying the parameters that fully specify that voice. A preset contains 1–6 voices."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0006-one-class-per-technique.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
-sstim:BinauralVoiceSpec a owl:Class ;
-    rdfs:subClassOf sstim:VoiceSpecification ;
-    rdfs:label "Binaural Voice Specification"@en ;
+sstim:BinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Binaural Voice"@en ;
     skos:definition "Two sine tones at slightly different frequencies (fl, fr) presented dichotically to produce a perceived beat at |fr - fl| Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
-sstim:MartigliVoiceSpec a owl:Class ;
-    rdfs:subClassOf sstim:VoiceSpecification ;
-    rdfs:label "Martigli Voice Specification"@en ;
+sstim:MartigliVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli Voice"@en ;
     skos:definition "A single tone whose frequency oscillates sinusoidally with a breathing arc that decelerates linearly from mp0 to mp1 over md seconds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
-sstim:MartigliBinauralVoiceSpec a owl:Class ;
-    rdfs:subClassOf sstim:VoiceSpecification ;
-    rdfs:label "Martigli-Binaural Voice Specification"@en ;
+sstim:MartigliBinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli-Binaural Voice"@en ;
     skos:definition "Binaural beat combined with Martigli breathing oscillation. Both carriers sweep in parallel, maintaining constant beat frequency while timbral register evolves with breathing."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
-sstim:SymmetryVoiceSpec a owl:Class ;
-    rdfs:subClassOf sstim:VoiceSpecification ;
-    rdfs:label "Symmetry Voice Specification"@en ;
+sstim:SymmetryVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Symmetry Voice"@en ;
     skos:definition "N notes log-distributed over I octaves, repeated with algebraic group permutation at each cycle boundary, at pulse rate N/d Hz. When I=0, reduces to traditional isochronous tone stimulation."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 [] a owl:AllDisjointClasses ;
     owl:members (
-        sstim:BinauralVoiceSpec
-        sstim:MartigliVoiceSpec
-        sstim:MartigliBinauralVoiceSpec
-        sstim:SymmetryVoiceSpec
+        sstim:BinauralVoice
+        sstim:MartigliVoice
+        sstim:MartigliBinauralVoice
+        sstim:SymmetryVoice
     ) .
 
 
@@ -352,7 +357,7 @@ sstim:hasStimulusTemporalStructure a owl:ObjectProperty ;
 
 sstim:composedOf a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
-    rdfs:range  sstim:VoiceSpecification ;
+    rdfs:range  sstim:Voice ;
     rdfs:label  "composed of"@en ;
     skos:definition "Links a preset to its 1–6 voice specifications."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .

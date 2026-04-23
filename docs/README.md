@@ -56,7 +56,7 @@ alternatives, and consequences. See
 - [0005](decisions/0005-binaural-carrier-pair-only.md) — binaural beat
   parameterized as carrier pair only.
 - [0006](decisions/0006-one-class-per-technique.md) — one class per
-  technique; no technique/parameter-bundle split.
+  technique; voice classes named `*Voice` (not `*VoiceSpec`).
 
 ## `ecosystem/` — IP, governance, outreach
 

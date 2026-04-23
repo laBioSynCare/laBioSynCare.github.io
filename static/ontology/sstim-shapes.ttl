@@ -81,28 +81,28 @@ sstim-sh:PresetShape a sh:NodeShape ;
     sh:property [
         sh:path sstim:composedOf ;
         sh:minCount 1 ;
-        sh:class sstim:VoiceSpecification ;
-        sh:message "Preset must be composed of at least one VoiceSpecification."@en ;
+        sh:class sstim:Voice ;
+        sh:message "Preset must be composed of at least one Voice."@en ;
     ] .
 
 
 ###########################################################################
-# Voice Specification Shapes
+# Voice Shapes
 ###########################################################################
 
-sstim-sh:VoiceSpecShape a sh:NodeShape ;
-    sh:targetClass sstim:VoiceSpecification ;
-    sh:name "VoiceSpecification"@en ;
+sstim-sh:VoiceShape a sh:NodeShape ;
+    sh:targetClass sstim:Voice ;
+    sh:name "Voice"@en ;
     sh:property [
         sh:path rdf:type ;
         sh:minCount 2 ;
-        sh:message "Voice spec must be typed as both sstim:VoiceSpecification and one of the four subtypes."@en ;
+        sh:message "Voice must be typed as both sstim:Voice and one of the four subtypes."@en ;
     ] .
 
 
 sstim-sh:BinauralVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:BinauralVoiceSpec ;
-    sh:name "BinauralVoiceSpec"@en ;
+    sh:targetClass sstim:BinauralVoice ;
+    sh:name "BinauralVoice"@en ;
 
     sh:property [
         sh:path sstim:carrierFreqLeft ;
@@ -130,8 +130,8 @@ sstim-sh:BinauralVoiceShape a sh:NodeShape ;
 
 
 sstim-sh:SymmetryVoiceShape a sh:NodeShape ;
-    sh:targetClass sstim:SymmetryVoiceSpec ;
-    sh:name "SymmetryVoiceSpec"@en ;
+    sh:targetClass sstim:SymmetryVoice ;
+    sh:name "SymmetryVoice"@en ;
 
     sh:property [
         sh:path sstim:baseFrequency ;
