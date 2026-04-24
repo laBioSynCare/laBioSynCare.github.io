@@ -43,7 +43,7 @@ substitute alternatives without explicit instruction.
 
 | Layer | Technology | Version | Rationale |
 |---|---|---|---|
-| Build | Vite | 8.x (Rolldown) | ESM-native dev, fast HMR, Rolldown prod builds |
+| Build | Vite | 6.x | ESM-native dev, fast HMR, SvelteKit static build |
 | UI framework | Svelte 5 | 5.x | Compiler-based, near-vanilla bundle, reactive stores fit SPARQL result rendering |
 | RDF parsing/store | N3.js | 1.17+ | Parses Turtle/TriG/N-Quads, in-memory triple store |
 | SPARQL engine | Comunica | `@comunica/query-sparql-rdfjs` 3.x | SPARQL 1.1 in browser against N3 store |
@@ -52,9 +52,9 @@ substitute alternatives without explicit instruction.
 | Visual engine (default) | PixiJS | v8.x | Auto WebGPU/WebGL, unified renderer API |
 | Audio engine (default) | Vanilla Web Audio API | browser native | Direct AudioContext control, no abstraction overhead |
 | Haptic engine (default) | Web Vibration API | browser native | NullHapticEngine fallback for unsupported platforms |
-| App hosting | Netlify | current | Static hosting + custom headers (COOP/COEP for SharedArrayBuffer); deployed to `lab.biosyncare.com` |
-| Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files and WIDOCO docs at `labiosyncare.github.io`; w3id.org redirects point here |
-| Ontology docs | WIDOCO | current | HTML documentation from OWL, deployed to GitHub Pages |
+| App hosting | Netlify | planned | Static hosting + custom headers (COOP/COEP for SharedArrayBuffer); target `lab.biosyncare.com` |
+| Ontology artifacts | GitHub Pages | planned | Stable citable URLs for `.ttl` files and WIDOCO docs; w3id.org redirects will point here |
+| Ontology docs | WIDOCO | planned | HTML documentation from OWL, deployed to GitHub Pages |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
 
 ### Svelte 5 AI tooling setup
@@ -79,13 +79,21 @@ automation, start the Vite dev server from the repository root:
 
 ```bash
 npm install
+make dev
+```
+
+`make dev` is the canonical entrypoint. The underlying package script is
+`npm run dev`; if custom flags are required, run:
+
+```bash
 npm run dev -- --host 127.0.0.1 --port 4173
 ```
 
 Use `http://127.0.0.1:4173/` as the local app URL unless the human explicitly
 requests a different host or port. Reuse an existing Vite process if one is
-already running; do not start duplicate dev servers. For documentation-only or
-ontology-only edits, a dev server is not required.
+already running; do not start duplicate dev servers. For production-build
+inspection, use `make preview` on `http://127.0.0.1:4174/`. For documentation-only
+or ontology-only edits, a dev server is not required.
 
 ---
 
@@ -310,7 +318,7 @@ The canonical BSC namespace prefixes:
 - `https://w3id.org/sstim` (`/sstim#`, `/sstim/vocab#`, `/sstim/shapes#`) — the
   **ontology**: OWL classes and properties, SKOS vocabulary concepts, SHACL
   shapes. This is the reusable, citable scientific artifact. Every `.ttl` file
-  in `ontology/` declares its prefixes here.
+  in `static/ontology/` declares its prefixes here.
 - `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` — **BSC
   product instances**: preset IRIs, session records, user annotations, evidence
   chain nodes specific to the BSC/BioSynCare catalog. These live under a
@@ -324,7 +332,7 @@ applies to something new, ask — do not guess.
 
 SKOS concepts in `sstim-vocab.ttl` are dual-typed: they are both `skos:Concept` and
 instances of the relevant OWL class. This is intentional (Pattern 2 design decision
-documented in `ontology/README.md`). Do not "fix" this by removing either type.
+documented in `static/ontology/README.md`). Do not "fix" this by removing either type.
 
 ```turtle
 # CORRECT — dual-typed individual
@@ -525,7 +533,7 @@ legal, regulatory, or architectural requirements.
 
 | Action | Reason |
 |---|---|
-| Modify `ontology/bsc-*.ttl` without explicit instruction | Vocabulary changes require scientific review |
+| Modify BSC instance TTL under `static/ontology/instances/` without explicit instruction | Vocabulary changes require scientific review |
 | Modify the three defensive publication files | They are timestamped prior art records |
 | Use `Date.now()` or `setTimeout()` for AV sync | Only `AudioContext.currentTime` is authoritative |
 | Bundle files in `static/worklets/` | AudioWorklets must load as plain static scripts |
@@ -596,25 +604,24 @@ for worklet files — that triggers Vite's module bundling.
 
 ## 10. Testing Requirements
 
-> **Phase 0 note.** The pyshacl command below is live and runnable today. The
-> remaining items in this section — `schemas/preset.schema.json`, the `tests/`
-> subtree, and `hooks/pre-commit` — are **planned (Phase 1)** and do not yet
-> exist in the repo.
+> **Phase 1 note.** `make validate`, `make check`, and `make build` are live
+> and mirrored by GitHub Actions. The remaining items in this section —
+> `schemas/preset.schema.json`, the `tests/` subtree, and `hooks/pre-commit` —
+> are planned and do not yet exist in the repo.
 
 Before any PR or commit that modifies `static/ontology/`, run:
 ```bash
-python -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-core.ttl
-python -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/instances/presets/
+make validate
 ```
-Or simply: `make shacl`
 
 Before any PR or commit that modifies `src/data/presets/`, run:
 ```bash
 npx ajv validate -s schemas/preset.schema.json -d 'src/data/presets/*.json'
 ```
 
-The pre-commit hook (`hooks/pre-commit`) runs both automatically. If it fails,
-fix the violations before committing. Do not use `--no-verify` to bypass it.
+When the pre-commit hook (`hooks/pre-commit`) lands, it should run the local
+validation mirror automatically. If it fails, fix the violations before
+committing. Do not use `--no-verify` to bypass it.
 
 ---
 

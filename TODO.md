@@ -7,8 +7,9 @@
 > are historical record. Do not add tasks to "Not yet" phases without
 > explicit instruction from Renato.
 >
-> **Current phase: 0.** Focus is on reference documents and ontology
-> skeleton. No software beyond scaffold should be built yet.
+> **Current phase: 0 → 1 boundary.** Focus is on closing the public
+> foundation pass and hardening the initial knowledge-browser scaffold.
+> Do not build the Phase 2 stimulation player yet.
 
 ---
 
@@ -33,14 +34,15 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Week of April 21, 2026:**
-Phase 0 Public Foundation Pass. The 31 Phase 0 reference documents and
-the four ontology `.ttl` files are committed. Remaining Phase 0 work:
-root README rewrite, docs/ontology-instance index files, namespace
-convention enforcement, reality-sync of this file and ROADMAP.md,
-and resolution of the known SHACL vocab failure (see Known Issues).
+Phase 0 Public Foundation Pass is closing. The 31 Phase 0 reference
+documents, four ontology `.ttl` files, docs index, instance-layout index,
+SvelteKit scaffold, RDF loader/query layer, ontology graph route, and basic
+SPARQL route exist. Current focus: reality-sync `README.md`/`ROADMAP.md`/
+`TODO.md`, keep namespace paths consistently under `static/ontology/`, and
+add CI that mirrors local validation.
 
 ### Known issues (Phase 0)
-- [x] ~~`ontology/sstim-vocab.ttl` SHACL non-conformance on
+- [x] ~~`static/ontology/sstim-vocab.ttl` SHACL non-conformance on
       `sstim-v:allFrequencyBands`~~ — resolved 2026-04-22. Introduced
       `sstim:FrequencyBandGroup` in `sstim-core.ttl`; retyped
       `allFrequencyBands` away from `sstim:FrequencyBand`. Both files
@@ -70,17 +72,17 @@ software is built. Written in the order specified in `ROADMAP.md`.
 - [x] `docs/technical/MARTIGLI_BINAURAL.md` — defensive publication `P0`
 - [x] `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` `P0`
 - [x] `docs/technical/VISUAL_ENGINE_ARCHITECTURE.md` `P0`
-- [x] `ontology/README.md` `P0`
-- [x] `ontology/sstim-core.ttl` `P0`
-- [x] `ontology/sstim-vocab.ttl` `P0`
-- [x] `ontology/sstim-shapes.ttl` `P0`
-- [x] `ontology/sstim-alignments.ttl` `P0`
+- [x] `static/ontology/README.md` `P0`
+- [x] `static/ontology/sstim-core.ttl` `P0`
+- [x] `static/ontology/sstim-vocab.ttl` `P0`
+- [x] `static/ontology/sstim-shapes.ttl` `P0`
+- [x] `static/ontology/sstim-alignments.ttl` `P0`
 - [x] `src/README.md` `P0`
 - [x] `src/engines/README.md` `P0`
 - [x] `src/core/README.md` `P0`
 - [x] `src/rdf/README.md` `P0`
 - [x] `src/ui/README.md` `P0`
-- [~] `README.md` — root landing page; in rewrite this pass `P0`
+- [x] `README.md` — root landing page; rewritten in public foundation pass `P0`
 - [x] `CONTRIBUTING.md` `P0`
 - [x] `docs/ecosystem/IP_STRATEGY.md` `P0`
 - [x] `docs/ecosystem/W3C_CG_CHARTER.md` `P0`
@@ -89,12 +91,12 @@ software is built. Written in the order specified in `ROADMAP.md`.
 - [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` `P0`
 
 ### Generated artifacts (still to produce)
-- [~] `docs/README.md` — index over `concept/` `technical/` `ecosystem/` `P0`
-- [~] `ontology/instances/README.md` — layout + current emptiness note `P0`
+- [x] `docs/README.md` — index over `concept/` `technical/` `ecosystem/` `P0`
+- [x] `static/ontology/instances/README.md` — layout + current emptiness note `P0`
 - [ ] `AGENTS.md` — from `CLAUDE.md` `P1`
 - [ ] `GEMINI.md` — from `CLAUDE.md` `P1`
 - [ ] `.github/copilot-instructions.md` — from `CLAUDE.md` `P1`
-- [ ] `.cursor/rules/rdf.mdc` — from `ontology/README.md` + `CLAUDE.md` `P1`
+- [ ] `.cursor/rules/rdf.mdc` — from `static/ontology/README.md` + `CLAUDE.md` `P1`
 - [ ] `.cursor/rules/audio-engine.mdc` — from `src/core/README.md` `P1`
 - [ ] `schemas/preset.schema.json` — from `docs/technical/PRESET_FORMAT.md` `P1`
 - [ ] `schemas/session.schema.json` — from `docs/technical/SESSION_MODEL.md` `P1`
@@ -165,7 +167,7 @@ indexed, examiner-searchable records.
       *Same process: `bsc/` folder with routing for the sub-paths
       used by BSC preset/session/annotation IRIs.*
 - [ ] Register `sstim:` and `bsc:` prefixes at https://prefix.cc `P1`
-- [ ] Add `static/_headers` with COOP/COEP for Netlify (required for
+- [x] Add `static/_headers` with COOP/COEP for Netlify (required for
       SharedArrayBuffer and WASM threading) `P1`
 
 ---
@@ -176,14 +178,14 @@ indexed, examiner-searchable records.
 Turtle files are listed in section 1. After they exist:
 
 ### Phase 1 validation and publication
-- [ ] Run pySHACL against `sstim-core.ttl` with `sstim-shapes.ttl` `P1`
-      `python -m pyshacl -s ontology/sstim-shapes.ttl -d ontology/sstim-core.ttl`
-- [ ] Run pySHACL against `sstim-vocab.ttl` with `sstim-shapes.ttl` `P1`
-- [ ] Fix any SHACL violations before publishing `P1`
+- [x] Run pySHACL against `sstim-core.ttl` with `sstim-shapes.ttl` `P1`
+      `python -m pyshacl -s static/ontology/sstim-shapes.ttl static/ontology/sstim-core.ttl`
+- [x] Run pySHACL against `sstim-vocab.ttl` with `sstim-shapes.ttl` `P1`
+- [x] Fix any SHACL violations before publishing `P1`
 - [ ] Run HermiT or ELK OWL reasoner on `sstim-core.ttl` to check
       consistency (Protégé, command line, or robot verify) `P1`
 - [ ] Generate WIDOCO HTML docs from `sstim-core.ttl` + `sstim-vocab.ttl` `P1`
-      `java -jar widoco.jar -ontFile ontology/sstim-core.ttl -outFolder docs-site`
+      `java -jar widoco.jar -ontFile static/ontology/sstim-core.ttl -outFolder docs-site`
 - [ ] Deploy WIDOCO output to GitHub Pages (`docs-site/` branch) `P1`
 - [ ] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
@@ -192,13 +194,13 @@ Turtle files are listed in section 1. After they exist:
 
 ### Phase 1 instances
 - [ ] Convert preset catalog v0.9.1 to RDF instances in
-      `ontology/instances/presets/` — one file per group or one
+      `static/ontology/instances/presets/` — one file per group or one
       combined file `P1`
       *Note: Claude Code generates this from `PRESET_FORMAT.md` +
       `sstim-core.ttl` + the JSON catalog. Verify each instance
       passes SHACL before committing.*
 - [ ] Convert Appendix A references to RDF in
-      `ontology/instances/references/` `P1`
+      `static/ontology/instances/references/` `P1`
 - [ ] Add RDF individuals for Binaural, Martigli, Symmetry, and
       Martigli-Binaural voice types as technique instances `P1`
 
@@ -234,29 +236,29 @@ Turtle files are listed in section 1. After they exist:
 Do not start these until all Phase 0 documents are committed.
 
 ### Project scaffold
-- [ ] Vite 8 + Svelte 5 project init `P1`
-      `npm create vite@latest bsc-lab -- --template svelte`
-      Then install Svelte 5: `npm install svelte@next`
+- [x] SvelteKit 2 + Svelte 5 + Vite 6 project scaffold `P1`
 - [ ] Configure Svelte 5 MCP server for AI tooling `P1`
       `npx @sveltejs/mcp` — add to `.cursor/mcp.json`
-- [ ] Install core dependencies: `n3`, `@comunica/query-sparql-rdfjs`,
-      `rdf-validate-shacl`, `cytoscape`, `cytoscape-dagre`, `picocss` `P1`
-- [ ] Configure Vite: `vite-plugin-wasm`, `vite-plugin-top-level-await`,
-      `vite-plugin-pwa`. Set COOP/COEP headers in `vite.config.js` `P1`
+- [x] Install core dependencies: `n3`, `@comunica/query-sparql-rdfjs`,
+      `rdf-validate-shacl`, `cytoscape`, `picocss` `P1`
+- [~] Configure Vite/SvelteKit runtime headers and future PWA/WASM plugins `P1`
+      *Done: COOP/COEP in `vite.config.js` and `static/_headers`. Pending:
+      WASM/PWA plugin additions when those features land.*
 - [ ] Add pre-commit hook: Turtle syntax check + JSON preset schema
       validation `P1`
-- [ ] Configure GitHub Actions: `validate-rdf.yml`, `widoco-docs.yml`,
+- [~] Configure GitHub Actions: `validate-rdf.yml`, `widoco-docs.yml`,
       `lint.yml` `P1`
-- [ ] `netlify.toml` and `static/_headers` configuration `P1`
-- [ ] Initial `public/index.html` and `public/manifest.json` `P1`
+      *Done: `validate-rdf.yml`, `lint.yml`. Pending: WIDOCO docs workflow.*
+- [x] `netlify.toml` and `static/_headers` configuration `P1`
+- [x] SvelteKit `src/app.html`, layout, ontology route, and SPARQL route `P1`
 
 ### RDF layer
-- [ ] `src/rdf/namespaces.js` — all prefix declarations `P1`
-- [ ] `src/rdf/loader.js` — fetch + parse TTL files from URLs (N3.js) `P1`
+- [x] `src/rdf/namespaces.js` — all prefix declarations `P1`
+- [~] `src/rdf/loader.js` — fetch + parse TTL files from URLs (N3.js) `P1`
       *Loads: sstim-core.ttl, sstim-vocab.ttl, sstim-alignments.ttl,
-      instances/presets/ at runtime. Uses N3.Parser.*
+      sstim-shapes.ttl. Instance loading is pending until instance TTL exists.*
 - [ ] `src/rdf/store.js` — N3.Store management, merge multiple graphs `P1`
-- [ ] `src/rdf/query.js` — Comunica SPARQL engine, lazy-loaded `P1`
+- [x] `src/rdf/query.js` — Comunica SPARQL engine, lazy-loaded `P1`
       *Dynamic import: only load Comunica when SPARQL interface opens*
 - [ ] `src/rdf/validate.js` — rdf-validate-shacl in browser `P1`
 - [ ] `src/rdf/export.js` — serialize preset instances to JSON,
@@ -273,9 +275,9 @@ Do not start these until all Phase 0 documents are committed.
       preset → claims → references → public-safe flag `P1`
 
 ### UI — Ontology graph
-- [ ] `src/ui/graph/OntologyGraph.js` — Cytoscape.js, lazy-loaded `P1`
+- [x] `src/ui/graph/OntologyGraph.svelte` — Cytoscape.js, lazy-loaded `P1`
       *Renders: OWL class hierarchy + SKOS broader/narrower relationships.
-      Layout: dagre (hierarchical). Only loads when graph tab opens.*
+      Layout: cose. Only loads when graph route opens.*
 - [ ] `src/ui/graph/EvidenceChainView.js` — force-directed graph of
       a single preset's evidence chain `P1`
 
@@ -286,8 +288,8 @@ Do not start these until all Phase 0 documents are committed.
       target node selector, save to AnnotationStore `P1`
 
 ### UI — SPARQL interface
-- [ ] `src/ui/sparql/SparqlEditor.js` — CodeMirror editor for SPARQL,
-      lazy-loads Comunica, executes query `P1`
+- [~] SPARQL route — textarea editor, lazy-loads Comunica, executes SELECT query `P1`
+      *Dedicated CodeMirror component still pending.*
 - [ ] `src/ui/sparql/ResultsView.js` — render bindings as table,
       CONSTRUCT results as graph `P1`
 
@@ -506,12 +508,11 @@ because financial sustainability constrains everything else.
 - [ ] Branch protection: require PR for main, CI must pass `P1`
 - [ ] Dependabot configured for npm dependency updates `P1`
 - [ ] Secret scanning enabled `P1`
-- [ ] `.github/workflows/validate-rdf.yml` — pySHACL on every PR
-      touching `ontology/` `P1`
+- [x] `.github/workflows/validate-rdf.yml` — pySHACL on every PR
+      touching `static/ontology/` `P1`
 - [ ] `.github/workflows/widoco-docs.yml` — regenerate docs-site
       on TTL file change `P1`
-- [ ] `.github/workflows/lint.yml` — Turtle syntax, JSON schema,
-      Svelte type check `P1`
+- [x] `.github/workflows/lint.yml` — Svelte type check and static build `P1`
 - [ ] `hooks/pre-commit` — local validation mirror of CI `P1`
 
 ---
@@ -579,11 +580,11 @@ Not project-specific — run on a schedule.
 
 **Per new preset added:**
 - [ ] Validate JSON against `schemas/preset.schema.json` `recurring`
-- [ ] Create RDF instance in `ontology/instances/presets/` `recurring`
+- [ ] Create RDF instance in `static/ontology/instances/presets/` `recurring`
 - [ ] Run SHACL validation on new instance `recurring`
 - [ ] Verify `techDesc` cites only PUBLIC-SAFE references `recurring`
 
 ---
 
 *Last updated: April 2026 — Renato Fabbri*
-*Next update due: when Phase 0 documents are complete*
+*Next update due: when CI is merged and Phase 1 focus is confirmed*

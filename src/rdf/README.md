@@ -1,8 +1,8 @@
 # src/rdf — Knowledge Graph Layer
 
-> **Status: planned — Phase 1.** No source files in this directory exist yet,
-> and `dist/presets.json` is not produced. This document describes the target
-> API and pipeline.
+> **Status: Phase 1 partial.** `namespaces.js`, `loader.js`, `query.js`, and
+> graph-query helpers exist. Browser-side SHACL validation, RDF export, instance
+> directory loading, and annotation storage are still planned.
 
 The RDF subsystem loads the SSTIM ontology and BSC preset instances into an
 in-browser N3.js triple store, executes SPARQL queries via Comunica, validates
@@ -16,10 +16,10 @@ data with SHACL, and exports the preset catalog to JSON for BioSynCare.
 rdf/
 ├── namespaces.js        All IRI prefix declarations — single source of truth
 ├── loader.js            Turtle/TriG/N-Quads → N3.Store
-├── store.js             N3.Store wrappers, helpers, named graph support
+├── graph.js             Ontology graph projection queries for Cytoscape
 ├── query.js             Comunica SPARQL execution wrapper (lazy-loaded)
-├── validate.js          SHACL validation via rdf-validate-shacl
-├── export.js            N3.Store → dist/presets.json for BioSynCare
+├── validate.js          SHACL validation via rdf-validate-shacl (planned)
+├── export.js            N3.Store → dist/presets.json for BioSynCare (planned)
 └── annotations/
     └── AnnotationStore.js   Named-graph annotation CRUD
 ```
@@ -51,7 +51,7 @@ Each exported namespace is a factory function returning `N3.DataFactory.namedNod
 Never pass raw strings to N3 store operations.
 
 **Turtle prefix alignment** — the prefix strings in `namespaces.js` match the
-`@prefix` declarations in all `ontology/*.ttl` files. When adding a new namespace
+`@prefix` declarations in all `static/ontology/*.ttl` files. When adding a new namespace
 to a TTL file, add the corresponding factory function to `namespaces.js` in the
 same commit.
 
@@ -59,37 +59,31 @@ same commit.
 
 ## `loader.js`
 
-Parses Turtle files into an N3.Store. Supports single files and directory
-loading (loads all `.ttl` files in a directory and merges into one store).
+Parses Turtle files into an N3.Store. The current implementation supports
+single-file loading and a fixed canonical ontology merge. Directory loading
+will land with preset/reference instances.
 
 ```javascript
-import { loadOntology, loadDirectory } from './loader.js'
+import { loadOntology, loadTurtle, loadMerged } from './loader.js'
 
-// Load core ontology + vocabulary
-const ontologyStore = await loadOntology([
-  'ontology/sstim-core.ttl',
-  'ontology/sstim-vocab.ttl'
-])
+// Load the four canonical ontology files
+const ontologyStore = await loadOntology()
 
-// Load preset instances
-const presetStore = await loadDirectory('ontology/instances/presets/')
+// Load one Turtle file
+const coreStore = await loadTurtle('/ontology/sstim-core.ttl')
 
 // Merge
-const combinedStore = await loadOntology([
-  'ontology/sstim-core.ttl',
-  'ontology/sstim-vocab.ttl',
-  'ontology/instances/presets/'
+const combinedStore = await loadMerged([
+  '/ontology/sstim-core.ttl',
+  '/ontology/sstim-vocab.ttl'
 ])
 ```
 
 In the browser, files are fetched via the Fetch API from the Vite static asset
-server. In Node.js (tests, export pipeline), they are read from the filesystem.
-`loader.js` detects the environment automatically.
+server. Node.js filesystem loading is deferred to the export/test pipeline.
 
 **Named graphs:** Ontology data is loaded into the default graph. Annotations
-are loaded into named graphs (see `AnnotationStore.js`). The `loadDirectory()`
-function respects TriG files with graph declarations; plain Turtle files are
-loaded into the default graph.
+will be loaded into named graphs (see planned `AnnotationStore.js`).
 
 ---
 
@@ -99,10 +93,10 @@ Wraps Comunica SPARQL execution. **Comunica is lazy-loaded** (~500 KB gzipped)
 to avoid blocking the initial app load.
 
 ```javascript
-import { sparqlSelect, sparqlConstruct } from './query.js'
+import { select, construct } from './query.js'
 
 // SELECT query — returns array of binding objects
-const results = await sparqlSelect(store, `
+const results = await select(store, `
   PREFIX sstim: <https://w3id.org/sstim#>
   PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
 
@@ -116,8 +110,8 @@ const results = await sparqlSelect(store, `
 `)
 // results: [{ preset: NamedNode, label: Literal, tier: Literal }, ...]
 
-// CONSTRUCT query — returns an N3.Store
-const subgraph = await sparqlConstruct(store, `
+// CONSTRUCT query — returns RDF quads
+const subgraph = await construct(store, `
   PREFIX sstim: <https://w3id.org/sstim#>
   CONSTRUCT { ?s ?p ?o }
   WHERE { ?s a sstim:Preset ; ?p ?o }
@@ -138,7 +132,7 @@ SELECT ?preset WHERE {
 
 ## `validate.js`
 
-Runs SHACL validation against `ontology/sstim-shapes.ttl`. Called by the
+Runs SHACL validation against `/ontology/sstim-shapes.ttl`. Called by the
 export pipeline before generating `dist/presets.json`, and exposed as a
 UI affordance in the annotation editor.
 
@@ -178,11 +172,11 @@ import { exportPresets } from './export.js'
 
 const exported = await exportPresets({
   ontologyPaths: [
-    'ontology/sstim-core.ttl',
-    'ontology/sstim-vocab.ttl'
+    '/ontology/sstim-core.ttl',
+    '/ontology/sstim-vocab.ttl'
   ],
-  instancePaths: ['ontology/instances/presets/'],
-  shapesPaths:   ['ontology/sstim-shapes.ttl'],
+  instancePaths: ['/ontology/instances/presets/'],
+  shapesPaths:   ['/ontology/sstim-shapes.ttl'],
   outputPath:    'dist/presets.json'
 })
 

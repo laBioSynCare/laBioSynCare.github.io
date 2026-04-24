@@ -812,7 +812,7 @@ backend tool track revisions manually.
 ## Relationship to the RDF ontology
 
 Each preset in `src/data/presets/` will have a corresponding RDF
-instance in `ontology/instances/presets/`. The mapping rules:
+instance in `static/ontology/instances/presets/`. The mapping rules:
 
 - `_id` or `uuid` → IRI at `https://w3id.org/bsc/preset/{normalized-id}`
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
@@ -821,7 +821,7 @@ instance in `ontology/instances/presets/`. The mapping rules:
 - `header.cautionTags` → `sstim:hasCautionTag` → caution tag individuals
 - Voice array → `sstim:composedOf` → voice component individuals
 
-The RDF instances are validated against `ontology/sstim-shapes.ttl`
+The RDF instances are validated against `static/ontology/sstim-shapes.ttl`
 before the export pipeline generates `dist/presets.json` for
 BioSynCare consumption. No preset that fails SHACL validation is
 exported.

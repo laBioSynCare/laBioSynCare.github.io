@@ -1,11 +1,11 @@
-# ontology/instances — BSC Product Instance Data
+# static/ontology/instances — BSC Product Instance Data
 
 RDF instance data that uses the [`sstim`](../) ontology. Unlike the ontology
 itself (reusable, under `w3id.org/sstim`), everything here is **BSC product
 data** and lives under the `w3id.org/bsc/...` namespace.
 
 See [`../README.md`](../README.md) for the namespace rule and
-[`CLAUDE.md` §5.1](../../CLAUDE.md) for the enforcement policy.
+[`CLAUDE.md` §5.1](../../../CLAUDE.md) for the enforcement policy.
 
 ---
 
@@ -28,16 +28,17 @@ instances/
 Both `presets/` and `references/` directories exist but are **empty**. No
 preset or reference instances have been committed yet; the v0.9.1 catalog
 is still in its original JSON form (not in this tree). Conversion to RDF
-instances is the first task in Phase 2 (`TODO.md` → "Phase 2 instances").
+instances is a Phase 1 ontology task (`TODO.md` → "Phase 1 instances").
 
 A `sessions/` subdirectory is not created yet; it will land alongside the
 session-recording code in Phase 2.
 
 ## Loading behaviour
 
-When the `src/rdf/loader.js` pipeline lands (Phase 1), `instances/` is
-loaded **after** the core ontology, into named graphs matching its
-subdirectory:
+The current `src/rdf/loader.js` pipeline loads the canonical ontology Turtle
+files. Instance loading will be added once preset/reference Turtle files exist;
+`instances/` should then be loaded **after** the core ontology, into named
+graphs matching its subdirectory:
 
 - `presets/*.ttl` → graph `https://w3id.org/bsc/preset/`
 - `references/*.ttl` → graph `https://w3id.org/sstim/ref/`

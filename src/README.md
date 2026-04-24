@@ -1,10 +1,10 @@
 # src — Software Architecture
 
-> **Status: planned — Phase 1.** This document describes the target architecture
-> for the BSC Lab application. None of the source files (`.js`, `.svelte`) or
-> companion directories (`static/worklets/`, `schemas/`, `tests/`, `dist/`)
-> referenced below exist yet. The repo is in Phase 0 (docs + ontology). See
-> `ROADMAP.md` for phase definitions.
+> **Status: Phase 1 scaffold in progress.** The SvelteKit/Svelte 5 app exists
+> with initial RDF loading, SPARQL querying, and ontology graph routes. Engine,
+> player, preset-browser, annotation, export, and browser-side validation
+> modules referenced below are still planned. See `ROADMAP.md` for phase
+> definitions.
 
 This directory contains the BSC Lab application: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL
@@ -80,12 +80,12 @@ rAF visual loop      ← clock sync
 
 Provides RDF-based browsing, querying, and annotation of the SSTIM ontology
 and BSC preset catalog. Operates entirely in the browser against an N3.Store
-loaded from the `ontology/` directory.
+served from `static/ontology/` at the runtime `/ontology/` URL.
 
 ```
-ontology/sstim-core.ttl
-ontology/sstim-vocab.ttl       →   N3.Store (in-browser)
-ontology/instances/presets/    →      ↓
+static/ontology/sstim-core.ttl
+static/ontology/sstim-vocab.ttl       →   N3.Store (in-browser)
+static/ontology/instances/presets/    →      ↓
                                Comunica SPARQL engine
                                       ↓
                                Cytoscape.js graph view
@@ -96,11 +96,11 @@ ontology/instances/presets/    →      ↓
 
 **Ontology files are bundled as static assets** (`static/ontology/`), not fetched
 from `labiosyncare.github.io` at runtime. This is required by
-`Cross-Origin-Embedder-Policy: require-corp` (needed for WASM audio). The Vite
-build copies `ontology/*.ttl` and `ontology/instances/**/*.ttl` into `dist/` so
-they are served from the same Netlify origin as the app. GitHub Pages hosts the
-canonical citable copies; Netlify hosts the runtime copies. Both come from the
-same source files — no duplication of truth.
+`Cross-Origin-Embedder-Policy: require-corp` (needed for WASM audio). SvelteKit
+copies `static/ontology/**/*.ttl` into `dist/ontology/` so they are served from
+the same Netlify origin as the app. GitHub Pages hosts the canonical citable
+copies; Netlify hosts the runtime copies. Both come from the same source files
+— no duplication of truth.
 
 ---
 
@@ -115,7 +115,7 @@ RDF ontology files.
 Changes to the preset format must be coordinated across:
 1. `docs/technical/PRESET_FORMAT.md` (specification)
 2. `schemas/preset.schema.json` (JSON Schema validation)
-3. `ontology/sstim-shapes.ttl` (SHACL validation)
+3. `static/ontology/sstim-shapes.ttl` (SHACL validation)
 4. `src/core/ProtocolRunner.js` (preset → VoiceSpec translation)
 5. `src/rdf/export.js` (RDF → JSON export)
 
@@ -125,11 +125,13 @@ Changes to the preset format must be coordinated across:
 
 ```bash
 npm install
-npm run dev      # Vite 8 dev server with HMR
-npm run build    # Production build (Rolldown)
-npm run preview  # Preview production build
-npm test         # Vitest unit + integration tests
-npm run validate # SHACL + JSON Schema validation
+make dev         # Preferred local entrypoint; wraps npm run dev on 127.0.0.1:4173
+npm run dev      # Underlying Vite script when custom flags are needed
+make build       # Production build (Vite/Rollup)
+make preview     # Preview production build on 127.0.0.1:4174
+make test        # Vitest unit + integration tests
+make check       # SvelteKit sync + svelte-check
+make validate    # SHACL validation (current ontology suite)
 ```
 
 ### AudioWorklet files

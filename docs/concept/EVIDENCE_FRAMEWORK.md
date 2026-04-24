@@ -5,7 +5,7 @@
 > description, web copy, or documentation about session effects, read
 > this document. The language rules in `CLAUDE.md` section 3.5 and
 > `docs/concept/SCOPE.md` implement these constraints. Evidence tiers
-> are formally encoded in `ontology/sstim-vocab.ttl`.
+> are formally encoded in `static/ontology/sstim-vocab.ttl`.
 
 ---
 
@@ -475,7 +475,7 @@ peer-reviewed evidence or documented methodological critique.
 
 The following declarations implement the six-tier vocabulary.
 Full class definitions and property assignments are in
-`ontology/sstim-core.ttl` and `ontology/sstim-vocab.ttl`.
+`static/ontology/sstim-core.ttl` and `static/ontology/sstim-vocab.ttl`.
 
 ```turtle
 @prefix bsc:      <https://w3id.org/sstim#> .

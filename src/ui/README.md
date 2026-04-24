@@ -1,7 +1,8 @@
 # src/ui — User Interface Layer
 
-> **Status: planned — Phase 1.** No Svelte components in this directory exist
-> yet. This document describes the target UI surface.
+> **Status: Phase 1 partial.** `graph/OntologyGraph.svelte` exists and the
+> SPARQL route currently renders inline. Player, creator, preset browser,
+> annotation, and dedicated SPARQL components are still planned.
 
 All UI components use Svelte 5 with runes syntax exclusively. See `CLAUDE.md`
 section 2 for the runes syntax mandate and the list of prohibited Svelte 4

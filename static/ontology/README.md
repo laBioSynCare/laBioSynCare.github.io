@@ -34,7 +34,7 @@ It is designed to be used by:
 ## File inventory
 
 ```
-ontology/
+static/ontology/
 ├── sstim-core.ttl        OWL class hierarchy, properties, axioms
 ├── sstim-vocab.ttl       SKOS vocabulary (multilingual concepts)
 ├── sstim-shapes.ttl      SHACL validation shapes
@@ -401,19 +401,19 @@ representation of the BSC operational taxonomy, not an error.
 # Validate core ontology
 python -m pyshacl \
   -s static/ontology/sstim-shapes.ttl \
-  -d static/ontology/sstim-core.ttl \
+  static/ontology/sstim-core.ttl \
   --inference rdfs \
   --format turtle
 
 # Validate vocabulary
 python -m pyshacl \
   -s static/ontology/sstim-shapes.ttl \
-  -d static/ontology/sstim-vocab.ttl
+  static/ontology/sstim-vocab.ttl
 
 # Validate all preset instances
 python -m pyshacl \
   -s static/ontology/sstim-shapes.ttl \
-  -d static/ontology/instances/presets/ \
+  static/ontology/instances/presets/ \
   --format turtle
 ```
 

@@ -29,21 +29,19 @@ these invariants will cause your PR to be rejected regardless of code quality.
 
 **Read the relevant domain document.** For preset work: `docs/technical/PRESET_FORMAT.md`.
 For evidence claims: `docs/concept/EVIDENCE_FRAMEWORK.md`. For ontology work:
-`ontology/README.md`. For the domain concept: `docs/concept/SENSORY_STIMULATION.md`.
+`static/ontology/README.md`. For the domain concept: `docs/concept/SENSORY_STIMULATION.md`.
 
-**Run the pre-commit hooks locally** before submitting (planned — Phase 1; the
-`hooks/` directory, `schemas/`, `tests/`, and CI do not yet exist):
+**Run the local checks before submitting.** A `hooks/` wrapper is planned, but
+CI now mirrors the core local checks:
 ```bash
-# Install hooks
-cp hooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
-
-# Run manually
-.git/hooks/pre-commit
+npm install
+make validate
+make check
+make build
 ```
 
-The hook will run SHACL validation, JSON Schema validation, and Turtle syntax
-checks. Until it lands, run the pyshacl commands from `CLAUDE.md` §10 manually.
+The future hook should wrap the same commands plus JSON Schema checks once the
+schemas exist.
 
 ---
 
@@ -85,9 +83,13 @@ checks. Until it lands, run the pyshacl commands from `CLAUDE.md` §10 manually.
 
 ```bash
 npm install
-npm run dev          # Vite dev server
-npm test             # Vitest
-npm run validate     # SHACL + JSON Schema validation
+make dev             # Preferred local entrypoint (http://127.0.0.1:4173/)
+npm run dev          # Underlying Vite script if you need custom flags
+make build           # Production build
+make preview         # Preview production build (http://127.0.0.1:4174/)
+make test            # Vitest
+make check           # SvelteKit sync + svelte-check
+make validate        # SHACL validation (current ontology suite)
 ```
 
 ---
@@ -151,10 +153,10 @@ Prohibited in any language in any user-facing field:
 These files are protected from modification without maintainer approval:
 
 ```
-ontology/sstim-core.ttl
-ontology/sstim-vocab.ttl
-ontology/sstim-shapes.ttl
-ontology/sstim-alignments.ttl
+static/ontology/sstim-core.ttl
+static/ontology/sstim-vocab.ttl
+static/ontology/sstim-shapes.ttl
+static/ontology/sstim-alignments.ttl
 docs/technical/BREATHING_MODEL.md   ← defensive publication, do not modify
 docs/technical/SYMMETRY_SYSTEM.md   ← defensive publication, do not modify
 docs/technical/MARTIGLI_BINAURAL.md ← defensive publication, do not modify
@@ -205,13 +207,13 @@ New SHACL shapes that add constraints must be accompanied by:
 
 Public-safe references (citable in user-facing `techDesc` fields) are managed
 in the BSC Reference Agent document (`referenceDocuments/BSC_Reference_Agent_*.md`)
-and in `ontology/instances/references/references.ttl`.
+and in `static/ontology/instances/references/references.ttl`.
 
 To add a reference:
 
 1. Confirm the paper is: (a) peer-reviewed, (b) publicly accessible, (c) not
    retracted, (d) relevant to a BSC technique's proposed mechanism or outcome
-2. Open a PR adding the reference to `ontology/instances/references/references.ttl`
+2. Open a PR adding the reference to `static/ontology/instances/references/references.ttl`
    using the `sstim:PublicSafeReference` class with `sstim:referenceKey`,
    `dct:title`, `dct:creator`, `dct:date`, `dct:identifier` (DOI)
 3. Note which modality tags apply (AUD, AV, BREATH, GENERAL, PRECLINICAL, REVIEW)
@@ -334,16 +336,9 @@ expressed through the Issue process, not through social pressure.
 
 ## 9. License
 
-**Software** (`src/`, `static/`, `schemas/`, `hooks/`): MIT License.
-
-**Ontology and vocabulary** (`ontology/`): CC BY 4.0. You may use, adapt,
-and redistribute with attribution to BSC Lab and the SSTIM contributors.
-
-**Preset catalog** (`ontology/instances/presets/`, `src/data/presets/`):
-CC BY 4.0. Presets contributed to this repository are contributed under CC BY
-4.0.
-
-**Documentation** (`docs/`, `README.md`, `ROADMAP.md`): CC BY 4.0.
+License files have not landed yet. The working assumption is a permissive
+OSI-approved license for software and CC BY 4.0 for ontology/docs, but do not
+assume a final license until `LICENSE` and `LICENSE-ontology` are committed.
 
 **Defensive publications** (`docs/technical/BREATHING_MODEL.md`,
 `docs/technical/SYMMETRY_SYSTEM.md`, `docs/technical/MARTIGLI_BINAURAL.md`):

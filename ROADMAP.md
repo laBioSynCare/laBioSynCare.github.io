@@ -76,7 +76,9 @@ primarily with AI-assisted development.
   improved navigation, and a new Learn screen.
 - **Revenue:** Near-zero. Introductory subscription at €2/month. Launch
   phase begins now with friends, family, and partner network activation.
-- **BSC Lab:** This repository is being created. No software deployed yet.
+- **BSC Lab:** This repository is public. The Phase 0 documents and ontology
+  skeleton exist, and an initial SvelteKit knowledge-browser scaffold runs
+  locally. No public deployment yet.
 - **Partners:** Marco Fracasso (MD, Italy), Rafael Reinhart (MD, Brazil),
   Theo Marins (neuroscience researcher, Austria), Prof. Olimpia Pino
   (University of Parma), IPRJ/UERJ (Brazil), Junto Innovation Hub — all
@@ -116,11 +118,11 @@ build in subsequent phases.
 - [x] `docs/ecosystem/PARTNERS.md` — named partners with interest letters
 - [x] `docs/ecosystem/W3C_CG_CHARTER.md` — draft charter, ready to submit
 - [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` — outreach template
-- [x] `ontology/README.md` — OWL/SKOS design decisions
-- [x] `ontology/sstim-core.ttl` — OWL skeleton
-- [x] `ontology/sstim-vocab.ttl` — SKOS vocabulary, multilingual
-- [x] `ontology/sstim-shapes.ttl` — SHACL shapes
-- [x] `ontology/sstim-alignments.ttl` — Wikidata/DBpedia links
+- [x] `static/ontology/README.md` — OWL/SKOS design decisions
+- [x] `static/ontology/sstim-core.ttl` — OWL skeleton
+- [x] `static/ontology/sstim-vocab.ttl` — SKOS vocabulary, multilingual
+- [x] `static/ontology/sstim-shapes.ttl` — SHACL shapes
+- [x] `static/ontology/sstim-alignments.ttl` — Wikidata/DBpedia links
 - [x] `src/README.md` — full software architecture
 - [x] `src/engines/README.md`, `src/core/README.md`, `src/rdf/README.md`, `src/ui/README.md`
 - [~] `README.md`, [x] `CONTRIBUTING.md`
@@ -131,14 +133,13 @@ All 31 reference documents exist in the repository. The ontology skeleton
 is valid Turtle and passes basic SHACL validation. The repo is public on
 GitHub. Nothing is deployed yet.
 
-**Status (2026-04-21):** all 31 reference documents are committed. The
-core ontology (`sstim-core.ttl`) conforms against `sstim-shapes.ttl`;
-`sstim-vocab.ttl` has one known SHACL failure on `sstim-v:allFrequencyBands`
-(missing `hzMin`/`hzMax`) — tracked in `TODO.md` as a blocked known issue.
-The repo is public on GitHub. A "Public Foundation Pass" (root README
-rewrite, namespace convention lock-in, `docs/README.md` and
-`ontology/instances/README.md` indexes, reality-sync of ROADMAP/TODO) is
-in flight and closes out Phase 0.
+**Status (2026-04-25):** all 31 reference documents are committed. The core
+ontology and vocabulary conform against `sstim-shapes.ttl`; the earlier
+`sstim-v:allFrequencyBands` SHACL issue is resolved. The repo is public on
+GitHub. A "Public Foundation Pass" has added the root README rewrite, docs
+index, instance-layout index, namespace convention lock-in, initial SvelteKit
+knowledge-browser scaffold, and local validation entrypoints. CI and final
+task-tracker reality sync close out the boundary into Phase 1.
 
 ---
 
@@ -154,15 +155,15 @@ before the community formation effort.
 The stimulation player is NOT part of this phase. Phase 1 builds only
 the knowledge navigation layer.
 
-- [ ] Vite 8 + Svelte 5 project scaffold
-- [ ] RDF loader: fetch and parse ontology TTL files at runtime (N3.js)
-- [ ] SPARQL query interface (Comunica, lazy-loaded)
+- [x] SvelteKit 2 + Svelte 5 + Vite 6 project scaffold
+- [x] RDF loader: fetch and parse ontology TTL files at runtime (N3.js)
+- [~] SPARQL query interface (Comunica, lazy-loaded)
 - [ ] Preset browser: list all presets, filter by group / frequency band /
       evidence tier, show full metadata
 - [ ] Evidence chain view: for each preset, show evidence claims →
       references → public-safe flag
 - [ ] SHACL validation: validate any preset on demand, display violations
-- [ ] Ontology graph view: Cytoscape.js visualization of class hierarchy
+- [x] Ontology graph view: Cytoscape.js visualization of class hierarchy
       and SKOS concept scheme (lazy-loaded)
 - [ ] Basic annotation: add a text note to any ontology node, stored in
       named graph in IndexedDB
@@ -178,7 +179,7 @@ the knowledge navigation layer.
       (presets, sessions, annotations) (PR to perma-id/w3id.org)
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
-- [ ] Publish `ontology/sstim-core.ttl` and `sstim-vocab.ttl` at w3id.org/sstim
+- [ ] Publish `static/ontology/sstim-core.ttl` and `sstim-vocab.ttl` at w3id.org/sstim
       with content negotiation
 - [ ] WIDOCO documentation generated and deployed to GitHub Pages
 
@@ -248,7 +249,7 @@ concrete rather than abstract.
 - [ ] RDF export pipeline: ontology instances → `dist/presets.json` for
       BioSynCare consumption
 - [ ] Preset instances: current catalog v0.9.1 represented as RDF in
-      `ontology/instances/presets/`
+      `static/ontology/instances/presets/`
 - [ ] SPARQL-driven preset routing: query by user need → ranked preset
       suggestions with evidence tier display
 - [ ] Enhanced annotation: named graph per user/session, export as Turtle
@@ -317,7 +318,7 @@ or group.
 ### Community
 
 - [ ] Find dedicated ontology contributor: a researcher or research group
-      willing to take primary ownership of `ontology/` development
+      willing to take primary ownership of `static/ontology/` development
       (candidate sources: UNIMORE Modena, University of Bologna,
       IIT Genoa, partner institutions in Brazil)
 - [ ] W3C CG producing regular meeting notes and discussion archives

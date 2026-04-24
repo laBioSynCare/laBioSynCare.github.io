@@ -15,29 +15,30 @@ consumes BSC Lab's exported preset catalog. BSC Lab is not BioSynCare — see
 
 ---
 
-## Current status — Phase 0
+## Current Status — Phase 0 → 1 Boundary
 
-The repository is in **Phase 0: Public Foundation**. What exists today:
+The repository is at the **Phase 0 → Phase 1 boundary**. What exists today:
 
 - 31 reference documents (concept, technical, ecosystem, AI-agent directive)
 - Four ontology Turtle files: `sstim-core.ttl` (OWL), `sstim-vocab.ttl`
   (multilingual SKOS), `sstim-shapes.ttl` (SHACL), `sstim-alignments.ttl`
   (external links to Wikidata, DBpedia, OBO)
+- A SvelteKit/Svelte 5 scaffold with initial ontology graph and SPARQL routes
 - Architecture READMEs under `src/` describing the target software design
 
 What does **not** yet exist (planned — Phase 1 and later):
 
-- A working runnable UI (the SvelteKit scaffold and initial routes exist but
-  the app is not yet deployed)
+- A public deployment at `lab.biosyncare.com`
+- Preset browser, evidence-chain view, annotation storage, or browser-side
+  SHACL validation UI
 - AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
-- Pre-commit hooks (`hooks/`) and CI (`.github/workflows/`)
+- Pre-commit hooks (`hooks/`)
 - Deployed WIDOCO documentation or published `w3id.org/sstim` namespace
 
 See [`ROADMAP.md`](ROADMAP.md) for phase definitions and
-[`TODO.md`](TODO.md) for the tracked task list, including the known SHACL
-vocab-conformance issue.
+[`TODO.md`](TODO.md) for the tracked task list and current Phase 1 backlog.
 
 ---
 
@@ -87,24 +88,18 @@ tests/                  Test suites (planned — Phase 1)
 
 ---
 
-## Validation
+## Local Verification
 
-The only runnable validation today is SHACL over the ontology, via
-[pyshacl](https://github.com/RDFLib/pySHACL):
+The current runnable checks are:
 
 ```bash
-# Core ontology — conforms
-python3 -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-core.ttl
-
-# Vocabulary — conforms (sstim:FrequencyBandGroup resolves the allFrequencyBands shape)
-python3 -m pyshacl -s static/ontology/sstim-shapes.ttl -d static/ontology/sstim-vocab.ttl
-
-# Or run all at once:
-make shacl
+make validate  # SHACL over core + vocabulary; skips empty instance dirs
+make check     # SvelteKit sync + svelte-check
+make build     # Static production build into dist/
 ```
 
-A JS-side validation pass (same N3.js parser the runtime will use) and a
-`hooks/pre-commit` wrapper are planned for Phase 1.
+The SHACL pass currently conforms for both the core ontology and vocabulary.
+A local `hooks/pre-commit` wrapper is planned for Phase 1.
 
 ---
 

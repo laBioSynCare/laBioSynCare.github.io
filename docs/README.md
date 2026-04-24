@@ -1,7 +1,7 @@
 # docs — BSC Lab Reference Documents
 
 Narrative and technical specification documents. The ontology's machine-
-readable form lives in [`../ontology/`](../ontology/); this directory holds
+readable form lives in [`../static/ontology/`](../static/ontology/); this directory holds
 the prose that justifies and explains it.
 
 Every document here is a BSC Lab canonical reference: assume a future AI
