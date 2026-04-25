@@ -48,9 +48,11 @@ export async function buildGraphElements(store) {
     PREFIX rdfs: <${RDFS}>
     PREFIX skos: <${SKOS}>
     SELECT ?cls ?label ?def WHERE {
-      ?cls a owl:Class .
-      OPTIONAL { ?cls rdfs:label ?label . FILTER(LANG(?label) = "en") }
-      OPTIONAL { ?cls skos:definition ?def . FILTER(LANG(?def) = "en") }
+      GRAPH ?g {
+        ?cls a owl:Class .
+        OPTIONAL { ?cls rdfs:label ?label . FILTER(LANG(?label) = "en") }
+        OPTIONAL { ?cls skos:definition ?def . FILTER(LANG(?def) = "en") }
+      }
     }`)
 
   for (const r of classRows) {
@@ -69,10 +71,12 @@ export async function buildGraphElements(store) {
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
     SELECT ?child ?parent WHERE {
-      ?child rdfs:subClassOf ?parent .
-      ?child  a owl:Class .
-      ?parent a owl:Class .
-      FILTER(!isBlank(?parent))
+      GRAPH ?g {
+        ?child rdfs:subClassOf ?parent .
+        ?child  a owl:Class .
+        ?parent a owl:Class .
+        FILTER(!isBlank(?parent))
+      }
     }`)
 
   for (const r of subRows) {
@@ -92,10 +96,12 @@ export async function buildGraphElements(store) {
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
     SELECT ?prop ?propLabel ?domain ?range WHERE {
-      ?prop a owl:ObjectProperty .
-      ?prop rdfs:domain ?domain .
-      ?prop rdfs:range  ?range .
-      OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+      GRAPH ?g {
+        ?prop a owl:ObjectProperty .
+        ?prop rdfs:domain ?domain .
+        ?prop rdfs:range  ?range .
+        OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+      }
     }`)
 
   for (const r of objPropRows) {
@@ -117,10 +123,12 @@ export async function buildGraphElements(store) {
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
     SELECT ?prop ?propLabel ?domain ?range WHERE {
-      ?prop a owl:DatatypeProperty .
-      ?prop rdfs:domain ?domain .
-      ?prop rdfs:range  ?range .
-      OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+      GRAPH ?g {
+        ?prop a owl:DatatypeProperty .
+        ?prop rdfs:domain ?domain .
+        ?prop rdfs:range  ?range .
+        OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+      }
     }`)
 
   for (const r of dataPropRows) {
@@ -146,10 +154,12 @@ export async function buildGraphElements(store) {
     PREFIX skos: <${SKOS}>
     PREFIX rdfs: <${RDFS}>
     SELECT ?concept ?label ?scheme ?notation WHERE {
-      ?concept a skos:Concept .
-      OPTIONAL { ?concept skos:prefLabel ?label . FILTER(LANG(?label) = "en") }
-      OPTIONAL { ?concept skos:inScheme ?scheme }
-      OPTIONAL { ?concept skos:notation ?notation }
+      GRAPH ?g {
+        ?concept a skos:Concept .
+        OPTIONAL { ?concept skos:prefLabel ?label . FILTER(LANG(?label) = "en") }
+        OPTIONAL { ?concept skos:inScheme ?scheme }
+        OPTIONAL { ?concept skos:notation ?notation }
+      }
     }`)
 
   for (const r of conceptRows) {
@@ -167,7 +177,9 @@ export async function buildGraphElements(store) {
   const narrowerRows = await select(store, `
     PREFIX skos: <${SKOS}>
     SELECT ?broader ?narrower WHERE {
-      ?broader skos:narrower ?narrower .
+      GRAPH ?g {
+        ?broader skos:narrower ?narrower .
+      }
     }`)
 
   for (const r of narrowerRows) {
@@ -185,9 +197,11 @@ export async function buildGraphElements(store) {
   const relatedRows = await select(store, `
     PREFIX skos: <${SKOS}>
     SELECT ?a ?b ?rel WHERE {
-      { ?a skos:related   ?b . BIND("related"    AS ?rel) }
-      UNION
-      { ?a skos:broadMatch ?b . BIND("broadMatch" AS ?rel) }
+      GRAPH ?g {
+        { ?a skos:related   ?b . BIND("related"    AS ?rel) }
+        UNION
+        { ?a skos:broadMatch ?b . BIND("broadMatch" AS ?rel) }
+      }
     }`)
 
   for (const r of relatedRows) {
@@ -207,9 +221,13 @@ export async function buildGraphElements(store) {
     PREFIX skos: <${SKOS}>
     PREFIX owl:  <${OWL}>
     SELECT ?concept ?owlClass WHERE {
-      ?concept a skos:Concept .
-      ?concept a ?owlClass .
-      ?owlClass a owl:Class .
+      GRAPH ?conceptGraph {
+        ?concept a skos:Concept .
+        ?concept a ?owlClass .
+      }
+      GRAPH ?classGraph {
+        ?owlClass a owl:Class .
+      }
       FILTER(?owlClass != skos:Concept)
     }`)
 

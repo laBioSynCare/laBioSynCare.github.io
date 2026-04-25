@@ -41,6 +41,16 @@ Use six distinct modeling layers:
 - **Session** — an actual execution event: one user, time, device/context, and
   run of a preset or session specification.
 
+Core ontology classes:
+
+- `sstim:SensoryStimulationFramework`
+- `sstim:SensoryStimulationTechnique`
+- `sstim:SensoryStimulationProtocol`
+- `sstim:SensoryStimulationImplementation`
+- `sstim:Preset`
+- `sstim:SessionSpecification`
+- `sstim:SessionInstance`
+
 Canonical SSTIM-scoped paths:
 
 - `https://w3id.org/sstim/technique/{id}`

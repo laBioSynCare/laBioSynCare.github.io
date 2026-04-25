@@ -38,6 +38,9 @@ import {
   SSTIM_V,   // https://w3id.org/sstim/vocab# (SKOS vocabulary)
   SSTIM_SH,  // https://w3id.org/sstim/shapes# (SHACL)
   SSTIM_I,   // https://w3id.org/sstim/inst/ (SSTIM instances)
+  BSC_FRAMEWORK_IRI, // https://w3id.org/sstim/framework/bsc
+  BSCLAB_IRI, // https://w3id.org/sstim/implementation/bsclab
+  BIOSYNCARE_IRI, // https://w3id.org/sstim/implementation/biosyncare
   BSC_FRAMEWORK, // https://w3id.org/sstim/framework/bsc/ (BSC framework)
   BSCLAB_PRESET, // https://w3id.org/sstim/implementation/bsclab/preset/
   BIOSYNCARE_PRESET, // https://w3id.org/sstim/implementation/biosyncare/preset/
@@ -88,9 +91,11 @@ const combinedStore = await loadMerged([
 In the browser, files are fetched via the Fetch API from the Vite static asset
 server. Node.js filesystem loading is deferred to the export/test pipeline.
 
-**Named graphs:** Ontology and committed product/reference instances are loaded
-into the default graph for browser queries. Annotations will be loaded into
-named graphs (see planned `AnnotationStore.js`).
+**Named graphs:** `loadOntology()` and `loadKnowledgeGraph()` assign canonical
+graph IRIs at load time. Ontology modules use `https://w3id.org/sstim/graph/*`;
+committed instance files use their SSTIM-scoped graph IRIs. Browser queries that
+need loaded data should use `GRAPH ?g { ... }`. Future annotations remain
+separate named graphs (see planned `AnnotationStore.js`).
 
 ---
 

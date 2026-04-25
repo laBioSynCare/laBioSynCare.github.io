@@ -90,7 +90,8 @@ The following are excluded from BSC's scope, or are adjacent but distinct:
 **Passive music listening.** Music may produce measurable physiological
 responses, but unstructured listening lacks the parameter specificity and
 reproducibility required for systematic study or evidence-based design. BSC
-sessions are parameter-defined protocols, not music in the conventional sense.
+sessions are parameter-defined executions of presets, not music in the
+conventional sense.
 
 **Neurofeedback (closed-loop brain-computer interface).** In neurofeedback, the
 user's own neural activity drives the feedback signal through an EEG measurement

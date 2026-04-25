@@ -817,6 +817,7 @@ Each preset in `src/data/presets/` will have a corresponding RDF
 instance in `static/ontology/instances/presets/`. The mapping rules:
 
 - `_id` or `uuid` → IRI at `https://w3id.org/sstim/implementation/biosyncare/preset/{normalized-id}` for BioSynCare, or `https://w3id.org/sstim/implementation/bsclab/preset/{normalized-id}` for BSC Lab reference presets
+- Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/biosyncare` or `https://w3id.org/sstim/implementation/bsclab`
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
 - `header.evidenceTier` → `sstim:evidenceTier` → tier individual

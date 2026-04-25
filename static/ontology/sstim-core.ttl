@@ -52,7 +52,7 @@
     dct:description "An OWL 2 ontology formalizing the domain of Sensory Stimulation: the parameter-specified delivery of structured sensory input toward defined physiological, psychological, or cognitive outcomes through identified or proposed neurobiological pathways."@en ;
     dct:creator <https://orcid.org/0000-0001-8602-7064> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:modified "2026-04-12"^^xsd:date ;
+    dct:modified "2026-04-25"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/bsc-lab/bsc-lab> ;
     skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en .
@@ -80,7 +80,7 @@ sstim:SensoryStimulationIntervention a owl:Class ;
                "Intervento di Stimolazione Sensoriale"@it,
                "Intervenção de Estimulação Sensorial"@pt,
                "Intervención de Estimulación Sensorial"@es ;
-    skos:definition "A specific, designed instance of Sensory Stimulation with defined parameters, target modalities, intended effect, and delivery mechanism. Corresponds to a BSC preset or protocol specification when realized in execution."@en ;
+    skos:definition "A specific, designed execution of Sensory Stimulation with defined parameters, target modalities, intended effect, and delivery mechanism. An intervention can realize a session specification derived from a preset, protocol, or framework."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -117,15 +117,40 @@ sstim:EntrainmentBasedTechnique owl:disjointWith sstim:NonEntrainmentTechnique .
 
 
 ###########################################################################
-# Part 3 — Preset and Session Classes
+# Part 3 — Framework, Protocol, Implementation, Preset, and Session Classes
 ###########################################################################
+
+sstim:SensoryStimulationFramework a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Stimulation Framework"@en ;
+    skos:definition "A broad information artifact defining a family of sensory stimulation principles, techniques, protocols, evidence rules, grouping logic, and design constraints. A framework can guide multiple protocols, implementations, presets, and sessions."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationProtocol a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Stimulation Protocol"@en ;
+    skos:definition "A structured method specification for using one or more sensory stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. A protocol is narrower than a framework and can constrain many presets."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationImplementation a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Stimulation Implementation"@en ;
+    skos:definition "A concrete realization of a sensory stimulation framework or protocol, represented in SSTIM by the implementation identity and metadata. An implementation can be software, hardware, mechanical, manual, or hybrid."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
 
 sstim:Preset a owl:Class ;
     rdfs:subClassOf obi:0000272 ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Preset"@en,
                "Preset"@it, "Preset"@pt, "Preset"@es ;
-    skos:definition "A reusable, versioned design template specifying the complete audio architecture, target frequency bands, evidence grounding, safety metadata, and multilingual content for a Sensory Stimulation session. A preset is the protocol specification; a session instance is its execution."@en ;
+    skos:definition "A reusable, versioned parameter configuration for a sensory stimulation implementation, specifying audio architecture, target frequency bands, evidence grounding, safety metadata, and multilingual content for a possible session. A preset follows a protocol or framework but is not itself the protocol."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -360,6 +385,62 @@ sstim:composedOf a owl:ObjectProperty ;
     rdfs:range  sstim:Voice ;
     rdfs:label  "composed of"@en ;
     skos:definition "Links a preset to its 1–6 voice specifications."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:definesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationFramework ;
+    rdfs:range  sstim:SensoryStimulationTechnique ;
+    rdfs:label  "defines technique"@en ;
+    skos:definition "Links a sensory stimulation framework to a technique that it defines or governs."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:usesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationProtocol ;
+    rdfs:range  sstim:SensoryStimulationTechnique ;
+    rdfs:label  "uses technique"@en ;
+    skos:definition "Links a sensory stimulation protocol to a technique used by the protocol."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:definedByFramework a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationProtocol ;
+    rdfs:range  sstim:SensoryStimulationFramework ;
+    rdfs:label  "defined by framework"@en ;
+    skos:definition "Links a protocol to the broader framework that defines or constrains it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:implementsFramework a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationImplementation ;
+    rdfs:range  sstim:SensoryStimulationFramework ;
+    rdfs:label  "implements framework"@en ;
+    skos:definition "Links an implementation to the framework it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:implementsProtocol a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationImplementation ;
+    rdfs:range  sstim:SensoryStimulationProtocol ;
+    rdfs:label  "implements protocol"@en ;
+    skos:definition "Links an implementation to a protocol it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:forImplementation a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationImplementation ;
+    rdfs:label  "for implementation"@en ;
+    skos:definition "Links a preset to the implementation whose parameter model it configures."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:followsProtocol a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationProtocol ;
+    rdfs:label  "follows protocol"@en ;
+    skos:definition "Links a preset to the sensory stimulation protocol whose rules or constraints it follows."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

@@ -1,0 +1,7 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+
+<https://w3id.org/sstim/framework/bsc> a sstim:SensoryStimulationFramework ;
+    rdfs:label "BSC Framework" ;
+    dct:description "Framework identity for the BioSynCare/BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance." .

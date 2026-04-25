@@ -17,6 +17,10 @@ See [`../README.md`](../README.md) for the namespace rule and
 
 ```
 instances/
+├── frameworks/   Framework identity records (w3id.org/sstim/framework/{id}).
+├── implementations/
+│                 Implementation identity records
+│                 (w3id.org/sstim/implementation/{id}).
 ├── presets/      One Turtle file per preset, or grouped by Heal/Support/
 │                 Perform/Indulge/Transcend. IRIs at w3id.org/sstim/implementation/bsclab/preset/{id}.
 │                 Source for dist/presets.json (planned — Phase 2 export).
@@ -31,6 +35,9 @@ instances/
 
 The first Phase 1 seed instances are committed:
 
+- `frameworks/bsc.ttl` — BSC framework identity record.
+- `implementations/implementations.ttl` — BSC Lab and BioSynCare implementation
+  identity records.
 - `presets/perform-alpha-10-seed.ttl` — minimal SHACL-valid preset instance
   with one Binaural voice and one evidence link.
 - `references/references.ttl` — initial public-safe bibliographic reference
@@ -49,6 +56,8 @@ The current `src/rdf/loader.js` pipeline loads the canonical ontology Turtle
 files and the committed preset/reference instance files through an explicit
 browser manifest. Instance data is loaded **after** the core ontology:
 
+- `frameworks/*.ttl` → graph `https://w3id.org/sstim/graph/frameworks`
+- `implementations/*.ttl` → graph `https://w3id.org/sstim/graph/implementations`
 - `presets/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/preset/`
 - `references/*.ttl` → graph `https://w3id.org/sstim/ref/`
 - `sessions/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/session/` (one per user)

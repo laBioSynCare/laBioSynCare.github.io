@@ -14,6 +14,7 @@ bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     sstim:inGroup sstim-v:groupPerform ;
     sstim:hasBreathGuide false ;
     sstim:presetVersion "0.1.0" ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
     sstim:composedOf preset-local:binaural-voice .
 
 preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;

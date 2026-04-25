@@ -1,8 +1,8 @@
 # Session Model
 
 > **For AI agents:** This document defines the distinction between
-> a preset (reusable protocol specification), a session specification
-> (a preset plus user-chosen parameters for one execution), and a
+> a preset (reusable parameter configuration), a session specification
+> (a preset plus user-chosen parameters for one intended execution), and a
 > session instance (the record of an actual completed execution). Before
 > building any session recording, playback, history, or data export
 > feature, read this document. The JSON schema source is
@@ -23,7 +23,8 @@ grounding, and default operational values. A preset exists independently
 of any execution. Many users can run the same preset and generate
 different session instances. The preset is immutable during a session;
 any change to a voice parameter produces a new or modified preset,
-not a session variant. Specified in `docs/technical/PRESET_FORMAT.md`.
+not a session variant. A preset follows a protocol or framework but is not
+itself the protocol. Specified in `docs/technical/PRESET_FORMAT.md`.
 
 **Layer 2 — Session Specification**
 A preset plus all user-defined parameters that together constitute

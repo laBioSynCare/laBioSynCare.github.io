@@ -8,8 +8,10 @@
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
 SELECT ?cls ?label WHERE {
-  ?cls a <http://www.w3.org/2002/07/owl#Class> .
-  OPTIONAL { ?cls rdfs:label ?label . FILTER(LANG(?label) = "en") }
+  GRAPH ?graph {
+    ?cls a <http://www.w3.org/2002/07/owl#Class> .
+    OPTIONAL { ?cls rdfs:label ?label . FILTER(LANG(?label) = "en") }
+  }
 }
 ORDER BY ?label`)
   let rows = $state([])

@@ -9,8 +9,8 @@
   </ul>
   <ul>
     <li><a href="/">Ontology</a></li>
-    <li><a href="/presets">Presets</a></li>
-    <li><a href="/sparql">SPARQL</a></li>
+    <li><a href="/presets/">Presets</a></li>
+    <li><a href="/sparql/">SPARQL</a></li>
   </ul>
 </nav>
 

@@ -259,16 +259,18 @@ biomedical ontologies in the OBO Foundry ecosystem.
 | BSC class | BFO parent | Rationale |
 |---|---|---|
 | `sstim:SensoryStimulation` | `bfo:0000015` (process) | A Sensory Stimulation session is a process unfolding in time |
-| `sstim:SensoryStimulationIntervention` | `obi:0000070` (planned process) | An intervention is a planned, goal-directed process |
-| `sstim:SensoryStimulationTechnique` | `obi:0000272` (protocol) | A reusable method specification |
-| `sstim:SensoryStimulus` | `bfo:0000015` (process) | The stimulus is a physical process (sound wave, light pattern) |
-| `sstim:SessionInstance` | `bfo:0000015` (process) | A particular session execution |
-| `sstim:SessionSpecification` | `iao:0000104` (plan specification) | An information artifact specifying an intended process |
-| `sstim:Preset` | `iao:0000104` (plan specification) | A reusable session design specification |
-| `sstim:FrequencyBand` | `bfo:0000019` (quality) | A quality of neural activity, not a material entity |
+| `sstim:SensoryStimulationIntervention` | `obi:0000011` (planned process) | An intervention is a planned, goal-directed process |
+| `sstim:SensoryStimulationFramework` | `iao:0000030` (information content entity) | A documented family of principles and constraints |
+| `sstim:SensoryStimulationProtocol` | `iao:0000030` (information content entity) | A documented method specification |
+| `sstim:SensoryStimulationImplementation` | `iao:0000030` (information content entity) | SSTIM represents implementation identity and metadata |
+| `sstim:SensoryStimulationTechnique` | `obi:0000272` (protocol) | A reusable method specification; SSTIM still distinguishes technique from protocol at the domain-model layer |
+| `sstim:SessionInstance` | `prov:Activity` | A particular session execution |
+| `sstim:SessionSpecification` | `iao:0000030` (information content entity) | An information artifact specifying an intended execution |
+| `sstim:Preset` | `iao:0000030` (information content entity) | A reusable parameter configuration |
+| `sstim:FrequencyBand` | `iao:0000030` (information content entity) | A named design/category artifact for Hz ranges |
 | `sstim:EvidenceClaim` | `iao:0000030` (information content entity) | A claim is an information entity |
-| `sstim:EvidenceTierValue` | `bfo:0000019` (quality) | A quality of the evidence relationship |
-| `sstim:SensoryModality` | `bfo:0000031` (generically dependent continuant) | A modality is a kind of process, not a quality |
+| `sstim:EvidenceTierValue` | `iao:0000030` (information content entity) | A named evidence-strength category |
+| `sstim:SensoryModality` | `bfo:0000023` (role) | A channel role in the delivery of stimulation |
 | `sstim:StimulationMechanism` | `bfo:0000015` (process) | A mechanism is a type of causal process |
 
 ### OBO Foundry imports
@@ -280,16 +282,15 @@ it uses selected terms by their stable OBO IRIs with explicit
 
 ```turtle
 # sstim-core.ttl excerpt — OBI alignment
-sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000070 .
-# obi:0000070 = 'planned process' in OBI
+sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011 .
 
 # IAO alignment
-sstim:Preset rdfs:subClassOf iao:0000104 .
-# iao:0000104 = 'plan specification' in IAO
+sstim:Preset rdfs:subClassOf iao:0000030 .
+sstim:SensoryStimulationFramework rdfs:subClassOf iao:0000030 .
 
-# PATO alignment (for quality subclasses)
-sstim:FrequencyBand rdfs:subClassOf pato:0000001 .
-# pato:0000001 = 'quality' in PATO
+# BFO alignment
+sstim:SensoryStimulation rdfs:subClassOf bfo:0000015 .
+sstim:SensoryModality rdfs:subClassOf bfo:0000023 .
 
 # ECO alignment (for evidence classification)
 sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
@@ -440,13 +441,23 @@ console.log(report.results)            // array of violations
 
 ## Named graphs architecture
 
-The default graph contains only authoritative ontology data from
-the four core TTL files. User-contributed annotations and session
-data live in named graphs:
+At runtime, `src/rdf/loader.js` assigns canonical named graph IRIs to every
+loaded Turtle source. Validation tools may still merge files into a default
+graph for standalone SHACL checks, but the browser knowledge graph preserves
+source provenance:
 
 ```turtle
-# Default graph: authoritative ontology (bsc-core + bsc-vocab + instances)
-# Never write user data here
+# Ontology module graphs:
+<https://w3id.org/sstim/graph/core>
+<https://w3id.org/sstim/graph/vocab>
+<https://w3id.org/sstim/graph/shapes>
+<https://w3id.org/sstim/graph/alignments>
+
+# Public instance graphs:
+<https://w3id.org/sstim/graph/frameworks>
+<https://w3id.org/sstim/graph/implementations>
+<https://w3id.org/sstim/implementation/bsclab/preset/>
+<https://w3id.org/sstim/ref/>
 
 # Named graph for user annotations on ontology node X:
 <https://w3id.org/sstim/implementation/bsclab/annotation/{userId}>
@@ -461,9 +472,9 @@ data live in named graphs:
 # Contains: disputed tier assignments, proposed corrections
 ```
 
-This separation is enforced in `src/rdf/annotations/AnnotationStore.js`.
-The `rdf-validate-shacl` library operates only on the default graph;
-annotation graphs are excluded from validation.
+User-contributed annotations and session data never write into ontology or
+public-instance graphs. This separation will be enforced in
+`src/rdf/annotations/AnnotationStore.js`.
 
 ---
 

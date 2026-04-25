@@ -13,8 +13,8 @@
 
 The BSC evidence framework is a structured system for grading the
 scientific support behind claims about what Sensory Stimulation
-interventions do. Every BSC protocol — every preset in the catalog,
-every session type in the platform — carries an evidence grade, and
+interventions do. Every BSC protocol, every preset in the catalog,
+and every session type in the platform carries an evidence grade, and
 that grade governs the language used to describe it to users.
 
 This framework exists for three reasons that reinforce each other.

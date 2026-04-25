@@ -2,7 +2,7 @@
 
 > **Read this file completely before touching any other file in this repository.**
 > This directive applies to Claude Code, GitHub Copilot, Cursor, and all AI coding agents.
-> Last updated: 2026-04-23. Maintained by Renato Fabbri.
+> Last updated: 2026-04-25. Maintained by Renato Fabbri.
 
 ---
 
@@ -12,7 +12,7 @@
 
 1. **Stimulation layer** — a precision multi-engine audiovisual stimulation application
    (Web Audio API, PixiJS, haptics) that delivers sensory entrainment sessions
-   via configurable preset protocols.
+   via configurable preset parameter sets.
 
 2. **Knowledge layer** — an RDF knowledge graph browser, annotator, and SPARQL
    query interface for the BSC ontology: OWL class hierarchy, SKOS vocabulary,

@@ -1,0 +1,13 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+
+<https://w3id.org/sstim/implementation/bsclab> a sstim:SensoryStimulationImplementation ;
+    rdfs:label "BSC Lab" ;
+    dct:description "Open research/reference implementation and knowledge platform for the BSC framework." ;
+    sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .
+
+<https://w3id.org/sstim/implementation/biosyncare> a sstim:SensoryStimulationImplementation ;
+    rdfs:label "BioSynCare" ;
+    dct:description "Commercial application implementation and catalog for the BSC framework." ;
+    sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .

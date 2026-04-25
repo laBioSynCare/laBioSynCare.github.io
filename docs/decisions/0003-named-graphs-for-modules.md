@@ -40,6 +40,10 @@ Canonical graph IRIs mirror the namespace structure where modules align:
 | `sstim-alignments.ttl` | `https://w3id.org/sstim/graph/alignments` |
 | Future `sstim-track.ttl` | `https://w3id.org/sstim/graph/track` |
 | Future `sstim-outcome.ttl` | `https://w3id.org/sstim/graph/outcome` |
+| Framework instances | `https://w3id.org/sstim/graph/frameworks` |
+| Implementation instances | `https://w3id.org/sstim/graph/implementations` |
+| BSC Lab preset instances | `https://w3id.org/sstim/implementation/bsclab/preset/` |
+| Public-safe references | `https://w3id.org/sstim/ref/` |
 | User annotations | `https://w3id.org/sstim/implementation/bsclab/annotation/{userId}` |
 | Session records | `https://w3id.org/sstim/implementation/bsclab/session/{sessionId}` |
 
@@ -72,16 +76,17 @@ namespace, but the annotation triple belongs in the user's graph.
 
 - Protected `.ttl` files are unchanged; `pyshacl` continues to work
   file-by-file.
-- The loader (`src/rdf/loader.js`) maintains the graph-IRI map. Adding a
-  module means adding one row to the map and creating the `.ttl` file.
+- The loader (`src/rdf/loader.js`) maintains the source-to-graph map. Adding a
+  module or committed instance file means adding one row to the map and
+  creating the `.ttl` file.
 - Module toggles in the ontology graph UI filter by graph IRI.
 - SPARQL queries can scope to a module with `FROM NAMED` / `GRAPH ?g`.
 - User annotations land in `sstim/implementation/bsclab/annotation/{userId}`
   graphs and are isolated from authoritative ontology data by construction
   (extends `CLAUDE.md` §5.5 from annotations-only to all user data).
 - When Firestore writes are added, each session record becomes a named
-  graph on hydration into the in-memory store; the default graph remains
-  authoritative ontology only.
+  graph on hydration into the in-memory store; user data never lands in the
+  default graph or in authoritative ontology graphs.
 
 ## See also
 
