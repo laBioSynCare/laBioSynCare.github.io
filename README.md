@@ -24,18 +24,21 @@ The repository is at the **Phase 0 → Phase 1 boundary**. What exists today:
   (multilingual SKOS), `sstim-shapes.ttl` (SHACL), `sstim-alignments.ttl`
   (external links to Wikidata, DBpedia, OBO)
 - A SvelteKit/Svelte 5 scaffold with initial ontology graph and SPARQL routes
+- A GitHub Pages deployment workflow for the client-only static build and
+  `/ontology/*.ttl` artifacts
 - Architecture READMEs under `src/` describing the target software design
 
 What does **not** yet exist (planned — Phase 1 and later):
 
-- A public deployment at `lab.biosyncare.com`
+- Custom-domain hosting at `lab.biosyncare.com`; this is deferred until the
+  app needs custom headers, WASM threading, or backend services
 - Preset browser, evidence-chain view, annotation storage, or browser-side
   SHACL validation UI
 - AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
 - Pre-commit hooks (`hooks/`)
-- Deployed WIDOCO documentation or published `w3id.org/sstim` namespace
+- Deployed WIDOCO documentation
 
 See [`ROADMAP.md`](ROADMAP.md) for phase definitions and
 [`TODO.md`](TODO.md) for the tracked task list and current Phase 1 backlog.
@@ -56,12 +59,12 @@ docs/
   ecosystem/            IP strategy, W3C CG charter, advisory board, partners
 
 static/
-  ontology/             Turtle files served same-origin by Netlify / Vite dev
+  ontology/             Turtle files served by Vite dev and GitHub Pages
     sstim-core.ttl        OWL classes and properties
     sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
     sstim-shapes.ttl      SHACL validation shapes
     sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
-    instances/            Preset/session/evidence RDF instances (planned)
+    instances/            Preset/reference RDF instances (Phase 1 seed data)
   worklets/             AudioWorklet processors (planned — Phase 2)
 
 src/                    SvelteKit app scaffold (Phase 1 — in progress)
@@ -93,13 +96,13 @@ tests/                  Test suites (planned — Phase 1)
 The current runnable checks are:
 
 ```bash
-make validate  # SHACL over core + vocabulary; skips empty instance dirs
+make validate  # SHACL over core + vocabulary + RDF instances
 make check     # SvelteKit sync + svelte-check
 make build     # Static production build into dist/
 ```
 
-The SHACL pass currently conforms for both the core ontology and vocabulary.
-A local `hooks/pre-commit` wrapper is planned for Phase 1.
+The SHACL pass currently conforms for the core ontology, vocabulary, and seeded
+RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
 
 ---
 
@@ -108,11 +111,12 @@ A local `hooks/pre-commit` wrapper is planned for Phase 1.
 Two persistent IRI roots, one rule each:
 
 - **`https://w3id.org/sstim`** — the ontology (OWL classes/properties, SKOS
-  vocabulary, SHACL shapes). Reusable by other projects. Planned for
-  registration at [w3id.org](https://w3id.org) in Phase 1.
+  vocabulary, SHACL shapes). Reusable by other projects. The w3id redirect is
+  live and should resolve to the GitHub Pages `/ontology/*.ttl` artifacts.
 - **`https://w3id.org/bsc/{preset,session,annotation,evidence}/...`** — BSC
   product instances. Preset IRIs and user-generated data live here so the
-  ontology stays reusable.
+  ontology stays reusable; the exact w3id routing for this namespace is a
+  Phase 1 planning task.
 
 Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
 [`static/ontology/README.md`](static/ontology/README.md).

@@ -52,9 +52,9 @@ substitute alternatives without explicit instruction.
 | Visual engine (default) | PixiJS | v8.x | Auto WebGPU/WebGL, unified renderer API |
 | Audio engine (default) | Vanilla Web Audio API | browser native | Direct AudioContext control, no abstraction overhead |
 | Haptic engine (default) | Web Vibration API | browser native | NullHapticEngine fallback for unsupported platforms |
-| App hosting | Netlify | planned | Static hosting + custom headers (COOP/COEP for SharedArrayBuffer); target `lab.biosyncare.com` |
-| Ontology artifacts | GitHub Pages | planned | Stable citable URLs for `.ttl` files and WIDOCO docs; w3id.org redirects will point here |
-| Ontology docs | WIDOCO | planned | HTML documentation from OWL, deployed to GitHub Pages |
+| App hosting | GitHub Pages | current | Client-only static app and `/ontology/*.ttl` artifacts; custom hosting deferred until headers or backend services are needed |
+| Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
+| Ontology docs | WIDOCO | blocked | HTML documentation from OWL; generate in CI and publish outside `main` after the publication path is chosen |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
 
 ### Svelte 5 AI tooling setup
@@ -487,7 +487,7 @@ docs/
                                 PARTNERS, CONSORTIUM_INVITATION
 
 static/
-  _headers                    ← COOP/COEP/CORP headers (Netlify)
+  _headers                    ← COOP/COEP/CORP headers for future Netlify/custom hosting
   worklets/                   ← AudioWorklet processors (never bundled by Vite)
     binaural.worklet.js
     martigli.worklet.js
@@ -563,18 +563,18 @@ documentation at `pixijs.com/8.x/`.
 
 **SharedArrayBuffer requires COOP/COEP headers.** WASM audio with threading and
 ring buffers requires `Cross-Origin-Opener-Policy: same-origin` and
-`Cross-Origin-Embedder-Policy: require-corp`. These are set in `static/_headers`
-(Netlify) and must be present on every response from `lab.biosyncare.com`. Without
-them, `SharedArrayBuffer` is undefined. GitHub Pages cannot serve these headers —
-this is why the app is hosted on Netlify, not GitHub Pages.
+`Cross-Origin-Embedder-Policy: require-corp`. GitHub Pages cannot serve these
+headers. That is acceptable while BSC Lab is a client-only knowledge browser;
+move runtime hosting to Netlify or another custom-header host before shipping
+threaded WASM audio or any feature that depends on `SharedArrayBuffer`.
 
 **COEP blocks cross-origin RDF fetches.** `Cross-Origin-Embedder-Policy: require-corp`
 means every resource the app loads must be same-origin or carry
 `Cross-Origin-Resource-Policy: cross-origin`. The ontology `.ttl` files are
 therefore bundled as static assets in `static/ontology/` and served from the same
-Netlify origin — the app never fetches them from `labiosyncare.github.io` at
-runtime. GitHub Pages hosts the citable/stable copies; Netlify hosts the runtime
-copies. Both come from the same source files in the repo.
+origin as the app. If runtime hosting moves away from GitHub Pages, keep the
+same-source-file pattern: the app origin serves runtime copies, and GitHub Pages
+continues to serve the citable/stable copies used by w3id redirects.
 
 **Comunica bundle size.** `@comunica/query-sparql` is ~500KB+ gzipped. Use dynamic
 import to lazy-load it only when the SPARQL interface is opened, not at app startup.

@@ -114,7 +114,8 @@ Two persistent namespaces are registered at
 [perma-id/w3id.org](https://github.com/perma-id/w3id.org):
 
 - `https://w3id.org/sstim` — the ontology (classes, properties, SKOS
-  vocabulary, SHACL shapes). Content-negotiated to Turtle or WIDOCO HTML.
+  vocabulary, SHACL shapes). Content-negotiated to Turtle now; WIDOCO HTML is
+  blocked until the publication path is chosen.
 - `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` —
   BSC product instance data.
 
@@ -410,14 +411,11 @@ python -m pyshacl \
   -s static/ontology/sstim-shapes.ttl \
   static/ontology/sstim-vocab.ttl
 
-# Validate all preset instances
-python -m pyshacl \
-  -s static/ontology/sstim-shapes.ttl \
-  static/ontology/instances/presets/ \
-  --format turtle
+# Validate core, vocabulary, and instances with the same command CI runs
+make validate
 ```
 
-The CI pipeline (`github/workflows/validate-rdf.yml`) runs these on
+The CI pipeline (`.github/workflows/validate-rdf.yml`) runs these on
 every PR that touches any `.ttl` file. PRs that fail SHACL validation
 are not merged.
 
@@ -520,21 +518,30 @@ in the `.htaccess` file at
 [perma-id/w3id.org/sstim/.htaccess](https://github.com/perma-id/w3id.org):
 
 ```
-# Accept: text/turtle → raw TTL (GitHub raw)
+# Accept: text/turtle → Turtle artifact on GitHub Pages
 RewriteCond %{HTTP_ACCEPT} text/turtle
-RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.ttl [R=303,L]
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.ttl [R=303,L]
 
-# Accept: application/rdf+xml → GitHub raw (RDF/XML export)
+# Accept: application/rdf+xml → RDF/XML export, when generated
 RewriteCond %{HTTP_ACCEPT} application/rdf+xml
-RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.rdf [R=303,L]
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.rdf [R=303,L]
 
-# Accept: application/ld+json → JSON-LD (CDN or GitHub raw)
+# Accept: application/ld+json → JSON-LD export, when generated
 RewriteCond %{HTTP_ACCEPT} application/ld+json
-RewriteRule ^$ https://raw.githubusercontent.com/.../sstim-core.jsonld [R=303,L]
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.jsonld [R=303,L]
 
-# Default (browsers, curl without Accept) → WIDOCO HTML docs
-RewriteRule ^$ https://bsc-lab.github.io/bsc-lab/ontology/ [R=303,L]
+# Default browser path while WIDOCO is blocked
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.ttl [R=303,L]
+
+# Future default after WIDOCO publication path is chosen:
+# RewriteRule ^$ https://labiosyncare.github.io/ontology/ [R=303,L]
 ```
+
+The repo deploys the SvelteKit static build with `.github/workflows/pages.yml`;
+`static/ontology/*.ttl` is copied into `dist/ontology/` and published by GitHub
+Pages. WIDOCO is intentionally not committed to `main`. When enabled, generate
+WIDOCO in GitHub Actions and publish the output as a Pages artifact or a
+separate docs branch.
 
 A parallel `.htaccess` at `perma-id/w3id.org/bsc/` routes the product
 instance namespace (`https://w3id.org/bsc/preset/...`, `/session/...`,

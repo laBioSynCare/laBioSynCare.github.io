@@ -161,14 +161,21 @@ indexed, examiner-searchable records.
       ontology `P1`
       *Process: fork https://github.com/perma-id/w3id.org, create
       `sstim/` folder with `.htaccess` content negotiation rules,
-      submit PR. Typically merges in 1–2 weeks.*
+      submit PR. Redirect is live; verify final Pages targets and the
+      browser/WIDOCO path after deployment.*
 - [ ] Register `https://w3id.org/bsc` persistent namespace for BSC
       product instances (preset, session, annotation, evidence) `P1`
       *Same process: `bsc/` folder with routing for the sub-paths
-      used by BSC preset/session/annotation IRIs.*
+      used by BSC preset/session/annotation IRIs. Namespace planning comes
+      before publication: keep presets under `/preset/`, sessions under
+      `/session/`, annotations under `/annotation/`, and evidence under
+      `/evidence/`.*
 - [ ] Register `sstim:` and `bsc:` prefixes at https://prefix.cc `P1`
-- [x] Add `static/_headers` with COOP/COEP for Netlify (required for
-      SharedArrayBuffer and WASM threading) `P1`
+- [x] Add `static/_headers` with COOP/COEP for future Netlify/custom hosting
+      (required for SharedArrayBuffer and WASM threading) `P1`
+      *Kept for future Netlify/custom hosting; GitHub Pages remains the
+      primary host while BSC Lab is client-only and does not need these
+      headers.*
 
 ---
 
@@ -186,7 +193,10 @@ Turtle files are listed in section 1. After they exist:
       consistency (Protégé, command line, or robot verify) `P1`
 - [ ] Generate WIDOCO HTML docs from `sstim-core.ttl` + `sstim-vocab.ttl` `P1`
       `java -jar widoco.jar -ontFile static/ontology/sstim-core.ttl -outFolder docs-site`
-- [ ] Deploy WIDOCO output to GitHub Pages (`docs-site/` branch) `P1`
+- [ ] Deploy WIDOCO output to GitHub Pages `P1`
+      *Blocked until the publication path is chosen. When enabled, generate
+      WIDOCO in GitHub Actions and publish the output as a Pages artifact or
+      separate docs branch; do not commit generated HTML into `main`.*
 - [ ] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
 - [ ] Add `owl:versionIRI` pointing to immutable snapshot:
@@ -246,9 +256,11 @@ Do not start these until all Phase 0 documents are committed.
       WASM/PWA plugin additions when those features land.*
 - [ ] Add pre-commit hook: Turtle syntax check + JSON preset schema
       validation `P1`
-- [~] Configure GitHub Actions: `validate-rdf.yml`, `widoco-docs.yml`,
-      `lint.yml` `P1`
-      *Done: `validate-rdf.yml`, `lint.yml`. Pending: WIDOCO docs workflow.*
+- [~] Configure GitHub Actions: `validate-rdf.yml`, `pages.yml`,
+      `widoco-docs.yml`, `lint.yml` `P1`
+      *Done: `validate-rdf.yml`, `lint.yml`, `pages.yml`. Pending:
+      WIDOCO docs workflow, intentionally blocked until publication path
+      is chosen.*
 - [x] `netlify.toml` and `static/_headers` configuration `P1`
 - [x] SvelteKit `src/app.html`, layout, ontology route, and SPARQL route `P1`
 
@@ -294,10 +306,21 @@ Do not start these until all Phase 0 documents are committed.
       CONSTRUCT results as graph `P1`
 
 ### Deployment
-- [ ] Deploy BSC Lab v0.1 to Netlify: `lab.biosyncare.com` (CNAME at Keliweb) `P1`
+- [x] Deploy BSC Lab v0.1 static build to GitHub Pages via
+      `.github/workflows/pages.yml` `P1`
+      *Primary host while the app is client-only and does not require custom
+      response headers.*
+- [ ] Verify GitHub Pages serves `https://labiosyncare.github.io/ontology/sstim-core.ttl`
+      and `https://labiosyncare.github.io/ontology/sstim-vocab.ttl` after the
+      Pages workflow runs `P1`
 - [ ] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
-      HTML for browser `P1`
+      browser path TBD until WIDOCO is chosen `P1`
+- [ ] Optional Netlify/custom-domain deployment: `lab.biosyncare.com`
+      (CNAME at Keliweb) `P2`
+      *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,
+      server-side APIs, or custom-domain product positioning.*
 - [ ] Verify WIDOCO docs are live on GitHub Pages `P1`
+      *Blocked until WIDOCO publication path is chosen.*
 
 ---
 
@@ -382,8 +405,9 @@ Do not start these until all Phase 0 documents are committed.
       *Note: requires wasm-pack, Rust toolchain, nightly for atomics.
       SharedArrayBuffer ring buffer pattern.* `P3`
 - [ ] Expanded annotation: multi-user named graphs with server-side sync;
-      backend technology TBD in Phase 3 (Firebase/Firestore ruled out
-      as primary hosting; evaluate alternatives at that point) `P3`
+      backend technology TBD in Phase 3. Firebase Auth is the leading
+      candidate for login if private/cross-device state becomes necessary;
+      evaluate Firestore or another sync backend at that point. `P3`
 
 ---
 
@@ -512,6 +536,8 @@ because financial sustainability constrains everything else.
       touching `static/ontology/` `P1`
 - [ ] `.github/workflows/widoco-docs.yml` — regenerate docs-site
       on TTL file change `P1`
+- [x] `.github/workflows/pages.yml` — build SvelteKit static output and deploy
+      `dist/` to GitHub Pages `P1`
 - [x] `.github/workflows/lint.yml` — Svelte type check and static build `P1`
 - [ ] `hooks/pre-commit` — local validation mirror of CI `P1`
 
@@ -523,13 +549,12 @@ These require human judgment before tasks can proceed. Flagged here
 to prevent AI agents from making the decision implicitly by building
 something that assumes an answer.
 
-- [x] **Firebase role**: resolved 2026-04-22. Firebase is not used.
-  App hosting moved to **Netlify** (`lab.biosyncare.com`) — already used
-  for BioSynCare, free tier is generous (100 GB/month vs Firebase's 10 GB),
-  and supports `static/_headers` for COOP/COEP without a configuration
-  surface. Annotation and session persistence: IndexedDB locally; a
-  server-side sync backend (if ever needed) is deferred to Phase 3 and
-  will be evaluated then without Firebase assumed.
+- [x] **Firebase role**: resolved 2026-04-25. Firebase is not used in
+  Phase 1. BSC Lab stays client-only on GitHub Pages while state is public
+  or local-only. If private or cross-device state becomes necessary, use
+  Firebase Auth as the leading candidate for email/password and Google login;
+  evaluate Firestore or another sync backend at that point instead of
+  assuming it now.
 
 - [?] **UI framework final confirmation**: Svelte 5 is the stated
   choice. Riccardo works in React Native (BioSynCare). If he

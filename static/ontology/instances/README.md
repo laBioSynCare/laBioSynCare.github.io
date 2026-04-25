@@ -1,8 +1,10 @@
 # static/ontology/instances — BSC Product Instance Data
 
 RDF instance data that uses the [`sstim`](../) ontology. Unlike the ontology
-itself (reusable, under `w3id.org/sstim`), everything here is **BSC product
-data** and lives under the `w3id.org/bsc/...` namespace.
+itself (reusable, under `w3id.org/sstim`), presets, evidence, sessions, and
+annotations here are **BSC product data** and live under the
+`w3id.org/bsc/...` namespace. Public-safe references live under
+`w3id.org/sstim/ref/...` because citations can be reused across products.
 
 See [`../README.md`](../README.md) for the namespace rule and
 [`CLAUDE.md` §5.1](../../../CLAUDE.md) for the enforcement policy.
@@ -25,10 +27,16 @@ instances/
 
 ## Current state
 
-Both `presets/` and `references/` directories exist but are **empty**. No
-preset or reference instances have been committed yet; the v0.9.1 catalog
-is still in its original JSON form (not in this tree). Conversion to RDF
-instances is a Phase 1 ontology task (`TODO.md` → "Phase 1 instances").
+The first Phase 1 seed instances are committed:
+
+- `presets/perform-alpha-10-seed.ttl` — minimal SHACL-valid preset instance
+  with one Binaural voice and one evidence link.
+- `references/references.ttl` — initial public-safe bibliographic reference
+  list.
+
+The v0.9.1 catalog is still in its original JSON form (not in this tree).
+Full conversion to RDF instances remains a Phase 1 ontology task
+(`TODO.md` -> "Phase 1 instances").
 
 A `sessions/` subdirectory is not created yet; it will land alongside the
 session-recording code in Phase 2.

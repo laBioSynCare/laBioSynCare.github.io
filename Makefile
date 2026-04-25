@@ -4,7 +4,8 @@ SHAPES     := static/ontology/sstim-shapes.ttl
 ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
-INSTANCES  := static/ontology/instances/presets/
+INSTANCE_ROOT := static/ontology/instances
+INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/presets/*.ttl) $(wildcard $(INSTANCE_ROOT)/references/*.ttl)
 DEV_HOST   ?= 127.0.0.1
 DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
@@ -36,17 +37,19 @@ shacl-core:
 shacl-vocab:
 	$(PYSHACL) -s $(SHAPES) $(VOCAB)
 
-## Validate preset instances against shapes (once instances exist)
+## Validate RDF instances against shapes with ontology + vocabulary context
 shacl-instances:
-	$(PYSHACL) -s $(SHAPES) $(INSTANCES)
-
-## Run all SHACL validations (core + vocab; skip instances if directory empty)
-shacl: shacl-core shacl-vocab
-	@if [ -n "$$(ls -A $(INSTANCES) 2>/dev/null)" ]; then \
-		$(MAKE) shacl-instances; \
+	@if [ -z "$(strip $(INSTANCE_FILES))" ]; then \
+		echo "shacl-instances: skipped ($(INSTANCE_ROOT) has no .ttl instances)"; \
 	else \
-		echo "shacl-instances: skipped ($(INSTANCES) is empty)"; \
+		tmp="$$(mktemp)"; \
+		trap 'rm -f "$$tmp"' EXIT; \
+		cat $(ONTOLOGY) $(VOCAB) $(INSTANCE_FILES) > "$$tmp"; \
+		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
 	fi
+
+## Run all SHACL validations
+shacl: shacl-core shacl-vocab shacl-instances
 
 ## Run Vitest
 test:
@@ -66,4 +69,4 @@ help:
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
-	@echo "  make shacl-instances  Validate static/ontology/instances/presets/ (skipped if empty)"
+	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"

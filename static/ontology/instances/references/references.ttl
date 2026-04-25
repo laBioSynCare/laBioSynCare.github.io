@@ -1,0 +1,11 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-ref: <https://w3id.org/sstim/ref/> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+sstim-ref:INGENDOH_2023 a sstim:PublicSafeReference ;
+    sstim:referenceKey "INGENDOH_2023" ;
+    dct:title "Binaural beats to entrain the brain? A systematic review of the effects of binaural beat stimulation on brain oscillatory activity, and the implications for psychological research and intervention" ;
+    dct:creator "Ingendoh, Ruth Maria", "Posny, Ella S.", "Heine, Angela" ;
+    dct:issued "2023-05-19"^^xsd:date ;
+    dct:identifier "doi:10.1371/journal.pone.0286023" .
