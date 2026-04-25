@@ -24,12 +24,13 @@ annotations lives here.
 
 | # | Title | Status |
 |---|---|---|
-| [0001](0001-namespace-split.md) | Two-root namespace split (`sstim` vs `bsc`) | Accepted |
+| [0001](0001-namespace-split.md) | SSTIM-scoped instance paths | Accepted |
 | [0002](0002-dual-typing-owl-skos.md) | Dual-typing of SKOS concepts and OWL classes (Pattern 2) | Accepted |
 | [0003](0003-named-graphs-for-modules.md) | Named graphs for runtime module isolation | Accepted |
 | [0004](0004-protected-ontology-files.md) | Protected ontology files policy | Accepted |
 | [0005](0005-binaural-carrier-pair-only.md) | Binaural beat parameterized as carrier pair only | Accepted |
 | [0006](0006-one-class-per-technique.md) | One class per technique; voice classes named `*Voice` | Accepted |
+| [0007](0007-framework-protocol-implementation.md) | Framework, technique, protocol, implementation, preset, session | Accepted |
 
 ## Adding an ADR
 

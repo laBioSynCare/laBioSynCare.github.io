@@ -363,10 +363,14 @@ RDF individual. The session ontology is minimal in Phase 1 and will
 be extended in Phase 3 as the evidence infrastructure matures.
 
 ```turtle
-@prefix bsc:     <https://w3id.org/sstim#> .
-@prefix bsc-si:  <https://w3id.org/bsc/session/> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix sstim:              <https://w3id.org/sstim#> .
+@prefix sstim-v:            <https://w3id.org/sstim/vocab#> .
+@prefix biosyncare-session: <https://w3id.org/sstim/implementation/biosyncare/session/> .
+@prefix owl:                <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:               <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:               <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:                <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:               <http://www.w3.org/ns/prov#> .
 
 # Session Specification class
 sstim:SessionSpecification a owl:Class ;
@@ -386,11 +390,11 @@ sstim:SessionInstance a owl:Class ;
         data."""@en .
 
 # Example session instance
-bsc-si:550e8400-e29b-41d4-a716-446655440000
+biosyncare-session:550e8400-e29b-41d4-a716-446655440000
     a sstim:SessionInstance, prov:Activity ;
     sstim:usesSpecification [
         a sstim:SessionSpecification ;
-        sstim:referencesPreset <https://w3id.org/bsc/preset/perform-deep-focus> ;
+        sstim:referencesPreset <https://w3id.org/sstim/implementation/biosyncare/preset/perform-deep-focus> ;
         sstim:presetVersion "0.9.1" ;
         sstim:durationSeconds 1800 ;
         sstim:headphoneMode sstim-v:headphones ;

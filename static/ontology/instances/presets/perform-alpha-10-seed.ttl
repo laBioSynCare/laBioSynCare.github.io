@@ -1,13 +1,13 @@
-@prefix bsc-evidence: <https://w3id.org/bsc/evidence/> .
-@prefix bsc-preset:   <https://w3id.org/bsc/preset/> .
+@prefix bsclab-evidence: <https://w3id.org/sstim/implementation/bsclab/evidence/> .
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
 @prefix dct:          <http://purl.org/dc/terms/> .
-@prefix preset-local: <https://w3id.org/bsc/preset/perform-alpha-10-seed#> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed#> .
 @prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sstim:        <https://w3id.org/sstim#> .
 @prefix sstim-ref:    <https://w3id.org/sstim/ref/> .
 @prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
 
-bsc-preset:perform-alpha-10-seed a sstim:Preset ;
+bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     rdfs:label "Perform Alpha 10 Seed" ;
     dct:description "Minimal Phase 1 RDF preset seed used to validate the BSC Lab preset instance model. This seed is not a clinical, health, or performance claim." ;
     sstim:targetsFrequencyBand sstim-v:alpha10 ;
@@ -22,10 +22,10 @@ preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;
     sstim:carrierFreqRight 210.0 ;
     sstim:initialVolume 0.16 .
 
-bsc-evidence:perform-alpha-10-seed-auditory-review a sstim:EvidenceClaim ;
+bsclab-evidence:perform-alpha-10-seed-auditory-review a sstim:EvidenceClaim ;
     rdfs:label "Perform Alpha 10 Seed auditory evidence note" ;
     dct:description "Pipeline seed evidence link only: cites a systematic review to keep the preset connected to public-safe literature without asserting a guaranteed outcome." ;
-    sstim:supportsRelation bsc-preset:perform-alpha-10-seed ;
+    sstim:supportsRelation bsclab-preset:perform-alpha-10-seed ;
     sstim:hasEvidenceTier sstim-v:tierSpeculative ;
     sstim:hasModalityTag sstim-v:modalityAUD, sstim-v:modalityREVIEW ;
     sstim:citesReference sstim-ref:INGENDOH_2023 .

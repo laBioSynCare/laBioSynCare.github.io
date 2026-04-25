@@ -311,22 +311,32 @@ The canonical BSC namespace prefixes:
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
+@prefix bsc-fw:   <https://w3id.org/sstim/framework/bsc/> .
+@prefix bsclab:   <https://w3id.org/sstim/implementation/bsclab/> .
+@prefix biosyncare: <https://w3id.org/sstim/implementation/biosyncare/> .
 ```
 
-**Namespace convention — two IRI roots, one rule each.**
+**Namespace convention — one registered SSTIM namespace, scoped by role.**
 
 - `https://w3id.org/sstim` (`/sstim#`, `/sstim/vocab#`, `/sstim/shapes#`) — the
   **ontology**: OWL classes and properties, SKOS vocabulary concepts, SHACL
   shapes. This is the reusable, citable scientific artifact. Every `.ttl` file
   in `static/ontology/` declares its prefixes here.
-- `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` — **BSC
-  product instances**: preset IRIs, session records, user annotations, evidence
-  chain nodes specific to the BSC/BioSynCare catalog. These live under a
-  product-scoped namespace so the ontology stays reusable by other projects.
+- `https://w3id.org/sstim/framework/bsc` — the **BSC framework**: techniques,
+  composition rules, evidence rules, grouping logic, and design principles.
+- `https://w3id.org/sstim/implementation/biosyncare` — the commercial
+  **BioSynCare** implementation and catalog.
+- `https://w3id.org/sstim/implementation/bsclab` — the open **BSC Lab**
+  reference implementation, public seeds, and knowledge-browser data.
 
-Never publish a BSC preset or session under `w3id.org/sstim`; never declare an
-OWL class or SKOS concept under `w3id.org/bsc`. If you are unsure which root
-applies to something new, ask — do not guess.
+Implementation data uses implementation-scoped subpaths:
+`/preset/{id}`, `/session/{id}`, `/annotation/{id}`, and `/evidence/{id}`.
+
+Never publish a BSC preset or session in the reusable ontology term space
+(`sstim#`, `sstim/vocab#`, `sstim/shapes#`); never declare an OWL class or
+SKOS concept under an implementation path. BSC itself is a framework, not a
+protocol, preset, or software app. See
+`docs/decisions/0007-framework-protocol-implementation.md`.
 
 ### 5.2 Dual-typing pattern for vocabulary concepts
 
@@ -400,7 +410,7 @@ graph contains only authoritative ontology data. This separation is enforced in
 
 ```javascript
 // CORRECT — annotation in named graph
-const annotationGraph = namedNode(`https://w3id.org/bsc/annotations/${userId}`);
+const annotationGraph = namedNode(`https://w3id.org/sstim/implementation/bsclab/annotation/${userId}`);
 store.addQuad(subject, predicate, object, annotationGraph);
 
 // WRONG — annotation in default graph pollutes authoritative data

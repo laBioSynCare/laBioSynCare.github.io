@@ -40,12 +40,12 @@ Canonical graph IRIs mirror the namespace structure where modules align:
 | `sstim-alignments.ttl` | `https://w3id.org/sstim/graph/alignments` |
 | Future `sstim-track.ttl` | `https://w3id.org/sstim/graph/track` |
 | Future `sstim-outcome.ttl` | `https://w3id.org/sstim/graph/outcome` |
-| User annotations | `https://w3id.org/bsc/annotations/{userId}` |
-| Session records | `https://w3id.org/bsc/session/{sessionId}` |
+| User annotations | `https://w3id.org/sstim/implementation/bsclab/annotation/{userId}` |
+| Session records | `https://w3id.org/sstim/implementation/bsclab/session/{sessionId}` |
 
 For ontology modules, namespace / file / graph IRI align. For user data,
-namespace (`bsc/`) and graph IRI come apart — a user can annotate a term in
-any namespace, but the annotation triple belongs in the user's graph.
+scoped path and graph IRI come apart — a user can annotate a term in any
+namespace, but the annotation triple belongs in the user's graph.
 
 ## Alternatives considered
 
@@ -76,9 +76,9 @@ any namespace, but the annotation triple belongs in the user's graph.
   module means adding one row to the map and creating the `.ttl` file.
 - Module toggles in the ontology graph UI filter by graph IRI.
 - SPARQL queries can scope to a module with `FROM NAMED` / `GRAPH ?g`.
-- User annotations land in `bsc/annotations/{userId}` graphs and are
-  isolated from authoritative ontology data by construction (extends
-  `CLAUDE.md` §5.5 from annotations-only to all user data).
+- User annotations land in `sstim/implementation/bsclab/annotation/{userId}`
+  graphs and are isolated from authoritative ontology data by construction
+  (extends `CLAUDE.md` §5.5 from annotations-only to all user data).
 - When Firestore writes are added, each session record becomes a named
   graph on hydration into the in-memory store; the default graph remains
   authoritative ontology only.

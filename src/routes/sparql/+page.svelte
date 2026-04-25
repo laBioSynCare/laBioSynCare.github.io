@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { loadOntology } from '../../rdf/loader.js'
+  import { loadKnowledgeGraph } from '../../rdf/loader.js'
   import { select } from '../../rdf/query.js'
 
   let store = $state(null)
@@ -20,7 +20,7 @@ ORDER BY ?label`)
 
   onMount(async () => {
     try {
-      store = await loadOntology()
+      store = await loadKnowledgeGraph()
     } catch (e) {
       error = `Failed to load ontology: ${e.message}`
     } finally {

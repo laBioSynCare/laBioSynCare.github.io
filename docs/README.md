@@ -45,8 +45,7 @@ Lightweight ADRs capturing non-obvious architectural choices with context,
 alternatives, and consequences. See
 [`decisions/README.md`](decisions/README.md) for the index and format.
 
-- [0001](decisions/0001-namespace-split.md) — two-root namespace split
-  (`sstim` vs `bsc`).
+- [0001](decisions/0001-namespace-split.md) — SSTIM-scoped instance paths.
 - [0002](decisions/0002-dual-typing-owl-skos.md) — dual-typing of SKOS
   concepts and OWL classes (Pattern 2).
 - [0003](decisions/0003-named-graphs-for-modules.md) — named graphs for
@@ -57,6 +56,8 @@ alternatives, and consequences. See
   parameterized as carrier pair only.
 - [0006](decisions/0006-one-class-per-technique.md) — one class per
   technique; voice classes named `*Voice` (not `*VoiceSpec`).
+- [0007](decisions/0007-framework-protocol-implementation.md) — framework,
+  technique, protocol, implementation, preset, and session distinctions.
 
 ## `ecosystem/` — IP, governance, outreach
 

@@ -171,13 +171,15 @@ supplied at the class level: `sstim:SensoryEntrainment`,
 The formal vocabulary for the domain is published at
 `https://w3id.org/sstim` with prefix `sstim:`. This namespace belongs to
 the Sensory Stimulation community, not to BSC Lab specifically. BSC Lab
-is the founding contributor. BioSynCare-specific preset instances use the
-`https://w3id.org/bsc/preset/` namespace, which is product-scoped.
+is the founding contributor. The BSC framework uses
+`https://w3id.org/sstim/framework/bsc`. BSC Lab reference instances use
+`https://w3id.org/sstim/implementation/bsclab/...`; BioSynCare commercial
+catalog instances use `https://w3id.org/sstim/implementation/biosyncare/...`.
 
 The separation of community vocabulary (`sstim:`) from product instances
-(`bsc-inst:`) is intentional: the ontology should be useful to any
-researcher working in sensory stimulation, regardless of their relationship
-to BioSynCare.
+(`bsclab-preset:` or `biosyncare-preset:`) is intentional: the ontology should
+be useful to any researcher working in sensory stimulation, regardless of their
+relationship to BioSynCare.
 
 ---
 

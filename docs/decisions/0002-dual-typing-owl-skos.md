@@ -75,7 +75,7 @@ sstim-v:alpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
 - **Not all OWL classes are dual-typed.** Classes with many instances and
   no taxonomic role (`sstim:Preset`, `sstim:SessionInstance`,
   `sstim:EvidenceClaim`) remain pure OWL classes; their instances live in
-  the `bsc/` namespace and are not SKOS concepts.
+  implementation-scoped SSTIM paths and are not SKOS concepts.
 
 ## See also
 

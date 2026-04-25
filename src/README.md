@@ -1,10 +1,9 @@
 # src — Software Architecture
 
 > **Status: Phase 1 scaffold in progress.** The SvelteKit/Svelte 5 app exists
-> with initial RDF loading, SPARQL querying, and ontology graph routes. Engine,
-> player, preset-browser, annotation, export, and browser-side validation
-> modules referenced below are still planned. See `ROADMAP.md` for phase
-> definitions.
+> with initial RDF loading, SPARQL querying, ontology graph, and preset routes.
+> Engine, player, annotation, export, and browser-side validation modules
+> referenced below are still planned. See `ROADMAP.md` for phase definitions.
 
 This directory contains the BSC Lab application: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL
@@ -94,13 +93,12 @@ static/ontology/instances/presets/    →      ↓
                                Annotation editor
 ```
 
-**Ontology files are bundled as static assets** (`static/ontology/`), not fetched
-from `labiosyncare.github.io` at runtime. This is required by
-`Cross-Origin-Embedder-Policy: require-corp` (needed for WASM audio). SvelteKit
-copies `static/ontology/**/*.ttl` into `dist/ontology/` so they are served from
-the same Netlify origin as the app. GitHub Pages hosts the canonical citable
-copies; Netlify hosts the runtime copies. Both come from the same source files
-— no duplication of truth.
+**Ontology files are bundled as static assets** (`static/ontology/`). SvelteKit
+copies `static/ontology/**/*.ttl` into `dist/ontology/` so the runtime app and
+citable artifacts are served from the same GitHub Pages origin today. If runtime
+hosting later moves to Netlify or another custom-header host for WASM threading,
+that host must serve the same source files from the app origin while GitHub
+Pages remains the canonical citable copy.
 
 ---
 
@@ -160,12 +158,13 @@ const { QueryEngine } = await import('@comunica/query-sparql-rdfjs')
 ## Deployment
 
 ```
-lab.biosyncare.com    Netlify — BSC Lab app; COOP/COEP headers via static/_headers
-labiosyncare.github.io  GitHub Pages — citable ontology .ttl files + WIDOCO docs
+labiosyncare.github.io  GitHub Pages — static app and citable ontology .ttl files
+lab.biosyncare.com      deferred custom host — only when headers/backend justify it
 ```
 
-Netlify deploy: `npm run build` → `dist/` → Netlify CI picks up `main` branch.
-Custom domain `lab.biosyncare.com` via CNAME at Keliweb DNS.
+GitHub Pages deploy: `.github/workflows/pages.yml` runs `npm run build`, uploads
+`dist/`, and publishes it as a Pages artifact. Netlify/custom hosting remains a
+fallback for COOP/COEP, WASM threading, or server-side services.
 
 ## Environment variables
 

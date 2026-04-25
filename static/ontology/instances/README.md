@@ -1,10 +1,12 @@
-# static/ontology/instances — BSC Product Instance Data
+# static/ontology/instances — BSC Lab Instance Data
 
 RDF instance data that uses the [`sstim`](../) ontology. Unlike the ontology
 itself (reusable, under `w3id.org/sstim`), presets, evidence, sessions, and
-annotations here are **BSC product data** and live under the
-`w3id.org/bsc/...` namespace. Public-safe references live under
-`w3id.org/sstim/ref/...` because citations can be reused across products.
+annotations here are **BSC Lab implementation data** and live under the
+`w3id.org/sstim/implementation/bsclab/...` namespace. The BioSynCare commercial
+catalog uses the sibling `w3id.org/sstim/implementation/biosyncare/...` path.
+Public-safe references live under `w3id.org/sstim/ref/...` because citations can
+be reused across implementations.
 
 See [`../README.md`](../README.md) for the namespace rule and
 [`CLAUDE.md` §5.1](../../../CLAUDE.md) for the enforcement policy.
@@ -16,11 +18,11 @@ See [`../README.md`](../README.md) for the namespace rule and
 ```
 instances/
 ├── presets/      One Turtle file per preset, or grouped by Heal/Support/
-│                 Perform/Indulge/Transcend. IRIs at w3id.org/bsc/preset/{id}.
+│                 Perform/Indulge/Transcend. IRIs at w3id.org/sstim/implementation/bsclab/preset/{id}.
 │                 Source for dist/presets.json (planned — Phase 2 export).
 ├── references/   Public-safe bibliographic references (w3id.org/sstim/ref/…)
 │                 cited from evidence chains.
-└── sessions/     Recorded session instances (w3id.org/bsc/session/{uuid}).
+└── sessions/     Recorded session instances (w3id.org/sstim/implementation/bsclab/session/{uuid}).
                   Not yet created — planned with the stimulation player
                   (Phase 2).
 ```
@@ -44,13 +46,12 @@ session-recording code in Phase 2.
 ## Loading behaviour
 
 The current `src/rdf/loader.js` pipeline loads the canonical ontology Turtle
-files. Instance loading will be added once preset/reference Turtle files exist;
-`instances/` should then be loaded **after** the core ontology, into named
-graphs matching its subdirectory:
+files and the committed preset/reference instance files through an explicit
+browser manifest. Instance data is loaded **after** the core ontology:
 
-- `presets/*.ttl` → graph `https://w3id.org/bsc/preset/`
+- `presets/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/preset/`
 - `references/*.ttl` → graph `https://w3id.org/sstim/ref/`
-- `sessions/*.ttl` → graph `https://w3id.org/bsc/session/` (one per user)
+- `sessions/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/session/` (one per user)
 
 Annotations never land here — they live in per-user named graphs created
 at runtime by `AnnotationStore.js` (see `CLAUDE.md` §5.5).

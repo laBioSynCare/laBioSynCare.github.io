@@ -4,12 +4,23 @@ const { namedNode } = DataFactory
 
 const ns = base => local => namedNode(base + local)
 
-// ── BSC Lab ontology (sstim namespace) ───────────────────────────────────────
+// ── SSTIM ontology and scoped implementation namespaces ──────────────────────
 export const SSTIM    = ns('https://w3id.org/sstim#')
 export const SSTIM_V  = ns('https://w3id.org/sstim/vocab#')
 export const SSTIM_SH = ns('https://w3id.org/sstim/shapes#')
 export const SSTIM_I  = ns('https://w3id.org/sstim/inst/')
-export const BSC_INST = ns('https://w3id.org/bsc/preset/')
+export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
+export const BSC_FRAMEWORK = ns('https://w3id.org/sstim/framework/bsc/')
+export const BIOSYNCARE = ns('https://w3id.org/sstim/implementation/biosyncare/')
+export const BIOSYNCARE_PRESET = ns('https://w3id.org/sstim/implementation/biosyncare/preset/')
+export const BIOSYNCARE_EVIDENCE = ns('https://w3id.org/sstim/implementation/biosyncare/evidence/')
+export const BIOSYNCARE_SESSION = ns('https://w3id.org/sstim/implementation/biosyncare/session/')
+export const BIOSYNCARE_ANNOTATION = ns('https://w3id.org/sstim/implementation/biosyncare/annotation/')
+export const BSCLAB = ns('https://w3id.org/sstim/implementation/bsclab/')
+export const BSCLAB_PRESET = ns('https://w3id.org/sstim/implementation/bsclab/preset/')
+export const BSCLAB_EVIDENCE = ns('https://w3id.org/sstim/implementation/bsclab/evidence/')
+export const BSCLAB_SESSION = ns('https://w3id.org/sstim/implementation/bsclab/session/')
+export const BSCLAB_ANNOTATION = ns('https://w3id.org/sstim/implementation/bsclab/annotation/')
 
 // ── W3C vocabularies ─────────────────────────────────────────────────────────
 export const RDF  = ns('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
@@ -46,7 +57,18 @@ export const PREFIXES = {
   'sstim-v':  'https://w3id.org/sstim/vocab#',
   'sstim-sh': 'https://w3id.org/sstim/shapes#',
   'sstim-i':  'https://w3id.org/sstim/inst/',
-  'bsc-inst': 'https://w3id.org/bsc/preset/',
+  'sstim-ref': 'https://w3id.org/sstim/ref/',
+  'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
+  'biosyncare': 'https://w3id.org/sstim/implementation/biosyncare/',
+  'biosyncare-preset': 'https://w3id.org/sstim/implementation/biosyncare/preset/',
+  'biosyncare-evidence': 'https://w3id.org/sstim/implementation/biosyncare/evidence/',
+  'biosyncare-session': 'https://w3id.org/sstim/implementation/biosyncare/session/',
+  'biosyncare-annotation': 'https://w3id.org/sstim/implementation/biosyncare/annotation/',
+  'bsclab': 'https://w3id.org/sstim/implementation/bsclab/',
+  'bsclab-preset': 'https://w3id.org/sstim/implementation/bsclab/preset/',
+  'bsclab-evidence': 'https://w3id.org/sstim/implementation/bsclab/evidence/',
+  'bsclab-session': 'https://w3id.org/sstim/implementation/bsclab/session/',
+  'bsclab-annotation': 'https://w3id.org/sstim/implementation/bsclab/annotation/',
   'rdf':      'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
   'rdfs':     'http://www.w3.org/2000/01/rdf-schema#',
   'owl':      'http://www.w3.org/2002/07/owl#',

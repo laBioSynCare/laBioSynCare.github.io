@@ -37,9 +37,9 @@ Phase tags:
 Phase 0 Public Foundation Pass is closing. The 31 Phase 0 reference
 documents, four ontology `.ttl` files, docs index, instance-layout index,
 SvelteKit scaffold, RDF loader/query layer, ontology graph route, and basic
-SPARQL route exist. Current focus: reality-sync `README.md`/`ROADMAP.md`/
-`TODO.md`, keep namespace paths consistently under `static/ontology/`, and
-add CI that mirrors local validation.
+SPARQL and preset routes exist. Current focus: convert the full preset catalog
+to RDF instances, keep namespace paths consistently scoped under SSTIM, and add
+local validation that mirrors CI.
 
 ### Known issues (Phase 0)
 - [x] ~~`static/ontology/sstim-vocab.ttl` SHACL non-conformance on
@@ -163,14 +163,17 @@ indexed, examiner-searchable records.
       `sstim/` folder with `.htaccess` content negotiation rules,
       submit PR. Redirect is live; verify final Pages targets and the
       browser/WIDOCO path after deployment.*
-- [ ] Register `https://w3id.org/bsc` persistent namespace for BSC
-      product instances (preset, session, annotation, evidence) `P1`
-      *Same process: `bsc/` folder with routing for the sub-paths
-      used by BSC preset/session/annotation IRIs. Namespace planning comes
-      before publication: keep presets under `/preset/`, sessions under
-      `/session/`, annotations under `/annotation/`, and evidence under
-      `/evidence/`.*
-- [ ] Register `sstim:` and `bsc:` prefixes at https://prefix.cc `P1`
+- [ ] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
+      framework and implementation instances under `/framework/bsc`,
+      `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
+      `/implementation/biosyncare/{preset,session,annotation,evidence}/...` `P1`
+      *No second top-level w3id namespace. Keep room for future
+      `/technique/{id}/`, `/protocol/{id}/`, `/framework/{id}/`,
+      `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
+      data under SSTIM.*
+- [ ] Register `sstim:` and scoped prefixes such as `bsc-fw:`,
+      `bsclab-preset:`, and `biosyncare-preset:` at
+      https://prefix.cc `P1`
 - [x] Add `static/_headers` with COOP/COEP for future Netlify/custom hosting
       (required for SharedArrayBuffer and WASM threading) `P1`
       *Kept for future Netlify/custom hosting; GitHub Pages remains the
@@ -266,9 +269,9 @@ Do not start these until all Phase 0 documents are committed.
 
 ### RDF layer
 - [x] `src/rdf/namespaces.js` — all prefix declarations `P1`
-- [~] `src/rdf/loader.js` — fetch + parse TTL files from URLs (N3.js) `P1`
+- [x] `src/rdf/loader.js` — fetch + parse TTL files from URLs (N3.js) `P1`
       *Loads: sstim-core.ttl, sstim-vocab.ttl, sstim-alignments.ttl,
-      sstim-shapes.ttl. Instance loading is pending until instance TTL exists.*
+      sstim-shapes.ttl, and committed preset/reference instance TTL files.*
 - [ ] `src/rdf/store.js` — N3.Store management, merge multiple graphs `P1`
 - [x] `src/rdf/query.js` — Comunica SPARQL engine, lazy-loaded `P1`
       *Dynamic import: only load Comunica when SPARQL interface opens*
@@ -279,8 +282,10 @@ Do not start these until all Phase 0 documents are committed.
       IndexedDB persistence `P1`
 
 ### UI — Preset browser
-- [ ] `src/ui/browser/PresetBrowser.js` — SPARQL query for all presets,
+- [~] `src/routes/presets/+page.svelte` — SPARQL query for all presets,
       filter by group / frequency band / evidence tier `P1`
+      *Initial table over committed RDF seed instances exists. Dedicated
+      reusable browser component can follow once catalog conversion starts.*
 - [ ] `src/ui/browser/ProtocolCard.js` — display preset metadata,
       voice architecture summary, evidence tier badge `P1`
 - [ ] `src/ui/browser/EvidencePanel.js` — show evidence chain:
@@ -310,11 +315,13 @@ Do not start these until all Phase 0 documents are committed.
       `.github/workflows/pages.yml` `P1`
       *Primary host while the app is client-only and does not require custom
       response headers.*
-- [ ] Verify GitHub Pages serves `https://labiosyncare.github.io/ontology/sstim-core.ttl`
+- [x] Verify GitHub Pages serves `https://labiosyncare.github.io/ontology/sstim-core.ttl`
       and `https://labiosyncare.github.io/ontology/sstim-vocab.ttl` after the
       Pages workflow runs `P1`
-- [ ] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
+- [~] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
       browser path TBD until WIDOCO is chosen `P1`
+      *Turtle redirect is live; browser-oriented HTML remains blocked on the
+      WIDOCO publication path.*
 - [ ] Optional Netlify/custom-domain deployment: `lab.biosyncare.com`
       (CNAME at Keliweb) `P2`
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,

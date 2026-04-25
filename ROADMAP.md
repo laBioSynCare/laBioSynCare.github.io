@@ -22,9 +22,11 @@ reinforcing layers:
 
 **Knowledge layer:** A published, open ontology (`w3id.org/sstim`) that
 formalizes the vocabulary, evidence tiers, protocol types, and technique
-taxonomy of sensory stimulation. BSC-specific instances (presets, sessions,
-annotations) live under the product namespace `w3id.org/bsc/`. Machine-readable, citable, linked to
-Wikidata and OBO Foundry. The foundation for scientific discussion and
+taxonomy of sensory stimulation. The BSC framework lives under
+`w3id.org/sstim/framework/bsc`; concrete implementations live under scoped
+paths such as `w3id.org/sstim/implementation/bsclab/` and
+`w3id.org/sstim/implementation/biosyncare/`. Machine-readable, citable, linked
+to Wikidata and OBO Foundry. The foundation for scientific discussion and
 nomenclature standardization.
 
 **Platform layer:** An open-source multi-engine stimulation platform (this
@@ -158,7 +160,7 @@ the knowledge navigation layer.
 - [x] SvelteKit 2 + Svelte 5 + Vite 6 project scaffold
 - [x] RDF loader: fetch and parse ontology TTL files at runtime (N3.js)
 - [~] SPARQL query interface (Comunica, lazy-loaded)
-- [ ] Preset browser: list all presets, filter by group / frequency band /
+- [~] Preset browser: list all presets, filter by group / frequency band /
       evidence tier, show full metadata
 - [ ] Evidence chain view: for each preset, show evidence claims →
       references → public-safe flag
@@ -178,8 +180,9 @@ the knowledge navigation layer.
 
 - [~] Register `https://w3id.org/sstim` namespace for the ontology
       (redirect is live; verify final Pages targets and WIDOCO browser path)
-- [ ] Register `https://w3id.org/bsc` namespace for BSC product instances
-      (presets, sessions, annotations) (PR to perma-id/w3id.org)
+- [ ] Extend `https://w3id.org/sstim` namespace routing for BSC framework and
+      implementation instances under `/framework/bsc`, `/implementation/bsclab`,
+      and `/implementation/biosyncare` (PR to perma-id/w3id.org)
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
 - [~] Publish `static/ontology/sstim-core.ttl` and `sstim-vocab.ttl` at

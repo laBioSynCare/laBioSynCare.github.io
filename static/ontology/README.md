@@ -19,8 +19,10 @@ machine-readable, queryable, citable, and interoperable with external
 biomedical vocabularies.
 
 The ontology is published at `https://w3id.org/sstim` under CC BY 4.0.
-BSC product instances (presets, sessions, annotations) use the separate
-product namespace `https://w3id.org/bsc/`.
+BSC is represented as a framework at `https://w3id.org/sstim/framework/bsc`.
+Concrete implementations use scoped SSTIM paths, including
+`https://w3id.org/sstim/implementation/bsclab/` for BSC Lab and
+`https://w3id.org/sstim/implementation/biosyncare/` for BioSynCare.
 It is designed to be used by:
 
 - The BSC Lab RDF browser and SPARQL interface (knowledge navigation)
@@ -81,12 +83,14 @@ All code that references BSC ontology terms must import namespaces
 from `src/rdf/namespaces.js`. Never hardcode IRI strings.
 
 ```turtle
-# Canonical prefix declarations — mirror src/rdf/namespaces.js exactly
+# Common prefix declarations — mirror src/rdf/namespaces.js when used in code
 
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
-@prefix bsc-inst: <https://w3id.org/bsc/preset/> .
+@prefix bsc-fw:   <https://w3id.org/sstim/framework/bsc/> .
+@prefix bsclab-preset: <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix biosyncare-preset: <https://w3id.org/sstim/implementation/biosyncare/preset/> .
 
 # Upper ontology
 @prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
@@ -110,17 +114,20 @@ from `src/rdf/namespaces.js`. Never hardcode IRI strings.
 @prefix wdt:      <http://www.wikidata.org/prop/direct/> .
 ```
 
-Two persistent namespaces are registered at
+One persistent namespace is registered at
 [perma-id/w3id.org](https://github.com/perma-id/w3id.org):
 
 - `https://w3id.org/sstim` — the ontology (classes, properties, SKOS
   vocabulary, SHACL shapes). Content-negotiated to Turtle now; WIDOCO HTML is
   blocked until the publication path is chosen.
-- `https://w3id.org/bsc/{preset,session,annotation,evidence}/...` —
-  BSC product instance data.
+- `https://w3id.org/sstim/framework/bsc` — the BSC framework.
+- `https://w3id.org/sstim/implementation/bsclab/{preset,session,annotation,evidence}/...` —
+  BSC Lab implementation data under the same registered SSTIM namespace.
+- `https://w3id.org/sstim/implementation/biosyncare/{preset,session,annotation,evidence}/...` —
+  BioSynCare implementation data under the same registered SSTIM namespace.
 
-Content negotiation rules live in the respective `sstim/` and `bsc/` folders
-of that repository (see Section 10).
+Content negotiation rules live in the `sstim/` folder of that repository (see
+Section 10), including routing for the framework and implementation subpaths.
 
 ---
 
@@ -442,15 +449,15 @@ data live in named graphs:
 # Never write user data here
 
 # Named graph for user annotations on ontology node X:
-<https://w3id.org/bsc/annotations/{userId}>
+<https://w3id.org/sstim/implementation/bsclab/annotation/{userId}>
 # Contains: skos:note, prov:wasAttributedTo, schema:comment triples
 
 # Named graph for session instances:
-<https://w3id.org/bsc/sessions/{userId}>
+<https://w3id.org/sstim/implementation/bsclab/session/{userId}>
 # Contains: sstim:SessionInstance individuals
 
 # Named graph for research evidence annotations:
-<https://w3id.org/bsc/evidence/annotations>
+<https://w3id.org/sstim/implementation/bsclab/evidence/annotation>
 # Contains: disputed tier assignments, proposed corrections
 ```
 
@@ -543,9 +550,11 @@ Pages. WIDOCO is intentionally not committed to `main`. When enabled, generate
 WIDOCO in GitHub Actions and publish the output as a Pages artifact or a
 separate docs branch.
 
-A parallel `.htaccess` at `perma-id/w3id.org/bsc/` routes the product
-instance namespace (`https://w3id.org/bsc/preset/...`, `/session/...`,
-`/annotation/...`, `/evidence/...`).
+The same `perma-id/w3id.org/sstim/.htaccess` file routes the BSC framework and
+implementation instance paths such as
+`https://w3id.org/sstim/framework/bsc`,
+`https://w3id.org/sstim/implementation/bsclab/preset/...`, and
+`https://w3id.org/sstim/implementation/biosyncare/preset/...`.
 
 Full content negotiation includes sub-paths:
 - `https://w3id.org/sstim#alpha` → term documentation
@@ -678,4 +687,6 @@ preset descriptions require coordination with the BioSynCare repository
 *Maintained by: Renato Fabbri*  
 *License: CC BY 4.0*  
 *Namespace (ontology): `https://w3id.org/sstim`*  
-*Namespace (BSC instances): `https://w3id.org/bsc/`*
+*Namespace (BSC framework): `https://w3id.org/sstim/framework/bsc`*
+*Namespace (BSC Lab instances): `https://w3id.org/sstim/implementation/bsclab/`*
+*Namespace (BioSynCare instances): `https://w3id.org/sstim/implementation/biosyncare/`*

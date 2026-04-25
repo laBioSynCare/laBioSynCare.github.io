@@ -32,8 +32,8 @@ What does **not** yet exist (planned — Phase 1 and later):
 
 - Custom-domain hosting at `lab.biosyncare.com`; this is deferred until the
   app needs custom headers, WASM threading, or backend services
-- Preset browser, evidence-chain view, annotation storage, or browser-side
-  SHACL validation UI
+- Full preset catalog conversion, evidence-chain view, annotation storage, or
+  browser-side SHACL validation UI
 - AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
@@ -69,7 +69,7 @@ static/
 
 src/                    SvelteKit app scaffold (Phase 1 — in progress)
   rdf/                  Loader, SPARQL wrapper, namespace IRI helpers
-  routes/               SvelteKit pages (ontology browser, SPARQL interface)
+  routes/               SvelteKit pages (ontology browser, presets, SPARQL)
   core/, engines/, ui/  Engine and UI modules (planned)
 
 schemas/                JSON Schemas (planned — Phase 1)
@@ -108,18 +108,25 @@ RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
 
 ## Namespace convention
 
-Two persistent IRI roots, one rule each:
+SSTIM has one persistent registered namespace, with scoped paths for ontology
+terms, frameworks, and concrete implementations:
 
 - **`https://w3id.org/sstim`** — the ontology (OWL classes/properties, SKOS
   vocabulary, SHACL shapes). Reusable by other projects. The w3id redirect is
   live and should resolve to the GitHub Pages `/ontology/*.ttl` artifacts.
-- **`https://w3id.org/bsc/{preset,session,annotation,evidence}/...`** — BSC
-  product instances. Preset IRIs and user-generated data live here so the
-  ontology stays reusable; the exact w3id routing for this namespace is a
-  Phase 1 planning task.
+- **`https://w3id.org/sstim/framework/bsc`** — the BSC framework: techniques,
+  composition rules, evidence rules, and design principles.
+- **`https://w3id.org/sstim/implementation/biosyncare`** — the commercial
+  BioSynCare implementation and catalog.
+- **`https://w3id.org/sstim/implementation/bsclab`** — the open BSC Lab
+  reference implementation and public seed/reference data.
+
+Implementation data uses implementation-scoped subpaths such as
+`/preset/{id}`, `/session/{id}`, `/annotation/{id}`, and `/evidence/{id}`.
+BSC itself is a framework, not a protocol, preset, or software app.
 
 Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
-[`static/ontology/README.md`](static/ontology/README.md).
+[`ADR 0007`](docs/decisions/0007-framework-protocol-implementation.md).
 
 ---
 

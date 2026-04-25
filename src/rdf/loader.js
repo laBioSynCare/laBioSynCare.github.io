@@ -24,9 +24,9 @@ export function parseIntoStore(text, format = 'text/turtle') {
 /**
  * Fetch a Turtle file from `url` and parse it into a new Store.
  *
- * In production the app is served from Netlify and all .ttl files are
+ * In production the app is served as a static site and all .ttl files are
  * co-located in dist/ (same origin), so fetch works without CORS issues.
- * In dev mode Vite serves public/ at the root, same behaviour.
+ * In dev mode Vite serves static/ at the root, same behaviour.
  *
  * For predecessor-namespace files during development you can pass a file://
  * URL via a Vite plugin or a relative path under static/.
@@ -60,7 +60,7 @@ export async function loadMerged(urls) {
 }
 
 /**
- * Standard BSC Lab ontology URLs served from the same Netlify origin.
+ * Standard BSC Lab ontology URLs served from the same runtime origin.
  * These constants mirror the files copied from static/ into dist/ at build time.
  */
 export const ONTOLOGY_URLS = {
@@ -71,12 +71,41 @@ export const ONTOLOGY_URLS = {
 }
 
 /**
+ * Committed RDF instance files. Browser builds cannot list directories, so this
+ * manifest is the source of truth until a generated instance manifest exists.
+ */
+export const INSTANCE_URLS = {
+  presets: [
+    '/ontology/instances/presets/perform-alpha-10-seed.ttl',
+  ],
+  references: [
+    '/ontology/instances/references/references.ttl',
+  ],
+}
+
+export function instanceUrls() {
+  return Object.values(INSTANCE_URLS).flat()
+}
+
+/**
  * Load the four canonical sstim ontology files into one merged store.
  * SHACL shapes are included so the store can be used for both querying
  * and validation without a second fetch.
  *
+ * @param {{ includeInstances?: boolean }} [options]
  * @returns {Promise<Store>}
  */
-export function loadOntology() {
-  return loadMerged(Object.values(ONTOLOGY_URLS))
+export function loadOntology(options = {}) {
+  const urls = Object.values(ONTOLOGY_URLS)
+  if (options.includeInstances) urls.push(...instanceUrls())
+  return loadMerged(urls)
+}
+
+/**
+ * Load the ontology plus committed BSC Lab RDF instances.
+ *
+ * @returns {Promise<Store>}
+ */
+export function loadKnowledgeGraph() {
+  return loadOntology({ includeInstances: true })
 }

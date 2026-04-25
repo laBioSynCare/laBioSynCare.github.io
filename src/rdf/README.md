@@ -1,8 +1,9 @@
 # src/rdf — Knowledge Graph Layer
 
-> **Status: Phase 1 partial.** `namespaces.js`, `loader.js`, `query.js`, and
-> graph-query helpers exist. Browser-side SHACL validation, RDF export, instance
-> directory loading, and annotation storage are still planned.
+> **Status: Phase 1 partial.** `namespaces.js`, `loader.js`, `query.js`,
+> `presets.js`, and graph-query helpers exist. Browser-side SHACL validation,
+> RDF export, a generated instance manifest, and annotation storage are still
+> planned.
 
 The RDF subsystem loads the SSTIM ontology and BSC preset instances into an
 in-browser N3.js triple store, executes SPARQL queries via Comunica, validates
@@ -37,8 +38,10 @@ import {
   SSTIM_V,   // https://w3id.org/sstim/vocab# (SKOS vocabulary)
   SSTIM_SH,  // https://w3id.org/sstim/shapes# (SHACL)
   SSTIM_I,   // https://w3id.org/sstim/inst/ (SSTIM instances)
-  BSC_INST,  // https://w3id.org/bsc/preset/ (BSC-specific preset instances)
-  OWL, RDF, RDFS, XSD, SKOS, PROV, DCT, VOAF, SH
+  BSC_FRAMEWORK, // https://w3id.org/sstim/framework/bsc/ (BSC framework)
+  BSCLAB_PRESET, // https://w3id.org/sstim/implementation/bsclab/preset/
+  BIOSYNCARE_PRESET, // https://w3id.org/sstim/implementation/biosyncare/preset/
+  OWL, RDF, RDFS, XSD, SKOS, PROV, DCT, FOAF, SH
 } from '../rdf/namespaces.js'
 
 // Usage
@@ -60,14 +63,17 @@ same commit.
 ## `loader.js`
 
 Parses Turtle files into an N3.Store. The current implementation supports
-single-file loading and a fixed canonical ontology merge. Directory loading
-will land with preset/reference instances.
+single-file loading, a fixed canonical ontology merge, and a committed instance
+manifest for browser loading.
 
 ```javascript
-import { loadOntology, loadTurtle, loadMerged } from './loader.js'
+import { loadOntology, loadKnowledgeGraph, loadTurtle, loadMerged } from './loader.js'
 
 // Load the four canonical ontology files
 const ontologyStore = await loadOntology()
+
+// Load ontology plus committed preset/reference instances
+const knowledgeStore = await loadKnowledgeGraph()
 
 // Load one Turtle file
 const coreStore = await loadTurtle('/ontology/sstim-core.ttl')
@@ -82,8 +88,9 @@ const combinedStore = await loadMerged([
 In the browser, files are fetched via the Fetch API from the Vite static asset
 server. Node.js filesystem loading is deferred to the export/test pipeline.
 
-**Named graphs:** Ontology data is loaded into the default graph. Annotations
-will be loaded into named graphs (see planned `AnnotationStore.js`).
+**Named graphs:** Ontology and committed product/reference instances are loaded
+into the default graph for browser queries. Annotations will be loaded into
+named graphs (see planned `AnnotationStore.js`).
 
 ---
 
@@ -175,7 +182,7 @@ const exported = await exportPresets({
     '/ontology/sstim-core.ttl',
     '/ontology/sstim-vocab.ttl'
   ],
-  instancePaths: ['/ontology/instances/presets/'],
+  instancePaths: ['/ontology/instances/presets/perform-alpha-10-seed.ttl'],
   shapesPaths:   ['/ontology/sstim-shapes.ttl'],
   outputPath:    'dist/presets.json'
 })
@@ -218,7 +225,7 @@ await store.add({
 const annotations = await store.getFor(SSTIM_V('alpha'))
 // returns: [{ uuid, annotationType, annotationText, createdAt }]
 
-// Named graph IRI: https://w3id.org/sstim/annotations/{userId}
+// Named graph IRI: https://w3id.org/sstim/implementation/bsclab/annotation/{userId}
 ```
 
 Annotations are stored in IndexedDB locally. Optional server-side sync
@@ -235,5 +242,10 @@ The default graph is never modified.
 | `sstim-v:` | `https://w3id.org/sstim/vocab#` | SKOS vocabulary individuals |
 | `sstim-sh:` | `https://w3id.org/sstim/shapes#` | SHACL shapes |
 | `sstim-i:` | `https://w3id.org/sstim/inst/` | Generic SSTIM instances |
-| `bsc-inst:` | `https://w3id.org/bsc/preset/` | BSC-specific preset instances |
-| `sstim-r:` | `https://w3id.org/sstim/ref/` | Public-safe references |
+| `sstim-ref:` | `https://w3id.org/sstim/ref/` | Public-safe references |
+| `bsc-fw:` | `https://w3id.org/sstim/framework/bsc/` | BSC framework |
+| `bsclab:` | `https://w3id.org/sstim/implementation/bsclab/` | BSC Lab implementation scope |
+| `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | BSC Lab preset instances |
+| `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab evidence-chain instances |
+| `biosyncare:` | `https://w3id.org/sstim/implementation/biosyncare/` | BioSynCare implementation scope |
+| `biosyncare-preset:` | `https://w3id.org/sstim/implementation/biosyncare/preset/` | BioSynCare catalog preset instances |

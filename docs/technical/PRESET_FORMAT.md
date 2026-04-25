@@ -57,8 +57,10 @@ one space between the group name and the English name.
 
 **Known gap:** `_id` is a human-readable string that may change across
 catalog versions. It is not a stable persistent identifier. The ontology
-uses a versioned IRI (`https://w3id.org/bsc/preset/heal-anxiety-reset`)
-as the stable URI. Future catalog versions should add a `uuid` field
+uses a versioned IRI (`https://w3id.org/sstim/implementation/biosyncare/preset/heal-anxiety-reset`)
+as the stable URI for BioSynCare catalog presets. BSC Lab reference presets use
+the sibling `https://w3id.org/sstim/implementation/bsclab/preset/...` path.
+Future catalog versions should add a `uuid` field
 at the top level for stable cross-version identification. When generating
 RDF instances from presets, derive the IRI from the UUID if present,
 otherwise from a normalized form of `_id`.
@@ -814,7 +816,7 @@ backend tool track revisions manually.
 Each preset in `src/data/presets/` will have a corresponding RDF
 instance in `static/ontology/instances/presets/`. The mapping rules:
 
-- `_id` or `uuid` → IRI at `https://w3id.org/bsc/preset/{normalized-id}`
+- `_id` or `uuid` → IRI at `https://w3id.org/sstim/implementation/biosyncare/preset/{normalized-id}` for BioSynCare, or `https://w3id.org/sstim/implementation/bsclab/preset/{normalized-id}` for BSC Lab reference presets
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
 - `header.evidenceTier` → `sstim:evidenceTier` → tier individual

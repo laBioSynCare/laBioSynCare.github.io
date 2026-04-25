@@ -478,7 +478,7 @@ Full class definitions and property assignments are in
 `static/ontology/sstim-core.ttl` and `static/ontology/sstim-vocab.ttl`.
 
 ```turtle
-@prefix bsc:      <https://w3id.org/sstim#> .
+@prefix sstim:   <https://w3id.org/sstim#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
 @prefix owl:      <http://www.w3.org/2002/07/owl#> .
