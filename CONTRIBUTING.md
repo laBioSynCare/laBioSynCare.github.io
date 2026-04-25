@@ -336,9 +336,11 @@ expressed through the Issue process, not through social pressure.
 
 ## 9. License
 
-License files have not landed yet. The working assumption is a permissive
-OSI-approved license for software and CC BY 4.0 for ontology/docs, but do not
-assume a final license until `LICENSE` and `LICENSE-ontology` are committed.
+**Software source code, build configuration, and application runtime code:**
+Apache License 2.0. See `LICENSE`.
+
+**Ontology, vocabulary, documentation, and preset data:** Creative Commons
+Attribution 4.0 International. See `LICENSE-ontology`.
 
 **Defensive publications** (`docs/technical/BREATHING_MODEL.md`,
 `docs/technical/SYMMETRY_SYSTEM.md`, `docs/technical/MARTIGLI_BINAURAL.md`):

@@ -2,6 +2,7 @@
   "name": "bsc-lab",
   "version": "0.1.0",
   "description": "BSC Lab — open sensory stimulation platform and RDF knowledge graph browser",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "dev": "vite dev",

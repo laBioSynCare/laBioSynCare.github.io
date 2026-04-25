@@ -132,10 +132,9 @@ require coordination between both.
 
 ## License and contact
 
-- **Code and ontology:** (license TBD — to be finalized in Phase 1; the
-  working assumption is a permissive OSI-approved license for code and
-  CC-BY-4.0 for the ontology/docs. Do not assume any specific license until
-  this file is updated.)
+- **Software source code:** Apache License 2.0 — see [`LICENSE`](LICENSE).
+- **Ontology, vocabulary, documentation, and preset data:** Creative Commons
+  Attribution 4.0 International — see [`LICENSE-ontology`](LICENSE-ontology).
 - **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com` —
   ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)
 - **Contributions:** see [`CONTRIBUTING.md`](CONTRIBUTING.md). Bug reports

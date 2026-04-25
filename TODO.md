@@ -503,7 +503,7 @@ because financial sustainability constrains everything else.
 ## 9. Infrastructure and DevOps
 
 - [ ] GitHub organization created: `bsc-lab` or `biosyncare-lab` `P0`
-- [ ] Repository created with correct license files:
+- [x] Repository created with correct license files:
       `LICENSE` (Apache 2.0) and `LICENSE-ontology` (CC BY 4.0) `P0`
 - [ ] Branch protection: require PR for main, CI must pass `P1`
 - [ ] Dependabot configured for npm dependency updates `P1`
