@@ -34,8 +34,9 @@ What does **not** yet exist or is explicitly out of scope:
 - Custom-domain hosting at `lab.biosyncare.com`; this is deferred until the
   app needs custom headers, WASM threading, or backend services
 - Private BioSynCare/BSC catalog conversion; that catalog is outside BSC Lab
-- Full public reference preset set, evidence-chain view, annotation storage, or
-  browser-side SHACL validation UI
+- Full public reference preset set, evidence-chain view, or browser-side SHACL
+  validation UI
+- Production Firebase project credentials for the optional RDF annotation layer
 - AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
 - Test suites (`tests/`)
@@ -105,6 +106,14 @@ make build     # Static production build into dist/
 
 The SHACL pass currently conforms for the core ontology, vocabulary, and seeded
 RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
+
+## Firebase Annotations
+
+RDF node annotations are optional. To enable them locally, copy
+`.env.example` to `.env`, fill the `VITE_FIREBASE_*` values from a Firebase web
+app, and enable Email/Password and Anonymous providers in Firebase Auth. Deploy
+`firestore.rules` and `firestore.indexes.json` to keep annotation documents
+scoped to the signed-in user.
 
 ---
 

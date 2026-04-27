@@ -1,5 +1,7 @@
 <script>
   import '@picocss/pico/css/pico.min.css'
+  import AuthControl from '../ui/auth/AuthControl.svelte'
+
   const { children } = $props()
 </script>
 
@@ -11,6 +13,7 @@
     <li><a href="/">Ontology</a></li>
     <li><a href="/presets/">Presets</a></li>
     <li><a href="/sparql/">SPARQL</a></li>
+    <li><AuthControl /></li>
   </ul>
 </nav>
 

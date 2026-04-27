@@ -2,8 +2,9 @@
 
 > **Status: Phase 1 partial.** `namespaces.js`, `loader.js`, `query.js`,
 > `presets.js`, and graph-query helpers exist. Browser-side SHACL validation,
-> optional public BSC Lab preset export, a generated instance manifest, and
-> annotation storage are still planned.
+> optional public BSC Lab preset export, and a generated instance manifest are
+> still planned. Annotation storage now has an env-gated Firebase Auth/Firestore
+> backend.
 
 The RDF subsystem loads the SSTIM ontology and public BSC Lab reference preset
 instances into an in-browser N3.js triple store, executes SPARQL queries via
@@ -23,7 +24,7 @@ rdf/
 ├── validate.js          SHACL validation via rdf-validate-shacl (planned)
 ├── export.js            N3.Store → optional public BSC Lab preset JSON (planned)
 └── annotations/
-    └── AnnotationStore.js   Named-graph annotation CRUD
+    └── AnnotationStore.js   Named-graph annotation CRUD via Firestore
 ```
 
 ---
@@ -42,8 +43,9 @@ import {
   BSC_FRAMEWORK_IRI, // https://w3id.org/sstim/framework/bsc
   BSCLAB_IRI, // https://w3id.org/sstim/implementation/bsclab
   BSC_FRAMEWORK, // https://w3id.org/sstim/framework/bsc/ (BSC framework)
+  BSC_FRAMEWORK_TECHNIQUE, // https://w3id.org/sstim/framework/bsc/technique/
   BSCLAB_PRESET, // https://w3id.org/sstim/implementation/bsclab/preset/
-  OWL, RDF, RDFS, XSD, SKOS, PROV, DCT, FOAF, SH
+  OWL, RDF, RDFS, XSD, SKOS, PROV, DCT, FOAF, SH, OA
 } from '../rdf/namespaces.js'
 
 // Usage
@@ -93,8 +95,8 @@ server. Node.js filesystem loading is deferred to the export/test pipeline.
 **Named graphs:** `loadOntology()` and `loadKnowledgeGraph()` assign canonical
 graph IRIs at load time. Ontology modules use `https://w3id.org/sstim/graph/*`;
 committed instance files use their SSTIM-scoped graph IRIs. Browser queries that
-need loaded data should use `GRAPH ?g { ... }`. Future annotations remain
-separate named graphs (see planned `AnnotationStore.js`).
+need loaded data should use `GRAPH ?g { ... }`. Annotations remain separate
+named graph records managed by `AnnotationStore.js`.
 
 ---
 
@@ -211,30 +213,34 @@ same public input files, the output is always the same.
 
 ## `annotations/AnnotationStore.js`
 
-Manages user annotations as RDF in named graphs. Never writes to the
-default graph. See `CLAUDE.md` section 5.5 for the constraint rationale.
+Manages user annotations as RDF-compatible records in per-user named graphs.
+The backing store is Firebase Auth + Firestore, enabled only when
+`VITE_FIREBASE_*` values are present. The authoritative ontology store is never
+modified.
 
 ```javascript
 import { AnnotationStore } from './annotations/AnnotationStore.js'
 
-const store = new AnnotationStore(userId)
+const store = await AnnotationStore.forUser(userId)
 
 // Add annotation on a specific ontology node
 await store.add({
   annotatesNode: SSTIM_V('alpha'),
-  annotationType: 'comment',
+  annotationType: 'commenting',
   annotationText: 'The alpha-10 subset is what this preset actually targets',
 })
 
-// Query annotations for a node
-const annotations = await store.getFor(SSTIM_V('alpha'))
-// returns: [{ uuid, annotationType, annotationText, createdAt }]
+// Subscribe to annotations for a node
+const unsubscribe = store.subscribeForTarget(SSTIM_V('alpha'), (annotations) => {
+  console.log(annotations)
+})
 
 // Named graph IRI: https://w3id.org/sstim/implementation/bsclab/annotation/{userId}
 ```
 
-Annotations are stored in IndexedDB locally. Optional server-side sync
-is deferred to Phase 3; the backend technology is TBD at that point.
+Firestore documents carry `graphIri`, `targetIri`, `annotationText`,
+timestamps, and the authenticated `userId`. `AnnotationStore.serialize()` can
+materialize those records as Turtle using the W3C Web Annotation vocabulary.
 The default graph is never modified.
 
 ---
@@ -249,6 +255,7 @@ The default graph is never modified.
 | `sstim-i:` | `https://w3id.org/sstim/inst/` | Generic SSTIM instances |
 | `sstim-ref:` | `https://w3id.org/sstim/ref/` | Public-safe references |
 | `bsc-fw:` | `https://w3id.org/sstim/framework/bsc/` | BSC framework |
+| `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework technique instances |
 | `bsclab:` | `https://w3id.org/sstim/implementation/bsclab/` | BSC Lab implementation scope |
 | `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | BSC Lab preset instances |
 | `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab evidence-chain instances |

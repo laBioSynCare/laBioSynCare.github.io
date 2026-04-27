@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rdfAnnotations/{annotationId} {
+      allow create: if signedIn()
+        && validAnnotationCreate();
+
+      allow read, delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && validAnnotationPayload();
+    }
+  }
+
+  function signedIn() {
+    return request.auth != null;
+  }
+
+  function validAnnotationCreate() {
+    return request.resource.data.userId == request.auth.uid
+      && validAnnotationPayload();
+  }
+
+  function validAnnotationPayload() {
+    return request.resource.data.keys().hasOnly([
+      'userId',
+      'graphIri',
+      'targetIri',
+      'annotationType',
+      'annotationText',
+      'createdAt',
+      'updatedAt'
+    ])
+    && request.resource.data.graphIri is string
+    && request.resource.data.targetIri is string
+    && request.resource.data.annotationType is string
+    && request.resource.data.annotationText is string
+    && request.resource.data.annotationText.size() > 0
+    && request.resource.data.annotationText.size() <= 4000;
+  }
+}

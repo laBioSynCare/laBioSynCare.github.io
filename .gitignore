@@ -1,7 +1,9 @@
 .DS_Store
+.env
+.env.*
+!.env.example
 
 sandbox/
 node_modules/
 .svelte-kit/
 dist/
-

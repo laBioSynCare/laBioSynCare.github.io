@@ -14,6 +14,7 @@ export const BSC_FRAMEWORK_IRI = namedNode('https://w3id.org/sstim/framework/bsc
 export const BIOSYNCARE_IRI = namedNode('https://w3id.org/sstim/implementation/biosyncare')
 export const BSCLAB_IRI = namedNode('https://w3id.org/sstim/implementation/bsclab')
 export const BSC_FRAMEWORK = ns('https://w3id.org/sstim/framework/bsc/')
+export const BSC_FRAMEWORK_TECHNIQUE = ns('https://w3id.org/sstim/framework/bsc/technique/')
 export const BIOSYNCARE = ns('https://w3id.org/sstim/implementation/biosyncare/')
 export const BIOSYNCARE_PRESET = ns('https://w3id.org/sstim/implementation/biosyncare/preset/')
 export const BIOSYNCARE_EVIDENCE = ns('https://w3id.org/sstim/implementation/biosyncare/evidence/')
@@ -33,6 +34,7 @@ export const XSD  = ns('http://www.w3.org/2001/XMLSchema#')
 export const SKOS = ns('http://www.w3.org/2004/02/skos/core#')
 export const SH   = ns('http://www.w3.org/ns/shacl#')
 export const PROV = ns('http://www.w3.org/ns/prov#')
+export const OA   = ns('http://www.w3.org/ns/oa#')
 
 // ── Metadata vocabularies ─────────────────────────────────────────────────────
 export const DCT  = ns('http://purl.org/dc/terms/')
@@ -62,6 +64,7 @@ export const PREFIXES = {
   'sstim-i':  'https://w3id.org/sstim/inst/',
   'sstim-ref': 'https://w3id.org/sstim/ref/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
+  'bsc-fw-tech': 'https://w3id.org/sstim/framework/bsc/technique/',
   'biosyncare': 'https://w3id.org/sstim/implementation/biosyncare/',
   'biosyncare-preset': 'https://w3id.org/sstim/implementation/biosyncare/preset/',
   'biosyncare-evidence': 'https://w3id.org/sstim/implementation/biosyncare/evidence/',
@@ -79,6 +82,7 @@ export const PREFIXES = {
   'skos':     'http://www.w3.org/2004/02/skos/core#',
   'sh':       'http://www.w3.org/ns/shacl#',
   'prov':     'http://www.w3.org/ns/prov#',
+  'oa':       'http://www.w3.org/ns/oa#',
   'dct':      'http://purl.org/dc/terms/',
   'foaf':     'http://xmlns.com/foaf/0.1/',
   'bfo':      'http://purl.obolibrary.org/obo/BFO_',

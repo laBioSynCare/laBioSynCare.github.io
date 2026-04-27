@@ -1,7 +1,43 @@
 @prefix dct:    <http://purl.org/dc/terms/> .
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
 @prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 
 <https://w3id.org/sstim/framework/bsc> a sstim:SensoryStimulationFramework ;
     rdfs:label "BSC Framework" ;
-    dct:description "Framework identity for the BioSynCare/BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance." .
+    dct:description "Framework identity for the BioSynCare/BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance." ;
+    sstim:definesTechnique
+        bsc-fw-tech:binaural-beat-stimulation,
+        bsc-fw-tech:martigli-breathing-oscillation,
+        bsc-fw-tech:martigli-binaural-hybrid,
+        bsc-fw-tech:symmetry-permutation-entrainment .
+
+bsc-fw-tech:binaural-beat-stimulation a sstim:EntrainmentBasedTechnique ;
+    rdfs:label "Binaural beat stimulation"@en ;
+    dct:description "Auditory technique using two dichotic carrier tones whose frequency difference defines the beat target."@en ;
+    skos:relatedMatch sstim-v:voiceBinaural ;
+    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechThalamocortical ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PRESET_FORMAT.md> .
+
+bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
+    rdfs:label "Martigli breathing oscillation"@en ;
+    dct:description "Auditory breathing-guide technique using a sinusoidal frequency sweep over a decelerating respiratory arc."@en ;
+    skos:relatedMatch sstim-v:voiceMartigli ;
+    sstim:proposedMechanism sstim-v:mechAutonomic ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/BREATHING_MODEL.md> .
+
+bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
+    rdfs:label "Martigli-Binaural hybrid"@en ;
+    dct:description "Hybrid auditory technique combining a maintained binaural beat difference with Martigli carrier-frequency breathing motion."@en ;
+    skos:relatedMatch sstim-v:voiceMartigliBinaural ;
+    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAutonomic ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/MARTIGLI_BINAURAL.md> .
+
+bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
+    rdfs:label "Symmetry permutation entrainment"@en ;
+    dct:description "Auditory technique using cyclic pitch permutations; the isochronic special case uses pulse rate as the target."@en ;
+    skos:relatedMatch sstim-v:voiceSymmetry ;
+    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAttentional ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/SYMMETRY_SYSTEM.md> .

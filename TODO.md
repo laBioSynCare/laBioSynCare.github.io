@@ -221,8 +221,9 @@ Turtle files are listed in section 1. After they exist:
       *Verify each public instance passes SHACL before committing.*
 - [ ] Convert Appendix A references to RDF in
       `static/ontology/instances/references/` `P1`
-- [ ] Add RDF individuals for Binaural, Martigli, Symmetry, and
+- [x] Add RDF individuals for Binaural, Martigli, Symmetry, and
       Martigli-Binaural voice types as technique instances `P1`
+      *Done 2026-04-28 in `static/ontology/instances/frameworks/bsc.ttl`.*
 
 ### Phase 2 ontology extensions
 - [ ] Model session instance class: `sstim:SessionInstance` with
@@ -285,8 +286,10 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] `src/rdf/validate.js` — rdf-validate-shacl in browser `P1`
 - [ ] `src/rdf/export.js` — serialize public BSC Lab preset instances to JSON
       for BSC Lab runtime use, serialize annotations as Turtle `P1`
-- [ ] `src/rdf/annotations/AnnotationStore.js` — named graph per node,
-      IndexedDB persistence `P1`
+- [~] `src/rdf/annotations/AnnotationStore.js` — named graph per node,
+      Firebase Auth/Firestore persistence `P1`
+      *Initial env-gated Firebase backend exists. Local IndexedDB fallback and
+      bulk annotation export UI are still pending.*
 
 ### UI — Preset browser
 - [~] `src/routes/presets/+page.svelte` — SPARQL query for all presets,
@@ -308,8 +311,9 @@ Do not start these until all Phase 0 documents are committed.
 ### UI — Annotation
 - [ ] Install CodeMirror 6 with Turtle syntax support `P1`
       `npm install @codemirror/view @codemirror/state codemirror-lang-turtle`
-- [ ] `src/ui/annotation/AnnotationEditor.js` — CodeMirror editor,
-      target node selector, save to AnnotationStore `P1`
+- [~] `src/ui/annotation/AnnotationPanel.svelte` — text editor in ontology
+      detail panel, target node selector, save to AnnotationStore `P1`
+      *Basic textarea UI exists. CodeMirror Turtle editor remains pending.*
 
 ### UI — SPARQL interface
 - [~] SPARQL route — textarea editor, lazy-loads Comunica, executes SELECT query `P1`
@@ -563,12 +567,11 @@ These require human judgment before tasks can proceed. Flagged here
 to prevent AI agents from making the decision implicitly by building
 something that assumes an answer.
 
-- [x] **Firebase role**: resolved 2026-04-25. Firebase is not used in
-  Phase 1. BSC Lab stays client-only on GitHub Pages while state is public
-  or local-only. If private or cross-device state becomes necessary, use
-  Firebase Auth as the leading candidate for email/password and Google login;
-  evaluate Firestore or another sync backend at that point instead of
-  assuming it now.
+- [x] **Firebase role**: updated 2026-04-28 by explicit maintainer direction.
+  Phase 1 now includes optional Firebase Auth + Firestore for RDF node
+  annotations. The integration is env-gated so GitHub Pages/static builds still
+  work without credentials; the authoritative ontology and public instance
+  graphs remain client-loaded static RDF.
 
 - [?] **UI framework final confirmation**: Svelte 5 is the stated
   choice. Riccardo works in React Native (BioSynCare). If he

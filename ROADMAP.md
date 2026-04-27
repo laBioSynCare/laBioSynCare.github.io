@@ -168,8 +168,8 @@ the knowledge navigation layer.
 - [ ] SHACL validation: validate any preset on demand, display violations
 - [x] Ontology graph view: Cytoscape.js visualization of class hierarchy
       and SKOS concept scheme (lazy-loaded)
-- [ ] Basic annotation: add a text note to any ontology node, stored in
-      named graph in IndexedDB
+- [~] Basic annotation: add a text note to any ontology node, stored in
+      per-user named graph metadata and Firestore when Firebase is configured
 - [x] GitHub Pages deployment for the client-only static build and
       `/ontology/*.ttl` artifacts
 - [ ] Custom-domain hosting deployment: `lab.biosyncare.com` (CNAME at Keliweb)
@@ -408,7 +408,7 @@ until BioSynCare reaches acquisition-relevant scale.
 | RDF loader + N3.js store | 1 | Yes |
 | SPARQL browser + evidence chain view | 1 | Yes |
 | Cytoscape.js ontology graph | 1 | Yes |
-| Basic annotation (IndexedDB) | 1 | Yes |
+| Basic annotation (Firebase-gated named graph records) | 1 | Yes |
 | AudioWorklet stimulation engine | 2 | Not yet |
 | PixiJS visual engine | 2 | Not yet |
 | Real-time preset creator | 2 | Not yet |

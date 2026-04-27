@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte'
   import { buildGraphElements } from '../../rdf/graph.js'
+  import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
 
   const { store } = $props()
 
@@ -277,6 +278,7 @@
       {#if selected.notation}
         <p><strong>Notation:</strong> <code>{selected.notation}</code></p>
       {/if}
+      <AnnotationPanel target={selected} />
     </aside>
   {/if}
 
@@ -336,7 +338,7 @@
   .overlay.error { color: #f88; }
 
   .detail {
-    width: 260px;
+    width: 320px;
     flex-shrink: 0;
     padding: 1rem;
     overflow-y: auto;
