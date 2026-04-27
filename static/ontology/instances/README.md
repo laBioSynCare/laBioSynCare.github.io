@@ -4,7 +4,9 @@ RDF instance data that uses the [`sstim`](../) ontology. Unlike the ontology
 itself (reusable, under `w3id.org/sstim`), presets, evidence, sessions, and
 annotations here are **BSC Lab implementation data** and live under the
 `w3id.org/sstim/implementation/bsclab/...` namespace. The BioSynCare commercial
-catalog uses the sibling `w3id.org/sstim/implementation/biosyncare/...` path.
+catalog is private and is not converted or loaded here; the sibling
+`w3id.org/sstim/implementation/biosyncare/...` path is reserved only for
+public-safe BioSynCare implementation metadata if it is ever published.
 Public-safe references live under `w3id.org/sstim/ref/...` because citations can
 be reused across implementations.
 
@@ -23,7 +25,7 @@ instances/
 │                 (w3id.org/sstim/implementation/{id}).
 ├── presets/      One Turtle file per preset, or grouped by Heal/Support/
 │                 Perform/Indulge/Transcend. IRIs at w3id.org/sstim/implementation/bsclab/preset/{id}.
-│                 Source for dist/presets.json (planned — Phase 2 export).
+│                 Public BSC Lab seed/reference presets only.
 ├── references/   Public-safe bibliographic references (w3id.org/sstim/ref/…)
 │                 cited from evidence chains.
 └── sessions/     Recorded session instances (w3id.org/sstim/implementation/bsclab/session/{uuid}).
@@ -43,9 +45,9 @@ The first Phase 1 seed instances are committed:
 - `references/references.ttl` — initial public-safe bibliographic reference
   list.
 
-The v0.9.1 catalog is still in its original JSON form (not in this tree).
-Full conversion to RDF instances remains a Phase 1 ontology task
-(`TODO.md` -> "Phase 1 instances").
+The private BioSynCare/BSC v0.9.1 catalog is not in this tree and will not be
+converted to RDF for BSC Lab. Future files in `presets/` should be explicit,
+public BSC Lab seed/reference presets only.
 
 A `sessions/` subdirectory is not created yet; it will land alongside the
 session-recording code in Phase 2.

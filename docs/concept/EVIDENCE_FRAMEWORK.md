@@ -409,9 +409,9 @@ AND `eco:ECO_0000007` (author inference).
 
 ---
 
-## Current state of the BSC catalog (v0.9.1)
+## Current state of the private BioSynCare/BSC catalog (v0.9.1)
 
-The current preset catalog uses a simplified three-value system:
+The private BioSynCare/BSC preset catalog uses a simplified three-value system:
 `speculative`, `moderate`, `established`. This was the working
 system during initial catalog development. The six-tier system
 described in this document is the target formalization.
@@ -429,11 +429,10 @@ No current BSC preset is genuinely Tier 6 (Established) for its
 of breathing-enabled presets reaches Tier 6 for the specific
 autonomic claim.
 
-Migration from the three-value to the six-value system will occur
-when the ontology instances are created for the preset catalog
-in Phase 1. Each preset's tier assignment will be reviewed against
-the criteria above, using the `evidenceBasis` and `evidenceRefs`
-fields already in the catalog as input.
+The private BioSynCare/BSC catalog is not converted into BSC Lab RDF instances.
+For public BSC Lab reference presets, six-tier assignments are made explicitly
+against the criteria above before publication, using only public-safe evidence
+metadata.
 
 ---
 

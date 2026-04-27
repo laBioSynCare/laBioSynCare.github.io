@@ -25,9 +25,10 @@ formalizes the vocabulary, evidence tiers, protocol types, and technique
 taxonomy of sensory stimulation. The BSC framework lives under
 `w3id.org/sstim/framework/bsc`; concrete implementations live under scoped
 paths such as `w3id.org/sstim/implementation/bsclab/` and
-`w3id.org/sstim/implementation/biosyncare/`. Machine-readable, citable, linked
-to Wikidata and OBO Foundry. The foundation for scientific discussion and
-nomenclature standardization.
+`w3id.org/sstim/implementation/biosyncare/` when public-safe implementation
+metadata is published. The private BioSynCare/BSC catalog is not a BSC Lab data
+source. Machine-readable, citable, linked to Wikidata and OBO Foundry. The
+foundation for scientific discussion and nomenclature standardization.
 
 **Platform layer:** An open-source multi-engine stimulation platform (this
 repository) that any researcher, developer, or institution can run, extend,
@@ -160,8 +161,8 @@ the knowledge navigation layer.
 - [x] SvelteKit 2 + Svelte 5 + Vite 6 project scaffold
 - [x] RDF loader: fetch and parse ontology TTL files at runtime (N3.js)
 - [~] SPARQL query interface (Comunica, lazy-loaded)
-- [~] Preset browser: list all presets, filter by group / frequency band /
-      evidence tier, show full metadata
+- [~] Preset browser: list public BSC Lab seed/reference presets, filter by
+      group / frequency band / evidence tier, show full metadata
 - [ ] Evidence chain view: for each preset, show evidence claims →
       references → public-safe flag
 - [ ] SHACL validation: validate any preset on demand, display violations
@@ -182,7 +183,9 @@ the knowledge navigation layer.
       (redirect is live; verify final Pages targets and WIDOCO browser path)
 - [ ] Extend `https://w3id.org/sstim` namespace routing for BSC framework and
       implementation instances under `/framework/bsc`, `/implementation/bsclab`,
-      and `/implementation/biosyncare` (PR to perma-id/w3id.org)
+      and public-safe `/implementation/biosyncare` metadata if needed (PR to
+      perma-id/w3id.org). Do not publish the private BioSynCare/BSC catalog
+      through BSC Lab.
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
 - [~] Publish `static/ontology/sstim-core.ttl` and `sstim-vocab.ttl` at
@@ -253,10 +256,11 @@ concrete rather than abstract.
 
 ### Software: BSC Lab v0.2 (RDF layer additions)
 
-- [ ] RDF export pipeline: ontology instances → `dist/presets.json` for
-      BioSynCare consumption
-- [ ] Preset instances: current catalog v0.9.1 represented as RDF in
-      `static/ontology/instances/presets/`
+- [ ] Optional RDF export pipeline: public BSC Lab preset instances →
+      runtime JSON for the BSC Lab player
+- [ ] Public BSC Lab reference preset instances grow only from explicit,
+      publishable examples; the private BioSynCare/BSC catalog remains outside
+      this repository
 - [ ] SPARQL-driven preset routing: query by user need → ranked preset
       suggestions with evidence tier display
 - [ ] Enhanced annotation: named graph per user/session, export as Turtle
@@ -287,7 +291,8 @@ concrete rather than abstract.
 The BSC Lab stimulation player works end-to-end with at least two
 swappable audio engines. The W3C Community Group is active with ≥ 5
 members. BioSynCare revenue has meaningfully reduced financial pressure.
-The preset catalog is available as both JSON and RDF at the public URI.
+Public BSC Lab reference presets are available as RDF, with runtime JSON
+generated only for BSC Lab if the player needs it.
 
 ---
 

@@ -89,9 +89,9 @@ it validates against `schemas/preset.schema.json` before persisting to
 
 ## `browser/`
 
-SPARQL-driven preset browser. Queries the N3.Store to render the preset
-catalog with filtering by group, frequency band, evidence tier, and headphone
-mode. Also powers the Seraphony preset recommendation surface.
+SPARQL-driven preset browser. Queries the N3.Store to render public BSC Lab
+reference presets with filtering by group, frequency band, evidence tier, and
+headphone mode. It does not load the private BioSynCare/BSC catalog.
 
 **Entry component:** `browser/PresetBrowser.svelte`
 

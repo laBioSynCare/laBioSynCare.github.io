@@ -20,9 +20,12 @@ parameters (respiration duration, session length) — those are recorded
 separately in a session instance (see `docs/technical/SESSION_MODEL.md`).
 
 The format has evolved across versions. This document describes **v0.9.1**,
-the current catalog version as of April 2026, which includes extended
-metadata fields beyond what Seraphony generates. The distinction between
-Seraphony output fields and extended catalog fields is noted throughout.
+the current private BioSynCare/BSC catalog version as of April 2026, which
+includes extended metadata fields beyond what Seraphony generates. The
+distinction between Seraphony output fields and extended catalog fields is
+noted throughout. This specification is public because the format is shared;
+the BioSynCare/BSC catalog data itself is private and is not converted into
+BSC Lab Turtle.
 
 ---
 
@@ -56,14 +59,11 @@ one space between the group name and the English name.
 ```
 
 **Known gap:** `_id` is a human-readable string that may change across
-catalog versions. It is not a stable persistent identifier. The ontology
-uses a versioned IRI (`https://w3id.org/sstim/implementation/biosyncare/preset/heal-anxiety-reset`)
-as the stable URI for BioSynCare catalog presets. BSC Lab reference presets use
-the sibling `https://w3id.org/sstim/implementation/bsclab/preset/...` path.
-Future catalog versions should add a `uuid` field
-at the top level for stable cross-version identification. When generating
-RDF instances from presets, derive the IRI from the UUID if present,
-otherwise from a normalized form of `_id`.
+catalog versions. It is not a stable persistent identifier. Public BSC Lab
+reference presets use `https://w3id.org/sstim/implementation/bsclab/preset/...`
+IRIs. The private BioSynCare/BSC catalog may use its own private identifiers
+outside this repository. Future catalog versions should add a `uuid` field at
+the top level for stable cross-version identification.
 
 ---
 
@@ -239,8 +239,8 @@ their evidence basis. It is shown to users who want more depth. Rules:
 
 **Note:** v0.9.1 uses four separate fields (`techDescEng` etc.) aligned
 with the multilingual desc pattern. Older presets may have a single
-`techDesc` field. The RDF pipeline should treat the `techDescEng` field
-as the primary if both exist.
+`techDesc` field. Public BSC Lab RDF mappings should treat the `techDescEng`
+field as the primary if both exist.
 
 ---
 
@@ -813,21 +813,22 @@ backend tool track revisions manually.
 
 ## Relationship to the RDF ontology
 
-Each preset in `src/data/presets/` will have a corresponding RDF
-instance in `static/ontology/instances/presets/`. The mapping rules:
+Public BSC Lab reference presets may have corresponding RDF instances in
+`static/ontology/instances/presets/`. The private BioSynCare/BSC catalog is not
+converted to Turtle in this repository. The mapping rules for public BSC Lab
+reference presets are:
 
-- `_id` or `uuid` → IRI at `https://w3id.org/sstim/implementation/biosyncare/preset/{normalized-id}` for BioSynCare, or `https://w3id.org/sstim/implementation/bsclab/preset/{normalized-id}` for BSC Lab reference presets
-- Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/biosyncare` or `https://w3id.org/sstim/implementation/bsclab`
+- `_id` or `uuid` → IRI at `https://w3id.org/sstim/implementation/bsclab/preset/{normalized-id}` for BSC Lab reference presets
+- Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/bsclab`
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
 - `header.evidenceTier` → `sstim:evidenceTier` → tier individual
 - `header.cautionTags` → `sstim:hasCautionTag` → caution tag individuals
 - Voice array → `sstim:composedOf` → voice component individuals
 
-The RDF instances are validated against `static/ontology/sstim-shapes.ttl`
-before the export pipeline generates `dist/presets.json` for
-BioSynCare consumption. No preset that fails SHACL validation is
-exported.
+Public RDF instances are validated against `static/ontology/sstim-shapes.ttl`.
+No public BSC Lab preset that fails SHACL validation should be published or
+included in a runtime JSON bundle.
 
 ---
 

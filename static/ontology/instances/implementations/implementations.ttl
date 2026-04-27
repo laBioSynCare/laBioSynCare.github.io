@@ -9,5 +9,5 @@
 
 <https://w3id.org/sstim/implementation/biosyncare> a sstim:SensoryStimulationImplementation ;
     rdfs:label "BioSynCare" ;
-    dct:description "Commercial application implementation and catalog for the BSC framework." ;
+    dct:description "Commercial application implementation for the BSC framework; its curated catalog is private and is not loaded by BSC Lab." ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .

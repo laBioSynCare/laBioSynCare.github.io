@@ -2,12 +2,13 @@
 
 > **Status: Phase 1 partial.** `namespaces.js`, `loader.js`, `query.js`,
 > `presets.js`, and graph-query helpers exist. Browser-side SHACL validation,
-> RDF export, a generated instance manifest, and annotation storage are still
-> planned.
+> optional public BSC Lab preset export, a generated instance manifest, and
+> annotation storage are still planned.
 
-The RDF subsystem loads the SSTIM ontology and BSC preset instances into an
-in-browser N3.js triple store, executes SPARQL queries via Comunica, validates
-data with SHACL, and exports the preset catalog to JSON for BioSynCare.
+The RDF subsystem loads the SSTIM ontology and public BSC Lab reference preset
+instances into an in-browser N3.js triple store, executes SPARQL queries via
+Comunica, and validates data with SHACL. It must not import, convert, or export
+the private BioSynCare/BSC catalog.
 
 ---
 
@@ -20,7 +21,7 @@ rdf/
 ├── graph.js             Ontology graph projection queries for Cytoscape
 ├── query.js             Comunica SPARQL execution wrapper (lazy-loaded)
 ├── validate.js          SHACL validation via rdf-validate-shacl (planned)
-├── export.js            N3.Store → dist/presets.json for BioSynCare (planned)
+├── export.js            N3.Store → optional public BSC Lab preset JSON (planned)
 └── annotations/
     └── AnnotationStore.js   Named-graph annotation CRUD
 ```
@@ -40,10 +41,8 @@ import {
   SSTIM_I,   // https://w3id.org/sstim/inst/ (SSTIM instances)
   BSC_FRAMEWORK_IRI, // https://w3id.org/sstim/framework/bsc
   BSCLAB_IRI, // https://w3id.org/sstim/implementation/bsclab
-  BIOSYNCARE_IRI, // https://w3id.org/sstim/implementation/biosyncare
   BSC_FRAMEWORK, // https://w3id.org/sstim/framework/bsc/ (BSC framework)
   BSCLAB_PRESET, // https://w3id.org/sstim/implementation/bsclab/preset/
-  BIOSYNCARE_PRESET, // https://w3id.org/sstim/implementation/biosyncare/preset/
   OWL, RDF, RDFS, XSD, SKOS, PROV, DCT, FOAF, SH
 } from '../rdf/namespaces.js'
 
@@ -144,9 +143,9 @@ SELECT ?preset WHERE {
 
 ## `validate.js`
 
-Runs SHACL validation against `/ontology/sstim-shapes.ttl`. Called by the
-export pipeline before generating `dist/presets.json`, and exposed as a
-UI affordance in the annotation editor.
+Runs SHACL validation against `/ontology/sstim-shapes.ttl`. Called before any
+public BSC Lab preset export, and exposed as a UI affordance in the annotation
+editor.
 
 ```javascript
 import { validate, ValidationReport } from './validate.js'
@@ -166,15 +165,16 @@ if (!report.conforms) {
 }
 ```
 
-SHACL validation is required before any preset export. No preset that fails
-validation is included in `dist/presets.json`.
+SHACL validation is required before any public BSC Lab preset export. No public
+preset that fails validation is included in runtime JSON.
 
 ---
 
 ## `export.js`
 
-Generates `dist/presets.json` — the preset catalog consumed by BioSynCare.
-This is the single data exchange point between BSC Lab and BioSynCare.
+Optionally generates runtime JSON for public BSC Lab reference presets. This is
+not a BioSynCare catalog export; the private BioSynCare/BSC catalog remains
+outside this repository.
 
 ```javascript
 // Run from command line or CI pipeline:
@@ -203,9 +203,9 @@ The export pipeline:
 4. Runs JSON Schema validation on each exported preset — aborts if invalid
 5. Writes `dist/presets.json`
 
-The output format is the canonical BSC preset JSON (see
-`docs/technical/PRESET_FORMAT.md`). The export is deterministic — given
-the same input files, the output is always the same (sorted by `isShownIndex`).
+The output format follows the BSC preset JSON format (see
+`docs/technical/PRESET_FORMAT.md`). The export is deterministic — given the
+same public input files, the output is always the same.
 
 ---
 
@@ -252,5 +252,5 @@ The default graph is never modified.
 | `bsclab:` | `https://w3id.org/sstim/implementation/bsclab/` | BSC Lab implementation scope |
 | `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | BSC Lab preset instances |
 | `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab evidence-chain instances |
-| `biosyncare:` | `https://w3id.org/sstim/implementation/biosyncare/` | BioSynCare implementation scope |
-| `biosyncare-preset:` | `https://w3id.org/sstim/implementation/biosyncare/preset/` | BioSynCare catalog preset instances |
+| `biosyncare:` | `https://w3id.org/sstim/implementation/biosyncare/` | Reserved public-safe BioSynCare implementation scope |
+| `biosyncare-preset:` | `https://w3id.org/sstim/implementation/biosyncare/preset/` | Reserved only; private BioSynCare catalog presets are not loaded by BSC Lab |

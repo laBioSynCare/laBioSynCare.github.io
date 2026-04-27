@@ -37,9 +37,10 @@ Phase tags:
 Phase 0 Public Foundation Pass is closing. The 31 Phase 0 reference
 documents, four ontology `.ttl` files, docs index, instance-layout index,
 SvelteKit scaffold, RDF loader/query layer, ontology graph route, and basic
-SPARQL and preset routes exist. Current focus: convert the full preset catalog
-to RDF instances, keep namespace paths consistently scoped under SSTIM, and add
-local validation that mirrors CI.
+SPARQL and preset routes exist. Current focus: keep BSC Lab seed/reference
+instances public and separate from the private BioSynCare/BSC catalog, keep
+namespace paths consistently scoped under SSTIM, and add local validation that
+mirrors CI.
 
 ### Known issues (Phase 0)
 - [x] ~~`static/ontology/sstim-vocab.ttl` SHACL non-conformance on
@@ -148,9 +149,11 @@ indexed, examiner-searchable records.
       application is confirmed accepted*
 
 ### Copyright registration
-- [ ] Register preset catalog v0.9.1 as a corpus with INPI-BR `P1`
+- [ ] Register the private BioSynCare/BSC preset catalog v0.9.1 as a corpus
+      with INPI-BR `P1`
       *Note: ~R$150–200. Establishes timestamped authorship record.
-      Important before catalog grows further.*
+      Important before catalog grows further. This is a BioSynCare legal/IP
+      task, not a BSC Lab RDF publication task.*
 - [ ] Contributor agreement with Riccardo Berti clarifying IP ownership
       of BioSynCare React Native codebase `P0`
       *Note: urgent — do before further BioSynCare commits. Simple
@@ -166,13 +169,15 @@ indexed, examiner-searchable records.
 - [ ] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
-      `/implementation/biosyncare/{preset,session,annotation,evidence}/...` `P1`
+      public-safe `/implementation/biosyncare/...` identity/metadata paths if
+      they are ever published `P1`
       *No second top-level w3id namespace. Keep room for future
       `/technique/{id}/`, `/protocol/{id}/`, `/framework/{id}/`,
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
-      data under SSTIM.*
+      data under SSTIM. Do not publish or route the private BioSynCare/BSC
+      catalog from BSC Lab.*
 - [ ] Register `sstim:` and scoped prefixes such as `bsc-fw:`,
-      `bsclab-preset:`, and `biosyncare-preset:` at
+      `bsclab-preset:`, and public-safe implementation prefixes at
       https://prefix.cc `P1`
 - [x] Add `static/_headers` with COOP/COEP for future Netlify/custom hosting
       (required for SharedArrayBuffer and WASM threading) `P1`
@@ -206,12 +211,14 @@ Turtle files are listed in section 1. After they exist:
       `https://w3id.org/sstim/0.1.0/sstim-core.ttl` `P1`
 
 ### Phase 1 instances
-- [ ] Convert preset catalog v0.9.1 to RDF instances in
-      `static/ontology/instances/presets/` — one file per group or one
-      combined file `P1`
-      *Note: Claude Code generates this from `PRESET_FORMAT.md` +
-      `sstim-core.ttl` + the JSON catalog. Verify each instance
-      passes SHACL before committing.*
+- [x] Do not convert the private BioSynCare/BSC preset catalog v0.9.1 to
+      Turtle in BSC Lab `P1`
+      *Decision recorded 2026-04-27: the catalog is private to BioSynCare/BSC
+      and will not be used as BSC Lab data.*
+- [ ] Add only public BSC Lab seed/reference preset instances in
+      `static/ontology/instances/presets/` as needed for browser, evidence, and
+      SHACL examples `P1`
+      *Verify each public instance passes SHACL before committing.*
 - [ ] Convert Appendix A references to RDF in
       `static/ontology/instances/references/` `P1`
 - [ ] Add RDF individuals for Binaural, Martigli, Symmetry, and
@@ -276,8 +283,8 @@ Do not start these until all Phase 0 documents are committed.
 - [x] `src/rdf/query.js` — Comunica SPARQL engine, lazy-loaded `P1`
       *Dynamic import: only load Comunica when SPARQL interface opens*
 - [ ] `src/rdf/validate.js` — rdf-validate-shacl in browser `P1`
-- [ ] `src/rdf/export.js` — serialize preset instances to JSON,
-      serialize annotations as Turtle `P1`
+- [ ] `src/rdf/export.js` — serialize public BSC Lab preset instances to JSON
+      for BSC Lab runtime use, serialize annotations as Turtle `P1`
 - [ ] `src/rdf/annotations/AnnotationStore.js` — named graph per node,
       IndexedDB persistence `P1`
 
@@ -285,7 +292,7 @@ Do not start these until all Phase 0 documents are committed.
 - [~] `src/routes/presets/+page.svelte` — SPARQL query for all presets,
       filter by group / frequency band / evidence tier `P1`
       *Initial table over committed RDF seed instances exists. Dedicated
-      reusable browser component can follow once catalog conversion starts.*
+      reusable browser component can follow as public reference presets grow.*
 - [ ] `src/ui/browser/ProtocolCard.js` — display preset metadata,
       voice architecture summary, evidence tier badge `P1`
 - [ ] `src/ui/browser/EvidencePanel.js` — show evidence chain:
@@ -382,10 +389,10 @@ Do not start these until all Phase 0 documents are committed.
       time as parameters are adjusted `P2`
 
 ### RDF pipeline
-- [ ] `src/rdf/export.js` — extend to generate `dist/presets.json`
-      for BioSynCare consumption `P2`
-- [ ] CI pipeline step: validate all ontology instances → export JSON
-      → commit `dist/presets.json` `P2`
+- [ ] `src/rdf/export.js` — optionally generate a public BSC Lab preset JSON
+      bundle for the local player `P2`
+- [ ] CI pipeline step: validate all public ontology instances → export BSC Lab
+      runtime JSON if enabled `P2`
 
 ### PWA
 - [ ] Service worker: cache preset JSONs, ontology TTL files,
@@ -568,12 +575,11 @@ something that assumes an answer.
   contributes to BSC Lab frontend, React may be more natural.
   Confirm with Riccardo before Phase 1 scaffold is built.
 
-- [?] **Preset catalog as RDF master vs. JSON master**: the current
-  catalog is JSON. Should the RDF become the source of truth (JSON
-  exported from RDF) or should JSON remain master (RDF derived)?
-  Affects Phase 2 export pipeline design. *Current recommendation:
-  RDF as master from Phase 1 instance generation onward; JSON
-  in `src/data/presets/` remains the BioSynCare bridge format.*
+- [x] **Private catalog boundary**: the BioSynCare/BSC catalog remains private
+  JSON outside this repository. BSC Lab does not convert that catalog to Turtle
+  and does not use it as app data. Public BSC Lab seed/reference presets may be
+  authored as RDF under `static/ontology/instances/presets/`; any JSON export is
+  for BSC Lab runtime use only.
 
 - [?] **Juliana's advisory role**: does she want a named public role
   on `biosyncare.com` and `BSC Lab`? Her boundary is no joint work
@@ -606,11 +612,11 @@ Not project-specific — run on a schedule.
 **Per release:**
 - [ ] Update `owl:versionIRI` in ontology header `recurring`
 - [ ] Run WIDOCO to regenerate docs `recurring`
-- [ ] Validate all preset instances pass SHACL `recurring`
-- [ ] Export `dist/presets.json` for BioSynCare `recurring`
+- [ ] Validate all public BSC Lab preset instances pass SHACL `recurring`
+- [ ] Regenerate the public BSC Lab preset JSON bundle if the player uses it `recurring`
 - [ ] Tag release in git with semver `recurring`
 
-**Per new preset added:**
+**Per new public BSC Lab reference preset added:**
 - [ ] Validate JSON against `schemas/preset.schema.json` `recurring`
 - [ ] Create RDF instance in `static/ontology/instances/presets/` `recurring`
 - [ ] Run SHACL validation on new instance `recurring`

@@ -14,9 +14,9 @@
 The BSC ontology is a formal knowledge representation of the Sensory
 Stimulation domain: its techniques, protocols, evidence claims, frequency
 band taxonomy, session specifications, and participants. It is the
-knowledge layer of BSC Lab — the part that makes the preset catalog
-machine-readable, queryable, citable, and interoperable with external
-biomedical vocabularies.
+knowledge layer of BSC Lab — the part that makes public reference presets and
+evidence metadata machine-readable, queryable, citable, and interoperable with
+external biomedical vocabularies.
 
 The ontology is published at `https://w3id.org/sstim` under CC BY 4.0.
 BSC is represented as a framework at `https://w3id.org/sstim/framework/bsc`.
@@ -26,10 +26,10 @@ Concrete implementations use scoped SSTIM paths, including
 It is designed to be used by:
 
 - The BSC Lab RDF browser and SPARQL interface (knowledge navigation)
-- The preset export pipeline (JSON generation from RDF source)
+- Public BSC Lab reference preset validation and browsing
 - Researchers who want to cite or extend the vocabulary
 - The W3C Community Group (when formed) for standardization discussion
-- External tools that want to consume BSC preset metadata as Linked Data
+- External tools that want to consume public BSC Lab metadata as Linked Data
 
 ---
 
@@ -123,8 +123,9 @@ One persistent namespace is registered at
 - `https://w3id.org/sstim/framework/bsc` — the BSC framework.
 - `https://w3id.org/sstim/implementation/bsclab/{preset,session,annotation,evidence}/...` —
   BSC Lab implementation data under the same registered SSTIM namespace.
-- `https://w3id.org/sstim/implementation/biosyncare/{preset,session,annotation,evidence}/...` —
-  BioSynCare implementation data under the same registered SSTIM namespace.
+- `https://w3id.org/sstim/implementation/biosyncare/...` —
+  reserved for public-safe BioSynCare implementation metadata if published. The
+  private BioSynCare/BSC catalog is not part of BSC Lab RDF data.
 
 Content negotiation rules live in the `sstim/` folder of that repository (see
 Section 10), including routing for the framework and implementation subpaths.
@@ -562,10 +563,11 @@ WIDOCO in GitHub Actions and publish the output as a Pages artifact or a
 separate docs branch.
 
 The same `perma-id/w3id.org/sstim/.htaccess` file routes the BSC framework and
-implementation instance paths such as
+public implementation instance paths such as
 `https://w3id.org/sstim/framework/bsc`,
-`https://w3id.org/sstim/implementation/bsclab/preset/...`, and
-`https://w3id.org/sstim/implementation/biosyncare/preset/...`.
+`https://w3id.org/sstim/implementation/bsclab/preset/...`, and any future
+public-safe BioSynCare metadata paths. It must not publish the private
+BioSynCare/BSC catalog.
 
 Full content negotiation includes sub-paths:
 - `https://w3id.org/sstim#alpha` → term documentation
@@ -700,4 +702,4 @@ preset descriptions require coordination with the BioSynCare repository
 *Namespace (ontology): `https://w3id.org/sstim`*  
 *Namespace (BSC framework): `https://w3id.org/sstim/framework/bsc`*
 *Namespace (BSC Lab instances): `https://w3id.org/sstim/implementation/bsclab/`*
-*Namespace (BioSynCare instances): `https://w3id.org/sstim/implementation/biosyncare/`*
+*Namespace (BioSynCare public-safe metadata, reserved): `https://w3id.org/sstim/implementation/biosyncare/`*

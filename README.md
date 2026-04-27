@@ -9,9 +9,10 @@ evidence. It is maintained by Renato Fabbri (PhD physics; creator of the
 Andrade (PhD neuroscience).
 
 BSC Lab is the research/infrastructure project. The related commercial
-application **BioSynCare** (React Native, separate repo, closed source)
-consumes BSC Lab's exported preset catalog. BSC Lab is not BioSynCare — see
-[Relationship to BioSynCare](#relationship-to-biosyncare).
+application **BioSynCare** (React Native, separate repo, closed source) shares
+the preset JSON format and SSTIM vocabulary, but its curated catalog is private
+and is not imported into or exported by BSC Lab. BSC Lab is not BioSynCare —
+see [Relationship to BioSynCare](#relationship-to-biosyncare).
 
 ---
 
@@ -28,11 +29,12 @@ The repository is at the **Phase 0 → Phase 1 boundary**. What exists today:
   `/ontology/*.ttl` artifacts
 - Architecture READMEs under `src/` describing the target software design
 
-What does **not** yet exist (planned — Phase 1 and later):
+What does **not** yet exist or is explicitly out of scope:
 
 - Custom-domain hosting at `lab.biosyncare.com`; this is deferred until the
   app needs custom headers, WASM threading, or backend services
-- Full preset catalog conversion, evidence-chain view, annotation storage, or
+- Private BioSynCare/BSC catalog conversion; that catalog is outside BSC Lab
+- Full public reference preset set, evidence-chain view, annotation storage, or
   browser-side SHACL validation UI
 - AudioWorklet processors (`static/worklets/`)
 - JSON Schemas for preset/session validation (`schemas/`)
@@ -64,7 +66,7 @@ static/
     sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
     sstim-shapes.ttl      SHACL validation shapes
     sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
-    instances/            Preset/reference RDF instances (Phase 1 seed data)
+    instances/            Public BSC Lab/reference RDF instances (Phase 1 seed data)
   worklets/             AudioWorklet processors (planned — Phase 2)
 
 src/                    SvelteKit app scaffold (Phase 1 — in progress)
@@ -116,8 +118,9 @@ terms, frameworks, and concrete implementations:
   live and should resolve to the GitHub Pages `/ontology/*.ttl` artifacts.
 - **`https://w3id.org/sstim/framework/bsc`** — the BSC framework: techniques,
   composition rules, evidence rules, and design principles.
-- **`https://w3id.org/sstim/implementation/biosyncare`** — the commercial
-  BioSynCare implementation and catalog.
+- **`https://w3id.org/sstim/implementation/biosyncare`** — reserved for
+  public-safe BioSynCare implementation metadata if it is ever published; the
+  private BioSynCare catalog is not loaded by BSC Lab.
 - **`https://w3id.org/sstim/implementation/bsclab`** — the open BSC Lab
   reference implementation and public seed/reference data.
 
@@ -134,18 +137,20 @@ Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
 
 BioSynCare is the commercial application (React Native, separate repository,
 closed source). BSC Lab is the open-source research and development platform.
-The single interface between them is the preset JSON format: BSC Lab's RDF
-pipeline will export `dist/presets.json` (planned — Phase 2) which BioSynCare
-consumes. Neither repo imports from the other. Changes to the preset schema
-require coordination between both.
+The interface between them is the preset JSON format, SSTIM vocabulary, and
+shared implementation standards. The BioSynCare/BSC catalog remains private in
+the BioSynCare context and is not converted to Turtle in this repository.
+Neither repo imports from the other. Changes to the preset schema require
+coordination between both.
 
 ---
 
 ## License and contact
 
 - **Software source code:** Apache License 2.0 — see [`LICENSE`](LICENSE).
-- **Ontology, vocabulary, documentation, and preset data:** Creative Commons
-  Attribution 4.0 International — see [`LICENSE-ontology`](LICENSE-ontology).
+- **Ontology, vocabulary, documentation, and public BSC Lab seed/reference
+  data:** Creative Commons Attribution 4.0 International — see
+  [`LICENSE-ontology`](LICENSE-ontology).
 - **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com` —
   ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)
 - **Contributions:** see [`CONTRIBUTING.md`](CONTRIBUTING.md). Bug reports

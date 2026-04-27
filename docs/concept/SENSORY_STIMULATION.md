@@ -70,9 +70,9 @@ stimulus is slow, smooth, and low-contrast by design — not photic stimulation.
 
 **Stochastic resonance stimulation.** Calibrated noise added to a
 subthreshold signal to enhance its detection probability through threshold
-dynamics. Not currently in the BSC preset catalog but within domain scope.
-The proposed pathway is not entrainment; it is noise-assisted signal detection
-at sensory threshold.
+dynamics. Not currently used in the private BioSynCare/BSC catalog but within
+domain scope. The proposed pathway is not entrainment; it is noise-assisted
+signal detection at sensory threshold.
 
 **Environmental arousal modulation.** The spectral and register properties of
 a stimulus — carrier frequency, timbre, amplitude — modulate arousal through
@@ -128,10 +128,11 @@ All sensory experience
         └── Paced respiratory entrainment  ← Martigli breathing oscillation
 ```
 
-The BSC preset catalog contains techniques from all four leaf categories,
-often combined within a single session. This is the multi-pathway character
-of BSC — a session may simultaneously drive frequency-following at a target
-band (neural/entrainment), maintain attentional engagement (neural/attentional),
+The private BioSynCare/BSC catalog contains techniques from all four leaf
+categories, often combined within a single session. This is the multi-pathway
+character of BSC — a session may simultaneously drive frequency-following at a
+target band (neural/entrainment), maintain attentional engagement
+(neural/attentional),
 and guide respiration toward resonance frequency (autonomic).
 
 ---
@@ -174,22 +175,24 @@ The formal vocabulary for the domain is published at
 the Sensory Stimulation community, not to BSC Lab specifically. BSC Lab
 is the founding contributor. The BSC framework uses
 `https://w3id.org/sstim/framework/bsc`. BSC Lab reference instances use
-`https://w3id.org/sstim/implementation/bsclab/...`; BioSynCare commercial
-catalog instances use `https://w3id.org/sstim/implementation/biosyncare/...`.
+`https://w3id.org/sstim/implementation/bsclab/...`; the
+`https://w3id.org/sstim/implementation/biosyncare/...` path is reserved for
+public-safe BioSynCare metadata if published. The private BioSynCare/BSC
+catalog is not a BSC Lab data source.
 
-The separation of community vocabulary (`sstim:`) from product instances
-(`bsclab-preset:` or `biosyncare-preset:`) is intentional: the ontology should
-be useful to any researcher working in sensory stimulation, regardless of their
-relationship to BioSynCare.
+The separation of community vocabulary (`sstim:`) from implementation-scoped
+metadata is intentional: the ontology should be useful to any researcher
+working in sensory stimulation, regardless of their relationship to BioSynCare.
 
 ---
 
 ## Relationship to BioSynCare
 
 BioSynCare is a commercial product that delivers designed sensory stimulation
-sessions. It is the primary consumer of the BSC preset catalog and the primary
-beneficiary of the BSC ontology infrastructure. But BioSynCare is not the
-domain. The domain is Sensory Stimulation; BioSynCare is one application within it.
+sessions. It shares the BSC preset JSON format and benefits from the SSTIM
+ontology infrastructure, but its curated catalog is private and is not converted
+into BSC Lab Turtle. BioSynCare is not the domain. The domain is Sensory
+Stimulation; BioSynCare is one application within it.
 
 This distinction matters for two reasons. First, the W3C CG and ontology work
 should be useful to the full community of sensory stimulation researchers and

@@ -26,10 +26,10 @@ evidence-graded, and comparable. It does not, by existing, validate the
 efficacy of any specific protocol.
 
 The related commercial application is **BioSynCare**, which delivers the
-same core protocols to general users. BioSynCare and BSC Lab share a
-preset catalog exported from the same RDF knowledge base. They have
-different audiences, different interfaces, and different licensing
-arrangements, but identical content standards.
+same core protocol family to general users. BioSynCare and BSC Lab share a
+preset JSON format, SSTIM vocabulary, and content standards. They do not share
+a public catalog: the BioSynCare/BSC catalog is private and is not converted
+into BSC Lab Turtle.
 
 ---
 
@@ -47,8 +47,9 @@ system, and not a brain assessment tool. A user who reports that a session
 helped with anxiety has not been assessed, screened, or diagnosed.
 
 **BSC Lab does not treat, cure, or prevent any condition.**
-No protocol in the BSC catalog — regardless of its evidence tier — is
-represented as a treatment for any diagnosed or diagnosable condition.
+No BSC Lab reference preset or BioSynCare/BSC protocol — regardless of its
+evidence tier — is represented as a treatment for any diagnosed or diagnosable
+condition.
 The group system (Heal, Support, Perform, Indulge, Transcend) organizes
 sessions by design character and wellness orientation, not by clinical
 indication. A session in the "Heal" group for stress is not treatment for
@@ -263,11 +264,10 @@ is not the current situation.
 Researchers using BSC Lab to study Sensory Stimulation should understand
 the following:
 
-The BSC preset catalog represents a set of designed interventions with
-specified parameters, not a validated set of treatments. Evidence tiers
-in the ontology represent the BSC team's synthesis of published literature,
-not a systematic review. Researchers should conduct their own evidence
-assessment.
+Public BSC Lab reference presets represent designed interventions with
+specified parameters, not a validated set of treatments. Evidence tiers in the
+ontology represent the BSC team's synthesis of published literature, not a
+systematic review. Researchers should conduct their own evidence assessment.
 
 BSC Lab's reproducibility architecture — in which a session instance
 records both the preset and all user-defined parameters, enabling exact

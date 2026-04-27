@@ -60,10 +60,11 @@ an acoustically identical session. This is the unit of scientific
 reproducibility. A session instance additionally records whether the
 specification was actually completed.
 
-**For the data pipeline:** The preset catalog is the design layer,
-shared across all users. Session instances are the per-user behavioral
-layer. These must be stored and processed separately. Never modify a
-preset when recording session data.
+**For the data pipeline:** Within a given implementation, presets are the
+design layer shared across users. Session instances are the per-user behavioral
+layer. These must be stored and processed separately. Never modify a preset when
+recording session data. The private BioSynCare/BSC catalog is not imported into
+BSC Lab.
 
 **For the UI:** The session player must distinguish between what the
 preset specifies and what the user has configured. The UI may display
@@ -302,9 +303,9 @@ identical session.
 This guarantee requires:
 
 1. The preset referenced by `presetId` + `presetVersion` must be
-   permanently accessible and immutable. The RDF ontology provides
-   this through versioned IRIs. The JSON catalog must never modify
-   a preset in place — only add new versions.
+   permanently accessible and immutable within its implementation context.
+   Public BSC Lab reference presets use versioned IRIs. A private JSON catalog
+   must never modify a preset in place — only add new versions.
 
 2. The session specification must record all parameters that affect
    the audio output, including user overrides. If `userMp0` is null
@@ -366,7 +367,7 @@ be extended in Phase 3 as the evidence infrastructure matures.
 ```turtle
 @prefix sstim:              <https://w3id.org/sstim#> .
 @prefix sstim-v:            <https://w3id.org/sstim/vocab#> .
-@prefix biosyncare-session: <https://w3id.org/sstim/implementation/biosyncare/session/> .
+@prefix bsclab-session:     <https://w3id.org/sstim/implementation/bsclab/session/> .
 @prefix owl:                <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:               <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:               <http://www.w3.org/2004/02/skos/core#> .
@@ -391,11 +392,11 @@ sstim:SessionInstance a owl:Class ;
         data."""@en .
 
 # Example session instance
-biosyncare-session:550e8400-e29b-41d4-a716-446655440000
+bsclab-session:550e8400-e29b-41d4-a716-446655440000
     a sstim:SessionInstance, prov:Activity ;
     sstim:usesSpecification [
         a sstim:SessionSpecification ;
-        sstim:referencesPreset <https://w3id.org/sstim/implementation/biosyncare/preset/perform-deep-focus> ;
+        sstim:referencesPreset <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed> ;
         sstim:presetVersion "0.9.1" ;
         sstim:durationSeconds 1800 ;
         sstim:headphoneMode sstim-v:headphones ;

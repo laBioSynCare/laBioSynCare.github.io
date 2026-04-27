@@ -37,7 +37,7 @@ src/
 │   ├── store.js          N3.Store wrappers and helpers
 │   ├── query.js          Comunica SPARQL execution wrapper
 │   ├── validate.js       SHACL validation via rdf-validate-shacl
-│   ├── export.js         N3.Store → JSON preset export (dist/presets.json)
+│   ├── export.js         N3.Store → optional public preset JSON export
 │   └── annotations/
 │       └── AnnotationStore.js   Named-graph annotation CRUD
 │
@@ -50,7 +50,7 @@ src/
 │   └── sparql/           Power user SPARQL query interface
 │
 └── data/
-    └── presets/          JSON preset files (source until RDF pipeline complete)
+    └── presets/          Public BSC Lab runtime JSON presets, if needed
 ```
 
 ---
@@ -78,7 +78,7 @@ rAF visual loop      ← clock sync
 ### Knowledge subsystem
 
 Provides RDF-based browsing, querying, and annotation of the SSTIM ontology
-and BSC preset catalog. Operates entirely in the browser against an N3.Store
+and public BSC Lab reference presets. Operates entirely in the browser against an N3.Store
 served from `static/ontology/` at the runtime `/ontology/` URL.
 
 ```
@@ -105,10 +105,13 @@ Pages remains the canonical citable copy.
 ## Shared data contract
 
 The preset JSON format (`docs/technical/PRESET_FORMAT.md`) is the interface
-between the two subsystems. The stimulation subsystem reads presets from
-`src/data/presets/` (JSON, Phase 1–2) or from the RDF export pipeline
-(`dist/presets.json`, Phase 3). The knowledge subsystem reads from the
-RDF ontology files.
+between the two BSC Lab subsystems and is also coordinated with BioSynCare as a
+format contract. It is not a shared catalog contract. The private BioSynCare/BSC
+catalog stays outside this repository and is not converted to Turtle here. The
+stimulation subsystem reads public BSC Lab presets from `src/data/presets/`
+(JSON, if present) or from an optional BSC Lab RDF export. The knowledge
+subsystem reads from the RDF ontology files and public BSC Lab reference
+instances.
 
 Changes to the preset format must be coordinated across:
 1. `docs/technical/PRESET_FORMAT.md` (specification)
