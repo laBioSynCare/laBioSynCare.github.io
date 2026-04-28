@@ -5,6 +5,7 @@
     createEmailAccount,
     signInForAnnotations,
     signInWithEmail,
+    signInWithGoogle,
     signOutCurrentUser,
   } from '../../firebase/auth.js'
 
@@ -45,6 +46,10 @@
 
   function submitAnonymous() {
     return runAuth(signInForAnnotations)
+  }
+
+  function submitGoogle() {
+    return runAuth(signInWithGoogle)
   }
 
   function submitSignOut() {
@@ -90,6 +95,9 @@
       </div>
       <button type="button" class="secondary outline anon" onclick={submitAnonymous} disabled={busy}>
         Anonymous
+      </button>
+      <button type="button" class="secondary outline anon" onclick={submitGoogle} disabled={busy}>
+        Google
       </button>
     </form>
   </details>

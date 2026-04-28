@@ -111,9 +111,11 @@ RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
 
 RDF node annotations are optional. To enable them locally, copy
 `.env.example` to `.env`, fill the `VITE_FIREBASE_*` values from a Firebase web
-app, and enable Email/Password and Anonymous providers in Firebase Auth. Deploy
-`firestore.rules` and `firestore.indexes.json` to keep annotation documents
-scoped to the signed-in user.
+app, and enable Email/Password, Google, and Anonymous providers in Firebase
+Auth. For GitHub Pages, add the same `VITE_FIREBASE_*` keys as repository
+Actions variables so the static build receives them. Deploy `firestore.rules`
+and `firestore.indexes.json` to keep annotation documents scoped to the signed-in
+user.
 
 ---
 

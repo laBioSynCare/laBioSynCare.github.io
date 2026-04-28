@@ -67,6 +67,14 @@ export async function signInForAnnotations() {
   return signInAnonymously(auth)
 }
 
+export async function signInWithGoogle() {
+  const { auth } = await requireFirebaseClient()
+  const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth')
+  const provider = new GoogleAuthProvider()
+  provider.setCustomParameters({ prompt: 'select_account' })
+  return signInWithPopup(auth, provider)
+}
+
 export async function signOutCurrentUser() {
   const { auth } = await requireFirebaseClient()
   const { signOut } = await import('firebase/auth')
