@@ -1,5 +1,7 @@
 PYTHON     := python3
 PYSHACL    := $(PYTHON) -m pyshacl
+FIREBASE   ?= npx firebase-tools
+FIREBASE_PROJECT ?= biosyncare-lab
 SHAPES     := static/ontology/sstim-shapes.ttl
 ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
@@ -11,7 +13,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check dev preview shacl shacl-core shacl-vocab shacl-instances test validate help
+.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances test validate help
 
 ## Build the production bundle
 build:
@@ -24,6 +26,10 @@ check:
 ## Start the local Vite dev server on the standard host/port
 dev:
 	npm run dev -- --host $(DEV_HOST) --port $(DEV_PORT)
+
+## Deploy Firestore security rules to the configured Firebase project
+deploy-firestore-rules:
+	$(FIREBASE) deploy --project $(FIREBASE_PROJECT) --only firestore:rules
 
 ## Preview the production build on a stable local host/port
 preview: build
@@ -62,6 +68,7 @@ help:
 	@echo "Available targets:"
 	@echo "  make build            Build the production bundle"
 	@echo "  make check            Run SvelteKit sync and static checks"
+	@echo "  make deploy-firestore-rules Deploy firestore.rules to $(FIREBASE_PROJECT)"
 	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
