@@ -266,8 +266,8 @@
   </div>
 
   <!-- Detail panel -->
-  {#if selected}
-    <aside class="detail">
+  <aside class="detail">
+    {#if selected}
       <button class="close" onclick={() => selected = null}>✕</button>
       <small style="opacity:.6">{selected.kind}</small>
       <h3>{selected.label}</h3>
@@ -279,8 +279,12 @@
         <p><strong>Notation:</strong> <code>{selected.notation}</code></p>
       {/if}
       <AnnotationPanel target={selected} />
-    </aside>
-  {/if}
+    {:else}
+      <small style="opacity:.6">Selection</small>
+      <h3>Ontology node</h3>
+      <p class="empty-state">No node selected.</p>
+    {/if}
+  </aside>
 
 </div>
 
@@ -360,6 +364,7 @@
 
   .iri { font-size: 0.72rem; word-break: break-all; opacity: 0.6; }
   .iri a { color: inherit; }
+  .empty-state { color: var(--pico-muted-color); }
 
   h3 { margin: 0.25rem 0 0.5rem; font-size: 1rem; }
 </style>
