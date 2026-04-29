@@ -29,7 +29,6 @@ function annotationFromDoc(docSnapshot) {
   return {
     id: docSnapshot.id,
     userId: data.userId,
-    graphIri: data.graphIri,
     targetIri: data.targetIri,
     annotationType: data.annotationType ?? 'commenting',
     annotationText: data.annotationText ?? '',
@@ -47,7 +46,7 @@ export class AnnotationStore {
     if (!userId) throw new Error('AnnotationStore requires an authenticated user.')
     this.userId = userId
     this.db = db
-    this.graphIri = annotationGraphIri(userId)
+    this.annotationGraphIri = annotationGraphIri(userId)
   }
 
   static async forUser(userId) {
@@ -62,7 +61,6 @@ export class AnnotationStore {
     const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
     const docRef = await addDoc(collection(this.db, ANNOTATION_COLLECTION), {
       userId: this.userId,
-      graphIri: this.graphIri,
       targetIri: normalizeTargetIri(annotatesNode),
       annotationType,
       annotationText: text,
@@ -123,7 +121,7 @@ export class AnnotationStore {
   }
 
   toQuads(annotations) {
-    const graph = namedNode(this.graphIri)
+    const graph = namedNode(this.annotationGraphIri)
     const actor = namedNode(`https://w3id.org/sstim/implementation/bsclab/user/${encodeURIComponent(this.userId)}`)
 
     return annotations.flatMap((annotation) => {

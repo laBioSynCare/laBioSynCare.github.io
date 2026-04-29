@@ -238,10 +238,11 @@ const unsubscribe = store.subscribeForTarget(SSTIM_V('alpha'), (annotations) => 
 // Named graph IRI: https://w3id.org/sstim/implementation/bsclab/annotation/{userId}
 ```
 
-Firestore documents carry `graphIri`, `targetIri`, `annotationText`,
-timestamps, and the authenticated `userId`. `AnnotationStore.serialize()` can
-materialize those records as Turtle using the W3C Web Annotation vocabulary.
-The default graph is never modified.
+Firestore documents carry `targetIri`, `annotationText`, timestamps, and the
+authenticated `userId`. The annotation graph IRI is derived from `userId` during
+RDF export rather than stored redundantly in every document.
+`AnnotationStore.serialize()` can materialize those records as Turtle using the
+W3C Web Annotation vocabulary. The default graph is never modified.
 
 ---
 

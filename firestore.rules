@@ -28,14 +28,12 @@ service cloud.firestore {
   function validAnnotationPayload() {
     return request.resource.data.keys().hasOnly([
       'userId',
-      'graphIri',
       'targetIri',
       'annotationType',
       'annotationText',
       'createdAt',
       'updatedAt'
     ])
-    && request.resource.data.graphIri is string
     && request.resource.data.targetIri is string
     && request.resource.data.annotationType is string
     && request.resource.data.annotationText is string
