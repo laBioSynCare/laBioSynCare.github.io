@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte'
   import { buildGraphElements } from '../../rdf/graph.js'
+  import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
 
@@ -29,6 +30,7 @@
   let iriCopied = $state(false)
   let iriCopyTimer = null
   let neighborhoodFocus = $state(false)
+  let connectionFilters = $state(new Set())
 
   const KIND_LABELS = {
     owlClass: 'OWL class',
@@ -295,6 +297,35 @@
     neighborhoodFocus = !neighborhoodFocus
   }
 
+  function toggleConnectionFilter(kind) {
+    const next = new Set(connectionFilters)
+    if (next.has(kind)) next.delete(kind)
+    else next.add(kind)
+    connectionFilters = next
+  }
+
+  const connectionKinds = $derived.by(() => {
+    const counts = new Map()
+    for (const n of neighbors) {
+      counts.set(n.kind, (counts.get(n.kind) ?? 0) + 1)
+    }
+    return [...counts.entries()].sort(([a], [b]) => a.localeCompare(b))
+  })
+
+  const filteredNeighbors = $derived(
+    neighbors.filter((n) => !connectionFilters.has(n.kind))
+  )
+
+  const groupedNeighbors = $derived.by(() => {
+    const out = []
+    const inc = []
+    for (const n of filteredNeighbors) {
+      if (n.direction === 'out') out.push(n)
+      else inc.push(n)
+    }
+    return { out, inc }
+  })
+
   function selectNodeById(id) {
     if (!cy || !id) return
     const node = cy.getElementById(id)
@@ -338,6 +369,80 @@
       })
     }
     return [...seen.values()].sort((a, b) => a.label.localeCompare(b.label))
+  }
+
+  const SSTIM_BASE   = 'https://w3id.org/sstim#'
+  const SSTIM_V_BASE = 'https://w3id.org/sstim/vocab#'
+  const HASH_PREFER_BASES = [SSTIM_BASE, SSTIM_V_BASE]
+
+  let hashSyncReady = false
+  let initialHash = ''
+
+  function resolveHashToNodeId(rawHash) {
+    if (!rawHash || !allElements.length) return null
+    let value = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash
+    try { value = decodeURIComponent(value) } catch { /* keep raw */ }
+    if (!value) return null
+
+    if (value.includes(':')) {
+      const colon = value.indexOf(':')
+      const prefix = value.slice(0, colon)
+      const local = value.slice(colon + 1)
+      const base = PREFIXES[prefix]
+      if (base) {
+        const iri = base + local
+        const exact = allElements.find((el) => !el.data?.source && el.data?.iri === iri)
+        if (exact) return exact.data.id
+      }
+    }
+
+    const localName = value.includes(':') ? value.slice(value.indexOf(':') + 1) : value
+    const candidates = allElements.filter((el) => {
+      if (el.data?.source) return false
+      const iri = el.data?.iri
+      return iri && iri.split(/[#/]/).pop() === localName
+    })
+    if (!candidates.length) return null
+    for (const base of HASH_PREFER_BASES) {
+      const match = candidates.find((c) => c.data.iri.startsWith(base))
+      if (match) return match.data.id
+    }
+    if (candidates.length > 1) {
+      console.warn('[BSC Lab] Hash matches multiple nodes; using first', {
+        hash: rawHash,
+        candidates: candidates.map((c) => c.data.iri),
+      })
+    }
+    return candidates[0].data.id
+  }
+
+  function hashForIri(iri) {
+    if (!iri) return ''
+    if (iri.startsWith(SSTIM_BASE) || iri.startsWith(SSTIM_V_BASE)) {
+      return '#' + iri.split(/[#/]/).pop()
+    }
+    const curie = toCurie(iri)
+    if (curie === iri) return ''
+    return '#' + curie
+  }
+
+  function writeHashForSelected() {
+    const target = hashForIri(selected?.iri)
+    if (window.location.hash === target) return
+    if (target === '' && !window.location.hash) return
+    const url = window.location.pathname + window.location.search + target
+    history.replaceState(null, '', url || window.location.pathname)
+  }
+
+  function handleHashChange() {
+    if (!cy || !allElements.length) return
+    const hash = window.location.hash
+    if (!hash) {
+      if (selected) clearSelection()
+      return
+    }
+    const id = resolveHashToNodeId(hash)
+    if (id && id !== selected?.id) selectNodeById(id)
   }
 
   async function copyIri() {
@@ -494,7 +599,9 @@
   }
 
   onMount(async () => {
+    initialHash = window.location.hash
     window.addEventListener('keydown', handleGraphKeydown)
+    window.addEventListener('hashchange', handleHashChange)
     try {
       const elements = await buildGraphElements(store)
       allElements = elements
@@ -529,6 +636,12 @@
       })
 
       applyGraphDisplay()
+
+      if (initialHash) {
+        const id = resolveHashToNodeId(initialHash)
+        if (id) selectNodeById(id)
+      }
+      hashSyncReady = true
     } catch (e) {
       error = e.message
       console.error(e)
@@ -539,9 +652,16 @@
 
   onDestroy(() => {
     window.removeEventListener('keydown', handleGraphKeydown)
+    window.removeEventListener('hashchange', handleHashChange)
     clearTimeout(iriCopyTimer)
     resetGraphNavigation()
     cy?.destroy()
+  })
+
+  $effect(() => {
+    selected
+    if (!hashSyncReady) return
+    writeHashForSelected()
   })
 
   const EDGE_KINDS = [
@@ -632,8 +752,8 @@
                   <div class="meta-row iri-row">
                     <dt>IRI</dt>
                     <dd>
-                      <a href={selected.iri} target="_blank" rel="noreferrer" title={selected.iri}>{selected.iri}</a>
-                      <button type="button" class="copy-btn" onclick={copyIri} aria-label="Copy IRI">
+                      <a href={selected.iri} target="_blank" rel="noreferrer" title={selected.iri}>{toCurie(selected.iri)}</a>
+                      <button type="button" class="copy-btn" onclick={copyIri} title={`Copy ${selected.iri}`} aria-label="Copy full IRI">
                         {iriCopied ? 'Copied' : 'Copy'}
                       </button>
                     </dd>
@@ -655,7 +775,14 @@
                 {#if neighbors.length}
                   <section class="neighbors">
                     <header class="connections-header">
-                      <h3 class="section-heading">Connections <span class="muted">({neighbors.length})</span></h3>
+                      <h3 class="section-heading">
+                        Connections
+                        {#if connectionFilters.size > 0 && filteredNeighbors.length !== neighbors.length}
+                          <span class="muted">({filteredNeighbors.length} of {neighbors.length})</span>
+                        {:else}
+                          <span class="muted">({neighbors.length})</span>
+                        {/if}
+                      </h3>
                       <button
                         type="button"
                         class="focus-btn"
@@ -666,8 +793,31 @@
                         {neighborhoodFocus ? 'Exit focus' : 'Focus neighborhood'}
                       </button>
                     </header>
-                    <ul>
-                      {#each neighbors as n}
+
+                    {#if connectionKinds.length > 1}
+                      <div class="kind-pills" role="group" aria-label="Filter connections by edge kind">
+                        {#each connectionKinds as [kind, count]}
+                          <button
+                            type="button"
+                            class="kind-pill"
+                            class:disabled={connectionFilters.has(kind)}
+                            style="--edge-color: {COLORS[kind] ?? '#888'}"
+                            aria-pressed={!connectionFilters.has(kind)}
+                            onclick={() => toggleConnectionFilter(kind)}
+                            title={connectionFilters.has(kind) ? `Show ${EDGE_KIND_LABELS[kind] ?? kind}` : `Hide ${EDGE_KIND_LABELS[kind] ?? kind}`}
+                          >
+                            <span class="dot" aria-hidden="true"></span>
+                            {EDGE_KIND_LABELS[kind] ?? kind}
+                            <span class="count">{count}</span>
+                          </button>
+                        {/each}
+                      </div>
+                    {/if}
+
+                    {#if filteredNeighbors.length === 0}
+                      <p class="empty-connections"><small>No connections match the active filters.</small></p>
+                    {:else}
+                      {#snippet neighborCard(n)}
                         <li>
                           <button
                             type="button"
@@ -690,8 +840,29 @@
                             {/if}
                           </button>
                         </li>
-                      {/each}
-                    </ul>
+                      {/snippet}
+
+                      {#if groupedNeighbors.out.length}
+                        <div class="connection-group">
+                          <h4 class="sub-heading">Outgoing <span class="muted">({groupedNeighbors.out.length})</span></h4>
+                          <ul>
+                            {#each groupedNeighbors.out as n (n.id + '|' + n.kind)}
+                              {@render neighborCard(n)}
+                            {/each}
+                          </ul>
+                        </div>
+                      {/if}
+                      {#if groupedNeighbors.inc.length}
+                        <div class="connection-group">
+                          <h4 class="sub-heading">Incoming <span class="muted">({groupedNeighbors.inc.length})</span></h4>
+                          <ul>
+                            {#each groupedNeighbors.inc as n (n.id + '|' + n.kind)}
+                              {@render neighborCard(n)}
+                            {/each}
+                          </ul>
+                        </div>
+                      {/if}
+                    {/if}
                   </section>
                 {/if}
               {/snippet}
@@ -993,6 +1164,68 @@
     padding: 0;
     display: grid;
     gap: 0.25rem;
+  }
+
+  .kind-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .kind-pill {
+    width: auto;
+    margin: 0;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    background: color-mix(in srgb, var(--edge-color, #888) 18%, transparent);
+    border: 1px solid var(--edge-color, #888);
+    border-radius: 0.85rem;
+    color: #ececec;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+  }
+  .kind-pill .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--edge-color, #888);
+    flex-shrink: 0;
+  }
+  .kind-pill .count {
+    font-size: 0.65rem;
+    opacity: 0.75;
+  }
+  .kind-pill:hover { filter: brightness(1.15); }
+
+  .kind-pill.disabled {
+    background: transparent;
+    border-color: #ffffff20;
+    color: var(--pico-muted-color);
+  }
+  .kind-pill.disabled .dot { opacity: 0.3; }
+  .kind-pill.disabled:hover { filter: none; border-color: #ffffff45; }
+
+  .connection-group + .connection-group {
+    margin-top: 0.55rem;
+  }
+
+  .sub-heading {
+    margin: 0 0 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pico-muted-color);
+  }
+
+  .empty-connections {
+    margin: 0.4rem 0 0;
+    color: var(--pico-muted-color);
   }
 
   .neighbor-btn {

@@ -56,7 +56,11 @@ export const DBR  = ns('http://dbpedia.org/resource/')
 export const NSO_V0 = ns('https://biosyncare.github.io/ont#')
 export const NSO_V1 = ns('https://biosyncarelab.github.io/ont#')
 
-// ── Prefix map for N3.Writer and SPARQL preambles ────────────────────────────
+// ── Prefix map for N3.Writer, SPARQL preambles, and CURIE display ────────────
+//
+// Used by toCurie() to compact full IRIs for display. Bases are matched
+// longest-first so that nested prefixes (e.g. bsclab vs bsclab-preset) resolve
+// to the most specific prefix.
 export const PREFIXES = {
   'sstim':    'https://w3id.org/sstim#',
   'sstim-v':  'https://w3id.org/sstim/vocab#',
@@ -95,4 +99,14 @@ export const PREFIXES = {
   'dbr':      'http://dbpedia.org/resource/',
   'nso-v0':   'https://biosyncare.github.io/ont#',
   'nso-v1':   'https://biosyncarelab.github.io/ont#',
+}
+
+const SORTED_PREFIXES = Object.entries(PREFIXES).sort(([, a], [, b]) => b.length - a.length)
+
+export function toCurie(iri) {
+  if (!iri) return ''
+  for (const [prefix, base] of SORTED_PREFIXES) {
+    if (iri.startsWith(base)) return `${prefix}:${iri.slice(base.length)}`
+  }
+  return iri
 }

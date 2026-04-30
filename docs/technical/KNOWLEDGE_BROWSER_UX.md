@@ -29,19 +29,45 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
 - **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
   close · `c` center · `f` fit · `r` relayout · `h` / `?` help. Discoverable
   from the help dialog and tooltips.
+- **Connections grouping & filter pills** — neighbors split into Outgoing /
+  Incoming subsections; a row of color-coded pills above the list toggles
+  visibility per edge kind, and the count in the header reflects the active
+  filter ("3 of 5"). Filter state persists across selections.
+- **CURIE display** — the IRI row shows the compact `sstim:X` /
+  `sstim-v:X` form; `href`, hover tooltip, and the Copy button still use the
+  full canonical IRI so the citable form never disappears. `toCurie()` lives in
+  `src/rdf/namespaces.js` next to the prefix table.
+- **Hash deep-linking** — `https://labiosyncare.github.io/#highTheta` lands on
+  the graph with the matching node selected; bare local names resolve via
+  lookup (preferring `sstim:` then `sstim-v:` on collision), CURIEs like
+  `#sstim-v:highTheta` are accepted as a fallback. Selection writes back to the
+  URL with `history.replaceState`, so the URL is bidirectionally shareable
+  without polluting the back stack.
 
 ---
 
+## Open follow-ups (user-flagged)
+
+### Focus this neighborhood — refinements
+- Keep camera position and zoom when walking to a neighbor; animate the new
+  node to the center instead of refitting the whole subgraph.
+- Add a "show other nodes, transparent" mode so the focus dims the rest of the
+  graph instead of hiding it.
+- Variable hop depth (currently 1-hop only); allow 2 / 3 / 4 hops via a small
+  control next to the focus toggle.
+
+### Connections palette polish
+- Make the per-edge-kind pill / card colors track the left-rail edge layer
+  swatches more closely (verify under the dark theme).
+
 ## Connections Panel
 
-- **Group / sort by direction or by kind.** Optional subheaders for "Outgoing" /
-  "Incoming", or grouping by edge kind so a hub class with 20 subclasses doesn't
-  flatten into a noisy list. Implementation: bucket + headers in the iteration.
+- **Optional grouping by edge kind.** Currently grouped by direction. For hub
+  classes with 20 subclasses an alternate "by kind" mode (or a small toggle)
+  would avoid one giant flat list.
 - **Hover preview on canvas.** Hovering a connection card flashes the matching
   node and edge in Cytoscape (e.g. yellow outline) without changing selection.
   `cy.getElementById(id).addClass('preview')` / `removeClass`.
-- **Filter pills above the list.** Per-edge-kind toggles scoped to the
-  connection list, independent of the global edge-layer toggles.
 - **Path between two nodes.** Pin a "from" node, pick a "to" node, run BFS on
   the cy graph and highlight the shortest path. Useful for "how is X related
   to Y?".
@@ -113,10 +139,17 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
 
 ## URL & Sharing
 
-- **URL state.** Reflect scope, focused IRI, and edge-layer toggles in the URL
-  hash so the view is shareable / bookmarkable.
-- **Permalinks per node.** A "share" button next to "Copy IRI" that copies a
-  link to the current view focused on this node.
+- **Reflect scope and edge-layer toggles in the URL.** The selected node's IRI
+  is already in the hash; extending the URL state to include scope and visible
+  edge layers would make filter views shareable too.
+- **Permalinks per node.** A "share" button next to "Copy IRI" that copies the
+  full BSC Lab deep-link (`https://labiosyncare.github.io/#X`) rather than the
+  canonical IRI.
+- **w3id redirect routes.** Once the redirect config lives in the w3id repo,
+  point `https://w3id.org/sstim` and `https://w3id.org/sstim/vocab` at distinct
+  paths under `labiosyncare.github.io` (e.g. `/` and `/vocab/`) so the namespace
+  isn't lost across the fragment boundary. Both routes can render the same
+  graph page; the route distinguishes which prefix bare hashes resolve to first.
 - **Export as image.** PNG / SVG export of the current canvas viewport. PNG is
   built in to Cytoscape; SVG via `cytoscape-svg`.
 
