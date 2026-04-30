@@ -33,7 +33,26 @@
   let connectionFilters = $state(new Set())
 
   let visibleSet = new Set()
-  const FADE_MS = 220
+
+  const TRANSITION_KEY = 'bsclab.graph.transitionMs'
+  const TRANSITION_DEFAULT = 320
+  const TRANSITION_EASING = 'ease-in-out-cubic'
+
+  function loadTransitionMs() {
+    if (typeof localStorage === 'undefined') return TRANSITION_DEFAULT
+    const raw = localStorage.getItem(TRANSITION_KEY)
+    if (raw == null) return TRANSITION_DEFAULT
+    const n = Number(raw)
+    if (!Number.isFinite(n) || n < 0 || n > 2000) return TRANSITION_DEFAULT
+    return n
+  }
+
+  let transitionMs = $state(loadTransitionMs())
+
+  $effect(() => {
+    if (typeof localStorage === 'undefined') return
+    localStorage.setItem(TRANSITION_KEY, String(transitionMs))
+  })
 
   const KIND_LABELS = {
     owlClass: 'OWL class',
@@ -261,6 +280,7 @@
     if (!cy) return null
     const visible = visibleElementsForCurrentView()
     const newIds = new Set(visible.map((element) => element.data.id))
+    const shouldAnimate = animate && transitionMs > 0
 
     cy.elements().forEach((element) => {
       const id = element.id()
@@ -271,10 +291,11 @@
         element.stop(true, false)
         const wasHidden = element.style('display') === 'none'
         element.style('display', 'element')
-        if (animate) {
+        if (shouldAnimate) {
           if (wasHidden) element.style('opacity', 0)
           element.animate({ style: { opacity: 1 } }, {
-            duration: FADE_MS,
+            duration: transitionMs,
+            easing: TRANSITION_EASING,
             complete: () => element.removeStyle('opacity'),
           })
         } else {
@@ -282,9 +303,10 @@
         }
       } else if (!shouldShow && wasShown) {
         element.stop(true, false)
-        if (animate) {
+        if (shouldAnimate) {
           element.animate({ style: { opacity: 0 } }, {
-            duration: FADE_MS,
+            duration: transitionMs,
+            easing: TRANSITION_EASING,
             complete: () => {
               element.style('display', 'none')
               element.removeStyle('opacity')
@@ -325,7 +347,11 @@
     const eles = elements ?? cy.elements().filter((element) => element.style('display') !== 'none')
     const target = eles.length ? eles : cy.elements()
     cy.stop(true)
-    cy.animate({ fit: { eles: target, padding: 30 } }, { duration: 300 })
+    if (transitionMs <= 0) {
+      cy.fit(target, 30)
+      return
+    }
+    cy.animate({ fit: { eles: target, padding: 30 } }, { duration: transitionMs, easing: TRANSITION_EASING })
   }
 
   function clearSelection() {
@@ -377,10 +403,15 @@
     selected = node.data()
     const zoom = neighborhoodFocus ? cy.zoom() : Math.max(cy.zoom(), 1)
     cy.stop(true)
+    if (transitionMs <= 0) {
+      cy.zoom(zoom)
+      cy.center(node)
+      return
+    }
     cy.animate({
       center: { eles: node },
       zoom,
-    }, { duration: 280 })
+    }, { duration: transitionMs, easing: TRANSITION_EASING })
   }
 
   function computeNeighbors(id) {
@@ -770,6 +801,23 @@
         <li><span class="swatch" style="background:{color}"></span> {iri.split('#')[1].replace('Scheme','')}</li>
       {/each}
     </ul>
+
+    <strong style="margin-top:1rem;display:block">Animation</strong>
+    <div class="anim-control">
+      <div class="anim-label">
+        <span>Transition speed</span>
+        <span class="anim-value">{transitionMs === 0 ? 'off' : `${transitionMs} ms`}</span>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max="800"
+        step="20"
+        bind:value={transitionMs}
+        aria-label="Animation duration in milliseconds"
+      />
+      <small class="anim-hint">Used by fade, pan, and fit. 0 disables animation.</small>
+    </div>
   </aside>
 
   <section class="graph-workspace">
@@ -1004,6 +1052,39 @@
     height: 12px;
     border-radius: 2px;
     flex-shrink: 0;
+  }
+
+  .anim-control {
+    margin-top: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .anim-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.4rem;
+    font-size: 0.74rem;
+    color: var(--pico-muted-color);
+  }
+
+  .anim-value {
+    font-variant-numeric: tabular-nums;
+    color: #ececec;
+  }
+
+  .anim-control input[type='range'] {
+    width: 100%;
+    margin: 0;
+    accent-color: #4fc3f7;
+  }
+
+  .anim-hint {
+    color: var(--pico-muted-color);
+    font-size: 0.66rem;
+    line-height: 1.3;
   }
 
   .graph-workspace {

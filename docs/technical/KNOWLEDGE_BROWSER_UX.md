@@ -29,7 +29,12 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
   animate the fit; walking inside focus preserves the current zoom and pans
   smoothly to the new node instead of re-fitting. Visibility transitions
   (focus toggle, scope/layer changes, neighborhood walk) cross-fade nodes and
-  edges over ~220 ms so nothing pops in or out.
+  edges so nothing pops in or out.
+- **Unified animation duration** — fade-in, fade-out, center-pan, and fit all
+  share a single `transitionMs` setting with `ease-in-out-cubic` easing, so
+  in/out feel symmetric and the camera + visibility changes finish together.
+  A slider in the left rail lets the user pick anywhere from 0 (instant) to
+  800 ms; the value persists to `localStorage`.
 - **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
   close · `c` center · `f` fit · `r` relayout · `h` / `?` help. Discoverable
   from the help dialog and tooltips.
