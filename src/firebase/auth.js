@@ -78,12 +78,6 @@ export async function createEmailAccount(email, password, displayName = '') {
   return credential
 }
 
-export async function signInForAnnotations() {
-  const { auth } = await requireFirebaseClient()
-  const { signInAnonymously } = await import('firebase/auth')
-  return signInAnonymously(auth)
-}
-
 export async function signInWithGoogle() {
   const { auth } = await requireFirebaseClient()
   const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth')

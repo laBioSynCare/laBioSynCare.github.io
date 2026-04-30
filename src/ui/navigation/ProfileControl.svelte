@@ -4,7 +4,6 @@
     authState,
     createEmailAccount,
     defaultDisplayNameFromEmail,
-    signInForAnnotations,
     signInWithEmail,
     signInWithGoogle,
     signOutCurrentUser,
@@ -45,10 +44,6 @@
 
   function submitCreate() {
     return runAuth(() => createEmailAccount(email, password, displayName))
-  }
-
-  function submitAnonymous() {
-    return runAuth(signInForAnnotations)
   }
 
   function submitGoogle() {
@@ -122,9 +117,6 @@
     </form>
     <button type="button" class="secondary outline" onclick={submitGoogle} disabled={busy}>
       Google
-    </button>
-    <button type="button" class="secondary outline" onclick={submitAnonymous} disabled={busy}>
-      Anonymous
     </button>
   {/if}
 </section>
