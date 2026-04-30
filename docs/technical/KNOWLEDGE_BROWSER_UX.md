@@ -50,6 +50,12 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
   display name is captured at write time and shown on each note. Public notes
   serialize into a shared RDF named graph; private notes stay in the per-user
   graph.
+- **Author display name + profile page** — display name on signup is optional
+  and falls back to the email's local-part instead of "Anonymous". A new
+  `/profile/` route lets signed-in users edit their display name, affiliation,
+  and bio; saving syncs the new display name back into Firebase Auth so
+  subsequent annotations attribute correctly. Profile data lives in
+  `users/{uid}` with owner-only Firestore rules.
 
 ---
 

@@ -1,5 +1,5 @@
 import { browser } from '$app/environment'
-import { readable } from 'svelte/store'
+import { writable } from 'svelte/store'
 import { getFirebaseClient, isFirebaseConfigured, requireFirebaseClient } from './client.js'
 
 function publicUser(user) {
@@ -13,14 +13,16 @@ function publicUser(user) {
   }
 }
 
-const configured = isFirebaseConfigured()
+export function defaultDisplayNameFromEmail(email) {
+  if (!email || typeof email !== 'string') return ''
+  const local = email.split('@')[0]
+  return local || ''
+}
 
-export const authState = readable({
-  ready: !browser || !configured,
-  configured,
-  user: null,
-  error: null,
-}, (set) => {
+const configured = isFirebaseConfigured()
+const initialState = { ready: !browser || !configured, configured, user: null, error: null }
+
+const authStateStore = writable(initialState, (set) => {
   if (!browser || !configured) {
     set({ ready: true, configured, user: null, error: null })
     return () => {}
@@ -49,16 +51,31 @@ export const authState = readable({
   }
 })
 
+export const authState = { subscribe: authStateStore.subscribe }
+
+export function syncAuthDisplayName(displayName) {
+  authStateStore.update((state) => {
+    if (!state.user) return state
+    return { ...state, user: { ...state.user, displayName } }
+  })
+}
+
 export async function signInWithEmail(email, password) {
   const { auth } = await requireFirebaseClient()
   const { signInWithEmailAndPassword } = await import('firebase/auth')
   return signInWithEmailAndPassword(auth, email, password)
 }
 
-export async function createEmailAccount(email, password) {
+export async function createEmailAccount(email, password, displayName = '') {
   const { auth } = await requireFirebaseClient()
-  const { createUserWithEmailAndPassword } = await import('firebase/auth')
-  return createUserWithEmailAndPassword(auth, email, password)
+  const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth')
+  const credential = await createUserWithEmailAndPassword(auth, email, password)
+  const finalName = (displayName?.trim()) || defaultDisplayNameFromEmail(email)
+  if (finalName) {
+    await updateProfile(credential.user, { displayName: finalName })
+    syncAuthDisplayName(finalName)
+  }
+  return credential
 }
 
 export async function signInForAnnotations() {
@@ -79,4 +96,13 @@ export async function signOutCurrentUser() {
   const { auth } = await requireFirebaseClient()
   const { signOut } = await import('firebase/auth')
   return signOut(auth)
+}
+
+export async function updateAuthProfile({ displayName }) {
+  const { auth } = await requireFirebaseClient()
+  if (!auth.currentUser) throw new Error('No signed-in user.')
+  const { updateProfile } = await import('firebase/auth')
+  const cleaned = displayName?.trim() ?? ''
+  await updateProfile(auth.currentUser, { displayName: cleaned })
+  syncAuthDisplayName(cleaned)
 }

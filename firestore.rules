@@ -17,10 +17,35 @@ service cloud.firestore {
       allow delete: if signedIn()
         && resource.data.userId == request.auth.uid;
     }
+
+    match /users/{userId} {
+      allow read: if signedIn() && userId == request.auth.uid;
+      allow write: if signedIn()
+        && userId == request.auth.uid
+        && validUserPayload();
+    }
   }
 
   function signedIn() {
     return request.auth != null;
+  }
+
+  function validUserPayload() {
+    return request.resource.data.keys().hasOnly([
+      'displayName',
+      'email',
+      'bio',
+      'affiliation',
+      'updatedAt'
+    ])
+    && request.resource.data.get('displayName', '') is string
+    && request.resource.data.get('displayName', '').size() <= 200
+    && request.resource.data.get('bio', '') is string
+    && request.resource.data.get('bio', '').size() <= 4000
+    && request.resource.data.get('affiliation', '') is string
+    && request.resource.data.get('affiliation', '').size() <= 200
+    && request.resource.data.get('email', '') is string
+    && request.resource.data.get('email', '').size() <= 200;
   }
 
   function validAnnotationCreate() {

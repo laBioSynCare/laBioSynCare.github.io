@@ -3,6 +3,7 @@
   import {
     authState,
     createEmailAccount,
+    defaultDisplayNameFromEmail,
     signInForAnnotations,
     signInWithEmail,
     signInWithGoogle,
@@ -12,6 +13,7 @@
   let state = $state({ ready: false, configured: false, user: null, error: null })
   let email = $state('')
   let password = $state('')
+  let displayName = $state('')
   let busy = $state(false)
   let error = $state(null)
 
@@ -28,6 +30,7 @@
     try {
       await action()
       password = ''
+      displayName = ''
     } catch (e) {
       error = e.message
     } finally {
@@ -41,7 +44,7 @@
   }
 
   function submitCreate() {
-    return runAuth(() => createEmailAccount(email, password))
+    return runAuth(() => createEmailAccount(email, password, displayName))
   }
 
   function submitAnonymous() {
@@ -56,9 +59,14 @@
     return runAuth(signOutCurrentUser)
   }
 
-  const userLabel = $derived(
-    state.user?.email || state.user?.displayName || (state.user?.isAnonymous ? 'Anonymous account' : 'Account')
-  )
+  const userLabel = $derived.by(() => {
+    if (!state.user) return ''
+    const name = state.user.displayName?.trim()
+    if (name) return name
+    if (state.user.email) return defaultDisplayNameFromEmail(state.user.email) || state.user.email
+    if (state.user.isAnonymous) return 'Anonymous account'
+    return 'Account'
+  })
 
   const shortUid = $derived(state.user?.uid ? `${state.user.uid.slice(0, 8)}...` : '')
 </script>
@@ -72,10 +80,11 @@
     <p><small>Firebase is not configured for annotations.</small></p>
   {:else if state.user}
     <p class="profile-name">{userLabel}</p>
-    <p><small>{state.user.isAnonymous ? 'Anonymous annotation account' : 'Signed in for annotations'}</small></p>
+    <p><small>{state.user.isAnonymous ? 'Anonymous annotation account' : state.user.email ?? 'Signed in for annotations'}</small></p>
     {#if shortUid}
       <p><small>UID {shortUid}</small></p>
     {/if}
+    <a class="profile-link" href="/profile/">Edit profile</a>
     <button type="button" class="secondary outline" onclick={submitSignOut} aria-busy={busy} disabled={busy}>
       Log out
     </button>
@@ -89,6 +98,17 @@
       <label>
         Password
         <input type="password" autocomplete="current-password" bind:value={password} disabled={busy} />
+      </label>
+      <label>
+        Display name <span class="optional">(for new accounts)</span>
+        <input
+          type="text"
+          autocomplete="nickname"
+          bind:value={displayName}
+          placeholder={defaultDisplayNameFromEmail(email) || 'Your name'}
+          disabled={busy}
+        />
+        <small>Shown next to public notes you leave. Defaults to the part of your email before "@".</small>
       </label>
       {#if error}
         <small class="profile-error">{error}</small>
@@ -127,8 +147,22 @@
   }
 
   .profile-control label {
+    display: block;
     margin-bottom: 0.35rem;
     font-size: 0.78rem;
+  }
+
+  .profile-control label > small {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--pico-muted-color);
+    font-size: 0.7rem;
+  }
+
+  .optional {
+    color: var(--pico-muted-color);
+    font-weight: 400;
+    font-size: 0.7rem;
   }
 
   .profile-control input {
@@ -151,6 +185,15 @@
     padding: 0.3rem 0.55rem;
     font-size: 0.78rem;
   }
+
+  .profile-link {
+    display: block;
+    padding: 0.4rem 0;
+    font-size: 0.78rem;
+    color: inherit;
+    text-decoration: none;
+  }
+  .profile-link:hover { text-decoration: underline; }
 
   .profile-error {
     display: block;

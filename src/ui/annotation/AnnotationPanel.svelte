@@ -1,7 +1,14 @@
 <script>
   import { onDestroy } from 'svelte'
-  import { authState } from '../../firebase/auth.js'
+  import { authState, defaultDisplayNameFromEmail } from '../../firebase/auth.js'
   import { createAnnotationStore } from '../../rdf/annotations/AnnotationStore.js'
+
+  function deriveDisplayName(user) {
+    if (!user) return ''
+    const name = user.displayName?.trim()
+    if (name) return name
+    return defaultDisplayNameFromEmail(user.email)
+  }
 
   const { target, between } = $props()
 
@@ -77,7 +84,7 @@
         annotationType: 'commenting',
         annotationText: text,
         visibility: annotationVisibility,
-        userDisplayName: auth.user.displayName ?? '',
+        userDisplayName: deriveDisplayName(auth.user),
       })
       annotationText = ''
     } catch (e) {
