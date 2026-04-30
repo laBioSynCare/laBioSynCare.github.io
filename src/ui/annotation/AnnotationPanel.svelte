@@ -8,20 +8,32 @@
   let auth = $state({ ready: false, configured: false, user: null, error: null })
   let annotations = $state([])
   let annotationText = $state('')
+  let annotationVisibility = $state('public')
   let error = $state(null)
   let saving = $state(false)
+
+  let editingId = $state(null)
+  let editText = $state('')
+  let editVisibility = $state('public')
+  let editError = $state(null)
 
   const unsubscribeAuth = authState.subscribe((value) => {
     auth = value
   })
 
   $effect(() => {
+    target?.iri
+    editingId = null
+    editError = null
+  })
+
+  $effect(() => {
     const targetIri = target?.iri
-    const userId = auth.user?.uid
+    const userId = auth.user?.uid ?? null
     annotations = []
     error = null
 
-    if (!targetIri || !userId || !auth.configured) return
+    if (!targetIri || !auth.configured) return
 
     let cancelled = false
     let unsubscribeAnnotations = null
@@ -64,10 +76,45 @@
         annotatesNode: target.iri,
         annotationType: 'commenting',
         annotationText: text,
+        visibility: annotationVisibility,
+        userDisplayName: auth.user.displayName ?? '',
       })
       annotationText = ''
     } catch (e) {
       error = e.message
+    } finally {
+      saving = false
+    }
+  }
+
+  function startEditing(annotation) {
+    editingId = annotation.id
+    editText = annotation.annotationText
+    editVisibility = annotation.visibility
+    editError = null
+  }
+
+  function cancelEditing() {
+    editingId = null
+    editError = null
+  }
+
+  async function saveEdit(event) {
+    event.preventDefault()
+    const text = editText.trim()
+    if (!text || !auth.user || saving) return
+
+    saving = true
+    editError = null
+    try {
+      const store = await createAnnotationStore(auth.user.uid)
+      await store.update(editingId, {
+        annotationText: text,
+        visibility: editVisibility,
+      })
+      editingId = null
+    } catch (e) {
+      editError = e.message
     } finally {
       saving = false
     }
@@ -95,6 +142,12 @@
       timeStyle: 'short',
     }).format(new Date(value))
   }
+
+  function authorLabel(annotation) {
+    if (auth.user?.uid === annotation.userId) return 'You'
+    const name = annotation.userDisplayName?.trim()
+    return name || 'Anonymous'
+  }
 </script>
 
 <div class="annotations">
@@ -102,20 +155,45 @@
     <p class="status"><small>Loading account…</small></p>
   {:else if !auth.configured}
     <p class="status"><small>Firebase config required.</small></p>
-  {:else if !auth.user}
-    <p class="status"><small>Sign in to save notes.</small></p>
   {:else}
-    <form onsubmit={saveAnnotation} class="annotation-form">
-      <textarea
-        rows="3"
-        placeholder="Add a note…"
-        bind:value={annotationText}
-        disabled={saving}
-      ></textarea>
-      <button type="submit" aria-busy={saving} disabled={saving || !annotationText.trim()}>
-        Save note
-      </button>
-    </form>
+    {#if auth.user}
+      <form onsubmit={saveAnnotation} class="annotation-form">
+        <textarea
+          rows="3"
+          placeholder="Add a note…"
+          bind:value={annotationText}
+          disabled={saving}
+        ></textarea>
+        <div class="form-row">
+          <div class="visibility-toggle" role="radiogroup" aria-label="Note visibility">
+            <button
+              type="button"
+              class="visibility-option"
+              class:active={annotationVisibility === 'public'}
+              role="radio"
+              aria-checked={annotationVisibility === 'public'}
+              onclick={() => (annotationVisibility = 'public')}
+              title="Anyone can read this note"
+            >Public</button>
+            <button
+              type="button"
+              class="visibility-option"
+              class:active={annotationVisibility === 'private'}
+              role="radio"
+              aria-checked={annotationVisibility === 'private'}
+              onclick={() => (annotationVisibility = 'private')}
+              title="Only you can read this note"
+            >Private</button>
+          </div>
+          <button type="submit" aria-busy={saving} disabled={saving || !annotationText.trim()}>
+            Save note
+          </button>
+        </div>
+      </form>
+    {:else}
+      <p class="status"><small>Sign in to add or edit notes.</small></p>
+    {/if}
+
     {#if error}
       <p class="annotation-error"><small>{error}</small></p>
     {/if}
@@ -127,17 +205,64 @@
     </div>
   {/if}
 
-  {#if auth.user && auth.configured && annotations.length}
+  {#if auth.configured && annotations.length}
     <ul class="notes-list">
-      {#each annotations as annotation}
-        <li>
-          <p>{annotation.annotationText}</p>
-          <div class="note-meta">
-            <small>{shortDate(annotation.createdAt)}</small>
-            <button type="button" class="secondary outline" onclick={() => removeAnnotation(annotation.id)} disabled={saving}>
-              Delete
-            </button>
-          </div>
+      {#each annotations as annotation (annotation.id)}
+        {@const isMine = auth.user?.uid === annotation.userId}
+        <li class:editing={editingId === annotation.id}>
+          {#if editingId === annotation.id}
+            <form onsubmit={saveEdit} class="edit-form">
+              <textarea
+                rows="3"
+                bind:value={editText}
+                disabled={saving}
+              ></textarea>
+              <div class="form-row">
+                <div class="visibility-toggle" role="radiogroup" aria-label="Note visibility">
+                  <button
+                    type="button"
+                    class="visibility-option"
+                    class:active={editVisibility === 'public'}
+                    role="radio"
+                    aria-checked={editVisibility === 'public'}
+                    onclick={() => (editVisibility = 'public')}
+                  >Public</button>
+                  <button
+                    type="button"
+                    class="visibility-option"
+                    class:active={editVisibility === 'private'}
+                    role="radio"
+                    aria-checked={editVisibility === 'private'}
+                    onclick={() => (editVisibility = 'private')}
+                  >Private</button>
+                </div>
+                <div class="edit-actions">
+                  <button type="button" class="secondary outline" onclick={cancelEditing} disabled={saving}>Cancel</button>
+                  <button type="submit" aria-busy={saving} disabled={saving || !editText.trim()}>Save</button>
+                </div>
+              </div>
+              {#if editError}
+                <p class="annotation-error"><small>{editError}</small></p>
+              {/if}
+            </form>
+          {:else}
+            <p class="note-text">{annotation.annotationText}</p>
+            <div class="note-meta">
+              <span class="meta-line">
+                <span class="author">{authorLabel(annotation)}</span>
+                <span class="dot" aria-hidden="true">·</span>
+                <span class="visibility-chip {annotation.visibility}">{annotation.visibility}</span>
+                <span class="dot" aria-hidden="true">·</span>
+                <span>{shortDate(annotation.updatedAt || annotation.createdAt)}</span>
+              </span>
+              {#if isMine}
+                <span class="actions">
+                  <button type="button" class="link-btn" onclick={() => startEditing(annotation)} disabled={saving}>Edit</button>
+                  <button type="button" class="link-btn danger" onclick={() => removeAnnotation(annotation.id)} disabled={saving}>Delete</button>
+                </span>
+              {/if}
+            </div>
+          {/if}
         </li>
       {/each}
     </ul>
@@ -151,14 +276,16 @@
     gap: 0.85rem;
   }
 
-  .annotation-form {
+  .annotation-form,
+  .edit-form {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
     margin: 0;
   }
 
-  .annotation-form textarea {
+  .annotation-form textarea,
+  .edit-form textarea {
     margin: 0;
     padding: 0.5rem 0.6rem;
     font-size: 0.85rem;
@@ -166,12 +293,52 @@
     resize: vertical;
   }
 
-  .annotation-form button {
+  .form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .visibility-toggle {
+    display: inline-flex;
+    border: 1px solid #ffffff25;
+    border-radius: 0.35rem;
+    overflow: hidden;
+  }
+
+  .visibility-option {
+    margin: 0;
+    padding: 0.32rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: var(--pico-muted-color);
+    cursor: pointer;
+    line-height: 1;
+    width: auto;
+  }
+  .visibility-option:hover { background: #ffffff10; color: #ececec; }
+  .visibility-option.active {
+    background: #ffffff18;
+    color: #ececec;
+  }
+  .visibility-option + .visibility-option {
+    border-left: 1px solid #ffffff25;
+  }
+
+  .annotation-form > .form-row > button[type="submit"],
+  .edit-form .edit-actions button {
     margin: 0;
     padding: 0.35rem 0.7rem;
     font-size: 0.78rem;
-    align-self: flex-end;
     width: auto;
+  }
+
+  .edit-actions {
+    display: flex;
+    gap: 0.35rem;
   }
 
   .annotation-between {
@@ -193,13 +360,17 @@
   }
 
   .notes-list li {
-    padding: 0.5rem 0.6rem;
+    padding: 0.55rem 0.65rem;
     border: 1px solid #ffffff18;
     border-radius: 0.35rem;
   }
+  .notes-list li.editing {
+    border-color: #ffffff35;
+    background: #ffffff04;
+  }
 
-  .notes-list li p {
-    margin: 0 0 0.35rem;
+  .note-text {
+    margin: 0 0 0.4rem;
     font-size: 0.82rem;
     line-height: 1.4;
     white-space: pre-wrap;
@@ -210,19 +381,66 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-  }
-
-  .note-meta small {
-    color: var(--pico-muted-color);
     font-size: 0.7rem;
   }
 
-  .note-meta button {
+  .meta-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.32rem;
+    color: var(--pico-muted-color);
+    flex-wrap: wrap;
+  }
+
+  .author {
+    font-weight: 600;
+    color: #d8d8d8;
+  }
+
+  .meta-line .dot {
+    opacity: 0.5;
+  }
+
+  .visibility-chip {
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.85rem;
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid #ffffff20;
+    color: var(--pico-muted-color);
+  }
+  .visibility-chip.public {
+    color: #cde9fa;
+    border-color: #4fc3f755;
+    background: #4fc3f714;
+  }
+  .visibility-chip.private {
+    color: #f0c694;
+    border-color: #ffb74d55;
+    background: #ffb74d14;
+  }
+
+  .actions {
+    display: inline-flex;
+    gap: 0.55rem;
+    flex-shrink: 0;
+  }
+
+  .link-btn {
     width: auto;
     margin: 0;
-    padding: 0.18rem 0.45rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    color: var(--pico-muted-color);
+    cursor: pointer;
     font-size: 0.7rem;
   }
+  .link-btn:hover { color: #ececec; text-decoration: underline; }
+  .link-btn.danger:hover { color: #f4a3a3; }
+  .link-btn:disabled { opacity: 0.5; cursor: default; text-decoration: none; }
 
   .annotation-error {
     margin: 0;

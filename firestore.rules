@@ -3,16 +3,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /rdfAnnotations/{annotationId} {
+      allow read: if resource.data.get('visibility', '') == 'public'
+        || (signedIn() && resource.data.userId == request.auth.uid);
+
       allow create: if signedIn()
         && validAnnotationCreate();
-
-      allow read, delete: if signedIn()
-        && resource.data.userId == request.auth.uid;
 
       allow update: if signedIn()
         && resource.data.userId == request.auth.uid
         && request.resource.data.userId == request.auth.uid
         && validAnnotationPayload();
+
+      allow delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
     }
   }
 
@@ -28,9 +31,11 @@ service cloud.firestore {
   function validAnnotationPayload() {
     return request.resource.data.keys().hasOnly([
       'userId',
+      'userDisplayName',
       'targetIri',
       'annotationType',
       'annotationText',
+      'visibility',
       'createdAt',
       'updatedAt'
     ])
@@ -38,6 +43,9 @@ service cloud.firestore {
     && request.resource.data.annotationType is string
     && request.resource.data.annotationText is string
     && request.resource.data.annotationText.size() > 0
-    && request.resource.data.annotationText.size() <= 4000;
+    && request.resource.data.annotationText.size() <= 4000
+    && request.resource.data.visibility in ['public', 'private']
+    && request.resource.data.get('userDisplayName', '') is string
+    && request.resource.data.get('userDisplayName', '').size() <= 200;
   }
 }

@@ -6,6 +6,8 @@ const { literal, namedNode, quad } = DataFactory
 
 export const ANNOTATION_COLLECTION = 'rdfAnnotations'
 
+const VISIBILITY_VALUES = new Set(['public', 'private'])
+
 export function normalizeTargetIri(target) {
   if (typeof target === 'string') return target
   if (target?.value) return target.value
@@ -13,7 +15,12 @@ export function normalizeTargetIri(target) {
 }
 
 export function annotationGraphIri(userId) {
+  if (!userId) return 'https://w3id.org/sstim/implementation/bsclab/annotation/public'
   return BSCLAB_ANNOTATION(encodeURIComponent(userId)).value
+}
+
+function safeVisibility(value) {
+  return VISIBILITY_VALUES.has(value) ? value : 'public'
 }
 
 function timestampToIso(value) {
@@ -29,9 +36,12 @@ function annotationFromDoc(docSnapshot) {
   return {
     id: docSnapshot.id,
     userId: data.userId,
+    userDisplayName: data.userDisplayName ?? '',
     targetIri: data.targetIri,
     annotationType: data.annotationType ?? 'commenting',
     annotationText: data.annotationText ?? '',
+    // Legacy docs without visibility default to private (their original behavior).
+    visibility: data.visibility ?? 'private',
     createdAt: timestampToIso(data.createdAt),
     updatedAt: timestampToIso(data.updatedAt),
   }
@@ -43,27 +53,39 @@ function dateTimeLiteral(value) {
 
 export class AnnotationStore {
   constructor(userId, db) {
-    if (!userId) throw new Error('AnnotationStore requires an authenticated user.')
-    this.userId = userId
+    this.userId = userId ?? null
     this.db = db
-    this.annotationGraphIri = annotationGraphIri(userId)
+    this.annotationGraphIri = annotationGraphIri(this.userId)
   }
 
   static async forUser(userId) {
+    if (!userId) throw new Error('AnnotationStore.forUser requires a uid; use forReader for unauthenticated access.')
     const { db } = await requireFirebaseClient()
     return new AnnotationStore(userId, db)
   }
 
-  async add({ annotatesNode, annotationText, annotationType = 'commenting' }) {
+  static async forReader() {
+    const { db } = await requireFirebaseClient()
+    return new AnnotationStore(null, db)
+  }
+
+  get isAuthenticated() {
+    return Boolean(this.userId)
+  }
+
+  async add({ annotatesNode, annotationText, annotationType = 'commenting', visibility = 'public', userDisplayName = '' }) {
+    if (!this.userId) throw new Error('Sign in to add annotations.')
     const text = annotationText?.trim()
     if (!text) throw new Error('Annotation text cannot be empty.')
 
     const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
     const docRef = await addDoc(collection(this.db, ANNOTATION_COLLECTION), {
       userId: this.userId,
+      userDisplayName: typeof userDisplayName === 'string' ? userDisplayName.slice(0, 200) : '',
       targetIri: normalizeTargetIri(annotatesNode),
       annotationType,
       annotationText: text,
+      visibility: safeVisibility(visibility),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     })
@@ -74,58 +96,96 @@ export class AnnotationStore {
   subscribeForTarget(annotatesNode, onValue, onError = () => {}) {
     const targetIri = normalizeTargetIri(annotatesNode)
     let stopped = false
-    let unsubscribe = () => {}
+    const unsubs = []
+
+    let publicResults = []
+    let ownResults = []
+    let publicReady = false
+    let ownReady = !this.userId   // no own-query when anonymous
+
+    const emit = () => {
+      if (!publicReady || !ownReady) return
+      const seen = new Map()
+      for (const annotation of publicResults) seen.set(annotation.id, annotation)
+      for (const annotation of ownResults) seen.set(annotation.id, annotation)
+      const merged = [...seen.values()].sort((a, b) =>
+        (b.createdAt || '').localeCompare(a.createdAt || ''),
+      )
+      onValue(merged)
+    }
 
     import('firebase/firestore')
       .then(({ collection, onSnapshot, query, where }) => {
         if (stopped) return
-        const userAnnotations = query(
-          collection(this.db, ANNOTATION_COLLECTION),
-          where('userId', '==', this.userId),
-        )
 
-        unsubscribe = onSnapshot(
-          userAnnotations,
+        const publicQuery = query(
+          collection(this.db, ANNOTATION_COLLECTION),
+          where('targetIri', '==', targetIri),
+          where('visibility', '==', 'public'),
+        )
+        unsubs.push(onSnapshot(
+          publicQuery,
           (snapshot) => {
-            const annotations = snapshot.docs
-              .map(annotationFromDoc)
-              .filter((annotation) => annotation.targetIri === targetIri)
-              .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
-            onValue(annotations)
+            publicResults = snapshot.docs.map(annotationFromDoc)
+            publicReady = true
+            emit()
           },
           onError,
-        )
+        ))
+
+        if (this.userId) {
+          const ownQuery = query(
+            collection(this.db, ANNOTATION_COLLECTION),
+            where('targetIri', '==', targetIri),
+            where('userId', '==', this.userId),
+          )
+          unsubs.push(onSnapshot(
+            ownQuery,
+            (snapshot) => {
+              ownResults = snapshot.docs.map(annotationFromDoc)
+              ownReady = true
+              emit()
+            },
+            onError,
+          ))
+        }
       })
       .catch(onError)
 
     return () => {
       stopped = true
-      unsubscribe()
+      for (const unsubscribe of unsubs) unsubscribe()
     }
   }
 
-  async update(id, annotationText) {
+  async update(id, { annotationText, visibility }) {
+    if (!this.userId) throw new Error('Sign in to edit annotations.')
     const text = annotationText?.trim()
     if (!text) throw new Error('Annotation text cannot be empty.')
 
     const { doc, serverTimestamp, updateDoc } = await import('firebase/firestore')
     await updateDoc(doc(this.db, ANNOTATION_COLLECTION, id), {
       annotationText: text,
+      visibility: safeVisibility(visibility),
       updatedAt: serverTimestamp(),
     })
   }
 
   async remove(id) {
+    if (!this.userId) throw new Error('Sign in to delete annotations.')
     const { deleteDoc, doc } = await import('firebase/firestore')
     await deleteDoc(doc(this.db, ANNOTATION_COLLECTION, id))
   }
 
   toQuads(annotations) {
-    const graph = namedNode(this.annotationGraphIri)
-    const actor = namedNode(`https://w3id.org/sstim/implementation/bsclab/user/${encodeURIComponent(this.userId)}`)
+    const fallbackGraph = namedNode(this.annotationGraphIri)
+    const publicGraph = namedNode('https://w3id.org/sstim/implementation/bsclab/annotation/public')
 
     return annotations.flatMap((annotation) => {
-      const annotationNode = BSCLAB_ANNOTATION(`${encodeURIComponent(this.userId)}/${annotation.id}`)
+      const ownerSegment = encodeURIComponent(annotation.userId || 'anonymous')
+      const annotationNode = BSCLAB_ANNOTATION(`${ownerSegment}/${annotation.id}`)
+      const actor = namedNode(`https://w3id.org/sstim/implementation/bsclab/user/${ownerSegment}`)
+      const graph = annotation.visibility === 'public' ? publicGraph : fallbackGraph
       const quads = [
         quad(annotationNode, RDF('type'), OA('Annotation'), graph),
         quad(annotationNode, OA('hasTarget'), namedNode(annotation.targetIri), graph),
@@ -158,5 +218,5 @@ export class AnnotationStore {
 }
 
 export function createAnnotationStore(userId) {
-  return AnnotationStore.forUser(userId)
+  return userId ? AnnotationStore.forUser(userId) : AnnotationStore.forReader()
 }

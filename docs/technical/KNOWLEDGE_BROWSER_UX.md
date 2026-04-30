@@ -43,6 +43,13 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
   `#sstim-v:highTheta` are accepted as a fallback. Selection writes back to the
   URL with `history.replaceState`, so the URL is bidirectionally shareable
   without polluting the back stack.
+- **Public / private annotations** — notes default to public so other readers
+  benefit from them; creators can mark a note private at write time, edit it
+  in place afterwards, and toggle visibility on edit. Unauthenticated visitors
+  see public notes (read-only); only the creator can edit or delete. Author
+  display name is captured at write time and shown on each note. Public notes
+  serialize into a shared RDF named graph; private notes stay in the per-user
+  graph.
 
 ---
 
