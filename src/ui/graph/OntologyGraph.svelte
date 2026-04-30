@@ -283,7 +283,9 @@
   function fitGraph() {
     if (!cy) return
     const visible = cy.elements().filter((element) => element.style('display') !== 'none')
-    cy.fit(visible.length ? visible : cy.elements(), 30)
+    const eles = visible.length ? visible : cy.elements()
+    cy.stop(true)
+    cy.animate({ fit: { eles, padding: 30 } }, { duration: 300 })
   }
 
   function clearSelection() {
@@ -333,10 +335,12 @@
     cy.nodes().unselect()
     node.select()
     selected = node.data()
+    const zoom = neighborhoodFocus ? cy.zoom() : Math.max(cy.zoom(), 1)
+    cy.stop(true)
     cy.animate({
       center: { eles: node },
-      zoom: Math.max(cy.zoom(), 1),
-    }, { duration: 250 })
+      zoom,
+    }, { duration: 280 })
   }
 
   function computeNeighbors(id) {
@@ -375,7 +379,7 @@
   const SSTIM_V_BASE = 'https://w3id.org/sstim/vocab#'
   const HASH_PREFER_BASES = [SSTIM_BASE, SSTIM_V_BASE]
 
-  let hashSyncReady = false
+  let setupReady = false
   let initialHash = ''
 
   function resolveHashToNodeId(rawHash) {
@@ -540,9 +544,16 @@
   $effect(() => {
     if (!cy) return
     neighborhoodFocus
-    if (neighborhoodFocus) selected?.id
+    if (!setupReady) return
     applyGraphDisplay()
     fitGraph()
+  })
+
+  $effect(() => {
+    if (!cy || !neighborhoodFocus) return
+    selected?.id
+    if (!setupReady) return
+    applyGraphDisplay()
   })
 
   $effect(() => {
@@ -641,7 +652,7 @@
         const id = resolveHashToNodeId(initialHash)
         if (id) selectNodeById(id)
       }
-      hashSyncReady = true
+      setupReady = true
     } catch (e) {
       error = e.message
       console.error(e)
@@ -660,7 +671,7 @@
 
   $effect(() => {
     selected
-    if (!hashSyncReady) return
+    if (!setupReady) return
     writeHashForSelected()
   })
 

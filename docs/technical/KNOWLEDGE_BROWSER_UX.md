@@ -25,7 +25,9 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
   `neighbor` and an incoming card reads `neighbor` / `← predicate`.
 - **Focus this neighborhood** — collapses the canvas to the selected node + its
   1-hop neighbors; updates as you walk to a neighbor; exit restores the full
-  view. Respects scope and edge-layer filters.
+  view. Respects scope and edge-layer filters. Entering and exiting focus
+  animate the fit; walking inside focus preserves the current zoom and pans
+  smoothly to the new node instead of re-fitting.
 - **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
   close · `c` center · `f` fit · `r` relayout · `h` / `?` help. Discoverable
   from the help dialog and tooltips.
@@ -62,10 +64,9 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
 ## Open follow-ups (user-flagged)
 
 ### Focus this neighborhood — refinements
-- Keep camera position and zoom when walking to a neighbor; animate the new
-  node to the center instead of refitting the whole subgraph.
 - Add a "show other nodes, transparent" mode so the focus dims the rest of the
-  graph instead of hiding it.
+  graph instead of hiding it. Would also smooth the small visibility-pop that
+  happens when walking from one neighborhood to the next.
 - Variable hop depth (currently 1-hop only); allow 2 / 3 / 4 hops via a small
   control next to the focus toggle.
 
