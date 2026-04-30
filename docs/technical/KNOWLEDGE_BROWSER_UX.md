@@ -27,7 +27,9 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
   1-hop neighbors; updates as you walk to a neighbor; exit restores the full
   view. Respects scope and edge-layer filters. Entering and exiting focus
   animate the fit; walking inside focus preserves the current zoom and pans
-  smoothly to the new node instead of re-fitting.
+  smoothly to the new node instead of re-fitting. Visibility transitions
+  (focus toggle, scope/layer changes, neighborhood walk) cross-fade nodes and
+  edges over ~220 ms so nothing pops in or out.
 - **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
   close · `c` center · `f` fit · `r` relayout · `h` / `?` help. Discoverable
   from the help dialog and tooltips.
@@ -65,8 +67,8 @@ The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
 
 ### Focus this neighborhood — refinements
 - Add a "show other nodes, transparent" mode so the focus dims the rest of the
-  graph instead of hiding it. Would also smooth the small visibility-pop that
-  happens when walking from one neighborhood to the next.
+  graph instead of hiding it (different visual idiom from the current fade-out
+  + collapse, useful when you want to keep the global layout in view).
 - Variable hop depth (currently 1-hop only); allow 2 / 3 / 4 hops via a small
   control next to the focus toggle.
 

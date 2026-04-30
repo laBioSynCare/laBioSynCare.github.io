@@ -32,6 +32,9 @@
   let neighborhoodFocus = $state(false)
   let connectionFilters = $state(new Set())
 
+  let visibleSet = new Set()
+  const FADE_MS = 220
+
   const KIND_LABELS = {
     owlClass: 'OWL class',
     skosConcept: 'SKOS concept',
@@ -254,15 +257,52 @@
 
   const focusNodeOptions = $derived(nodeOptionsForCurrentView())
 
-  function applyGraphDisplay() {
-    if (!cy) return
+  function applyGraphDisplay({ animate = true } = {}) {
+    if (!cy) return null
     const visible = visibleElementsForCurrentView()
-    const visibleIds = new Set(visible.map((element) => element.data.id))
+    const newIds = new Set(visible.map((element) => element.data.id))
 
     cy.elements().forEach((element) => {
-      element.style('display', visibleIds.has(element.id()) ? 'element' : 'none')
+      const id = element.id()
+      const shouldShow = newIds.has(id)
+      const wasShown = visibleSet.has(id)
+
+      if (shouldShow && !wasShown) {
+        element.stop(true, false)
+        const wasHidden = element.style('display') === 'none'
+        element.style('display', 'element')
+        if (animate) {
+          if (wasHidden) element.style('opacity', 0)
+          element.animate({ style: { opacity: 1 } }, {
+            duration: FADE_MS,
+            complete: () => element.removeStyle('opacity'),
+          })
+        } else {
+          element.removeStyle('opacity')
+        }
+      } else if (!shouldShow && wasShown) {
+        element.stop(true, false)
+        if (animate) {
+          element.animate({ style: { opacity: 0 } }, {
+            duration: FADE_MS,
+            complete: () => {
+              element.style('display', 'none')
+              element.removeStyle('opacity')
+            },
+          })
+        } else {
+          element.style('display', 'none')
+          element.removeStyle('opacity')
+        }
+      } else if (!shouldShow) {
+        element.style('display', 'none')
+        element.removeStyle('opacity')
+      }
     })
+
+    visibleSet = newIds
     graphStats = computeGraphStats(visible)
+    return cy.elements().filter((element) => newIds.has(element.id()))
   }
 
   function relayoutGraph() {
@@ -280,12 +320,12 @@
     }).run()
   }
 
-  function fitGraph() {
+  function fitGraph(elements = null) {
     if (!cy) return
-    const visible = cy.elements().filter((element) => element.style('display') !== 'none')
-    const eles = visible.length ? visible : cy.elements()
+    const eles = elements ?? cy.elements().filter((element) => element.style('display') !== 'none')
+    const target = eles.length ? eles : cy.elements()
     cy.stop(true)
-    cy.animate({ fit: { eles, padding: 30 } }, { duration: 300 })
+    cy.animate({ fit: { eles: target, padding: 30 } }, { duration: 300 })
   }
 
   function clearSelection() {
@@ -545,8 +585,8 @@
     if (!cy) return
     neighborhoodFocus
     if (!setupReady) return
-    applyGraphDisplay()
-    fitGraph()
+    const targets = applyGraphDisplay()
+    fitGraph(targets)
   })
 
   $effect(() => {
@@ -646,7 +686,7 @@
         if (evt.target === cy) clearSelection()
       })
 
-      applyGraphDisplay()
+      applyGraphDisplay({ animate: false })
 
       if (initialHash) {
         const id = resolveHashToNodeId(initialHash)
