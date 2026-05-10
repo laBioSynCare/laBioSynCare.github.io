@@ -10,3 +10,8 @@
 <div style="overflow:hidden">
   {@render children()}
 </div>
+
+<style>
+  :global(body.studio-page .app-topbar) { display: none; }
+  :global(body.studio-page > div)       { overflow: visible; }
+</style>

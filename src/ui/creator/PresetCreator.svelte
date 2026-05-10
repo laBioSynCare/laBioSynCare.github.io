@@ -1,878 +1,924 @@
 <script>
   import {
-    AUDIO_WAVEFORMS,
-    CONTROL_KINDS,
-    LFO_WAVEFORMS,
-    STIM_TYPES,
-    VISUAL_MOTION,
-    VISUAL_SHAPES,
-    analyzePatch,
+    AUDIO_PARAMS,
+    AUDIO_TRACK_TYPES,
+    CONTROL_TYPES,
+    HAPTIC_PARAMS,
+    HAPTIC_TRACK_TYPES,
+    MARTIGLI_WAVEFORMS,
+    VISUAL_PARAMS,
+    VISUAL_TRACK_TYPES,
     buildPatchExport,
+    createAudioTrack,
     createControlTrack,
     createDraft,
-    createRoute,
-    createStimulationTrack,
-    modulationParametersFor,
+    createHapticTrack,
+    createMod,
+    createVisualTrack,
     patchSummary,
     validateDraft,
   } from './presetDraft.js'
 
   let draft = $state(createDraft())
   let statusMessage = $state('')
+  let expandedMod = $state(null) // "trackId:paramName" for the open mod picker
+  let menuOpen = $state(false)
 
   const summary = $derived(patchSummary(draft))
   const issues = $derived(validateDraft(draft))
-  const hasBlockingIssues = $derived(issues.some(issue => issue.level === 'error'))
-  const analysis = $derived(analyzePatch(draft))
-  const patchExport = $derived(buildPatchExport(draft))
-  const jsonPreview = $derived(JSON.stringify(patchExport, null, 2))
+  const hasErrors = $derived(issues.some(i => i.level === 'error'))
+  const jsonExport = $derived(JSON.stringify(buildPatchExport(draft), null, 2))
 
-  function addControlTrack(kind) {
-    draft.controlTracks.push(createControlTrack(kind))
-    statusMessage = `${kind} control track added.`
+  // ── Control tracks ──────────────────────────────────────────────────────────
+
+  function addControlTrack(type) {
+    draft.controlTracks.push(createControlTrack(type))
   }
 
   function removeControlTrack(id) {
-    draft.controlTracks = draft.controlTracks.filter(track => track.id !== id)
-    draft.routes = draft.routes.filter(route => route.controlId !== id)
-    statusMessage = 'Control track removed with its routes.'
+    draft.controlTracks = draft.controlTracks.filter(t => t.id !== id)
+    // drop dangling mods from all sensory tracks
+    for (const col of [draft.audioTracks, draft.visualTracks, draft.hapticTracks]) {
+      for (const track of col) {
+        for (const param of Object.values(track.params)) {
+          param.mods = param.mods.filter(m => m.controlId !== id)
+        }
+      }
+    }
+    status('Control track removed.')
   }
 
-  function changeControlKind(id, nextKind) {
-    const index = draft.controlTracks.findIndex(track => track.id === id)
-    if (index === -1) return
+  // ── Sensory tracks ──────────────────────────────────────────────────────────
 
-    const previous = draft.controlTracks[index]
-    draft.controlTracks[index] = createControlTrack(nextKind, { id, name: previous.name })
-    draft.routes = draft.routes.map(route => route.controlId === id ? { ...route, amount: 1 } : route)
-    statusMessage = `Control track switched to ${nextKind}.`
+  function addAudioTrack(trackType) {
+    draft.audioTracks.push(createAudioTrack(trackType))
+    status(`${trackType} added.`)
   }
 
-  function addStimulationTrack(type) {
-    draft.stimulationTracks.push(createStimulationTrack(type))
-    statusMessage = `${type} stimulation track added.`
+  function removeAudioTrack(id) {
+    draft.audioTracks = draft.audioTracks.filter(t => t.id !== id)
+    status('Audio track removed.')
   }
 
-  function removeStimulationTrack(id) {
-    draft.stimulationTracks = draft.stimulationTracks.filter(track => track.id !== id)
-    draft.routes = draft.routes.filter(route => route.stimulationId !== id)
-    statusMessage = 'Stimulation track removed with its routes.'
+  function addVisualTrack(trackType) {
+    draft.visualTracks.push(createVisualTrack(trackType))
+    status(`${trackType} added.`)
   }
 
-  function changeStimulationType(id, nextType) {
-    const index = draft.stimulationTracks.findIndex(track => track.id === id)
-    if (index === -1) return
-
-    const previous = draft.stimulationTracks[index]
-    draft.stimulationTracks[index] = createStimulationTrack(nextType, { id, name: previous.name })
-    draft.routes = draft.routes.map(route => {
-      if (route.stimulationId !== id) return route
-      const options = modulationParametersFor(nextType)
-      return { ...route, parameter: options[0] }
-    })
-    statusMessage = `Stimulation track switched to ${nextType}.`
+  function removeVisualTrack(id) {
+    draft.visualTracks = draft.visualTracks.filter(t => t.id !== id)
+    status('Visual track removed.')
   }
 
-  function addRoute() {
-    const controlId = draft.controlTracks[0]?.id ?? ''
-    const stimulation = draft.stimulationTracks[0]
-    if (!controlId || !stimulation) return
-
-    const parameter = modulationParametersFor(stimulation.type)[0]
-    draft.routes.push(createRoute(controlId, stimulation.id, parameter, 1))
-    statusMessage = 'Route added.'
+  function addHapticTrack(trackType) {
+    draft.hapticTracks.push(createHapticTrack(trackType))
+    status(`${trackType} added.`)
   }
 
-  function removeRoute(id) {
-    draft.routes = draft.routes.filter(route => route.id !== id)
-    statusMessage = 'Route removed.'
+  function removeHapticTrack(id) {
+    draft.hapticTracks = draft.hapticTracks.filter(t => t.id !== id)
+    status('Haptic track removed.')
   }
 
-  function syncRouteParameter(route) {
-    const stimulation = draft.stimulationTracks.find(track => track.id === route.stimulationId)
-    if (!stimulation) return
+  // ── Mod slots ───────────────────────────────────────────────────────────────
 
-    const allowed = modulationParametersFor(stimulation.type)
-    if (!allowed.includes(route.parameter)) {
-      route.parameter = allowed[0]
+  function toggleModPicker(trackId, paramName) {
+    const key = `${trackId}:${paramName}`
+    expandedMod = expandedMod === key ? null : key
+  }
+
+  function addMod(param, controlId) {
+    if (!param.mods.find(m => m.controlId === controlId)) {
+      param.mods.push(createMod(controlId))
+    }
+    expandedMod = null
+    status('Mod link added.')
+  }
+
+  function removeMod(param, modId) {
+    param.mods = param.mods.filter(m => m.id !== modId)
+    status('Mod link removed.')
+  }
+
+  // ── Transport (placeholder until engines are wired) ─────────────────────────
+
+  function togglePlay() {
+    draft.playing = !draft.playing
+    status(draft.playing ? 'Playing…' : 'Stopped.')
+  }
+
+  // ── Save / load ─────────────────────────────────────────────────────────────
+
+  function downloadPatch() {
+    const blob = new Blob([jsonExport], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${slugify(draft.patchName)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    status('Patch downloaded.')
+  }
+
+  async function copyPatch() {
+    try {
+      await navigator.clipboard.writeText(jsonExport)
+      status('JSON copied.')
+    } catch {
+      status('Clipboard unavailable.')
     }
   }
 
   function resetPatch() {
     draft = createDraft()
-    statusMessage = 'Patch reset to Model 1 defaults.'
+    expandedMod = null
+    status('Patch reset.')
   }
 
-  async function copyJson() {
-    try {
-      await navigator.clipboard.writeText(jsonPreview)
-      statusMessage = 'Patch JSON copied to the clipboard.'
-    } catch {
-      statusMessage = 'Clipboard access was not available in this browser context.'
-    }
+  function slugify(v) {
+    return `${v ?? 'patch'}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'patch'
   }
 
-  function downloadJson() {
-    const blob = new Blob([jsonPreview], { type: 'application/json' })
-    const link = document.createElement('a')
-    const objectUrl = URL.createObjectURL(blob)
+  function status(msg) { statusMessage = msg }
 
-    link.href = objectUrl
-    link.download = `${slugify(draft.patchName)}.json`
-    link.click()
-    URL.revokeObjectURL(objectUrl)
-    statusMessage = 'Patch JSON downloaded.'
-  }
-
-  function slugify(value) {
-    return `${value ?? 'model-1-patch'}`
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '') || 'model-1-patch'
-  }
-
-  function formatAnalysis(details) {
-    if (details.type === 'frequency-range') {
-      return `${details.minHz} Hz to ${details.maxHz} Hz around ${details.centerHz} Hz`
-    }
-
-    if (details.type === 'lfo-depth') {
-      return `depth ${details.effectiveDepth} from route amount ${details.amount}`
-    }
-
-    if (details.type === 'sequence-values') {
-      return `values ${details.scaledValues.join(', ')} every ${details.stepSec}s`
-    }
-
-    return JSON.stringify(details)
+  function ctrlName(id) {
+    return draft.controlTracks.find(t => t.id === id)?.name ?? id
   }
 </script>
 
-<main class="studio-shell">
-  <section class="hero panel">
-    <div>
-      <p class="eyebrow">Sensory Stimulation Interface</p>
-      <h1>Patch Studio · Model 1</h1>
-      <p class="hero-copy">
-        Control tracks generate modulation signals. Stimulation tracks produce audio or visual
-        output. Routes plug controls into stimulation parameters, so one slow LFO can sweep a
-        400 Hz sine carrier, pulse a circle, or drive both in parallel.
-      </p>
+<div class="studio">
+
+  <!-- ── Header ── -->
+  <header class="studio-header">
+    <div class="header-left">
+      <input class="patch-name" bind:value={draft.patchName} placeholder="Patch name" />
+      <span class="overview-pill">
+        {summary.controlCount} ctrl · {summary.audioCount} audio · {summary.visualCount} visual · {summary.hapticCount} haptic · {summary.modLinks} links
+      </span>
     </div>
 
-    <div class="hero-metrics">
-      <article>
-        <span>Control tracks</span>
-        <strong>{summary.controlCount} total · {summary.lfoCount} LFO · {summary.sequenceCount} sequence</strong>
-      </article>
-      <article>
-        <span>Stimulation tracks</span>
-        <strong>{summary.stimulationCount} total · {summary.audioCount} audio · {summary.visualCount} visual</strong>
-      </article>
-      <article>
-        <span>Routes</span>
-        <strong>{summary.routeCount}</strong>
-      </article>
+    <div class="header-center">
+      <button class="transport-btn" onclick={togglePlay} title={draft.playing ? 'Stop' : 'Play'}>
+        {draft.playing ? '■' : '▶'}
+      </button>
+      <label class="meta-field">
+        BPM <input type="number" min="1" step="1" bind:value={draft.bpm} />
+      </label>
+      <label class="meta-field">
+        sec <input type="number" min="1" step="1" bind:value={draft.lengthSec} />
+      </label>
     </div>
-  </section>
 
-  <section class="workspace">
-    <div class="editor-column">
-      <section class="panel section-card">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Patch frame</p>
-            <h2>Session shell</h2>
+    <div class="header-right">
+      {#if issues.length > 0}
+        <span class="badge {hasErrors ? 'badge-err' : 'badge-warn'}">{issues.length} {hasErrors ? 'error' : 'warning'}{issues.length > 1 ? 's' : ''}</span>
+      {:else}
+        <span class="badge badge-ok">OK</span>
+      {/if}
+      <button class="ghost-btn" onclick={copyPatch}>Copy JSON</button>
+      <button class="ghost-btn" onclick={downloadPatch} disabled={hasErrors}>Download</button>
+      <button class="ghost-btn" onclick={resetPatch}>Reset</button>
+
+      <div class="nav-cluster">
+        <details class="nav-menu" bind:open={menuOpen}>
+          <summary aria-label="Navigation menu" title="Navigation">+</summary>
+          <div class="nav-panel">
+            <a href="/creator/">Patch Studio</a>
+            <a href="/presets/">Presets</a>
+            <a href="/sparql/">SPARQL</a>
+            <a href="/">Graph</a>
           </div>
-          <button type="button" class="secondary outline" onclick={resetPatch}>Reset patch</button>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  {#if statusMessage}
+    <div class="status-bar" aria-live="polite">{statusMessage}</div>
+  {/if}
+
+  <!-- ── Four columns ── -->
+  <div class="columns">
+
+    <!-- Controls column -->
+    <div class="col col-control">
+      <div class="col-head">
+        <span class="col-title">Controls</span>
+        <div class="col-actions">
+          {#each CONTROL_TYPES as type}
+            <button class="add-btn" onclick={() => addControlTrack(type)}>+ {type}</button>
+          {/each}
         </div>
+      </div>
+      <div class="col-description">Martigli oscillators and Symmetry patterns, all available as modulators.</div>
 
-        <div class="field-grid field-grid--shell">
-          <label>
-            Patch name
-            <input bind:value={draft.patchName} placeholder="Model 1 Patch" />
-          </label>
-
-          <label>
-            BPM
-            <input type="number" min="1" step="1" bind:value={draft.bpm} />
-          </label>
-
-          <label>
-            Length in seconds
-            <input type="number" min="1" step="1" bind:value={draft.lengthSec} />
-          </label>
-
-          <label class="field-span-3">
-            Notes
-            <textarea bind:value={draft.notes} rows="3" placeholder="Describe how the control tracks are meant to shape the stimulation layer."></textarea>
-          </label>
-        </div>
-      </section>
-
-      <section class="panel section-card">
-        <div class="section-head section-head--stack">
-          <div>
-            <p class="section-kicker">Control tracks</p>
-            <h2>Modulators</h2>
+      {#each draft.controlTracks as track (track.id)}
+        <article class="track-card">
+          <div class="track-head">
+            <input class="track-name" bind:value={track.name} />
+            <button class="icon-btn" onclick={() => removeControlTrack(track.id)} title="Remove">✕</button>
           </div>
 
-          <div class="track-actions">
-            {#each CONTROL_KINDS as kind}
-              <button type="button" class="secondary outline" onclick={() => addControlTrack(kind)}>Add {kind}</button>
-            {/each}
-          </div>
+          {#if track.type === 'Martigli'}
+            <div class="field-row">
+              <label>Waveform
+                <select bind:value={track.waveform}>
+                  {#each MARTIGLI_WAVEFORMS as w}<option value={w}>{w}</option>{/each}
+                </select>
+              </label>
+            </div>
+            <div class="field-row">
+              <label>Period sec <input type="number" min="3" step="1" bind:value={track.periodSec} /></label>
+              <label>Target sec <input type="number" min="3" step="1" bind:value={track.targetPeriodSec} /></label>
+            </div>
+            <div class="field-row">
+              <label>Inhale ratio <input type="number" min="0.1" max="0.9" step="0.05" bind:value={track.inhaleRatio} /></label>
+              <label>Amplitude <input type="number" min="0" max="2" step="0.05" bind:value={track.amplitude} /></label>
+            </div>
+            <div class="track-meta">
+              Breath {track.periodSec}s → {track.targetPeriodSec}s · Inhale {Math.round(track.inhaleRatio * 100)}%
+            </div>
+
+          {:else}
+            <div class="field-row">
+              <label>Rate Hz <input type="number" min="0.001" max="50" step="0.1" bind:value={track.rateHz} /></label>
+              <label>Depth <input type="number" step="0.1" bind:value={track.depth} /></label>
+            </div>
+            <div class="field-row">
+              <label>Offset <input type="number" step="0.1" bind:value={track.offset} /></label>
+              <label>Phase ° <input type="number" step="1" bind:value={track.phaseDeg} /></label>
+            </div>
+            <div class="track-meta">
+              {track.rateHz} Hz {track.waveform}
+            </div>
+          {/if}
+        </article>
+      {/each}
+
+      {#if draft.controlTracks.length === 0}
+        <p class="empty-hint">Add a Martigli or Symmetry oscillator to use as a modulator.</p>
+      {/if}
+    </div>
+
+    <!-- Audio column -->
+    <div class="col col-audio">
+      <div class="col-head">
+        <span class="col-title">Audio</span>
+        <div class="col-actions">
+          {#each AUDIO_TRACK_TYPES as type}
+            <button class="add-btn" onclick={() => addAudioTrack(type)}>+ {type}</button>
+          {/each}
         </div>
+      </div>
+      <div class="col-description">Tonal and rhythmic audio layers.</div>
 
-        <div class="track-grid">
-          {#each draft.controlTracks as track, index (track.id)}
-            <article class="track-card">
-              <header>
-                <div>
-                  <p>Control {index + 1}</p>
-                  <h3>{track.name}</h3>
-                </div>
-                <button type="button" class="secondary outline ghost" onclick={() => removeControlTrack(track.id)} disabled={draft.controlTracks.length <= 1}>Remove</button>
-              </header>
-
-              <div class="field-grid field-grid--track">
-                <label>
-                  Name
-                  <input bind:value={track.name} />
-                </label>
-
-                <label>
-                  Kind
-                  <select value={track.kind} onchange={(event) => changeControlKind(track.id, event.currentTarget.value)}>
-                    {#each CONTROL_KINDS as kind}
-                      <option value={kind}>{kind}</option>
-                    {/each}
-                  </select>
-                </label>
-
-                {#if track.kind === 'LFO'}
-                  <label>
-                    Waveform
-                    <select bind:value={track.waveform}>
-                      {#each LFO_WAVEFORMS as waveform}
-                        <option value={waveform}>{waveform}</option>
-                      {/each}
-                    </select>
-                  </label>
-
-                  <label>
-                    Rate Hz
-                    <input type="number" min="0.001" step="0.001" bind:value={track.rateHz} />
-                  </label>
-
-                  <label>
-                    Depth
-                    <input type="number" step="0.1" bind:value={track.depth} />
-                  </label>
-
-                  <label>
-                    Offset
-                    <input type="number" step="0.1" bind:value={track.offset} />
-                  </label>
-
-                  <label>
-                    Phase deg
-                    <input type="number" step="1" bind:value={track.phaseDeg} />
-                  </label>
-                {:else}
-                  <label class="field-span-2">
-                    Sequence values
-                    <textarea bind:value={track.valuesText} rows="2" placeholder="0, 4, 7, 12"></textarea>
-                  </label>
-
-                  <label>
-                    Step sec
-                    <input type="number" min="0.01" step="0.01" bind:value={track.stepSec} />
-                  </label>
-
-                  <label>
-                    Interpolation
-                    <select bind:value={track.interpolation}>
-                      <option value="hold">hold</option>
-                      <option value="linear">linear</option>
-                    </select>
-                  </label>
+      {#each draft.audioTracks as track (track.id)}
+        <article class="track-card">
+          <div class="track-head">
+            <input class="track-name" bind:value={track.name} />
+            <button class="icon-btn" onclick={() => removeAudioTrack(track.id)} title="Remove">✕</button>
+          </div>
+          {#each AUDIO_PARAMS as paramName}
+            {@const param = track.params[paramName]}
+            <div class="param-row">
+              <span class="param-label">{paramName}</span>
+              <input class="param-val" type="number" step="any" bind:value={param.value} />
+              <button
+                class="mod-toggle {param.mods.length > 0 ? 'mod-active' : ''}"
+                onclick={() => toggleModPicker(track.id, paramName)}
+                title="Modulation"
+              >M</button>
+            </div>
+            {#if expandedMod === `${track.id}:${paramName}`}
+              <div class="mod-picker">
+                {#each draft.controlTracks as ctrl}
+                  <button class="mod-pick-btn" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
+                {/each}
+                {#if draft.controlTracks.length === 0}
+                  <span class="mod-pick-empty">No controls yet</span>
                 {/if}
               </div>
-            </article>
-          {/each}
-        </div>
-      </section>
-
-      <section class="panel section-card">
-        <div class="section-head section-head--stack">
-          <div>
-            <p class="section-kicker">Stimulation tracks</p>
-            <h2>Outputs</h2>
-          </div>
-
-          <div class="track-actions">
-            {#each STIM_TYPES as type}
-              <button type="button" class="secondary outline" onclick={() => addStimulationTrack(type)}>
-                Add {type}
-              </button>
+            {/if}
+            {#each param.mods as mod (mod.id)}
+              <div class="mod-chip">
+                <span>{ctrlName(mod.controlId)}</span>
+                <input class="mod-amount" type="number" step="any" bind:value={mod.amount} title="Amount" />
+                <button class="icon-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
+              </div>
             {/each}
-          </div>
-        </div>
-
-        <div class="track-grid">
-          {#each draft.stimulationTracks as track, index (track.id)}
-            <article class="track-card">
-              <header>
-                <div>
-                  <p>Output {index + 1}</p>
-                  <h3>{track.name}</h3>
-                </div>
-                <button type="button" class="secondary outline ghost" onclick={() => removeStimulationTrack(track.id)} disabled={draft.stimulationTracks.length <= 1}>Remove</button>
-              </header>
-
-              <div class="field-grid field-grid--track">
-                <label>
-                  Name
-                  <input bind:value={track.name} />
-                </label>
-
-                <label>
-                  Type
-                  <select value={track.type} onchange={(event) => changeStimulationType(track.id, event.currentTarget.value)}>
-                    {#each STIM_TYPES as type}
-                      <option value={type}>{type}</option>
-                    {/each}
-                  </select>
-                </label>
-
-                {#if track.type === 'audio'}
-                  <label>
-                    Waveform
-                    <select bind:value={track.waveform}>
-                      {#each AUDIO_WAVEFORMS as waveform}
-                        <option value={waveform}>{waveform}</option>
-                      {/each}
-                    </select>
-                  </label>
-
-                  <label>
-                    Base frequency
-                    <input type="number" min="1" step="1" bind:value={track.baseFrequency} />
-                  </label>
-
-                  <label>
-                    Amplitude
-                    <input type="number" min="0" max="1" step="0.01" bind:value={track.amplitude} />
-                  </label>
-
-                  <label>
-                    Pan
-                    <input type="number" min="-1" max="1" step="0.01" bind:value={track.pan} />
-                  </label>
-
-                  <label>
-                    Phase
-                    <input type="number" step="1" bind:value={track.phase} />
-                  </label>
-                {:else}
-                  <label>
-                    Shape
-                    <select bind:value={track.shape}>
-                      {#each VISUAL_SHAPES as shape}
-                        <option value={shape}>{shape}</option>
-                      {/each}
-                    </select>
-                  </label>
-
-                  <label>
-                    Color
-                    <input bind:value={track.color} placeholder="#88c9ff" />
-                  </label>
-
-                  <label>
-                    Motion
-                    <select bind:value={track.motion}>
-                      {#each VISUAL_MOTION as motion}
-                        <option value={motion}>{motion}</option>
-                      {/each}
-                    </select>
-                  </label>
-
-                  <label>
-                    Size
-                    <input type="number" min="1" step="1" bind:value={track.size} />
-                  </label>
-
-                  <label>
-                    Speed
-                    <input type="number" min="0" step="0.1" bind:value={track.speed} />
-                  </label>
-
-                  <label>
-                    Opacity
-                    <input type="number" min="0" max="1" step="0.01" bind:value={track.opacity} />
-                  </label>
-
-                  <label>
-                    X
-                    <input type="number" step="1" bind:value={track.x} />
-                  </label>
-
-                  <label>
-                    Y
-                    <input type="number" step="1" bind:value={track.y} />
-                  </label>
-                {/if}
-              </div>
-            </article>
           {/each}
-        </div>
-      </section>
+        </article>
+      {/each}
 
-      <section class="panel section-card">
-        <div class="section-head section-head--stack">
-          <div>
-            <p class="section-kicker">Routing matrix</p>
-            <h2>Patch cords</h2>
-          </div>
-
-          <div class="track-actions">
-            <button type="button" class="secondary outline" onclick={addRoute}>Add route</button>
-          </div>
-        </div>
-
-        <div class="route-grid">
-          {#each draft.routes as route, index (route.id)}
-            <article class="route-card">
-              <header>
-                <div>
-                  <p>Route {index + 1}</p>
-                  <h3>Control to stimulation</h3>
-                </div>
-                <button type="button" class="secondary outline ghost" onclick={() => removeRoute(route.id)}>Remove</button>
-              </header>
-
-              <div class="field-grid field-grid--route">
-                <label>
-                  Source control
-                  <select bind:value={route.controlId}>
-                    {#each draft.controlTracks as track}
-                      <option value={track.id}>{track.name}</option>
-                    {/each}
-                  </select>
-                </label>
-
-                <label>
-                  Target track
-                  <select bind:value={route.stimulationId} onchange={() => syncRouteParameter(route)}>
-                    {#each draft.stimulationTracks as track}
-                      <option value={track.id}>{track.name}</option>
-                    {/each}
-                  </select>
-                </label>
-
-                <label>
-                  Parameter
-                  <select bind:value={route.parameter}>
-                    {#each modulationParametersFor(draft.stimulationTracks.find(track => track.id === route.stimulationId)?.type ?? 'audio') as parameter}
-                      <option value={parameter}>{parameter}</option>
-                    {/each}
-                  </select>
-                </label>
-
-                <label>
-                  Amount
-                  <input type="number" step="0.1" bind:value={route.amount} />
-                </label>
-              </div>
-            </article>
-          {/each}
-        </div>
-      </section>
+      {#if draft.audioTracks.length === 0}
+        <p class="empty-hint">No audio tracks. Select a type above and add one.</p>
+      {/if}
     </div>
 
-    <aside class="preview-column">
-      <section class="panel section-card sticky-card">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Validation</p>
-            <h2>Patch status</h2>
-          </div>
-          <span class:status-pill={true} class:error={hasBlockingIssues} class:ok={!hasBlockingIssues}>
-            {hasBlockingIssues ? 'Needs fixes' : 'Patchable'}
-          </span>
-        </div>
-
-        <p class="status-copy">
-          {draft.patchName} · {summary.routeCount} routes across {summary.stimulationCount} outputs
-        </p>
-
-        <ul class="issue-list">
-          {#each issues as issue}
-            <li class:warning={issue.level === 'warning'}>{issue.message}</li>
-          {:else}
-            <li class="ok-item">No blocking issues. This patch graph is ready to export as JSON.</li>
+    <!-- Visual column -->
+    <div class="col col-visual">
+      <div class="col-head">
+        <span class="col-title">Visual</span>
+        <div class="col-actions">
+          {#each VISUAL_TRACK_TYPES as type}
+            <button class="add-btn" onclick={() => addVisualTrack(type)}>+ {type}</button>
           {/each}
-        </ul>
-
-        <div class="action-row">
-          <button type="button" onclick={copyJson}>Copy JSON</button>
-          <button type="button" class="contrast" onclick={downloadJson} disabled={hasBlockingIssues}>Download JSON</button>
         </div>
+      </div>
+      <div class="col-description">Geometry and particle visual layers.</div>
 
-        <p class="status-note" aria-live="polite">{statusMessage}</p>
-      </section>
-
-      <section class="panel section-card">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Analysis</p>
-            <h2>Route previews</h2>
+      {#each draft.visualTracks as track (track.id)}
+        <article class="track-card">
+          <div class="track-head">
+            <input class="track-name" bind:value={track.name} />
+            <button class="icon-btn" onclick={() => removeVisualTrack(track.id)} title="Remove">✕</button>
           </div>
-        </div>
-
-        <ul class="analysis-list">
-          {#each analysis as line}
-            <li>
-              <strong>{line.label}</strong>
-              <span>{formatAnalysis(line.details)}</span>
-            </li>
-          {:else}
-            <li class="ok-item">Add routes to see estimated modulation ranges.</li>
+          {#each VISUAL_PARAMS as paramName}
+            {@const param = track.params[paramName]}
+            <div class="param-row">
+              <span class="param-label">{paramName}</span>
+              <input class="param-val" type="number" step="any" bind:value={param.value} />
+              <button
+                class="mod-toggle {param.mods.length > 0 ? 'mod-active' : ''}"
+                onclick={() => toggleModPicker(track.id, paramName)}
+                title="Modulation"
+              >M</button>
+            </div>
+            {#if expandedMod === `${track.id}:${paramName}`}
+              <div class="mod-picker">
+                {#each draft.controlTracks as ctrl}
+                  <button class="mod-pick-btn" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
+                {/each}
+                {#if draft.controlTracks.length === 0}
+                  <span class="mod-pick-empty">No controls yet</span>
+                {/if}
+              </div>
+            {/if}
+            {#each param.mods as mod (mod.id)}
+              <div class="mod-chip">
+                <span>{ctrlName(mod.controlId)}</span>
+                <input class="mod-amount" type="number" step="any" bind:value={mod.amount} title="Amount" />
+                <button class="icon-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
+              </div>
+            {/each}
           {/each}
-        </ul>
-      </section>
+        </article>
+      {/each}
 
-      <section class="panel section-card preview-card">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Output</p>
-            <h2>Patch JSON</h2>
-          </div>
+      {#if draft.visualTracks.length === 0}
+        <p class="empty-hint">No visual tracks. Select a type above and add one.</p>
+      {/if}
+    </div>
+
+    <!-- Haptic column -->
+    <div class="col col-haptic">
+      <div class="col-head">
+        <span class="col-title">Haptic</span>
+        <div class="col-actions">
+          {#each HAPTIC_TRACK_TYPES as type}
+            <button class="add-btn" onclick={() => addHapticTrack(type)}>+ {type}</button>
+          {/each}
         </div>
+      </div>
+      <div class="col-description">Vibration patterns via Web Vibration API.</div>
 
-        <pre>{jsonPreview}</pre>
-      </section>
-    </aside>
-  </section>
-</main>
+      {#each draft.hapticTracks as track (track.id)}
+        <article class="track-card">
+          <div class="track-head">
+            <input class="track-name" bind:value={track.name} />
+            <button class="icon-btn" onclick={() => removeHapticTrack(track.id)} title="Remove">✕</button>
+          </div>
+          {#each HAPTIC_PARAMS as paramName}
+            {@const param = track.params[paramName]}
+            <div class="param-row">
+              <span class="param-label">{paramName}</span>
+              <input class="param-val" type="number" step="any" bind:value={param.value} />
+              <button
+                class="mod-toggle {param.mods.length > 0 ? 'mod-active' : ''}"
+                onclick={() => toggleModPicker(track.id, paramName)}
+                title="Modulation"
+              >M</button>
+            </div>
+            {#if expandedMod === `${track.id}:${paramName}`}
+              <div class="mod-picker">
+                {#each draft.controlTracks as ctrl}
+                  <button class="mod-pick-btn" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
+                {/each}
+                {#if draft.controlTracks.length === 0}
+                  <span class="mod-pick-empty">No controls yet</span>
+                {/if}
+              </div>
+            {/if}
+            {#each param.mods as mod (mod.id)}
+              <div class="mod-chip">
+                <span>{ctrlName(mod.controlId)}</span>
+                <input class="mod-amount" type="number" step="any" bind:value={mod.amount} title="Amount" />
+                <button class="icon-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
+              </div>
+            {/each}
+          {/each}
+        </article>
+      {/each}
+
+      {#if draft.hapticTracks.length === 0}
+        <p class="empty-hint">No haptic tracks. Add a Vibration track to include haptic cues.</p>
+      {/if}
+    </div>
+
+  </div><!-- /columns -->
+
+  <!-- ── Validation footer ── -->
+  {#if issues.length > 0}
+    <footer class="issues-footer">
+      {#each issues as issue}
+        <span class="issue {issue.level}">{issue.message}</span>
+      {/each}
+    </footer>
+  {/if}
+
+</div><!-- /studio -->
 
 <style>
-  :global(body) {
-    background:
-      radial-gradient(circle at top left, #f3dcc0 0, #f3dcc000 26rem),
-      linear-gradient(180deg, #f7f4ec 0%, #efe8da 100%);
-  }
+  /* ── Shell ── */
+  .studio {
+    --c-bg: #0e1117;
+    --c-surface: #161c26;
+    --c-border: #263040;
+    --c-text: #c8d4e0;
+    --c-muted: #5a7080;
+    --c-accent: #3b9eff;
+    --c-accent-soft: #1a3a5c;
+    --c-ok: #2ecc71;
+    --c-warn: #f39c12;
+    --c-err: #e74c3c;
+    --c-ctrl: #e67e22;
+    --c-audio: #3b9eff;
+    --c-visual: #9b59b6;
+    --c-haptic: #1abc9c;
 
-  .studio-shell {
-    --studio-ink: #1f2319;
-    --studio-muted: #616950;
-    --studio-line: #b7b39f;
-    --studio-panel: #fcfaf4de;
-    --studio-accent: #0f6a66;
-    --studio-accent-soft: #d6ebe5;
-    --studio-warn: #91531d;
-    color: var(--studio-ink);
-    padding: 1.2rem;
-  }
-
-  .panel {
-    border: 1px solid #ffffff70;
-    border-radius: 1.3rem;
-    background: var(--studio-panel);
-    box-shadow: 0 1.2rem 2.5rem #3c2f1614;
-    backdrop-filter: blur(14px);
-  }
-
-  .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 1fr);
-    gap: 1.25rem;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow,
-  .section-kicker,
-  .track-card header p,
-  .route-card header p {
-    margin: 0 0 0.35rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.68rem;
-    color: var(--studio-muted);
-  }
-
-  h1,
-  h2,
-  h3 {
-    font-family: 'Avenir Next Condensed', 'Arial Narrow', 'Gill Sans', sans-serif;
-    letter-spacing: 0.01em;
-  }
-
-  h1 {
-    margin: 0;
-    font-size: clamp(2.1rem, 4vw, 3.6rem);
-    line-height: 0.95;
-  }
-
-  .hero-copy,
-  .status-copy {
-    color: var(--studio-muted);
-  }
-
-  .hero-copy {
-    max-width: 56rem;
-    margin: 0.9rem 0 0;
-    line-height: 1.6;
-  }
-
-  .hero-metrics {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .hero-metrics article {
-    padding: 0.95rem 1rem;
-    border-radius: 1rem;
-    border: 1px solid var(--studio-line);
-    background: #fffef8a6;
-  }
-
-  .hero-metrics span {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-size: 0.78rem;
-    color: var(--studio-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .hero-metrics strong {
-    font-size: 1.05rem;
-  }
-
-  .workspace {
-    display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(22rem, 0.95fr);
-    gap: 1rem;
-    align-items: start;
-  }
-
-  .editor-column,
-  .preview-column {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .section-card {
-    padding: 1.2rem;
-  }
-
-  .section-head {
     display: flex;
-    align-items: start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .section-head--stack {
     flex-direction: column;
+    height: 100vh;
+    background: var(--c-bg);
+    color: var(--c-text);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    overflow: hidden;
   }
 
-  .section-head h2,
-  .track-card h3,
-  .route-card h3 {
-    margin: 0;
-  }
-
-  .field-grid {
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .field-grid--shell,
-  .field-grid--track,
-  .field-grid--route {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .field-span-2 {
-    grid-column: span 2;
-  }
-
-  .field-span-3 {
-    grid-column: span 3;
-  }
-
-  label {
-    margin: 0;
-    color: var(--studio-ink);
-  }
-
-  input,
-  select,
-  textarea,
-  pre {
-    border-color: var(--studio-line);
-  }
-
-  textarea {
-    min-height: 6.5rem;
-  }
-
-  .track-actions {
+  /* ── Header ── */
+  .studio-header {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-  }
-
-  .track-grid,
-  .route-grid {
-    display: grid;
-    gap: 0.9rem;
-  }
-
-  .track-card,
-  .route-card {
-    border: 1px solid var(--studio-line);
-    border-radius: 1.05rem;
-    background: #fffef8b8;
-    padding: 1rem;
-  }
-
-  .track-card header,
-  .route-card header {
-    display: flex;
-    align-items: start;
+    align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+    flex-shrink: 0;
   }
 
-  .ghost {
+  .header-left,
+  .header-center,
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .patch-name {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-text);
+    font-size: 0.95rem;
+    font-weight: 600;
+    width: 14rem;
+    padding: 0.15rem 0.25rem;
+  }
+
+  .patch-name:focus { outline: none; border-bottom-color: var(--c-accent); }
+
+  .overview-pill {
+    color: var(--c-muted);
+    font-size: 0.72rem;
     white-space: nowrap;
   }
 
-  .sticky-card {
-    position: sticky;
-    top: 1rem;
+  .transport-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid var(--c-accent);
+    background: transparent;
+    color: var(--c-accent);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
   }
 
-  .status-pill {
+  .transport-btn:hover { background: var(--c-accent-soft); }
+
+  .meta-field {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--c-muted);
+    font-size: 0.72rem;
+  }
+
+  .meta-field input {
+    width: 4rem;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    border-radius: 3px;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+  }
+
+  .badge {
     border-radius: 999px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.76rem;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
   }
 
-  .status-pill.ok {
-    background: var(--studio-accent-soft);
-    color: var(--studio-accent);
+  .badge-ok { background: #1a3d2b; color: var(--c-ok); }
+  .badge-warn { background: #3d2e0a; color: var(--c-warn); }
+  .badge-err { background: #3d120a; color: var(--c-err); }
+
+  .ghost-btn {
+    background: transparent;
+    border: 1px solid var(--c-border);
+    color: var(--c-muted);
+    border-radius: 4px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: color 0.12s, border-color 0.12s;
   }
 
-  .status-pill.error {
-    background: #f5e5d4;
-    color: #8d3e0c;
+  .ghost-btn:hover { color: var(--c-text); border-color: var(--c-accent); }
+  .ghost-btn:disabled { opacity: 0.35; cursor: default; }
+
+  /* ── Status bar ── */
+  .status-bar {
+    padding: 0.2rem 1rem;
+    font-size: 0.68rem;
+    color: var(--c-muted);
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-border);
+    flex-shrink: 0;
   }
 
-  .issue-list {
-    margin: 0;
-    padding-left: 1.15rem;
+  /* ── Columns ── */
+  .columns {
     display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-right: 1px solid var(--c-border);
+    padding: 0.75rem 0.65rem;
     gap: 0.55rem;
   }
 
-  .issue-list li {
-    color: #883409;
-  }
+  .col:last-child { border-right: none; }
 
-  .issue-list li.warning {
-    color: var(--studio-warn);
-  }
-
-  .issue-list .ok-item {
-    color: var(--studio-accent);
-  }
-
-  .action-row {
+  .col-head {
     display: flex;
-    gap: 0.65rem;
-    margin-top: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.4rem;
+    flex-shrink: 0;
   }
 
-  .status-note {
-    min-height: 1.25rem;
-    margin: 0.8rem 0 0;
-    color: var(--studio-muted);
+  .col-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
   }
 
-  .analysis-list {
+  .col-control .col-title { color: var(--c-ctrl); }
+  .col-audio   .col-title { color: var(--c-audio); }
+  .col-visual  .col-title { color: var(--c-visual); }
+  .col-haptic  .col-title { color: var(--c-haptic); }
+
+  .col-description {
+    font-size: 0.68rem;
+    color: var(--c-muted);
+    line-height: 1.4;
+    flex-shrink: 0;
+  }
+
+  .col-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .add-btn {
+    background: transparent;
+    border: 1px solid var(--c-border);
+    color: var(--c-muted);
+    border-radius: 4px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.68rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.12s, border-color 0.12s;
+  }
+
+  .add-btn:hover { color: var(--c-text); border-color: var(--c-accent); }
+
+  .empty-hint {
+    color: var(--c-muted);
+    font-size: 0.72rem;
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+    line-height: 1.5;
+  }
+
+  /* ── Track cards ── */
+  .track-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 0.6rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    flex-shrink: 0;
+  }
+
+  .track-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+
+  .track-name {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--c-border);
+    color: var(--c-text);
+    font-weight: 600;
+    font-size: 0.8rem;
+    width: 100%;
+    padding: 0.1rem 0.2rem;
+    font-family: inherit;
+  }
+
+  .track-name:focus { outline: none; border-bottom-color: var(--c-accent); }
+
+  .track-meta {
+    font-size: 0.65rem;
+    color: var(--c-muted);
+  }
+
+  /* ── Fields inside control cards ── */
+  .field-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .field-row label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.68rem;
+    color: var(--c-muted);
+    flex: 1;
+  }
+
+  .field-row input,
+  .field-row select {
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    border-radius: 3px;
+    padding: 0.2rem 0.35rem;
+    font-size: 0.75rem;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  /* ── Param rows (sensory tracks) ── */
+  .param-row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    height: 1.6rem;
+  }
+
+  .param-label {
+    width: 7rem;
+    font-size: 0.72rem;
+    color: var(--c-muted);
+    flex-shrink: 0;
+  }
+
+  .param-val {
+    flex: 1;
+    background: var(--c-bg);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    border-radius: 3px;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.72rem;
+    font-family: inherit;
+    min-width: 0;
+  }
+
+  .mod-toggle {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: 1px solid var(--c-border);
+    background: transparent;
+    color: var(--c-muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+  }
+
+  .mod-toggle:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .mod-toggle.mod-active { border-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-accent); }
+
+  /* ── Mod picker dropdown ── */
+  .mod-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0.35rem 0.4rem;
+    background: var(--c-bg);
+    border: 1px solid var(--c-accent);
+    border-radius: 5px;
+    margin-left: 7.4rem;
+  }
+
+  .mod-pick-btn {
+    background: var(--c-accent-soft);
+    border: 1px solid var(--c-accent);
+    color: var(--c-accent);
+    border-radius: 3px;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.68rem;
+    cursor: pointer;
+  }
+
+  .mod-pick-empty {
+    font-size: 0.68rem;
+    color: var(--c-muted);
+  }
+
+  /* ── Mod chip ── */
+  .mod-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-left: 7.4rem;
+    background: var(--c-accent-soft);
+    border: 1px solid var(--c-accent);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.65rem;
+    color: var(--c-accent);
+  }
+
+  .mod-chip span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+  .mod-amount {
+    width: 3.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--c-accent);
+    color: var(--c-accent);
+    font-size: 0.65rem;
+    font-family: inherit;
+    padding: 0;
+    text-align: right;
+  }
+
+  /* ── Buttons ── */
+  .icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--c-muted);
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.25rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: color 0.12s;
+  }
+
+  .icon-btn:hover { color: var(--c-err); }
+  .icon-btn.tiny { font-size: 0.58rem; }
+
+  /* ── Issues footer ── */
+  .issues-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-border);
+    flex-shrink: 0;
+  }
+
+  .issue {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+  }
+
+  .issue.error { background: #3d120a; color: var(--c-err); }
+  .issue.warning { background: #3d2e0a; color: var(--c-warn); }
+
+  /* ── Scrollbar ── */
+  .col::-webkit-scrollbar { width: 4px; }
+  .col::-webkit-scrollbar-track { background: transparent; }
+  .col::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 2px; }
+
+  /* ── Nav cluster ── */
+  .nav-cluster {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.25rem;
+    padding-left: 0.6rem;
+    border-left: 1px solid var(--c-border);
+  }
+
+  .nav-menu {
+    position: relative;
     margin: 0;
-    padding-left: 1.1rem;
+  }
+
+  .nav-menu summary {
     display: grid;
-    gap: 0.75rem;
+    place-items: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    border: 1px solid var(--c-border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--c-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.12s, border-color 0.12s;
   }
 
-  .analysis-list li {
-    display: grid;
-    gap: 0.15rem;
+  .nav-menu summary::marker,
+  .nav-menu summary::after { display: none; content: ''; }
+  .nav-menu summary::-webkit-details-marker { display: none; }
+  .nav-menu summary:hover { color: var(--c-text); border-color: var(--c-accent); }
+
+  .nav-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.4rem);
+    z-index: 50;
+    min-width: 11rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+    box-shadow: 0 0.8rem 2rem #00000088;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
   }
 
-  .analysis-list span {
-    color: var(--studio-muted);
+  .nav-panel a {
+    display: block;
+    padding: 0.35rem 0.4rem;
+    color: var(--c-text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    border-radius: 3px;
+    transition: background 0.1s;
   }
 
-  .preview-card pre {
-    margin: 0;
-    padding: 1rem;
-    border-radius: 0.9rem;
-    overflow: auto;
-    background: #1c221d;
-    color: #ebf1eb;
-    font-size: 0.78rem;
-    line-height: 1.45;
-  }
-
-  @media (max-width: 1080px) {
-    .workspace,
-    .hero {
-      grid-template-columns: 1fr;
-    }
-
-    .sticky-card {
-      position: static;
-    }
-  }
-
-  @media (max-width: 760px) {
-    .studio-shell {
-      padding: 0.8rem;
-    }
-
-    .field-grid--shell,
-    .field-grid--track,
-    .field-grid--route {
-      grid-template-columns: 1fr;
-    }
-
-    .field-span-2,
-    .field-span-3 {
-      grid-column: auto;
-    }
-
-    .action-row,
-    .track-actions {
-      flex-direction: column;
-    }
-
-    .action-row button,
-    .track-actions button,
-    .section-head button {
-      width: 100%;
-    }
-  }
+  .nav-panel a:hover { background: var(--c-accent-soft); color: var(--c-accent); }
 </style>
