@@ -131,6 +131,7 @@
   <details class="global-menu">
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
+      <a href="/creator/">Patch Studio</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
       <ProfileControl />
