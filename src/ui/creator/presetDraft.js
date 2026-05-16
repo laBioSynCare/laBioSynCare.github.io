@@ -128,6 +128,7 @@ export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
     id: uid('audio'),
     trackType,
     name: trackType,
+    muted: false,
     params: audioParams(),
     ...overrides,
   }

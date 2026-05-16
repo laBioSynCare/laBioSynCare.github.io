@@ -55,7 +55,6 @@
   const issues = $derived(validateDraft(draft))
   const hasErrors = $derived(issues.some(i => i.level === 'error'))
   const jsonExport = $derived(JSON.stringify(buildPatchExport(draft), null, 2))
-  const PREVIEW_BARS = [0, 1, 2, 3, 4, 5, 6, 7]
 
   // ── Controls ──────────────────────────────────────────────────────────────────
 
@@ -137,11 +136,12 @@
 
   function trackToVoiceSpec(track) {
     const p = track.params
+    const gain = track.muted ? 0 : p.gain.value
     return {
       type: track.trackType,
-      volume: p.gain.value,
+      volume: gain,
       params: {
-        gain: p.gain.value,
+        gain,
         pan: p.pan.value,
         frequency: p.frequency.value,
         pulseRate: p.pulseRate.value,
@@ -200,6 +200,7 @@
         v += (Number(mod.amount) || 0) * cv
       }
       v = clampRange(v, ranges, name)
+      if (track.muted && name === 'gain') v = 0
       base[name] = v
       if (writeAudio) writeAudio(name, v)
     }
@@ -319,21 +320,55 @@
     ].join(';')
   }
 
-  function audioStyle(track) {
-    const gain = clamp(num(getLive(track, 'gain'), 0.5), 0, 1)
-    const pan = clamp((num(getLive(track, 'pan'), 0) + 1) / 2, 0, 1)
-    const freq = clamp((num(getLive(track, 'frequency'), 200) - 20) / 1980, 0, 1)
-    const pulse = clamp(num(getLive(track, 'pulseRate'), 10), 0.5, 50)
-    return [
-      `--audio-pulse:${clamp(1 / pulse, 0.08, 2).toFixed(3)}s`,
-      `--audio-carrier-pulse:${clamp(4 / pulse, 0.32, 5).toFixed(3)}s`,
-      `--audio-gain:${gain.toFixed(3)}`,
-      `--audio-level:${(24 + gain * 66).toFixed(1)}%`,
-      `--audio-alpha:${(0.32 + gain * 0.6).toFixed(3)}`,
-      `--audio-pan:${(pan * 100).toFixed(2)}%`,
-      `--audio-frequency:${freq.toFixed(3)}`,
-      `--audio-freq-y:${(82 - freq * 58).toFixed(2)}%`,
-    ].join(';')
+  function freqToCycles(freq, minCycles = 1, maxCycles = 8) {
+    const f = clamp(num(freq, 200), 20, 2000)
+    const r = Math.log10(f / 20) / Math.log10(100) // 0..1
+    return minCycles + (maxCycles - minCycles) * r
+  }
+
+  function pulseToEnvCycles(pulse, minCycles = 0.5, maxCycles = 5) {
+    const p = clamp(num(pulse, 10), 0.5, 50)
+    const r = Math.log10(p / 0.5) / Math.log10(100)
+    return minCycles + (maxCycles - minCycles) * r
+  }
+
+  function sinePathD(xMin, xMax, yMid, yAmp, cycles, samples = 96) {
+    const span = xMax - xMin
+    let d = ''
+    for (let i = 0; i <= samples; i += 1) {
+      const t = i / samples
+      const x = xMin + span * t
+      const y = yMid - yAmp * Math.sin(2 * Math.PI * cycles * t)
+      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
+    }
+    return d
+  }
+
+  function envelopedSinePathD(xMin, xMax, yMid, yAmp, carrierCycles, envCycles, samples = 140) {
+    const span = xMax - xMin
+    let d = ''
+    for (let i = 0; i <= samples; i += 1) {
+      const t = i / samples
+      const env = 0.5 - 0.5 * Math.cos(2 * Math.PI * envCycles * t)
+      const x = xMin + span * t
+      const y = yMid - yAmp * env * Math.sin(2 * Math.PI * carrierCycles * t)
+      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
+    }
+    return d
+  }
+
+  function envelopeOutlineD(xMin, xMax, yMid, yAmp, envCycles, samples = 96) {
+    const span = xMax - xMin
+    let top = ''
+    let bot = ''
+    for (let i = 0; i <= samples; i += 1) {
+      const t = i / samples
+      const env = 0.5 - 0.5 * Math.cos(2 * Math.PI * envCycles * t)
+      const x = xMin + span * t
+      top += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + (yMid - yAmp * env).toFixed(1)
+      bot = ' L' + x.toFixed(1) + ' ' + (yMid + yAmp * env).toFixed(1) + bot
+    }
+    return top + bot + ' Z'
   }
 
   function visualStyle(track) {
@@ -537,20 +572,51 @@
       </div>
       <div class="col-body">
         {#each draft.audioTracks as track (track.id)}
-          <article class="card">
+          {@const aGain = clamp(num(getLive(track, 'gain'), 0.5), 0, 1)}
+          {@const aPan = clamp(num(getLive(track, 'pan'), 0), -1, 1)}
+          {@const aFreq = num(getLive(track, 'frequency'), 200)}
+          {@const aPulse = num(getLive(track, 'pulseRate'), 10)}
+          {@const cyc = freqToCycles(aFreq)}
+          {@const envCyc = pulseToEnvCycles(aPulse)}
+          {@const panX = (4 + 112 * (aPan + 1) / 2).toFixed(2)}
+          <article class="card" class:muted={track.muted}>
             <div class="card-head">
               <input class="card-name" bind:value={track.name} />
+              <button
+                class="mute-btn"
+                class:on={track.muted}
+                onclick={() => { track.muted = !track.muted }}
+                title={track.muted ? 'Unmute' : 'Mute'}
+                type="button"
+              >mute</button>
               <button class="x-btn" onclick={() => removeAudio(track.id)}>✕</button>
             </div>
             <div class="card-body">
-              <div class="track-preview audio-preview" class:audio-binaural={track.trackType === 'BinauralBeat'} class:audio-carrier={track.trackType === 'Carrier'} style={audioStyle(track)} aria-hidden="true">
-                <div class="audio-field">
-                  {#each PREVIEW_BARS as i}
-                    <span style={`--bar-delay:${(-i * 0.045).toFixed(3)}s`}></span>
-                  {/each}
+              <div class="audio-scope a-{track.trackType.toLowerCase()}" aria-hidden="true">
+                <svg viewBox="0 0 120 36" preserveAspectRatio="none">
+                  <line class="scope-axis" x1="4" y1="18" x2="116" y2="18" />
+                  {#if track.trackType === 'BinauralBeat'}
+                    <path class="scope-trace scope-trace-l" d={sinePathD(4, 116, 10, 6 * aGain, cyc)} />
+                    <path class="scope-trace scope-trace-r" d={sinePathD(4, 116, 26, 6 * aGain, cyc + Math.max(0.4, envCyc * 0.5))} />
+                  {:else if track.trackType === 'IsochronicTone'}
+                    <path class="scope-envelope" d={envelopeOutlineD(4, 116, 18, 13 * aGain, envCyc)} />
+                    <path class="scope-trace" d={envelopedSinePathD(4, 116, 18, 13 * aGain, cyc, envCyc)} />
+                  {:else}
+                    <path class="scope-trace" d={sinePathD(4, 116, 18, 13 * aGain, cyc)} />
+                  {/if}
+                </svg>
+                <div class="pan-ruler">
+                  <span class="pan-track"></span>
+                  <span class="pan-dot" style={`left:${panX}%`}></span>
+                  <span class="pan-l">L</span>
+                  <span class="pan-r">R</span>
                 </div>
-                <span class="pan-cursor"></span>
-                <span class="freq-line"></span>
+                <div class="scope-meta">
+                  <span>{Math.round(aFreq)} Hz</span>
+                  {#if track.trackType !== 'Carrier'}
+                    <span>· {aPulse < 10 ? aPulse.toFixed(1) : Math.round(aPulse)} Hz {track.trackType === 'BinauralBeat' ? 'beat' : 'pulse'}</span>
+                  {/if}
+                </div>
               </div>
               <div class="knob-grid">
                 {#each AUDIO_PARAMS as pname}
@@ -1314,57 +1380,93 @@
   }
   .sym-lobe-a { left: var(--sym-left, 8%); }
 
-  .audio-preview {
-    background:
-      radial-gradient(circle at var(--audio-pan, 50%) 50%, #3b9eff33, transparent 42%),
-      linear-gradient(90deg, #07111c, #06131b);
+  .audio-scope {
+    position: relative;
+    border: 1px solid #203245;
+    border-radius: 4px;
+    overflow: hidden;
+    padding: 3px 4px 2px;
+    flex-shrink: 0;
+    background: linear-gradient(90deg, #07111c, #06131b);
   }
 
-  .audio-field {
-    position: absolute;
-    inset: 6px 8px 7px;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    align-items: end;
-    gap: 3px;
-  }
-
-  .audio-field span {
+  .audio-scope svg {
+    width: 100%;
+    height: 36px;
     display: block;
-    height: var(--audio-level, 58%);
-    min-height: 5px;
-    border-radius: 2px 2px 0 0;
-    background: linear-gradient(180deg, #9fd0ff, #3b9eff);
-    opacity: var(--audio-alpha, 0.62);
-    transform-origin: bottom;
-    animation: audioBars var(--audio-pulse, 0.12s) ease-in-out infinite;
-    animation-delay: var(--bar-delay, 0s);
+    overflow: visible;
   }
 
-  .audio-binaural .audio-field span:nth-child(odd) { background: linear-gradient(180deg, #9fd0ff, #8e44ad); }
-  .audio-carrier .audio-field span { animation-duration: var(--audio-carrier-pulse, 0.48s); }
+  .scope-axis {
+    stroke: #1b2738;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
 
-  .pan-cursor,
-  .freq-line {
+  .scope-trace {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 3px #3b9eff66);
+  }
+
+  .scope-envelope {
+    fill: #3b9eff1c;
+    stroke: #3b9eff55;
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .a-binauralbeat .scope-trace-l { stroke: #9fd0ff; }
+  .a-binauralbeat .scope-trace-r { stroke: #c28ce0; filter: drop-shadow(0 0 3px #8e44ad66); }
+
+  .pan-ruler {
+    position: relative;
+    height: 10px;
+    margin: 2px 6px 0;
+  }
+
+  .pan-track {
     position: absolute;
-    pointer-events: none;
-  }
-
-  .pan-cursor {
-    top: 5px;
-    bottom: 5px;
-    left: var(--audio-pan, 50%);
-    width: 1px;
-    background: linear-gradient(180deg, transparent, #c0d0e088, transparent);
-  }
-
-  .freq-line {
-    left: 8px;
-    right: 8px;
-    top: var(--audio-freq-y, 70%);
+    left: 0; right: 0; top: 50%;
     height: 1px;
-    background: #3b9eff77;
-    box-shadow: 0 0 8px #3b9eff55;
+    background: linear-gradient(90deg, #1b2738, #2b3c4c 50%, #1b2738);
+  }
+
+  .pan-dot {
+    position: absolute;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9fd0ff;
+    box-shadow: 0 0 4px #3b9effaa;
+    transform: translate(-50%, -50%);
+  }
+
+  .pan-l, .pan-r {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 7px;
+    color: var(--mut);
+    letter-spacing: 0.04em;
+  }
+  .pan-l { left: 0; }
+  .pan-r { right: 0; }
+
+  .scope-meta {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    padding: 0 4px;
+    font-size: 8px;
+    color: var(--mut);
+    font-variant-numeric: tabular-nums;
   }
 
   .visual-preview {
@@ -1528,6 +1630,35 @@
     text-align: right;
   }
 
+  /* ── Mute button ───────────────────────────────────────────────────────────── */
+  .mute-btn {
+    background: transparent;
+    border: 1px solid var(--bdr);
+    color: var(--mut);
+    border-radius: 2px;
+    height: 16px;
+    padding: 0 5px;
+    font-size: 8px;
+    font-weight: 700;
+    font-family: inherit;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition: color .1s, border-color .1s, background .1s;
+  }
+  .mute-btn:hover { color: var(--txt); border-color: var(--ac); }
+  .mute-btn.on {
+    color: var(--err);
+    border-color: var(--err);
+    background: #2a0805;
+  }
+
+  .card.muted .card-name { color: var(--mut); text-decoration: line-through; }
+  .card.muted .track-preview { opacity: 0.35; }
+
   /* ── Buttons ───────────────────────────────────────────────────────────────── */
   .x-btn {
     background: transparent;
@@ -1588,11 +1719,6 @@
     }
   }
 
-  @keyframes audioBars {
-    0%, 100% { transform: scaleY(0.35); }
-    45% { transform: scaleY(1); }
-  }
-
   @keyframes visualDrift {
     0%, 100% { transform: translate(-8%, 0) scale(0.9); }
     50% { transform: translate(8%, 0) scale(1.08); }
@@ -1632,7 +1758,6 @@
     .tempo-dot,
     .sym-orbit,
     .sym-lobe,
-    .audio-field span,
     .visual-aura,
     .visual-shape,
     .visual-particle,
