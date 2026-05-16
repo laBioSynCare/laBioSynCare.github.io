@@ -4,11 +4,39 @@ export const CONTROL_TYPES = ['Martigli', 'Symmetry']
 // Martigli waveform shapes for breath curve
 export const MARTIGLI_WAVEFORMS = ['sine', 'triangle', 'square']
 
+// Knob ranges for Martigli control params [min, max, step]
+export const MARTIGLI_PARAM_RANGE = {
+  periodSec:       [3,   60,  1],
+  targetPeriodSec: [3,   60,  1],
+  inhaleRatio:     [0.1, 0.9, 0.05],
+  amplitude:       [0,   2,   0.05],
+}
+
+export const MARTIGLI_PARAMS = ['periodSec', 'targetPeriodSec', 'inhaleRatio', 'amplitude']
+
+// Knob ranges for Symmetry control params [min, max, step]
+export const SYMMETRY_PARAM_RANGE = {
+  rateHz:   [0.001, 50,  0.1],
+  depth:    [0,     10,  0.1],
+  offset:   [-5,    5,   0.1],
+  phaseDeg: [0,     360, 1],
+}
+
+export const SYMMETRY_PARAMS = ['rateHz', 'depth', 'offset', 'phaseDeg']
+
 // Audio track types
 export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier']
 
 // Audio parameters that can accept modulation
 export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate']
+
+// Knob ranges for audio params [min, max, step]
+export const AUDIO_PARAM_RANGE = {
+  gain:      [0,    1,     0.01],
+  pan:       [-1,   1,     0.01],
+  frequency: [20,   2000,  1],
+  pulseRate: [0.5,  50,    0.5],
+}
 
 // Visual track types
 export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient']
@@ -16,11 +44,27 @@ export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient']
 // Visual parameters that can accept modulation
 export const VISUAL_PARAMS = ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue']
 
+// Knob ranges for visual params [min, max, step]
+export const VISUAL_PARAM_RANGE = {
+  opacity:       [0,   1,    0.01],
+  scale:         [0,   4,    0.01],
+  rotationSpeed: [-2,  2,    0.01],
+  sides:         [3,   12,   1],
+  hue:           [0,   360,  1],
+}
+
 // Haptic track types
 export const HAPTIC_TRACK_TYPES = ['Vibration']
 
 // Haptic parameters that can accept modulation
 export const HAPTIC_PARAMS = ['intensity', 'frequency', 'pattern']
+
+// Knob ranges for haptic params [min, max, step]
+export const HAPTIC_PARAM_RANGE = {
+  intensity:  [0,   1,    0.01],
+  frequency:  [20,  500,  1],
+  pattern:    [0,   10,   1],
+}
 
 let _nextId = 1
 function uid(prefix) { return `${prefix}-${_nextId++}` }
