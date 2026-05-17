@@ -36,7 +36,38 @@ export const AUDIO_PARAM_RANGE = {
   pan:       [-1,   1,     0.01],
   frequency: [20,   2000,  1],
   pulseRate: [0.5,  50,    0.5],
+  leftFreq:  [20,   2000,  1],
+  rightFreq: [20,   2000,  1],
 }
+
+// Canonical (audible & modulatable) params per voice type. BinauralBeat owns
+// leftFreq and rightFreq INDEPENDENTLY — center/beat are derived for display
+// only. No pan on Binaural (the two carriers are hard-panned L/R by definition;
+// a user pan stage defeats the binaural effect). No pulseRate on Carrier.
+export const VOICE_PARAMS = {
+  Carrier:        ['gain', 'pan', 'frequency'],
+  IsochronicTone: ['gain', 'pan', 'frequency', 'pulseRate'],
+  BinauralBeat:   ['gain', 'leftFreq', 'rightFreq'],
+}
+
+export function voiceParamNames(trackType) {
+  return VOICE_PARAMS[trackType] ?? AUDIO_PARAMS
+}
+
+// IsochronicTone envelope types
+export const ISO_ENVELOPES = ['square', 'AR', 'AD', 'ADSR']
+
+// Envelope sub-fraction defaults per type (only fractions meaningful for the
+// active envelope are honored by the engine).
+export const ISO_ENVELOPE_DEFAULTS = {
+  square: { attackFrac: 0,    decayFrac: 0,    sustainLevel: 1.0, releaseFrac: 0    },
+  AD:     { attackFrac: 0.5,  decayFrac: 0,    sustainLevel: 1.0, releaseFrac: 0    },
+  AR:     { attackFrac: 0.1,  decayFrac: 0,    sustainLevel: 1.0, releaseFrac: 0.15 },
+  ADSR:   { attackFrac: 0.1,  decayFrac: 0.15, sustainLevel: 0.7, releaseFrac: 0.2  },
+}
+
+// Binaural parametrization modes
+export const BINAURAL_MODES = ['center-beat', 'left-right']
 
 // Visual track types
 export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient']
@@ -113,25 +144,36 @@ export function createMod(controlId = '', amount = 1) {
 
 // ── Audio tracks ─────────────────────────────────────────────────────────────
 
-function audioParams(defaults = {}) {
-  const base = { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10 }
+function audioParams(trackType = 'IsochronicTone', defaults = {}) {
+  const base = trackType === 'BinauralBeat'
+    ? { gain: 0.5, leftFreq: 200, rightFreq: 210 }
+    : { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10 }
   const merged = { ...base, ...defaults }
   const params = {}
-  for (const key of AUDIO_PARAMS) {
+  for (const key of voiceParamNames(trackType)) {
     params[key] = { value: merged[key], mods: [] }
   }
   return params
 }
 
 export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
-  return {
+  const base = {
     id: uid('audio'),
     trackType,
     name: trackType,
     muted: false,
-    params: audioParams(),
-    ...overrides,
+    windowSec: 1.0,
+    params: audioParams(trackType),
   }
+  if (trackType === 'IsochronicTone') {
+    base.envelope = 'AR'
+    base.noteDurationFrac = 0.5
+    Object.assign(base, ISO_ENVELOPE_DEFAULTS.AR)
+  }
+  if (trackType === 'BinauralBeat') {
+    base.binauralMode = 'center-beat'
+  }
+  return { ...base, ...overrides }
 }
 
 // ── Visual tracks ─────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
   import Knob from './Knob.svelte'
-  import { VanillaWebAudioEngine } from '../../engines/audio/VanillaWebAudioEngine.js'
+  import { VanillaWebAudioEngine, envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
   import {
     computeMartigliState,
     computeMartigliStateFree,
@@ -12,10 +12,13 @@
     AUDIO_PARAM_RANGE,
     AUDIO_PARAMS,
     AUDIO_TRACK_TYPES,
+    BINAURAL_MODES,
     CONTROL_TYPES,
     HAPTIC_PARAM_RANGE,
     HAPTIC_PARAMS,
     HAPTIC_TRACK_TYPES,
+    ISO_ENVELOPES,
+    ISO_ENVELOPE_DEFAULTS,
     MARTIGLI_PARAM_RANGE,
     MARTIGLI_PARAMS,
     MARTIGLI_WAVEFORMS,
@@ -33,6 +36,7 @@
     createVisualTrack,
     patchSummary,
     validateDraft,
+    voiceParamNames,
   } from './presetDraft.js'
 
   let draft = $state(createDraft())
@@ -137,16 +141,21 @@
   function trackToVoiceSpec(track) {
     const p = track.params
     const gain = track.muted ? 0 : p.gain.value
-    return {
+    const spec = {
       type: track.trackType,
       volume: gain,
-      params: {
-        gain,
-        pan: p.pan.value,
-        frequency: p.frequency.value,
-        pulseRate: p.pulseRate.value,
-      },
+      params: { gain },
     }
+    if (track.trackType === 'BinauralBeat') {
+      spec.params.leftFreq = p.leftFreq.value
+      spec.params.rightFreq = p.rightFreq.value
+    } else {
+      spec.params.pan = p.pan?.value ?? 0
+      spec.params.frequency = p.frequency?.value ?? 200
+      spec.params.pulseRate = p.pulseRate?.value ?? 10
+    }
+    if (track.trackType === 'IsochronicTone') spec.envelope = isoEnvSpec(track)
+    return spec
   }
 
   function startVoiceFor(track) {
@@ -237,7 +246,7 @@
         const write = handle && engine
           ? (name, v) => engine.setVoiceParameter(handle, name, v, tNow, 'step')
           : null
-        applyMods(track, controlValues, AUDIO_PARAM_RANGE, write, AUDIO_PARAMS)
+        applyMods(track, controlValues, AUDIO_PARAM_RANGE, write, voiceParamNames(track.trackType))
       }
       for (const track of draft.visualTracks) applyMods(track, controlValues, VISUAL_PARAM_RANGE, null, VISUAL_PARAMS)
       for (const track of draft.hapticTracks) applyMods(track, controlValues, HAPTIC_PARAM_RANGE, null, HAPTIC_PARAMS)
@@ -247,6 +256,26 @@
   }
 
   onMount(() => { rafId = requestAnimationFrame(rafTick) })
+
+  // Push Iso envelope shape to live voices whenever the user-set envelope
+  // fields change. We read the envelope spec for every Iso track *before* the
+  // engine null-check so Svelte registers the reactive deps even on the first
+  // mount pass (when engine is null). Otherwise no subsequent change re-fires
+  // the effect. Cost is bounded — depends only on knob base values, not the
+  // modulated pulseRate.
+  $effect(() => {
+    const specs = []
+    for (const track of draft.audioTracks) {
+      if (track.trackType !== 'IsochronicTone') continue
+      specs.push([track.id, isoEnvSpec(track)])
+    }
+    if (!engine) return
+    for (const [tid, spec] of specs) {
+      const handle = voiceHandles.get(tid)
+      if (!handle) continue
+      engine.setVoiceEnvelope(handle, spec)
+    }
+  })
 
   onDestroy(async () => {
     if (rafId != null) cancelAnimationFrame(rafId)
@@ -320,51 +349,132 @@
     ].join(';')
   }
 
-  function freqToCycles(freq, minCycles = 1, maxCycles = 8) {
-    const f = clamp(num(freq, 200), 20, 2000)
-    const r = Math.log10(f / 20) / Math.log10(100) // 0..1
-    return minCycles + (maxCycles - minCycles) * r
+  // Above this many visible cycles, the wave is too dense for SVG to convey —
+  // fall back to a constant-amplitude band. Below it we use adaptive sampling
+  // (≥ 6 samples per cycle, capped) so a dense-but-still-resolved wave reads
+  // as a wave, not a bar.
+  const SCOPE_BAND_THRESHOLD = 600
+
+  function adaptiveSamples(cycles, perCycle = 6, base = 200, max = 1500) {
+    return Math.max(base, Math.min(max, Math.ceil(Math.abs(cycles) * perCycle)))
   }
 
-  function pulseToEnvCycles(pulse, minCycles = 0.5, maxCycles = 5) {
-    const p = clamp(num(pulse, 10), 0.5, 50)
-    const r = Math.log10(p / 0.5) / Math.log10(100)
-    return minCycles + (maxCycles - minCycles) * r
+  // Time-base for the L/R rows of a binaural scope: exactly ONE beat period
+  // (1/|beat|). This way the wave count visibly differs between channels —
+  // L draws floor(L/|beat|) cycles per beat, R draws floor(R/|beat|) cycles —
+  // and changing leftFreq / rightFreq / beat actually moves things. Capped at
+  // the user's screen so very small beats don't make the row way too long.
+  function binauralRowWindow(beatHz, userWinSec) {
+    const absBeat = Math.abs(beatHz)
+    if (!Number.isFinite(absBeat) || absBeat < 0.01) return userWinSec
+    return Math.min(userWinSec, 1 / absBeat)
   }
 
-  function sinePathD(xMin, xMax, yMid, yAmp, cycles, samples = 96) {
+  function fmtWin(s) {
+    if (!Number.isFinite(s) || s <= 0) return '—'
+    if (s >= 1) return `${s.toFixed(2)}s`
+    if (s >= 0.01) return `${(s * 1000).toFixed(0)}ms`
+    return `${(s * 1000).toFixed(1)}ms`
+  }
+
+  // Build the effective envelope spec from a track's user-set fields. The only
+  // auto-adjust we keep is a per-phase minimum (~0.5 ms absolute time) on
+  // attack/release/decay so they never produce clicks at high pulseRate. We do
+  // NOT clamp noteDurationFrac or override envelope type — the user's setting
+  // is final. Reads track.params.pulseRate.value (knob base, not the modulated
+  // live value) so the envelope shape stays stable under modulation.
+  function isoEnvSpec(track) {
+    const pulseRate = clamp(num(track.params?.pulseRate?.value, 10), 0.5, 50)
+    const type = track.envelope ?? 'AR'
+    const def = ISO_ENVELOPE_DEFAULTS[type] ?? ISO_ENVELOPE_DEFAULTS.AR
+    const noteDurationFrac = clamp(num(track.noteDurationFrac, 0.5), 0.01, 1)
+    let attackFrac = num(track.attackFrac, def.attackFrac)
+    let decayFrac = num(track.decayFrac, def.decayFrac)
+    let releaseFrac = num(track.releaseFrac, def.releaseFrac)
+    const sustainLevel = clamp(num(track.sustainLevel, def.sustainLevel), 0, 1)
+
+    const noteSec = noteDurationFrac / pulseRate
+    if (noteSec > 0) {
+      const minPhaseFrac = Math.min(0.4, 0.0005 / noteSec)
+      if (attackFrac > 0) attackFrac = Math.max(attackFrac, minPhaseFrac)
+      if (releaseFrac > 0) releaseFrac = Math.max(releaseFrac, minPhaseFrac)
+      if (decayFrac > 0) decayFrac = Math.max(decayFrac, minPhaseFrac)
+    }
+    return { type, attackFrac, decayFrac, sustainLevel, releaseFrac, noteDurationFrac }
+  }
+
+  function rectanglePath(xMin, xMax, yMid, yAmp) {
+    const top = (yMid - yAmp).toFixed(1)
+    const bot = (yMid + yAmp).toFixed(1)
+    return `M${xMin} ${top} L${xMax} ${top} L${xMax} ${bot} L${xMin} ${bot} Z`
+  }
+
+  function sineWavePath(xMin, xMax, yMid, yAmp, cycles, samples) {
+    const s = samples ?? adaptiveSamples(cycles)
     const span = xMax - xMin
     let d = ''
-    for (let i = 0; i <= samples; i += 1) {
-      const t = i / samples
-      const x = xMin + span * t
-      const y = yMid - yAmp * Math.sin(2 * Math.PI * cycles * t)
+    for (let i = 0; i <= s; i += 1) {
+      const u = i / s
+      const x = xMin + span * u
+      const y = yMid - yAmp * Math.sin(2 * Math.PI * cycles * u)
       d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
     }
     return d
   }
 
-  function envelopedSinePathD(xMin, xMax, yMid, yAmp, carrierCycles, envCycles, samples = 140) {
-    const span = xMax - xMin
-    let d = ''
-    for (let i = 0; i <= samples; i += 1) {
-      const t = i / samples
-      const env = 0.5 - 0.5 * Math.cos(2 * Math.PI * envCycles * t)
-      const x = xMin + span * t
-      const y = yMid - yAmp * env * Math.sin(2 * Math.PI * carrierCycles * t)
-      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
-    }
-    return d
-  }
-
-  function envelopeOutlineD(xMin, xMax, yMid, yAmp, envCycles, samples = 96) {
+  function isoEnvelopeOutlinePath(xMin, xMax, yMid, yAmp, envSpec, envCycles, samples = 320) {
     const span = xMax - xMin
     let top = ''
     let bot = ''
     for (let i = 0; i <= samples; i += 1) {
-      const t = i / samples
-      const env = 0.5 - 0.5 * Math.cos(2 * Math.PI * envCycles * t)
-      const x = xMin + span * t
+      const u = i / samples
+      const slotPhase = ((envCycles * u) % 1 + 1) % 1
+      const env = envelopeValueAt(envSpec, slotPhase)
+      const x = xMin + span * u
+      top += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + (yMid - yAmp * env).toFixed(1)
+      bot = ' L' + x.toFixed(1) + ' ' + (yMid + yAmp * env).toFixed(1) + bot
+    }
+    return top + bot + ' Z'
+  }
+
+  function isoWavePath(xMin, xMax, yMid, yAmp, carrierCycles, envSpec, envCycles, samples) {
+    const s = samples ?? adaptiveSamples(carrierCycles)
+    const span = xMax - xMin
+    let d = ''
+    for (let i = 0; i <= s; i += 1) {
+      const u = i / s
+      const slotPhase = ((envCycles * u) % 1 + 1) % 1
+      const env = envelopeValueAt(envSpec, slotPhase)
+      const v = env * Math.sin(2 * Math.PI * carrierCycles * u)
+      const x = xMin + span * u
+      const y = yMid - yAmp * v
+      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
+    }
+    return d
+  }
+
+  function binauralSumPath(xMin, xMax, yMid, yAmp, leftCycles, rightCycles, samples) {
+    const s = samples ?? adaptiveSamples(Math.max(Math.abs(leftCycles), Math.abs(rightCycles)))
+    const span = xMax - xMin
+    let d = ''
+    for (let i = 0; i <= s; i += 1) {
+      const u = i / s
+      const v = 0.5 * (Math.sin(2 * Math.PI * leftCycles * u) + Math.sin(2 * Math.PI * rightCycles * u))
+      const x = xMin + span * u
+      const y = yMid - yAmp * v
+      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
+    }
+    return d
+  }
+
+  function binauralBeatEnvelopePath(xMin, xMax, yMid, yAmp, beatCycles, samples = 240) {
+    const span = xMax - xMin
+    let top = ''
+    let bot = ''
+    for (let i = 0; i <= samples; i += 1) {
+      const u = i / samples
+      const env = Math.abs(Math.cos(Math.PI * beatCycles * u))
+      const x = xMin + span * u
       top += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + (yMid - yAmp * env).toFixed(1)
       bot = ' L' + x.toFixed(1) + ' ' + (yMid + yAmp * env).toFixed(1) + bot
     }
@@ -575,10 +685,14 @@
           {@const aGain = clamp(num(getLive(track, 'gain'), 0.5), 0, 1)}
           {@const aPan = clamp(num(getLive(track, 'pan'), 0), -1, 1)}
           {@const aFreq = num(getLive(track, 'frequency'), 200)}
-          {@const aPulse = num(getLive(track, 'pulseRate'), 10)}
-          {@const cyc = freqToCycles(aFreq)}
-          {@const envCyc = pulseToEnvCycles(aPulse)}
+          {@const aPulse = Math.max(0.001, num(getLive(track, 'pulseRate'), 10))}
+          {@const winSec = Math.max(0.005, num(track.windowSec, 1))}
           {@const panX = (4 + 112 * (aPan + 1) / 2).toFixed(2)}
+          {@const leftF = track.trackType === 'BinauralBeat' ? num(getLive(track, 'leftFreq'), 200) : aFreq - aPulse / 2}
+          {@const rightF = track.trackType === 'BinauralBeat' ? num(getLive(track, 'rightFreq'), 210) : aFreq + aPulse / 2}
+          {@const centerF = (leftF + rightF) / 2}
+          {@const beatF = rightF - leftF}
+          {@const isoEnv = track.trackType === 'IsochronicTone' ? isoEnvSpec(track) : null}
           <article class="card" class:muted={track.muted}>
             <div class="card-head">
               <input class="card-name" bind:value={track.name} />
@@ -592,57 +706,185 @@
               <button class="x-btn" onclick={() => removeAudio(track.id)}>✕</button>
             </div>
             <div class="card-body">
-              <div class="audio-scope a-{track.trackType.toLowerCase()}" aria-hidden="true">
-                <svg viewBox="0 0 120 36" preserveAspectRatio="none">
-                  <line class="scope-axis" x1="4" y1="18" x2="116" y2="18" />
-                  {#if track.trackType === 'BinauralBeat'}
-                    <path class="scope-trace scope-trace-l" d={sinePathD(4, 116, 10, 6 * aGain, cyc)} />
-                    <path class="scope-trace scope-trace-r" d={sinePathD(4, 116, 26, 6 * aGain, cyc + Math.max(0.4, envCyc * 0.5))} />
-                  {:else if track.trackType === 'IsochronicTone'}
-                    <path class="scope-envelope" d={envelopeOutlineD(4, 116, 18, 13 * aGain, envCyc)} />
-                    <path class="scope-trace" d={envelopedSinePathD(4, 116, 18, 13 * aGain, cyc, envCyc)} />
-                  {:else}
-                    <path class="scope-trace" d={sinePathD(4, 116, 18, 13 * aGain, cyc)} />
-                  {/if}
-                </svg>
+              {#if track.trackType === 'BinauralBeat'}
+                {@const lrWin = binauralRowWindow(beatF, winSec)}
+                {@const leftCyc = leftF * lrWin}
+                {@const rightCyc = rightF * lrWin}
+                {@const sumLeftCyc = leftF * winSec}
+                {@const sumRightCyc = rightF * winSec}
+                {@const beatCyc = Math.abs(beatF) * winSec}
+                <div class="audio-scope a-binauralbeat" aria-hidden="true">
+                  <div class="scope-row">
+                    <span class="scope-side scope-side-l">L</span>
+                    <svg viewBox="0 0 120 22" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
+                      {#if leftCyc < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace scope-trace-l" d={sineWavePath(4, 116, 11, 8 * aGain, leftCyc)} />
+                      {:else}
+                        <path class="scope-band scope-band-l" d={rectanglePath(4, 116, 11, 8 * aGain)} />
+                      {/if}
+                    </svg>
+                    <span class="row-win">{leftCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
+                  </div>
+                  <div class="scope-row">
+                    <span class="scope-side scope-side-r">R</span>
+                    <svg viewBox="0 0 120 22" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
+                      {#if rightCyc < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace scope-trace-r" d={sineWavePath(4, 116, 11, 8 * aGain, rightCyc)} />
+                      {:else}
+                        <path class="scope-band scope-band-r" d={rectanglePath(4, 116, 11, 8 * aGain)} />
+                      {/if}
+                    </svg>
+                    <span class="row-win">{rightCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
+                  </div>
+                  <div class="scope-row scope-row-sum">
+                    <span class="scope-side scope-side-sum">Σ</span>
+                    <svg viewBox="0 0 120 28" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="14" x2="116" y2="14" />
+                      <path class="scope-envelope" d={binauralBeatEnvelopePath(4, 116, 14, 11 * aGain, beatCyc)} />
+                      {#if Math.max(sumLeftCyc, sumRightCyc) < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace scope-trace-sum" d={binauralSumPath(4, 116, 14, 11 * aGain, sumLeftCyc, sumRightCyc)} />
+                      {/if}
+                    </svg>
+                    <span class="row-win">{fmtWin(winSec)}</span>
+                  </div>
+                </div>
+              {:else if track.trackType === 'IsochronicTone'}
+                {@const envCyc = aPulse * winSec}
+                {@const carrCyc = aFreq * winSec}
+                <div class="audio-scope a-isochronictone" aria-hidden="true">
+                  <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                    <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                    <path class="scope-envelope" d={isoEnvelopeOutlinePath(4, 116, 20, 16 * aGain, isoEnv, envCyc)} />
+                    {#if carrCyc < SCOPE_BAND_THRESHOLD}
+                      <path class="scope-trace" d={isoWavePath(4, 116, 20, 16 * aGain, carrCyc, isoEnv, envCyc)} />
+                    {/if}
+                  </svg>
+                </div>
+              {:else}
+                {@const carrCyc = aFreq * winSec}
+                <div class="audio-scope a-carrier" aria-hidden="true">
+                  <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                    <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                    {#if carrCyc < SCOPE_BAND_THRESHOLD}
+                      <path class="scope-trace" d={sineWavePath(4, 116, 20, 16 * aGain, carrCyc)} />
+                    {:else}
+                      <path class="scope-band" d={rectanglePath(4, 116, 20, 16 * aGain)} />
+                    {/if}
+                  </svg>
+                </div>
+              {/if}
+
+              {#if track.trackType !== 'BinauralBeat'}
                 <div class="pan-ruler">
                   <span class="pan-track"></span>
                   <span class="pan-dot" style={`left:${panX}%`}></span>
                   <span class="pan-l">L</span>
                   <span class="pan-r">R</span>
                 </div>
-                <div class="scope-meta">
-                  <span>{Math.round(aFreq)} Hz</span>
-                  {#if track.trackType !== 'Carrier'}
-                    <span>· {aPulse < 10 ? aPulse.toFixed(1) : Math.round(aPulse)} Hz {track.trackType === 'BinauralBeat' ? 'beat' : 'pulse'}</span>
-                  {/if}
-                </div>
+              {/if}
+
+              <div class="scope-meta">
+                {#if track.trackType === 'BinauralBeat'}
+                  <span class="meta-pair">L {Math.round(leftF)} / R {Math.round(rightF)} Hz</span>
+                  <span class="meta-pair meta-mut">center {Math.round(centerF)} · beat {beatF >= 0 ? '+' : ''}{beatF.toFixed(1)} Hz</span>
+                {:else if track.trackType === 'IsochronicTone'}
+                  <span class="meta-pair">{Math.round(aFreq)} Hz · pulse {aPulse.toFixed(1)} Hz · {isoEnv.type}</span>
+                {:else}
+                  <span class="meta-pair">{Math.round(aFreq)} Hz</span>
+                {/if}
+                <label class="win-field">
+                  <span>screen</span>
+                  <input type="number" step="0.01" min="0.005" max="60" bind:value={track.windowSec} />
+                  <span>s</span>
+                </label>
               </div>
+
+              {#if track.trackType === 'IsochronicTone'}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>env</span>
+                    <select
+                      bind:value={track.envelope}
+                      onchange={() => Object.assign(track, ISO_ENVELOPE_DEFAULTS[track.envelope] ?? {})}
+                    >
+                      {#each ISO_ENVELOPES as e}<option value={e}>{e}</option>{/each}
+                    </select>
+                  </label>
+                  <label class="voice-num">
+                    <span>note%</span>
+                    <input type="number" step="0.01" min="0.05" max="1" bind:value={track.noteDurationFrac} />
+                  </label>
+                </div>
+              {/if}
+              {#if track.trackType === 'BinauralBeat'}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>mode</span>
+                    <select bind:value={track.binauralMode}>
+                      {#each BINAURAL_MODES as m}<option value={m}>{m}</option>{/each}
+                    </select>
+                  </label>
+                </div>
+              {/if}
+
               <div class="knob-grid">
-                {#each AUDIO_PARAMS as pname}
-                  {@const param = track.params[pname]}
-                  {@const [pmin, pmax, pstep] = AUDIO_PARAM_RANGE[pname]}
+                {#if track.trackType === 'BinauralBeat' && track.binauralMode === 'center-beat'}
+                  {@const lParam = track.params.leftFreq}
+                  {@const rParam = track.params.rightFreq}
+                  {@const gParam = track.params.gain}
+                  {@const [gmin, gmax, gstep] = AUDIO_PARAM_RANGE.gain}
+                  {@const [fmin, fmax, fstep] = AUDIO_PARAM_RANGE.leftFreq}
                   <div class="knob-cell">
-                    <Knob value={param.value} onchange={(v) => { param.value = v }}
-                      min={pmin} max={pmax} step={pstep} label={pname}
-                      modActive={param.mods.length > 0} onmod={() => toggleMod(track.id, pname)} />
+                    <Knob value={gParam.value} onchange={(v) => { gParam.value = v }}
+                      min={gmin} max={gmax} step={gstep} label="gain"
+                      modActive={gParam.mods.length > 0} onmod={() => toggleMod(track.id, 'gain')} />
                   </div>
-                  {#if expandedMod === `${track.id}:${pname}`}
-                    <div class="mod-picker">
-                      {#each draft.controlTracks as ctrl}
-                        <button class="mod-pick" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
-                      {/each}
-                      {#if !draft.controlTracks.length}<span class="mod-empty">No controls</span>{/if}
+                  <div class="knob-cell">
+                    <Knob value={(lParam.value + rParam.value) / 2}
+                      onchange={(v) => {
+                        const beat = rParam.value - lParam.value
+                        lParam.value = clamp(v - beat / 2, fmin, fmax)
+                        rParam.value = clamp(v + beat / 2, fmin, fmax)
+                      }}
+                      min={fmin} max={fmax} step={fstep} label="centerFreq" />
+                  </div>
+                  <div class="knob-cell">
+                    <Knob value={rParam.value - lParam.value}
+                      onchange={(v) => {
+                        const c = (lParam.value + rParam.value) / 2
+                        lParam.value = clamp(c - v / 2, fmin, fmax)
+                        rParam.value = clamp(c + v / 2, fmin, fmax)
+                      }}
+                      min={-50} max={50} step={0.5} label="beatFreq" />
+                  </div>
+                {:else}
+                  {#each voiceParamNames(track.trackType) as pname}
+                    {@const param = track.params[pname]}
+                    {@const [pmin, pmax, pstep] = AUDIO_PARAM_RANGE[pname]}
+                    <div class="knob-cell">
+                      <Knob value={param.value} onchange={(v) => { param.value = v }}
+                        min={pmin} max={pmax} step={pstep} label={pname}
+                        modActive={param.mods.length > 0} onmod={() => toggleMod(track.id, pname)} />
                     </div>
-                  {/if}
-                  {#each param.mods as mod (mod.id)}
-                    <div class="mod-chip">
-                      <span>{ctrlName(mod.controlId)}</span>
-                      <input class="mod-amt" type="number" step="any" bind:value={mod.amount} />
-                      <button class="x-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
-                    </div>
+                    {#if expandedMod === `${track.id}:${pname}`}
+                      <div class="mod-picker">
+                        {#each draft.controlTracks as ctrl}
+                          <button class="mod-pick" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
+                        {/each}
+                        {#if !draft.controlTracks.length}<span class="mod-empty">No controls</span>{/if}
+                      </div>
+                    {/if}
+                    {#each param.mods as mod (mod.id)}
+                      <div class="mod-chip">
+                        <span>{ctrlName(mod.controlId)}</span>
+                        <input class="mod-amt" type="number" step="any" bind:value={mod.amount} />
+                        <button class="x-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
+                      </div>
+                    {/each}
                   {/each}
-                {/each}
+                {/if}
               </div>
             </div>
           </article>
@@ -1392,10 +1634,47 @@
 
   .audio-scope svg {
     width: 100%;
-    height: 36px;
+    height: 40px;
     display: block;
     overflow: visible;
   }
+
+  .a-binauralbeat .scope-row svg { height: 22px; }
+  .a-binauralbeat .scope-row-sum svg { height: 28px; }
+
+  .scope-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .scope-row + .scope-row { margin-top: 2px; padding-top: 2px; border-top: 1px solid #11202e; }
+
+  .scope-side {
+    width: 10px;
+    text-align: center;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--mut);
+    flex-shrink: 0;
+  }
+  .scope-side-l { color: #9fd0ff; }
+  .scope-side-r { color: #c28ce0; }
+  .scope-side-sum { color: var(--ac); }
+
+  .row-win {
+    flex-shrink: 0;
+    font-size: 7px;
+    color: var(--mut);
+    font-variant-numeric: tabular-nums;
+    padding-left: 2px;
+    min-width: 32px;
+    text-align: right;
+  }
+
+  .scope-row svg { flex: 1; min-width: 0; }
 
   .scope-axis {
     stroke: #1b2738;
@@ -1413,6 +1692,13 @@
     filter: drop-shadow(0 0 3px #3b9eff66);
   }
 
+  .scope-band {
+    fill: #3b9eff33;
+    stroke: var(--ac);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
   .scope-envelope {
     fill: #3b9eff1c;
     stroke: #3b9eff55;
@@ -1421,8 +1707,11 @@
     vector-effect: non-scaling-stroke;
   }
 
-  .a-binauralbeat .scope-trace-l { stroke: #9fd0ff; }
-  .a-binauralbeat .scope-trace-r { stroke: #c28ce0; filter: drop-shadow(0 0 3px #8e44ad66); }
+  .scope-trace-l { stroke: #9fd0ff; filter: drop-shadow(0 0 3px #3b9eff66); }
+  .scope-trace-r { stroke: #c28ce0; filter: drop-shadow(0 0 3px #8e44ad66); }
+  .scope-band-l { fill: #9fd0ff33; stroke: #9fd0ff; }
+  .scope-band-r { fill: #c28ce033; stroke: #c28ce0; }
+  .scope-trace-sum { stroke: var(--ac); }
 
   .pan-ruler {
     position: relative;
@@ -1461,13 +1750,65 @@
 
   .scope-meta {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 4px;
     margin-top: 2px;
     padding: 0 4px;
     font-size: 8px;
-    color: var(--mut);
+    color: var(--txt);
     font-variant-numeric: tabular-nums;
   }
+  .meta-pair { white-space: nowrap; }
+  .meta-mut { color: var(--mut); }
+
+  .win-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    color: var(--mut);
+  }
+  .win-field input {
+    width: 36px;
+    background: var(--bg);
+    border: 1px solid var(--bdr);
+    color: var(--txt);
+    border-radius: 2px;
+    padding: 0 3px;
+    font-size: 8px;
+    font-family: inherit;
+    height: 14px;
+  }
+
+  .voice-extras {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 4px 0;
+    font-size: 8px;
+    color: var(--mut);
+  }
+
+  .voice-select,
+  .voice-num {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .voice-select select,
+  .voice-num input {
+    background: var(--bg);
+    border: 1px solid var(--bdr);
+    color: var(--txt);
+    border-radius: 2px;
+    padding: 0 3px;
+    font-size: 9px;
+    font-family: inherit;
+    height: 16px;
+  }
+  .voice-num input { width: 40px; }
 
   .visual-preview {
     background:
@@ -1657,7 +1998,8 @@
   }
 
   .card.muted .card-name { color: var(--mut); text-decoration: line-through; }
-  .card.muted .track-preview { opacity: 0.35; }
+  .card.muted .audio-scope { opacity: 0.35; }
+  .card.muted .pan-ruler { opacity: 0.5; }
 
   /* ── Buttons ───────────────────────────────────────────────────────────────── */
   .x-btn {
