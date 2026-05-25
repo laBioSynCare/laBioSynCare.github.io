@@ -15,14 +15,18 @@ export const MARTIGLI_PARAM_RANGE = {
 export const MARTIGLI_PARAMS = ['periodSec', 'targetPeriodSec', 'inhaleRatio', 'amplitude']
 
 // Knob ranges for Symmetry control params [min, max, step]
+// Symmetry is a change-ringing-style stepped LFO: a row of `nnotes` notes is
+// played one step at a time, then the row is permuted (plain hunt) and the
+// next cycle begins. After 2N rows the sequence returns to rounds.
 export const SYMMETRY_PARAM_RANGE = {
-  rateHz:   [0.001, 50,  0.1],
-  depth:    [0,     10,  0.1],
-  offset:   [-5,    5,   0.1],
-  phaseDeg: [0,     360, 1],
+  nnotes:    [2,    8,   1],
+  rateHz:    [0.05, 50,  0.1],
+  amplitude: [0,    2,   0.05],
 }
 
-export const SYMMETRY_PARAMS = ['rateHz', 'depth', 'offset', 'phaseDeg']
+export const SYMMETRY_PARAMS = ['nnotes', 'rateHz', 'amplitude']
+
+export const SYMMETRY_FAMILIES = ['plain-hunt']
 
 // Audio track types
 export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier']
@@ -121,11 +125,10 @@ export function createSymmetryTrack(overrides = {}) {
     id: uid('ctl'),
     type: 'Symmetry',
     name: 'Primary Symmetry',
-    rateHz: 10,
-    waveform: 'sine',
-    depth: 1.0,
-    offset: 0,
-    phaseDeg: 0,
+    nnotes: 4,
+    rateHz: 2,
+    amplitude: 1.0,
+    family: 'plain-hunt',
     ...overrides,
   }
 }

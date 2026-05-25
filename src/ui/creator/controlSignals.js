@@ -75,12 +75,73 @@ export function computeMartigliStateFree(track, t) {
   return { phase, value, currentPeriod: period, progress: 0, amp, ratio }
 }
 
+// Plain-hunt change-ringing rows on n bells: starting from rounds [1..n],
+// alternate "outside" swaps (positions 0-1, 2-3, …) and "inside" swaps
+// (positions 1-2, 3-4, …) for 2n steps; the 2n-th step returns to rounds.
+// We return the 2n distinct rows (rounds at index 0).
+export function plainHuntRows(n) {
+  const size = Math.max(2, Math.floor(n))
+  let row = Array.from({ length: size }, (_, i) => i + 1)
+  const rows = [row.slice()]
+  for (let step = 0; step < 2 * size - 1; step += 1) {
+    const next = row.slice()
+    if (step % 2 === 0) {
+      for (let i = 0; i + 1 < size; i += 2) {
+        const tmp = next[i]; next[i] = next[i + 1]; next[i + 1] = tmp
+      }
+    } else {
+      for (let i = 1; i + 1 < size; i += 2) {
+        const tmp = next[i]; next[i] = next[i + 1]; next[i + 1] = tmp
+      }
+    }
+    rows.push(next)
+    row = next
+  }
+  return rows
+}
+
+const _huntCache = new Map()
+function getPlainHunt(n) {
+  if (!_huntCache.has(n)) _huntCache.set(n, plainHuntRows(n))
+  return _huntCache.get(n)
+}
+
+// Compute the Symmetry control state at audio time t.
+//   nnotes: 2..8 (sequence size)
+//   rateHz: steps per second; one row spans nnotes steps; full cycle = 2·N
+//           rows × nnotes steps = 2·N² steps = 2·N² / rateHz seconds.
+//   amplitude: output scaling. Value is normalised to [-1, +1] across the
+//              note indices 1..N, then multiplied by amplitude.
+export function computeSymmetryState(track, t) {
+  const N = clamp(Math.round(num(track.nnotes, 4)), 2, 8)
+  const rate = Math.max(0.001, num(track.rateHz, 2))
+  const amp = num(track.amplitude, 1)
+  const rows = getPlainHunt(N)
+  const totalRows = rows.length
+
+  const totalSteps = Math.max(0, t) * rate
+  const wrapStep = totalSteps % (N * totalRows)
+  const rowIdx = Math.floor(wrapStep / N)
+  const stepInRow = Math.floor(wrapStep) % N
+  const row = rows[rowIdx]
+  const note = row[stepInRow]
+  const normalized = N > 1 ? (2 * (note - 1) / (N - 1)) - 1 : 0
+  const progress = (rowIdx * N + (wrapStep - rowIdx * N)) / (N * totalRows)
+
+  return {
+    value: amp * normalized,
+    note,
+    nnotes: N,
+    row,
+    rowIdx,
+    totalRows,
+    stepInRow,
+    progress,
+  }
+}
+
 export function evaluateSymmetry(track, t) {
-  const rate = Math.max(0.0001, num(track.rateHz, 1))
-  const depth = num(track.depth, 1)
-  const offset = num(track.offset, 0)
-  const phase = num(track.phaseDeg, 0) * Math.PI / 180
-  return offset + depth * Math.sin(TWO_PI * rate * t + phase)
+  return computeSymmetryState(track, t).value
 }
 
 export function evaluateControl(track, t, sessionElapsed, sessionLength) {
@@ -91,6 +152,9 @@ export function evaluateControl(track, t, sessionElapsed, sessionLength) {
       ? computeMartigliState(track, sessionElapsed, sessionLength).value
       : computeMartigliStateFree(track, t).value
   }
-  if (track.type === 'Symmetry') return evaluateSymmetry(track, t)
+  if (track.type === 'Symmetry') {
+    const ts = Number.isFinite(sessionElapsed) ? sessionElapsed : t
+    return computeSymmetryState(track, ts).value
+  }
   return 0
 }

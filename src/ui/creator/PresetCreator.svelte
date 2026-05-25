@@ -5,7 +5,7 @@
   import {
     computeMartigliState,
     computeMartigliStateFree,
-    evaluateSymmetry,
+    computeSymmetryState,
     martigliPathD,
   } from './controlSignals.js'
   import {
@@ -232,7 +232,8 @@
           ? computeMartigliState(c, sessionElapsed, sessionLength)
           : computeMartigliStateFree(c, tNow)
       } else if (c.type === 'Symmetry') {
-        st = { value: evaluateSymmetry(c, tNow) }
+        const ts = sessionElapsed != null ? sessionElapsed : tNow
+        st = computeSymmetryState(c, ts)
       } else {
         st = { value: 0 }
       }
@@ -330,23 +331,6 @@
   function tempoStyle(bpm) {
     const beat = 60 / Math.max(1, num(bpm, 60))
     return `--beat-duration:${clamp(beat, 0.12, 6).toFixed(3)}s;--bar-duration:${clamp(beat * 4, 0.48, 24).toFixed(3)}s;`
-  }
-
-  function symmetryStyle(track) {
-    const rate = clamp(num(track.rateHz, 1), 0.001, 50)
-    const depth = clamp(num(track.depth, 1) / 10, 0, 1)
-    const offset = clamp(num(track.offset, 0) / 5, -1, 1)
-    const duration = clamp(1 / rate, 0.18, 20)
-    return [
-      `--osc-duration:${duration.toFixed(3)}s`,
-      `--osc-delay:${(-duration / 2).toFixed(3)}s`,
-      `--sym-depth:${depth.toFixed(3)}`,
-      `--sym-offset:${offset.toFixed(3)}`,
-      `--sym-left:${(8 + offset * 8).toFixed(2)}%`,
-      `--sym-right:${(8 - offset * 8).toFixed(2)}%`,
-      `--sym-lobe-scale:${(0.95 + depth * 0.4).toFixed(3)}`,
-      `--sym-phase:${num(track.phaseDeg, 0).toFixed(1)}deg`,
-    ].join(';')
   }
 
   // Above this many visible cycles, the wave is too dense for SVG to convey —
@@ -640,14 +624,42 @@
                 </div>
                 <div class="card-meta">{Math.round(track.inhaleRatio * 100)}% inhale</div>
               {:else}
-                <div class="control-preview symmetry-preview" style={symmetryStyle(track)} aria-hidden="true">
-                  <span class="sym-orbit">
-                    <span class="sym-dot sym-dot-a"></span>
-                    <span class="sym-dot sym-dot-b"></span>
-                  </span>
-                  <span class="sym-axis"></span>
-                  <span class="sym-lobe sym-lobe-a"></span>
-                  <span class="sym-lobe sym-lobe-b"></span>
+                {@const symSt = controlStates[track.id] ?? {}}
+                {@const symN = clamp(Math.round(num(symSt.nnotes, num(track.nnotes, 4))), 2, 8)}
+                {@const symRow = Array.isArray(symSt.row) ? symSt.row : Array.from({length: symN}, (_, i) => i + 1)}
+                {@const symStep = clamp(num(symSt.stepInRow, 0), 0, symN - 1)}
+                {@const symRowIdx = num(symSt.rowIdx, 0)}
+                {@const symTotalRows = num(symSt.totalRows, 2 * symN)}
+                {@const symProgress = clamp(num(symSt.progress, 0), 0, 1)}
+
+                <div class="symmetry-widget" aria-hidden="true">
+                  <svg viewBox="0 0 120 44" preserveAspectRatio="none">
+                    <line class="sym-baseline" x1="4" y1="32" x2="116" y2="32" />
+                    {#each symRow as value, i}
+                      {@const cellWidth = 112 / symN}
+                      {@const cellX = 4 + i * cellWidth}
+                      {@const barH = (value / symN) * 26}
+                      {@const barY = 32 - barH}
+                      <rect
+                        class="sym-cell"
+                        class:sym-cell-active={i === symStep}
+                        x={cellX + 1.2}
+                        y={barY}
+                        width={cellWidth - 2.4}
+                        height={barH}
+                        rx="1"
+                      />
+                      <text
+                        class="sym-cell-num"
+                        class:sym-cell-num-active={i === symStep}
+                        x={cellX + cellWidth / 2}
+                        y="40"
+                        text-anchor="middle"
+                      >{value}</text>
+                    {/each}
+                    <line class="sym-progress-track" x1="4" y1="42.5" x2="116" y2="42.5" />
+                    <line class="sym-progress" x1="4" y1="42.5" x2={4 + 112 * symProgress} y2="42.5" />
+                  </svg>
                 </div>
                 <div class="knob-grid">
                   {#each SYMMETRY_PARAMS as pname}
@@ -658,7 +670,7 @@
                     </div>
                   {/each}
                 </div>
-                <div class="card-meta">{track.rateHz} Hz · {track.waveform}</div>
+                <div class="card-meta">{track.family ?? 'plain-hunt'} · row {symRowIdx + 1}/{symTotalRows} · step {symStep + 1}/{symN}</div>
               {/if}
             </div>
           </article>
@@ -1566,61 +1578,67 @@
     font-weight: 700;
   }
 
-  .symmetry-preview {
+  .symmetry-widget {
+    position: relative;
+    height: 48px;
+    border: 1px solid #2a1b3a;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
     background:
-      radial-gradient(circle at 50% 50%, #8e44ad38, transparent 48%),
-      linear-gradient(90deg, #061018, #100b18);
+      radial-gradient(circle at 50% 50%, #8e44ad22, transparent 60%),
+      linear-gradient(90deg, #0a0612, #100b18);
   }
 
-  .sym-axis {
-    position: absolute;
-    left: 8px;
-    right: 8px;
-    top: 50%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #8e44ad99, transparent);
+  .symmetry-widget svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
   }
 
-  .sym-orbit {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 30px;
-    height: 30px;
-    border: 1px solid #8e44ad88;
-    border-radius: 50%;
-    transform: translate(-50%, -50%) rotate(var(--sym-phase, 0deg));
-    animation: symSpin var(--osc-duration, 1s) linear infinite;
+  .sym-baseline {
+    stroke: #2b1f3c;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
   }
 
-  .sym-dot {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #c28ce0;
-    box-shadow: 0 0 10px #8e44ad;
+  .sym-cell {
+    fill: #8e44ad55;
+    stroke: #8e44ad88;
+    stroke-width: 0.6;
+    vector-effect: non-scaling-stroke;
+    transition: fill 0.12s, stroke 0.12s;
   }
 
-  .sym-dot-a { left: 50%; top: -3px; transform: translateX(-50%); }
-  .sym-dot-b { left: 50%; bottom: -3px; transform: translateX(-50%); }
-
-  .sym-lobe {
-    position: absolute;
-    top: 18%;
-    width: 42%;
-    height: 64%;
-    border-radius: 50%;
-    border: 1px solid #8e44ad66;
-    opacity: 0.45;
-    animation: symPulse var(--osc-duration, 1s) ease-in-out infinite;
+  .sym-cell-active {
+    fill: #c28ce0;
+    stroke: #fff;
+    filter: drop-shadow(0 0 4px #c28ce0);
   }
 
-  .sym-lobe-b {
-    right: var(--sym-right, 8%);
-    animation-delay: var(--osc-delay, -0.5s);
+  .sym-cell-num {
+    font-size: 6px;
+    font-weight: 600;
+    fill: var(--mut);
+    font-family: inherit;
+    font-variant-numeric: tabular-nums;
   }
-  .sym-lobe-a { left: var(--sym-left, 8%); }
+
+  .sym-cell-num-active { fill: #fff; }
+
+  .sym-progress-track {
+    stroke: #1b1224;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .sym-progress {
+    stroke: #c28ce0;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 0 2px #8e44adaa);
+  }
 
   .audio-scope {
     position: relative;
@@ -2046,21 +2064,6 @@
     48% { transform: scale(0.95); opacity: 0.75; }
   }
 
-  @keyframes symSpin {
-    to { transform: translate(-50%, -50%) rotate(calc(var(--sym-phase, 0deg) + 360deg)); }
-  }
-
-  @keyframes symPulse {
-    0%, 100% {
-      transform: scaleX(0.75) scaleY(0.82);
-      opacity: 0.25;
-    }
-    50% {
-      transform: scaleX(var(--sym-lobe-scale, 1.02)) scaleY(1.08);
-      opacity: 0.72;
-    }
-  }
-
   @keyframes visualDrift {
     0%, 100% { transform: translate(-8%, 0) scale(0.9); }
     50% { transform: translate(8%, 0) scale(1.08); }
@@ -2098,8 +2101,6 @@
   @media (prefers-reduced-motion: reduce) {
     .tempo-sweep,
     .tempo-dot,
-    .sym-orbit,
-    .sym-lobe,
     .visual-aura,
     .visual-shape,
     .visual-particle,
