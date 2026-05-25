@@ -16,6 +16,39 @@ see [Relationship to BioSynCare](#relationship-to-biosyncare).
 
 ---
 
+## W3C Community Group Proposal: Sensory Stimulation Vocabulary
+
+This repository is the public technical anchor for a proposed **Sensory Stimulation Vocabulary Community Group**.
+
+The proposed group would develop shared terminology, open vocabularies, ontology modules, semantic models, JSON-LD contexts, SHACL validation profiles, and implementation guidance for describing sensory stimulation sessions, stimuli, modalities, parameters, devices, safety metadata, evidence annotations, and related datasets on the Web.
+
+The work is intended to be vendor-neutral and community-led. BioSynCare/BSC Lab may serve as an early implementation environment, but the vocabulary effort is not limited to BioSynCare and is not a BioSynCare product specification.
+
+BSC Lab has two complementary roles in relation to `sstim`:
+
+1. **Vocabulary navigation and annotation interface** — making the `sstim` vocabulary and ontology easier to browse, inspect, annotate, discuss, review, and evolve.
+2. **Reference implementation** — providing an open implementation environment for sensory stimulation techniques and protocols described using `sstim`, so terms can be tested against real session structures, stimulus parameters, devices, safety metadata, evidence annotations, and user-facing workflows.
+
+The proposed W3C Community Group would focus on developing shared terminology and semantic structures so that sensory stimulation research, software, hardware, datasets, safety metadata, and institutional communication can become more coherent and interoperable.
+
+The proposed group does **not** define clinical practice guidelines, certify therapeutic efficacy, prescribe medical protocols, issue public-health recommendations, evaluate regulated-device claims, or claim that any specific sensory stimulation protocol treats, cures, prevents, or diagnoses medical conditions.
+
+Initial namespace:
+
+```text
+https://w3id.org/sstim/
+```
+
+Key documents:
+
+- [Charter](./CHARTER.md)
+- [W3C Community Group Proposal](./docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
+- [Scope](./docs/concept/SCOPE.md)
+- [Non-Scope](./docs/concept/NON_SCOPE.md)
+- [Ontology / Vocabulary Notes](./docs/ontology/README.md)
+
+---
+
 ## Current Status — Phase 0 → 1 Boundary
 
 The repository is at the **Phase 0 → Phase 1 boundary**. What exists today:

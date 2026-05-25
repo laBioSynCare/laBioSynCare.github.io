@@ -1,5 +1,158 @@
 # Scope
 
+This document covers two related but distinct scopes:
+
+1. The proposed **Sensory Stimulation Vocabulary Community Group** scope (the
+   W3C Community Group proposal anchored in this repository).
+2. The **BSC Lab** scope — what BSC Lab itself does and explicitly does not
+   claim, with regulatory and language guidance for contributors.
+
+See also [`NON_SCOPE.md`](./NON_SCOPE.md) for an explicit list of items that
+fall outside the proposed Community Group's remit.
+
+---
+
+# Part 1 — Proposed W3C Community Group Scope
+
+This part defines the intended scope of the proposed Sensory Stimulation
+Vocabulary Community Group.
+
+## Core Intent
+
+The core intent is to develop shared terminology and semantic structures so sensory stimulation can be described consistently across:
+
+- scientific research;
+- software systems;
+- hardware devices;
+- external protocols;
+- datasets;
+- safety and evidence documentation;
+- institutional and public-interest communication.
+
+The vocabulary should help research become more shareable and representative, help devices and software communicate, and help sensory stimulation be presented more clearly to authorities, institutions, and the public.
+
+## In Scope
+
+The proposed group may work on open semantic descriptions for:
+
+### Sessions
+
+- sensory stimulation sessions;
+- session structure;
+- timing metadata;
+- duration metadata;
+- intended context;
+- user-facing mode descriptors;
+- implementation profiles.
+
+### Stimuli
+
+- auditory stimuli;
+- visual stimuli;
+- haptic stimuli;
+- respiratory guidance cues;
+- multimodal stimuli;
+- stimulus parameters;
+- temporal patterns;
+- frequency structures;
+- carrier and modulation structures.
+
+### Modalities
+
+- auditory;
+- visual;
+- haptic;
+- respiratory;
+- audiovisual;
+- multimodal;
+- environmental or contextual sensory layers.
+
+### Research Communication
+
+- terminology for comparing studies;
+- metadata for sensory stimulation datasets;
+- evidence annotation structures;
+- study/protocol description support;
+- parameter reporting support;
+- representativeness and comparability metadata.
+
+### Software and Hardware Interoperability
+
+- app-to-app sensory stimulation metadata;
+- app-to-device metadata;
+- device capability descriptors;
+- session/protocol exchange structures;
+- external protocol mapping;
+- machine-readable parameter descriptions.
+
+### Institutional Communication
+
+- terminology for authorities and institutions;
+- public-interest documentation structures;
+- safety and caution metadata;
+- intended-use and claim-strength metadata;
+- clear separation between wellness, research, and clinical/regulatory claims.
+
+### BSC Lab Implementation Role
+
+- vocabulary navigation interface;
+- ontology annotation interface;
+- reference implementation of sensory stimulation techniques and protocols;
+- concrete examples mapping vocabulary terms to implemented sessions and parameters.
+
+### Metadata
+
+- safety and caution metadata;
+- evidence annotation metadata;
+- provenance metadata;
+- dataset metadata;
+- device and delivery context;
+- accessibility metadata;
+- claim-strength metadata;
+- validation metadata.
+
+### Semantic-Web Artifacts
+
+- RDF vocabularies;
+- OWL ontology modules;
+- SKOS concept schemes;
+- SHACL validation profiles;
+- JSON-LD contexts;
+- linked-data publishing guidance;
+- persistent identifier guidance;
+- mappings to existing vocabularies.
+
+### Implementation Guidance
+
+- examples for Web applications;
+- examples for research datasets;
+- examples for device/app interoperability;
+- examples for validation workflows;
+- examples for public documentation.
+
+## Initial Namespace
+
+```text
+https://w3id.org/sstim/
+```
+
+## Initial Prefix
+
+```text
+sstim
+```
+
+## Design Principle
+
+The vocabulary should support interoperability and clarity without implying that a described stimulation session has clinically validated effects.
+
+For an explicit list of items outside the proposed group's remit, see
+[`NON_SCOPE.md`](./NON_SCOPE.md).
+
+---
+
+# Part 2 — BSC Lab Scope
+
 > **For AI agents:** This is the claims and regulatory boundary document.
 > Before generating any user-facing text, preset descriptions, web copy,
 > or documentation about what BSC or BSC Lab does, read this document.
