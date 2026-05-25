@@ -78,6 +78,22 @@ The group may produce:
 7. Implementation Examples
 8. Mapping Notes to Existing Web and Semantic-Web Vocabularies
 
+### Indicative Phase 1 (first 12 months)
+
+- Core Sensory Stimulation Vocabulary draft (SKOS + OWL).
+- Initial OWL ontology modules covering sessions, stimuli, modalities, parameters.
+- SHACL validation profiles for session and parameter descriptors.
+- JSON-LD context draft.
+- Use cases and requirements document.
+
+### Indicative Phase 2 (months 13–24)
+
+- Mapping notes to WHO ICD and SNOMED CT terminology where relevant for institutional and research communication. These mappings are descriptive only and do not imply clinical endorsement of any protocol.
+- Implementation guidance for session data recording and export.
+- Interoperability report covering adjacent vocabularies and standards (for example, OBO Foundry ontologies, PROV-O for provenance, and self-report questionnaire structures where useful).
+
+Timelines are indicative and may be adjusted by group consensus.
+
 ## Technologies
 
 Relevant technologies may include:
@@ -107,6 +123,25 @@ The group welcomes participation from:
 - standards practitioners;
 - researchers working on evidence, safety, reproducibility, and metadata.
 
+Participation is open to W3C Members and non-Members. Non-Members must sign the W3C Community Contributor License Agreement (CLA) before contributing. The CLA grants the community a royalty-free license to any essential patent claims covering the group's deliverables.
+
+Organization affiliation is not required. Individual researchers, developers, and practitioners are welcome.
+
+## Communication
+
+- Mailing list: to be requested from W3C once the group is approved.
+- Public repository: to be created in a community-neutral GitHub organization once the group is approved; this BSC Lab repository serves as the pre-submission anchor.
+- Meeting cadence: indicative monthly video call, with asynchronous discussion via GitHub issues and the mailing list.
+- Working language: English for written deliverables and meeting minutes; spoken discussion may take place in any language participants share.
+
+## Decision Process
+
+Decisions are reached by consensus. In the absence of consensus, the Chair (or rotating facilitator) may call a vote; a simple majority of active participants — those who have participated in at least one meeting or comment in the previous 60 days — prevails.
+
+Vocabulary term additions and removals require a two-week public comment period and consensus.
+
+Term IRIs are never deleted after publication. Deprecated terms receive `owl:deprecated true` and a `skos:historyNote` explaining the deprecation, so existing data and citations remain dereferenceable.
+
 ## Governance Principle
 
 The vocabulary work should remain vendor-neutral. BioSynCare/BSC Lab may provide early examples and implementation feedback, but the group should not be governed as a BioSynCare product effort.
@@ -132,3 +167,29 @@ Avoided wording:
 - "certified by W3C"
 - "therapeutic standard"
 - "medical standard"
+
+## Relationship to Adjacent Groups
+
+The group intends to maintain awareness of, and where useful coordinate with, adjacent communities and standards efforts:
+
+- **W3C Accessibility Guidelines Working Group (AG WG).** Visual safety constraints for sensory stimulation (for example, avoiding high-contrast flicker that can trigger photosensitive seizures, and WCAG 2.3.1 alignment) intersect with WCAG. The group will track WCAG developments relevant to sensory stimulation software.
+- **OBO Foundry.** The vocabulary may align with BFO, OBI, IAO, and ECO where appropriate. The group will coordinate vocabulary additions with the relevant OBO Foundry editorial boards when alignments are proposed.
+- **HL7 FHIR.** Self-report data from sensory stimulation sessions may be representable as FHIR Questionnaire resources. The group may assess alignment as a Phase 2 task.
+- **Music therapy and rhythmic-stimulation research communities.** Rhythmic Auditory Stimulation (RAS) and Neurologic Music Therapy (NMT) overlap with sensory stimulation at the motor-entrainment end. The group may maintain liaison with bodies such as the World Federation of Music Therapy.
+- **Research and implementation partners.** The group welcomes liaison with research labs, open-science communities, accessibility organizations, and software/hardware implementation partners interested in shared sensory stimulation terminology.
+
+## Proposers and Initial Contacts
+
+This proposal is being prepared by:
+
+- **Renato Fabbri** — proposing contact for the Community Group, maintainer of the BSC Lab repository serving as the pre-submission anchor. ORCID: 0000-0002-9699-629X. Contact: renato.fabbri@gmail.com.
+
+Additional initial supporters will be added only after explicit consent. Target: 3–5 founding participants from distinct institutions across sensory stimulation research, semantic-web engineering, accessibility, and software/hardware implementation.
+
+## Next Steps Before W3C Submission
+
+- [ ] Confirm group name and short name.
+- [ ] Identify 3–5 additional founding participants willing to be named publicly.
+- [ ] Confirm W3C accounts for proposer and initial supporters.
+- [ ] Register `https://w3id.org/sstim` redirects at w3id.org.
+- [ ] Submit charter at https://www.w3.org/community/groups/proposed/.
