@@ -63,8 +63,13 @@ alternatives, and consequences. See
 
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
   approach over patents; trademark plan.
-- [`W3C_CG_CHARTER.md`](ecosystem/W3C_CG_CHARTER.md) — draft charter for a
-  Community Group around the sensory-stimulation ontology.
+- [`CHARTER.md`](../CHARTER.md) (repo root) — draft charter for the proposed
+  W3C Sensory Stimulation Vocabulary Community Group.
+- [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md) —
+  full proposal description, problem statement, deliverables, and submission
+  checklist.
+- [`INVITATION_TEMPLATE.md`](ecosystem/INVITATION_TEMPLATE.md) — outreach
+  template for inviting supporters of the Community Group proposal.
 - [`ADVISORY_BOARD.md`](ecosystem/ADVISORY_BOARD.md) — named members and
   roles.
 - [`PARTNERS.md`](ecosystem/PARTNERS.md) — named partners with interest

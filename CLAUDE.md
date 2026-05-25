@@ -493,8 +493,9 @@ docs/
   technical/                  ← PRESET_FORMAT, SESSION_MODEL, BREATHING_MODEL,
   │                             SYMMETRY_SYSTEM, MARTIGLI_BINAURAL,
   │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE
-  ecosystem/                  ← IP_STRATEGY, W3C_CG_CHARTER, ADVISORY_BOARD,
-                                PARTNERS, CONSORTIUM_INVITATION
+  ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
+                                INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
+                                CONSORTIUM_INVITATION
 
 static/
   _headers                    ← COOP/COEP/CORP headers for future Netlify/custom hosting

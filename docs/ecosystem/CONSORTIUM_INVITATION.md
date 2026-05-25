@@ -110,7 +110,7 @@ ORCID: 0000-0001-8602-7064
 
 Before sending this invitation:
 
-- [ ] Confirm charter draft is stable (see `docs/ecosystem/W3C_CG_CHARTER.md`)
+- [ ] Confirm charter draft is stable (see `CHARTER.md` at the repository root)
 - [ ] Confirm `https://w3id.org/sstim` is registered and resolves
 - [ ] Confirm GitHub repository is public and README is complete
 - [ ] Personalize [Name], [SPECIFIC RELEVANT WORK], and [LINK]
