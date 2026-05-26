@@ -132,6 +132,7 @@
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
       <a href="/creator/">Patch Studio</a>
+      <a href="/settings/">Settings</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
       <ProfileControl />
@@ -174,7 +175,10 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 1rem;
-    border-bottom: 1px solid #ffffff18;
+    background: var(--app-surface);
+    color: var(--app-text);
+    border-bottom: var(--app-border-width) solid var(--app-border);
+    font-family: var(--app-font-ui);
   }
 
   .topbar-main {
@@ -200,6 +204,10 @@
     padding: 0 0.65rem;
     font-size: 0.8rem;
     line-height: 1.2;
+    background: var(--app-surface-2);
+    border-color: var(--app-border);
+    color: var(--app-text);
+    border-radius: var(--app-radius);
   }
 
   .topbar-control:is(button) {
@@ -217,10 +225,10 @@
     height: 2.25rem;
     margin: 0;
     padding: 0;
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 0.35rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
     background: transparent;
-    color: inherit;
+    color: var(--app-text);
     font-size: 1.05rem;
     font-weight: 600;
     line-height: 1;
@@ -229,7 +237,7 @@
     cursor: pointer;
     flex-shrink: 0;
   }
-  .help-toggle:hover { background: #ffffff10; }
+  .help-toggle:hover { background: var(--app-accent-soft); border-color: var(--app-accent); }
 
   .help-overlay {
     position: fixed;
@@ -245,9 +253,9 @@
   .help-card {
     width: min(28rem, 100%);
     padding: 1rem 1.25rem 1.1rem;
-    background: var(--pico-card-background-color);
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 0.45rem;
+    background: var(--app-surface);
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: calc(var(--app-radius) + 2px);
     box-shadow: 0 1.5rem 3rem #0008;
   }
 
@@ -269,8 +277,8 @@
     height: 1.7rem;
     margin: 0;
     padding: 0;
-    border: 1px solid #ffffff30;
-    border-radius: 0.3rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
     background: transparent;
     color: inherit;
     cursor: pointer;
@@ -279,7 +287,7 @@
     font-size: 0.85rem;
     line-height: 1;
   }
-  .help-close:hover { background: #ffffff14; }
+  .help-close:hover { background: var(--app-accent-soft); border-color: var(--app-accent); }
 
   .help-list {
     display: grid;
@@ -304,7 +312,7 @@
 
   .help-list dd {
     margin: 0;
-    color: #d8d8d8;
+    color: var(--app-text);
     line-height: 1.4;
   }
 
@@ -316,9 +324,9 @@
     font-weight: 600;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     text-align: center;
-    color: #f4f4f4;
-    background: #ffffff1a;
-    border: 1px solid #ffffff55;
+    color: var(--app-text-strong);
+    background: var(--app-surface-2);
+    border: var(--app-border-width) solid var(--app-border);
     border-bottom-width: 2px;
     border-radius: 0.3rem;
     box-shadow: 0 1px 0 #00000050;
@@ -341,8 +349,10 @@
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 0.35rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--app-accent);
     cursor: pointer;
     font-size: 1.35rem;
     line-height: 1;
@@ -367,9 +377,9 @@
     width: min(20rem, calc(100vw - 2rem));
     margin-top: 0.5rem;
     padding: 0.7rem;
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: 0.35rem;
-    background: var(--pico-card-background-color);
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface-2);
     box-shadow: 0 0.65rem 1.6rem #0005;
   }
 
@@ -377,6 +387,11 @@
     display: block;
     padding: 0.4rem 0;
     text-decoration: none;
+    color: var(--app-text);
+  }
+
+  .global-menu-panel > a:hover {
+    color: var(--app-accent);
   }
 
   @media (max-width: 980px) {

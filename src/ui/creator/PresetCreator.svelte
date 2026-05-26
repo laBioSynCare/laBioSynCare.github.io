@@ -539,6 +539,7 @@
         <summary title="Navigate">+</summary>
         <div class="nav-panel">
           <a href="/creator/">Patch Studio</a>
+          <a href="/settings/">Settings</a>
           <a href="/presets/">Presets</a>
           <a href="/sparql/">SPARQL</a>
           <a href="/">Graph</a>
@@ -1044,21 +1045,21 @@
 <style>
   /* ── Design tokens ─────────────────────────────────────────────────────────── */
   .studio {
-    --bg:     #0b0f14;
-    --sur:    #111820;
-    --sur2:   #161e28;
-    --bdr:    #1c2a38;
-    --txt:    #c0d0e0;
-    --mut:    #445866;
-    --acc:    #3b9eff;
-    --acc-s:  #0c2440;
-    --ok:     #27ae60;
-    --warn:   #e67e22;
-    --err:    #c0392b;
-    --cc:     #e67e22;   /* control colour */
-    --ac:     #3b9eff;   /* audio colour   */
-    --vc:     #8e44ad;   /* visual colour  */
-    --hc:     #16a085;   /* haptic colour  */
+    --bg:     var(--app-bg, #0b0f14);
+    --sur:    var(--app-surface, #111820);
+    --sur2:   var(--app-surface-2, #161e28);
+    --bdr:    var(--app-border, #1c2a38);
+    --txt:    var(--app-text, #c0d0e0);
+    --mut:    var(--app-muted-2, #445866);
+    --acc:    var(--app-accent, #3b9eff);
+    --acc-s:  var(--app-accent-soft, #0c2440);
+    --ok:     var(--app-ok, #27ae60);
+    --warn:   var(--app-warn, #e67e22);
+    --err:    var(--app-error, #c0392b);
+    --cc:     var(--app-control, #e67e22);   /* control colour */
+    --ac:     var(--app-audio, #3b9eff);     /* audio colour   */
+    --vc:     var(--app-visual, #8e44ad);    /* visual colour  */
+    --hc:     var(--app-haptic, #16a085);    /* haptic colour  */
 
     display: flex;
     flex-direction: column;
@@ -1066,7 +1067,7 @@
     overflow: hidden;
     background: var(--bg);
     color: var(--txt);
-    font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+    font-family: var(--app-font-mono, 'SF Mono', 'Fira Code', ui-monospace, monospace);
     font-size: 11px;
     line-height: 1;
   }
