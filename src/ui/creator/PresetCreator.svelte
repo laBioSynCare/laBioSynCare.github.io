@@ -564,13 +564,37 @@
     }
     return points.join(' ')
   }
+
+  // Compute sum of absolute enabled mod amounts (used for range band width).
+  function paramModDepth(param) {
+    return param.mods.reduce(
+      (s, m) => m.enabled !== false ? s + Math.abs(Number(m.amount) || 0) : s,
+      0
+    )
+  }
+
+  // Compute live modulated value for the parameter knob dot.
+  // Reads controlStates (reactive), so it re-runs every frame automatically.
+  function paramLiveValue(param, pmin, pmax) {
+    if (!param.mods.some(m => m.enabled !== false)) return null
+    let sum = 0
+    for (const m of param.mods) {
+      if (m.enabled === false) continue
+      sum += (Number(m.amount) || 0) * (controlStates[m.controlId]?.value ?? 0)
+    }
+    return Math.max(pmin, Math.min(pmax, param.value + sum))
+  }
 </script>
 
 <div class="studio" class:playing={draft.playing}>
 
-  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey)}
+  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId)}
     {@const isOpen = expandedMod === rowKey}
     {@const [mmin, mmax, mstep] = modAmountRange(pmin, pmax, pstep)}
+    {@const pLiveVal = paramLiveValue(param, pmin, pmax)}
+    {@const pDepth = paramModDepth(param)}
+    {@const pRangeLow = pDepth > 0 ? Math.max(pmin, param.value - pDepth) : null}
+    {@const pRangeHigh = pDepth > 0 ? Math.min(pmax, param.value + pDepth) : null}
     <div class="param-row" class:mod-open={isOpen} class:has-mod={param.mods.length > 0}>
       <div class="param-main">
         <Knob
@@ -583,6 +607,9 @@
           modAvailable={true}
           modActive={param.mods.length > 0 || isOpen}
           onmod={() => toggleModKey(rowKey)}
+          liveValue={pLiveVal}
+          rangeLow={pRangeLow}
+          rangeHigh={pRangeHigh}
         />
       </div>
 
@@ -590,7 +617,13 @@
         <div class="param-mods" aria-label={`${pname} modulation controls`}>
           {#each draft.controlTracks as ctrl (ctrl.id)}
             {@const mod = modForControl(param, ctrl.id)}
-            <div class="mod-control-cell" class:linked={!!mod}>
+            {@const ctrlVal = controlStates[ctrl.id]?.value ?? 0}
+            {@const ctrlAmp = controlStates[ctrl.id]?.amp ?? 1}
+            {@const modAmt = Number(mod?.amount) || 0}
+            {@const ctrlLiveVal = mod && mod.enabled !== false ? Math.max(mmin, Math.min(mmax, modAmt * ctrlVal)) : null}
+            {@const ctrlBandLow = mod ? Math.max(mmin, -Math.abs(modAmt) * ctrlAmp) : null}
+            {@const ctrlBandHigh = mod ? Math.min(mmax, Math.abs(modAmt) * ctrlAmp) : null}
+            <div class="mod-control-cell" class:linked={!!mod} class:mod-disabled={mod && mod.enabled === false}>
               <Knob
                 value={num(mod?.amount, 0)}
                 onchange={(v) => setModAmount(param, ctrl.id, v)}
@@ -598,8 +631,19 @@
                 max={mmax}
                 step={mstep}
                 label={ctrl.name}
+                liveValue={ctrlLiveVal}
+                liveValueRef={0}
+                rangeLow={ctrlBandLow}
+                rangeHigh={ctrlBandHigh}
               />
               {#if mod}
+                <label class="mod-enable" title={mod.enabled === false ? 'Enable modulation' : 'Disable modulation'}>
+                  <input
+                    type="checkbox"
+                    checked={mod.enabled !== false}
+                    onchange={() => { mod.enabled = mod.enabled === false ? true : false }}
+                  />
+                </label>
                 <button
                   class="mod-clear"
                   type="button"
@@ -995,7 +1039,7 @@
                   {@const gParam = track.params.gain}
                   {@const [gmin, gmax, gstep] = AUDIO_PARAM_RANGE.gain}
                   {@const [fmin, fmax, fstep] = AUDIO_PARAM_RANGE.leftFreq}
-                  {@render paramRow(gParam, 'gain', gmin, gmax, gstep, modKey(track.id, 'gain'))}
+                  {@render paramRow(gParam, 'gain', gmin, gmax, gstep, modKey(track.id, 'gain'), track.id)}
                   <div class="param-row">
                     <div class="param-main">
                       <Knob value={(lParam.value + rParam.value) / 2}
@@ -1022,7 +1066,7 @@
                   {#each voiceParamNames(track.trackType) as pname}
                     {@const param = track.params[pname]}
                     {@const [pmin, pmax, pstep] = AUDIO_PARAM_RANGE[pname]}
-                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
                   {/each}
                 {/if}
               </div>
@@ -1066,7 +1110,7 @@
                 {#each VISUAL_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = VISUAL_PARAM_RANGE[pname]}
-                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
                 {/each}
               </div>
             </div>
@@ -1106,7 +1150,7 @@
                 {#each HAPTIC_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = HAPTIC_PARAM_RANGE[pname]}
-                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
                 {/each}
               </div>
             </div>
@@ -2201,6 +2245,29 @@
 
   .mod-control-cell.linked {
     background: color-mix(in srgb, var(--acc-s) 58%, transparent);
+  }
+
+  .mod-control-cell.mod-disabled {
+    opacity: 0.45;
+  }
+
+  .mod-enable {
+    position: absolute;
+    left: 50%;
+    top: 37px; /* knob-label (14px + 1px margin) + half of knob-svg-wrap (22px) */
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .mod-enable input[type='checkbox'] {
+    margin: 0;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--acc);
   }
 
   .mod-empty {

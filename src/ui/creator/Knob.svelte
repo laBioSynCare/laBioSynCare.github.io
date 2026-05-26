@@ -11,6 +11,10 @@
     modAvailable = false,
     onmod = () => {},
     onchange = (_v) => {},
+    liveValue = null,     // live/modulated value → shows dot on arc
+    liveValueRef = null,  // reference for up/down color; null → uses `value`
+    rangeLow = null,      // lower bound of modulation range band
+    rangeHigh = null,     // upper bound of modulation range band
   } = $props()
 
   const R = 18
@@ -32,6 +36,29 @@
   }
 
   const trackPath = $derived(arcPath(START_DEG, START_DEG + SWEEP_DEG))
+
+  function valueToDeg(v) {
+    const t = Math.max(0, Math.min(1, (v - min) / (max - min)))
+    return START_DEG + SWEEP_DEG * t
+  }
+
+  const bandPath = $derived(() => {
+    if (rangeLow == null || rangeHigh == null) return ''
+    const lo = Math.max(min, Math.min(max, rangeLow))
+    const hi = Math.max(min, Math.min(max, rangeHigh))
+    if (hi <= lo + 0.5) return ''
+    return arcPath(valueToDeg(lo), valueToDeg(hi))
+  })
+
+  const liveDotXY = $derived(() => {
+    if (liveValue == null) return null
+    const v = Math.max(min, Math.min(max, liveValue))
+    return polarToXY(valueToDeg(v))
+  })
+
+  const liveRef = $derived(liveValueRef ?? value)
+  const liveUp = $derived(liveValue != null && liveValue > liveRef + 1e-6)
+  const liveDown = $derived(liveValue != null && liveValue < liveRef - 1e-6)
 
   const fillPath = $derived(() => {
     const t = Math.max(0, Math.min(1, (value - min) / (max - min)))
@@ -130,11 +157,22 @@
     tabindex="0"
   >
     <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
+      {#if bandPath()}
+        <path d={bandPath()} fill="none" stroke="var(--knob-band, #3b9eff2a)" stroke-width="5.5" stroke-linecap="round" />
+      {/if}
       <path d={trackPath} fill="none" stroke="var(--knob-track, #263040)" stroke-width="3.5" stroke-linecap="round" />
       {#if fillPath()}
         <path d={fillPath()} fill="none" stroke="var(--acc, var(--app-accent, #3b9eff))" stroke-width="3.5" stroke-linecap="round" />
       {/if}
       <circle cx={CX} cy={CY} r="3.5" fill="var(--knob-center, #1e2a3a)" stroke="var(--knob-center-stroke, #3b9eff44)" stroke-width="1" />
+      {#if liveDotXY()}
+        <circle
+          cx={liveDotXY().x}
+          cy={liveDotXY().y}
+          r="2.8"
+          fill={liveUp ? 'var(--knob-live-up, #f5a623)' : liveDown ? 'var(--knob-live-dn, #e040fb)' : 'var(--knob-live-n, #8ea0b0)'}
+        />
+      {/if}
     </svg>
 
     {#if modAvailable}
