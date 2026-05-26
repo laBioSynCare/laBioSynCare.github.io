@@ -40,6 +40,7 @@
     --app-ok: #35c46d;
     --app-warn: #e8a23c;
     --app-error: #e0604d;
+    --app-header-height: 56px;
     --app-radius: 4px;
     --app-border-width: 1px;
     --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

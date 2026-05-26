@@ -170,7 +170,7 @@
 
 <style>
   .app-topbar {
-    height: 56px;
+    height: var(--app-header-height, 56px);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -397,7 +397,7 @@
   @media (max-width: 980px) {
     .app-topbar {
       height: auto;
-      min-height: 56px;
+      min-height: var(--app-header-height, 56px);
       align-items: flex-start;
     }
 

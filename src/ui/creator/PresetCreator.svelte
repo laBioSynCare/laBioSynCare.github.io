@@ -42,6 +42,7 @@
   let draft = $state(createDraft())
   let statusMsg = $state('')
   let expandedMod = $state(null) // "trackId:paramName"
+  let helpOpen = $state(false)
 
   let engine = null
   const voiceHandles = new Map()
@@ -59,6 +60,12 @@
   const issues = $derived(validateDraft(draft))
   const hasErrors = $derived(issues.some(i => i.level === 'error'))
   const jsonExport = $derived(JSON.stringify(buildPatchExport(draft), null, 2))
+
+  const STUDIO_HELP = [
+    ['Add', 'Use the column + buttons to add control, audio, visual, and haptic tracks.'],
+    ['Tune', 'Adjust each card directly; linked modulation appears under the M controls.'],
+    ['Export', 'Copy or save the patch JSON from the header.'],
+  ]
 
   // ── Controls ──────────────────────────────────────────────────────────────────
 
@@ -256,7 +263,41 @@
     rafId = requestAnimationFrame(rafTick)
   }
 
-  onMount(() => { rafId = requestAnimationFrame(rafTick) })
+  function isTypingTarget(node) {
+    if (!node) return false
+    if (node.isContentEditable) return true
+    return ['INPUT', 'TEXTAREA', 'SELECT'].includes(node.tagName)
+  }
+
+  function toggleHelp() {
+    helpOpen = !helpOpen
+  }
+
+  function closeHelp() {
+    helpOpen = false
+  }
+
+  function handleWindowKeydown(event) {
+    if (event.metaKey || event.ctrlKey || event.altKey) return
+
+    if (event.key === 'Escape' && helpOpen) {
+      event.preventDefault()
+      helpOpen = false
+      return
+    }
+
+    if (event.key === '?' || event.key === 'h' || event.key === 'H') {
+      if (isTypingTarget(document.activeElement)) return
+      event.preventDefault()
+      helpOpen = !helpOpen
+    }
+  }
+
+  onMount(() => {
+    rafId = requestAnimationFrame(rafTick)
+    window.addEventListener('keydown', handleWindowKeydown)
+    return () => window.removeEventListener('keydown', handleWindowKeydown)
+  })
 
   // Push Iso envelope shape to live voices whenever the user-set envelope
   // fields change. We read the envelope spec for every Iso track *before* the
@@ -535,6 +576,14 @@
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Save</button>
       <button class="act-btn" onclick={reset}>Reset</button>
+      <button
+        type="button"
+        class="hdr-icon"
+        aria-label="Show Patch Studio help"
+        aria-expanded={helpOpen}
+        title="Patch Studio help (?)"
+        onclick={toggleHelp}
+      >?</button>
       <details class="nav-menu">
         <summary title="Navigate">+</summary>
         <div class="nav-panel">
@@ -547,6 +596,29 @@
       </details>
     </div>
   </header>
+
+  {#if helpOpen}
+    <div
+      class="studio-help-overlay"
+      role="presentation"
+      onclick={(event) => { if (event.target === event.currentTarget) closeHelp() }}
+    >
+      <div class="studio-help-card" role="dialog" aria-label="Patch Studio help" aria-modal="true">
+        <header class="studio-help-head">
+          <h3>Patch Studio</h3>
+          <button type="button" class="studio-help-close" aria-label="Close help" onclick={closeHelp}>✕</button>
+        </header>
+        <dl>
+          {#each STUDIO_HELP as item}
+            <div>
+              <dt>{item[0]}</dt>
+              <dd>{item[1]}</dd>
+            </div>
+          {/each}
+        </dl>
+      </div>
+    </div>
+  {/if}
 
   {#if statusMsg}
     <div class="status-bar" aria-live="polite">{statusMsg}</div>
@@ -1079,10 +1151,10 @@
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
     gap: 12px;
-    height: 36px;
-    padding: 0 10px;
+    height: var(--app-header-height, 56px);
+    padding: 0 1rem;
     background: var(--sur);
-    border-bottom: 1px solid var(--bdr);
+    border-bottom: var(--app-border-width) solid var(--bdr);
     flex-shrink: 0;
   }
 
@@ -1102,7 +1174,7 @@
     font-size: 12px;
     font-weight: 700;
     font-family: inherit;
-    width: 120px;
+    width: 132px;
     padding: 0 2px 1px;
     flex-shrink: 0;
   }
@@ -1123,13 +1195,13 @@
   }
 
   .play-btn {
-    width: 24px;
-    height: 24px;
+    width: 2.25rem;
+    height: 2.25rem;
     border-radius: 50%;
     border: 1.5px solid var(--acc);
     background: transparent;
     color: var(--acc);
-    font-size: 10px;
+    font-size: 0.8rem;
     cursor: pointer;
     display: grid;
     place-items: center;
@@ -1144,10 +1216,10 @@
 
   .tempo-meter {
     position: relative;
-    width: 54px;
-    height: 20px;
-    border: 1px solid var(--bdr);
-    border-radius: 3px;
+    width: 64px;
+    height: 2.25rem;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
     background:
       radial-gradient(circle at 20% 50%, #3b9eff22, transparent 46%),
       linear-gradient(180deg, #09131d, #050a0f);
@@ -1197,13 +1269,13 @@
   .mini-field input {
     width: 42px;
     background: var(--bg);
-    border: 1px solid var(--bdr);
+    border: var(--app-border-width) solid var(--bdr);
     color: var(--txt);
-    border-radius: 3px;
+    border-radius: var(--app-radius);
     padding: 1px 4px;
     font-size: 9px;
     font-family: inherit;
-    height: 20px;
+    height: 1.8rem;
   }
 
   .hdr-actions {
@@ -1227,14 +1299,14 @@
 
   .act-btn {
     background: transparent;
-    border: 1px solid var(--bdr);
+    border: var(--app-border-width) solid var(--bdr);
     color: var(--mut);
-    border-radius: 3px;
+    border-radius: var(--app-radius);
     padding: 1px 6px;
     font-size: 9px;
     font-family: inherit;
     cursor: pointer;
-    height: 20px;
+    height: 1.8rem;
     white-space: nowrap;
     transition: color .1s, border-color .1s;
   }
@@ -1242,26 +1314,31 @@
   .act-btn:disabled { opacity: .3; cursor: default; }
 
   /* ── Nav menu ──────────────────────────────────────────────────────────────── */
+  .hdr-icon,
   .nav-menu { position: relative; margin: 0; }
+  .hdr-icon,
   .nav-menu summary {
     display: grid;
     place-items: center;
-    width: 22px;
-    height: 22px;
-    border: 1px solid var(--bdr);
-    border-radius: 3px;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
     background: transparent;
-    color: var(--mut);
-    font-size: 14px;
+    color: var(--acc);
+    font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
     list-style: none;
     transition: color .1s, border-color .1s;
+    padding: 0;
+    font-family: inherit;
   }
   .nav-menu summary::marker,
   .nav-menu summary::after { display: none; content: ''; }
   .nav-menu summary::-webkit-details-marker { display: none; }
-  .nav-menu summary:hover { color: var(--txt); border-color: var(--acc); }
+  .hdr-icon:hover,
+  .nav-menu summary:hover { color: var(--txt); border-color: var(--acc); background: var(--acc-s); }
   .nav-panel {
     position: absolute;
     right: 0;
@@ -1286,6 +1363,82 @@
     border-radius: 3px;
   }
   .nav-panel a:hover { background: var(--acc-s); color: var(--acc); }
+
+  .studio-help-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: #00000088;
+    backdrop-filter: blur(2px);
+  }
+
+  .studio-help-card {
+    width: min(28rem, 100%);
+    padding: 1rem 1.25rem 1.1rem;
+    background: var(--sur);
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: calc(var(--app-radius) + 2px);
+    box-shadow: 0 1.5rem 3rem #0008;
+  }
+
+  .studio-help-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .studio-help-head h3 {
+    margin: 0;
+    color: var(--txt);
+    font-size: 0.95rem;
+  }
+
+  .studio-help-close {
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 0;
+    padding: 0;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--txt);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+  .studio-help-close:hover { background: var(--acc-s); border-color: var(--acc); }
+
+  .studio-help-card dl {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+  }
+
+  .studio-help-card dl > div {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 0.65rem;
+    align-items: baseline;
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .studio-help-card dt {
+    color: var(--acc);
+    font-weight: 700;
+  }
+
+  .studio-help-card dd {
+    margin: 0;
+    color: var(--txt);
+  }
 
   /* ── Status bar ────────────────────────────────────────────────────────────── */
   .status-bar {
