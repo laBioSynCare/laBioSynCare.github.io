@@ -65,6 +65,9 @@
     ['Add', 'Use the column + buttons to add control, audio, visual, and haptic tracks.'],
     ['Tune', 'Adjust each card directly; linked modulation appears under the M controls.'],
     ['Export', 'Copy or save the patch JSON from the header.'],
+    ['Space', 'Start / stop playback.'],
+    ['R', 'Stop playback and restart the audio engine.'],
+    ['? / H', 'Toggle this help panel.'],
   ]
 
   // ── Controls ──────────────────────────────────────────────────────────────────
@@ -72,7 +75,6 @@
   function addControl(type) { draft.controlTracks.push(createControlTrack(type)) }
 
   function removeControl(id) {
-    draft.controlTracks = draft.controlTracks.filter(t => t.id !== id)
     for (const col of [draft.audioTracks, draft.visualTracks, draft.hapticTracks])
       for (const track of col)
         for (const p of Object.values(track.params))
@@ -221,7 +223,7 @@
   function clampRange(value, ranges, name) {
     const r = ranges?.[name]
     if (!r) return value
-    return Math.min(r[1], Math.max(r[0], value))
+    return clamp(value, r[0], r[1])
   }
 
   function applyMods(track, controlValues, ranges, writeAudio, paramNames) {
@@ -326,6 +328,30 @@
     rafId = requestAnimationFrame(rafTick)
   }
 
+  async function restartSystem() {
+    stopAllVoices()
+    draft.playing = false
+    sessionStartTime = null
+    liveValues = {}
+    if (engine) {
+      try { await engine.dispose() } catch (_) {}
+      engine = null
+      voiceHandles.clear()
+    }
+    try {
+      engine = new VanillaWebAudioEngine()
+      await engine.initialize()
+      await engine.resume()
+    } catch (e) {
+      tip(`Restart failed: ${e.message ?? e}`)
+      return
+    }
+    draft.playing = true
+    sessionStartTime = engine.getAudioContext().currentTime
+    for (const track of draft.audioTracks) startVoiceFor(track)
+    tip('Restarted.')
+  }
+
   function isTypingTarget(node) {
     if (!node) return false
     if (node.isContentEditable) return true
@@ -342,6 +368,7 @@
 
   function handleWindowKeydown(event) {
     if (event.metaKey || event.ctrlKey || event.altKey) return
+    if (isTypingTarget(document.activeElement)) return
 
     if (event.key === 'Escape' && helpOpen) {
       event.preventDefault()
@@ -349,8 +376,19 @@
       return
     }
 
+    if (event.key === ' ') {
+      event.preventDefault()
+      togglePlay()
+      return
+    }
+
+    if (event.key === 'r' || event.key === 'R') {
+      event.preventDefault()
+      restartSystem()
+      return
+    }
+
     if (event.key === '?' || event.key === 'h' || event.key === 'H') {
-      if (isTypingTarget(document.activeElement)) return
       event.preventDefault()
       helpOpen = !helpOpen
     }
@@ -797,7 +835,7 @@
           <article class="card">
             <div class="card-head">
               <input class="card-name" bind:value={track.name} />
-              <button class="x-btn" onclick={() => removeControl(track.id)}>✕</button>
+              <button class="x-btn" onclick={() => removeControl(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
               {#if track.type === 'Martigli'}
@@ -947,7 +985,7 @@
                 title={track.muted ? 'Unmute' : 'Mute'}
                 type="button"
               >mute</button>
-              <button class="x-btn" onclick={() => removeAudio(track.id)}>✕</button>
+              <button class="x-btn" onclick={() => removeAudio(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
               {#if track.trackType === 'BinauralBeat'}
@@ -1121,7 +1159,7 @@
           <article class="card">
             <div class="card-head">
               <input class="card-name" bind:value={track.name} />
-              <button class="x-btn" onclick={() => removeVisual(track.id)}>✕</button>
+              <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
               <div class="track-preview visual-preview" style={visualStyle(track)} aria-hidden="true">
@@ -1164,7 +1202,7 @@
           <article class="card">
             <div class="card-head">
               <input class="card-name" bind:value={track.name} />
-              <button class="x-btn" onclick={() => removeHaptic(track.id)}>✕</button>
+              <button class="x-btn" onclick={() => removeHaptic(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
               <div class="track-preview haptic-preview" style={hapticStyle(track)} aria-hidden="true">
@@ -1700,7 +1738,7 @@
     flex: 1;
     min-width: 0;
     padding: 0;
-    height: 100%;
+    line-height: 1;
   }
   .card-name:focus { outline: none; color: var(--acc); }
 
@@ -2363,10 +2401,15 @@
     border: none;
     color: var(--mut);
     cursor: pointer;
-    font-size: 9px;
-    padding: 0 3px;
+    font-size: 11px;
+    font-weight: 700;
+    width: 16px;
+    padding: 0;
     border-radius: 2px;
     flex-shrink: 0;
+    height: 16px;
+    display: grid;
+    place-items: center;
     line-height: 1;
     transition: color .1s;
   }
