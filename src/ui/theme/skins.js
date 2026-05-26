@@ -28,6 +28,22 @@ export const skins = [
     font: 'System UI',
     border: 'Medium',
   },
+  {
+    id: 'daylight',
+    name: 'Daylight Clinic',
+    description: 'Bright clinical surfaces with blue-green operational accents.',
+    swatches: ['#eef4f7', '#ffffff', '#0b72c9', '#16856f', '#c46a00'],
+    font: 'System UI',
+    border: 'Fine',
+  },
+  {
+    id: 'paper',
+    name: 'Paper Desk',
+    description: 'Soft off-white panels for long daytime reading and editing.',
+    swatches: ['#f7f3ea', '#fffdf8', '#3366a3', '#8a5a00', '#7c5cc4'],
+    font: 'System UI',
+    border: 'Fine',
+  },
 ]
 
 const skinIds = new Set(skins.map((skin) => skin.id))
