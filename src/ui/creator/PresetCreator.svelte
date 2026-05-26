@@ -101,16 +101,38 @@
 
   // ── Mod slots ─────────────────────────────────────────────────────────────────
 
-  function toggleMod(trackId, paramName) {
-    const k = `${trackId}:${paramName}`
-    expandedMod = expandedMod === k ? null : k
+  function modKey(trackId, paramName) {
+    return `${trackId}:${paramName}`
   }
 
-  function addMod(param, controlId) {
-    if (!param.mods.find(m => m.controlId === controlId))
-      param.mods.push(createMod(controlId))
-    expandedMod = null
-    tip('Mod linked.')
+  function toggleModKey(rowKey) {
+    expandedMod = expandedMod === rowKey ? null : rowKey
+  }
+
+  function modForControl(param, controlId) {
+    return param.mods.find(m => m.controlId === controlId)
+  }
+
+  function modAmountRange(paramMin, paramMax, paramStep) {
+    const span = Math.max(0.01, Math.abs(num(paramMax) - num(paramMin)))
+    const stepValue = Math.max(0.0001, Math.abs(num(paramStep, span / 100)))
+    return [-span, span, stepValue]
+  }
+
+  function setModAmount(param, controlId, amount) {
+    const next = Number(amount)
+    const mod = modForControl(param, controlId)
+    if (!Number.isFinite(next)) return
+    if (Math.abs(next) < 1e-9) {
+      if (mod) removeMod(param, mod.id)
+      return
+    }
+    if (mod) {
+      mod.amount = next
+    } else {
+      param.mods.push(createMod(controlId, next))
+      tip('Mod linked.')
+    }
   }
 
   function removeMod(param, modId) {
@@ -358,7 +380,6 @@
   }
 
   function tip(msg) { statusMsg = msg }
-  function ctrlName(id) { return draft.controlTracks.find(t => t.id === id)?.name ?? id }
 
   function num(value, fallback = 0) {
     const n = Number(value)
@@ -547,6 +568,55 @@
 
 <div class="studio" class:playing={draft.playing}>
 
+  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey)}
+    {@const isOpen = expandedMod === rowKey}
+    {@const [mmin, mmax, mstep] = modAmountRange(pmin, pmax, pstep)}
+    <div class="param-row" class:mod-open={isOpen} class:has-mod={param.mods.length > 0}>
+      <div class="param-main">
+        <Knob
+          value={param.value}
+          onchange={(v) => { param.value = v }}
+          min={pmin}
+          max={pmax}
+          step={pstep}
+          label={pname}
+          modAvailable={true}
+          modActive={param.mods.length > 0 || isOpen}
+          onmod={() => toggleModKey(rowKey)}
+        />
+      </div>
+
+      {#if isOpen}
+        <div class="param-mods" aria-label={`${pname} modulation controls`}>
+          {#each draft.controlTracks as ctrl (ctrl.id)}
+            {@const mod = modForControl(param, ctrl.id)}
+            <div class="mod-control-cell" class:linked={!!mod}>
+              <Knob
+                value={num(mod?.amount, 0)}
+                onchange={(v) => setModAmount(param, ctrl.id, v)}
+                min={mmin}
+                max={mmax}
+                step={mstep}
+                label={ctrl.name}
+              />
+              {#if mod}
+                <button
+                  class="mod-clear"
+                  type="button"
+                  title="Remove modulation"
+                  onclick={() => removeMod(param, mod.id)}
+                >×</button>
+              {/if}
+            </div>
+          {/each}
+          {#if !draft.controlTracks.length}
+            <span class="mod-empty">No control tracks</span>
+          {/if}
+        </div>
+      {/if}
+    </div>
+  {/snippet}
+
   <!-- ── HEADER ── -->
   <header class="hdr">
     <div class="hdr-name">
@@ -689,9 +759,11 @@
                 <div class="knob-grid">
                   {#each MARTIGLI_PARAMS as pname}
                     {@const [pmin, pmax, pstep] = MARTIGLI_PARAM_RANGE[pname]}
-                    <div class="knob-cell">
-                      <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
-                        min={pmin} max={pmax} step={pstep} label={pname} />
+                    <div class="param-row">
+                      <div class="param-main">
+                        <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
+                          min={pmin} max={pmax} step={pstep} label={pname} />
+                      </div>
                     </div>
                   {/each}
                 </div>
@@ -737,9 +809,11 @@
                 <div class="knob-grid">
                   {#each SYMMETRY_PARAMS as pname}
                     {@const [pmin, pmax, pstep] = SYMMETRY_PARAM_RANGE[pname]}
-                    <div class="knob-cell">
-                      <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
-                        min={pmin} max={pmax} step={pstep} label={pname} />
+                    <div class="param-row">
+                      <div class="param-main">
+                        <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
+                          min={pmin} max={pmax} step={pstep} label={pname} />
+                      </div>
                     </div>
                   {/each}
                 </div>
@@ -921,53 +995,34 @@
                   {@const gParam = track.params.gain}
                   {@const [gmin, gmax, gstep] = AUDIO_PARAM_RANGE.gain}
                   {@const [fmin, fmax, fstep] = AUDIO_PARAM_RANGE.leftFreq}
-                  <div class="knob-cell">
-                    <Knob value={gParam.value} onchange={(v) => { gParam.value = v }}
-                      min={gmin} max={gmax} step={gstep} label="gain"
-                      modActive={gParam.mods.length > 0} onmod={() => toggleMod(track.id, 'gain')} />
+                  {@render paramRow(gParam, 'gain', gmin, gmax, gstep, modKey(track.id, 'gain'))}
+                  <div class="param-row">
+                    <div class="param-main">
+                      <Knob value={(lParam.value + rParam.value) / 2}
+                        onchange={(v) => {
+                          const beat = rParam.value - lParam.value
+                          lParam.value = clamp(v - beat / 2, fmin, fmax)
+                          rParam.value = clamp(v + beat / 2, fmin, fmax)
+                        }}
+                        min={fmin} max={fmax} step={fstep} label="centerFreq" />
+                    </div>
                   </div>
-                  <div class="knob-cell">
-                    <Knob value={(lParam.value + rParam.value) / 2}
-                      onchange={(v) => {
-                        const beat = rParam.value - lParam.value
-                        lParam.value = clamp(v - beat / 2, fmin, fmax)
-                        rParam.value = clamp(v + beat / 2, fmin, fmax)
-                      }}
-                      min={fmin} max={fmax} step={fstep} label="centerFreq" />
-                  </div>
-                  <div class="knob-cell">
-                    <Knob value={rParam.value - lParam.value}
-                      onchange={(v) => {
-                        const c = (lParam.value + rParam.value) / 2
-                        lParam.value = clamp(c - v / 2, fmin, fmax)
-                        rParam.value = clamp(c + v / 2, fmin, fmax)
-                      }}
-                      min={-50} max={50} step={0.5} label="beatFreq" />
+                  <div class="param-row">
+                    <div class="param-main">
+                      <Knob value={rParam.value - lParam.value}
+                        onchange={(v) => {
+                          const c = (lParam.value + rParam.value) / 2
+                          lParam.value = clamp(c - v / 2, fmin, fmax)
+                          rParam.value = clamp(c + v / 2, fmin, fmax)
+                        }}
+                        min={-50} max={50} step={0.5} label="beatFreq" />
+                    </div>
                   </div>
                 {:else}
                   {#each voiceParamNames(track.trackType) as pname}
                     {@const param = track.params[pname]}
                     {@const [pmin, pmax, pstep] = AUDIO_PARAM_RANGE[pname]}
-                    <div class="knob-cell">
-                      <Knob value={param.value} onchange={(v) => { param.value = v }}
-                        min={pmin} max={pmax} step={pstep} label={pname}
-                        modActive={param.mods.length > 0} onmod={() => toggleMod(track.id, pname)} />
-                    </div>
-                    {#if expandedMod === `${track.id}:${pname}`}
-                      <div class="mod-picker">
-                        {#each draft.controlTracks as ctrl}
-                          <button class="mod-pick" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
-                        {/each}
-                        {#if !draft.controlTracks.length}<span class="mod-empty">No controls</span>{/if}
-                      </div>
-                    {/if}
-                    {#each param.mods as mod (mod.id)}
-                      <div class="mod-chip">
-                        <span>{ctrlName(mod.controlId)}</span>
-                        <input class="mod-amt" type="number" step="any" bind:value={mod.amount} />
-                        <button class="x-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
-                      </div>
-                    {/each}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
                   {/each}
                 {/if}
               </div>
@@ -1011,26 +1066,7 @@
                 {#each VISUAL_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = VISUAL_PARAM_RANGE[pname]}
-                  <div class="knob-cell">
-                    <Knob value={param.value} onchange={(v) => { param.value = v }}
-                      min={pmin} max={pmax} step={pstep} label={pname}
-                      modActive={param.mods.length > 0} onmod={() => toggleMod(track.id, pname)} />
-                  </div>
-                  {#if expandedMod === `${track.id}:${pname}`}
-                    <div class="mod-picker">
-                      {#each draft.controlTracks as ctrl}
-                        <button class="mod-pick" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
-                      {/each}
-                      {#if !draft.controlTracks.length}<span class="mod-empty">No controls</span>{/if}
-                    </div>
-                  {/if}
-                  {#each param.mods as mod (mod.id)}
-                    <div class="mod-chip">
-                      <span>{ctrlName(mod.controlId)}</span>
-                      <input class="mod-amt" type="number" step="any" bind:value={mod.amount} />
-                      <button class="x-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
-                    </div>
-                  {/each}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
                 {/each}
               </div>
             </div>
@@ -1070,26 +1106,7 @@
                 {#each HAPTIC_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = HAPTIC_PARAM_RANGE[pname]}
-                  <div class="knob-cell">
-                    <Knob value={param.value} onchange={(v) => { param.value = v }}
-                      min={pmin} max={pmax} step={pstep} label={pname}
-                      modActive={param.mods.length > 0} onmod={() => toggleMod(track.id, pname)} />
-                  </div>
-                  {#if expandedMod === `${track.id}:${pname}`}
-                    <div class="mod-picker">
-                      {#each draft.controlTracks as ctrl}
-                        <button class="mod-pick" onclick={() => addMod(param, ctrl.id)}>{ctrl.name}</button>
-                      {/each}
-                      {#if !draft.controlTracks.length}<span class="mod-empty">No controls</span>{/if}
-                    </div>
-                  {/if}
-                  {#each param.mods as mod (mod.id)}
-                    <div class="mod-chip">
-                      <span>{ctrlName(mod.controlId)}</span>
-                      <input class="mod-amt" type="number" step="any" bind:value={mod.amount} />
-                      <button class="x-btn tiny" onclick={() => removeMod(param, mod.id)}>✕</button>
-                    </div>
-                  {/each}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname))}
                 {/each}
               </div>
             </div>
@@ -1132,6 +1149,15 @@
     --ac:     var(--app-audio, #3b9eff);     /* audio colour   */
     --vc:     var(--app-visual, #8e44ad);    /* visual colour  */
     --hc:     var(--app-haptic, #16a085);    /* haptic colour  */
+    --hdr-control: 34px;
+    --knob-track: color-mix(in srgb, var(--txt) 28%, var(--sur2));
+    --knob-center: var(--sur2);
+    --knob-center-stroke: color-mix(in srgb, var(--acc) 32%, transparent);
+    --knob-mod-bg: color-mix(in srgb, var(--sur) 88%, var(--txt) 12%);
+    --knob-glow: color-mix(in srgb, var(--acc) 55%, transparent);
+    --knob-glow-strong: color-mix(in srgb, var(--acc) 72%, transparent);
+    --knob-value-hover-border: color-mix(in srgb, var(--acc) 56%, transparent);
+    --knob-value-hover-bg: color-mix(in srgb, var(--acc) 14%, transparent);
 
     display: flex;
     flex-direction: column;
@@ -1150,7 +1176,7 @@
     /* name pill | transport | actions */
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     height: var(--app-header-height, 56px);
     padding: 0 1rem;
     background: var(--sur);
@@ -1158,15 +1184,28 @@
     flex-shrink: 0;
   }
 
+  .hdr *,
+  .hdr *::before,
+  .hdr *::after {
+    box-sizing: border-box;
+  }
+
+  .hdr :is(input, button, summary) {
+    margin: 0;
+    min-height: 0;
+  }
+
   .hdr-name {
     display: flex;
     align-items: center;
     gap: 8px;
+    height: var(--hdr-control);
     min-width: 0;
     overflow: hidden;
   }
 
   .patch-name {
+    display: block;
     background: transparent;
     border: none;
     border-bottom: 1px solid var(--bdr);
@@ -1175,12 +1214,18 @@
     font-weight: 700;
     font-family: inherit;
     width: 132px;
-    padding: 0 2px 1px;
+    height: var(--hdr-control);
+    line-height: var(--hdr-control);
+    padding: 0 2px;
     flex-shrink: 0;
+    border-radius: 0;
   }
   .patch-name:focus { outline: none; border-bottom-color: var(--acc); }
 
   .pill {
+    display: inline-flex;
+    align-items: center;
+    height: var(--hdr-control);
     color: var(--mut);
     font-size: 9px;
     white-space: nowrap;
@@ -1191,12 +1236,13 @@
   .hdr-transport {
     display: flex;
     align-items: center;
+    height: var(--hdr-control);
     gap: 6px;
   }
 
   .play-btn {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: var(--hdr-control);
+    height: var(--hdr-control);
     border-radius: 50%;
     border: 1.5px solid var(--acc);
     background: transparent;
@@ -1217,7 +1263,7 @@
   .tempo-meter {
     position: relative;
     width: 64px;
-    height: 2.25rem;
+    height: var(--hdr-control);
     border: var(--app-border-width) solid var(--bdr);
     border-radius: var(--app-radius);
     background:
@@ -1260,33 +1306,41 @@
   }
 
   .mini-field {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
+    height: var(--hdr-control);
+    margin: 0;
     font-size: 9px;
+    line-height: 1;
     color: var(--mut);
   }
   .mini-field input {
-    width: 42px;
+    width: 46px;
+    height: var(--hdr-control);
     background: var(--bg);
     border: var(--app-border-width) solid var(--bdr);
     color: var(--txt);
     border-radius: var(--app-radius);
-    padding: 1px 4px;
+    padding: 0 6px;
     font-size: 9px;
     font-family: inherit;
-    height: 1.8rem;
+    line-height: 1;
   }
 
   .hdr-actions {
     display: flex;
     align-items: center;
+    height: var(--hdr-control);
     gap: 4px;
   }
 
   .badge {
+    display: inline-flex;
+    align-items: center;
     border-radius: 99px;
-    padding: 1px 5px;
+    height: 18px;
+    padding: 0 6px;
     font-size: 8px;
     font-weight: 700;
     text-transform: uppercase;
@@ -1298,15 +1352,19 @@
   .b-err  { background: #2a0805; color: var(--err); }
 
   .act-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: var(--app-border-width) solid var(--bdr);
     color: var(--mut);
     border-radius: var(--app-radius);
-    padding: 1px 6px;
+    padding: 0 8px;
     font-size: 9px;
     font-family: inherit;
     cursor: pointer;
-    height: 1.8rem;
+    height: var(--hdr-control);
+    line-height: 1;
     white-space: nowrap;
     transition: color .1s, border-color .1s;
   }
@@ -1316,12 +1374,17 @@
   /* ── Nav menu ──────────────────────────────────────────────────────────────── */
   .hdr-icon,
   .nav-menu { position: relative; margin: 0; }
+  .nav-menu {
+    display: inline-flex;
+    align-items: center;
+    height: var(--hdr-control);
+  }
   .hdr-icon,
   .nav-menu summary {
     display: grid;
     place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
+    width: var(--hdr-control);
+    height: var(--hdr-control);
     border: var(--app-border-width) solid var(--bdr);
     border-radius: var(--app-radius);
     background: transparent;
@@ -2077,70 +2140,97 @@
   /* ── Knob grid ─────────────────────────────────────────────────────────────── */
   .knob-grid {
     display: grid;
-    /* 4 equal columns so knobs never truncate their labels */
-    grid-template-columns: repeat(4, 1fr);
-    gap: 4px 2px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px 3px;
+    align-items: start;
   }
 
-  .knob-cell {
+  .param-row {
+    min-width: 0;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1px 0 2px;
+    border: 1px solid transparent;
+    border-radius: 4px;
   }
 
-  /* ── Mod picker ────────────────────────────────────────────────────────────── */
-  .mod-picker {
+  .param-row.has-mod:not(.mod-open) {
+    background: color-mix(in srgb, var(--acc-s) 38%, transparent);
+  }
+
+  .param-main {
+    flex: 0 0 58px;
     display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
-    padding: 3px;
-    background: var(--bg);
-    border: 1px solid var(--acc);
-    border-radius: 3px;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .param-row.mod-open {
     grid-column: 1 / -1;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 7px;
+    background: color-mix(in srgb, var(--acc-s) 74%, transparent);
+    border-color: var(--acc);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 24%, transparent);
+    overflow-x: auto;
+    scrollbar-width: thin;
   }
 
-  .mod-pick {
-    background: var(--acc-s);
-    border: 1px solid var(--acc);
-    color: var(--acc);
-    border-radius: 2px;
-    padding: 1px 4px;
+  .param-mods {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+    padding-left: 8px;
+    border-left: 1px solid color-mix(in srgb, var(--acc) 35%, var(--bdr));
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .mod-control-cell {
+    position: relative;
+    flex: 0 0 58px;
+    display: grid;
+    justify-items: center;
+    padding-bottom: 13px;
+    border-radius: 4px;
+  }
+
+  .mod-control-cell.linked {
+    background: color-mix(in srgb, var(--acc-s) 58%, transparent);
+  }
+
+  .mod-empty {
+    align-self: center;
+    color: var(--mut);
     font-size: 8px;
-    font-family: inherit;
-    cursor: pointer;
+    line-height: 1.4;
     white-space: nowrap;
   }
 
-  .mod-empty { font-size: 8px; color: var(--mut); }
-
-  /* ── Mod chip ──────────────────────────────────────────────────────────────── */
-  .mod-chip {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    background: var(--acc-s);
-    border: 1px solid var(--acc);
-    border-radius: 3px;
-    padding: 1px 4px;
-    font-size: 8px;
-    color: var(--acc);
-    grid-column: 1 / -1;
-    min-width: 0;
-  }
-  .mod-chip span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-
-  .mod-amt {
-    width: 28px;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--acc);
-    color: var(--acc);
-    font-size: 8px;
-    font-family: inherit;
+  .mod-clear {
+    position: absolute;
+    right: 3px;
+    bottom: 0;
+    width: 13px;
+    height: 13px;
     padding: 0;
-    text-align: right;
+    border: none;
+    background: transparent;
+    color: var(--mut);
+    font-size: 10px;
+    line-height: 1;
+    font-family: inherit;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+  }
+
+  .mod-clear:hover {
+    color: var(--err);
   }
 
   /* ── Mute button ───────────────────────────────────────────────────────────── */

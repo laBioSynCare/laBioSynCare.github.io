@@ -1,4 +1,6 @@
 <script>
+  import { tick } from 'svelte'
+
   const {
     value = 0,
     min = 0,
@@ -6,6 +8,7 @@
     step = 0.01,
     label = '',
     modActive = false,
+    modAvailable = false,
     onmod = () => {},
     onchange = (_v) => {},
   } = $props()
@@ -42,8 +45,12 @@
   )
 
   let dragging = $state(false)
+  let fineDrag = $state(false)
   let dragStartY = 0
   let dragStartVal = 0
+  let editing = $state(false)
+  let editText = $state('')
+  let editInput = $state(null)
 
   function emit(raw) {
     const snapped = Math.round(raw / step) * step
@@ -54,6 +61,7 @@
     if (event.button !== 0) return
     if (event.target.closest && event.target.closest('.mod-dot')) return
     dragging = true
+    fineDrag = event.shiftKey
     dragStartY = event.clientY
     dragStartVal = value
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -63,15 +71,48 @@
   function onPointerMove(event) {
     if (!dragging) return
     const dy = dragStartY - event.clientY
-    emit(dragStartVal + (dy / 150) * (max - min))
+    const dragPixels = fineDrag ? 1500 : 150
+    emit(dragStartVal + (dy / dragPixels) * (max - min))
   }
 
-  function onPointerUp() { dragging = false }
+  function onPointerUp() {
+    dragging = false
+    fineDrag = false
+  }
 
   function onDblClick() { emit((min + max) / 2) }
+
+  async function startEditing() {
+    editText = Number.isFinite(value) ? parseFloat(value.toPrecision(6)).toString() : ''
+    editing = true
+    await tick()
+    editInput?.focus()
+    editInput?.select()
+  }
+
+  function commitEdit() {
+    const parsed = Number(editText)
+    if (Number.isFinite(parsed)) emit(parsed)
+    editing = false
+  }
+
+  function cancelEdit() {
+    editing = false
+  }
+
+  function onEditKeydown(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      commitEdit()
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      cancelEdit()
+    }
+  }
 </script>
 
 <div class="knob-wrap">
+  <span class="knob-label">{label}</span>
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="knob-svg-wrap"
@@ -79,6 +120,7 @@
     onpointerdown={onPointerDown}
     onpointermove={onPointerMove}
     onpointerup={onPointerUp}
+    onpointercancel={onPointerUp}
     ondblclick={onDblClick}
     role="slider"
     aria-valuemin={min}
@@ -88,25 +130,43 @@
     tabindex="0"
   >
     <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
-      <path d={trackPath} fill="none" stroke="#263040" stroke-width="3.5" stroke-linecap="round" />
+      <path d={trackPath} fill="none" stroke="var(--knob-track, #263040)" stroke-width="3.5" stroke-linecap="round" />
       {#if fillPath()}
-        <path d={fillPath()} fill="none" stroke="#3b9eff" stroke-width="3.5" stroke-linecap="round" />
+        <path d={fillPath()} fill="none" stroke="var(--acc, var(--app-accent, #3b9eff))" stroke-width="3.5" stroke-linecap="round" />
       {/if}
-      <circle cx={CX} cy={CY} r="3.5" fill="#1e2a3a" stroke="#3b9eff44" stroke-width="1" />
+      <circle cx={CX} cy={CY} r="3.5" fill="var(--knob-center, #1e2a3a)" stroke="var(--knob-center-stroke, #3b9eff44)" stroke-width="1" />
     </svg>
 
-    <button
-      class="mod-dot"
-      class:mod-dot-active={modActive}
-      onclick={(e) => { e.stopPropagation(); onmod() }}
-      title="Modulation"
-      tabindex="-1"
-      type="button"
-    >M</button>
+    {#if modAvailable}
+      <button
+        class="mod-dot"
+        class:mod-dot-active={modActive}
+        onclick={(e) => { e.stopPropagation(); onmod() }}
+        title="Modulation"
+        tabindex="-1"
+        type="button"
+      >M</button>
+    {/if}
   </div>
 
-  <span class="knob-val">{display}</span>
-  <span class="knob-label">{label}</span>
+  {#if editing}
+    <input
+      class="knob-val knob-val-input"
+      bind:this={editInput}
+      bind:value={editText}
+      inputmode="decimal"
+      aria-label={`${label} value`}
+      onblur={commitEdit}
+      onkeydown={onEditKeydown}
+    />
+  {:else}
+    <button
+      type="button"
+      class="knob-val knob-val-button"
+      title="Click to type a value. Shift-drag the knob for fine adjustment."
+      onclick={startEditing}
+    >{display}</button>
+  {/if}
 </div>
 
 <style>
@@ -115,6 +175,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0;
+    width: 56px;
     user-select: none;
   }
 
@@ -127,20 +188,21 @@
     transition: filter 0.12s;
   }
 
-  .knob-svg-wrap:focus { outline: none; filter: drop-shadow(0 0 4px #3b9eff88); }
-  .knob-svg-wrap.dragging { filter: drop-shadow(0 0 5px #3b9effaa); }
+  .knob-svg-wrap:focus { outline: none; filter: drop-shadow(0 0 4px var(--knob-glow, #3b9eff88)); }
+  .knob-svg-wrap.dragging { filter: drop-shadow(0 0 5px var(--knob-glow-strong, #3b9effaa)); }
 
   .mod-dot {
     position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 13px;
-    height: 13px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
-    border: 1px solid #263040;
-    background: #161c26;
-    color: #5a7080;
-    font-size: 0.48rem;
+    border: 1px solid var(--knob-track, #263040);
+    background: var(--knob-mod-bg, #161c26e8);
+    color: var(--mut, var(--app-muted-2, #8ea0b0));
+    font-size: 0.52rem;
     font-weight: 700;
     font-family: inherit;
     line-height: 1;
@@ -151,27 +213,60 @@
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }
 
-  .mod-dot:hover { border-color: #3b9eff; color: #3b9eff; }
-  .mod-dot-active { border-color: #3b9eff; background: #1a3a5c; color: #3b9eff; }
-
-  .knob-val {
-    font-size: 0.6rem;
-    color: #c8d4e0;
-    line-height: 1.2;
-    margin-top: 2px;
-    font-variant-numeric: tabular-nums;
+  .mod-dot:hover {
+    border-color: var(--acc, var(--app-accent, #3b9eff));
+    color: var(--acc, var(--app-accent, #3b9eff));
+  }
+  .mod-dot-active {
+    border-color: var(--acc, var(--app-accent, #3b9eff));
+    background: var(--acc-s, var(--app-accent-soft, #1a3a5c));
+    color: var(--acc, var(--app-accent, #3b9eff));
   }
 
   .knob-label {
+    height: 14px;
+    margin-bottom: 1px;
     font-size: 0.55rem;
-    color: #5a7080;
+    color: var(--mut, var(--app-muted-2, #5a7080));
     text-transform: lowercase;
     letter-spacing: 0.03em;
-    line-height: 1.2;
+    line-height: 14px;
     text-align: center;
-    max-width: 52px;
+    max-width: 56px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .knob-val {
+    box-sizing: border-box;
+    width: 52px;
+    height: 17px;
+    margin: 2px 0 0;
+    padding: 0 2px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+    font-size: 0.6rem;
+    color: var(--txt, var(--app-text, #c8d4e0));
+    line-height: 15px;
+    font-variant-numeric: tabular-nums;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .knob-val-button {
+    cursor: text;
+  }
+
+  .knob-val-button:hover {
+    border-color: var(--knob-value-hover-border, #3b9eff66);
+    background: var(--knob-value-hover-bg, #3b9eff14);
+  }
+
+  .knob-val-input {
+    border-color: var(--acc, var(--app-accent, #3b9eff));
+    background: var(--bg, var(--app-bg, #07111d));
+    outline: none;
   }
 </style>
