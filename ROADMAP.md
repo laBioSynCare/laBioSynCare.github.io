@@ -119,7 +119,7 @@ build in subsequent phases.
 - [x] `docs/ecosystem/IP_STRATEGY.md` — defensive publication over patents, trademark plan
 - [x] `docs/ecosystem/ADVISORY_BOARD.md` — named members and roles
 - [x] `docs/ecosystem/PARTNERS.md` — named partners with interest letters
-- [x] `docs/ecosystem/W3C_CG_CHARTER.md` — draft charter, ready to submit
+- [x] `CHARTER.md` (root) — draft W3C CG charter, ready to submit
 - [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` — outreach template
 - [x] `static/ontology/README.md` — OWL/SKOS design decisions
 - [x] `static/ontology/sstim-core.ttl` — OWL skeleton
@@ -267,7 +267,7 @@ concrete rather than abstract.
 
 ### Community
 
-- [ ] W3C Community Group "Sensory Stimulation Community Group" proposal
+- [ ] W3C Community Group "Sensory Stimulation Vocabulary Community Group" proposal
       submitted with ≥ 5 named founding members
 - [ ] BSC Lab GitHub Discussions enabled: initial threads on frequency
       band taxonomy, evidence tier definitions, Sensory Stimulation definition

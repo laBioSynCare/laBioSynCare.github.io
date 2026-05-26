@@ -86,7 +86,7 @@ software is built. Written in the order specified in `ROADMAP.md`.
 - [x] `README.md` — root landing page; rewritten in public foundation pass `P0`
 - [x] `CONTRIBUTING.md` `P0`
 - [x] `docs/ecosystem/IP_STRATEGY.md` `P0`
-- [x] `docs/ecosystem/W3C_CG_CHARTER.md` `P0`
+- [x] `CHARTER.md` (root) — W3C CG draft charter `P0`
 - [x] `docs/ecosystem/ADVISORY_BOARD.md` `P0`
 - [x] `docs/ecosystem/PARTNERS.md` `P0`
 - [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` `P0`
@@ -460,10 +460,10 @@ Do not start these until all Phase 0 documents are committed.
       *Do not submit CG proposal until 5 are confirmed. An empty or
       low-activity CG closes and damages credibility.*
 - [ ] Create W3C account if not already exists: `https://www.w3.org/accounts/request` `P1`
-- [ ] Submit W3C Community Group proposal using `docs/ecosystem/W3C_CG_CHARTER.md` `P1`
+- [ ] Submit W3C Community Group proposal using `CHARTER.md` and `docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md` `P1`
       *URL: https://www.w3.org/community/groups/proposed/*
-      *Name: "Sensory Stimulation Community Group" or "Rhythmic Sensory
-      Stimulation Community Group" — confirm with founding members*
+      *Name: "Sensory Stimulation Vocabulary Community Group" — confirm with
+      founding members before submission*
 - [ ] Announce CG on relevant mailing lists and forums after creation `P1`
 - [ ] First CG meeting: agree on scope, initial vocabulary items,
       contribution process `P2`
@@ -589,10 +589,9 @@ something that assumes an answer.
   that could stress the relationship. A named advisory role with no
   deliverables may be acceptable. Confirm directly.
 
-- [?] **W3C CG name**: "Sensory Stimulation Community Group" uses the
-  coined BSC term. "Rhythmic Sensory Stimulation Community Group"
-  is more neutral but narrower. Confirm with founding members before
-  submitting proposal.
+- [?] **W3C CG name**: current proposal uses "Sensory Stimulation Vocabulary
+  Community Group" to emphasize terminology and semantic interoperability.
+  Confirm with founding members before submitting proposal.
 
 - [?] **arXiv submission path**: Renato has a PhD in physics but may
   not have current institutional affiliation. arXiv cs.SD may require
