@@ -267,7 +267,7 @@ concrete rather than abstract.
 
 ### Community
 
-- [ ] W3C Community Group "Sensory Stimulation Community Group" proposal
+- [ ] W3C Community Group "Sensory Stimulation Vocabulary Community Group" proposal
       submitted with ≥ 5 named founding members
 - [ ] BSC Lab GitHub Discussions enabled: initial threads on frequency
       band taxonomy, evidence tier definitions, Sensory Stimulation definition

@@ -1,10 +1,10 @@
-# Invitation to the W3C Sensory Stimulation Community Group
+# Invitation to the W3C Sensory Stimulation Vocabulary Community Group
 
 > **Purpose:** This document is a template invitation letter and briefing
-> for prospective founding participants of the W3C Sensory Stimulation
-> Community Group. Adapt the greeting and any institution-specific details
-> before sending. Do not send to recipients before confirming the charter
-> status and the group's readiness with Renato Fabbri.
+> for prospective founding participants of the proposed W3C Sensory
+> Stimulation Vocabulary Community Group. Adapt the greeting and any
+> institution-specific details before sending. Do not send to recipients before
+> confirming the charter status and the group's readiness with Renato Fabbri.
 
 ---
 
@@ -12,28 +12,30 @@
 
 ### What we are building
 
-The W3C Sensory Stimulation Community Group (W3C SS CG) is a proposed open
+The Sensory Stimulation Vocabulary Community Group is a proposed open
 community group at the World Wide Web Consortium that will develop shared
-vocabulary standards for the description and exchange of sensory stimulation
-protocols — the parameter-specified delivery of structured sensory input for
-physiological, psychological, or cognitive benefit.
+terminology, semantic vocabularies, ontology modules, and implementation
+guidance for describing sensory stimulation sessions, stimuli, modalities,
+parameters, devices, safety metadata, evidence annotations, and related
+datasets on the Web.
 
 The group's core deliverable is the **SSTIM (Sensory Stimulation) Ontology
 and Vocabulary**, a SKOS/OWL formal vocabulary published at
 `https://w3id.org/sstim`. The vocabulary provides a shared language for
-describing techniques (binaural beats, paced breathing guidance, isochronous
-tones), evidence tiers, target frequency bands, modalities, and session data,
-enabling interoperability between research groups, clinical settings, and
-software implementations.
+describing techniques such as binaural beats, paced breathing guidance, and
+isochronous tones; evidence tiers; target frequency bands; modalities; safety
+metadata; and session data. The intent is to support clearer comparison and
+interoperability across research groups, software implementations, and
+hardware or device contexts.
 
 ### Why it matters
 
 The sensory stimulation domain currently lacks shared terminology. Researchers
 working on binaural beats, audiovisual entrainment, HRV biofeedback, and
 Rhythmic Auditory Stimulation use overlapping but incompatible vocabulary,
-making evidence synthesis and meta-analysis harder than it should be. A W3C
-vocabulary standard — lightweight, open, machine-readable, and linked to
-existing ontologies like BFO, OBI, and Wikidata — would be a meaningful
+making evidence synthesis and meta-analysis harder than it should be. A
+community-led vocabulary that is lightweight, open, machine-readable, and
+linked to existing ontologies like BFO, OBI, and Wikidata would be a meaningful
 contribution to the field's infrastructure.
 
 ### What founding participation involves
@@ -49,7 +51,7 @@ As a **founding participant** you would:
 
 There is no financial commitment. All contributions are made under the W3C
 Community Contributor License Agreement, which grants the community a royalty-free
-license to patent claims over the specifications — standard W3C open process.
+license to patent claims over Community Group deliverables.
 
 ---
 
@@ -57,28 +59,27 @@ license to patent claims over the specifications — standard W3C open process.
 
 ---
 
-Subject: Invitation to founding participation — W3C Sensory Stimulation Community Group
+Subject: Invitation to founding participation — W3C Sensory Stimulation Vocabulary Community Group
 
 Dear [Name],
 
 I am writing to invite you to participate as a founding member of the W3C
-Sensory Stimulation Community Group, a proposed open standards community at
+Sensory Stimulation Vocabulary Community Group, a proposed open community at
 the World Wide Web Consortium.
 
-The group's goal is to develop shared vocabulary for the description and
-exchange of designed sensory stimulation protocols — the parameter-specified
-delivery of structured auditory, visual, or haptic input for physiological
-or psychological benefit. This spans techniques from binaural beat stimulation
-and paced respiratory entrainment to isochronous auditory stimulation and
-ambient sensory anchoring.
+The group's goal is to develop shared terminology, semantic vocabularies,
+ontology modules, JSON-LD contexts, SHACL validation profiles, and
+implementation guidance for describing sensory stimulation sessions, stimuli,
+modalities, parameters, devices, safety metadata, evidence annotations, and
+related datasets on the Web.
 
 We are proposing a lightweight SKOS/OWL vocabulary published at
 `https://w3id.org/sstim`, aligned to BFO 2020 and the OBO Foundry
 ontologies your community already uses. The vocabulary currently covers
 frequency bands, evidence tiers, stimulation mechanisms, sensory modalities,
 and preset protocol structure. It is seeded from the BSC Lab open-source
-platform (https://github.com/bsc-lab/bsc-lab) and intended to be a community
-resource governed independently of any single product.
+platform (https://github.com/laBioSynCare/laBioSynCare.github.io) and intended
+to be a community resource governed independently of any single product.
 
 Given your work on [SPECIFIC RELEVANT WORK], I believe your perspective would
 be valuable in shaping the vocabulary scope and the evidence framework that
@@ -87,8 +88,7 @@ governs what claims the ontology can represent.
 Founding participation requires:
 - Consent to be named in the charter and vocabulary metadata
 - Roughly 1–2 hours per month for async review and optional video calls
-- Signing the W3C Community Contributor License Agreement (standard open
-  standards process; no patent restriction on your own work)
+- Signing the W3C Community Contributor License Agreement
 
 There is no financial commitment, no exclusive relationship with BSC Lab or
 BioSynCare, and no requirement to use BSC Lab's software.
@@ -102,7 +102,7 @@ With best regards,
 Renato Fabbri
 BSC Lab / BioSynCare
 renato@biosyncare.com
-ORCID: 0000-0001-8602-7064
+ORCID: 0000-0002-9699-629X
 
 ---
 

@@ -462,8 +462,8 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] Create W3C account if not already exists: `https://www.w3.org/accounts/request` `P1`
 - [ ] Submit W3C Community Group proposal using `CHARTER.md` and `docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md` `P1`
       *URL: https://www.w3.org/community/groups/proposed/*
-      *Name: "Sensory Stimulation Community Group" or "Rhythmic Sensory
-      Stimulation Community Group" — confirm with founding members*
+      *Name: "Sensory Stimulation Vocabulary Community Group" — confirm with
+      founding members before submission*
 - [ ] Announce CG on relevant mailing lists and forums after creation `P1`
 - [ ] First CG meeting: agree on scope, initial vocabulary items,
       contribution process `P2`
@@ -589,10 +589,9 @@ something that assumes an answer.
   that could stress the relationship. A named advisory role with no
   deliverables may be acceptable. Confirm directly.
 
-- [?] **W3C CG name**: "Sensory Stimulation Community Group" uses the
-  coined BSC term. "Rhythmic Sensory Stimulation Community Group"
-  is more neutral but narrower. Confirm with founding members before
-  submitting proposal.
+- [?] **W3C CG name**: current proposal uses "Sensory Stimulation Vocabulary
+  Community Group" to emphasize terminology and semantic interoperability.
+  Confirm with founding members before submitting proposal.
 
 - [?] **arXiv submission path**: Renato has a PhD in physics but may
   not have current institutional affiliation. arXiv cs.SD may require
