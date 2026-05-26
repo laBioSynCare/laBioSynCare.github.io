@@ -42,6 +42,9 @@ export const AUDIO_PARAM_RANGE = {
   pulseRate: [0.5,  50,    0.5],
   leftFreq:  [20,   2000,  1],
   rightFreq: [20,   2000,  1],
+  // Virtual params for BinauralBeat center-beat modulation
+  centerFreq: [20,  2000,  1],
+  beatFreq:   [-50, 50,    0.5],
 }
 
 // Canonical (audible & modulatable) params per voice type. BinauralBeat owns
@@ -155,6 +158,11 @@ function audioParams(trackType = 'IsochronicTone', defaults = {}) {
   const params = {}
   for (const key of voiceParamNames(trackType)) {
     params[key] = { value: merged[key], mods: [] }
+  }
+  // Virtual params for center-beat modulation (mods only; value is derived)
+  if (trackType === 'BinauralBeat') {
+    params.centerFreq = { value: (merged.leftFreq + merged.rightFreq) / 2, mods: [] }
+    params.beatFreq   = { value: merged.rightFreq - merged.leftFreq, mods: [] }
   }
   return params
 }

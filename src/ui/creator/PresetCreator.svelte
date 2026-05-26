@@ -278,6 +278,47 @@
           : null
         applyMods(track, controlValues, AUDIO_PARAM_RANGE, write, voiceParamNames(track.trackType))
       }
+
+      // BinauralBeat virtual params: apply centerFreq/beatFreq mods on top of
+      // the already-modulated leftFreq/rightFreq from the primary pass above.
+      for (const track of draft.audioTracks) {
+        if (track.trackType !== 'BinauralBeat') continue
+        const cMods = track.params.centerFreq?.mods ?? []
+        const bMods = track.params.beatFreq?.mods ?? []
+        if (!cMods.some(m => m.enabled !== false) && !bMods.some(m => m.enabled !== false)) continue
+
+        const baseLeft  = liveValues[track.id]?.leftFreq  ?? track.params.leftFreq.value
+        const baseRight = liveValues[track.id]?.rightFreq ?? track.params.rightFreq.value
+        let centerLive = (baseLeft + baseRight) / 2
+        let beatLive   = baseRight - baseLeft
+
+        for (const mod of cMods) {
+          if (mod.enabled === false) continue
+          const cv = controlValues.get(mod.controlId)
+          if (cv == null) continue
+          centerLive += (Number(mod.amount) || 0) * cv
+        }
+        for (const mod of bMods) {
+          if (mod.enabled === false) continue
+          const cv = controlValues.get(mod.controlId)
+          if (cv == null) continue
+          beatLive += (Number(mod.amount) || 0) * cv
+        }
+
+        const [fmin, fmax] = AUDIO_PARAM_RANGE.leftFreq
+        const liveLeft  = clamp(centerLive - beatLive / 2, fmin, fmax)
+        const liveRight = clamp(centerLive + beatLive / 2, fmin, fmax)
+        if (!liveValues[track.id]) liveValues[track.id] = {}
+        liveValues[track.id].leftFreq  = liveLeft
+        liveValues[track.id].rightFreq = liveRight
+
+        const handle = voiceHandles.get(track.id)
+        if (handle && engine) {
+          engine.setVoiceParameter(handle, 'leftFreq',  liveLeft,  tNow, 'step')
+          engine.setVoiceParameter(handle, 'rightFreq', liveRight, tNow, 'step')
+        }
+      }
+
       for (const track of draft.visualTracks) applyMods(track, controlValues, VISUAL_PARAM_RANGE, null, VISUAL_PARAMS)
       for (const track of draft.hapticTracks) applyMods(track, controlValues, HAPTIC_PARAM_RANGE, null, HAPTIC_PARAMS)
     }
@@ -588,7 +629,7 @@
 
 <div class="studio" class:playing={draft.playing}>
 
-  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId)}
+  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId, customOnchange)}
     {@const isOpen = expandedMod === rowKey}
     {@const [mmin, mmax, mstep] = modAmountRange(pmin, pmax, pstep)}
     {@const pLiveVal = paramLiveValue(param, pmin, pmax)}
@@ -599,7 +640,7 @@
       <div class="param-main">
         <Knob
           value={param.value}
-          onchange={(v) => { param.value = v }}
+          onchange={customOnchange ?? ((v) => { param.value = v })}
           min={pmin}
           max={pmax}
           step={pstep}
@@ -1040,28 +1081,14 @@
                   {@const [gmin, gmax, gstep] = AUDIO_PARAM_RANGE.gain}
                   {@const [fmin, fmax, fstep] = AUDIO_PARAM_RANGE.leftFreq}
                   {@render paramRow(gParam, 'gain', gmin, gmax, gstep, modKey(track.id, 'gain'), track.id)}
-                  <div class="param-row">
-                    <div class="param-main">
-                      <Knob value={(lParam.value + rParam.value) / 2}
-                        onchange={(v) => {
-                          const beat = rParam.value - lParam.value
-                          lParam.value = clamp(v - beat / 2, fmin, fmax)
-                          rParam.value = clamp(v + beat / 2, fmin, fmax)
-                        }}
-                        min={fmin} max={fmax} step={fstep} label="centerFreq" />
-                    </div>
-                  </div>
-                  <div class="param-row">
-                    <div class="param-main">
-                      <Knob value={rParam.value - lParam.value}
-                        onchange={(v) => {
-                          const c = (lParam.value + rParam.value) / 2
-                          lParam.value = clamp(c - v / 2, fmin, fmax)
-                          rParam.value = clamp(c + v / 2, fmin, fmax)
-                        }}
-                        min={-50} max={50} step={0.5} label="beatFreq" />
-                    </div>
-                  </div>
+                  {@const centerSynth = { value: (lParam.value + rParam.value) / 2, mods: track.params.centerFreq.mods }}
+                  {@const beatSynth   = { value: rParam.value - lParam.value,        mods: track.params.beatFreq.mods }}
+                  {@const [cfmin, cfmax, cfstep] = AUDIO_PARAM_RANGE.centerFreq}
+                  {@const [bfmin, bfmax, bfstep] = AUDIO_PARAM_RANGE.beatFreq}
+                  {@render paramRow(centerSynth, 'centerFreq', cfmin, cfmax, cfstep, modKey(track.id, 'centerFreq'), track.id,
+                    (v) => { const beat = rParam.value - lParam.value; lParam.value = clamp(v - beat / 2, fmin, fmax); rParam.value = clamp(v + beat / 2, fmin, fmax) })}
+                  {@render paramRow(beatSynth, 'beatFreq', bfmin, bfmax, bfstep, modKey(track.id, 'beatFreq'), track.id,
+                    (v) => { const c = (lParam.value + rParam.value) / 2; lParam.value = clamp(c - v / 2, fmin, fmax); rParam.value = clamp(c + v / 2, fmin, fmax) })}
                 {:else}
                   {#each voiceParamNames(track.trackType) as pname}
                     {@const param = track.params[pname]}
