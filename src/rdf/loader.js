@@ -96,6 +96,7 @@ export const ONTOLOGY_URLS = {
   vocab:      '/ontology/sstim-vocab.ttl',
   shapes:     '/ontology/sstim-shapes.ttl',
   alignments: '/ontology/sstim-alignments.ttl',
+  patchStudio:'/ontology/sstim-patch-studio.ttl',
 }
 
 export const ONTOLOGY_SOURCES = {
@@ -114,6 +115,10 @@ export const ONTOLOGY_SOURCES = {
   alignments: {
     url: ONTOLOGY_URLS.alignments,
     graph: 'https://w3id.org/sstim/graph/alignments',
+  },
+  patchStudio: {
+    url: ONTOLOGY_URLS.patchStudio,
+    graph: 'https://w3id.org/sstim/graph/patch-studio',
   },
 }
 

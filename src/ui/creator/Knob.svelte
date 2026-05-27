@@ -15,6 +15,8 @@
     liveValueRef = null,  // reference for up/down color; null → uses `value`
     rangeLow = null,      // lower bound of modulation range band
     rangeHigh = null,     // upper bound of modulation range band
+    onlabel = null,
+    labelTitle = '',
   } = $props()
 
   const R = 18
@@ -139,7 +141,11 @@
 </script>
 
 <div class="knob-wrap">
-  <span class="knob-label">{label}</span>
+  {#if onlabel}
+    <button type="button" class="knob-label knob-label-button" title={labelTitle || label} onclick={onlabel}>{label}</button>
+  {:else}
+    <span class="knob-label">{label}</span>
+  {/if}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="knob-svg-wrap"
@@ -274,6 +280,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+  }
+
+  .knob-label-button {
+    cursor: help;
+  }
+
+  .knob-label-button:hover {
+    color: var(--acc, var(--app-accent, #3b9eff));
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   .knob-val {

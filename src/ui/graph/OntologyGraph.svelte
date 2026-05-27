@@ -3,6 +3,7 @@
   import { buildGraphElements } from '../../rdf/graph.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
+  import { graphSession, saveGraphSession } from './graphSession.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
 
   const { store } = $props()
@@ -13,24 +14,24 @@
   let loading = $state(true)
   let graphStats = $state(null)
   let allElements = $state([])
-  let graphScope = $state('all')
-  let focusNodeQuery = $state('')
+  let graphScope = $state(graphSession.graphScope)
+  let focusNodeQuery = $state(graphSession.focusNodeQuery)
 
   // Layer visibility
-  let showSubClassOf  = $state(true)
-  let showObjProp     = $state(true)
-  let showDataProp    = $state(false)
-  let showNarrower    = $state(true)
-  let showRelated     = $state(true)
-  let showInstanceOf  = $state(true)
+  let showSubClassOf  = $state(graphSession.showSubClassOf)
+  let showObjProp     = $state(graphSession.showObjProp)
+  let showDataProp    = $state(graphSession.showDataProp)
+  let showNarrower    = $state(graphSession.showNarrower)
+  let showRelated     = $state(graphSession.showRelated)
+  let showInstanceOf  = $state(graphSession.showInstanceOf)
 
   // Detail panel
   let selected = $state(null)
   let neighbors = $state([])
   let iriCopied = $state(false)
   let iriCopyTimer = null
-  let neighborhoodFocus = $state(false)
-  let connectionFilters = $state(new Set())
+  let neighborhoodFocus = $state(graphSession.neighborhoodFocus)
+  let connectionFilters = $state(new Set(graphSession.connectionFilters))
 
   let visibleSet = new Set()
 
@@ -58,6 +59,8 @@
     owlClass: 'OWL class',
     skosConcept: 'SKOS concept',
     xsdType: 'XSD datatype',
+    objectProperty: 'Object property',
+    dataProperty: 'Datatype property',
   }
 
   const EDGE_KIND_LABELS = {
@@ -79,6 +82,8 @@
     narrower:    '#81c784',
     related:     '#f48fb1',
     instanceOf:  '#aaaaaa',
+    objectProperty: '#ce93d8',
+    dataProperty: '#ffcc80',
   }
 
   const SCHEME_COLORS = {
@@ -109,6 +114,8 @@
   function nodeColor(data) {
     if (data.kind === 'owlClass')    return COLORS.owlClass
     if (data.kind === 'xsdType')     return COLORS.xsdType
+    if (data.kind === 'objectProperty') return COLORS.objectProperty
+    if (data.kind === 'dataProperty') return COLORS.dataProperty
     if (data.kind === 'skosConcept') return SCHEME_COLORS[data.scheme] ?? COLORS.skosConcept
     return '#888'
   }
@@ -142,6 +149,14 @@
       {
         selector: 'node[kind="xsdType"]',
         style: { shape: 'diamond', 'font-size': 10, 'font-style': 'italic' }
+      },
+      {
+        selector: 'node[kind="objectProperty"]',
+        style: { shape: 'round-rectangle', 'font-size': 10, 'font-style': 'italic' }
+      },
+      {
+        selector: 'node[kind="dataProperty"]',
+        style: { shape: 'round-rectangle', 'font-size': 10, 'font-style': 'italic' }
       },
       {
         selector: 'node[kind="skosConcept"]',
@@ -195,7 +210,7 @@
   function graphScopeNodeVisible(data) {
     if (!data) return false
     if (graphScope === 'all') return true
-    if (graphScope === 'core') return data.kind === 'owlClass' || data.kind === 'xsdType'
+    if (graphScope === 'core') return ['owlClass', 'xsdType', 'objectProperty', 'dataProperty'].includes(data.kind)
     if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
     if (graphScope === 'frequency') {
       return data.scheme === 'https://w3id.org/sstim/vocab#FrequencyBandScheme' ||
@@ -355,9 +370,26 @@
   }
 
   function clearSelection() {
-    cy?.nodes().unselect()
+    cy?.elements().unselect()
     selected = null
     neighborhoodFocus = false
+  }
+
+  function persistGraphSession() {
+    saveGraphSession({
+      graphScope,
+      focusNodeQuery,
+      showSubClassOf,
+      showObjProp,
+      showDataProp,
+      showNarrower,
+      showRelated,
+      showInstanceOf,
+      selectedIri: selected?.iri ?? '',
+      neighborhoodFocus,
+      connectionFilters: [...connectionFilters],
+      camera: cy ? { pan: cy.pan(), zoom: cy.zoom() } : graphSession.camera,
+    })
   }
 
   function toggleNeighborhoodFocus() {
@@ -398,7 +430,7 @@
     if (!cy || !id) return
     const node = cy.getElementById(id)
     if (!node.length) return
-    cy.nodes().unselect()
+    cy.elements().unselect()
     node.select()
     selected = node.data()
     const zoom = neighborhoodFocus ? cy.zoom() : Math.max(cy.zoom(), 1)
@@ -722,6 +754,13 @@
       if (initialHash) {
         const id = resolveHashToNodeId(initialHash)
         if (id) selectNodeById(id)
+      } else if (graphSession.selectedIri) {
+        const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
+        if (id) selectNodeById(id)
+      }
+      if (!initialHash && graphSession.camera) {
+        cy.zoom(graphSession.camera.zoom)
+        cy.pan(graphSession.camera.pan)
       }
       setupReady = true
     } catch (e) {
@@ -733,6 +772,7 @@
   })
 
   onDestroy(() => {
+    persistGraphSession()
     window.removeEventListener('keydown', handleGraphKeydown)
     window.removeEventListener('hashchange', handleHashChange)
     clearTimeout(iriCopyTimer)
@@ -793,6 +833,8 @@
       <li><span class="swatch" style="background:{COLORS.owlClass}"></span> OWL class</li>
       <li><span class="swatch" style="background:{COLORS.skosConcept}"></span> SKOS concept</li>
       <li><span class="swatch" style="background:{COLORS.xsdType}"></span> XSD datatype</li>
+      <li><span class="swatch" style="background:{COLORS.objectProperty}"></span> Object property</li>
+      <li><span class="swatch" style="background:{COLORS.dataProperty}"></span> Datatype property</li>
     </ul>
 
     <strong style="margin-top:1rem;display:block">SKOS schemes</strong>
@@ -1020,7 +1062,7 @@
   .graph-shell {
     display: flex;
     gap: 0;
-    height: calc(100vh - var(--app-header-height, 56px));
+    height: calc(100vh - var(--app-header-height, 56px) - var(--app-bottom-dock-height, 48px));
     overflow: hidden;
     background: var(--app-bg);
     color: var(--app-text);

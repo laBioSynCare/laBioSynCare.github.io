@@ -95,12 +95,14 @@ export async function buildGraphElements(store) {
   const objPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
-    SELECT ?prop ?propLabel ?domain ?range WHERE {
+    PREFIX skos: <${SKOS}>
+    SELECT ?prop ?propLabel ?def ?domain ?range WHERE {
       GRAPH ?g {
         ?prop a owl:ObjectProperty .
         ?prop rdfs:domain ?domain .
         ?prop rdfs:range  ?range .
         OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }
       }
     }`)
 
@@ -109,11 +111,24 @@ export async function buildGraphElements(store) {
     const tgt = r.range.value
     if (!nodes.has(src) || !nodes.has(tgt)) continue
     const propId = r.prop.value
-    edges.push({ data: {
-      id: `obj_${localName(propId)}`,
-      source: src, target: tgt,
-      kind: 'objProp',
+    addNode(propId, {
+      kind: 'objectProperty',
       label: r.propLabel?.value ?? localName(propId),
+      definition: r.def?.value ?? '',
+      iri: propId,
+    })
+    edges.push({ data: {
+      id: `obj_${localName(propId)}_domain`,
+      source: src, target: propId,
+      kind: 'objProp',
+      label: 'domain',
+      propIri: propId,
+    }})
+    edges.push({ data: {
+      id: `obj_${localName(propId)}_range`,
+      source: propId, target: tgt,
+      kind: 'objProp',
+      label: 'range',
       propIri: propId,
     }})
   }
@@ -122,12 +137,14 @@ export async function buildGraphElements(store) {
   const dataPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
-    SELECT ?prop ?propLabel ?domain ?range WHERE {
+    PREFIX skos: <${SKOS}>
+    SELECT ?prop ?propLabel ?def ?domain ?range WHERE {
       GRAPH ?g {
         ?prop a owl:DatatypeProperty .
         ?prop rdfs:domain ?domain .
         ?prop rdfs:range  ?range .
         OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
+        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }
       }
     }`)
 
@@ -140,11 +157,24 @@ export async function buildGraphElements(store) {
       addNode(tgt, { kind: 'xsdType', label: xsdLabel(tgt), iri: tgt })
     }
     const propId = r.prop.value
-    edges.push({ data: {
-      id: `dat_${localName(propId)}`,
-      source: src, target: tgt,
-      kind: 'dataProp',
+    addNode(propId, {
+      kind: 'dataProperty',
       label: r.propLabel?.value ?? localName(propId),
+      definition: r.def?.value ?? '',
+      iri: propId,
+    })
+    edges.push({ data: {
+      id: `dat_${localName(propId)}_domain`,
+      source: src, target: propId,
+      kind: 'dataProp',
+      label: 'domain',
+      propIri: propId,
+    }})
+    edges.push({ data: {
+      id: `dat_${localName(propId)}_range`,
+      source: propId, target: tgt,
+      kind: 'dataProp',
+      label: 'range',
       propIri: propId,
     }})
   }

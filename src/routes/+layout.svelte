@@ -1,6 +1,7 @@
 <script>
   import '@picocss/pico/css/pico.min.css'
   import { onMount } from 'svelte'
+  import AppBottomDock from '../ui/navigation/AppBottomDock.svelte'
   import AppTopBar from '../ui/navigation/AppTopBar.svelte'
   import { initSkin } from '../ui/theme/skins.js'
 
@@ -13,9 +14,11 @@
 
 <AppTopBar />
 
-<div style="overflow:hidden">
+<div class="app-page-shell">
   {@render children()}
 </div>
+
+<AppBottomDock />
 
 <style>
   :global(:root) {
@@ -41,6 +44,7 @@
     --app-warn: #e8a23c;
     --app-error: #e0604d;
     --app-header-height: 56px;
+    --app-bottom-dock-height: 48px;
     --app-radius: 4px;
     --app-border-width: 1px;
     --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -162,6 +166,11 @@
   :global(body) {
     margin: 0;
     font-family: var(--app-font-ui);
+    padding-bottom: var(--app-bottom-dock-height);
+  }
+
+  .app-page-shell {
+    overflow: hidden;
   }
 
   :global(body.studio-page .app-topbar) { display: none; }

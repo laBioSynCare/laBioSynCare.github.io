@@ -1,3 +1,16 @@
+import {
+  TEMPO_DIVISIONS,
+  TEMPO_MAX_BEATS_PER_BAR,
+  TEMPO_MAX_BPM,
+  TEMPO_MIN_BEATS_PER_BAR,
+  TEMPO_MIN_BPM,
+  TEMPO_MODIFIERS,
+  clampBeatsPerBar,
+  clampBpm,
+  createTempoSyncConfig,
+  validateTempoSyncConfig,
+} from './tempo.js'
+
 // Control track types
 export const CONTROL_TYPES = ['Martigli', 'Symmetry']
 
@@ -32,7 +45,7 @@ export const SYMMETRY_FAMILIES = ['plain-hunt']
 export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier']
 
 // Audio parameters that can accept modulation
-export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate']
+export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac']
 
 // Knob ranges for audio params [min, max, step]
 export const AUDIO_PARAM_RANGE = {
@@ -40,6 +53,7 @@ export const AUDIO_PARAM_RANGE = {
   pan:       [-1,   1,     0.01],
   frequency: [20,   2000,  1],
   pulseRate: [0.5,  50,    0.5],
+  noteDurationFrac: [0.05, 1,    0.01],
   leftFreq:  [20,   2000,  1],
   rightFreq: [20,   2000,  1],
   // Virtual params for BinauralBeat center-beat modulation
@@ -53,7 +67,7 @@ export const AUDIO_PARAM_RANGE = {
 // a user pan stage defeats the binaural effect). No pulseRate on Carrier.
 export const VOICE_PARAMS = {
   Carrier:        ['gain', 'pan', 'frequency'],
-  IsochronicTone: ['gain', 'pan', 'frequency', 'pulseRate'],
+  IsochronicTone: ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac'],
   BinauralBeat:   ['gain', 'leftFreq', 'rightFreq'],
 }
 
@@ -95,13 +109,46 @@ export const VISUAL_PARAM_RANGE = {
 export const HAPTIC_TRACK_TYPES = ['Vibration']
 
 // Haptic parameters that can accept modulation
-export const HAPTIC_PARAMS = ['intensity', 'frequency', 'pattern']
+export const HAPTIC_PARAMS = ['intensity', 'frequency', 'pulseRate', 'pattern']
 
 // Knob ranges for haptic params [min, max, step]
 export const HAPTIC_PARAM_RANGE = {
   intensity:  [0,   1,    0.01],
   frequency:  [20,  500,  1],
+  pulseRate:  [0.25, 50,  0.25],
   pattern:    [0,   10,   1],
+}
+
+export { TEMPO_DIVISIONS, TEMPO_MODIFIERS, createTempoSyncConfig }
+
+export const TIMING_PARAM_RANGE = {
+  bpm: [TEMPO_MIN_BPM, TEMPO_MAX_BPM, 1],
+}
+
+export const TEMPO_SYNC_TARGETS = {
+  Martigli: { periodSec: 'duration', targetPeriodSec: 'duration' },
+  Symmetry: { rateHz: 'rate' },
+  IsochronicTone: { pulseRate: 'rate' },
+  BinauralBeat: { beatFreq: 'rate' },
+  Geometry: { rotationSpeed: 'signedRate' },
+  Particles: { rotationSpeed: 'signedRate' },
+  Gradient: { rotationSpeed: 'signedRate' },
+  Vibration: { pulseRate: 'rate' },
+}
+
+export function tempoSyncKindForTrackParam(track, paramName) {
+  return TEMPO_SYNC_TARGETS[track?.trackType ?? track?.type]?.[paramName] ?? null
+}
+
+function tempoSyncFor(trackType, paramName) {
+  return TEMPO_SYNC_TARGETS[trackType]?.[paramName]
+    ? createTempoSyncConfig()
+    : undefined
+}
+
+function attachTempoSync(param, trackType, paramName) {
+  const sync = tempoSyncFor(trackType, paramName)
+  return sync ? { ...param, tempoSync: sync } : param
 }
 
 let _nextId = 1
@@ -119,6 +166,10 @@ export function createMartigliTrack(overrides = {}) {
     targetPeriodSec: 20,
     inhaleRatio: 0.5,
     amplitude: 1.0,
+    tempoSync: {
+      periodSec: createTempoSyncConfig(),
+      targetPeriodSec: createTempoSyncConfig(),
+    },
     ...overrides,
   }
 }
@@ -132,6 +183,9 @@ export function createSymmetryTrack(overrides = {}) {
     rateHz: 2,
     amplitude: 1.0,
     family: 'plain-hunt',
+    tempoSync: {
+      rateHz: createTempoSyncConfig(),
+    },
     ...overrides,
   }
 }
@@ -153,16 +207,16 @@ export function createMod(controlId = '', amount = 1) {
 function audioParams(trackType = 'IsochronicTone', defaults = {}) {
   const base = trackType === 'BinauralBeat'
     ? { gain: 0.5, leftFreq: 200, rightFreq: 210 }
-    : { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10 }
+    : { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10, noteDurationFrac: 0.5 }
   const merged = { ...base, ...defaults }
   const params = {}
   for (const key of voiceParamNames(trackType)) {
-    params[key] = { value: merged[key], mods: [] }
+    params[key] = attachTempoSync({ value: merged[key], mods: [] }, trackType, key)
   }
   // Virtual params for center-beat modulation (mods only; value is derived)
   if (trackType === 'BinauralBeat') {
     params.centerFreq = { value: (merged.leftFreq + merged.rightFreq) / 2, mods: [] }
-    params.beatFreq   = { value: merged.rightFreq - merged.leftFreq, mods: [] }
+    params.beatFreq   = attachTempoSync({ value: merged.rightFreq - merged.leftFreq, mods: [] }, trackType, 'beatFreq')
   }
   return params
 }
@@ -174,11 +228,11 @@ export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
     name: trackType,
     muted: false,
     windowSec: 1.0,
-    params: audioParams(trackType),
+    params: audioParams(trackType, overrides),
   }
   if (trackType === 'IsochronicTone') {
     base.envelope = 'AR'
-    base.noteDurationFrac = 0.5
+    base.noteDurationFrac = overrides.noteDurationFrac ?? 0.5
     Object.assign(base, ISO_ENVELOPE_DEFAULTS.AR)
   }
   if (trackType === 'BinauralBeat') {
@@ -194,7 +248,7 @@ function visualParams(defaults = {}) {
   const merged = { ...base, ...defaults }
   const params = {}
   for (const key of VISUAL_PARAMS) {
-    params[key] = { value: merged[key], mods: [] }
+    params[key] = attachTempoSync({ value: merged[key], mods: [] }, 'Geometry', key)
   }
   return params
 }
@@ -212,11 +266,11 @@ export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
 // ── Haptic tracks ─────────────────────────────────────────────────────────────
 
 function hapticParams(defaults = {}) {
-  const base = { intensity: 0.5, frequency: 100, pattern: 0 }
+  const base = { intensity: 0.5, frequency: 100, pulseRate: 4, pattern: 0 }
   const merged = { ...base, ...defaults }
   const params = {}
   for (const key of HAPTIC_PARAMS) {
-    params[key] = { value: merged[key], mods: [] }
+    params[key] = attachTempoSync({ value: merged[key], mods: [] }, 'Vibration', key)
   }
   return params
 }
@@ -243,8 +297,7 @@ export function createDraft() {
 
   return {
     patchName: 'New Patch',
-    bpm: 60,
-    lengthSec: 900,
+    timing: createTiming(),
     playing: false,
     controlTracks: [ctrl],
     audioTracks: [audio],
@@ -253,10 +306,20 @@ export function createDraft() {
   }
 }
 
+export function createTiming(overrides = {}) {
+  return {
+    lengthSec: 900,
+    bpmEnabled: false,
+    beatsPerBar: 4,
+    bpm: { value: 60, mods: [] },
+    ...overrides,
+  }
+}
+
 // ── Counts / summary ──────────────────────────────────────────────────────────
 
 export function patchSummary(draft) {
-  let modLinks = 0
+  let modLinks = draft.timing?.bpmEnabled ? (draft.timing?.bpm?.mods?.length ?? 0) : 0
   for (const tracks of [draft.audioTracks, draft.visualTracks, draft.hapticTracks]) {
     for (const track of tracks) {
       for (const p of Object.values(track.params)) {
@@ -276,10 +339,21 @@ export function patchSummary(draft) {
 // ── Export ────────────────────────────────────────────────────────────────────
 
 export function buildPatchExport(draft) {
+  const timing = draft.timing ?? createTiming({
+    lengthSec: draft.lengthSec ?? 900,
+    bpm: { value: draft.bpm ?? 60, mods: [] },
+  })
+  const bpmEnabled = !!timing.bpmEnabled
   return {
     model: 'patch-studio-model-1',
     patchName: draft.patchName,
-    timing: { bpm: draft.bpm, lengthSec: draft.lengthSec },
+    timing: {
+      bpmEnabled,
+      bpm: clampBpm(timing.bpm?.value ?? timing.bpm ?? 60),
+      bpmMods: bpmEnabled ? (timing.bpm?.mods ?? []) : [],
+      beatsPerBar: clampBeatsPerBar(timing.beatsPerBar ?? 4),
+      lengthSec: timing.lengthSec ?? 900,
+    },
     controlTracks: draft.controlTracks,
     audioTracks: draft.audioTracks,
     visualTracks: draft.visualTracks,
@@ -292,11 +366,28 @@ export function buildPatchExport(draft) {
 export function validateDraft(draft) {
   const issues = []
   const ctrlIds = new Set(draft.controlTracks.map(t => t.id))
+  const timing = draft.timing ?? createTiming({
+    lengthSec: draft.lengthSec ?? 900,
+    bpm: { value: draft.bpm ?? 60, mods: [] },
+  })
+  const bpmEnabled = !!timing.bpmEnabled
 
   if (!draft.patchName?.trim()) issues.push(err('Set a patch name.'))
-  if ((draft.bpm ?? 0) <= 0) issues.push(err('BPM must be > 0.'))
-  if ((draft.lengthSec ?? 0) <= 0) issues.push(err('Length must be > 0 sec.'))
+  if (bpmEnabled) {
+    const bpm = timing.bpm?.value ?? timing.bpm
+    if (Number(bpm) !== clampBpm(bpm)) issues.push(err(`BPM must be ${TEMPO_MIN_BPM}–${TEMPO_MAX_BPM}.`))
+    if (clampBeatsPerBar(timing.beatsPerBar) !== Number(timing.beatsPerBar)) {
+      issues.push(err(`Beats/bar must be an integer ${TEMPO_MIN_BEATS_PER_BAR}–${TEMPO_MAX_BEATS_PER_BAR}.`))
+    }
+  }
+  if ((timing.lengthSec ?? 0) <= 0) issues.push(err('Length must be > 0 sec.'))
   if (draft.controlTracks.length === 0) issues.push(warn('No control tracks — add a Martigli or Symmetry oscillator.'))
+
+  if (bpmEnabled) {
+    for (const mod of timing.bpm?.mods ?? []) {
+      if (!ctrlIds.has(mod.controlId)) issues.push(err('BPM: linked control no longer exists.'))
+    }
+  }
 
   for (const track of draft.controlTracks) {
     if (track.type === 'Martigli') {
@@ -306,6 +397,7 @@ export function validateDraft(draft) {
       if ((track.rateHz ?? 0) <= 0) issues.push(err(`${track.name}: rate must be > 0 Hz.`))
       if ((track.rateHz ?? 0) > 50) issues.push(err(`${track.name}: rate exceeds 50 Hz maximum.`))
     }
+    if (bpmEnabled) validateTempoSyncMap(issues, track, track.tempoSync ?? {})
   }
 
   const allSensory = [...draft.audioTracks, ...draft.visualTracks, ...draft.hapticTracks]
@@ -313,6 +405,7 @@ export function validateDraft(draft) {
 
   for (const track of allSensory) {
     for (const [paramName, param] of Object.entries(track.params)) {
+      if (bpmEnabled) validateParamTempoSync(issues, track, paramName, param)
       for (const mod of param.mods) {
         if (!ctrlIds.has(mod.controlId)) {
           issues.push(err(`${track.name}.${paramName}: linked control no longer exists.`))
@@ -322,6 +415,30 @@ export function validateDraft(draft) {
   }
 
   return issues
+}
+
+function validateTempoSyncMap(issues, track, syncMap) {
+  for (const [paramName, config] of Object.entries(syncMap)) {
+    const kind = tempoSyncKindForTrackParam(track, paramName)
+    if (!kind && config?.enabled) {
+      issues.push(err(`${track.name}.${paramName}: tempo sync is not supported.`))
+      continue
+    }
+    const issue = validateTempoSyncConfig(config)
+    if (issue) issues.push(err(`${track.name}.${paramName}: ${issue}.`))
+  }
+}
+
+function validateParamTempoSync(issues, track, paramName, param) {
+  const config = param?.tempoSync
+  if (!config) return
+  const kind = tempoSyncKindForTrackParam(track, paramName)
+  if (!kind && config.enabled) {
+    issues.push(err(`${track.name}.${paramName}: tempo sync is not supported.`))
+    return
+  }
+  const issue = validateTempoSyncConfig(config)
+  if (issue) issues.push(err(`${track.name}.${paramName}: ${issue}.`))
 }
 
 function err(message) { return { level: 'error', message } }

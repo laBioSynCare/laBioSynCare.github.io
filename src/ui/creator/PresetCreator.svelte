@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte'
   import Knob from './Knob.svelte'
   import { VanillaWebAudioEngine, envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
+  import { creatorSession } from './creatorSession.js'
   import {
     computeMartigliState,
     computeMartigliStateFree,
@@ -24,9 +25,12 @@
     MARTIGLI_WAVEFORMS,
     SYMMETRY_PARAM_RANGE,
     SYMMETRY_PARAMS,
+    TEMPO_DIVISIONS,
+    TEMPO_MODIFIERS,
     VISUAL_PARAM_RANGE,
     VISUAL_PARAMS,
     VISUAL_TRACK_TYPES,
+    TIMING_PARAM_RANGE,
     buildPatchExport,
     createAudioTrack,
     createControlTrack,
@@ -35,25 +39,43 @@
     createMod,
     createVisualTrack,
     patchSummary,
+    tempoSyncKindForTrackParam,
     validateDraft,
     voiceParamNames,
   } from './presetDraft.js'
+  import {
+    localSemanticName,
+    semanticForParameter,
+    semanticForTrackType,
+    semanticGraphHref,
+  } from './semantic.js'
+  import {
+    clampBeatsPerBar,
+    clampBpm,
+    evaluateModulatedBpm,
+    formatTempoSyncReadout,
+    isTempoSyncEnabled,
+    tempoContextFromTiming,
+    tempoValueFromSync,
+  } from './tempo.js'
 
-  let draft = $state(createDraft())
-  let statusMsg = $state('')
-  let expandedMod = $state(null) // "trackId:paramName"
+  let draft = $state(creatorSession.draft)
+  let statusMsg = $state(creatorSession.statusMsg)
+  let expandedMod = $state(creatorSession.expandedMod) // "trackId:paramName"
   let helpOpen = $state(false)
+  let semanticInfo = $state(null)
 
-  let engine = null
-  const voiceHandles = new Map()
+  let engine = creatorSession.engine
+  const voiceHandles = creatorSession.voiceHandles
 
   // Modulated parameter values per track, updated each animation frame while playing.
   // Previews read these via getLive(); base track.params[name].value stays the knob source.
-  let liveValues = $state({})
+  let liveValues = $state(creatorSession.liveValues)
+  let liveTempo = $state(creatorSession.liveTempo)
   // Live per-control widget state ({ phase, value, currentPeriod, progress, ... }).
   // Updated every frame whether or not playing, so the control previews stay alive.
-  let controlStates = $state({})
-  let sessionStartTime = null
+  let controlStates = $state(creatorSession.controlStates)
+  let sessionStartTime = creatorSession.sessionStartTime
   let rafId = null
 
   const summary = $derived(patchSummary(draft))
@@ -70,11 +92,42 @@
     ['? / H', 'Toggle this help panel.'],
   ]
 
+  const [BPM_MIN, BPM_MAX, BPM_STEP] = TIMING_PARAM_RANGE.bpm
+  const [BPM_MOD_MIN, BPM_MOD_MAX, BPM_MOD_STEP] = [-(BPM_MAX - BPM_MIN), BPM_MAX - BPM_MIN, BPM_STEP]
+
+  function syncCreatorSession() {
+    creatorSession.draft = draft
+    creatorSession.statusMsg = statusMsg
+    creatorSession.expandedMod = expandedMod
+    creatorSession.engine = engine
+    creatorSession.liveValues = liveValues
+    creatorSession.liveTempo = liveTempo
+    creatorSession.controlStates = controlStates
+    creatorSession.sessionStartTime = sessionStartTime
+  }
+
+  function showSemanticInfo(info) {
+    semanticInfo = info
+  }
+
+  function showTrackTypeInfo(track) {
+    showSemanticInfo(semanticForTrackType(track.trackType ?? track.type))
+  }
+
+  function showParamInfo(track, pname) {
+    showSemanticInfo(semanticForParameter(track, pname))
+  }
+
+  function closeSemanticInfo() {
+    semanticInfo = null
+  }
+
   // ── Controls ──────────────────────────────────────────────────────────────────
 
   function addControl(type) { draft.controlTracks.push(createControlTrack(type)) }
 
   function removeControl(id) {
+    if (draft.timing?.bpm?.mods) draft.timing.bpm.mods = draft.timing.bpm.mods.filter(m => m.controlId !== id)
     for (const col of [draft.audioTracks, draft.visualTracks, draft.hapticTracks])
       for (const track of col)
         for (const p of Object.values(track.params))
@@ -109,6 +162,7 @@
 
   function toggleModKey(rowKey) {
     expandedMod = expandedMod === rowKey ? null : rowKey
+    creatorSession.expandedMod = expandedMod
   }
 
   function modForControl(param, controlId) {
@@ -150,6 +204,7 @@
       draft.playing = false
       sessionStartTime = null
       liveValues = {}
+      syncCreatorSession()
       tip('Stopped.')
       return
     }
@@ -157,6 +212,7 @@
       if (!engine) {
         engine = new VanillaWebAudioEngine()
         await engine.initialize()
+        creatorSession.engine = engine
       }
       await engine.resume()
     } catch (e) {
@@ -165,25 +221,25 @@
     }
     draft.playing = true
     sessionStartTime = engine.getAudioContext().currentTime
+    syncCreatorSession()
     for (const track of draft.audioTracks) startVoiceFor(track)
     tip('Playing…')
   }
 
   function trackToVoiceSpec(track) {
-    const p = track.params
-    const gain = track.muted ? 0 : p.gain.value
+    const gain = track.muted ? 0 : num(getLive(track, 'gain'), track.params.gain?.value ?? 0.5)
     const spec = {
       type: track.trackType,
       volume: gain,
       params: { gain },
     }
     if (track.trackType === 'BinauralBeat') {
-      spec.params.leftFreq = p.leftFreq.value
-      spec.params.rightFreq = p.rightFreq.value
+      spec.params.leftFreq = num(getLive(track, 'leftFreq'), track.params.leftFreq.value)
+      spec.params.rightFreq = num(getLive(track, 'rightFreq'), track.params.rightFreq.value)
     } else {
-      spec.params.pan = p.pan?.value ?? 0
-      spec.params.frequency = p.frequency?.value ?? 200
-      spec.params.pulseRate = p.pulseRate?.value ?? 10
+      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
+      spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 200)
+      spec.params.pulseRate = num(getLive(track, 'pulseRate'), track.params.pulseRate?.value ?? 10)
     }
     if (track.trackType === 'IsochronicTone') spec.envelope = isoEnvSpec(track)
     return spec
@@ -220,19 +276,80 @@
     return liveValues[track.id]?.[paramName] ?? track.params[paramName]?.value
   }
 
+  function getTiming() {
+    return draft.timing ?? { lengthSec: draft.lengthSec ?? 900, bpmEnabled: false, beatsPerBar: 4, bpm: { value: draft.bpm ?? 60, mods: [] } }
+  }
+
+  function getLengthSec() {
+    return Math.max(0.001, num(getTiming().lengthSec, 900))
+  }
+
+  function bpmEnabled() {
+    return !!getTiming().bpmEnabled
+  }
+
+  function setBpmEnabled(enabled) {
+    if (!draft.timing) draft.timing = getTiming()
+    draft.timing.bpmEnabled = enabled
+    if (!enabled && expandedMod === 'timing:bpm') expandedMod = null
+    syncCreatorSession()
+  }
+
+  function tempoSyncActive(param) {
+    return bpmEnabled() && isTempoSyncEnabled(param?.tempoSync)
+  }
+
+  function effectiveTempoValue(param, fallbackValue, tempoKind, tempoContext) {
+    if (!bpmEnabled()) return fallbackValue
+    return tempoValueFromSync(param?.tempoSync, tempoKind, tempoContext, fallbackValue)
+  }
+
   function clampRange(value, ranges, name) {
     const r = ranges?.[name]
     if (!r) return value
     return clamp(value, r[0], r[1])
   }
 
-  function applyMods(track, controlValues, ranges, writeAudio, paramNames) {
+  function controlTrackForTempo(track, tempoContext) {
+    if (track.type === 'Martigli') {
+      return {
+        ...track,
+        periodSec: clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.periodSec }, num(track.periodSec, 10), 'duration', tempoContext),
+          MARTIGLI_PARAM_RANGE,
+          'periodSec'
+        ),
+        targetPeriodSec: clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.targetPeriodSec }, num(track.targetPeriodSec, 20), 'duration', tempoContext),
+          MARTIGLI_PARAM_RANGE,
+          'targetPeriodSec'
+        ),
+      }
+    }
+    if (track.type === 'Symmetry') {
+      return {
+        ...track,
+        rateHz: clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, num(track.rateHz, 2), 'rate', tempoContext),
+          SYMMETRY_PARAM_RANGE,
+          'rateHz'
+        ),
+      }
+    }
+    return track
+  }
+
+  function applyMods(track, controlValues, ranges, writeAudio, paramNames, tempoContext) {
     if (!liveValues[track.id]) liveValues[track.id] = {}
     const base = liveValues[track.id]
     for (const name of paramNames) {
       const param = track.params[name]
       if (!param) continue
-      let v = param.value
+      const prev = base[name]
+      const tempoKind = tempoSyncKindForTrackParam(track, name)
+      let v = tempoKind
+        ? effectiveTempoValue(param, param.value, tempoKind, tempoContext)
+        : param.value
       for (const mod of param.mods) {
         if (mod.enabled === false) continue
         const cv = controlValues.get(mod.controlId)
@@ -242,7 +359,7 @@
       v = clampRange(v, ranges, name)
       if (track.muted && name === 'gain') v = 0
       base[name] = v
-      if (writeAudio) writeAudio(name, v)
+      if (writeAudio && (prev == null || Math.abs(prev - v) > 1e-6)) writeAudio(name, v)
     }
   }
 
@@ -250,79 +367,126 @@
     const ctx = engine?.getAudioContext()
     const tNow = ctx ? ctx.currentTime : performance.now() / 1000
     const playing = draft.playing
-    const sessionLength = Math.max(0.001, num(draft.lengthSec, 900))
+    const timing = getTiming()
+    const sessionLength = getLengthSec()
     const sessionElapsed = (playing && sessionStartTime != null)
       ? Math.max(0, Math.min(sessionLength, tNow - sessionStartTime))
       : null
 
-    const controlValues = new Map()
-    for (const c of draft.controlTracks) {
-      let st
-      if (c.type === 'Martigli') {
-        st = (sessionElapsed != null)
-          ? computeMartigliState(c, sessionElapsed, sessionLength)
-          : computeMartigliStateFree(c, tNow)
-      } else if (c.type === 'Symmetry') {
-        const ts = sessionElapsed != null ? sessionElapsed : tNow
-        st = computeSymmetryState(c, ts)
-      } else {
-        st = { value: 0 }
+    function evaluateControls(tempoContext, writeStates = false) {
+      const values = new Map()
+      for (const c of draft.controlTracks) {
+        const effectiveTrack = controlTrackForTempo(c, tempoContext)
+        let st
+        if (c.type === 'Martigli') {
+          st = (sessionElapsed != null)
+            ? computeMartigliState(effectiveTrack, sessionElapsed, sessionLength)
+            : computeMartigliStateFree(effectiveTrack, tNow)
+        } else if (c.type === 'Symmetry') {
+          const ts = sessionElapsed != null ? sessionElapsed : tNow
+          st = computeSymmetryState(effectiveTrack, ts)
+        } else {
+          st = { value: 0 }
+        }
+        if (writeStates) controlStates[c.id] = st
+        values.set(c.id, st.value)
       }
-      controlStates[c.id] = st
-      controlValues.set(c.id, st.value)
+      return values
     }
 
-    if (playing) {
-      for (const track of draft.audioTracks) {
-        const handle = voiceHandles.get(track.id)
-        const write = handle && engine
-          ? (name, v) => engine.setVoiceParameter(handle, name, v, tNow, 'step')
-          : null
-        applyMods(track, controlValues, AUDIO_PARAM_RANGE, write, voiceParamNames(track.trackType))
+    const baseTempo = tempoContextFromTiming(timing)
+    let controlValues
+    if (bpmEnabled()) {
+      const baseControlValues = evaluateControls(baseTempo, false)
+      liveTempo = tempoContextFromTiming(timing, evaluateModulatedBpm(timing.bpm, baseControlValues))
+      controlValues = evaluateControls(liveTempo, true)
+    } else {
+      liveTempo = baseTempo
+      controlValues = evaluateControls(baseTempo, true)
+    }
+
+    for (const track of draft.audioTracks) {
+      const handle = voiceHandles.get(track.id)
+      const write = playing && handle && engine
+        ? (name, v) => {
+            if (name === 'noteDurationFrac' && track.trackType === 'IsochronicTone') {
+              engine.setVoiceEnvelope(handle, isoEnvSpec(track, v))
+              return
+            }
+            engine.setVoiceParameter(handle, name, v, tNow, 'step')
+          }
+        : null
+      applyMods(track, controlValues, AUDIO_PARAM_RANGE, write, voiceParamNames(track.trackType), liveTempo)
+    }
+
+    // BinauralBeat virtual params: apply centerFreq/beatFreq mods on top of
+    // the already-modulated leftFreq/rightFreq from the primary pass above.
+    for (const track of draft.audioTracks) {
+      if (track.trackType !== 'BinauralBeat') continue
+      const cMods = track.params.centerFreq?.mods ?? []
+      const bMods = track.params.beatFreq?.mods ?? []
+      const beatSync = tempoSyncActive(track.params.beatFreq)
+      if (!beatSync && !cMods.some(m => m.enabled !== false) && !bMods.some(m => m.enabled !== false)) continue
+
+      const baseLeft  = liveValues[track.id]?.leftFreq  ?? track.params.leftFreq.value
+      const baseRight = liveValues[track.id]?.rightFreq ?? track.params.rightFreq.value
+      let centerLive = (baseLeft + baseRight) / 2
+      let beatLive = effectiveTempoValue(track.params.beatFreq, baseRight - baseLeft, 'rate', liveTempo)
+
+      for (const mod of cMods) {
+        if (mod.enabled === false) continue
+        const cv = controlValues.get(mod.controlId)
+        if (cv == null) continue
+        centerLive += (Number(mod.amount) || 0) * cv
+      }
+      for (const mod of bMods) {
+        if (mod.enabled === false) continue
+        const cv = controlValues.get(mod.controlId)
+        if (cv == null) continue
+        beatLive += (Number(mod.amount) || 0) * cv
       }
 
-      // BinauralBeat virtual params: apply centerFreq/beatFreq mods on top of
-      // the already-modulated leftFreq/rightFreq from the primary pass above.
-      for (const track of draft.audioTracks) {
-        if (track.trackType !== 'BinauralBeat') continue
-        const cMods = track.params.centerFreq?.mods ?? []
-        const bMods = track.params.beatFreq?.mods ?? []
-        if (!cMods.some(m => m.enabled !== false) && !bMods.some(m => m.enabled !== false)) continue
+      const [fmin, fmax] = AUDIO_PARAM_RANGE.leftFreq
+      const liveLeft  = clamp(centerLive - beatLive / 2, fmin, fmax)
+      const liveRight = clamp(centerLive + beatLive / 2, fmin, fmax)
+      if (!liveValues[track.id]) liveValues[track.id] = {}
+      liveValues[track.id].leftFreq  = liveLeft
+      liveValues[track.id].rightFreq = liveRight
 
-        const baseLeft  = liveValues[track.id]?.leftFreq  ?? track.params.leftFreq.value
-        const baseRight = liveValues[track.id]?.rightFreq ?? track.params.rightFreq.value
-        let centerLive = (baseLeft + baseRight) / 2
-        let beatLive   = baseRight - baseLeft
-
-        for (const mod of cMods) {
-          if (mod.enabled === false) continue
-          const cv = controlValues.get(mod.controlId)
-          if (cv == null) continue
-          centerLive += (Number(mod.amount) || 0) * cv
-        }
-        for (const mod of bMods) {
-          if (mod.enabled === false) continue
-          const cv = controlValues.get(mod.controlId)
-          if (cv == null) continue
-          beatLive += (Number(mod.amount) || 0) * cv
-        }
-
-        const [fmin, fmax] = AUDIO_PARAM_RANGE.leftFreq
-        const liveLeft  = clamp(centerLive - beatLive / 2, fmin, fmax)
-        const liveRight = clamp(centerLive + beatLive / 2, fmin, fmax)
-        if (!liveValues[track.id]) liveValues[track.id] = {}
-        liveValues[track.id].leftFreq  = liveLeft
-        liveValues[track.id].rightFreq = liveRight
-
-        const handle = voiceHandles.get(track.id)
-        if (handle && engine) {
-          engine.setVoiceParameter(handle, 'leftFreq',  liveLeft,  tNow, 'step')
-          engine.setVoiceParameter(handle, 'rightFreq', liveRight, tNow, 'step')
-        }
+      const handle = voiceHandles.get(track.id)
+      if (playing && handle && engine) {
+        engine.setVoiceParameter(handle, 'leftFreq',  liveLeft,  tNow, 'step')
+        engine.setVoiceParameter(handle, 'rightFreq', liveRight, tNow, 'step')
       }
+    }
 
-      for (const track of draft.visualTracks) applyMods(track, controlValues, VISUAL_PARAM_RANGE, null, VISUAL_PARAMS)
-      for (const track of draft.hapticTracks) applyMods(track, controlValues, HAPTIC_PARAM_RANGE, null, HAPTIC_PARAMS)
+    for (const track of draft.visualTracks) applyMods(track, controlValues, VISUAL_PARAM_RANGE, null, VISUAL_PARAMS, liveTempo)
+    for (const track of draft.hapticTracks) applyMods(track, controlValues, HAPTIC_PARAM_RANGE, null, HAPTIC_PARAMS, liveTempo)
+
+    // Keep direct control-track previews aligned with tempo-synced values.
+    for (const track of draft.controlTracks) {
+      if (!liveValues[track.id]) liveValues[track.id] = {}
+      if (track.type === 'Martigli') {
+        for (const name of ['periodSec', 'targetPeriodSec']) {
+          liveValues[track.id][name] = clampRange(
+            effectiveTempoValue({ tempoSync: track.tempoSync?.[name] }, track[name], 'duration', liveTempo),
+            MARTIGLI_PARAM_RANGE,
+            name
+          )
+        }
+      } else if (track.type === 'Symmetry') {
+        liveValues[track.id].rateHz = clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, track.rateHz, 'rate', liveTempo),
+          SYMMETRY_PARAM_RANGE,
+          'rateHz'
+        )
+      }
+    }
+
+    if (!playing) {
+      for (const track of draft.audioTracks) {
+        if (track.muted && liveValues[track.id]) liveValues[track.id].gain = 0
+      }
     }
 
     rafId = requestAnimationFrame(rafTick)
@@ -333,21 +497,25 @@
     draft.playing = false
     sessionStartTime = null
     liveValues = {}
+    syncCreatorSession()
     if (engine) {
       try { await engine.dispose() } catch (_) {}
       engine = null
       voiceHandles.clear()
+      syncCreatorSession()
     }
     try {
       engine = new VanillaWebAudioEngine()
       await engine.initialize()
       await engine.resume()
+      creatorSession.engine = engine
     } catch (e) {
       tip(`Restart failed: ${e.message ?? e}`)
       return
     }
     draft.playing = true
     sessionStartTime = engine.getAudioContext().currentTime
+    syncCreatorSession()
     for (const track of draft.audioTracks) startVoiceFor(track)
     tip('Restarted.')
   }
@@ -376,6 +544,12 @@
       return
     }
 
+    if (event.key === 'Escape' && semanticInfo) {
+      event.preventDefault()
+      semanticInfo = null
+      return
+    }
+
     if (event.key === ' ') {
       event.preventDefault()
       togglePlay()
@@ -395,6 +569,7 @@
   }
 
   onMount(() => {
+    syncCreatorSession()
     rafId = requestAnimationFrame(rafTick)
     window.addEventListener('keydown', handleWindowKeydown)
     return () => window.removeEventListener('keydown', handleWindowKeydown)
@@ -423,11 +598,7 @@
   onDestroy(async () => {
     if (rafId != null) cancelAnimationFrame(rafId)
     rafId = null
-    if (engine) {
-      try { await engine.dispose() } catch (_) {}
-      engine = null
-      voiceHandles.clear()
-    }
+    syncCreatorSession()
   })
 
   function fmtSec(v) {
@@ -452,13 +623,26 @@
     catch { tip('Clipboard unavailable.') }
   }
 
-  function reset() { draft = createDraft(); expandedMod = null; tip('Reset.') }
+  function reset() {
+    stopAllVoices()
+    draft = createDraft()
+    expandedMod = null
+    liveValues = {}
+    controlStates = {}
+    sessionStartTime = null
+    liveTempo = tempoContextFromTiming(draft.timing)
+    syncCreatorSession()
+    tip('Reset.')
+  }
 
   function slug(v) {
     return `${v ?? 'patch'}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'patch'
   }
 
-  function tip(msg) { statusMsg = msg }
+  function tip(msg) {
+    statusMsg = msg
+    creatorSession.statusMsg = msg
+  }
 
   function num(value, fallback = 0) {
     const n = Number(value)
@@ -469,9 +653,55 @@
     return Math.min(max, Math.max(min, value))
   }
 
-  function tempoStyle(bpm) {
-    const beat = 60 / Math.max(1, num(bpm, 60))
-    return `--beat-duration:${clamp(beat, 0.12, 6).toFixed(3)}s;--bar-duration:${clamp(beat * 4, 0.48, 24).toFixed(3)}s;`
+  function tempoStyle(bpm, beatsPerBar) {
+    const beat = 60 / clampBpm(bpm)
+    const beats = clampBeatsPerBar(beatsPerBar)
+    return [
+      `--beat-duration:${clamp(beat, 0.12, 6).toFixed(3)}s`,
+      `--bar-duration:${clamp(beat * beats, 0.48, 48).toFixed(3)}s`,
+      `--tempo-beats:${beats}`,
+    ].join(';')
+  }
+
+  function tempoModeValue(sync) {
+    if (!sync?.enabled) return 'free'
+    return sync.mode === 'beats' ? 'beats' : 'division'
+  }
+
+  function setTempoMode(sync, mode) {
+    if (!sync) return
+    if (mode === 'free') {
+      sync.enabled = false
+      return
+    }
+    sync.enabled = true
+    sync.mode = mode === 'beats' ? 'beats' : 'division'
+  }
+
+  function tempoSyncReadout(param, tempoKind) {
+    return formatTempoSyncReadout(param?.tempoSync, tempoKind, liveTempo)
+  }
+
+  function controlParam(track, pname) {
+    return {
+      value: track[pname],
+      mods: [],
+      tempoSync: track.tempoSync?.[pname],
+    }
+  }
+
+  function liveControlValue(track, pname) {
+    return liveValues[track.id]?.[pname] ?? track[pname]
+  }
+
+  function bpmLiveValue() {
+    return liveTempo.bpm
+  }
+
+  function fmtHz(v) {
+    const n = Number(v)
+    if (!Number.isFinite(n)) return '—'
+    return n >= 10 ? `${n.toFixed(1)} Hz` : `${n.toFixed(2)} Hz`
   }
 
   // Above this many visible cycles, the wave is too dense for SVG to convey —
@@ -508,11 +738,12 @@
   // NOT clamp noteDurationFrac or override envelope type — the user's setting
   // is final. Reads track.params.pulseRate.value (knob base, not the modulated
   // live value) so the envelope shape stays stable under modulation.
-  function isoEnvSpec(track) {
+  function isoEnvSpec(track, noteDurationOverride = null) {
     const pulseRate = clamp(num(track.params?.pulseRate?.value, 10), 0.5, 50)
     const type = track.envelope ?? 'AR'
     const def = ISO_ENVELOPE_DEFAULTS[type] ?? ISO_ENVELOPE_DEFAULTS.AR
-    const noteDurationFrac = clamp(num(track.noteDurationFrac, 0.5), 0.01, 1)
+    const rawNoteDuration = noteDurationOverride ?? track.params?.noteDurationFrac?.value ?? track.noteDurationFrac
+    const noteDurationFrac = clamp(num(rawNoteDuration, 0.5), 0.01, 1)
     let attackFrac = num(track.attackFrac, def.attackFrac)
     let decayFrac = num(track.decayFrac, def.decayFrac)
     let releaseFrac = num(track.releaseFrac, def.releaseFrac)
@@ -620,8 +851,8 @@
 
   function hapticStyle(track) {
     const intensity = clamp(num(getLive(track, 'intensity'), 0.5), 0, 1)
-    const freq = clamp(num(getLive(track, 'frequency'), 100), 20, 500)
-    const pulse = clamp(14 / freq, 0.08, 0.7)
+    const pulseRate = clamp(num(getLive(track, 'pulseRate'), 4), 0.25, 50)
+    const pulse = clamp(1 / pulseRate, 0.05, 2)
     return [
       `--haptic-intensity:${intensity.toFixed(3)}`,
       `--haptic-alpha:${(0.25 + intensity * 0.65).toFixed(3)}`,
@@ -654,27 +885,50 @@
 
   // Compute live modulated value for the parameter knob dot.
   // Reads controlStates (reactive), so it re-runs every frame automatically.
-  function paramLiveValue(param, pmin, pmax) {
-    if (!param.mods.some(m => m.enabled !== false)) return null
-    let sum = 0
+  function paramLiveValue(param, pmin, pmax, tempoKind = null) {
+    const hasMods = param.mods.some(m => m.enabled !== false)
+    const hasTempo = tempoKind && tempoSyncActive(param)
+    if (!hasMods && !hasTempo) return null
+    let sum = tempoKind
+      ? effectiveTempoValue(param, param.value, tempoKind, liveTempo)
+      : param.value
     for (const m of param.mods) {
       if (m.enabled === false) continue
       sum += (Number(m.amount) || 0) * (controlStates[m.controlId]?.value ?? 0)
     }
-    return Math.max(pmin, Math.min(pmax, param.value + sum))
+    return Math.max(pmin, Math.min(pmax, sum))
+  }
+
+  function paramLabel(name) {
+    return name === 'noteDurationFrac' ? 'note%' : name
+  }
+
+  function audioSubtitleFor(track, aFreq, aPulse, leftF, rightF, centerF, beatF, isoEnv) {
+    if (track.trackType === 'BinauralBeat') {
+      return `L ${Math.round(leftF)} / R ${Math.round(rightF)} Hz · center ${Math.round(centerF)} · beat ${beatF >= 0 ? '+' : ''}${beatF.toFixed(1)} Hz`
+    }
+    if (track.trackType === 'IsochronicTone') {
+      return `${Math.round(aFreq)} Hz · pulse ${aPulse.toFixed(1)} Hz · ${isoEnv?.type ?? track.envelope ?? 'AR'}`
+    }
+    return `${Math.round(aFreq)} Hz`
   }
 </script>
 
 <div class="studio" class:playing={draft.playing}>
 
-  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId, customOnchange)}
+  {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId, customOnchange, tempoKind, allowMods = true)}
     {@const isOpen = expandedMod === rowKey}
+    {@const hasLinkedMods = allowMods && param.mods.length > 0}
+    {@const hasTempoSync = bpmEnabled() && !!tempoKind && !!param.tempoSync}
+    {@const isTempoActive = hasTempoSync && tempoSyncActive(param)}
+    {@const showMods = allowMods && (isOpen || hasLinkedMods)}
+    {@const showRow = showMods || hasTempoSync}
     {@const [mmin, mmax, mstep] = modAmountRange(pmin, pmax, pstep)}
-    {@const pLiveVal = paramLiveValue(param, pmin, pmax)}
+    {@const pLiveVal = paramLiveValue(param, pmin, pmax, tempoKind)}
     {@const pDepth = paramModDepth(param)}
     {@const pRangeLow = pDepth > 0 ? Math.max(pmin, param.value - pDepth) : null}
     {@const pRangeHigh = pDepth > 0 ? Math.min(pmax, param.value + pDepth) : null}
-    <div class="param-row" class:mod-open={isOpen} class:has-mod={param.mods.length > 0}>
+    <div class="param-row" class:mod-open={showRow} class:mod-editing={isOpen} class:has-mod={hasLinkedMods || isTempoActive} class:has-tempo={hasTempoSync}>
       <div class="param-main">
         <Knob
           value={param.value}
@@ -682,9 +936,11 @@
           min={pmin}
           max={pmax}
           step={pstep}
-          label={pname}
-          modAvailable={true}
-          modActive={param.mods.length > 0 || isOpen}
+          label={paramLabel(pname)}
+          onlabel={() => showParamInfo({ id: trackId }, pname)}
+          labelTitle={`${paramLabel(pname)} semantic info`}
+          modAvailable={allowMods}
+          modActive={allowMods && (param.mods.length > 0 || isOpen)}
           onmod={() => toggleModKey(rowKey)}
           liveValue={pLiveVal}
           rangeLow={pRangeLow}
@@ -692,47 +948,80 @@
         />
       </div>
 
-      {#if isOpen}
+      {#if hasTempoSync}
+        <div class="tempo-sync-control" class:tempo-sync-on={isTempoActive}>
+          <select
+            aria-label={`${pname} tempo sync mode`}
+            value={tempoModeValue(param.tempoSync)}
+            onchange={(event) => setTempoMode(param.tempoSync, event.currentTarget.value)}
+          >
+            <option value="free">free</option>
+            <option value="beats">beats</option>
+            <option value="division">division</option>
+          </select>
+          {#if param.tempoSync.enabled && param.tempoSync.mode === 'beats'}
+            <input
+              aria-label={`${pname} tempo sync beats`}
+              type="number"
+              min="0.01"
+              step="0.25"
+              bind:value={param.tempoSync.beats}
+            />
+          {:else if param.tempoSync.enabled}
+            <select aria-label={`${pname} tempo sync division`} bind:value={param.tempoSync.division}>
+              {#each TEMPO_DIVISIONS as division}<option value={division}>{division}</option>{/each}
+            </select>
+            <select aria-label={`${pname} tempo sync modifier`} bind:value={param.tempoSync.modifier}>
+              {#each TEMPO_MODIFIERS as modifier}<option value={modifier}>{modifier}</option>{/each}
+            </select>
+          {/if}
+          <span>{tempoSyncReadout(param, tempoKind)}</span>
+        </div>
+      {/if}
+
+      {#if showMods}
         <div class="param-mods" aria-label={`${pname} modulation controls`}>
           {#each draft.controlTracks as ctrl (ctrl.id)}
             {@const mod = modForControl(param, ctrl.id)}
-            {@const ctrlVal = controlStates[ctrl.id]?.value ?? 0}
-            {@const ctrlAmp = controlStates[ctrl.id]?.amp ?? 1}
-            {@const modAmt = Number(mod?.amount) || 0}
-            {@const ctrlLiveVal = mod && mod.enabled !== false ? Math.max(mmin, Math.min(mmax, modAmt * ctrlVal)) : null}
-            {@const ctrlBandLow = mod ? Math.max(mmin, -Math.abs(modAmt) * ctrlAmp) : null}
-            {@const ctrlBandHigh = mod ? Math.min(mmax, Math.abs(modAmt) * ctrlAmp) : null}
-            <div class="mod-control-cell" class:linked={!!mod} class:mod-disabled={mod && mod.enabled === false}>
-              <Knob
-                value={num(mod?.amount, 0)}
-                onchange={(v) => setModAmount(param, ctrl.id, v)}
-                min={mmin}
-                max={mmax}
-                step={mstep}
-                label={ctrl.name}
-                liveValue={ctrlLiveVal}
-                liveValueRef={0}
-                rangeLow={ctrlBandLow}
-                rangeHigh={ctrlBandHigh}
-              />
-              {#if mod}
-                <label class="mod-enable" title={mod.enabled === false ? 'Enable modulation' : 'Disable modulation'}>
-                  <input
-                    type="checkbox"
-                    checked={mod.enabled !== false}
-                    onchange={() => { mod.enabled = mod.enabled === false ? true : false }}
-                  />
-                </label>
-                <button
-                  class="mod-clear"
-                  type="button"
-                  title="Remove modulation"
-                  onclick={() => removeMod(param, mod.id)}
-                >×</button>
-              {/if}
-            </div>
+            {#if isOpen || mod}
+              {@const ctrlVal = controlStates[ctrl.id]?.value ?? 0}
+              {@const ctrlAmp = controlStates[ctrl.id]?.amp ?? 1}
+              {@const modAmt = Number(mod?.amount) || 0}
+              {@const ctrlLiveVal = mod && mod.enabled !== false ? Math.max(mmin, Math.min(mmax, modAmt * ctrlVal)) : null}
+              {@const ctrlBandLow = mod ? Math.max(mmin, -Math.abs(modAmt) * ctrlAmp) : null}
+              {@const ctrlBandHigh = mod ? Math.min(mmax, Math.abs(modAmt) * ctrlAmp) : null}
+              <div class="mod-control-cell" class:linked={!!mod} class:mod-disabled={mod && mod.enabled === false}>
+                <Knob
+                  value={num(mod?.amount, 0)}
+                  onchange={(v) => setModAmount(param, ctrl.id, v)}
+                  min={mmin}
+                  max={mmax}
+                  step={mstep}
+                  label={ctrl.name}
+                  liveValue={ctrlLiveVal}
+                  liveValueRef={0}
+                  rangeLow={ctrlBandLow}
+                  rangeHigh={ctrlBandHigh}
+                />
+                {#if mod}
+                  <label class="mod-enable" title={mod.enabled === false ? 'Enable modulation' : 'Disable modulation'}>
+                    <input
+                      type="checkbox"
+                      checked={mod.enabled !== false}
+                      onchange={() => { mod.enabled = mod.enabled === false ? true : false }}
+                    />
+                  </label>
+                  <button
+                    class="mod-clear"
+                    type="button"
+                    title="Remove modulation"
+                    onclick={() => removeMod(param, mod.id)}
+                  >×</button>
+                {/if}
+              </div>
+            {/if}
           {/each}
-          {#if !draft.controlTracks.length}
+          {#if isOpen && !draft.controlTracks.length}
             <span class="mod-empty">No control tracks</span>
           {/if}
         </div>
@@ -751,13 +1040,81 @@
       <button class="play-btn" onclick={togglePlay} title={draft.playing ? 'Stop' : 'Play'}>
         {draft.playing ? '■' : '▶'}
       </button>
-      <div class="tempo-meter" style={tempoStyle(draft.bpm)} aria-hidden="true">
-        <span class="tempo-sweep"></span>
-        <span class="tempo-dot"></span>
-        <span class="tempo-grid"></span>
-      </div>
-      <label class="mini-field">BPM<input type="number" min="1" step="1" bind:value={draft.bpm} /></label>
-      <label class="mini-field">sec<input type="number" min="1" step="1" bind:value={draft.lengthSec} /></label>
+      <label class="bpm-toggle" class:on={bpmEnabled()} title="Enable BPM clock">
+        <input
+          type="checkbox"
+          checked={bpmEnabled()}
+          onchange={(event) => setBpmEnabled(event.currentTarget.checked)}
+        />
+        <span>BPM</span>
+      </label>
+      {#if bpmEnabled()}
+        <div class="tempo-meter" style={tempoStyle(liveTempo.bpm, getTiming().beatsPerBar)} aria-hidden="true">
+          <span class="tempo-sweep"></span>
+          <span class="tempo-dot"></span>
+          <span class="tempo-grid"></span>
+        </div>
+        <div class="tempo-bpm-wrap" class:has-mod={(draft.timing?.bpm?.mods?.length ?? 0) > 0}>
+          <label class="mini-field">BPM<input type="number" min="1" max="500" step="1" bind:value={draft.timing.bpm.value} /></label>
+          <button
+            type="button"
+            class="mini-mod-btn"
+            class:on={expandedMod === 'timing:bpm' || (draft.timing?.bpm?.mods?.length ?? 0) > 0}
+            title="Modulate BPM"
+            onclick={() => toggleModKey('timing:bpm')}
+          >M</button>
+          <span class="tempo-live">{Math.round(bpmLiveValue())}</span>
+          {#if expandedMod === 'timing:bpm' || (draft.timing?.bpm?.mods?.length ?? 0) > 0}
+            <div class="tempo-bpm-mods" aria-label="BPM modulation controls">
+              {#each draft.controlTracks as ctrl (ctrl.id)}
+                {@const mod = modForControl(draft.timing.bpm, ctrl.id)}
+                {#if expandedMod === 'timing:bpm' || mod}
+                  {@const ctrlVal = controlStates[ctrl.id]?.value ?? 0}
+                  {@const ctrlAmp = controlStates[ctrl.id]?.amp ?? 1}
+                  {@const modAmt = Number(mod?.amount) || 0}
+                  {@const ctrlLiveVal = mod && mod.enabled !== false ? Math.max(BPM_MOD_MIN, Math.min(BPM_MOD_MAX, modAmt * ctrlVal)) : null}
+                  {@const ctrlBandLow = mod ? Math.max(BPM_MOD_MIN, -Math.abs(modAmt) * ctrlAmp) : null}
+                  {@const ctrlBandHigh = mod ? Math.min(BPM_MOD_MAX, Math.abs(modAmt) * ctrlAmp) : null}
+                  <div class="mod-control-cell" class:linked={!!mod} class:mod-disabled={mod && mod.enabled === false}>
+                    <Knob
+                      value={num(mod?.amount, 0)}
+                      onchange={(v) => setModAmount(draft.timing.bpm, ctrl.id, v)}
+                      min={BPM_MOD_MIN}
+                      max={BPM_MOD_MAX}
+                      step={BPM_MOD_STEP}
+                      label={ctrl.name}
+                      liveValue={ctrlLiveVal}
+                      liveValueRef={0}
+                      rangeLow={ctrlBandLow}
+                      rangeHigh={ctrlBandHigh}
+                    />
+                    {#if mod}
+                      <label class="mod-enable" title={mod.enabled === false ? 'Enable modulation' : 'Disable modulation'}>
+                        <input
+                          type="checkbox"
+                          checked={mod.enabled !== false}
+                          onchange={() => { mod.enabled = mod.enabled === false ? true : false }}
+                        />
+                      </label>
+                      <button
+                        class="mod-clear"
+                        type="button"
+                        title="Remove modulation"
+                        onclick={() => removeMod(draft.timing.bpm, mod.id)}
+                      >×</button>
+                    {/if}
+                  </div>
+                {/if}
+              {/each}
+              {#if expandedMod === 'timing:bpm' && !draft.controlTracks.length}
+                <span class="mod-empty">No control tracks</span>
+              {/if}
+            </div>
+          {/if}
+        </div>
+        <label class="mini-field">beats/bar<input type="number" min="1" max="16" step="1" bind:value={draft.timing.beatsPerBar} /></label>
+      {/if}
+      <label class="mini-field">sec<input type="number" min="1" step="1" bind:value={draft.timing.lengthSec} /></label>
     </div>
 
     <div class="hdr-actions">
@@ -834,7 +1191,10 @@
         {#each draft.controlTracks as track (track.id)}
           <article class="card">
             <div class="card-head">
-              <input class="card-name" bind:value={track.name} />
+              <div class="card-title-line">
+                <input class="card-name" bind:value={track.name} />
+                <button class="type-info-btn" type="button" title={`${track.type} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
+              </div>
               <button class="x-btn" onclick={() => removeControl(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
@@ -873,21 +1233,20 @@
                     <circle class="dur-marker" cx={markerX} cy="7" r="3.4" />
                   </svg>
                   <div class="dur-labels">
-                    <span class="dur-label-l">{fmtSec(track.periodSec)}</span>
+                    <span class="dur-label-l">{fmtSec(liveControlValue(track, 'periodSec'))}</span>
                     <span class="dur-label-c">{fmtSec(currentP)}</span>
-                    <span class="dur-label-r">{fmtSec(track.targetPeriodSec)}</span>
+                    <span class="dur-label-r">{fmtSec(liveControlValue(track, 'targetPeriodSec'))}</span>
                   </div>
                 </div>
 
                 <div class="knob-grid">
                   {#each MARTIGLI_PARAMS as pname}
                     {@const [pmin, pmax, pstep] = MARTIGLI_PARAM_RANGE[pname]}
-                    <div class="param-row">
-                      <div class="param-main">
-                        <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
-                          min={pmin} max={pmax} step={pstep} label={pname} />
-                      </div>
-                    </div>
+                    {@const param = controlParam(track, pname)}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id,
+                      (v) => { track[pname] = v },
+                      tempoSyncKindForTrackParam(track, pname),
+                      false)}
                   {/each}
                 </div>
                 <div class="card-meta">{Math.round(track.inhaleRatio * 100)}% inhale</div>
@@ -932,12 +1291,11 @@
                 <div class="knob-grid">
                   {#each SYMMETRY_PARAMS as pname}
                     {@const [pmin, pmax, pstep] = SYMMETRY_PARAM_RANGE[pname]}
-                    <div class="param-row">
-                      <div class="param-main">
-                        <Knob value={track[pname]} onchange={(v) => { track[pname] = v }}
-                          min={pmin} max={pmax} step={pstep} label={pname} />
-                      </div>
-                    </div>
+                    {@const param = controlParam(track, pname)}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id,
+                      (v) => { track[pname] = v },
+                      tempoSyncKindForTrackParam(track, pname),
+                      false)}
                   {/each}
                 </div>
                 <div class="card-meta">{track.family ?? 'plain-hunt'} · row {symRowIdx + 1}/{symTotalRows} · step {symStep + 1}/{symN}</div>
@@ -969,118 +1327,119 @@
           {@const aFreq = num(getLive(track, 'frequency'), 200)}
           {@const aPulse = Math.max(0.001, num(getLive(track, 'pulseRate'), 10))}
           {@const winSec = Math.max(0.005, num(track.windowSec, 1))}
-          {@const panX = (4 + 112 * (aPan + 1) / 2).toFixed(2)}
+          {@const panX = ((aPan + 1) * 50).toFixed(2)}
           {@const leftF = track.trackType === 'BinauralBeat' ? num(getLive(track, 'leftFreq'), 200) : aFreq - aPulse / 2}
           {@const rightF = track.trackType === 'BinauralBeat' ? num(getLive(track, 'rightFreq'), 210) : aFreq + aPulse / 2}
           {@const centerF = (leftF + rightF) / 2}
           {@const beatF = rightF - leftF}
           {@const isoEnv = track.trackType === 'IsochronicTone' ? isoEnvSpec(track) : null}
+          {@const audioSubtitle = audioSubtitleFor(track, aFreq, aPulse, leftF, rightF, centerF, beatF, isoEnv)}
           <article class="card" class:muted={track.muted}>
-            <div class="card-head">
-              <input class="card-name" bind:value={track.name} />
-              <button
-                class="mute-btn"
-                class:on={track.muted}
-                onclick={() => { track.muted = !track.muted }}
-                title={track.muted ? 'Unmute' : 'Mute'}
-                type="button"
-              >mute</button>
-              <button class="x-btn" onclick={() => removeAudio(track.id)} aria-label="Remove track" type="button">x</button>
+            <div class="card-head card-head-audio">
+              <div class="card-head-main">
+                <div class="card-title-line">
+                  <input class="card-name" bind:value={track.name} />
+                  <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
+                </div>
+                <div class="card-subtitle">{audioSubtitle}</div>
+              </div>
+              <div class="card-head-actions">
+                <button
+                  class="mute-btn"
+                  class:on={track.muted}
+                  onclick={() => { track.muted = !track.muted }}
+                  title={track.muted ? 'Unmute' : 'Mute'}
+                  type="button"
+                >mute</button>
+                <button class="x-btn" onclick={() => removeAudio(track.id)} aria-label="Remove track" type="button">x</button>
+              </div>
             </div>
             <div class="card-body">
-              {#if track.trackType === 'BinauralBeat'}
-                {@const lrWin = binauralRowWindow(beatF, winSec)}
-                {@const leftCyc = leftF * lrWin}
-                {@const rightCyc = rightF * lrWin}
-                {@const sumLeftCyc = leftF * winSec}
-                {@const sumRightCyc = rightF * winSec}
-                {@const beatCyc = Math.abs(beatF) * winSec}
-                <div class="audio-scope a-binauralbeat" aria-hidden="true">
-                  <div class="scope-row">
-                    <span class="scope-side scope-side-l">L</span>
-                    <svg viewBox="0 0 120 22" preserveAspectRatio="none">
-                      <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
-                      {#if leftCyc < SCOPE_BAND_THRESHOLD}
-                        <path class="scope-trace scope-trace-l" d={sineWavePath(4, 116, 11, 8 * aGain, leftCyc)} />
-                      {:else}
-                        <path class="scope-band scope-band-l" d={rectanglePath(4, 116, 11, 8 * aGain)} />
-                      {/if}
-                    </svg>
-                    <span class="row-win">{leftCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
-                  </div>
-                  <div class="scope-row">
-                    <span class="scope-side scope-side-r">R</span>
-                    <svg viewBox="0 0 120 22" preserveAspectRatio="none">
-                      <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
-                      {#if rightCyc < SCOPE_BAND_THRESHOLD}
-                        <path class="scope-trace scope-trace-r" d={sineWavePath(4, 116, 11, 8 * aGain, rightCyc)} />
-                      {:else}
-                        <path class="scope-band scope-band-r" d={rectanglePath(4, 116, 11, 8 * aGain)} />
-                      {/if}
-                    </svg>
-                    <span class="row-win">{rightCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
-                  </div>
-                  <div class="scope-row scope-row-sum">
-                    <span class="scope-side scope-side-sum">Σ</span>
-                    <svg viewBox="0 0 120 28" preserveAspectRatio="none">
-                      <line class="scope-axis" x1="4" y1="14" x2="116" y2="14" />
-                      <path class="scope-envelope" d={binauralBeatEnvelopePath(4, 116, 14, 11 * aGain, beatCyc)} />
-                      {#if Math.max(sumLeftCyc, sumRightCyc) < SCOPE_BAND_THRESHOLD}
-                        <path class="scope-trace scope-trace-sum" d={binauralSumPath(4, 116, 14, 11 * aGain, sumLeftCyc, sumRightCyc)} />
-                      {/if}
-                    </svg>
-                    <span class="row-win">{fmtWin(winSec)}</span>
-                  </div>
-                </div>
-              {:else if track.trackType === 'IsochronicTone'}
-                {@const envCyc = aPulse * winSec}
-                {@const carrCyc = aFreq * winSec}
-                <div class="audio-scope a-isochronictone" aria-hidden="true">
-                  <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                    <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
-                    <path class="scope-envelope" d={isoEnvelopeOutlinePath(4, 116, 20, 16 * aGain, isoEnv, envCyc)} />
-                    {#if carrCyc < SCOPE_BAND_THRESHOLD}
-                      <path class="scope-trace" d={isoWavePath(4, 116, 20, 16 * aGain, carrCyc, isoEnv, envCyc)} />
-                    {/if}
-                  </svg>
-                </div>
-              {:else}
-                {@const carrCyc = aFreq * winSec}
-                <div class="audio-scope a-carrier" aria-hidden="true">
-                  <svg viewBox="0 0 120 40" preserveAspectRatio="none">
-                    <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
-                    {#if carrCyc < SCOPE_BAND_THRESHOLD}
-                      <path class="scope-trace" d={sineWavePath(4, 116, 20, 16 * aGain, carrCyc)} />
-                    {:else}
-                      <path class="scope-band" d={rectanglePath(4, 116, 20, 16 * aGain)} />
-                    {/if}
-                  </svg>
-                </div>
-              {/if}
-
-              {#if track.trackType !== 'BinauralBeat'}
-                <div class="pan-ruler">
-                  <span class="pan-track"></span>
-                  <span class="pan-dot" style={`left:${panX}%`}></span>
-                  <span class="pan-l">L</span>
-                  <span class="pan-r">R</span>
-                </div>
-              {/if}
-
-              <div class="scope-meta">
-                {#if track.trackType === 'BinauralBeat'}
-                  <span class="meta-pair">L {Math.round(leftF)} / R {Math.round(rightF)} Hz</span>
-                  <span class="meta-pair meta-mut">center {Math.round(centerF)} · beat {beatF >= 0 ? '+' : ''}{beatF.toFixed(1)} Hz</span>
-                {:else if track.trackType === 'IsochronicTone'}
-                  <span class="meta-pair">{Math.round(aFreq)} Hz · pulse {aPulse.toFixed(1)} Hz · {isoEnv.type}</span>
-                {:else}
-                  <span class="meta-pair">{Math.round(aFreq)} Hz</span>
-                {/if}
-                <label class="win-field">
+              <div class="scope-shell">
+                <label class="win-field win-field-floating">
                   <span>screen</span>
                   <input type="number" step="0.01" min="0.005" max="60" bind:value={track.windowSec} />
                   <span>s</span>
                 </label>
+
+                {#if track.trackType === 'BinauralBeat'}
+                  {@const lrWin = binauralRowWindow(beatF, winSec)}
+                  {@const leftCyc = leftF * lrWin}
+                  {@const rightCyc = rightF * lrWin}
+                  {@const sumLeftCyc = leftF * winSec}
+                  {@const sumRightCyc = rightF * winSec}
+                  {@const beatCyc = Math.abs(beatF) * winSec}
+                  <div class="audio-scope a-binauralbeat" aria-hidden="true">
+                    <div class="scope-row">
+                      <span class="scope-side scope-side-l">L</span>
+                      <svg viewBox="0 0 120 22" preserveAspectRatio="none">
+                        <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
+                        {#if leftCyc < SCOPE_BAND_THRESHOLD}
+                          <path class="scope-trace scope-trace-l" d={sineWavePath(4, 116, 11, 8 * aGain, leftCyc)} />
+                        {:else}
+                          <path class="scope-band scope-band-l" d={rectanglePath(4, 116, 11, 8 * aGain)} />
+                        {/if}
+                      </svg>
+                      <span class="row-win">{leftCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
+                    </div>
+                    <div class="scope-row">
+                      <span class="scope-side scope-side-r">R</span>
+                      <svg viewBox="0 0 120 22" preserveAspectRatio="none">
+                        <line class="scope-axis" x1="4" y1="11" x2="116" y2="11" />
+                        {#if rightCyc < SCOPE_BAND_THRESHOLD}
+                          <path class="scope-trace scope-trace-r" d={sineWavePath(4, 116, 11, 8 * aGain, rightCyc)} />
+                        {:else}
+                          <path class="scope-band scope-band-r" d={rectanglePath(4, 116, 11, 8 * aGain)} />
+                        {/if}
+                      </svg>
+                      <span class="row-win">{rightCyc.toFixed(1)} cyc · {fmtWin(lrWin)}</span>
+                    </div>
+                    <div class="scope-row scope-row-sum">
+                      <span class="scope-side scope-side-sum">Σ</span>
+                      <svg viewBox="0 0 120 28" preserveAspectRatio="none">
+                        <line class="scope-axis" x1="4" y1="14" x2="116" y2="14" />
+                        <path class="scope-envelope" d={binauralBeatEnvelopePath(4, 116, 14, 11 * aGain, beatCyc)} />
+                        {#if Math.max(sumLeftCyc, sumRightCyc) < SCOPE_BAND_THRESHOLD}
+                          <path class="scope-trace scope-trace-sum" d={binauralSumPath(4, 116, 14, 11 * aGain, sumLeftCyc, sumRightCyc)} />
+                        {/if}
+                      </svg>
+                      <span class="row-win">{fmtWin(winSec)}</span>
+                    </div>
+                  </div>
+                {:else if track.trackType === 'IsochronicTone'}
+                  {@const envCyc = aPulse * winSec}
+                  {@const carrCyc = aFreq * winSec}
+                  <div class="audio-scope a-isochronictone" aria-hidden="true">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                      <path class="scope-envelope" d={isoEnvelopeOutlinePath(4, 116, 20, 16 * aGain, isoEnv, envCyc)} />
+                      {#if carrCyc < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace" d={isoWavePath(4, 116, 20, 16 * aGain, carrCyc, isoEnv, envCyc)} />
+                      {/if}
+                    </svg>
+                  </div>
+                {:else}
+                  {@const carrCyc = aFreq * winSec}
+                  <div class="audio-scope a-carrier" aria-hidden="true">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                      {#if carrCyc < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace" d={sineWavePath(4, 116, 20, 16 * aGain, carrCyc)} />
+                      {:else}
+                        <path class="scope-band" d={rectanglePath(4, 116, 20, 16 * aGain)} />
+                      {/if}
+                    </svg>
+                  </div>
+                {/if}
+
+                {#if track.trackType !== 'BinauralBeat'}
+                  <div class="pan-ruler">
+                    <span class="pan-track"></span>
+                    <span class="pan-dot" style={`left:${panX}%`}></span>
+                    <span class="pan-l">L</span>
+                    <span class="pan-r">R</span>
+                  </div>
+                {/if}
               </div>
 
               {#if track.trackType === 'IsochronicTone'}
@@ -1093,10 +1452,6 @@
                     >
                       {#each ISO_ENVELOPES as e}<option value={e}>{e}</option>{/each}
                     </select>
-                  </label>
-                  <label class="voice-num">
-                    <span>note%</span>
-                    <input type="number" step="0.01" min="0.05" max="1" bind:value={track.noteDurationFrac} />
                   </label>
                 </div>
               {/if}
@@ -1120,18 +1475,23 @@
                   {@const [fmin, fmax, fstep] = AUDIO_PARAM_RANGE.leftFreq}
                   {@render paramRow(gParam, 'gain', gmin, gmax, gstep, modKey(track.id, 'gain'), track.id)}
                   {@const centerSynth = { value: (lParam.value + rParam.value) / 2, mods: track.params.centerFreq.mods }}
-                  {@const beatSynth   = { value: rParam.value - lParam.value,        mods: track.params.beatFreq.mods }}
+                  {@const beatSynth   = { value: rParam.value - lParam.value, mods: track.params.beatFreq.mods, tempoSync: track.params.beatFreq.tempoSync }}
                   {@const [cfmin, cfmax, cfstep] = AUDIO_PARAM_RANGE.centerFreq}
                   {@const [bfmin, bfmax, bfstep] = AUDIO_PARAM_RANGE.beatFreq}
                   {@render paramRow(centerSynth, 'centerFreq', cfmin, cfmax, cfstep, modKey(track.id, 'centerFreq'), track.id,
                     (v) => { const beat = rParam.value - lParam.value; lParam.value = clamp(v - beat / 2, fmin, fmax); rParam.value = clamp(v + beat / 2, fmin, fmax) })}
                   {@render paramRow(beatSynth, 'beatFreq', bfmin, bfmax, bfstep, modKey(track.id, 'beatFreq'), track.id,
-                    (v) => { const c = (lParam.value + rParam.value) / 2; lParam.value = clamp(c - v / 2, fmin, fmax); rParam.value = clamp(c + v / 2, fmin, fmax) })}
+                    (v) => { const c = (lParam.value + rParam.value) / 2; lParam.value = clamp(c - v / 2, fmin, fmax); rParam.value = clamp(c + v / 2, fmin, fmax) },
+                    tempoSyncKindForTrackParam(track, 'beatFreq'))}
                 {:else}
                   {#each voiceParamNames(track.trackType) as pname}
                     {@const param = track.params[pname]}
                     {@const [pmin, pmax, pstep] = AUDIO_PARAM_RANGE[pname]}
-                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id,
+                      pname === 'noteDurationFrac'
+                        ? (v) => { param.value = v; track.noteDurationFrac = v }
+                        : null,
+                      tempoSyncKindForTrackParam(track, pname))}
                   {/each}
                 {/if}
               </div>
@@ -1158,7 +1518,10 @@
         {#each draft.visualTracks as track (track.id)}
           <article class="card">
             <div class="card-head">
-              <input class="card-name" bind:value={track.name} />
+              <div class="card-title-line">
+                <input class="card-name" bind:value={track.name} />
+                <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
+              </div>
               <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
@@ -1175,7 +1538,7 @@
                 {#each VISUAL_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = VISUAL_PARAM_RANGE[pname]}
-                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id, null, tempoSyncKindForTrackParam(track, pname))}
                 {/each}
               </div>
             </div>
@@ -1201,7 +1564,10 @@
         {#each draft.hapticTracks as track (track.id)}
           <article class="card">
             <div class="card-head">
-              <input class="card-name" bind:value={track.name} />
+              <div class="card-title-line">
+                <input class="card-name" bind:value={track.name} />
+                <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
+              </div>
               <button class="x-btn" onclick={() => removeHaptic(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
@@ -1215,7 +1581,7 @@
                 {#each HAPTIC_PARAMS as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = HAPTIC_PARAM_RANGE[pname]}
-                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id)}
+                  {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id, null, tempoSyncKindForTrackParam(track, pname))}
                 {/each}
               </div>
             </div>
@@ -1236,6 +1602,36 @@
         <span class="iss {iss.level}">{iss.message}</span>
       {/each}
     </footer>
+  {/if}
+
+  {#if semanticInfo}
+    <div
+      class="semantic-overlay"
+      role="presentation"
+      onclick={(event) => { if (event.target === event.currentTarget) closeSemanticInfo() }}
+    >
+      <div class="semantic-card" role="dialog" aria-label={`${semanticInfo.label} semantic info`} aria-modal="true">
+        <header class="semantic-head">
+          <div>
+            <span class="semantic-kind">{semanticInfo.kind}</span>
+            <h3>{semanticInfo.label}</h3>
+          </div>
+          <button type="button" class="semantic-close" aria-label="Close semantic info" onclick={closeSemanticInfo}>×</button>
+        </header>
+        <p>{semanticInfo.description}</p>
+        <dl>
+          <div>
+            <dt>CURIE</dt>
+            <dd>{localSemanticName(semanticInfo.uri)}</dd>
+          </div>
+          <div>
+            <dt>URI</dt>
+            <dd><code>{semanticInfo.uri}</code></dd>
+          </div>
+        </dl>
+        <a class="semantic-graph-link" href={semanticGraphHref(semanticInfo)}>Open in graph</a>
+      </div>
+    </div>
   {/if}
 
 </div>
@@ -1270,7 +1666,7 @@
 
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh - var(--app-bottom-dock-height, 48px));
     overflow: hidden;
     background: var(--bg);
     color: var(--txt);
@@ -1369,6 +1765,34 @@
     box-shadow: 0 0 12px #3b9eff44;
   }
 
+  .bpm-toggle {
+    height: var(--hdr-control);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 8px;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
+    background: var(--bg);
+    color: var(--mut);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+  .bpm-toggle input {
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    accent-color: var(--acc);
+  }
+  .bpm-toggle.on {
+    border-color: var(--acc);
+    color: var(--acc);
+    background: var(--acc-s);
+  }
+
   .tempo-meter {
     position: relative;
     width: 64px;
@@ -1387,7 +1811,7 @@
   .tempo-grid {
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(90deg, transparent 0 12px, #243547 12px 13px);
+    background: linear-gradient(90deg, #243547 1px, transparent 1px) 0 0 / calc(100% / var(--tempo-beats, 4)) 100%;
     opacity: 0.65;
   }
 
@@ -1435,6 +1859,64 @@
     font-size: 9px;
     font-family: inherit;
     line-height: 1;
+  }
+
+  .tempo-bpm-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: var(--hdr-control);
+  }
+
+  .mini-mod-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--bdr);
+    background: var(--bg);
+    color: var(--mut);
+    font-size: 9px;
+    font-weight: 700;
+    font-family: inherit;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .mini-mod-btn:hover,
+  .mini-mod-btn.on {
+    border-color: var(--acc);
+    color: var(--acc);
+    background: var(--acc-s);
+  }
+
+  .tempo-live {
+    min-width: 24px;
+    color: var(--acc);
+    font-size: 9px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .tempo-bpm-mods {
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 0;
+    z-index: 70;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 220px;
+    max-width: min(480px, 80vw);
+    padding: 10px;
+    border: 1px solid var(--acc);
+    border-radius: 6px;
+    background: var(--sur2);
+    box-shadow: 0 10px 28px #00000088;
+    overflow-x: auto;
+    scrollbar-width: thin;
   }
 
   .hdr-actions {
@@ -1612,6 +2094,137 @@
     color: var(--txt);
   }
 
+  .semantic-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 130;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: #00000088;
+    backdrop-filter: blur(2px);
+  }
+
+  .semantic-card {
+    width: min(34rem, 100%);
+    margin: 0;
+    padding: 1rem 1.2rem 1.15rem;
+    background: var(--sur);
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: calc(var(--app-radius) + 2px);
+    box-shadow: 0 1.5rem 3rem #0009;
+    color: var(--txt);
+  }
+
+  .semantic-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .semantic-kind {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--acc);
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .semantic-card h3,
+  .semantic-card p,
+  .semantic-card dl {
+    margin: 0;
+  }
+
+  .semantic-card h3 {
+    font-size: 1rem;
+    color: var(--txt);
+  }
+
+  .semantic-card p {
+    margin-top: 0.65rem;
+    color: color-mix(in srgb, var(--txt) 72%, var(--mut));
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .semantic-card dl {
+    display: grid;
+    gap: 0.55rem;
+    margin-top: 0.85rem;
+  }
+
+  .semantic-card dl > div {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: baseline;
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
+  .semantic-card dt {
+    color: var(--acc);
+    font-weight: 700;
+  }
+
+  .semantic-card dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--txt);
+    word-break: break-word;
+  }
+
+  .semantic-card code {
+    color: color-mix(in srgb, var(--txt) 82%, var(--acc));
+    background: color-mix(in srgb, var(--sur2) 80%, transparent);
+    border-radius: 3px;
+    padding: 0.1rem 0.25rem;
+    white-space: normal;
+  }
+
+  .semantic-close {
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 0;
+    padding: 0;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--txt);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+  .semantic-close:hover { background: var(--acc-s); border-color: var(--acc); }
+
+  .semantic-graph-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2rem;
+    margin-top: 1rem;
+    padding: 0 0.8rem;
+    border: 1px solid var(--acc);
+    border-radius: var(--app-radius);
+    background: var(--acc-s);
+    color: var(--acc);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .semantic-graph-link:hover {
+    background: color-mix(in srgb, var(--acc-s) 72%, var(--acc));
+    color: var(--txt);
+  }
+
   /* ── Status bar ────────────────────────────────────────────────────────────── */
   .status-bar {
     padding: 2px 10px;
@@ -1629,33 +2242,41 @@
   .cols {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px;
     flex: 1;
-    overflow: hidden;
+    overflow: auto;
     /* Each col is a flex column; align column headers at the top */
     align-items: stretch;
+    align-content: stretch;
   }
 
   .col {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    border-right: 1px solid var(--bdr);
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid var(--bdr);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--sur) 82%, var(--bg));
+    box-shadow: inset 0 1px 0 #ffffff05, 0 10px 28px #00000012;
   }
-  .col:last-child { border-right: none; }
 
   /* Column header: two rows, each exactly 26px, always the same across columns */
   .col-head {
     display: grid;
-    grid-template-rows: 26px 26px;
+    grid-template-rows: 30px 32px;
     flex-shrink: 0;
     border-bottom: 1px solid var(--bdr);
+    background: color-mix(in srgb, var(--sur2) 82%, var(--bg));
   }
 
   .col-title {
     display: flex;
     align-items: center;
-    padding: 0 8px;
-    font-size: 10px;
+    padding: 0 12px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -1669,8 +2290,8 @@
   .col-adds {
     display: flex;
     align-items: center;
-    gap: 3px;
-    padding: 0 6px;
+    gap: 6px;
+    padding: 0 10px;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -1680,14 +2301,14 @@
     background: transparent;
     border: 1px solid var(--bdr);
     color: var(--mut);
-    border-radius: 3px;
-    padding: 1px 5px;
-    font-size: 9px;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 10px;
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    height: 18px;
+    height: 22px;
     transition: color .1s, border-color .1s;
   }
   .add-btn:hover { color: var(--txt); border-color: var(--acc); }
@@ -1696,16 +2317,18 @@
   .col-body {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding: 5px 5px;
+    gap: 10px;
+    padding: 10px 10px 14px;
     flex: 1;
+    min-height: 0;
+    overflow: auto;
   }
 
   .empty {
     color: var(--mut);
-    font-size: 9px;
+    font-size: 10px;
     text-align: center;
-    padding: 12px 6px;
+    padding: 18px 10px;
     line-height: 1.5;
   }
 
@@ -1713,19 +2336,53 @@
   .card {
     background: var(--sur2);
     border: 1px solid var(--bdr);
-    border-radius: 5px;
+    border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 6px 20px #0000000f;
   }
 
   /* Card title bar — single compact row */
   .card-head {
     display: flex;
     align-items: center;
-    height: 22px;
-    padding: 0 4px 0 6px;
+    min-height: 34px;
+    padding: 6px 10px 6px 12px;
     border-bottom: 1px solid var(--bdr);
-    gap: 4px;
+    gap: 8px;
+  }
+
+  .card-head-audio {
+    align-items: flex-start;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .card-head-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .card-head-audio .card-name {
+    flex: 1 1 auto;
+  }
+
+  .card-title-line {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
   }
 
   .card-name {
@@ -1733,35 +2390,74 @@
     border: none;
     color: var(--txt);
     font-weight: 600;
-    font-size: 10px;
+    font-size: 13px;
     font-family: inherit;
     flex: 1;
     min-width: 0;
+    height: 24px;
+    min-height: 0;
+    margin: 0;
     padding: 0;
-    line-height: 1;
+    line-height: 1.15;
+    box-shadow: none;
   }
   .card-name:focus { outline: none; color: var(--acc); }
 
+  .type-info-btn {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--txt) 22%, var(--bdr));
+    background: transparent;
+    color: var(--mut);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1;
+    cursor: help;
+  }
+
+  .type-info-btn:hover {
+    border-color: var(--acc);
+    color: var(--acc);
+    background: var(--acc-s);
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+    line-height: 1.3;
+    color: color-mix(in srgb, var(--txt) 48%, var(--mut));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .card-body {
-    padding: 6px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
   }
 
   .card-meta {
-    font-size: 8px;
-    color: var(--mut);
-    padding-top: 2px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    line-height: 1.4;
   }
 
   /* ── Waveform select (control cards) ──────────────────────────────────────── */
   .wave-field {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 8px;
-    color: var(--mut);
+    gap: 8px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    line-height: 1.3;
   }
 
   .wave-field select {
@@ -1769,19 +2465,19 @@
     background: var(--bg);
     border: 1px solid var(--bdr);
     color: var(--txt);
-    border-radius: 3px;
-    padding: 1px 4px;
-    font-size: 9px;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 11px;
     font-family: inherit;
-    height: 20px;
+    height: 26px;
   }
 
   .control-preview,
   .track-preview {
     position: relative;
-    height: 38px;
+    height: 48px;
     border: 1px solid #203245;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     background: #071018;
     flex-shrink: 0;
@@ -1802,9 +2498,9 @@
 
   .phase-widget {
     position: relative;
-    height: 44px;
+    height: 54px;
     border: 1px solid #203245;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
     background:
@@ -1854,9 +2550,9 @@
   .duration-widget {
     position: relative;
     border: 1px solid #203245;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    padding: 4px 4px 3px;
+    padding: 6px 6px 5px;
     background: #050b12;
     flex-shrink: 0;
   }
@@ -1893,9 +2589,9 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-top: 2px;
-    font-size: 8px;
-    color: var(--mut);
+    margin-top: 4px;
+    font-size: 10px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
     font-variant-numeric: tabular-nums;
   }
 
@@ -1906,9 +2602,9 @@
 
   .symmetry-widget {
     position: relative;
-    height: 48px;
+    height: 58px;
     border: 1px solid #2a1b3a;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
     background:
@@ -1944,7 +2640,7 @@
   }
 
   .sym-cell-num {
-    font-size: 6px;
+    font-size: 8px;
     font-weight: 600;
     fill: var(--mut);
     font-family: inherit;
@@ -1969,39 +2665,46 @@
   .audio-scope {
     position: relative;
     border: 1px solid #203245;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    padding: 3px 4px 2px;
+    padding: 6px 8px 5px;
     flex-shrink: 0;
     background: linear-gradient(90deg, #07111c, #06131b);
   }
 
+  .scope-shell {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
   .audio-scope svg {
     width: 100%;
-    height: 40px;
+    height: 52px;
     display: block;
     overflow: visible;
   }
 
-  .a-binauralbeat .scope-row svg { height: 22px; }
-  .a-binauralbeat .scope-row-sum svg { height: 28px; }
+  .a-binauralbeat .scope-row svg { height: 28px; }
+  .a-binauralbeat .scope-row-sum svg { height: 34px; }
 
   .scope-row {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
   }
 
-  .scope-row + .scope-row { margin-top: 2px; padding-top: 2px; border-top: 1px solid #11202e; }
+  .scope-row + .scope-row { margin-top: 5px; padding-top: 5px; border-top: 1px solid #11202e; }
 
   .scope-side {
-    width: 10px;
+    width: 14px;
     text-align: center;
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--mut);
+    color: color-mix(in srgb, var(--txt) 38%, var(--mut));
     flex-shrink: 0;
   }
   .scope-side-l { color: #9fd0ff; }
@@ -2010,11 +2713,12 @@
 
   .row-win {
     flex-shrink: 0;
-    font-size: 7px;
-    color: var(--mut);
+    font-size: 10px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
     font-variant-numeric: tabular-nums;
-    padding-left: 2px;
-    min-width: 32px;
+    line-height: 1.25;
+    padding-left: 4px;
+    min-width: 74px;
     text-align: right;
   }
 
@@ -2059,8 +2763,8 @@
 
   .pan-ruler {
     position: relative;
-    height: 10px;
-    margin: 2px 6px 0;
+    height: 12px;
+    margin: 0 10px;
   }
 
   .pan-track {
@@ -2073,8 +2777,8 @@
   .pan-dot {
     position: absolute;
     top: 50%;
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #9fd0ff;
     box-shadow: 0 0 4px #3b9effaa;
@@ -2085,8 +2789,8 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 7px;
-    color: var(--mut);
+    font-size: 10px;
+    color: color-mix(in srgb, var(--txt) 38%, var(--mut));
     letter-spacing: 0.04em;
   }
   .pan-l { left: 0; }
@@ -2096,10 +2800,11 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 4px;
+    gap: 8px 14px;
     margin-top: 2px;
-    padding: 0 4px;
-    font-size: 8px;
+    padding: 0 6px;
+    font-size: 12px;
+    line-height: 1.35;
     color: var(--txt);
     font-variant-numeric: tabular-nums;
   }
@@ -2109,50 +2814,62 @@
   .win-field {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: 6px;
     margin-left: auto;
-    color: var(--mut);
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    font-size: 11px;
+    line-height: 1;
+  }
+  .win-field.win-field-floating {
+    align-self: flex-end;
+    margin-left: 0;
+    background: transparent;
   }
   .win-field input {
-    width: 36px;
+    width: 50px;
     background: var(--bg);
     border: 1px solid var(--bdr);
     color: var(--txt);
-    border-radius: 2px;
-    padding: 0 3px;
-    font-size: 8px;
+    border-radius: 4px;
+    padding: 0 6px;
+    font-size: 11px;
     font-family: inherit;
-    height: 14px;
+    height: 28px;
+    min-height: 0;
+    margin: 0;
+    box-shadow: none;
+  }
+  .win-field.win-field-floating input {
+    width: 46px;
+    height: 24px;
   }
 
   .voice-extras {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
-    padding: 2px 4px 0;
-    font-size: 8px;
-    color: var(--mut);
+    gap: 10px 16px;
+    padding: 0 6px;
+    font-size: 11px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
   }
 
-  .voice-select,
-  .voice-num {
+  .voice-select {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 6px;
   }
 
-  .voice-select select,
-  .voice-num input {
+  .voice-select select {
     background: var(--bg);
     border: 1px solid var(--bdr);
     color: var(--txt);
-    border-radius: 2px;
-    padding: 0 3px;
-    font-size: 9px;
+    border-radius: 4px;
+    padding: 0 8px;
+    font-size: 11px;
     font-family: inherit;
-    height: 16px;
+    height: 30px;
   }
-  .voice-num input { width: 40px; }
 
   .visual-preview {
     background:
@@ -2248,9 +2965,10 @@
 
   /* ── Knob grid ─────────────────────────────────────────────────────────────── */
   .knob-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 5px 3px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 14px 18px;
     align-items: start;
   }
 
@@ -2259,9 +2977,11 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 1px 0 2px;
+    flex: 0 0 auto;
+    width: auto;
+    padding: 3px 0 4px;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 6px;
   }
 
   .param-row.has-mod:not(.mod-open) {
@@ -2276,10 +2996,11 @@
   }
 
   .param-row.mod-open {
-    grid-column: 1 / -1;
+    flex: 1 0 100%;
+    width: 100%;
     justify-content: flex-start;
-    gap: 8px;
-    padding: 7px;
+    gap: 12px;
+    padding: 10px;
     background: color-mix(in srgb, var(--acc-s) 74%, transparent);
     border-color: var(--acc);
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 24%, transparent);
@@ -2287,13 +3008,58 @@
     scrollbar-width: thin;
   }
 
+  .tempo-sync-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    min-width: 138px;
+    padding-left: 12px;
+    border-left: 1px solid color-mix(in srgb, var(--acc) 22%, var(--bdr));
+    color: color-mix(in srgb, var(--txt) 46%, var(--mut));
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .tempo-sync-control select,
+  .tempo-sync-control input {
+    height: 24px;
+    min-height: 0;
+    margin: 0;
+    border: 1px solid var(--bdr);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--txt);
+    font-size: 10px;
+    font-family: inherit;
+    padding: 0 6px;
+  }
+
+  .tempo-sync-control input {
+    width: 56px;
+  }
+
+  .tempo-sync-control span {
+    min-width: 54px;
+    color: var(--mut);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tempo-sync-control.tempo-sync-on {
+    color: var(--acc);
+  }
+
+  .tempo-sync-control.tempo-sync-on span {
+    color: var(--acc);
+  }
+
   .param-mods {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 12px;
     min-width: 0;
     flex: 1;
-    padding-left: 8px;
+    padding-left: 12px;
     border-left: 1px solid color-mix(in srgb, var(--acc) 35%, var(--bdr));
     overflow-x: auto;
     scrollbar-width: thin;
@@ -2304,8 +3070,8 @@
     flex: 0 0 58px;
     display: grid;
     justify-items: center;
-    padding-bottom: 13px;
-    border-radius: 4px;
+    padding-bottom: 15px;
+    border-radius: 6px;
   }
 
   .mod-control-cell.linked {
@@ -2337,8 +3103,8 @@
 
   .mod-empty {
     align-self: center;
-    color: var(--mut);
-    font-size: 8px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    font-size: 10px;
     line-height: 1.4;
     white-space: nowrap;
   }
@@ -2370,10 +3136,11 @@
     background: transparent;
     border: 1px solid var(--bdr);
     color: var(--mut);
-    border-radius: 2px;
-    height: 16px;
-    padding: 0 5px;
-    font-size: 8px;
+    border-radius: 4px;
+    height: 24px;
+    margin: 0;
+    padding: 0 8px;
+    font-size: 10px;
     font-weight: 700;
     font-family: inherit;
     text-transform: lowercase;
@@ -2401,13 +3168,14 @@
     border: none;
     color: var(--mut);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
-    width: 16px;
+    width: 20px;
+    margin: 0;
     padding: 0;
-    border-radius: 2px;
+    border-radius: 4px;
     flex-shrink: 0;
-    height: 16px;
+    height: 20px;
     display: grid;
     place-items: center;
     line-height: 1;
@@ -2477,6 +3245,24 @@
 
   @keyframes hapticScan {
     to { transform: translateX(150px); }
+  }
+
+  @media (max-width: 1480px) {
+    .cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-rows: minmax(20rem, 1fr);
+    }
+  }
+
+  @media (max-width: 860px) {
+    .cols {
+      grid-template-columns: minmax(0, 1fr);
+      grid-auto-rows: auto;
+    }
+
+    .col {
+      min-height: 22rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
