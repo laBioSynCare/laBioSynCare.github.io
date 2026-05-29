@@ -3,12 +3,15 @@
   import { onMount } from 'svelte'
   import AppBottomDock from '../ui/navigation/AppBottomDock.svelte'
   import AppTopBar from '../ui/navigation/AppTopBar.svelte'
+  import PhotosensitivityAdvisory from '../ui/safety/PhotosensitivityAdvisory.svelte'
   import { initSkin } from '../ui/theme/skins.js'
+  import { initVisualStimulation } from '../ui/safety/visualSafety.js'
 
   const { children } = $props()
 
   onMount(() => {
     initSkin()
+    initVisualStimulation()
   })
 </script>
 
@@ -19,6 +22,8 @@
 </div>
 
 <AppBottomDock />
+
+<PhotosensitivityAdvisory />
 
 <style>
   /* Skin-independent tokens and Pico bindings. Per-skin colour palettes

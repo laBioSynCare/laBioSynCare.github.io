@@ -3,6 +3,7 @@
   import Knob from './Knob.svelte'
   import { envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
+  import { visualStimulationOn } from '../../ui/safety/visualSafety.js'
   import { creatorSession } from './creatorSession.js'
   import {
     computeMartigliState,
@@ -1627,7 +1628,11 @@
               <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
-              {#if track.trackType === 'Blink'}
+              {#if !$visualStimulationOn}
+                <div class="track-preview visual-off" aria-hidden="true">
+                  <span>Visual stimulation is off (Settings)</span>
+                </div>
+              {:else if track.trackType === 'Blink'}
                 <div class="track-preview visual-preview vp-blink" style={visualStyle(track)} aria-hidden="true">
                   <span class="visual-aura"></span>
                   <span class="blink-dot"></span>
@@ -2596,6 +2601,18 @@
     background: #071018;
     flex-shrink: 0;
     isolation: isolate;
+  }
+
+  .visual-off {
+    display: grid;
+    place-items: center;
+    background: var(--app-surface-2);
+    border: 1px dashed var(--app-border);
+  }
+  .visual-off span {
+    color: var(--app-muted);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
   }
 
   .control-preview::before,

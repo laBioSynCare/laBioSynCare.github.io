@@ -9,18 +9,28 @@
     initAudioEnginePreference,
     isAudioEngineSupported,
   } from '../../engines/audio/audioEngines.js'
+  import {
+    advisoryOpen,
+    applyVisualStimulation,
+    initVisualStimulation,
+    resetPhotoAdvisory,
+    visualStimulationOn,
+  } from '../../ui/safety/visualSafety.js'
 
   let selectedSkin = $state('midnight')
   let selectedEngine = $state('vanilla')
   let caps = $state({ webAudio: true, audioWorklet: true, wasm: true })
+  let visualOn = $state(true)
 
   onMount(() => {
     selectedSkin = initSkin()
     selectedEngine = initAudioEnginePreference()
+    visualOn = initVisualStimulation()
     caps = detectAudioCapabilities()
     const unsubSkin = activeSkin.subscribe((skinId) => { selectedSkin = skinId })
     const unsubEngine = activeAudioEngineId.subscribe((id) => { selectedEngine = id })
-    return () => { unsubSkin(); unsubEngine() }
+    const unsubVisual = visualStimulationOn.subscribe((on) => { visualOn = on })
+    return () => { unsubSkin(); unsubEngine(); unsubVisual() }
   })
 
   function selectSkin(id) {
@@ -29,6 +39,15 @@
 
   function selectEngine(id) {
     selectedEngine = applyAudioEngine(id)
+  }
+
+  function setVisual(on) {
+    visualOn = applyVisualStimulation(on)
+  }
+
+  function reviewAdvisory() {
+    resetPhotoAdvisory()
+    advisoryOpen.set(true)
   }
 </script>
 
@@ -115,6 +134,47 @@
           <span class="engine-desc">{engine.description}</span>
         </button>
       {/each}
+    </div>
+  </section>
+
+  <section class="settings-section" aria-labelledby="visual-heading">
+    <div class="section-copy">
+      <h2 id="visual-heading">Visual stimulation</h2>
+      <p>Some visual tracks flash, flicker, or move. If you are sensitive to flashing light, you can turn all visual stimulation off — previews and visual output stay hidden everywhere on the platform.</p>
+      <button type="button" class="review-link" onclick={reviewAdvisory}>Review the photosensitivity notice</button>
+    </div>
+
+    <div class="engine-grid" role="radiogroup" aria-label="Visual stimulation">
+      <button
+        type="button"
+        class="engine-card"
+        class:active={visualOn}
+        role="radio"
+        aria-checked={visualOn}
+        onclick={() => setVisual(true)}
+      >
+        <span class="engine-head">
+          <span class="engine-name">Enabled</span>
+          <span class="engine-mark">{visualOn ? 'Selected' : 'Select'}</span>
+        </span>
+        <span class="engine-tagline">Visuals render</span>
+        <span class="engine-desc">Animated and flashing visual previews and output are shown.</span>
+      </button>
+      <button
+        type="button"
+        class="engine-card"
+        class:active={!visualOn}
+        role="radio"
+        aria-checked={!visualOn}
+        onclick={() => setVisual(false)}
+      >
+        <span class="engine-head">
+          <span class="engine-name">Disabled</span>
+          <span class="engine-mark">{!visualOn ? 'Selected' : 'Select'}</span>
+        </span>
+        <span class="engine-tagline">No visual stimulation</span>
+        <span class="engine-desc">All flashing and moving visuals are suppressed; audio and editing are unaffected.</span>
+      </button>
     </div>
   </section>
 </main>
@@ -293,6 +353,19 @@
     font-size: 0.82rem;
     line-height: 1.5;
   }
+
+  .review-link {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--app-accent);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .review-link:hover { color: var(--app-text-strong); }
 
   .settings-section + .settings-section {
     margin-top: 2rem;
