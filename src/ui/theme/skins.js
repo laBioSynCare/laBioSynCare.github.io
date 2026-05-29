@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store'
 
 export const SKIN_STORAGE_KEY = 'bsclab.skin'
-export const DEFAULT_SKIN_ID = 'midnight'
+export const DEFAULT_SKIN_ID = 'paper'
 
 export const skins = [
   {

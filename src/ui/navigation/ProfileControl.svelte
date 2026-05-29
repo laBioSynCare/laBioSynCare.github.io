@@ -2,17 +2,12 @@
   import { onDestroy } from 'svelte'
   import {
     authState,
-    createEmailAccount,
     defaultDisplayNameFromEmail,
-    signInWithEmail,
-    signInWithGoogle,
     signOutCurrentUser,
   } from '../../firebase/auth.js'
+  import SignInForm from '../auth/SignInForm.svelte'
 
   let state = $state({ ready: false, configured: false, user: null, error: null })
-  let email = $state('')
-  let password = $state('')
-  let displayName = $state('')
   let busy = $state(false)
   let error = $state(null)
 
@@ -28,26 +23,11 @@
     busy = true
     try {
       await action()
-      password = ''
-      displayName = ''
     } catch (e) {
       error = e.message
     } finally {
       busy = false
     }
-  }
-
-  function submitSignIn(event) {
-    event.preventDefault()
-    return runAuth(() => signInWithEmail(email, password))
-  }
-
-  function submitCreate() {
-    return runAuth(() => createEmailAccount(email, password, displayName))
-  }
-
-  function submitGoogle() {
-    return runAuth(signInWithGoogle)
   }
 
   function submitSignOut() {
@@ -85,39 +65,7 @@
     </button>
   {:else}
     <p><small>Sign in to save RDF annotations.</small></p>
-    <form onsubmit={submitSignIn}>
-      <label>
-        Email
-        <input type="email" autocomplete="email" bind:value={email} disabled={busy} />
-      </label>
-      <label>
-        Password
-        <input type="password" autocomplete="current-password" bind:value={password} disabled={busy} />
-      </label>
-      <label>
-        Display name <span class="optional">(for new accounts)</span>
-        <input
-          type="text"
-          autocomplete="nickname"
-          bind:value={displayName}
-          placeholder={defaultDisplayNameFromEmail(email) || 'Your name'}
-          disabled={busy}
-        />
-        <small>Shown next to public notes you leave. Defaults to the part of your email before "@".</small>
-      </label>
-      {#if error}
-        <small class="profile-error">{error}</small>
-      {/if}
-      <div class="profile-actions">
-        <button type="submit" aria-busy={busy} disabled={busy || !email || !password}>Sign in</button>
-        <button type="button" class="secondary" onclick={submitCreate} disabled={busy || !email || !password}>
-          Create
-        </button>
-      </div>
-    </form>
-    <button type="button" class="secondary outline" onclick={submitGoogle} disabled={busy}>
-      Google
-    </button>
+    <SignInForm />
   {/if}
 </section>
 
@@ -138,46 +86,6 @@
     word-break: break-word;
   }
 
-  .profile-control label {
-    display: block;
-    margin-bottom: 0.35rem;
-    font-size: 0.78rem;
-  }
-
-  .profile-control label > small {
-    display: block;
-    margin-top: 0.2rem;
-    color: var(--pico-muted-color);
-    font-size: 0.7rem;
-  }
-
-  .optional {
-    color: var(--pico-muted-color);
-    font-weight: 400;
-    font-size: 0.7rem;
-  }
-
-  .profile-control input {
-    min-height: 2rem;
-    margin: 0.2rem 0 0;
-    padding: 0.3rem 0.5rem;
-    font-size: 0.8rem;
-  }
-
-  .profile-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.4rem;
-  }
-
-  .profile-control button {
-    width: 100%;
-    min-height: 2rem;
-    margin: 0;
-    padding: 0.3rem 0.55rem;
-    font-size: 0.78rem;
-  }
-
   .profile-link {
     display: block;
     padding: 0.4rem 0;
@@ -186,10 +94,4 @@
     text-decoration: none;
   }
   .profile-link:hover { text-decoration: underline; }
-
-  .profile-error {
-    display: block;
-    margin-bottom: 0.4rem;
-    color: var(--pico-color-red-500, #d33);
-  }
 </style>

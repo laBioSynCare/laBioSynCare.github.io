@@ -6,6 +6,7 @@
     { href: '/creator/', label: 'Patch Studio' },
     { href: '/presets/', label: 'Presets' },
     { href: '/sparql/', label: 'SPARQL' },
+    { href: '/logbook/', label: 'Logbook' },
     { href: '/settings/', label: 'Settings' },
   ]
 
@@ -33,7 +34,7 @@
     z-index: 120;
     height: var(--app-bottom-dock-height, 48px);
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     align-items: stretch;
     background: color-mix(in srgb, var(--app-surface) 94%, #000 6%);
     border-top: var(--app-border-width) solid var(--app-border);
