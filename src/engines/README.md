@@ -22,10 +22,12 @@ specifications. This README is an index and quick reference.
 engines/
 ├── audio/
 │   ├── IAudioEngine.js              Interface contract + JSDoc types
-│   ├── VanillaWebAudioEngine.js     Primary implementation (native Web Audio)
-│   ├── ToneJsEngine.js              Research comparison implementation
-│   └── __tests__/
-│       └── IAudioEngineCompliance.test.js
+│   ├── VanillaWebAudioEngine.js     Default: native Web Audio nodes (main thread)
+│   ├── WorkletVoiceEngine.js        Shared base for the AudioWorklet engines
+│   ├── AudioWorkletEngine.js        Audio-thread DSP in JS (bsc-voice processor)
+│   ├── WasmAudioWorkletEngine.js    Audio-thread DSP in WASM (bsc-voice-wasm)
+│   ├── NullAudioEngine.js           Silent: real clock, no sound (fallback)
+│   └── audioEngines.js              Registry + persisted selection + factory
 │
 ├── visual/
 │   ├── IVisualEngine.js             Interface contract + JSDoc types
@@ -47,47 +49,60 @@ engines/
 
 ## Audio engines
 
-### `VanillaWebAudioEngine` (primary)
+Four interchangeable implementations of `IAudioEngine`, all rendering the same
+Phase-1 voice model (`Carrier`, `IsochronicTone`, `BinauralBeat`). The user
+picks one in **Settings → Audio engine**; the choice is persisted to
+`localStorage` (`bsclab.audioEngine`) and read by `createAudioEngine()` when the
+Patch Studio next starts playback. `audioEngines.js` holds the registry,
+capability detection, the Svelte store, and the factory (which falls back to the
+default when a selected engine's capabilities are unavailable).
 
-Uses native Web Audio API with `AudioWorkletProcessor` for all signal
-generation. No third-party audio library.
-
-**Key constraints from `CLAUDE.md`:**
-- `AudioContext.currentTime` is the only timing authority
+**Key constraints from `CLAUDE.md` (apply to every engine):**
+- `AudioContext.currentTime` is the only timing authority — engines drive all
+  parameters through timed `AudioParam` automation, never a wall clock
 - AudioWorklet files in `static/worklets/` are never bundled
 - No allocation inside `AudioWorkletProcessor.process()`
 - `AudioContext.resume()` must be called inside a user gesture handler
 
-**Node graph:**
-```
-AudioContext.destination
-    ↑
-GainNode (masterGain)
-    ↑ (per active voice)
-AudioWorkletNode (binaural-processor)
-AudioWorkletNode (martigli-processor)
-AudioWorkletNode (martigli-binaural-processor)
-AudioWorkletNode (symmetry-processor)
-```
-
-**Initialization:**
 ```javascript
-const engine = new VanillaWebAudioEngine()
-await engine.initialize()
-// Must call inside gesture handler:
-await engine.resume()
+import { createAudioEngine } from './audioEngines.js'
+const { engine, fellBack } = createAudioEngine()   // reads the saved preference
+await engine.initialize()                           // loads worklets/WASM if needed
+await engine.resume()                               // inside a gesture handler
 ```
 
-### `ToneJsEngine` (research comparison)
+### `VanillaWebAudioEngine` (default — `vanilla`)
 
-Wraps Tone.js v15.x to implement the same `IAudioEngine` interface. Used
-for A/B comparisons — run the same preset with both engines and compare.
+Signal built from native Web Audio nodes (oscillators, gains, stereo panners,
+a `PeriodicWave` envelope for `IsochronicTone`). Broadest compatibility; no
+worklet required.
 
-**Important:** `getAudioContext()` must return the underlying `AudioContext`,
-not a Tone wrapper object. `MasterClock` needs the real hardware clock.
+### `AudioWorkletEngine` (`worklet`)
 
-**Not for production sessions.** The compliance test suite verifies that
-both engines produce equivalent output for the same preset spec.
+Each voice is one `AudioWorkletNode` running `bsc-voice.worklet.js` on the audio
+render thread — sample-by-sample JS DSP isolated from main-thread jank. Params
+are a-rate `AudioParam`s set from the main thread.
+
+### `WasmAudioWorkletEngine` (`worklet-wasm`)
+
+Same audio-thread voice model, but the per-sample sine oscillator runs as a
+hand-written WebAssembly kernel (`bsc-osc.wat` → `bsc-osc.wasm`, a 4096-point
+sine LUT with linear interpolation). The host fetches the `.wasm` on the main
+thread and posts the bytes into each node, which compiles + instantiates them
+against memory it owns; envelope/gain/pan/mix stay in JS.
+
+### `NullAudioEngine` (`silent`)
+
+Implements the full contract but emits no sound, while still owning a real
+`AudioContext` so the clock, control modulation and visual previews run exactly
+as a sounding engine would. For quiet/shared environments, accessibility, and
+timing/visual debugging — and the guaranteed fallback when AudioWorklet is
+unavailable. Mirrors the `NullHapticEngine` pattern.
+
+**Regenerating the WASM kernel** (after editing `static/worklets/bsc-osc.wat`):
+```bash
+wat2wasm static/worklets/bsc-osc.wat -o static/worklets/bsc-osc.wasm
+```
 
 ---
 

@@ -1,7 +1,8 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
   import Knob from './Knob.svelte'
-  import { VanillaWebAudioEngine, envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
+  import { envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
+  import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
   import { creatorSession } from './creatorSession.js'
   import {
     computeMartigliState,
@@ -198,6 +199,21 @@
 
   // ── Transport / IO ────────────────────────────────────────────────────────────
 
+  // Build and initialise the audio engine chosen in Settings, falling back to
+  // Vanilla Web Audio when the selected engine isn't supported here.
+  async function createEngine() {
+    const { engine: created, id, fellBack } = createAudioEngine()
+    if (fellBack) {
+      const wanted = audioEngines.find((e) => e.id === getActiveAudioEngineId())
+      tip(`${wanted?.name ?? 'Selected engine'} unavailable here — using Vanilla Web Audio.`)
+    } else {
+      const desc = audioEngines.find((e) => e.id === id)
+      if (desc && desc.id !== 'vanilla') tip(`Audio engine: ${desc.name}.`)
+    }
+    await created.initialize()
+    return created
+  }
+
   async function togglePlay() {
     if (draft.playing) {
       stopAllVoices()
@@ -210,8 +226,7 @@
     }
     try {
       if (!engine) {
-        engine = new VanillaWebAudioEngine()
-        await engine.initialize()
+        engine = await createEngine()
         creatorSession.engine = engine
       }
       await engine.resume()
@@ -505,8 +520,7 @@
       syncCreatorSession()
     }
     try {
-      engine = new VanillaWebAudioEngine()
-      await engine.initialize()
+      engine = await createEngine()
       await engine.resume()
       creatorSession.engine = engine
     } catch (e) {

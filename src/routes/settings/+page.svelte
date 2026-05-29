@@ -1,18 +1,34 @@
 <script>
   import { onMount } from 'svelte'
   import { activeSkin, applySkin, initSkin, skins } from '../../ui/theme/skins.js'
+  import {
+    activeAudioEngineId,
+    applyAudioEngine,
+    audioEngines,
+    detectAudioCapabilities,
+    initAudioEnginePreference,
+    isAudioEngineSupported,
+  } from '../../engines/audio/audioEngines.js'
 
   let selectedSkin = $state('midnight')
+  let selectedEngine = $state('vanilla')
+  let caps = $state({ webAudio: true, audioWorklet: true, wasm: true })
 
   onMount(() => {
     selectedSkin = initSkin()
-    return activeSkin.subscribe((skinId) => {
-      selectedSkin = skinId
-    })
+    selectedEngine = initAudioEnginePreference()
+    caps = detectAudioCapabilities()
+    const unsubSkin = activeSkin.subscribe((skinId) => { selectedSkin = skinId })
+    const unsubEngine = activeAudioEngineId.subscribe((id) => { selectedEngine = id })
+    return () => { unsubSkin(); unsubEngine() }
   })
 
   function selectSkin(id) {
     selectedSkin = applySkin(id)
+  }
+
+  function selectEngine(id) {
+    selectedEngine = applyAudioEngine(id)
   }
 </script>
 
@@ -62,6 +78,42 @@
             <span>Border: {skin.border}</span>
           </span>
         </label>
+      {/each}
+    </div>
+  </section>
+
+  <section class="settings-section" aria-labelledby="engine-heading">
+    <div class="section-copy">
+      <h2 id="engine-heading">Audio engine</h2>
+      <p>Choose how the Patch Studio synthesises sound. All engines produce the same voices; they differ in where and how the signal is generated. The selection applies the next time you start playback.</p>
+      {#if !caps.audioWorklet}
+        <p class="cap-note">This browser does not expose AudioWorklet, so the audio-thread engines are unavailable.</p>
+      {/if}
+    </div>
+
+    <div class="engine-grid" role="radiogroup" aria-label="Audio engine">
+      {#each audioEngines as engine}
+        {@const supported = isAudioEngineSupported(engine, caps)}
+        {@const active = selectedEngine === engine.id}
+        <button
+          type="button"
+          class="engine-card"
+          class:active={active}
+          role="radio"
+          aria-checked={active}
+          disabled={!supported}
+          title={supported ? '' : 'Not available on this browser'}
+          onclick={() => supported && selectEngine(engine.id)}
+        >
+          <span class="engine-head">
+            <span class="engine-name">{engine.name}</span>
+            <span class="engine-mark">
+              {#if !supported}Unavailable{:else if active}Selected{:else}Select{/if}
+            </span>
+          </span>
+          <span class="engine-tagline">{engine.tagline}</span>
+          <span class="engine-desc">{engine.description}</span>
+        </button>
       {/each}
     </div>
   </section>
@@ -235,12 +287,107 @@
     font-size: 0.72rem;
   }
 
+  .cap-note {
+    margin: 0.75rem 0 0;
+    color: var(--app-warn);
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .settings-section + .settings-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--app-border);
+  }
+
+  .engine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+    gap: 0.75rem;
+  }
+
+  .engine-card {
+    margin: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    background: var(--app-surface);
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: calc(var(--app-radius) + 2px);
+    color: var(--app-text);
+    cursor: pointer;
+    transition: border-color 0.14s, background 0.14s, transform 0.14s;
+  }
+
+  .engine-card:hover:not(:disabled),
+  .engine-card.active {
+    border-color: var(--app-accent);
+    background: color-mix(in srgb, var(--app-surface-2) 86%, var(--app-accent) 14%);
+  }
+
+  .engine-card:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .engine-card:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .engine-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .engine-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--app-text-strong);
+  }
+
+  .engine-mark {
+    flex-shrink: 0;
+    padding: 0.22rem 0.45rem;
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    color: var(--app-muted);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .engine-card.active .engine-mark {
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+    background: var(--app-accent-soft);
+  }
+
+  .engine-tagline {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-accent);
+  }
+
+  .engine-desc {
+    color: var(--app-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+
   @media (max-width: 880px) {
     .settings-section {
       grid-template-columns: 1fr;
     }
 
-    .skin-grid {
+    .skin-grid,
+    .engine-grid {
       grid-template-columns: 1fr;
     }
 

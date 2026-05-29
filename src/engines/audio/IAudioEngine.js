@@ -72,6 +72,17 @@ export class IAudioEngine {
   }
 
   /**
+   * Update an IsochronicTone voice's envelope shape. Optional capability —
+   * meaningful only for envelope-bearing voices; engines without per-voice
+   * envelopes may treat this as a no-op. Defaults to a no-op so callers never
+   * need to feature-detect.
+   *
+   * @param {VoiceHandle} handle
+   * @param {Object}      envSpec
+   */
+  setVoiceEnvelope(handle, envSpec) {}
+
+  /**
    * @param {number} volume 0–1
    * @param {number} atTime
    */
