@@ -21,7 +21,57 @@
 <AppBottomDock />
 
 <style>
+  /* Skin-independent tokens and Pico bindings. Per-skin colour palettes
+     follow below, keyed by [data-skin]. The default skin (paper) palette
+     also lives in :root so the no-JS / pre-hydration state matches the
+     default applied by the inline script in app.html. */
   :global(:root) {
+    color-scheme: light;
+    --app-header-height: 56px;
+    --app-bottom-dock-height: 48px;
+    --app-radius: 4px;
+    --app-border-width: 1px;
+    --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --app-font-mono: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --pico-background-color: var(--app-bg);
+    --pico-card-background-color: var(--app-surface);
+    --pico-color: var(--app-text);
+    --pico-muted-color: var(--app-muted);
+    --pico-muted-border-color: var(--app-border);
+    --pico-primary: var(--app-accent);
+    --pico-primary-background: var(--app-accent-soft);
+    --pico-primary-border: var(--app-accent);
+    --pico-border-radius: var(--app-radius);
+    --pico-font-family: var(--app-font-ui);
+  }
+
+  /* Default skin (paper) — also applied when no data-skin is set yet. */
+  :global(:root),
+  :global(:root[data-skin='paper']) {
+    color-scheme: light;
+    --app-bg: #f7f3ea;
+    --app-canvas: #fffdf8;
+    --app-surface: #fffaf1;
+    --app-surface-2: #eee7d8;
+    --app-surface-3: #e5dcc9;
+    --app-border: #cdbfa6;
+    --app-border-subtle: #e1d6c4;
+    --app-text: #2f2a21;
+    --app-text-strong: #17130d;
+    --app-muted: #746a5b;
+    --app-muted-2: #8a806f;
+    --app-accent: #3366a3;
+    --app-accent-soft: #dce8f3;
+    --app-control: #8a5a00;
+    --app-audio: #3366a3;
+    --app-visual: #7c5cc4;
+    --app-haptic: #28745e;
+    --app-ok: #317a43;
+    --app-warn: #9a6500;
+    --app-error: #a94438;
+  }
+
+  :global(:root[data-skin='midnight']) {
     color-scheme: dark;
     --app-bg: #080d12;
     --app-canvas: #0b0b0c;
@@ -43,25 +93,10 @@
     --app-ok: #35c46d;
     --app-warn: #e8a23c;
     --app-error: #e0604d;
-    --app-header-height: 56px;
-    --app-bottom-dock-height: 48px;
-    --app-radius: 4px;
-    --app-border-width: 1px;
-    --app-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --app-font-mono: "SF Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
-    --pico-background-color: var(--app-bg);
-    --pico-card-background-color: var(--app-surface);
-    --pico-color: var(--app-text);
-    --pico-muted-color: var(--app-muted);
-    --pico-muted-border-color: var(--app-border);
-    --pico-primary: var(--app-accent);
-    --pico-primary-background: var(--app-accent-soft);
-    --pico-primary-border: var(--app-accent);
-    --pico-border-radius: var(--app-radius);
-    --pico-font-family: var(--app-font-ui);
   }
 
   :global(:root[data-skin='aurora']) {
+    color-scheme: dark;
     --app-bg: #071013;
     --app-canvas: #071012;
     --app-surface: #102026;
@@ -131,30 +166,6 @@
     --app-ok: #1f8a4c;
     --app-warn: #ad6600;
     --app-error: #b33c2e;
-  }
-
-  :global(:root[data-skin='paper']) {
-    color-scheme: light;
-    --app-bg: #f7f3ea;
-    --app-canvas: #fffdf8;
-    --app-surface: #fffaf1;
-    --app-surface-2: #eee7d8;
-    --app-surface-3: #e5dcc9;
-    --app-border: #cdbfa6;
-    --app-border-subtle: #e1d6c4;
-    --app-text: #2f2a21;
-    --app-text-strong: #17130d;
-    --app-muted: #746a5b;
-    --app-muted-2: #8a806f;
-    --app-accent: #3366a3;
-    --app-accent-soft: #dce8f3;
-    --app-control: #8a5a00;
-    --app-audio: #3366a3;
-    --app-visual: #7c5cc4;
-    --app-haptic: #28745e;
-    --app-ok: #317a43;
-    --app-warn: #9a6500;
-    --app-error: #a94438;
   }
 
   :global(html),

@@ -237,7 +237,7 @@
     color: var(--pico-muted-color);
     text-decoration: none;
   }
-  .back-link:hover { color: #ececec; text-decoration: underline; }
+  .back-link:hover { color: var(--app-text, #ececec); text-decoration: underline; }
 
   .profile-error {
     margin: 0;

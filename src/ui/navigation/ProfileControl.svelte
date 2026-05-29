@@ -74,7 +74,7 @@
     display: grid;
     gap: 0.45rem;
     padding-top: 0.55rem;
-    border-top: 1px solid #ffffff18;
+    border-top: 1px solid var(--app-border);
   }
 
   .profile-control p {

@@ -131,10 +131,12 @@
   <details class="global-menu">
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
+      <a href="/">Graph</a>
       <a href="/creator/">Patch Studio</a>
-      <a href="/settings/">Settings</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
+      <a href="/logbook/">Logbook</a>
+      <a href="/settings/">Settings</a>
       <ProfileControl />
     </div>
   </details>

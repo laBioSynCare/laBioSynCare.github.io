@@ -6,6 +6,21 @@
     <meta name="description" content="BSC Lab — open-source sensory stimulation platform and RDF knowledge browser" />
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
     <title>BSC Lab</title>
+    <script>
+      // Apply the stored (or default) skin before first paint to avoid a
+      // flash of the wrong theme. Must stay in sync with src/ui/theme/skins.js.
+      (function () {
+        try {
+          var ids = ['midnight', 'aurora', 'ember', 'daylight', 'paper'];
+          var fallback = 'paper';
+          var stored = localStorage.getItem('bsclab.skin');
+          document.documentElement.dataset.skin =
+            ids.indexOf(stored) !== -1 ? stored : fallback;
+        } catch (e) {
+          document.documentElement.dataset.skin = 'paper';
+        }
+      })();
+    </script>
     %sveltekit.head%
   </head>
   <body>

@@ -309,7 +309,7 @@
 
   .visibility-toggle {
     display: inline-flex;
-    border: 1px solid #ffffff25;
+    border: 1px solid var(--app-border);
     border-radius: 0.35rem;
     overflow: hidden;
   }
@@ -326,13 +326,13 @@
     line-height: 1;
     width: auto;
   }
-  .visibility-option:hover { background: #ffffff10; color: #ececec; }
+  .visibility-option:hover { background: var(--app-surface-3); color: var(--app-text); }
   .visibility-option.active {
-    background: #ffffff18;
-    color: #ececec;
+    background: var(--app-surface-3);
+    color: var(--app-text-strong);
   }
   .visibility-option + .visibility-option {
-    border-left: 1px solid #ffffff25;
+    border-left: 1px solid var(--app-border);
   }
 
   .annotation-form > .form-row > button[type="submit"],
@@ -368,12 +368,12 @@
 
   .notes-list li {
     padding: 0.55rem 0.65rem;
-    border: 1px solid #ffffff18;
+    border: 1px solid var(--app-border);
     border-radius: 0.35rem;
   }
   .notes-list li.editing {
-    border-color: #ffffff35;
-    background: #ffffff04;
+    border-color: var(--app-accent);
+    background: var(--app-surface-2);
   }
 
   .note-text {
@@ -401,7 +401,7 @@
 
   .author {
     font-weight: 600;
-    color: #d8d8d8;
+    color: var(--app-text);
   }
 
   .meta-line .dot {
@@ -415,18 +415,18 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border: 1px solid #ffffff20;
+    border: 1px solid var(--app-border);
     color: var(--pico-muted-color);
   }
   .visibility-chip.public {
-    color: #cde9fa;
-    border-color: #4fc3f755;
-    background: #4fc3f714;
+    color: var(--app-accent);
+    border-color: color-mix(in srgb, var(--app-accent) 45%, transparent);
+    background: color-mix(in srgb, var(--app-accent) 12%, transparent);
   }
   .visibility-chip.private {
-    color: #f0c694;
-    border-color: #ffb74d55;
-    background: #ffb74d14;
+    color: var(--app-warn);
+    border-color: color-mix(in srgb, var(--app-warn) 45%, transparent);
+    background: color-mix(in srgb, var(--app-warn) 12%, transparent);
   }
 
   .actions {
@@ -445,8 +445,8 @@
     cursor: pointer;
     font-size: 0.7rem;
   }
-  .link-btn:hover { color: #ececec; text-decoration: underline; }
-  .link-btn.danger:hover { color: #f4a3a3; }
+  .link-btn:hover { color: var(--app-text); text-decoration: underline; }
+  .link-btn.danger:hover { color: var(--app-error); }
   .link-btn:disabled { opacity: 0.5; cursor: default; text-decoration: none; }
 
   .annotation-error {

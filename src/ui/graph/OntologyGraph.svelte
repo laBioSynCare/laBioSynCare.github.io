@@ -1369,7 +1369,7 @@
     background: color-mix(in srgb, var(--edge-color, #888) 18%, transparent);
     border: 1px solid var(--edge-color, #888);
     border-radius: 0.85rem;
-    color: #ececec;
+    color: var(--app-text);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
