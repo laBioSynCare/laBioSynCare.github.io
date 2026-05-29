@@ -24,6 +24,7 @@
     MARTIGLI_PARAM_RANGE,
     MARTIGLI_PARAMS,
     MARTIGLI_WAVEFORMS,
+    NOISE_COLORS,
     SYMMETRY_PARAM_RANGE,
     SYMMETRY_PARAMS,
     TEMPO_DIVISIONS,
@@ -42,6 +43,7 @@
     patchSummary,
     tempoSyncKindForTrackParam,
     validateDraft,
+    visualParamNames,
     voiceParamNames,
   } from './presetDraft.js'
   import {
@@ -78,6 +80,12 @@
   let controlStates = $state(creatorSession.controlStates)
   let sessionStartTime = creatorSession.sessionStartTime
   let rafId = null
+
+  // Free-running phase accumulators (cycles, [0,1)) for Blink/Oscillate visual
+  // previews, advanced each frame by the track's live rate so previews animate
+  // continuously and reflect modulation. Not reactive state — read via liveValues.
+  const visualPhase = {}
+  let lastVisualTick = null
 
   const summary = $derived(patchSummary(draft))
   const issues = $derived(validateDraft(draft))
@@ -251,6 +259,10 @@
     if (track.trackType === 'BinauralBeat') {
       spec.params.leftFreq = num(getLive(track, 'leftFreq'), track.params.leftFreq.value)
       spec.params.rightFreq = num(getLive(track, 'rightFreq'), track.params.rightFreq.value)
+    } else if (track.trackType === 'Noise') {
+      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
+      spec.params.cutoff = num(getLive(track, 'cutoff'), track.params.cutoff?.value ?? 6000)
+      spec.noiseColor = track.noiseColor ?? 'pink'
     } else {
       spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
       spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 200)
@@ -280,6 +292,14 @@
     const t = engine.getAudioContext().currentTime
     for (const handle of voiceHandles.values()) engine.stopVoice(handle, t)
     voiceHandles.clear()
+  }
+
+  // Rebuild a live voice from scratch — used when a structural choice (e.g. the
+  // noise colour) changes, which can't be applied as a smooth AudioParam ramp.
+  function restartVoice(track) {
+    if (!draft.playing || !engine) return
+    stopVoiceFor(track.id)
+    startVoiceFor(track)
   }
 
   // ── rAF loop ─────────────────────────────────────────────────────────────────
@@ -477,6 +497,30 @@
 
     for (const track of draft.visualTracks) applyMods(track, controlValues, VISUAL_PARAM_RANGE, null, VISUAL_PARAMS, liveTempo)
     for (const track of draft.hapticTracks) applyMods(track, controlValues, HAPTIC_PARAM_RANGE, null, HAPTIC_PARAMS, liveTempo)
+
+    // Advance Blink/Oscillate preview phases from a free-running clock (so they
+    // animate whether or not the session is playing) using the live, modulated
+    // rate. Writes __blinkOn / __oscVal into liveValues for visualStyle().
+    const vdt = lastVisualTick == null ? 0 : Math.max(0, Math.min(0.1, tNow - lastVisualTick))
+    lastVisualTick = tNow
+    for (const track of draft.visualTracks) {
+      if (track.trackType !== 'Blink' && track.trackType !== 'Oscillate') continue
+      const lv = liveValues[track.id] ?? (liveValues[track.id] = {})
+      if (track.trackType === 'Blink') {
+        const rate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
+        const duty = clamp(num(lv.duty ?? track.params.duty?.value, 0.5), 0.01, 0.99)
+        let ph = (visualPhase[track.id] ?? 0) + vdt * rate
+        ph -= Math.floor(ph)
+        visualPhase[track.id] = ph
+        lv.__blinkOn = ph < duty ? 1 : 0
+      } else {
+        const rate = clamp(num(lv.oscRate ?? track.params.oscRate?.value, 1), 0.01, 10)
+        let ph = (visualPhase[track.id] ?? 0) + vdt * rate
+        ph -= Math.floor(ph)
+        visualPhase[track.id] = ph
+        lv.__oscVal = 0.5 - 0.5 * Math.cos(2 * Math.PI * ph)
+      }
+    }
 
     // Keep direct control-track previews aligned with tempo-synced values.
     for (const track of draft.controlTracks) {
@@ -851,6 +895,24 @@
     return top + bot + ' Z'
   }
 
+  // Deterministic low-passed noise trace for the Noise scope. Seeded so it does
+  // not flicker every render; cutoffNorm (0..1) controls how jagged it looks.
+  function noisePath(xMin, xMax, yMid, yAmp, cutoffNorm, samples = 120) {
+    const span = xMax - xMin
+    let seed = 0x2545f491
+    const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed / 0x7fffffff) * 2 - 1 }
+    const alpha = clamp(cutoffNorm, 0.04, 1)
+    let lp = 0
+    let d = ''
+    for (let i = 0; i <= samples; i += 1) {
+      lp += alpha * (rand() - lp)
+      const x = xMin + span * (i / samples)
+      const y = yMid - yAmp * lp * 1.6
+      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
+    }
+    return d
+  }
+
   function visualStyle(track) {
     const rotation = num(getLive(track, 'rotationSpeed'), 0.1)
     const spin = Math.abs(rotation) < 0.01 ? 18 : clamp(1 / Math.abs(rotation), 0.5, 18)
@@ -860,6 +922,9 @@
       `--visual-scale:${clamp(num(getLive(track, 'scale'), 1), 0, 4).toFixed(3)}`,
       `--visual-spin:${spin.toFixed(3)}s`,
       `--visual-dir:${rotation < 0 ? 'reverse' : 'normal'}`,
+      // Blink/Oscillate live preview drivers (computed in the rAF loop).
+      `--visual-blink:${(getLive(track, '__blinkOn') ?? 1)}`,
+      `--visual-osc:${(num(getLive(track, '__oscVal'), 0)).toFixed(3)}`,
     ].join(';')
   }
 
@@ -914,7 +979,9 @@
   }
 
   function paramLabel(name) {
-    return name === 'noteDurationFrac' ? 'note%' : name
+    if (name === 'noteDurationFrac') return 'note%'
+    if (name === 'blinkRate' || name === 'oscRate') return 'rate'
+    return name
   }
 
   function audioSubtitleFor(track, aFreq, aPulse, leftF, rightF, centerF, beatF, isoEnv) {
@@ -923,6 +990,9 @@
     }
     if (track.trackType === 'IsochronicTone') {
       return `${Math.round(aFreq)} Hz · pulse ${aPulse.toFixed(1)} Hz · ${isoEnv?.type ?? track.envelope ?? 'AR'}`
+    }
+    if (track.trackType === 'Noise') {
+      return `${track.noiseColor ?? 'pink'} noise · ≤ ${Math.round(num(getLive(track, 'cutoff'), 6000))} Hz`
     }
     return `${Math.round(aFreq)} Hz`
   }
@@ -1432,6 +1502,14 @@
                       {/if}
                     </svg>
                   </div>
+                {:else if track.trackType === 'Noise'}
+                  {@const aCutoff = clamp(num(getLive(track, 'cutoff'), 6000), 100, 12000)}
+                  <div class="audio-scope a-noise" data-color={track.noiseColor ?? 'pink'} aria-hidden="true">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                      <path class="scope-trace scope-trace-noise" d={noisePath(4, 116, 20, 15 * aGain, aCutoff / 12000)} />
+                    </svg>
+                  </div>
                 {:else}
                   {@const carrCyc = aFreq * winSec}
                   <div class="audio-scope a-carrier" aria-hidden="true">
@@ -1475,6 +1553,16 @@
                     <span>mode</span>
                     <select bind:value={track.binauralMode}>
                       {#each BINAURAL_MODES as m}<option value={m}>{m}</option>{/each}
+                    </select>
+                  </label>
+                </div>
+              {/if}
+              {#if track.trackType === 'Noise'}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>color</span>
+                    <select bind:value={track.noiseColor} onchange={() => restartVoice(track)}>
+                      {#each NOISE_COLORS as c}<option value={c}>{c}</option>{/each}
                     </select>
                   </label>
                 </div>
@@ -1539,17 +1627,29 @@
               <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
-              <div class="track-preview visual-preview" style={visualStyle(track)} aria-hidden="true">
-                <span class="visual-aura"></span>
-                <svg class="visual-shape" viewBox="0 0 80 50">
-                  <polygon points={polygonPoints(getLive(track, 'sides'))} />
-                </svg>
-                <span class="visual-particle visual-particle-a"></span>
-                <span class="visual-particle visual-particle-b"></span>
-                <span class="visual-particle visual-particle-c"></span>
-              </div>
+              {#if track.trackType === 'Blink'}
+                <div class="track-preview visual-preview vp-blink" style={visualStyle(track)} aria-hidden="true">
+                  <span class="visual-aura"></span>
+                  <span class="blink-dot"></span>
+                </div>
+              {:else if track.trackType === 'Oscillate'}
+                <div class="track-preview visual-preview vp-osc" style={visualStyle(track)} aria-hidden="true">
+                  <span class="visual-aura"></span>
+                  <span class="osc-dot"></span>
+                </div>
+              {:else}
+                <div class="track-preview visual-preview" style={visualStyle(track)} aria-hidden="true">
+                  <span class="visual-aura"></span>
+                  <svg class="visual-shape" viewBox="0 0 80 50">
+                    <polygon points={polygonPoints(getLive(track, 'sides'))} />
+                  </svg>
+                  <span class="visual-particle visual-particle-a"></span>
+                  <span class="visual-particle visual-particle-b"></span>
+                  <span class="visual-particle visual-particle-c"></span>
+                </div>
+              {/if}
               <div class="knob-grid">
-                {#each VISUAL_PARAMS as pname}
+                {#each visualParamNames(track.trackType) as pname}
                   {@const param = track.params[pname]}
                   {@const [pmin, pmax, pstep] = VISUAL_PARAM_RANGE[pname]}
                   {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id, null, tempoSyncKindForTrackParam(track, pname))}
@@ -2775,6 +2875,12 @@
   .scope-band-r { fill: #c28ce033; stroke: #c28ce0; }
   .scope-trace-sum { stroke: var(--ac); }
 
+  /* Noise scope: tint the broadband trace by spectral colour. */
+  .scope-trace-noise { stroke-width: 1; filter: none; }
+  .a-noise[data-color='white'] .scope-trace-noise { stroke: #d7e1ec; }
+  .a-noise[data-color='pink'] .scope-trace-noise { stroke: #e58fb0; filter: drop-shadow(0 0 2px #e58fb055); }
+  .a-noise[data-color='brown'] .scope-trace-noise { stroke: #c79a5b; filter: drop-shadow(0 0 2px #c79a5b55); }
+
   .pan-ruler {
     position: relative;
     height: 12px;
@@ -2932,6 +3038,35 @@
   .visual-particle-a { left: 18%; top: 26%; }
   .visual-particle-b { left: 74%; top: 34%; animation-delay: -1.2s; }
   .visual-particle-c { left: 58%; top: 70%; animation-delay: -2.1s; }
+
+  /* Blink / Oscillate previews are driven live by --visual-blink (0/1) and
+     --visual-osc (0..1), updated each frame by the rAF loop. */
+  .blink-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, hsla(var(--visual-hue, 200), 95%, 66%, 1), hsla(var(--visual-hue, 200), 90%, 50%, 0.18) 70%);
+    box-shadow: 0 0 18px hsla(var(--visual-hue, 200), 95%, 60%, 0.85);
+    opacity: calc(var(--visual-opacity, 1) * var(--visual-blink, 1));
+    transition: opacity 0.02s linear;
+  }
+
+  .osc-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle, hsla(var(--visual-hue, 200), 95%, 64%, 0.95), hsla(var(--visual-hue, 200), 90%, 48%, 0.14) 70%);
+    box-shadow: 0 0 16px hsla(var(--visual-hue, 200), 95%, 60%, 0.7);
+    transform: translate(-50%, -50%) scale(calc(0.55 + var(--visual-osc, 0) * var(--visual-scale, 1) * 0.6));
+    opacity: calc(var(--visual-opacity, 1) * (0.45 + 0.55 * var(--visual-osc, 0)));
+  }
 
   .haptic-preview {
     background:

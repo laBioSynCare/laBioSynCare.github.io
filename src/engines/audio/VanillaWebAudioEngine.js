@@ -79,6 +79,39 @@ function buildEnvelopeWave(ctx, envSpec) {
   return { wave, dc }
 }
 
+// Fill a mono buffer with one of three noise colours. White is flat; pink uses
+// Paul Kellet's economical −3 dB/oct filter; brown is a leaky integrator
+// (−6 dB/oct). The buffer is looped by an AudioBufferSourceNode at playback.
+export function buildNoiseBuffer(ctx, color = 'pink', seconds = 2) {
+  const len = Math.max(1, Math.floor(ctx.sampleRate * seconds))
+  const buffer = ctx.createBuffer(1, len, ctx.sampleRate)
+  const data = buffer.getChannelData(0)
+  if (color === 'white') {
+    for (let i = 0; i < len; i += 1) data[i] = Math.random() * 2 - 1
+  } else if (color === 'brown') {
+    let last = 0
+    for (let i = 0; i < len; i += 1) {
+      const white = Math.random() * 2 - 1
+      last = (last + 0.02 * white) / 1.02
+      data[i] = last * 3.5
+    }
+  } else {
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0
+    for (let i = 0; i < len; i += 1) {
+      const white = Math.random() * 2 - 1
+      b0 = 0.99886 * b0 + white * 0.0555179
+      b1 = 0.99332 * b1 + white * 0.0750759
+      b2 = 0.96900 * b2 + white * 0.1538520
+      b3 = 0.86650 * b3 + white * 0.3104856
+      b4 = 0.55000 * b4 + white * 0.5329522
+      b5 = -0.7616 * b5 - white * 0.0168980
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11
+      b6 = white * 0.115926
+    }
+  }
+  return buffer
+}
+
 /**
  * Minimal Vanilla Web Audio implementation of IAudioEngine.
  *
@@ -179,6 +212,9 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     } else if (paramName === 'pulseRate') {
       v.pulseRate = Number.isFinite(value) ? value : v.pulseRate
       this._applyPulseRate(v, apply)
+    } else if (paramName === 'cutoff' && v._lowpass) {
+      v.cutoff = Number.isFinite(value) ? value : v.cutoff
+      apply(v._lowpass.frequency, v.cutoff)
     } else if (paramName === 'leftFreq' && v.type === 'BinauralBeat' && v._oscL) {
       v.leftFreq = Number.isFinite(value) ? value : v.leftFreq
       apply(v._oscL.frequency, v.leftFreq)
@@ -305,6 +341,30 @@ export class VanillaWebAudioEngine extends IAudioEngine {
       v._envScale = envScale
       v._envDC = envDC
       v._envInfo = envInfo
+    } else if (type === 'Noise') {
+      // Looping colored-noise buffer → low-pass (modulatable cutoff) → gain → pan.
+      const cutoff = Number.isFinite(params.cutoff) ? params.cutoff : 6000
+      const src = ctx.createBufferSource()
+      src.buffer = buildNoiseBuffer(ctx, spec.noiseColor || 'pink', 2)
+      src.loop = true
+
+      const lowpass = ctx.createBiquadFilter()
+      lowpass.type = 'lowpass'
+      lowpass.frequency.value = cutoff
+      lowpass.Q.value = 0.707
+
+      const ampGain = ctx.createGain(); ampGain.gain.value = userGain
+      const userPan = ctx.createStereoPanner(); userPan.pan.value = pan
+      userPan.connect(outGain)
+
+      src.connect(lowpass).connect(ampGain).connect(userPan)
+      src.start(t0)
+
+      v.userPan = userPan
+      v.cutoff = cutoff
+      v.sources.push(src)
+      v._ampGain = ampGain
+      v._lowpass = lowpass
     } else {
       // Carrier
       const ampGain = ctx.createGain(); ampGain.gain.value = userGain

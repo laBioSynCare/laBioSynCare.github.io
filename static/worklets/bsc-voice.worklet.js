@@ -64,6 +64,7 @@ class BSCVoiceProcessor extends AudioWorkletProcessor {
       { name: 'frequency', defaultValue: 200, minValue: 0, maxValue: 24000, automationRate: 'a-rate' },
       { name: 'pulseRate', defaultValue: 10, minValue: 0, maxValue: 200, automationRate: 'a-rate' },
       { name: 'pan', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' },
+      { name: 'cutoff', defaultValue: 6000, minValue: 20, maxValue: 24000, automationRate: 'a-rate' },
       { name: 'leftFreq', defaultValue: 200, minValue: 0, maxValue: 24000, automationRate: 'a-rate' },
       { name: 'rightFreq', defaultValue: 200, minValue: 0, maxValue: 24000, automationRate: 'a-rate' },
     ]
@@ -74,12 +75,19 @@ class BSCVoiceProcessor extends AudioWorkletProcessor {
     const opts = (options && options.processorOptions) || {}
     this._type = opts.voiceType || 'Carrier'
     this._env = opts.envelope || { type: 'AR', attackFrac: 0.1, releaseFrac: 0.15, noteDurationFrac: 0.5 }
+    this._noiseColor = opts.noiseColor || 'pink'
 
     // Pre-allocated phase accumulators (cycles, [0,1)). No allocation in process().
     this._phase = 0
     this._phaseL = 0
     this._phaseR = 0
     this._slot = 0
+
+    // Pre-allocated noise filter state (pink IIR taps, brown integrator, LP).
+    this._b0 = 0; this._b1 = 0; this._b2 = 0; this._b3 = 0
+    this._b4 = 0; this._b5 = 0; this._b6 = 0
+    this._brown = 0
+    this._lp = 0
 
     this.port.onmessage = (event) => {
       const data = event.data || {}
@@ -146,6 +154,48 @@ class BSCVoiceProcessor extends AudioWorkletProcessor {
       }
       this._phase = ph
       this._slot = slot
+      return true
+    }
+
+    if (this._type === 'Noise') {
+      const cutP = parameters.cutoff
+      const color = this._noiseColor
+      // Cutoff held constant across the block (smooth enough for sweeps); avoids
+      // a per-sample exp(). alpha is the one-pole low-pass coefficient.
+      const cutoff = Math.min(cutP[0], sr * 0.45)
+      const alpha = 1 - Math.exp(-TWO_PI * cutoff * invSr)
+      let lp = this._lp
+      let b0 = this._b0, b1 = this._b1, b2 = this._b2, b3 = this._b3
+      let b4 = this._b4, b5 = this._b5, b6 = this._b6, brown = this._brown
+      for (let i = 0; i < n; i += 1) {
+        const white = Math.random() * 2 - 1
+        let x
+        if (color === 'white') {
+          x = white
+        } else if (color === 'brown') {
+          brown = (brown + 0.02 * white) / 1.02
+          x = brown * 3.5
+        } else {
+          b0 = 0.99886 * b0 + white * 0.0555179
+          b1 = 0.99332 * b1 + white * 0.0750759
+          b2 = 0.96900 * b2 + white * 0.1538520
+          b3 = 0.86650 * b3 + white * 0.3104856
+          b4 = 0.55000 * b4 + white * 0.5329522
+          b5 = -0.7616 * b5 - white * 0.0168980
+          x = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11
+          b6 = white * 0.115926
+        }
+        lp += alpha * (x - lp)
+        const g = gC ? gainP[0] : gainP[i]
+        const pan = paC ? panP[0] : panP[i]
+        const s = lp * g
+        const a = (pan + 1) * (Math.PI / 4)
+        outL[i] = s * Math.cos(a)
+        outR[i] = s * Math.sin(a)
+      }
+      this._lp = lp
+      this._b0 = b0; this._b1 = b1; this._b2 = b2; this._b3 = b3
+      this._b4 = b4; this._b5 = b5; this._b6 = b6; this._brown = brown
       return true
     }
 

@@ -7,7 +7,7 @@ const DEFAULT_RELEASE = 0.05
 // Parameter names the BSC voice processors expose as AudioParams. The studio
 // drives all of them from the main thread via timed AudioParam automation, so
 // AudioContext.currentTime stays the only clock.
-const VOICE_PARAMS = ['gain', 'frequency', 'pulseRate', 'pan', 'leftFreq', 'rightFreq']
+const VOICE_PARAMS = ['gain', 'frequency', 'pulseRate', 'pan', 'cutoff', 'leftFreq', 'rightFreq']
 
 /**
  * Shared base for the AudioWorklet-backed engines.
@@ -88,6 +88,7 @@ export class WorkletVoiceEngine extends IAudioEngine {
       processorOptions: {
         voiceType: spec.type,
         envelope: spec.envelope || null,
+        noiseColor: spec.noiseColor || null,
       },
     })
     this._onVoiceCreated(node, spec)
@@ -102,6 +103,9 @@ export class WorkletVoiceEngine extends IAudioEngine {
     if (spec.type === 'BinauralBeat') {
       setP('leftFreq', params.leftFreq)
       setP('rightFreq', params.rightFreq)
+    } else if (spec.type === 'Noise') {
+      setP('pan', params.pan)
+      setP('cutoff', params.cutoff)
     } else {
       setP('frequency', params.frequency)
       setP('pulseRate', params.pulseRate)

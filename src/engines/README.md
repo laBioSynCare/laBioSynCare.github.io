@@ -50,7 +50,7 @@ engines/
 ## Audio engines
 
 Four interchangeable implementations of `IAudioEngine`, all rendering the same
-Phase-1 voice model (`Carrier`, `IsochronicTone`, `BinauralBeat`). The user
+Phase-1 voice model (`Carrier`, `IsochronicTone`, `BinauralBeat`, `Noise`). The user
 picks one in **Settings → Audio engine**; the choice is persisted to
 `localStorage` (`bsclab.audioEngine`) and read by `createAudioEngine()` when the
 Patch Studio next starts playback. `audioEngines.js` holds the registry,

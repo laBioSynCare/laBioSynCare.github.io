@@ -42,10 +42,14 @@ export const SYMMETRY_PARAMS = ['nnotes', 'rateHz', 'amplitude']
 export const SYMMETRY_FAMILIES = ['plain-hunt']
 
 // Audio track types
-export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier']
+export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier', 'Noise']
 
 // Audio parameters that can accept modulation
-export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac']
+export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac', 'cutoff']
+
+// Noise spectral colours (broadband sources). White is flat power, pink falls
+// −3 dB/octave, brown −6 dB/octave (progressively warmer / less harsh).
+export const NOISE_COLORS = ['white', 'pink', 'brown']
 
 // Knob ranges for audio params [min, max, step]
 export const AUDIO_PARAM_RANGE = {
@@ -54,6 +58,7 @@ export const AUDIO_PARAM_RANGE = {
   frequency: [20,   2000,  1],
   pulseRate: [0.5,  50,    0.5],
   noteDurationFrac: [0.05, 1,    0.01],
+  cutoff:    [100,  12000, 10],
   leftFreq:  [20,   2000,  1],
   rightFreq: [20,   2000,  1],
   // Virtual params for BinauralBeat center-beat modulation
@@ -64,11 +69,13 @@ export const AUDIO_PARAM_RANGE = {
 // Canonical (audible & modulatable) params per voice type. BinauralBeat owns
 // leftFreq and rightFreq INDEPENDENTLY — center/beat are derived for display
 // only. No pan on Binaural (the two carriers are hard-panned L/R by definition;
-// a user pan stage defeats the binaural effect). No pulseRate on Carrier.
+// a user pan stage defeats the binaural effect). No pulseRate on Carrier. Noise
+// is a broadband source shaped by a low-pass cutoff (modulatable for sweeps).
 export const VOICE_PARAMS = {
   Carrier:        ['gain', 'pan', 'frequency'],
   IsochronicTone: ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac'],
   BinauralBeat:   ['gain', 'leftFreq', 'rightFreq'],
+  Noise:          ['gain', 'pan', 'cutoff'],
 }
 
 export function voiceParamNames(trackType) {
@@ -91,18 +98,35 @@ export const ISO_ENVELOPE_DEFAULTS = {
 export const BINAURAL_MODES = ['center-beat', 'left-right']
 
 // Visual track types
-export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient']
+export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate']
 
-// Visual parameters that can accept modulation
-export const VISUAL_PARAMS = ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue']
+// Visual parameters that can accept modulation (full registry across all types)
+export const VISUAL_PARAMS = ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue', 'blinkRate', 'duty', 'oscRate']
 
 // Knob ranges for visual params [min, max, step]
 export const VISUAL_PARAM_RANGE = {
-  opacity:       [0,   1,    0.01],
-  scale:         [0,   4,    0.01],
-  rotationSpeed: [-2,  2,    0.01],
-  sides:         [3,   12,   1],
-  hue:           [0,   360,  1],
+  opacity:       [0,    1,    0.01],
+  scale:         [0,    4,    0.01],
+  rotationSpeed: [-2,   2,    0.01],
+  sides:         [3,    12,   1],
+  hue:           [0,    360,  1],
+  blinkRate:     [0.5,  40,   0.5],   // Hz — photic flicker rate
+  duty:          [0.05, 0.95, 0.01],  // on-fraction of each blink cycle
+  oscRate:       [0.05, 10,   0.05],  // Hz — sinusoidal oscillation rate
+}
+
+// Modulatable params per visual track type. The three legacy types keep the
+// original shared set; Blink and Oscillate expose their own controls.
+export const VISUAL_VOICE_PARAMS = {
+  Geometry:  ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
+  Particles: ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
+  Gradient:  ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
+  Blink:     ['opacity', 'blinkRate', 'duty', 'hue'],
+  Oscillate: ['opacity', 'scale', 'oscRate', 'hue'],
+}
+
+export function visualParamNames(trackType) {
+  return VISUAL_VOICE_PARAMS[trackType] ?? VISUAL_VOICE_PARAMS.Geometry
 }
 
 // Haptic track types
@@ -133,6 +157,8 @@ export const TEMPO_SYNC_TARGETS = {
   Geometry: { rotationSpeed: 'signedRate' },
   Particles: { rotationSpeed: 'signedRate' },
   Gradient: { rotationSpeed: 'signedRate' },
+  Blink: { blinkRate: 'rate' },
+  Oscillate: { oscRate: 'rate' },
   Vibration: { pulseRate: 'rate' },
 }
 
@@ -205,9 +231,10 @@ export function createMod(controlId = '', amount = 1) {
 // ── Audio tracks ─────────────────────────────────────────────────────────────
 
 function audioParams(trackType = 'IsochronicTone', defaults = {}) {
-  const base = trackType === 'BinauralBeat'
-    ? { gain: 0.5, leftFreq: 200, rightFreq: 210 }
-    : { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10, noteDurationFrac: 0.5 }
+  let base
+  if (trackType === 'BinauralBeat') base = { gain: 0.5, leftFreq: 200, rightFreq: 210 }
+  else if (trackType === 'Noise') base = { gain: 0.3, pan: 0, cutoff: 6000 }
+  else base = { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10, noteDurationFrac: 0.5 }
   const merged = { ...base, ...defaults }
   const params = {}
   for (const key of voiceParamNames(trackType)) {
@@ -238,17 +265,23 @@ export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
   if (trackType === 'BinauralBeat') {
     base.binauralMode = 'center-beat'
   }
+  if (trackType === 'Noise') {
+    base.noiseColor = overrides.noiseColor ?? 'pink'
+  }
   return { ...base, ...overrides }
 }
 
 // ── Visual tracks ─────────────────────────────────────────────────────────────
 
-function visualParams(defaults = {}) {
-  const base = { opacity: 1, scale: 1, rotationSpeed: 0.1, sides: 3, hue: 200 }
+function visualParams(trackType = 'Geometry', defaults = {}) {
+  const base = {
+    opacity: 1, scale: 1, rotationSpeed: 0.1, sides: 3, hue: 200,
+    blinkRate: 10, duty: 0.5, oscRate: 1,
+  }
   const merged = { ...base, ...defaults }
   const params = {}
-  for (const key of VISUAL_PARAMS) {
-    params[key] = attachTempoSync({ value: merged[key], mods: [] }, 'Geometry', key)
+  for (const key of visualParamNames(trackType)) {
+    params[key] = attachTempoSync({ value: merged[key], mods: [] }, trackType, key)
   }
   return params
 }
@@ -258,7 +291,7 @@ export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
     id: uid('visual'),
     trackType,
     name: trackType,
-    params: visualParams(),
+    params: visualParams(trackType),
     ...overrides,
   }
 }

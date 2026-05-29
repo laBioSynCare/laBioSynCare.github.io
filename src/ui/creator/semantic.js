@@ -19,6 +19,12 @@ const TRACK_SEMANTICS = {
     uri: SSTIM('Voice').value,
     description: 'A direct audio layer used as a carrier tone or continuous voice component in a patch.',
   },
+  Noise: {
+    label: 'Noise',
+    kind: 'Audio voice type',
+    uri: SSTIM('Voice').value,
+    description: 'A broadband noise layer (white, pink, or brown) shaped by a low-pass cutoff, used for masking and calming textures.',
+  },
   Martigli: {
     label: 'Martigli',
     kind: 'Control signal type',
@@ -49,6 +55,18 @@ const TRACK_SEMANTICS = {
     uri: SSTIM_V('modalityVisual').value,
     description: 'A visual sensory modality component rendered as a changing gradient field.',
   },
+  Blink: {
+    label: 'Blink',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A photic visual component that flashes on and off at a set rate and duty cycle, supporting flicker-based entrainment.',
+  },
+  Oscillate: {
+    label: 'Oscillate',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A visual component whose brightness and scale vary smoothly and sinusoidally at a set rate.',
+  },
   Vibration: {
     label: 'Vibration',
     kind: 'Haptic track type',
@@ -74,9 +92,13 @@ const PARAM_SEMANTICS = {
   rateHz: ['Rate', 'Rhythmic parameter', 'pulseRateHz', 'Control or sequence step rate in Hz.'],
   nnotes: ['Note count', 'Sequence parameter', 'noteCount', 'Number of notes or sequence positions in a Symmetry cycle.'],
   noctaves: ['Octave span', 'Pitch parameter', 'octaveSpan', 'Pitch span covered by a Symmetry sequence.'],
+  cutoff: ['Cutoff', 'Filter parameter', 'lowpassCutoffHz', 'Low-pass filter cutoff in Hz applied to a broadband noise source.'],
   rotationSpeed: ['Rotation speed', 'Visual parameter', 'rotationSpeed', 'Visual rotation rate or angular speed.'],
   sides: ['Sides', 'Visual parameter', 'visualSideCount', 'Number of sides used by a geometric visual form.'],
   density: ['Density', 'Visual parameter', 'visualDensity', 'Density of rendered visual elements.'],
+  blinkRate: ['Blink rate', 'Visual parameter', 'flickerRateHz', 'Photic flicker rate in Hz for a blinking visual.'],
+  duty: ['Duty cycle', 'Visual parameter', 'dutyCycle', 'On-fraction of each blink cycle.'],
+  oscRate: ['Oscillation rate', 'Visual parameter', 'oscillationRateHz', 'Rate in Hz of a smooth visual oscillation.'],
   intensity: ['Intensity', 'Haptic parameter', 'stimulationIntensity', 'Strength of haptic or sensory output.'],
   pattern: ['Pattern', 'Haptic parameter', 'hapticPattern', 'Pattern index or selector for haptic delivery.'],
 }
