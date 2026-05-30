@@ -1,4 +1,5 @@
 import { IAudioEngine } from './IAudioEngine.js'
+import { loadSample, sampleUrl } from './sampleLoader.js'
 
 const DEFAULT_RELEASE = 0.05
 const PARAM_RAMP = 0.02
@@ -112,6 +113,22 @@ export function buildNoiseBuffer(ctx, color = 'pink', seconds = 2) {
   return buffer
 }
 
+// WaveShaper curve mapping a sine LFO (domain [-1,1]) to a tremolo gain. The
+// oscillator drives this curve into a GainNode's gain param, so one mechanism
+// covers both modes: 'linear' (linear in amplitude) and 'exponential' (linear
+// in dB / perceived loudness).
+export function buildTremCurve(mode = 'exponential', depth = 0.5, N = 2048) {
+  const d = Math.max(0, Math.min(1, depth))
+  const floor = Math.max(0.001, 1 - d)
+  const curve = new Float32Array(N)
+  for (let i = 0; i < N; i += 1) {
+    const x = (i / (N - 1)) * 2 - 1
+    const lfo01 = 0.5 - 0.5 * x
+    curve[i] = mode === 'linear' ? (1 - d * lfo01) : Math.pow(floor, lfo01)
+  }
+  return curve
+}
+
 /**
  * Minimal Vanilla Web Audio implementation of IAudioEngine.
  *
@@ -129,6 +146,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     this._ctx = null
     this._masterGain = null
     this._voices = new Map()
+    this._sampleCache = new Map()
   }
 
   async initialize() {
@@ -181,6 +199,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     const t = Math.max(stopTime, this._ctx.currentTime)
     const tEnd = t + releaseSeconds
     const v = handle._voice
+    v._stopped = true
     v.outGain.gain.cancelScheduledValues(t)
     v.outGain.gain.setValueAtTime(v.outGain.gain.value, t)
     v.outGain.gain.linearRampToValueAtTime(0.0001, tEnd)
@@ -190,6 +209,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     handle.isActive = false
     setTimeout(() => {
       for (const node of v.sources) { try { node.disconnect() } catch (_) {} }
+      for (const node of (v._extraNodes || [])) { try { node.disconnect() } catch (_) {} }
       try { v.outGain.disconnect() } catch (_) {}
       this._voices.delete(handle.id)
     }, (releaseSeconds + 0.05) * 1000)
@@ -212,9 +232,14 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     } else if (paramName === 'pulseRate') {
       v.pulseRate = Number.isFinite(value) ? value : v.pulseRate
       this._applyPulseRate(v, apply)
-    } else if (paramName === 'cutoff' && v._lowpass) {
+    } else if (paramName === 'cutoff' && v._filter) {
       v.cutoff = Number.isFinite(value) ? value : v.cutoff
-      apply(v._lowpass.frequency, v.cutoff)
+      apply(v._filter.frequency, v.cutoff)
+    } else if (paramName === 'resonance' && v._filter) {
+      apply(v._filter.Q, value)
+    } else if (paramName === 'detune' && v._droneOscs) {
+      v.droneDetune = Number.isFinite(value) ? value : v.droneDetune
+      for (const d of v._droneOscs) apply(d.osc.detune, d.norm * v.droneDetune)
     } else if (paramName === 'leftFreq' && v.type === 'BinauralBeat' && v._oscL) {
       v.leftFreq = Number.isFinite(value) ? value : v.leftFreq
       apply(v._oscL.frequency, v.leftFreq)
@@ -236,6 +261,19 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     v._envInfo = info
     const t = this._ctx.currentTime
     this._applyParam(v._envDC.offset, v.userGain * info.dc, t, 'step')
+  }
+
+  // Live tremolo update for rate / depth / mode. Enabling or disabling tremolo
+  // is structural (adds/removes a node), so the caller rebuilds the voice for
+  // that; here we only adjust an already-present tremolo stage.
+  setTremolo(handle, tremolo) {
+    const v = handle?._voice
+    if (!v || !v._trem || !tremolo) return
+    const t = this._ctx.currentTime
+    if (Number.isFinite(tremolo.rate)) {
+      this._applyParam(v._trem.lfo.frequency, Math.max(0.01, tremolo.rate), t, 'linear')
+    }
+    v._trem.shaper.curve = buildTremCurve(tremolo.mode, tremolo.depth)
   }
 
   setMasterVolume(volume, atTime) {
@@ -279,11 +317,30 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     const outGain = ctx.createGain()
     outGain.gain.setValueAtTime(0, t0)
     outGain.gain.linearRampToValueAtTime(1, t0 + ATTACK)
-    outGain.connect(this._masterGain)
 
     const v = {
       type, userGain, frequency, pulseRate,
-      outGain, userPan: null, sources: [],
+      outGain, userPan: null, sources: [], _extraNodes: [],
+    }
+
+    // Optional tremolo / AM stage between the per-voice fade gain and master.
+    const trem = spec.tremolo
+    if (trem && trem.enabled && trem.depth > 0) {
+      const tremGain = ctx.createGain()
+      tremGain.gain.value = 0 // driven entirely by the shaped LFO
+      const lfo = ctx.createOscillator(); lfo.type = 'sine'
+      lfo.frequency.value = Math.max(0.01, trem.rate)
+      const shaper = ctx.createWaveShaper()
+      shaper.curve = buildTremCurve(trem.mode, trem.depth)
+      lfo.connect(shaper).connect(tremGain.gain)
+      outGain.connect(tremGain)
+      tremGain.connect(this._masterGain)
+      lfo.start(t0)
+      v._trem = { lfo, shaper }
+      v.sources.push(lfo)
+      v._extraNodes.push(tremGain, shaper)
+    } else {
+      outGain.connect(this._masterGain)
     }
 
     if (type === 'BinauralBeat') {
@@ -342,29 +399,77 @@ export class VanillaWebAudioEngine extends IAudioEngine {
       v._envDC = envDC
       v._envInfo = envInfo
     } else if (type === 'Noise') {
-      // Looping colored-noise buffer → low-pass (modulatable cutoff) → gain → pan.
+      // Looping colored-noise buffer → biquad (lowpass/bandpass/highpass with
+      // modulatable cutoff + resonance) → gain → pan.
       const cutoff = Number.isFinite(params.cutoff) ? params.cutoff : 6000
+      const resonance = Number.isFinite(params.resonance) ? params.resonance : 0.707
       const src = ctx.createBufferSource()
       src.buffer = buildNoiseBuffer(ctx, spec.noiseColor || 'pink', 2)
       src.loop = true
 
-      const lowpass = ctx.createBiquadFilter()
-      lowpass.type = 'lowpass'
-      lowpass.frequency.value = cutoff
-      lowpass.Q.value = 0.707
+      const filter = ctx.createBiquadFilter()
+      filter.type = spec.noiseFilter || 'lowpass'
+      filter.frequency.value = cutoff
+      filter.Q.value = resonance
 
       const ampGain = ctx.createGain(); ampGain.gain.value = userGain
       const userPan = ctx.createStereoPanner(); userPan.pan.value = pan
       userPan.connect(outGain)
 
-      src.connect(lowpass).connect(ampGain).connect(userPan)
+      src.connect(filter).connect(ampGain).connect(userPan)
       src.start(t0)
 
       v.userPan = userPan
       v.cutoff = cutoff
       v.sources.push(src)
       v._ampGain = ampGain
-      v._lowpass = lowpass
+      v._filter = filter
+    } else if (type === 'Drone') {
+      // Stack of N detuned sine oscillators (lush pad). Each carries the same
+      // root frequency; per-voice detune in cents spreads them symmetrically.
+      const root = Number.isFinite(params.frequency) ? params.frequency : 110
+      const detune = Number.isFinite(params.detune) ? params.detune : 12
+      const N = Math.max(1, Math.min(7, spec.droneVoices || 5))
+
+      const normGain = ctx.createGain(); normGain.gain.value = 1 / Math.sqrt(N)
+      const ampGain = ctx.createGain(); ampGain.gain.value = userGain
+      const userPan = ctx.createStereoPanner(); userPan.pan.value = pan
+      normGain.connect(ampGain).connect(userPan).connect(outGain)
+
+      const oscs = []
+      for (let i = 0; i < N; i += 1) {
+        const norm = N > 1 ? (i - (N - 1) / 2) / ((N - 1) / 2) : 0 // -1..1
+        const osc = ctx.createOscillator(); osc.type = 'sine'
+        osc.frequency.value = root
+        osc.detune.value = norm * detune
+        osc.connect(normGain); osc.start(t0)
+        oscs.push({ osc, norm })
+        v.sources.push(osc)
+      }
+      v.userPan = userPan
+      v.frequency = root
+      v.droneDetune = detune
+      v._ampGain = ampGain
+      v._droneOscs = oscs
+      v._extraNodes.push(normGain)
+    } else if (type === 'Sample') {
+      // Looping ambient clip → gain → pan. The buffer decodes asynchronously;
+      // the source starts as soon as it is ready (a few ms after scheduling).
+      const ampGain = ctx.createGain(); ampGain.gain.value = userGain
+      const userPan = ctx.createStereoPanner(); userPan.pan.value = pan
+      ampGain.connect(userPan).connect(outGain)
+      const src = ctx.createBufferSource(); src.loop = true
+      src.connect(ampGain)
+      v.userPan = userPan
+      v._ampGain = ampGain
+      v.sources.push(src)
+      loadSample(ctx, this._sampleCache, sampleUrl(spec.sampleId || 'rain'))
+        .then((buf) => {
+          if (v._stopped) return
+          src.buffer = buf
+          try { src.start(Math.max(t0, ctx.currentTime)) } catch (_) {}
+        })
+        .catch(() => {})
     } else {
       // Carrier
       const ampGain = ctx.createGain(); ampGain.gain.value = userGain
@@ -400,6 +505,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     // BinauralBeat uses independent leftFreq/rightFreq via dedicated branches
     // in setVoiceParameter — it doesn't share the 'frequency' param name.
     if (v._osc) apply(v._osc.frequency, v.frequency)
+    if (v._droneOscs) for (const d of v._droneOscs) apply(d.osc.frequency, v.frequency)
   }
 
   _applyPulseRate(v, apply) {

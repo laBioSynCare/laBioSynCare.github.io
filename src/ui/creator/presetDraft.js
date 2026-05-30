@@ -42,14 +42,23 @@ export const SYMMETRY_PARAMS = ['nnotes', 'rateHz', 'amplitude']
 export const SYMMETRY_FAMILIES = ['plain-hunt']
 
 // Audio track types
-export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier', 'Noise']
+export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier', 'Noise', 'Drone', 'Sample']
+
+// Built-in ambient sample clips (synthetic CC0 loops in static/audio/).
+export const SAMPLE_CLIPS = ['rain', 'ocean', 'wind']
 
 // Audio parameters that can accept modulation
-export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac', 'cutoff']
+export const AUDIO_PARAMS = ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac', 'cutoff', 'resonance', 'detune']
+
+// Drone voice-stack sizes (number of detuned oscillators).
+export const DRONE_VOICES = [3, 5, 7]
 
 // Noise spectral colours (broadband sources). White is flat power, pink falls
 // −3 dB/octave, brown −6 dB/octave (progressively warmer / less harsh).
 export const NOISE_COLORS = ['white', 'pink', 'brown']
+
+// Noise shaping-filter modes (applied after the colour source).
+export const NOISE_FILTERS = ['lowpass', 'bandpass', 'highpass']
 
 // Knob ranges for audio params [min, max, step]
 export const AUDIO_PARAM_RANGE = {
@@ -59,6 +68,8 @@ export const AUDIO_PARAM_RANGE = {
   pulseRate: [0.5,  50,    0.5],
   noteDurationFrac: [0.05, 1,    0.01],
   cutoff:    [100,  12000, 10],
+  resonance: [0.3,  18,    0.1],
+  detune:    [0,    50,    0.5],   // cents — drone stack spread
   leftFreq:  [20,   2000,  1],
   rightFreq: [20,   2000,  1],
   // Virtual params for BinauralBeat center-beat modulation
@@ -75,7 +86,9 @@ export const VOICE_PARAMS = {
   Carrier:        ['gain', 'pan', 'frequency'],
   IsochronicTone: ['gain', 'pan', 'frequency', 'pulseRate', 'noteDurationFrac'],
   BinauralBeat:   ['gain', 'leftFreq', 'rightFreq'],
-  Noise:          ['gain', 'pan', 'cutoff'],
+  Noise:          ['gain', 'pan', 'cutoff', 'resonance'],
+  Drone:          ['gain', 'pan', 'frequency', 'detune'],
+  Sample:         ['gain', 'pan'],
 }
 
 export function voiceParamNames(trackType) {
@@ -97,8 +110,21 @@ export const ISO_ENVELOPE_DEFAULTS = {
 // Binaural parametrization modes
 export const BINAURAL_MODES = ['center-beat', 'left-right']
 
+// Tremolo / amplitude modulation, available on ANY audio track. 'linear' is
+// linear in amplitude; 'exponential' is linear in perceived loudness (dB).
+export const TREMOLO_MODES = ['exponential', 'linear']
+
+export const TREMOLO_PARAM_RANGE = {
+  rate:  [0.05, 30, 0.05],  // Hz
+  depth: [0,    1,  0.01],  // 0 = none … 1 = full
+}
+
+export function createTremolo(overrides = {}) {
+  return { enabled: false, rate: 4, depth: 0.5, mode: 'exponential', ...overrides }
+}
+
 // Visual track types
-export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate']
+export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate', 'Pacer', 'Ripple', 'Spiral', 'Mandala']
 
 // Visual parameters that can accept modulation (full registry across all types)
 export const VISUAL_PARAMS = ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue', 'blinkRate', 'duty', 'oscRate']
@@ -123,6 +149,21 @@ export const VISUAL_VOICE_PARAMS = {
   Gradient:  ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
   Blink:     ['opacity', 'blinkRate', 'duty', 'hue'],
   Oscillate: ['opacity', 'scale', 'oscRate', 'hue'],
+  Pacer:     ['opacity', 'scale', 'oscRate', 'hue'],
+  Ripple:    ['opacity', 'scale', 'oscRate', 'hue'],
+  Spiral:    ['opacity', 'scale', 'rotationSpeed', 'hue'],
+  Mandala:   ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
+}
+
+// Blend modes for layering visual tracks in the mixed/fullscreen view.
+export const BLEND_MODES = ['screen', 'lighten', 'normal', 'multiply', 'overlay', 'difference']
+
+// Per-type default overrides (e.g. a breathing pacer wants a slow rate).
+export const VISUAL_DEFAULTS = {
+  Pacer:   { oscRate: 0.15, scale: 1.7 },
+  Ripple:  { oscRate: 0.6 },
+  Spiral:  { rotationSpeed: 0.4 },
+  Mandala: { sides: 6, rotationSpeed: 0.15 },
 }
 
 export function visualParamNames(trackType) {
@@ -159,6 +200,10 @@ export const TEMPO_SYNC_TARGETS = {
   Gradient: { rotationSpeed: 'signedRate' },
   Blink: { blinkRate: 'rate' },
   Oscillate: { oscRate: 'rate' },
+  Pacer: { oscRate: 'rate' },
+  Ripple: { oscRate: 'rate' },
+  Spiral: { rotationSpeed: 'signedRate' },
+  Mandala: { rotationSpeed: 'signedRate' },
   Vibration: { pulseRate: 'rate' },
 }
 
@@ -233,7 +278,9 @@ export function createMod(controlId = '', amount = 1) {
 function audioParams(trackType = 'IsochronicTone', defaults = {}) {
   let base
   if (trackType === 'BinauralBeat') base = { gain: 0.5, leftFreq: 200, rightFreq: 210 }
-  else if (trackType === 'Noise') base = { gain: 0.3, pan: 0, cutoff: 6000 }
+  else if (trackType === 'Noise') base = { gain: 0.3, pan: 0, cutoff: 6000, resonance: 0.707 }
+  else if (trackType === 'Drone') base = { gain: 0.3, pan: 0, frequency: 110, detune: 12 }
+  else if (trackType === 'Sample') base = { gain: 0.4, pan: 0 }
   else base = { gain: 0.5, pan: 0, frequency: 200, pulseRate: 10, noteDurationFrac: 0.5 }
   const merged = { ...base, ...defaults }
   const params = {}
@@ -255,6 +302,7 @@ export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
     name: trackType,
     muted: false,
     windowSec: 1.0,
+    tremolo: createTremolo(overrides.tremolo),
     params: audioParams(trackType, overrides),
   }
   if (trackType === 'IsochronicTone') {
@@ -267,6 +315,13 @@ export function createAudioTrack(trackType = 'IsochronicTone', overrides = {}) {
   }
   if (trackType === 'Noise') {
     base.noiseColor = overrides.noiseColor ?? 'pink'
+    base.noiseFilter = overrides.noiseFilter ?? 'lowpass'
+  }
+  if (trackType === 'Drone') {
+    base.droneVoices = overrides.droneVoices ?? 5
+  }
+  if (trackType === 'Sample') {
+    base.sampleId = overrides.sampleId ?? 'rain'
   }
   return { ...base, ...overrides }
 }
@@ -291,7 +346,8 @@ export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
     id: uid('visual'),
     trackType,
     name: trackType,
-    params: visualParams(trackType),
+    blend: overrides.blend ?? 'screen',
+    params: visualParams(trackType, VISUAL_DEFAULTS[trackType]),
     ...overrides,
   }
 }

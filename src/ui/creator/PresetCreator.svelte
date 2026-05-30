@@ -16,6 +16,7 @@
     AUDIO_PARAMS,
     AUDIO_TRACK_TYPES,
     BINAURAL_MODES,
+    BLEND_MODES,
     CONTROL_TYPES,
     HAPTIC_PARAM_RANGE,
     HAPTIC_PARAMS,
@@ -24,9 +25,15 @@
     ISO_ENVELOPE_DEFAULTS,
     MARTIGLI_PARAM_RANGE,
     MARTIGLI_PARAMS,
+    DRONE_VOICES,
     MARTIGLI_WAVEFORMS,
     NOISE_COLORS,
+    NOISE_FILTERS,
+    SAMPLE_CLIPS,
     SYMMETRY_PARAM_RANGE,
+    TREMOLO_MODES,
+    TREMOLO_PARAM_RANGE,
+    createTremolo,
     SYMMETRY_PARAMS,
     TEMPO_DIVISIONS,
     TEMPO_MODIFIERS,
@@ -87,6 +94,21 @@
   // continuously and reflect modulation. Not reactive state — read via liveValues.
   const visualPhase = {}
   let lastVisualTick = null
+
+  // Visual mix / fullscreen stage.
+  let mixOpen = $state(false)
+  let stageEl = $state(null)
+
+  function openMix() {
+    mixOpen = true
+    // Try true fullscreen; fall back to the fixed overlay if unavailable.
+    queueMicrotask(() => { try { stageEl?.requestFullscreen?.() } catch (_) {} })
+  }
+
+  function closeMix() {
+    mixOpen = false
+    try { if (document.fullscreenElement) document.exitFullscreen?.() } catch (_) {}
+  }
 
   const summary = $derived(patchSummary(draft))
   const issues = $derived(validateDraft(draft))
@@ -256,6 +278,7 @@
       type: track.trackType,
       volume: gain,
       params: { gain },
+      tremolo: track.tremolo ? { ...track.tremolo } : null,
     }
     if (track.trackType === 'BinauralBeat') {
       spec.params.leftFreq = num(getLive(track, 'leftFreq'), track.params.leftFreq.value)
@@ -263,7 +286,17 @@
     } else if (track.trackType === 'Noise') {
       spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
       spec.params.cutoff = num(getLive(track, 'cutoff'), track.params.cutoff?.value ?? 6000)
+      spec.params.resonance = num(getLive(track, 'resonance'), track.params.resonance?.value ?? 0.707)
       spec.noiseColor = track.noiseColor ?? 'pink'
+      spec.noiseFilter = track.noiseFilter ?? 'lowpass'
+    } else if (track.trackType === 'Drone') {
+      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
+      spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 110)
+      spec.params.detune = num(getLive(track, 'detune'), track.params.detune?.value ?? 12)
+      spec.droneVoices = track.droneVoices ?? 5
+    } else if (track.trackType === 'Sample') {
+      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
+      spec.sampleId = track.sampleId ?? 'rain'
     } else {
       spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
       spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 200)
@@ -301,6 +334,20 @@
     if (!draft.playing || !engine) return
     stopVoiceFor(track.id)
     startVoiceFor(track)
+  }
+
+  // ── Tremolo (per-track AM, any audio track) ─────────────────────────────────
+  function toggleTremolo(track) {
+    if (!track.tremolo) track.tremolo = createTremolo()
+    track.tremolo.enabled = !track.tremolo.enabled
+    restartVoice(track) // enabling/disabling is structural in the Vanilla engine
+  }
+
+  // Live rate/depth/mode update for an enabled tremolo (no voice restart).
+  function applyTremolo(track) {
+    if (!engine) return
+    const handle = voiceHandles.get(track.id)
+    if (handle) engine.setTremolo(handle, track.tremolo)
   }
 
   // ── rAF loop ─────────────────────────────────────────────────────────────────
@@ -505,9 +552,10 @@
     const vdt = lastVisualTick == null ? 0 : Math.max(0, Math.min(0.1, tNow - lastVisualTick))
     lastVisualTick = tNow
     for (const track of draft.visualTracks) {
-      if (track.trackType !== 'Blink' && track.trackType !== 'Oscillate') continue
+      const tt = track.trackType
+      if (tt !== 'Blink' && tt !== 'Oscillate' && tt !== 'Pacer') continue
       const lv = liveValues[track.id] ?? (liveValues[track.id] = {})
-      if (track.trackType === 'Blink') {
+      if (tt === 'Blink') {
         const rate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
         const duty = clamp(num(lv.duty ?? track.params.duty?.value, 0.5), 0.01, 0.99)
         let ph = (visualPhase[track.id] ?? 0) + vdt * rate
@@ -515,6 +563,7 @@
         visualPhase[track.id] = ph
         lv.__blinkOn = ph < duty ? 1 : 0
       } else {
+        // Oscillate and Pacer both breathe on oscRate (0..1 cosine).
         const rate = clamp(num(lv.oscRate ?? track.params.oscRate?.value, 1), 0.01, 10)
         let ph = (visualPhase[track.id] ?? 0) + vdt * rate
         ph -= Math.floor(ph)
@@ -609,6 +658,12 @@
       return
     }
 
+    if (event.key === 'Escape' && mixOpen) {
+      event.preventDefault()
+      closeMix()
+      return
+    }
+
     if (event.key === ' ') {
       event.preventDefault()
       togglePlay()
@@ -627,11 +682,20 @@
     }
   }
 
+  function handleFullscreenChange() {
+    // If the user leaves true fullscreen (e.g. via Esc), drop the overlay too.
+    if (mixOpen && !document.fullscreenElement) mixOpen = false
+  }
+
   onMount(() => {
     syncCreatorSession()
     rafId = requestAnimationFrame(rafTick)
     window.addEventListener('keydown', handleWindowKeydown)
-    return () => window.removeEventListener('keydown', handleWindowKeydown)
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      window.removeEventListener('keydown', handleWindowKeydown)
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+    }
   })
 
   // Push Iso envelope shape to live voices whenever the user-set envelope
@@ -923,9 +987,11 @@
       `--visual-scale:${clamp(num(getLive(track, 'scale'), 1), 0, 4).toFixed(3)}`,
       `--visual-spin:${spin.toFixed(3)}s`,
       `--visual-dir:${rotation < 0 ? 'reverse' : 'normal'}`,
-      // Blink/Oscillate live preview drivers (computed in the rAF loop).
+      // Blink/Oscillate/Pacer live preview drivers (computed in the rAF loop).
       `--visual-blink:${(getLive(track, '__blinkOn') ?? 1)}`,
       `--visual-osc:${(num(getLive(track, '__oscVal'), 0)).toFixed(3)}`,
+      // Ripple ring cadence (CSS-animated) from oscRate.
+      `--visual-ripple-period:${(1 / clamp(num(getLive(track, 'oscRate'), 0.6), 0.05, 10)).toFixed(2)}s`,
     ].join(';')
   }
 
@@ -993,7 +1059,13 @@
       return `${Math.round(aFreq)} Hz · pulse ${aPulse.toFixed(1)} Hz · ${isoEnv?.type ?? track.envelope ?? 'AR'}`
     }
     if (track.trackType === 'Noise') {
-      return `${track.noiseColor ?? 'pink'} noise · ≤ ${Math.round(num(getLive(track, 'cutoff'), 6000))} Hz`
+      return `${track.noiseColor ?? 'pink'} · ${track.noiseFilter ?? 'lowpass'} ${Math.round(num(getLive(track, 'cutoff'), 6000))} Hz`
+    }
+    if (track.trackType === 'Drone') {
+      return `${Math.round(aFreq)} Hz · ${track.droneVoices ?? 5} voices · ±${Math.round(num(getLive(track, 'detune'), 12))}c`
+    }
+    if (track.trackType === 'Sample') {
+      return `${track.sampleId ?? 'rain'} · ambient loop`
     }
     return `${Math.round(aFreq)} Hz`
   }
@@ -1112,6 +1184,40 @@
         </div>
       {/if}
     </div>
+  {/snippet}
+
+  <!-- Per-type visual preview content (no outer box) — reused by track cards
+       and the fullscreen mix stage. -->
+  {#snippet visualLayer(track)}
+    {#if track.trackType === 'Blink'}
+      <span class="visual-aura"></span>
+      <span class="blink-dot"></span>
+    {:else if track.trackType === 'Oscillate'}
+      <span class="visual-aura"></span>
+      <span class="osc-dot"></span>
+    {:else if track.trackType === 'Pacer'}
+      <span class="pacer-ring"></span>
+      <span class="pacer-core"></span>
+    {:else if track.trackType === 'Ripple'}
+      <span class="ripple-ring"></span>
+      <span class="ripple-ring"></span>
+      <span class="ripple-ring"></span>
+    {:else if track.trackType === 'Spiral'}
+      <span class="spiral-disc"></span>
+    {:else if track.trackType === 'Mandala'}
+      <svg class="mandala-shape" viewBox="0 0 80 50">
+        <polygon points={polygonPoints(getLive(track, 'sides'))} />
+        <polygon class="mandala-shape-2" points={polygonPoints(getLive(track, 'sides'))} />
+      </svg>
+    {:else}
+      <span class="visual-aura"></span>
+      <svg class="visual-shape" viewBox="0 0 80 50">
+        <polygon points={polygonPoints(getLive(track, 'sides'))} />
+      </svg>
+      <span class="visual-particle visual-particle-a"></span>
+      <span class="visual-particle visual-particle-b"></span>
+      <span class="visual-particle visual-particle-c"></span>
+    {/if}
   {/snippet}
 
   <!-- ── HEADER ── -->
@@ -1511,6 +1617,28 @@
                       <path class="scope-trace scope-trace-noise" d={noisePath(4, 116, 20, 15 * aGain, aCutoff / 12000)} />
                     </svg>
                   </div>
+                {:else if track.trackType === 'Drone'}
+                  {@const aDetune = num(getLive(track, 'detune'), 12)}
+                  {@const droneCyc = aFreq * winSec}
+                  {@const topCyc = aFreq * Math.pow(2, aDetune / 1200) * winSec}
+                  <div class="audio-scope a-drone" aria-hidden="true">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                      {#if Math.max(droneCyc, topCyc) < SCOPE_BAND_THRESHOLD}
+                        <path class="scope-trace scope-trace-drone-2" d={sineWavePath(4, 116, 20, 12 * aGain, topCyc)} />
+                        <path class="scope-trace" d={sineWavePath(4, 116, 20, 14 * aGain, droneCyc)} />
+                      {:else}
+                        <path class="scope-band" d={rectanglePath(4, 116, 20, 15 * aGain)} />
+                      {/if}
+                    </svg>
+                  </div>
+                {:else if track.trackType === 'Sample'}
+                  <div class="audio-scope a-sample" aria-hidden="true">
+                    <svg viewBox="0 0 120 40" preserveAspectRatio="none">
+                      <line class="scope-axis" x1="4" y1="20" x2="116" y2="20" />
+                      <path class="scope-trace scope-trace-sample" d={noisePath(4, 116, 20, 14 * aGain, 0.5)} />
+                    </svg>
+                  </div>
                 {:else}
                   {@const carrCyc = aFreq * winSec}
                   <div class="audio-scope a-carrier" aria-hidden="true">
@@ -1566,6 +1694,64 @@
                       {#each NOISE_COLORS as c}<option value={c}>{c}</option>{/each}
                     </select>
                   </label>
+                  <label class="voice-select">
+                    <span>filter</span>
+                    <select bind:value={track.noiseFilter} onchange={() => restartVoice(track)}>
+                      {#each NOISE_FILTERS as f}<option value={f}>{f}</option>{/each}
+                    </select>
+                  </label>
+                </div>
+              {/if}
+              {#if track.trackType === 'Drone'}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>voices</span>
+                    <select bind:value={track.droneVoices} onchange={() => restartVoice(track)}>
+                      {#each DRONE_VOICES as v}<option value={v}>{v}</option>{/each}
+                    </select>
+                  </label>
+                </div>
+              {/if}
+              {#if track.trackType === 'Sample'}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>clip</span>
+                    <select bind:value={track.sampleId} onchange={() => restartVoice(track)}>
+                      {#each SAMPLE_CLIPS as c}<option value={c}>{c}</option>{/each}
+                    </select>
+                  </label>
+                </div>
+              {/if}
+
+              {#if track.tremolo}
+                {@const tr = TREMOLO_PARAM_RANGE.rate}
+                {@const td = TREMOLO_PARAM_RANGE.depth}
+                <div class="trem-panel" class:on={track.tremolo.enabled}>
+                  <div class="trem-head">
+                    <button class="trem-toggle" type="button" class:on={track.tremolo.enabled} onclick={() => toggleTremolo(track)}>
+                      tremolo {track.tremolo.enabled ? 'on' : 'off'}
+                    </button>
+                    {#if track.tremolo.enabled}
+                      <label class="voice-select trem-mode">
+                        <span>AM</span>
+                        <select bind:value={track.tremolo.mode} onchange={() => applyTremolo(track)}>
+                          {#each TREMOLO_MODES as m}<option value={m}>{m}</option>{/each}
+                        </select>
+                      </label>
+                    {/if}
+                  </div>
+                  {#if track.tremolo.enabled}
+                    <div class="trem-knobs">
+                      <Knob
+                        value={track.tremolo.rate} min={tr[0]} max={tr[1]} step={tr[2]} label="rate"
+                        onchange={(v) => { track.tremolo.rate = v; applyTremolo(track) }}
+                      />
+                      <Knob
+                        value={track.tremolo.depth} min={td[0]} max={td[1]} step={td[2]} label="depth"
+                        onchange={(v) => { track.tremolo.depth = v; applyTremolo(track) }}
+                      />
+                    </div>
+                  {/if}
                 </div>
               {/if}
 
@@ -1615,6 +1801,12 @@
           {#each VISUAL_TRACK_TYPES as t}
             <button class="add-btn" onclick={() => addVisual(t)}>+{t}</button>
           {/each}
+          <button
+            class="add-btn mix-btn"
+            onclick={openMix}
+            disabled={!$visualStimulationOn || !draft.visualTracks.length}
+            title="Mix all visual tracks fullscreen"
+          >⛶ Mix</button>
         </div>
       </div>
       <div class="col-body">
@@ -1632,25 +1824,19 @@
                 <div class="track-preview visual-off" aria-hidden="true">
                   <span>Visual stimulation is off (Settings)</span>
                 </div>
-              {:else if track.trackType === 'Blink'}
-                <div class="track-preview visual-preview vp-blink" style={visualStyle(track)} aria-hidden="true">
-                  <span class="visual-aura"></span>
-                  <span class="blink-dot"></span>
-                </div>
-              {:else if track.trackType === 'Oscillate'}
-                <div class="track-preview visual-preview vp-osc" style={visualStyle(track)} aria-hidden="true">
-                  <span class="visual-aura"></span>
-                  <span class="osc-dot"></span>
-                </div>
               {:else}
                 <div class="track-preview visual-preview" style={visualStyle(track)} aria-hidden="true">
-                  <span class="visual-aura"></span>
-                  <svg class="visual-shape" viewBox="0 0 80 50">
-                    <polygon points={polygonPoints(getLive(track, 'sides'))} />
-                  </svg>
-                  <span class="visual-particle visual-particle-a"></span>
-                  <span class="visual-particle visual-particle-b"></span>
-                  <span class="visual-particle visual-particle-c"></span>
+                  {@render visualLayer(track)}
+                </div>
+              {/if}
+              {#if $visualStimulationOn}
+                <div class="voice-extras">
+                  <label class="voice-select">
+                    <span>blend</span>
+                    <select bind:value={track.blend}>
+                      {#each BLEND_MODES as b}<option value={b}>{b}</option>{/each}
+                    </select>
+                  </label>
                 </div>
               {/if}
               <div class="knob-grid">
@@ -1750,6 +1936,21 @@
         </dl>
         <a class="semantic-graph-link" href={semanticGraphHref(semanticInfo)}>Open in graph</a>
       </div>
+    </div>
+  {/if}
+
+  {#if mixOpen}
+    <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
+    <div class="visual-stage" bind:this={stageEl}>
+      {#each draft.visualTracks as track (track.id)}
+        <div class="stage-layer" style={`${visualStyle(track)};mix-blend-mode:${track.blend || 'screen'}`}>
+          <div class="stage-scale">{@render visualLayer(track)}</div>
+        </div>
+      {/each}
+      {#if !draft.visualTracks.length}
+        <p class="stage-empty">Add visual tracks to mix.</p>
+      {/if}
+      <button type="button" class="stage-close" onclick={closeMix} aria-label="Close mix">✕ Close</button>
     </div>
   {/if}
 
@@ -2898,6 +3099,9 @@
   .a-noise[data-color='pink'] .scope-trace-noise { stroke: #e58fb0; filter: drop-shadow(0 0 2px #e58fb055); }
   .a-noise[data-color='brown'] .scope-trace-noise { stroke: #c79a5b; filter: drop-shadow(0 0 2px #c79a5b55); }
 
+  .scope-trace-drone-2 { stroke: color-mix(in srgb, var(--ac) 55%, transparent); stroke-width: 1; filter: none; }
+  .scope-trace-sample { stroke: #6fcf97; stroke-width: 1; filter: drop-shadow(0 0 2px #6fcf9755); }
+
   .pan-ruler {
     position: relative;
     height: 12px;
@@ -3008,6 +3212,45 @@
     height: 30px;
   }
 
+  .trem-panel {
+    margin: 6px 6px 0;
+    padding: 8px;
+    border: 1px dashed var(--bdr);
+    border-radius: 6px;
+  }
+  .trem-panel.on { border-style: solid; border-color: color-mix(in srgb, var(--ac) 50%, var(--bdr)); }
+  .trem-panel > .trem-head { font-size: 11px; }
+
+  .trem-head {
+    display: flex;
+    align-items: center;
+    gap: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  .trem-toggle {
+    margin: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    background: var(--bg);
+    border: 1px solid var(--bdr);
+    color: var(--mut);
+    border-radius: 4px;
+    cursor: pointer;
+    width: auto;
+  }
+  .trem-toggle.on { background: var(--acc-s); border-color: var(--ac); color: var(--ac); }
+
+  .trem-knobs {
+    display: flex;
+    gap: 18px;
+    margin-top: 8px;
+    padding-left: 2px;
+  }
+
   .visual-preview {
     background:
       radial-gradient(circle at 34% 42%, hsla(var(--visual-hue, 200), 88%, 58%, 0.34), transparent 46%),
@@ -3084,6 +3327,144 @@
     transform: translate(-50%, -50%) scale(calc(0.55 + var(--visual-osc, 0) * var(--visual-scale, 1) * 0.6));
     opacity: calc(var(--visual-opacity, 1) * (0.45 + 0.55 * var(--visual-osc, 0)));
   }
+
+  /* Pacer: breathing guide — orb + ring expand on inhale (high --visual-osc). */
+  .pacer-core, .pacer-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(calc(0.4 + var(--visual-osc, 0) * var(--visual-scale, 1.5) * 0.5));
+  }
+  .pacer-core {
+    width: 26px;
+    height: 26px;
+    background: radial-gradient(circle, hsla(var(--visual-hue, 200), 95%, 66%, 0.95), hsla(var(--visual-hue, 200), 90%, 50%, 0.1) 72%);
+    box-shadow: 0 0 18px hsla(var(--visual-hue, 200), 95%, 60%, 0.7);
+    opacity: var(--visual-opacity, 1);
+  }
+  .pacer-ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid hsla(var(--visual-hue, 200), 95%, 70%, 0.8);
+    opacity: calc(var(--visual-opacity, 1) * (0.3 + 0.5 * var(--visual-osc, 0)));
+  }
+
+  /* Ripple: concentric rings expanding outward at the oscRate cadence. */
+  .ripple-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+    border-radius: 50%;
+    border: 2px solid hsla(var(--visual-hue, 200), 95%, 66%, 0.9);
+    opacity: 0;
+    animation: rippleExpand var(--visual-ripple-period, 1.6s) linear infinite;
+  }
+  .ripple-ring:nth-child(2) { animation-delay: calc(var(--visual-ripple-period, 1.6s) * -0.33); }
+  .ripple-ring:nth-child(3) { animation-delay: calc(var(--visual-ripple-period, 1.6s) * -0.66); }
+  @keyframes rippleExpand {
+    0%   { transform: scale(0.15); opacity: calc(var(--visual-opacity, 1) * 0.85); }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  /* Spiral: rotating radial sweep. */
+  .spiral-disc {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(var(--visual-scale, 1));
+    opacity: var(--visual-opacity, 1);
+    background: repeating-conic-gradient(
+      from 0deg,
+      hsla(var(--visual-hue, 200), 95%, 64%, 0.95) 0deg 18deg,
+      transparent 18deg 36deg);
+    -webkit-mask: radial-gradient(circle, #000 62%, transparent 64%);
+    mask: radial-gradient(circle, #000 62%, transparent 64%);
+    animation: visualSpin var(--visual-spin, 10s) linear infinite;
+    animation-direction: var(--visual-dir, normal);
+  }
+
+  /* Mandala: two overlaid symmetric polygons, counter-rotating. */
+  .mandala-shape {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 64px;
+    height: 40px;
+    transform: translate(-50%, -50%) scale(var(--visual-scale, 1));
+    opacity: var(--visual-opacity, 1);
+    animation: visualSpin var(--visual-spin, 10s) linear infinite;
+    animation-direction: var(--visual-dir, normal);
+  }
+  .mandala-shape polygon {
+    fill: hsla(var(--visual-hue, 200), 88%, 58%, 0.22);
+    stroke: hsla(var(--visual-hue, 200), 95%, 70%, 0.9);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .mandala-shape-2 { transform: rotate(30deg); opacity: 0.7; }
+
+  /* ── Visual mix / fullscreen stage ──────────────────────────────────────── */
+  .mix-btn { margin-left: auto; }
+  .mix-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .visual-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: #04060a;
+    overflow: hidden;
+  }
+  .visual-stage:fullscreen { width: 100vw; height: 100vh; }
+
+  .stage-layer {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Scale the small centered preview elements up to fill the stage. */
+  .stage-scale {
+    position: absolute;
+    inset: 0;
+    transform: scale(7);
+    transform-origin: center;
+  }
+
+  .stage-empty {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--mut);
+    font-size: 1rem;
+  }
+
+  .stage-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    margin: 0;
+    padding: 8px 14px;
+    width: auto;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: #ffffff1c;
+    border: 1px solid #ffffff40;
+    border-radius: 6px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+  }
+  .stage-close:hover { background: #ffffff30; }
 
   .haptic-preview {
     background:

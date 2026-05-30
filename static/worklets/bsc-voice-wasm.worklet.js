@@ -69,6 +69,8 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
       { name: 'pulseRate', defaultValue: 10, minValue: 0, maxValue: 200, automationRate: 'a-rate' },
       { name: 'pan', defaultValue: 0, minValue: -1, maxValue: 1, automationRate: 'a-rate' },
       { name: 'cutoff', defaultValue: 6000, minValue: 20, maxValue: 24000, automationRate: 'a-rate' },
+      { name: 'resonance', defaultValue: 0.707, minValue: 0.1, maxValue: 24, automationRate: 'a-rate' },
+      { name: 'detune', defaultValue: 12, minValue: 0, maxValue: 100, automationRate: 'a-rate' },
       { name: 'leftFreq', defaultValue: 200, minValue: 0, maxValue: 24000, automationRate: 'a-rate' },
       { name: 'rightFreq', defaultValue: 200, minValue: 0, maxValue: 24000, automationRate: 'a-rate' },
     ]
@@ -80,17 +82,29 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
     this._type = opts.voiceType || 'Carrier'
     this._env = opts.envelope || { type: 'AR', attackFrac: 0.1, releaseFrac: 0.15, noteDurationFrac: 0.5 }
     this._noiseColor = opts.noiseColor || 'pink'
+    this._noiseFilter = opts.noiseFilter || 'lowpass'
+    this._droneVoices = Math.max(1, Math.min(7, opts.droneVoices || 5))
 
     this._phase = 0
     this._phaseL = 0
     this._phaseR = 0
     this._slot = 0
+    this._dronePhases = new Float32Array(8)
+    this._droneIncs = new Float32Array(8)
 
-    // Noise filter state (broadband voices don't use the WASM oscillator).
+    // Sample playback state (PCM posted from the main thread once decoded).
+    this._sampleL = null
+    this._sampleR = null
+    this._sampleLen = 0
+    this._samplePos = 0
+    this._sampleStep = 1
+
+    // Noise state (broadband voices don't use the WASM oscillator): pink/brown
+    // generators plus the two TPT state-variable filter integrators.
     this._b0 = 0; this._b1 = 0; this._b2 = 0; this._b3 = 0
     this._b4 = 0; this._b5 = 0; this._b6 = 0
     this._brown = 0
-    this._lp = 0
+    this._ic1 = 0; this._ic2 = 0
 
     // Own the linear memory the WASM kernel reads/writes; fill the sine LUT.
     this._memory = new WebAssembly.Memory({ initial: 1 })
@@ -102,10 +116,30 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
     this._render = null // set once WASM is instantiated
     this._ready = false
 
+    // Tremolo / AM (applies to every voice type at the output stage).
+    const trem = opts.tremolo || {}
+    this._tremEnabled = !!trem.enabled
+    this._tremRate = trem.rate != null ? trem.rate : 4
+    this._tremDepth = trem.depth != null ? trem.depth : 0
+    this._tremLinear = trem.mode === 'linear'
+    this._tremPhase = 0
+
     this.port.onmessage = (event) => {
       const data = event.data || {}
       if (data.type === 'envelope' && data.envelope) {
         this._env = data.envelope
+      } else if (data.type === 'tremolo' && data.tremolo) {
+        const t = data.tremolo
+        this._tremEnabled = !!t.enabled
+        if (t.rate != null) this._tremRate = t.rate
+        if (t.depth != null) this._tremDepth = t.depth
+        this._tremLinear = t.mode === 'linear'
+      } else if (data.type === 'sample' && data.left) {
+        this._sampleL = data.left
+        this._sampleR = data.right || data.left
+        this._sampleLen = data.left.length
+        this._samplePos = 0
+        this._sampleStep = (data.sampleRate || sampleRate) / sampleRate
       } else if (data.type === 'wasm' && data.bytes) {
         WebAssembly.instantiate(data.bytes, { env: { memory: this._memory } })
           .then((result) => {
@@ -118,6 +152,24 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
           })
       }
     }
+  }
+
+  _finish(outL, outR, n) {
+    if (this._tremEnabled && this._tremDepth > 0) {
+      const depth = this._tremDepth
+      const floor = Math.max(0.001, 1 - depth)
+      const inc = this._tremRate / sampleRate
+      let tph = this._tremPhase
+      for (let i = 0; i < n; i += 1) {
+        const lfo01 = 0.5 - 0.5 * Math.cos(2 * Math.PI * tph)
+        const g = this._tremLinear ? (1 - depth * lfo01) : Math.pow(floor, lfo01)
+        outL[i] *= g
+        outR[i] *= g
+        tph += inc; if (tph >= 1) tph -= Math.floor(tph)
+      }
+      this._tremPhase = tph
+    }
+    return true
   }
 
   process(_inputs, outputs, parameters) {
@@ -138,9 +190,15 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
       const gC = gainP.length === 1
       const paC = panP.length === 1
       const color = this._noiseColor
+      const mode = this._noiseFilter
       const cutoff = Math.min(cutP[0], srN * 0.45)
-      const alpha = 1 - Math.exp(-2 * Math.PI * cutoff * invSrN)
-      let lp = this._lp
+      const Q = Math.max(0.3, parameters.resonance[0])
+      const gco = Math.tan(Math.PI * cutoff * invSrN)
+      const k = 1 / Q
+      const a1 = 1 / (1 + gco * (gco + k))
+      const a2 = gco * a1
+      const a3 = gco * a2
+      let ic1 = this._ic1, ic2 = this._ic2
       let b0 = this._b0, b1 = this._b1, b2 = this._b2, b3 = this._b3
       let b4 = this._b4, b5 = this._b5, b6 = this._b6, brown = this._brown
       for (let i = 0; i < n; i += 1) {
@@ -161,18 +219,84 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
           x = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11
           b6 = white * 0.115926
         }
-        lp += alpha * (x - lp)
+        const v3 = x - ic2
+        const v1 = a1 * ic1 + a2 * v3
+        const v2 = ic2 + a2 * ic1 + a3 * v3
+        ic1 = 2 * v1 - ic1
+        ic2 = 2 * v2 - ic2
+        const o = mode === 'bandpass' ? v1 : (mode === 'highpass' ? (x - k * v1 - v2) : v2)
         const g = gC ? gainP[0] : gainP[i]
         const pan = paC ? panP[0] : panP[i]
-        const s = lp * g
+        const s = o * g
         const a = (pan + 1) * (Math.PI / 4)
         outL[i] = s * Math.cos(a)
         outR[i] = s * Math.sin(a)
       }
-      this._lp = lp
+      this._ic1 = ic1; this._ic2 = ic2
       this._b0 = b0; this._b1 = b1; this._b2 = b2; this._b3 = b3
       this._b4 = b4; this._b5 = b5; this._b6 = b6; this._brown = brown
-      return true
+      return this._finish(outL, outR, n)
+    }
+
+    // Drone: a detuned sine stack — rendered in JS (the WASM kernel renders a
+    // single oscillator; a stack is cheaper to sum directly here).
+    if (this._type === 'Drone') {
+      const srD = sampleRate
+      const invSrD = 1 / srD
+      const gainP = parameters.gain
+      const panP = parameters.pan
+      const gC = gainP.length === 1
+      const paC = panP.length === 1
+      const N = this._droneVoices
+      const root = parameters.frequency[0]
+      const detune = parameters.detune[0]
+      const norm = 1 / Math.sqrt(N)
+      const ph = this._dronePhases
+      const incs = this._droneIncs
+      for (let j = 0; j < N; j += 1) {
+        const nj = N > 1 ? (j - (N - 1) / 2) / ((N - 1) / 2) : 0
+        incs[j] = (root * Math.pow(2, (nj * detune) / 1200)) * invSrD
+      }
+      for (let i = 0; i < n; i += 1) {
+        let sum = 0
+        for (let j = 0; j < N; j += 1) {
+          sum += Math.sin(2 * Math.PI * ph[j])
+          ph[j] += incs[j]; if (ph[j] >= 1) ph[j] -= Math.floor(ph[j])
+        }
+        const g = gC ? gainP[0] : gainP[i]
+        const pan = paC ? panP[0] : panP[i]
+        const s = sum * norm * g
+        const a = (pan + 1) * (Math.PI / 4)
+        outL[i] = s * Math.cos(a)
+        outR[i] = s * Math.sin(a)
+      }
+      return this._finish(outL, outR, n)
+    }
+
+    // Sample playback (PCM buffer) — does not use the WASM oscillator.
+    if (this._type === 'Sample') {
+      const gainP = parameters.gain
+      const panP = parameters.pan
+      const gC = gainP.length === 1
+      const paC = panP.length === 1
+      const L = this._sampleL, R = this._sampleR
+      if (!L) { for (let i = 0; i < n; i += 1) { outL[i] = 0; outR[i] = 0 } return this._finish(outL, outR, n) }
+      const len = this._sampleLen, step = this._sampleStep
+      let pos = this._samplePos
+      for (let i = 0; i < n; i += 1) {
+        const idx = pos | 0
+        const frac = pos - idx
+        const i2 = idx + 1 >= len ? 0 : idx + 1
+        const sL = L[idx] + (L[i2] - L[idx]) * frac
+        const sR = R[idx] + (R[i2] - R[idx]) * frac
+        const g = gC ? gainP[0] : gainP[i]
+        const pan = paC ? panP[0] : panP[i]
+        outL[i] = sL * g * (pan > 0 ? 1 - pan : 1)
+        outR[i] = sR * g * (pan < 0 ? 1 + pan : 1)
+        pos += step; if (pos >= len) pos -= len
+      }
+      this._samplePos = pos
+      return this._finish(outL, outR, n)
     }
 
     // Until the WASM module is live, emit silence (a few ms during startup).
@@ -204,7 +328,7 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
         outL[i] = sl[i] * g
         outR[i] = srr[i] * g
       }
-      return true
+      return this._finish(outL, outR, n)
     }
 
     const f = parameters.frequency[0]
@@ -227,7 +351,7 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
         slot += pr * invSr; if (slot >= 1) slot -= Math.floor(slot)
       }
       this._slot = slot
-      return true
+      return this._finish(outL, outR, n)
     }
 
     // Carrier
@@ -239,7 +363,7 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
       outL[i] = s * Math.cos(a)
       outR[i] = s * Math.sin(a)
     }
-    return true
+    return this._finish(outL, outR, n)
   }
 }
 

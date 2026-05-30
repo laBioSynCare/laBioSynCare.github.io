@@ -50,7 +50,8 @@ engines/
 ## Audio engines
 
 Four interchangeable implementations of `IAudioEngine`, all rendering the same
-Phase-1 voice model (`Carrier`, `IsochronicTone`, `BinauralBeat`, `Noise`). The user
+Phase-1 voice model (`Carrier`, `IsochronicTone`, `BinauralBeat`, `Noise`,
+`Drone`, `Sample`, plus a universal per-voice tremolo/AM effect). The user
 picks one in **Settings → Audio engine**; the choice is persisted to
 `localStorage` (`bsclab.audioEngine`) and read by `createAudioEngine()` when the
 Patch Studio next starts playback. `audioEngines.js` holds the registry,
@@ -103,6 +104,15 @@ unavailable. Mirrors the `NullHapticEngine` pattern.
 ```bash
 wat2wasm static/worklets/bsc-osc.wat -o static/worklets/bsc-osc.wasm
 ```
+
+**Ambient sample clips** for the `Sample` voice are synthetic CC0 loops in
+`static/audio/` (no third-party licensing). Regenerate with:
+```bash
+node scripts/gen-ambiences.mjs
+```
+They are decoded on the main thread and, for the worklet engines, the PCM is
+transferred into the processor which loops it; the Vanilla engine uses a native
+looping `AudioBufferSourceNode`.
 
 ---
 

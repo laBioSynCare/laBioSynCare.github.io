@@ -83,6 +83,15 @@ export class IAudioEngine {
   setVoiceEnvelope(handle, envSpec) {}
 
   /**
+   * Update a voice's tremolo / amplitude-modulation effect. Optional capability;
+   * defaults to a no-op so callers never need to feature-detect.
+   *
+   * @param {VoiceHandle} handle
+   * @param {{enabled:boolean, rate:number, depth:number, mode:'linear'|'exponential'}} tremolo
+   */
+  setTremolo(handle, tremolo) {}
+
+  /**
    * @param {number} volume 0–1
    * @param {number} atTime
    */

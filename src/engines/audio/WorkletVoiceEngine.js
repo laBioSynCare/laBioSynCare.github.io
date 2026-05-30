@@ -1,4 +1,5 @@
 import { IAudioEngine } from './IAudioEngine.js'
+import { loadSample, sampleUrl } from './sampleLoader.js'
 
 const PARAM_RAMP = 0.02
 const ATTACK = 0.05
@@ -7,7 +8,7 @@ const DEFAULT_RELEASE = 0.05
 // Parameter names the BSC voice processors expose as AudioParams. The studio
 // drives all of them from the main thread via timed AudioParam automation, so
 // AudioContext.currentTime stays the only clock.
-const VOICE_PARAMS = ['gain', 'frequency', 'pulseRate', 'pan', 'cutoff', 'leftFreq', 'rightFreq']
+const VOICE_PARAMS = ['gain', 'frequency', 'pulseRate', 'pan', 'cutoff', 'resonance', 'detune', 'leftFreq', 'rightFreq']
 
 /**
  * Shared base for the AudioWorklet-backed engines.
@@ -27,6 +28,7 @@ export class WorkletVoiceEngine extends IAudioEngine {
     this._ctx = null
     this._masterGain = null
     this._voices = new Map()
+    this._sampleCache = new Map()
     // Subclasses override:
     this._moduleUrl = '/worklets/bsc-voice.worklet.js'
     this._processorName = 'bsc-voice'
@@ -89,6 +91,9 @@ export class WorkletVoiceEngine extends IAudioEngine {
         voiceType: spec.type,
         envelope: spec.envelope || null,
         noiseColor: spec.noiseColor || null,
+        noiseFilter: spec.noiseFilter || null,
+        droneVoices: spec.droneVoices || null,
+        tremolo: spec.tremolo || null,
       },
     })
     this._onVoiceCreated(node, spec)
@@ -106,6 +111,25 @@ export class WorkletVoiceEngine extends IAudioEngine {
     } else if (spec.type === 'Noise') {
       setP('pan', params.pan)
       setP('cutoff', params.cutoff)
+      setP('resonance', params.resonance)
+    } else if (spec.type === 'Drone') {
+      setP('frequency', params.frequency)
+      setP('detune', params.detune)
+      setP('pan', params.pan)
+    } else if (spec.type === 'Sample') {
+      setP('pan', params.pan)
+      loadSample(this._ctx, this._sampleCache, sampleUrl(spec.sampleId || 'rain'))
+        .then((buf) => {
+          const left = Float32Array.from(buf.getChannelData(0))
+          const right = Float32Array.from(buf.numberOfChannels > 1 ? buf.getChannelData(1) : buf.getChannelData(0))
+          try {
+            node.port.postMessage(
+              { type: 'sample', left, right, sampleRate: buf.sampleRate },
+              [left.buffer, right.buffer],
+            )
+          } catch (_) {}
+        })
+        .catch(() => {})
     } else {
       setP('frequency', params.frequency)
       setP('pulseRate', params.pulseRate)
@@ -159,6 +183,11 @@ export class WorkletVoiceEngine extends IAudioEngine {
   setVoiceEnvelope(handle, envSpec) {
     if (!handle || !handle._node || handle.type !== 'IsochronicTone') return
     try { handle._node.port.postMessage({ type: 'envelope', envelope: envSpec }) } catch (_) {}
+  }
+
+  setTremolo(handle, tremolo) {
+    if (!handle || !handle._node || !tremolo) return
+    try { handle._node.port.postMessage({ type: 'tremolo', tremolo }) } catch (_) {}
   }
 
   setMasterVolume(volume, atTime) {
