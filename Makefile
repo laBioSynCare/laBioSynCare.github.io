@@ -1,5 +1,6 @@
-PYTHON     := python3
-PYSHACL    := $(PYTHON) -m pyshacl
+# pyshacl console script: provided by the Nix flake (top-level `pyshacl`) and by
+# `pip install pyshacl`. Override with `make PYSHACL='python3 -m pyshacl'` if needed.
+PYSHACL    ?= pyshacl
 WAT2WASM   ?= wat2wasm
 FIREBASE   ?= npx firebase-tools
 FIREBASE_PROJECT ?= biosyncare-lab
