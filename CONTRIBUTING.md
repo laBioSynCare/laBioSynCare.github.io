@@ -32,8 +32,10 @@ For evidence claims: `docs/concept/EVIDENCE_FRAMEWORK.md`. For ontology work:
 `static/ontology/README.md`. For the domain concept: `docs/concept/SENSORY_STIMULATION.md`.
 
 **Run the local checks before submitting.** A `hooks/` wrapper is planned, but
-CI now mirrors the core local checks:
+CI now mirrors the core local checks — and runs them inside the same pinned Nix
+flake, so "works on my machine" matches CI exactly:
 ```bash
+nix develop          # enter the pinned toolchain (or `direnv allow` once)
 npm install
 make validate
 make check
@@ -81,7 +83,11 @@ schemas exist.
 
 ### Setup
 
+The toolchain is pinned with a Nix flake (`flake.nix`). Enter it once per shell
+with `nix develop` (or `direnv allow` for automatic loading), then use `make`:
+
 ```bash
+nix develop          # Node 24, Python 3.12 + pyshacl, wabt, make — pinned by flake.lock
 npm install
 make dev             # Preferred local entrypoint (http://127.0.0.1:4173/)
 npm run dev          # Underlying Vite script if you need custom flags
@@ -90,7 +96,11 @@ make preview         # Preview production build (http://127.0.0.1:4174/)
 make test            # Vitest
 make check           # SvelteKit sync + svelte-check
 make validate        # SHACL validation (current ontology suite)
+make wasm            # Recompile static/worklets/bsc-osc.wasm from bsc-osc.wat
 ```
+
+Without Nix, install Node 24, Python 3.12 + `pyshacl`, and `wabt` yourself; the
+same `make` targets then apply.
 
 ---
 

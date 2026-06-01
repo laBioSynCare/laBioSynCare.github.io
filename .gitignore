@@ -8,4 +8,9 @@ node_modules/
 .svelte-kit/
 dist/
 
+# Nix / direnv (flake.nix + flake.lock are committed; build outputs are not)
+.direnv/
+result
+result-*
+
 docs/credentials/

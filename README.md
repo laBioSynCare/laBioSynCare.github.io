@@ -146,14 +146,35 @@ tests/                  Dedicated test subtree (planned; unit tests beside sourc
 
 ---
 
+## Development environment (Nix)
+
+The canonical toolchain is pinned with a Nix flake, so every contributor and CI
+run uses the exact same Node, Python + pySHACL, and WABT (`wat2wasm`) versions:
+
+```bash
+nix develop          # enter the pinned dev shell (Node 24, Python 3.12 + pyshacl, wabt, make)
+# or, with direnv:
+direnv allow         # auto-loads the shell on cd into the repo (one-time)
+```
+
+CI builds, checks, validation, and the Pages deploy all run inside this same
+flake (`nix develop --command ...`). `flake.lock` records the exact nixpkgs
+revision; regenerate it with `nix flake update`.
+
+Nix is the recommended path but not mandatory — the plain `npm`/`make` workflow
+below still works if you provide Node 24, Python 3.12 + `pyshacl`, and `wabt`
+yourself.
+
 ## Local Verification
 
-The current runnable checks are:
+The current runnable checks are (run them directly, or prefix with
+`nix develop --command` if you are not in the shell):
 
 ```bash
 make validate  # SHACL over core + vocabulary + RDF instances
 make check     # SvelteKit sync + svelte-check
 make build     # Static production build into dist/
+make wasm      # Recompile static/worklets/bsc-osc.wasm from bsc-osc.wat
 ```
 
 The SHACL pass currently conforms for the core ontology, vocabulary, and seeded

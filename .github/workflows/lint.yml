@@ -8,24 +8,33 @@ on:
 
 jobs:
   svelte:
-    name: SvelteKit check and static build
+    name: SvelteKit check and static build (Nix)
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
+      # Node 24 comes from the pinned flake devShell — identical to local dev.
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
         with:
-          node-version: '24'
-          cache: npm
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # Nix pins the toolchain; this caches the npm package downloads only.
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
       - name: Install dependencies
-        run: npm ci
+        run: nix develop --command npm ci
 
       - name: Run Svelte checks
-        run: npm run check
+        run: nix develop --command npm run check
 
       - name: Build static site
-        run: npm run build
+        run: nix develop --command make build

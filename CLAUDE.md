@@ -56,6 +56,7 @@ substitute alternatives without explicit instruction.
 | Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
 | Ontology docs | WIDOCO | blocked | HTML documentation from OWL; generate in CI and publish outside `main` after the publication path is chosen |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
+| Dev toolchain | Nix flake | flakes | First-class: `flake.nix` pins Node, Python+pySHACL, WABT; CI runs inside it. `flake.lock` is the source of truth — regenerate via `nix flake update` |
 
 ### Svelte 5 AI tooling setup
 
@@ -73,6 +74,15 @@ If an AI agent generates Svelte 4 syntax (`export let`, `$:`, `on:click`, `<slot
 reject it and regenerate with explicit runes instruction.
 
 ### Local dev server
+
+The toolchain is pinned by `flake.nix` and is first-class: CI (build, check,
+validate, Pages deploy) runs every command inside `nix develop`. When working in
+an environment that has Nix, enter the shell first so your Node/Python/WABT match
+CI exactly:
+
+```bash
+nix develop            # or `direnv allow` once, then it auto-loads
+```
 
 When an AI agent needs to inspect routes, reproduce a UI bug, or run browser
 automation, start the Vite dev server from the repository root:

@@ -24,17 +24,26 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
+      # Build the deployed artifact with the same pinned flake toolchain as
+      # local dev and the lint/validate workflows — one source of truth.
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
         with:
-          node-version: '24'
-          cache: npm
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Cache npm downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
 
       - name: Install dependencies
-        run: npm ci
+        run: nix develop --command npm ci
 
       - name: Build static site
-        run: npm run build
+        run: nix develop --command npm run build
         env:
           VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}

@@ -1,7 +1,11 @@
 PYTHON     := python3
 PYSHACL    := $(PYTHON) -m pyshacl
+WAT2WASM   ?= wat2wasm
 FIREBASE   ?= npx firebase-tools
 FIREBASE_PROJECT ?= biosyncare-lab
+WORKLET_DIR := static/worklets
+WASM_WAT   := $(WORKLET_DIR)/bsc-osc.wat
+WASM_OUT   := $(WORKLET_DIR)/bsc-osc.wasm
 SHAPES     := static/ontology/sstim-shapes.ttl
 ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
@@ -13,7 +17,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances test validate help
+.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances test validate wasm help
 
 ## Build the production bundle
 build:
@@ -64,6 +68,11 @@ test:
 ## Run the current ontology validation suite
 validate: shacl
 
+## Recompile the hand-written WASM oscillator kernel (bsc-osc.wat -> .wasm)
+wasm:
+	$(WAT2WASM) $(WASM_WAT) -o $(WASM_OUT)
+	@echo "wasm: rebuilt $(WASM_OUT) — commit the regenerated artifact"
+
 help:
 	@echo "Available targets:"
 	@echo "  make build            Build the production bundle"
@@ -73,6 +82,7 @@ help:
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
 	@echo "  make validate         Run the current ontology validation suite"
+	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
