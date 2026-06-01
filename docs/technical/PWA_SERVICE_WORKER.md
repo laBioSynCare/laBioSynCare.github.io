@@ -7,6 +7,10 @@
 > its rationale are in [`../decisions/0009-pwa.md`](../decisions/0009-pwa.md);
 > this document specifies *how the code works*. If code and this document
 > disagree, the code wins and this document must be corrected.
+>
+> **How far does PWA compliance go?** See the compliance matrix in §8 — core
+> installability and the baseline checklist are fully met; the rest is either a
+> deferred enhancement or excluded by the static, client-first architecture.
 
 The canonical implementation is:
 
@@ -259,3 +263,99 @@ Then, in the browser devtools:
 - **Update** — rebuild, reload once to register the new worker, confirm the
   banner appears and that **Reload** (not any automatic action) performs the
   single reload.
+
+This flow was verified end-to-end in headless Chrome over the DevTools Protocol
+(registration via the real component, precache composition, and a *true* offline
+test with the server killed mid-run). The precache stays lean: an un-used asset
+is **not** retrievable offline, while precached worklets and previously-used
+assets are. See §8 for what that adds up to in compliance terms.
+
+---
+
+## 8. PWA compliance matrix
+
+"PWA compliance" is not a single switch; it is a set of bars. BSC Lab meets the
+core installability and baseline bars in full, and treats the rest as either
+deliberate enhancements or architecture-level exclusions. This section is the
+canonical statement of *how far* the compliance goes.
+
+### 8.1 Core installability (Chromium) — fully met
+
+These are the hard requirements for an install prompt. All are satisfied, so the
+app is installable on Android and desktop Chromium.
+
+| Requirement | Status | Where |
+|---|---|---|
+| Served over HTTPS (or `localhost`) | ✅ | GitHub Pages is HTTPS; `localhost` for preview |
+| Linked web app manifest | ✅ | `app.html` → `manifest.webmanifest` |
+| `name` and/or `short_name` | ✅ | both present |
+| `start_url` (same-origin) | ✅ | `/` |
+| `display` is `standalone`/`fullscreen`/`minimal-ui` | ✅ | `standalone` |
+| 192px **and** 512px PNG icons | ✅ | plus a 512 `maskable` and an SVG `any` |
+| Registered service worker controlling `start_url`, with a `fetch` handler | ✅ | `src/service-worker.js`, scope `/` |
+
+### 8.2 Baseline PWA checklist (the former Lighthouse PWA audits) — fully met
+
+| Item | Status |
+|---|---|
+| `apple-touch-icon` (180px) | ✅ `static/icons/apple-touch-icon-180.png` |
+| `theme-color` meta | ✅ static (default *paper* skin) |
+| Maskable icon | ✅ within the safe zone |
+| `viewport` meta | ✅ |
+| `<html lang>` | ✅ `en` |
+| Responsive; content fits the viewport | ✅ |
+| HTTP → HTTPS redirect | ✅ (GitHub Pages) |
+| `start_url` responds offline | ✅ verified headless (server killed) |
+| Manifest `description` / `id` / `lang` / `dir` / `categories` / `background_color` | ✅ |
+| iOS standalone display + status bar (`apple-mobile-web-app-*`) | ✅ added in `app.html` |
+| Legacy Android (`mobile-web-app-capable`) | ✅ |
+
+Result: installs on Android and desktop; on **iOS** it installs via Share → Add
+to Home Screen and launches standalone with the correct title, icon, and status
+bar (iOS does not honour the manifest install prompt, which is why the
+`apple-*` tags and the PNG `apple-touch-icon` exist).
+
+### 8.3 Optional enhancements — deliberately deferred
+
+Not required for compliance; recorded so the omission is a choice, not an
+oversight.
+
+| Enhancement | Why deferred |
+|---|---|
+| Manifest `screenshots` | Only enriches the desktop/Android install dialog; cosmetic. Cheap to add later. |
+| Manifest `shortcuts` (jump-list to Presets / SPARQL / Patch Studio) | On-brand and cheap, but a feature addition, not a compliance gap. |
+| Per-skin dynamic `theme-color` | The app ships five skins; the static `theme-color` does not follow dark ones. Tracked in §2. |
+| Suppress the update banner during playback | Needs a global "is a session playing" signal (planned `core/` orchestrator). The banner is already session-safe; this is polish (§5). |
+| Share Target / File Handlers / Protocol Handlers | No use case in a knowledge browser + session player. |
+
+### 8.4 Excluded by architecture (ADR 0009)
+
+Not gaps — these are out of scope by decision, and the document records why so a
+future contributor does not "add them for completeness."
+
+| Capability | Why excluded |
+|---|---|
+| Push notifications | Requires a permanent push backend; BSC Lab is client-first and static-hosted. Same posture as [ADR 0008](../decisions/0008-activitypub.md). |
+| Background Sync / Periodic Background Sync | No backend to sync against. |
+| `SharedArrayBuffer` / threaded WASM audio | Needs COOP/COEP headers GitHub Pages cannot send; the COEP-injecting service-worker route was **declined** because it re-breaks Firebase (Trap 2). See [ADR 0009](../decisions/0009-pwa.md) "Alternatives" and `CLAUDE.md` §9. |
+
+### 8.5 Project-specific manifest discipline
+
+The claim-discipline rules that govern user-facing copy (`CLAUDE.md` §3.5,
+[`../concept/SCOPE.md`](../concept/SCOPE.md)) extend to the manifest, because the
+manifest's strings surface in OS install dialogs and app listings:
+
+- `name`, `short_name`, and `description` use conservative wellness framing — no
+  medical or treatment claims.
+- `categories` deliberately avoid the `health` and `medical` values (which would
+  nudge store categorisation toward a medical framing); BSC Lab declares
+  `education`, `lifestyle`, `productivity` instead.
+
+### 8.6 Net assessment
+
+BSC Lab is a **fully installable, offline-capable, cross-platform PWA**
+(Android + desktop install, iOS Add-to-Home-Screen standalone). It meets the
+core installability bar and the full baseline checklist. Everything beyond that
+is either an optional enhancement consciously deferred (§8.3) or a capability
+excluded by the static, client-first architecture (§8.4). There are no known
+compliance failures.

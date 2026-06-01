@@ -37,8 +37,9 @@ banner pointing to the as-built reference.
   **as-built** photosensitivity advisory and visual-stimulation policy.
 - [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md) — **as-built** PWA
   layer: web manifest, service worker, caching strategy, the three traps
-  (session-safe updates, Firebase/cross-origin bypass, cache budget), and the
-  update flow.
+  (session-safe updates, Firebase/cross-origin bypass, cache budget), the
+  update flow, and the **PWA compliance matrix** (§8 — what is met, deferred,
+  or excluded by design).
 - [`PRESET_FORMAT.md`](technical/PRESET_FORMAT.md) — canonical preset **catalog
   JSON** format (shared with BioSynCare). Source for `schemas/preset.schema.json`
   (planned). Distinct from the Patch Studio model above.

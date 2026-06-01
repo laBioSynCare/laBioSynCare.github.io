@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="BSC Lab — open-source sensory stimulation platform and RDF knowledge browser" />
     <link rel="icon" href="%sveltekit.assets%/favicon.svg" type="image/svg+xml" />
-    <!-- PWA: installable, offline-capable. See docs/technical/PWA_SERVICE_WORKER.md.
-         theme-color is the default (paper) skin; a per-skin theme-color is a
-         documented future enhancement. -->
+    <!-- PWA: installable, offline-capable. See docs/technical/PWA_SERVICE_WORKER.md
+         (incl. the compliance matrix). theme-color is the default (paper) skin;
+         a per-skin theme-color is a documented future enhancement. The
+         apple-/mobile-web-app-* tags give iOS/legacy Android standalone display
+         and status-bar styling that the manifest alone does not on iOS. -->
     <link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
     <meta name="theme-color" content="#f7f3ea" />
     <link rel="apple-touch-icon" href="%sveltekit.assets%/icons/apple-touch-icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="BSC Lab" />
     <title>BSC Lab</title>
     <script>
       // Apply the stored (or default) skin before first paint to avoid a
