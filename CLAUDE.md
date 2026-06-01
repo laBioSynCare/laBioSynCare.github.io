@@ -56,6 +56,7 @@ substitute alternatives without explicit instruction.
 | Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
 | Ontology docs | WIDOCO | blocked | HTML documentation from OWL; generate in CI and publish outside `main` after the publication path is chosen |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
+| PWA / offline | SvelteKit native service worker | built-in | Installable, offline-capable from the same static `dist/`. No `vite-plugin-pwa`. Three binding constraints — see ADR 0009 + `docs/technical/PWA_SERVICE_WORKER.md` |
 | Dev toolchain | Nix flake | flakes | First-class: `flake.nix` pins Node, Python+pySHACL, WABT; CI runs inside it. `flake.lock` is the source of truth — regenerate via `nix flake update` |
 
 ### Svelte 5 AI tooling setup
@@ -521,13 +522,15 @@ docs/
   │                             PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
   │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE,
   │                             BREATHING_MODEL, SYMMETRY_SYSTEM, MARTIGLI_BINAURAL
-  decisions/                  ← ADRs 0001–0007 (+ README index)
+  decisions/                  ← ADRs 0001–0009 (+ README index)
   ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
                                 INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
                                 CONSORTIUM_INVITATION
 
 static/
   _headers                    ← COOP/COEP/CORP headers for future Netlify/custom hosting
+  manifest.webmanifest        ← PWA web app manifest (PWA_SERVICE_WORKER.md)
+  icons/                      ← PWA icons (192/512/maskable PNG + SVG sources)
   worklets/                   ← AudioWorklet processors (never bundled by Vite)
     bsc-voice.worklet.js        ← unified voice processor (JS DSP)
     bsc-voice-wasm.worklet.js   ← unified voice processor (WASM oscillator)
@@ -546,7 +549,8 @@ scripts/
 schemas/                      ← (planned) preset.schema.json, session.schema.json
 
 src/
-  app.html                    ← HTML shell (pre-paint skin script)
+  app.html                    ← HTML shell (pre-paint skin script, manifest link)
+  service-worker.js           ← PWA service worker (PWA_SERVICE_WORKER.md)
   engines/audio/              ← IAudioEngine + 4 engines + audioEngines factory
   engines/visual|haptic/      ← (planned) IVisualEngine / IHapticEngine + impls
   core/                       ← (planned) MasterClock, Orchestrator, Scheduler, Recorder
@@ -556,6 +560,7 @@ src/
   ui/graph/                   ← RDF graph visualization (Cytoscape.js)
   ui/annotation/              ← annotation panel (named graphs)
   ui/navigation|theme|safety|auth/  ← chrome, skins, photosensitivity, sign-in
+  ui/pwa/                     ← service-worker registration + session-safe update banner
   routes/                     ← /, /creator, /presets, /sparql, /logbook, /profile, /settings
 
 tests/                        ← (planned) rdf/, engines/, schemas/ suites
@@ -585,6 +590,8 @@ legal, regulatory, or architectural requirements.
 | Call engine-specific methods from `StimulationOrchestrator` | Only interface methods; use capability detection |
 | Set `iniVolume: 1.0` in any preset | Hard upper limit; use ≤ 0.30 by default |
 | Set `isOn: true` on more than one voice per preset | Exactly one voice carries the breathing reference |
+| Auto-reload the page from the service worker on update | Would kill an in-progress session; reload only on explicit user click (ADR 0009, Trap 1) |
+| Let the service worker intercept cross-origin requests | Breaks Firebase auth / Google sign-in; same-origin only (ADR 0009, Trap 2) |
 
 ---
 
@@ -616,6 +623,24 @@ continues to serve the citable/stable copies used by w3id redirects.
 
 **Comunica bundle size.** `@comunica/query-sparql` is ~500KB+ gzipped. Use dynamic
 import to lazy-load it only when the SPARQL interface is opened, not at app startup.
+
+**Service worker — three binding constraints.** The PWA service worker
+(`src/service-worker.js`, spec in `docs/technical/PWA_SERVICE_WORKER.md`, ADR
+0009) is networking/caching only and never touches the audio clock, but three
+rules are non-negotiable: (1) **never auto-reload** — the worker must not call
+`skipWaiting()` on its own; updates wait and reload only on an explicit user
+click, or an in-progress stimulation session is killed mid-stream; (2) **never
+intercept cross-origin** — the `fetch` handler returns early for any
+`url.origin !== self.location.origin`, which is what keeps Firebase auth/Firestore
+and Google sign-in working; (3) **never eagerly precache the heavy assets** — the
+ambient `static/audio/*.wav` (~2.8 MB) and ontology `.ttl` are runtime-cached on
+first use, not precached. Do not "simplify" any of these away.
+
+**Service worker is production-only.** `kit.serviceWorker.register = false`; the
+worker is registered manually in `src/ui/pwa/ServiceWorkerUpdate.svelte` under
+`!dev`. Never enable it in `make dev` — a precaching worker serves stale assets
+and fights HMR. If you see stale output during development, check that no worker
+is registered (DevTools → Application → Service Workers → Unregister).
 
 **iOS Safari vibration.** `navigator.vibrate` returns `undefined` on iOS Safari,
 not `false`. The capability check must use `typeof navigator.vibrate === 'function'`,

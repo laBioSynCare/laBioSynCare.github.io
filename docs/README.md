@@ -35,6 +35,10 @@ banner pointing to the as-built reference.
   controls, tempo, `patch-studio-model-1` export).
 - [`PHOTOSENSITIVITY_SAFETY.md`](technical/PHOTOSENSITIVITY_SAFETY.md) —
   **as-built** photosensitivity advisory and visual-stimulation policy.
+- [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md) — **as-built** PWA
+  layer: web manifest, service worker, caching strategy, the three traps
+  (session-safe updates, Firebase/cross-origin bypass, cache budget), and the
+  update flow.
 - [`PRESET_FORMAT.md`](technical/PRESET_FORMAT.md) — canonical preset **catalog
   JSON** format (shared with BioSynCare). Source for `schemas/preset.schema.json`
   (planned). Distinct from the Patch Studio model above.
@@ -85,6 +89,10 @@ alternatives, and consequences. See
   technique; voice classes named `*Voice` (not `*VoiceSpec`).
 - [0007](decisions/0007-framework-protocol-implementation.md) — framework,
   technique, protocol, implementation, preset, and session distinctions.
+- [0008](decisions/0008-activitypub.md) — ActivityPub federation (no full
+  federation now; phased, bridge-preferred).
+- [0009](decisions/0009-pwa.md) — Progressive Web App: installable,
+  offline-capable, SvelteKit-native service worker, three binding constraints.
 
 ## `ecosystem/` — IP, governance, outreach
 

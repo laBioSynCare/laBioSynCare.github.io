@@ -32,6 +32,7 @@ annotations lives here.
 | [0006](0006-one-class-per-technique.md) | One class per technique; voice classes named `*Voice` | Accepted |
 | [0007](0007-framework-protocol-implementation.md) | Framework, technique, protocol, implementation, preset, session | Accepted |
 | [0008](0008-activitypub.md) | ActivityPub federation | Accepted |
+| [0009](0009-pwa.md) | Progressive Web App (installable, offline-capable) | Accepted |
 
 ## Adding an ADR
 
