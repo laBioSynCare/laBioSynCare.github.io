@@ -31,6 +31,7 @@ annotations lives here.
 | [0005](0005-binaural-carrier-pair-only.md) | Binaural beat parameterized as carrier pair only | Accepted |
 | [0006](0006-one-class-per-technique.md) | One class per technique; voice classes named `*Voice` | Accepted |
 | [0007](0007-framework-protocol-implementation.md) | Framework, technique, protocol, implementation, preset, session | Accepted |
+| [0008](0008-activitypub.md) | ActivityPub federation | Accepted |
 
 ## Adding an ADR
 
