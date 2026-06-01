@@ -2,7 +2,7 @@
 
 > **Read this file completely before touching any other file in this repository.**
 > This directive applies to Claude Code, GitHub Copilot, Cursor, and all AI coding agents.
-> Last updated: 2026-04-25. Maintained by Renato Fabbri.
+> Last updated: 2026-05-31. Maintained by Renato Fabbri.
 
 ---
 
@@ -132,14 +132,17 @@ DOM or module system.
 
 ```javascript
 // CORRECT
-await audioContext.audioWorklet.addModule('/worklets/binaural.worklet.js');
+await audioContext.audioWorklet.addModule('/worklets/bsc-voice.worklet.js');
 
 // WRONG — Vite must never process these
-import BinauralWorklet from './worklets/binaural.worklet.js';
+import BscVoiceWorklet from './worklets/bsc-voice.worklet.js';
 ```
 
 Never import worklet files. Never add them to Vite's module graph. They must remain
-plain ES5-compatible scripts in `static/worklets/`.
+plain ES-compatible scripts in `static/worklets/`. The current processors are
+`bsc-voice.worklet.js` (JS DSP) and `bsc-voice-wasm.worklet.js` (which loads the
+`bsc-osc.wasm` kernel); the ambient `Sample` clips in `static/audio/*.wav` are
+likewise plain static assets.
 
 ### 3.3 No allocation inside AudioWorkletProcessor.process()
 
@@ -205,9 +208,17 @@ before writing it.
 
 ## 4. Preset Format — Critical Rules
 
-Presets are the core data objects. The canonical specification is
+Presets are the core catalog data objects. The canonical specification is
 `docs/technical/PRESET_FORMAT.md`. These rules apply to any code that
 reads, writes, validates, or generates presets.
+
+> **Do not confuse two distinct models.** This section governs the **preset
+> catalog JSON** (`header` + `voices`, voice types `Binaural` / `Martigli` /
+> `Martigli-Binaural` / `Symmetry`) shared with BioSynCare. The **Patch Studio**
+> (`src/ui/creator/`) is a separate, live authoring model tagged
+> `model: "patch-studio-model-1"` with its own track types (`IsochronicTone`,
+> `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample`, …) — see
+> `docs/technical/PATCH_STUDIO.md`. The rules in §4 do not apply to patch drafts.
 
 ### 4.1 Voice type names
 
@@ -421,8 +432,13 @@ store.addTriple(subject, predicate, object);
 
 ## 6. Stimulation Engine Architecture
 
-The full architecture is in `src/README.md` and `src/core/README.md`. Critical
-points for any code touching the engine:
+The target architecture is in `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` and
+`src/core/README.md`. **As built today:** four selectable `IAudioEngine`
+implementations (Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, Null) chosen
+in Settings and applied on next playback — see `src/engines/README.md` and
+`docs/technical/PATCH_STUDIO.md`. The `core/` orchestrator + Worker scheduler and
+the `visual/`/`haptic/` engines are still planned. Critical points for any code
+touching the engine:
 
 ### 6.1 Three-clock architecture — never collapse it
 
@@ -440,13 +456,13 @@ renders. Never merge these clocks. Never schedule audio events from rAF.
 
 ### 6.2 Engine interface contract
 
-All audio, visual, and haptic engines implement the interfaces in:
-- `src/engines/audio/IAudioEngine.js`
-- `src/engines/visual/IVisualEngine.js`
-- `src/engines/haptic/IHapticEngine.js`
-
-When adding a new engine implementation, implement the full interface. Never call
-engine-specific methods from the orchestrator — only interface methods.
+All audio engines implement `src/engines/audio/IAudioEngine.js`. New audio
+engines are added via the registry/factory in
+`src/engines/audio/audioEngines.js` (so they appear in Settings and inherit
+capability-based fallback). The visual and haptic interfaces
+(`engines/visual/IVisualEngine.js`, `engines/haptic/IHapticEngine.js`) are
+planned. When adding an implementation, implement the full interface and call
+only interface methods from callers — never engine-specific methods.
 
 ### 6.3 Engine capability detection
 
@@ -488,11 +504,14 @@ TODO.md                       ← all tracked work (dev + ecosystem)
 CONTRIBUTING.md               ← governance and contribution guide
 
 docs/
-  concept/                    ← SENSORY_HARNESSING, SCOPE, EVIDENCE_FRAMEWORK,
-  │                             FACILITATING_DEDICATION
-  technical/                  ← PRESET_FORMAT, SESSION_MODEL, BREATHING_MODEL,
-  │                             SYMMETRY_SYSTEM, MARTIGLI_BINAURAL,
-  │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE
+  README.md                   ← documentation index (start here for docs)
+  concept/                    ← SENSORY_STIMULATION, SCOPE, NON_SCOPE,
+  │                             EVIDENCE_FRAMEWORK, FACILITATING_DEDICATION
+  technical/                  ← PRESET_FORMAT, SESSION_MODEL, PATCH_STUDIO,
+  │                             PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
+  │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE,
+  │                             BREATHING_MODEL, SYMMETRY_SYSTEM, MARTIGLI_BINAURAL
+  decisions/                  ← ADRs 0001–0007 (+ README index)
   ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
                                 INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
                                 CONSORTIUM_INVITATION
@@ -500,9 +519,10 @@ docs/
 static/
   _headers                    ← COOP/COEP/CORP headers for future Netlify/custom hosting
   worklets/                   ← AudioWorklet processors (never bundled by Vite)
-    binaural.worklet.js
-    martigli.worklet.js
-    symmetry.worklet.js
+    bsc-voice.worklet.js        ← unified voice processor (JS DSP)
+    bsc-voice-wasm.worklet.js   ← unified voice processor (WASM oscillator)
+    bsc-osc.wat / bsc-osc.wasm  ← hand-written WASM sine-LUT kernel + source
+  audio/                      ← ambient Sample clips (rain/ocean/wind, CC0)
   ontology/                   ← Turtle files served same-origin (copied to dist/)
     sstim-core.ttl              ← OWL ontology
     sstim-vocab.ttl             ← SKOS vocabulary (multilingual)
@@ -510,29 +530,26 @@ static/
     sstim-alignments.ttl        ← external links (Wikidata, DBpedia, OBO)
     instances/                ← preset and reference instances as RDF
 
-schemas/
-  preset.schema.json          ← JSON Schema for preset validation
-  session.schema.json         ← JSON Schema for session instance records
+scripts/
+  gen-ambiences.mjs           ← regenerates static/audio/*.wav
+
+schemas/                      ← (planned) preset.schema.json, session.schema.json
 
 src/
-  engines/audio/              ← IAudioEngine + implementations
-  engines/visual/             ← IVisualEngine + implementations
-  engines/haptic/             ← IHapticEngine + implementations
-  core/                       ← MasterClock, Orchestrator, Scheduler, Recorder
-  rdf/                        ← loader, store, query, validate, export, namespaces
-  ui/player/                  ← session player + engine switcher
-  ui/creator/                 ← real-time preset/session creation
-  ui/browser/                 ← SPARQL-driven preset browser
+  app.html                    ← HTML shell (pre-paint skin script)
+  engines/audio/              ← IAudioEngine + 4 engines + audioEngines factory
+  engines/visual|haptic/      ← (planned) IVisualEngine / IHapticEngine + impls
+  core/                       ← (planned) MasterClock, Orchestrator, Scheduler, Recorder
+  firebase/                   ← optional auth + Firestore (client, auth, profile)
+  rdf/                        ← namespaces, loader, query, graph, presets, annotations/
+  ui/creator/                 ← Patch Studio (PATCH_STUDIO.md)
   ui/graph/                   ← RDF graph visualization (Cytoscape.js)
-  ui/annotation/              ← annotation editor (CodeMirror + named graphs)
-  ui/sparql/                  ← power user SPARQL interface
-  data/presets/               ← JSON preset files (source until RDF pipeline complete)
+  ui/annotation/              ← annotation panel (named graphs)
+  ui/navigation|theme|safety|auth/  ← chrome, skins, photosensitivity, sign-in
+  routes/                     ← /, /creator, /presets, /sparql, /logbook, /profile, /settings
 
-
-tests/
-  rdf/                        ← ontology consistency, SHACL validation
-  engines/                    ← engine interface compliance
-  schemas/                    ← preset JSON schema validation
+tests/                        ← (planned) rdf/, engines/, schemas/ suites
+  (current unit tests live beside source, e.g. ui/creator/*.test.js)
 ```
 
 ---
@@ -608,7 +625,7 @@ Always initialize the writer with the full prefix map from `src/rdf/namespaces.j
 
 **Vite and AudioWorklet static paths.** In development, Vite serves `static/`
 at the root. In production builds, the same path applies. Use a relative path from
-the app root: `/worklets/binaural.worklet.js`. Never use `new URL(..., import.meta.url)`
+the app root: `/worklets/bsc-voice.worklet.js`. Never use `new URL(..., import.meta.url)`
 for worklet files — that triggers Vite's module bundling.
 
 ---

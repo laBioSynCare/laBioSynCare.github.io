@@ -1,188 +1,113 @@
 # src/ui — User Interface Layer
 
-> **Status: Phase 1 partial.** `graph/OntologyGraph.svelte` exists and the
-> SPARQL route currently renders inline. Player, creator, preset browser,
-> annotation, and dedicated SPARQL components are still planned.
+> **Status.** The shipped UI is the **knowledge browser** (graph, SPARQL,
+> annotations, presets) and the **Patch Studio** (`creator/`), wrapped in shared
+> navigation, theming, and the photosensitivity safety layer. The standalone
+> session `player/` and preset `browser/` components in the target design are
+> still planned.
 
-All UI components use Svelte 5 with runes syntax exclusively. See `CLAUDE.md`
-section 2 for the runes syntax mandate and the list of prohibited Svelte 4
-patterns.
+All UI components use Svelte 5 with **runes** syntax exclusively (`$state`,
+`$derived`, `$effect`, `$props`, `onclick`, `{@render ...}`). See `CLAUDE.md` §2
+for the runes mandate and the prohibited Svelte 4 patterns.
 
 ---
 
-## Directory structure
+## Directory structure (as built)
 
 ```
 ui/
-├── player/       Session player — canvas, controls, engine switcher
-├── creator/      Real-time preset/session designer
-├── browser/      SPARQL-driven preset browser + recommendation
-├── graph/        RDF ontology/evidence graph (Cytoscape.js)
-├── annotation/   Annotation editor (CodeMirror + named graphs)
-└── sparql/       Power user SPARQL query interface
+├── creator/       Patch Studio — real-time audiovisual designer
+├── graph/         RDF ontology graph (Cytoscape.js)
+├── annotation/    Annotation panel (named-graph CRUD)
+├── navigation/    App top bar, bottom dock, profile control
+├── theme/         Skin / palette system
+├── safety/        Photosensitivity advisory + visual-stimulation policy
+├── auth/          Firebase sign-in form
+└── (planned) player/, browser/, dedicated sparql/ component
 ```
 
----
-
-## `player/`
-
-The session player is the primary user-facing interface. It renders the PixiJS
-canvas, provides transport controls (play, pause, stop), shows the breathing
-guide and session progress, and optionally exposes the engine switcher for
-research use.
-
-**Entry component:** `player/SessionPlayer.svelte`
-
-**Key responsibilities:**
-- `AudioContext.resume()` must be called inside the button `onclick` handler
-  — never in `$effect()` or on component mount
-- Reads `breathingPhase` from the audio engine's `onTimingState` callback;
-  passes it to the visual engine; never computes phase from wall clock
-- Engine switcher calls `orchestrator.switchAudioEngine()` /
-  `orchestrator.switchVisualEngine()` — no preset reload required
-
-```svelte
-<!-- Svelte 5 runes — correct pattern -->
-<script>
-  import { onMount } from 'svelte'
-  let isPlaying = $state(false)
-  let breathingPhase = $state(NaN)
-
-  async function handlePlay() {
-    // AudioContext.resume() MUST be inside this gesture handler
-    await audioEngine.resume()
-    await orchestrator.startSession(sessionSpec, preset)
-    isPlaying = true
-  }
-</script>
-
-<button onclick={handlePlay}>Play</button>
-```
-
-**Visual canvas:** The PixiJS canvas is mounted into a container `div` by
-the `PixiJSEngine.initialize()` call. The Svelte component holds the container
-reference; it does not manage the canvas element directly.
+Routes that mount these live in `src/routes/`: `/` (graph), `/creator`,
+`/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`.
 
 ---
 
-## `creator/`
+## `creator/` — Patch Studio
 
-Real-time preset designer. Allows users to adjust voice parameters and hear
-the result immediately. Changes feed into the audio engine via
-`setVoiceParameter()` — no session restart needed for most parameter changes.
+The primary authoring surface. A four-quadrant designer (controls, audio,
+visual, haptic) that builds an in-memory **patch draft** and renders it live
+through the selected audio engine. Knob/parameter changes are applied without a
+restart via `engine.setVoiceParameter()`; structural changes (e.g. noise colour,
+drone voice count, tremolo enable) rebuild the affected voice.
 
-**Entry component:** `creator/PresetCreator.svelte`
+- `PresetCreator.svelte` — the studio shell, transport, rAF live-evaluation loop,
+  scopes/previews, and the fullscreen visual **mix** stage.
+- `presetDraft.js` — the data model (track types, parameter ranges, factories,
+  validation). **Authoritative model spec:**
+  [`../../docs/technical/PATCH_STUDIO.md`](../../docs/technical/PATCH_STUDIO.md).
+- `controlSignals.js` — Martigli / Symmetry control-signal evaluation.
+- `tempo.js` — BPM / tempo-sync math. `semantic.js` — track/param → SSTIM terms.
+- `creatorSession.js` — cross-navigation session persistence.
+- `Knob.svelte` — the reusable rotary control (base value + live/modulated dot).
+- Tests: `presetDraft.test.js`, `tempo.test.js`.
 
-Parameters that can change without a restart (via AudioParam automation):
-- `iniVolume` (GainNode value)
-- `panOscPeriod`, `panOscTrans` (scheduled as parameter ramps)
-
-Parameters that require stopping and restarting the voice:
-- `fl`, `fr`, `f0`, `nnotes`, `noctaves`, `d`, `permfunc`
-- `mf0`, `ma`, `mp0`, `mp1`, `md`, `isOn`
-
-The creator stores the working preset in a Svelte `$state` object. On save,
-it validates against `schemas/preset.schema.json` before persisting to
-`src/data/presets/`.
-
----
-
-## `browser/`
-
-SPARQL-driven preset browser. Queries the N3.Store to render public BSC Lab
-reference presets with filtering by group, frequency band, evidence tier, and
-headphone mode. It does not load the private BioSynCare/BSC catalog.
-
-**Entry component:** `browser/PresetBrowser.svelte`
-
-Comunica is lazy-loaded when this panel is first opened. The initial load may
-take 1–2 seconds on slow connections; show a loading indicator.
-
-Standard SPARQL queries are in `src/rdf/query.js`. The browser constructs
-parameterized queries from the user's filter selections.
-
-**SKOS hierarchy filtering** uses `skos:narrower*` property paths:
-```sparql
-PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
-SELECT DISTINCT ?preset WHERE {
-  sstim-v:alpha skos:narrower* ?band .
-  ?preset sstim:targetsFrequencyBand ?band .
-}
-```
-This returns presets targeting `alpha`, `low-alpha`, `high-alpha`, or
-`alpha-10` with a single query.
+`AudioContext.resume()` is called inside the play button's gesture handler, never
+on mount (browser autoplay policy). The engine is built by
+`createAudioEngine()` from [`../engines/audio/audioEngines.js`](../engines/audio/audioEngines.js).
 
 ---
 
-## `graph/`
+## `graph/` — ontology graph
 
-RDF graph visualization using Cytoscape.js. Renders the ontology class
-hierarchy, evidence claim chains, and preset-to-band relationships as an
-interactive node-edge graph.
-
-**Entry component:** `graph/OntologyGraph.svelte`
-
-Cytoscape.js (~300 KB) is lazy-loaded when this panel is first opened.
-
-The graph has two modes:
-- **Ontology mode:** shows the SSTIM class hierarchy with BFO/OBI/IAO
-  parent alignments
-- **Evidence mode:** shows a specific preset's evidence chain — the
-  claim nodes, tier values, modality tags, and reference nodes
-
-Clicking a node in the graph opens the annotation panel for that node.
+`OntologyGraph.svelte` renders the SSTIM class hierarchy and instance graph with
+Cytoscape.js (lazy-loaded on first open). Edge/node layers can be toggled;
+nodes are searchable, centerable, and fit/relayout from the top bar.
+`graphSession.js` persists view state across navigation. Clicking a node opens
+the annotation panel for it.
 
 ---
 
-## `annotation/`
+## `annotation/` — annotation panel
 
-Annotation editor for any ontology node. Uses CodeMirror with a simple
-Turtle syntax highlighter for the annotation body. Calls `AnnotationStore.js`
-for persistence.
-
-**Entry component:** `annotation/AnnotationEditor.svelte`
-
-Annotation types:
-- `comment` — general note
-- `question` — open question for the maintainer
-- `disputesTierAssignment` — challenge to an evidence tier
-- `proposesNewConcept` — suggestion for a new vocabulary term
-- `evidenceCitation` — link to an additional reference
-
-Annotations are shown in the graph view as badge counts on their target
-nodes. The annotation editor panel opens from a node click in the graph.
+`AnnotationPanel.svelte` lists and edits annotations for the selected ontology
+node. Persistence goes through [`../rdf/annotations/AnnotationStore.js`](../rdf/annotations/AnnotationStore.js),
+which writes to **named graphs only** (never the default graph — `CLAUDE.md`
+§5.5). Public vs private visibility is per annotation; authorship comes from the
+optional Firebase sign-in.
 
 ---
 
-## `sparql/`
+## `navigation/`, `theme/`, `safety/`, `auth/`
 
-Power user SPARQL interface with a CodeMirror editor, result table, and
-CONSTRUCT result graph view. Intended for researchers and ontology contributors.
-
-**Entry component:** `sparql/SparqlInterface.svelte`
-
-The interface provides:
-- Auto-completing prefix declarations (all `namespaces.js` prefixes)
-- Query history (stored in IndexedDB, not the default RDF graph)
-- Result export as CSV (SELECT) or Turtle (CONSTRUCT)
-- Link to the WIDOCO-generated ontology documentation
+- **navigation/** — `AppTopBar.svelte` (graph scope/search/fit + keyboard help +
+  the global `+` menu), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
+  SPARQL · Logbook · Settings), `ProfileControl.svelte`, `graphNavigation.js`.
+- **theme/** — `skins.js`: five palettes (default `paper`) applied via a
+  `data-skin` attribute, persisted to `localStorage`, pre-applied before first
+  paint by an inline script in `app.html` to avoid a flash of the wrong theme.
+- **safety/** — `visualSafety.js` (visual-stimulation policy store) and
+  `PhotosensitivityAdvisory.svelte` (page-load advisory). Spec:
+  [`../../docs/technical/PHOTOSENSITIVITY_SAFETY.md`](../../docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+- **auth/** — `SignInForm.svelte`, used by the profile control and the Logbook
+  gate; backed by `src/firebase/`.
 
 ---
 
 ## Shared UI conventions
 
-**No inline styles.** All styling uses Pico.css semantic classes plus
-component-scoped Svelte `<style>` blocks. No Tailwind, no CSS-in-JS.
+**Styling.** Pico.css for semantic defaults plus component-scoped Svelte
+`<style>` blocks driven by skin CSS variables (`--app-*`). No Tailwind, no
+CSS-in-JS. Component colours must resolve from skin variables so every palette
+(including the light `paper`/`daylight` skins) stays legible — do not hard-code
+dark-only `#fff`/white-alpha values.
 
-**Error boundaries.** Every panel that makes async calls (SPARQL, RDF loading)
-wraps its async logic in try/catch and shows a human-readable error state.
-Never let a SPARQL error or an N3.js parse error reach the user as a raw
-exception.
+**Error boundaries.** Every panel making async calls (SPARQL, RDF loading,
+Firebase) wraps its logic in try/catch and shows a human-readable error state.
+Never surface a raw N3.js parse error or SPARQL exception to the user.
 
-**Accessibility.** Breathing guide animations respect `prefers-reduced-motion`
-by delegating to `CSSEngine`. Interactive controls have `aria-label` attributes.
-Color is never the sole information carrier.
+**Accessibility & safety.** Visual stimulation honors the global policy and
+`prefers-reduced-motion` via `safety/visualSafety.js` (not a `CSSEngine`).
+Interactive controls carry `aria-label`s; colour is never the sole information
+carrier; dialogs are dismissible with Esc.
 
-**Loading indicators.** Comunica (SPARQL) and Cytoscape (graph) are heavy.
-Show a loading indicator the first time each panel opens. Subsequent opens
-can use the already-initialized library.
+**Loading indicators.** Comunica (SPARQL, ~500 KB) and Cytoscape (graph,
+~300 KB) are lazy-loaded; show a loading indicator the first time each opens.

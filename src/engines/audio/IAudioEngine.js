@@ -18,19 +18,29 @@
 
 /**
  * @typedef {Object} VoiceSpec
- * @property {string} type    Voice type: 'Carrier' | 'IsochronicTone' | 'BinauralBeat'
- *                            (later: 'Binaural' | 'Martigli' | 'Martigli-Binaural' | 'Symmetry')
+ * @property {string} type    Patch Studio voice type:
+ *                            'Carrier' | 'IsochronicTone' | 'BinauralBeat' |
+ *                            'Noise' | 'Drone' | 'Sample'
  * @property {number} volume  0–1 initial scalar
  * @property {Object} params  Voice-type-specific parameters
+ * @property {Object} [tremolo]  Optional AM effect { enabled, rate, depth, mode }
+ * @property {Object} [envelope] IsochronicTone envelope spec
+ * @property {string} [noiseColor]  Noise: 'white' | 'pink' | 'brown'
+ * @property {string} [noiseFilter] Noise: 'lowpass' | 'bandpass' | 'highpass'
+ * @property {number} [droneVoices] Drone: detuned-oscillator count
+ * @property {string} [sampleId]    Sample: ambient clip id
  */
 
 /**
  * IAudioEngine — BSC audio engine interface contract.
  *
- * Defined in `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` §3. The
- * orchestrator (and, for now, the patch studio) call only these methods.
- * Implementations: VanillaWebAudioEngine (now). Future: ToneJsEngine,
- * WasmAudioEngine.
+ * Target design in `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md`; the as-built
+ * engines and the live voice model are in `src/engines/README.md` and
+ * `docs/technical/PATCH_STUDIO.md`. Callers (today the Patch Studio; later a
+ * `StimulationOrchestrator`) use only these interface methods.
+ *
+ * Implementations: VanillaWebAudioEngine, AudioWorkletEngine,
+ * WasmAudioWorkletEngine, NullAudioEngine — registered in `audioEngines.js`.
  *
  * Invariant: the AudioContext created by this engine is the timing
  * authority for all visual and haptic synchronization.

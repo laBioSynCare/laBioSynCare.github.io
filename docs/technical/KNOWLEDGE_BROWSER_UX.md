@@ -6,8 +6,9 @@
 
 This is not a hard roadmap. Items are unranked except by category. Each
 entry states the *user-visible value* and a one-line implementation hint.
-The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`,
-`src/ui/navigation/`, and `src/ui/sparql/`.
+The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`, and
+`src/ui/navigation/`, with the SPARQL interface in the `src/routes/sparql/`
+page (a dedicated `src/ui/sparql/` component is planned).
 
 ---
 

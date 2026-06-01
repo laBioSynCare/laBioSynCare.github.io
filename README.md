@@ -49,35 +49,42 @@ Key documents:
 
 ---
 
-## Current Status — Phase 0 → 1 Boundary
+## Current Status
 
-The repository is at the **Phase 0 → Phase 1 boundary**. What exists today:
+What exists today:
 
-- 31 reference documents (concept, technical, ecosystem, AI-agent directive)
+- A reference-document set (concept, technical, ecosystem, decisions, AI-agent
+  directive) — see the [documentation index](docs/README.md)
 - Four ontology Turtle files: `sstim-core.ttl` (OWL), `sstim-vocab.ttl`
   (multilingual SKOS), `sstim-shapes.ttl` (SHACL), `sstim-alignments.ttl`
   (external links to Wikidata, DBpedia, OBO)
-- A SvelteKit/Svelte 5 scaffold with initial ontology graph and SPARQL routes
+- A SvelteKit/Svelte 5 app with two working subsystems:
+  - **Knowledge browser** — Cytoscape ontology graph, SPARQL interface, preset
+    browser, and optional Firebase-backed node annotations
+  - **Patch Studio** — a real-time audiovisual designer with four selectable
+    audio engines (Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, Silent),
+    six audio voice types (incl. noise, drone, sample) with a universal
+    tremolo, nine visual track types with blend/fullscreen mixing, breathing/
+    Symmetry control modulation, and a photosensitivity safety layer.
+    See [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md).
+- AudioWorklet processors and a hand-written WASM oscillator kernel in
+  `static/worklets/`, with synthetic CC0 ambient clips in `static/audio/`
 - A GitHub Pages deployment workflow for the client-only static build and
   `/ontology/*.ttl` artifacts
-- Architecture READMEs under `src/` describing the target software design
 
 What does **not** yet exist or is explicitly out of scope:
 
-- Custom-domain hosting at `lab.biosyncare.com`; this is deferred until the
-  app needs custom headers, WASM threading, or backend services
+- The `core/` orchestration layer (master clock, Worker scheduler, orchestrator)
+  and the GPU visual / haptic engines described in the architecture specs
+- Custom-domain hosting at `lab.biosyncare.com`; deferred until the app needs
+  custom headers, WASM threading, or backend services
 - Private BioSynCare/BSC catalog conversion; that catalog is outside BSC Lab
-- Full public reference preset set, evidence-chain view, or browser-side SHACL
-  validation UI
-- Production Firebase project credentials for the optional RDF annotation layer
-- AudioWorklet processors (`static/worklets/`)
-- JSON Schemas for preset/session validation (`schemas/`)
-- Test suites (`tests/`)
-- Pre-commit hooks (`hooks/`)
-- Deployed WIDOCO documentation
+- A bridge from a Patch Studio draft to the preset catalog JSON / RDF instances
+- JSON Schemas for preset/session validation (`schemas/`), the `tests/` subtree,
+  pre-commit hooks (`hooks/`), and deployed WIDOCO documentation
 
 See [`ROADMAP.md`](ROADMAP.md) for phase definitions and
-[`TODO.md`](TODO.md) for the tracked task list and current Phase 1 backlog.
+[`TODO.md`](TODO.md) for the tracked task list.
 
 ---
 
@@ -89,9 +96,10 @@ ROADMAP.md              Strategic phases (0 → 1 → 2 → 3)
 TODO.md                 Tracked task list; current-focus section at top
 CONTRIBUTING.md         Governance and contribution guide
 
-docs/
+docs/                   Reference documents — see docs/README.md (index)
   concept/              What the domain is, scope, evidence framework
-  technical/            Preset format, engine architectures, defensive pubs
+  technical/            Preset format, Patch Studio, safety, engine architectures
+  decisions/            Architecture decision records (ADRs)
   ecosystem/            IP strategy, W3C CG charter, advisory board, partners
 
 static/
@@ -100,29 +108,40 @@ static/
     sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
     sstim-shapes.ttl      SHACL validation shapes
     sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
-    instances/            Public BSC Lab/reference RDF instances (Phase 1 seed data)
-  worklets/             AudioWorklet processors (planned — Phase 2)
+    instances/            Public BSC Lab/reference RDF instances (seed data)
+  worklets/             AudioWorklet processors + WASM oscillator kernel
+  audio/                Synthetic CC0 ambient clips for the Sample voice
 
-src/                    SvelteKit app scaffold (Phase 1 — in progress)
-  rdf/                  Loader, SPARQL wrapper, namespace IRI helpers
-  routes/               SvelteKit pages (ontology browser, presets, SPARQL)
-  core/, engines/, ui/  Engine and UI modules (planned)
+src/                    SvelteKit app — see src/README.md
+  rdf/                  Loader, SPARQL wrapper, graph model, namespace IRI helpers
+  engines/audio/        IAudioEngine + four engines + selection factory
+  ui/                   Patch Studio, ontology graph, annotations, navigation,
+                        theme, safety, auth
+  firebase/             Optional auth + Firestore (annotations, profiles)
+  routes/               SvelteKit pages (graph, creator, presets, sparql,
+                        logbook, profile, settings)
+  core/, engines/visual, engines/haptic  Planned modules (README placeholders)
 
-schemas/                JSON Schemas (planned — Phase 1)
-tests/                  Test suites (planned — Phase 1)
+scripts/                gen-ambiences.mjs (regenerates static/audio/*.wav)
+schemas/                JSON Schemas (planned)
+tests/                  Dedicated test subtree (planned; unit tests beside source)
 ```
 
 ---
 
 ## Start here
 
+- **Documentation index:** [`docs/README.md`](docs/README.md) — the map of every
+  reference document.
 - **First-time readers:** [`docs/concept/SCOPE.md`](docs/concept/SCOPE.md) —
   what BSC Lab claims and explicitly does not claim.
 - **Ontology / knowledge graph:** [`static/ontology/README.md`](static/ontology/README.md).
-- **Software architecture:** [`src/README.md`](src/README.md) (targets only).
+- **Software architecture:** [`src/README.md`](src/README.md).
+- **Patch Studio (the audiovisual designer):**
+  [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md).
 - **AI coding agents (Claude, Copilot, Cursor, Gemini):**
   [`CLAUDE.md`](CLAUDE.md) — absolute invariants and project conventions.
-- **Preset data format:**
+- **Preset catalog data format:**
   [`docs/technical/PRESET_FORMAT.md`](docs/technical/PRESET_FORMAT.md).
 
 ---

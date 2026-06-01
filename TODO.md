@@ -34,13 +34,22 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Week of April 21, 2026:**
-Phase 0 Public Foundation Pass is closing. The 31 Phase 0 reference
+Phase 0 Public Foundation Pass is closing. The Phase 0 reference
 documents, four ontology `.ttl` files, docs index, instance-layout index,
 SvelteKit scaffold, RDF loader/query layer, ontology graph route, and basic
 SPARQL and preset routes exist. Current focus: keep BSC Lab seed/reference
 instances public and separate from the private BioSynCare/BSC catalog, keep
 namespace paths consistently scoped under SSTIM, and add local validation that
 mirrors CI.
+
+**Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
+(real-time audiovisual designer, four selectable audio engines, six audio voice
+types + universal tremolo, nine visual track types with blend/fullscreen mixing,
+and a photosensitivity safety layer) — now exists ahead of schedule. It is
+documented in [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)
+and [`docs/technical/PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+The `core/` orchestration layer and the GPU visual/haptic engines remain Phase 2
+work; Phase 3 infrastructure still must not be built during Phase 1.
 
 ### Known issues (Phase 0)
 - [x] ~~`static/ontology/sstim-vocab.ttl` SHACL non-conformance on

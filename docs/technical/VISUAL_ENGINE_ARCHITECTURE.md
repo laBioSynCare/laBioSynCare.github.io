@@ -1,11 +1,21 @@
 # Visual Engine Architecture
 
-> **For AI agents:** This document is the authoritative design
-> specification for the BSC Lab visual subsystem. Before writing any
-> code that renders session visuals, reads `AudioContext.currentTime`
-> for visual purposes, or touches `PixiJS`, read this document.
-> The `IVisualEngine` interface and audio clock coupling rules are
-> absolute — see also `CLAUDE.md` section 3.1 for the clock invariant.
+> **For AI agents:** This document is the authoritative **target design**
+> specification for the BSC Lab visual subsystem (the PixiJS-based
+> `IVisualEngine`, audio-clock-coupled rendering). Read it before writing code
+> that renders session visuals or reads `AudioContext.currentTime` for visual
+> purposes. The clock invariant in `CLAUDE.md` §3.1 is absolute.
+
+> **Implementation status (as-built ≠ this design yet).** No PixiJS visual
+> engine exists yet. Visual stimuli are currently authored and previewed as
+> live **CSS/DOM** elements in the Patch Studio — see
+> [`PATCH_STUDIO.md` §5](PATCH_STUDIO.md) for the implemented visual track types
+> (`Geometry`, `Particles`, `Gradient`, `Blink`, `Oscillate`, `Pacer`,
+> `Ripple`, `Spiral`, `Mandala`), their parameters, per-track blend modes, and
+> the mixed/fullscreen stage. All flashing/moving output is gated by the safety
+> policy in [`PHOTOSENSITIVITY_SAFETY.md`](PHOTOSENSITIVITY_SAFETY.md). The
+> `IVisualEngine` and `phaseMapping` contracts below are the target this preview
+> layer will graduate into.
 
 ---
 

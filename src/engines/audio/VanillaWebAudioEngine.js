@@ -130,15 +130,18 @@ export function buildTremCurve(mode = 'exponential', depth = 0.5, N = 2048) {
 }
 
 /**
- * Minimal Vanilla Web Audio implementation of IAudioEngine.
+ * Vanilla Web Audio implementation of IAudioEngine, built from native nodes.
+ * The default engine; broadest compatibility, no AudioWorklet required.
  *
- * Phase 1 scope — supports the patch studio's three audio track types:
+ * Supports the Patch Studio voice model (docs/technical/PATCH_STUDIO.md §4):
  *   - Carrier:        single sine
  *   - IsochronicTone: sine carrier × periodic-wave envelope (square/AR/AD/ADSR)
  *   - BinauralBeat:   two sines hard-panned L/R at center ± beat/2 (no user pan
  *                     stage — adding one defeats the binaural effect)
- * The AudioWorklet-backed voices (Binaural/Martigli/Martigli-Binaural/Symmetry
- * per docs/technical/AUDIO_ENGINE_ARCHITECTURE.md) are not yet implemented.
+ *   - Noise:          white/pink/brown buffer → biquad (lowpass/bandpass/highpass)
+ *   - Drone:          stack of detuned sine oscillators
+ *   - Sample:         looping ambient clip (AudioBufferSourceNode)
+ * Plus a universal tremolo/AM stage (linear or exponential) on any voice.
  */
 export class VanillaWebAudioEngine extends IAudioEngine {
   constructor() {

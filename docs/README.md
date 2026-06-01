@@ -10,12 +10,19 @@ anything adjacent to it. Keep them self-contained.
 
 ---
 
+Each technical document is marked as **as-built** (describes shipped code) or
+**target** (a design the code is growing toward). When the two disagree, the
+code and the as-built docs win; target specs carry an "implementation status"
+banner pointing to the as-built reference.
+
 ## `concept/` — what the domain is and what we claim
 
 - [`SENSORY_STIMULATION.md`](concept/SENSORY_STIMULATION.md) — defines the
   "sensory stimulation" term and grounds the first ontology classes.
 - [`SCOPE.md`](concept/SCOPE.md) — what BSC Lab claims and explicitly does
   not claim. Load-bearing for every user-facing string; see `CLAUDE.md` §3.5.
+- [`NON_SCOPE.md`](concept/NON_SCOPE.md) — what is explicitly out of scope for
+  the project and the proposed W3C Community Group.
 - [`EVIDENCE_FRAMEWORK.md`](concept/EVIDENCE_FRAMEWORK.md) — the six-tier
   evidence system used throughout the ontology.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
@@ -23,10 +30,24 @@ anything adjacent to it. Keep them self-contained.
 
 ## `technical/` — specifications
 
-- [`PRESET_FORMAT.md`](technical/PRESET_FORMAT.md) — canonical preset JSON
-  format. Source for `schemas/preset.schema.json` (planned — Phase 1).
+- [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) — **as-built** authoring model
+  for the live audiovisual designer (track types, parameters, tremolo, mixing,
+  controls, tempo, `patch-studio-model-1` export).
+- [`PHOTOSENSITIVITY_SAFETY.md`](technical/PHOTOSENSITIVITY_SAFETY.md) —
+  **as-built** photosensitivity advisory and visual-stimulation policy.
+- [`PRESET_FORMAT.md`](technical/PRESET_FORMAT.md) — canonical preset **catalog
+  JSON** format (shared with BioSynCare). Source for `schemas/preset.schema.json`
+  (planned). Distinct from the Patch Studio model above.
 - [`SESSION_MODEL.md`](technical/SESSION_MODEL.md) — preset vs. session
   instance distinction. Source for `schemas/session.schema.json` (planned).
+- [`KNOWLEDGE_BROWSER_UX.md`](technical/KNOWLEDGE_BROWSER_UX.md) — UX design for
+  the ontology graph, SPARQL, preset browser, and annotation surfaces.
+- [`AUDIO_ENGINE_ARCHITECTURE.md`](technical/AUDIO_ENGINE_ARCHITECTURE.md) —
+  **target** pluggable audio engine design (three-clock model, orchestrator).
+  As-built engines: [`../src/engines/README.md`](../src/engines/README.md).
+- [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md) —
+  **target** visual engine design (PixiJS v8 default, CSS fallback). As-built
+  visuals: `PATCH_STUDIO.md` §5.
 - [`BREATHING_MODEL.md`](technical/BREATHING_MODEL.md) — Martigli breathing
   system specification. **Defensive publication — do not modify** after
   first commit (see `CLAUDE.md` §3.4).
@@ -34,10 +55,16 @@ anything adjacent to it. Keep them self-contained.
   system. **Defensive publication.**
 - [`MARTIGLI_BINAURAL.md`](technical/MARTIGLI_BINAURAL.md) — hybrid voice
   type specification. **Defensive publication.**
-- [`AUDIO_ENGINE_ARCHITECTURE.md`](technical/AUDIO_ENGINE_ARCHITECTURE.md) —
-  pluggable audio engine design (Web Audio, AudioWorklet, three-clock model).
-- [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md) —
-  pluggable visual engine design (PixiJS v8 default, CSS fallback).
+
+## Implementation notes (alongside the code)
+
+- [`../src/README.md`](../src/README.md) — software architecture and directory map.
+- [`../src/engines/README.md`](../src/engines/README.md) — the four audio engines.
+- [`../src/ui/README.md`](../src/ui/README.md), [`../src/rdf/README.md`](../src/rdf/README.md),
+  [`../src/core/README.md`](../src/core/README.md) — layer-specific docs.
+- [`../static/ontology/README.md`](../static/ontology/README.md) — ontology design.
+- [`ontology/README.md`](ontology/README.md) — vocabulary / `sstim` notes.
+- [`credentials/firebase.md`](credentials/firebase.md) — optional Firebase setup.
 
 ## `decisions/` — architecture decision records
 

@@ -119,7 +119,8 @@ Before submitting a new or revised preset:
 - [ ] `evidenceTier` assigned using criteria in `docs/concept/EVIDENCE_FRAMEWORK.md`
 - [ ] `cautionTags` complete and accurate
 - [ ] `techDesc*` contains no fabricated citations, numeric effect sizes without references, or treatment claims
-- [ ] JSON Schema validation passes: `npx ajv validate -s schemas/preset.schema.json -d your-preset.json`
+- [ ] JSON Schema validation passes once `schemas/preset.schema.json` lands
+      (planned): `npx ajv validate -s schemas/preset.schema.json -d your-preset.json`
 
 ### Evidence tier requirements by group
 

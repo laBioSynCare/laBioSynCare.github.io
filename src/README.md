@@ -1,9 +1,14 @@
 # src — Software Architecture
 
-> **Status: Phase 1 scaffold in progress.** The SvelteKit/Svelte 5 app exists
-> with initial RDF loading, SPARQL querying, ontology graph, and preset routes.
-> Engine, player, annotation, export, and browser-side validation modules
-> referenced below are still planned. See `ROADMAP.md` for phase definitions.
+> **Status.** Two things run today: the **knowledge browser** (RDF loader,
+> Cytoscape ontology graph, SPARQL route, preset browser, node annotations) and
+> the **Patch Studio** (`ui/creator/`) — a real-time audiovisual designer with
+> four selectable audio engines (see [`engines/README.md`](engines/README.md)
+> and [`../docs/technical/PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)).
+> Still planned: the `core/` orchestration layer (clock, scheduler worker,
+> orchestrator), the GPU `visual/`+`haptic/` engines, `rdf/export.js`, JSON
+> Schemas, and the test subtree. Items below are marked **(planned)** where they
+> do not yet exist. See `ROADMAP.md` for phase definitions.
 
 This directory contains the BSC Lab application: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL
@@ -19,38 +24,55 @@ in `process()`, namespace imports — govern the entire codebase.
 
 ```
 src/
-├── engines/
-│   ├── audio/          IAudioEngine interface + implementations
-│   ├── visual/         IVisualEngine interface + implementations
-│   └── haptic/         IHapticEngine interface + implementations
+├── app.html                      HTML shell (pre-paint skin + a11y meta)
 │
-├── core/
-│   ├── MasterClock.js           AudioContext clock exposure
-│   ├── StimulationOrchestrator.js  Engine coordination
-│   ├── SessionScheduler.worker.js  Web Worker: event queue + lookahead
-│   ├── ProtocolRunner.js        Preset → VoiceSpec translation + timeline
-│   └── SessionRecorder.js       Session instance lifecycle
+├── engines/
+│   └── audio/                    IAudioEngine + four implementations + factory
+│       ├── IAudioEngine.js        Interface contract
+│       ├── audioEngines.js        Registry, capability detection, persisted
+│       │                          selection, createAudioEngine() factory
+│       ├── VanillaWebAudioEngine.js   Native Web Audio nodes (default)
+│       ├── WorkletVoiceEngine.js  Shared base for the AudioWorklet engines
+│       ├── AudioWorkletEngine.js  Audio-thread DSP in JS
+│       ├── WasmAudioWorkletEngine.js  Audio-thread DSP in WASM
+│       ├── NullAudioEngine.js     Silent (clock only) — fallback
+│       └── sampleLoader.js        Decode/cache for the Sample voice
+│   ├── visual/                  IVisualEngine + PixiJS/CSS engines (planned)
+│   └── haptic/                  IHapticEngine + Vibration/Null engines (planned)
+│
+├── core/                        Orchestration layer (planned — README only):
+│   │                            MasterClock, StimulationOrchestrator,
+│   │                            SessionScheduler.worker, ProtocolRunner,
+│   │                            SessionRecorder
+│
+├── firebase/                    Optional auth + Firestore profile/annotations
+│   ├── client.js  auth.js  profile.js
 │
 ├── rdf/
 │   ├── namespaces.js     All IRI prefix declarations (single source of truth)
 │   ├── loader.js         Turtle/TriG → N3.Store
-│   ├── store.js          N3.Store wrappers and helpers
 │   ├── query.js          Comunica SPARQL execution wrapper
-│   ├── validate.js       SHACL validation via rdf-validate-shacl
-│   ├── export.js         N3.Store → optional public preset JSON export
-│   └── annotations/
-│       └── AnnotationStore.js   Named-graph annotation CRUD
+│   ├── graph.js          Ontology → Cytoscape graph model
+│   ├── presets.js        SPARQL-driven preset listing
+│   ├── annotations/AnnotationStore.js   Named-graph annotation CRUD
+│   └── (planned) validate.js, export.js
 │
 ├── ui/
-│   ├── player/           Session player (canvas + controls + engine switcher)
-│   ├── creator/          Real-time preset/session designer
-│   ├── browser/          SPARQL-driven preset browser
-│   ├── graph/            RDF graph visualization (Cytoscape.js)
-│   ├── annotation/       Annotation editor (CodeMirror + named graphs)
-│   └── sparql/           Power user SPARQL query interface
+│   ├── creator/          Patch Studio — real-time audiovisual designer
+│   │                     (PresetCreator, presetDraft, controlSignals, tempo,
+│   │                      semantic, Knob)  → docs/technical/PATCH_STUDIO.md
+│   ├── graph/            RDF ontology graph (Cytoscape.js)
+│   ├── annotation/       Annotation panel (named graphs)
+│   ├── navigation/       Top bar, bottom dock, profile control
+│   ├── theme/            Skin/palette system (skins.js)
+│   ├── safety/           Photosensitivity advisory + visual-stim policy
+│   ├── auth/             Sign-in form (Firebase)
+│   └── (planned) player/, browser/, dedicated sparql/ component
 │
-└── data/
-    └── presets/          Public BSC Lab runtime JSON presets, if needed
+├── routes/              SvelteKit pages: / (graph), /creator, /presets,
+│   │                    /sparql, /logbook, /profile, /settings
+│
+└── data/presets/        Public BSC Lab runtime JSON presets (planned)
 ```
 
 ---
@@ -65,14 +87,16 @@ Delivers audiovisual sessions from preset specifications. Three threads, three
 clocks. See `src/engines/README.md` for the full engine architecture and
 `src/core/README.md` for the orchestration layer.
 
+Target three-thread model (the Web Worker scheduler and orchestrator are
+planned; today live updates run from the Patch Studio rAF loop):
+
 ```
 Main thread          Web Worker (scheduler)      Audio render thread
 ──────────────       ──────────────────────       ──────────────────
 StimulationOrch      SessionScheduler.worker      AudioWorkletProcessor
-IAudioEngine         setInterval(25ms)            binaural.worklet.js
-IVisualEngine        event queue + lookahead      martigli.worklet.js
-IHapticEngine        postMessage → main           symmetry.worklet.js
-rAF visual loop      ← clock sync
+IAudioEngine         setInterval(25ms)            bsc-voice.worklet.js
+rAF visual loop      event queue + lookahead      bsc-voice-wasm.worklet.js
+                     postMessage → main           (+ bsc-osc.wasm kernel)
 ```
 
 ### Knowledge subsystem
@@ -113,12 +137,16 @@ stimulation subsystem reads public BSC Lab presets from `src/data/presets/`
 subsystem reads from the RDF ontology files and public BSC Lab reference
 instances.
 
-Changes to the preset format must be coordinated across:
+The Patch Studio authors its own live model (`model: "patch-studio-model-1"`,
+see [`docs/technical/PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)); a
+bridge from a patch to the catalog preset / RDF instance is future work.
+
+Changes to the **preset catalog format** must be coordinated across:
 1. `docs/technical/PRESET_FORMAT.md` (specification)
-2. `schemas/preset.schema.json` (JSON Schema validation)
+2. `schemas/preset.schema.json` (JSON Schema validation) — *planned*
 3. `static/ontology/sstim-shapes.ttl` (SHACL validation)
-4. `src/core/ProtocolRunner.js` (preset → VoiceSpec translation)
-5. `src/rdf/export.js` (RDF → JSON export)
+4. `src/core/ProtocolRunner.js` (preset → VoiceSpec translation) — *planned*
+5. `src/rdf/export.js` (RDF → JSON export) — *planned*
 
 ---
 
@@ -141,10 +169,13 @@ make validate    # SHACL validation (current ontology suite)
 process them. They are loaded at runtime:
 
 ```javascript
-await audioContext.audioWorklet.addModule('/worklets/binaural.worklet.js')
+await audioContext.audioWorklet.addModule('/worklets/bsc-voice.worklet.js')
 ```
 
 Never `import` worklet files. Never add them to Vite config as entry points.
+The WASM kernel (`static/worklets/bsc-osc.wasm`, source `bsc-osc.wat`) and the
+ambient `Sample` clips (`static/audio/*.wav`, generated by
+`scripts/gen-ambiences.mjs`) are likewise served as static assets.
 
 ### Lazy-loaded heavy libraries
 

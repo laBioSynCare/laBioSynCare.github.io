@@ -1,12 +1,32 @@
 # Audio Engine Architecture
 
-> **For AI agents:** This document is the authoritative design
-> specification for the BSC Lab audio subsystem. Before writing any
-> code touching audio scheduling, AudioWorklet processors, the
-> orchestrator, or anything that calls `AudioContext`, read this
-> document. The hard constraints in `CLAUDE.md` sections 3.1–3.3 and
-> 6.1–6.4 summarize the invariants; this document provides the full
-> rationale and complete interface contracts.
+> **For AI agents:** This document is the authoritative **target design**
+> specification for the BSC Lab audio subsystem (full three-clock scheduler,
+> orchestrator, per-technique worklets, mid-session engine swapping). Before
+> writing code touching audio scheduling or `AudioContext`, read it together
+> with `CLAUDE.md` §3.1–3.3 / §6.1–6.4.
+
+> **Implementation status (as-built ≠ this design yet).** The shipped audio
+> layer differs from the target below and is documented in
+> [`../../src/engines/README.md`](../../src/engines/README.md) (engines) and
+> [`PATCH_STUDIO.md`](PATCH_STUDIO.md) (the live authoring/playback model).
+> Key divergences to keep in mind while reading:
+>
+> - **Worklets.** The target's separate `binaural` / `martigli` / `symmetry`
+>   processors were implemented as a single unified processor,
+>   `static/worklets/bsc-voice.worklet.js` (and a WASM variant
+>   `bsc-voice-wasm.worklet.js` + `bsc-osc.wasm`), covering all voice types.
+> - **Engines.** Four selectable `IAudioEngine` implementations exist today
+>   (Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, Null/Silent), chosen
+>   in **Settings** and applied on next playback — not swapped mid-session by an
+>   orchestrator. The `ToneJsEngine` referenced below was never built.
+> - **Scheduling.** Live parameter updates run from the Patch Studio's
+>   `requestAnimationFrame` loop reading `AudioContext.currentTime`; the
+>   dedicated Web Worker scheduler / `StimulationOrchestrator` below remain
+>   target work.
+>
+> The **invariants** in this document (audio clock authority, no worklet
+> bundling, no allocation in `process()`) are in force regardless.
 
 ---
 

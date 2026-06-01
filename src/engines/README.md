@@ -1,18 +1,21 @@
 # src/engines — Stimulation Engine Layer
 
-> **Status: planned — Phase 1.** No engine source files or AudioWorklets in
-> `static/worklets/` exist yet; the interfaces and test suites described below
-> are targets for Phase 1.
+> **Status.** The **audio** layer is built: four `IAudioEngine` implementations
+> plus the `bsc-voice` / `bsc-voice-wasm` AudioWorklets and the `bsc-osc.wasm`
+> kernel in `static/worklets/`. The **visual** and **haptic** engines are still
+> **planned** — the sections below marked *(planned)* describe their target
+> design. Today the Patch Studio (`src/ui/creator/`) calls the audio engine
+> directly through the `IAudioEngine` interface; the `StimulationOrchestrator`
+> in `src/core/` (which would own multi-engine coordination) is also planned.
 
 The engines layer provides pluggable implementations of audio, visual, and
-haptic stimulation delivery. All three engine types expose interface contracts;
-the `StimulationOrchestrator` calls only interface methods, never
-implementation-specific APIs. This makes engine swapping transparent to the
-rest of the system.
+haptic stimulation delivery. Each engine type exposes an interface contract so
+callers depend only on the interface, never implementation-specific APIs.
 
 See `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` and
-`docs/technical/VISUAL_ENGINE_ARCHITECTURE.md` for full architectural
-specifications. This README is an index and quick reference.
+`docs/technical/VISUAL_ENGINE_ARCHITECTURE.md` for the full **target**
+architecture and `docs/technical/PATCH_STUDIO.md` for the as-built playback
+model. This README is an index and quick reference.
 
 ---
 
@@ -29,21 +32,22 @@ engines/
 │   ├── NullAudioEngine.js           Silent: real clock, no sound (fallback)
 │   └── audioEngines.js              Registry + persisted selection + factory
 │
-├── visual/
+├── visual/   (planned — none of these files exist yet)
 │   ├── IVisualEngine.js             Interface contract + JSDoc types
 │   ├── PixiJSEngine.js              Primary implementation (PixiJS v8)
 │   ├── CSSEngine.js                 Reduced-motion / low-power fallback
-│   ├── phaseMapping.js              Canonical φ→visual mapping functions
-│   └── __tests__/
-│       └── IVisualEngineCompliance.test.js
+│   └── phaseMapping.js              Canonical φ→visual mapping functions
 │
-└── haptic/
+└── haptic/   (planned — none of these files exist yet)
     ├── IHapticEngine.js             Interface contract
     ├── VibrationHapticEngine.js     Web Vibration API implementation
-    ├── NullHapticEngine.js          Silent fallback (iOS Safari, desktops)
-    └── __tests__/
-        └── IHapticEngineCompliance.test.js
+    └── NullHapticEngine.js          Silent fallback (iOS Safari, desktops)
 ```
+
+> Today, visual stimuli are authored and previewed as CSS/DOM elements in the
+> Patch Studio (see `docs/technical/PATCH_STUDIO.md` §5), and the audio engines
+> are verified with `OfflineAudioContext` harnesses rather than a committed
+> `tests/engines/` compliance suite.
 
 ---
 
@@ -116,7 +120,12 @@ looping `AudioBufferSourceNode`.
 
 ---
 
-## Visual engines
+## Visual engines (planned)
+
+*None of the visual engines below exist yet.* The as-built visual layer is the
+CSS/DOM preview model in `docs/technical/PATCH_STUDIO.md` §5, gated by the
+photosensitivity policy in `docs/technical/PHOTOSENSITIVITY_SAFETY.md`. The
+design below is the target the preview layer will graduate into.
 
 ### `PixiJSEngine` (primary)
 
@@ -169,7 +178,10 @@ Phase convention (must match `BREATHING_MODEL.md` Section 7):
 
 ---
 
-## Haptic engines
+## Haptic engines (planned)
+
+*None of the haptic engines below exist yet.* The Patch Studio currently shows a
+haptic *preview* only. The design below is the target.
 
 ### `VibrationHapticEngine`
 
@@ -196,39 +208,30 @@ const haptic = typeof navigator.vibrate === 'function'
 
 ---
 
-## Engine swapping
+## Engine selection (as built) and swapping (planned)
 
-All three engine types can be swapped mid-session for research comparison
-via `StimulationOrchestrator.switchAudioEngine()` and
-`StimulationOrchestrator.switchVisualEngine()`.
+**Today:** the audio engine is chosen in **Settings → Audio engine**, persisted
+to `localStorage`, and instantiated by `createAudioEngine()` (in
+`audioEngines.js`) when the Patch Studio *next* starts playback. The factory
+falls back to the default (`vanilla`) when a selected engine's capabilities are
+unavailable. There is no mid-session hot-swap yet.
 
-The swap procedure:
-1. Pause the current engine (audio: `suspend()`; visual: `pause()`)
-2. Initialize the new engine with the same parameters
-3. Re-register the `onTimingState` callback to the new audio engine
-4. Start the new engine
-5. Dispose the old engine
-
-The session specification is immutable — a swapped session continues
-from the same preset and parameters.
+**Target:** once `StimulationOrchestrator` (`src/core/`) exists, all three engine
+types will be swappable mid-session for research comparison via
+`switchAudioEngine()` / `switchVisualEngine()` — pause, init the new engine with
+the same parameters, re-register the `onTimingState` callback, start, dispose
+the old engine — keeping the immutable session specification.
 
 ---
 
-## Compliance tests
+## Verification
 
-Every engine implementation must pass the compliance test for its type:
+**As built:** the audio engines are validated with deterministic
+`OfflineAudioContext` harnesses (sine accuracy, binaural L/R separation, noise
+spectral tilt + filter modes, drone beating, tremolo depth/rate, sample
+playback) plus the `src/ui/creator/*.test.js` unit tests run by `make test`.
 
-```bash
-# Audio compliance
-npx vitest tests/engines/audio/IAudioEngineCompliance.test.js
-
-# Visual compliance
-npx vitest tests/engines/visual/IVisualEngineCompliance.test.js
-
-# Haptic compliance
-npx vitest tests/engines/haptic/IHapticEngineCompliance.test.js
-```
-
-Tests verify: all interface methods are present, `getCapabilities()` returns
-required fields, no exceptions on valid inputs, `dispose()` closes cleanly.
-Acoustic accuracy tests (FFT, onset timing) are in separate integration tests.
+**Planned:** a committed `tests/engines/` compliance suite asserting that every
+implementation presents all interface methods, returns the required
+`getCapabilities()` fields, never throws on valid input, and `dispose()`s
+cleanly.

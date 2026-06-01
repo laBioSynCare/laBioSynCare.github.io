@@ -18,11 +18,12 @@ the private BioSynCare/BSC catalog.
 ```
 rdf/
 ├── namespaces.js        All IRI prefix declarations — single source of truth
-├── loader.js            Turtle/TriG/N-Quads → N3.Store
-├── graph.js             Ontology graph projection queries for Cytoscape
-├── query.js             Comunica SPARQL execution wrapper (lazy-loaded)
-├── validate.js          SHACL validation via rdf-validate-shacl (planned)
-├── export.js            N3.Store → optional public BSC Lab preset JSON (planned)
+├── loader.js            Turtle/TriG/N-Quads → N3.Store (+ ontology/instance URLs)
+├── graph.js             Ontology → Cytoscape graph projection (buildGraphElements)
+├── presets.js           SPARQL-driven preset listing (listPresets)
+├── query.js             Comunica SPARQL wrapper (lazy-loaded): select/ask/construct
+├── validate.js          SHACL validation via rdf-validate-shacl — (planned)
+├── export.js            N3.Store → optional public BSC Lab preset JSON — (planned)
 └── annotations/
     └── AnnotationStore.js   Named-graph annotation CRUD via Firestore
 ```
@@ -143,7 +144,11 @@ SELECT ?preset WHERE {
 
 ---
 
-## `validate.js`
+## `validate.js` (planned)
+
+> Not yet implemented. SHACL validation currently runs in CI / locally via
+> `make validate` (pySHACL); this module is the planned in-browser equivalent.
+> The API below is the target.
 
 Runs SHACL validation against `/ontology/sstim-shapes.ttl`. Called before any
 public BSC Lab preset export, and exposed as a UI affordance in the annotation
@@ -172,7 +177,11 @@ preset that fails validation is included in runtime JSON.
 
 ---
 
-## `export.js`
+## `export.js` (planned)
+
+> Not yet implemented. The API and pipeline below are the target. Note this is
+> the **catalog** export path; the live Patch Studio uses its own
+> `patch-studio-model-1` export (see `docs/technical/PATCH_STUDIO.md`).
 
 Optionally generates runtime JSON for public BSC Lab reference presets. This is
 not a BioSynCare catalog export; the private BioSynCare/BSC catalog remains

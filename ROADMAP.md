@@ -8,6 +8,14 @@
 > BSC Lab v0.1 (knowledge browser) is the nearest software milestone.
 > The stimulation player is Phase 2. Evidence collection is Phase 3.
 > Do not build Phase 3 infrastructure during Phase 1 work.
+>
+> **Implementation note (ahead of schedule).** An early Phase-2 artifact already
+> exists: the **Patch Studio** — a real-time audiovisual designer with four
+> selectable audio engines and a photosensitivity safety layer
+> ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)). It is a
+> prototype ahead of the formal Phase 2 schedule; the `core/` orchestration
+> layer and the GPU visual/haptic engines remain Phase 2 work, and Phase 3
+> infrastructure still must not be built during Phase 1.
 
 ---
 

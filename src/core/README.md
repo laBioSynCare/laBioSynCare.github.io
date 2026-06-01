@@ -1,7 +1,11 @@
 # src/core — Orchestration Layer
 
-> **Status: planned — Phase 1.** No source files in this directory exist yet.
-> This document describes the target design.
+> **Status: planned (Phase 2).** No source files in this directory exist yet —
+> this document describes the target design. The audio engines already exist and
+> are driven directly by the Patch Studio (`src/ui/creator/`) through the
+> `IAudioEngine` interface; this orchestration layer is what will eventually own
+> the clock, scheduler, and multi-engine session lifecycle. See
+> `docs/technical/AUDIO_ENGINE_ARCHITECTURE.md` and `src/engines/README.md`.
 
 The core layer connects the engine interfaces to the preset data model.
 It translates preset JSON into scheduled audio events, coordinates the
