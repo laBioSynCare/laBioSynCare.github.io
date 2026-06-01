@@ -102,6 +102,10 @@ make wasm            # Recompile static/worklets/bsc-osc.wasm from bsc-osc.wat
 Without Nix, install Node 24, Python 3.12 + `pyshacl`, and `wabt` yourself; the
 same `make` targets then apply.
 
+**macOS + Homebrew:** safe to run alongside Nix — `nix develop` is scoped and
+impure, so it layers the flake's tools on top of your existing PATH only inside
+that shell; your Homebrew/system `git` and global tools are unaffected.
+
 ---
 
 ## 3. Layer 2 — Preset design
