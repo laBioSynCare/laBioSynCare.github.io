@@ -33,6 +33,11 @@
   let neighborhoodFocus = $state(graphSession.neighborhoodFocus)
   let connectionFilters = $state(new Set(graphSession.connectionFilters))
 
+  // How to place nodes disconnected from the main cluster:
+  //   'all'        — grid every node outside the largest connected component
+  //   'singletons' — grid only degree-0 nodes; keep multi-node islands in cose
+  let strayMode = $state(graphSession.strayMode ?? 'all')
+
   let visibleSet = new Set()
 
   const TRANSITION_KEY = 'bsclab.graph.transitionMs'
@@ -342,6 +347,12 @@
     return cy.elements().filter((element) => newIds.has(element.id()))
   }
 
+  // A node is a true singleton when none of its currently-visible edges connect
+  // it to anything — e.g. an XSD datatype once the data-property layer is hidden.
+  function isVisiblyIsolated(node) {
+    return node.connectedEdges().filter((edge) => edge.style('display') !== 'none').length === 0
+  }
+
   // Among the visible elements, return the largest connected component (the
   // "core" cluster). Everything outside it — lone single-concept SKOS schemes
   // (PresetGroup, VoiceType…) and small disconnected islands — are "strays".
@@ -394,13 +405,34 @@
     const visible = cy.elements().filter((element) => element.style('display') !== 'none')
     if (!visible.nodes().length) return
 
-    const core = largestComponent(visible)
-    const strayNodes = visible.nodes().not(core.nodes())
+    // Choose what gets gridded vs. kept in the force layout (see strayMode).
+    let core, strayNodes
+    if (strayMode === 'singletons') {
+      strayNodes = visible.nodes().filter(isVisiblyIsolated)
+      core = visible.not(strayNodes)
+    } else {
+      core = largestComponent(visible)
+      strayNodes = visible.nodes().not(core.nodes())
+    }
+
+    // Degenerate case (e.g. every node is a singleton): just tile a grid.
+    if (!core.nodes().length) {
+      visible.layout({ name: 'grid', fit: false, avoidOverlap: true }).run()
+      fitGraph()
+      return
+    }
 
     // cose with animate:false runs synchronously, so positions are final here.
     core.layout({ ...COSE_OPTIONS }).run()
     if (strayNodes.length) packStrayNodes(strayNodes, core)
     fitGraph()
+  }
+
+  function setStrayMode(value) {
+    if (value === strayMode) return
+    strayMode = value
+    relayoutGraph()
+    persistGraphSession()
   }
 
   function fitGraph(elements = null) {
@@ -434,6 +466,7 @@
       selectedIri: selected?.iri ?? '',
       neighborhoodFocus,
       connectionFilters: [...connectionFilters],
+      strayMode,
       camera: cy ? { pan: cy.pan(), zoom: cy.zoom() } : graphSession.camera,
     })
   }
@@ -713,8 +746,10 @@
       focusNodeQuery,
       focusNodeOptions,
       canCenter: Boolean(focusNodeQuery.trim() || selected),
+      strayMode,
       setScope: setGraphScope,
       setFocusNodeQuery,
+      setStrayMode,
       center: focusNode,
       fit: fitGraph,
       relayout: relayoutGraph,

@@ -10,6 +10,7 @@ export const graphSession = {
   selectedIri: '',
   neighborhoodFocus: false,
   connectionFilters: [],
+  strayMode: 'all',
   camera: null,
 }
 

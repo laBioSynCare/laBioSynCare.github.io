@@ -104,6 +104,16 @@
       </datalist>
 
       <div class="topbar-actions">
+        <select
+          class="topbar-control secondary stray-field"
+          aria-label="Layout for nodes disconnected from the main cluster"
+          title="How to place nodes that aren't connected to the main cluster"
+          value={$graphNavigation.strayMode}
+          onchange={(event) => $graphNavigation.setStrayMode(event.currentTarget.value)}
+        >
+          <option value="all">Grid all disconnected</option>
+          <option value="singletons">Grid singletons only</option>
+        </select>
         <button type="button" class="topbar-control secondary" title="Center on selected node (c)" onclick={$graphNavigation.center} disabled={!$graphNavigation.canCenter}>
           Center
         </button>
@@ -410,6 +420,11 @@
     .topbar-actions {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* The stray-mode select gets its own full-width row above the buttons. */
+    .stray-field {
+      grid-column: 1 / -1;
     }
   }
 </style>
