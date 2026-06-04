@@ -5,11 +5,14 @@ import {
   TEMPO_MIN_BEATS_PER_BAR,
   TEMPO_MIN_BPM,
   TEMPO_MODIFIERS,
+  clamp,
   clampBeatsPerBar,
   clampBpm,
   createTempoSyncConfig,
   validateTempoSyncConfig,
 } from './tempo.js'
+
+export const PATCH_STUDIO_MODEL = 'patch-studio-model-1'
 
 // Control track types
 export const CONTROL_TYPES = ['Martigli', 'Symmetry']
@@ -225,6 +228,231 @@ function attachTempoSync(param, trackType, paramName) {
 let _nextId = 1
 function uid(prefix) { return `${prefix}-${_nextId++}` }
 
+function plainObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+}
+
+function safeText(value, fallback, limit = 200) {
+  const text = typeof value === 'string' ? value.trim() : ''
+  return (text || fallback).slice(0, limit)
+}
+
+function safeId(value, fallback) {
+  return typeof value === 'string' && value.trim() ? value.trim().slice(0, 120) : fallback
+}
+
+function finiteNumber(value, fallback) {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
+
+function rangedNumber(value, [min, max], fallback) {
+  return clamp(finiteNumber(value, fallback), min, max)
+}
+
+function choice(value, allowed, fallback) {
+  return allowed.includes(value) ? value : fallback
+}
+
+function normalizeMods(mods) {
+  if (!Array.isArray(mods)) return []
+  return mods
+    .map((mod) => {
+      const source = plainObject(mod)
+      const controlId = typeof source.controlId === 'string' ? source.controlId : ''
+      const amount = finiteNumber(source.amount, 0)
+      if (!controlId || !Number.isFinite(amount)) return null
+      return {
+        id: safeId(source.id, uid('mod')),
+        controlId,
+        amount,
+        enabled: source.enabled !== false,
+      }
+    })
+    .filter(Boolean)
+}
+
+function normalizeTempoSync(config) {
+  const source = plainObject(config)
+  return createTempoSyncConfig({
+    enabled: source.enabled === true,
+    mode: source.mode === 'beats' ? 'beats' : 'division',
+    beats: Math.max(0.001, finiteNumber(source.beats, 1)),
+    division: choice(source.division, TEMPO_DIVISIONS, '1/4'),
+    modifier: choice(source.modifier, TEMPO_MODIFIERS, 'straight'),
+  })
+}
+
+function normalizeParam(source, fallback) {
+  const stored = plainObject(source)
+  const param = {
+    value: finiteNumber(stored.value, fallback.value),
+    mods: normalizeMods(stored.mods),
+  }
+  if (fallback.tempoSync || stored.tempoSync) {
+    param.tempoSync = normalizeTempoSync(stored.tempoSync ?? fallback.tempoSync)
+  }
+  return param
+}
+
+function normalizeParams(source, fallbackParams) {
+  const stored = plainObject(source)
+  const params = {}
+  for (const key of Object.keys(fallbackParams)) {
+    params[key] = normalizeParam(stored[key], fallbackParams[key])
+  }
+  return params
+}
+
+function normalizeTiming(source = {}) {
+  const timing = plainObject(source)
+  const bpmSource = plainObject(timing.bpm)
+  const rawBpm = timing.bpm && typeof timing.bpm === 'object' ? bpmSource.value : timing.bpm
+  const rawMods = Array.isArray(bpmSource.mods) ? bpmSource.mods : timing.bpmMods
+
+  return createTiming({
+    lengthSec: Math.max(0.001, finiteNumber(timing.lengthSec, 900)),
+    bpmEnabled: timing.bpmEnabled === true,
+    beatsPerBar: clampBeatsPerBar(timing.beatsPerBar ?? 4),
+    bpm: {
+      value: clampBpm(rawBpm ?? 60),
+      mods: normalizeMods(rawMods),
+    },
+  })
+}
+
+function normalizeControlTrack(source) {
+  const stored = plainObject(source)
+  const type = choice(stored.type, CONTROL_TYPES, 'Martigli')
+  const base = createControlTrack(type)
+  const track = {
+    ...base,
+    id: safeId(stored.id, base.id),
+    type,
+    name: safeText(stored.name, base.name),
+  }
+
+  if (type === 'Martigli') {
+    track.waveform = choice(stored.waveform, MARTIGLI_WAVEFORMS, base.waveform)
+    track.periodSec = rangedNumber(stored.periodSec, MARTIGLI_PARAM_RANGE.periodSec, base.periodSec)
+    track.targetPeriodSec = rangedNumber(stored.targetPeriodSec, MARTIGLI_PARAM_RANGE.targetPeriodSec, base.targetPeriodSec)
+    track.inhaleRatio = rangedNumber(stored.inhaleRatio, MARTIGLI_PARAM_RANGE.inhaleRatio, base.inhaleRatio)
+    track.amplitude = rangedNumber(stored.amplitude, MARTIGLI_PARAM_RANGE.amplitude, base.amplitude)
+    track.tempoSync = {
+      periodSec: normalizeTempoSync(stored.tempoSync?.periodSec ?? base.tempoSync.periodSec),
+      targetPeriodSec: normalizeTempoSync(stored.tempoSync?.targetPeriodSec ?? base.tempoSync.targetPeriodSec),
+    }
+  } else {
+    track.nnotes = Math.round(rangedNumber(stored.nnotes, SYMMETRY_PARAM_RANGE.nnotes, base.nnotes))
+    track.rateHz = rangedNumber(stored.rateHz, SYMMETRY_PARAM_RANGE.rateHz, base.rateHz)
+    track.amplitude = rangedNumber(stored.amplitude, SYMMETRY_PARAM_RANGE.amplitude, base.amplitude)
+    track.family = choice(stored.family, SYMMETRY_FAMILIES, base.family)
+    track.tempoSync = {
+      rateHz: normalizeTempoSync(stored.tempoSync?.rateHz ?? base.tempoSync.rateHz),
+    }
+  }
+
+  return track
+}
+
+function normalizeAudioTrack(source) {
+  const stored = plainObject(source)
+  const trackType = choice(stored.trackType, AUDIO_TRACK_TYPES, 'IsochronicTone')
+  const base = createAudioTrack(trackType)
+  const track = {
+    ...base,
+    id: safeId(stored.id, base.id),
+    trackType,
+    name: safeText(stored.name, base.name),
+    muted: stored.muted === true,
+    windowSec: Math.max(0.05, finiteNumber(stored.windowSec, base.windowSec)),
+    tremolo: createTremolo({
+      ...base.tremolo,
+      ...plainObject(stored.tremolo),
+      rate: rangedNumber(plainObject(stored.tremolo).rate, TREMOLO_PARAM_RANGE.rate, base.tremolo.rate),
+      depth: rangedNumber(plainObject(stored.tremolo).depth, TREMOLO_PARAM_RANGE.depth, base.tremolo.depth),
+      mode: choice(plainObject(stored.tremolo).mode, TREMOLO_MODES, base.tremolo.mode),
+      enabled: plainObject(stored.tremolo).enabled === true,
+    }),
+    params: normalizeParams(stored.params, base.params),
+  }
+
+  if (trackType === 'IsochronicTone') {
+    track.envelope = choice(stored.envelope, ISO_ENVELOPES, base.envelope)
+    track.noteDurationFrac = rangedNumber(stored.noteDurationFrac, [0.05, 1], base.noteDurationFrac)
+    track.attackFrac = rangedNumber(stored.attackFrac, [0, 1], base.attackFrac)
+    track.decayFrac = rangedNumber(stored.decayFrac, [0, 1], base.decayFrac)
+    track.sustainLevel = rangedNumber(stored.sustainLevel, [0, 1], base.sustainLevel)
+    track.releaseFrac = rangedNumber(stored.releaseFrac, [0, 1], base.releaseFrac)
+  }
+  if (trackType === 'BinauralBeat') {
+    track.binauralMode = choice(stored.binauralMode, BINAURAL_MODES, base.binauralMode)
+  }
+  if (trackType === 'Noise') {
+    track.noiseColor = choice(stored.noiseColor, NOISE_COLORS, base.noiseColor)
+    track.noiseFilter = choice(stored.noiseFilter, NOISE_FILTERS, base.noiseFilter)
+  }
+  if (trackType === 'Drone') {
+    track.droneVoices = choice(stored.droneVoices, DRONE_VOICES, base.droneVoices)
+  }
+  if (trackType === 'Sample') {
+    track.sampleId = choice(stored.sampleId, SAMPLE_CLIPS, base.sampleId)
+  }
+
+  return track
+}
+
+function normalizeVisualTrack(source) {
+  const stored = plainObject(source)
+  const trackType = choice(stored.trackType, VISUAL_TRACK_TYPES, 'Geometry')
+  const base = createVisualTrack(trackType)
+  return {
+    ...base,
+    id: safeId(stored.id, base.id),
+    trackType,
+    name: safeText(stored.name, base.name),
+    blend: choice(stored.blend, BLEND_MODES, base.blend),
+    params: normalizeParams(stored.params, base.params),
+  }
+}
+
+function normalizeHapticTrack(source) {
+  const stored = plainObject(source)
+  const trackType = choice(stored.trackType, HAPTIC_TRACK_TYPES, 'Vibration')
+  const base = createHapticTrack(trackType)
+  return {
+    ...base,
+    id: safeId(stored.id, base.id),
+    trackType,
+    name: safeText(stored.name, base.name),
+    params: normalizeParams(stored.params, base.params),
+  }
+}
+
+function bumpNextIdFromDraft(draft) {
+  const ids = [
+    ...(draft.controlTracks ?? []),
+    ...(draft.audioTracks ?? []),
+    ...(draft.visualTracks ?? []),
+    ...(draft.hapticTracks ?? []),
+  ].flatMap((track) => [
+    track.id,
+    ...Object.values(track.params ?? {}).flatMap((param) => (param.mods ?? []).map((mod) => mod.id)),
+    ...(track.type === 'Martigli'
+      ? []
+      : []),
+  ])
+  const bpmMods = draft.timing?.bpm?.mods ?? []
+  for (const mod of bpmMods) ids.push(mod.id)
+
+  let max = 0
+  for (const id of ids) {
+    const match = typeof id === 'string' ? id.match(/-(\d+)$/) : null
+    if (match) max = Math.max(max, Number(match[1]))
+  }
+  _nextId = Math.max(_nextId, max + 1)
+}
+
 // ── Control tracks ──────────────────────────────────────────────────────────
 
 export function createMartigliTrack(overrides = {}) {
@@ -395,6 +623,51 @@ export function createDraft() {
   }
 }
 
+export function createEmptyDraft() {
+  return {
+    patchName: 'Untitled Patch',
+    timing: createTiming(),
+    playing: false,
+    controlTracks: [],
+    audioTracks: [],
+    visualTracks: [],
+    hapticTracks: [],
+  }
+}
+
+export function draftFromPatchExport(exported) {
+  const source = plainObject(exported)
+  if (source.model && source.model !== PATCH_STUDIO_MODEL) {
+    throw new Error(`Unsupported patch model: ${source.model}`)
+  }
+
+  const controlTracks = Array.isArray(source.controlTracks)
+    ? source.controlTracks.map(normalizeControlTrack)
+    : []
+  const audioTracks = Array.isArray(source.audioTracks)
+    ? source.audioTracks.map(normalizeAudioTrack)
+    : []
+  const visualTracks = Array.isArray(source.visualTracks)
+    ? source.visualTracks.map(normalizeVisualTrack)
+    : []
+  const hapticTracks = Array.isArray(source.hapticTracks)
+    ? source.hapticTracks.map(normalizeHapticTrack)
+    : []
+
+  const draft = {
+    patchName: safeText(source.patchName, 'Imported Patch'),
+    timing: normalizeTiming(source.timing),
+    playing: false,
+    controlTracks,
+    audioTracks,
+    visualTracks,
+    hapticTracks,
+  }
+
+  bumpNextIdFromDraft(draft)
+  return draft
+}
+
 export function createTiming(overrides = {}) {
   return {
     lengthSec: 900,
@@ -434,7 +707,7 @@ export function buildPatchExport(draft) {
   })
   const bpmEnabled = !!timing.bpmEnabled
   return {
-    model: 'patch-studio-model-1',
+    model: PATCH_STUDIO_MODEL,
     patchName: draft.patchName,
     timing: {
       bpmEnabled,

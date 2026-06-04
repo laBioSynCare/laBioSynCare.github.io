@@ -3,6 +3,8 @@
   import Knob from './Knob.svelte'
   import { envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
+  import { authState } from '../../firebase/auth.js'
+  import { deletePatchStudioPatch, listPatchStudioPatches, savePatchStudioPatch } from '../../firebase/patches.js'
   import { visualStimulationOn } from '../../ui/safety/visualSafety.js'
   import { creatorSession } from './creatorSession.js'
   import {
@@ -45,9 +47,11 @@
     createAudioTrack,
     createControlTrack,
     createDraft,
+    createEmptyDraft,
     createHapticTrack,
     createMod,
     createVisualTrack,
+    draftFromPatchExport,
     patchSummary,
     tempoSyncKindForTrackParam,
     validateDraft,
@@ -75,6 +79,20 @@
   let expandedMod = $state(creatorSession.expandedMod) // "trackId:paramName"
   let helpOpen = $state(false)
   let semanticInfo = $state(null)
+  let auth = $state({ ready: false, configured: false, user: null, error: null })
+  let cloudOpen = $state(false)
+  let cloudPatches = $state([])
+  let cloudLoading = $state(false)
+  let cloudSaving = $state(false)
+  let cloudError = $state(null)
+  let currentCloudPatchId = $state(null)
+  let currentCloudPatchName = $state(null)
+  let cloudBusyPatchId = $state(null)
+  let lastPatchUid = null
+
+  const unsubscribeAuth = authState.subscribe((value) => {
+    auth = value
+  })
 
   let engine = creatorSession.engine
   const voiceHandles = creatorSession.voiceHandles
@@ -115,10 +133,22 @@
   const hasErrors = $derived(issues.some(i => i.level === 'error'))
   const jsonExport = $derived(JSON.stringify(buildPatchExport(draft), null, 2))
 
+  $effect(() => {
+    if (!auth.ready) return
+    const uid = auth.user?.uid ?? null
+    if (uid === lastPatchUid) return
+    lastPatchUid = uid
+    currentCloudPatchId = null
+    currentCloudPatchName = null
+    cloudPatches = []
+    cloudError = null
+    if (uid && auth.configured) refreshCloudPatches({ silent: true })
+  })
+
   const STUDIO_HELP = [
     ['Add', 'Use the column + buttons to add control, audio, visual, and haptic tracks.'],
     ['Tune', 'Adjust each card directly; linked modulation appears under the M controls.'],
-    ['Export', 'Copy or save the patch JSON from the header.'],
+    ['Export', 'Copy or download JSON, or save signed-in patches to Firebase.'],
     ['Space', 'Start / stop playback.'],
     ['R', 'Stop playback and restart the audio engine.'],
     ['? / H', 'Toggle this help panel.'],
@@ -652,6 +682,12 @@
       return
     }
 
+    if (event.key === 'Escape' && cloudOpen) {
+      event.preventDefault()
+      cloudOpen = false
+      return
+    }
+
     if (event.key === 'Escape' && semanticInfo) {
       event.preventDefault()
       semanticInfo = null
@@ -719,6 +755,7 @@
   })
 
   onDestroy(async () => {
+    unsubscribeAuth()
     if (rafId != null) cancelAnimationFrame(rafId)
     rafId = null
     syncCreatorSession()
@@ -746,20 +783,181 @@
     catch { tip('Clipboard unavailable.') }
   }
 
-  function reset() {
+  function resetLiveDraftState(nextDraft) {
     stopAllVoices()
-    draft = createDraft()
+    draft = nextDraft
     expandedMod = null
     liveValues = {}
     controlStates = {}
     sessionStartTime = null
     liveTempo = tempoContextFromTiming(draft.timing)
+    for (const key of Object.keys(visualPhase)) delete visualPhase[key]
+    lastVisualTick = null
     syncCreatorSession()
+  }
+
+  async function refreshCloudPatches({ silent = false } = {}) {
+    const uid = auth.user?.uid
+    if (!uid || !auth.configured) {
+      cloudPatches = []
+      return
+    }
+
+    cloudLoading = true
+    cloudError = null
+    try {
+      const patches = await listPatchStudioPatches(uid)
+      if (uid === auth.user?.uid) {
+        cloudPatches = patches
+        const active = currentCloudPatchId ? patches.find(patch => patch.id === currentCloudPatchId) : null
+        if (active) {
+          currentCloudPatchName = active.patchName
+        } else if (currentCloudPatchId) {
+          currentCloudPatchId = null
+          currentCloudPatchName = null
+        }
+      }
+      if (!silent) tip(patches.length ? `Loaded ${patches.length} cloud patches.` : 'No cloud patches yet.')
+    } catch (e) {
+      cloudError = e.message
+      if (!silent) tip(`Cloud load failed: ${e.message}`)
+    } finally {
+      cloudLoading = false
+    }
+  }
+
+  async function saveCloudPatch() {
+    if (!auth.user) {
+      tip('Sign in to save cloud patches.')
+      return
+    }
+    if (hasErrors) {
+      tip('Fix patch errors before saving to Firebase.')
+      return
+    }
+
+    cloudSaving = true
+    cloudError = null
+    try {
+      const exported = buildPatchExport(draft)
+      const currentName = normalizePatchName(exported.patchName)
+      const loadedName = normalizePatchName(currentCloudPatchName)
+      const sameLoadedPatch = currentCloudPatchId && currentName && currentName === loadedName
+      const sameNamedPatch = cloudPatches.find(patch => normalizePatchName(patch.patchName) === currentName)
+      const targetPatchId = sameLoadedPatch ? currentCloudPatchId : sameNamedPatch?.id ?? null
+
+      currentCloudPatchId = await savePatchStudioPatch(auth.user.uid, exported, targetPatchId)
+      currentCloudPatchName = exported.patchName
+      await refreshCloudPatches({ silent: true })
+      tip(targetPatchId ? 'Updated in Firebase.' : 'Saved to Firebase.')
+    } catch (e) {
+      cloudError = e.message
+      tip(`Cloud save failed: ${e.message}`)
+    } finally {
+      cloudSaving = false
+    }
+  }
+
+  function loadCloudPatch(savedPatch) {
+    try {
+      const nextDraft = draftFromPatchExport(savedPatch.patch)
+      resetLiveDraftState(nextDraft)
+      currentCloudPatchId = savedPatch.id
+      currentCloudPatchName = savedPatch.patchName
+      cloudOpen = false
+      tip(`Loaded ${nextDraft.patchName}.`)
+    } catch (e) {
+      cloudError = e.message
+      tip(`Cloud patch failed: ${e.message}`)
+    }
+  }
+
+  function reset() {
+    resetLiveDraftState(createDraft())
+    currentCloudPatchId = null
+    currentCloudPatchName = null
     tip('Reset.')
+  }
+
+  function clearStudio() {
+    if (!confirm('Clear the current patch studio? Unsaved changes will be lost.')) return
+    resetLiveDraftState(createEmptyDraft())
+    currentCloudPatchId = null
+    currentCloudPatchName = null
+    tip('Cleared.')
   }
 
   function slug(v) {
     return `${v ?? 'patch'}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'patch'
+  }
+
+  function normalizePatchName(value) {
+    return `${value ?? ''}`.trim().toLocaleLowerCase()
+  }
+
+  async function renameCloudPatch(savedPatch) {
+    if (!auth.user || cloudSaving) return
+    const nextName = prompt('Rename patch', savedPatch.patchName)?.trim()
+    if (!nextName || nextName === savedPatch.patchName) return
+    const normalized = normalizePatchName(nextName)
+    if (cloudPatches.some(patch => patch.id !== savedPatch.id && normalizePatchName(patch.patchName) === normalized)) {
+      cloudError = 'A patch with that name already exists.'
+      tip(cloudError)
+      return
+    }
+
+    cloudSaving = true
+    cloudBusyPatchId = savedPatch.id
+    cloudError = null
+    try {
+      const patch = { ...savedPatch.patch, patchName: nextName }
+      await savePatchStudioPatch(auth.user.uid, patch, savedPatch.id)
+      if (currentCloudPatchId === savedPatch.id) {
+        currentCloudPatchName = nextName
+        draft.patchName = nextName
+        syncCreatorSession()
+      }
+      await refreshCloudPatches({ silent: true })
+      tip('Renamed in Firebase.')
+    } catch (e) {
+      cloudError = e.message
+      tip(`Rename failed: ${e.message}`)
+    } finally {
+      cloudBusyPatchId = null
+      cloudSaving = false
+    }
+  }
+
+  async function removeCloudPatch(savedPatch) {
+    if (!auth.user || cloudSaving) return
+    if (!confirm(`Delete "${savedPatch.patchName}" from Firebase?`)) return
+
+    cloudSaving = true
+    cloudBusyPatchId = savedPatch.id
+    cloudError = null
+    try {
+      await deletePatchStudioPatch(auth.user.uid, savedPatch.id)
+      if (currentCloudPatchId === savedPatch.id) {
+        currentCloudPatchId = null
+        currentCloudPatchName = null
+      }
+      await refreshCloudPatches({ silent: true })
+      tip('Deleted from Firebase.')
+    } catch (e) {
+      cloudError = e.message
+      tip(`Delete failed: ${e.message}`)
+    } finally {
+      cloudBusyPatchId = null
+      cloudSaving = false
+    }
+  }
+
+  function shortDate(value) {
+    if (!value) return 'unsynced'
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value))
   }
 
   function tip(msg) {
@@ -1315,7 +1513,91 @@
         <span class="badge b-ok">OK</span>
       {/if}
       <button class="act-btn" onclick={copyJson}>Copy</button>
-      <button class="act-btn" onclick={download} disabled={hasErrors}>Save</button>
+      <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
+      <details
+        class="cloud-menu"
+        bind:open={cloudOpen}
+        ontoggle={(event) => {
+          cloudOpen = event.currentTarget.open
+          if (cloudOpen && auth.user && auth.configured) refreshCloudPatches({ silent: true })
+        }}
+      >
+        <summary title="Save and load Firebase patches">Save / Load</summary>
+        <div class="cloud-panel">
+          {#if !auth.ready}
+            <p class="cloud-status">Loading account...</p>
+          {:else if !auth.configured}
+            <p class="cloud-status">Firebase config required.</p>
+          {:else if !auth.user}
+            <p class="cloud-status">Sign in from the + menu to save patches.</p>
+          {:else}
+            <div class="cloud-actions">
+              <button
+                type="button"
+                class="cloud-action"
+                onclick={saveCloudPatch}
+                disabled={cloudSaving || hasErrors}
+              >
+                {cloudSaving ? 'Saving...' : 'Save'}
+              </button>
+              <button
+                type="button"
+                class="cloud-action secondary"
+                onclick={() => refreshCloudPatches()}
+                disabled={cloudLoading}
+              >
+                {cloudLoading ? 'Loading...' : 'Refresh'}
+              </button>
+            </div>
+            {#if cloudError}
+              <p class="cloud-error">{cloudError}</p>
+            {/if}
+            {#if cloudLoading && !cloudPatches.length}
+              <p class="cloud-status">Loading patches...</p>
+            {:else if cloudPatches.length}
+              <ul class="cloud-list">
+                {#each cloudPatches as patch (patch.id)}
+                  <li class:active={patch.id === currentCloudPatchId}>
+                    <div class="cloud-item-main">
+                      <span>{patch.patchName}</span>
+                      <small>{shortDate(patch.updatedAt || patch.createdAt)}</small>
+                    </div>
+                    <div class="cloud-item-actions">
+                      <button
+                        type="button"
+                        class="cloud-row-action primary"
+                        onclick={() => loadCloudPatch(patch)}
+                        disabled={cloudSaving}
+                      >
+                        Load
+                      </button>
+                      <button
+                        type="button"
+                        class="cloud-row-action"
+                        onclick={() => renameCloudPatch(patch)}
+                        disabled={cloudSaving}
+                      >
+                        {cloudBusyPatchId === patch.id && cloudSaving ? '...' : 'Rename'}
+                      </button>
+                      <button
+                        type="button"
+                        class="cloud-row-action danger"
+                        onclick={() => removeCloudPatch(patch)}
+                        disabled={cloudSaving}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                {/each}
+              </ul>
+            {:else}
+              <p class="cloud-status">No Firebase patches yet.</p>
+            {/if}
+          {/if}
+        </div>
+      </details>
+      <button class="act-btn" onclick={clearStudio}>Clear</button>
       <button class="act-btn" onclick={reset}>Reset</button>
       <button
         type="button"
@@ -1369,7 +1651,7 @@
   <div class="cols">
 
     <!-- Controls -->
-    <div class="col col-ctrl">
+    <div class="col col-ctrl" class:is-empty={draft.controlTracks.length === 0}>
       <div class="col-head">
         <span class="col-title">Controls</span>
         <div class="col-adds">
@@ -1502,7 +1784,7 @@
 
     <!-- Sensory column macro — same structure for Audio / Visual / Haptic -->
     <!-- Audio -->
-    <div class="col col-audio">
+    <div class="col col-audio" class:is-empty={draft.audioTracks.length === 0}>
       <div class="col-head">
         <span class="col-title">Audio</span>
         <div class="col-adds">
@@ -1794,7 +2076,7 @@
     </div>
 
     <!-- Visual -->
-    <div class="col col-visual">
+    <div class="col col-visual" class:is-empty={draft.visualTracks.length === 0}>
       <div class="col-head">
         <span class="col-title">Visual</span>
         <div class="col-adds">
@@ -1856,7 +2138,7 @@
     </div>
 
     <!-- Haptic -->
-    <div class="col col-haptic">
+    <div class="col col-haptic" class:is-empty={draft.hapticTracks.length === 0}>
       <div class="col-head">
         <span class="col-title">Haptic</span>
         <div class="col-adds">
@@ -2282,6 +2564,189 @@
   .act-btn:hover { color: var(--txt); border-color: var(--acc); }
   .act-btn:disabled { opacity: .3; cursor: default; }
 
+  .cloud-menu {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: var(--hdr-control);
+    margin: 0;
+  }
+
+  .cloud-menu summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--hdr-control);
+    min-width: 76px;
+    padding: 0 8px;
+    border: var(--app-border-width) solid var(--bdr);
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--mut);
+    font-size: 9px;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    list-style: none;
+    white-space: nowrap;
+  }
+
+  .cloud-menu summary::marker,
+  .cloud-menu summary::after { display: none; content: ''; }
+  .cloud-menu summary::-webkit-details-marker { display: none; }
+  .cloud-menu summary:hover,
+  .cloud-menu[open] summary {
+    color: var(--txt);
+    border-color: var(--acc);
+    background: var(--acc-s);
+  }
+
+  .cloud-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 80;
+    width: min(19rem, 82vw);
+    max-height: min(28rem, calc(100vh - 6rem));
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--bdr);
+    border-radius: 6px;
+    background: var(--sur2);
+    box-shadow: 0 12px 28px #00000099;
+    overflow: auto;
+  }
+
+  .cloud-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+  }
+
+  .cloud-action {
+    height: 28px;
+    margin: 0;
+    padding: 0 8px;
+    border: 1px solid var(--acc);
+    border-radius: var(--app-radius);
+    background: var(--acc-s);
+    color: var(--acc);
+    font-size: 10px;
+    font-family: inherit;
+    cursor: pointer;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .cloud-action.secondary {
+    border-color: var(--bdr);
+    background: transparent;
+    color: var(--mut);
+  }
+
+  .cloud-action:hover { color: var(--txt); border-color: var(--acc); }
+  .cloud-action:disabled { opacity: 0.35; cursor: default; }
+
+  .cloud-status,
+  .cloud-error {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--mut);
+  }
+
+  .cloud-error { color: var(--err); }
+
+  .cloud-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cloud-list li {
+    margin: 0;
+    padding: 7px;
+    border: 1px solid var(--bdr);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--sur) 82%, var(--bg));
+    display: grid;
+    gap: 7px;
+  }
+
+  .cloud-list li.active {
+    border-color: color-mix(in srgb, var(--acc) 62%, transparent);
+    background: color-mix(in srgb, var(--acc-s) 64%, transparent);
+  }
+
+  .cloud-item-main {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .cloud-item-main span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--txt);
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .cloud-item-main small {
+    color: var(--mut);
+    font-size: 8px;
+    line-height: 1.2;
+  }
+
+  .cloud-item-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 5px;
+  }
+
+  .cloud-row-action {
+    height: 24px;
+    margin: 0;
+    padding: 0 7px;
+    border: 1px solid var(--bdr);
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--mut);
+    font-size: 9px;
+    font-family: inherit;
+    cursor: pointer;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .cloud-row-action.primary {
+    border-color: color-mix(in srgb, var(--acc) 62%, var(--bdr));
+    color: var(--acc);
+    background: var(--acc-s);
+  }
+
+  .cloud-row-action.danger:hover {
+    border-color: var(--err);
+    color: var(--err);
+  }
+
+  .cloud-row-action:hover {
+    border-color: var(--acc);
+    color: var(--txt);
+  }
+
+  .cloud-row-action:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
   /* ── Nav menu ──────────────────────────────────────────────────────────────── */
   .hdr-icon,
   .nav-menu { position: relative; margin: 0; }
@@ -2559,21 +3024,22 @@
   }
 
   /* ── Four columns ──────────────────────────────────────────────────────────── */
+  /* Content-aware widths: a lane with tracks grows; an empty lane shrinks to a
+     slim rail so its add-buttons stay reachable without stealing half the board. */
   .cols {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    display: flex;
     gap: 12px;
     padding: 12px;
     flex: 1;
     overflow: auto;
-    /* Each col is a flex column; align column headers at the top */
     align-items: stretch;
-    align-content: stretch;
   }
 
   .col {
     display: flex;
     flex-direction: column;
+    /* Populated lanes share the space; empty lanes (.is-empty) get less below. */
+    flex: 2.2 1 0;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
@@ -2581,6 +3047,13 @@
     border-radius: 12px;
     background: color-mix(in srgb, var(--sur) 82%, var(--bg));
     box-shadow: inset 0 1px 0 #ffffff05, 0 10px 28px #00000012;
+  }
+
+  /* Empty lane: collapse toward a rail, but stay wide enough for the column
+     title and the horizontally-scrollable add-button row. */
+  .col.is-empty {
+    flex: 1 1 0;
+    min-width: 150px;
   }
 
   /* Column header: two rows, each exactly 26px, always the same across columns */
@@ -3795,19 +4268,22 @@
   }
 
   @media (max-width: 1480px) {
+    /* Two lanes per row; drop the content-aware weighting when stacked. */
     .cols {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-auto-rows: minmax(20rem, 1fr);
+      flex-wrap: wrap;
+    }
+    .col,
+    .col.is-empty {
+      flex: 1 1 calc(50% - 6px);
+      min-width: 0;
+      min-height: 20rem;
     }
   }
 
   @media (max-width: 860px) {
-    .cols {
-      grid-template-columns: minmax(0, 1fr);
-      grid-auto-rows: auto;
-    }
-
-    .col {
+    .col,
+    .col.is-empty {
+      flex: 1 1 100%;
       min-height: 22rem;
     }
   }

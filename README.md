@@ -117,7 +117,7 @@ src/                    SvelteKit app — see src/README.md
   engines/audio/        IAudioEngine + four engines + selection factory
   ui/                   Patch Studio, ontology graph, annotations, navigation,
                         theme, safety, auth
-  firebase/             Optional auth + Firestore (annotations, profiles)
+  firebase/             Optional auth + Firestore (annotations, profiles, patches)
   routes/               SvelteKit pages (graph, creator, presets, sparql,
                         logbook, profile, settings)
   core/, engines/visual, engines/haptic  Planned modules (README placeholders)
@@ -180,15 +180,16 @@ make wasm      # Recompile static/worklets/bsc-osc.wasm from bsc-osc.wat
 The SHACL pass currently conforms for the core ontology, vocabulary, and seeded
 RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
 
-## Firebase Annotations
+## Firebase Features
 
-RDF node annotations are optional. To enable them locally, copy
+RDF node annotations, profiles, and Patch Studio cloud patches are optional.
+To enable them locally, copy
 `.env.example` to `.env`, fill the `VITE_FIREBASE_*` values from a Firebase web
 app, and enable Email/Password, Google, and Anonymous providers in Firebase
 Auth. For GitHub Pages, add the same `VITE_FIREBASE_*` keys as repository
 Actions variables so the static build receives them. Deploy `firestore.rules`
-and `firestore.indexes.json` to keep annotation documents scoped to the signed-in
-user.
+and `firestore.indexes.json` to keep user-owned documents scoped to the
+signed-in user.
 
 ---
 

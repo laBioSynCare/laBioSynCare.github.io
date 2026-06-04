@@ -45,8 +45,8 @@ src/
 │   │                            SessionScheduler.worker, ProtocolRunner,
 │   │                            SessionRecorder
 │
-├── firebase/                    Optional auth + Firestore profile/annotations
-│   ├── client.js  auth.js  profile.js
+├── firebase/                    Optional auth + Firestore profile/annotations/patches
+│   ├── client.js  auth.js  profile.js  patches.js
 │
 ├── rdf/
 │   ├── namespaces.js     All IRI prefix declarations (single source of truth)

@@ -342,19 +342,65 @@
     return cy.elements().filter((element) => newIds.has(element.id()))
   }
 
+  // Among the visible elements, return the largest connected component (the
+  // "core" cluster). Everything outside it — lone single-concept SKOS schemes
+  // (PresetGroup, VoiceType…) and small disconnected islands — are "strays".
+  function largestComponent(visible) {
+    const components = visible.components()
+    let core = null
+    for (const comp of components) {
+      if (!core || comp.nodes().length > core.nodes().length) core = comp
+    }
+    return core
+  }
+
+  // cose tiles disconnected components into a long strip across an edge, leaving
+  // the real cluster crammed into one corner. Instead we lay out only the core
+  // with cose, then pack the stray nodes into a compact grid beside it so they
+  // fill the otherwise-empty space without distorting the cluster.
+  function packStrayNodes(strays, core) {
+    const bb = core.boundingBox()
+    const n = strays.length
+    const cols = Math.max(1, Math.round(Math.sqrt(n) * 1.3))
+    const rows = Math.ceil(n / cols)
+    const cellW = 165
+    const cellH = 48
+    const blockH = rows * cellH
+    const x1 = bb.x2 + 90
+    const y1 = bb.y1 + Math.max(0, (bb.h - blockH) / 2)
+    strays.layout({
+      name: 'grid',
+      fit: false,
+      avoidOverlap: true,
+      cols,
+      boundingBox: { x1, y1, x2: x1 + cols * cellW, y2: y1 + blockH },
+    }).run()
+  }
+
+  const COSE_OPTIONS = {
+    name: 'cose',
+    animate: false,
+    nodeRepulsion: () => 8000,
+    idealEdgeLength: () => 80,
+    edgeElasticity: () => 100,
+    gravity: 0.4,
+    numIter: 1000,
+    fit: false,
+    padding: 30,
+  }
+
   function relayoutGraph() {
     if (!cy) return
-    cy.layout({
-      name: 'cose',
-      animate: false,
-      nodeRepulsion: () => 8000,
-      idealEdgeLength: () => 80,
-      edgeElasticity: () => 100,
-      gravity: 0.4,
-      numIter: 1000,
-      fit: true,
-      padding: 30,
-    }).run()
+    const visible = cy.elements().filter((element) => element.style('display') !== 'none')
+    if (!visible.nodes().length) return
+
+    const core = largestComponent(visible)
+    const strayNodes = visible.nodes().not(core.nodes())
+
+    // cose with animate:false runs synchronously, so positions are final here.
+    core.layout({ ...COSE_OPTIONS }).run()
+    if (strayNodes.length) packStrayNodes(strayNodes, core)
+    fitGraph()
   }
 
   function fitGraph(elements = null) {
@@ -734,7 +780,7 @@
           edgeElasticity: () => 100,
           gravity: 0.4,
           numIter: 1000,
-          fit: true,
+          fit: false,
           padding: 30,
         },
         minZoom: 0.1,
@@ -750,6 +796,10 @@
       })
 
       applyGraphDisplay({ animate: false })
+      // Re-run through relayoutGraph so the initial paint gets the same
+      // stray-node packing as manual Relayout (the inline cose above only gives
+      // the core a first pass and would otherwise tile islands into a strip).
+      relayoutGraph()
 
       if (initialHash) {
         const id = resolveHashToNodeId(initialHash)
@@ -830,17 +880,18 @@
 
     <strong style="margin-top:1rem;display:block">Node types</strong>
     <ul class="legend-list">
-      <li><span class="swatch" style="background:{COLORS.owlClass}"></span> OWL class</li>
-      <li><span class="swatch" style="background:{COLORS.skosConcept}"></span> SKOS concept</li>
-      <li><span class="swatch" style="background:{COLORS.xsdType}"></span> XSD datatype</li>
-      <li><span class="swatch" style="background:{COLORS.objectProperty}"></span> Object property</li>
-      <li><span class="swatch" style="background:{COLORS.dataProperty}"></span> Datatype property</li>
+      <li><span class="swatch" style="background:{COLORS.owlClass}"></span><span class="legend-label">OWL class</span></li>
+      <li><span class="swatch" style="background:{COLORS.skosConcept}"></span><span class="legend-label">SKOS concept</span></li>
+      <li><span class="swatch" style="background:{COLORS.xsdType}"></span><span class="legend-label">XSD datatype</span></li>
+      <li><span class="swatch" style="background:{COLORS.objectProperty}"></span><span class="legend-label">Object property</span></li>
+      <li><span class="swatch" style="background:{COLORS.dataProperty}"></span><span class="legend-label">Datatype property</span></li>
     </ul>
 
     <strong style="margin-top:1rem;display:block">SKOS schemes</strong>
     <ul class="legend-list">
       {#each Object.entries(SCHEME_COLORS) as [iri, color]}
-        <li><span class="swatch" style="background:{color}"></span> {iri.split('#')[1].replace('Scheme','')}</li>
+        {@const schemeName = iri.split('#')[1].replace('Scheme', '')}
+        <li><span class="swatch" style="background:{color}"></span><span class="legend-label" title={schemeName}>{schemeName}</span></li>
       {/each}
     </ul>
 
@@ -1069,7 +1120,7 @@
   }
 
   .controls {
-    width: 190px;
+    width: 210px;
     flex-shrink: 0;
     padding: 0.75rem;
     overflow-y: auto;
@@ -1104,6 +1155,16 @@
     height: 12px;
     border-radius: 2px;
     flex-shrink: 0;
+  }
+
+  /* Long scheme/type names (e.g. "StimulationMechanism") get an ellipsis and a
+     tooltip instead of being clipped by the fixed-width sidebar. */
+  .legend-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .anim-control {

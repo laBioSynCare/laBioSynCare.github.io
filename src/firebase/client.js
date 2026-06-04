@@ -59,7 +59,7 @@ export async function getFirebaseClient() {
 export async function requireFirebaseClient() {
   const client = await getFirebaseClient()
   if (!client) {
-    throw new Error('Firebase is not configured. Add VITE_FIREBASE_* values to enable annotations.')
+    throw new Error('Firebase is not configured. Add VITE_FIREBASE_* values to enable Firebase-backed features.')
   }
   return client
 }

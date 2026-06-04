@@ -216,6 +216,11 @@ preset or an RDF instance is intentionally deferred — when added, the mapping
 belongs alongside the preset-format change checklist in
 [`../../src/README.md`](../../src/README.md).
 
+Signed-in users can also save this same export object to Firestore via
+`src/firebase/patches.js`. Patch documents live in `patchStudioPatches`, are
+owner-scoped by `firestore.rules`, and load through `draftFromPatchExport()`,
+which normalizes older or partial JSON back into the live draft shape.
+
 ---
 
 ## 9. Validation
