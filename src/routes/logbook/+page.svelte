@@ -88,6 +88,8 @@
 
   let entries     = $state([])
   let showForm    = $state(false)
+  let editingId   = $state(null)
+  let expandedId  = $state(null)
   let selType     = $state('note')
   let formDate    = $state('')
   let formData    = $state({})
@@ -146,31 +148,97 @@
     }
   }
 
+  // Which field each type already surfaces in the collapsed card.
+  const TITLE_KEY = {
+    'stimulation-session': 'preset',
+    'stimulation-outcome': 'description',
+    observation: 'description',
+    idea: 'title',
+    activity: 'title',
+    initiative: 'title',
+    note: 'content',
+    achievement: 'title',
+  }
+  const META_KEY = {
+    'stimulation-session': 'duration',
+    'stimulation-outcome': 'rating',
+    initiative: 'status',
+  }
+  // Types whose title line is a truncation of a longer text field.
+  const TRUNC_TYPES = new Set(['stimulation-outcome', 'observation', 'note'])
+
+  // Fields worth revealing on expand: those carrying content not already shown
+  // in full by the collapsed card (title line + meta).
+  function entryFields(entry) {
+    const def = TYPES[entry.type]
+    if (!def) return []
+    const d = entry.data || {}
+    const titleKey = TITLE_KEY[entry.type]
+    const metaKey  = META_KEY[entry.type]
+    const out = []
+    for (const f of def.fields) {
+      const v = d[f.key]
+      if (v === undefined || v === null || String(v).trim() === '') continue
+      if (f.key === metaKey) continue
+      if (f.key === titleKey && !(TRUNC_TYPES.has(entry.type) && String(v).length > 72)) continue
+      out.push({ key: f.key, label: f.label, value: v, type: f.type })
+    }
+    return out
+  }
+
+  function toggle(id) {
+    expandedId = expandedId === id ? null : id
+  }
+
   function openForm() {
-    selType  = 'note'
-    formDate = todayISO()
-    formData = {}
-    showForm = true
+    editingId = null
+    selType   = 'note'
+    formDate  = todayISO()
+    formData  = {}
+    showForm  = true
+  }
+
+  function openEdit(entry) {
+    editingId = entry.id
+    selType   = entry.type
+    formDate  = entry.date
+    formData  = { ...(entry.data || {}) }
+    showForm  = true
+  }
+
+  function closeForm() {
+    showForm  = false
+    editingId = null
   }
 
   function changeType(type) {
+    if (type === selType) return
     selType  = type
     formData = {}
   }
 
   function saveEntry() {
-    entries = [
-      { id: crypto.randomUUID(), type: selType, date: formDate,
-        createdAt: new Date().toISOString(), data: { ...formData } },
-      ...entries,
-    ]
+    if (editingId) {
+      entries = entries.map((e) =>
+        e.id === editingId
+          ? { ...e, type: selType, date: formDate, data: { ...formData }, updatedAt: new Date().toISOString() }
+          : e
+      )
+    } else {
+      entries = [
+        { id: crypto.randomUUID(), type: selType, date: formDate,
+          createdAt: new Date().toISOString(), data: { ...formData } },
+        ...entries,
+      ]
+    }
     persist()
-    showForm = false
+    closeForm()
   }
 
   function deleteEntry(id) {
     if (!confirm('Delete this entry?')) return
     entries = entries.filter(e => e.id !== id)
+    if (expandedId === id) expandedId = null
     persist()
   }
 
@@ -225,12 +293,12 @@
 <!-- ── Add-entry modal ─────────────────────────────────────────────────── -->
 {#if showForm}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-  <div class="overlay" role="presentation" onclick={() => (showForm = false)}>
+  <div class="overlay" role="presentation" onclick={closeForm}>
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <div class="sheet" tabindex="-1" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="New logbook entry">
+    <div class="sheet" tabindex="-1" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={editingId ? 'Edit logbook entry' : 'New logbook entry'}>
       <div class="sheet-top">
-        <span class="sheet-title">New Entry</span>
-        <button class="sheet-close" onclick={() => (showForm = false)} aria-label="Close">✕</button>
+        <span class="sheet-title">{editingId ? 'Edit Entry' : 'New Entry'}</span>
+        <button class="sheet-close" onclick={closeForm} aria-label="Close">✕</button>
       </div>
 
       <div class="type-grid">
@@ -283,8 +351,8 @@
       </div>
 
       <div class="form-actions">
-        <button class="btn-cancel" onclick={() => (showForm = false)}>Cancel</button>
-        <button class="btn-save" onclick={saveEntry}>Save</button>
+        <button class="btn-cancel" onclick={closeForm}>Cancel</button>
+        <button class="btn-save" onclick={saveEntry}>{editingId ? 'Save changes' : 'Save'}</button>
       </div>
     </div>
   </div>
@@ -309,21 +377,49 @@
   {:else}
     <ul class="entry-feed">
       {#each sorted as entry (entry.id)}
-        {@const typeDef = TYPES[entry.type]}
-        {@const color   = typeDef?.color ?? 'var(--app-muted)'}
-        {@const label   = typeDef?.label ?? entry.type}
+        {@const typeDef  = TYPES[entry.type]}
+        {@const color    = typeDef?.color ?? 'var(--app-muted)'}
+        {@const label    = typeDef?.label ?? entry.type}
+        {@const details  = entryFields(entry)}
+        {@const meta     = entryMeta(entry)}
+        {@const expanded = expandedId === entry.id}
         <li class="entry-card" style="--card-color: {color}">
-          <div class="entry-head">
-            <span class="type-badge">{label}</span>
-            <span class="entry-date">{fmtDate(entry.date)}</span>
+          <button
+            class="entry-toggle"
+            class:expandable={details.length > 0}
+            onclick={() => details.length && toggle(entry.id)}
+            aria-expanded={details.length ? expanded : undefined}
+          >
+            <span class="entry-head">
+              <span class="type-badge">{label}</span>
+              <span class="entry-date">{fmtDate(entry.date)}</span>
+              {#if details.length}
+                <span class="chevron" class:open={expanded} aria-hidden="true">▾</span>
+              {/if}
+            </span>
+            <span class="entry-body">
+              <span class="entry-title">{entryTitle(entry)}</span>
+              {#if meta}
+                <span class="entry-meta">{meta}</span>
+              {/if}
+            </span>
+          </button>
+
+          {#if expanded && details.length}
+            <dl class="entry-details">
+              {#each details as f (f.key)}
+                <div class="detail-row">
+                  <dt>{f.label}</dt>
+                  <dd class:multiline={f.type === 'textarea'}>{f.value}</dd>
+                </div>
+              {/each}
+            </dl>
+          {/if}
+
+          <div class="entry-actions">
+            <button class="btn-icon" onclick={() => openEdit(entry)} aria-label="Edit entry" title="Edit">✎</button>
+            <button class="btn-icon btn-del" onclick={() => deleteEntry(entry.id)} aria-label="Delete entry" title="Delete">✕</button>
           </div>
-          <div class="entry-body">
-            <span class="entry-title">{entryTitle(entry)}</span>
-            {#if entryMeta(entry)}
-              <span class="entry-meta">{entryMeta(entry)}</span>
-            {/if}
-          </div>
-          <button class="btn-delete" onclick={() => deleteEntry(entry.id)} aria-label="Delete entry">✕</button>
         </li>
       {/each}
     </ul>
@@ -504,15 +600,41 @@
     border: var(--app-border-width) solid var(--app-border);
     border-left: 3px solid var(--card-color);
     border-radius: var(--app-radius);
-    padding: 0.65rem 2.4rem 0.65rem 0.85rem;
+  }
+
+  /* Whole card header is the expand toggle */
+  .entry-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    padding: 0.65rem 3.7rem 0.65rem 0.85rem;
+    cursor: default;
+  }
+  .entry-toggle.expandable { cursor: pointer; }
+  .entry-toggle:focus-visible {
+    outline: 2px solid var(--app-accent);
+    outline-offset: -2px;
+    border-radius: var(--app-radius);
   }
 
   .entry-head {
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    margin-bottom: 0.3rem;
   }
+
+  .chevron {
+    font-size: 0.7rem;
+    color: var(--app-muted-2);
+    transition: transform 0.15s ease;
+  }
+  .chevron.open { transform: rotate(180deg); }
 
   .type-badge {
     font-size: 0.68rem;
@@ -552,25 +674,63 @@
     white-space: nowrap;
   }
 
-  .btn-delete {
+  /* ── Expanded details ────────────────────────────────────────────────── */
+  .entry-details {
+    margin: 0 0.85rem;
+    padding: 0.6rem 0 0.7rem;
+    border-top: 1px solid var(--app-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .detail-row dt {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted-2);
+    margin: 0;
+  }
+
+  .detail-row dd {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--app-text);
+    word-break: break-word;
+  }
+  .detail-row dd.multiline { white-space: pre-wrap; }
+
+  /* ── Per-entry actions (always visible, touch-friendly) ──────────────── */
+  .entry-actions {
     position: absolute;
-    top: 0.55rem;
-    right: 0.55rem;
-    width: 1.5rem;
-    height: 1.5rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.1rem;
+  }
+
+  .btn-icon {
+    width: 1.6rem;
+    height: 1.6rem;
     display: grid;
     place-items: center;
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     color: var(--app-muted-2);
-    font-size: 0.72rem;
-    border-radius: 3px;
+    font-size: 0.78rem;
+    border-radius: 4px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s;
+    transition: background 0.12s, color 0.12s;
   }
-  .entry-card:hover .btn-delete { opacity: 1; }
-  .btn-delete:hover { background: var(--app-surface-3); color: var(--app-error); }
+  .btn-icon:hover { background: var(--app-surface-2); color: var(--app-text); }
+  .btn-del:hover { color: var(--app-error); }
 
   /* ── Modal overlay ───────────────────────────────────────────────────── */
   .overlay {
