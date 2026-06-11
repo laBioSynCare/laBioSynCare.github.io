@@ -190,6 +190,7 @@ static/ontology/sstim-core.ttl
 static/ontology/sstim-vocab.ttl
 static/ontology/sstim-shapes.ttl
 static/ontology/sstim-alignments.ttl
+static/ontology/sstim-patch-studio.ttl
 docs/technical/BREATHING_MODEL.md
 docs/technical/SYMMETRY_SYSTEM.md
 docs/technical/MARTIGLI_BINAURAL.md
@@ -541,7 +542,9 @@ static/
     sstim-vocab.ttl             ← SKOS vocabulary (multilingual)
     sstim-shapes.ttl            ← SHACL validation shapes
     sstim-alignments.ttl        ← external links (Wikidata, DBpedia, OBO)
-    instances/                ← preset and reference instances as RDF
+    sstim-patch-studio.ttl      ← Patch Studio model vocabulary
+    0.1.0/                      ← immutable release snapshot
+    instances/                  ← preset and reference instances as RDF
 
 scripts/
   gen-ambiences.mjs           ← regenerates static/audio/*.wav

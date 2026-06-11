@@ -1,5 +1,5 @@
 <script>
-  import { onMount, onDestroy } from 'svelte'
+  import { onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
   import { authState } from '../../firebase/auth.js'
   import SignInForm from '../../ui/auth/SignInForm.svelte'
@@ -9,8 +9,10 @@
   const unsubAuth = authState.subscribe((v) => { auth = v })
   onDestroy(unsubAuth)
 
-  // Show the gate whenever auth is ready and user is absent
-  let gateVisible = $derived(auth.ready && !auth.user)
+  // Firebase-configured deployments keep the logbook behind auth. Local/static
+  // deployments without Firebase still get a browser-local logbook.
+  let logbookAccessible = $derived(auth.ready && (!auth.configured || Boolean(auth.user)))
+  let gateVisible = $derived(auth.ready && auth.configured && !auth.user)
 
   function dismissGate() {
     goto('/')
@@ -84,38 +86,241 @@
     },
   }
 
-  const STORAGE_KEY = 'bsclab_logbook_v1'
+  const STORE_KEY  = 'bsclab_logbook_v2'
+  const LEGACY_KEY = 'bsclab_logbook_v1'
 
-  let entries     = $state([])
+  let logbooks    = $state([])     // [{ id, name, createdAt }]
+  let entries     = $state([])     // each: { id, logbookId, type, date, createdAt, data, tags[] }
+  let activeBook  = $state(null)   // id of the logbook in view
+  let tagFilter   = $state([])     // selected tag strings (AND filter)
+  let bookMenuOpen = $state(false)
+  let logbookReady = $state(false)
+
   let showForm    = $state(false)
   let editingId   = $state(null)
   let expandedId  = $state(null)
   let selType     = $state('note')
   let formDate    = $state('')
   let formData    = $state({})
+  let formBook    = $state(null)   // logbook the entry belongs to
+  let formTags    = $state([])     // tags being edited in the form
+  let tagDraft    = $state('')     // current text in the tag input
+  let activeStoreKey = $state(STORE_KEY)
+  let loadedStoreKey = $state(null)
 
-  let sorted = $derived(
-    [...entries].sort((a, b) =>
-      b.date !== a.date
-        ? b.date.localeCompare(a.date)
-        : b.createdAt.localeCompare(a.createdAt)
-    )
+  // Entries of the active logbook, filtered by selected tags, newest first.
+  let activeEntries = $derived(entries.filter((e) => e.logbookId === activeBook))
+
+  let bookTags = $derived(
+    [...new Set(activeEntries.flatMap((e) => e.tags ?? []))].sort((a, b) => a.localeCompare(b))
   )
 
-  onMount(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      entries = raw ? JSON.parse(raw) : []
-    } catch { entries = [] }
+  let sorted = $derived(
+    [...activeEntries]
+      .filter((e) => tagFilter.every((t) => (e.tags ?? []).includes(t)))
+      .sort((a, b) =>
+        b.date !== a.date
+          ? b.date.localeCompare(a.date)
+          : (b.createdAt ?? '').localeCompare(a.createdAt ?? '')
+      )
+  )
+
+  $effect(() => {
+    if (!auth.ready) return
+    if (!logbookAccessible) {
+      logbookReady = false
+      loadedStoreKey = null
+      logbooks = []
+      entries = []
+      activeBook = null
+      tagFilter = []
+      expandedId = null
+      bookMenuOpen = false
+      showForm = false
+      return
+    }
+
+    const nextKey = storeKeyForAuth()
+    if (loadedStoreKey === nextKey) return
+
+    activeStoreKey = nextKey
+    load(nextKey)
     formDate = todayISO()
+    loadedStoreKey = nextKey
+    logbookReady = true
   })
+
+  function newBook(name) {
+    return { id: crypto.randomUUID(), name, createdAt: new Date().toISOString() }
+  }
+
+  function storeKeyForAuth() {
+    return auth.configured && auth.user?.uid
+      ? `${STORE_KEY}:${encodeURIComponent(auth.user.uid)}`
+      : STORE_KEY
+  }
+
+  function normalizeLogbooks(value) {
+    if (!Array.isArray(value)) return []
+    return value
+      .filter((b) => b && typeof b.id === 'string' && typeof b.name === 'string' && b.name.trim())
+      .map((b) => ({ id: b.id, name: b.name.trim(), createdAt: b.createdAt ?? new Date().toISOString() }))
+  }
+
+  function repairLoadedState() {
+    let changed = false
+
+    logbooks = normalizeLogbooks(logbooks)
+    if (logbooks.length === 0) {
+      logbooks = [newBook('Main')]
+      changed = true
+    }
+
+    const ids = new Set(logbooks.map((b) => b.id))
+    if (!ids.has(activeBook)) {
+      activeBook = logbooks[0].id
+      changed = true
+    }
+
+    const loadedEntries = Array.isArray(entries) ? entries : []
+    const validEntries = loadedEntries.filter(
+      (entry) => entry && typeof entry === 'object' && typeof entry.id === 'string'
+    )
+    if (validEntries.length !== loadedEntries.length) changed = true
+
+    entries = validEntries.map((entry) => {
+      let next = entry
+      if (!TYPES[next.type]) {
+        next = { ...next, type: 'note' }
+        changed = true
+      }
+      if (!next.date) {
+        next = { ...next, date: todayISO() }
+        changed = true
+      }
+      if (!next.createdAt) {
+        next = { ...next, createdAt: new Date().toISOString() }
+        changed = true
+      }
+      if (!next.data || typeof next.data !== 'object') {
+        next = { ...next, data: {} }
+        changed = true
+      }
+      if (!ids.has(next.logbookId)) {
+        next = { ...next, logbookId: activeBook }
+        changed = true
+      }
+      if (!Array.isArray(next.tags)) {
+        next = { ...next, tags: [] }
+        changed = true
+      }
+      return next
+    })
+
+    return changed
+  }
+
+  function load(key = activeStoreKey) {
+    let shouldPersist = false
+    try {
+      const primaryRaw = localStorage.getItem(key)
+      const fallbackRaw = key !== STORE_KEY ? localStorage.getItem(STORE_KEY) : null
+      const raw = primaryRaw ?? fallbackRaw
+      shouldPersist = !primaryRaw && Boolean(fallbackRaw)
+
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        logbooks   = normalizeLogbooks(parsed.logbooks)
+        entries    = Array.isArray(parsed.entries)  ? parsed.entries  : []
+        activeBook = parsed.activeBook ?? null
+      } else {
+        // First run on v2: migrate any v1 entries into a default logbook.
+        const book = newBook('Main')
+        logbooks = [book]
+        let legacy = []
+        try {
+          const old = JSON.parse(localStorage.getItem(LEGACY_KEY) || '[]')
+          if (Array.isArray(old)) legacy = old
+        } catch { /* ignore malformed legacy data */ }
+        entries = legacy.map((e) => ({ ...e, logbookId: book.id, tags: e.tags ?? [] }))
+        activeBook = book.id
+        shouldPersist = true
+      }
+    } catch {
+      const book = newBook('Main')
+      logbooks = [book]
+      entries = []
+      activeBook = book.id
+      shouldPersist = true
+    }
+    shouldPersist = repairLoadedState() || shouldPersist
+    if (shouldPersist) persist(key)
+  }
 
   function todayISO() {
     return new Date().toISOString().slice(0, 10)
   }
 
-  function persist() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(entries)) } catch {}
+  function persist(key = activeStoreKey) {
+    try {
+      localStorage.setItem(key, JSON.stringify({ version: 2, logbooks, entries, activeBook }))
+    } catch {}
+  }
+
+  function activeBookName() {
+    return logbooks.find((b) => b.id === activeBook)?.name ?? 'Logbook'
+  }
+
+  function bookCount(id) {
+    return entries.reduce((n, e) => n + (e.logbookId === id ? 1 : 0), 0)
+  }
+
+  // ── Logbook management ─────────────────────────────────────────────────
+  function switchBook(id) {
+    activeBook   = id
+    tagFilter    = []
+    expandedId   = null
+    bookMenuOpen = false
+    persist()
+  }
+
+  function createBook() {
+    const name = prompt('New logbook name:')?.trim()
+    if (!name) return
+    const book = newBook(name)
+    logbooks = [...logbooks, book]
+    switchBook(book.id)
+  }
+
+  function renameBook(id) {
+    const b = logbooks.find((x) => x.id === id)
+    if (!b) return
+    const name = prompt('Rename logbook:', b.name)?.trim()
+    if (!name || name === b.name) return
+    logbooks = logbooks.map((x) => (x.id === id ? { ...x, name } : x))
+    persist()
+  }
+
+  function deleteBook(id) {
+    if (logbooks.length <= 1) {
+      alert('You need at least one logbook.')
+      return
+    }
+    const b = logbooks.find((x) => x.id === id)
+    if (!b) return
+    const count  = bookCount(id)
+    const target = logbooks.find((x) => x.id !== id)
+    let msg = `Delete logbook “${b.name}”?`
+    if (count) msg += `\n\nIts ${count} ${count === 1 ? 'entry' : 'entries'} will be moved to “${target.name}”.`
+    if (!confirm(msg)) return
+    if (count) entries = entries.map((e) => (e.logbookId === id ? { ...e, logbookId: target.id } : e))
+    logbooks = logbooks.filter((x) => x.id !== id)
+    if (activeBook === id) { activeBook = target.id; tagFilter = []; expandedId = null }
+    persist()
+  }
+
+  function toggleTagFilter(t) {
+    tagFilter = tagFilter.includes(t) ? tagFilter.filter((x) => x !== t) : [...tagFilter, t]
   }
 
   function trunc(str, n) {
@@ -195,6 +400,9 @@
     selType   = 'note'
     formDate  = todayISO()
     formData  = {}
+    formBook  = activeBook
+    formTags  = []
+    tagDraft  = ''
     showForm  = true
   }
 
@@ -203,6 +411,9 @@
     selType   = entry.type
     formDate  = entry.date
     formData  = { ...(entry.data || {}) }
+    formBook  = entry.logbookId ?? activeBook
+    formTags  = [...(entry.tags ?? [])]
+    tagDraft  = ''
     showForm  = true
   }
 
@@ -217,17 +428,44 @@
     formData = {}
   }
 
+  // ── Tag input ──────────────────────────────────────────────────────────
+  function normalizeTag(s) {
+    return s.trim().toLowerCase().replace(/^#+/, '').replace(/\s+/g, '-')
+  }
+  function addTag(raw) {
+    const t = normalizeTag(raw)
+    if (t && !formTags.includes(t)) formTags = [...formTags, t]
+  }
+  function commitDraft() {
+    if (tagDraft.trim()) { addTag(tagDraft); tagDraft = '' }
+  }
+  function removeTag(t) {
+    formTags = formTags.filter((x) => x !== t)
+  }
+  function tagKeydown(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      commitDraft()
+    } else if (e.key === 'Backspace' && !tagDraft && formTags.length) {
+      formTags = formTags.slice(0, -1)
+    }
+  }
+
   function saveEntry() {
+    commitDraft()
+    const tags = [...formTags]
+    const book = formBook ?? activeBook
     if (editingId) {
       entries = entries.map((e) =>
         e.id === editingId
-          ? { ...e, type: selType, date: formDate, data: { ...formData }, updatedAt: new Date().toISOString() }
+          ? { ...e, type: selType, date: formDate, logbookId: book, tags,
+              data: { ...formData }, updatedAt: new Date().toISOString() }
           : e
       )
     } else {
       entries = [
-        { id: crypto.randomUUID(), type: selType, date: formDate,
-          createdAt: new Date().toISOString(), data: { ...formData } },
+        { id: crypto.randomUUID(), type: selType, date: formDate, logbookId: book,
+          tags, createdAt: new Date().toISOString(), data: { ...formData } },
         ...entries,
       ]
     }
@@ -256,9 +494,9 @@
 </svelte:head>
 
 <!-- ── Loading state ──────────────────────────────────────────────────── -->
-{#if !auth.ready}
+{#if !auth.ready || (logbookAccessible && !logbookReady)}
   <main class="logbook-status">
-    <p aria-busy="true">Loading account…</p>
+    <p aria-busy="true">{auth.ready ? 'Loading logbook…' : 'Loading account…'}</p>
   </main>
 {/if}
 
@@ -275,20 +513,16 @@
         Sign in to keep a private, persistent record of your sessions, observations, ideas, and progress.
       </p>
 
-      {#if !auth.configured}
-        <p class="gate-unconfigured">Firebase is not configured — sign-in is unavailable in this environment.</p>
-      {:else}
-        <div class="gate-form">
-          <SignInForm />
-        </div>
-      {/if}
+      <div class="gate-form">
+        <SignInForm />
+      </div>
 
       <button class="gate-dismiss" onclick={dismissGate}>Not now</button>
     </div>
   </div>
 {/if}
 
-{#if auth.user}
+{#if logbookAccessible && logbookReady}
 
 <!-- ── Add-entry modal ─────────────────────────────────────────────────── -->
 {#if showForm}
@@ -313,9 +547,19 @@
       </div>
 
       <div class="form-fields">
-        <div class="field-row">
-          <label for="entry-date">Date</label>
-          <input type="date" id="entry-date" bind:value={formDate} />
+        <div class="field-two">
+          <div class="field-row">
+            <label for="entry-date">Date</label>
+            <input type="date" id="entry-date" bind:value={formDate} />
+          </div>
+          <div class="field-row">
+            <label for="entry-book">Logbook</label>
+            <select id="entry-book" bind:value={formBook}>
+              {#each logbooks as b (b.id)}
+                <option value={b.id}>{b.name}</option>
+              {/each}
+            </select>
+          </div>
         </div>
         {#each TYPES[selType].fields as field (field.key)}
           <div class="field-row">
@@ -348,6 +592,27 @@
             {/if}
           </div>
         {/each}
+
+        <div class="field-row">
+          <label for="entry-tags">Tags</label>
+          <div class="tag-input">
+            {#each formTags as t (t)}
+              <span class="tag-pill">
+                #{t}
+                <button type="button" class="tag-pill-x" onclick={(e) => { e.stopPropagation(); removeTag(t) }} aria-label="Remove tag {t}">✕</button>
+              </span>
+            {/each}
+            <input
+              id="entry-tags"
+              class="tag-entry"
+              placeholder={formTags.length ? '' : 'Add tags — Enter or comma to confirm'}
+              value={tagDraft}
+              oninput={(e) => { tagDraft = e.currentTarget.value }}
+              onkeydown={tagKeydown}
+              onblur={commitDraft}
+            />
+          </div>
+        </div>
       </div>
 
       <div class="form-actions">
@@ -361,18 +626,57 @@
 <!-- ── Page ────────────────────────────────────────────────────────────── -->
 <main class="logbook-page">
   <header class="logbook-header">
-    <div>
-      <p class="eyebrow">Long-term memory</p>
-      <h1>Logbook</h1>
+    <div class="header-left">
+      <div class="book-switch">
+        <button class="book-btn" onclick={() => (bookMenuOpen = !bookMenuOpen)} aria-haspopup="menu" aria-expanded={bookMenuOpen}>
+          <span class="book-label">Logbook:</span>
+          <span class="book-name">{activeBookName()}</span>
+          <span class="book-caret" class:open={bookMenuOpen} aria-hidden="true">▾</span>
+        </button>
+
+        {#if bookMenuOpen}
+          <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+          <div class="book-backdrop" role="presentation" onclick={() => (bookMenuOpen = false)}></div>
+          <div class="book-menu" role="menu">
+            {#each logbooks as b (b.id)}
+              <div class="book-row" class:active={b.id === activeBook} role="presentation">
+                <button class="book-pick" role="menuitemradio" aria-checked={b.id === activeBook} onclick={() => switchBook(b.id)}>
+                  <span class="book-dot" class:on={b.id === activeBook} aria-hidden="true"></span>
+                  <span class="book-pick-name">{b.name}</span>
+                  <span class="book-count">{bookCount(b.id)}</span>
+                </button>
+                <button class="book-act" onclick={() => renameBook(b.id)} aria-label="Rename {b.name}" title="Rename">✎</button>
+                <button class="book-act book-del" onclick={() => deleteBook(b.id)} aria-label="Delete {b.name}" title="Delete">✕</button>
+              </div>
+            {/each}
+            <button class="book-new" onclick={createBook}>+ New logbook</button>
+          </div>
+        {/if}
+      </div>
       <p class="tagline">The long-term memory of your sensory stimulation work.</p>
     </div>
-    <button class="btn-add" onclick={openForm}>+ Add</button>
+    <button class="btn-add" onclick={openForm}>+ Add entry</button>
   </header>
 
-  {#if sorted.length === 0}
+  {#if bookTags.length}
+    <div class="filter-bar">
+      <span class="filter-label">Filter</span>
+      <button class="filter-chip" class:active={tagFilter.length === 0} onclick={() => (tagFilter = [])}>All</button>
+      {#each bookTags as t (t)}
+        <button class="filter-chip" class:active={tagFilter.includes(t)} onclick={() => toggleTagFilter(t)}>#{t}</button>
+      {/each}
+    </div>
+  {/if}
+
+  {#if activeEntries.length === 0}
     <div class="empty-state">
       <p>No entries yet.</p>
       <button class="btn-add-empty" onclick={openForm}>Add your first entry</button>
+    </div>
+  {:else if sorted.length === 0}
+    <div class="empty-state">
+      <p>No entries match the selected tags.</p>
+      <button class="btn-add-empty" onclick={() => (tagFilter = [])}>Clear filter</button>
     </div>
   {:else}
     <ul class="entry-feed">
@@ -393,17 +697,28 @@
             <span class="entry-head">
               <span class="type-badge">{label}</span>
               <span class="entry-date">{fmtDate(entry.date)}</span>
-              {#if details.length}
-                <span class="chevron" class:open={expanded} aria-hidden="true">▾</span>
-              {/if}
             </span>
             <span class="entry-body">
               <span class="entry-title">{entryTitle(entry)}</span>
               {#if meta}
                 <span class="entry-meta">{meta}</span>
               {/if}
+              {#if details.length}
+                <span class="more-hint">
+                  <span class="more-text">{expanded ? 'Hide' : `+${details.length} more`}</span>
+                  <span class="more-caret" class:open={expanded} aria-hidden="true">▾</span>
+                </span>
+              {/if}
             </span>
           </button>
+
+          {#if entry.tags?.length}
+            <div class="entry-tags">
+              {#each entry.tags as t (t)}
+                <button class="tag-chip" class:active={tagFilter.includes(t)} onclick={() => toggleTagFilter(t)}>#{t}</button>
+              {/each}
+            </div>
+          {/if}
 
           {#if expanded && details.length}
             <dl class="entry-details">
@@ -480,12 +795,6 @@
     padding-top: 1rem;
   }
 
-  .gate-unconfigured {
-    font-size: 0.82rem;
-    color: var(--app-warn);
-    margin: 0;
-  }
-
   .gate-dismiss {
     background: transparent;
     border: none;
@@ -524,26 +833,187 @@
     margin-bottom: 1.75rem;
   }
 
-  .eyebrow {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--app-muted);
-    margin: 0 0 0.2rem;
-  }
+  .header-left { min-width: 0; }
 
-  h1 {
+  /* ── Logbook switcher ────────────────────────────────────────────────── */
+  .book-switch { position: relative; }
+
+  .book-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 0 0.3rem;
+    cursor: pointer;
+    color: var(--app-text-strong);
+    max-width: 100%;
+  }
+  .book-label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--app-muted);
+    white-space: nowrap;
+  }
+  .book-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--app-text-strong);
-    margin: 0 0 0.3rem;
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+  .book-caret {
+    font-size: 1.15rem;
+    line-height: 1;
+    color: var(--app-muted);
+    transition: transform 0.15s ease, color 0.12s;
+  }
+  .book-caret.open { transform: rotate(180deg); }
+  .book-btn:hover .book-caret { color: var(--app-text); }
+
+  .book-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+  }
+
+  .book-menu {
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    left: 0;
+    z-index: 50;
+    min-width: 240px;
+    max-width: min(320px, 90vw);
+    background: var(--app-surface);
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    box-shadow: 0 10px 30px rgba(0 0 0 / 0.28);
+    padding: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .book-row {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    border-radius: var(--app-radius);
+  }
+  .book-row.active { background: var(--app-accent-soft); }
+
+  .book-pick {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    padding: 0.45rem 0.5rem;
+    cursor: pointer;
+    color: var(--app-text);
+    font-size: 0.88rem;
+    text-align: left;
+    border-radius: var(--app-radius);
+  }
+  .book-pick:hover { background: var(--app-surface-2); }
+
+  .book-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--app-muted-2);
+    flex-shrink: 0;
+  }
+  .book-dot.on {
+    border-color: var(--app-accent);
+    background: var(--app-accent);
+  }
+
+  .book-pick-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .book-count {
+    font-size: 0.72rem;
+    color: var(--app-muted-2);
+    flex-shrink: 0;
+  }
+
+  .book-act {
+    width: 1.6rem;
+    height: 1.6rem;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    border: none;
+    color: var(--app-muted-2);
+    font-size: 0.72rem;
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .book-act:hover { background: var(--app-surface-2); color: var(--app-text); }
+  .book-del:hover { color: var(--app-error); }
+
+  .book-new {
+    margin-top: 0.15rem;
+    padding: 0.45rem 0.5rem;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--app-border);
+    border-radius: 0;
+    color: var(--app-accent);
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+  .book-new:hover { color: var(--app-accent); filter: brightness(1.2); }
 
   .tagline {
     color: var(--app-muted);
     font-size: 0.88rem;
     margin: 0;
+  }
+
+  /* ── Tag filter bar ──────────────────────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+  .filter-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-muted-2);
+    margin-right: 0.15rem;
+  }
+  .filter-chip {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.76rem;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    color: var(--app-muted);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .filter-chip:hover { color: var(--app-text); border-color: var(--app-muted-2); }
+  .filter-chip.active {
+    background: var(--app-accent);
+    border-color: var(--app-accent);
+    color: #fff;
   }
 
   .btn-add {
@@ -629,12 +1099,26 @@
     gap: 0.55rem;
   }
 
-  .chevron {
-    font-size: 0.7rem;
-    color: var(--app-muted-2);
+  /* "More / Hide" expand indicator — a clearly visible sign that an entry
+     carries content beyond what the collapsed card shows. */
+  .more-hint {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--app-muted);
+    white-space: nowrap;
+  }
+  .more-caret {
+    font-size: 0.85rem;
+    line-height: 1;
     transition: transform 0.15s ease;
   }
-  .chevron.open { transform: rotate(180deg); }
+  .more-caret.open { transform: rotate(180deg); }
+  .entry-toggle.expandable:hover .more-hint { color: var(--app-accent); }
 
   .type-badge {
     font-size: 0.68rem;
@@ -731,6 +1215,32 @@
   }
   .btn-icon:hover { background: var(--app-surface-2); color: var(--app-text); }
   .btn-del:hover { color: var(--app-error); }
+
+  /* ── Per-entry tags ──────────────────────────────────────────────────── */
+  .entry-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0 3.7rem 0.6rem 0.85rem;
+    margin-top: -0.15rem;
+  }
+
+  .tag-chip {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.72rem;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: 999px;
+    color: var(--app-muted);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .tag-chip:hover { color: var(--app-text); border-color: var(--app-muted-2); }
+  .tag-chip.active {
+    background: color-mix(in srgb, var(--app-accent) 16%, transparent);
+    border-color: var(--app-accent);
+    color: var(--app-accent);
+  }
 
   /* ── Modal overlay ───────────────────────────────────────────────────── */
   .overlay {
@@ -852,6 +1362,64 @@
   }
   .field-row textarea { resize: vertical; }
 
+  .field-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  /* ── Tag input (chips + free text) ───────────────────────────────────── */
+  .tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 0.35rem 0.5rem;
+  }
+  .tag-input:focus-within { border-color: var(--app-accent); }
+
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.2rem 0.1rem 0.5rem;
+    font-size: 0.76rem;
+    background: color-mix(in srgb, var(--app-accent) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--app-accent) 30%, transparent);
+    border-radius: 999px;
+    color: var(--app-accent);
+    white-space: nowrap;
+  }
+  .tag-pill-x {
+    display: grid;
+    place-items: center;
+    width: 1rem;
+    height: 1rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 0.6rem;
+    cursor: pointer;
+    border-radius: 50%;
+    opacity: 0.7;
+  }
+  .tag-pill-x:hover { opacity: 1; background: color-mix(in srgb, var(--app-accent) 22%, transparent); }
+
+  .tag-input .tag-entry {
+    flex: 1;
+    min-width: 8ch;
+    background: transparent;
+    border: none;
+    padding: 0.1rem 0;
+    color: var(--app-text);
+    font-size: 0.86rem;
+    font-family: var(--app-font-ui);
+  }
+  .tag-input .tag-entry:focus { outline: none; }
+
   /* ── Form actions ────────────────────────────────────────────────────── */
   .form-actions {
     display: flex;
@@ -884,5 +1452,6 @@
 
   @media (max-width: 480px) {
     .type-grid { grid-template-columns: repeat(2, 1fr); }
+    .field-two { grid-template-columns: 1fr; }
   }
 </style>

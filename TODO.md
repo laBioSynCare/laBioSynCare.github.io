@@ -134,8 +134,9 @@ indexed, examiner-searchable records.
       endorsement. Renato has PhD credentials; check arXiv endorsement
       process for cs.SD. Alternative: IACR ePrint or OSF Preprints*
 - [ ] Record IP.com submission receipts and arXiv IDs in
-      `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md` (Claude Code generates
-      this file after submissions are complete) `P1`
+      `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md` `P1`
+      *Tracker file exists; receipts remain pending until the external
+      submissions are actually filed.*
 
 ### Trademark filings — Brazil (INPI) — do in P1
 - [ ] File "BioSynCare" — Classes 9, 41, 44 — INPI-BR `P1`
@@ -169,12 +170,12 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Ontology namespace
-- [ ] Register `https://w3id.org/sstim` persistent namespace for the
+- [~] Register `https://w3id.org/sstim` persistent namespace for the
       ontology `P1`
       *Process: fork https://github.com/perma-id/w3id.org, create
       `sstim/` folder with `.htaccess` content negotiation rules,
-      submit PR. Redirect is live; verify final Pages targets and the
-      browser/WIDOCO path after deployment.*
+      submit PR. The root Turtle redirect is live; staging copy now exists in
+      `docs/ecosystem/w3id/` for the versioned snapshot route and future sync.*
 - [ ] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
@@ -214,10 +215,14 @@ Turtle files are listed in section 1. After they exist:
       *Blocked until the publication path is chosen. When enabled, generate
       WIDOCO in GitHub Actions and publish the output as a Pages artifact or
       separate docs branch; do not commit generated HTML into `main`.*
-- [ ] Publish ontology at `https://w3id.org/sstim` with content
+- [~] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
-- [ ] Add `owl:versionIRI` pointing to immutable snapshot:
-      `https://w3id.org/sstim/0.1.0/sstim-core.ttl` `P1`
+      *Root Turtle redirect is live. Versioned `0.1.0/` routes and browser
+      WIDOCO target still need deployment/registry update.*
+- [x] Add `owl:versionIRI` pointing to immutable snapshot:
+      `https://w3id.org/sstim/0.1.0` `P1`
+      *`sstim-core.ttl` declares the version IRI, and
+      `static/ontology/0.1.0/` contains the frozen Turtle snapshot.*
 
 ### Phase 1 instances
 - [x] Do not convert the private BioSynCare/BSC preset catalog v0.9.1 to
@@ -635,5 +640,5 @@ Not project-specific — run on a schedule.
 
 ---
 
-*Last updated: April 2026 — Renato Fabbri*
-*Next update due: when CI is merged and Phase 1 focus is confirmed*
+*Last updated: 2026-06-11 — local task-state sync after w3id/snapshot staging*
+*Next update due: after the w3id PR or defensive-publication submissions are filed*

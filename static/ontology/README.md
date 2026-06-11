@@ -4,7 +4,9 @@
 > imports from `src/rdf/namespaces.js`, generates SPARQL queries, creates
 > RDF instances, or modifies any `*.ttl` file. The design decisions here
 > are fixed — they are not defaults open to re-interpretation.
-> The four Turtle files in this directory are in `CLAUDE.md`'s protected
+> The top-level Turtle files in this directory are scientific ontology
+> artifacts. The protected-file list lives in `CLAUDE.md`; modify protected
+> artifacts only with explicit human instruction.
 > list: modify them only with explicit human instruction.
 
 ---
@@ -41,9 +43,13 @@ static/ontology/
 ├── sstim-vocab.ttl       SKOS vocabulary (multilingual concepts)
 ├── sstim-shapes.ttl      SHACL validation shapes
 ├── sstim-alignments.ttl  External alignments (Wikidata, OBO Foundry)
+├── sstim-patch-studio.ttl Patch Studio model vocabulary
+├── 0.1.0/                Frozen ontology snapshot for version 0.1.0
 └── instances/
-    ├── presets/        One .ttl file per preset group
-    └── references/     Bibliographic reference instances
+    ├── frameworks/      BSC framework identity and technique instances
+    ├── implementations/ BSC Lab / BioSynCare implementation identities
+    ├── presets/         Public BSC Lab reference preset instances
+    └── references/      Bibliographic reference instances
 ```
 
 ### `sstim-core.ttl` — OWL class hierarchy and properties
@@ -74,6 +80,19 @@ and `skos:relatedMatch` statements to:
 - Wikidata entities (`wd:` prefix)
 - OBO Foundry terms (NBO, OMIT, NCIT as applicable)
 - DBpedia resources
+
+### `sstim-patch-studio.ttl` — Patch Studio vocabulary
+
+Defines the Patch Studio authoring model vocabulary used by the as-built
+real-time audiovisual designer. It is snapshotted with the other ontology
+modules so model terms remain citable alongside each release.
+
+### `0.1.0/` — Frozen version snapshot
+
+Contains byte-identical copies of the top-level Turtle modules for ontology
+version `0.1.0`. Generate future snapshots with `make snapshot` after bumping
+`owl:versionInfo` / `owl:versionIRI`; use `FORCE=1` only to correct an
+unpublished snapshot.
 
 ---
 
@@ -510,8 +529,10 @@ The ontology uses `owl:versionIRI` for immutable version snapshots:
     dct:modified "2026-04-12"^^xsd:date .
 ```
 
-Version IRIs point to immutable snapshots hosted on GitHub Pages:
-`https://w3id.org/sstim/0.1.0/sstim-core.ttl`
+Version IRIs point to immutable snapshots hosted on GitHub Pages through w3id:
+`https://w3id.org/sstim/0.1.0` redirects to the frozen
+`/ontology/0.1.0/sstim-core.ttl` document. The explicit file URL
+`https://w3id.org/sstim/0.1.0/sstim-core.ttl` is also available.
 
 **Versioning policy:**
 - **Patch (0.1.x):** Adds new instances, corrects labels, adds

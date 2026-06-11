@@ -1,0 +1,60 @@
+# w3id.org/sstim — Sensory Stimulation Ontology (SSTIM)
+#
+# Persistent-identifier namespace for the SSTIM ontology. Serves content-
+# negotiated redirects to the canonical artifacts hosted on GitHub Pages
+# (https://labiosyncare.github.io/ontology/). RDF clients receive Turtle;
+# browsers receive the human-readable documentation.
+#
+# This file is the staging copy. The live copy lives at
+# https://github.com/perma-id/w3id.org/tree/master/sstim/.htaccess — keep the
+# two in sync. Source of truth for the routing targets:
+# https://github.com/laBioSynCare/laBioSynCare.github.io (static/ontology/*.ttl).
+#
+# Maintainer: Renato Fabbri <renato@biosyncare.com> (ORCID 0000-0001-8602-7064)
+
+Options -MultiViews
+AddType text/turtle .ttl
+
+RewriteEngine On
+RewriteBase /sstim/
+
+# Accept headers that mean "give me RDF, not a web page". Reused by every
+# content-negotiated rule below via the immediately-preceding RewriteCond.
+# (text/turtle, N-Triples, N-Quads, RDF/XML, JSON-LD, N3)
+
+# ===========================================================================
+# 1. Versioned, immutable snapshots — must come first so a version path is
+#    never shadowed by the term routes in section 3.
+#       w3id.org/sstim/0.1.0                 (owl:versionIRI)
+#       w3id.org/sstim/0.1.0/sstim-core.ttl  (frozen file)
+# ===========================================================================
+RewriteRule ^(\d+\.\d+\.\d+)/([A-Za-z0-9._-]+\.ttl)$ https://labiosyncare.github.io/ontology/$1/$2 [R=302,L]
+RewriteRule ^(\d+\.\d+\.\d+)/?$ https://labiosyncare.github.io/ontology/$1/sstim-core.ttl [R=302,L]
+
+# ===========================================================================
+# 2. Term-space modules (hash namespaces sstim/vocab#, sstim/shapes#, …).
+#    Browsers and RDF clients alike get the Turtle document; the fragment is
+#    resolved client-side.
+# ===========================================================================
+RewriteRule ^vocab/?$       https://labiosyncare.github.io/ontology/sstim-vocab.ttl       [R=303,L]
+RewriteRule ^shapes/?$      https://labiosyncare.github.io/ontology/sstim-shapes.ttl      [R=303,L]
+RewriteRule ^alignments/?$  https://labiosyncare.github.io/ontology/sstim-alignments.ttl  [R=303,L]
+
+# ===========================================================================
+# 3. Core ontology IRI — w3id.org/sstim (hash namespace sstim#).
+#    RDF clients → Turtle.  Browsers → human documentation.
+#
+#    NOTE: WIDOCO HTML docs are not deployed yet. Until they are, browsers are
+#    sent to the live knowledge browser. When WIDOCO is published, change the
+#    browser target below to its URL (e.g. .../ontology/0.1.0/index-en.html).
+# ===========================================================================
+RewriteCond %{HTTP_ACCEPT} (text/turtle|application/(n-triples|n-quads|rdf\+xml|ld\+json)|text/n3) [NC]
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.ttl [R=303,L]
+
+RewriteRule ^$ https://labiosyncare.github.io/ [R=303,L]
+
+# ===========================================================================
+# 4. Generic passthrough — any other published .ttl artifact resolves without
+#    needing a new rule here.
+# ===========================================================================
+RewriteRule ^([A-Za-z0-9._-]+\.ttl)$ https://labiosyncare.github.io/ontology/$1 [R=302,L]

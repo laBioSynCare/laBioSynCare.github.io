@@ -18,7 +18,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances test validate wasm help
+.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -62,6 +62,12 @@ shacl-instances:
 ## Run all SHACL validations
 shacl: shacl-core shacl-vocab shacl-instances
 
+## Freeze the current ontology as an immutable versioned snapshot
+## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
+## Existing snapshots are protected; overwrite an unpublished one with FORCE=1.
+snapshot:
+	node scripts/snapshot-ontology.mjs $(VERSION) $(if $(FORCE),--force,)
+
 ## Run Vitest
 test:
 	npm test
@@ -88,3 +94,4 @@ help:
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
+	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

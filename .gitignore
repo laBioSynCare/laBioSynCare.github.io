@@ -14,3 +14,5 @@ result
 result-*
 
 docs/credentials/
+
+.playwright-cli/

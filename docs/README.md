@@ -99,6 +99,10 @@ alternatives, and consequences. See
 
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
   approach over patents; trademark plan.
+- [`DEFENSIVE_PUBLICATIONS.md`](ecosystem/DEFENSIVE_PUBLICATIONS.md) —
+  filing tracker for the three technical defensive publications.
+- [`w3id/README.md`](ecosystem/w3id/README.md) — staged instructions and
+  redirect rules for the `https://w3id.org/sstim` persistent namespace.
 - [`CHARTER.md`](../CHARTER.md) (repo root) — draft charter for the proposed
   W3C Sensory Stimulation Vocabulary Community Group.
 - [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md) —
