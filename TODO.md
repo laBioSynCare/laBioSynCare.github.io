@@ -170,12 +170,13 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Ontology namespace
-- [~] Register `https://w3id.org/sstim` persistent namespace for the
+- [x] Register `https://w3id.org/sstim` persistent namespace for the
       ontology `P1`
       *Process: fork https://github.com/perma-id/w3id.org, create
       `sstim/` folder with `.htaccess` content negotiation rules,
-      submit PR. The root Turtle redirect is live; staging copy now exists in
-      `docs/ecosystem/w3id/` for the versioned snapshot route and future sync.*
+      submit PR. PR #6184 was merged on 2026-06-11; root RDF, module,
+      Patch Studio, and versioned `0.1.0/` redirects are live. Keep the
+      mirrored copy in `docs/ecosystem/w3id/` synchronized with the registry.*
 - [ ] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
@@ -217,8 +218,9 @@ Turtle files are listed in section 1. After they exist:
       separate docs branch; do not commit generated HTML into `main`.*
 - [~] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
-      *Root Turtle redirect is live. Versioned `0.1.0/` routes and browser
-      WIDOCO target still need deployment/registry update.*
+      *Root RDF, module, Patch Studio, and versioned `0.1.0/` redirects are
+      live. Browser HTML currently points at the app root; WIDOCO remains the
+      open publication follow-up.*
 - [x] Add `owl:versionIRI` pointing to immutable snapshot:
       `https://w3id.org/sstim/0.1.0` `P1`
       *`sstim-core.ttl` declares the version IRI, and
@@ -345,8 +347,8 @@ Do not start these until all Phase 0 documents are committed.
       Pages workflow runs `P1`
 - [~] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
       browser path TBD until WIDOCO is chosen `P1`
-      *Turtle redirect is live; browser-oriented HTML remains blocked on the
-      WIDOCO publication path.*
+      *RDF redirects and versioned snapshot routes are live; browser-oriented
+      HTML remains blocked on the WIDOCO publication path.*
 - [ ] Optional Netlify/custom-domain deployment: `lab.biosyncare.com`
       (CNAME at Keliweb) `P2`
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,
@@ -640,5 +642,5 @@ Not project-specific — run on a schedule.
 
 ---
 
-*Last updated: 2026-06-11 — local task-state sync after w3id/snapshot staging*
-*Next update due: after the w3id PR or defensive-publication submissions are filed*
+*Last updated: 2026-06-11 — w3id PR #6184 merged and live routes verified*
+*Next update due: after WIDOCO publication path or defensive-publication submissions are filed*
