@@ -5,7 +5,7 @@
 #  Namespace:  https://w3id.org/sstim
 #  Version:    0.1.0
 #  Date:       2026-04-12
-#  Author:     Renato Fabbri <renato@biosyncare.com>
+#  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
 #  OWL 2 DL class hierarchy, object properties, datatype properties, and

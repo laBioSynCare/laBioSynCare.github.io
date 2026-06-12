@@ -101,7 +101,7 @@ With best regards,
 
 Renato Fabbri
 BSC Lab / BioSynCare
-renato@biosyncare.com
+renato@junto.space
 ORCID: 0000-0002-9699-629X
 
 ---

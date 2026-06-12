@@ -5,7 +5,7 @@
 #  Namespace:  https://w3id.org/sstim
 #  Version:    0.1.0
 #  Date:       2026-04-12
-#  Author:     Renato Fabbri <renato@biosyncare.com>
+#  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
 #  External vocabulary alignments: Wikidata, OBO Foundry, Music Ontology.
@@ -117,6 +117,23 @@ sstim-v:tierEstablished skos:closeMatch eco:0006151 .  # systematic review
 # BSC sessions have musical / acoustic qualities; loose relationship only
 sstim:SensoryStimulationTechnique skos:relatedMatch mo:MusicalWork .
 sstim:Preset skos:relatedMatch mo:Score .
+
+
+###########################################################################
+# External upper-ontology term labels (display stubs)
+#
+# Local rdfs:label assertions for the external BFO/OBI/IAO IRIs referenced
+# above and in sstim-core.ttl, so the knowledge browser renders readable
+# names instead of opaque numeric IRIs. These are display aids, not
+# authoritative definitions — the canonical labels live in BFO/OBI/IAO.
+###########################################################################
+
+bfo:0000015 rdfs:label "process"@en .
+bfo:0000016 rdfs:label "disposition"@en .
+bfo:0000023 rdfs:label "role"@en .
+obi:0000011 rdfs:label "planned process"@en .
+obi:0000272 rdfs:label "protocol"@en .
+iao:0000030 rdfs:label "information content entity"@en .
 
 
 ###########################################################################

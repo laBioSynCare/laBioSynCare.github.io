@@ -5,7 +5,7 @@
 #  Namespace:  https://w3id.org/sstim
 #  Version:    0.1.0
 #  Date:       2026-04-12
-#  Author:     Renato Fabbri <renato@biosyncare.com>
+#  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
 #  OWL 2 DL class hierarchy, object properties, datatype properties, and
@@ -52,10 +52,11 @@
     dct:description "An OWL 2 ontology formalizing the domain of Sensory Stimulation: the parameter-specified delivery of structured sensory input toward defined physiological, psychological, or cognitive outcomes through identified or proposed neurobiological pathways."@en ;
     dct:creator <https://orcid.org/0000-0001-8602-7064> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:modified "2026-04-25"^^xsd:date ;
+    dct:modified "2026-06-12"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/bsc-lab/bsc-lab> ;
-    skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en .
+    skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,
+        "Unreleased (pending 0.2.0): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; added external upper-ontology label stubs. Freeze with `make snapshot VERSION=0.2.0` and bump owl:versionInfo/versionIRI to release."@en .
 
 
 ###########################################################################
@@ -251,6 +252,30 @@ sstim:StimulusTemporalStructure a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Stimulus Temporal Structure"@en ;
     skos:definition "The temporal organization of a sensory stimulus. Values: periodic, quasi-periodic, aperiodic, adaptive (closed-loop)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:CautionTag a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Caution Tag"@en,
+               "Etichetta di Cautela"@it,
+               "Etiqueta de Cautela"@pt,
+               "Etiqueta de Precaución"@es ;
+    skos:definition "A safety or usage advisory flag attached to a preset, signalling conditions under which the preset may be unsuitable (e.g. photosensitivity risk, drowsiness, high sensory intensity). Advisory wellness metadata, not a medical contraindication."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:VoiceType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice Type"@en ;
+    skos:definition "A named category of BSC audio voice (Binaural, Martigli, Martigli-Binaural, Symmetry) identifying the synthesis technique a voice realizes. Classification anchor for the SKOS voice-type vocabulary; distinct from the sstim:Voice parameter-bundle classes in Part 6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:PermutationFunction a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Permutation Function"@en ;
+    skos:definition "A named reordering rule applied to a Symmetry voice note sequence at each cycle boundary (identity, rotate forward, rotate backward, reversal, shuffle)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -463,6 +488,14 @@ sstim:hasIntendedEffect a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:IntendedEffect ;
     rdfs:label  "has intended effect"@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasCautionTag a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:CautionTag ;
+    rdfs:label  "has caution tag"@en ;
+    skos:definition "Links a preset to a safety or usage advisory flag. A preset may carry zero or more caution tags."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
