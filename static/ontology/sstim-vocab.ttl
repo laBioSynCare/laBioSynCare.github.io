@@ -44,7 +44,8 @@ sstim-v:FrequencyBandScheme a skos:ConceptScheme ;
 sstim-v:allFrequencyBands a owl:NamedIndividual, sstim:FrequencyBandGroup, skos:Concept ;
     skos:inScheme sstim-v:FrequencyBandScheme ;
     skos:topConceptOf sstim-v:FrequencyBandScheme ;
-    skos:prefLabel "All Frequency Bands"@en ;
+    skos:prefLabel "All Frequency Bands"@en, "Tutte le Bande di Frequenza"@it,
+                   "Todas as Bandas de Frequência"@pt, "Todas las Bandas de Frecuencia"@es ;
     skos:narrower sstim-v:delta, sstim-v:theta, sstim-v:alpha,
                   sstim-v:smr, sstim-v:beta, sstim-v:gamma .
 
@@ -314,37 +315,37 @@ sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
 
 sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "Auditory"@en ;
+    skos:prefLabel "Auditory"@en, "Uditivo"@it, "Auditivo"@pt, "Auditivo"@es ;
     skos:notation "AUD" ;
     skos:definition "Evidence from auditory-only stimulation. Applies directly to BSC presets."@en .
 
 sstim-v:modalityAV a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "Audiovisual"@en ;
+    skos:prefLabel "Audiovisual"@en, "Audiovisivo"@it, "Audiovisual"@pt, "Audiovisual"@es ;
     skos:notation "AV" ;
     skos:definition "Evidence from combined audiovisual stimulation. Applies to BSC with one tier discount for auditory-only claims."@en .
 
 sstim-v:modalityBREATH a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "Breathing"@en ;
+    skos:prefLabel "Breathing"@en, "Respirazione"@it, "Respiração"@pt, "Respiración"@es ;
     skos:notation "BREATH" ;
     skos:definition "Evidence from paced breathing / HRV biofeedback. Applies directly to Martigli breathing guidance component."@en .
 
 sstim-v:modalityGENERAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "General / Mixed"@en ;
+    skos:prefLabel "General / Mixed"@en, "Generale / Misto"@it, "Geral / Misto"@pt, "General / Mixto"@es ;
     skos:notation "GENERAL" ;
     skos:definition "Evidence from mixed or unspecified modalities. Must state indirectness in techDesc."@en .
 
 sstim-v:modalityPRECLINICAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "Preclinical"@en ;
+    skos:prefLabel "Preclinical"@en, "Preclinico"@it, "Pré-clínico"@pt, "Preclínico"@es ;
     skos:notation "PRECLINICAL" ;
     skos:definition "Evidence from animal or in-vitro studies. Maximum tier contribution: Tier 3 for human wellness claims."@en .
 
 sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
-    skos:prefLabel "Review"@en ;
+    skos:prefLabel "Review"@en, "Revisione"@it, "Revisão"@pt, "Revisión"@es ;
     skos:notation "REVIEW" ;
     skos:definition "Systematic review or meta-analysis. Tag used alongside AUD/AV/BREATH/GENERAL to note the evidence synthesis level."@en .
 
@@ -358,25 +359,25 @@ sstim-v:VoiceTypeScheme a skos:ConceptScheme ;
 
 sstim-v:voiceBinaural a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
-    skos:prefLabel "Binaural"@en ;
+    skos:prefLabel "Binaural"@en, "Binaurale"@it, "Binaural"@pt, "Binaural"@es ;
     skos:notation "Binaural" ;
     skos:definition "Two dichotic sine tones producing a binaural beat at |fr - fl| Hz."@en .
 
 sstim-v:voiceMartigli a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
-    skos:prefLabel "Martigli"@en ;
+    skos:prefLabel "Martigli"@en, "Martigli"@it, "Martigli"@pt, "Martigli"@es ;
     skos:notation "Martigli" ;
     skos:definition "Single tone with sinusoidal frequency oscillation following a decelerating breathing arc."@en .
 
 sstim-v:voiceMartigliBinaural a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
-    skos:prefLabel "Martigli-Binaural"@en ;
+    skos:prefLabel "Martigli-Binaural"@en, "Martigli-Binaurale"@it, "Martigli-Binaural"@pt, "Martigli-Binaural"@es ;
     skos:notation "Martigli-Binaural" ;
     skos:definition "Binaural beat combined with Martigli oscillation. Constant beat frequency despite sweeping carriers."@en .
 
 sstim-v:voiceSymmetry a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
-    skos:prefLabel "Symmetry"@en ;
+    skos:prefLabel "Symmetry"@en, "Simmetria"@it, "Simetria"@pt, "Simetría"@es ;
     skos:notation "Symmetry" ;
     skos:definition "Log-distributed pitch sequence with algebraic group permutation at each cycle. Includes isochronic special case (noctaves=0)."@en .
 
@@ -438,37 +439,55 @@ sstim-v:StimulationMechanismScheme a skos:ConceptScheme ;
 
 sstim-v:mechFFR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Frequency-Following Response"@en ;
+    skos:prefLabel "Frequency-Following Response"@en,
+                   "Risposta di Inseguimento della Frequenza"@it,
+                   "Resposta de Seguimento de Frequência"@pt,
+                   "Respuesta de Seguimiento de Frecuencia"@es ;
     skos:notation "FFR" ;
     skos:definition "Subcortical brainstem and inferior colliculus response that tracks the envelope of a periodic acoustic stimulus. Best-supported mechanistic claim for binaural beats and isochronic tones."@en .
 
 sstim-v:mechThalamocortical a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Thalamocortical Entrainment"@en ;
+    skos:prefLabel "Thalamocortical Entrainment"@en,
+                   "Trascinamento Talamocorticale"@it,
+                   "Arrastamento Talamocortical"@pt,
+                   "Arrastre Talamocortical"@es ;
     skos:notation "THALCORT" ;
     skos:definition "Proposed propagation of frequency-following response from subcortical centers to cortical oscillatory networks via thalamocortical loops. More contested than subcortical FFR."@en .
 
 sstim-v:mechAutonomic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Autonomic Respiratory Entrainment"@en ;
+    skos:prefLabel "Autonomic Respiratory Entrainment"@en,
+                   "Trascinamento Respiratorio Autonomo"@it,
+                   "Arrastamento Respiratório Autonômico"@pt,
+                   "Arrastre Respiratorio Autonómico"@es ;
     skos:notation "AUTONOMIC" ;
     skos:definition "Paced breathing at resonance frequency modulates respiratory sinus arrhythmia (RSA) and HRV via baroreflex. Primary mechanism for Martigli breathing oscillation. Evidence base: Lehrer & Gevirtz (2014), Zaccaro et al. (2018)."@en .
 
 sstim-v:mechStochastic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Stochastic Resonance"@en ;
+    skos:prefLabel "Stochastic Resonance"@en,
+                   "Risonanza Stocastica"@it,
+                   "Ressonância Estocástica"@pt,
+                   "Resonancia Estocástica"@es ;
     skos:notation "SR" ;
     skos:definition "Calibrated noise improves subthreshold signal detection via threshold dynamics. Not entrainment; no periodic forcing required."@en .
 
 sstim-v:mechAttentional a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Attentional Anchoring"@en ;
+    skos:prefLabel "Attentional Anchoring"@en,
+                   "Ancoraggio Attentivo"@it,
+                   "Ancoragem Atencional"@pt,
+                   "Anclaje Atencional"@es ;
     skos:notation "ATTN" ;
     skos:definition "Structured but undemanding sensory content occupies default mode network processing, reducing mind-wandering without requiring executive attention. Proposed mechanism for ambient Symmetry voices."@en .
 
 sstim-v:mechGamma40 a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Gamma-40 Neuroimmune Modulation"@en ;
+    skos:prefLabel "Gamma-40 Neuroimmune Modulation"@en,
+                   "Modulazione Neuroimmune Gamma-40"@it,
+                   "Modulação Neuroimune Gama-40"@pt,
+                   "Modulación Neuroinmune Gamma-40"@es ;
     skos:notation "GAMMA40NI" ;
     skos:definition "Proposed mechanism from GENUS/Iaccarino literature: 40 Hz multisensory entrainment triggers microglial activation and amyloid clearance. Preclinical evidence in mice; early human studies ongoing. Contested and modality-specific (primarily visual in original studies)."@en .
 
@@ -488,25 +507,27 @@ sstim-v:permShuffle a owl:NamedIndividual, sstim:PermutationFunction, skos:Conce
 
 sstim-v:permRotateForward a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
-    skos:prefLabel "Rotate Forward"@en ;
+    skos:prefLabel "Rotate Forward"@en, "Rotazione in Avanti"@it,
+                   "Rotação para Frente"@pt, "Rotación hacia Adelante"@es ;
     skos:notation "1" ;
     skos:definition "Cyclic left shift at each cycle boundary. Systematic upward pitch drift over N cycles."@en .
 
 sstim-v:permRotateBackward a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
-    skos:prefLabel "Rotate Backward"@en ;
+    skos:prefLabel "Rotate Backward"@en, "Rotazione all'Indietro"@it,
+                   "Rotação para Trás"@pt, "Rotación hacia Atrás"@es ;
     skos:notation "2" ;
     skos:definition "Cyclic right shift. Systematic downward pitch drift over N cycles."@en .
 
 sstim-v:permReverse a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
-    skos:prefLabel "Reverse"@en ;
+    skos:prefLabel "Reverse"@en, "Inversione"@it, "Inversão"@pt, "Inversión"@es ;
     skos:notation "3" ;
     skos:definition "Alternating reversal — ascending and descending passes alternate with period 2 cycles."@en .
 
 sstim-v:permIdentity a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
-    skos:prefLabel "Identity"@en ;
+    skos:prefLabel "Identity"@en, "Identità"@it, "Identidade"@pt, "Identidad"@es ;
     skos:notation "4" ;
     skos:definition "No permutation. Pure repetition. Lowest cognitive engagement; habituation risk for long sessions."@en .
 
@@ -520,67 +541,77 @@ sstim-v:CautionTagScheme a skos:ConceptScheme ;
 
 sstim-v:cautionEpilepsyRisk a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Epilepsy Risk"@en ;
+    skos:prefLabel "Epilepsy Risk"@en, "Rischio di Epilessia"@it,
+                   "Risco de Epilepsia"@pt, "Riesgo de Epilepsia"@es ;
     skos:notation "epilepsy-risk" ;
     skos:definition "Preset uses strobing visual stimulation; not safe for users with photosensitive epilepsy."@en .
 
 sstim-v:cautionStimulating a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Stimulating"@en ;
+    skos:prefLabel "Stimulating"@en, "Stimolante"@it, "Estimulante"@pt, "Estimulante"@es ;
     skos:notation "stimulating" ;
     skos:definition "Activating preset; may not be suitable near sleep time."@en .
 
 sstim-v:cautionDrowsyUse a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Drowsy Use"@en ;
+    skos:prefLabel "Drowsy Use"@en, "Uso in Sonnolenza"@it,
+                   "Uso com Sonolência"@pt, "Uso con Somnolencia"@es ;
     skos:notation "drowsy-use" ;
     skos:definition "Produces drowsiness; unsafe while driving or operating machinery."@en .
 
 sstim-v:cautionDrivingUnsafe a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Driving Unsafe"@en ;
+    skos:prefLabel "Driving Unsafe"@en, "Non Sicuro alla Guida"@it,
+                   "Inseguro ao Dirigir"@pt, "Inseguro al Conducir"@es ;
     skos:notation "driving-unsafe" ;
     skos:definition "Do not use while operating vehicles."@en .
 
 sstim-v:cautionNighttimeOnly a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Nighttime Only"@en ;
+    skos:prefLabel "Nighttime Only"@en, "Solo Notturno"@it,
+                   "Apenas à Noite"@pt, "Solo Nocturno"@es ;
     skos:notation "nighttime-only" ;
     skos:definition "Should only be used before sleep."@en .
 
 sstim-v:cautionFatigueSensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Fatigue Sensitive"@en ;
+    skos:prefLabel "Fatigue Sensitive"@en, "Sensibile alla Fatica"@it,
+                   "Sensível à Fadiga"@pt, "Sensible a la Fatiga"@es ;
     skos:notation "fatigue-sensitive" ;
     skos:definition "May increase fatigue in susceptible users."@en .
 
 sstim-v:cautionEmotionallySensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Emotionally Sensitive"@en ;
+    skos:prefLabel "Emotionally Sensitive"@en, "Sensibile Emotivamente"@it,
+                   "Sensível Emocionalmente"@pt, "Sensible Emocionalmente"@es ;
     skos:notation "emotionally-sensitive" ;
     skos:definition "May surface strong emotional responses."@en .
 
 sstim-v:cautionHighIntensity a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "High Intensity"@en ;
+    skos:prefLabel "High Intensity"@en, "Alta Intensità"@it,
+                   "Alta Intensidade"@pt, "Alta Intensidad"@es ;
     skos:notation "high-intensity" ;
     skos:definition "Strong or overwhelming sensory impact; may not be suitable for first-time users."@en .
 
 sstim-v:cautionAdvancedUser a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Advanced User"@en ;
+    skos:prefLabel "Advanced User"@en, "Utente Avanzato"@it,
+                   "Usuário Avançado"@pt, "Usuario Avanzado"@es ;
     skos:notation "advanced-use" ;
     skos:definition "Not recommended as a first BSC experience."@en .
 
 sstim-v:cautionOverloadSensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Overload Sensitive"@en ;
+    skos:prefLabel "Overload Sensitive"@en, "Sensibile al Sovraccarico"@it,
+                   "Sensível à Sobrecarga"@pt, "Sensible a la Sobrecarga"@es ;
     skos:notation "overload-sensitive" ;
     skos:definition "May be too intense for sensory-sensitive users."@en .
 
 sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
-    skos:prefLabel "Ultra-Slow Breathing"@en ;
+    skos:prefLabel "Ultra-Slow Breathing"@en, "Respirazione Ultra-Lenta"@it,
+                   "Respiração Ultra-Lenta"@pt, "Respiración Ultra-Lenta"@es ;
     skos:notation "ultra-slow-breathing" ;
     skos:definition "Very slow breathing parameters (< 3 bpm). Consult physician if respiratory conditions are present."@en .
 
