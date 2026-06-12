@@ -3,7 +3,7 @@
 #  SSTIM Vocabulary  —  sstim-vocab.ttl
 #
 #  Namespace:  https://w3id.org/sstim/vocab#
-#  Version:    0.1.0
+#  Version:    0.2.0
 #  Date:       2026-04-12
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
