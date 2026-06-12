@@ -24,7 +24,7 @@ jobs:
 
       # Nix pins the toolchain; this caches the npm package downloads only.
       - name: Cache npm downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
