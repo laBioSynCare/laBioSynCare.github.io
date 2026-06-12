@@ -382,23 +382,28 @@ sstim-v:alpha a skos:Concept ;
 Always use `src/rdf/query.js` for SPARQL execution. Standard patterns:
 
 ```javascript
-// Get all presets with evidence tier and target bands
+// Get all presets with their target bands and any evidence tier.
+// Evidence tiers live on sstim:EvidenceClaim (linked via supportsRelation),
+// not directly on the preset; preset rdfs:labels carry no language tag.
 const PRESET_QUERY = `
 PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?preset ?label ?evidenceTier ?band ?bandLabel WHERE {
+SELECT ?preset ?label ?tier ?band ?bandLabel WHERE {
   ?preset a sstim:Preset ;
           rdfs:label ?label ;
-          sstim:evidenceTier ?evidenceTier ;
           sstim:targetsFrequencyBand ?band .
   ?band skos:prefLabel ?bandLabel .
-  FILTER(LANG(?label) = "en")
+  OPTIONAL {
+    ?claim a sstim:EvidenceClaim ;
+           sstim:supportsRelation ?preset ;
+           sstim:hasEvidenceTier ?tier .
+  }
   FILTER(LANG(?bandLabel) = "en")
 }
-ORDER BY ?evidenceTier`;
+ORDER BY ?tier`;
 
 // SKOS hierarchy traversal — all sub-bands of alpha
 const SUBBANDS_QUERY = `

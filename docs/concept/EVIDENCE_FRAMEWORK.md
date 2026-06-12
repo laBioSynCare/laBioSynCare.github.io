@@ -396,15 +396,15 @@ evidence, author statement, curator inference, and so on.
 The BSC tier system is orthogonal to ECO.
 
 In the BSC ontology:
-- `sstim:EvidenceTier` captures strength (the six tiers above)
+- `sstim:EvidenceTierValue` captures strength (the six tiers above)
 - `eco:ECO_0000000` (ECO terms) capture type
 - A single `sstim:EvidenceClaim` instance carries both
 
 For example, a claim supported by two RCTs would carry
-`sstim:evidenceTier sstim-v:moderate` AND
+`sstim:hasEvidenceTier sstim-v:tierModerate` AND
 `eco:ECO_0001384` (randomized controlled trial evidence
 used in manual assertion). A claim supported only by mechanism-
-based reasoning would carry `sstim:evidenceTier sstim-v:speculative`
+based reasoning would carry `sstim:hasEvidenceTier sstim-v:tierSpeculative`
 AND `eco:ECO_0000007` (author inference).
 
 ---
@@ -617,10 +617,10 @@ sstim-v:evidenceReview a skos:Concept, sstim:EvidenceModalityTag ;
 
 # ── Key property ─────────────────────────────────────────────────────────
 
-sstim:evidenceTier a owl:ObjectProperty ;
+sstim:hasEvidenceTier a owl:ObjectProperty ;
     rdfs:domain sstim:EvidenceClaim ;
     rdfs:range  sstim:EvidenceTierValue ;
-    rdfs:label  "evidence tier"@en ;
+    rdfs:label  "has evidence tier"@en ;
     skos:definition
         """Links an evidence claim to its strength classification.
         Assignment must account for both study quality (OCEBM-style)

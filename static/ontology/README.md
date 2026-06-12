@@ -56,8 +56,8 @@ static/ontology/
 
 Contains OWL class declarations, object properties, datatype
 properties, domain/range axioms, and top-level individuals that
-serve as controlled vocabulary anchors. Imports BFO and declares
-`rdfs:subClassOf` alignments to OBI, IAO, and PATO.
+serve as controlled vocabulary anchors. Aligns to BFO 2020 and declares
+`rdfs:subClassOf` alignments to OBI, IAO, and PROV-O.
 
 ### `sstim-vocab.ttl` — SKOS multilingual vocabulary
 
@@ -217,22 +217,21 @@ Pattern 2 provides:
 ```turtle
 # sstim-core.ttl — OWL class declaration
 sstim:FrequencyBand a owl:Class ;
-    rdfs:subClassOf bfo:0000019 ;      # BFO: quality
+    rdfs:subClassOf iao:0000030 ;      # IAO: information content entity
     rdfs:label "Frequency Band"@en .
 
 # sstim-vocab.ttl — SKOS concept, dual-typed as OWL individual
-sstim-v:alpha a skos:Concept, sstim:FrequencyBand ;
+sstim-v:alpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:inScheme sstim-v:FrequencyBandScheme ;
     skos:prefLabel "Alpha"@en, "Alfa"@it, "Alfa"@pt, "Alfa"@es ;
-    skos:definition
-        "Neural oscillation band spanning 8–13 Hz. BSC use: relaxation,
-         stress reduction, calm alertness, acute pain support."@en ;
-    skos:narrower sstim-v:low-alpha,
-                  sstim-v:high-alpha,
-                  sstim-v:alpha-10 ;
-    sstim:minHz 8.0 ;
-    sstim:maxHz 13.0 ;
-    sstim:platformDeliverable true .
+    skos:notation "alpha" ;
+    skos:broader sstim-v:allFrequencyBands ;
+    skos:scopeNote "8–13 Hz. Relaxation, stress reduction, calm alertness."@en ;
+    skos:narrower sstim-v:lowAlpha,
+                  sstim-v:highAlpha,
+                  sstim-v:alpha10 ;
+    sstim:hzMin "8"^^xsd:decimal ;
+    sstim:hzMax "13"^^xsd:decimal .
 ```
 
 **The class `sstim:FrequencyBand` is NOT punned.** There is no statement
@@ -335,23 +334,26 @@ and ontology IRIs (e.g., `sstim-v:alpha`) is maintained in
 Hierarchy (top-level concepts with narrower shown as indented):
 
 ```
-sstim-v:delta (0.5–4 Hz)
-  sstim-v:low-delta  (0.5–2 Hz)
-  sstim-v:high-delta (2–4 Hz)
+sstim-v:delta (0.5–4 Hz)            [notation "delta"]
+  sstim-v:lowDelta  (0.5–2 Hz)
+  sstim-v:highDelta (2–4 Hz)
 sstim-v:theta (4–8 Hz)
-  sstim-v:low-theta  (4–6 Hz)
-  sstim-v:high-theta (6–8 Hz)
+  sstim-v:lowTheta  (4–6 Hz)
+  sstim-v:highTheta (6–8 Hz)
 sstim-v:alpha (8–13 Hz)
-  sstim-v:low-alpha  (8–10 Hz)
-  sstim-v:high-alpha (10–13 Hz)
-  sstim-v:alpha-10   (10 Hz)    ← single-frequency target
+  sstim-v:lowAlpha  (8–10 Hz)
+  sstim-v:highAlpha (10–13 Hz)
+  sstim-v:alpha10   (10 Hz)    ← single-frequency target
 sstim-v:smr (12–15 Hz)
 sstim-v:beta (15–30 Hz)
-  sstim-v:low-beta   (15–20 Hz)
-  sstim-v:mid-beta   (20–25 Hz)
-  sstim-v:high-beta  (25–30 Hz)
+  sstim-v:lowBeta   (15–20 Hz)
+  sstim-v:midBeta   (20–25 Hz)
+  sstim-v:highBeta  (25–30 Hz)
 sstim-v:gamma (30–42 Hz)
-  sstim-v:gamma-40   (40 Hz)    ← single-frequency target
+  sstim-v:gamma40   (40 Hz)    ← single-frequency target
+
+(IRI local names are camelCase; the skos:notation strings are hyphenated,
+ e.g. sstim-v:lowAlpha has skos:notation "low-alpha".)
 ```
 
 Note: `smr` (12–15 Hz) is a BSC operational category and overlaps
@@ -368,10 +370,15 @@ representation of the BSC operational taxonomy, not an error.
 - `sstim-v:SensoryModalityScheme` — auditory, visual, somatosensory,
   interoceptive, vestibular, olfactory
 - `sstim-v:StimulationMechanismScheme` — the six proposed mechanisms
+- `sstim-v:VoiceTypeScheme` — Binaural, Martigli, Martigli-Binaural, Symmetry
 - `sstim-v:PermutationFunctionScheme` — identity, rotateForward,
   rotateBackward, reversal, shuffle
 - `sstim-v:EvidenceModalityScheme` — AUD, AV, BREATH, GENERAL,
   PRECLINICAL, REVIEW tags
+- `sstim-v:CautionTagScheme` — safety/usage advisory flags
+  (epilepsy-risk, drowsy-use, high-intensity, …)
+- `sstim-v:StimulusTemporalStructureScheme` — periodic, quasi-periodic,
+  aperiodic, adaptive
 
 ---
 
@@ -382,28 +389,29 @@ representation of the BSC operational taxonomy, not an error.
 | Property | Domain | Range | Description |
 |---|---|---|---|
 | `sstim:targetsFrequencyBand` | Preset | FrequencyBand | Links a preset to its target frequency band(s) |
-| `sstim:evidenceTier` | EvidenceClaim | EvidenceTierValue | Evidence strength grade |
-| `sstim:hasModalityTag` | EvidenceClaim | EvidenceModalityTag | Type of supporting evidence |
+| `sstim:composedOf` | Preset | Voice | Links a preset to its voice components |
 | `sstim:inGroup` | Preset | PresetGroup | Preset's group classification |
 | `sstim:hasCautionTag` | Preset | CautionTag | Safety and usage flags |
-| `sstim:hasVoice` | Preset | Voice | Links preset to its voice components |
-| `sstim:usesStimulationMechanism` | SensoryStimulationTechnique | StimulationMechanism | Proposed mechanism |
-| `sstim:supportsEffect` | StimulationMechanism | IntendedEffect | Effect a mechanism may produce |
-| `sstim:executedPreset` | SessionInstance | Preset | Which preset was run |
+| `sstim:hasIntendedEffect` | Preset | IntendedEffect | Target state change the preset is designed to facilitate |
+| `sstim:proposedMechanism` | SensoryStimulationTechnique | StimulationMechanism | Proposed neurobiological mechanism |
+| `sstim:hasEvidenceTier` | EvidenceClaim | EvidenceTierValue | Evidence strength grade |
+| `sstim:hasModalityTag` | EvidenceClaim | EvidenceModalityTag | Type of supporting evidence |
+| `sstim:supportsRelation` | EvidenceClaim | (Preset/Technique) | What the claim supports |
+| `sstim:citesReference` | EvidenceClaim | PublicSafeReference | Cleared citation backing the claim |
 | `sstim:usesSpecification` | SessionInstance | SessionSpecification | The full execution spec |
-| `sstim:referencesPreset` | SessionSpecification | Preset | Preset referenced by spec |
+| `sstim:referencesPreset` | SessionSpecification | Preset | Preset referenced by spec (the preset that was run) |
 
-### Datatype properties (sstim-core.ttl)
+### Datatype properties (sstim-core.ttl, voice/session parameters in sstim-patch-studio.ttl)
 
 | Property | Domain | Range | Description |
 |---|---|---|---|
-| `sstim:minHz` | FrequencyBand | xsd:decimal | Lower bound of band (Hz) |
-| `sstim:maxHz` | FrequencyBand | xsd:decimal | Upper bound of band (Hz) |
+| `sstim:hzMin` | FrequencyBand | xsd:decimal | Lower bound of band (Hz) |
+| `sstim:hzMax` | FrequencyBand | xsd:decimal | Upper bound of band (Hz) |
 | `sstim:platformDeliverable` | SensoryModality | xsd:boolean | Deliverable via standard digital platforms |
 | `sstim:tierRank` | EvidenceTierValue | xsd:integer | Ordinal rank (1=speculative, 6=established) |
-| `sstim:targetHz` | Voice | xsd:decimal | The Hz value being driven (if isochronic) |
+| `sstim:baseFrequency` | Voice | xsd:decimal | Base/carrier/center frequency being driven |
 | `sstim:beatHz` | Voice | xsd:decimal | Binaural beat frequency |
-| `sstim:durationSeconds` | SessionSpecification | xsd:decimal | Intended session length |
+| `sstim:durationSeconds` | SessionSpecification | xsd:integer | Intended session length |
 
 ---
 
@@ -417,12 +425,12 @@ representation of the BSC operational taxonomy, not an error.
   link pointing to a concept in `sstim-v:FrequencyBandScheme`
 - Every `sstim:Voice` individual has exactly one `rdf:type` from the
   permitted voice type class hierarchy
-- Every `sstim:EvidenceClaim` individual has exactly one `sstim:evidenceTier`
+- Every `sstim:EvidenceClaim` individual has exactly one `sstim:hasEvidenceTier`
   link pointing to a concept in `sstim-v:EvidenceTierScheme`
 - `sstim:tierRank` values are integers in the range 1–6
 - Multilingual labels: every concept in the frequency band scheme
   has exactly one `skos:prefLabel` in each of en, it, pt, es
-- `sstim:minHz` ≤ `sstim:maxHz` for frequency band individuals
+- `sstim:hzMin` ≤ `sstim:hzMax` for frequency band individuals
 
 **Running validation locally:**
 
@@ -603,23 +611,23 @@ Full content negotiation includes sub-paths:
 1. Add the concept to `sstim-vocab.ttl` following the dual-typing pattern:
 
 ```turtle
-sstim-v:mid-alpha a skos:Concept, sstim:FrequencyBand ;
+sstim-v:midAlpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:inScheme sstim-v:FrequencyBandScheme ;
     skos:prefLabel "Mid-Alpha"@en, "Alfa Medio"@it,
                    "Alfa Médio"@pt, "Alfa Medio"@es ;
+    skos:notation "mid-alpha" ;
     skos:broader sstim-v:alpha ;
     skos:definition
         "Alpha sub-band 9–11 Hz, sometimes used for targeted
          alpha-10 designs with slightly broader tolerances."@en ;
-    sstim:minHz 9.0 ;
-    sstim:maxHz 11.0 ;
-    sstim:platformDeliverable true .
+    sstim:hzMin "9"^^xsd:decimal ;
+    sstim:hzMax "11"^^xsd:decimal .
 ```
 
 2. Add the inverse `skos:narrower` link to `sstim-v:alpha`:
 
 ```turtle
-sstim-v:alpha skos:narrower sstim-v:mid-alpha .
+sstim-v:alpha skos:narrower sstim-v:midAlpha .
 ```
 
 3. Add the new value to `src/rdf/namespaces.js` in the
@@ -627,7 +635,7 @@ sstim-v:alpha skos:narrower sstim-v:mid-alpha .
 
 4. Run SHACL validation. Commit only if it passes.
 
-5. Update `docs/concept/SENSORY_HARNESSING.md` and the BSC
+5. Update `docs/concept/SENSORY_STIMULATION.md` and the BSC
    Reference Agent document to reference the new band.
 
 **To add a new OWL class:**
@@ -665,14 +673,16 @@ SELECT DISTINCT ?preset ?label WHERE {
   ?band skos:broader* sstim-v:alpha .
   ?preset sstim:targetsFrequencyBand ?band ;
           rdfs:label ?label .
-  FILTER(LANG(?label) = "en")
 }
 
-# All presets with evidence tier 'moderate' or better
+# All presets with an evidence claim at tier 'moderate' or better.
+# Evidence tiers live on sstim:EvidenceClaim, not directly on the preset.
 PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
 
 SELECT ?preset ?tier WHERE {
-  ?preset sstim:evidenceTier ?tier .
+  ?claim a sstim:EvidenceClaim ;
+         sstim:supportsRelation ?preset ;
+         sstim:hasEvidenceTier ?tier .
   ?tier sstim:tierRank ?rank .
   FILTER(?rank >= 4)
 }
@@ -680,7 +690,7 @@ ORDER BY DESC(?rank)
 
 # Presets with breathing guide in the Heal group
 SELECT ?preset WHERE {
-  ?preset sstim:inGroup sstim-v:Heal ;
+  ?preset sstim:inGroup sstim-v:groupHeal ;
           sstim:hasBreathGuide true .
 }
 ```

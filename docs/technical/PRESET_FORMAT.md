@@ -822,7 +822,7 @@ reference presets are:
 - Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/bsclab`
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
-- `header.evidenceTier` → `sstim:evidenceTier` → tier individual
+- `header.evidenceTier` → a `sstim:EvidenceClaim` carrying `sstim:hasEvidenceTier` → tier individual
 - `header.cautionTags` → `sstim:hasCautionTag` → caution tag individuals
 - Voice array → `sstim:composedOf` → voice component individuals
 
