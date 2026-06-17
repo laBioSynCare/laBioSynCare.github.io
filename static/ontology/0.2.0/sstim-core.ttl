@@ -51,14 +51,14 @@
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
               "Ontología de Estimulación Sensorial (SSTIM)"@es ;
     dct:description "An OWL 2 ontology formalizing the domain of Sensory Stimulation: the parameter-specified delivery of structured sensory input toward defined physiological, psychological, or cognitive outcomes through identified or proposed neurobiological pathways."@en ;
-    dct:creator "Renato Fabbri" ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:modified "2026-06-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ;
     skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,
         "v0.2.0 (2026-06): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; completed it/pt/es prefLabel coverage across the vocabulary; added external upper-ontology label stubs. Backward-compatible minor release (no terms removed or renamed)."@en,
-        "v0.2.0 patched (2026-06-13): corrected external alignment IRIs that were wrong since 0.1.0 — every Wikidata QID (all resolved to unrelated entities such as a Van Halen album and a stock exchange), the EvidenceClaim parent (iao:0000001 'conditional specification' → iao:0000030 'information content entity'), the obsolete OBI planned-process parent (added cob:0000082), a non-existent ORCID (replaced with a name literal), and a dead repository link. No vocabulary terms changed."@en .
+        "v0.2.0 patched (2026-06-13): corrected external alignment IRIs that were wrong since 0.1.0 — every Wikidata QID (all resolved to unrelated entities such as a Van Halen album and a stock exchange), the EvidenceClaim parent (iao:0000001 'conditional specification' → iao:0000030 'information content entity'), the obsolete OBI planned-process parent (added cob:0000082), a non-existent ORCID (replaced with the verified ORCID 0000-0002-9699-629X), and a dead repository link. No vocabulary terms changed."@en .
 
 
 ###########################################################################
