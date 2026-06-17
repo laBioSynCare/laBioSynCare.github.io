@@ -3,8 +3,8 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.2.0
-#  Date:       2026-04-12
+#  Version:    0.3.0
+#  Date:       2026-06-17
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
