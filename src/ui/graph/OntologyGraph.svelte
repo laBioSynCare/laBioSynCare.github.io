@@ -64,8 +64,8 @@
     owlClass: 'OWL class',
     skosConcept: 'SKOS concept',
     xsdType: 'XSD datatype',
-    objectProperty: 'Object property',
-    dataProperty: 'Datatype property',
+    objProp: 'Object property',
+    dataProp: 'Datatype property',
   }
 
   const EDGE_KIND_LABELS = {
@@ -87,8 +87,6 @@
     narrower:    '#81c784',
     related:     '#f48fb1',
     instanceOf:  '#aaaaaa',
-    objectProperty: '#ce93d8',
-    dataProperty: '#ffcc80',
   }
 
   const SCHEME_COLORS = {
@@ -119,8 +117,6 @@
   function nodeColor(data) {
     if (data.kind === 'owlClass')    return COLORS.owlClass
     if (data.kind === 'xsdType')     return COLORS.xsdType
-    if (data.kind === 'objectProperty') return COLORS.objectProperty
-    if (data.kind === 'dataProperty') return COLORS.dataProperty
     if (data.kind === 'skosConcept') return SCHEME_COLORS[data.scheme] ?? COLORS.skosConcept
     return '#888'
   }
@@ -156,20 +152,16 @@
         style: { shape: 'diamond', 'font-size': 10, 'font-style': 'italic' }
       },
       {
-        selector: 'node[kind="objectProperty"]',
-        style: { shape: 'round-rectangle', 'font-size': 10, 'font-style': 'italic' }
-      },
-      {
-        selector: 'node[kind="dataProperty"]',
-        style: { shape: 'round-rectangle', 'font-size': 10, 'font-style': 'italic' }
-      },
-      {
         selector: 'node[kind="skosConcept"]',
         style: { shape: 'ellipse' }
       },
       {
         selector: 'node:selected',
         style: { 'border-width': 3, 'border-color': '#fff', 'z-index': 999 }
+      },
+      {
+        selector: 'edge:selected',
+        style: { 'width': 4, 'opacity': 1, 'z-index': 999 }
       },
       {
         selector: 'edge',
@@ -215,7 +207,7 @@
   function graphScopeNodeVisible(data) {
     if (!data) return false
     if (graphScope === 'all') return true
-    if (graphScope === 'core') return ['owlClass', 'xsdType', 'objectProperty', 'dataProperty'].includes(data.kind)
+    if (graphScope === 'core') return ['owlClass', 'xsdType'].includes(data.kind)
     if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
     if (graphScope === 'frequency') {
       return data.scheme === 'https://w3id.org/sstim/vocab#FrequencyBandScheme' ||
@@ -234,7 +226,7 @@
     }
     if (graphScope === 'voice') {
       return data.scheme === 'https://w3id.org/sstim/vocab#VoiceTypeScheme' ||
-        ['Voice', 'BinauralVoice', 'MartigliVoice', 'MartigliBinauralVoice', 'SymmetryVoice']
+        ['Preset', 'Voice', 'BinauralVoice', 'MartigliVoice', 'MartigliBinauralVoice', 'SymmetryVoice']
           .includes(localName(data.iri))
     }
     return true
@@ -260,7 +252,7 @@
         .map((element) => element.data.id)
     )
 
-    if (neighborhoodFocus && selected?.id && visibleNodeIds.has(selected.id)) {
+    if (neighborhoodFocus && selected?.id && !selected.source && visibleNodeIds.has(selected.id)) {
       const focused = new Set([selected.id])
       for (const element of allElements) {
         const data = element.data
@@ -525,6 +517,23 @@
     }, { duration: transitionMs, easing: TRANSITION_EASING })
   }
 
+  function selectElementById(id) {
+    if (!cy || !id) return
+    const element = cy.getElementById(id)
+    if (!element.length) return
+    cy.elements().unselect()
+    element.select()
+    selected = element.data()
+    cy.stop(true)
+    if (transitionMs <= 0) {
+      cy.center(element)
+      return
+    }
+    cy.animate({
+      center: { eles: element },
+    }, { duration: transitionMs, easing: TRANSITION_EASING })
+  }
+
   function computeNeighbors(id) {
     if (!id) return []
     const nodeById = new Map()
@@ -577,14 +586,13 @@
       const base = PREFIXES[prefix]
       if (base) {
         const iri = base + local
-        const exact = allElements.find((el) => !el.data?.source && el.data?.iri === iri)
+        const exact = allElements.find((el) => el.data?.iri === iri)
         if (exact) return exact.data.id
       }
     }
 
     const localName = value.includes(':') ? value.slice(value.indexOf(':') + 1) : value
     const candidates = allElements.filter((el) => {
-      if (el.data?.source) return false
       const iri = el.data?.iri
       return iri && iri.split(/[#/]/).pop() === localName
     })
@@ -628,7 +636,7 @@
       return
     }
     const id = resolveHashToNodeId(hash)
-    if (id && id !== selected?.id) selectNodeById(id)
+    if (id && id !== selected?.id) selectElementById(id)
   }
 
   async function copyIri() {
@@ -661,7 +669,7 @@
 
   function focusNode() {
     if (!cy) return
-    let id = selected?.id
+    let id = selected && !selected.source ? selected.id : null
 
     if (focusNodeQuery.trim()) {
       const query = focusNodeQuery.trim().toLowerCase()
@@ -711,7 +719,7 @@
   })
 
   $effect(() => {
-    if (!cy || !selected) {
+    if (!cy || !selected || selected.source) {
       neighbors = []
       return
     }
@@ -826,6 +834,10 @@
         const d = evt.target.data()
         selected = d
       })
+      cy.on('tap', 'edge', (evt) => {
+        const d = evt.target.data()
+        selected = d
+      })
       cy.on('tap', (evt) => {
         if (evt.target === cy) clearSelection()
       })
@@ -838,10 +850,10 @@
 
       if (initialHash) {
         const id = resolveHashToNodeId(initialHash)
-        if (id) selectNodeById(id)
+        if (id) selectElementById(id)
       } else if (graphSession.selectedIri) {
         const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
-        if (id) selectNodeById(id)
+        if (id) selectElementById(id)
       }
       if (!initialHash && graphSession.camera) {
         cy.zoom(graphSession.camera.zoom)
@@ -918,8 +930,6 @@
       <li><span class="swatch" style="background:{COLORS.owlClass}"></span><span class="legend-label">OWL class</span></li>
       <li><span class="swatch" style="background:{COLORS.skosConcept}"></span><span class="legend-label">SKOS concept</span></li>
       <li><span class="swatch" style="background:{COLORS.xsdType}"></span><span class="legend-label">XSD datatype</span></li>
-      <li><span class="swatch" style="background:{COLORS.objectProperty}"></span><span class="legend-label">Object property</span></li>
-      <li><span class="swatch" style="background:{COLORS.dataProperty}"></span><span class="legend-label">Datatype property</span></li>
     </ul>
 
     <strong style="margin-top:1rem;display:block">SKOS schemes</strong>
@@ -976,15 +986,17 @@
                 {/if}
 
                 <dl class="meta">
-                  <div class="meta-row iri-row">
-                    <dt>IRI</dt>
-                    <dd>
-                      <a href={selected.iri} target="_blank" rel="noreferrer" title={selected.iri}>{toCurie(selected.iri)}</a>
-                      <button type="button" class="copy-btn" onclick={copyIri} title={`Copy ${selected.iri}`} aria-label="Copy full IRI">
-                        {iriCopied ? 'Copied' : 'Copy'}
-                      </button>
-                    </dd>
-                  </div>
+                  {#if selected.iri}
+                    <div class="meta-row iri-row">
+                      <dt>IRI</dt>
+                      <dd>
+                        <a href={selected.iri} target="_blank" rel="noreferrer" title={selected.iri}>{toCurie(selected.iri)}</a>
+                        <button type="button" class="copy-btn" onclick={copyIri} title={`Copy ${selected.iri}`} aria-label="Copy full IRI">
+                          {iriCopied ? 'Copied' : 'Copy'}
+                        </button>
+                      </dd>
+                    </div>
+                  {/if}
                   {#if selected.notation}
                     <div class="meta-row">
                       <dt>Notation</dt>
@@ -997,9 +1009,19 @@
                       <dd>{localName(selected.scheme).replace('Scheme', '')}</dd>
                     </div>
                   {/if}
+                  {#if selected.source}
+                    <div class="meta-row">
+                      <dt>Source</dt>
+                      <dd>{selected.sourceLabel ?? localName(selected.source)}</dd>
+                    </div>
+                    <div class="meta-row">
+                      <dt>Target</dt>
+                      <dd>{selected.targetLabel ?? localName(selected.target)}</dd>
+                    </div>
+                  {/if}
                 </dl>
 
-                {#if neighbors.length}
+                {#if !selected.source && neighbors.length}
                   <section class="neighbors">
                     <header class="connections-header">
                       <h3 class="section-heading">

@@ -73,7 +73,7 @@
   async function saveAnnotation(event) {
     event.preventDefault()
     const text = annotationText.trim()
-    if (!text || !auth.user || saving) return
+    if (!text || !auth.user || saving || !target?.iri) return
 
     saving = true
     error = null
@@ -163,7 +163,7 @@
   {:else if !auth.configured}
     <p class="status"><small>Firebase config required.</small></p>
   {:else}
-    {#if auth.user}
+    {#if auth.user && target?.iri}
       <form onsubmit={saveAnnotation} class="annotation-form">
         <textarea
           rows="3"
@@ -197,6 +197,8 @@
           </button>
         </div>
       </form>
+    {:else if auth.user}
+      <p class="status"><small>No annotatable IRI selected.</small></p>
     {:else}
       <p class="status"><small>Sign in to add or edit notes.</small></p>
     {/if}

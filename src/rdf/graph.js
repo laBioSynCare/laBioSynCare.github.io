@@ -9,8 +9,8 @@
  *
  * Edge types (data.kind):
  *   'subClassOf'  — rdfs:subClassOf between OWL classes
- *   'objProp'     — object property domain→range (labeled)
- *   'dataProp'    — datatype property domain→xsd type (labeled)
+ *   'objProp'     — object property domain→range, labeled by the property
+ *   'dataProp'    — datatype property domain→xsd type, labeled by the property
  *   'narrower'    — skos:narrower between concepts
  *   'related'     — skos:related / skos:broadMatch between concepts
  *   'instanceOf'  — OWL class membership of a SKOS concept (bridge edge)
@@ -111,25 +111,16 @@ export async function buildGraphElements(store) {
     const tgt = r.range.value
     if (!nodes.has(src) || !nodes.has(tgt)) continue
     const propId = r.prop.value
-    addNode(propId, {
-      kind: 'objectProperty',
+    edges.push({ data: {
+      id: `obj_${localName(propId)}_${localName(src)}_${localName(tgt)}`,
+      source: src, target: tgt,
+      kind: 'objProp',
       label: r.propLabel?.value ?? localName(propId),
-      definition: r.def?.value ?? '',
       iri: propId,
-    })
-    edges.push({ data: {
-      id: `obj_${localName(propId)}_domain`,
-      source: src, target: propId,
-      kind: 'objProp',
-      label: 'domain',
       propIri: propId,
-    }})
-    edges.push({ data: {
-      id: `obj_${localName(propId)}_range`,
-      source: propId, target: tgt,
-      kind: 'objProp',
-      label: 'range',
-      propIri: propId,
+      definition: r.def?.value ?? '',
+      sourceLabel: nodes.get(src).data.label,
+      targetLabel: nodes.get(tgt).data.label,
     }})
   }
 
@@ -157,25 +148,16 @@ export async function buildGraphElements(store) {
       addNode(tgt, { kind: 'xsdType', label: xsdLabel(tgt), iri: tgt })
     }
     const propId = r.prop.value
-    addNode(propId, {
-      kind: 'dataProperty',
+    edges.push({ data: {
+      id: `dat_${localName(propId)}_${localName(src)}_${localName(tgt)}`,
+      source: src, target: tgt,
+      kind: 'dataProp',
       label: r.propLabel?.value ?? localName(propId),
-      definition: r.def?.value ?? '',
       iri: propId,
-    })
-    edges.push({ data: {
-      id: `dat_${localName(propId)}_domain`,
-      source: src, target: propId,
-      kind: 'dataProp',
-      label: 'domain',
       propIri: propId,
-    }})
-    edges.push({ data: {
-      id: `dat_${localName(propId)}_range`,
-      source: propId, target: tgt,
-      kind: 'dataProp',
-      label: 'range',
-      propIri: propId,
+      definition: r.def?.value ?? '',
+      sourceLabel: nodes.get(src).data.label,
+      targetLabel: nodes.get(tgt).data.label,
     }})
   }
 
