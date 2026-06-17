@@ -69,6 +69,8 @@ banner pointing to the as-built reference.
   [`../src/core/README.md`](../src/core/README.md) — layer-specific docs.
 - [`../static/ontology/README.md`](../static/ontology/README.md) — ontology design.
 - [`ontology/README.md`](ontology/README.md) — vocabulary / `sstim` notes.
+- [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — canonical
+  ontology maturity backlog after SSTIM `0.3.0`.
 - [`credentials/firebase.md`](credentials/firebase.md) — optional Firebase setup.
 
 ## `decisions/` — architecture decision records

@@ -20,6 +20,11 @@ knowledge layer of BSC Lab — the part that makes public reference presets and
 evidence metadata machine-readable, queryable, citable, and interoperable with
 external biomedical vocabularies.
 
+The current ontology maturity backlog is maintained in
+[`docs/ontology/IMPROVEMENT_PLAN.md`](../../docs/ontology/IMPROVEMENT_PLAN.md).
+Consult it before broadening the ontology, adding validation scope, or changing
+modality/delivery semantics.
+
 The ontology is published at `https://w3id.org/sstim` under CC BY 4.0.
 BSC is represented as a framework at `https://w3id.org/sstim/framework/bsc`.
 Concrete implementations use scoped SSTIM paths, including

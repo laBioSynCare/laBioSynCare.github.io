@@ -85,6 +85,13 @@ Candidate top-level concepts include:
 
 SHACL profiles should be used to validate concrete data structures such as session descriptors, dataset annotations, safety metadata, and implementation examples.
 
+## Maturity and Improvement Plan
+
+[`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md) is the canonical backlog for
+ontology maturity work after SSTIM `0.3.0`. It records known gaps, the priority
+order for validation/modeling work, and the next major design improvement:
+separating physical delivery from perceived sensory modality.
+
 ## Evidence and Safety Metadata
 
 The vocabulary may describe evidence annotations and safety/caution metadata. It must not imply that a specific stimulation protocol is clinically effective merely because it can be described with the vocabulary.
