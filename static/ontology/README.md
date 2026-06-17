@@ -45,6 +45,8 @@ static/ontology/
 ├── sstim-alignments.ttl  External alignments (Wikidata, OBO Foundry)
 ├── sstim-patch-studio.ttl Patch Studio model vocabulary
 ├── 0.1.0/                Frozen ontology snapshot for version 0.1.0
+├── 0.2.0/                Frozen ontology snapshot for version 0.2.0
+├── 0.3.0/                Frozen ontology snapshot for version 0.3.0
 └── instances/
     ├── frameworks/      BSC framework identity and technique instances
     ├── implementations/ BSC Lab / BioSynCare implementation identities
@@ -87,12 +89,12 @@ Defines the Patch Studio authoring model vocabulary used by the as-built
 real-time audiovisual designer. It is snapshotted with the other ontology
 modules so model terms remain citable alongside each release.
 
-### `0.1.0/` — Frozen version snapshot
+### Versioned snapshot directories
 
-Contains byte-identical copies of the top-level Turtle modules for ontology
-version `0.1.0`. Generate future snapshots with `make snapshot` after bumping
-`owl:versionInfo` / `owl:versionIRI`; use `FORCE=1` only to correct an
-unpublished snapshot.
+Each semver directory contains byte-identical copies of the top-level Turtle
+modules for that ontology version. Generate future snapshots with
+`make snapshot` after bumping `owl:versionInfo` / `owl:versionIRI`; use
+`FORCE=1` only to correct an unpublished snapshot.
 
 ---
 
@@ -532,15 +534,15 @@ The ontology uses `owl:versionIRI` for immutable version snapshots:
 ```turtle
 # In sstim-core.ttl header
 <https://w3id.org/sstim> a owl:Ontology ;
-    owl:versionIRI <https://w3id.org/sstim/0.1.0> ;
-    owl:versionInfo "0.1.0" ;
-    dct:modified "2026-04-12"^^xsd:date .
+    owl:versionIRI <https://w3id.org/sstim/0.3.0> ;
+    owl:versionInfo "0.3.0" ;
+    dct:modified "2026-06-17"^^xsd:date .
 ```
 
 Version IRIs point to immutable snapshots hosted on GitHub Pages through w3id:
-`https://w3id.org/sstim/0.1.0` redirects to the frozen
-`/ontology/0.1.0/sstim-core.ttl` document. The explicit file URL
-`https://w3id.org/sstim/0.1.0/sstim-core.ttl` is also available.
+`https://w3id.org/sstim/0.3.0` redirects to the frozen
+`/ontology/0.3.0/sstim-core.ttl` document. The explicit file URL
+`https://w3id.org/sstim/0.3.0/sstim-core.ttl` is also available.
 
 **Versioning policy:**
 - **Patch (0.1.x):** Adds new instances, corrects labels, adds
@@ -727,7 +729,7 @@ preset descriptions require coordination with the BioSynCare repository
 
 ---
 
-*Version: 0.1.0 (April 2026)*  
+*Version: 0.3.0 (June 2026)*
 *Maintained by: Renato Fabbri*  
 *License: CC BY 4.0*  
 *Namespace (ontology): `https://w3id.org/sstim`*  

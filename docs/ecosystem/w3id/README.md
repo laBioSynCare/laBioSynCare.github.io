@@ -5,8 +5,8 @@ namespace `https://w3id.org/sstim`. It is **not** served by this repository —
 the live copy is maintained in the
 [`perma-id/w3id.org`](https://github.com/perma-id/w3id.org) registry.
 
-Current live state: root RDF, module, Patch Studio, and versioned `0.1.0/`
-routes resolve through `w3id.org` to the GitHub Pages artifacts. Browser
+Current live state: root RDF, module, Patch Studio, and semver versioned
+snapshot routes resolve through `w3id.org` to the GitHub Pages artifacts. Browser
 branches still point at the app root until WIDOCO HTML output is generated and
 published.
 
@@ -23,15 +23,15 @@ published.
 | `https://w3id.org/sstim/shapes` | `/ontology/sstim-shapes.ttl` |
 | `https://w3id.org/sstim/alignments` | `/ontology/sstim-alignments.ttl` |
 | `https://w3id.org/sstim/patch-studio` | `/ontology/sstim-patch-studio.ttl` |
-| `https://w3id.org/sstim/0.1.0` | `/ontology/0.1.0/sstim-core.ttl` (frozen) |
-| `https://w3id.org/sstim/0.1.0/sstim-core.ttl` | `/ontology/0.1.0/sstim-core.ttl` (frozen) |
+| `https://w3id.org/sstim/0.3.0` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
+| `https://w3id.org/sstim/0.3.0/sstim-core.ttl` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
 
-The immutable `0.1.0/` snapshot is produced by `make snapshot`
+Immutable version snapshots are produced by `make snapshot`
 (see [`scripts/snapshot-ontology.mjs`](../../../scripts/snapshot-ontology.mjs)).
 Existing snapshot directories are protected; use `make snapshot FORCE=1` only
 to correct an unpublished snapshot. The version root
-`https://w3id.org/sstim/0.1.0` is the ontology's `owl:versionIRI` and redirects
-to the frozen `sstim-core.ttl` document.
+`https://w3id.org/sstim/<version>` is the ontology's `owl:versionIRI` and
+redirects to the frozen `sstim-core.ttl` document for that version.
 
 ## Updating the registry rules
 
@@ -60,7 +60,7 @@ curl -sIL -H 'Accept: text/html'  https://w3id.org/sstim | grep -i location
 # Module, Patch Studio, and versioned snapshot resolve
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/vocab        | grep -i location
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/patch-studio | grep -i location
-curl -sIL https://w3id.org/sstim/0.1.0/sstim-core.ttl                  | grep -i location
+curl -sIL https://w3id.org/sstim/0.3.0/sstim-core.ttl                  | grep -i location
 
 # Round-trip parse check (n3 / rapper / riot)
 curl -sL -H 'Accept: text/turtle' https://w3id.org/sstim | rapper -i turtle -c -
