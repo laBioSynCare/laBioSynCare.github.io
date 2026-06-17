@@ -44,6 +44,7 @@ export const FOAF = ns('http://xmlns.com/foaf/0.1/')
 export const BFO  = ns('http://purl.obolibrary.org/obo/BFO_')
 export const OBI  = ns('http://purl.obolibrary.org/obo/OBI_')
 export const IAO  = ns('http://purl.obolibrary.org/obo/IAO_')
+export const COB  = ns('http://purl.obolibrary.org/obo/COB_')
 export const PATO = ns('http://purl.obolibrary.org/obo/PATO_')
 export const ECO  = ns('http://purl.obolibrary.org/obo/ECO_')
 
@@ -92,6 +93,7 @@ export const PREFIXES = {
   'bfo':      'http://purl.obolibrary.org/obo/BFO_',
   'obi':      'http://purl.obolibrary.org/obo/OBI_',
   'iao':      'http://purl.obolibrary.org/obo/IAO_',
+  'cob':      'http://purl.obolibrary.org/obo/COB_',
   'pato':     'http://purl.obolibrary.org/obo/PATO_',
   'eco':      'http://purl.obolibrary.org/obo/ECO_',
   'wd':       'http://www.wikidata.org/entity/',

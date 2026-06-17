@@ -33,6 +33,7 @@
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
 @prefix eco:   <http://purl.obolibrary.org/obo/ECO_> .
 @prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
 
@@ -50,13 +51,14 @@
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
               "Ontología de Estimulación Sensorial (SSTIM)"@es ;
     dct:description "An OWL 2 ontology formalizing the domain of Sensory Stimulation: the parameter-specified delivery of structured sensory input toward defined physiological, psychological, or cognitive outcomes through identified or proposed neurobiological pathways."@en ;
-    dct:creator <https://orcid.org/0000-0001-8602-7064> ;
+    dct:creator "Renato Fabbri" ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:modified "2026-06-12"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/bsc-lab/bsc-lab> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ;
     skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,
-        "v0.2.0 (2026-06): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; completed it/pt/es prefLabel coverage across the vocabulary; added external upper-ontology label stubs. Backward-compatible minor release (no terms removed or renamed)."@en .
+        "v0.2.0 (2026-06): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; completed it/pt/es prefLabel coverage across the vocabulary; added external upper-ontology label stubs. Backward-compatible minor release (no terms removed or renamed)."@en,
+        "Unreleased (pending 0.3.0): Added sstim-v:TechniqueScheme — a vendor-neutral controlled vocabulary of auditory and cross-modal sensory stimulation techniques — together with seven new StimulationMechanism concepts (ASSR, auditory-motor coupling, closed-loop phase reinforcement, masking, vibrotactile mechanoreception, acoustic startle, ultrasonic neuromodulation) and the sstim:techniqueModality property. Two non-evidence-bearing folk techniques are catalogued and explicitly flagged via skos:editorialNote. Additive, backward-compatible. Also corrected external alignment IRIs that had been wrong since 0.1.0: every Wikidata QID (all resolved to unrelated entities), the EvidenceClaim parent (iao:0000001 'conditional specification' → iao:0000030 'information content entity'), the obsolete OBI planned-process parent (added cob:0000082), a non-existent ORCID, and a dead repository link."@en .
 
 
 ###########################################################################
@@ -76,7 +78,8 @@ sstim:SensoryStimulation a owl:Class ;
 
 sstim:SensoryStimulationIntervention a owl:Class ;
     rdfs:subClassOf sstim:SensoryStimulation ;
-    rdfs:subClassOf obi:0000011 ;
+    rdfs:subClassOf obi:0000011 ;   # OBI 'planned process' — obsoleted in OBI; retained for tool continuity
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
     rdfs:label "Sensory Stimulation Intervention"@en,
                "Intervento di Stimolazione Sensoriale"@it,
                "Intervenção de Estimulação Sensorial"@pt,
@@ -284,7 +287,7 @@ sstim:PermutationFunction a owl:Class ;
 ###########################################################################
 
 sstim:EvidenceClaim a owl:Class ;
-    rdfs:subClassOf iao:0000001 ;
+    rdfs:subClassOf iao:0000030 ;
     rdfs:label "Evidence Claim"@en ;
     skos:definition "A specific assertion about the effect of a Sensory Stimulation intervention, together with its evidence tier, modality tags, and citation list. Tier assignments are revisable as literature develops."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
@@ -395,6 +398,14 @@ sstim:proposedMechanism a owl:ObjectProperty ;
     rdfs:domain sstim:SensoryStimulationTechnique ;
     rdfs:range  sstim:StimulationMechanism ;
     rdfs:label  "proposed mechanism"@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:techniqueModality a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationTechnique ;
+    rdfs:range  sstim:SensoryModality ;
+    rdfs:label  "technique modality"@en ;
+    skos:definition "Links a sensory stimulation technique to the sensory modality (or modalities) through which it is typically delivered. A technique may engage more than one modality (e.g. vibroacoustic stimulation is both auditory and somatosensory)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

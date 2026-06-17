@@ -278,7 +278,7 @@ biomedical ontologies in the OBO Foundry ecosystem.
 | BSC class | BFO parent | Rationale |
 |---|---|---|
 | `sstim:SensoryStimulation` | `bfo:0000015` (process) | A Sensory Stimulation session is a process unfolding in time |
-| `sstim:SensoryStimulationIntervention` | `obi:0000011` (planned process) | An intervention is a planned, goal-directed process |
+| `sstim:SensoryStimulationIntervention` | `obi:0000011` + `cob:0000082` (planned process) | An intervention is a planned, goal-directed process. `obi:0000011` is obsolete in OBI; `cob:0000082` is the current canonical term, and both are asserted for continuity |
 | `sstim:SensoryStimulationFramework` | `iao:0000030` (information content entity) | A documented family of principles and constraints |
 | `sstim:SensoryStimulationProtocol` | `iao:0000030` (information content entity) | A documented method specification |
 | `sstim:SensoryStimulationImplementation` | `iao:0000030` (information content entity) | SSTIM represents implementation identity and metadata |
@@ -301,7 +301,7 @@ it uses selected terms by their stable OBO IRIs with explicit
 
 ```turtle
 # sstim-core.ttl excerpt — OBI alignment
-sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011 .
+sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
 
 # IAO alignment
 sstim:Preset rdfs:subClassOf iao:0000030 .

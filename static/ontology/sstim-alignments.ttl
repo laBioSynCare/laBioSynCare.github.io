@@ -31,7 +31,7 @@
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
-@prefix eco:   <http://purl.obolibrary.org/obo/ECO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
 @prefix mo:    <http://purl.org/ontology/mo/> .
 
 
@@ -39,33 +39,44 @@
 # Wikidata alignments — frequency bands
 ###########################################################################
 
-# Alpha wave: https://www.wikidata.org/wiki/Q398696
-sstim-v:alpha skos:exactMatch wd:Q398696 .
+# All QIDs below were verified against live Wikidata (2026-06). The prior
+# QIDs in this section were incorrect (they resolved to unrelated entities
+# such as a Van Halen album and a stock exchange) and were replaced.
 
-# Delta wave: https://www.wikidata.org/wiki/Q233975
-sstim-v:delta skos:exactMatch wd:Q233975 .
+# alpha wave: https://www.wikidata.org/wiki/Q2469782
+sstim-v:alpha skos:exactMatch wd:Q2469782 .
 
-# Theta wave: https://www.wikidata.org/wiki/Q1754404
-sstim-v:theta skos:exactMatch wd:Q1754404 .
+# delta wave: https://www.wikidata.org/wiki/Q2623205
+sstim-v:delta skos:exactMatch wd:Q2623205 .
 
-# Beta wave: https://www.wikidata.org/wiki/Q271900
-sstim-v:beta skos:exactMatch wd:Q271900 .
+# theta rhythm: https://www.wikidata.org/wiki/Q2370623
+sstim-v:theta skos:exactMatch wd:Q2370623 .
 
-# Gamma wave: https://www.wikidata.org/wiki/Q1254487
-sstim-v:gamma skos:exactMatch wd:Q1254487 .
+# beta wave: https://www.wikidata.org/wiki/Q831014
+sstim-v:beta skos:exactMatch wd:Q831014 .
 
-# Binaural beats: https://www.wikidata.org/wiki/Q638740
-sstim-v:voiceBinaural skos:exactMatch wd:Q638740 .
+# gamma wave: https://www.wikidata.org/wiki/Q2623017
+sstim-v:gamma skos:exactMatch wd:Q2623017 .
 
-# Brainwave entrainment (close match — covers AVE, binaural beats):
-# https://www.wikidata.org/wiki/Q4957211
-sstim:SensoryStimulation skos:closeMatch wd:Q4957211 .
+# binaural beats: https://www.wikidata.org/wiki/Q863539
+sstim-v:voiceBinaural skos:closeMatch wd:Q863539 .
 
-# Sensory stimulation (general): https://www.wikidata.org/wiki/Q7449956
-sstim:SensoryStimulation skos:closeMatch wd:Q7449956 .
+# brainwave entrainment (close match — covers AVE, binaural beats):
+# https://www.wikidata.org/wiki/Q3508179
+sstim:SensoryStimulation skos:closeMatch wd:Q3508179 .
 
-# Isochronic tones: https://www.wikidata.org/wiki/Q6068745
-sstim-v:voiceSymmetry skos:relatedMatch wd:Q6068745 .
+# sensory stimulation therapy (nearest general concept):
+# https://www.wikidata.org/wiki/Q17163316
+sstim:SensoryStimulation skos:closeMatch wd:Q17163316 .
+
+# isochronic tones: https://www.wikidata.org/wiki/Q98000061
+sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
+
+# Technique vocabulary alignments (QIDs verified against live Wikidata, 2026-06).
+# Other techniques (monaural beats, RAS, ASSR, vibroacoustic, ultrasound
+# neuromodulation, etc.) are pending Wikidata alignment — tracked in TODO.md.
+sstim-v:techIsochronicTones skos:closeMatch wd:Q98000061 .
+sstim-v:techBinauralBeats skos:exactMatch wd:Q863539 .
 
 # Note: Wikidata items for Martigli oscillation, Sonic Symmetry permutation
 # technique, and the SSTIM ontology itself are pending — Wikidata contribution
@@ -76,8 +87,10 @@ sstim-v:voiceSymmetry skos:relatedMatch wd:Q6068745 .
 # OBO Foundry class alignments
 ###########################################################################
 
-# Sensory stimulation intervention → OBI planned process
-sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011 .
+# Sensory stimulation intervention → planned process.
+# OBI_0000011 is obsoleted in OBI; retained for tool continuity. COB_0000082
+# is the current canonical 'planned process' term (verified via OLS, 2026-06).
+sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
 
 # Preset → OBI protocol
 sstim:Preset rdfs:subClassOf obi:0000272 .
@@ -86,8 +99,10 @@ sstim:Preset rdfs:subClassOf obi:0000272 .
 # for cross-reference in alignment context)
 # sstim:SessionInstance rdfs:subClassOf prov:Activity .
 
-# Evidence claim → IAO objective specification
-sstim:EvidenceClaim rdfs:subClassOf iao:0000001 .
+# Evidence claim → IAO information content entity.
+# (Was iao:0000001 'conditional specification' — wrong; an evidence claim is
+# not a conditional specification. iao:0000030 is the correct generalization.)
+sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
 
 # Frequency band → IAO information content entity
 sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
@@ -104,19 +119,25 @@ sstim:StimulationMechanism rdfs:subClassOf bfo:0000015 .
 # Intended effect → BFO disposition
 sstim:IntendedEffect rdfs:subClassOf bfo:0000016 .
 
-# ECO: Evidence Codes (for evidence tier concepts)
-# ECO:0000006 = experimental evidence used in manual assertion
-# sstim-v:tierPreliminary → close to ECO small-scale experiment codes
-sstim-v:tierEstablished skos:closeMatch eco:0006151 .  # systematic review
+# ECO (Evidence & Conclusion Ontology) classifies evidence by TYPE / provenance,
+# not by strength, so it has no clean match for the SSTIM evidence-tier concepts
+# (speculative…established), which are GRADE-style strength grades. The former
+# `sstim-v:tierEstablished skos:closeMatch eco:0006151` mapping was removed:
+# ECO_0006151 is "documented statement evidence", not a systematic review, and
+# ECO has no review/meta-analysis strength term. Left unmapped intentionally.
 
 
 ###########################################################################
 # Music Ontology alignments
 ###########################################################################
 
-# BSC sessions have musical / acoustic qualities; loose relationship only
+# Sessions have musical / acoustic qualities; loose relationship only.
+# NOTE: the Music Ontology host (purl.org/ontology/mo/) returned 503 at audit
+# time (2026-06), so these could not be re-verified live. mo:MusicalWork is a
+# stable core MO class; mo:Score could not be confirmed to exist and is disabled
+# pending verification.
 sstim:SensoryStimulationTechnique skos:relatedMatch mo:MusicalWork .
-sstim:Preset skos:relatedMatch mo:Score .
+# sstim:Preset skos:relatedMatch mo:Score .   # unverified — re-enable once confirmed
 
 
 ###########################################################################
@@ -131,8 +152,9 @@ sstim:Preset skos:relatedMatch mo:Score .
 bfo:0000015 rdfs:label "process"@en .
 bfo:0000016 rdfs:label "disposition"@en .
 bfo:0000023 rdfs:label "role"@en .
-obi:0000011 rdfs:label "planned process"@en .
+obi:0000011 rdfs:label "planned process (obsolete in OBI)"@en .
 obi:0000272 rdfs:label "protocol"@en .
+cob:0000082 rdfs:label "planned process"@en .
 iao:0000030 rdfs:label "information content entity"@en .
 
 
