@@ -63,8 +63,13 @@ per-eye flicker.
   - Per-eye flicker asymmetry (dichoptic frequency tagging) is a known paradigm
     but compounds photosensitivity risk. It is not implemented in Step 3a and
     must be gated at least as strictly as Step 2 if added later.
-- **Step 3b — richer depth scenes (planned).** More shapes, colour distributions,
-  and future headset/VR paths.
+- **Step 3b — richer depth scenes.** The **Stereoscopic Tree** (`/field/tree/`,
+  [src/ui/field/tree/](../../src/ui/field/tree/)) is the first delivered Step 3b
+  scene: a procedural tree whose leaves, branches, and roots each carry an
+  (x, y, z) position, so the scene has real depth rather than two markers. One
+  shared 3D model is viewed through three user-selectable stereoscopic techniques
+  (see §8). More shapes, colour distributions, and future headset/VR paths remain
+  planned.
 
 ## 4. Audio
 
@@ -117,11 +122,50 @@ links each active concept to the graph view via
 ## 7. File map
 
 ```
-src/routes/field/+page.svelte      route (thin)
-src/ui/field/SensoryField.svelte   main UI: session, clock loop, controls, export
-src/ui/field/FieldStage.svelte     render surface (colour fill / fullscreen)
-src/ui/field/fieldState.js         channel state model + persistence (bsclab.field)
-src/ui/field/exposureProfile.js    state → sstim-ex:ExposureProfile (N3 Writer)
-src/ui/field/fieldSemantic.js      UI concept → ontology IRI (graph links)
-src/ui/safety/flashSafety.js       flash-rate cap + risk classification
+src/routes/field/+page.svelte         route (thin)
+src/routes/field/tree/+page.svelte    Stereoscopic Tree route (thin)
+src/ui/field/SensoryField.svelte      main UI: session, clock loop, controls, export
+src/ui/field/FieldStage.svelte        render surface (colour fill / fullscreen)
+src/ui/field/fieldState.js            channel state model + persistence (bsclab.field)
+src/ui/field/exposureProfile.js       state → sstim-ex:ExposureProfile (N3 Writer)
+src/ui/field/fieldSemantic.js         UI concept → ontology IRI (graph links)
+src/ui/field/tree/treeModel.js        3D tree generator + projection + autostereogram
+src/ui/field/tree/treeState.js        tree state model + persistence (bsclab.field.tree)
+src/ui/field/tree/TreeStereo.svelte   tree UI: controls, clock loop, safety gate
+src/ui/field/tree/TreeStage.svelte    tree render surface (stereo-pair / anaglyph / autostereogram)
+src/ui/safety/flashSafety.js          flash-rate cap + risk classification
 ```
+
+## 8. Stereoscopic Tree (`/field/tree/`)
+
+A Step 3b instrument that extends the field's free-view depth from two markers to
+a full 3D scene. [treeModel.js](../../src/ui/field/tree/treeModel.js) generates a
+deterministic procedural tree from a seed: leaves, branches, and roots each have
+an (x, y, z) position in a normalized model space (+y up, +z toward the viewer).
+The `spread` parameter is the depth knob — at `spread = 0` the tree is planar
+(z = 0 everywhere), and toward `spread = 1` the branching tilts fully out of the
+plane. Yaw rotation about the vertical axis (`rotateY`) makes the structure
+legible; it is driven by the free-running visual clock (`performance.now()`), the
+same preview precedent as `SensoryField` — there is no audio on this page, so the
+AudioContext-only clock rule (CLAUDE.md §3.1) does not apply.
+
+One shared model, three projections (orthographic, so disparity is a pure function
+of z with the focal plane at z = 0 — matching the field's `--offset` cue):
+
+| Technique | Term | How it renders |
+|---|---|---|
+| **Free-view stereo pair** | the codebase's free-view stereoscopy | two SVG panels; each vertex shifted ± `disparity(z)/2`; parallel or cross-eye (panels swap) |
+| **Autostereogram** | single-image random-dot stereogram | the tree is rasterised to a per-pixel depth buffer, then the classic constraint-propagation SIRDS algorithm builds one dot image |
+| **Anaglyph** | red/cyan | one SVG, the tree drawn twice (left eye red, right eye cyan) with `mix-blend-mode: screen`; needs red/cyan glasses |
+
+"Stereogram" is ambiguous — the autostereogram is what the word usually means
+(a single "Magic Eye" image), whereas the stereo pair is two images. Both are
+supported; the codebase term for the two-panel method is **free-view
+stereoscopy** (`capabilityFreeViewStereoscopy`).
+
+Safety and framing match the rest of the field: the scene renders only when the
+global visual-stimulation gate is on (placeholder otherwise), the auto-rotate
+default honours `prefers-reduced-motion`, the motion is gentle and non-flashing
+(so the flash-rate cap is not engaged), and all copy is conservative wellness
+framing (CLAUDE.md §3.5). The instrument reuses existing stereoscopy exposure
+terms for its "In the ontology" panel and does not introduce new ontology IRIs.
