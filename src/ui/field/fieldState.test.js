@@ -4,6 +4,7 @@ import {
   createFieldState,
   normalizeFieldState,
   resolveEarFrequencies,
+  resolveDepthSeparation,
 } from './fieldState.js'
 
 describe('fieldState', () => {
@@ -23,6 +24,9 @@ describe('fieldState', () => {
     expect(s.visual.color).toBe('#3355ff') // rejected bad color → default
     expect(s.visual.intensity).toBe(1) // clamped to 1
     expect(s.visual.blinkRateHz).toBe(60) // clamped to BLINK_MAX_HZ
+    expect(s.depth.viewingMode).toBe('parallel')
+    expect(s.depth.source).toBe('static')
+    expect(s.depth.baseSeparationPx).toBe(48)
     expect(s.audio.beatMode).toBe('none') // rejected → default
     expect(s.audio.left.freqHz).toBe(50) // clamped to TONE_MIN_HZ
     expect(s.audio.left.gain).toBe(0) // clamped to 0
@@ -51,5 +55,34 @@ describe('fieldState', () => {
     s.audio.left.freqHz = 200
     s.audio.right.freqHz = 260
     expect(resolveEarFrequencies(s)).toEqual({ left: 200, right: 260 })
+  })
+
+  it('resolves static depth separation from the base value', () => {
+    const s = createFieldState()
+    s.depth.enabled = true
+    s.depth.baseSeparationPx = 64
+    s.depth.source = 'static'
+    expect(resolveDepthSeparation(s, 12)).toBe(64)
+  })
+
+  it('resolves beat-driven depth separation from the beat rate', () => {
+    const s = createFieldState()
+    s.depth.enabled = true
+    s.depth.source = 'beat'
+    s.depth.baseSeparationPx = 40
+    s.depth.modulationPx = 10
+    s.audio.beatRateHz = 1
+    expect(resolveDepthSeparation(s, 0)).toBe(40)
+    expect(resolveDepthSeparation(s, 0.25)).toBeCloseTo(50)
+  })
+
+  it('resolves breath-driven depth separation from the breath period', () => {
+    const s = createFieldState()
+    s.depth.enabled = true
+    s.depth.source = 'breath'
+    s.depth.baseSeparationPx = 40
+    s.depth.modulationPx = 10
+    s.depth.breathPeriodSec = 4
+    expect(resolveDepthSeparation(s, 1)).toBeCloseTo(50)
   })
 })

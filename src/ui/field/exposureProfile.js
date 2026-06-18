@@ -38,6 +38,8 @@ export function fieldStateToQuads(state, opts = {}) {
 
   const channels = []
   const profileBoundaries = new Set()
+  const profileGains = new Set()
+  const profileLosses = new Set()
   const effectClaims = []
 
   // ── Visual channel ─────────────────────────────────────────────────────────
@@ -62,6 +64,45 @@ export function fieldStateToQuads(state, opts = {}) {
     }
     add(ch, SSTIM_EX('hasComfortBoundary'), SSTIM_EX('boundaryEyeStrain'))
     profileBoundaries.add('boundaryEyeStrain')
+  }
+
+  // ── Free-view stereoscopic visual channels ────────────────────────────────
+  if (state.visual.enabled && state.depth?.enabled) {
+    const movingDepth = state.depth.source !== 'static'
+    const eyeSpecs = [
+      { placement: 'placementEyeLeft', label: 'Left-eye stereoscopic visual channel', frag: 'left-eye-stereo-channel' },
+      { placement: 'placementEyeRight', label: 'Right-eye stereoscopic visual channel', frag: 'right-eye-stereo-channel' },
+    ]
+
+    for (const spec of eyeSpecs) {
+      const ch = node(spec.frag)
+      channels.push(ch)
+      add(ch, a, SSTIM_EX('StimulusChannel'))
+      add(ch, RDFS('label'), en(spec.label))
+      add(ch, SSTIM_EX('deliveryMedium'), SSTIM_EX('mediumStereoscopicVisualPresentation'))
+      add(ch, SSTIM_EX('perceivedModality'), SSTIM_EX('modalityVisual'))
+      add(ch, SSTIM_EX('requiresDeviceCapability'), SSTIM_EX('capabilityDisplayLightOutput'))
+      add(ch, SSTIM_EX('requiresDeviceCapability'), SSTIM_EX('capabilityFreeViewStereoscopy'))
+      add(ch, SSTIM_EX('hasBodyPlacement'), SSTIM_EX(spec.placement))
+      add(ch, SSTIM_EX('hasStimulusPattern'), movingDepth ? SSTIM_EX('patternMoving') : SSTIM_EX('patternStatic'))
+      add(ch, SSTIM_EX('hasComfortBoundary'), SSTIM_EX('boundaryEyeStrain'))
+    }
+
+    profileBoundaries.add('boundaryEyeStrain')
+    profileGains.add('gainStereoDepth')
+    profileLosses.add('lossHorizontalField')
+
+    const stereoClaim = node('stereo-depth-claim')
+    effectClaims.push(stereoClaim)
+    add(stereoClaim, a, SSTIM_EX('ExposureEffectClaim'))
+    add(stereoClaim, a, SSTIM('EvidenceClaim'))
+    add(stereoClaim, RDFS('label'), en('Free-view stereo-depth hypothesis'))
+    add(stereoClaim, DCT('description'), en('Records the hypothesis that the free-view pair can create perceived stereo depth while reducing horizontal visual field. No effect magnitude is asserted.'))
+    add(stereoClaim, SSTIM('hasEvidenceTier'), SSTIM_V('tierSpeculative'))
+    add(stereoClaim, SSTIM('hasModalityTag'), SSTIM_V('modalityAV'))
+    add(stereoClaim, SSTIM_EX('concernsEffectDimension'), SSTIM_EX('effectImmersion'))
+    add(stereoClaim, SSTIM_EX('concernsEffectDimension'), SSTIM_EX('effectSpatialPresence'))
+    add(stereoClaim, SSTIM_EX('hasKnowledgeStatus'), SSTIM_EX('hypothesisInSSTIM'))
   }
 
   // ── Per-ear audio channels ──────────────────────────────────────────────────
@@ -144,6 +185,8 @@ export function fieldStateToQuads(state, opts = {}) {
   add(profile, SSTIM_EX('hasKnowledgeStatus'), SSTIM_EX('knownInSSTIM'))
   for (const ch of channels) add(profile, SSTIM_EX('usesStimulusChannel'), ch)
   for (const b of profileBoundaries) add(profile, SSTIM_EX('hasComfortBoundary'), SSTIM_EX(b))
+  for (const g of profileGains) add(profile, SSTIM_EX('hasPerceptualGain'), SSTIM_EX(g))
+  for (const l of profileLosses) add(profile, SSTIM_EX('hasPerceptualLoss'), SSTIM_EX(l))
   for (const claim of effectClaims) add(profile, SSTIM_EX('hasEffectClaim'), claim)
 
   return quads

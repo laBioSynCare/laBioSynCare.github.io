@@ -26,17 +26,19 @@ while the other entrains, a binaural beat, a gently blinking colour.
 
 The conceptual target is a per-channel × time matrix — left eye, right eye, left
 ear, right ear, tactile — each cell either static (0 Hz) or modulated at a
-frequency. Steps 1–2 deliver the **physically honest subset** on commodity
+frequency. Steps 1–3a deliver the **physically honest subset** on commodity
 hardware:
 
 | Channel | Delivered now | Laterality |
 |---|---|---|
-| Visual field | one full-screen field (both eyes) | No — single field; per-eye is **Step 3** (needs dichoptic/stereoscopic rendering) |
+| Visual field | one full-screen field (both eyes) | No — single field |
+| Free-view depth pair | two side-by-side eye images for parallel or cross-eye viewing | **Yes**, via free-view stereoscopy |
 | Left ear / Right ear | true independent L/R (panned Carrier voices) | **Yes** |
 | Tactile | (planned) Web Vibration pulse | No (single actuator) |
 
-Eye-laterality is *modelled* in the ontology (`placementEyeLeft/Right`) but not
-*delivered* until Step 3.
+Eye-laterality is now delivered only through the free-view depth pair. It is not
+yet delivered through VR, AR glasses, eye-tracked displays, or independent
+per-eye flicker.
 
 ## 3. Steps
 
@@ -46,19 +48,23 @@ Eye-laterality is *modelled* in the ontology (`placementEyeLeft/Right`) but not
   duty) and audio **beat**: *monaural* (one tone, amplitude-modulated, via the
   engine's tremolo) or *binaural* (a small frequency difference between the ears).
   This is where the flash-rate and sound-level safety becomes load-bearing.
-- **Step 3 — depth (outline, not built).** Stereoscopic depth from two shapes
-  whose separation is driven by the beat or Martigli wave; true per-eye
-  (dichoptic) delivery. Notes for whoever builds it:
+- **Step 3a — free-view depth.** Stereoscopic depth from two simple point/stick
+  markers whose separation is static or driven by the beat or breath wave. The
+  renderer is CSS/SVG-like DOM, not PixiJS. It supports **parallel** and
+  **cross-eye** viewing by swapping the left/right image order.
   - **Free-view parallel (wall-eyed)** assigns left image → left eye, the same as
     a **VR headset**. **Cross-eyed** free-viewing assigns left image → right eye —
     the *mirror* of parallel. A cross-eye pair fed to VR/parallel without swapping
     L/R produces **inverted (pseudoscopic) depth**.
-  - So the stereo *content* transfers across cross-eye, parallel, and VR, but the
-    **L/R ordering is method-specific**. Store one canonical pair; let the
-    capability (`capabilityFreeViewStereoscopy` vs `capabilityVrHeadset`) decide
-    whether to swap. VR additionally needs lens pre-distortion, IPD, and FOV.
+  - The stereo *content* transfers across cross-eye, parallel, and future VR, but
+    the **L/R ordering is method-specific**. BSC Lab stores one canonical pair
+    and swaps for cross-eye viewing. VR remains future work and additionally
+    needs lens pre-distortion, IPD, and FOV.
   - Per-eye flicker asymmetry (dichoptic frequency tagging) is a known paradigm
-    but compounds photosensitivity risk — gate it at least as strictly as Step 2.
+    but compounds photosensitivity risk. It is not implemented in Step 3a and
+    must be gated at least as strictly as Step 2 if added later.
+- **Step 3b — richer depth scenes (planned).** More shapes, colour distributions,
+  and future headset/VR paths.
 
 ## 4. Audio
 
@@ -80,6 +86,9 @@ delivered SPL — with conservative defaults and a NIOSH 85 dBA / 8 h note.
   unless the user makes an explicit **per-session** acknowledgement. Rates in the
   ≈ 15–25 Hz peak band are flagged highest-risk. The acknowledgement is never
   persisted — it is re-confirmed each session by design (ADR 0011).
+- **Depth safety.** Step 3a does not add independent per-eye flicker. It can add
+  eye strain through free-view convergence/divergence, so exported profiles add
+  `boundaryEyeStrain` and `lossHorizontalField`.
 - The same 3 Hz threshold is modelled as `sstim-ex:limitFlickerWcag`, so the gate
   and the ontology cannot silently diverge.
 
@@ -95,6 +104,7 @@ Mapping:
 |---|---|
 | Colour field | `mediumVisualLight`, `modalityVisual`, `patternFixedColor`, `placementEyes`, `capabilityDisplayLightOutput`, `hasGainLevel` |
 | Blink | `patternBlinking`, `capabilityDisplayFlicker`, `hasFlickerRateHz`, `hasDutyCycle`, `boundaryPhotosensitivity` |
+| Free-view depth | two `mediumStereoscopicVisualPresentation` visual channels, `placementEyeLeft` / `placementEyeRight`, `capabilityFreeViewStereoscopy`, `gainStereoDepth`, `lossHorizontalField`, `boundaryEyeStrain` |
 | Per-ear tone | `mediumAirConductedSound`, `modalityAuditory`, `placementEarLeft` / `placementEarRight`, `capabilityHeadphones` + `capabilityStereoSeparation`, `patternContinuous`, `hasFrequencyHz`, `hasGainLevel`, `boundaryHearingRisk` |
 | Noise | `patternNoise` + an `audioNoise…` colour concept |
 | Beat | `hasBeatFrequencyHz` |

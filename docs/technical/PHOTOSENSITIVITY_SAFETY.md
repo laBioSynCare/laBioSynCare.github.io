@@ -85,6 +85,10 @@ gated.
   acknowledgement (never persisted, never saved into the patch — so a shared
   patch can't flash a recipient who never consented), with the live risk level
   shown on each affected `Blink` card.
+- The Sensory Field Step 3a free-view depth renderer does **not** implement
+  independent per-eye flicker. If dichoptic frequency tagging or any other
+  per-eye flicker is added later, it must use the same 3 Hz cap at minimum and
+  may require stricter gating because per-eye asymmetry compounds visual risk.
 - Still planned (not yet built): applying the cap to the future PixiJS visual
   engine, contrast limits, and a conditional SHACL "flashing channel must declare
   a photosensitivity boundary" check.

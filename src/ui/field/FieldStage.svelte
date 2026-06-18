@@ -2,12 +2,45 @@
   // Presentational render surface for the Sensory Field. The parent computes the
   // current colour and opacity (including the blink phase, driven from the audio
   // clock) and passes them in. Gated by the global visual-stimulation policy.
-  let { color = '#000000', opacity = 1, active = true, fullscreen = false } = $props()
+  let {
+    color = '#000000',
+    opacity = 1,
+    active = true,
+    fullscreen = false,
+    depth = null,
+    depthSeparationPx = 48,
+  } = $props()
+
+  const stereoPanels = $derived(buildStereoPanels(depth, depthSeparationPx))
+
+  function buildStereoPanels(depthState, separation) {
+    const half = Math.max(0, Number(separation) || 0) / 2
+    const canonical = [
+      { key: 'left', offset: -half },
+      { key: 'right', offset: half },
+    ]
+    return depthState?.viewingMode === 'cross' ? [canonical[1], canonical[0]] : canonical
+  }
 </script>
 
 {#if active}
   <div class="field-surface" class:fullscreen>
     <div class="field-fill" style="background:{color}; opacity:{opacity}"></div>
+    {#if depth?.enabled}
+      <div class="stereo-pair" aria-hidden="true">
+        {#each stereoPanels as panel}
+          <div class="eye-pane" data-eye={panel.key}>
+            <div
+              class="stereo-mark"
+              style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px"
+            >
+              <span class="stick"></span>
+              <span class="point"></span>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 {:else}
   <div class="field-surface visual-off" class:fullscreen>
@@ -37,6 +70,60 @@
     inset: 0;
     /* Snappy enough to track a blink but soft enough to avoid hard clicks. */
     transition: opacity 0.02s linear;
+  }
+
+  .stereo-pair {
+    position: absolute;
+    inset: clamp(0.75rem, 3vw, 2rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(0.5rem, 3vw, 2rem);
+    pointer-events: none;
+  }
+
+  .eye-pane {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    border: 1px solid color-mix(in srgb, #fff 28%, transparent);
+    background:
+      linear-gradient(color-mix(in srgb, #fff 15%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, #fff 15%, transparent) 1px, transparent 1px);
+    background-size: 100% 50%, 50% 100%;
+    overflow: hidden;
+  }
+
+  .stereo-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--dot-size);
+    height: calc(var(--dot-size) * 4);
+    transform: translate(calc(-50% + var(--offset)), -50%);
+  }
+
+  .stick {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: calc(var(--dot-size) * 0.65);
+    width: max(2px, calc(var(--dot-size) * 0.16));
+    border-radius: 999px;
+    background: color-mix(in srgb, #fff 82%, transparent);
+    transform: translateX(-50%);
+    box-shadow: 0 0 18px color-mix(in srgb, #000 42%, transparent);
+  }
+
+  .point {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 999px;
+    background: #fff;
+    transform: translateX(-50%);
+    box-shadow: 0 0 18px color-mix(in srgb, #000 38%, transparent);
   }
 
   .visual-off {

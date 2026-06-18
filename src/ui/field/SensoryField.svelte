@@ -8,7 +8,10 @@
   import {
     loadFieldState, saveFieldState, resolveEarFrequencies,
     NOISE_COLORS, BEAT_MODES, TONE_MIN_HZ, TONE_MAX_HZ, BEAT_MIN_HZ, BEAT_MAX_HZ,
-    BLINK_MIN_HZ, BLINK_MAX_HZ,
+    BLINK_MIN_HZ, BLINK_MAX_HZ, DEPTH_VIEWING_MODES, DEPTH_SOURCES,
+    DEPTH_SEPARATION_MIN_PX, DEPTH_SEPARATION_MAX_PX, DEPTH_MODULATION_MIN_PX,
+    DEPTH_MODULATION_MAX_PX, DEPTH_DOT_MIN_PX, DEPTH_DOT_MAX_PX,
+    DEPTH_BREATH_MIN_SEC, DEPTH_BREATH_MAX_SEC, resolveDepthSeparation,
   } from './fieldState.js'
   import { fieldStateToTurtle } from './exposureProfile.js'
   import { FIELD_SEMANTICS, fieldGraphHref } from './fieldSemantic.js'
@@ -18,6 +21,7 @@
   let playing = $state(false)
   let fullscreen = $state(false)
   let displayOpacity = $state(field.visual.intensity)
+  let depthSeparationPx = $state(field.depth.baseSeparationPx)
   let engineNote = $state('')
   let exportTtl = $state('')
   let exportOpen = $state(false)
@@ -34,6 +38,8 @@
 
   const blinkRisk = $derived(field.visual.blinkEnabled ? flashRiskLevel(field.visual.blinkRateHz) : 'safe')
   const blinkNeedsAck = $derived(field.visual.blinkEnabled && requiresFlashAcknowledgement(field.visual.blinkRateHz))
+  const depthSourceLabels = { static: 'static', beat: 'beat', breath: 'breath' }
+  const depthModeLabels = { parallel: 'parallel', cross: 'cross-eye' }
   const trem = () => (field.audio.beatMode === 'monaural'
     ? { enabled: true, rate: field.audio.beatRateHz, depth: 0.8, mode: 'linear' }
     : null)
@@ -60,6 +66,7 @@
     } else {
       displayOpacity = field.visual.intensity
     }
+    depthSeparationPx = resolveDepthSeparation(field, t)
     if (playing && engine) applyLiveAudio(t)
     raf = requestAnimationFrame(tick)
   }
@@ -211,6 +218,16 @@
   function buildSemList(f) {
     const out = [FIELD_SEMANTICS.visual]
     if (f.visual.blinkEnabled) out.push(FIELD_SEMANTICS.blink, FIELD_SEMANTICS.photosensitivity)
+    if (f.depth.enabled) {
+      out.push(
+        FIELD_SEMANTICS.stereoscopy,
+        FIELD_SEMANTICS.leftEye,
+        FIELD_SEMANTICS.rightEye,
+        FIELD_SEMANTICS.stereoDepth,
+        FIELD_SEMANTICS.horizontalFieldLoss,
+        FIELD_SEMANTICS.eyeStrain,
+      )
+    }
     if (f.audio.enabled) {
       out.push(FIELD_SEMANTICS.leftEar, FIELD_SEMANTICS.rightEar, FIELD_SEMANTICS.hearing)
       if (f.audio.beatMode === 'binaural') out.push(FIELD_SEMANTICS.binaural)
@@ -240,8 +257,10 @@
       <FieldStage
         color={field.visual.color}
         opacity={$visualStimulationOn ? displayOpacity : 1}
-        active={$visualStimulationOn}
+        active={$visualStimulationOn && field.visual.enabled}
         {fullscreen}
+        depth={field.depth}
+        {depthSeparationPx}
       />
       {#if fullscreen}
         <button type="button" class="exit-fs" onclick={toggleFullscreen}>Exit ✕</button>
@@ -315,6 +334,85 @@
           {#if !field.flashRiskAccepted}
             <p class="note">Flash rate is capped at 3&nbsp;Hz until you accept the risk.</p>
           {/if}
+        {/if}
+      {/if}
+    </fieldset>
+
+    <!-- Depth -------------------------------------------------------------- -->
+    <fieldset>
+      <legend>Stereoscopic depth</legend>
+      <label class="row">
+        <input type="checkbox" bind:checked={field.depth.enabled} role="switch" />
+        Free-view pair
+      </label>
+
+      {#if field.depth.enabled}
+        <label class="row">
+          Viewing
+          <select bind:value={field.depth.viewingMode}>
+            {#each DEPTH_VIEWING_MODES as mode}
+              <option value={mode}>{depthModeLabels[mode]}</option>
+            {/each}
+          </select>
+        </label>
+        <label class="row">
+          Source
+          <select bind:value={field.depth.source}>
+            {#each DEPTH_SOURCES as source}
+              <option value={source}>{depthSourceLabels[source]}</option>
+            {/each}
+          </select>
+        </label>
+        <label class="row">
+          Separation
+          <input
+            type="range"
+            min={DEPTH_SEPARATION_MIN_PX}
+            max={DEPTH_SEPARATION_MAX_PX}
+            step="1"
+            bind:value={field.depth.baseSeparationPx}
+          />
+          <output>{Math.round(field.depth.baseSeparationPx)} px</output>
+        </label>
+        <label class="row">
+          Motion
+          <input
+            type="range"
+            min={DEPTH_MODULATION_MIN_PX}
+            max={DEPTH_MODULATION_MAX_PX}
+            step="1"
+            bind:value={field.depth.modulationPx}
+            disabled={field.depth.source === 'static'}
+          />
+          <output>{Math.round(field.depth.modulationPx)} px</output>
+        </label>
+        {#if field.depth.source === 'breath'}
+          <label class="row">
+            Breath period
+            <input
+              type="range"
+              min={DEPTH_BREATH_MIN_SEC}
+              max={DEPTH_BREATH_MAX_SEC}
+              step="0.5"
+              bind:value={field.depth.breathPeriodSec}
+            />
+            <output>{field.depth.breathPeriodSec.toFixed(1)} s</output>
+          </label>
+        {/if}
+        <label class="row">
+          Marker
+          <input
+            type="range"
+            min={DEPTH_DOT_MIN_PX}
+            max={DEPTH_DOT_MAX_PX}
+            step="1"
+            bind:value={field.depth.dotSizePx}
+          />
+          <output>{Math.round(field.depth.dotSizePx)} px</output>
+        </label>
+        <p class="note">Current delivered separation: {Math.round(depthSeparationPx)} px.</p>
+        {#if field.depth.source === 'beat' && field.audio.beatMode === 'none'}
+          <p class="note">Beat-driven depth uses the beat-rate control even when audio beat is off.</p>
         {/if}
       {/if}
     </fieldset>

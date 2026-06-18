@@ -17,6 +17,42 @@ export const FIELD_SEMANTICS = {
     uri: SSTIM_EX('patternBlinking').value,
     description: 'The field alternates on and off at a chosen flicker rate; bounded by the photosensitivity flash-rate limit.',
   },
+  stereoscopy: {
+    label: 'Free-view stereoscopy',
+    kind: 'Device capability',
+    uri: SSTIM_EX('capabilityFreeViewStereoscopy').value,
+    description: 'Stereoscopic perception through cross-eye or parallel free-viewing rather than a headset.',
+  },
+  leftEye: {
+    label: 'Left eye',
+    kind: 'Body placement',
+    uri: SSTIM_EX('placementEyeLeft').value,
+    description: 'Visual content intended for the left eye in a stereoscopic pair.',
+  },
+  rightEye: {
+    label: 'Right eye',
+    kind: 'Body placement',
+    uri: SSTIM_EX('placementEyeRight').value,
+    description: 'Visual content intended for the right eye in a stereoscopic pair.',
+  },
+  stereoDepth: {
+    label: 'Stereo depth',
+    kind: 'Perceptual gain',
+    uri: SSTIM_EX('gainStereoDepth').value,
+    description: 'A perceived depth gain created by binocular separation.',
+  },
+  horizontalFieldLoss: {
+    label: 'Horizontal-field loss',
+    kind: 'Perceptual loss',
+    uri: SSTIM_EX('lossHorizontalField').value,
+    description: 'Reduced horizontal visual field created by side-by-side free-view presentation.',
+  },
+  eyeStrain: {
+    label: 'Eye-strain boundary',
+    kind: 'Comfort boundary',
+    uri: SSTIM_EX('boundaryEyeStrain').value,
+    description: 'Eye-comfort boundary for free-view or near-eye visual presentation.',
+  },
   leftEar: {
     label: 'Left ear',
     kind: 'Body placement',

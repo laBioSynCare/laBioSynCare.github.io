@@ -50,4 +50,26 @@ describe('exposureProfile', () => {
     expect(objs).not.toContain('https://w3id.org/sstim/exposure#placementEarLeft')
     expect(objs).toContain('https://w3id.org/sstim/exposure#mediumVisualLight')
   })
+
+  it('adds free-view stereo terms only when depth is enabled', () => {
+    const off = createFieldState()
+    const offObjs = fieldStateToQuads(off, opts).map((q) => q.object.value)
+    expect(offObjs).not.toContain('https://w3id.org/sstim/exposure#capabilityFreeViewStereoscopy')
+
+    const on = createFieldState()
+    on.depth.enabled = true
+    on.depth.source = 'beat'
+    const quads = fieldStateToQuads(on, opts)
+    const objs = quads.map((q) => q.object.value)
+    const preds = quads.map((q) => q.predicate.value)
+
+    expect(objs).toContain('https://w3id.org/sstim/exposure#mediumStereoscopicVisualPresentation')
+    expect(objs).toContain('https://w3id.org/sstim/exposure#capabilityFreeViewStereoscopy')
+    expect(objs).toContain('https://w3id.org/sstim/exposure#placementEyeLeft')
+    expect(objs).toContain('https://w3id.org/sstim/exposure#placementEyeRight')
+    expect(objs).toContain('https://w3id.org/sstim/exposure#gainStereoDepth')
+    expect(objs).toContain('https://w3id.org/sstim/exposure#lossHorizontalField')
+    expect(preds).toContain('https://w3id.org/sstim/exposure#hasPerceptualGain')
+    expect(preds).toContain('https://w3id.org/sstim/exposure#hasPerceptualLoss')
+  })
 })

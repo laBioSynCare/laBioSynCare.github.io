@@ -14,6 +14,8 @@ export const FIELD_STORAGE_KEY = 'bsclab.field'
 
 export const NOISE_COLORS = ['white', 'pink', 'brown']
 export const BEAT_MODES = ['none', 'monaural', 'binaural']
+export const DEPTH_VIEWING_MODES = ['parallel', 'cross']
+export const DEPTH_SOURCES = ['static', 'beat', 'breath']
 
 // Tone frequency bounds (Hz) and absolute caps shared with the UI sliders.
 export const TONE_MIN_HZ = 50
@@ -22,8 +24,21 @@ export const BEAT_MIN_HZ = 0
 export const BEAT_MAX_HZ = 40
 export const BLINK_MIN_HZ = 0.1
 export const BLINK_MAX_HZ = 60
+export const DEPTH_SEPARATION_MIN_PX = 0
+export const DEPTH_SEPARATION_MAX_PX = 160
+export const DEPTH_MODULATION_MIN_PX = 0
+export const DEPTH_MODULATION_MAX_PX = 80
+export const DEPTH_DOT_MIN_PX = 6
+export const DEPTH_DOT_MAX_PX = 40
+export const DEPTH_BREATH_MIN_SEC = 3
+export const DEPTH_BREATH_MAX_SEC = 30
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+const TWO_PI = Math.PI * 2
+const numberOr = (value, fallback) => {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
 
 export function createFieldState() {
   return {
@@ -37,6 +52,15 @@ export function createFieldState() {
       blinkRateHz: 1,
       blinkDuty: 0.5,
     },
+    depth: {
+      enabled: false,
+      viewingMode: 'parallel',
+      source: 'static',
+      baseSeparationPx: 48,
+      modulationPx: 18,
+      dotSizePx: 16,
+      breathPeriodSec: 10,
+    },
     audio: {
       enabled: true,
       linkEars: true,
@@ -48,6 +72,35 @@ export function createFieldState() {
     // Per-session acknowledgement that the user accepts a flash rate inside the
     // photosensitivity risk band. Never persisted — always re-confirmed.
     flashRiskAccepted: false,
+  }
+}
+
+function normalizeDepth(depth = {}) {
+  const base = createFieldState().depth
+  return {
+    enabled: typeof depth.enabled === 'boolean' ? depth.enabled : base.enabled,
+    viewingMode: DEPTH_VIEWING_MODES.includes(depth.viewingMode) ? depth.viewingMode : base.viewingMode,
+    source: DEPTH_SOURCES.includes(depth.source) ? depth.source : base.source,
+    baseSeparationPx: clamp(
+      numberOr(depth.baseSeparationPx, base.baseSeparationPx),
+      DEPTH_SEPARATION_MIN_PX,
+      DEPTH_SEPARATION_MAX_PX,
+    ),
+    modulationPx: clamp(
+      numberOr(depth.modulationPx, base.modulationPx),
+      DEPTH_MODULATION_MIN_PX,
+      DEPTH_MODULATION_MAX_PX,
+    ),
+    dotSizePx: clamp(
+      numberOr(depth.dotSizePx, base.dotSizePx),
+      DEPTH_DOT_MIN_PX,
+      DEPTH_DOT_MAX_PX,
+    ),
+    breathPeriodSec: clamp(
+      numberOr(depth.breathPeriodSec, base.breathPeriodSec),
+      DEPTH_BREATH_MIN_SEC,
+      DEPTH_BREATH_MAX_SEC,
+    ),
   }
 }
 
@@ -90,6 +143,7 @@ export function normalizeFieldState(input) {
       blinkRateHz: clamp(Number(v.blinkRateHz ?? base.visual.blinkRateHz) || base.visual.blinkRateHz, BLINK_MIN_HZ, BLINK_MAX_HZ),
       blinkDuty: clamp(Number(v.blinkDuty ?? base.visual.blinkDuty) || base.visual.blinkDuty, 0.05, 0.95),
     },
+    depth: normalizeDepth(input?.depth),
     audio: {
       enabled: typeof a.enabled === 'boolean' ? a.enabled : base.audio.enabled,
       linkEars: typeof a.linkEars === 'boolean' ? a.linkEars : base.audio.linkEars,
@@ -120,6 +174,25 @@ export function resolveEarFrequencies(state) {
     }
   }
   return { left, right }
+}
+
+/**
+ * Resolve the delivered stereo point separation, in CSS pixels. The parent
+ * component passes AudioContext.currentTime while a session is running.
+ */
+export function resolveDepthSeparation(state, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const base = depth.baseSeparationPx
+  if (!depth.enabled || depth.source === 'static' || depth.modulationPx <= 0) return base
+
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (depth.source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (depth.source === 'breath') rate = 1 / depth.breathPeriodSec
+  if (rate <= 0) return base
+
+  const value = base + depth.modulationPx * Math.sin(time * rate * TWO_PI)
+  return clamp(value, DEPTH_SEPARATION_MIN_PX, DEPTH_SEPARATION_MAX_PX)
 }
 
 export function loadFieldState() {
