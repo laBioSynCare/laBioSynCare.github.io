@@ -55,6 +55,9 @@ banner pointing to the as-built reference.
   instance distinction. Source for `schemas/session.schema.json` (planned).
 - [`KNOWLEDGE_BROWSER_UX.md`](technical/KNOWLEDGE_BROWSER_UX.md) — UX design for
   the ontology graph, SPARQL, preset browser, and annotation surfaces.
+- [`OPENCLAW_AGENT_AUTOMATION_USAGE.md`](technical/OPENCLAW_AGENT_AUTOMATION_USAGE.md) —
+  target guidance for using OpenClaw as a conversational agent-automation layer
+  around SSTIM intake, routing, review packets, and maintainer commands.
 - [`AUDIO_ENGINE_ARCHITECTURE.md`](technical/AUDIO_ENGINE_ARCHITECTURE.md) —
   **target** pluggable audio engine design (three-clock model, orchestrator).
   As-built engines: [`../src/engines/README.md`](../src/engines/README.md).
