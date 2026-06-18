@@ -58,6 +58,14 @@ RewriteRule ^patch-studio$ https://labiosyncare.github.io/ [R=303,L]
 RewriteRule ^patch-studio$ https://labiosyncare.github.io/ontology/sstim-patch-studio.ttl [R=303,L]
 
 # -------------------------------------------------------------------------
+# /sstim/exposure — exposure, delivery, modality, and experiment vocabulary
+# -------------------------------------------------------------------------
+RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)
+RewriteRule ^exposure$ https://labiosyncare.github.io/ [R=303,L]
+
+RewriteRule ^exposure$ https://labiosyncare.github.io/ontology/sstim-exposure.ttl [R=303,L]
+
+# -------------------------------------------------------------------------
 # /sstim — core ontology (OWL classes and properties). Fragment IRIs such
 # as /sstim#Preset resolve here; the fragment is handled client-side.
 # -------------------------------------------------------------------------

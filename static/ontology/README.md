@@ -49,10 +49,12 @@ static/ontology/
 ├── sstim-shapes.ttl      SHACL validation shapes
 ├── sstim-alignments.ttl  External alignments (Wikidata, OBO Foundry)
 ├── sstim-patch-studio.ttl Patch Studio model vocabulary
+├── sstim-exposure.ttl    Exposure, delivery, modality, and experiment vocabulary
 ├── 0.1.0/                Frozen ontology snapshot for version 0.1.0
 ├── 0.2.0/                Frozen ontology snapshot for version 0.2.0
 ├── 0.3.0/                Frozen ontology snapshot for version 0.3.0
 └── instances/
+    ├── experiments/     Exploratory BSC Lab exposure experiment instances
     ├── frameworks/      BSC framework identity and technique instances
     ├── implementations/ BSC Lab / BioSynCare implementation identities
     ├── presets/         Public BSC Lab reference preset instances
@@ -94,6 +96,17 @@ Defines the Patch Studio authoring model vocabulary used by the as-built
 real-time audiovisual designer. It is snapshotted with the other ontology
 modules so model terms remain citable alongside each release.
 
+### `sstim-exposure.ttl` — Exposure and experiment vocabulary
+
+Defines the exposure layer introduced by
+[ADR 0010](../../docs/decisions/0010-exposure-delivery-modality.md). It
+separates physical delivery medium, perceived modality, device capability, body
+placement, comfort boundary, effect claim, experiment context, and knowledge
+status. The module keeps `sstim:techniqueModality` as a coarse compatibility
+relation while giving new work explicit terms for haptics, visual noise,
+stereoscopy/VR, smell/taste boundaries, Wi-Fi/electromagnetic hypotheses, and
+future tactile or volumetric immersion.
+
 ### Versioned snapshot directories
 
 Each semver directory contains byte-identical copies of the top-level Turtle
@@ -114,8 +127,10 @@ from `src/rdf/namespaces.js`. Never hardcode IRI strings.
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix bsc-fw:   <https://w3id.org/sstim/framework/bsc/> .
 @prefix bsclab-preset: <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix biosyncare-preset: <https://w3id.org/sstim/implementation/biosyncare/preset/> .
 
 # Upper ontology
@@ -146,8 +161,10 @@ One persistent namespace is registered at
 - `https://w3id.org/sstim` — the ontology (classes, properties, SKOS
   vocabulary, SHACL shapes). Content-negotiated to Turtle now; WIDOCO HTML is
   blocked until the publication path is chosen.
+- `https://w3id.org/sstim/exposure` — exposure, physical delivery, perceived
+  modality, device capability, experiment context, and knowledge-status module.
 - `https://w3id.org/sstim/framework/bsc` — the BSC framework.
-- `https://w3id.org/sstim/implementation/bsclab/{preset,session,annotation,evidence}/...` —
+- `https://w3id.org/sstim/implementation/bsclab/{preset,experiment,session,annotation,evidence}/...` —
   BSC Lab implementation data under the same registered SSTIM namespace.
 - `https://w3id.org/sstim/implementation/biosyncare/...` —
   reserved for public-safe BioSynCare implementation metadata if published. The

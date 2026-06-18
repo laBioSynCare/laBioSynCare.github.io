@@ -1,0 +1,65 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/free-view-stereo-headphones#> .
+
+bsclab-experiment:free-view-stereo-headphones a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Free-view stereoscopy with headphones"@en ;
+    dct:description "Non-clinical exploratory setup using free-view or hand-separated stereoscopy with headphones. It models stereo-depth and audio-immersion gains, horizontal-field and environmental-awareness losses, and eye-strain/hearing comfort boundaries."@en ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBiohacking ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Free-view stereo plus headphone exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-channel, this:audio-channel ;
+    sstim-ex:hasPerceptualGain sstim-ex:gainStereoDepth, sstim-ex:gainAudioImmersion, sstim-ex:gainSpatialAudio ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossHorizontalField, sstim-ex:lossEnvironmentalAwareness ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryEyeStrain, sstim-ex:boundaryHearingRisk ;
+    sstim-ex:hasEffectClaim this:stereo-depth-claim, this:audio-immersion-claim, this:eye-strain-risk-claim .
+
+this:visual-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Free-view stereoscopic visual channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumStereoscopicVisualPresentation, sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityFreeViewStereoscopy ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes, sstim-ex:placementHands ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternStatic, sstim-ex:patternMoving ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryEyeStrain .
+
+this:audio-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Headphone audio channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityStereoSeparation, sstim-ex:capabilityHrtfSpatialAudio ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk, sstim-ex:boundaryEnvironmentalAwareness .
+
+this:stereo-depth-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Stereo-depth perception hypothesis"@en ;
+    dct:description "Hypothesizes increased perceived depth from free-view stereoscopy while noting reduced horizontal visual field."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityAV ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectImmersion, sstim-ex:effectEyeStrain ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+
+this:audio-immersion-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Audio immersion hypothesis"@en ;
+    dct:description "Hypothesizes greater perceived audio immersion from stereo-separated headphone presentation while noting environmental-awareness loss."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityAUD ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectImmersion ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+
+this:eye-strain-risk-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Eye-strain risk boundary"@en ;
+    dct:description "Marks free-view or near-eye stereoscopic use as requiring an eye-comfort boundary. No clinical safety threshold is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectEyeStrain ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .

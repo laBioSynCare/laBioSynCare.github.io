@@ -11,6 +11,7 @@ SHAPES     := static/ontology/sstim-shapes.ttl
 ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
+EXPOSURE   := static/ontology/sstim-exposure.ttl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/*/*.ttl)
 DEV_HOST   ?= 127.0.0.1
@@ -18,7 +19,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-instances snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -48,6 +49,10 @@ shacl-core:
 shacl-vocab:
 	$(PYSHACL) -s $(SHAPES) $(VOCAB)
 
+## Validate exposure ontology module against shapes
+shacl-exposure:
+	$(PYSHACL) -s $(SHAPES) $(EXPOSURE)
+
 ## Validate RDF instances against shapes with ontology + vocabulary context
 shacl-instances:
 	@if [ -z "$(strip $(INSTANCE_FILES))" ]; then \
@@ -55,12 +60,16 @@ shacl-instances:
 	else \
 		tmp="$$(mktemp)"; \
 		trap 'rm -f "$$tmp"' EXIT; \
-		cat $(ONTOLOGY) $(VOCAB) $(INSTANCE_FILES) > "$$tmp"; \
+		cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(INSTANCE_FILES) > "$$tmp"; \
 		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
 	fi
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-instances
+shacl: shacl-core shacl-vocab shacl-exposure shacl-instances
+
+## Run ontology SPARQL sanity checks
+sparql-sanity:
+	node scripts/sstim-exposure-sanity.mjs
 
 ## Freeze the current ontology as an immutable versioned snapshot
 ## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
@@ -73,7 +82,7 @@ test:
 	npm test
 
 ## Run the current ontology validation suite
-validate: shacl
+validate: shacl sparql-sanity
 
 ## Recompile the hand-written WASM oscillator kernel (bsc-osc.wat -> .wasm)
 wasm:
@@ -93,5 +102,7 @@ help:
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
+	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
+	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
 	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

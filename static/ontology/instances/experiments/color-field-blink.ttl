@@ -1,0 +1,54 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/color-field-blink#> .
+
+bsclab-experiment:color-field-blink a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Color field and blink exposure"@en ;
+    dct:description "Non-clinical exploratory setup for modeling static or blinking display color fields and their comfort, arousal, and photosensitivity boundaries without asserting physiological effects as fact."@en ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBscLabPrototype ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Color field blink exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-channel ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasEffectClaim this:color-arousal-claim, this:photosensitivity-risk-claim, this:heart-rate-hypothesis .
+
+this:visual-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Blinking color-field visual channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternBlinking, sstim-ex:patternFixedColor, sstim-ex:patternChangingColor, sstim-ex:visualFieldStaticColor ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain .
+
+this:color-arousal-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Color-field arousal hypothesis"@en ;
+    dct:description "Hypothesizes that static or blinking color fields may differ in perceived arousal or discomfort. No direction or magnitude is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectArousal, sstim-ex:effectDiscomfort ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+
+this:photosensitivity-risk-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Photosensitivity risk boundary"@en ;
+    dct:description "Marks flicker and high-intensity visual exposure as requiring conservative photosensitivity handling. No clinical screening rule is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectPhotosensitivityRisk ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+this:heart-rate-hypothesis a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Heart-rate response hypothesis"@en ;
+    dct:description "Records a question about whether blinking or static color fields relate to heart-rate changes. SSTIM records no settled answer here."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectHeartRate, sstim-ex:effectBloodPressure, sstim-ex:effectBreathRate ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .

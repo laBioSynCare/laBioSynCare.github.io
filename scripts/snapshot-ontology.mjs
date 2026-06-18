@@ -35,6 +35,7 @@ const ONTOLOGY_FILES = [
   'sstim-shapes.ttl',
   'sstim-alignments.ttl',
   'sstim-patch-studio.ttl',
+  'sstim-exposure.ttl',
 ]
 
 function declaredVersion() {

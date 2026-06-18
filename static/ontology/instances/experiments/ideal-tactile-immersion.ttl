@@ -1,0 +1,144 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/ideal-tactile-immersion#> .
+
+bsclab-experiment:ideal-tactile-immersion a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Ideal tactile immersion"@en ;
+    dct:description "Non-clinical future-capability model for full-body tactile and volumetric immersion through clothing, gel or liquid, rigid surfaces, moving and static texture, temperature, airflow, fluid motion, joint force, gravity-like cueing, walking, and room-scale movement."@en ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Ideal tactile immersion exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    sstim-ex:usesStimulusChannel this:textile-channel, this:liquid-gel-channel, this:rigid-surface-channel, this:thermal-airflow-channel, this:joint-gravity-channel, this:wearable-light-audio-channel, this:room-scale-locomotion-channel ;
+    sstim-ex:requiresDeviceCapability
+        sstim-ex:capabilityLiquidGelTactileImmersion,
+        sstim-ex:capabilityHapticActuator,
+        sstim-ex:capabilityThermalActuation,
+        sstim-ex:capabilityAirflowActuation,
+        sstim-ex:capabilityJointForceActuation,
+        sstim-ex:capabilityGravityCueing,
+        sstim-ex:capabilityFullVisualOcclusion,
+        sstim-ex:capabilityBodyPositionTracking,
+        sstim-ex:capabilityRoomScaleTracking,
+        sstim-ex:capabilityLocomotionInterface,
+        sstim-ex:capabilityWearableSpeakerArray,
+        sstim-ex:capabilityWearableLightArray,
+        sstim-ex:capabilityVrHeadset,
+        sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasPerceptualGain sstim-ex:gainTactileImmersion, sstim-ex:gainBodyVibration, sstim-ex:gainThermalProximity, sstim-ex:gainSpatialPresence ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryBodyContactComfort, sstim-ex:boundaryThermalComfort, sstim-ex:boundaryIsolation, sstim-ex:boundaryBalanceRisk ;
+    sstim-ex:hasEffectClaim this:tactile-immersion-claim, this:temperature-proximity-claim, this:gravity-joint-claim, this:wearable-array-claim, this:spatial-presence-claim, this:balance-boundary-claim .
+
+this:textile-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Textile/clothing tactile channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumTextileClothingContact, sstim-ex:mediumMechanicalVibration ;
+    sstim-ex:perceivedModality sstim-ex:modalityTactile, sstim-ex:modalitySomatosensory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHapticActuator, sstim-ex:capabilityWearableSpeakerArray ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternTextured, sstim-ex:patternRhythmic, sstim-ex:patternContinuous .
+
+this:liquid-gel-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Liquid/gel immersion channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumLiquidGelImmersion, sstim-ex:mediumFluidMotion ;
+    sstim-ex:perceivedModality sstim-ex:modalityTactile, sstim-ex:modalitySomatosensory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityLiquidGelTactileImmersion ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternTextured .
+
+this:rigid-surface-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Rigid surface contact channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumRigidSurfaceContact ;
+    sstim-ex:perceivedModality sstim-ex:modalityTactile, sstim-ex:modalitySomatosensory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHapticActuator ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternStatic, sstim-ex:patternMoving .
+
+this:thermal-airflow-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Temperature and airflow channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumThermalContact, sstim-ex:mediumAirflow, sstim-ex:mediumFluidMotion ;
+    sstim-ex:perceivedModality sstim-ex:modalityTactile, sstim-ex:modalitySomatosensory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityThermalActuation, sstim-ex:capabilityAirflowActuation ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternAdaptive ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryThermalComfort .
+
+this:joint-gravity-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Joint force and gravity cue channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumMechanicalVibration, sstim-ex:mediumRigidSurfaceContact ;
+    sstim-ex:perceivedModality sstim-ex:modalitySomatosensory, sstim-ex:modalityVestibular ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityJointForceActuation, sstim-ex:capabilityGravityCueing ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementJoints, sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternAdaptive .
+
+this:wearable-light-audio-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Wearable audio/light array channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration, sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory, sstim-ex:modalityTactile, sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityWearableSpeakerArray, sstim-ex:capabilityWearableLightArray ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic, sstim-ex:patternBlinking, sstim-ex:patternChangingColor .
+
+this:room-scale-locomotion-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Room-scale locomotion and spatial-presence channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumRigidSurfaceContact, sstim-ex:mediumStereoscopicVisualPresentation, sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityVestibular, sstim-ex:modalityProprioceptive, sstim-ex:modalityVisual, sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityRoomScaleTracking, sstim-ex:capabilityBodyPositionTracking, sstim-ex:capabilityLocomotionInterface, sstim-ex:capabilityVrHeadset, sstim-ex:capabilityFullVisualOcclusion, sstim-ex:capabilityHeadphones, sstim-ex:capabilityHrtfSpatialAudio ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementFeet, sstim-ex:placementWholeBody, sstim-ex:placementEyes, sstim-ex:placementEars, sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternAdaptive ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryBalanceRisk, sstim-ex:boundaryEnvironmentalAwareness .
+
+this:tactile-immersion-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Full-body tactile immersion hypothesis"@en ;
+    dct:description "Hypothesizes a future capability for full-body tactile immersion through multiple delivery media. Current BSC Lab systems do not deliver this."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectImmersion, sstim-ex:effectTactileSensation ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:temperature-proximity-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Temperature/proximity hypothesis"@en ;
+    dct:description "Models temperature and airflow as possible cues for tactile proximity or environmental presence. No physiological benefit is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectTemperaturePerception ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+
+this:gravity-joint-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Joint force and gravity-cue hypothesis"@en ;
+    dct:description "Models pull, push, joint force, spinning, and gravity-like cueing as future immersion concepts requiring device capability review."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectGravityPerception, sstim-ex:effectImmersion ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:wearable-array-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Wearable speaker/light array concept"@en ;
+    dct:description "Models clothing with distributed speakers or light emitters as a device-capability concept requiring literature and implementation review."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectBodyVibration, sstim-ex:effectImmersion ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:spatial-presence-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Walking/moving spatial-presence hypothesis"@en ;
+    dct:description "Models volume immersion as requiring room-scale movement, position tracking, locomotion support, outside-vision occlusion, spatial audio, and visual motion/parallax. No guaranteed effect is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityAV, sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectSpatialPresence, sstim-ex:effectProprioception ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:balance-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Room-scale balance-risk boundary"@en ;
+    dct:description "Marks walking or locomotion immersion as requiring explicit balance, environmental-awareness, and physical-space boundaries."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectBalanceRisk ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .

@@ -38,11 +38,14 @@ Canonical graph IRIs mirror the namespace structure where modules align:
 | `sstim-vocab.ttl` | `https://w3id.org/sstim/graph/vocab` |
 | `sstim-shapes.ttl` | `https://w3id.org/sstim/graph/shapes` |
 | `sstim-alignments.ttl` | `https://w3id.org/sstim/graph/alignments` |
+| `sstim-patch-studio.ttl` | `https://w3id.org/sstim/graph/patch-studio` |
+| `sstim-exposure.ttl` | `https://w3id.org/sstim/graph/exposure` |
 | Future `sstim-track.ttl` | `https://w3id.org/sstim/graph/track` |
 | Future `sstim-outcome.ttl` | `https://w3id.org/sstim/graph/outcome` |
 | Framework instances | `https://w3id.org/sstim/graph/frameworks` |
 | Implementation instances | `https://w3id.org/sstim/graph/implementations` |
 | BSC Lab preset instances | `https://w3id.org/sstim/implementation/bsclab/preset/` |
+| BSC Lab experiment instances | `https://w3id.org/sstim/implementation/bsclab/experiment/` |
 | Public-safe references | `https://w3id.org/sstim/ref/` |
 | User annotations | `https://w3id.org/sstim/implementation/bsclab/annotation/{userId}` |
 | Session records | `https://w3id.org/sstim/implementation/bsclab/session/{sessionId}` |

@@ -406,7 +406,9 @@ sstim:techniqueModality a owl:ObjectProperty ;
     rdfs:domain sstim:SensoryStimulationTechnique ;
     rdfs:range  sstim:SensoryModality ;
     rdfs:label  "technique modality"@en ;
-    skos:definition "Links a sensory stimulation technique to the sensory modality (or modalities) through which it is typically delivered. A technique may engage more than one modality (e.g. vibroacoustic stimulation is both auditory and somatosensory)."@en ;
+    skos:definition "Coarse legacy/convenience relation linking a sensory stimulation technique to broad sensory modality tags. Use the SSTIM exposure module when physical delivery medium, perceived modality, device capability, body placement, experiment context, or knowledge status must be represented separately."@en ;
+    skos:scopeNote "Kept unchanged for compatibility with SSTIM 0.3.0 consumers. New detailed modeling should use sstim-exposure.ttl terms such as sstim-ex:deliveryMedium, sstim-ex:perceivedModality, and sstim-ex:requiresDeviceCapability."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

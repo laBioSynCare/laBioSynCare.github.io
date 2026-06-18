@@ -97,6 +97,7 @@ export const ONTOLOGY_URLS = {
   shapes:     '/ontology/sstim-shapes.ttl',
   alignments: '/ontology/sstim-alignments.ttl',
   patchStudio:'/ontology/sstim-patch-studio.ttl',
+  exposure:   '/ontology/sstim-exposure.ttl',
 }
 
 export const ONTOLOGY_SOURCES = {
@@ -120,6 +121,10 @@ export const ONTOLOGY_SOURCES = {
     url: ONTOLOGY_URLS.patchStudio,
     graph: 'https://w3id.org/sstim/graph/patch-studio',
   },
+  exposure: {
+    url: ONTOLOGY_URLS.exposure,
+    graph: 'https://w3id.org/sstim/graph/exposure',
+  },
 }
 
 /**
@@ -135,6 +140,17 @@ export const INSTANCE_URLS = {
   ],
   presets: [
     '/ontology/instances/presets/perform-alpha-10-seed.ttl',
+  ],
+  experiments: [
+    '/ontology/instances/experiments/free-view-stereo-headphones.ttl',
+    '/ontology/instances/experiments/multi-headphone-haptic.ttl',
+    '/ontology/instances/experiments/color-field-blink.ttl',
+    '/ontology/instances/experiments/colored-audio-noise.ttl',
+    '/ontology/instances/experiments/silence-darkness-baseline.ttl',
+    '/ontology/instances/experiments/social-graph-sensory-protocol.ttl',
+    '/ontology/instances/experiments/wifi-em-field-hypothesis.ttl',
+    '/ontology/instances/experiments/smell-taste-device-boundary.ttl',
+    '/ontology/instances/experiments/ideal-tactile-immersion.ttl',
   ],
   references: [
     '/ontology/instances/references/references.ttl',
@@ -154,6 +170,10 @@ export const INSTANCE_SOURCES = {
     url,
     graph: 'https://w3id.org/sstim/implementation/bsclab/preset/',
   })),
+  experiments: INSTANCE_URLS.experiments.map(url => ({
+    url,
+    graph: 'https://w3id.org/sstim/implementation/bsclab/experiment/',
+  })),
   references: INSTANCE_URLS.references.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/ref/',
@@ -169,7 +189,7 @@ export function instanceSources() {
 }
 
 /**
- * Load the four canonical sstim ontology files into one merged store.
+ * Load the canonical sstim ontology files into one merged store.
  * SHACL shapes are included so the store can be used for both querying
  * and validation without a second fetch.
  *

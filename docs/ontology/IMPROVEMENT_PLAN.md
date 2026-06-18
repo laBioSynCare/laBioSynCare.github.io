@@ -44,6 +44,13 @@ overloads at least three distinct questions:
 - what sensory or perceptual channel is engaged;
 - what device or hardware capability is required.
 
+Raw Portuguese/English maintainer notes that motivated the exposure model are
+preserved in
+[`raw-notes/2026-06-18-exposure-maintainer-notes.md`](raw-notes/2026-06-18-exposure-maintainer-notes.md).
+The normalized design question is: what can SSTIM represent about biohacking,
+sensory stimulation, delivery media, device capabilities, perceived modalities,
+body placement, evidence status, and BSC Lab's current delivery limits?
+
 This matters for cross-modal and non-consumer cases:
 
 - vibroacoustic stimulation is acoustic plus somatosensory;
@@ -51,22 +58,53 @@ This matters for cross-modal and non-consumer cases:
   perception;
 - visual flicker and photic stimulation need luminance/display constraints;
 - haptic stimulation needs actuator capability and body contact;
+- high-volume or low-frequency audio can become tactile or body-perceived, so
+  audio delivery should not be treated as purely auditory without body-contact,
+  amplitude, frequency, distance, and comfort context;
 - breath pacing is interoceptive/behavioral guidance rather than simply an
-  output modality.
+  output modality;
+- stereoscopy, free-view 3D, phone-in-front-of-eye usage, VR headsets, AR
+  glasses, and hand-separated phone viewing require visual capability and
+  perceptual-loss modeling, not only a `visual` tag;
+- social-graph sensory protocols can combine visualized social structure,
+  conversation, sound, and collective aesthetic experience, so experiment
+  context must remain separate from the core exposure channel;
+- Wi-Fi, screen light, power cables, and other electromagnetic exposures are
+  modelable physical delivery media, but SSTIM should mark their stimulation
+  or physiological-effect status as unknown, speculative, or unsupported unless
+  an explicit reviewed evidence claim exists;
+- smell and taste are SSTIM-relevant modalities, but ordinary phone smell,
+  taste, perfumes on devices, or device-contact taste should be separated from
+  current BSC Lab delivery capability;
+- ideal tactile/VR immersion needs vocabulary for clothing contact, liquid or
+  gel immersion, rigid surfaces, moving/static textures, temperature, airflow or
+  fluid motion, pull/push on body points, joint force, gravity-like effects, and
+  wearable arrays of speakers or light emitters;
+- volumetric or room-scale immersion needs modeling for walking, movement,
+  body/position tracking, spatial presence, proprioception, vestibular cues,
+  scale, and environmental boundaries.
 
 Target model direction:
 
-- Keep `sstim:SensoryModality` for perceived or engaged sensory channels.
-- Add a separate delivery/energy vocabulary, for example
-  `sstim:PhysicalDeliveryModality` or `sstim:DeliveryMedium`.
-- Add properties such as:
-  - `sstim:perceivedModality`
-  - `sstim:deliveryMedium`
-  - `sstim:requiresDeviceCapability`
-- Keep `sstim:techniqueModality` only if it is narrowed and documented as a
-  convenience property, or deprecate it after replacement properties exist.
-
-This design change should be written as an ADR before RDF changes are made.
+- Keep `sstim:SensoryModality` for coarse perceived or engaged sensory
+  channels.
+- Keep `sstim:techniqueModality` unchanged for compatibility, but document it
+  as a coarse legacy/convenience relation.
+- Add the `sstim-ex:` exposure module with separate classes and properties for
+  exposure profile, stimulus channel, physical delivery medium, perceived
+  modality, device capability, body placement, comfort boundary, effect claim,
+  experiment context, and knowledge status.
+- Represent physiological, wellness, comfort, or risk statements as
+  `ExposureEffectClaim` resources with evidence/knowledge status, not as direct
+  unqualified health-benefit properties such as `usageForHealth` or
+  `healthImpact`.
+- Include explicit knowledge statuses for local certainty and local capability:
+  known in SSTIM, hypothesis in SSTIM, unknown to SSTIM, no known evidence in
+  SSTIM, not currently used in BSC Lab, not currently deliverable by BSC Lab,
+  and outside BSC Lab scope.
+- Maintain exploratory examples for Wi-Fi/EM exposure, haptic audio, blinking
+  visual fields, colored noise, darkness/silence, social-graph protocols,
+  smell/taste boundaries, and ideal tactile immersion.
 
 ## Known Gaps
 
@@ -166,8 +204,10 @@ erratum, but several alignments remain pending:
    Remove or replace the misleading OBI protocol alignment if the preset is
    not intended to be inferred as a protocol.
 
-3. Create an ADR for physical delivery versus perceived sensory modality.
-   Do this before changing `sstim:techniqueModality`.
+3. Implement the exposure/delivery/modality separation.
+   ADR 0010 records the decision. The active work item is the `sstim-ex:`
+   exposure module plus exploratory BSC Lab experiment instances. Keep
+   `sstim:techniqueModality` as a coarse compatibility property.
 
 ### P1: Strengthen Validation
 
@@ -213,7 +253,11 @@ erratum, but several alignments remain pending:
 
 3. Model device capability separately from modality:
    headphones, stereo separation, display flicker, haptic actuator, sensor,
-   wearable, ultrasound hardware, and closed-loop EEG/sleep sensing.
+   wearable, ultrasound hardware, closed-loop EEG/sleep sensing, VR/AR
+   headsets, free-view stereoscopy, scent/taste delivery, temperature, airflow
+   or fluid-motion delivery, full-body tactile immersion, and wearable audio or
+   light arrays, room-scale tracking, locomotion interfaces, and spatial
+   presence support.
 
 ### P4: External Alignment and Interoperability
 

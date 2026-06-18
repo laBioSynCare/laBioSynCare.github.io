@@ -5,10 +5,10 @@ namespace `https://w3id.org/sstim`. It is **not** served by this repository —
 the live copy is maintained in the
 [`perma-id/w3id.org`](https://github.com/perma-id/w3id.org) registry.
 
-Current live state: root RDF, module, Patch Studio, and semver versioned
-snapshot routes resolve through `w3id.org` to the GitHub Pages artifacts. Browser
-branches still point at the app root until WIDOCO HTML output is generated and
-published.
+Current live state: root RDF, module, Patch Studio, exposure, and semver
+versioned snapshot routes resolve through `w3id.org` to the GitHub Pages
+artifacts. Browser branches still point at the app root until WIDOCO HTML output
+is generated and published.
 
 > Prerequisite for future routes: GitHub Pages must serve each redirect target
 > before the matching w3id rule is merged.
@@ -23,6 +23,7 @@ published.
 | `https://w3id.org/sstim/shapes` | `/ontology/sstim-shapes.ttl` |
 | `https://w3id.org/sstim/alignments` | `/ontology/sstim-alignments.ttl` |
 | `https://w3id.org/sstim/patch-studio` | `/ontology/sstim-patch-studio.ttl` |
+| `https://w3id.org/sstim/exposure` | `/ontology/sstim-exposure.ttl` |
 | `https://w3id.org/sstim/0.3.0` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
 | `https://w3id.org/sstim/0.3.0/sstim-core.ttl` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
 
@@ -57,9 +58,10 @@ curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim | grep -iE 'location|c
 # Browsers get HTML (303 → knowledge browser, later WIDOCO)
 curl -sIL -H 'Accept: text/html'  https://w3id.org/sstim | grep -i location
 
-# Module, Patch Studio, and versioned snapshot resolve
+# Module, Patch Studio, exposure, and versioned snapshot resolve
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/vocab        | grep -i location
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/patch-studio | grep -i location
+curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/exposure     | grep -i location
 curl -sIL https://w3id.org/sstim/0.3.0/sstim-core.ttl                  | grep -i location
 
 # Round-trip parse check (n3 / rapper / riot)

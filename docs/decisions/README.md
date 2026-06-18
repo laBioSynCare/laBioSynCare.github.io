@@ -33,6 +33,7 @@ annotations lives here.
 | [0007](0007-framework-protocol-implementation.md) | Framework, technique, protocol, implementation, preset, session | Accepted |
 | [0008](0008-activitypub.md) | ActivityPub federation | Accepted |
 | [0009](0009-pwa.md) | Progressive Web App (installable, offline-capable) | Accepted |
+| [0010](0010-exposure-delivery-modality.md) | Exposure delivery, perceived modality, and evidence status | Accepted |
 
 ## Adding an ADR
 

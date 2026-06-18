@@ -8,6 +8,7 @@ const ns = base => local => namedNode(base + local)
 export const SSTIM    = ns('https://w3id.org/sstim#')
 export const SSTIM_V  = ns('https://w3id.org/sstim/vocab#')
 export const SSTIM_SH = ns('https://w3id.org/sstim/shapes#')
+export const SSTIM_EX = ns('https://w3id.org/sstim/exposure#')
 export const SSTIM_I  = ns('https://w3id.org/sstim/inst/')
 export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
 export const BSC_FRAMEWORK_IRI = namedNode('https://w3id.org/sstim/framework/bsc')
@@ -22,6 +23,7 @@ export const BIOSYNCARE_SESSION = ns('https://w3id.org/sstim/implementation/bios
 export const BIOSYNCARE_ANNOTATION = ns('https://w3id.org/sstim/implementation/biosyncare/annotation/')
 export const BSCLAB = ns('https://w3id.org/sstim/implementation/bsclab/')
 export const BSCLAB_PRESET = ns('https://w3id.org/sstim/implementation/bsclab/preset/')
+export const BSCLAB_EXPERIMENT = ns('https://w3id.org/sstim/implementation/bsclab/experiment/')
 export const BSCLAB_EVIDENCE = ns('https://w3id.org/sstim/implementation/bsclab/evidence/')
 export const BSCLAB_SESSION = ns('https://w3id.org/sstim/implementation/bsclab/session/')
 export const BSCLAB_ANNOTATION = ns('https://w3id.org/sstim/implementation/bsclab/annotation/')
@@ -66,6 +68,7 @@ export const PREFIXES = {
   'sstim':    'https://w3id.org/sstim#',
   'sstim-v':  'https://w3id.org/sstim/vocab#',
   'sstim-sh': 'https://w3id.org/sstim/shapes#',
+  'sstim-ex': 'https://w3id.org/sstim/exposure#',
   'sstim-i':  'https://w3id.org/sstim/inst/',
   'sstim-ref': 'https://w3id.org/sstim/ref/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
@@ -77,6 +80,7 @@ export const PREFIXES = {
   'biosyncare-annotation': 'https://w3id.org/sstim/implementation/biosyncare/annotation/',
   'bsclab': 'https://w3id.org/sstim/implementation/bsclab/',
   'bsclab-preset': 'https://w3id.org/sstim/implementation/bsclab/preset/',
+  'bsclab-experiment': 'https://w3id.org/sstim/implementation/bsclab/experiment/',
   'bsclab-evidence': 'https://w3id.org/sstim/implementation/bsclab/evidence/',
   'bsclab-session': 'https://w3id.org/sstim/implementation/bsclab/session/',
   'bsclab-annotation': 'https://w3id.org/sstim/implementation/bsclab/annotation/',

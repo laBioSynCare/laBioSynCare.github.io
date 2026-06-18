@@ -1,0 +1,54 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/silence-darkness-baseline#> .
+
+bsclab-experiment:silence-darkness-baseline a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Silence and darkness baseline"@en ;
+    dct:description "Non-clinical baseline setup for modeling black visual field and silence/near-silence as an exposure profile with comfort and isolation boundaries."@en ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextSelfObservation ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Silence/darkness baseline exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-baseline-channel, this:audio-baseline-channel ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossEnvironmentalAwareness, sstim-ex:lossOutsideVision ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryIsolation, sstim-ex:boundaryEnvironmentalAwareness ;
+    sstim-ex:hasEffectClaim this:baseline-comfort-claim, this:isolation-boundary-claim .
+
+this:visual-baseline-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Black visual-field baseline channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:visualFieldBlack, sstim-ex:patternStatic .
+
+this:audio-baseline-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Silence baseline channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasStimulusPattern sstim-ex:audioNoiseBlackSilence, sstim-ex:patternStatic .
+
+this:baseline-comfort-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Baseline comfort observation target"@en ;
+    dct:description "Models silence and darkness as possible comparison conditions for self-report comfort or discomfort. No superiority over active BSC Lab patches is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectDiscomfort, sstim-ex:effectPleasantness ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+
+this:isolation-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Isolation boundary"@en ;
+    dct:description "Marks reduced sound and light as requiring an isolation or environmental-awareness boundary."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectDiscomfort ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
