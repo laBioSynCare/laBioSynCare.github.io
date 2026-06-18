@@ -429,6 +429,7 @@ until BioSynCare reaches acquisition-relevant scale.
 | User feedback / self-report collection | 3 | Not yet |
 | Session data export pipeline | 3 | Not yet |
 | Multi-user annotation (server-side) | 3 | Not yet |
+| Conversational agent automation (OpenClaw intake) — *exploratory proposal* | 3 | Not yet |
 
 If you are asked to build something in "Not yet" rows, flag the
 phase conflict before proceeding. Building Phase 3 infrastructure

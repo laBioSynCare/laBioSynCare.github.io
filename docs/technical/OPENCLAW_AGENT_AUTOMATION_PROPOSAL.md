@@ -1,10 +1,14 @@
-# OpenClaw Agent Automation Usage
+# OpenClaw Agent Automation — Proposal
 
-> **Status:** target integration guidance. No OpenClaw runtime, skill package,
-> Firebase Functions backend, or GitHub Actions workflow described here is
-> implemented by this document alone.
+> **Status: exploratory proposal — Phase 3, not on the current roadmap.** Nothing
+> here is built: no OpenClaw runtime, skill package, Firebase Functions backend,
+> or GitHub Actions workflow described below exists. It also assumes a server-side
+> backend (Firebase Functions, queues, webhooks) that BSC Lab does not currently
+> run — the app is client-only on GitHub Pages (see `CLAUDE.md` §2 and
+> `ROADMAP.md`). Treat this as a design sketch for possible future contributor
+> intake, not a commitment or a description of how the project works today.
 
-This document defines the intended BSC Lab use of OpenClaw. The category is
+This document sketches a possible future BSC Lab use of OpenClaw. The category is
 **agent automation**: OpenClaw is useful as a persistent conversational gateway
 and agent coordinator around SSTIM and BSC Lab, not as the core validation
 engine, ontology authority, or SPARQL endpoint.
@@ -370,4 +374,4 @@ generation.
 - GitHub Actions schedule event: https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule
 - Telegram Bot API: https://core.telegram.org/bots/api
 - Gmail push notifications: https://developers.google.com/workspace/gmail/api/guides/push
-- WhatsApp Business Platform: https://whatsappbusiness.com/products/business-platform/
+- WhatsApp Business Platform: https://developers.facebook.com/docs/whatsapp/

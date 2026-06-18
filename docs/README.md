@@ -28,8 +28,9 @@ banner pointing to the as-built reference.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
   primary validated use case narrative.
 - [`SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md) —
-  how SSTIM complements LLMs as symbolic AI infrastructure, grounding, and
-  validation for agentic workflows.
+  how SSTIM (symbolic) and LLMs complement each other: grounding, validation, and
+  the example workflow. Public-wording guidance lives in
+  [`ecosystem/SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md).
 
 ## `technical/` — specifications
 
@@ -55,9 +56,10 @@ banner pointing to the as-built reference.
   instance distinction. Source for `schemas/session.schema.json` (planned).
 - [`KNOWLEDGE_BROWSER_UX.md`](technical/KNOWLEDGE_BROWSER_UX.md) — UX design for
   the ontology graph, SPARQL, preset browser, and annotation surfaces.
-- [`OPENCLAW_AGENT_AUTOMATION_USAGE.md`](technical/OPENCLAW_AGENT_AUTOMATION_USAGE.md) —
-  target guidance for using OpenClaw as a conversational agent-automation layer
-  around SSTIM intake, routing, review packets, and maintainer commands.
+- [`OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md`](technical/OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md) —
+  **exploratory proposal (Phase 3, not built)** for using OpenClaw as a future
+  conversational agent-automation layer around SSTIM intake, routing, review
+  packets, and maintainer commands. Assumes a server backend BSC Lab does not yet run.
 - [`AUDIO_ENGINE_ARCHITECTURE.md`](technical/AUDIO_ENGINE_ARCHITECTURE.md) —
   **target** pluggable audio engine design (three-clock model, orchestrator).
   As-built engines: [`../src/engines/README.md`](../src/engines/README.md).
@@ -116,6 +118,9 @@ alternatives, and consequences. See
 
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
   approach over patents; trademark plan.
+- [`SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md) — recommended
+  terminology and public wording for SSTIM's relationship to AI/LLMs (avoids
+  overclaiming). Pairs with [`concept/SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md).
 - [`DEFENSIVE_PUBLICATIONS.md`](ecosystem/DEFENSIVE_PUBLICATIONS.md) —
   filing tracker for the three technical defensive publications.
 - [`w3id/README.md`](ecosystem/w3id/README.md) — staged instructions and
