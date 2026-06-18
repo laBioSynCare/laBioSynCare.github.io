@@ -80,6 +80,8 @@ export function createFieldState() {
       markerMotionXAmplitudePx: 30,
       markerMotionYSource: 'none',
       markerMotionYAmplitudePx: 30,
+      markerMotionCircleSource: 'none',
+      markerMotionCircleAmplitudePx: 30,
     },
     audio: {
       enabled: true,
@@ -139,6 +141,8 @@ function normalizeDepth(depth = {}) {
     markerMotionXAmplitudePx: clamp(numberOr(depth.markerMotionXAmplitudePx, base.markerMotionXAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
     markerMotionYSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionYSource) ? depth.markerMotionYSource : base.markerMotionYSource,
     markerMotionYAmplitudePx: clamp(numberOr(depth.markerMotionYAmplitudePx, base.markerMotionYAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerMotionCircleSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionCircleSource) ? depth.markerMotionCircleSource : base.markerMotionCircleSource,
+    markerMotionCircleAmplitudePx: clamp(numberOr(depth.markerMotionCircleAmplitudePx, base.markerMotionCircleAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
   }
 }
 
@@ -248,6 +252,25 @@ export function resolveMarkerMotion(state, axis, t = 0) {
   if (source === 'breath') rate = 1 / (depth.breathPeriodSec || 10)
   if (rate <= 0) return 0
   return amplitude * Math.sin(time * rate * TWO_PI)
+}
+
+/**
+ * Resolve circular motion offset for the central marker.
+ * Returns { x, y } in CSS pixels: x = A·sin(ωt), y = A·cos(ωt).
+ * The quarter-phase offset between axes produces circular motion at any single rate.
+ */
+export function resolveMarkerCircle(state, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const source = depth.markerMotionCircleSource
+  const amplitude = depth.markerMotionCircleAmplitudePx
+  if (!source || source === 'none' || amplitude <= 0) return { x: 0, y: 0 }
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (source === 'breath') rate = 1 / (depth.breathPeriodSec || 10)
+  if (rate <= 0) return { x: 0, y: 0 }
+  const phase = time * rate * TWO_PI
+  return { x: amplitude * Math.sin(phase), y: amplitude * Math.cos(phase) }
 }
 
 export function loadFieldState() {

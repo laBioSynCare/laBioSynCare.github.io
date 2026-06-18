@@ -14,7 +14,7 @@
     DEPTH_BREATH_MIN_SEC, DEPTH_BREATH_MAX_SEC, resolveDepthSeparation,
     GRID_DEPTH_AXES, GRID_DEPTH_RANGE_MIN_PX, GRID_DEPTH_RANGE_MAX_PX,
     GRID_SIZE_MIN, GRID_SIZE_MAX, GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX,
-    resolveMarkerMotion, MARKER_MOTION_SOURCES,
+    resolveMarkerMotion, resolveMarkerCircle, MARKER_MOTION_SOURCES,
     MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX,
   } from './fieldState.js'
   import { fieldStateToTurtle } from './exposureProfile.js'
@@ -74,8 +74,9 @@
       displayOpacity = field.visual.intensity
     }
     depthSeparationPx = resolveDepthSeparation(field, t)
-    markerOffsetX = resolveMarkerMotion(field, 'x', t)
-    markerOffsetY = resolveMarkerMotion(field, 'y', t)
+    const circle = resolveMarkerCircle(field, t)
+    markerOffsetX = resolveMarkerMotion(field, 'x', t) + circle.x
+    markerOffsetY = resolveMarkerMotion(field, 'y', t) + circle.y
     if (playing && engine) applyLiveAudio(t)
     raf = requestAnimationFrame(tick)
   }
@@ -450,6 +451,27 @@
               bind:value={field.depth.markerMotionYAmplitudePx}
             />
             <output>{Math.round(field.depth.markerMotionYAmplitudePx)} px</output>
+          </label>
+        {/if}
+        <label class="row">
+          Circle motion
+          <select bind:value={field.depth.markerMotionCircleSource}>
+            {#each MARKER_MOTION_SOURCES as src}
+              <option value={src}>{src}</option>
+            {/each}
+          </select>
+        </label>
+        {#if field.depth.markerMotionCircleSource !== 'none'}
+          <label class="row">
+            Circle radius
+            <input
+              type="range"
+              min={MARKER_MOTION_AMPLITUDE_MIN_PX}
+              max={MARKER_MOTION_AMPLITUDE_MAX_PX}
+              step="1"
+              bind:value={field.depth.markerMotionCircleAmplitudePx}
+            />
+            <output>{Math.round(field.depth.markerMotionCircleAmplitudePx)} px</output>
           </label>
         {/if}
         <label class="row">
