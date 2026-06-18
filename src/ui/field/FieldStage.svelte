@@ -21,6 +21,13 @@
     ]
     return depthState?.viewingMode === 'cross' ? [canonical[1], canonical[0]] : canonical
   }
+
+  // 3×3 grid positions (percent) excluding the centre, which oscillates.
+  const GRID_POSITIONS = [
+    { x: 25, y: 25 }, { x: 50, y: 25 }, { x: 75, y: 25 },
+    { x: 25, y: 50 },                    { x: 75, y: 50 },
+    { x: 25, y: 75 }, { x: 50, y: 75 }, { x: 75, y: 75 },
+  ]
 </script>
 
 {#if active}
@@ -30,6 +37,12 @@
       <div class="stereo-pair" aria-hidden="true">
         {#each stereoPanels as panel}
           <div class="eye-pane" data-eye={panel.key}>
+            {#each GRID_POSITIONS as pos}
+              <div class="grid-mark" style="--gx:{pos.x}%; --gy:{pos.y}%; --dot-size:{depth.dotSizePx}px">
+                <span class="stick"></span>
+                <span class="point"></span>
+              </div>
+            {/each}
             <div
               class="stereo-mark"
               style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px"
@@ -91,6 +104,16 @@
       linear-gradient(90deg, color-mix(in srgb, #fff 15%, transparent) 1px, transparent 1px);
     background-size: 100% 50%, 50% 100%;
     overflow: hidden;
+  }
+
+  .grid-mark {
+    position: absolute;
+    left: var(--gx);
+    top: var(--gy);
+    width: var(--dot-size);
+    height: calc(var(--dot-size) * 4);
+    transform: translate(-50%, -50%);
+    opacity: 0.45;
   }
 
   .stereo-mark {
