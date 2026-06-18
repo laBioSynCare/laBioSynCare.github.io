@@ -42,6 +42,8 @@ export const GRID_DOT_SCALE_MAX = 4
 export const MARKER_MOTION_SOURCES = ['none', 'beat', 'breath']
 export const MARKER_MOTION_AMPLITUDE_MIN_PX = 0
 export const MARKER_MOTION_AMPLITUDE_MAX_PX = 200
+export const MARKER_TRAJECTORY_STEPS_MIN = 3
+export const MARKER_TRAJECTORY_STEPS_MAX = 36
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const TWO_PI = Math.PI * 2
@@ -82,6 +84,8 @@ export function createFieldState() {
       markerMotionYAmplitudePx: 30,
       markerMotionCircleSource: 'none',
       markerMotionCircleAmplitudePx: 30,
+      markerTrajectoryEnabled: false,
+      markerTrajectorySteps: 12,
     },
     audio: {
       enabled: true,
@@ -143,6 +147,12 @@ function normalizeDepth(depth = {}) {
     markerMotionYAmplitudePx: clamp(numberOr(depth.markerMotionYAmplitudePx, base.markerMotionYAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
     markerMotionCircleSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionCircleSource) ? depth.markerMotionCircleSource : base.markerMotionCircleSource,
     markerMotionCircleAmplitudePx: clamp(numberOr(depth.markerMotionCircleAmplitudePx, base.markerMotionCircleAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerTrajectoryEnabled: typeof depth.markerTrajectoryEnabled === 'boolean' ? depth.markerTrajectoryEnabled : base.markerTrajectoryEnabled,
+    markerTrajectorySteps: clamp(
+      Math.round(numberOr(depth.markerTrajectorySteps, base.markerTrajectorySteps)),
+      MARKER_TRAJECTORY_STEPS_MIN,
+      MARKER_TRAJECTORY_STEPS_MAX,
+    ),
   }
 }
 

@@ -16,6 +16,7 @@
     GRID_SIZE_MIN, GRID_SIZE_MAX, GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX,
     resolveMarkerMotion, resolveMarkerCircle, MARKER_MOTION_SOURCES,
     MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX,
+    MARKER_TRAJECTORY_STEPS_MIN, MARKER_TRAJECTORY_STEPS_MAX,
   } from './fieldState.js'
   import { fieldStateToTurtle } from './exposureProfile.js'
   import { FIELD_SEMANTICS, fieldGraphHref } from './fieldSemantic.js'
@@ -472,6 +473,23 @@
               bind:value={field.depth.markerMotionCircleAmplitudePx}
             />
             <output>{Math.round(field.depth.markerMotionCircleAmplitudePx)} px</output>
+          </label>
+        {/if}
+        <label class="row">
+          <input type="checkbox" bind:checked={field.depth.markerTrajectoryEnabled} />
+          Show trajectory
+        </label>
+        {#if field.depth.markerTrajectoryEnabled}
+          <label class="row">
+            Trajectory steps
+            <input
+              type="range"
+              min={MARKER_TRAJECTORY_STEPS_MIN}
+              max={MARKER_TRAJECTORY_STEPS_MAX}
+              step="1"
+              bind:value={field.depth.markerTrajectorySteps}
+            />
+            <output>{field.depth.markerTrajectorySteps}</output>
           </label>
         {/if}
         <label class="row">

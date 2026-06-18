@@ -54,6 +54,33 @@
 
   // 3×3 grid positions (percent) excluding the centre, which oscillates.
   const GRID_POSITIONS = $derived(buildGridPositions(depth?.gridSize ?? 3))
+
+  const TWO_PI = Math.PI * 2
+
+  // Compute N evenly-spaced phase samples of the full motion path (one period).
+  // Returns [{x, y, offset}] in CSS pixels, where offset is the per-panel
+  // stereo parallax at that phase.
+  function buildTrajectoryPoints(d, sign) {
+    const n = Math.max(3, Math.min(36, Math.round(Number(d?.markerTrajectorySteps) || 12)))
+    const points = []
+    for (let k = 0; k < n; k++) {
+      const phi = (k / n) * TWO_PI
+      const mx = (d?.markerMotionXSource && d.markerMotionXSource !== 'none')
+        ? (d.markerMotionXAmplitudePx ?? 0) * Math.sin(phi) : 0
+      const my = (d?.markerMotionYSource && d.markerMotionYSource !== 'none')
+        ? (d.markerMotionYAmplitudePx ?? 0) * Math.sin(phi) : 0
+      const cSrc = d?.markerMotionCircleSource ?? 'none'
+      const cx = cSrc !== 'none' ? (d.markerMotionCircleAmplitudePx ?? 0) * Math.sin(phi) : 0
+      const cy = cSrc !== 'none' ? (d.markerMotionCircleAmplitudePx ?? 0) * Math.cos(phi) : 0
+      const baseSep = d?.baseSeparationPx ?? 48
+      const zMod = (d?.source && d.source !== 'static') ? (d.modulationPx ?? 0) * Math.sin(phi) : 0
+      const depthSep = Math.max(0, Math.min(160, baseSep + zMod))
+      points.push({ x: mx + cx, y: my + cy, offset: sign * depthSep / 2 })
+    }
+    return points
+  }
+
+  const trajectoryByPanel = $derived(stereoPanels.map(p => buildTrajectoryPoints(depth, p.sign)))
 </script>
 
 {#if active}
@@ -61,18 +88,24 @@
     <div class="field-fill" style="background:{color}; opacity:{opacity}"></div>
     {#if depth?.enabled}
       <div class="stereo-pair" aria-hidden="true">
-        {#each stereoPanels as panel}
+        {#each stereoPanels as panel, pi}
           <div class="eye-pane" data-eye={panel.key} class:no-plane={depth.showCartesianPlane === false}>
             {#each GRID_POSITIONS as pos}
               <div class="grid-mark" style="--gx:{pos.x}%; --gy:{pos.y}%; --offset:{(panel.sign * gridMarkerParallax(pos, depth)).toFixed(1)}px; --dot-size:{depth.dotSizePx}px; --scale-x:{depth.gridDotScaleX ?? 1}; --scale-y:{depth.gridDotScaleY ?? 1}"></div>
             {/each}
-            <div
-              class="stereo-mark"
-              style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px; --mx:{markerOffsetX}px; --my:{markerOffsetY}px"
-            >
-              <span class="stick"></span>
-              <span class="point"></span>
-            </div>
+            {#if depth.markerTrajectoryEnabled}
+              {#each trajectoryByPanel[pi] as pt, k}
+                <div class="traj-dot" style="--toffset:{pt.offset.toFixed(1)}px; --tx:{pt.x.toFixed(1)}px; --ty:{pt.y.toFixed(1)}px; --dot-size:{depth.dotSizePx}px; --op:{(0.2 + 0.7 * (k / Math.max(trajectoryByPanel[pi].length - 1, 1))).toFixed(2)}"></div>
+              {/each}
+            {:else}
+              <div
+                class="stereo-mark"
+                style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px; --mx:{markerOffsetX}px; --my:{markerOffsetY}px"
+              >
+                <span class="stick"></span>
+                <span class="point"></span>
+              </div>
+            {/if}
           </div>
         {/each}
       </div>
@@ -140,6 +173,23 @@
     box-shadow: 0 0 18px color-mix(in srgb, #000 38%, transparent);
     transform: translate(calc(-50% + var(--offset)), -50%);
     opacity: 0.45;
+  }
+
+  .traj-dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--dot-size);
+    height: var(--dot-size);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 14px color-mix(in srgb, #000 38%, transparent);
+    transform: translate(
+      calc(-50% + var(--toffset) + var(--tx)),
+      calc(-50% + var(--ty))
+    );
+    opacity: var(--op);
+    pointer-events: none;
   }
 
   .eye-pane.no-plane {
