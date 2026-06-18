@@ -53,7 +53,7 @@ also sets `documentElement.dataset.visualStim` for CSS hooks.
 
 | Surface | Behaviour when policy is off |
 |---|---|
-| Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
+| Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder; the `Blink` track flicker is also rate-capped (see §4) ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
 | **Mix** / fullscreen visual stage | Disabled (the button is inert when off or when there are no visual tracks) |
 | Sensory Field (`/field/`) | The colour field shows a placeholder when off; the blink rate is additionally capped by `flashSafety.js` (see §4) — [`FieldStage.svelte`](../../src/ui/field/FieldStage.svelte), [`SensoryField.svelte`](../../src/ui/field/SensoryField.svelte) |
 | Future PixiJS visual engine | Must read `isVisualStimulationOn()` and render nothing when off |
@@ -78,9 +78,16 @@ gated.
   persisted — re-confirmed each session by design, [ADR 0011](../decisions/0011-sensory-field-and-flash-safety.md)).
   The same 3 Hz threshold is modelled in the ontology as
   `sstim-ex:limitFlickerWcag`, so the gate and the vocabulary cannot diverge.
-- Still planned (not yet built): applying the cap to the Patch Studio `Blink`
-  track and the PixiJS engine, contrast limits, and a conditional SHACL
-  "flashing channel must declare a photosensitivity boundary" check.
+- The **Patch Studio `Blink` track** uses the same cap. Because the Patch Studio
+  is an authoring tool where alpha (10 Hz) and gamma (40 Hz) flicker entrainment
+  are legitimate targets, the cap there is opt-through, not a hard ceiling: rates
+  above 3 Hz are capped until the author makes an explicit **per-session**
+  acknowledgement (never persisted, never saved into the patch — so a shared
+  patch can't flash a recipient who never consented), with the live risk level
+  shown on each affected `Blink` card.
+- Still planned (not yet built): applying the cap to the future PixiJS visual
+  engine, contrast limits, and a conditional SHACL "flashing channel must declare
+  a photosensitivity boundary" check.
 
 See also: [`PATCH_STUDIO.md` §5.2](PATCH_STUDIO.md) and the W3C CG scope, which
 explicitly includes **safety metadata** as a vocabulary concern

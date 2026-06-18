@@ -6,6 +6,10 @@
   import { authState } from '../../firebase/auth.js'
   import { deletePatchStudioPatch, listPatchStudioPatches, savePatchStudioPatch } from '../../firebase/patches.js'
   import { visualStimulationOn } from '../../ui/safety/visualSafety.js'
+  import {
+    FLASH_SAFE_MAX_HZ, clampFlashRate, flashRiskLevel, flashRiskMessage,
+    requiresFlashAcknowledgement,
+  } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
   import {
     computeMartigliState,
@@ -111,6 +115,11 @@
   // previews, advanced each frame by the track's live rate so previews animate
   // continuously and reflect modulation. Not reactive state — read via liveValues.
   const visualPhase = {}
+  // Per-session consent to author Blink flicker above the 3 Hz general-safe
+  // ceiling (flashSafety.js). Never persisted and never saved into the patch —
+  // re-confirmed each authoring session so a shared patch can't flash a
+  // recipient who never consented (ADR 0011).
+  let flashAccepted = $state(false)
   let lastVisualTick = null
 
   // Visual mix / fullscreen stage.
@@ -586,7 +595,10 @@
       if (tt !== 'Blink' && tt !== 'Oscillate' && tt !== 'Pacer') continue
       const lv = liveValues[track.id] ?? (liveValues[track.id] = {})
       if (tt === 'Blink') {
-        const rate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
+        const rawRate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
+        // Photosensitivity gate: capped at the general-safe ceiling unless the
+        // author has accepted the risk for this session.
+        const rate = clampFlashRate(rawRate, { accepted: flashAccepted })
         const duty = clamp(num(lv.duty ?? track.params.duty?.value, 0.5), 0.01, 0.99)
         let ph = (visualPhase[track.id] ?? 0) + vdt * rate
         ph -= Math.floor(ph)
@@ -2111,6 +2123,21 @@
                   {@render visualLayer(track)}
                 </div>
               {/if}
+              {#if $visualStimulationOn && track.trackType === 'Blink'}
+                {@const br = num(track.params.blinkRate?.value, 10)}
+                {#if requiresFlashAcknowledgement(br)}
+                  <div class="flash-warn flash-{flashAccepted ? flashRiskLevel(br) : 'capped'}">
+                    {#if flashAccepted}
+                      <span>{br.toFixed(1)} Hz — {flashRiskMessage(flashRiskLevel(br))}</span>
+                    {:else}
+                      <span>Capped at {FLASH_SAFE_MAX_HZ} Hz for photosensitivity safety.</span>
+                      <button type="button" class="flash-allow" onclick={() => (flashAccepted = true)}>
+                        Allow flashing above {FLASH_SAFE_MAX_HZ} Hz (this session)
+                      </button>
+                    {/if}
+                  </div>
+                {/if}
+              {/if}
               {#if $visualStimulationOn}
                 <div class="voice-extras">
                   <label class="voice-select">
@@ -3287,6 +3314,35 @@
     color: var(--app-muted);
     font-size: 0.72rem;
     letter-spacing: 0.02em;
+  }
+
+  .flash-warn {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    padding: 0.3rem 0.45rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    border-radius: 6px;
+    border: 1px solid;
+  }
+  .flash-warn.flash-capped { background: #c9920018; border-color: #c9920066; }
+  .flash-warn.flash-safe { background: #2a7d4f18; border-color: #2a7d4f66; }
+  .flash-warn.flash-caution { background: #c9920018; border-color: #c9920066; }
+  .flash-warn.flash-high { background: #cc222218; border-color: #cc222288; }
+  .flash-allow {
+    margin: 0;
+    padding: 0.2rem 0.5rem;
+    width: auto;
+    font-size: 0.68rem;
+    font-weight: 600;
+    border: 1px solid currentColor;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
   }
 
   .control-preview::before,
