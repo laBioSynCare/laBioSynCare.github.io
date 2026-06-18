@@ -30,6 +30,10 @@ this:profile a sstim-ex:ExposureProfile ;
         sstim-ex:capabilityLocomotionInterface,
         sstim-ex:capabilityWearableSpeakerArray,
         sstim-ex:capabilityWearableLightArray,
+        sstim-ex:capabilityTactileDisplay,
+        sstim-ex:capabilityTactileCamera,
+        sstim-ex:capabilityInfraredLightOutput,
+        sstim-ex:capabilityUltravioletLightOutput,
         sstim-ex:capabilityVrHeadset,
         sstim-ex:capabilityHeadphones ;
     sstim-ex:hasPerceptualGain sstim-ex:gainTactileImmersion, sstim-ex:gainBodyVibration, sstim-ex:gainThermalProximity, sstim-ex:gainSpatialPresence ;
@@ -80,9 +84,9 @@ this:joint-gravity-channel a sstim-ex:StimulusChannel ;
 
 this:wearable-light-audio-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Wearable audio/light array channel"@en ;
-    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration, sstim-ex:mediumVisualLight ;
-    sstim-ex:perceivedModality sstim-ex:modalityAuditory, sstim-ex:modalityTactile, sstim-ex:modalityVisual ;
-    sstim-ex:requiresDeviceCapability sstim-ex:capabilityWearableSpeakerArray, sstim-ex:capabilityWearableLightArray ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration, sstim-ex:mediumVisualLight, sstim-ex:mediumInfraredRadiation, sstim-ex:mediumUltravioletRadiation ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory, sstim-ex:modalityTactile, sstim-ex:modalityVisual, sstim-ex:modalityNotDirectlyPerceived ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityWearableSpeakerArray, sstim-ex:capabilityWearableLightArray, sstim-ex:capabilityTactileDisplay, sstim-ex:capabilityTactileCamera, sstim-ex:capabilityInfraredLightOutput, sstim-ex:capabilityUltravioletLightOutput ;
     sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
     sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic, sstim-ex:patternBlinking, sstim-ex:patternChangingColor .
 
@@ -121,7 +125,7 @@ this:gravity-joint-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
 
 this:wearable-array-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
     rdfs:label "Wearable speaker/light array concept"@en ;
-    dct:description "Models clothing with distributed speakers or light emitters as a device-capability concept requiring literature and implementation review."@en ;
+    dct:description "Models clothing with distributed speakers, tactile display/camera concepts, and visible or invisible-spectrum light emitters as future device-capability concepts requiring literature and implementation review."@en ;
     sstim:hasEvidenceTier sstim-v:tierSpeculative ;
     sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectBodyVibration, sstim-ex:effectImmersion ;

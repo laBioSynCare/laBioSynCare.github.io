@@ -59,6 +59,7 @@ async function assertRows(store, label, sparql, minRows = 1) {
 
 const prefixes = `
 PREFIX owl:      <http://www.w3.org/2002/07/owl#>
+PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
 PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
 `
 
@@ -152,6 +153,21 @@ ASK {
     FILTER NOT EXISTS {
       GRAPH <https://w3id.org/sstim/graph/exposure> {
         ?object a ?expectedClass .
+      }
+    }
+  }
+}
+`)
+
+await assertAsk(store, 'exposure SKOS top concepts are declared', `${prefixes}
+ASK {
+  FILTER NOT EXISTS {
+    GRAPH <https://w3id.org/sstim/graph/exposure> {
+      ?scheme skos:hasTopConcept ?concept .
+    }
+    FILTER NOT EXISTS {
+      GRAPH <https://w3id.org/sstim/graph/exposure> {
+        ?concept a skos:Concept .
       }
     }
   }

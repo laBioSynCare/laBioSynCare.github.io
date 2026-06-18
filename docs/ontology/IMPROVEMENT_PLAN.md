@@ -256,8 +256,8 @@ erratum, but several alignments remain pending:
    wearable, ultrasound hardware, closed-loop EEG/sleep sensing, VR/AR
    headsets, free-view stereoscopy, scent/taste delivery, temperature, airflow
    or fluid-motion delivery, full-body tactile immersion, and wearable audio or
-   light arrays, room-scale tracking, locomotion interfaces, and spatial
-   presence support.
+   light arrays, tactile displays/cameras, infrared or ultraviolet output,
+   room-scale tracking, locomotion interfaces, and spatial presence support.
 
 ### P4: External Alignment and Interoperability
 

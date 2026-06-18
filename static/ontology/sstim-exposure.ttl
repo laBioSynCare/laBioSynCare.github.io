@@ -274,7 +274,9 @@ sstim-ex:DeliveryMediumScheme a skos:ConceptScheme ;
         sstim-ex:mediumRigidSurfaceContact,
         sstim-ex:mediumThermalContact,
         sstim-ex:mediumAirflow,
-        sstim-ex:mediumFluidMotion .
+        sstim-ex:mediumFluidMotion,
+        sstim-ex:mediumInfraredRadiation,
+        sstim-ex:mediumUltravioletRadiation .
 
 sstim-ex:PerceivedModalityScheme a skos:ConceptScheme ;
     skos:prefLabel "Perceived Modality Scheme"@en ;
@@ -322,7 +324,11 @@ sstim-ex:DeviceCapabilityScheme a skos:ConceptScheme ;
         sstim-ex:capabilityRoomScaleTracking,
         sstim-ex:capabilityLocomotionInterface,
         sstim-ex:capabilityWearableSpeakerArray,
-        sstim-ex:capabilityWearableLightArray .
+        sstim-ex:capabilityWearableLightArray,
+        sstim-ex:capabilityTactileDisplay,
+        sstim-ex:capabilityTactileCamera,
+        sstim-ex:capabilityInfraredLightOutput,
+        sstim-ex:capabilityUltravioletLightOutput .
 
 sstim-ex:BodyPlacementScheme a skos:ConceptScheme ;
     skos:prefLabel "Body Placement Scheme"@en ;
@@ -579,6 +585,20 @@ sstim-ex:mediumFluidMotion a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMediu
     skos:notation "fluid-motion" ;
     skos:definition "Moving water, gel, or other fluid used as a tactile or immersive cue."@en .
 
+sstim-ex:mediumInfraredRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:prefLabel "infrared radiation"@en ;
+    skos:notation "infrared-radiation" ;
+    skos:definition "Non-visible optical radiation in the infrared range, modeled as physical exposure without asserting perceptual or physiological effect."@en .
+
+sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:prefLabel "ultraviolet radiation"@en ;
+    skos:notation "ultraviolet-radiation" ;
+    skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure with explicit optical-safety boundaries."@en .
+
 sstim-ex:modalityAuditory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
@@ -822,6 +842,32 @@ sstim-ex:capabilityWearableLightArray a owl:NamedIndividual, sstim-ex:DeviceCapa
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
     skos:prefLabel "wearable light array"@en ;
     skos:notation "wearable-light-array" .
+
+sstim-ex:capabilityTactileDisplay a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
+    skos:inScheme sstim-ex:DeviceCapabilityScheme ;
+    skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
+    skos:prefLabel "tactile display"@en ;
+    skos:notation "tactile-display" ;
+    skos:definition "Capability to render spatial or patterned tactile information on the body."@en .
+
+sstim-ex:capabilityTactileCamera a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
+    skos:inScheme sstim-ex:DeviceCapabilityScheme ;
+    skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
+    skos:prefLabel "tactile camera"@en ;
+    skos:notation "tactile-camera" ;
+    skos:definition "Exploratory capability concept for mapping captured environmental or visual structure into tactile presentation."@en .
+
+sstim-ex:capabilityInfraredLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
+    skos:inScheme sstim-ex:DeviceCapabilityScheme ;
+    skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
+    skos:prefLabel "infrared light output"@en ;
+    skos:notation "infrared-light-output" .
+
+sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
+    skos:inScheme sstim-ex:DeviceCapabilityScheme ;
+    skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
+    skos:prefLabel "ultraviolet light output"@en ;
+    skos:notation "ultraviolet-light-output" .
 
 sstim-ex:placementEars a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
