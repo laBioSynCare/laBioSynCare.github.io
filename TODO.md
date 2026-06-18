@@ -48,6 +48,15 @@ types + universal tremolo, nine visual track types with blend/fullscreen mixing,
 and a photosensitivity safety layer) — now exists ahead of schedule. It is
 documented in [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)
 and [`docs/technical/PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+
+**Update (Jun 2026):** the **Sensory Field** (`/field/`) ships Steps 1–2 — a
+static colour field + per-ear tone/noise, blink and monaural/binaural beat, a
+runtime flash-rate cap ([`src/ui/safety/flashSafety.js`](src/ui/safety/flashSafety.js)),
+and per-configuration `sstim-ex:ExposureProfile` export. Exposure ontology bumped
+to 0.4.0 (laterality, quantitative properties, `ExposureLimit` safety boundaries).
+See [`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md) and
+[ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md). Next: Step 3
+(stereoscopic depth / dichoptic eye-laterality).
 The `core/` orchestration layer and the GPU visual/haptic engines remain Phase 2
 work; Phase 3 infrastructure still must not be built during Phase 1.
 

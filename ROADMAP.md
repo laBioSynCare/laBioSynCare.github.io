@@ -9,11 +9,15 @@
 > The stimulation player is Phase 2. Evidence collection is Phase 3.
 > Do not build Phase 3 infrastructure during Phase 1 work.
 >
-> **Implementation note (ahead of schedule).** An early Phase-2 artifact already
-> exists: the **Patch Studio** — a real-time audiovisual designer with four
+> **Implementation note (ahead of schedule).** Two early Phase-2 artifacts
+> already exist: the **Patch Studio** — a real-time audiovisual designer with four
 > selectable audio engines and a photosensitivity safety layer
-> ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)). It is a
-> prototype ahead of the formal Phase 2 schedule; the `core/` orchestration
+> ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)) — and the
+> **Sensory Field** (`/field/`), a minimal stimulation instrument that emits an
+> `sstim-ex:ExposureProfile` and adds a runtime flash-rate safety cap
+> ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
+> [ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)). Both are
+> prototypes ahead of the formal Phase 2 schedule; the `core/` orchestration
 > layer and the GPU visual/haptic engines remain Phase 2 work, and Phase 3
 > infrastructure still must not be built during Phase 1.
 

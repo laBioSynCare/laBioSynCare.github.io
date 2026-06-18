@@ -151,6 +151,7 @@ export const INSTANCE_URLS = {
     '/ontology/instances/experiments/wifi-em-field-hypothesis.ttl',
     '/ontology/instances/experiments/smell-taste-device-boundary.ttl',
     '/ontology/instances/experiments/ideal-tactile-immersion.ttl',
+    '/ontology/instances/experiments/sensory-field-example.ttl',
   ],
   references: [
     '/ontology/instances/references/references.ttl',

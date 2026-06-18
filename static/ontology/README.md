@@ -107,6 +107,15 @@ relation while giving new work explicit terms for haptics, visual noise,
 stereoscopy/VR, smell/taste boundaries, Wi-Fi/electromagnetic hypotheses, and
 future tactile or volumetric immersion.
 
+Module **0.4.0** ([ADR 0011](../../docs/decisions/0011-sensory-field-and-flash-safety.md))
+adds the vocabulary the Sensory Field interface emits: left/right laterality
+placements (`skos:broader` children of the bilateral parents), quantitative
+stimulus datatype properties (`hasFrequencyHz`, `hasFlickerRateHz`,
+`hasBeatFrequencyHz`, `hasDutyCycle`, `hasGainLevel`, `hasPhaseOffset`), the
+`sstim-ex:ExposureLimit` class with quantified flicker/hearing/optical limits
+citing external standards (linked from comfort boundaries), and the
+`affordsDeliveryMedium` capability→medium relation.
+
 ### Versioned snapshot directories
 
 Each semver directory contains byte-identical copies of the top-level Turtle

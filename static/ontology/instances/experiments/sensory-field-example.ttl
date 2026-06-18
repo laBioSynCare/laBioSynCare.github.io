@@ -1,0 +1,79 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/sensory-field-example#> .
+
+# Reference exposure profile for the BSC Lab Sensory Field interface (ADR 0011).
+# Exercises the 0.4.0 exposure additions: per-ear laterality placements,
+# quantitative stimulus properties, and quantified safety boundaries. This is
+# the kind of profile the Sensory Field route emits at runtime; it is deliverable
+# by BSC Lab today, so its knowledge status is knownInSSTIM.
+
+bsclab-experiment:sensory-field-example a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Sensory Field reference exposure"@en ;
+    dct:description "Reference profile for the Sensory Field interface: a full-screen color field (static or gently blinking) with an independent per-ear tone forming a binaural beat. Non-clinical; no physiological benefit is asserted."@en ;
+    sstim-ex:hasExperimentContext sstim-ex:contextBscLabPrototype, sstim-ex:contextSelfObservation ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Sensory Field reference exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-channel, this:left-ear-channel, this:right-ear-channel ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain, sstim-ex:boundaryHearingRisk ;
+    sstim-ex:hasEffectClaim this:photosensitivity-claim, this:calm-arousal-claim .
+
+this:visual-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Color-field visual channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternFixedColor, sstim-ex:patternBlinking ;
+    sstim-ex:hasFlickerRateHz "3.0"^^xsd:decimal ;
+    sstim-ex:hasDutyCycle "0.5"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.6"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain .
+
+this:left-ear-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Left-ear tone channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityStereoSeparation ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEarLeft ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
+    sstim-ex:hasFrequencyHz "200.0"^^xsd:decimal ;
+    sstim-ex:hasBeatFrequencyHz "4.0"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.18"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
+
+this:right-ear-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Right-ear tone channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityStereoSeparation ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEarRight ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
+    sstim-ex:hasFrequencyHz "204.0"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.18"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
+
+this:photosensitivity-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Flicker photosensitivity boundary"@en ;
+    dct:description "Marks the blinking visual field as bounded by the photosensitivity flash-rate limit. The interface caps the flash rate at the general-safe threshold unless the user explicitly accepts the risk band."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityGENERAL ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectPhotosensitivityRisk ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+this:calm-arousal-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+    rdfs:label "Calm/arousal self-observation target"@en ;
+    dct:description "Records the question of whether a static versus gently modulated color field and binaural tone relate to self-reported calm or arousal. No effect direction or magnitude is asserted."@en ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityAV ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectCalm, sstim-ex:effectArousal ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .

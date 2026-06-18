@@ -173,3 +173,65 @@ ASK {
   }
 }
 `)
+
+await assertAsk(store, 'laterality placements are declared and narrower than a bilateral parent', `${prefixes}
+ASK {
+  GRAPH <https://w3id.org/sstim/graph/exposure> {
+    sstim-ex:placementEarLeft a sstim-ex:BodyPlacement ; skos:broader sstim-ex:placementEars .
+    sstim-ex:placementEarRight a sstim-ex:BodyPlacement ; skos:broader sstim-ex:placementEars .
+    sstim-ex:placementEyeLeft a sstim-ex:BodyPlacement ; skos:broader sstim-ex:placementEyes .
+    sstim-ex:placementEyeRight a sstim-ex:BodyPlacement ; skos:broader sstim-ex:placementEyes .
+  }
+}
+`)
+
+await assertAsk(store, 'every skos:broader placement resolves to a declared BodyPlacement', `${prefixes}
+ASK {
+  FILTER NOT EXISTS {
+    GRAPH <https://w3id.org/sstim/graph/exposure> {
+      ?narrow skos:broader ?broad .
+    }
+    FILTER NOT EXISTS {
+      GRAPH <https://w3id.org/sstim/graph/exposure> {
+        ?broad a sstim-ex:BodyPlacement .
+      }
+    }
+  }
+}
+`)
+
+await assertAsk(store, 'every ExposureLimit cites an external standard', `${prefixes}
+ASK {
+  FILTER NOT EXISTS {
+    GRAPH <https://w3id.org/sstim/graph/exposure> {
+      ?limit a sstim-ex:ExposureLimit .
+    }
+    FILTER NOT EXISTS {
+      GRAPH <https://w3id.org/sstim/graph/exposure> {
+        ?limit sstim-ex:conformsToStandard ?std .
+      }
+    }
+  }
+}
+`)
+
+await assertAsk(store, 'optical-radiation boundary carries an exposure limit', `${prefixes}
+ASK {
+  GRAPH <https://w3id.org/sstim/graph/exposure> {
+    sstim-ex:boundaryOpticalRadiation sstim-ex:hasExposureLimit ?l .
+    ?l a sstim-ex:ExposureLimit .
+  }
+}
+`)
+
+await assertRows(store, 'stimulus channels carry quantitative frequency/flicker properties', `${prefixes}
+SELECT ?channel ?value WHERE {
+  GRAPH ?g {
+    ?channel a sstim-ex:StimulusChannel .
+    { ?channel sstim-ex:hasFrequencyHz ?value . }
+    UNION { ?channel sstim-ex:hasFlickerRateHz ?value . }
+    UNION { ?channel sstim-ex:hasBeatFrequencyHz ?value . }
+  }
+}
+ORDER BY ?channel
+`, 3)

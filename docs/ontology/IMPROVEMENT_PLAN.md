@@ -29,8 +29,27 @@ Structured review snapshot:
 - Datatype properties: 40
 - SKOS concept schemes: 11
 - SKOS concepts: 102
-- SHACL node shapes: 9
+- SHACL node shapes: 9 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
+  `hasExposureLimit` link, and quantitative-property ranges)
 - Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
+
+### 0.4.0 follow-up (exposure module / Sensory Field — ADR 0011)
+
+Delivered: per-ear / per-eye laterality placements (`skos:broader` children of
+the bilateral parents); quantitative stimulus datatype properties
+(`hasFrequencyHz`, `hasFlickerRateHz`, `hasBeatFrequencyHz`, `hasDutyCycle`,
+`hasGainLevel`, `hasPhaseOffset`); the `sstim-ex:ExposureLimit` class with
+quantified flicker/hearing/optical limits citing external standards, linked from
+comfort boundaries; `affordsDeliveryMedium`; and corrected UV/IR definitions.
+This substantially advances P3 item 3 (device capability vs modality) and part of
+P3 item 2 (safety metadata).
+
+Still open: a **conditional** SHACL check that a `StimulusChannel` delivering UV
+or IR (or carrying a flicker rate) must declare the matching comfort boundary.
+This was deferred because `make validate` concatenates all committed instances
+and pre-0.4.0 instances would fail a Violation-level rule; it needs either
+SHACL-SPARQL or reconciling those instances. Runtime flicker enforcement already
+exists in `src/ui/safety/flashSafety.js`.
 
 ## Primary Design Improvement
 

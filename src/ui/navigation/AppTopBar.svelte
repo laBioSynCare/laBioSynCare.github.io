@@ -143,6 +143,7 @@
     <div class="global-menu-panel">
       <a href="/">Graph</a>
       <a href="/creator/">Patch Studio</a>
+      <a href="/field/">Sensory Field</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
       <a href="/logbook/">Logbook</a>

@@ -55,6 +55,7 @@ also sets `documentElement.dataset.visualStim` for CSS hooks.
 |---|---|
 | Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
 | **Mix** / fullscreen visual stage | Disabled (the button is inert when off or when there are no visual tracks) |
+| Sensory Field (`/field/`) | The colour field shows a placeholder when off; the blink rate is additionally capped by `flashSafety.js` (see §4) — [`FieldStage.svelte`](../../src/ui/field/FieldStage.svelte), [`SensoryField.svelte`](../../src/ui/field/SensoryField.svelte) |
 | Future PixiJS visual engine | Must read `isVisualStimulationOn()` and render nothing when off |
 
 Audio and editing are unaffected by the policy — only visual stimulation is
@@ -68,10 +69,18 @@ gated.
   caution once and can disable visuals at any time.
 - `prefers-reduced-motion` is honored as a safe default, consistent with the
   accessibility conventions in [`../../src/ui/README.md`](../../src/ui/README.md).
-- The policy is intentionally a single global switch today. Planned refinements
-  (not yet built): per-track flash-rate caps with explicit warnings in the
-  ~15–25 Hz risk band, contrast limits, and surfacing safety metadata in the
-  exported patch / SSTIM `safety` annotations.
+- The global on/off policy is the first line. A **flash-rate cap** is now
+  implemented for the Sensory Field in
+  [`src/ui/safety/flashSafety.js`](../../src/ui/safety/flashSafety.js): the
+  general-safe ceiling is **3 Hz** (WCAG 2.3.1; Harding / ITU-R BT.1702), with
+  the ~15–25 Hz peak band flagged highest-risk. Flashing above 3 Hz is clamped
+  unless the user makes an explicit **per-session** acknowledgement (never
+  persisted — re-confirmed each session by design, [ADR 0011](../decisions/0011-sensory-field-and-flash-safety.md)).
+  The same 3 Hz threshold is modelled in the ontology as
+  `sstim-ex:limitFlickerWcag`, so the gate and the vocabulary cannot diverge.
+- Still planned (not yet built): applying the cap to the Patch Studio `Blink`
+  track and the PixiJS engine, contrast limits, and a conditional SHACL
+  "flashing channel must declare a photosensitivity boundary" check.
 
 See also: [`PATCH_STUDIO.md` §5.2](PATCH_STUDIO.md) and the W3C CG scope, which
 explicitly includes **safety metadata** as a vocabulary concern

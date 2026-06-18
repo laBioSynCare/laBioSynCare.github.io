@@ -27,14 +27,22 @@ banner pointing to the as-built reference.
   evidence system used throughout the ontology.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
   primary validated use case narrative.
+- [`SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md) —
+  how SSTIM complements LLMs as symbolic AI infrastructure, grounding, and
+  validation for agentic workflows.
 
 ## `technical/` — specifications
 
 - [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) — **as-built** authoring model
   for the live audiovisual designer (track types, parameters, tremolo, mixing,
   controls, tempo, `patch-studio-model-1` export).
+- [`SENSORY_FIELD.md`](technical/SENSORY_FIELD.md) — **as-built** Sensory Field
+  instrument (`/field/`): the per-channel matrix, static→blink→beat steps, the
+  runtime flash-rate cap, and per-configuration `sstim-ex:ExposureProfile`
+  emission. Step 3 (stereoscopy) outlined.
 - [`PHOTOSENSITIVITY_SAFETY.md`](technical/PHOTOSENSITIVITY_SAFETY.md) —
-  **as-built** photosensitivity advisory and visual-stimulation policy.
+  **as-built** photosensitivity advisory, visual-stimulation policy, and the
+  flash-rate cap.
 - [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md) — **as-built** PWA
   layer: web manifest, service worker, caching strategy, the three traps
   (session-safe updates, Firebase/cross-origin bypass, cache budget), the
@@ -96,6 +104,10 @@ alternatives, and consequences. See
   federation now; phased, bridge-preferred).
 - [0009](decisions/0009-pwa.md) — Progressive Web App: installable,
   offline-capable, SvelteKit-native service worker, three binding constraints.
+- [0010](decisions/0010-exposure-delivery-modality.md) — exposure delivery
+  medium, perceived modality, device capability, and evidence status.
+- [0011](decisions/0011-sensory-field-and-flash-safety.md) — Sensory Field
+  interface, runtime flash-rate safety, and exposure ontology 0.4.0.
 
 ## `ecosystem/` — IP, governance, outreach
 

@@ -525,10 +525,10 @@ docs/
   concept/                    ← SENSORY_STIMULATION, SCOPE, NON_SCOPE,
   │                             EVIDENCE_FRAMEWORK, FACILITATING_DEDICATION
   technical/                  ← PRESET_FORMAT, SESSION_MODEL, PATCH_STUDIO,
-  │                             PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
+  │                             SENSORY_FIELD, PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
   │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE,
   │                             BREATHING_MODEL, SYMMETRY_SYSTEM, MARTIGLI_BINAURAL
-  decisions/                  ← ADRs 0001–0009 (+ README index)
+  decisions/                  ← ADRs 0001–0011 (+ README index)
   ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
                                 INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
                                 CONSORTIUM_INVITATION
@@ -565,11 +565,12 @@ src/
   firebase/                   ← optional auth + Firestore (client, auth, profile)
   rdf/                        ← namespaces, loader, query, graph, presets, annotations/
   ui/creator/                 ← Patch Studio (PATCH_STUDIO.md)
+  ui/field/                   ← Sensory Field instrument (SENSORY_FIELD.md)
   ui/graph/                   ← RDF graph visualization (Cytoscape.js)
   ui/annotation/              ← annotation panel (named graphs)
-  ui/navigation|theme|safety|auth/  ← chrome, skins, photosensitivity, sign-in
+  ui/navigation|theme|safety|auth/  ← chrome, skins, photosensitivity + flashSafety, sign-in
   ui/pwa/                     ← service-worker registration + session-safe update banner
-  routes/                     ← /, /creator, /presets, /sparql, /logbook, /profile, /settings
+  routes/                     ← /, /creator, /field, /presets, /sparql, /logbook, /profile, /settings
 
 tests/                        ← (planned) rdf/, engines/, schemas/ suites
   (current unit tests live beside source, e.g. ui/creator/*.test.js)

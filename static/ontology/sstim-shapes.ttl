@@ -20,6 +20,7 @@
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh: <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -320,6 +321,106 @@ sstim-sh:ReferenceShape a sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:message "PublicSafeReference must have a dct:title."@en ;
     ] .
+
+###########################################################################
+# Exposure module shapes (sstim-ex:)
+#
+# These target the exposure terms added in module 0.4.0 (ADR 0011). They are
+# scoped narrowly to the new terms so that pre-0.4.0 committed instances are
+# not retroactively invalidated. Runtime flicker enforcement lives in
+# src/ui/safety/flashSafety.js; a conditional "UV/IR channel must declare an
+# optical boundary" shape is tracked as future work in IMPROVEMENT_PLAN.
+###########################################################################
+
+sstim-sh:ExposureLimitShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:ExposureLimit ;
+    sh:name "ExposureLimit"@en ;
+
+    sh:property [
+        sh:path sstim-ex:conformsToStandard ;
+        sh:minCount 1 ;
+        sh:message "ExposureLimit must cite at least one external standard via conformsToStandard."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:limitMaxFrequencyHz ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "limitMaxFrequencyHz must be a non-negative decimal (Hz)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:limitValue ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "limitValue must be a non-negative decimal."@en ;
+    ] .
+
+
+# Any node carrying hasExposureLimit must point at a real ExposureLimit. This is
+# safe across the per-file validation runs because it only targets subjects that
+# actually use the property (the optical-radiation boundary's presence of a limit
+# is asserted separately by the SPARQL sanity suite).
+sstim-sh:ExposureLimitLinkShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasExposureLimit ;
+    sh:property [
+        sh:path sstim-ex:hasExposureLimit ;
+        sh:class sstim-ex:ExposureLimit ;
+        sh:message "hasExposureLimit must point at an sstim-ex:ExposureLimit."@en ;
+    ] .
+
+
+# Range checks for the quantitative stimulus properties. Each shape targets only
+# the subjects that actually use the property, so it never fires on instances
+# that omit it.
+
+sstim-sh:FlickerRateShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasFlickerRateHz ;
+    sh:property [
+        sh:path sstim-ex:hasFlickerRateHz ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "hasFlickerRateHz must be a non-negative decimal (Hz)."@en ;
+    ] .
+
+sstim-sh:FrequencyShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasFrequencyHz ;
+    sh:property [
+        sh:path sstim-ex:hasFrequencyHz ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "hasFrequencyHz must be a non-negative decimal (Hz)."@en ;
+    ] .
+
+sstim-sh:BeatFrequencyShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasBeatFrequencyHz ;
+    sh:property [
+        sh:path sstim-ex:hasBeatFrequencyHz ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "hasBeatFrequencyHz must be a non-negative decimal (Hz)."@en ;
+    ] .
+
+sstim-sh:DutyCycleShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasDutyCycle ;
+    sh:property [
+        sh:path sstim-ex:hasDutyCycle ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 1 ;
+        sh:message "hasDutyCycle must be a decimal in [0, 1]."@en ;
+    ] .
+
+sstim-sh:GainLevelShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasGainLevel ;
+    sh:property [
+        sh:path sstim-ex:hasGainLevel ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 1 ;
+        sh:message "hasGainLevel must be a decimal in [0, 1]."@en ;
+    ] .
+
 
 ###########################################################################
 # End of sstim-shapes.ttl

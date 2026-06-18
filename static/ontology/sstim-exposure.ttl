@@ -32,15 +32,18 @@
 ###########################################################################
 
 <https://w3id.org/sstim/exposure> a owl:Ontology ;
-    owl:versionInfo "0.3.0" ;
+    owl:versionInfo "0.4.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-06-18"^^xsd:date ;
+    dct:modified "2026-06-18"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ;
-    skos:historyNote "Initial exposure module for post-0.3.0 ontology work. The module does not assert physiological or health effects directly; those statements must be modeled as qualified claims with evidence or knowledge status."@en .
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    skos:historyNote "Initial exposure module for post-0.3.0 ontology work. The module does not assert physiological or health effects directly; those statements must be modeled as qualified claims with evidence or knowledge status."@en ;
+    skos:historyNote "0.4.0 — added left/right laterality body placements, quantitative stimulus datatype properties (frequency, flicker rate, beat frequency, duty cycle, gain, phase), the ExposureLimit class with quantified optical/flicker/hearing safety boundaries citing external standards, and the affordsDeliveryMedium capability-to-medium relation. Grounds the Sensory Field interface (ADR 0011)."@en .
 
 
 ###########################################################################
@@ -157,6 +160,13 @@ sstim-ex:EffectDimension a owl:Class ;
     skos:definition "Controlled vocabulary class for dimensions that an exposure effect claim can concern, including comfort, risk, perception, and physiological measures."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
+sstim-ex:ExposureLimit a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Exposure Limit"@en ;
+    skos:definition "A quantified safety limit for an exposure, such as a maximum flash frequency, a sound-level dose, or an optical-radiation exposure boundary. An exposure limit carries a value and/or maximum frequency, an optional averaging time and body placement, and should cite the external standard it is derived from. It does not itself assert that any specific delivery is safe; it records the threshold against which a delivery is checked."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> .
+
 
 ###########################################################################
 # Core properties
@@ -249,6 +259,109 @@ sstim-ex:concernsEffectDimension a owl:ObjectProperty ;
     rdfs:range sstim-ex:EffectDimension ;
     rdfs:label "concerns effect dimension"@en ;
     skos:definition "Links an exposure effect claim to the comfort, risk, perception, or physiological dimension it concerns."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasExposureLimit a owl:ObjectProperty ;
+    rdfs:range sstim-ex:ExposureLimit ;
+    rdfs:label "has exposure limit"@en ;
+    skos:definition "Links a comfort boundary or device capability to a quantified exposure limit against which a delivery is checked."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:conformsToStandard a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:label "conforms to standard"@en ;
+    skos:definition "Links an exposure limit to the external standard, guideline, or recommendation it is derived from."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:appliesToPlacement a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range sstim-ex:BodyPlacement ;
+    rdfs:label "applies to placement"@en ;
+    skos:definition "Links an exposure limit to the body or near-body placement it applies to, since limits differ by site (for example eyes are more vulnerable than hands to optical radiation)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:affordsDeliveryMedium a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:DeviceCapability ;
+    rdfs:range sstim-ex:PhysicalDeliveryMedium ;
+    rdfs:label "affords delivery medium"@en ;
+    skos:definition "Links a device capability to the physical delivery medium it produces or affords, making the capability-to-medium pairing explicit rather than implied by naming."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasFrequencyHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "frequency (Hz)"@en ;
+    skos:definition "Carrier or tone frequency of a stimulus channel, in hertz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasFlickerRateHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "flicker rate (Hz)"@en ;
+    skos:definition "Blink, pulse, or flicker rate of a stimulus channel, in hertz. Visual flicker rate is subject to photosensitivity exposure limits."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasBeatFrequencyHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "beat frequency (Hz)"@en ;
+    skos:definition "Monaural or binaural beat frequency (the difference frequency) of an audio stimulus channel, in hertz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasDutyCycle a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "duty cycle"@en ;
+    skos:definition "On-fraction of each blink or pulse cycle for a stimulus channel, between 0 and 1."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasGainLevel a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "gain level"@en ;
+    skos:definition "Relative output amplitude of a stimulus channel, between 0 and 1. This is a relative level, not a calibrated physical intensity."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasPhaseOffset a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "phase offset"@en ;
+    skos:definition "Phase offset of a stimulus channel's modulation relative to other channels, as a fraction of a cycle between 0 and 1."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitValue a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "limit value"@en ;
+    skos:definition "Numeric value of an exposure limit, interpreted together with limitUnit and limitQuantity."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitUnit a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range xsd:string ;
+    rdfs:label "limit unit"@en ;
+    skos:definition "Unit of an exposure limit value (for example \"dBA\" or \"J/m2\"). A QUDT unit IRI may be linked separately where precision is required."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitQuantity a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range xsd:string ;
+    rdfs:label "limit quantity"@en ;
+    skos:definition "Physical quantity an exposure limit constrains (for example \"flash frequency\", \"sound pressure level\", or \"effective irradiance\")."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitAveragingTime a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range xsd:duration ;
+    rdfs:label "limit averaging time"@en ;
+    skos:definition "Averaging or reference time over which an exposure limit is defined (for example an 8-hour dose), as an xsd:duration."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "limit maximum frequency (Hz)"@en ;
+    skos:definition "Maximum permitted frequency under an exposure limit, in hertz (for example a maximum safe flash rate)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 
@@ -597,7 +710,8 @@ sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeli
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:prefLabel "ultraviolet radiation"@en ;
     skos:notation "ultraviolet-radiation" ;
-    skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure with explicit optical-safety boundaries."@en .
+    skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure. Any at-body delivery is bounded by the optical-radiation comfort boundary (sstim-ex:boundaryOpticalRadiation), which carries an exposure limit citing IEC 62471 / ICNIRP. BSC Lab does not currently deliver ultraviolet radiation at the body."@en ;
+    skos:scopeNote "Ultraviolet exposure to skin and especially the eyes is hazardous; model it with sstim-ex:boundaryOpticalRadiation and an appropriate knowledge status rather than as a benign visual cue."@en .
 
 sstim-ex:modalityAuditory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
@@ -687,7 +801,8 @@ sstim-ex:capabilityHeadphones a owl:NamedIndividual, sstim-ex:DeviceCapability, 
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
     skos:prefLabel "headphones"@en ;
-    skos:notation "headphones" .
+    skos:notation "headphones" ;
+    sstim-ex:affordsDeliveryMedium sstim-ex:mediumAirConductedSound .
 
 sstim-ex:capabilityHrtfSpatialAudio a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
@@ -705,7 +820,8 @@ sstim-ex:capabilityDisplayLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapa
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
     skos:prefLabel "display light output"@en ;
-    skos:notation "display-light-output" .
+    skos:notation "display-light-output" ;
+    sstim-ex:affordsDeliveryMedium sstim-ex:mediumVisualLight .
 
 sstim-ex:capabilityDisplayFlicker a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
@@ -861,13 +977,17 @@ sstim-ex:capabilityInfraredLightOutput a owl:NamedIndividual, sstim-ex:DeviceCap
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
     skos:prefLabel "infrared light output"@en ;
-    skos:notation "infrared-light-output" .
+    skos:notation "infrared-light-output" ;
+    skos:definition "Capability to emit non-visible infrared optical radiation. Exploratory; not a current BSC Lab delivery capability."@en ;
+    sstim-ex:affordsDeliveryMedium sstim-ex:mediumInfraredRadiation .
 
 sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
     skos:prefLabel "ultraviolet light output"@en ;
-    skos:notation "ultraviolet-light-output" .
+    skos:notation "ultraviolet-light-output" ;
+    skos:definition "Capability to emit non-visible ultraviolet optical radiation. Exploratory and optical-safety-bounded; not a current BSC Lab delivery capability."@en ;
+    sstim-ex:affordsDeliveryMedium sstim-ex:mediumUltravioletRadiation .
 
 sstim-ex:placementEars a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
@@ -934,6 +1054,34 @@ sstim-ex:placementNearbyEnvironment a owl:NamedIndividual, sstim-ex:BodyPlacemen
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
     skos:prefLabel "nearby environment"@en ;
     skos:notation "nearby-environment" .
+
+sstim-ex:placementEarLeft a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
+    skos:inScheme sstim-ex:BodyPlacementScheme ;
+    skos:broader sstim-ex:placementEars ;
+    skos:prefLabel "left ear"@en ;
+    skos:notation "ear-left" ;
+    skos:definition "The left ear specifically, for dichotic or per-ear delivery such as a binaural beat."@en .
+
+sstim-ex:placementEarRight a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
+    skos:inScheme sstim-ex:BodyPlacementScheme ;
+    skos:broader sstim-ex:placementEars ;
+    skos:prefLabel "right ear"@en ;
+    skos:notation "ear-right" ;
+    skos:definition "The right ear specifically, for dichotic or per-ear delivery such as a binaural beat."@en .
+
+sstim-ex:placementEyeLeft a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
+    skos:inScheme sstim-ex:BodyPlacementScheme ;
+    skos:broader sstim-ex:placementEyes ;
+    skos:prefLabel "left eye"@en ;
+    skos:notation "eye-left" ;
+    skos:definition "The left eye specifically, for dichoptic or per-eye delivery such as stereoscopic depth or interocular frequency tagging."@en .
+
+sstim-ex:placementEyeRight a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
+    skos:inScheme sstim-ex:BodyPlacementScheme ;
+    skos:broader sstim-ex:placementEyes ;
+    skos:prefLabel "right eye"@en ;
+    skos:notation "eye-right" ;
+    skos:definition "The right eye specifically, for dichoptic or per-eye delivery such as stereoscopic depth or interocular frequency tagging."@en .
 
 sstim-ex:patternContinuous a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
@@ -1283,13 +1431,15 @@ sstim-ex:boundaryHearingRisk a owl:NamedIndividual, sstim-ex:ComfortBoundary, sk
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
     skos:prefLabel "hearing-risk boundary"@en ;
-    skos:notation "hearing-risk" .
+    skos:notation "hearing-risk" ;
+    sstim-ex:hasExposureLimit sstim-ex:limitHearingNiosh .
 
 sstim-ex:boundaryPhotosensitivity a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
     skos:prefLabel "photosensitivity boundary"@en ;
-    skos:notation "photosensitivity" .
+    skos:notation "photosensitivity" ;
+    sstim-ex:hasExposureLimit sstim-ex:limitFlickerWcag .
 
 sstim-ex:boundaryThermalComfort a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
@@ -1320,6 +1470,14 @@ sstim-ex:boundaryBalanceRisk a owl:NamedIndividual, sstim-ex:ComfortBoundary, sk
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
     skos:prefLabel "balance-risk boundary"@en ;
     skos:notation "balance-risk" .
+
+sstim-ex:boundaryOpticalRadiation a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
+    skos:inScheme sstim-ex:ComfortBoundaryScheme ;
+    skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
+    skos:prefLabel "optical-radiation boundary"@en ;
+    skos:notation "optical-radiation" ;
+    skos:definition "Boundary for non-visible optical-radiation exposure (infrared or ultraviolet) reaching the body, especially the eyes."@en ;
+    sstim-ex:hasExposureLimit sstim-ex:limitUvActinicIec .
 
 sstim-ex:effectPleasantness a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
@@ -1448,6 +1606,46 @@ sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
     skos:prefLabel "gravity perception"@en ;
     skos:notation "gravity-perception" .
+
+
+###########################################################################
+# Exposure limits (quantified safety thresholds, citing external standards)
+#
+# These record recognized thresholds against which a delivery is checked.
+# They do not assert that any delivery is safe; runtime enforcement of the
+# flicker limit lives in src/ui/safety/flashSafety.js (ADR 0011).
+###########################################################################
+
+sstim-ex:limitFlickerWcag a owl:NamedIndividual, sstim-ex:ExposureLimit ;
+    rdfs:label "general-safe flash-rate limit"@en ;
+    sstim-ex:limitQuantity "flash frequency" ;
+    sstim-ex:limitMaxFrequencyHz "3"^^xsd:decimal ;
+    sstim-ex:limitUnit "Hz" ;
+    sstim-ex:appliesToPlacement sstim-ex:placementEyes ;
+    sstim-ex:conformsToStandard <https://www.w3.org/TR/WCAG21/#three-flashes-or-below-threshold> ,
+        <https://www.itu.int/rec/R-REC-BT.1702> ;
+    skos:definition "No more than three general or red flashes per second; flashing above this rate (peak provocation roughly 15–25 Hz) requires explicit caution. Derived from WCAG 2.3.1 and ITU-R BT.1702 / Harding guidance."@en .
+
+sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
+    rdfs:label "recommended sound-exposure limit"@en ;
+    sstim-ex:limitQuantity "sound pressure level" ;
+    sstim-ex:limitValue "85"^^xsd:decimal ;
+    sstim-ex:limitUnit "dBA" ;
+    sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
+    sstim-ex:appliesToPlacement sstim-ex:placementEars ;
+    sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/topics/noise/> ;
+    skos:definition "85 dBA averaged over 8 hours, with a 3 dB exchange rate (each +3 dB halves the safe duration). Derived from NIOSH recommended exposure limits. BSC Lab cannot measure delivered sound pressure level and treats this as advisory."@en .
+
+sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
+    rdfs:label "actinic ultraviolet exposure limit"@en ;
+    sstim-ex:limitQuantity "effective radiant exposure" ;
+    sstim-ex:limitValue "30"^^xsd:decimal ;
+    sstim-ex:limitUnit "J/m2" ;
+    sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
+    sstim-ex:appliesToPlacement sstim-ex:placementEyes , sstim-ex:placementWholeBody ;
+    sstim-ex:conformsToStandard <https://webstore.iec.ch/publication/7076> ;
+    skos:definition "Approximately 30 J/m2 spectrally-weighted effective ultraviolet radiant exposure per day for skin and eye, with photobiological risk groups per IEC 62471 and ICNIRP. Eyes are more vulnerable than skin. BSC Lab does not deliver ultraviolet radiation at the body."@en .
+
 
 ###########################################################################
 # End of sstim-exposure.ttl
