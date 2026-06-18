@@ -201,6 +201,36 @@ export function normalizeDepth(z, zMin, zMax) {
   return t < 0 ? 0 : t > 1 ? 1 : t
 }
 
+// ── Colour helpers (depth-cued shading) ─────────────────────────────────────────
+const clampByte = (n) => (n < 0 ? 0 : n > 255 ? 255 : n)
+
+/** Parse `#rgb` or `#rrggbb` into { r, g, b } (0..255); invalid → black. */
+export function parseHexColor(hex) {
+  let h = String(hex ?? '').replace('#', '').trim()
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]
+  const n = parseInt(h, 16)
+  if (h.length !== 6 || Number.isNaN(n)) return { r: 0, g: 0, b: 0 }
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
+}
+
+/** Serialise { r, g, b } back to `#rrggbb`. */
+export function toHexColor({ r, g, b }) {
+  const h = (v) => clampByte(Math.round(v)).toString(16).padStart(2, '0')
+  return `#${h(r)}${h(g)}${h(b)}`
+}
+
+/** Linear RGB interpolation between two hex colours; t clamped to [0,1]. */
+export function lerpHexColor(a, b, t) {
+  const ca = parseHexColor(a)
+  const cb = parseHexColor(b)
+  const k = t < 0 ? 0 : t > 1 ? 1 : t
+  return toHexColor({
+    r: ca.r + (cb.r - ca.r) * k,
+    g: ca.g + (cb.g - ca.g) * k,
+    b: ca.b + (cb.b - ca.b) * k,
+  })
+}
+
 // ── Autostereogram (single-image random-dot stereogram) ─────────────────────────
 /**
  * Build an RGBA random-dot autostereogram from a per-pixel depth buffer.

@@ -40,6 +40,7 @@ const numberOr = (value, fallback) => {
   const n = Number(value)
   return Number.isFinite(n) ? n : fallback
 }
+const isHexColor = (s) => typeof s === 'string' && /^#[0-9a-fA-F]{6}$/.test(s)
 
 export function createTreeState() {
   return {
@@ -59,11 +60,32 @@ export function createTreeState() {
     strokeWidth: 1,
     showLeaves: true,
     showRoots: true,
+    // Depth-cued shading for the free-view stereo pair: each vertex's colour is
+    // blended toward a near/far gradient by its (rotated) z. A monocular depth
+    // cue on top of binocular disparity; both eyes get the same colour so fusion
+    // is unaffected. Does not apply to anaglyph (per-eye channels) or the
+    // autostereogram (grayscale dots).
+    depthColor: {
+      enabled: false,
+      near: '#ffe7a8',
+      far: '#274b73',
+      strength: 0.75,
+    },
     rotation: {
       yawDeg: 20,
       autoRotate: false,
       autoRotateSec: 24,
     },
+  }
+}
+
+function normalizeDepthColor(dc = {}) {
+  const base = createTreeState().depthColor
+  return {
+    enabled: typeof dc.enabled === 'boolean' ? dc.enabled : base.enabled,
+    near: isHexColor(dc.near) ? dc.near : base.near,
+    far: isHexColor(dc.far) ? dc.far : base.far,
+    strength: clamp(numberOr(dc.strength, base.strength), 0, 1),
   }
 }
 
@@ -101,6 +123,7 @@ export function normalizeTreeState(input) {
     strokeWidth: clamp(numberOr(input?.strokeWidth, base.strokeWidth), STROKE_MIN, STROKE_MAX),
     showLeaves: typeof input?.showLeaves === 'boolean' ? input.showLeaves : base.showLeaves,
     showRoots: typeof input?.showRoots === 'boolean' ? input.showRoots : base.showRoots,
+    depthColor: normalizeDepthColor(input?.depthColor),
     rotation: normalizeRotation(input?.rotation),
   }
 }

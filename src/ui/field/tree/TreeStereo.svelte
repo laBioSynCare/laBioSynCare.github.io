@@ -127,6 +127,7 @@
         strokeWidth={tree.strokeWidth}
         showLeaves={tree.showLeaves}
         showRoots={tree.showRoots}
+        depthColor={tree.depthColor}
         active={$visualStimulationOn}
       />
       {#if fullscreen}
@@ -242,6 +243,27 @@
         </label>
       {/if}
       <p class="note">Depth scale sets how strongly z separates the eyes. A bigger separation reads as more depth but is harder to fuse — keep it comfortable.</p>
+
+      {#if tree.renderMode === 'stereo-pair'}
+        <label class="row">
+          <input type="checkbox" bind:checked={tree.depthColor.enabled} />
+          Colour by depth
+        </label>
+        {#if tree.depthColor.enabled}
+          <label class="row indent">
+            Near
+            <input type="color" bind:value={tree.depthColor.near} aria-label="Near (foreground) colour" />
+            Far
+            <input type="color" bind:value={tree.depthColor.far} aria-label="Far (background) colour" />
+          </label>
+          <label class="row indent">
+            Strength
+            <input type="range" min="0" max="1" step="0.01" bind:value={tree.depthColor.strength} />
+            <output>{Math.round(tree.depthColor.strength * 100)}%</output>
+          </label>
+          <p class="note">Tints each part of the tree by its depth — nearer parts toward the near colour, farther toward the far. Both eyes share the colour, so fusion is unaffected. Applies to the stereo pair only.</p>
+        {/if}
+      {/if}
     </fieldset>
 
     <!-- Ontology mapping -------------------------------------------------- -->

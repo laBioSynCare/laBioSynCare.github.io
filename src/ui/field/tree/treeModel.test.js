@@ -8,6 +8,8 @@ import {
   disparity,
   normalizeDepth,
   buildAutostereogram,
+  parseHexColor,
+  lerpHexColor,
 } from './treeModel.js'
 
 const finite = (p) => Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z)
@@ -86,6 +88,21 @@ describe('normalizeDepth', () => {
     expect(normalizeDepth(1, -1, 1)).toBe(1)
     expect(normalizeDepth(-2, -1, 1)).toBe(0)
     expect(normalizeDepth(5, 0, 0)).toBe(0.5) // degenerate range
+  })
+})
+
+describe('colour helpers', () => {
+  it('parses #rgb and #rrggbb, rejecting junk', () => {
+    expect(parseHexColor('#ffffff')).toEqual({ r: 255, g: 255, b: 255 })
+    expect(parseHexColor('#f00')).toEqual({ r: 255, g: 0, b: 0 })
+    expect(parseHexColor('nope')).toEqual({ r: 0, g: 0, b: 0 })
+  })
+
+  it('interpolates and clamps the blend factor', () => {
+    expect(lerpHexColor('#000000', '#ffffff', 0)).toBe('#000000')
+    expect(lerpHexColor('#000000', '#ffffff', 1)).toBe('#ffffff')
+    expect(lerpHexColor('#000000', '#ffffff', 0.5)).toBe('#808080')
+    expect(lerpHexColor('#000000', '#ffffff', 2)).toBe('#ffffff') // clamped
   })
 })
 

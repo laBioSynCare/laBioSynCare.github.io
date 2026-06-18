@@ -4,7 +4,7 @@
   // clock); this component projects it to screen and draws it through one of
   // three stereoscopic techniques. Gated by the global visual-stimulation policy
   // via the `active` prop, mirroring FieldStage.svelte.
-  import { project, disparity, normalizeDepth, buildAutostereogram } from './treeModel.js'
+  import { project, disparity, normalizeDepth, buildAutostereogram, lerpHexColor } from './treeModel.js'
 
   let {
     tree = { branches: [], roots: [], leaves: [] },
@@ -16,8 +16,15 @@
     strokeWidth = 1,
     showLeaves = true,
     showRoots = true,
+    depthColor = { enabled: false, near: '#ffe7a8', far: '#274b73', strength: 0.75 },
     active = true,
   } = $props()
+
+  // Natural element colours, used as-is when depth shading is off and as the
+  // blend base when it is on.
+  const BRANCH_COLOR = '#d8c4a0'
+  const ROOT_COLOR = '#9c8161'
+  const LEAF_COLOR = '#8ccb6f'
 
   // Measured surface size (client-side; 0 during prerender, which is fine —
   // nothing fuses until the browser lays the element out).
@@ -76,6 +83,18 @@
   )
 
   const eyeX = (x, z, sign) => x + (sign * disparity(z, depthScalePx)) / 2
+
+  // Depth-cued colour for the stereo pair. Bounds are taken at the current yaw so
+  // the shading turns with the tree. Computed only when shading is on.
+  const depthBounds = $derived(depthColor?.enabled ? rotatedBounds(tree, theta) : null)
+  function colorFor(z, baseHex) {
+    if (!depthColor?.enabled || !depthBounds) return baseHex
+    const zn = normalizeDepth(z, depthBounds.minZ, depthBounds.maxZ)
+    const depthHex = lerpHexColor(depthColor.far, depthColor.near, zn) // far → near
+    return lerpHexColor(baseHex, depthHex, depthColor.strength)
+  }
+  const branchColor = (s) => colorFor((s.az + s.bz) / 2, BRANCH_COLOR)
+  const rootColor = (s) => colorFor((s.az + s.bz) / 2, ROOT_COLOR)
 
   // Build an SVG path covering every segment, each endpoint shifted by the eye
   // disparity. One path keeps the DOM light versus a node per segment.
@@ -189,12 +208,16 @@
         {#each panes as pane}
           <svg class="pane eye-pane" data-eye={pane.key} viewBox={`0 0 ${paneW} ${paneH}`} preserveAspectRatio="none">
             {#if showRoots}
-              <path d={segPath(projRoots, pane.sign)} class="root" fill="none" stroke-width={rootStroke} />
+              {#each projRoots as s}
+                <line x1={eyeX(s.ax, s.az, pane.sign)} y1={s.ay} x2={eyeX(s.bx, s.bz, pane.sign)} y2={s.by} stroke={rootColor(s)} stroke-width={rootStroke} stroke-linecap="round" />
+              {/each}
             {/if}
-            <path d={segPath(projBranches, pane.sign)} class="branch" fill="none" stroke-width={branchStroke} />
+            {#each projBranches as s}
+              <line x1={eyeX(s.ax, s.az, pane.sign)} y1={s.ay} x2={eyeX(s.bx, s.bz, pane.sign)} y2={s.by} stroke={branchColor(s)} stroke-width={branchStroke} stroke-linecap="round" />
+            {/each}
             {#if showLeaves}
               {#each projLeaves as l}
-                <circle cx={eyeX(l.x, l.z, pane.sign)} cy={l.y} r={l.r} class="leaf" />
+                <circle cx={eyeX(l.x, l.z, pane.sign)} cy={l.y} r={l.r} fill={colorFor(l.z, LEAF_COLOR)} />
               {/each}
             {/if}
           </svg>
@@ -248,10 +271,6 @@
     width: 100%;
     height: 100%;
   }
-
-  .branch { stroke: #d8c4a0; stroke-linecap: round; }
-  .root { stroke: #9c8161; stroke-linecap: round; }
-  .leaf { fill: #8ccb6f; }
 
   .visual-off {
     display: grid;
