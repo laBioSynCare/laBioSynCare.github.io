@@ -122,41 +122,79 @@ links each active concept to the graph view via
 ## 7. File map
 
 ```
-src/routes/field/+page.svelte         route (thin)
-src/routes/field/tree/+page.svelte    Stereoscopic Tree route (thin)
-src/ui/field/SensoryField.svelte      main UI: session, clock loop, controls, export
-src/ui/field/FieldStage.svelte        render surface (colour fill / fullscreen)
-src/ui/field/fieldState.js            channel state model + persistence (bsclab.field)
-src/ui/field/exposureProfile.js       state → sstim-ex:ExposureProfile (N3 Writer)
-src/ui/field/fieldSemantic.js         UI concept → ontology IRI (graph links)
-src/ui/field/tree/treeModel.js        3D tree generator + projection + autostereogram
-src/ui/field/tree/treeState.js        tree state model + persistence (bsclab.field.tree)
-src/ui/field/tree/TreeStereo.svelte   tree UI: controls, clock loop, safety gate
-src/ui/field/tree/TreeStage.svelte    tree render surface (stereo-pair / anaglyph / autostereogram)
-src/ui/safety/flashSafety.js          flash-rate cap + risk classification
+src/routes/field/+page.svelte               route (thin)
+src/routes/field/{tree,abstract,landscape}/+page.svelte   scene routes (thin)
+src/ui/field/SensoryField.svelte            main UI: session, clock loop, controls, export
+src/ui/field/FieldStage.svelte              render surface (colour fill / fullscreen)
+src/ui/field/fieldState.js                  channel state model + persistence (bsclab.field)
+src/ui/field/exposureProfile.js             state → sstim-ex:ExposureProfile (N3 Writer)
+src/ui/field/fieldSemantic.js               UI concept → ontology IRI (graph links)
+
+src/ui/field/scene/sceneGeom.js             shared: projection, disparity, depth tint, autostereogram
+src/ui/field/scene/sceneView.js             shared technique/rotation/depth state + resolveYaw
+src/ui/field/scene/SceneStage.svelte        shared renderer (segments/dots/polys × 3 techniques)
+src/ui/field/scene/SceneStereo.svelte       shared shell (selector, clock, fullscreen, gate, controls slot)
+
+src/ui/field/tree/treeModel.js              3D tree generator (re-exports shared geom)
+src/ui/field/tree/treeState.js              tree state model + persistence (bsclab.field.tree)
+src/ui/field/tree/TreeStereo.svelte         tree UI (own stage, predates the shared framework)
+src/ui/field/tree/TreeStage.svelte          tree render surface
+src/ui/field/abstract/abstractScene.js      Miró/Kandinsky/Klee scene generator
+src/ui/field/abstract/abstractState.js      abstract state (bsclab.field.abstract)
+src/ui/field/abstract/AbstractField.svelte  abstract page (uses SceneStereo)
+src/ui/field/landscape/landscapeScene.js    hills/river/houses/trees/flowers generator
+src/ui/field/landscape/landscapeState.js    landscape state (bsclab.field.landscape)
+src/ui/field/landscape/LandscapeField.svelte landscape page (uses SceneStereo)
+src/ui/safety/flashSafety.js                flash-rate cap + risk classification
 ```
 
-## 8. Stereoscopic Tree (`/field/tree/`)
+## 8. Stereoscopic scenes (`/field/tree`, `/field/abstract`, `/field/landscape`)
 
-A Step 3b instrument that extends the field's free-view depth from two markers to
-a full 3D scene. [treeModel.js](../../src/ui/field/tree/treeModel.js) generates a
-deterministic procedural tree from a seed: leaves, branches, and roots each have
-an (x, y, z) position in a normalized model space (+y up, +z toward the viewer).
-The `spread` parameter is the depth knob — at `spread = 0` the tree is planar
-(z = 0 everywhere), and toward `spread = 1` the branching tilts fully out of the
-plane. Yaw rotation about the vertical axis (`rotateY`) makes the structure
-legible; it is driven by the free-running visual clock (`performance.now()`), the
-same preview precedent as `SensoryField` — there is no audio on this page, so the
-AudioContext-only clock rule (CLAUDE.md §3.1) does not apply.
+Step 3b instruments that extend the field's free-view depth from two markers to
+full 3D scenes. Three scenes share one renderer and differ only in their
+generator:
 
-One shared model, three projections (orthographic, so disparity is a pure function
-of z with the focal plane at z = 0 — matching the field's `--offset` cue):
+- **Stereoscopic Tree** (`/field/tree/`) — a procedural tree; leaves, branches,
+  and roots each have an (x, y, z) position.
+- **Abstraction** (`/field/abstract/`) — shapes scattered in 3D in the spirit of
+  a **Miró / Kandinsky / Paul Klee** composition (selectable style).
+- **3D Landscape** (`/field/landscape/`) — receding hills, a winding river,
+  houses, trees, and flowers, each at its own depth (day / dusk / night).
+
+### Shared scene framework (`src/ui/field/scene/`)
+
+A scene is a flat bag of primitives in normalized 3D space (+y up, +z toward the
+viewer), each carrying its own colour:
+
+```
+{ background, segments:[{a,b,width,color}], dots:[{x,y,z,r,fill,stroke?}],
+  polys:[{pts:[{x,y,z}…], fill, stroke?, closed}] }
+```
+
+[sceneGeom.js](../../src/ui/field/scene/sceneGeom.js) holds the scene-agnostic
+math (projection, disparity, `depthTint`, the SIRDS kernel);
+[SceneStage.svelte](../../src/ui/field/scene/SceneStage.svelte) is the one
+renderer (segments → lines, dots → circles, polys → paths, depth-sorted);
+[SceneStereo.svelte](../../src/ui/field/scene/SceneStereo.svelte) is the shared
+shell (technique selector, depth + rotation controls, the `performance.now()` yaw
+clock, fullscreen, the global visual gate, and the ontology panel) with a snippet
+slot for each scene's own controls. Each scene generator
+(`abstractScene.js`, `landscapeScene.js`, `treeModel.js`) is pure and
+deterministic per seed. `spread` is the common depth knob — at `spread = 0` a
+scene is planar (z = 0), toward `spread = 1` it is fully three-dimensional. Yaw is
+driven by the free-running visual clock (no audio on these pages, so the
+AudioContext-only clock rule, CLAUDE.md §3.1, does not apply). The tree predates
+the framework and keeps its own `TreeStage`/`TreeStereo`; `treeModel.js`
+re-exports the shared geometry and `treeToScene()` can adapt it to `SceneStage`.
+
+One model, three projections (orthographic, so disparity is a pure function of z
+with the focal plane at z = 0 — matching the field's `--offset` cue):
 
 | Technique | Term | How it renders |
 |---|---|---|
-| **Free-view stereo pair** | the codebase's free-view stereoscopy | two SVG panels; each vertex shifted ± `disparity(z)/2`; parallel or cross-eye (panels swap) |
-| **Autostereogram** | single-image random-dot stereogram | the tree is rasterised to a per-pixel depth buffer, then the classic constraint-propagation SIRDS algorithm builds one dot image |
-| **Anaglyph** | red/cyan | one SVG, the tree drawn twice (left eye red, right eye cyan) with `mix-blend-mode: screen`; needs red/cyan glasses |
+| **Free-view stereo pair** | the codebase's free-view stereoscopy | two SVG panels; each vertex shifted ± `disparity(z)/2`; parallel or cross-eye (panels swap); depth-cued colour optional |
+| **Autostereogram** | single-image random-dot stereogram | the scene is rasterised to a per-pixel depth buffer (depth-sorted), then the classic constraint-propagation SIRDS algorithm builds one dot image |
+| **Anaglyph** | red/cyan | one SVG, the scene drawn twice (left eye red, right eye cyan) with `mix-blend-mode: screen`; dots filled, everything else outlined; needs red/cyan glasses |
 
 "Stereogram" is ambiguous — the autostereogram is what the word usually means
 (a single "Magic Eye" image), whereas the stereo pair is two images. Both are

@@ -259,8 +259,10 @@
       A minimal instrument: a full-screen colour field with an independent
       per-ear tone. Static is the resting (0&nbsp;Hz) case; turn on blink or a beat
       to add the time dimension. Every configuration maps to an
-      exposure profile you can export. For a richer depth scene, see the
-      <a href="/field/tree/">Stereoscopic Tree</a>.
+      exposure profile you can export. For richer depth scenes, see the
+      <a href="/field/tree/">Stereoscopic Tree</a>,
+      <a href="/field/abstract/">Abstraction</a>, and
+      <a href="/field/landscape/">3D Landscape</a>.
     </p>
   </header>
 

@@ -145,6 +145,8 @@
       <a href="/creator/">Patch Studio</a>
       <a href="/field/">Sensory Field</a>
       <a href="/field/tree/">Stereoscopic Tree</a>
+      <a href="/field/abstract/">Abstraction</a>
+      <a href="/field/landscape/">3D Landscape</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
       <a href="/logbook/">Logbook</a>
