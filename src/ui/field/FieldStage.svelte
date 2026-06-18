@@ -9,6 +9,8 @@
     fullscreen = false,
     depth = null,
     depthSeparationPx = 48,
+    markerOffsetX = 0,
+    markerOffsetY = 0,
   } = $props()
 
   const stereoPanels = $derived(buildStereoPanels(depth, depthSeparationPx))
@@ -16,18 +18,42 @@
   function buildStereoPanels(depthState, separation) {
     const half = Math.max(0, Number(separation) || 0) / 2
     const canonical = [
-      { key: 'left', offset: -half },
-      { key: 'right', offset: half },
+      { key: 'left', offset: -half, sign: -1 },
+      { key: 'right', offset: half, sign: 1 },
     ]
     return depthState?.viewingMode === 'cross' ? [canonical[1], canonical[0]] : canonical
   }
 
+  // Per-position parallax for static grid markers (px). Returns 0 when axis is 'none'.
+  function gridMarkerParallax(pos, depthState) {
+    const axis = depthState?.gridDepthAxis ?? 'none'
+    const range = Number(depthState?.gridDepthRangePx) || 0
+    if (axis === 'none' || range === 0) return 0
+    const nx = (pos.x - 50) / 50  // -1 (left) … +1 (right)
+    const ny = (pos.y - 50) / 50  // -1 (top)  … +1 (bottom)
+    let t = 0
+    if (axis === 'x') t = nx
+    else if (axis === 'y') t = ny
+    else if (axis === 'both') t = (nx + ny) / 2
+    return t * range / 2
+  }
+
+  // Build NxN grid positions (percent), skipping the centre cell when N is odd.
+  function buildGridPositions(size) {
+    const n = Math.max(1, Math.min(7, Math.round(Number(size) || 3)))
+    const positions = []
+    for (let col = 1; col <= n; col++) {
+      for (let row = 1; row <= n; row++) {
+        // Centre cell: col = row = (n+1)/2, only exists when n is odd.
+        if (2 * col === n + 1 && 2 * row === n + 1) continue
+        positions.push({ x: 100 * col / (n + 1), y: 100 * row / (n + 1) })
+      }
+    }
+    return positions
+  }
+
   // 3×3 grid positions (percent) excluding the centre, which oscillates.
-  const GRID_POSITIONS = [
-    { x: 25, y: 25 }, { x: 50, y: 25 }, { x: 75, y: 25 },
-    { x: 25, y: 50 },                    { x: 75, y: 50 },
-    { x: 25, y: 75 }, { x: 50, y: 75 }, { x: 75, y: 75 },
-  ]
+  const GRID_POSITIONS = $derived(buildGridPositions(depth?.gridSize ?? 3))
 </script>
 
 {#if active}
@@ -36,16 +62,13 @@
     {#if depth?.enabled}
       <div class="stereo-pair" aria-hidden="true">
         {#each stereoPanels as panel}
-          <div class="eye-pane" data-eye={panel.key}>
+          <div class="eye-pane" data-eye={panel.key} class:no-plane={depth.showCartesianPlane === false}>
             {#each GRID_POSITIONS as pos}
-              <div class="grid-mark" style="--gx:{pos.x}%; --gy:{pos.y}%; --dot-size:{depth.dotSizePx}px">
-                <span class="stick"></span>
-                <span class="point"></span>
-              </div>
+              <div class="grid-mark" style="--gx:{pos.x}%; --gy:{pos.y}%; --offset:{(panel.sign * gridMarkerParallax(pos, depth)).toFixed(1)}px; --dot-size:{depth.dotSizePx}px; --scale-x:{depth.gridDotScaleX ?? 1}; --scale-y:{depth.gridDotScaleY ?? 1}"></div>
             {/each}
             <div
               class="stereo-mark"
-              style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px"
+              style="--offset:{panel.offset}px; --dot-size:{depth.dotSizePx}px; --mx:{markerOffsetX}px; --my:{markerOffsetY}px"
             >
               <span class="stick"></span>
               <span class="point"></span>
@@ -110,10 +133,17 @@
     position: absolute;
     left: var(--gx);
     top: var(--gy);
-    width: var(--dot-size);
-    height: calc(var(--dot-size) * 4);
-    transform: translate(-50%, -50%);
+    width: calc(var(--dot-size) * var(--scale-x));
+    height: calc(var(--dot-size) * var(--scale-y));
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 18px color-mix(in srgb, #000 38%, transparent);
+    transform: translate(calc(-50% + var(--offset)), -50%);
     opacity: 0.45;
+  }
+
+  .eye-pane.no-plane {
+    background: none;
   }
 
   .stereo-mark {
@@ -122,7 +152,10 @@
     top: 50%;
     width: var(--dot-size);
     height: calc(var(--dot-size) * 4);
-    transform: translate(calc(-50% + var(--offset)), -50%);
+    transform: translate(
+      calc(-50% + var(--offset) + var(--mx, 0px)),
+      calc(-50% + var(--my, 0px))
+    );
   }
 
   .stick {

@@ -32,6 +32,16 @@ export const DEPTH_DOT_MIN_PX = 6
 export const DEPTH_DOT_MAX_PX = 40
 export const DEPTH_BREATH_MIN_SEC = 3
 export const DEPTH_BREATH_MAX_SEC = 30
+export const GRID_DEPTH_AXES = ['none', 'x', 'y', 'both']
+export const GRID_DEPTH_RANGE_MIN_PX = 0
+export const GRID_DEPTH_RANGE_MAX_PX = 80
+export const GRID_SIZE_MIN = 1
+export const GRID_SIZE_MAX = 7
+export const GRID_DOT_SCALE_MIN = 0.25
+export const GRID_DOT_SCALE_MAX = 4
+export const MARKER_MOTION_SOURCES = ['none', 'beat', 'breath']
+export const MARKER_MOTION_AMPLITUDE_MIN_PX = 0
+export const MARKER_MOTION_AMPLITUDE_MAX_PX = 200
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
 const TWO_PI = Math.PI * 2
@@ -60,6 +70,16 @@ export function createFieldState() {
       modulationPx: 18,
       dotSizePx: 16,
       breathPeriodSec: 10,
+      gridDepthAxis: 'none',
+      gridDepthRangePx: 24,
+      showCartesianPlane: true,
+      gridSize: 3,
+      gridDotScaleX: 1,
+      gridDotScaleY: 1,
+      markerMotionXSource: 'none',
+      markerMotionXAmplitudePx: 30,
+      markerMotionYSource: 'none',
+      markerMotionYAmplitudePx: 30,
     },
     audio: {
       enabled: true,
@@ -101,6 +121,24 @@ function normalizeDepth(depth = {}) {
       DEPTH_BREATH_MIN_SEC,
       DEPTH_BREATH_MAX_SEC,
     ),
+    gridDepthAxis: GRID_DEPTH_AXES.includes(depth.gridDepthAxis) ? depth.gridDepthAxis : base.gridDepthAxis,
+    gridDepthRangePx: clamp(
+      numberOr(depth.gridDepthRangePx, base.gridDepthRangePx),
+      GRID_DEPTH_RANGE_MIN_PX,
+      GRID_DEPTH_RANGE_MAX_PX,
+    ),
+    showCartesianPlane: typeof depth.showCartesianPlane === 'boolean' ? depth.showCartesianPlane : base.showCartesianPlane,
+    gridSize: clamp(
+      Math.round(numberOr(depth.gridSize, base.gridSize)),
+      GRID_SIZE_MIN,
+      GRID_SIZE_MAX,
+    ),
+    gridDotScaleX: clamp(numberOr(depth.gridDotScaleX, base.gridDotScaleX), GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX),
+    gridDotScaleY: clamp(numberOr(depth.gridDotScaleY, base.gridDotScaleY), GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX),
+    markerMotionXSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionXSource) ? depth.markerMotionXSource : base.markerMotionXSource,
+    markerMotionXAmplitudePx: clamp(numberOr(depth.markerMotionXAmplitudePx, base.markerMotionXAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerMotionYSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionYSource) ? depth.markerMotionYSource : base.markerMotionYSource,
+    markerMotionYAmplitudePx: clamp(numberOr(depth.markerMotionYAmplitudePx, base.markerMotionYAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
   }
 }
 
@@ -193,6 +231,23 @@ export function resolveDepthSeparation(state, t = 0) {
 
   const value = base + depth.modulationPx * Math.sin(time * rate * TWO_PI)
   return clamp(value, DEPTH_SEPARATION_MIN_PX, DEPTH_SEPARATION_MAX_PX)
+}
+
+/**
+ * Resolve the X or Y position offset of the central marker, in CSS pixels.
+ * axis: 'x' | 'y'
+ */
+export function resolveMarkerMotion(state, axis, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const source = axis === 'x' ? depth.markerMotionXSource : depth.markerMotionYSource
+  const amplitude = axis === 'x' ? depth.markerMotionXAmplitudePx : depth.markerMotionYAmplitudePx
+  if (!source || source === 'none' || amplitude <= 0) return 0
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (source === 'breath') rate = 1 / (depth.breathPeriodSec || 10)
+  if (rate <= 0) return 0
+  return amplitude * Math.sin(time * rate * TWO_PI)
 }
 
 export function loadFieldState() {

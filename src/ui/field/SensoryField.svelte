@@ -12,6 +12,10 @@
     DEPTH_SEPARATION_MIN_PX, DEPTH_SEPARATION_MAX_PX, DEPTH_MODULATION_MIN_PX,
     DEPTH_MODULATION_MAX_PX, DEPTH_DOT_MIN_PX, DEPTH_DOT_MAX_PX,
     DEPTH_BREATH_MIN_SEC, DEPTH_BREATH_MAX_SEC, resolveDepthSeparation,
+    GRID_DEPTH_AXES, GRID_DEPTH_RANGE_MIN_PX, GRID_DEPTH_RANGE_MAX_PX,
+    GRID_SIZE_MIN, GRID_SIZE_MAX, GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX,
+    resolveMarkerMotion, MARKER_MOTION_SOURCES,
+    MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX,
   } from './fieldState.js'
   import { fieldStateToTurtle } from './exposureProfile.js'
   import { FIELD_SEMANTICS, fieldGraphHref } from './fieldSemantic.js'
@@ -22,6 +26,8 @@
   let fullscreen = $state(false)
   let displayOpacity = $state(field.visual.intensity)
   let depthSeparationPx = $state(field.depth.baseSeparationPx)
+  let markerOffsetX = $state(0)
+  let markerOffsetY = $state(0)
   let engineNote = $state('')
   let exportTtl = $state('')
   let exportOpen = $state(false)
@@ -40,6 +46,7 @@
   const blinkNeedsAck = $derived(field.visual.blinkEnabled && requiresFlashAcknowledgement(field.visual.blinkRateHz))
   const depthSourceLabels = { static: 'static', beat: 'beat', breath: 'breath' }
   const depthModeLabels = { parallel: 'parallel', cross: 'cross-eye' }
+  const gridDepthAxisLabels = { none: 'none', x: 'left ↔ right', y: 'top ↔ bottom', both: 'diagonal' }
   const trem = () => (field.audio.beatMode === 'monaural'
     ? { enabled: true, rate: field.audio.beatRateHz, depth: 0.8, mode: 'linear' }
     : null)
@@ -67,6 +74,8 @@
       displayOpacity = field.visual.intensity
     }
     depthSeparationPx = resolveDepthSeparation(field, t)
+    markerOffsetX = resolveMarkerMotion(field, 'x', t)
+    markerOffsetY = resolveMarkerMotion(field, 'y', t)
     if (playing && engine) applyLiveAudio(t)
     raf = requestAnimationFrame(tick)
   }
@@ -261,6 +270,8 @@
         {fullscreen}
         depth={field.depth}
         {depthSeparationPx}
+        {markerOffsetX}
+        {markerOffsetY}
       />
       {#if fullscreen}
         <button type="button" class="exit-fs" onclick={toggleFullscreen}>Exit ✕</button>
@@ -400,6 +411,48 @@
           </label>
         {/if}
         <label class="row">
+          X motion
+          <select bind:value={field.depth.markerMotionXSource}>
+            {#each MARKER_MOTION_SOURCES as src}
+              <option value={src}>{src}</option>
+            {/each}
+          </select>
+        </label>
+        {#if field.depth.markerMotionXSource !== 'none'}
+          <label class="row">
+            X amplitude
+            <input
+              type="range"
+              min={MARKER_MOTION_AMPLITUDE_MIN_PX}
+              max={MARKER_MOTION_AMPLITUDE_MAX_PX}
+              step="1"
+              bind:value={field.depth.markerMotionXAmplitudePx}
+            />
+            <output>{Math.round(field.depth.markerMotionXAmplitudePx)} px</output>
+          </label>
+        {/if}
+        <label class="row">
+          Y motion
+          <select bind:value={field.depth.markerMotionYSource}>
+            {#each MARKER_MOTION_SOURCES as src}
+              <option value={src}>{src}</option>
+            {/each}
+          </select>
+        </label>
+        {#if field.depth.markerMotionYSource !== 'none'}
+          <label class="row">
+            Y amplitude
+            <input
+              type="range"
+              min={MARKER_MOTION_AMPLITUDE_MIN_PX}
+              max={MARKER_MOTION_AMPLITUDE_MAX_PX}
+              step="1"
+              bind:value={field.depth.markerMotionYAmplitudePx}
+            />
+            <output>{Math.round(field.depth.markerMotionYAmplitudePx)} px</output>
+          </label>
+        {/if}
+        <label class="row">
           Marker
           <input
             type="range"
@@ -410,6 +463,64 @@
           />
           <output>{Math.round(field.depth.dotSizePx)} px</output>
         </label>
+        <label class="row">
+          Dot X
+          <input
+            type="range"
+            min={GRID_DOT_SCALE_MIN}
+            max={GRID_DOT_SCALE_MAX}
+            step="0.05"
+            bind:value={field.depth.gridDotScaleX}
+          />
+          <output>{field.depth.gridDotScaleX.toFixed(2)}</output>
+        </label>
+        <label class="row">
+          Dot Y
+          <input
+            type="range"
+            min={GRID_DOT_SCALE_MIN}
+            max={GRID_DOT_SCALE_MAX}
+            step="0.05"
+            bind:value={field.depth.gridDotScaleY}
+          />
+          <output>{field.depth.gridDotScaleY.toFixed(2)}</output>
+        </label>
+        <label class="row">
+          <input type="checkbox" bind:checked={field.depth.showCartesianPlane} />
+          Show grid lines
+        </label>
+        <label class="row">
+          Grid size
+          <input
+            type="range"
+            min={GRID_SIZE_MIN}
+            max={GRID_SIZE_MAX}
+            step="1"
+            bind:value={field.depth.gridSize}
+          />
+          <output>{field.depth.gridSize} × {field.depth.gridSize}</output>
+        </label>
+        <label class="row">
+          Grid depth
+          <select bind:value={field.depth.gridDepthAxis}>
+            {#each GRID_DEPTH_AXES as axis}
+              <option value={axis}>{gridDepthAxisLabels[axis]}</option>
+            {/each}
+          </select>
+        </label>
+        {#if field.depth.gridDepthAxis !== 'none'}
+          <label class="row">
+            Depth range
+            <input
+              type="range"
+              min={GRID_DEPTH_RANGE_MIN_PX}
+              max={GRID_DEPTH_RANGE_MAX_PX}
+              step="1"
+              bind:value={field.depth.gridDepthRangePx}
+            />
+            <output>{Math.round(field.depth.gridDepthRangePx)} px</output>
+          </label>
+        {/if}
         <p class="note">Current delivered separation: {Math.round(depthSeparationPx)} px.</p>
         {#if field.depth.source === 'beat' && field.audio.beatMode === 'none'}
           <p class="note">Beat-driven depth uses the beat-rate control even when audio beat is off.</p>
