@@ -35,5 +35,18 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
+      # Nix pins the toolchain; this caches the npm package downloads only.
+      - name: Cache npm downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      # `make validate` runs the SPARQL sanity script (scripts/sstim-exposure-sanity.mjs),
+      # which imports n3 and @comunica/query-sparql-rdfjs from node_modules.
+      - name: Install dependencies
+        run: nix develop --command npm ci
+
       - name: Run SHACL validation
         run: nix develop --command make validate
