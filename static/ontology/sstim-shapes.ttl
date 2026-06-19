@@ -23,7 +23,6 @@
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
@@ -94,11 +93,16 @@ sstim-sh:PresetShape a sh:NodeShape ;
 sstim-sh:VoiceShape a sh:NodeShape ;
     sh:targetClass sstim:Voice ;
     sh:name "Voice"@en ;
-    sh:property [
-        sh:path rdf:type ;
-        sh:minCount 2 ;
-        sh:message "Voice must be typed as both sstim:Voice and one of the four subtypes."@en ;
-    ] .
+    # A Voice must be exactly one of the four disjoint subtypes. sh:xone enforces
+    # this at the data level (pyshacl runs without OWL inference, so the
+    # owl:AllDisjointClasses axiom alone would not be checked).
+    sh:xone (
+        [ sh:class sstim:BinauralVoice ]
+        [ sh:class sstim:MartigliVoice ]
+        [ sh:class sstim:MartigliBinauralVoice ]
+        [ sh:class sstim:SymmetryVoice ]
+    ) ;
+    sh:message "Voice must be typed as exactly one of the four subtypes: Binaural, Martigli, Martigli-Binaural, or Symmetry."@en .
 
 
 sstim-sh:BinauralVoiceShape a sh:NodeShape ;
@@ -272,7 +276,8 @@ sstim-sh:SessionInstanceShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Frequency Band Shape — validate hzMin < hzMax for non-point bands
+# Frequency Band Shape — validate hzMin <= hzMax (equality allowed for the
+# single-point bands alpha-10 and gamma-40)
 ###########################################################################
 
 sstim-sh:FrequencyBandShape a sh:NodeShape ;
@@ -285,7 +290,8 @@ sstim-sh:FrequencyBandShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
-        sh:message "FrequencyBand must have exactly one hzMin >= 0."@en ;
+        sh:lessThanOrEquals sstim:hzMax ;
+        sh:message "FrequencyBand must have exactly one hzMin >= 0, and hzMin must be <= hzMax."@en ;
     ] ;
 
     sh:property [
@@ -321,6 +327,90 @@ sstim-sh:ReferenceShape a sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:message "PublicSafeReference must have a dct:title."@en ;
     ] .
+
+###########################################################################
+# Self-Report Shape
+#
+# All fields are optional in the model (self-report is collected only with
+# consent), so these constraints validate the value range when a field is
+# present rather than requiring it.
+###########################################################################
+
+sstim-sh:SelfReportShape a sh:NodeShape ;
+    sh:targetClass sstim:SelfReport ;
+    sh:name "SelfReport"@en ;
+
+    sh:property [
+        sh:path sstim:primaryAffect ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 5 ;
+        sh:message "primaryAffect must be an integer 1–5."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:focusRating ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 5 ;
+        sh:message "focusRating must be an integer 1–5."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:sleepiness ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 5 ;
+        sh:message "sleepiness must be an integer 1–5."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:subjectiveQuality ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 5 ;
+        sh:message "subjectiveQuality must be an integer 1–5."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:goalAchieved ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "goalAchieved must be a boolean."@en ;
+    ] .
+
+
+###########################################################################
+# Framework / Protocol / Implementation Shapes
+#
+# Minimal coverage: each must carry a human-readable rdfs:label, matching the
+# label requirement already imposed on Preset. Closes the framework/protocol/
+# implementation gap noted in docs/ontology/IMPROVEMENT_PLAN.md.
+###########################################################################
+
+sstim-sh:FrameworkShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationFramework ;
+    sh:name "SensoryStimulationFramework"@en ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "SensoryStimulationFramework must have at least one rdfs:label."@en ;
+    ] .
+
+sstim-sh:ProtocolShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationProtocol ;
+    sh:name "SensoryStimulationProtocol"@en ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "SensoryStimulationProtocol must have at least one rdfs:label."@en ;
+    ] .
+
+sstim-sh:ImplementationShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationImplementation ;
+    sh:name "SensoryStimulationImplementation"@en ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "SensoryStimulationImplementation must have at least one rdfs:label."@en ;
+    ] .
+
 
 ###########################################################################
 # Exposure module shapes (sstim-ex:)

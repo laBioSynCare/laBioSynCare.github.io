@@ -2,7 +2,7 @@
 
 Status: active planning document
 Baseline reviewed: SSTIM ontology `0.3.0`
-Last reviewed: 2026-06-18
+Last reviewed: 2026-06-20
 
 This document is the repo-truth backlog for ontology and vocabulary maturity
 work after the `0.3.0` release. It records known modeling gaps, the main
@@ -29,7 +29,7 @@ Structured review snapshot:
 - Datatype properties: 40
 - SKOS concept schemes: 11
 - SKOS concepts: 102
-- SHACL node shapes: 9 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
+- SHACL node shapes: 13 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
   `hasExposureLimit` link, and quantitative-property ranges)
 - Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
 
@@ -50,6 +50,26 @@ This was deferred because `make validate` concatenates all committed instances
 and pre-0.4.0 instances would fail a Violation-level rule; it needs either
 SHACL-SPARQL or reconciling those instances. Runtime flicker enforcement already
 exists in `src/ui/safety/flashSafety.js`.
+
+### SHACL quick-wins (2026-06-20)
+
+Delivered the low-risk subset of P1 (Strengthen Validation):
+
+- `VoiceShape` now enforces subtype membership with `sh:xone` over the four
+  disjoint voice subtypes, replacing the weak `rdf:type sh:minCount 2` check.
+  pyshacl runs without OWL inference, so the `owl:AllDisjointClasses` axiom alone
+  was not validated at the data level.
+- `FrequencyBandShape` now checks `hzMin <= hzMax` via `sh:lessThanOrEquals`
+  (equality allowed for the single-point bands `alpha-10` and `gamma-40`).
+- `SelfReportShape` (P1 item 3) — 1–5 rating ranges and `goalAchieved` boolean
+  typing, all optional/consent-dependent.
+- `FrameworkShape` / `ProtocolShape` / `ImplementationShape` (P1 item 4) —
+  minimal `rdfs:label` requirement, matching the Preset label rule.
+- `sstim-exposure.ttl` version header reconciled to `0.4.0` with `owl:versionIRI`;
+  removed unused `eco:`/`rdf:` prefixes from core and shapes.
+
+Still open in P1: `TechniqueShape` (item 1), Martigli / Martigli-Binaural voice
+shapes (item 2), and SKOS integrity shapes (item 5).
 
 ## Primary Design Improvement
 
@@ -135,11 +155,12 @@ surface evenly. Missing or weak areas:
 - no technique shape;
 - no Martigli voice shape;
 - no Martigli-Binaural voice shape;
-- no self-report shape;
-- no framework/protocol/implementation shapes;
 - no shape requiring technique metadata such as mechanism, temporal structure,
   and modality/delivery metadata;
 - limited controlled-vocabulary integrity checks.
+
+(Self-report and framework/protocol/implementation shapes were added in the
+2026-06-20 SHACL quick-wins; see the follow-up note above.)
 
 ### Evidence Modeling
 
@@ -238,13 +259,14 @@ erratum, but several alignments remain pending:
    Validate breathing-period, transition, amplitude, carrier-pair, and hybrid
    constraints from the technical docs.
 
-3. Add `SelfReportShape`.
+3. Add `SelfReportShape`. **(Done — 2026-06-20)**
    Validate 1-5 rating ranges, optional consent-dependent fields, and
    `goalAchieved` boolean typing.
 
-4. Add framework/protocol/implementation shapes.
+4. Add framework/protocol/implementation shapes. **(Done — 2026-06-20, minimal)**
    Require labels, definitions/descriptions, and the core relation fields that
-   make those resources navigable.
+   make those resources navigable. Initial pass requires `rdfs:label` only;
+   definitions and relation-field coverage remain open.
 
 5. Add SKOS integrity shapes.
    Validate `skos:inScheme`, notation presence where expected, preferred-label
