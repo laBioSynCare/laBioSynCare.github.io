@@ -34,7 +34,6 @@
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 @prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
-@prefix eco:   <http://purl.obolibrary.org/obo/ECO_> .
 @prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
 
 
