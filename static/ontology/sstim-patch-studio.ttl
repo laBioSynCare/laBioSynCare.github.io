@@ -131,6 +131,65 @@ sstim:breathingAmplitude a owl:DatatypeProperty ;
 
 
 ###########################################################################
+# Martigli voice oscillation parameters (Martigli & Martigli-Binaural voices)
+#
+# Per-voice authored parameters of the Martigli breathing arc, distinct from the
+# session-level sstim:breathingPeriod* override properties (domain
+# SessionSpecification). Domain is the broad sstim:Voice, matching the other voice
+# parameters above; the SHACL Martigli voice shapes enforce which subtype must
+# carry which parameter. See ADR 0012 and docs/technical/BREATHING_MODEL.md.
+###########################################################################
+
+sstim:martigliCenterFreq a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli center frequency"@en ;
+    skos:definition "Center frequency (mf0) of a Martigli voice's oscillating tone, in Hz; the frequency sweeps mf0 ± ma. Martigli voices only — Martigli-Binaural uses the carrier pair."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:martigliAmplitude a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli oscillation amplitude"@en ;
+    skos:definition "Frequency-sweep amplitude (ma) of a Martigli oscillation, in Hz; the carrier(s) sweep ± ma around the center."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:martigliPeriodInitial a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli initial period"@en ;
+    skos:definition "Initial breathing-cycle duration (mp0) of a Martigli oscillation, in seconds. Must be >= 3 s when the voice is the breathing reference (isOn)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:martigliPeriodFinal a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli final period"@en ;
+    skos:definition "Final breathing-cycle duration (mp1) of a Martigli oscillation after the transition, in seconds."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:martigliTransitionDuration a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Martigli transition duration"@en ;
+    skos:definition "Time (md) over which the breathing cycle interpolates linearly from mp0 to mp1, in seconds; mp1 is held afterwards."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:isBreathReference a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "is breath reference"@en ;
+    skos:definition "True iff this voice is the breathing reference (isOn): its oscillation drives the visual breathing animation and haptic pulse. At most one voice per preset may be the breathing reference."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
 # Session authoring parameter datatype properties
 # (domain sstim:SessionSpecification — visual, haptic, and tempo authoring)
 ###########################################################################

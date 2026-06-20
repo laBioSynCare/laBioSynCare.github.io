@@ -1,6 +1,6 @@
 # ADR 0012 — Where Martigli voice parameters live in RDF
 
-**Status:** Proposed — 2026-06-20
+**Status:** Accepted — 2026-06-20
 
 ## Context
 
@@ -52,28 +52,33 @@ The question this ADR resolves: **where do the per-voice Martigli parameters
 live, so that `MartigliVoiceShape` and `MartigliBinauralVoiceShape` can require
 them?**
 
-## Decision (proposed)
+## Decision
 
-**Option A — dedicated voice-level Martigli properties, shared via a parameter
-group.** Define new datatype properties for the Martigli oscillation arc and
-attach them to the voice, keeping the session-level `breathingPeriod*` overrides
-as a distinct concept.
+**Option A — dedicated voice-level Martigli properties.** Define new datatype
+properties for the Martigli oscillation arc and attach them to the voice, keeping
+the session-level `breathingPeriod*` overrides as a distinct concept.
 
-Proposed terms (final placement — `sstim-patch-studio.ttl` alongside the other
-voice params, or `sstim-core.ttl` — decided at implementation time):
+The terms are added to `sstim-patch-studio.ttl` (alongside the other voice
+parameters `carrierFreqLeft`, `baseFrequency`, …) and, matching that existing
+pattern, declare `rdfs:domain sstim:Voice` rather than a per-subtype union — the
+**SHACL shape**, not the OWL domain, enforces which subtype must carry which
+parameter:
 
 | Property | Domain | Range | JSON field |
 |---|---|---|---|
-| `sstim:martigliCenterFreq` | `MartigliVoice` | xsd:decimal | `mf0` |
-| `sstim:martigliAmplitude` | `MartigliVoice` ∪ `MartigliBinauralVoice` | xsd:decimal | `ma` |
-| `sstim:martigliPeriodInitial` | `MartigliVoice` ∪ `MartigliBinauralVoice` | xsd:decimal | `mp0` |
-| `sstim:martigliPeriodFinal` | `MartigliVoice` ∪ `MartigliBinauralVoice` | xsd:decimal | `mp1` |
-| `sstim:martigliTransitionDuration` | `MartigliVoice` ∪ `MartigliBinauralVoice` | xsd:decimal | `md` |
+| `sstim:martigliCenterFreq` | `Voice` | xsd:decimal | `mf0` |
+| `sstim:martigliAmplitude` | `Voice` | xsd:decimal | `ma` |
+| `sstim:martigliPeriodInitial` | `Voice` | xsd:decimal | `mp0` |
+| `sstim:martigliPeriodFinal` | `Voice` | xsd:decimal | `mp1` |
+| `sstim:martigliTransitionDuration` | `Voice` | xsd:decimal | `md` |
 | `sstim:isBreathReference` | `Voice` | xsd:boolean | `isOn` |
 
 `Martigli-Binaural` reuses the existing `sstim:carrierFreqLeft` /
 `sstim:carrierFreqRight` (per ADR 0005) for `fl`/`fr` and the shared
-`martigli*` arc properties; it does **not** use `martigliCenterFreq`.
+`martigli*` arc properties; it does **not** use `martigliCenterFreq`. The
+`MartigliVoiceShape` requires `martigliCenterFreq` and forbids the carrier pair;
+`MartigliBinauralVoiceShape` requires the carrier pair and forbids
+`martigliCenterFreq`.
 
 This matches the precedent set by `Binaural` and `Symmetry` (each voice owns its
 parameters), keeps every domain correct, and leaves the session-level
@@ -116,21 +121,21 @@ Once the terms exist, the shapes are mechanical:
 
 ## Consequences
 
-- **New ontology terms.** Option A adds six datatype properties. Placement
-  (`sstim-patch-studio.ttl` vs `sstim-core.ttl`) and final names are an
-  implementation detail to settle when the terms are added; `sstim-patch-studio.ttl`
-  is consistent with where `carrierFreqLeft`/`baseFrequency`/etc. already live.
-- **Protected-file change.** Adding properties touches a CLAUDE.md §3.4 protected
-  file and requires explicit maintainer instruction plus scientific review. This
-  ADR proposes the model; it does not enact it.
-- **Unblocks P1 item 2.** With the terms in place, `MartigliVoiceShape` and
-  `MartigliBinauralVoiceShape` are straightforward and the §4.5 breathing
-  constraints become validatable.
-- **No instances exist yet**, so the additive terms cannot retroactively break
-  `make validate`; a seed Martigli/MB reference instance should be added in the
-  same change so the new shapes are actually exercised (the lesson from the
-  framework/implementation shapes, which only became meaningful once real
-  instances existed).
+- **New ontology terms.** Option A adds six datatype properties to
+  `sstim-patch-studio.ttl`, consistent with where `carrierFreqLeft`/`baseFrequency`
+  already live. Each carries `rdfs:seeAlso` to this ADR.
+- **Protected-file change.** Adding properties touched a CLAUDE.md §3.4 protected
+  file under explicit maintainer instruction; the terms remain subject to
+  scientific review and may be refined before a tagged ontology release.
+- **Unblocks P1 item 2.** `MartigliVoiceShape` and `MartigliBinauralVoiceShape`
+  are now in `sstim-shapes.ttl`. The §4.5 `mp0 ≥ 3 when isOn` constraint is
+  enforced per-voice via `sh:or`. The preset-level "≤ 1 breathing reference per
+  preset / `hasBreathGuide` iff exactly one `isOn`" invariant needs a cross-voice
+  count (SHACL-SPARQL) and remains follow-up work.
+- **Seed instances added.** A breathing-enabled preset seed
+  (`instances/presets/heal-theta-breathing-seed.ttl`) carries a Martigli-Binaural
+  breathing-reference voice and a non-reference Martigli textural voice, so both
+  new shapes are exercised by `make validate` rather than being dead rules.
 
 ## See also
 

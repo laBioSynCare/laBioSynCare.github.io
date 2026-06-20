@@ -179,6 +179,152 @@ sstim-sh:SymmetryVoiceShape a sh:NodeShape ;
     ] .
 
 
+# Martigli & Martigli-Binaural voice parameter properties live in
+# sstim-patch-studio.ttl (domain sstim:Voice); these shapes enforce which subtype
+# requires which parameter. See ADR 0012 and docs/technical/{BREATHING_MODEL,
+# MARTIGLI_BINAURAL}.md for parameter ranges.
+
+sstim-sh:MartigliVoiceShape a sh:NodeShape ;
+    sh:targetClass sstim:MartigliVoice ;
+    sh:name "MartigliVoice"@en ;
+
+    sh:property [
+        sh:path sstim:martigliCenterFreq ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 80 ; sh:maxInclusive 400 ;
+        sh:message "mf0 must be a decimal in [80, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliAmplitude ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 1 ; sh:maxInclusive 400 ;
+        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliPeriodInitial ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
+        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliPeriodFinal ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
+        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliTransitionDuration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
+        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:isBreathReference ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "isOn must be a boolean."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "iniVolume must be in [0, 1)."@en ;
+    ] ;
+    # A Martigli voice is a single tone — the carrier pair belongs to Martigli-Binaural.
+    sh:property [
+        sh:path sstim:carrierFreqLeft ; sh:maxCount 0 ;
+        sh:message "Martigli voice must not declare carrierFreqLeft (use Martigli-Binaural)."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:carrierFreqRight ; sh:maxCount 0 ;
+        sh:message "Martigli voice must not declare carrierFreqRight (use Martigli-Binaural)."@en ;
+    ] ;
+    # CLAUDE.md §4.5: when this voice is the breathing reference, mp0 must be >= 3 s.
+    sh:or (
+        [ sh:not [ sh:path sstim:isBreathReference ; sh:hasValue true ] ]
+        [ sh:path sstim:martigliPeriodInitial ; sh:minInclusive 3 ]
+    ) ;
+    sh:message "When isOn=true (breathing reference), mp0 must be >= 3 s."@en .
+
+
+sstim-sh:MartigliBinauralVoiceShape a sh:NodeShape ;
+    sh:targetClass sstim:MartigliBinauralVoice ;
+    sh:name "MartigliBinauralVoice"@en ;
+
+    sh:property [
+        sh:path sstim:carrierFreqLeft ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
+        sh:message "fl must be a positive decimal less than 1000 Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:carrierFreqRight ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
+        sh:message "fr must be a positive decimal less than 1000 Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliAmplitude ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 1 ; sh:maxInclusive 400 ;
+        sh:message "ma must be a decimal in [1, 400] Hz."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliPeriodInitial ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 120 ;
+        sh:message "mp0 must be a decimal in [0.1, 120] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliPeriodFinal ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 240 ;
+        sh:message "mp1 must be a decimal in [0.1, 240] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:martigliTransitionDuration ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0.1 ; sh:maxInclusive 3600 ;
+        sh:message "md must be a decimal in [0.1, 3600] s."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:isBreathReference ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "isOn must be a boolean."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "iniVolume must be in [0, 1)."@en ;
+    ] ;
+    # Martigli-Binaural uses the carrier pair (fl/fr), not a single-tone center.
+    sh:property [
+        sh:path sstim:martigliCenterFreq ; sh:maxCount 0 ;
+        sh:message "Martigli-Binaural voice must not declare martigliCenterFreq (uses the fl/fr carrier pair)."@en ;
+    ] ;
+    # CLAUDE.md §4.5: when this voice is the breathing reference, mp0 must be >= 3 s.
+    sh:or (
+        [ sh:not [ sh:path sstim:isBreathReference ; sh:hasValue true ] ]
+        [ sh:path sstim:martigliPeriodInitial ; sh:minInclusive 3 ]
+    ) ;
+    sh:message "When isOn=true (breathing reference), mp0 must be >= 3 s."@en .
+
+
 ###########################################################################
 # Evidence Claim Shape
 ###########################################################################
