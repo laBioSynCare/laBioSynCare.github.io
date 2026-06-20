@@ -29,7 +29,7 @@ Structured review snapshot:
 - Datatype properties: 40
 - SKOS concept schemes: 11
 - SKOS concepts: 102
-- SHACL node shapes: 15 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
+- SHACL node shapes: 17 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
   `hasExposureLimit` link, and quantitative-property ranges)
 - Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
 
@@ -91,14 +91,30 @@ Violation severity (so `make validate` stays green without repo-wide
   remaining flat schemes is **deferred to P2 item 1** (several schemes still have
   no `skos:hasTopConcept`).
 
-Still open in P1: Martigli / Martigli-Binaural voice shapes (item 2). These need a
-modeling decision first, not just a shape: the voice-parameter properties live in
-`sstim-patch-studio.ttl`, the breathing-period / transition properties are declared
-with domain `sstim:SessionSpecification` (session-level, not voice-level), the only
-voice-level breathing params are generic (`breathingAmplitude`,
-`breathingPhaseRatio`), and there are **no Martigli voice instances** to validate
-against. Decide where Martigli voice carrier/breathing parameters live before
-writing the shape, or it would contradict the existing domain declarations.
+### SHACL P1 shapes — Martigli voice shapes (2026-06-20)
+
+Resolved the last open P1 validation item (item 2) by first taking the modeling
+decision in [ADR 0012](../decisions/0012-martigli-voice-parameters.md) (Accepted,
+Option A):
+
+- Added six per-voice Martigli parameter properties to `sstim-patch-studio.ttl`
+  (`martigliCenterFreq`, `martigliAmplitude`, `martigliPeriodInitial`,
+  `martigliPeriodFinal`, `martigliTransitionDuration`, `isBreathReference`), each
+  with `rdfs:domain sstim:Voice` and `rdfs:seeAlso` to the ADR — distinct from the
+  session-level `breathingPeriod*` override properties.
+- `MartigliVoiceShape` requires `martigliCenterFreq` + the arc params and forbids
+  the carrier pair; `MartigliBinauralVoiceShape` requires the `carrierFreqLeft` /
+  `carrierFreqRight` pair + the arc params and forbids `martigliCenterFreq`. Both
+  enforce the CLAUDE.md §4.5 `mp0 ≥ 3 when isOn` rule via `sh:or`.
+- Added a breathing-enabled seed preset
+  (`instances/presets/heal-theta-breathing-seed.ttl`) with a Martigli-Binaural
+  breathing-reference voice and a non-reference Martigli textural voice, so both
+  shapes are exercised by `make validate` (negative-tested: deliberate violations
+  are caught).
+
+Still open: the preset-level breathing invariant (`hasBreathGuide` true iff exactly
+one voice has `isOn` = true; ≤ 1 breathing reference per preset) needs a
+cross-voice count via SHACL-SPARQL — tracked as follow-up.
 
 ## Primary Design Improvement
 
@@ -181,16 +197,17 @@ Target model direction:
 SHACL currently covers the most immediate data paths, but not the ontology
 surface evenly. Missing or weak areas:
 
-- no Martigli voice shape;
-- no Martigli-Binaural voice shape;
 - technique shape covers mechanism only; temporal-structure and modality/delivery
   metadata not yet required (deferred to P2 item 4 — data not aligned);
+- preset-level breathing invariant (`hasBreathGuide` iff exactly one `isOn` voice)
+  not yet enforced — needs a cross-voice count (SHACL-SPARQL);
 - controlled-vocabulary integrity covers `skos:inScheme` + `@en` `skos:prefLabel`;
   top-concept structure for flat schemes not yet required (P2 item 1).
 
 (Self-report and framework/protocol/implementation shapes were added in the
 2026-06-20 SHACL quick-wins; `TechniqueShape` and `ConceptIntegrityShape` in the
-2026-06-20 P1 follow-up — see the notes above.)
+2026-06-20 P1 follow-up; `MartigliVoiceShape` and `MartigliBinauralVoiceShape` in
+the 2026-06-20 Martigli voice shapes work (ADR 0012) — see the notes above.)
 
 ### Evidence Modeling
 
@@ -287,14 +304,13 @@ erratum, but several alignments remain pending:
    which aligns the BSC framework technique instances first; promote to Violation
    once they carry that metadata.
 
-2. Add Martigli and Martigli-Binaural voice shapes. **(Blocked — modeling decision in [ADR 0012](../decisions/0012-martigli-voice-parameters.md), Proposed)**
-   Validate breathing-period, transition, amplitude, carrier-pair, and hybrid
-   constraints from the technical docs. Blocked: voice-parameter properties live in
-   `sstim-patch-studio.ttl`, breathing-period/transition are declared with domain
-   `sstim:SessionSpecification` (not the voice), and there are no Martigli instances.
-   ADR 0012 lays out the options (dedicated voice-level params vs reuse session-level
-   props vs JSON-schema-only) and recommends dedicated voice-level Martigli
-   properties; accept it, add the terms, then write the shapes.
+2. Add Martigli and Martigli-Binaural voice shapes. **(Done — 2026-06-20, via [ADR 0012](../decisions/0012-martigli-voice-parameters.md))**
+   `MartigliVoiceShape` and `MartigliBinauralVoiceShape` validate the amplitude,
+   breathing-period trio, carrier-pair (MB) / center-frequency (Martigli), and the
+   §4.5 `mp0 ≥ 3 when isOn` constraint, backed by the six new `martigli*` voice
+   properties (ADR 0012, Option A) and a breathing-enabled seed preset. The
+   preset-level `hasBreathGuide`/single-`isOn` invariant remains follow-up
+   (needs SHACL-SPARQL).
 
 3. Add `SelfReportShape`. **(Done — 2026-06-20)**
    Validate 1-5 rating ranges, optional consent-dependent fields, and

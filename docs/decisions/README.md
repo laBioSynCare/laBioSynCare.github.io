@@ -35,7 +35,7 @@ annotations lives here.
 | [0009](0009-pwa.md) | Progressive Web App (installable, offline-capable) | Accepted |
 | [0010](0010-exposure-delivery-modality.md) | Exposure delivery, perceived modality, and evidence status | Accepted |
 | [0011](0011-sensory-field-and-flash-safety.md) | Sensory Field interface, runtime flash-rate safety, exposure ontology 0.4.0 | Accepted |
-| [0012](0012-martigli-voice-parameters.md) | Where Martigli voice parameters live in RDF | Proposed |
+| [0012](0012-martigli-voice-parameters.md) | Where Martigli voice parameters live in RDF | Accepted |
 
 ## Adding an ADR
 
