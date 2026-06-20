@@ -287,12 +287,14 @@ erratum, but several alignments remain pending:
    which aligns the BSC framework technique instances first; promote to Violation
    once they carry that metadata.
 
-2. Add Martigli and Martigli-Binaural voice shapes. **(Blocked — needs modeling decision)**
+2. Add Martigli and Martigli-Binaural voice shapes. **(Blocked — modeling decision in [ADR 0012](../decisions/0012-martigli-voice-parameters.md), Proposed)**
    Validate breathing-period, transition, amplitude, carrier-pair, and hybrid
    constraints from the technical docs. Blocked: voice-parameter properties live in
    `sstim-patch-studio.ttl`, breathing-period/transition are declared with domain
    `sstim:SessionSpecification` (not the voice), and there are no Martigli instances.
-   Decide where Martigli voice parameters live before writing the shape.
+   ADR 0012 lays out the options (dedicated voice-level params vs reuse session-level
+   props vs JSON-schema-only) and recommends dedicated voice-level Martigli
+   properties; accept it, add the terms, then write the shapes.
 
 3. Add `SelfReportShape`. **(Done — 2026-06-20)**
    Validate 1-5 rating ranges, optional consent-dependent fields, and
