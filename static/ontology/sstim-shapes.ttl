@@ -83,6 +83,27 @@ sstim-sh:PresetShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:class sstim:Voice ;
         sh:message "Preset must be composed of at least one Voice."@en ;
+    ] ;
+
+    # CLAUDE.md §4.5: hasBreathGuide is true iff exactly one composed voice is the
+    # breathing reference (isBreathReference = true); at most one voice may be.
+    # SHACL-SPARQL is required because the rule counts across the preset's voices —
+    # a per-voice property shape cannot express it. Full IRIs avoid an sh:prefixes
+    # block.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "hasBreathGuide must be true iff exactly one composed voice has isBreathReference=true (found {?n} breathing-reference voice(s) for hasBreathGuide={?guide})."@en ;
+        sh:select """
+            SELECT $this ?guide (COUNT(?v) AS ?n) WHERE {
+                $this <https://w3id.org/sstim#hasBreathGuide> ?guide .
+                OPTIONAL {
+                    $this <https://w3id.org/sstim#composedOf> ?v .
+                    ?v <https://w3id.org/sstim#isBreathReference> true .
+                }
+            }
+            GROUP BY $this ?guide
+            HAVING ( ( ?guide && COUNT(?v) != 1 ) || ( !?guide && COUNT(?v) != 0 ) )
+        """ ;
     ] .
 
 

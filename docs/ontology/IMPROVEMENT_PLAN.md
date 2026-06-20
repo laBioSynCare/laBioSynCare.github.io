@@ -112,9 +112,12 @@ Option A):
   shapes are exercised by `make validate` (negative-tested: deliberate violations
   are caught).
 
-Still open: the preset-level breathing invariant (`hasBreathGuide` true iff exactly
-one voice has `isOn` = true; ≤ 1 breathing reference per preset) needs a
-cross-voice count via SHACL-SPARQL — tracked as follow-up.
+The preset-level breathing invariant (`hasBreathGuide` true iff exactly one voice
+has `isOn` = true; ≤ 1 breathing reference per preset) is now enforced too: a
+`sh:SPARQLConstraint` on `PresetShape` counts the breathing-reference voices and
+compares to `hasBreathGuide` (the first SHACL-SPARQL rule in the shapes graph;
+pyshacl runs it without extra flags). Negative-tested for both the wrong-count and
+wrong-flag cases.
 
 ## Primary Design Improvement
 
@@ -199,8 +202,6 @@ surface evenly. Missing or weak areas:
 
 - technique shape covers mechanism only; temporal-structure and modality/delivery
   metadata not yet required (deferred to P2 item 4 — data not aligned);
-- preset-level breathing invariant (`hasBreathGuide` iff exactly one `isOn` voice)
-  not yet enforced — needs a cross-voice count (SHACL-SPARQL);
 - controlled-vocabulary integrity covers `skos:inScheme` + `@en` `skos:prefLabel`;
   top-concept structure for flat schemes not yet required (P2 item 1).
 
@@ -309,8 +310,8 @@ erratum, but several alignments remain pending:
    breathing-period trio, carrier-pair (MB) / center-frequency (Martigli), and the
    §4.5 `mp0 ≥ 3 when isOn` constraint, backed by the six new `martigli*` voice
    properties (ADR 0012, Option A) and a breathing-enabled seed preset. The
-   preset-level `hasBreathGuide`/single-`isOn` invariant remains follow-up
-   (needs SHACL-SPARQL).
+   preset-level `hasBreathGuide`/single-`isOn` invariant is also enforced now, via a
+   `sh:SPARQLConstraint` on `PresetShape`.
 
 3. Add `SelfReportShape`. **(Done — 2026-06-20)**
    Validate 1-5 rating ranges, optional consent-dependent fields, and
