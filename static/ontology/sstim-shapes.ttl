@@ -413,6 +413,61 @@ sstim-sh:ImplementationShape a sh:NodeShape ;
 
 
 ###########################################################################
+# Technique Shape (P1 item 1, partial)
+#
+# Every Sensory Stimulation Technique must declare a proposed mechanism, unless
+# it is a catalogued non-evidence-bearing (folk) technique explicitly flagged
+# with skos:editorialNote — sh:or admits either. Targets the base class;
+# subclass instances (Entrainment-Based / Non-Entrainment) are covered via
+# rdfs:subClassOf closure when the core ontology is in scope.
+#
+# Temporal-structure and delivery-modality requirements are intentionally NOT
+# enforced here yet: the vocabulary techniques carry them, but the BSC framework
+# technique instances do not (e.g. sstim-v:techUltrasoundNeuromod also lacks
+# modality), so a rule would either break `make validate` (Violation) or require
+# repo-wide --allow-warnings (Warning). Deferred to P2 item 4, which aligns the
+# BSC framework technique instances with the vocabulary metadata model first.
+###########################################################################
+
+sstim-sh:TechniqueShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationTechnique ;
+    sh:name "SensoryStimulationTechnique"@en ;
+
+    sh:or (
+        [ sh:path sstim:proposedMechanism ; sh:minCount 1 ]
+        [ sh:path skos:editorialNote ; sh:minCount 1 ]
+    ) ;
+    sh:message "Technique must declare a sstim:proposedMechanism, or be flagged as non-evidence-bearing with a skos:editorialNote."@en .
+
+
+###########################################################################
+# SKOS Concept Integrity Shape (P1 item 5, partial)
+#
+# Every controlled-vocabulary concept must sit in a scheme and carry an English
+# preferred label (the cross-language anchor used by the knowledge browser).
+# Top-concept structure for the remaining flat schemes is deferred (P2 item 1):
+# several schemes still have no skos:hasTopConcept, so a top-concept rule would
+# be premature and is tracked there instead.
+###########################################################################
+
+sstim-sh:ConceptIntegrityShape a sh:NodeShape ;
+    sh:targetClass skos:Concept ;
+    sh:name "SKOS Concept"@en ;
+
+    sh:property [
+        sh:path skos:inScheme ;
+        sh:minCount 1 ;
+        sh:message "Every skos:Concept must declare at least one skos:inScheme."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:message "Every skos:Concept must have an English (@en) skos:prefLabel."@en ;
+    ] .
+
+
+###########################################################################
 # Exposure module shapes (sstim-ex:)
 #
 # These target the exposure terms added in module 0.4.0 (ADR 0011). They are
