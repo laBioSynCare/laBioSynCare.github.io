@@ -29,7 +29,7 @@ Structured review snapshot:
 - Datatype properties: 40
 - SKOS concept schemes: 11
 - SKOS concepts: 102
-- SHACL node shapes: 13 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
+- SHACL node shapes: 15 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
   `hasExposureLimit` link, and quantitative-property ranges)
 - Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
 
@@ -70,6 +70,35 @@ Delivered the low-risk subset of P1 (Strengthen Validation):
 
 Still open in P1: `TechniqueShape` (item 1), Martigli / Martigli-Binaural voice
 shapes (item 2), and SKOS integrity shapes (item 5).
+
+### SHACL P1 shapes — Technique + SKOS integrity (2026-06-20)
+
+Delivered the next tranche of P1, scoped to what the committed data supports at
+Violation severity (so `make validate` stays green without repo-wide
+`--allow-warnings`):
+
+- `TechniqueShape` (P1 item 1, partial) — every `sstim:SensoryStimulationTechnique`
+  must declare a `sstim:proposedMechanism`, **or** be flagged non-evidence-bearing
+  with a `skos:editorialNote` (`sh:or` admits either; the two folk techniques
+  `techSolfeggioTuning` / `techSubliminalAudio` take the editorial-note branch).
+  Temporal-structure and delivery-modality requirements are **deferred to P2 item
+  4**: the BSC framework technique instances (and `sstim-v:techUltrasoundNeuromod`)
+  lack that metadata, so enforcing it now would either fail validation or need
+  `--allow-warnings`. Align the instances first, then promote those to Violation.
+- `ConceptIntegrityShape` (P1 item 5, partial) — every `skos:Concept` must declare
+  at least one `skos:inScheme` and carry an English (`@en`) `skos:prefLabel`
+  (verified: 260/260 concepts already satisfy both). Top-concept structure for the
+  remaining flat schemes is **deferred to P2 item 1** (several schemes still have
+  no `skos:hasTopConcept`).
+
+Still open in P1: Martigli / Martigli-Binaural voice shapes (item 2). These need a
+modeling decision first, not just a shape: the voice-parameter properties live in
+`sstim-patch-studio.ttl`, the breathing-period / transition properties are declared
+with domain `sstim:SessionSpecification` (session-level, not voice-level), the only
+voice-level breathing params are generic (`breathingAmplitude`,
+`breathingPhaseRatio`), and there are **no Martigli voice instances** to validate
+against. Decide where Martigli voice carrier/breathing parameters live before
+writing the shape, or it would contradict the existing domain declarations.
 
 ## Primary Design Improvement
 
@@ -152,15 +181,16 @@ Target model direction:
 SHACL currently covers the most immediate data paths, but not the ontology
 surface evenly. Missing or weak areas:
 
-- no technique shape;
 - no Martigli voice shape;
 - no Martigli-Binaural voice shape;
-- no shape requiring technique metadata such as mechanism, temporal structure,
-  and modality/delivery metadata;
-- limited controlled-vocabulary integrity checks.
+- technique shape covers mechanism only; temporal-structure and modality/delivery
+  metadata not yet required (deferred to P2 item 4 — data not aligned);
+- controlled-vocabulary integrity covers `skos:inScheme` + `@en` `skos:prefLabel`;
+  top-concept structure for flat schemes not yet required (P2 item 1).
 
 (Self-report and framework/protocol/implementation shapes were added in the
-2026-06-20 SHACL quick-wins; see the follow-up note above.)
+2026-06-20 SHACL quick-wins; `TechniqueShape` and `ConceptIntegrityShape` in the
+2026-06-20 P1 follow-up — see the notes above.)
 
 ### Evidence Modeling
 
@@ -251,13 +281,18 @@ erratum, but several alignments remain pending:
 
 ### P1: Strengthen Validation
 
-1. Add `TechniqueShape`.
-   Require mechanism, temporal structure, and modality/delivery metadata, with
-   explicit exceptions for catalogued non-evidence-bearing techniques.
+1. Add `TechniqueShape`. **(Partial — 2026-06-20)**
+   Mechanism is required (or a `skos:editorialNote` for folk techniques).
+   Temporal structure and modality/delivery metadata remain deferred to P2 item 4,
+   which aligns the BSC framework technique instances first; promote to Violation
+   once they carry that metadata.
 
-2. Add Martigli and Martigli-Binaural voice shapes.
+2. Add Martigli and Martigli-Binaural voice shapes. **(Blocked — needs modeling decision)**
    Validate breathing-period, transition, amplitude, carrier-pair, and hybrid
-   constraints from the technical docs.
+   constraints from the technical docs. Blocked: voice-parameter properties live in
+   `sstim-patch-studio.ttl`, breathing-period/transition are declared with domain
+   `sstim:SessionSpecification` (not the voice), and there are no Martigli instances.
+   Decide where Martigli voice parameters live before writing the shape.
 
 3. Add `SelfReportShape`. **(Done — 2026-06-20)**
    Validate 1-5 rating ranges, optional consent-dependent fields, and
@@ -268,9 +303,10 @@ erratum, but several alignments remain pending:
    make those resources navigable. Initial pass requires `rdfs:label` only;
    definitions and relation-field coverage remain open.
 
-5. Add SKOS integrity shapes.
-   Validate `skos:inScheme`, notation presence where expected, preferred-label
-   language coverage for public vocabulary concepts, and top-concept structure.
+5. Add SKOS integrity shapes. **(Partial — 2026-06-20)**
+   `ConceptIntegrityShape` validates `skos:inScheme` and `@en` preferred-label
+   coverage for every concept. Notation presence and top-concept structure remain
+   open (top concepts tracked under P2 item 1).
 
 ### P2: Improve Vocabulary Structure
 
