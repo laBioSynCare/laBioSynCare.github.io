@@ -771,5 +771,50 @@ sstim-sh:GainLevelShape a sh:NodeShape ;
 
 
 ###########################################################################
+# Stimulus Channel Shape — conditional comfort-boundary checks
+#
+# Closes the conditional check deferred in IMPROVEMENT_PLAN (exposure 0.4.0
+# follow-up): a channel that delivers optical-radiation media (UV/IR) or carries a
+# flicker rate must declare the matching comfort boundary. These are conditional
+# over object/datatype values, so they use SHACL-SPARQL (pyshacl runs it without
+# extra flags; full IRIs avoid an sh:prefixes block).
+###########################################################################
+
+sstim-sh:StimulusChannelShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:StimulusChannel ;
+    sh:name "StimulusChannel"@en ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A StimulusChannel delivering ultraviolet or infrared radiation must declare sstim-ex:hasComfortBoundary sstim-ex:boundaryOpticalRadiation."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/exposure#deliveryMedium> ?m .
+                FILTER( ?m IN ( <https://w3id.org/sstim/exposure#mediumUltravioletRadiation>,
+                                <https://w3id.org/sstim/exposure#mediumInfraredRadiation> ) )
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/exposure#hasComfortBoundary>
+                          <https://w3id.org/sstim/exposure#boundaryOpticalRadiation> .
+                }
+            }
+        """ ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A StimulusChannel carrying a flicker rate (sstim-ex:hasFlickerRateHz) must declare sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/exposure#hasFlickerRateHz> ?f .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/exposure#hasComfortBoundary>
+                          <https://w3id.org/sstim/exposure#boundaryPhotosensitivity> .
+                }
+            }
+        """ ;
+    ] .
+
+
+###########################################################################
 # End of sstim-shapes.ttl
 ###########################################################################
