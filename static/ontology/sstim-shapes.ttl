@@ -590,20 +590,19 @@ sstim-sh:ImplementationShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Technique Shape (P1 item 1, partial)
+# Technique Shape (P1 item 1 — full, after P2 item 4)
 #
-# Every Sensory Stimulation Technique must declare a proposed mechanism, unless
-# it is a catalogued non-evidence-bearing (folk) technique explicitly flagged
-# with skos:editorialNote — sh:or admits either. Targets the base class;
+# Every Sensory Stimulation Technique must declare a proposed mechanism, a
+# stimulus temporal structure, and a delivery/perceived modality — UNLESS it is a
+# deliberately catalogued entry flagged with skos:editorialNote (a
+# non-evidence-bearing folk technique, or a no-perceived-modality entry such as
+# ultrasound neuromodulation). sh:or admits either branch. Targets the base class;
 # subclass instances (Entrainment-Based / Non-Entrainment) are covered via
 # rdfs:subClassOf closure when the core ontology is in scope.
 #
-# Temporal-structure and delivery-modality requirements are intentionally NOT
-# enforced here yet: the vocabulary techniques carry them, but the BSC framework
-# technique instances do not (e.g. sstim-v:techUltrasoundNeuromod also lacks
-# modality), so a rule would either break `make validate` (Violation) or require
-# repo-wide --allow-warnings (Warning). Deferred to P2 item 4, which aligns the
-# BSC framework technique instances with the vocabulary metadata model first.
+# The BSC framework technique instances were aligned with this metadata model
+# (P2 item 4) so the temporal/modality requirements hold at Violation severity
+# without breaking `make validate`.
 ###########################################################################
 
 sstim-sh:TechniqueShape a sh:NodeShape ;
@@ -611,20 +610,25 @@ sstim-sh:TechniqueShape a sh:NodeShape ;
     sh:name "SensoryStimulationTechnique"@en ;
 
     sh:or (
-        [ sh:path sstim:proposedMechanism ; sh:minCount 1 ]
         [ sh:path skos:editorialNote ; sh:minCount 1 ]
+        [ sh:and (
+            [ sh:path sstim:proposedMechanism ; sh:minCount 1 ]
+            [ sh:path sstim:hasStimulusTemporalStructure ; sh:minCount 1 ]
+            [ sh:path sstim:techniqueModality ; sh:minCount 1 ]
+        ) ]
     ) ;
-    sh:message "Technique must declare a sstim:proposedMechanism, or be flagged as non-evidence-bearing with a skos:editorialNote."@en .
+    sh:message "Technique must declare sstim:proposedMechanism, sstim:hasStimulusTemporalStructure, and sstim:techniqueModality — or be a deliberately catalogued entry flagged with a skos:editorialNote (non-evidence-bearing folk technique, or a no-perceived-modality entry such as ultrasound neuromodulation)."@en .
 
 
 ###########################################################################
-# SKOS Concept Integrity Shape (P1 item 5, partial)
+# SKOS Concept Integrity Shape (P1 item 5 / P2 items 1 & 3)
 #
-# Every controlled-vocabulary concept must sit in a scheme and carry an English
-# preferred label (the cross-language anchor used by the knowledge browser).
-# Top-concept structure for the remaining flat schemes is deferred (P2 item 1):
-# several schemes still have no skos:hasTopConcept, so a top-concept rule would
-# be premature and is tracked there instead.
+# Every controlled-vocabulary concept must sit in a scheme, carry an English
+# preferred label (the cross-language anchor used by the knowledge browser), and
+# carry a skos:notation. Notation policy (P2 item 3): every concept — including
+# structural roots such as sstim-v:allFrequencyBands (notation "all") — carries a
+# notation; coverage is 100% across the vocabulary and exposure modules.
+# Scheme-level navigability (top concepts) is enforced by ConceptSchemeShape.
 ###########################################################################
 
 sstim-sh:ConceptIntegrityShape a sh:NodeShape ;
@@ -641,6 +645,28 @@ sstim-sh:ConceptIntegrityShape a sh:NodeShape ;
         sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
         sh:qualifiedMinCount 1 ;
         sh:message "Every skos:Concept must have an English (@en) skos:prefLabel."@en ;
+    ] ;
+    sh:property [
+        sh:path skos:notation ;
+        sh:minCount 1 ;
+        sh:message "Every skos:Concept must declare a skos:notation."@en ;
+    ] .
+
+
+###########################################################################
+# SKOS Concept Scheme Shape (P1 item 5 / P2 item 1)
+#
+# Every concept scheme must be navigable from at least one top concept. With the
+# 2026-06 top-concept additions, all 11 schemes declare skos:hasTopConcept.
+###########################################################################
+
+sstim-sh:ConceptSchemeShape a sh:NodeShape ;
+    sh:targetClass skos:ConceptScheme ;
+    sh:name "SKOS Concept Scheme"@en ;
+    sh:property [
+        sh:path skos:hasTopConcept ;
+        sh:minCount 1 ;
+        sh:message "Every skos:ConceptScheme must declare at least one skos:hasTopConcept (navigability)."@en ;
     ] .
 
 

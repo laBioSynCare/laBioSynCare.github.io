@@ -202,18 +202,24 @@ Target model direction:
 
 ### Validation Coverage
 
-SHACL currently covers the most immediate data paths, but not the ontology
-surface evenly. Missing or weak areas:
+SHACL now covers the major data paths evenly: presets, all four voice types,
+evidence claims (with `supportsRelation` range), techniques (mechanism + temporal +
+modality), self-reports, framework/protocol/implementation resources, frequency
+bands, exposure quantitative properties and limits, the preset breathing invariant
+(SHACL-SPARQL), and SKOS concept/scheme integrity (`inScheme`, `@en` label,
+`notation`, top-concept navigability). Remaining validation gaps:
 
-- technique shape covers mechanism only; temporal-structure and modality/delivery
-  metadata not yet required (deferred to P2 item 4 — data not aligned);
-- controlled-vocabulary integrity covers `skos:inScheme` + `@en` `skos:prefLabel`;
-  top-concept structure for flat schemes not yet required (P2 item 1).
+- the **conditional** exposure check (a `StimulusChannel` delivering UV/IR or
+  carrying a flicker rate must declare the matching comfort boundary) — feasible
+  now via SHACL-SPARQL;
+- evidence- and safety-dimension shapes, which depend on first adding those
+  dimensions (P3 items 1–2).
 
 (Self-report and framework/protocol/implementation shapes were added in the
 2026-06-20 SHACL quick-wins; `TechniqueShape` and `ConceptIntegrityShape` in the
-2026-06-20 P1 follow-up; `MartigliVoiceShape` and `MartigliBinauralVoiceShape` in
-the 2026-06-20 Martigli voice shapes work (ADR 0012) — see the notes above.)
+2026-06-20 P1 follow-up; `MartigliVoiceShape`/`MartigliBinauralVoiceShape` in the
+2026-06-20 Martigli work (ADR 0012); `TechniqueShape` was promoted to full
+metadata and `ConceptSchemeShape` added in the 2026-06-21 P2 work.)
 
 ### Evidence Modeling
 
@@ -335,11 +341,12 @@ entry below is marked Done with the date and the delivering artifact.
 
 ### P1: Strengthen Validation
 
-1. Add `TechniqueShape`. **(Partial — 2026-06-20)**
-   Mechanism is required (or a `skos:editorialNote` for folk techniques).
-   Temporal structure and modality/delivery metadata remain deferred to P2 item 4,
-   which aligns the BSC framework technique instances first; promote to Violation
-   once they carry that metadata.
+1. Add `TechniqueShape`. **(Done — 2026-06-21)**
+   Requires `proposedMechanism`, `hasStimulusTemporalStructure`, and
+   `techniqueModality` at Violation severity — or a `skos:editorialNote` marking a
+   deliberately catalogued entry (non-evidence-bearing folk technique, or a
+   no-perceived-modality entry such as `techUltrasoundNeuromod`). Enabled by the
+   P2 item 4 metadata alignment below.
 
 2. Add Martigli and Martigli-Binaural voice shapes. **(Done — 2026-06-20, via [ADR 0012](../decisions/0012-martigli-voice-parameters.md))**
    `MartigliVoiceShape` and `MartigliBinauralVoiceShape` validate the amplitude,
@@ -358,20 +365,33 @@ entry below is marked Done with the date and the delivering artifact.
    make those resources navigable. Initial pass requires `rdfs:label` only;
    definitions and relation-field coverage remain open.
 
-5. Add SKOS integrity shapes. **(Partial — 2026-06-20)**
-   `ConceptIntegrityShape` validates `skos:inScheme` and `@en` preferred-label
-   coverage for every concept. Notation presence and top-concept structure remain
-   open (top concepts tracked under P2 item 1).
+5. Add SKOS integrity shapes. **(Done — 2026-06-21)**
+   `ConceptIntegrityShape` requires `skos:inScheme`, an `@en` preferred label, and
+   `skos:notation` for every concept; `ConceptSchemeShape` requires every scheme to
+   declare at least one `skos:hasTopConcept` (navigability).
 
 ### P2: Improve Vocabulary Structure
 
-1. Add top concepts or explicit scheme-root concepts to flat schemes.
+1. Add top concepts or explicit scheme-root concepts to flat schemes. **(Done — 2026-06-21)**
+   All 7 previously-flat schemes (EvidenceModality, VoiceType, SensoryModality,
+   StimulationMechanism, PermutationFunction, CautionTag, Technique) now declare
+   `skos:hasTopConcept`; all 11 schemes are navigable and `ConceptSchemeShape`
+   enforces it.
 2. Complete definitions or scope notes for remaining lightly documented
-   concepts such as frequency sub-bands and basic sensory modalities.
+   concepts such as frequency sub-bands and basic sensory modalities. **(Done — 2026-06-21)**
+   Added `skos:scopeNote` to the 9 EEG sub-bands, a definition + notation to
+   `allFrequencyBands`, and definitions to `modalityAuditory`/`modalityVisual`.
+   Every concept now carries a definition or scope note.
 3. Add notation policy per scheme, including whether root concepts like
-   `allFrequencyBands` require notation.
+   `allFrequencyBands` require notation. **(Done — 2026-06-21)**
+   Policy: every concept — including structural roots (`allFrequencyBands`,
+   notation `all`) — carries `skos:notation`. Coverage is 100% (260/260) and
+   `ConceptIntegrityShape` enforces it.
 4. Align BSC framework technique instances with the technique vocabulary
-   metadata model.
+   metadata model. **(Done — 2026-06-21)**
+   The four `bsc-fw-tech:*` techniques now declare `hasStimulusTemporalStructure`
+   and `techniqueModality`; `techUltrasoundNeuromod` is marked with an
+   `editorialNote` (no perceived modality). This unblocked the P1 item 1 promotion.
 
 ### P3: Deepen Evidence and Safety Semantics
 

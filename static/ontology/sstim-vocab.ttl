@@ -47,7 +47,9 @@ sstim-v:allFrequencyBands a owl:NamedIndividual, sstim:FrequencyBandGroup, skos:
     skos:prefLabel "All Frequency Bands"@en, "Tutte le Bande di Frequenza"@it,
                    "Todas as Bandas de Frequência"@pt, "Todas las Bandas de Frecuencia"@es ;
     skos:narrower sstim-v:delta, sstim-v:theta, sstim-v:alpha,
-                  sstim-v:smr, sstim-v:beta, sstim-v:gamma .
+                  sstim-v:smr, sstim-v:beta, sstim-v:gamma ;
+    skos:notation "all" ;
+    skos:definition "Top concept of the frequency band scheme: the set of all EEG-derived neural oscillation bands and sub-bands used in BSC protocol design. A grouping root, not a stimulation target in itself."@en .
 
 # --- Primary bands ---
 
@@ -117,6 +119,7 @@ sstim-v:lowDelta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "Low Delta"@en, "Delta Basso"@it, "Delta Baixo"@pt, "Delta Bajo"@es ;
     skos:notation "low-delta" ;
     skos:broader sstim-v:delta ;
+    skos:scopeNote "0.5–2 Hz. Lower portion of the delta band."@en ;
     sstim:hzMin "0.5"^^xsd:decimal ;
     sstim:hzMax "2"^^xsd:decimal .
 
@@ -125,6 +128,7 @@ sstim-v:highDelta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "High Delta"@en, "Delta Alto"@it, "Delta Alto"@pt, "Delta Alto"@es ;
     skos:notation "high-delta" ;
     skos:broader sstim-v:delta ;
+    skos:scopeNote "2–4 Hz. Upper portion of the delta band."@en ;
     sstim:hzMin "2"^^xsd:decimal ;
     sstim:hzMax "4"^^xsd:decimal .
 
@@ -135,6 +139,7 @@ sstim-v:lowTheta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "Low Theta"@en, "Theta Basso"@it, "Theta Baixo"@pt, "Theta Bajo"@es ;
     skos:notation "low-theta" ;
     skos:broader sstim-v:theta ;
+    skos:scopeNote "4–6 Hz. Lower portion of the theta band."@en ;
     sstim:hzMin "4"^^xsd:decimal ;
     sstim:hzMax "6"^^xsd:decimal .
 
@@ -143,6 +148,7 @@ sstim-v:highTheta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "High Theta"@en, "Theta Alto"@it, "Theta Alto"@pt, "Theta Alto"@es ;
     skos:notation "high-theta" ;
     skos:broader sstim-v:theta ;
+    skos:scopeNote "6–8 Hz. Upper portion of the theta band."@en ;
     sstim:hzMin "6"^^xsd:decimal ;
     sstim:hzMax "8"^^xsd:decimal .
 
@@ -153,6 +159,7 @@ sstim-v:lowAlpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "Low Alpha"@en, "Alfa Basso"@it, "Alfa Baixo"@pt, "Alfa Bajo"@es ;
     skos:notation "low-alpha" ;
     skos:broader sstim-v:alpha ;
+    skos:scopeNote "8–10 Hz. Lower portion of the alpha band."@en ;
     sstim:hzMin "8"^^xsd:decimal ;
     sstim:hzMax "10"^^xsd:decimal .
 
@@ -161,6 +168,7 @@ sstim-v:highAlpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "High Alpha"@en, "Alfa Alto"@it, "Alfa Alto"@pt, "Alfa Alto"@es ;
     skos:notation "high-alpha" ;
     skos:broader sstim-v:alpha ;
+    skos:scopeNote "10–13 Hz. Upper portion of the alpha band."@en ;
     sstim:hzMin "10"^^xsd:decimal ;
     sstim:hzMax "13"^^xsd:decimal .
 
@@ -181,6 +189,7 @@ sstim-v:lowBeta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "Low Beta"@en, "Beta Basso"@it, "Beta Baixo"@pt, "Beta Bajo"@es ;
     skos:notation "low-beta" ;
     skos:broader sstim-v:beta ;
+    skos:scopeNote "15–20 Hz. Lower portion of the beta band."@en ;
     sstim:hzMin "15"^^xsd:decimal ;
     sstim:hzMax "20"^^xsd:decimal .
 
@@ -189,6 +198,7 @@ sstim-v:midBeta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "Mid Beta"@en, "Beta Medio"@it, "Beta Médio"@pt, "Beta Medio"@es ;
     skos:notation "mid-beta" ;
     skos:broader sstim-v:beta ;
+    skos:scopeNote "20–25 Hz. Middle portion of the beta band."@en ;
     sstim:hzMin "20"^^xsd:decimal ;
     sstim:hzMax "25"^^xsd:decimal .
 
@@ -197,6 +207,7 @@ sstim-v:highBeta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "High Beta"@en, "Beta Alto"@it, "Beta Alto"@pt, "Beta Alto"@es ;
     skos:notation "high-beta" ;
     skos:broader sstim-v:beta ;
+    skos:scopeNote "25–30 Hz. Upper portion of the beta band."@en ;
     sstim:hzMin "25"^^xsd:decimal ;
     sstim:hzMax "30"^^xsd:decimal .
 
@@ -311,7 +322,9 @@ sstim-v:tierEstablished a owl:NamedIndividual, sstim:EvidenceTierValue, skos:Con
 ###########################################################################
 
 sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
-    skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary"@en .
+    skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:modalityAUD, sstim-v:modalityAV, sstim-v:modalityBREATH,
+        sstim-v:modalityGENERAL, sstim-v:modalityPRECLINICAL, sstim-v:modalityREVIEW .
 
 sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
@@ -355,7 +368,9 @@ sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
 ###########################################################################
 
 sstim-v:VoiceTypeScheme a skos:ConceptScheme ;
-    skos:prefLabel "BSC Voice Type Vocabulary"@en .
+    skos:prefLabel "BSC Voice Type Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:voiceBinaural, sstim-v:voiceMartigli,
+        sstim-v:voiceMartigliBinaural, sstim-v:voiceSymmetry .
 
 sstim-v:voiceBinaural a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
     skos:inScheme sstim-v:VoiceTypeScheme ;
@@ -387,18 +402,23 @@ sstim-v:voiceSymmetry a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
 ###########################################################################
 
 sstim-v:SensoryModalityScheme a skos:ConceptScheme ;
-    skos:prefLabel "SSTIM Sensory Modality Vocabulary"@en .
+    skos:prefLabel "SSTIM Sensory Modality Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:modalityAuditory, sstim-v:modalityVisual,
+        sstim-v:modalitySomatosensory, sstim-v:modalityInteroceptive,
+        sstim-v:modalityVestibular, sstim-v:modalityOlfactory .
 
 sstim-v:modalityAuditory a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;
     skos:prefLabel "Auditory"@en, "Uditivo"@it, "Auditivo"@pt, "Auditivo"@es ;
     skos:notation "auditory" ;
+    skos:definition "The auditory sensory modality: perception of sound via the ear and auditory pathway. The primary BSC delivery channel."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean .
 
 sstim-v:modalityVisual a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;
     skos:prefLabel "Visual"@en, "Visivo"@it, "Visual"@pt, "Visual"@es ;
     skos:notation "visual" ;
+    skos:definition "The visual sensory modality: perception of light, color, and motion via the eye and visual pathway."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean .
 
 sstim-v:modalitySomatosensory a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
@@ -435,7 +455,11 @@ sstim-v:modalityOlfactory a owl:NamedIndividual, sstim:SensoryModality, skos:Con
 ###########################################################################
 
 sstim-v:StimulationMechanismScheme a skos:ConceptScheme ;
-    skos:prefLabel "SSTIM Stimulation Mechanism Vocabulary"@en .
+    skos:prefLabel "SSTIM Stimulation Mechanism Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:mechFFR, sstim-v:mechThalamocortical, sstim-v:mechAutonomic,
+        sstim-v:mechStochastic, sstim-v:mechAttentional, sstim-v:mechGamma40, sstim-v:mechASSR,
+        sstim-v:mechAuditoryMotor, sstim-v:mechClosedLoopPhase, sstim-v:mechMasking,
+        sstim-v:mechMechanoreceptive, sstim-v:mechStartle, sstim-v:mechUltrasonic .
 
 sstim-v:mechFFR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -561,7 +585,9 @@ sstim-v:mechUltrasonic a owl:NamedIndividual, sstim:StimulationMechanism, skos:C
 ###########################################################################
 
 sstim-v:PermutationFunctionScheme a skos:ConceptScheme ;
-    skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en .
+    skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:permShuffle, sstim-v:permRotateForward,
+        sstim-v:permRotateBackward, sstim-v:permReverse, sstim-v:permIdentity .
 
 sstim-v:permShuffle a owl:NamedIndividual, sstim:PermutationFunction, skos:Concept ;
     skos:inScheme sstim-v:PermutationFunctionScheme ;
@@ -601,7 +627,12 @@ sstim-v:permIdentity a owl:NamedIndividual, sstim:PermutationFunction, skos:Conc
 ###########################################################################
 
 sstim-v:CautionTagScheme a skos:ConceptScheme ;
-    skos:prefLabel "BSC Preset Caution Tag Vocabulary"@en .
+    skos:prefLabel "BSC Preset Caution Tag Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:cautionEpilepsyRisk, sstim-v:cautionStimulating,
+        sstim-v:cautionDrowsyUse, sstim-v:cautionDrivingUnsafe, sstim-v:cautionNighttimeOnly,
+        sstim-v:cautionFatigueSensitive, sstim-v:cautionEmotionallySensitive,
+        sstim-v:cautionHighIntensity, sstim-v:cautionAdvancedUser,
+        sstim-v:cautionOverloadSensitive, sstim-v:cautionUltraSlowBreathing .
 
 sstim-v:cautionEpilepsyRisk a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
@@ -740,7 +771,16 @@ sstim-v:TechniqueScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Sensory Stimulation Technique Vocabulary"@en ,
                    "Vocabolario delle Tecniche di Stimolazione Sensoriale SSTIM"@it ,
                    "Vocabulário de Técnicas de Estimulação Sensorial SSTIM"@pt ,
-                   "Vocabulario de Técnicas de Estimulación Sensorial SSTIM"@es .
+                   "Vocabulario de Técnicas de Estimulación Sensorial SSTIM"@es ;
+    skos:hasTopConcept sstim-v:techAmplitudeModulation, sstim-v:techClickTrain,
+        sstim-v:techIsochronicTones, sstim-v:techMonauralBeats, sstim-v:techBinauralBeats,
+        sstim-v:techFrequencyModulation, sstim-v:techGamma40Auditory,
+        sstim-v:techRhythmicAuditoryCueing, sstim-v:techFractalRhythm,
+        sstim-v:techMusicStructural, sstim-v:techBroadbandNoise, sstim-v:techNotchedSound,
+        sstim-v:techSpatialAuditory, sstim-v:techClosedLoopAuditory, sstim-v:techSonification,
+        sstim-v:techRoughness, sstim-v:techAuditoryIllusion, sstim-v:techASMR,
+        sstim-v:techVoiceMantra, sstim-v:techVibroacoustic, sstim-v:techUltrasoundNeuromod,
+        sstim-v:techAcousticStartle, sstim-v:techSolfeggioTuning, sstim-v:techSubliminalAudio .
 
 # ── Periodic auditory entrainment ───────────────────────────────────────
 
@@ -1028,7 +1068,8 @@ sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NonEntrainmentTechni
     skos:definition "Modulation of neural activity by focused ultrasound, with no audible percept. A genuine neuromodulation field, included for domain completeness."@en ;
     skos:scopeNote "Not ordinary auditory stimulation and not consumer web/mobile feasible; requires dedicated hardware. Catalogued so the ontology can describe it, not because it is a lightweight delivery method."@en ;
     sstim:proposedMechanism sstim-v:mechUltrasonic ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic .
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    skos:editorialNote "Deliberately catalogued for domain completeness. Has no perceived sensory modality (direct neuromodulation with no audible percept), so it is exempt from the techniqueModality requirement; the exposure module captures its delivery/perception profile."@en .
 
 sstim-v:techAcousticStartle a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
