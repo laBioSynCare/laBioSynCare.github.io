@@ -92,8 +92,9 @@ sstim-v:techBinauralBeats skos:exactMatch wd:Q863539 .
 # is the current canonical 'planned process' term (verified via OLS, 2026-06).
 sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
 
-# Preset → OBI protocol
-sstim:Preset rdfs:subClassOf obi:0000272 .
+# Protocol → OBI protocol. A preset is an information content entity that FOLLOWS
+# a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
+sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
 
 # Session instance → PROV Activity (stated in sstim-core.ttl; repeated here
 # for cross-reference in alignment context)

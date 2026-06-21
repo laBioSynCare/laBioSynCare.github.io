@@ -2,7 +2,7 @@
 
 Status: active planning document
 Baseline reviewed: SSTIM ontology `0.3.0`
-Last reviewed: 2026-06-20
+Last reviewed: 2026-06-21
 
 This document is the repo-truth backlog for ontology and vocabulary maturity
 work after the `0.3.0` release. It records known modeling gaps, the main
@@ -30,8 +30,13 @@ Structured review snapshot:
 - SKOS concept schemes: 11
 - SKOS concepts: 102
 - SHACL node shapes: 17 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
-  `hasExposureLimit` link, and quantitative-property ranges)
+  `hasExposureLimit` link, and quantitative-property ranges) + 1 SHACL-SPARQL
+  constraint on `PresetShape` (breathing invariant)
 - Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
+
+> Counts above are the `0.3.0` baseline plus the 2026-06 SHACL work; the class
+> and property counts grow as the P0/P3 tasks below add terms. Re-snapshot at the
+> next tagged release rather than per-commit.
 
 ### 0.4.0 follow-up (exposure module / Sensory Field — ADR 0011)
 
@@ -258,8 +263,9 @@ carry the same key metadata. Known gaps:
 - BSC framework technique instances lack delivery/perceived modality and
   temporal-structure metadata.
 - `techUltrasoundNeuromod` lacks modality metadata under the current model.
-- Folk-technique entries intentionally lack proposed mechanisms, but that
-  exception should be validated explicitly rather than left implicit.
+- Folk-technique entries intentionally lack proposed mechanisms; this exception
+  is now validated explicitly — `TechniqueShape` requires `proposedMechanism`
+  **or** a `skos:editorialNote` (`sh:or`), so the carve-out is machine-checked.
 
 ### Safety Modeling
 
@@ -280,17 +286,47 @@ erratum, but several alignments remain pending:
 - additional Wikidata technique items;
 - Music Ontology `mo:Score`, pending reliable host verification.
 
+## Remaining Work — Execution Order (2026-06-21)
+
+P1 validation is essentially complete (see the dated notes above): voice,
+technique, self-report, framework/protocol/implementation, and SKOS-integrity
+shapes are in place, plus the first SHACL-SPARQL constraint. The remaining
+backlog is sequenced below by dependency — later phases assume earlier ones.
+
+1. **P0 — semantic ambiguities** (foundational; external consumers infer from
+   these upper-ontology alignments). Resolve `supportsRelation` range and the
+   `Preset`-vs-protocol OBI alignment. Each is an ADR-bearing decision
+   (ADR 0013, ADR 0014).
+2. **P2 — vocabulary structure** (unblocks the P1 partials). Top concepts (P2.1)
+   let `ConceptIntegrityShape` require scheme navigability; aligning technique
+   instances (P2.4) lets `TechniqueShape` promote temporal/modality from absent
+   to required. Then definitions/scope notes (P2.2) and notation policy (P2.3).
+3. **Exposure conditional check** — now feasible with SHACL-SPARQL: a
+   `StimulusChannel` delivering UV/IR or carrying a flicker rate must declare the
+   matching comfort boundary.
+4. **P3 — evidence & safety semantics**: evidence-claim dimensions (P3.1),
+   safety-metadata dimensions (P3.2), device capability vs modality (P3.3).
+5. **P4 — external alignment & interop**: SNOMED CT / MeSH / Wikidata (P4.1 —
+   every external identifier verified before it is added, never fabricated),
+   Music Ontology re-check (P4.2), JSON-LD context (P4.3), competency questions
+   and SPARQL query tests (P4.4).
+
+Each phase ships as its own validated PR. As items land, their Priority-Task
+entry below is marked Done with the date and the delivering artifact.
+
 ## Priority Tasks
 
 ### P0: Correct Semantic Ambiguities
 
-1. Resolve `sstim:supportsRelation`.
-   Choose either a constrained union range or split properties such as
-   `sstim:supportsPreset` and `sstim:supportsTechnique`.
+1. Resolve `sstim:supportsRelation`. **(Done — 2026-06-21, [ADR 0013](../decisions/0013-evidence-support-relation-range.md))**
+   Constrained union range `Preset ∪ SensoryStimulationTechnique` (single property
+   kept), enforced at the data level by `EvidenceClaimShape`.
 
-2. Resolve `sstim:Preset` versus protocol semantics.
-   Remove or replace the misleading OBI protocol alignment if the preset is
-   not intended to be inferred as a protocol.
+2. Resolve `sstim:Preset` versus protocol semantics. **(Done — 2026-06-21, [ADR 0014](../decisions/0014-preset-is-not-a-protocol.md))**
+   `Preset` is `iao:0000030` only (OBI protocol alignment removed); the protocol
+   alignment now lives on `SensoryStimulationProtocol`, and `followsProtocol`
+   carries the preset→protocol relation. (Open: whether `SensoryStimulationTechnique`
+   should also drop `obi:0000272` — flagged in ADR 0014, tracked under P4.)
 
 3. Implement the exposure/delivery/modality separation.
    ADR 0010 records the decision. The active work item is the `sstim-ex:`
