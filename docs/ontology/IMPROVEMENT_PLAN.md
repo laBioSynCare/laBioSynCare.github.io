@@ -49,12 +49,12 @@ comfort boundaries; `affordsDeliveryMedium`; and corrected UV/IR definitions.
 This substantially advances P3 item 3 (device capability vs modality) and part of
 P3 item 2 (safety metadata).
 
-Still open: a **conditional** SHACL check that a `StimulusChannel` delivering UV
-or IR (or carrying a flicker rate) must declare the matching comfort boundary.
-This was deferred because `make validate` concatenates all committed instances
-and pre-0.4.0 instances would fail a Violation-level rule; it needs either
-SHACL-SPARQL or reconciling those instances. Runtime flicker enforcement already
-exists in `src/ui/safety/flashSafety.js`.
+**Done — 2026-06-21:** the **conditional** check that a `StimulusChannel`
+delivering UV or IR (or carrying a flicker rate) must declare the matching comfort
+boundary is now enforced by `StimulusChannelShape` (two `sh:SPARQLConstraint`s:
+UV/IR → `boundaryOpticalRadiation`, flicker → `boundaryPhotosensitivity`). The one
+affected committed instance (`wearable-light-audio-channel`) was reconciled.
+Runtime flicker enforcement also exists in `src/ui/safety/flashSafety.js`.
 
 ### SHACL quick-wins (2026-06-20)
 
@@ -209,11 +209,11 @@ bands, exposure quantitative properties and limits, the preset breathing invaria
 (SHACL-SPARQL), and SKOS concept/scheme integrity (`inScheme`, `@en` label,
 `notation`, top-concept navigability). Remaining validation gaps:
 
-- the **conditional** exposure check (a `StimulusChannel` delivering UV/IR or
-  carrying a flicker rate must declare the matching comfort boundary) — feasible
-  now via SHACL-SPARQL;
 - evidence- and safety-dimension shapes, which depend on first adding those
   dimensions (P3 items 1–2).
+
+(The conditional exposure check — UV/IR or flicker channels must declare the
+matching comfort boundary — was added 2026-06-21 as `StimulusChannelShape`.)
 
 (Self-report and framework/protocol/implementation shapes were added in the
 2026-06-20 SHACL quick-wins; `TechniqueShape` and `ConceptIntegrityShape` in the
@@ -307,9 +307,9 @@ backlog is sequenced below by dependency — later phases assume earlier ones.
    let `ConceptIntegrityShape` require scheme navigability; aligning technique
    instances (P2.4) lets `TechniqueShape` promote temporal/modality from absent
    to required. Then definitions/scope notes (P2.2) and notation policy (P2.3).
-3. **Exposure conditional check** — now feasible with SHACL-SPARQL: a
-   `StimulusChannel` delivering UV/IR or carrying a flicker rate must declare the
-   matching comfort boundary.
+3. **Exposure conditional check** — **(Done — 2026-06-21)** `StimulusChannelShape`
+   (SHACL-SPARQL): a `StimulusChannel` delivering UV/IR or carrying a flicker rate
+   must declare the matching comfort boundary.
 4. **P3 — evidence & safety semantics**: evidence-claim dimensions (P3.1),
    safety-metadata dimensions (P3.2), device capability vs modality (P3.3).
 5. **P4 — external alignment & interop**: SNOMED CT / MeSH / Wikidata (P4.1 —

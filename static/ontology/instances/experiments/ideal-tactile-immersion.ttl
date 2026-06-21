@@ -88,7 +88,8 @@ this:wearable-light-audio-channel a sstim-ex:StimulusChannel ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory, sstim-ex:modalityTactile, sstim-ex:modalityVisual, sstim-ex:modalityNotDirectlyPerceived ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityWearableSpeakerArray, sstim-ex:capabilityWearableLightArray, sstim-ex:capabilityTactileDisplay, sstim-ex:capabilityTactileCamera, sstim-ex:capabilityInfraredLightOutput, sstim-ex:capabilityUltravioletLightOutput ;
     sstim-ex:hasBodyPlacement sstim-ex:placementWholeBody ;
-    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic, sstim-ex:patternBlinking, sstim-ex:patternChangingColor .
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic, sstim-ex:patternBlinking, sstim-ex:patternChangingColor ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryOpticalRadiation, sstim-ex:boundaryPhotosensitivity .
 
 this:room-scale-locomotion-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Room-scale locomotion and spatial-presence channel"@en ;
