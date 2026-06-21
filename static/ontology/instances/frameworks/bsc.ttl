@@ -19,6 +19,8 @@ bsc-fw-tech:binaural-beat-stimulation a sstim:EntrainmentBasedTechnique ;
     dct:description "Auditory technique using two dichotic carrier tones whose frequency difference defines the beat target."@en ;
     skos:relatedMatch sstim-v:voiceBinaural ;
     sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechThalamocortical ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PRESET_FORMAT.md> .
 
 bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
@@ -26,6 +28,8 @@ bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
     dct:description "Auditory breathing-guide technique using a sinusoidal frequency sweep over a decelerating respiratory arc."@en ;
     skos:relatedMatch sstim-v:voiceMartigli ;
     sstim:proposedMechanism sstim-v:mechAutonomic ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityInteroceptive ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/BREATHING_MODEL.md> .
 
 bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
@@ -33,6 +37,8 @@ bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
     dct:description "Hybrid auditory technique combining a maintained binaural beat difference with Martigli carrier-frequency breathing motion."@en ;
     skos:relatedMatch sstim-v:voiceMartigliBinaural ;
     sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAutonomic ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityInteroceptive ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/MARTIGLI_BINAURAL.md> .
 
 bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
@@ -40,4 +46,6 @@ bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
     dct:description "Auditory technique using cyclic pitch permutations; the isochronic special case uses pulse rate as the target."@en ;
     skos:relatedMatch sstim-v:voiceSymmetry ;
     sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAttentional ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/SYMMETRY_SYSTEM.md> .
