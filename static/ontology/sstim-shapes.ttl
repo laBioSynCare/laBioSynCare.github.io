@@ -367,6 +367,16 @@ sstim-sh:EvidenceClaimShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:class sstim:EvidenceModalityTag ;
         sh:message "EvidenceClaim must have at least one modality tag from sstim:EvidenceModalityTag."@en ;
+    ] ;
+
+    # ADR 0013: when present, supportsRelation must point to a Preset or a Technique
+    # (range is not OWL-inferred under pyshacl, so enforce the union at the data
+    # level). Presence is not required: ExposureEffectClaim (ADR 0010) is dual-typed
+    # sstim:EvidenceClaim but links to its subject via sstim-ex:hasEffectClaim.
+    sh:property [
+        sh:path sstim:supportsRelation ;
+        sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
+        sh:message "supportsRelation must point to a sstim:Preset or sstim:SensoryStimulationTechnique."@en ;
     ] .
 
 

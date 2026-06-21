@@ -134,9 +134,11 @@ sstim:SensoryStimulationFramework a owl:Class ;
 
 sstim:SensoryStimulationProtocol a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf obi:0000272 ;
     rdfs:label "Sensory Stimulation Protocol"@en ;
     skos:definition "A structured method specification for using one or more sensory stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. A protocol is narrower than a framework and can constrain many presets."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -149,12 +151,12 @@ sstim:SensoryStimulationImplementation a owl:Class ;
 
 
 sstim:Preset a owl:Class ;
-    rdfs:subClassOf obi:0000272 ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Preset"@en,
                "Preset"@it, "Preset"@pt, "Preset"@es ;
     skos:definition "A reusable, versioned parameter configuration for a sensory stimulation implementation, specifying audio architecture, target frequency bands, evidence grounding, safety metadata, and multilingual content for a possible session. A preset follows a protocol or framework but is not itself the protocol."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -381,8 +383,10 @@ sstim:hasModalityTag a owl:ObjectProperty ;
 
 sstim:supportsRelation a owl:ObjectProperty ;
     rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:SensoryStimulationTechnique ) ] ;
     rdfs:label  "supports relation"@en ;
-    skos:definition "Links an evidence claim to the preset or technique it supports."@en ;
+    skos:definition "Links an evidence claim to the preset or sensory stimulation technique it supports. Range is the union of sstim:Preset and sstim:SensoryStimulationTechnique; EvidenceClaimShape enforces this at the data level (pyshacl runs without OWL inference)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0013-evidence-support-relation-range.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

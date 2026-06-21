@@ -36,6 +36,8 @@ annotations lives here.
 | [0010](0010-exposure-delivery-modality.md) | Exposure delivery, perceived modality, and evidence status | Accepted |
 | [0011](0011-sensory-field-and-flash-safety.md) | Sensory Field interface, runtime flash-rate safety, exposure ontology 0.4.0 | Accepted |
 | [0012](0012-martigli-voice-parameters.md) | Where Martigli voice parameters live in RDF | Accepted |
+| [0013](0013-evidence-support-relation-range.md) | Evidence `supportsRelation` range (Preset ∪ Technique) | Accepted |
+| [0014](0014-preset-is-not-a-protocol.md) | A Preset is an information content entity, not a protocol | Accepted |
 
 ## Adding an ADR
 
