@@ -305,12 +305,12 @@ technique vocabulary is explicitly "auditory and cross-modal"; visual and tactil
 stimulation are under-represented relative to the platform's audiovisual + haptic
 ambition. Known coverage gaps (tracked as **P5** below):
 
-- **Visual entrainment** exists only as example strings (`photic driving`) and the
-  `mechGamma40` note — no visual technique concepts (photic/flicker driving, SSVEP,
-  audiovisual entrainment, neutral color/chromatic stimulation).
-- **Tactile / cross-modal** entrainment is limited to the single
-  `techVibroacoustic` cross-modal entry; no first-class audiovisual or
-  audio-tactile technique concepts.
+- **Visual entrainment** — *addressed (ADR 0015):* `techPhoticDriving` and
+  `techColorFieldStimulation` added, plus the `mechSSVEP` mechanism. (Earlier gap:
+  visual driving existed only as the example string "photic driving".)
+- **Tactile / cross-modal** — *addressed (ADR 0015):* `techVibrotactileEntrainment`,
+  `techAudiovisualEntrainment`, and `techAudioTactile` added, plus `mechSSSEP` and
+  `mechMultisensory`. (Earlier gap: only the single `techVibroacoustic` entry.)
 - **No neutral tuning vocabulary.** A=432 vs A=440 can only be filed under the
   mystical `techSolfeggioTuning`; there is no neutral `tuningReferenceHz` parameter
   and no musical-interval/consonance terms.
@@ -466,15 +466,16 @@ entry below is marked Done with the date and the delivering artifact.
 Targets the `0.5.0` release. Each item is an additive, ADR-bearing vocabulary
 decision; none renames or removes existing terms (minor version).
 
-1. **Visual-entrainment technique vocabulary.** Add first-class technique
-   concepts for photic/flicker driving, SSVEP-evoking stimulation, audiovisual
-   entrainment (AVE), and a *neutral* color/chromatic stimulation concept — with
-   an explicit `skos:editorialNote` negative assertion where "chromotherapy"
-   claims appear, mirroring the `techSolfeggioTuning` pattern. *(Proposed ADR 0015.)*
-2. **Tactile / cross-modal technique vocabulary.** Promote tactile rhythmic
-   entrainment beyond `techVibroacoustic`, and add genuinely cross-modal
-   technique concepts (audiovisual, audio-tactile) instead of single-modality
-   tagging. *(Proposed ADR 0015.)*
+1. **Visual-entrainment technique vocabulary. (Done — 2026-06-30, [ADR 0015](../decisions/0015-visual-and-cross-modal-techniques.md))**
+   Added `techPhoticDriving` (flicker/SSVEP) and `techColorFieldStimulation`
+   (steady colour field, with an explicit `skos:editorialNote` chromotherapy
+   negative assertion mirroring `techSolfeggioTuning`), plus the `mechSSVEP`
+   mechanism. Photosensitivity stays modeled in the exposure layer.
+2. **Tactile / cross-modal technique vocabulary. (Done — 2026-06-30, [ADR 0015](../decisions/0015-visual-and-cross-modal-techniques.md))**
+   Added `techVibrotactileEntrainment` (distinct from vibroacoustic) and the
+   cross-modal `techAudiovisualEntrainment` and `techAudioTactile`, plus the
+   `mechSSSEP` and `mechMultisensory` mechanisms. Cross-modal is expressed as
+   multiple `techniqueModality` values, not a new class.
 3. **Neutral tuning vocabulary.** Add a `tuningReferenceHz` datatype property so
    A=432 vs A=440 is a neutral aesthetic parameter, distinct from the mystical
    `techSolfeggioTuning`. Decide (ADR) whether to add a minimal musical-interval /

@@ -58,17 +58,14 @@ stimulation vocabulary rather than an auditory-first one. These are added to
 [`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md) as **P5: Domain Content Coverage**;
 summarized here because publication should not precede them.
 
-1. **Visual-entrainment technique vocabulary.** Today `TechniqueScheme` is
-   explicitly "auditory and cross-modal"; visual entrainment exists only as
-   example strings (`photic driving`) and the `mechGamma40` note. Add visual
-   techniques as first-class concepts: photic/flicker driving, SSVEP-evoking
-   stimulation, audiovisual entrainment (AVE), and a *neutral* color/chromatic
-   stimulation concept (with an explicit negative-assertion `editorialNote`
-   where "chromotherapy" claims appear, mirroring the solfeggio pattern).
-2. **Tactile / haptic & cross-modal techniques.** Promote tactile rhythmic
-   entrainment beyond the single `techVibroacoustic` cross-modal entry, and add
-   genuinely cross-modal technique concepts (audiovisual, audio-tactile) rather
-   than tagging a single modality.
+1. **Visual-entrainment technique vocabulary.** *Done — ADR 0015:*
+   `techPhoticDriving` (flicker/SSVEP) and `techColorFieldStimulation` (steady
+   colour field, with a chromotherapy negative-assertion `editorialNote`), plus
+   the `mechSSVEP` mechanism.
+2. **Tactile / haptic & cross-modal techniques.** *Done — ADR 0015:*
+   `techVibrotactileEntrainment`, `techAudiovisualEntrainment`, and
+   `techAudioTactile`, plus `mechSSSEP` and `mechMultisensory`. Cross-modal is
+   modeled as multiple `techniqueModality` values, not a new class.
 3. **Neutral tuning / harmonic vocabulary.** Add a `tuningReferenceHz`
    datatype property (e.g. A=432 vs A=440) so tuning can be modeled as a neutral
    aesthetic parameter, *distinct* from `techSolfeggioTuning`'s mystical claim.

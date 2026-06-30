@@ -540,7 +540,8 @@ sstim-v:StimulationMechanismScheme a skos:ConceptScheme ;
     skos:hasTopConcept sstim-v:mechFFR, sstim-v:mechThalamocortical, sstim-v:mechAutonomic,
         sstim-v:mechStochastic, sstim-v:mechAttentional, sstim-v:mechGamma40, sstim-v:mechASSR,
         sstim-v:mechAuditoryMotor, sstim-v:mechClosedLoopPhase, sstim-v:mechMasking,
-        sstim-v:mechMechanoreceptive, sstim-v:mechStartle, sstim-v:mechUltrasonic .
+        sstim-v:mechMechanoreceptive, sstim-v:mechStartle, sstim-v:mechUltrasonic,
+        sstim-v:mechSSVEP, sstim-v:mechSSSEP, sstim-v:mechMultisensory .
 
 sstim-v:mechFFR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -659,6 +660,35 @@ sstim-v:mechUltrasonic a owl:NamedIndividual, sstim:StimulationMechanism, skos:C
                    "Neuromodulación Mecánica Ultrasónica"@es ;
     skos:notation "USND" ;
     skos:definition "Modulation of neural activity by focused ultrasound via acoustic radiation force and mechanosensitive ion channels, without an audible percept. A genuine neuromodulation modality included for domain completeness; not ordinary auditory stimulation and not consumer-platform deliverable."@en .
+
+# Steady-state evoked-potential family — visual and somatosensory counterparts of
+# mechASSR — plus cross-modal integration (ADR 0015).
+sstim-v:mechSSVEP a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
+    skos:inScheme sstim-v:StimulationMechanismScheme ;
+    skos:prefLabel "Steady-State Visual Evoked Potential"@en,
+                   "Potenziale Evocato Visivo di Stato Stazionario"@it,
+                   "Potencial Evocado Visual de Estado Estacionário"@pt,
+                   "Potencial Evocado Visual de Estado Estacionario"@es ;
+    skos:notation "SSVEP" ;
+    skos:definition "Sustained, phase-locked occipital EEG response to a periodically flickering visual stimulus — the visual counterpart of the ASSR and the canonical electrophysiological correlate of photic driving. A measurable response; downstream cognitive or wellness effects of driving it are less certain."@en .
+
+sstim-v:mechSSSEP a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
+    skos:inScheme sstim-v:StimulationMechanismScheme ;
+    skos:prefLabel "Steady-State Somatosensory Evoked Potential"@en,
+                   "Potenziale Evocato Somatosensoriale di Stato Stazionario"@it,
+                   "Potencial Evocado Somatossensorial de Estado Estacionário"@pt,
+                   "Potencial Evocado Somatosensorial de Estado Estacionario"@es ;
+    skos:notation "SSSEP" ;
+    skos:definition "Sustained, phase-locked cortical response to periodic vibrotactile stimulation — the somatosensory counterpart of the ASSR and SSVEP. The electrophysiological correlate of vibrotactile entrainment; a measurable response whose downstream effects remain under study."@en .
+
+sstim-v:mechMultisensory a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
+    skos:inScheme sstim-v:StimulationMechanismScheme ;
+    skos:prefLabel "Multisensory Integration"@en,
+                   "Integrazione Multisensoriale"@it,
+                   "Integração Multissensorial"@pt,
+                   "Integración Multisensorial"@es ;
+    skos:notation "MULTISENS" ;
+    skos:definition "Convergence and mutual enhancement of temporally congruent inputs across modalities (e.g. light and sound pulsed at the same rate), which can yield a larger or more reliable response than any single modality. Proposed basis for audiovisual and audio-tactile entrainment; the GENUS multisensory-over-unisensory finding rests on it. Contested in magnitude and modality-specific."@en .
 
 
 ###########################################################################
@@ -861,7 +891,10 @@ sstim-v:TechniqueScheme a skos:ConceptScheme ;
         sstim-v:techSpatialAuditory, sstim-v:techClosedLoopAuditory, sstim-v:techSonification,
         sstim-v:techRoughness, sstim-v:techAuditoryIllusion, sstim-v:techASMR,
         sstim-v:techVoiceMantra, sstim-v:techVibroacoustic, sstim-v:techUltrasoundNeuromod,
-        sstim-v:techAcousticStartle, sstim-v:techSolfeggioTuning, sstim-v:techSubliminalAudio .
+        sstim-v:techAcousticStartle, sstim-v:techSolfeggioTuning, sstim-v:techSubliminalAudio,
+        sstim-v:techPhoticDriving, sstim-v:techAudiovisualEntrainment,
+        sstim-v:techColorFieldStimulation, sstim-v:techVibrotactileEntrainment,
+        sstim-v:techAudioTactile .
 
 # ── Periodic auditory entrainment ───────────────────────────────────────
 
@@ -1164,6 +1197,78 @@ sstim-v:techAcousticStartle a owl:NamedIndividual, sstim:NonEntrainmentTechnique
     sstim:proposedMechanism sstim-v:mechStartle ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAperiodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .
+
+# ── Visual & cross-modal (ADR 0015) ─────────────────────────────────────
+
+sstim-v:techPhoticDriving a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Photic / Flicker Visual Driving"@en,
+                   "Stimolazione Visiva Fotica/con Sfarfallio"@it,
+                   "Estimulação Visual Fótica/com Cintilação"@pt,
+                   "Estimulación Visual Fótica/con Parpadeo"@es ;
+    skos:notation "photic-driving" ;
+    skos:definition "Periodic visual flicker — a light source or whole-screen field switched or modulated at a target rate — used to drive occipital rhythms at the flicker frequency. The visual counterpart of isochronic/amplitude-modulated auditory entrainment; at alpha rates it can also evoke stroboscopic imagery (the 'flicker' / Dreamachine phenomenon)."@en ;
+    skos:scopeNote "Subject to photosensitivity exposure limits — model the flicker rate and the photosensitivity comfort boundary via the exposure module (sstim-ex:hasFlickerRateHz, sstim-ex:boundaryPhotosensitivity, ADR 0011). Avoid high-contrast full-field flicker around 15–25 Hz in unscreened users. At 40 Hz this is the GENUS visual-gamma case (preclinical-strongest, contested in humans), which additionally invokes sstim-v:mechGamma40."@en ;
+    sstim:proposedMechanism sstim-v:mechSSVEP, sstim-v:mechGamma40 ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalityVisual ;
+    skos:related sstim-v:techIsochronicTones, sstim-v:gamma40 .
+
+sstim-v:techAudiovisualEntrainment a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Audiovisual Entrainment"@en,
+                   "Trascinamento Audiovisivo"@it,
+                   "Arrastamento Audiovisual"@pt,
+                   "Arrastre Audiovisual"@es ;
+    skos:notation "audiovisual-entrainment" ;
+    skos:definition "Light and sound pulsed at the same target rate (the classic 'mind machine' / AVE configuration), so auditory and visual driving reinforce one another. Cross-modal: it engages auditory and visual steady-state responses together with multisensory integration."@en ;
+    skos:scopeNote "Combines the auditory and visual flicker constraints; the visual channel is subject to photosensitivity limits. Reported effects on state and EEG are mixed across studies; frame conservatively. At 40 Hz this is the multisensory GENUS configuration."@en ;
+    sstim:proposedMechanism sstim-v:mechASSR, sstim-v:mechSSVEP, sstim-v:mechMultisensory ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityVisual ;
+    skos:related sstim-v:techPhoticDriving, sstim-v:techGamma40Auditory, sstim-v:techIsochronicTones .
+
+sstim-v:techColorFieldStimulation a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Color / Chromatic Field Stimulation"@en,
+                   "Stimolazione con Campo Cromatico/di Colore"@it,
+                   "Estimulação com Campo Cromático/de Cor"@pt,
+                   "Estimulación con Campo Cromático/de Color"@es ;
+    skos:notation "color-field" ;
+    skos:definition "A steady or slowly changing full-field colour — a coloured light wash or whole-screen field, e.g. a Ganzfeld — used as an ambient visual environment rather than as a periodic driver."@en ;
+    skos:scopeNote "Aesthetic/ambient device; any calming effect is attentional and contextual. A steady (non-flickering) field is not entrainment."@en ;
+    skos:editorialNote "Catalogued to allow an explicit negative assertion: there is no established neurophysiological mechanism and no controlled evidence that any specific colour produces a specific physiological or therapeutic effect ('chromotherapy' / 'colour therapy'). Use aesthetically and honestly; do not attach colour-specific health claims."@en ;
+    sstim:proposedMechanism sstim-v:mechAttentional ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalAperiodic ;
+    sstim:techniqueModality sstim-v:modalityVisual .
+
+sstim-v:techVibrotactileEntrainment a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Vibrotactile Pulse Entrainment"@en,
+                   "Trascinamento con Impulsi Vibrotattili"@it,
+                   "Arrastamento com Pulsos Vibrotáteis"@pt,
+                   "Arrastre con Pulsos Vibrotáctiles"@es ;
+    skos:notation "vibrotactile-entrainment" ;
+    skos:definition "Rhythmic vibrotactile pulses delivered to the skin (wrist, fingertips, torso, or a wearable) at a target rate to drive somatosensory cortical rhythms. The tactile counterpart of isochronic auditory entrainment; deliverable on consumer hardware via the Web Vibration API."@en ;
+    skos:scopeNote "Distinct from vibroacoustic stimulation: here the pulse rate — not low-frequency audio energy — is the driver, and the percept is primarily tactile. Web Vibration API is Android-only; absent on iOS Safari (sstim-v:modalitySomatosensory scope note)."@en ;
+    sstim:proposedMechanism sstim-v:mechSSSEP, sstim-v:mechMechanoreceptive ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalitySomatosensory ;
+    skos:related sstim-v:techVibroacoustic, sstim-v:techIsochronicTones .
+
+sstim-v:techAudioTactile a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Audio-Tactile Entrainment"@en,
+                   "Trascinamento Audio-Tattile"@it,
+                   "Arrastamento Áudio-Tátil"@pt,
+                   "Arrastre Audio-Táctil"@es ;
+    skos:notation "audio-tactile" ;
+    skos:definition "An auditory pulse train (isochronic, monaural, or binaural) and a vibrotactile pulse delivered in phase at the same target rate, so hearing and touch are driven together. Cross-modal: auditory and somatosensory steady-state responses plus multisensory integration."@en ;
+    skos:scopeNote "A natural pairing for the BSC breathing/haptic pulse — the isOn breathing-reference voice already drives both the visual breathing animation and the haptic pulse. The tactile channel is Android-only via the Web Vibration API."@en ;
+    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechSSSEP, sstim-v:mechMultisensory ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalitySomatosensory ;
+    skos:related sstim-v:techVibrotactileEntrainment, sstim-v:techIsochronicTones, sstim-v:techBinauralBeats .
 
 # ── Catalogued but NOT evidence-bearing (flagged via skos:editorialNote) ─
 
