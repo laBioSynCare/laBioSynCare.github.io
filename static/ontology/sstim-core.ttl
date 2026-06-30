@@ -295,6 +295,27 @@ sstim:EvidenceClaim a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
+# Evidence-dimension value classes (P3 item 1). Dual-typed SKOS concepts in
+# sstim-vocab.ttl populate these (Pattern 2, ADR 0002).
+sstim:ClaimDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Claim Direction"@en ;
+    skos:definition "Whether a body of evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EffectDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Effect Direction"@en ;
+    skos:definition "The direction of the measured outcome (increase, decrease, or no change). Wellness-neutral; describes what was measured, not a health claim."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ReviewStatus a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Review Status"@en ;
+    skos:definition "The audit status of an evidence claim's tier assignment (provisional, reviewed, or needs update)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
 sstim:PublicSafeReference a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Public-Safe Reference"@en ;
@@ -395,6 +416,65 @@ sstim:citesReference a owl:ObjectProperty ;
     rdfs:range  sstim:PublicSafeReference ;
     rdfs:label  "cites reference"@en ;
     skos:definition "Links an evidence claim to a cleared public-safe reference."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# Evidence-claim dimensions (P3 item 1). All optional: they enrich a claim for
+# systematic review and auditing without being required of every claim.
+sstim:hasClaimDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:ClaimDirection ;
+    rdfs:label  "has claim direction"@en ;
+    skos:definition "Whether the cited evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasEffectDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:EffectDirection ;
+    rdfs:label  "has effect direction"@en ;
+    skos:definition "Direction of the measured outcome (increase / decrease / no change). Wellness-neutral measurement metadata."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:ReviewStatus ;
+    rdfs:label  "has review status"@en ;
+    skos:definition "Audit status of the tier assignment (provisional / reviewed / needs update)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:evidenceOutcome a owl:DatatypeProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "evidence outcome"@en ;
+    skos:definition "The outcome or endpoint the evidence concerns, in conservative wellness framing (e.g. self-reported relaxation, sustained attention)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:studyPopulation a owl:DatatypeProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "study population"@en ;
+    skos:definition "The population the cited evidence studied (e.g. healthy adults)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:comparator a owl:DatatypeProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "comparator"@en ;
+    skos:definition "The comparator or control condition in the cited evidence (e.g. sham stimulation, no stimulation)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:evidenceDate a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  xsd:date ;
+    rdfs:label  "evidence date"@en ;
+    skos:definition "Date the evidence was published or the tier last reviewed (ISO 8601)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:reviewedBy a owl:DatatypeProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reviewed by"@en ;
+    skos:definition "Identifier of the reviewer who assigned or last checked the evidence tier (provenance of the tier assignment)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

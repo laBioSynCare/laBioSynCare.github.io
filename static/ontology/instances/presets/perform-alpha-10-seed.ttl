@@ -6,6 +6,7 @@
 @prefix sstim:        <https://w3id.org/sstim#> .
 @prefix sstim-ref:    <https://w3id.org/sstim/ref/> .
 @prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
 
 bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     rdfs:label "Perform Alpha 10 Seed" ;
@@ -29,4 +30,10 @@ bsclab-evidence:perform-alpha-10-seed-auditory-review a sstim:EvidenceClaim ;
     sstim:supportsRelation bsclab-preset:perform-alpha-10-seed ;
     sstim:hasEvidenceTier sstim-v:tierSpeculative ;
     sstim:hasModalityTag sstim-v:modalityAUD, sstim-v:modalityREVIEW ;
-    sstim:citesReference sstim-ref:INGENDOH_2023 .
+    sstim:citesReference sstim-ref:INGENDOH_2023 ;
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-06-21"^^xsd:date ;
+    sstim:studyPopulation "Healthy adults" ;
+    sstim:comparator "Sham / no binaural beat audio" ;
+    sstim:reviewedBy "BSC Lab editorial" .

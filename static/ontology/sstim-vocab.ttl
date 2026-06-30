@@ -364,6 +364,87 @@ sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
 
 
 ###########################################################################
+# Part 4b — Evidence dimension vocabularies (P3 item 1):
+# claim direction, effect direction, review status
+###########################################################################
+
+sstim-v:ClaimDirectionScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Evidence Claim Direction Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:claimSupports, sstim-v:claimMixed,
+        sstim-v:claimInconclusive, sstim-v:claimRefutes .
+
+sstim-v:claimSupports a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
+    skos:inScheme sstim-v:ClaimDirectionScheme ;
+    skos:prefLabel "Supports"@en ;
+    skos:notation "supports" ;
+    skos:definition "The body of cited evidence, on balance, supports the asserted relation."@en .
+
+sstim-v:claimMixed a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
+    skos:inScheme sstim-v:ClaimDirectionScheme ;
+    skos:prefLabel "Mixed"@en ;
+    skos:notation "mixed" ;
+    skos:definition "The cited evidence is mixed: some studies support the relation and others do not."@en .
+
+sstim-v:claimInconclusive a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
+    skos:inScheme sstim-v:ClaimDirectionScheme ;
+    skos:prefLabel "Inconclusive"@en ;
+    skos:notation "inconclusive" ;
+    skos:definition "The cited evidence is insufficient to determine whether the relation holds."@en .
+
+sstim-v:claimRefutes a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
+    skos:inScheme sstim-v:ClaimDirectionScheme ;
+    skos:prefLabel "Refutes"@en ;
+    skos:notation "refutes" ;
+    skos:definition "The body of cited evidence, on balance, does not support (or refutes) the asserted relation."@en .
+
+
+sstim-v:EffectDirectionScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Effect Direction Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:effectIncrease, sstim-v:effectDecrease, sstim-v:effectNoChange .
+
+sstim-v:effectIncrease a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
+    skos:inScheme sstim-v:EffectDirectionScheme ;
+    skos:prefLabel "Increase"@en ;
+    skos:notation "increase" ;
+    skos:definition "The measured outcome increased relative to the comparator."@en .
+
+sstim-v:effectDecrease a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
+    skos:inScheme sstim-v:EffectDirectionScheme ;
+    skos:prefLabel "Decrease"@en ;
+    skos:notation "decrease" ;
+    skos:definition "The measured outcome decreased relative to the comparator."@en .
+
+sstim-v:effectNoChange a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
+    skos:inScheme sstim-v:EffectDirectionScheme ;
+    skos:prefLabel "No Change"@en ;
+    skos:notation "no-change" ;
+    skos:definition "No measurable change in the outcome relative to the comparator."@en .
+
+
+sstim-v:ReviewStatusScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Evidence Review Status Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:reviewProvisional, sstim-v:reviewReviewed, sstim-v:reviewNeedsUpdate .
+
+sstim-v:reviewProvisional a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
+    skos:inScheme sstim-v:ReviewStatusScheme ;
+    skos:prefLabel "Provisional"@en ;
+    skos:notation "provisional" ;
+    skos:definition "Tier assigned provisionally; not yet independently reviewed."@en .
+
+sstim-v:reviewReviewed a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
+    skos:inScheme sstim-v:ReviewStatusScheme ;
+    skos:prefLabel "Reviewed"@en ;
+    skos:notation "reviewed" ;
+    skos:definition "Tier assignment has been independently reviewed."@en .
+
+sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
+    skos:inScheme sstim-v:ReviewStatusScheme ;
+    skos:prefLabel "Needs Update"@en ;
+    skos:notation "needs-update" ;
+    skos:definition "Tier assignment is out of date and should be re-reviewed against current literature."@en .
+
+
+###########################################################################
 # Part 5 — Voice Type Scheme
 ###########################################################################
 

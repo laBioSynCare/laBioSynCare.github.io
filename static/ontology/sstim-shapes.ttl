@@ -377,6 +377,40 @@ sstim-sh:EvidenceClaimShape a sh:NodeShape ;
         sh:path sstim:supportsRelation ;
         sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
         sh:message "supportsRelation must point to a sstim:Preset or sstim:SensoryStimulationTechnique."@en ;
+    ] ;
+
+    # Optional evidence dimensions (P3 item 1): validated by type when present.
+    sh:property [
+        sh:path sstim:hasClaimDirection ; sh:maxCount 1 ; sh:class sstim:ClaimDirection ;
+        sh:message "hasClaimDirection must be a single sstim:ClaimDirection."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasEffectDirection ; sh:maxCount 1 ; sh:class sstim:EffectDirection ;
+        sh:message "hasEffectDirection must be a single sstim:EffectDirection."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasReviewStatus ; sh:maxCount 1 ; sh:class sstim:ReviewStatus ;
+        sh:message "hasReviewStatus must be a single sstim:ReviewStatus."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:evidenceDate ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "evidenceDate must be a single xsd:date."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:evidenceOutcome ; sh:datatype xsd:string ;
+        sh:message "evidenceOutcome must be a string."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:studyPopulation ; sh:datatype xsd:string ;
+        sh:message "studyPopulation must be a string."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:comparator ; sh:datatype xsd:string ;
+        sh:message "comparator must be a string."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:reviewedBy ; sh:datatype xsd:string ;
+        sh:message "reviewedBy must be a string."@en ;
     ] .
 
 
