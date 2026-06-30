@@ -104,6 +104,31 @@ sstim-sh:PresetShape a sh:NodeShape ;
             GROUP BY $this ?guide
             HAVING ( ( ?guide && COUNT(?v) != 1 ) || ( !?guide && COUNT(?v) != 0 ) )
         """ ;
+    ] ;
+
+    # P7.2 (ADR 0018): public-claim legality. A preset asserting a public claim
+    # level whose requiresEvidenceTierRank >= 1 must have a supporting EvidenceClaim
+    # (sstim:supportsRelation) at a tier whose rank meets that requirement. C0/C1/C2
+    # (requires 0) need no evidence; C4 medical (sentinel 7, above max tier 6) can
+    # never be satisfied, so asserting it publicly always fails. The mapping is the
+    # PROVISIONAL default in sstim-vocab (PublicClaimLevelScheme) — reconcile with
+    # the BioSynCare Reference enum and legal advice before launch.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A preset's public claim level requires supporting evidence at or above its required tier (sstim:requiresEvidenceTierRank); medical/condition (C4) and unbacked quantified (C5) claims are not publicly assertable."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim#hasPublicClaimLevel> ?level .
+                ?level <https://w3id.org/sstim#requiresEvidenceTierRank> ?req .
+                FILTER( ?req >= 1 )
+                FILTER NOT EXISTS {
+                    ?claim <https://w3id.org/sstim#supportsRelation> $this ;
+                           <https://w3id.org/sstim#hasEvidenceTier> ?tier .
+                    ?tier <https://w3id.org/sstim#tierRank> ?rank .
+                    FILTER( ?rank >= ?req )
+                }
+            }
+        """ ;
     ] .
 
 
@@ -411,6 +436,25 @@ sstim-sh:EvidenceClaimShape a sh:NodeShape ;
     sh:property [
         sh:path sstim:reviewedBy ; sh:datatype xsd:string ;
         sh:message "reviewedBy must be a string."@en ;
+    ] ;
+
+    # P7.1 (ADR 0018): evidence integrity. A claim at tier preliminary or stronger
+    # (tierRank >= 3) must cite at least one PublicSafeReference. Speculative/
+    # anecdotal claims — and the ExposureEffectClaim hypotheses (all tierSpeculative)
+    # — stay legitimately uncited. SHACL-SPARQL because it is conditional on the
+    # linked tier's rank (full IRIs avoid an sh:prefixes block; pyshacl runs it
+    # without extra flags).
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An EvidenceClaim at tier preliminary or stronger (tierRank >= 3) must cite at least one PublicSafeReference via sstim:citesReference."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim#hasEvidenceTier> ?tier .
+                ?tier <https://w3id.org/sstim#tierRank> ?rank .
+                FILTER( ?rank >= 3 )
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#citesReference> ?ref . }
+            }
+        """ ;
     ] .
 
 

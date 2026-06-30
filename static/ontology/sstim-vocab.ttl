@@ -387,6 +387,72 @@ sstim-v:modalityMULTISENSORY a owl:NamedIndividual, sstim:EvidenceModalityTag, s
 
 
 ###########################################################################
+# Part 6b — Public Claim Level Scheme (ADR 0018)
+#
+# The C0–C5 risk ladder: how much a public-facing surface may assert, gated by
+# evidence. requiresEvidenceTierRank is the minimum sstim:tierRank of supporting
+# evidence; the PresetShape legality constraint enforces it. The mapping is a
+# PROVISIONAL risk-reduction default — reconcile with the BioSynCare Reference
+# publicClaimLevel/clinicalScope enum and a qualified EU MDR adviser before launch.
+###########################################################################
+
+sstim-v:PublicClaimLevelScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Public Claim Level Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:claimC0Descriptive, sstim-v:claimC1Experiential,
+        sstim-v:claimC2Wellness, sstim-v:claimC3StructureFunction,
+        sstim-v:claimC4Medical, sstim-v:claimC5Quantified .
+
+sstim-v:claimC0Descriptive a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C0 — Descriptive"@en, "C0 — Descrittivo"@it, "C0 — Descritivo"@pt, "C0 — Descriptivo"@es ;
+    skos:notation "C0" ;
+    skos:definition "A mechanical fact about what the product does (e.g. \"plays binaural beats and isochronic tones; guides paced breathing\"). Permitted on every surface."@en ;
+    sstim:claimLevelRank 0 ;
+    sstim:requiresEvidenceTierRank 0 .
+
+sstim-v:claimC1Experiential a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C1 — Experiential (hedged)"@en, "C1 — Esperienziale (mitigato)"@it, "C1 — Experiencial (moderado)"@pt, "C1 — Experiencial (moderado)"@es ;
+    skos:notation "C1" ;
+    skos:definition "A subjective, non-universal experience report (e.g. \"many people find sessions relaxing\"). Hedged and non-universal; permitted on every surface."@en ;
+    sstim:claimLevelRank 1 ;
+    sstim:requiresEvidenceTierRank 0 .
+
+sstim-v:claimC2Wellness a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C2 — Wellness/function (general)"@en, "C2 — Benessere/funzione (generale)"@it, "C2 — Bem-estar/função (geral)"@pt, "C2 — Bienestar/función (general)"@es ;
+    skos:notation "C2" ;
+    skos:definition "A general wellness/function statement with no disease language (e.g. \"supports relaxation and focus\"). Permitted publicly; watch for drift toward C3."@en ;
+    sstim:claimLevelRank 2 ;
+    sstim:requiresEvidenceTierRank 0 .
+
+sstim-v:claimC3StructureFunction a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C3 — Structure/function"@en, "C3 — Struttura/funzione"@it, "C3 — Estrutura/função"@pt, "C3 — Estructura/función"@es ;
+    skos:notation "C3" ;
+    skos:definition "A claim that affects a body function (e.g. \"improves sleep\", \"reduces stress\"). Borderline on both the medical-device and misleading-advertising vectors; assertable publicly only with at least moderate evidence."@en ;
+    sstim:claimLevelRank 3 ;
+    sstim:requiresEvidenceTierRank 4 .
+
+sstim-v:claimC4Medical a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C4 — Medical/condition"@en, "C4 — Medico/condizione"@it, "C4 — Médico/condição"@pt, "C4 — Médico/afección"@es ;
+    skos:notation "C4" ;
+    skos:definition "A named-condition or symptom claim (e.g. relieves anxiety, depression, migraine, pain, suicidal ideation). Medical-device intended-purpose language; NOT publicly assertable. The underlying observation belongs in evidence-quarantine (a low-tier EvidenceClaim) and may motivate a study, never a public claim."@en ;
+    skos:editorialNote "requiresEvidenceTierRank is the sentinel 7 (above the maximum tier 6): no evidence tier makes a condition claim publicly assertable. Public/in-app/partner surfaces force this level off; it survives only as an internal, labeled hypothesis."@en ;
+    sstim:claimLevelRank 4 ;
+    sstim:requiresEvidenceTierRank 7 .
+
+sstim-v:claimC5Quantified a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Concept ;
+    skos:inScheme sstim-v:PublicClaimLevelScheme ;
+    skos:prefLabel "C5 — Quantified/superiority"@en, "C5 — Quantificato/superiorità"@it, "C5 — Quantificado/superioridade"@pt, "C5 — Cuantificado/superioridad"@es ;
+    skos:notation "C5" ;
+    skos:definition "A magnitude or comparative-superiority claim (e.g. \"20% IQ boost\", \"resolves X in 3 sessions\"). Requires strong (RCT-grade) evidence; absent that, not publicly assertable."@en ;
+    sstim:claimLevelRank 5 ;
+    sstim:requiresEvidenceTierRank 5 .
+
+
+###########################################################################
 # Part 4b — Evidence dimension vocabularies (P3 item 1):
 # claim direction, effect direction, review status
 ###########################################################################

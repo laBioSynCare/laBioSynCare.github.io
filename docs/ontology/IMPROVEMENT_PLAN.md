@@ -540,21 +540,18 @@ modality × outcome × population × protocol* (already encoded via `supportsRel
 + `hasModalityTag` + `studyPopulation` + `comparator` + `evidenceOutcome`), and a
 claim may never exceed what its evidence supports.
 
-1. **Conditional citation requirement.** A `sh:SPARQLConstraint` on
-   `EvidenceClaimShape`: if `hasEvidenceTier` has `tierRank ≥ 3` (preliminary or
-   stronger), the claim must declare at least one `sstim:citesReference` to a
-   `PublicSafeReference`. Speculative/anecdotal claims (and the `ExposureEffectClaim`
-   hypotheses) stay legitimately uncited. Verified to pass against all current data.
-2. **Public-claim-level taxonomy + legality.** Add a `sstim:PublicClaimLevel` class
-   and a SKOS scheme of six levels — C0 descriptive, C1 experiential-hedged, C2
-   wellness-general, C3 structure/function, C4 medical/condition, C5 quantified/
-   superiority — plus `sstim:hasPublicClaimLevel`. A SHACL legality constraint maps
-   the asserted public level to an evidence-tier ceiling (e.g. C4/C5 are not
-   publicly assertable; C3 needs strong evidence), so a preset/claim that promises
-   above its evidence fails validation. **Reconcile** with the BioSynCare Reference's
-   existing `publicClaimLevel` / `clinicalScope` / `marketScope` enum — that
-   alignment is the one piece that needs the maintainer's input; the SSTIM-canonical
-   scheme can land first and the Reference align to it.
+1. **Conditional citation requirement. (Done — 2026-06-30, [ADR 0018](../decisions/0018-evidence-integrity-and-public-claim-governance.md))**
+   `sh:SPARQLConstraint` on `EvidenceClaimShape`: tier `tierRank ≥ 3` ⇒ at least one
+   `sstim:citesReference`. Speculative/anecdotal claims (and the `ExposureEffectClaim`
+   hypotheses) stay legitimately uncited. Passes all current data; negative-tested.
+2. **Public-claim-level taxonomy + legality. (Done — 2026-06-30, [ADR 0018](../decisions/0018-evidence-integrity-and-public-claim-governance.md))**
+   Added `sstim:PublicClaimLevel` + `sstim-v:PublicClaimLevelScheme` (C0 descriptive
+   → C5 quantified/superiority), each with `claimLevelRank` + `requiresEvidenceTierRank`;
+   `sstim:hasPublicClaimLevel` (Preset → level); and a `PresetShape` SHACL legality
+   constraint (C4 never publicly assertable via the sentinel-7 mapping; C5 needs
+   strong evidence; C3 moderate). Negative-tested on a C4 preset. **Still open:** the
+   level↔tier mapping is a PROVISIONAL default — reconcile with the BioSynCare
+   Reference's `publicClaimLevel`/`clinicalScope`/`marketScope` enum + legal review.
 
 > Out of SSTIM scope (product/legal, tracked elsewhere): crisis-routing /
 > duty-of-care copy, the condition-claim (suicidality/migraine/pain) quarantine,

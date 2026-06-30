@@ -276,6 +276,17 @@ sstim:CautionTag a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
+sstim:PublicClaimLevel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Public Claim Level"@en,
+               "Livello di Affermazione Pubblica"@it,
+               "Nível de Alegação Pública"@pt,
+               "Nivel de Afirmación Pública"@es ;
+    skos:definition "A named ceiling on what a sensory-stimulation product may assert about itself on a public-facing surface, ordered from descriptive fact to quantified/superiority claims. Each level carries the minimum evidence-tier rank required to assert at that level publicly, so over-claiming is machine-checkable. A risk-reduction classification, not legal advice."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
 sstim:VoiceType a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Voice Type"@en ;
@@ -602,6 +613,15 @@ sstim:hasCautionTag a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
+sstim:hasPublicClaimLevel a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:PublicClaimLevel ;
+    rdfs:label  "has public claim level"@en ;
+    skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that supporting evidence meets the level's required tier."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
 sstim:derivedFrom a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:Preset ;
@@ -658,6 +678,22 @@ sstim:tierRank a owl:DatatypeProperty ;
     rdfs:range  xsd:integer ;
     rdfs:label  "tier rank"@en ;
     skos:definition "Ordinal rank 1–6 for SPARQL ORDER BY. Speculative=1, Anecdotal=2, Preliminary=3, Moderate=4, Strong=5, Established=6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:claimLevelRank a owl:DatatypeProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "claim level rank"@en ;
+    skos:definition "Ordinal rank 0–5 of a public claim level. C0 Descriptive=0, C1 Experiential=1, C2 Wellness=2, C3 Structure/Function=3, C4 Medical/Condition=4, C5 Quantified/Superiority=5."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:requiresEvidenceTierRank a owl:DatatypeProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "requires evidence tier rank"@en ;
+    skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition). PROVISIONAL policy mapping — reconcile with the BioSynCare Reference publicClaimLevel/clinicalScope enum and a qualified EU MDR adviser before launch."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

@@ -41,10 +41,7 @@ annotations lives here.
 | [0015](0015-visual-and-cross-modal-techniques.md) | Visual and cross-modal technique vocabulary | Accepted |
 | [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
 | [0017](0017-reference-pitch-retuning.md) | Reference-pitch retuning (432 Hz) modeling | Accepted |
-
-> ADR **0018** (evidence integrity & public-claim governance, IMPROVEMENT_PLAN P7)
-> is reserved by [`docs/ontology/IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md);
-> it will be written when that decision is taken.
+| [0018](0018-evidence-integrity-and-public-claim-governance.md) | Evidence integrity and public-claim governance | Accepted |
 
 ## Adding an ADR
 
