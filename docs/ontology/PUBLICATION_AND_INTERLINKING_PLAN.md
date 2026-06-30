@@ -282,6 +282,18 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
 - **Phase 0 — FAIR packaging (no semantics):** B2 (JSON-LD/RDF-XML exports +
   htaccess), B3 (vann/VoID metadata + reasoner consistency check in CI), B4
   (JSON-LD context), B5 (Zenodo DOI). *Unblocks everything; safe to start now.*
+
+  > **Partially delivered — 2026-06-30** (ADR 0016): `scripts/export-ontology.py`
+  > + `make export` generate JSON-LD + RDF/XML for all six modules into
+  > `dist/ontology/`, wired into the Pages build (non-fatal); `vann:`
+  > namespace metadata + `cc:license` added to the ontology node;
+  > `static/ontology/context.jsonld` added; `.zenodo.json` added; the Nix
+  > devShell now exposes rdflib. **Still open in Phase 0:** the external
+  > `.htaccess` `Accept`-routing for the new formats (per
+  > [`../ecosystem/w3id`](../ecosystem/w3id/README.md)), a VoID/DCAT dataset
+  > description, the WIDOCO HTML branch, a CI DL-consistency (reasoner) check,
+  > enabling the GitHub↔Zenodo webhook, and removing `continue-on-error` from
+  > the Pages export step after a green CI run.
 - **Phase 1 — content coverage:** IMPROVEMENT_PLAN **P5** items 1–3 (visual,
   tactile/cross-modal, neutral tuning) → release **0.5.0**. ADRs for the new
   schemes and the tuning property.

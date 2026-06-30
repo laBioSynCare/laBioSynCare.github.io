@@ -38,6 +38,12 @@ annotations lives here.
 | [0012](0012-martigli-voice-parameters.md) | Where Martigli voice parameters live in RDF | Accepted |
 | [0013](0013-evidence-support-relation-range.md) | Evidence `supportsRelation` range (Preset ∪ Technique) | Accepted |
 | [0014](0014-preset-is-not-a-protocol.md) | A Preset is an information content entity, not a protocol | Accepted |
+| [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
+
+> ADR **0015** (visual & cross-modal technique vocabulary) and **0017** (neutral
+> tuning vocabulary) are reserved by
+> [`docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md`](../ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
+> and IMPROVEMENT_PLAN P5; they will be written when those modeling decisions are taken.
 
 ## Adding an ADR
 

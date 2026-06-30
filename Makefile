@@ -1,6 +1,8 @@
 # pyshacl console script: provided by the Nix flake (top-level `pyshacl`) and by
 # `pip install pyshacl`. Override with `make PYSHACL='python3 -m pyshacl'` if needed.
 PYSHACL    ?= pyshacl
+PYTHON     ?= python3
+EXPORT_DIR ?= dist/ontology
 WAT2WASM   ?= wat2wasm
 FIREBASE   ?= npx firebase-tools
 FIREBASE_PROJECT ?= biosyncare-lab
@@ -19,7 +21,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev preview shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev export preview shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -84,6 +86,11 @@ test:
 ## Run the current ontology validation suite
 validate: shacl sparql-sanity
 
+## Generate JSON-LD + RDF/XML serializations of the ontology modules
+## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
+export:
+	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)
+
 ## Recompile the hand-written WASM oscillator kernel (bsc-osc.wat -> .wasm)
 wasm:
 	$(WAT2WASM) $(WASM_WAT) -o $(WASM_OUT)
@@ -98,6 +105,7 @@ help:
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
 	@echo "  make validate         Run the current ontology validation suite"
+	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"

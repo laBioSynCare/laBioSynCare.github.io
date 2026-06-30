@@ -76,7 +76,7 @@
 
             packages = [
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
-              py                  # Python 3.12 interpreter for ad-hoc use
+              (py.withPackages (ps: [ ps.rdflib ]))  # python3.12 + rdflib — `make export`, ad-hoc use
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
               pkgs.wabt           # wat2wasm for `make wasm` (bsc-osc.wat → .wasm)
               pkgs.gnumake        # the canonical task entrypoint (Makefile)

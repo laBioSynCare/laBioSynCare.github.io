@@ -53,6 +53,15 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
 
+      # The build copies static/ontology/*.ttl into dist/ontology/; generate the
+      # JSON-LD + RDF/XML serializations beside them so https://w3id.org/sstim can
+      # content-negotiate application/ld+json and application/rdf+xml (PUBLICATION
+      # plan B2). Non-fatal: a serializer/toolchain hiccup must never block the
+      # site deploy. Make strict once it has run green in CI.
+      - name: Export ontology serializations (JSON-LD + RDF/XML)
+        run: nix develop --command make export EXPORT_DIR=dist/ontology
+        continue-on-error: true
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
 

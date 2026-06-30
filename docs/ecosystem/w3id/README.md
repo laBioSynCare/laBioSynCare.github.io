@@ -68,6 +68,30 @@ curl -sIL https://w3id.org/sstim/0.3.0/sstim-core.ttl                  | grep -i
 curl -sL -H 'Accept: text/turtle' https://w3id.org/sstim | rapper -i turtle -c -
 ```
 
+## Multi-format content negotiation (JSON-LD + RDF/XML)
+
+The Pages build now generates `*.jsonld` and `*.rdf` (RDF/XML) beside each
+`*.ttl` in `dist/ontology/` via `make export` (`scripts/export-ontology.py`,
+rdflib). Turtle stays the editable master; the exports exist only so the
+namespace can content-negotiate other formats. Once published, extend the
+external `sstim/.htaccess` so the `Accept` branches resolve:
+
+```apache
+# Accept: application/ld+json → JSON-LD export
+RewriteCond %{HTTP_ACCEPT} application/ld\+json
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.jsonld [R=303,L]
+
+# Accept: application/rdf+xml → RDF/XML export
+RewriteCond %{HTTP_ACCEPT} application/rdf\+xml
+RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.rdf [R=303,L]
+```
+
+Apply the same per-module pattern for `vocab`, `shapes`, `alignments`,
+`patch-studio`, and `exposure`. See
+[`docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md`](../../ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
+B2. The `dist/ontology/*.jsonld`/`.rdf` targets must exist on Pages before the
+matching `.htaccess` rule is merged (same prerequisite as every other route).
+
 ## Open follow-up
 
 - **WIDOCO HTML docs.** The browser branch currently points at the app root.
