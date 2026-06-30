@@ -311,17 +311,43 @@ ambition. Known coverage gaps (tracked as **P5** below):
 - **Tactile / cross-modal** — *addressed (ADR 0015):* `techVibrotactileEntrainment`,
   `techAudiovisualEntrainment`, and `techAudioTactile` added, plus `mechSSSEP` and
   `mechMultisensory`. (Earlier gap: only the single `techVibroacoustic` entry.)
-- **No neutral tuning vocabulary.** A=432 vs A=440 can only be filed under the
-  mystical `techSolfeggioTuning`; there is no neutral `tuningReferenceHz` parameter
-  and no musical-interval/consonance terms.
+- **No neutral reference-pitch vocabulary.** A=432 vs A=440 can only be filed
+  under the mystical `techSolfeggioTuning`. 432 Hz is a *carrier/reference-pitch*
+  claim, orthogonal to the *modulation/beat* frequency the whole `FrequencyBand`
+  evidence model is about — and it must be modeled disjoint from entrainment
+  evidence (the carrier-vs-modulation firewall) to keep a pseudoscience magnet
+  away from the standard's credibility. Tracked as P5.3 / ADR 0017.
 - **Evidence lives in prose, not data.** The richest evidence content sits in
   `skos:definition`/`scopeNote` strings rather than queryable `EvidenceClaim`
   instances citing cleared references — the new P3 claim dimensions are still
-  scaffolding without populated claims.
+  scaffolding without populated claims (P5.4).
+- **Evidence-modality tags are auditory-skewed.** `EvidenceModalityScheme` carries
+  only `AUD, AV, BREATH, GENERAL, PRECLINICAL, REVIEW`. The ADR 0015 visual/tactile
+  techniques have no matching evidence-modality tag, so the modality-match discount
+  cannot fire on them. Tracked as P5.6.
 - **Modality nomenclature drift.** The `modalitySomatosensory` label
   "Somatosensory / Haptic" mixes a device word into a perceptual-channel concept,
   and the two parallel modality vocabularies (`sstim-v:modality*` vs
-  `sstim-ex:modality*`) risk diverging.
+  `sstim-ex:modality*`) risk diverging (P5.5).
+
+### Evidence Integrity and Public-Claim Governance
+
+Independent external review (2026-06) surfaced a hardening gap and a governance
+need, both about keeping *claims within evidence* — the project's dominant risk:
+
+- **`EvidenceClaimShape` requires no citation.** It enforces a tier and a modality
+  tag but not a `citesReference`, so a claim can assert any tier with zero backing.
+  A blanket fix is wrong — the ~30 `ExposureEffectClaim` hypotheses are legitimately
+  uncited at `tierSpeculative`. The correct rule is **conditional**: tier ≥
+  preliminary (rank ≥ 3) ⇒ must cite a `PublicSafeReference`. Tracked as **P7.1**.
+- **No machine-checked public-claim ceiling.** There is no vocabulary or constraint
+  expressing that a public-facing claim level (descriptive → wellness → structure/
+  function → medical/condition → quantified) may not exceed what the supporting
+  evidence tier permits. A C0–C5 claim-level taxonomy + a SHACL legality constraint
+  would make over-claiming a validation failure. Reconcile with the BioSynCare
+  Reference's existing `publicClaimLevel`/`clinicalScope`/`marketScope` enum.
+  Tracked as **P7.2** / ADR 0018. (Crisis-routing/duty-of-care copy and the
+  condition-claim quarantine are product/legal surfaces, outside SSTIM.)
 
 ## Remaining Work — Execution Order (2026-06-30)
 
@@ -348,11 +374,16 @@ backlog is sequenced below by dependency — later phases assume earlier ones.
    Music Ontology re-check (P4.2), JSON-LD context (P4.3), competency questions
    and SPARQL query tests (P4.4).
 6. **P5 — domain content coverage**: visual + tactile/cross-modal technique
-   vocabulary, neutral tuning vocabulary, populated evidence-claim instances, and
-   modality-nomenclature cleanup. Targets the `0.5.0` release. These are additive
-   vocabulary decisions (ADR-bearing), sequenced after the P0–P3 structural work
-   they depend on.
-7. **P6 — first-class publication & interlinking**: FAIR packaging, registries,
+   vocabulary (P5.1-2, done — ADR 0015), reference-pitch / 432 Hz vocabulary
+   (P5.3, ADR 0017), populated evidence-claim instances (P5.4), modality-
+   nomenclature cleanup (P5.5), and visual/tactile evidence-modality tags (P5.6).
+   Targets the `0.5.0` release. Additive vocabulary decisions (ADR-bearing).
+7. **P7 — evidence integrity & public-claim governance** (ADR 0018): the
+   conditional citation requirement (P7.1) and the C0–C5 public-claim-level
+   taxonomy + SHACL legality (P7.2). High priority — it is the project's dominant
+   risk surface — and it hardens, rather than extends, the evidence model, so it
+   can proceed alongside P5.
+8. **P6 — first-class publication & interlinking**: FAIR packaging, registries,
    and external linkage, owned by
    [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md).
    Its FAIR-packaging phase (Phase 0) is semantics-free and may start immediately;
@@ -476,20 +507,65 @@ decision; none renames or removes existing terms (minor version).
    cross-modal `techAudiovisualEntrainment` and `techAudioTactile`, plus the
    `mechSSSEP` and `mechMultisensory` mechanisms. Cross-modal is expressed as
    multiple `techniqueModality` values, not a new class.
-3. **Neutral tuning vocabulary.** Add a `tuningReferenceHz` datatype property so
-   A=432 vs A=440 is a neutral aesthetic parameter, distinct from the mystical
-   `techSolfeggioTuning`. Decide (ADR) whether to add a minimal musical-interval /
-   consonance vocabulary or to scope it out. *(Proposed ADR 0017.)*
+3. **Reference-pitch vocabulary (432 Hz). *(ADR 0017.)*** Model 432/440 as
+   *reference-pitch retuning*, not a `tuningReferenceHz` afterthought and never an
+   entrainment target. Add `sstim-v:techReferencePitchRetuning`
+   (`NonEntrainmentTechnique`), make `techSolfeggioTuning skos:broader` it, and add
+   carrier-pitch datatype properties (`referencePitchNote`, `referencePitchHz`,
+   `pitchShiftCents`, `retunedFromReferenceHz`) on the exposure `StimulusChannel`
+   beside `hasFrequencyHz`. **Firewall:** carrier tuning is orthogonal to the
+   modulation/beat frequency, so any 432 Hz evidence is kept disjoint from
+   `EntrainmentBasedTechnique`/`FrequencyBand` evidence; the honest posture is
+   tier 2–3 with an `evidenceNotes` caveat that the pilots tested transposed
+   *music*, not a 432 Hz carrier under a beat (a modality/population mismatch).
+   Keep the `skos:editorialNote` negative-assertion discipline against
+   "cosmic/healing-frequency" claims. Musical-interval/consonance terms are scoped
+   out for now.
 4. **Populate evidence-claim instances.** Move evidence from prose
    (`skos:definition`/`scopeNote`) into queryable `EvidenceClaim` individuals
    citing `PublicSafeReference`s, starting with the best-supported auditory claims
    (FFR/ASSR) and the explicit negative assertions. Turns the P3.1 claim-dimension
-   machinery into data.
+   machinery into data. **Audit each citation's venue** before it enters a claim
+   (exclude predatory publishers; verify the journal, not just the DOI).
 5. **Modality nomenclature cleanup.** Resolve the `modalitySomatosensory`
    "Somatosensory / Haptic" label conflation and reduce drift between
    `sstim-v:modality*` and `sstim-ex:modality*` by adopting the convention
    **haptic = device/actuator, tactile = percept, somatosensory = superordinate
    channel, vibrotactile = mechanism** consistently.
+6. **Visual/tactile evidence-modality tags.** Extend `EvidenceModalityScheme`
+   beyond `AUD/AV/BREATH/GENERAL/PRECLINICAL/REVIEW` with `VIS`, `TACTILE`, and
+   `MULTISENSORY`, so the ADR 0015 visual/tactile techniques can carry evidence
+   tagged with a matching modality (and the modality-match discount can fire).
+   Complements ADR 0015; additive.
+
+### P7: Evidence Integrity and Public-Claim Governance
+
+The project's dominant risk is over-claiming. SSTIM can make over-claiming a
+**validation failure**. ADR 0018. The invariant: *evidence attaches to technique ×
+modality × outcome × population × protocol* (already encoded via `supportsRelation`
++ `hasModalityTag` + `studyPopulation` + `comparator` + `evidenceOutcome`), and a
+claim may never exceed what its evidence supports.
+
+1. **Conditional citation requirement.** A `sh:SPARQLConstraint` on
+   `EvidenceClaimShape`: if `hasEvidenceTier` has `tierRank ≥ 3` (preliminary or
+   stronger), the claim must declare at least one `sstim:citesReference` to a
+   `PublicSafeReference`. Speculative/anecdotal claims (and the `ExposureEffectClaim`
+   hypotheses) stay legitimately uncited. Verified to pass against all current data.
+2. **Public-claim-level taxonomy + legality.** Add a `sstim:PublicClaimLevel` class
+   and a SKOS scheme of six levels — C0 descriptive, C1 experiential-hedged, C2
+   wellness-general, C3 structure/function, C4 medical/condition, C5 quantified/
+   superiority — plus `sstim:hasPublicClaimLevel`. A SHACL legality constraint maps
+   the asserted public level to an evidence-tier ceiling (e.g. C4/C5 are not
+   publicly assertable; C3 needs strong evidence), so a preset/claim that promises
+   above its evidence fails validation. **Reconcile** with the BioSynCare Reference's
+   existing `publicClaimLevel` / `clinicalScope` / `marketScope` enum — that
+   alignment is the one piece that needs the maintainer's input; the SSTIM-canonical
+   scheme can land first and the Reference align to it.
+
+> Out of SSTIM scope (product/legal, tracked elsewhere): crisis-routing /
+> duty-of-care copy, the condition-claim (suicidality/migraine/pain) quarantine,
+> dropping "neuromodulation"/"device" from marketing, and the GDPR/pilot documents.
+> SSTIM's job is to make the *permitted claim envelope* machine-checkable.
 
 ### P6: First-Class Publication and External Interlinking
 

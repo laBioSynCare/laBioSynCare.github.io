@@ -41,9 +41,10 @@ annotations lives here.
 | [0015](0015-visual-and-cross-modal-techniques.md) | Visual and cross-modal technique vocabulary | Accepted |
 | [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
 
-> ADR **0017** (neutral tuning vocabulary) is reserved by
-> [`docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md`](../ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
-> and IMPROVEMENT_PLAN P5 item 3; it will be written when that modeling decision is taken.
+> ADR **0017** (reference-pitch / 432 Hz vocabulary, IMPROVEMENT_PLAN P5.3) and
+> **0018** (evidence integrity & public-claim governance, IMPROVEMENT_PLAN P7) are
+> reserved by [`docs/ontology/IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md);
+> they will be written as those decisions are taken.
 
 ## Adding an ADR
 

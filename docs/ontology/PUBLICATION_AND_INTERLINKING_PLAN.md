@@ -66,22 +66,33 @@ summarized here because publication should not precede them.
    `techVibrotactileEntrainment`, `techAudiovisualEntrainment`, and
    `techAudioTactile`, plus `mechSSSEP` and `mechMultisensory`. Cross-modal is
    modeled as multiple `techniqueModality` values, not a new class.
-3. **Neutral tuning / harmonic vocabulary.** Add a `tuningReferenceHz`
-   datatype property (e.g. A=432 vs A=440) so tuning can be modeled as a neutral
-   aesthetic parameter, *distinct* from `techSolfeggioTuning`'s mystical claim.
-   Decide (ADR) whether to add a minimal musical-interval / consonance vocabulary
-   or to explicitly scope it out.
+3. **Reference-pitch vocabulary (432 Hz).** *ADR 0017:* model 432/440 as
+   *reference-pitch retuning* (`techReferencePitchRetuning`, with
+   `techSolfeggioTuning skos:broader` it) + carrier-pitch properties on the
+   exposure `StimulusChannel` — kept **disjoint** from beat/`FrequencyBand`
+   evidence (the carrier-vs-modulation firewall), tier 2–3 with an `evidenceNotes`
+   caveat (pilots tested transposed *music*, not a 432 Hz carrier under a beat) and
+   the `editorialNote` negative-assertion discipline.
 4. **Populate `EvidenceClaim` instances.** Move the evidence knowledge that
    currently lives in prose (`skos:definition` / `scopeNote`) into queryable
    `EvidenceClaim` individuals citing `PublicSafeReference`s — starting with the
    best-supported auditory claims (FFR/ASSR) and the explicit negative
-   assertions. This is what turns the new P3 claim-dimension machinery from
-   scaffolding into data.
+   assertions, **auditing each citation's venue** (exclude predatory journals).
+   This is what turns the P3 claim-dimension machinery from scaffolding into data.
 5. **Nomenclature cleanup.** Resolve the `modalitySomatosensory` label
    "Somatosensory / Haptic" conflation and reduce drift between the two parallel
    modality vocabularies (`sstim-v:modality*` vs `sstim-ex:modality*`) by adopting
    the convention **haptic = device/actuator, tactile = percept, somatosensory =
    superordinate channel, vibrotactile = mechanism** consistently.
+6. **Visual/tactile evidence-modality tags** (`VIS`, `TACTILE`, `MULTISENSORY`)
+   so ADR 0015's techniques carry evidence with a matching modality.
+
+**Evidence integrity (P7, ADR 0018) is a publication prerequisite, not just
+content.** Before SSTIM is linked into external catalogs it must enforce that
+claims stay within evidence: the conditional citation requirement (tier ≥
+preliminary ⇒ must cite) and the C0–C5 public-claim-level legality constraint. A
+standards vocabulary that lets unsupported claims validate would fail exactly the
+credibility test registries and the W3C-CG audience apply.
 
 **Gate:** publication to external registries (Part C) should target the **0.5.0**
 release that lands P5 items 1–3 and at least a starter set for item 4. Linking a
