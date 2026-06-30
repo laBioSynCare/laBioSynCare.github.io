@@ -507,20 +507,15 @@ decision; none renames or removes existing terms (minor version).
    cross-modal `techAudiovisualEntrainment` and `techAudioTactile`, plus the
    `mechSSSEP` and `mechMultisensory` mechanisms. Cross-modal is expressed as
    multiple `techniqueModality` values, not a new class.
-3. **Reference-pitch vocabulary (432 Hz). *(ADR 0017.)*** Model 432/440 as
-   *reference-pitch retuning*, not a `tuningReferenceHz` afterthought and never an
-   entrainment target. Add `sstim-v:techReferencePitchRetuning`
-   (`NonEntrainmentTechnique`), make `techSolfeggioTuning skos:broader` it, and add
-   carrier-pitch datatype properties (`referencePitchNote`, `referencePitchHz`,
-   `pitchShiftCents`, `retunedFromReferenceHz`) on the exposure `StimulusChannel`
-   beside `hasFrequencyHz`. **Firewall:** carrier tuning is orthogonal to the
-   modulation/beat frequency, so any 432 Hz evidence is kept disjoint from
-   `EntrainmentBasedTechnique`/`FrequencyBand` evidence; the honest posture is
-   tier 2–3 with an `evidenceNotes` caveat that the pilots tested transposed
-   *music*, not a 432 Hz carrier under a beat (a modality/population mismatch).
-   Keep the `skos:editorialNote` negative-assertion discipline against
-   "cosmic/healing-frequency" claims. Musical-interval/consonance terms are scoped
-   out for now.
+3. **Reference-pitch vocabulary (432 Hz). (Done — 2026-06-30, [ADR 0017](../decisions/0017-reference-pitch-retuning.md))**
+   Added `sstim-v:techReferencePitchRetuning` (`NonEntrainmentTechnique`, with the
+   carrier-vs-modulation firewall in its scope/editorial/evidence notes), made
+   `techSolfeggioTuning skos:broader` it, and added carrier-pitch properties
+   (`referencePitchNote`, `referencePitchHz`, `retunedFromReferenceHz`,
+   `pitchShiftCents`) on the exposure `StimulusChannel`. Evidence kept disjoint
+   from entrainment/`FrequencyBand`; tier 2–3 ceiling recorded in `evidenceNotes`;
+   `editorialNote` negative assertion retained. Musical-interval/consonance terms
+   scoped out.
 4. **Populate evidence-claim instances.** Move evidence from prose
    (`skos:definition`/`scopeNote`) into queryable `EvidenceClaim` individuals
    citing `PublicSafeReference`s, starting with the best-supported auditory claims
@@ -532,11 +527,10 @@ decision; none renames or removes existing terms (minor version).
    `sstim-v:modality*` and `sstim-ex:modality*` by adopting the convention
    **haptic = device/actuator, tactile = percept, somatosensory = superordinate
    channel, vibrotactile = mechanism** consistently.
-6. **Visual/tactile evidence-modality tags.** Extend `EvidenceModalityScheme`
-   beyond `AUD/AV/BREATH/GENERAL/PRECLINICAL/REVIEW` with `VIS`, `TACTILE`, and
-   `MULTISENSORY`, so the ADR 0015 visual/tactile techniques can carry evidence
-   tagged with a matching modality (and the modality-match discount can fire).
-   Complements ADR 0015; additive.
+6. **Visual/tactile evidence-modality tags. (Done — 2026-06-30)** Extended
+   `EvidenceModalityScheme` with `VIS`, `TACTILE`, and `MULTISENSORY` (each with a
+   one-tier-discount / no-direct-transfer note), so the ADR 0015 visual/tactile
+   techniques can carry evidence tagged with a matching modality. Additive.
 
 ### P7: Evidence Integrity and Public-Claim Governance
 

@@ -324,7 +324,8 @@ sstim-v:tierEstablished a owl:NamedIndividual, sstim:EvidenceTierValue, skos:Con
 sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary"@en ;
     skos:hasTopConcept sstim-v:modalityAUD, sstim-v:modalityAV, sstim-v:modalityBREATH,
-        sstim-v:modalityGENERAL, sstim-v:modalityPRECLINICAL, sstim-v:modalityREVIEW .
+        sstim-v:modalityGENERAL, sstim-v:modalityPRECLINICAL, sstim-v:modalityREVIEW,
+        sstim-v:modalityVIS, sstim-v:modalityTACTILE, sstim-v:modalityMULTISENSORY .
 
 sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
@@ -361,6 +362,28 @@ sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
     skos:prefLabel "Review"@en, "Revisione"@it, "Revisão"@pt, "Revisión"@es ;
     skos:notation "REVIEW" ;
     skos:definition "Systematic review or meta-analysis. Tag used alongside AUD/AV/BREATH/GENERAL to note the evidence synthesis level."@en .
+
+# Visual / tactile / multisensory tags (ADR 0015 follow-up, P5.6). Evidence must
+# match modality: a claim tagged VIS does not transfer to an auditory-only preset
+# without a tier discount, and multisensory (e.g. GENUS) results do not transfer
+# directly to any single modality.
+sstim-v:modalityVIS a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceModalityScheme ;
+    skos:prefLabel "Visual"@en, "Visivo"@it, "Visual"@pt, "Visual"@es ;
+    skos:notation "VIS" ;
+    skos:definition "Evidence from visual-only stimulation (e.g. photic/flicker driving, SSVEP). Applies directly to visual techniques; one tier discount for auditory-only claims."@en .
+
+sstim-v:modalityTACTILE a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceModalityScheme ;
+    skos:prefLabel "Tactile"@en, "Tattile"@it, "Tátil"@pt, "Táctil"@es ;
+    skos:notation "TACTILE" ;
+    skos:definition "Evidence from tactile / vibrotactile stimulation (e.g. vibrotactile pulse, SSSEP, vibroacoustic). Applies directly to tactile techniques; one tier discount for auditory-only claims."@en .
+
+sstim-v:modalityMULTISENSORY a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceModalityScheme ;
+    skos:prefLabel "Multisensory"@en, "Multisensoriale"@it, "Multissensorial"@pt, "Multisensorial"@es ;
+    skos:notation "MULTISENSORY" ;
+    skos:definition "Evidence from combined multisensory stimulation (e.g. GENUS audiovisual, audio-tactile). Modality-specific results do not transfer directly to any single channel; apply a tier discount for single-modality claims."@en .
 
 
 ###########################################################################
@@ -891,7 +914,7 @@ sstim-v:TechniqueScheme a skos:ConceptScheme ;
         sstim-v:techSpatialAuditory, sstim-v:techClosedLoopAuditory, sstim-v:techSonification,
         sstim-v:techRoughness, sstim-v:techAuditoryIllusion, sstim-v:techASMR,
         sstim-v:techVoiceMantra, sstim-v:techVibroacoustic, sstim-v:techUltrasoundNeuromod,
-        sstim-v:techAcousticStartle, sstim-v:techSolfeggioTuning, sstim-v:techSubliminalAudio,
+        sstim-v:techAcousticStartle, sstim-v:techReferencePitchRetuning, sstim-v:techSubliminalAudio,
         sstim-v:techPhoticDriving, sstim-v:techAudiovisualEntrainment,
         sstim-v:techColorFieldStimulation, sstim-v:techVibrotactileEntrainment,
         sstim-v:techAudioTactile .
@@ -1270,6 +1293,28 @@ sstim-v:techAudioTactile a owl:NamedIndividual, sstim:EntrainmentBasedTechnique,
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalitySomatosensory ;
     skos:related sstim-v:techVibrotactileEntrainment, sstim-v:techIsochronicTones, sstim-v:techBinauralBeats .
 
+# ── Reference-pitch / low-evidence tunings (ADR 0017) ───────────────────
+
+# Reference-pitch retuning (432 Hz etc.) is a CARRIER/absolute-pitch claim,
+# orthogonal to the modulation/beat frequency the FrequencyBand evidence model is
+# about. It is modeled NonEntrainment, with its own (weak) evidence kept disjoint
+# from EntrainmentBasedTechnique/FrequencyBand evidence — the carrier-vs-modulation
+# firewall. Carrier-tuning parameters live on sstim-ex:StimulusChannel.
+sstim-v:techReferencePitchRetuning a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Reference-Pitch Retuning"@en,
+                   "Riaccordatura del Diapason"@it,
+                   "Reafinação do Diapasão"@pt,
+                   "Reafinación del Diapasón"@es ;
+    skos:notation "reference-pitch-retuning" ;
+    skos:definition "Music or tones retuned so that a named reference note (commonly A4) is set to a non-standard frequency such as 432 Hz instead of the standard 440 Hz."@en ;
+    skos:scopeNote "A property of the carrier / absolute pitch, orthogonal to any modulation or beat frequency — not brainwave entrainment. Parametrize a stimulus channel with sstim-ex:referencePitchNote / referencePitchHz / retunedFromReferenceHz / pitchShiftCents. Any effect claim must be modeled as music-listening / tuning-preference / psychoacoustic / expectation-mediated, with its own EvidenceClaim kept disjoint from EntrainmentBasedTechnique and FrequencyBand evidence."@en ;
+    skos:editorialNote "Catalogued to allow an explicit negative assertion. There is no established mechanism and no robust controlled evidence that any specific tuning (432 Hz, 'cosmic/healing frequency', Verdi tuning) produces a specific physiological effect beyond ordinary music, relaxation, and expectancy. A 432 Hz pseudoscience literature exists; use only as a warm aesthetic tuning option, framed honestly — never as a feature benefit or healing claim."@en ;
+    sstim:evidenceNotes "Honest ceiling: tier 2-3, claim direction mixed/inconclusive. The few small double-blind crossover pilots (e.g. ~4.79 bpm heart-rate reduction for 432 vs 440 Hz, n=33) tested full transposed MUSIC, confounding absolute tuning with overall pitch-lowering and tempo, and none tested a 432 Hz carrier under a binaural/isochronic beat — a modality/population mismatch that discounts any transfer to BSC's use case. At least one 2025 athlete study found 440 Hz more effective for several outcomes. Audit citation venues before use."@en ;
+    sstim:proposedMechanism sstim-v:mechAttentional ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
+    sstim:techniqueModality sstim-v:modalityAuditory .
+
 # ── Catalogued but NOT evidence-bearing (flagged via skos:editorialNote) ─
 
 sstim-v:techSolfeggioTuning a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
@@ -1279,7 +1324,8 @@ sstim-v:techSolfeggioTuning a owl:NamedIndividual, sstim:NonEntrainmentTechnique
                    "Estimulação com Frequências Solfeggio/Afinação Mística"@pt,
                    "Estimulación con Frecuencias Solfeggio/Afinación Mística"@es ;
     skos:notation "solfeggio-tuning" ;
-    skos:definition "Music or tones tuned to so-called 'Solfeggio frequencies' (e.g. 432 Hz, 528 Hz) or other arbitrary tunings claimed to carry special healing properties."@en ;
+    skos:broader sstim-v:techReferencePitchRetuning ;
+    skos:definition "Music or tones tuned to so-called 'Solfeggio frequencies' (e.g. 432 Hz, 528 Hz) or other arbitrary tunings claimed to carry special healing properties. A specific folk-claim case of reference-pitch retuning."@en ;
     skos:editorialNote "Catalogued for transparency and to allow an explicit negative assertion. There is no established neurophysiological mechanism and no controlled evidence that any specific tuning produces specific effects beyond ordinary music/relaxation. Not an evidence-bearing technique; any use should be framed aesthetically and honestly."@en ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .

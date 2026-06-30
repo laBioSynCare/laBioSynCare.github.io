@@ -40,11 +40,11 @@ annotations lives here.
 | [0014](0014-preset-is-not-a-protocol.md) | A Preset is an information content entity, not a protocol | Accepted |
 | [0015](0015-visual-and-cross-modal-techniques.md) | Visual and cross-modal technique vocabulary | Accepted |
 | [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
+| [0017](0017-reference-pitch-retuning.md) | Reference-pitch retuning (432 Hz) modeling | Accepted |
 
-> ADR **0017** (reference-pitch / 432 Hz vocabulary, IMPROVEMENT_PLAN P5.3) and
-> **0018** (evidence integrity & public-claim governance, IMPROVEMENT_PLAN P7) are
-> reserved by [`docs/ontology/IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md);
-> they will be written as those decisions are taken.
+> ADR **0018** (evidence integrity & public-claim governance, IMPROVEMENT_PLAN P7)
+> is reserved by [`docs/ontology/IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md);
+> it will be written when that decision is taken.
 
 ## Adding an ADR
 

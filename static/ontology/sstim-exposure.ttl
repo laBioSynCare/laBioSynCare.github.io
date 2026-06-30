@@ -330,6 +330,40 @@ sstim-ex:hasPhaseOffset a owl:DatatypeProperty ;
     skos:definition "Phase offset of a stimulus channel's modulation relative to other channels, as a fraction of a cycle between 0 and 1."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
+# Reference-pitch / carrier-tuning properties (ADR 0017). These describe the
+# absolute pitch (carrier) of an audio stimulus channel — orthogonal to the
+# modulation/beat frequency (sstim-ex:hasBeatFrequencyHz, sstim:FrequencyBand).
+# Keep any reference-pitch effect claim disjoint from entrainment/beat evidence.
+sstim-ex:referencePitchNote a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:string ;
+    rdfs:label "reference pitch note"@en ;
+    skos:definition "Named reference note whose pitch a tuning sets, commonly \"A4\"."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0017-reference-pitch-retuning.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:referencePitchHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "reference pitch (Hz)"@en ;
+    skos:definition "Frequency in hertz assigned to the reference note (e.g. 432 or 440 for A4). This is a carrier/absolute-pitch attribute, not a modulation or beat frequency."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0017-reference-pitch-retuning.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:retunedFromReferenceHz a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "retuned from reference (Hz)"@en ;
+    skos:definition "Standard reference frequency the tuning departs from, typically 440 Hz for A4."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:pitchShiftCents a owl:DatatypeProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "pitch shift (cents)"@en ;
+    skos:definition "Resulting pitch shift in cents relative to the standard reference (e.g. about -31.77 cents for A4=432 versus A4=440)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
 sstim-ex:limitValue a owl:DatatypeProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:decimal ;
