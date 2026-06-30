@@ -2,7 +2,7 @@
 
 Status: active planning document
 Baseline reviewed: SSTIM ontology `0.3.0`
-Last reviewed: 2026-06-21
+Last reviewed: 2026-06-30
 
 This document is the repo-truth backlog for ontology and vocabulary maturity
 work after the `0.3.0` release. It records known modeling gaps, the main
@@ -292,7 +292,38 @@ erratum, but several alignments remain pending:
 - additional Wikidata technique items;
 - Music Ontology `mo:Score`, pending reliable host verification.
 
-## Remaining Work — Execution Order (2026-06-21)
+The outward-facing publication and interlinking strategy (DBpedia Archivo,
+Wikidata, Wikimedia, OBO posture, LOV/BioPortal/OLS/FAIRsharing/Zenodo, FAIR
+packaging) is owned by a companion document,
+[`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md),
+and tracked here as **P6**.
+
+### Domain Content Coverage
+
+`0.3.0` is structurally sound but **auditory-skewed** in domain content. The
+technique vocabulary is explicitly "auditory and cross-modal"; visual and tactile
+stimulation are under-represented relative to the platform's audiovisual + haptic
+ambition. Known coverage gaps (tracked as **P5** below):
+
+- **Visual entrainment** exists only as example strings (`photic driving`) and the
+  `mechGamma40` note — no visual technique concepts (photic/flicker driving, SSVEP,
+  audiovisual entrainment, neutral color/chromatic stimulation).
+- **Tactile / cross-modal** entrainment is limited to the single
+  `techVibroacoustic` cross-modal entry; no first-class audiovisual or
+  audio-tactile technique concepts.
+- **No neutral tuning vocabulary.** A=432 vs A=440 can only be filed under the
+  mystical `techSolfeggioTuning`; there is no neutral `tuningReferenceHz` parameter
+  and no musical-interval/consonance terms.
+- **Evidence lives in prose, not data.** The richest evidence content sits in
+  `skos:definition`/`scopeNote` strings rather than queryable `EvidenceClaim`
+  instances citing cleared references — the new P3 claim dimensions are still
+  scaffolding without populated claims.
+- **Modality nomenclature drift.** The `modalitySomatosensory` label
+  "Somatosensory / Haptic" mixes a device word into a perceptual-channel concept,
+  and the two parallel modality vocabularies (`sstim-v:modality*` vs
+  `sstim-ex:modality*`) risk diverging.
+
+## Remaining Work — Execution Order (2026-06-30)
 
 P1 validation is essentially complete (see the dated notes above): voice,
 technique, self-report, framework/protocol/implementation, and SKOS-integrity
@@ -316,6 +347,17 @@ backlog is sequenced below by dependency — later phases assume earlier ones.
    every external identifier verified before it is added, never fabricated),
    Music Ontology re-check (P4.2), JSON-LD context (P4.3), competency questions
    and SPARQL query tests (P4.4).
+6. **P5 — domain content coverage**: visual + tactile/cross-modal technique
+   vocabulary, neutral tuning vocabulary, populated evidence-claim instances, and
+   modality-nomenclature cleanup. Targets the `0.5.0` release. These are additive
+   vocabulary decisions (ADR-bearing), sequenced after the P0–P3 structural work
+   they depend on.
+7. **P6 — first-class publication & interlinking**: FAIR packaging, registries,
+   and external linkage, owned by
+   [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md).
+   Its FAIR-packaging phase (Phase 0) is semantics-free and may start immediately;
+   its registry/Wikidata/Archivo phases gate on P5 reaching `0.5.0` so the
+   published scope is not misleadingly auditory-only.
 
 Each phase ships as its own validated PR. As items land, their Priority-Task
 entry below is marked Done with the date and the delivering artifact.
@@ -418,6 +460,56 @@ entry below is marked Done with the date and the delivering artifact.
 3. Add JSON-LD context or examples if external consumers begin using SSTIM
    outside the BSC Lab runtime.
 4. Add competency questions and SPARQL query tests for the ontology use cases.
+
+### P5: Domain Content Coverage
+
+Targets the `0.5.0` release. Each item is an additive, ADR-bearing vocabulary
+decision; none renames or removes existing terms (minor version).
+
+1. **Visual-entrainment technique vocabulary.** Add first-class technique
+   concepts for photic/flicker driving, SSVEP-evoking stimulation, audiovisual
+   entrainment (AVE), and a *neutral* color/chromatic stimulation concept — with
+   an explicit `skos:editorialNote` negative assertion where "chromotherapy"
+   claims appear, mirroring the `techSolfeggioTuning` pattern. *(Proposed ADR 0015.)*
+2. **Tactile / cross-modal technique vocabulary.** Promote tactile rhythmic
+   entrainment beyond `techVibroacoustic`, and add genuinely cross-modal
+   technique concepts (audiovisual, audio-tactile) instead of single-modality
+   tagging. *(Proposed ADR 0015.)*
+3. **Neutral tuning vocabulary.** Add a `tuningReferenceHz` datatype property so
+   A=432 vs A=440 is a neutral aesthetic parameter, distinct from the mystical
+   `techSolfeggioTuning`. Decide (ADR) whether to add a minimal musical-interval /
+   consonance vocabulary or to scope it out. *(Proposed ADR 0017.)*
+4. **Populate evidence-claim instances.** Move evidence from prose
+   (`skos:definition`/`scopeNote`) into queryable `EvidenceClaim` individuals
+   citing `PublicSafeReference`s, starting with the best-supported auditory claims
+   (FFR/ASSR) and the explicit negative assertions. Turns the P3.1 claim-dimension
+   machinery into data.
+5. **Modality nomenclature cleanup.** Resolve the `modalitySomatosensory`
+   "Somatosensory / Haptic" label conflation and reduce drift between
+   `sstim-v:modality*` and `sstim-ex:modality*` by adopting the convention
+   **haptic = device/actuator, tactile = percept, somatosensory = superordinate
+   channel, vibrotactile = mechanism** consistently.
+
+### P6: First-Class Publication and External Interlinking
+
+Owned by [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md).
+Summary of the recommended posture:
+
+1. **FAIR packaging (semantics-free; may start now):** multi-format
+   content-negotiation (Turtle/RDF-XML/JSON-LD/HTML via WIDOCO), `vann:`/VoID
+   metadata, DL-consistency check in CI, JSON-LD context, and Zenodo DOIs.
+2. **DBpedia — via DBpedia Archivo** (not direct): submit the dereferenceable URI,
+   iterate to a 4-star rating.
+3. **Wikidata — incremental:** one ontology item; conservative two-way `exact
+   match` (P2888) links for already-aligned notable concepts; defer the "SSTIM ID"
+   property and new concept items until adoption/notability.
+4. **Wikimedia/Wikipedia — defer** on notability; Commons diagrams optional (CC BY).
+5. **OBO — already linked by reference; deepen interoperability (BFO/IAO/OBI/RO),
+   do not seek full membership** in the current human-readable-IRI form; reserve a
+   dual-published OBO-ID bridge as a future ADR-gated option.
+6. **Registries:** prefix.cc, LOV, BARTOC, BioPortal, OLS, OntoBee, FAIRsharing.
+
+*(Proposed ADR 0016 records the publication/OBO posture.)*
 
 ## Acceptance Criteria for Next Maturity Step
 

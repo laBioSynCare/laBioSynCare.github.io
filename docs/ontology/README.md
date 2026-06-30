@@ -90,7 +90,17 @@ SHACL profiles should be used to validate concrete data structures such as sessi
 [`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md) is the canonical backlog for
 ontology maturity work after SSTIM `0.3.0`. It records known gaps, the priority
 order for validation/modeling work, and the next major design improvement:
-separating physical delivery from perceived sensory modality.
+separating physical delivery from perceived sensory modality. Internal
+modeling/validation maturity (P0–P4) plus domain content coverage (P5) live here.
+
+## Publication and External Interlinking Plan
+
+[`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md) is
+the canonical strategy for making SSTIM a first-class, publicly usable, well-linked
+artifact: FAIR packaging (multi-format dereferenceability, metadata, DOIs), and the
+external-linkage decisions for **DBpedia (via Archivo), Wikidata, Wikimedia, OBO**,
+and the public registries (LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing). It
+is tracked as **P6** in the improvement plan.
 
 ## Evidence and Safety Metadata
 
