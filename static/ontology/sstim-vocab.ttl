@@ -593,10 +593,12 @@ sstim-v:modalityVisual a owl:NamedIndividual, sstim:SensoryModality, skos:Concep
 
 sstim-v:modalitySomatosensory a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;
-    skos:prefLabel "Somatosensory / Haptic"@en, "Somatosensoriale / Aptico"@it, "Somatossensorial / Háptico"@pt, "Somatosensorial / Háptico"@es ;
+    skos:prefLabel "Somatosensory"@en, "Somatosensoriale"@it, "Somatossensorial"@pt, "Somatosensorial"@es ;
     skos:notation "somatosensory" ;
+    skos:definition "The somatosensory modality: body-perceived sensation including touch, pressure, vibration, and related cutaneous and deep-tissue sensation. In SSTIM this is the superordinate body-sense channel — the tactile percept is a sub-modality, the haptic actuator (e.g. the Web Vibration API) is the device-delivery path, and vibrotactile is the driving mechanism (P5.5 convention; ADR 0019)."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean ;
-    skos:scopeNote "Deliverable via Web Vibration API on Android; not available on iOS Safari."@en .
+    skos:scopeNote "BSC delivers somatosensory stimulation through the haptic actuator path (Web Vibration API on Android; unavailable on iOS Safari). Device capability, perceived modality, and mechanism are modeled separately in the exposure module (ADR 0010)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0019-modality-nomenclature-cleanup.md> .
 
 sstim-v:modalityInteroceptive a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;

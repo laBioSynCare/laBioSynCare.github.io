@@ -42,6 +42,7 @@ annotations lives here.
 | [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
 | [0017](0017-reference-pitch-retuning.md) | Reference-pitch retuning (432 Hz) modeling | Accepted |
 | [0018](0018-evidence-integrity-and-public-claim-governance.md) | Evidence integrity and public-claim governance | Accepted |
+| [0019](0019-modality-nomenclature-cleanup.md) | Modality nomenclature cleanup (somatosensory / haptic / tactile / vibrotactile) | Accepted |
 
 ## Adding an ADR
 

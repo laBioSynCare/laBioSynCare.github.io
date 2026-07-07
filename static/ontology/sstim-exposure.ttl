@@ -767,28 +767,33 @@ sstim-ex:modalityTactile a owl:NamedIndividual, sstim-ex:PerceivedModality, skos
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "tactile"@en ;
     skos:notation "tactile" ;
-    skos:definition "Perceived cutaneous touch, pressure, vibration, texture, or temperature."@en .
+    skos:definition "Perceived cutaneous touch, pressure, vibration, texture, or temperature."@en ;
+    skos:scopeNote "The tactile percept is a sub-modality of the somatosensory body-sense channel (sstim-ex:modalitySomatosensory); distinct from the haptic device path and the vibrotactile mechanism (P5.5 convention; ADR 0019)."@en .
 
 sstim-ex:modalitySomatosensory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "somatosensory"@en ;
     skos:notation "somatosensory" ;
-    skos:definition "Body-perceived sensation including touch, vibration, pressure, proprioception, or related body sensation."@en .
+    skos:definition "Body-perceived sensation including touch, vibration, pressure, proprioception, or related body sensation."@en ;
+    skos:scopeNote "Superordinate body-sense channel: the tactile percept (sstim-ex:modalityTactile) is a sub-modality, the haptic actuator is the device path, and vibrotactile is the mechanism (P5.5 convention; ADR 0019)."@en ;
+    skos:closeMatch sstim-v:modalitySomatosensory .
 
 sstim-ex:modalityInteroceptive a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "interoceptive"@en ;
     skos:notation "interoceptive" ;
-    skos:definition "Perception or guidance involving internal body state, such as breath awareness."@en .
+    skos:definition "Perception or guidance involving internal body state, such as breath awareness."@en ;
+    skos:closeMatch sstim-v:modalityInteroceptive .
 
 sstim-ex:modalityVestibular a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "vestibular"@en ;
     skos:notation "vestibular" ;
-    skos:definition "Perceived balance, motion, orientation, or gravity-related sensation."@en .
+    skos:definition "Perceived balance, motion, orientation, or gravity-related sensation."@en ;
+    skos:closeMatch sstim-v:modalityVestibular .
 
 sstim-ex:modalityProprioceptive a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
@@ -802,7 +807,8 @@ sstim-ex:modalityOlfactory a owl:NamedIndividual, sstim-ex:PerceivedModality, sk
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "olfactory"@en ;
     skos:notation "olfactory" ;
-    skos:definition "Perceived smell."@en .
+    skos:definition "Perceived smell."@en ;
+    skos:closeMatch sstim-v:modalityOlfactory .
 
 sstim-ex:modalityGustatory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;

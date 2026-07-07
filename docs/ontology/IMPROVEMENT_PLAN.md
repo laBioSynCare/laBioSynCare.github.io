@@ -522,11 +522,20 @@ decision; none renames or removes existing terms (minor version).
    (FFR/ASSR) and the explicit negative assertions. Turns the P3.1 claim-dimension
    machinery into data. **Audit each citation's venue** before it enters a claim
    (exclude predatory publishers; verify the journal, not just the DOI).
-5. **Modality nomenclature cleanup.** Resolve the `modalitySomatosensory`
-   "Somatosensory / Haptic" label conflation and reduce drift between
-   `sstim-v:modality*` and `sstim-ex:modality*` by adopting the convention
-   **haptic = device/actuator, tactile = percept, somatosensory = superordinate
-   channel, vibrotactile = mechanism** consistently.
+5. **Modality nomenclature cleanup. (Done — 2026-07-07, [ADR 0019](../decisions/0019-modality-nomenclature-cleanup.md))**
+   Adopted the convention **haptic = device/actuator, tactile = percept,
+   somatosensory = superordinate channel, vibrotactile = mechanism**: narrowed the
+   `modalitySomatosensory` "Somatosensory / Haptic" label to "Somatosensory" (+
+   definition and reworked scope note), completed the `skos:closeMatch` bridge
+   between `sstim-v:modality*` and `sstim-ex:modality*` for all six shared channels
+   (auditory/visual already linked; added somatosensory/interoceptive/vestibular/
+   olfactory), and documented tactile ⊂ somatosensory in scope notes. Additive,
+   `make validate` green. **Fixed in passing:** the `EvidenceModalityTag`
+   definition drift (6 → 9 values). **Two breaking items deferred to a major
+   bump** and scoped in ADR 0019: the `sstim-v:modality*` stem overload (channels
+   vs evidence tags) and the `SensoryModality`/`PerceivedModality` two-class-for-
+   one-concept unification. Motivated by
+   [`SENSORY_TAXONOMY_REVIEW.md`](SENSORY_TAXONOMY_REVIEW.md).
 6. **Visual/tactile evidence-modality tags. (Done — 2026-06-30)** Extended
    `EvidenceModalityScheme` with `VIS`, `TACTILE`, and `MULTISENSORY` (each with a
    one-tier-discount / no-direct-transfer note), so the ADR 0015 visual/tactile

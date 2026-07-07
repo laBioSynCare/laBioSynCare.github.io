@@ -228,7 +228,7 @@ sstim:EvidenceTierValue a owl:Class ;
 sstim:EvidenceModalityTag a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Evidence Modality Tag"@en ;
-    skos:definition "A tag classifying the stimulation modality in which supporting evidence was gathered. Values: AUD, AV, BREATH, GENERAL, PRECLINICAL, REVIEW. Governs the modality-matching discount when assigning evidence tiers."@en ;
+    skos:definition "A tag classifying the stimulation modality in which supporting evidence was gathered. Values: AUD, AV, VIS, TACTILE, MULTISENSORY, BREATH, GENERAL, PRECLINICAL, REVIEW. Governs the modality-matching discount when assigning evidence tiers."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
