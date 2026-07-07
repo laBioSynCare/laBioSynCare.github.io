@@ -93,6 +93,15 @@ order for validation/modeling work, and the next major design improvement:
 separating physical delivery from perceived sensory modality. Internal
 modeling/validation maturity (P0–P4) plus domain content coverage (P5) live here.
 
+## Sensory-Taxonomy Review
+
+[`SENSORY_TAXONOMY_REVIEW.md`](SENSORY_TAXONOMY_REVIEW.md) is a critical
+evaluation of an external "more than five senses" taxonomy proposal against
+SSTIM's actual state. It maps the proposal onto the existing exposure module,
+rejects its new-OWL-class approach (per ADR 0015), and distils the genuine gaps
+(chemesthesis, thermal-as-channel, the P5.5 modality-list divergence) into a
+maintainer decision set. Analysis only — no `.ttl` was changed.
+
 ## Publication and External Interlinking Plan
 
 [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md) is
