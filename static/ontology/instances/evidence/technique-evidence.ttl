@@ -1,0 +1,110 @@
+# BSC Lab technique-level evidence claims (IMPROVEMENT_PLAN P5.4).
+#
+# Migrates the technique-evidence assessments that previously lived only in the
+# vocab prose (skos:scopeNote / editorialNote / sstim:evidenceNotes) into
+# queryable sstim:EvidenceClaim individuals. The vocab prose is retained as
+# human-facing documentation; these individuals add the queryable layer.
+#
+# Namespace: evidence is BSC Lab implementation/editorial data
+# (bsclab-evidence:, see instances/README.md); the claims support the
+# vendor-neutral sstim-v: technique vocabulary via sstim:supportsRelation.
+#
+# Discipline (ADR 0016 / ADR 0018): every citation venue is audited before use
+# (see references.ttl audit notes). Positive "measurable response" claims are
+# framed as electrophysiological responses, NOT wellness outcomes (SCOPE.md).
+# Negative assertions sit at tier <= 2 and are legitimately uncited (P7.1:
+# only tierRank >= 3 requires a PublicSafeReference).
+
+@prefix bsclab-evidence: <https://w3id.org/sstim/implementation/bsclab/evidence/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim: <https://w3id.org/sstim#> .
+@prefix sstim-ref: <https://w3id.org/sstim/ref/> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# ── Best-supported auditory responses (measurable, cited) ────────────────────
+
+bsclab-evidence:assr-isochronic-response a sstim:EvidenceClaim ;
+    rdfs:label "Auditory steady-state response to isochronic / amplitude-modulated auditory stimulation" ;
+    dct:description "Periodic auditory stimulation (isochronic tones, amplitude-modulated tones, click trains) reliably evokes a phase-locked auditory steady-state response (ASSR), most robust near 40 Hz. A measurable electrophysiological response — not a wellness outcome." ;
+    sstim:supportsRelation sstim-v:techIsochronicTones ;
+    sstim:hasEvidenceTier sstim-v:tierStrong ;
+    sstim:hasModalityTag sstim-v:modalityAUD ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:PICTON_2003 ;
+    sstim:evidenceOutcome "Reliable phase-locked ASSR at the modulation/pulse rate; the modulation rate (not the carrier) sets the response frequency." ;
+    sstim:studyPopulation "Healthy adults (auditory electrophysiology)" ;
+    sstim:comparator "Unmodulated tone / no periodic stimulus" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .
+
+bsclab-evidence:ffr-monaural-response a sstim:EvidenceClaim ;
+    rdfs:label "Subcortical frequency-following response to acoustically periodic stimuli" ;
+    dct:description "Stimuli that carry a physical acoustic periodicity (monaural beats, isochronic tones) evoke a subcortical frequency-following response (FFR) that tracks the stimulus envelope. A measurable brainstem response; downstream cognitive or wellness effects are not asserted here." ;
+    sstim:supportsRelation sstim-v:techMonauralBeats ;
+    sstim:hasEvidenceTier sstim-v:tierStrong ;
+    sstim:hasModalityTag sstim-v:modalityAUD ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:SKOE_KRAUS_2010 ;
+    sstim:evidenceOutcome "Envelope-tracking FFR is reliably recorded to periodic/complex sounds; distinct from binaural beats, whose beat has no acoustic periodicity." ;
+    sstim:studyPopulation "Healthy adults (auditory electrophysiology)" ;
+    sstim:comparator "Aperiodic / non-envelope-modulated sound" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .
+
+bsclab-evidence:binaural-beats-state-mixed a sstim:EvidenceClaim ;
+    rdfs:label "Binaural-beat effects on EEG oscillatory activity and psychological state are mixed" ;
+    dct:description "A systematic review finds the effects of binaural-beat stimulation on brain oscillatory activity and on psychological/cognitive state to be inconsistent across studies. The perceived beat is a central construct with no acoustic periodicity, so the subcortical FFR does not straightforwardly transfer." ;
+    sstim:supportsRelation sstim-v:techBinauralBeats ;
+    sstim:hasEvidenceTier sstim-v:tierPreliminary ;
+    sstim:hasModalityTag sstim-v:modalityAUD, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimMixed ;
+    sstim:citesReference sstim-ref:INGENDOH_2023 ;
+    sstim:evidenceOutcome "Reported effects on EEG and state are mixed/inconsistent; no reliable modality-matched outcome established." ;
+    sstim:studyPopulation "Healthy adults" ;
+    sstim:comparator "Sham / no binaural beat" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .
+
+# ── Explicit negative assertions (tier <= 2, legitimately uncited) ───────────
+
+bsclab-evidence:color-field-chromotherapy-negative a sstim:EvidenceClaim ;
+    rdfs:label "No established colour-specific physiological effect ('chromotherapy')" ;
+    dct:description "Migrated from techColorFieldStimulation's editorial note: there is no established neurophysiological mechanism and no controlled evidence that a specific colour produces a specific physiological or therapeutic effect. A steady colour field is an aesthetic/ambient stimulus; any calming effect is attentional and contextual." ;
+    sstim:supportsRelation sstim-v:techColorFieldStimulation ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityVIS ;
+    sstim:hasClaimDirection sstim-v:claimRefutes ;
+    sstim:evidenceOutcome "No colour-specific physiological or therapeutic effect supported." ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .
+
+bsclab-evidence:solfeggio-tuning-negative a sstim:EvidenceClaim ;
+    rdfs:label "No tuning-specific physiological effect for 'Solfeggio' / mystical tunings" ;
+    dct:description "Migrated from techSolfeggioTuning's editorial note: there is no established mechanism and no controlled evidence that 'Solfeggio' / mystical tunings (e.g. 432 Hz, 528 Hz) produce specific physiological effects beyond ordinary music, relaxation, and expectancy." ;
+    sstim:supportsRelation sstim-v:techSolfeggioTuning ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasModalityTag sstim-v:modalityAUD ;
+    sstim:hasClaimDirection sstim-v:claimRefutes ;
+    sstim:evidenceOutcome "No tuning-specific physiological effect supported; use aesthetically and honestly." ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .
+
+bsclab-evidence:reference-pitch-432-inconclusive a sstim:EvidenceClaim ;
+    rdfs:label "432 Hz vs 440 Hz reference-pitch retuning — inconclusive for BSC use" ;
+    dct:description "Migrated from techReferencePitchRetuning's evidenceNotes: the few small double-blind crossover pilots tested full transposed music, confounding absolute tuning with overall pitch-lowering and tempo, and none tested a retuned carrier under a binaural/isochronic beat — a modality/population mismatch that discounts transfer to BSC's use case. Honest ceiling: anecdotal / inconclusive. Audit any pilot's venue before promoting the tier above 2." ;
+    sstim:supportsRelation sstim-v:techReferencePitchRetuning ;
+    sstim:hasEvidenceTier sstim-v:tierAnecdotal ;
+    sstim:hasModalityTag sstim-v:modalityAUD ;
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:evidenceOutcome "No robust tuning-specific physiological effect for BSC's carrier-under-beat use case; pilot evidence confounded." ;
+    sstim:studyPopulation "Music-listening pilots (not BSC carrier-under-beat)" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-08"^^xsd:date .

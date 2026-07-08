@@ -516,12 +516,19 @@ decision; none renames or removes existing terms (minor version).
    from entrainment/`FrequencyBand`; tier 2–3 ceiling recorded in `evidenceNotes`;
    `editorialNote` negative assertion retained. Musical-interval/consonance terms
    scoped out.
-4. **Populate evidence-claim instances.** Move evidence from prose
-   (`skos:definition`/`scopeNote`) into queryable `EvidenceClaim` individuals
-   citing `PublicSafeReference`s, starting with the best-supported auditory claims
-   (FFR/ASSR) and the explicit negative assertions. Turns the P3.1 claim-dimension
-   machinery into data. **Audit each citation's venue** before it enters a claim
-   (exclude predatory publishers; verify the journal, not just the DOI).
+4. **Populate evidence-claim instances. (Done — 2026-07-08)** Added
+   `instances/evidence/technique-evidence.ttl` — six queryable `EvidenceClaim`
+   individuals migrated from vocab prose: ASSR (`techIsochronicTones`, tier
+   strong, cites `PICTON_2003`) and FFR (`techMonauralBeats`, tier strong, cites
+   `SKOE_KRAUS_2010`) as *measurable-response* claims framed conservatively (no
+   wellness outcome asserted); the mixed binaural-beat state/EEG outcome
+   (`techBinauralBeats`, tier preliminary, cites `INGENDOH_2023`); and the three
+   explicit negative assertions (chromotherapy, Solfeggio, 432 Hz reference-pitch)
+   at tier ≤ 2, legitimately uncited per P7.1. Two new `PublicSafeReference`s with
+   **Crossref-audited venues** (Int. J. Audiology; Ear & Hearing). Wired into
+   `loader.js` as a new `bsclab-evidence` graph. Additive, `make validate` green;
+   vocab prose retained as human documentation. Remaining well-supported claims
+   (paced-breathing/HRV, rhythmic auditory cueing) can be populated incrementally.
 5. **Modality nomenclature cleanup. (Done — 2026-07-07, [ADR 0019](../decisions/0019-modality-nomenclature-cleanup.md))**
    Adopted the convention **haptic = device/actuator, tactile = percept,
    somatosensory = superordinate channel, vibrotactile = mechanism**: narrowed the

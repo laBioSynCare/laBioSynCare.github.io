@@ -26,6 +26,8 @@ instances/
 ├── presets/      One Turtle file per preset, or grouped by Heal/Support/
 │                 Perform/Indulge/Transcend. IRIs at w3id.org/sstim/implementation/bsclab/preset/{id}.
 │                 Public BSC Lab seed/reference presets only.
+├── evidence/     Technique- and preset-level sstim:EvidenceClaim individuals
+│                 (w3id.org/sstim/implementation/bsclab/evidence/{id}).
 ├── references/   Public-safe bibliographic references (w3id.org/sstim/ref/…)
 │                 cited from evidence chains.
 └── sessions/     Recorded session instances (w3id.org/sstim/implementation/bsclab/session/{uuid}).
@@ -42,8 +44,12 @@ The first Phase 1 seed instances are committed:
   identity records.
 - `presets/perform-alpha-10-seed.ttl` — minimal SHACL-valid preset instance
   with one Binaural voice and one evidence link.
-- `references/references.ttl` — initial public-safe bibliographic reference
-  list.
+- `evidence/technique-evidence.ttl` — technique-level evidence claims (ASSR/FFR
+  measurable responses, the mixed binaural-beat outcome, and the explicit
+  chromotherapy / Solfeggio / 432 Hz negative assertions), migrated from vocab
+  prose into queryable `sstim:EvidenceClaim` individuals (IMPROVEMENT_PLAN P5.4).
+- `references/references.ttl` — public-safe bibliographic references
+  (INGENDOH_2023, PICTON_2003, SKOE_KRAUS_2010; each venue Crossref-audited).
 
 The private BioSynCare/BSC v0.9.1 catalog is not in this tree and will not be
 converted to RDF for BSC Lab. Future files in `presets/` should be explicit,
@@ -61,6 +67,7 @@ browser manifest. Instance data is loaded **after** the core ontology:
 - `frameworks/*.ttl` → graph `https://w3id.org/sstim/graph/frameworks`
 - `implementations/*.ttl` → graph `https://w3id.org/sstim/graph/implementations`
 - `presets/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/preset/`
+- `evidence/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/evidence/`
 - `references/*.ttl` → graph `https://w3id.org/sstim/ref/`
 - `sessions/*.ttl` → graph `https://w3id.org/sstim/implementation/bsclab/session/` (one per user)
 

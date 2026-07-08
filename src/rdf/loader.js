@@ -141,6 +141,9 @@ export const INSTANCE_URLS = {
   presets: [
     '/ontology/instances/presets/perform-alpha-10-seed.ttl',
   ],
+  evidence: [
+    '/ontology/instances/evidence/technique-evidence.ttl',
+  ],
   experiments: [
     '/ontology/instances/experiments/free-view-stereo-headphones.ttl',
     '/ontology/instances/experiments/multi-headphone-haptic.ttl',
@@ -170,6 +173,10 @@ export const INSTANCE_SOURCES = {
   presets: INSTANCE_URLS.presets.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/implementation/bsclab/preset/',
+  })),
+  evidence: INSTANCE_URLS.evidence.map(url => ({
+    url,
+    graph: 'https://w3id.org/sstim/implementation/bsclab/evidence/',
   })),
   experiments: INSTANCE_URLS.experiments.map(url => ({
     url,

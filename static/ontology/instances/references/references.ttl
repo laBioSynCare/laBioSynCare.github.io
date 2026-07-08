@@ -9,3 +9,21 @@ sstim-ref:INGENDOH_2023 a sstim:PublicSafeReference ;
     dct:creator "Ingendoh, Ruth Maria", "Posny, Ella S.", "Heine, Angela" ;
     dct:issued "2023-05-19"^^xsd:date ;
     dct:identifier "doi:10.1371/journal.pone.0286023" .
+
+# Venue audited 2026-07-08 (Crossref): International Journal of Audiology
+# (Informa UK / Taylor & Francis), vol. 42(4):177-219. Foundational ASSR review.
+sstim-ref:PICTON_2003 a sstim:PublicSafeReference ;
+    sstim:referenceKey "PICTON_2003" ;
+    dct:title "Human auditory steady-state responses" ;
+    dct:creator "Picton, Terence W.", "John, M. Sasha", "Dimitrijevic, Andrew", "Purcell, David" ;
+    dct:issued "2003"^^xsd:gYear ;
+    dct:identifier "doi:10.3109/14992020309101316" .
+
+# Venue audited 2026-07-08 (Crossref): Ear & Hearing (Wolters Kluwer),
+# vol. 31(3):302-324. Standard tutorial on the auditory brainstem/FFR response.
+sstim-ref:SKOE_KRAUS_2010 a sstim:PublicSafeReference ;
+    sstim:referenceKey "SKOE_KRAUS_2010" ;
+    dct:title "Auditory brainstem response to complex sounds: a tutorial" ;
+    dct:creator "Skoe, Erika", "Kraus, Nina" ;
+    dct:issued "2010"^^xsd:gYear ;
+    dct:identifier "doi:10.1097/AUD.0b013e3181cdb272" .
