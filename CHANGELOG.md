@@ -15,7 +15,12 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-_Nothing yet._
+### Changed
+- Module versioning ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)):
+  the whole-set snapshot (`static/ontology/<version>/`, identified by core
+  `owl:versionIRI`) is the single citable unit. Removed the exposure module's
+  independent `owl:versionIRI` / `owl:priorVersion` (they never dereferenced);
+  modules now carry `owl:versionInfo` only, as a module-level change counter.
 
 ## [0.5.0] — 2026-07-09
 
