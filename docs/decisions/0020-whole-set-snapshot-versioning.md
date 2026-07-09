@@ -53,11 +53,10 @@ Version SSTIM as **one whole set**.
   dereferences (to a whole-set snapshot directory).
 - The exposure module is cited as part of `sstim/<version>` (e.g. SSTIM 0.5.0),
   with its own `owl:versionInfo` distinguishing module-level revisions within.
-- Metadata-only; `make validate` stays green. The change landed **after** the
-  0.5.0 snapshot/tag were cut, so it is an `[Unreleased]` forward change — the
-  frozen 0.5.0 snapshot retains the old exposure metadata (snapshots are
-  immutable) and the cleanup is captured in the next snapshot (or folded in if
-  0.5.0 is re-cut before it merges to `main`).
+- Metadata-only; `make validate` stays green. The 0.5.0 snapshot and tag were
+  **re-cut** to include this change before the branch merged to `main`, so the
+  0.5.0 release is internally consistent — no dangling `owl:versionIRI` in the
+  frozen artifact.
 - Future modules follow this pattern: `owl:versionInfo` only, no per-module
   `owl:versionIRI`.
 

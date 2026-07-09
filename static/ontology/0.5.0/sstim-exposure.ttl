@@ -32,9 +32,11 @@
 ###########################################################################
 
 <https://w3id.org/sstim/exposure> a owl:Ontology ;
-    owl:versionIRI <https://w3id.org/sstim/exposure/0.4.1> ;
+    # No owl:versionIRI / owl:priorVersion: SSTIM is versioned as a whole set — the
+    # frozen snapshot at static/ontology/<version>/ (identified by the core
+    # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
+    # module-level change counter. See ADR 0020.
     owl:versionInfo "0.4.1" ;
-    owl:priorVersion <https://w3id.org/sstim/exposure/0.4.0> ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

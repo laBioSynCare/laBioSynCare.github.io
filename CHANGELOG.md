@@ -15,12 +15,7 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-### Changed
-- Module versioning ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)):
-  the whole-set snapshot (`static/ontology/<version>/`, identified by core
-  `owl:versionIRI`) is the single citable unit. Removed the exposure module's
-  independent `owl:versionIRI` / `owl:priorVersion` (they never dereferenced);
-  modules now carry `owl:versionInfo` only, as a module-level change counter.
+_Nothing yet._
 
 ## [0.5.0] — 2026-07-09
 
@@ -59,6 +54,11 @@ module is released at 0.4.1 within this whole-set snapshot.
   scheme has carried nine since the P5.6 additions).
 - Exposure module 0.4.0 → 0.4.1 (additive: the closeMatch bridge and convention
   scope notes).
+- Module versioning ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)):
+  the whole-set snapshot (`static/ontology/<version>/`, identified by core
+  `owl:versionIRI`) is the single citable unit. Removed the exposure module's
+  independent `owl:versionIRI` / `owl:priorVersion` (they never dereferenced);
+  modules now carry `owl:versionInfo` only, as a module-level change counter.
 
 ## [0.4.0] — 2026-06-18
 
