@@ -494,8 +494,11 @@ entry below is marked Done with the date and the delivering artifact.
 
 ### P5: Domain Content Coverage
 
-Targets the `0.5.0` release. Each item is an additive, ADR-bearing vocabulary
-decision; none renames or removes existing terms (minor version).
+**Shipped as `0.5.0` — 2026-07-09** (tag `v0.5.0`; frozen snapshot
+`static/ontology/0.5.0/`; core `owl:versionInfo` 0.3.0 → 0.5.0, exposure module
+0.4.0 → 0.4.1). Each item was an additive, ADR-bearing vocabulary decision; none
+renamed or removed existing terms (minor version). This unblocks the P6
+registry/Zenodo/Archivo phases (they gated on P5 reaching 0.5.0).
 
 1. **Visual-entrainment technique vocabulary. (Done — 2026-06-30, [ADR 0015](../decisions/0015-visual-and-cross-modal-techniques.md))**
    Added `techPhoticDriving` (flicker/SSVEP) and `techColorFieldStimulation`
