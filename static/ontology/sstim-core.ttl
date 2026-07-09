@@ -29,6 +29,7 @@
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix voaf:  <http://purl.org/vocommons/voaf#> .
+@prefix void:  <http://rdfs.org/ns/void#> .
 @prefix vann:  <http://purl.org/vocab/vann/> .
 @prefix cc:    <http://creativecommons.org/ns#> .
 
@@ -60,6 +61,7 @@
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     vann:preferredNamespacePrefix "sstim" ;
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;
+    void:inDataset <https://w3id.org/sstim/void> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0016-publication-obo-posture-and-registries.md> ;
     skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,

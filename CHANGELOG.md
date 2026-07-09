@@ -19,7 +19,8 @@ file is the human-readable summary.
 - VoID + DCAT dataset description (`static/ontology/void.ttl`) for FAIR
   publication: one `void:Dataset` with per-module subsets and Turtle/JSON-LD/
   RDF-XML distributions, `void:uriSpace`, vocabularies used, and example
-  resources. Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
+  resources. Added a `void:inDataset` back-link on the ontology node so
+  registries discover it. Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
 
 ## [0.5.0] — 2026-07-09
 
