@@ -66,6 +66,14 @@ RewriteRule ^exposure$ https://labiosyncare.github.io/ [R=303,L]
 RewriteRule ^exposure$ https://labiosyncare.github.io/ontology/sstim-exposure.ttl [R=303,L]
 
 # -------------------------------------------------------------------------
+# /sstim/void — VoID + DCAT dataset description
+# -------------------------------------------------------------------------
+RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)
+RewriteRule ^void$ https://labiosyncare.github.io/ [R=303,L]
+
+RewriteRule ^void$ https://labiosyncare.github.io/ontology/void.ttl [R=303,L]
+
+# -------------------------------------------------------------------------
 # /sstim — core ontology (OWL classes and properties). Fragment IRIs such
 # as /sstim#Preset resolve here; the fragment is handled client-side.
 # -------------------------------------------------------------------------

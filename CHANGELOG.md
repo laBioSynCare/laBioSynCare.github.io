@@ -15,7 +15,11 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+- VoID + DCAT dataset description (`static/ontology/void.ttl`) for FAIR
+  publication: one `void:Dataset` with per-module subsets and Turtle/JSON-LD/
+  RDF-XML distributions, `void:uriSpace`, vocabularies used, and example
+  resources. Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
 
 ## [0.5.0] — 2026-07-09
 

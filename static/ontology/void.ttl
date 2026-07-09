@@ -1,0 +1,161 @@
+###########################################################################
+#
+#  SSTIM — VoID + DCAT dataset description  —  void.ttl
+#
+#  Namespace:  https://w3id.org/sstim
+#  Date:       2026-07-09
+#  License:    CC BY 4.0
+#
+#  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
+#  ontology graph set — distributions, formats, uriSpace, vocabularies used,
+#  and example resources. Targets LOV review and DBpedia Archivo's metadata
+#  star (PUBLICATION_AND_INTERLINKING_PLAN B3).
+#
+#  This file describes the dataset; it is NOT part of the versioned term-space
+#  (not snapshotted by `make snapshot`, not in the export ONTOLOGY_FILES list).
+#  It is served verbatim at https://labiosyncare.github.io/ontology/void.ttl and
+#  (once the w3id route lands) at https://w3id.org/sstim/void.
+#
+#  Deliberately omitted: void:triples / void:classes / void:properties counts —
+#  these drift per release and are better auto-generated in the export pipeline
+#  than hand-maintained here. Tracked as a B3 follow-up.
+#
+###########################################################################
+
+@prefix void:  <http://rdfs.org/ns/void#> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix vann:  <http://purl.org/vocab/vann/> .
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# IANA media types and W3C format IRIs used below:
+#   text/turtle          https://www.iana.org/assignments/media-types/text/turtle
+#   application/ld+json  https://www.iana.org/assignments/media-types/application/ld+json
+#   application/rdf+xml  https://www.iana.org/assignments/media-types/application/rdf+xml
+
+<https://w3id.org/sstim/void>
+    a void:Dataset, dcat:Dataset ;
+    dct:title "Sensory Stimulation Ontology (SSTIM) — dataset"@en ;
+    dct:description "FAIR dataset description for the SSTIM ontology: an OWL 2 ontology with a multilingual SKOS vocabulary, SHACL shapes, external alignments, an exposure/experiment module, and a Patch Studio authoring model, for the domain of sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML serializations are generated beside each module."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    cc:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:issued "2026-04-12"^^xsd:date ;
+    dct:modified "2026-07-09"^^xsd:date ;
+    dct:hasVersion "0.5.0" ;
+    foaf:homepage <https://labiosyncare.github.io/> ;
+    dcat:landingPage <https://labiosyncare.github.io/> ;
+    foaf:primaryTopic <https://w3id.org/sstim> ;
+    void:rootResource <https://w3id.org/sstim> ;
+    void:uriSpace "https://w3id.org/sstim" ;
+    dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
+        "brainwave entrainment", "binaural beats", "isochronic tones",
+        "audio-visual entrainment", "wellness", "evidence tiers" ;
+    void:feature <http://www.w3.org/ns/formats/Turtle>,
+        <http://www.w3.org/ns/formats/JSON-LD>,
+        <http://www.w3.org/ns/formats/RDF_XML> ;
+    void:vocabulary <http://www.w3.org/2002/07/owl#>,
+        <http://www.w3.org/2000/01/rdf-schema#>,
+        <http://www.w3.org/2004/02/skos/core#>,
+        <http://purl.org/dc/terms/>,
+        <http://www.w3.org/2001/XMLSchema#>,
+        <http://purl.org/vocab/vann/>,
+        <http://purl.org/vocommons/voaf#>,
+        <http://creativecommons.org/ns#>,
+        <http://www.w3.org/ns/shacl#>,
+        <http://purl.obolibrary.org/obo/>,
+        <http://www.wikidata.org/entity/> ;
+    void:exampleResource <https://w3id.org/sstim#SensoryStimulation>,
+        <https://w3id.org/sstim#EvidenceClaim>,
+        <https://w3id.org/sstim/vocab#alpha>,
+        <https://w3id.org/sstim/exposure#ExposureProfile> ;
+    void:subset <https://w3id.org/sstim/void#core>,
+        <https://w3id.org/sstim/void#vocab>,
+        <https://w3id.org/sstim/void#shapes>,
+        <https://w3id.org/sstim/void#alignments>,
+        <https://w3id.org/sstim/void#patch-studio>,
+        <https://w3id.org/sstim/void#exposure> ;
+    # Primary distribution: the core OWL module in Turtle.
+    dcat:distribution [
+        a dcat:Distribution ;
+        dct:title "SSTIM core ontology (Turtle)"@en ;
+        dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
+        dcat:accessURL <https://w3id.org/sstim> ;
+        dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.ttl> ] .
+
+###########################################################################
+# Module subsets — one void:Dataset per published module, each with Turtle
+# (master) plus JSON-LD and RDF/XML distributions.
+###########################################################################
+
+<https://w3id.org/sstim/void#core>
+    a void:Dataset ;
+    dct:title "SSTIM Core ontology"@en ;
+    dct:description "OWL 2 classes, object/datatype properties, and annotation properties."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-core.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.rdf> ] .
+
+<https://w3id.org/sstim/void#vocab>
+    a void:Dataset ;
+    dct:title "SSTIM SKOS Vocabulary"@en ;
+    dct:description "Multilingual SKOS concepts: frequency bands, groups, techniques, mechanisms, evidence tiers, claim dimensions, modalities."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-vocab.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/vocab> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/vocab> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-vocab.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-vocab.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-vocab.rdf> ] .
+
+<https://w3id.org/sstim/void#shapes>
+    a void:Dataset ;
+    dct:title "SSTIM SHACL Shapes"@en ;
+    dct:description "SHACL node/property shapes and SHACL-SPARQL constraints validating presets, voices, techniques, evidence claims, and SKOS integrity."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-shapes.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/shapes> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/shapes> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-shapes.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-shapes.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-shapes.rdf> ] .
+
+<https://w3id.org/sstim/void#alignments>
+    a void:Dataset ;
+    dct:title "SSTIM External Alignments"@en ;
+    dct:description "Links from SSTIM terms to BFO/IAO/OBI/COB, Wikidata, and other external vocabularies."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-alignments.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/alignments> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/alignments> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.rdf> ] .
+
+<https://w3id.org/sstim/void#patch-studio>
+    a void:Dataset ;
+    dct:title "SSTIM Patch Studio Model"@en ;
+    dct:description "Vocabulary for the Patch Studio real-time authoring model (parameter properties, track types)."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-patch-studio.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/patch-studio> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/patch-studio> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-patch-studio.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-patch-studio.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-patch-studio.rdf> ] .
+
+<https://w3id.org/sstim/void#exposure>
+    a void:Dataset ;
+    dct:title "SSTIM Exposure & Experiment Module"@en ;
+    dct:description "Separates physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-exposure.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/exposure> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/exposure> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.rdf> ] .

@@ -24,6 +24,7 @@ is generated and published.
 | `https://w3id.org/sstim/alignments` | `/ontology/sstim-alignments.ttl` |
 | `https://w3id.org/sstim/patch-studio` | `/ontology/sstim-patch-studio.ttl` |
 | `https://w3id.org/sstim/exposure` | `/ontology/sstim-exposure.ttl` |
+| `https://w3id.org/sstim/void` | `/ontology/void.ttl` (VoID + DCAT dataset description) |
 | `https://w3id.org/sstim/0.3.0` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
 | `https://w3id.org/sstim/0.3.0/sstim-core.ttl` | `/ontology/0.3.0/sstim-core.ttl` (frozen) |
 

@@ -141,16 +141,24 @@ Actions:
 
 ### B3 — Machine-readable ontology metadata
 
-Only `voaf:Vocabulary` is currently declared. To pass LOV review and earn Archivo
-stars, add to the `owl:Ontology` node (in `sstim-core.ttl`, via ADR + PR):
-- `vann:preferredNamespacePrefix "sstim"` and `vann:preferredNamespaceUri`.
-- `dct:license` (present ✓), `dct:title`/`description`/`creator`/`created`/
-  `modified` (present ✓) — verify completeness across modules.
-- A **VoID/DCAT dataset description** for the published graph set (distributions,
-  formats, example resources, SPARQL endpoint if any).
-- `cc:license` / `cc:attributionName` for CreativeCommons-aware tools.
-- Ensure the ontology is **logically consistent** under a DL reasoner (HermiT/ELK)
-  — Archivo's 4th star and OWL-DL credibility depend on it.
+State on the `owl:Ontology` node in `sstim-core.ttl`: `voaf:Vocabulary`,
+`vann:preferredNamespacePrefix`/`Uri`, `dct:license`/`cc:license`,
+`dct:title`/`description`/`creator`/`created`/`modified` are all **present ✓**.
+
+- **VoID/DCAT dataset description — DONE.** [`static/ontology/void.ttl`](../../static/ontology/void.ttl)
+  describes the published graph set (VoID + DCAT): one `void:Dataset` with a
+  per-module `void:subset`, distributions in Turtle/JSON-LD/RDF-XML with IANA
+  media types, `void:uriSpace`, `void:vocabulary`, `void:feature`, and
+  `void:exampleResource`. Served at `/ontology/void.ttl`; `/sstim/void` w3id route
+  staged. Not part of the versioned term-space (not snapshotted/exported).
+  Follow-ups: (i) auto-generate `void:triples`/`classes`/`properties` counts in
+  the export pipeline (omitted here to avoid per-release drift); (ii) add a
+  discoverability back-link from the ontology node (`void:inDataset` /
+  `rdfs:seeAlso <…/void.ttl>`) — needs a `sstim-core.ttl` edit.
+- **DL-reasoner consistency check — OPEN (main remaining B3 item).** Ensure the
+  ontology is logically consistent under a DL reasoner (HermiT/ELK) in CI —
+  Archivo's 4th star and OWL-DL credibility depend on it. No reasoner is in the
+  Nix flake yet; needs a tooling decision (ROBOT/ELK) plus a `validate-rdf.yml` step.
 
 ### B4 — JSON-LD context (IMPROVEMENT_PLAN P4.3)
 
