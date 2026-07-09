@@ -119,7 +119,7 @@ software is built. Written in the order specified in `ROADMAP.md`.
 - [ ] `.cursor/rules/audio-engine.mdc` — from `src/core/README.md` `P1`
 - [ ] `schemas/preset.schema.json` — from `docs/technical/PRESET_FORMAT.md` `P1`
 - [ ] `schemas/session.schema.json` — from `docs/technical/SESSION_MODEL.md` `P1`
-- [ ] `CHANGELOG.md` — start at first tagged release `P1`
+- [x] `CHANGELOG.md` — started at the first tagged release (v0.5.0); Keep a Changelog format, 0.1.0–0.5.0 `P1`
 
 ---
 

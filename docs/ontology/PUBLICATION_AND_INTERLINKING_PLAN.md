@@ -129,6 +129,24 @@ Actions:
 - Unblock **WIDOCO** HTML docs (currently intentionally not on `main`): generate
   in GitHub Actions, publish as a Pages artifact or docs branch, and switch the
   w3id "browser" branch from the app root to the WIDOCO landing page.
+- **Versioned-IRI dereferenceability (module-versioning decision).** Every
+  `owl:versionIRI` should resolve to a frozen copy. Whole-set snapshots exist at
+  `static/ontology/<version>/` (core `owl:versionIRI <…/sstim/0.5.0>` → that
+  directory), but the exposure module declares an **independent**
+  `owl:versionIRI <…/sstim/exposure/0.4.1>` that is *not* snapshotted — `make
+  snapshot` only writes whole-set `sstim/<version>/` dirs, so `sstim/exposure/0.x`
+  has never dereferenced (true since 0.4.0; not introduced by the 0.5.0 cut).
+  Decide the module-versioning model via a short ADR:
+  - **(a) Simplify (recommended):** drop the per-module `owl:versionIRI`, track
+    modules by `owl:versionInfo` only, and treat the whole-set snapshot file
+    (`sstim/<version>/sstim-exposure.ttl`) as the citable frozen unit — one
+    versioning axis, nothing dangling.
+  - **(b) Per-module snapshot lineage:** extend `scripts/snapshot-ontology.mjs`
+    to also freeze each independently-versioned module into
+    `static/ontology/<module>/<module-version>/` and add the matching w3id route,
+    so `sstim/exposure/0.4.1` resolves. Preserves standalone module citability at
+    the cost of a second snapshot axis + routing.
+  Until decided, treat `sstim/exposure/*` version IRIs as known-non-dereferenceable.
 
 ### B3 — Machine-readable ontology metadata
 
