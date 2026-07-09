@@ -3,7 +3,7 @@
 #  SSTIM External Alignments  —  sstim-alignments.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.3.0
+#  Version:    0.5.0
 #  Date:       2026-06-17
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
