@@ -21,6 +21,10 @@ file is the human-readable summary.
   RDF-XML distributions, `void:uriSpace`, vocabularies used, and example
   resources. Added a `void:inDataset` back-link on the ontology node so
   registries discover it. Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
+- Staged JSON-LD / RDF-XML content-negotiation for core and every module in the
+  w3id `.htaccess` (`Accept: application/ld+json` → `.jsonld`, `application/rdf+xml`
+  → `.rdf`, else Turtle). Goes live via the next `main` deploy plus a
+  perma-id/w3id.org PR. (PUBLICATION plan B2)
 
 ## [0.5.0] — 2026-07-09
 

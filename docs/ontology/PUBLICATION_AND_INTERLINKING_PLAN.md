@@ -121,11 +121,13 @@ generated" and **do not yet exist** in `static/ontology/`. Archivo, LOV, and man
 consumers expect the ontology IRI to dereference to RDF in the requested format.
 
 Actions:
-- Generate `*.jsonld` and `*.rdf` (RDF/XML) exports from the Turtle masters in CI
-  (N3.js or `rapper`/`riot`), written to `dist/ontology/`. Turtle remains the
-  editable master; exports are never hand-edited (consistent with README).
-- Confirm the `perma-id/w3id.org/sstim/.htaccess` `Accept`-routing for
-  `application/ld+json` and `application/rdf+xml` points at the generated files.
+- **Done:** `*.jsonld` and `*.rdf` (RDF/XML) exports are generated from the Turtle
+  masters by the Pages build (`make export`, rdflib → `dist/ontology/`); Turtle
+  remains the editable master, exports are never hand-edited.
+- **Done (staged):** the `Accept`-routing for `application/ld+json` and
+  `application/rdf+xml` is in the repo's [`sstim/.htaccess`](../ecosystem/w3id/sstim/.htaccess)
+  for core and every module (plus the `/sstim/void` route); it goes live via a
+  perma-id/w3id.org PR after the `main` deploy serves the `*.jsonld`/`*.rdf` targets.
 - Unblock **WIDOCO** HTML docs (currently intentionally not on `main`): generate
   in GitHub Actions, publish as a Pages artifact or docs branch, and switch the
   w3id "browser" branch from the app root to the WIDOCO landing page.
