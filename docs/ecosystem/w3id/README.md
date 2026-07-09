@@ -10,13 +10,12 @@ versioned snapshot routes resolve through `w3id.org` to the GitHub Pages
 artifacts. Browser branches still point at the app root until WIDOCO HTML output
 is generated and published.
 
-**Staged but not yet live** (in the [`sstim/.htaccess`](sstim/.htaccess) copy here,
-pending the next perma-id/w3id.org PR): the `/sstim/void` route and the
-`application/ld+json` / `application/rdf+xml` content-negotiation branches for
-core and every module. Their Pages targets (`void.ttl`, `*.jsonld`, `*.rdf`) ship
-with the ontology build, so they go live at `labiosyncare.github.io` on the next
-`main` deploy; the w3id rules resolve once that deploy is live **and** the perma-id
-PR merges.
+**Staged, submitted as [perma-id/w3id.org#6337](https://github.com/perma-id/w3id.org/pull/6337)
+(awaiting merge):** the `/sstim/void` route and the `application/ld+json` /
+`application/rdf+xml` content-negotiation branches for core and every module.
+Their Pages targets (`void.ttl`, `*.jsonld`, `*.rdf`) are **live** at
+`labiosyncare.github.io` (deployed with 0.5.0); the w3id rules resolve once that
+PR merges. The [`sstim/.htaccess`](sstim/.htaccess) here is the exact submitted copy.
 
 > Prerequisite for future routes: GitHub Pages must serve each redirect target
 > before the matching w3id rule is merged.
