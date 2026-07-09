@@ -149,8 +149,12 @@ State on the `owl:Ontology` node in `sstim-core.ttl`: `voaf:Vocabulary`,
   describes the published graph set (VoID + DCAT): one `void:Dataset` with a
   per-module `void:subset`, distributions in Turtle/JSON-LD/RDF-XML with IANA
   media types, `void:uriSpace`, `void:vocabulary`, `void:feature`, and
-  `void:exampleResource`. Served at `/ontology/void.ttl`; `/sstim/void` w3id route
-  staged. Not part of the versioned term-space (not snapshotted/exported).
+  `void:exampleResource`. Deploys to `/ontology/void.ttl` **on merge to `main`**
+  (Pages deploys from `main` only); the `/sstim/void` w3id route is staged in-repo
+  and will resolve once (a) that deploy is live **and** (b) the rule ships in a
+  perma-id/w3id.org PR — and per the w3id README the Pages target must be live
+  before that rule merges. Not part of the versioned term-space (not
+  snapshotted/exported).
   Follow-ups: (i) auto-generate `void:triples`/`classes`/`properties` counts in
   the export pipeline (omitted here to avoid per-release drift); (ii) add a
   discoverability back-link from the ontology node (`void:inDataset` /

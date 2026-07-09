@@ -13,8 +13,9 @@
 #
 #  This file describes the dataset; it is NOT part of the versioned term-space
 #  (not snapshotted by `make snapshot`, not in the export ONTOLOGY_FILES list).
-#  It is served verbatim at https://labiosyncare.github.io/ontology/void.ttl and
-#  (once the w3id route lands) at https://w3id.org/sstim/void.
+#  Once merged to `main` and deployed, it is served verbatim at
+#  https://labiosyncare.github.io/ontology/void.ttl, and — after the staged
+#  /sstim/void w3id rule ships in a perma-id PR — at https://w3id.org/sstim/void.
 #
 #  Deliberately omitted: void:triples / void:classes / void:properties counts —
 #  these drift per release and are better auto-generated in the export pipeline
@@ -26,10 +27,6 @@
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-@prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
-@prefix vann:  <http://purl.org/vocab/vann/> .
 @prefix cc:    <http://creativecommons.org/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
