@@ -40,7 +40,8 @@ As of 2026-07-11:
   [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
   is resolved for release, and the maintainer guided and accepted the ontology
   changes. Independent human ontology review is deferred under ADR 0022 and is
-  not claimed for `0.6.0`.
+  not claimed for `0.6.0`. The deployed canonical FOOPS score is 87.5%; the
+  remaining failures are registry-dependent.
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
   Sensory Field, logbook, profile, settings, and optional Firebase-backed user
   data are implemented as a static SvelteKit application.

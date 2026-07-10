@@ -51,6 +51,7 @@ real participant records are excluded.
   OOPS/FOOPS results, authoritative identifier and safety-source checks, and
   accepted/rejected finding dispositions. The maintainer accepted `0.6.0`;
   independent human review remains desirable but is deferred under ADR 0022.
+  The post-release canonical FOOPS rerun scores 87.5%.
 - [Raw maintainer notes](raw-notes/): provenance for design questions; these are
   inputs to review, not normative ontology definitions.
 

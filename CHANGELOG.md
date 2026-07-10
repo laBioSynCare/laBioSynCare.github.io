@@ -72,6 +72,8 @@ independent human ontology review is explicitly deferred by ADR 0022.
   metadata, citation guidance, and JSON-LD context. (PUBLICATION plan B5)
 - Published SSTIM `v0.6.0` under version DOI `10.5281/zenodo.21302910`, retaining
   `10.5281/zenodo.21286974` as the all-versions concept DOI.
+- Reassessed the deployed canonical URI with FOOPS at 87.5%; all minimum
+  metadata and version-IRI checks pass, leaving only registry-dependent checks.
 - Added the 2026-07-10 external automated review disposition, covering OOPS,
   FOOPS, OLS/OBO identifier checks, and authoritative safety-source checks.
 - Recorded the `0.6.0` review posture in

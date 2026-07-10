@@ -49,6 +49,9 @@ close mapping.
 - `make validate` integrates Turtle parsing, SHACL, HermiT reasoning,
   repository quality checks, SPARQL competency queries, and graph-isomorphic
   JSON-LD/RDF/XML round trips.
+- The post-release canonical FOOPS assessment scores 87.5%. Minimum metadata
+  and both version-IRI checks pass; the remaining failures depend on public
+  prefix and ontology registry discovery.
 
 ### Still external or deployment-dependent
 

@@ -1,7 +1,8 @@
 # SSTIM External Automated Review - 2026-07-10
 
-**Status:** completed automated review; accepted for `0.6.0` through
-maintainer-guided review. Independent human ontology review is deferred.
+**Status:** completed automated review and post-release FOOPS rerun; accepted
+for `0.6.0` through maintainer-guided review. Independent human ontology review
+is deferred.
 
 **Reviewed baseline:** commit `8ff91f2` (`0.6.0-dev`)
 
@@ -20,7 +21,8 @@ and private BioSynCare data were out of scope.
    post-correction canonical-URI score was `0.78472227`, displayed by FOOPS as
    **78%**. A narrower, metadata-focused 15-test file assessment rose from
    `0.7722222` to `0.9222222`; that file-mode result is diagnostic and is not
-   the public FAIR score.
+   the public FAIR score. After the `0.6.0` version IRI and Zenodo DOI were
+   deployed, a 2026-07-11 canonical-URI rerun scored `0.875` (**87.5%**).
 3. External OBO identifiers were checked against the
    [EMBL-EBI Ontology Lookup Service](https://www.ebi.ac.uk/ols4/) and the
    [OBO Foundry term-stability principle](https://obofoundry.org/principles/fp-019-term-stability.html).
@@ -66,12 +68,12 @@ the six-module graph consistent, and every generated JSON-LD/RDF/XML graph is
 isomorphic with its Turtle source. The review also fixed a Makefile error that
 had allowed a missing ROBOT executable to print a false success message.
 
-The post-correction canonical FOOPS assessment is 78%. Citation, DOI,
-publisher, issued date, logo, status, source, and detailed provenance checks
-pass. Its remaining losses were the then-absent release `owl:versionIRI`, public
-prefix/ontology registry entries, and metadata persistence tied by FOOPS to
-those registries. The release resolves the version-IRI item; the URI assessment
-must be rerun after deployment, and registry items remain publication follow-up.
+The post-correction pre-release canonical FOOPS assessment was 78%. The
+post-release assessment is 87.5%: minimum ontology metadata passes 6/6, the
+version IRI is declared and distinct from the ontology IRI, and the version IRI
+resolves. The only failed checks are `FIND2`, `FIND3`, and `FIND_3_BIS`: public
+prefix/ontology registry discovery and the metadata-persistence check that
+FOOPS ties to registry presence.
 
 ## Release Decision and Deferred Review
 
@@ -85,5 +87,4 @@ and reviewing the ontology work and its finding dispositions. Under
 independent human review is desirable but is not a blocker for this release; it
 is deferred until a suitable reviewer is available, potentially for `0.7.0` or
 later. Release material must not describe this as independent human sign-off.
-WIDOCO, registry submission, and the post-deployment FOOPS rerun remain
-publication follow-up tasks.
+WIDOCO and registry submission remain publication follow-up tasks.
