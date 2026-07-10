@@ -45,6 +45,7 @@ annotations lives here.
 | [0019](0019-modality-nomenclature-cleanup.md) | Modality nomenclature cleanup (somatosensory / haptic / tactile / vibrotactile) | Accepted |
 | [0020](0020-whole-set-snapshot-versioning.md) | Whole-set snapshot is the citable versioning unit (modules carry versionInfo only) | Accepted |
 | [0021](0021-controlled-value-semantics.md) | Controlled values describe categories, not their real-world referents | Accepted |
+| [0022](0022-0.6-release-review-posture.md) | Maintainer acceptance is sufficient for the 0.6 release | Accepted |
 
 ## Adding an ADR
 

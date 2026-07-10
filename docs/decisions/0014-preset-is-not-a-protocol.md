@@ -48,7 +48,7 @@ too strong.
 
 `sstim:SensoryStimulationTechnique` now subclasses `iao:0000030` (information
 content entity), while `sstim:SensoryStimulationProtocol` remains the only SSTIM
-class aligned to `obi:0000272`. This is an inference change on the `0.6.0-dev`
+class aligned to `obi:0000272`. This is an inference change released in `0.6.0`
 line; no SSTIM IRI was renamed or removed.
 
 ## Consequences

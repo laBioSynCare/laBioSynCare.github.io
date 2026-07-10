@@ -11,6 +11,8 @@ abstract: >-
   shapes, and linked evidence chains — describing stimulation
   protocols, parameters, and supporting evidence.
 type: software
+version: 0.6.0
+date-released: 2026-07-11
 authors:
   - family-names: Fabbri
     given-names: Renato

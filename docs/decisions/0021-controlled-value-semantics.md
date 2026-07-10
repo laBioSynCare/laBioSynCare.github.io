@@ -45,7 +45,7 @@ Keep real executions and plans separate:
   an information artifact.
 
 No term IRI is renamed. The changed superclass axioms are published on the
-`0.6.0-dev` line because they alter inference and must not be folded silently
+`0.6.0` release because they alter inference and must not be folded silently
 into the frozen 0.5.0 release.
 
 ## Alternatives considered

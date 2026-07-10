@@ -2,13 +2,13 @@
 
 Status: active publication plan
 
-Current citable release: SSTIM `0.5.0`
+Current citable release: SSTIM `0.6.0`
 
-Development line: SSTIM `0.6.0-dev`
+Next development line: not yet opened
 
 Created: 2026-06-30
 
-Last reviewed: 2026-07-10
+Last reviewed: 2026-07-11
 
 Maintainer: Renato Fabbri
 
@@ -24,8 +24,9 @@ close mapping.
 
 ### Released and citable
 
-- SSTIM `0.5.0` is frozen under `static/ontology/0.5.0/` and tagged `v0.5.0`.
-- Version DOI: [`10.5281/zenodo.21286975`](https://doi.org/10.5281/zenodo.21286975).
+- SSTIM `0.6.0` is frozen under `static/ontology/0.6.0/`, identified by
+  `https://w3id.org/sstim/0.6.0`, and tagged `v0.6.0`.
+- Version DOI: pending automatic GitHub-Zenodo archival.
 - All-versions concept DOI:
   [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
 - The GitHub-Zenodo integration is enabled for future GitHub releases.
@@ -39,7 +40,7 @@ close mapping.
 - Core and module routing rules for Turtle, JSON-LD, and RDF/XML are staged in
   `docs/ecosystem/w3id/sstim/.htaccess`.
 - Every module has machine-readable ontology metadata, licensing, dependency,
-  and development-version information.
+  and synchronized release-version information.
 - `static/ontology/void.ttl` describes the module graph and public instance
   data with VoID/DCAT distributions, examples, vocabularies, and checked counts.
 - The core ontology links back to the VoID dataset with `void:inDataset`.
@@ -60,9 +61,9 @@ close mapping.
 5. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
 
-The `0.6.0-dev` files are not a new Zenodo release. A new DOI version is created
-only after the 0.6 release gates pass, the snapshot is frozen, and the GitHub
-release is published.
+The `0.6.0` term-space is released independently of WIDOCO and registry
+submission. Zenodo creates its version DOI from the GitHub release; the DOI is
+then added to live publication metadata without rewriting the frozen snapshot.
 
 ## Identifier and Version Policy
 
@@ -180,29 +181,28 @@ notability. Reusable diagrams may be published to Wikimedia Commons under CC BY
 
 ## Rollout
 
-### Phase 0: complete FAIR deployment
-
-- Run the full validation/export pipeline on `main`.
-- Deploy generated RDF serializations and the checked VoID description.
-- Publish WIDOCO HTML.
-- Merge and verify the staged w3id routing changes.
-
 ### Phase 1: release 0.6
 
-- Complete the modeling and evidence review gates in
-  `IMPROVEMENT_PLAN.md`.
+- Complete the modeling, maintainer review, and automated validation recorded
+  in `IMPROVEMENT_PLAN.md` and ADR 0022.
 - Freeze `static/ontology/0.6.0/` from the validated live modules.
-- Update all version, citation, VoID, and documentation metadata together.
+- Update version, citation, VoID, and documentation metadata together.
 - Tag and publish the GitHub release; verify the new Zenodo version record.
 
-### Phase 2: registries
+### Phase 2: complete FAIR deployment
+
+- Deploy generated RDF serializations and the checked VoID description.
+- Publish reproducible WIDOCO HTML.
+- Merge and verify the staged w3id routing changes.
+
+### Phase 3: registries
 
 - Submit prefix.cc, LOV, BARTOC, BioPortal, OLS, and FAIRsharing records.
 - Submit to DBpedia Archivo and address actionable quality findings.
 - Register with OpenAIRE when an eligible gateway record is accepted.
 - Store submission URLs, dates, record identifiers, and status in the repo.
 
-### Phase 3: knowledge-graph links
+### Phase 4: knowledge-graph links
 
 - Create the SSTIM ontology item in Wikidata.
 - Add reciprocal mappings only for released terms with verified equivalence.

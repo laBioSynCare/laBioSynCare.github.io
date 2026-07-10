@@ -8,10 +8,10 @@ live under [`static/ontology/`](../../static/ontology/README.md).
 
 - Stable namespace: `https://w3id.org/sstim`
 - Prefix: `sstim`
-- Current citable release: `0.5.0`
-- Editable development line: `0.6.0-dev`
+- Current citable release: `0.6.0`
+- Next development line: not yet opened
 - Ontology license: CC BY 4.0
-- Current release DOI: `10.5281/zenodo.21286975`
+- Current release DOI: pending automatic GitHub-Zenodo archival
 - All-versions concept DOI: `10.5281/zenodo.21286974`
 
 SSTIM is an OWL/SKOS model for sensory-stimulation techniques, delivery and
@@ -49,7 +49,8 @@ real participant records are excluded.
   expanded-senses taxonomy against SSTIM's modeling boundaries.
 - [External automated review - 2026-07-10](reviews/2026-07-10-external-automated-review.md):
   OOPS/FOOPS results, authoritative identifier and safety-source checks, and
-  accepted/rejected finding dispositions. Human expert sign-off remains open.
+  accepted/rejected finding dispositions. The maintainer accepted `0.6.0`;
+  independent human review remains desirable but is deferred under ADR 0022.
 - [Raw maintainer notes](raw-notes/): provenance for design questions; these are
   inputs to review, not normative ontology definitions.
 

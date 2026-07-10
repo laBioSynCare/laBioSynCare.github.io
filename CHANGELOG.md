@@ -15,6 +15,14 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-11
+
+Semantic-quality and FAIR-metadata release. No SSTIM term IRI was removed or
+renamed, but corrected superclass axioms change some inferred types; consumers
+that depend on the pre-0.6 upper model should review ADR 0021. The release was
+accepted through maintainer-guided review and automated external validation;
+independent human ontology review is explicitly deferred by ADR 0022.
+
 ### Added
 - Complete module-level ontology metadata for all six editable SSTIM modules,
   including titles, descriptions, creators, licenses, dependencies, development
@@ -64,11 +72,15 @@ file is the human-readable summary.
   metadata, citation guidance, and JSON-LD context. (PUBLICATION plan B5)
 - Added the 2026-07-10 external automated review disposition, covering OOPS,
   FOOPS, OLS/OBO identifier checks, and authoritative safety-source checks.
+- Recorded the `0.6.0` review posture in
+  [ADR 0022](docs/decisions/0022-0.6-release-review-posture.md): maintainer
+  acceptance is sufficient for this release, with independent human review
+  deferred and no claim of independent sign-off.
 
 ### Changed
-- Advanced editable module sources to `0.6.0-dev` while keeping `0.5.0` as the
-  latest citable, immutable whole-set snapshot. Only core release snapshots
-  carry `owl:versionIRI`; live module files carry development `owl:versionInfo`.
+- Finalized all six ontology modules as `0.6.0`; the core identifies the
+  immutable whole-set release as `https://w3id.org/sstim/0.6.0`, while the
+  other modules carry synchronized `owl:versionInfo` under ADR 0020.
 - Reclassified sensory modality, stimulation mechanism, and intended effect as
   information-content categories rather than biological processes, roles, or
   dispositions. Session specifications are PROV plans, session executions are
@@ -208,5 +220,6 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.6.0
 [0.5.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.5.0

@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.6.0-dev
-#  Date:       2026-07-10
+#  Version:    0.6.0
+#  Date:       2026-07-11
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -36,7 +36,7 @@
     # frozen snapshot at static/ontology/<version>/ (identified by the core
     # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
     # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.6.0-dev" ;
+    owl:versionInfo "0.6.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -45,14 +45,14 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-18"^^xsd:date ;
     dct:issued "2026-06-18"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-11"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     skos:historyNote "Initial exposure module for post-0.3.0 ontology work. The module does not assert physiological or health effects directly; those statements must be modeled as qualified claims with evidence or knowledge status."@en ;
     skos:historyNote "0.4.0 — added left/right laterality body placements, quantitative stimulus datatype properties (frequency, flicker rate, beat frequency, duty cycle, gain, phase), the ExposureLimit class with quantified optical/flicker/hearing safety boundaries citing external standards, and the affordsDeliveryMedium capability-to-medium relation. Grounds the Sensory Field interface (ADR 0011)."@en ;
     skos:historyNote "0.4.1 — added the sstim-ex: to sstim-v: perceived-modality/sensory-channel closeMatch bridge and the somatosensory/haptic/tactile/vibrotactile convention scope notes (ADR 0019, P5.5). Released as part of SSTIM 0.5.0. Additive; no terms removed or renamed."@en ;
-    skos:historyNote "0.6.0-dev — completes operational definitions for every exposure concept, materializes SKOS inverse links for non-reasoning clients, adds precise union domains and scalar cardinalities, and strengthens exposure SHACL coverage. Additive at the term level."@en .
+    skos:historyNote "0.6.0 — completes operational definitions for every exposure concept, materializes SKOS inverse links for non-reasoning clients, adds precise union domains and scalar cardinalities, and strengthens exposure SHACL coverage. Additive at the term level."@en .
 
 
 ###########################################################################
@@ -1670,7 +1670,7 @@ sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension
 
 
 ###########################################################################
-# Operational definitions completed in 0.6.0-dev
+# Operational definitions completed in 0.6.0
 #
 # These annotations complete the previously label-only exposure concepts.
 # Effect terms name dimensions that may be measured or hypothesized; they do

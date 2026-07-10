@@ -2,10 +2,11 @@
 
 Status: active maturity and release-planning document
 
-Current release: SSTIM `0.5.0`
+Current release: SSTIM `0.6.0`
 
-Development line: SSTIM `0.6.0-dev`
-Last reviewed: 2026-07-10
+Next development line: not yet opened
+
+Last reviewed: 2026-07-11
 
 This document records the current ontology assessment, the work completed on
 the live development line, and the remaining gates for the next release. It is
@@ -20,8 +21,7 @@ evidence claims, cautions, sessions, and consent-dependent self-reports. It is
 intended for research, education, interoperability, and conservative wellness
 applications. It does not encode diagnoses, prescriptions, or treatment claims.
 
-The citable `0.5.0` release is frozen under `static/ontology/0.5.0/`. Editable
-module sources and public instance data are on the `0.6.0-dev` line. The six
+The citable `0.6.0` release is frozen under `static/ontology/0.6.0/`. The six
 term-space modules are:
 
 1. `sstim-core.ttl`: OWL classes, properties, and evidence/safety contracts.
@@ -52,7 +52,7 @@ The repository quality audit currently measures the live graph as:
 Counts are regression thresholds, not quality targets. New terms should be
 added only when they answer a competency question or support a real data need.
 
-## 0.6 Development Work
+## 0.6 Release Work
 
 ### Conceptual consistency
 
@@ -141,18 +141,23 @@ added only when they answer a competency question or support a real data need.
 
 ## Remaining Priorities
 
-### P0: release gates for 0.6
+### 0.6 release disposition
 
-1. Obtain a named human ontology review of the controlled-value model,
-   protocol/session distinction, and upper-ontology alignments. The external
-   automated review is complete but does not substitute for expert sign-off.
-2. Review every new evidence summary against the cited primary source; retain
-   conservative wording and record reviewer identity/date.
-3. Run the complete Nix validation suite, regenerate exports, verify that
-   generated serializations parse, and confirm frozen snapshots are unchanged.
-4. Decide the final `0.6.0` scope, replace development metadata with release
-   metadata, create `static/ontology/0.6.0/`, tag, and publish through Zenodo.
-5. Regenerate human-readable ontology documentation before the release tag.
+1. Maintainer Renato Fabbri guided the ontology revisions and accepted the
+   release on 2026-07-11. Under
+   [ADR 0022](../decisions/0022-0.6-release-review-posture.md), an independent
+   named human review is deferred until a suitable reviewer is available and
+   is not claimed as part of `0.6.0`.
+2. New evidence summaries retain conservative, claim-scoped wording and carry
+   source, review-date, and responsible-agent provenance.
+3. The complete pinned-Nix validation suite passes, including SHACL,
+   ROBOT/HermiT, repository audits, competency queries, and graph-isomorphic
+   generated serializations.
+4. All six modules share final `0.6.0` metadata; core carries the release
+   `owl:versionIRI`, and the whole set is frozen, tagged, and archived through
+   the GitHub-Zenodo release workflow.
+5. WIDOCO output and registry submissions are post-release FAIR-publication
+   priorities. They do not change or block the validated RDF artifact.
 
 ### P1: domain depth
 
@@ -201,7 +206,7 @@ The following are not growth targets for SSTIM:
 These boundaries keep SSTIM useful as an interoperability layer rather than an
 unreviewed encyclopedia.
 
-## Acceptance Criteria for 0.6.0
+## Release Acceptance Criteria
 
 The next release is ready only when:
 
@@ -217,8 +222,10 @@ The next release is ready only when:
 - VoID counts, JSON-LD context terms, and loader manifests match live RDF;
 - no file under an earlier frozen snapshot changes;
 - no obsolete external term occurs in a live logical axiom;
-- changelog, citation metadata, exports, WIDOCO pages, release snapshot, tag,
-  and Zenodo record all describe the same version.
+- changelog, citation metadata, exports, release snapshot, tag, and Zenodo
+  record all describe the same version;
+- release material accurately distinguishes maintainer-guided review from
+  independent human sign-off.
 
 ## Change Discipline
 

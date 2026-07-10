@@ -1,7 +1,7 @@
 # SSTIM External Automated Review - 2026-07-10
 
-**Status:** completed automated review; independent human ontology review still
-required before `0.6.0`
+**Status:** completed automated review; accepted for `0.6.0` through
+maintainer-guided review. Independent human ontology review is deferred.
 
 **Reviewed baseline:** commit `8ff91f2` (`0.6.0-dev`)
 
@@ -16,9 +16,11 @@ and private BioSynCare data were out of scope.
    execution is no longer supported by its public service.
 2. [FOOPS!](https://foops.linkeddata.es/FAIR_validator.html) assessed the
    canonical ontology URI. The pre-correction URI score was `0.69097227` across
-   24 accessibility, registry, metadata, vocabulary, and versioning tests. A
-   like-for-like 15-test file assessment rose from `0.7722222` on the reviewed
-   baseline to `0.9222222` after correction.
+   24 accessibility, registry, metadata, vocabulary, and versioning tests. The
+   post-correction canonical-URI score was `0.78472227`, displayed by FOOPS as
+   **78%**. A narrower, metadata-focused 15-test file assessment rose from
+   `0.7722222` to `0.9222222`; that file-mode result is diagnostic and is not
+   the public FAIR score.
 3. External OBO identifiers were checked against the
    [EMBL-EBI Ontology Lookup Service](https://www.ebi.ac.uk/ols4/) and the
    [OBO Foundry term-stability principle](https://obofoundry.org/principles/fp-019-term-stability.html).
@@ -42,13 +44,13 @@ returning findings. Neither model is counted as a reviewer or evidence source.
 | ER-03 | Major | OOPS P11 found no range for `conformsToStandard`. | Accepted. Added `rdfs:range dct:Standard`, matching DCMI's broad standard/reference-point class. |
 | ER-04 | Major | The core ontology description and `SensoryStimulation` definition implied outcome induction through neurobiological pathways. | Accepted. Rewritten to define the delivery process and keep mechanisms, responses, and outcomes separate and evidence-qualified. |
 | ER-05 | Major | The `30 J/m2` ultraviolet value was cited only to IEC 62471 even though the value is from ICNIRP's spectrally weighted exposure guideline. | Accepted. Added the ICNIRP source, retained IEC for lamp risk classification, and made the attribution explicit. |
-| ER-06 | Moderate | FOOPS reported missing citation, publisher, issued date, DOI recognition, logo, status, and source metadata. | Partly accepted. Added applicable metadata to the core and publisher/issued metadata to every module. Version IRI remains intentionally absent on the development line. |
+| ER-06 | Moderate | FOOPS reported missing citation, publisher, issued date, DOI recognition, logo, status, and source metadata. | Accepted. Added applicable metadata to the core and publisher/issued metadata to every module. The final release adds its version IRI. |
 | ER-07 | Moderate | The NIOSH record did not state that `85 dBA / 8 h / 3 dB` is an occupational recommendation rather than general listening guidance. | Accepted. Scope and advisory limitations are now explicit. |
 | ER-08 | Minor | OOPS suggested that `derivedFrom` might be symmetric or transitive because domain and range are both `Preset`. | Rejected as proposed; clarified it as immediate-predecessor history and declared it asymmetric and irreflexive. |
 | ER-09 | Minor | OOPS P08/P34 treated reused OBO, PROV, SKOS, SHACL, and VOAF classes as locally undocumented or untyped. | Rejected. SSTIM references these external terms without taking ownership or importing whole ontologies. |
 | ER-10 | Minor | OOPS P13 proposed inverses for 48 object properties. | Rejected. Inverses are published only where they support a demonstrated query and have unambiguous semantics. |
 | ER-11 | Minor | OOPS P22 reported mixed local naming because OBO numeric IRIs and SSTIM CamelCase IRIs occur in one graph. | Rejected. External identifier conventions are intentionally preserved. |
-| ER-12 | Minor | FOOPS reported no `owl:versionIRI`, registry entry, or prefix registry entry. | Deferred. Development sources omit `owl:versionIRI` by ADR 0020; registry submissions and release metadata remain `0.6.0` publication gates. |
+| ER-12 | Minor | FOOPS reported no `owl:versionIRI`, registry entry, or prefix registry entry. | Partly resolved. The `0.6.0` release adds a resolvable `owl:versionIRI`; prefix and ontology registry submissions remain post-release publication work. |
 
 ## Verification Added
 
@@ -64,16 +66,24 @@ the six-module graph consistent, and every generated JSON-LD/RDF/XML graph is
 isomorphic with its Turtle source. The review also fixed a Makefile error that
 had allowed a missing ROBOT executable to print a false success message.
 
-The post-correction FOOPS file assessment reports only the intentionally absent
-development `owl:versionIRI`; citation, DOI, publisher, issued date, logo,
-status, source, and detailed provenance checks now pass. URI accessibility and
-registry tests must be rerun against the canonical URI after deployment.
+The post-correction canonical FOOPS assessment is 78%. Citation, DOI,
+publisher, issued date, logo, status, source, and detailed provenance checks
+pass. Its remaining losses were the then-absent release `owl:versionIRI`, public
+prefix/ontology registry entries, and metadata persistence tied by FOOPS to
+those registries. The release resolves the version-IRI item; the URI assessment
+must be rerun after deployment, and registry items remain publication follow-up.
 
-## Remaining Release Gate
+## Release Decision and Deferred Review
 
-This review is independent and externally executed, but automated. It is not a
-substitute for domain-expert or ontology-engineer sign-off on the controlled
-value model, protocol/session distinction, and evidence summaries. Before
-tagging `0.6.0`, obtain one named human review, resolve its findings, rerun FOOPS
-after deployment, add the release `owl:versionIRI`, generate WIDOCO
-documentation, freeze the snapshot, and publish the matching Zenodo release.
+This assessment uses externally operated services but is automated. It is not
+domain-expert or ontology-engineer sign-off on the controlled-value model,
+protocol/session distinction, or evidence summaries.
+
+On 2026-07-11, maintainer Renato Fabbri accepted `0.6.0` after directly guiding
+and reviewing the ontology work and its finding dispositions. Under
+[ADR 0022](../../decisions/0022-0.6-release-review-posture.md), a named
+independent human review is desirable but is not a blocker for this release; it
+is deferred until a suitable reviewer is available, potentially for `0.7.0` or
+later. Release material must not describe this as independent human sign-off.
+WIDOCO, registry submission, and the post-deployment FOOPS rerun remain
+publication follow-up tasks.

@@ -3,8 +3,8 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.6.0-dev
-#  Date:       2026-07-10
+#  Version:    0.6.0
+#  Date:       2026-07-11
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -37,7 +37,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.6.0-dev" ;
+    owl:versionInfo "0.6.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, and references."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -46,7 +46,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-11"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 

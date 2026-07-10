@@ -3,7 +3,7 @@
 #  SSTIM — VoID + DCAT dataset description  —  void.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Date:       2026-07-10
+#  Date:       2026-07-11
 #  License:    CC BY 4.0
 #
 #  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
@@ -43,14 +43,13 @@
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-11"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
-    dct:hasVersion <https://doi.org/10.5281/zenodo.21286975> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.6.0-dev" ;
+    dcat:version "0.6.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     foaf:primaryTopic <https://w3id.org/sstim> ;

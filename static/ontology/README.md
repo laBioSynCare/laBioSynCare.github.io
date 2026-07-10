@@ -16,21 +16,22 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.5.0`, DOI
-  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+- Latest immutable release: `v0.6.0`, version IRI
+  `https://w3id.org/sstim/0.6.0`. The release-specific Zenodo DOI is added
+  after automatic archival.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: `0.6.0-dev`; no development module claims an immutable
-  `owl:versionIRI`.
-- Current term graph: 5,820 unique triples, 56 named OWL classes, six anonymous
+- Live sources: the validated `0.6.0` release sources; core claims the whole-set
+  `owl:versionIRI` and every module carries synchronized `owl:versionInfo`.
+- Current term graph: 5,851 unique triples, 56 named OWL classes, six anonymous
   union-class expressions, 124 properties, 295 SKOS concepts, and 30 concept
   schemes.
 - Public instance graph: 1,394 unique triples in 18 files.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
-The frozen [`0.5.0/`](0.5.0) directory is immutable. It remains the citable
-release while the top-level modules evolve toward the next release.
+The frozen [`0.6.0/`](0.6.0) directory is immutable and is the current citable
+whole-set release.
 
 ## Files
 
@@ -44,7 +45,7 @@ static/ontology/
 |-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
-|-- 0.1.0/ ... 0.5.0/      Immutable whole-set snapshots
+|-- 0.1.0/ ... 0.6.0/      Immutable whole-set snapshots
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
     |-- implementations/    BSC Lab and public-safe BioSynCare identities
@@ -357,7 +358,9 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.5.0` for the current immutable citation:
+Use SSTIM `v0.6.0` for the current immutable citation. Until the automatic
+Zenodo archive supplies its version DOI, the stable release identifier is
+`https://w3id.org/sstim/0.6.0`:
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -365,11 +368,9 @@ Use SSTIM `v0.5.0` for the current immutable citation:
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21286975},
-  url       = {https://doi.org/10.5281/zenodo.21286975}
+  url       = {https://w3id.org/sstim/0.6.0}
 }
 ```
 
 For SSTIM across all releases, use the concept DOI
-[10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974). Do not cite
-`0.6.0-dev` as immutable.
+[10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).

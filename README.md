@@ -15,14 +15,16 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-07-10:
+As of 2026-07-11:
 
-- **Latest immutable release:** SSTIM `v0.5.0`, archived at
-  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+- **Latest immutable release:** SSTIM `v0.6.0`, identified by
+  `https://w3id.org/sstim/0.6.0`. Its Zenodo version DOI is added after the
+  GitHub-Zenodo archive is minted.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** `0.6.0-dev`. Development sources deliberately do
-  not claim an `owl:versionIRI`; only frozen release snapshots do.
+- **Live ontology sources:** the validated `0.6.0` release sources. The core
+  claims the whole-set `owl:versionIRI`; the other modules share synchronized
+  `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
 - **Ontology graph:** six Turtle modules, 56 named OWL classes, six anonymous
   union-class expressions, 124 properties, and 295 SKOS concepts in 30 concept
@@ -36,14 +38,15 @@ As of 2026-07-10:
   the pinned Nix toolchain.
 - **External review:** the 2026-07-10
   [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
-  is resolved on the development line; named human ontology review remains a
-  `0.6.0` release gate.
+  is resolved for release, and the maintainer guided and accepted the ontology
+  changes. Independent human ontology review is deferred under ADR 0022 and is
+  not claimed for `0.6.0`.
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
   Sensory Field, logbook, profile, settings, and optional Firebase-backed user
   data are implemented as a static SvelteKit application.
 
 The deployed HTML ontology documentation is still the application/browser;
-WIDOCO publication remains open. Real participant session data, the private
+WIDOCO publication and registry submissions remain post-release work. Real participant session data, the private
 BioSynCare catalog, clinical protocols, and clinical claims are not published
 here.
 
@@ -129,8 +132,8 @@ make export     # JSON-LD and RDF/XML serializations of all six modules
 5. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
 
-The immutable [`static/ontology/0.5.0/`](static/ontology/0.5.0) snapshot is not
-edited while live sources evolve. A future release is cut only after validation,
+The immutable [`static/ontology/0.6.0/`](static/ontology/0.6.0) snapshot is not
+edited after publication. Future releases are cut only after validation,
 version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 
 ## Repository Map
@@ -199,10 +202,11 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.5.0` using
-[10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975). Use the
+For the released ontology, cite SSTIM `v0.6.0` using its stable version IRI,
+`https://w3id.org/sstim/0.6.0`; the release-specific Zenodo DOI is added here
+after automatic archival. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
-across releases. Do not cite `0.6.0-dev` as an immutable release.
+across releases.
 
 - Software: [Apache License 2.0](LICENSE).
 - Ontology, vocabulary, documentation, and public reference data:

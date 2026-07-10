@@ -3,8 +3,8 @@
 #  SSTIM Vocabulary  —  sstim-vocab.ttl
 #
 #  Namespace:  https://w3id.org/sstim/vocab#
-#  Version:    0.6.0-dev
-#  Date:       2026-07-10
+#  Version:    0.6.0
+#  Date:       2026-07-11
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -33,7 +33,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/vocab> a owl:Ontology ;
-    owl:versionInfo "0.6.0-dev" ;
+    owl:versionInfo "0.6.0" ;
     dct:title "SSTIM Controlled Vocabulary"@en ;
     dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -42,9 +42,9 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-11"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    skos:historyNote "0.6.0-dev adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en .
+    skos:historyNote "0.6.0 adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en .
 
 
 ###########################################################################
@@ -1566,7 +1566,7 @@ sstim-v:techSubliminalAudio a owl:NamedIndividual, sstim:NonEntrainmentTechnique
 # many RDF clients do not run OWL inference.
 ###########################################################################
 
-# Scheme scope definitions completed in 0.6.0-dev.
+# Scheme scope definitions completed in 0.6.0.
 sstim-v:CautionTagScheme skos:definition "Safety, comfort, attention, and context advisories that an implementation can attach to a preset."@en .
 sstim-v:ClaimDirectionScheme skos:definition "Categories describing whether a reviewed body of evidence supports, mixes, leaves inconclusive, or refutes an asserted relation."@en .
 sstim-v:EffectDirectionScheme skos:definition "Categories describing the observed direction of a measured outcome relative to a comparator."@en .

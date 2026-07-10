@@ -55,7 +55,7 @@ flagged in the RDF (`requiresEvidenceTierRank` definition, the scheme header) fo
 `clinicalScope` / `marketScope` enum** and a qualified EU MDR adviser before
 launch. The SSTIM-canonical scheme lands first; the Reference aligns to it.
 
-**P7.3 - Required review and provenance record (0.6.0-dev).** Every
+**P7.3 - Required review and provenance record (0.6.0).** Every
 `EvidenceClaim` now requires an explicit claim direction, review status, evidence
 review date, `dct:modified`, and an IRI-valued `prov:wasAttributedTo` agent. A
 claim must identify its subject through `supportsRelation`, or, for an
