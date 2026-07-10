@@ -116,6 +116,7 @@
 
     "title": "dct:title",
     "description": "dct:description",
+    "identifier": "dct:identifier",
     "creator": "dct:creator",
     "publisher": "dct:publisher",
     "license": { "@id": "dct:license", "@type": "@id" },
@@ -124,6 +125,7 @@
     "modified": { "@id": "dct:modified", "@type": "xsd:date" },
     "issued": "dct:issued",
     "hasVersion": "dct:hasVersion",
+    "datasetVersion": "dcat:version",
     "isPartOf": { "@id": "dct:isPartOf", "@type": "@id" },
     "source": { "@id": "dct:source", "@type": "@id" },
     "references": { "@id": "dct:references", "@type": "@id" },

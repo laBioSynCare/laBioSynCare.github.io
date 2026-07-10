@@ -56,7 +56,9 @@
     dct:description "An OWL 2 ontology formalizing the domain of Sensory Stimulation: the parameter-specified delivery of structured sensory input toward defined physiological, psychological, or cognitive outcomes through identified or proposed neurobiological pathways."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-09"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    dct:identifier "10.5281/zenodo.21286974" ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21286975> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     vann:preferredNamespacePrefix "sstim" ;

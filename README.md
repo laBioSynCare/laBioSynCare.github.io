@@ -1,5 +1,7 @@
 # BSC Lab
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
+
 **BSC Lab** is the open-source scientific and technical foundation for sensory
 stimulation: a precision multi-engine audiovisual stimulation platform paired
 with an open RDF knowledge graph (OWL ontology, SKOS vocabulary, SHACL shapes,
@@ -236,6 +238,10 @@ coordination between both.
 - **Ontology, vocabulary, documentation, and public BSC Lab seed/reference
   data:** Creative Commons Attribution 4.0 International — see
   [`LICENSE-ontology`](LICENSE-ontology).
+- **Current citable release (`v0.5.0`):**
+  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+- **All archived versions:** concept DOI
+  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
 - **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com` —
   ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)
 - **Contributions:** see [`CONTRIBUTING.md`](CONTRIBUTING.md). Bug reports

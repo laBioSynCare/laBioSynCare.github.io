@@ -183,10 +183,16 @@ should be additive unless a versioned JSON-LD context policy is introduced.
 
 ### B5 — Versioned DOIs (citability)
 
-Enable the GitHub↔Zenodo integration so every tagged release mints a versioned
-DOI plus a concept DOI. Update the `@misc` citation in README/`sstim-core.ttl` to
-carry the DOI. This is the single biggest "is this a real research artifact?"
-signal for FAIRsharing and academic reuse.
+**Done — 2026-07-10.** The GitHub↔Zenodo integration is enabled, and the first
+archived release is SSTIM `v0.5.0`: version DOI
+[`10.5281/zenodo.21286975`](https://doi.org/10.5281/zenodo.21286975), under the
+all-versions concept DOI
+[`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974). Both
+READMEs expose the concept badge, and the ontology README carries the canonical
+`@misc` citation. The ontology node and VoID/DCAT dataset description publish
+the concept DOI as `dct:identifier` and link the release DOI with
+`dct:hasVersion`. Future GitHub releases are archived automatically by the
+enabled integration.
 
 ---
 
@@ -332,9 +338,10 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
   > devShell now exposes rdflib. **Further delivered — 2026-07-09/10:** VoID/DCAT
   > metadata, the staged w3id `.htaccess` content-negotiation and `/void` route,
   > the JSON-LD context completeness pass, and ROBOT/HermiT DL-consistency
-  > validation in `make validate` + CI. **Still open in Phase 0:** merge and
-  > verify the external perma-id PR, the WIDOCO HTML branch, enabling the
-  > GitHub↔Zenodo webhook.
+  > validation in `make validate` + CI. The GitHub↔Zenodo integration is enabled,
+  > with `v0.5.0` archived under version and concept DOIs. **Still open in Phase
+  > 0:** merge and verify the external perma-id PR and deliver the WIDOCO HTML
+  > branch.
 - **Phase 1 — content coverage:** IMPROVEMENT_PLAN **P5** items 1–3 (visual,
   tactile/cross-modal, neutral tuning) → release **0.5.0**. ADRs for the new
   schemes and the tuning property.
@@ -360,7 +367,8 @@ SSTIM is publicly first-class when:
   content negotiation, and resolves the same way through w3id;
 - it carries complete machine-readable metadata (license, namespace prefix/URI,
   VoID/DCAT) and is **logically consistent** under a DL reasoner in CI;
-- each tagged release has a **Zenodo DOI** and a frozen snapshot;
+- each tagged release from `v0.5.0` onward has a **Zenodo DOI** and a frozen
+  snapshot;
 - it is listed in **LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing**, and
   archived with a **4-star DBpedia Archivo** rating;
 - a **Wikidata item** exists and a verified, conservative set of concept

@@ -32,6 +32,10 @@ file is the human-readable summary.
 - Added ROBOT/HermiT OWL DL consistency validation (`make reason`) over the
   merged ontology term-space modules, wired into `make validate` and the RDF CI
   workflow. (PUBLICATION plan B3)
+- Enabled GitHub↔Zenodo release archiving and published SSTIM `v0.5.0` under
+  version DOI `10.5281/zenodo.21286975` and all-versions concept DOI
+  `10.5281/zenodo.21286974`. Added the DOI links to the ontology and VoID/DCAT
+  metadata, citation guidance, and JSON-LD context. (PUBLICATION plan B5)
 
 ## [0.5.0] — 2026-07-09
 

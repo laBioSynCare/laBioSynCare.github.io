@@ -1,5 +1,7 @@
 # BSC Ontology
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
+
 > **For AI agents:** Read this document before writing any code that
 > imports from `src/rdf/namespaces.js`, generates SPARQL queries, creates
 > RDF instances, or modifies any `*.ttl` file. The design decisions here
@@ -753,16 +755,23 @@ SELECT ?preset WHERE {
 
 ## Citation
 
-If you use the BSC ontology in a research paper or software system,
-please cite:
+SSTIM `v0.5.0` is archived under the version DOI
+[10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+For references to SSTIM across all releases, use the concept DOI
+[10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
+
+If you use SSTIM in a research paper or software system, cite:
 
 ```bibtex
-@misc{bsc_ontology_2026,
+@misc{https://doi.org/10.5281/zenodo.21286975,
+  doi       = {10.5281/ZENODO.21286975},
+  url       = {https://zenodo.org/doi/10.5281/zenodo.21286975},
   author    = {Fabbri, Renato},
-  title     = {{BSC} Ontology: A Knowledge Representation for Sensory Stimulation},
+  keywords  = {sensory stimulation, ontology, OWL, SKOS, SHACL, knowledge graph, linked data, brainwave entrainment, binaural beats, SSTIM, BFO, wellness},
+  title     = {BSC Lab — Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
+  publisher = {Zenodo},
   year      = {2026},
-  url       = {https://w3id.org/sstim},
-  note      = {CC BY 4.0}
+  copyright = {Creative Commons Attribution 4.0 International}
 }
 ```
 
@@ -781,7 +790,7 @@ preset descriptions require coordination with the BioSynCare repository
 
 ---
 
-*Version: 0.3.0 (June 2026)*
+*Version: 0.5.0 (July 2026)*
 *Maintained by: Renato Fabbri*  
 *License: CC BY 4.0*  
 *Namespace (ontology): `https://w3id.org/sstim`*  

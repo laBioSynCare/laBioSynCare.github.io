@@ -589,7 +589,8 @@ Summary of the recommended posture:
 1. **FAIR packaging (semantics-free; may start now):** multi-format
    content-negotiation (Turtle/RDF-XML/JSON-LD/HTML via WIDOCO), `vann:`/VoID
    metadata, DL-consistency check in CI **(done — 2026-07-10 via ROBOT/HermiT)**,
-   JSON-LD context, and Zenodo DOIs.
+   JSON-LD context, and Zenodo DOIs **(done — 2026-07-10; concept DOI
+   `10.5281/zenodo.21286974`, first version DOI `10.5281/zenodo.21286975`)**.
 2. **DBpedia — via DBpedia Archivo** (not direct): submit the dereferenceable URI,
    iterate to a 4-star rating.
 3. **Wikidata — incremental:** one ontology item; conservative two-way `exact
