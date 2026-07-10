@@ -137,7 +137,9 @@ for path, ontology_iri in MODULES.items():
         DCTERMS.title,
         DCTERMS.description,
         DCTERMS.creator,
+        DCTERMS.publisher,
         DCTERMS.created,
+        DCTERMS.issued,
         DCTERMS.modified,
         DCTERMS.license,
     )
@@ -154,6 +156,24 @@ for path, ontology_iri in MODULES.items():
         fail(f"{rel}: development sources must not claim an immutable owl:versionIRI")
     if versions and "-dev" not in str(versions[0]) and ontology_iri == URIRef("https://w3id.org/sstim") and not version_iris:
         fail(f"{rel}: release core must declare an immutable owl:versionIRI")
+
+# External upper-model alignments are live logical axioms, not display-only
+# links. Keep obsolete terms out and preserve the reviewed technique/protocol
+# distinction from the 2026-07-10 external audit.
+obsolete_planned_process = URIRef("http://purl.obolibrary.org/obo/OBI_0000011")
+if any(obsolete_planned_process in triple for triple in modules):
+    fail("live modules must not use obsolete OBI_0000011")
+
+technique = SSTIM.SensoryStimulationTechnique
+protocol = SSTIM.SensoryStimulationProtocol
+iao_information_content_entity = URIRef("http://purl.obolibrary.org/obo/IAO_0000030")
+obi_protocol = URIRef("http://purl.obolibrary.org/obo/OBI_0000272")
+if (technique, RDFS.subClassOf, iao_information_content_entity) not in modules:
+    fail("SensoryStimulationTechnique must remain an IAO information content entity")
+if (technique, RDFS.subClassOf, obi_protocol) in modules:
+    fail("SensoryStimulationTechnique must not be aligned to the more specific OBI protocol class")
+if (protocol, RDFS.subClassOf, obi_protocol) not in modules:
+    fail("SensoryStimulationProtocol must retain its OBI protocol alignment")
 
 
 # Every local OWL term is readable without dereferencing another document.

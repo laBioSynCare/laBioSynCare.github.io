@@ -83,7 +83,8 @@ shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
-	@tmpdir="$$(mktemp -d)"; \
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
 	$(ROBOT) merge $(foreach file,$(ONTOLOGY_MODULES),--input $(file)) \
 		reason --reasoner $(REASONER) --output "$$tmpdir/sstim-reasoned.owl"; \

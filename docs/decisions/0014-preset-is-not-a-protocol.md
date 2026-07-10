@@ -37,21 +37,26 @@ So the protocol alignment was on the wrong classes.
   by* an engine; it is not itself the plan that is executed. `iao:0000030` is the
   honest, minimal alignment; `followsProtocol` expresses the plan link.
 
-## Note — Technique alignment (not changed here)
+## Follow-up - Technique alignment (resolved 2026-07-10)
 
-`sstim:SensoryStimulationTechnique` also carries `rdfs:subClassOf obi:0000272`.
-Whether a technique *type* (an abstract, repeatable method — ADR 0006) should be
-an OBI protocol (a detailed, reproducible plan specification) is a distinct
-question from the preset issue and is **not** decided here. It is flagged for
-separate review under the external-alignment work (P4) so this ADR stays scoped to
-what P0 item 2 names.
+The 0.6 external audit resolved the question deliberately left open by this ADR.
+OBI defines `obi:0000272` as a plan specification detailed enough for different
+investigation agents to reproduce a process independently. SSTIM defines a
+technique as a reusable, parameterizable method category that is less specific
+than a protocol. The prior technique-to-OBI-protocol subclass axiom was therefore
+too strong.
+
+`sstim:SensoryStimulationTechnique` now subclasses `iao:0000030` (information
+content entity), while `sstim:SensoryStimulationProtocol` remains the only SSTIM
+class aligned to `obi:0000272`. This is an inference change on the `0.6.0-dev`
+line; no SSTIM IRI was renamed or removed.
 
 ## Consequences
 
 - No preset instance relies on protocol typing, so no data breaks; `make validate`
   stays green.
-- `SensoryStimulationProtocol` becomes the single class inferred as an OBI
-  protocol (alongside the still-open Technique question above).
+- `SensoryStimulationProtocol` is the single SSTIM class inferred as an OBI
+  protocol.
 - Consumers must use `followsProtocol` — not class inference — to find the
   protocol a preset follows.
 

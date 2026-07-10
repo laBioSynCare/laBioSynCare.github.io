@@ -42,7 +42,9 @@
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-18"^^xsd:date ;
+    dct:issued "2026-06-18"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
@@ -286,6 +288,7 @@ sstim-ex:hasExposureLimit a owl:ObjectProperty ;
 
 sstim-ex:conformsToStandard a owl:ObjectProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
+    rdfs:range dct:Standard ;
     rdfs:label "conforms to standard"@en ;
     skos:definition "Links an exposure limit to the external standard, guideline, or recommendation it is derived from."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
@@ -1813,9 +1816,9 @@ sstim-ex:limitFlickerWcag a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitMaxFrequencyHz "3"^^xsd:decimal ;
     sstim-ex:limitUnit "Hz" ;
     sstim-ex:appliesToPlacement sstim-ex:placementEyes ;
-    sstim-ex:conformsToStandard <https://www.w3.org/TR/WCAG21/#three-flashes-or-below-threshold> ,
+    sstim-ex:conformsToStandard <https://www.w3.org/TR/WCAG22/#three-flashes-or-below-threshold> ,
         <https://www.itu.int/rec/R-REC-BT.1702> ;
-    skos:definition "Accessibility safeguard derived from WCAG 2.3.1 and ITU-R BT.1702: content should not exceed three general flashes or three red flashes in one second unless the applicable below-threshold test is satisfied. This simplified frequency bound does not establish individual safety."@en .
+    skos:definition "Accessibility safeguard derived from WCAG 2.2 success criterion 2.3.1 and ITU-R BT.1702: content should not exceed three general flashes or three red flashes in one second unless the applicable below-threshold test is satisfied. This simplified frequency bound does not establish individual safety."@en .
 
 sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     rdfs:label "recommended sound-exposure limit"@en ;
@@ -1824,8 +1827,8 @@ sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitUnit "dBA" ;
     sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
     sstim-ex:appliesToPlacement sstim-ex:placementEars ;
-    sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/topics/noise/> ;
-    skos:definition "NIOSH recommended exposure limit of 85 dBA averaged over 8 hours, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). BSC Lab cannot measure delivered sound pressure level and treats this record as advisory rather than a safety guarantee."@en .
+    sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/docs/98-126/> ;
+    skos:definition "NIOSH occupational recommended exposure limit of 85 dBA as an 8-hour time-weighted average, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). This occupational limit is not a general-public listening recommendation. BSC Lab cannot measure delivered sound pressure level and treats this record as advisory rather than a safety guarantee."@en .
 
 sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     rdfs:label "actinic ultraviolet exposure limit"@en ;
@@ -1834,8 +1837,10 @@ sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitUnit "J/m2" ;
     sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
     sstim-ex:appliesToPlacement sstim-ex:placementEyes , sstim-ex:placementWholeBody ;
-    sstim-ex:conformsToStandard <https://webstore.iec.ch/publication/7076> ;
-    skos:definition "Approximately 30 J/m2 spectrally-weighted effective ultraviolet radiant exposure per day for skin and eye, with photobiological risk groups per IEC 62471 and ICNIRP. Eyes are more vulnerable than skin. BSC Lab does not deliver ultraviolet radiation at the body."@en .
+    sstim-ex:conformsToStandard <https://www.icnirp.org/cms/upload/publications/ICNIRPUV2004.pdf> ,
+        <https://webstore.iec.ch/publication/7076> ;
+    skos:definition "ICNIRP daily exposure limit of 30 J/m2 spectrally weighted effective ultraviolet radiant exposure for unprotected skin and eye, calculated over 180-400 nm. IEC 62471 supplies lamp photobiological risk classification; it is not the source of the 30 J/m2 value. BSC Lab does not deliver ultraviolet radiation at the body."@en ;
+    skos:editorialNote "The historical IRI suffix 'Iec' is retained for identifier stability. The value is attributed explicitly to ICNIRP after the 2026-07-10 external review."@en .
 
 
 ###########################################################################

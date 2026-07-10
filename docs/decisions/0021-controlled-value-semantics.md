@@ -32,7 +32,10 @@ prove causation or outcome.
 Keep real executions and plans separate:
 
 - `SensoryStimulation` remains a BFO process;
-- `SensoryStimulationIntervention` remains a planned process;
+- `SensoryStimulationIntervention` remains a planned process through active
+  `cob:0000082`; the obsolete `obi:0000011` parent is removed;
+- `SensoryStimulationTechnique` is an information-content category, while the
+  more detailed `SensoryStimulationProtocol` remains aligned to OBI protocol;
 - `SessionInstance` is both a PROV activity and a sensory stimulation
   intervention;
 - `SessionSpecification` is both an information content entity and a
@@ -58,6 +61,8 @@ into the frozen 0.5.0 release.
 ## Consequences
 
 - Controlled concepts have one coherent upper-model interpretation.
+- Technique categories no longer infer the stronger semantics of a detailed,
+  independently reproducible OBI protocol.
 - Query authors can distinguish a category assignment from an executed process
   or realized disposition.
 - Consumers that inferred BFO role/process/disposition membership from the old

@@ -88,7 +88,7 @@ SSTIM keeps these levels distinct:
 | Level | Meaning |
 |---|---|
 | `SensoryStimulationFramework` | Broad principles, evidence rules, techniques, and constraints |
-| `SensoryStimulationTechnique` | Reusable parameterizable method |
+| `SensoryStimulationTechnique` | Reusable information category for a parameterizable method |
 | `SensoryStimulationProtocol` | Structured use specification combining techniques and constraints |
 | `SensoryStimulationImplementation` | Software, hardware, manual, or hybrid realization |
 | `Preset` | Versioned parameter configuration for one implementation |
@@ -136,18 +136,21 @@ The selected upper-model placements are deliberately small:
 | SSTIM class | Parent |
 |---|---|
 | `SensoryStimulation` | BFO process (`bfo:0000015`) |
-| `SensoryStimulationIntervention` | OBI/COB planned process |
-| `SensoryStimulationTechnique` | OBI protocol (`obi:0000272`) |
-| `SensoryStimulationFramework`, `Protocol`, `Preset` | IAO information content entity |
+| `SensoryStimulationIntervention` | COB planned process (`cob:0000082`) |
+| `SensoryStimulationTechnique` | IAO information content entity (`iao:0000030`) |
+| `SensoryStimulationFramework`, `Preset` | IAO information content entity |
+| `SensoryStimulationProtocol` | IAO information content entity and OBI protocol (`obi:0000272`) |
 | `SessionSpecification` | IAO information content entity and `prov:Plan` |
 | `SessionInstance` | `prov:Activity` and `SensoryStimulationIntervention` |
 | `SensoryStimulationImplementation` | `prov:Entity` |
 | controlled-value classes | IAO information content entity |
 
 SSTIM references selected OBO IRIs instead of importing entire external
-ontologies. Alignments are conservative. In particular, no MeSH mapping is
-asserted for a supposed `D012910` Sensory Stimulation term: that identifier is
-Snake Venoms and was removed during the 0.6.0 audit.
+ontologies. Alignments are conservative. The 0.6 audit removed obsolete
+`obi:0000011` from live axioms and rejected OBI protocol as an over-specific
+parent for a technique category. In addition, no MeSH mapping is asserted for
+a supposed `D012910` Sensory Stimulation term: that identifier is Snake Venoms.
+See the [external review disposition](../../docs/ontology/reviews/2026-07-10-external-automated-review.md).
 
 ## Evidence Governance
 
@@ -190,7 +193,9 @@ advice; see [ADR 0018](../../docs/decisions/0018-evidence-integrity-and-public-c
 These are interface and validation instructions, not diagnoses. Exposure
 limits separately record a quantity, unit, placement, numeric threshold, and
 source standard. They do not assert that a particular delivery is safe. Runtime
-flicker enforcement remains in `src/ui/safety/flashSafety.js`.
+flicker enforcement remains in `src/ui/safety/flashSafety.js`. The published
+threshold records distinguish WCAG's flash criterion, NIOSH's occupational
+noise recommendation, and ICNIRP's spectrally weighted ultraviolet limit.
 
 ## Exposure Model
 

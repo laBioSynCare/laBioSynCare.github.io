@@ -47,6 +47,9 @@ real participant records are excluded.
   conservative Wikidata/biomedical mapping policy.
 - [Sensory Taxonomy Review](SENSORY_TAXONOMY_REVIEW.md): assessment of a proposed
   expanded-senses taxonomy against SSTIM's modeling boundaries.
+- [External automated review - 2026-07-10](reviews/2026-07-10-external-automated-review.md):
+  OOPS/FOOPS results, authoritative identifier and safety-source checks, and
+  accepted/rejected finding dispositions. Human expert sign-off remains open.
 - [Raw maintainer notes](raw-notes/): provenance for design questions; these are
   inputs to review, not normative ontology definitions.
 

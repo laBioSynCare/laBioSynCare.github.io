@@ -43,7 +43,9 @@
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
+    dct:issued "2026-04-12"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
@@ -73,8 +75,16 @@ sstim-sh:OntologyMetadataShape a sh:NodeShape ;
         sh:message "Every SSTIM ontology module must identify an IRI-valued dct:creator."@en ;
     ] ;
     sh:property [
+        sh:path dct:publisher ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every SSTIM ontology module must identify an IRI-valued dct:publisher."@en ;
+    ] ;
+    sh:property [
         sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
         sh:message "Every SSTIM ontology module must declare one xsd:date dct:created value."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:issued ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every SSTIM ontology module must declare one xsd:date dct:issued value."@en ;
     ] ;
     sh:property [
         sh:path dct:modified ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;

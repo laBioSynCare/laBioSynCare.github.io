@@ -109,6 +109,11 @@ added only when they answer a competency question or support a real data need.
 ### Alignment corrections
 
 - Retained external mappings only where equivalence or relatedness was checked.
+- Removed obsolete `OBI_0000011` from live planned-process axioms and retained
+  active `COB_0000082` for sensory stimulation interventions.
+- Resolved the technique-alignment question from ADR 0014: a reusable technique
+  category is an IAO information content entity, while only the detailed SSTIM
+  protocol class aligns to OBI protocol.
 - Replaced over-broad whole-domain mappings with term-level mappings.
 - Added a related mapping for multisensory integration and narrowed the voice
   mapping for binaural beats.
@@ -116,6 +121,8 @@ added only when they answer a competency question or support a real data need.
 - Rejected MeSH `D012910` as a sensory-stimulation mapping because the official
   NLM record identifies it as *Snake Venoms*. No replacement MeSH identifier is
   asserted without verification.
+- Completed an [external automated OOPS/FOOPS review](reviews/2026-07-10-external-automated-review.md)
+  with authoritative OLS, W3C, NIOSH, ICNIRP, and DCMI disposition checks.
 
 ### Executable quality controls
 
@@ -136,8 +143,9 @@ added only when they answer a competency question or support a real data need.
 
 ### P0: release gates for 0.6
 
-1. Obtain at least one external ontology review of the controlled-value model,
-   protocol/session distinction, and upper-ontology alignments.
+1. Obtain a named human ontology review of the controlled-value model,
+   protocol/session distinction, and upper-ontology alignments. The external
+   automated review is complete but does not substitute for expert sign-off.
 2. Review every new evidence summary against the cited primary source; retain
    conservative wording and record reviewer identity/date.
 3. Run the complete Nix validation suite, regenerate exports, verify that
@@ -208,6 +216,7 @@ The next release is ready only when:
   public-claim metadata;
 - VoID counts, JSON-LD context terms, and loader manifests match live RDF;
 - no file under an earlier frozen snapshot changes;
+- no obsolete external term occurs in a live logical axiom;
 - changelog, citation metadata, exports, WIDOCO pages, release snapshot, tag,
   and Zenodo record all describe the same version.
 

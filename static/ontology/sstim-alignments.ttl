@@ -45,10 +45,12 @@
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
+    dct:issued "2026-04-12"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    skos:historyNote "0.6.0-dev narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, and records the corrected MeSH audit."@en .
+    skos:historyNote "0.6.0-dev narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en .
 
 
 ###########################################################################
@@ -103,9 +105,15 @@ sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
 ###########################################################################
 
 # Sensory stimulation intervention → planned process.
-# OBI_0000011 is obsoleted in OBI; retained for tool continuity. COB_0000082
-# is the current canonical 'planned process' term (verified via OLS, 2026-06).
-sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
+# OBI_0000011 is obsolete and must not appear in live logical axioms. SSTIM
+# uses the active, broader COB_0000082 'planned process' term because an
+# intervention need not be completely executed (verified via OLS, 2026-07-10).
+sstim:SensoryStimulationIntervention rdfs:subClassOf cob:0000082 .
+
+# Technique → information content entity. OBI_0000272 requires enough detail
+# for independent process reproduction; a reusable technique category is less
+# specific and is therefore not an OBI protocol (ADR 0014 review disposition).
+sstim:SensoryStimulationTechnique rdfs:subClassOf iao:0000030 .
 
 # Protocol → OBI protocol. A preset is an information content entity that FOLLOWS
 # a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
@@ -148,7 +156,6 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 ###########################################################################
 
 bfo:0000015 rdfs:label "process"@en .
-obi:0000011 rdfs:label "planned process (obsolete in OBI)"@en .
 obi:0000272 rdfs:label "protocol"@en .
 cob:0000082 rdfs:label "planned process"@en .
 iao:0000030 rdfs:label "information content entity"@en .

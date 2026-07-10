@@ -34,6 +34,10 @@ As of 2026-07-10:
 - **Validation:** SHACL Core and SHACL-SPARQL, HermiT via ROBOT, repository-wide
   semantic integrity checks, and executable SPARQL competency queries run under
   the pinned Nix toolchain.
+- **External review:** the 2026-07-10
+  [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
+  is resolved on the development line; named human ontology review remains a
+  `0.6.0` release gate.
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
   Sensory Field, logbook, profile, settings, and optional Firebase-backed user
   data are implemented as a static SvelteKit application.
@@ -57,11 +61,11 @@ here.
 | [`void.ttl`](static/ontology/void.ttl) | VoID/DCAT publication metadata and checked graph counts |
 | [`instances/`](static/ontology/instances) | Public BSC Lab framework, protocol, preset, evidence, experiment, reference, and synthetic session data |
 
-Every module is an `owl:Ontology` with creator, dates, license, description, and
-version metadata. Controlled values are dual-typed OWL individuals and SKOS
-concepts; their SKOS hierarchy inverses are materialized for clients that do not
-run inference. See the [ontology guide](static/ontology/README.md) and
-[ADR index](docs/decisions/README.md).
+Every module is an `owl:Ontology` with creator, publisher, dates, license,
+description, and version metadata. Controlled values are dual-typed OWL
+individuals and SKOS concepts; their SKOS hierarchy inverses are materialized
+for clients that do not run inference. See the
+[ontology guide](static/ontology/README.md) and [ADR index](docs/decisions/README.md).
 
 ## Application
 

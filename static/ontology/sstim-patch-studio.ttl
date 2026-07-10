@@ -39,7 +39,9 @@
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-17"^^xsd:date ;
+    dct:issued "2026-06-17"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 

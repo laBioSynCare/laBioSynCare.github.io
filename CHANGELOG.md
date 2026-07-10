@@ -62,6 +62,8 @@ file is the human-readable summary.
   version DOI `10.5281/zenodo.21286975` and all-versions concept DOI
   `10.5281/zenodo.21286974`. Added the DOI links to the ontology and VoID/DCAT
   metadata, citation guidance, and JSON-LD context. (PUBLICATION plan B5)
+- Added the 2026-07-10 external automated review disposition, covering OOPS,
+  FOOPS, OLS/OBO identifier checks, and authoritative safety-source checks.
 
 ### Changed
 - Advanced editable module sources to `0.6.0-dev` while keeping `0.5.0` as the
@@ -87,6 +89,12 @@ file is the human-readable summary.
   mapping.
 - Expanded the RDF loader and JSON-LD context to cover protocols, both public
   presets, synthetic sessions, safety terms, and PROV metadata.
+- Restricted the OBI protocol alignment to `SensoryStimulationProtocol`;
+  `SensoryStimulationTechnique` is now an IAO information-content category.
+- Clarified `derivedFrom` as an asymmetric, irreflexive immediate-predecessor
+  relation rather than a symmetric or transitive preset relation.
+- Completed publisher/issued metadata for every module and added citation,
+  DOI, status, source, and logo metadata to the core ontology.
 
 ### Fixed
 - Removed the stale MeSH `D012910` candidate mapping after authoritative NLM
@@ -98,6 +106,16 @@ file is the human-readable summary.
   loader.
 - Replaced hand-maintained/omitted VoID metrics with counts checked by the
   repository quality audit.
+- Fixed the ROBOT reasoning Make target so a missing executable or failed
+  reasoner command exits nonzero instead of printing a false success message.
+- Removed obsolete `OBI_0000011` from live planned-process axioms; retained
+  active `COB_0000082` for sensory stimulation interventions.
+- Added the missing `dct:Standard` range on `conformsToStandard`, updated the
+  WCAG and NIOSH references, and attributed the 30 J/m2 ultraviolet limit to
+  ICNIRP while retaining IEC 62471 for lamp risk classification.
+- Rewrote the core domain description and `SensoryStimulation` definition so
+  delivery, proposed mechanisms, observed responses, and outcomes are not
+  conflated.
 
 ## [0.5.0] — 2026-07-09
 
