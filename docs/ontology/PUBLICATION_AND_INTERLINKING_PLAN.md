@@ -301,7 +301,10 @@ Recommended posture:
 | **BioPortal** (NCBO) | Browsing, REST API, Annotator, **automatic mapping suggestions to MeSH/SNOMED/NCIT** | Bonus: surfaces candidate alignments for IMPROVEMENT_PLAN P4.1. |
 | **OLS** (EBI) | OBO-adjacent browser/API | Accepts non-OBO via config; pairs with C5. |
 | **OntoBee** | Linked-data server for ontology terms | OBO-adjacent. |
-| **FAIRsharing** | Registers SSTIM as a standard; citable record | Pairs with Zenodo DOI (B5). |
+| **FAIRsharing** | Registers SSTIM as a standard; citable record | Pairs with Zenodo DOI (B5). One of three gateways required for OpenAIRE registration. |
+| **OpenDOAR** | [SHERPA directory of open-access repositories](https://v2.sherpa.ac.uk/opendoar/); broad academic discoverability | One of three gateways required for OpenAIRE registration. |
+| **Re3data** | [Registry of research data repositories](http://www.re3data.org/) | One of three gateways required for OpenAIRE registration. |
+| **OpenAIRE** | European open-science aggregator; surfaces the vocabulary to EU-funded researchers and funders | Requires prior registration in **OpenDOAR**, **Re3data**, or **FAIRsharing** before registering at [OpenAIRE Provide](https://provide.openaire.eu). |
 | **Zenodo** | Versioned DOIs per release | GitHub integration (B5). |
 
 ---
@@ -348,7 +351,9 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
 - **Phase 2 — evidence as data:** P5 item 4 (populate `EvidenceClaim` instances +
   cleared references), leveraging the P3 claim-dimension machinery.
 - **Phase 3 — registries:** submit to prefix.cc, LOV, BARTOC, BioPortal, OLS,
-  OntoBee, FAIRsharing; submit to **DBpedia Archivo**; iterate to 4 stars.
+  OntoBee, **FAIRsharing** (or **OpenDOAR** / **Re3data**); then register with
+  **OpenAIRE** (requires one of those three to be in place); submit to
+  **DBpedia Archivo**; iterate to 4 stars.
 - **Phase 4 — Wikidata:** ontology item + conservative P2888 links; *(later)*
   SSTIM-ID property proposal once there is adoption to cite.
 - **Phase 5 — deep biomedical alignment:** P4.1 MeSH/SNOMED (aided by BioPortal
@@ -369,7 +374,8 @@ SSTIM is publicly first-class when:
   VoID/DCAT) and is **logically consistent** under a DL reasoner in CI;
 - each tagged release from `v0.5.0` onward has a **Zenodo DOI** and a frozen
   snapshot;
-- it is listed in **LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing**, and
+- it is listed in **LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing** (or
+  **OpenDOAR** / **Re3data**), and registered with **OpenAIRE**, and
   archived with a **4-star DBpedia Archivo** rating;
 - a **Wikidata item** exists and a verified, conservative set of concept
   `exact match` links is in place both directions;

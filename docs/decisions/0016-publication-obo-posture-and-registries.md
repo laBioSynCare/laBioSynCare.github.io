@@ -44,7 +44,10 @@ hard to reverse.
 6. **Wikimedia/Wikipedia: defer** on notability grounds; Commons diagrams under
    CC BY are optional.
 7. **Register in the vocabulary registries** once FAIR packaging lands: prefix.cc,
-   LOV, BARTOC, BioPortal, OLS, OntoBee, FAIRsharing, and Zenodo DOIs per release.
+   LOV, BARTOC, BioPortal, OLS, OntoBee, FAIRsharing (or OpenDOAR / Re3data), and
+   Zenodo DOIs per release. After one of those three is in place, register with
+   **OpenAIRE** ([OpenAIRE Provide](https://provide.openaire.eu)) to surface the
+   vocabulary in the European open-science infrastructure.
 8. **Make the artifact FAIR first (prerequisite for 4–7):** multi-format
    content negotiation (Turtle/RDF-XML/JSON-LD, HTML via WIDOCO), `vann:`/VoID
    metadata, a JSON-LD context, and DL-consistency in CI.
