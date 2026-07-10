@@ -16,14 +16,14 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.6.0`, version IRI
-  `https://w3id.org/sstim/0.6.0`. The release-specific Zenodo DOI is added
-  after automatic archival.
+- Latest immutable release: `v0.6.0`, DOI
+  [10.5281/zenodo.21302910](https://doi.org/10.5281/zenodo.21302910), version
+  IRI `https://w3id.org/sstim/0.6.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
 - Live sources: the validated `0.6.0` release sources; core claims the whole-set
   `owl:versionIRI` and every module carries synchronized `owl:versionInfo`.
-- Current term graph: 5,851 unique triples, 56 named OWL classes, six anonymous
+- Current term graph: 5,852 unique triples, 56 named OWL classes, six anonymous
   union-class expressions, 124 properties, 295 SKOS concepts, and 30 concept
   schemes.
 - Public instance graph: 1,394 unique triples in 18 files.
@@ -358,9 +358,7 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.6.0` for the current immutable citation. Until the automatic
-Zenodo archive supplies its version DOI, the stable release identifier is
-`https://w3id.org/sstim/0.6.0`:
+Use SSTIM `v0.6.0` for the current immutable citation:
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -368,7 +366,8 @@ Zenodo archive supplies its version DOI, the stable release identifier is
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  url       = {https://w3id.org/sstim/0.6.0}
+  doi       = {10.5281/zenodo.21302910},
+  url       = {https://doi.org/10.5281/zenodo.21302910}
 }
 ```
 

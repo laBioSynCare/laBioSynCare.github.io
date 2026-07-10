@@ -64,7 +64,8 @@
     dct:modified "2026-07-11"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
-    dct:bibliographicCitation "Fabbri, Renato (2026). BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform. Zenodo. https://doi.org/10.5281/zenodo.21286974"@en ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21302910> ;
+    dct:bibliographicCitation "Fabbri, Renato (2026). BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform (v0.6.0). Zenodo. https://doi.org/10.5281/zenodo.21302910"@en ;
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
