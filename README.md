@@ -2,247 +2,206 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
 
-**BSC Lab** is the open-source scientific and technical foundation for sensory
-stimulation: a precision multi-engine audiovisual stimulation platform paired
-with an open RDF knowledge graph (OWL ontology, SKOS vocabulary, SHACL shapes,
-evidence chains) that describes what the platform does, why, and on what
-evidence. It is maintained by Renato Fabbri (PhD physics; creator of the
-`music` package on PyPI) with scientific advisor Juliana Braga de Salles
-Andrade (PhD neuroscience).
+BSC Lab is an open sensory-stimulation research and engineering platform paired
+with **SSTIM**, a public RDF knowledge graph for describing techniques,
+modalities, stimulus parameters, exposure boundaries, evidence claims,
+protocols, presets, and sessions. The repository contains both the reusable
+ontology and a SvelteKit reference implementation that exercises it.
 
-BSC Lab is the research/infrastructure project. The related commercial
-application **BioSynCare** (React Native, separate repo, closed source) shares
-the preset JSON format and SSTIM vocabulary, but its curated catalog is private
-and is not imported into or exported by BSC Lab. BSC Lab is not BioSynCare —
-see [Relationship to BioSynCare](#relationship-to-biosyncare).
+The work is non-clinical. It does not prescribe treatment, certify efficacy, or
+claim that a protocol treats, prevents, cures, or diagnoses a condition. Start
+with [Scope](docs/concept/SCOPE.md), [Non-Scope](docs/concept/NON_SCOPE.md), and
+the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
----
+## Project Status
 
-## W3C Community Group Proposal: Sensory Stimulation Vocabulary
+As of 2026-07-10:
 
-This repository is the public technical anchor for a proposed **Sensory Stimulation Vocabulary Community Group**.
+- **Latest immutable release:** SSTIM `v0.5.0`, archived at
+  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+- **All-version DOI:**
+  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
+- **Live ontology sources:** `0.6.0-dev`. Development sources deliberately do
+  not claim an `owl:versionIRI`; only frozen release snapshots do.
+- **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
+- **Ontology graph:** six Turtle modules, 56 named OWL classes, six anonymous
+  union-class expressions, 124 properties, and 295 SKOS concepts in 30 concept
+  schemes, plus VoID/DCAT and a JSON-LD context.
+- **Public example data:** 18 Turtle files containing the BSC framework, seven
+  framework techniques, two implementations, 12 protocols, two reference
+  presets, 38 evidence claims, seven DOI-identified references, ten exposure
+  profiles, and one explicitly synthetic session with pre/post reports.
+- **Validation:** SHACL Core and SHACL-SPARQL, HermiT via ROBOT, repository-wide
+  semantic integrity checks, and executable SPARQL competency queries run under
+  the pinned Nix toolchain.
+- **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
+  Sensory Field, logbook, profile, settings, and optional Firebase-backed user
+  data are implemented as a static SvelteKit application.
 
-The proposed group would develop shared terminology, open vocabularies, ontology modules, semantic models, JSON-LD contexts, SHACL validation profiles, and implementation guidance for describing sensory stimulation sessions, stimuli, modalities, parameters, devices, safety metadata, evidence annotations, and related datasets on the Web.
+The deployed HTML ontology documentation is still the application/browser;
+WIDOCO publication remains open. Real participant session data, the private
+BioSynCare catalog, clinical protocols, and clinical claims are not published
+here.
 
-The work is intended to be vendor-neutral and community-led. BioSynCare/BSC Lab may serve as an early implementation environment, but the vocabulary effort is not limited to BioSynCare and is not a BioSynCare product specification.
+## SSTIM Modules
 
-BSC Lab has two complementary roles in relation to `sstim`:
+| Source | Role |
+|---|---|
+| [`sstim-core.ttl`](static/ontology/sstim-core.ttl) | OWL classes, properties, axioms, evidence governance, caution metadata, and session model |
+| [`sstim-vocab.ttl`](static/ontology/sstim-vocab.ttl) | Multilingual SKOS values for bands, modalities, mechanisms, techniques, evidence, cautions, and report phases |
+| [`sstim-shapes.ttl`](static/ontology/sstim-shapes.ttl) | SHACL constraints for modules, SKOS integrity, evidence, protocols, presets, safety, exposure, and sessions |
+| [`sstim-alignments.ttl`](static/ontology/sstim-alignments.ttl) | Conservatively scoped, verified Wikidata and OBO Foundry links |
+| [`sstim-patch-studio.ttl`](static/ontology/sstim-patch-studio.ttl) | Reproducible voice and authoring parameter properties |
+| [`sstim-exposure.ttl`](static/ontology/sstim-exposure.ttl) | Delivery media, perceived modalities, devices, placement, stimulus patterns, limits, effects, and knowledge status |
+| [`context.jsonld`](static/ontology/context.jsonld) | Public JSON-LD compaction context |
+| [`void.ttl`](static/ontology/void.ttl) | VoID/DCAT publication metadata and checked graph counts |
+| [`instances/`](static/ontology/instances) | Public BSC Lab framework, protocol, preset, evidence, experiment, reference, and synthetic session data |
 
-1. **Vocabulary navigation and annotation interface** — making the `sstim` vocabulary and ontology easier to browse, inspect, annotate, discuss, review, and evolve.
-2. **Reference implementation** — providing an open implementation environment for sensory stimulation techniques and protocols described using `sstim`, so terms can be tested against real session structures, stimulus parameters, devices, safety metadata, evidence annotations, and user-facing workflows.
+Every module is an `owl:Ontology` with creator, dates, license, description, and
+version metadata. Controlled values are dual-typed OWL individuals and SKOS
+concepts; their SKOS hierarchy inverses are materialized for clients that do not
+run inference. See the [ontology guide](static/ontology/README.md) and
+[ADR index](docs/decisions/README.md).
 
-The proposed W3C Community Group would focus on developing shared terminology and semantic structures so that sensory stimulation research, software, hardware, datasets, safety metadata, and institutional communication can become more coherent and interoperable.
+## Application
 
-The proposed group does **not** define clinical practice guidelines, certify therapeutic efficacy, prescribe medical protocols, issue public-health recommendations, evaluate regulated-device claims, or claim that any specific sensory stimulation protocol treats, cures, prevents, or diagnoses medical conditions.
+The first screen is the working application, not a marketing site. Its main
+surfaces are:
 
-Initial namespace:
+- **Knowledge browser:** Cytoscape graph navigation over named RDF graphs.
+- **SPARQL workbench:** Comunica queries over ontology and public instance data.
+- **Presets:** public BSC Lab reference presets and their evidence links.
+- **Patch Studio:** real-time audio/visual authoring with Web Audio,
+  AudioWorklet/WASM options, modulation, and photosensitivity safeguards.
+- **Sensory Field:** bounded visual/audio exposure prototyping that emits the
+  exposure vocabulary used by the knowledge graph.
+- **Logbook and profile:** optional user-owned records when Firebase is
+  configured.
+
+Architecture details are in [src/README.md](src/README.md),
+[Patch Studio](docs/technical/PATCH_STUDIO.md), and the
+[Session Model](docs/technical/SESSION_MODEL.md).
+
+## Quick Start
+
+The canonical environment is the pinned Nix flake:
+
+```bash
+nix develop
+npm ci
+make dev
+```
+
+The default development URL is `http://127.0.0.1:4173`. `direnv allow` can load
+the dev shell automatically. Without Nix, provide compatible Node 24, Python
+3.12 with `rdflib` and `pyshacl`, ROBOT/HermiT, WABT, and GNU Make yourself.
+
+Firebase is optional. Copy `.env.example` to `.env` and provide the
+`VITE_FIREBASE_*` values only when testing authentication, annotations,
+profiles, or cloud patches.
+
+## Verification
+
+Run the same gates used by CI:
+
+```bash
+make validate   # SHACL + audit + HermiT + SPARQL + serialization round trips
+make test       # Vitest unit tests
+make check      # SvelteKit sync and svelte-check
+make build      # Static production bundle in dist/
+make export     # JSON-LD and RDF/XML serializations of all six modules
+```
+
+`make validate` checks more than RDF syntax:
+
+1. SHACL validates each primary graph, all six merged modules, and all public
+   instances.
+2. `scripts/sstim-quality-audit.py` checks module metadata, JSON-LD context and
+   loader completeness, SKOS uniqueness/inverses/cycles, local IRI resolution,
+   functional properties, evidence provenance, and competency thresholds.
+3. ROBOT with HermiT checks OWL DL consistency across the module set.
+4. Comunica runs named-graph competency queries for delivery media, protocol
+   chains, evidence trails, actionable cautions, and phase-qualified reports.
+5. Generated JSON-LD and RDF/XML are parsed back and checked for graph
+   isomorphism with each Turtle source module.
+
+The immutable [`static/ontology/0.5.0/`](static/ontology/0.5.0) snapshot is not
+edited while live sources evolve. A future release is cut only after validation,
+version metadata, snapshot generation, tag creation, and Zenodo archival agree.
+
+## Repository Map
 
 ```text
-https://w3id.org/sstim/
-```
-
-Key documents:
-
-- [Charter](./CHARTER.md)
-- [W3C Community Group Proposal](./docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
-- [Scope](./docs/concept/SCOPE.md)
-- [Non-Scope](./docs/concept/NON_SCOPE.md)
-- [Ontology / Vocabulary Notes](./docs/ontology/README.md)
-
----
-
-## Current Status
-
-What exists today:
-
-- A reference-document set (concept, technical, ecosystem, decisions, AI-agent
-  directive) — see the [documentation index](docs/README.md)
-- Four ontology Turtle files: `sstim-core.ttl` (OWL), `sstim-vocab.ttl`
-  (multilingual SKOS), `sstim-shapes.ttl` (SHACL), `sstim-alignments.ttl`
-  (external links to Wikidata, DBpedia, OBO)
-- A SvelteKit/Svelte 5 app with two working subsystems:
-  - **Knowledge browser** — Cytoscape ontology graph, SPARQL interface, preset
-    browser, and optional Firebase-backed node annotations
-  - **Patch Studio** — a real-time audiovisual designer with four selectable
-    audio engines (Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, Silent),
-    six audio voice types (incl. noise, drone, sample) with a universal
-    tremolo, nine visual track types with blend/fullscreen mixing, breathing/
-    Symmetry control modulation, and a photosensitivity safety layer.
-    See [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md).
-- AudioWorklet processors and a hand-written WASM oscillator kernel in
-  `static/worklets/`, with synthetic CC0 ambient clips in `static/audio/`
-- A GitHub Pages deployment workflow for the client-only static build and
-  `/ontology/*.ttl` artifacts
-
-What does **not** yet exist or is explicitly out of scope:
-
-- The `core/` orchestration layer (master clock, Worker scheduler, orchestrator)
-  and the GPU visual / haptic engines described in the architecture specs
-- Custom-domain hosting at `lab.biosyncare.com`; deferred until the app needs
-  custom headers, WASM threading, or backend services
-- Private BioSynCare/BSC catalog conversion; that catalog is outside BSC Lab
-- A bridge from a Patch Studio draft to the preset catalog JSON / RDF instances
-- JSON Schemas for preset/session validation (`schemas/`), the `tests/` subtree,
-  pre-commit hooks (`hooks/`), and deployed WIDOCO documentation
-
-See [`ROADMAP.md`](ROADMAP.md) for phase definitions and
-[`TODO.md`](TODO.md) for the tracked task list.
-
----
-
-## Repository map
-
-```
-CLAUDE.md               AI agent directive — read first before any edit
-ROADMAP.md              Strategic phases (0 → 1 → 2 → 3)
-TODO.md                 Tracked task list; current-focus section at top
-CONTRIBUTING.md         Governance and contribution guide
-
-docs/                   Reference documents — see docs/README.md (index)
-  concept/              What the domain is, scope, evidence framework
-  technical/            Preset format, Patch Studio, safety, engine architectures
-  decisions/            Architecture decision records (ADRs)
-  ecosystem/            IP strategy, W3C CG charter, advisory board, partners
-
+CLAUDE.md                 Repository invariants and agent instructions
+README.md                 Project status and entry point
+ROADMAP.md / TODO.md      Strategic phases and tracked work
+docs/
+  concept/                Domain definition, scope, non-scope, evidence policy
+  technical/              Preset, session, engine, safety, and UI specifications
+  ontology/               Ontology review and publication planning
+  decisions/              Architecture decision records
+  ecosystem/              W3C proposal, governance, identifiers, and outreach
 static/
-  ontology/             Turtle files served by Vite dev and GitHub Pages
-    sstim-core.ttl        OWL classes and properties
-    sstim-vocab.ttl       SKOS vocabulary (en/it/pt/es), dual-typed individuals
-    sstim-shapes.ttl      SHACL validation shapes
-    sstim-alignments.ttl  External ontology alignments (BFO, OBI, IAO, Wikidata)
-    instances/            Public BSC Lab/reference RDF instances (seed data)
-  worklets/             AudioWorklet processors + WASM oscillator kernel
-  audio/                Synthetic CC0 ambient clips for the Sample voice
-
-src/                    SvelteKit app — see src/README.md
-  rdf/                  Loader, SPARQL wrapper, graph model, namespace IRI helpers
-  engines/audio/        IAudioEngine + four engines + selection factory
-  ui/                   Patch Studio, ontology graph, annotations, navigation,
-                        theme, safety, auth
-  firebase/             Optional auth + Firestore (annotations, profiles, patches)
-  routes/               SvelteKit pages (graph, creator, presets, sparql,
-                        logbook, profile, settings)
-  core/, engines/visual, engines/haptic  Planned modules (README placeholders)
-
-scripts/                gen-ambiences.mjs (regenerates static/audio/*.wav)
-schemas/                JSON Schemas (planned)
-tests/                  Dedicated test subtree (planned; unit tests beside source)
+  ontology/               Live modules, context, VoID, frozen releases, instances
+  worklets/               AudioWorklet processors and oscillator WASM
+  audio/                  Synthetic CC0 reference audio
+src/
+  rdf/                    N3 loader, named graphs, queries, and validation
+  engines/                Audio implementation and planned engine boundaries
+  ui/                     Knowledge browser, Patch Studio, field, safety, account UI
+  routes/                 SvelteKit application routes
+scripts/                  Export, snapshot, semantic audit, and competency tooling
+.github/workflows/        RDF validation, app checks, and Pages deployment
 ```
 
----
+The full documentation map is [docs/README.md](docs/README.md).
 
-## Start here
+## Identifiers And Data Boundaries
 
-- **Documentation index:** [`docs/README.md`](docs/README.md) — the map of every
-  reference document.
-- **First-time readers:** [`docs/concept/SCOPE.md`](docs/concept/SCOPE.md) —
-  what BSC Lab claims and explicitly does not claim.
-- **Ontology / knowledge graph:** [`static/ontology/README.md`](static/ontology/README.md).
-- **Software architecture:** [`src/README.md`](src/README.md).
-- **Patch Studio (the audiovisual designer):**
-  [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md).
-- **AI coding agents (Claude, Copilot, Cursor, Gemini):**
-  [`CLAUDE.md`](CLAUDE.md) — absolute invariants and project conventions.
-- **Preset catalog data format:**
-  [`docs/technical/PRESET_FORMAT.md`](docs/technical/PRESET_FORMAT.md).
+- `https://w3id.org/sstim#` - reusable core terms.
+- `https://w3id.org/sstim/vocab#` - controlled vocabulary concepts.
+- `https://w3id.org/sstim/exposure#` - exposure and experiment terms.
+- `https://w3id.org/sstim/framework/bsc` - the BSC framework.
+- `https://w3id.org/sstim/implementation/bsclab/` - public BSC Lab data.
+- `https://w3id.org/sstim/implementation/biosyncare/` - reserved public-safe
+  BioSynCare implementation metadata, not its private catalog.
+- `https://w3id.org/sstim/ref/` - reusable public-safe references.
 
----
+Ontology terms, public reference data, user annotations, and session records
+belong in separate named graphs. The repository includes only a clearly marked
+synthetic session fixture; real user records remain user-owned and are not
+committed.
 
-## Development environment (Nix)
+## Relationship To BioSynCare
 
-The canonical toolchain is pinned with a Nix flake, so every contributor and CI
-run uses the exact same Node, Python + pySHACL, and WABT (`wat2wasm`) versions:
+BSC Lab is the open research and reference implementation. BioSynCare is a
+separate closed-source commercial application. They may coordinate on the
+preset format and SSTIM vocabulary, but neither repository imports the other's
+private data. BSC is a framework; BSC Lab and BioSynCare are implementations;
+protocols, presets, and session executions are separate modeled levels.
 
-```bash
-nix develop          # enter the pinned dev shell (Node 24, Python 3.12 + pyshacl, wabt, make)
-# or, with direnv:
-direnv allow         # auto-loads the shell on cd into the repo (one-time)
-```
+## W3C Community Group Proposal
 
-CI builds, checks, validation, and the Pages deploy all run inside this same
-flake (`nix develop --command ...`). `flake.lock` records the exact nixpkgs
-revision; regenerate it with `nix flake update`.
+This repository is the technical anchor for a proposed vendor-neutral Sensory
+Stimulation Vocabulary Community Group. The proposal covers shared terms,
+semantic models, JSON-LD contexts, SHACL profiles, safety metadata, evidence
+annotations, and implementation guidance. It does not define clinical practice
+or certify products.
 
-Nix is the recommended path but not mandatory — the plain `npm`/`make` workflow
-below still works if you provide Node 24, Python 3.12 + `pyshacl`, and `wabt`
-yourself.
+- [Charter](CHARTER.md)
+- [Community Group Proposal](docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
+- [Ontology publication plan](docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
+- [Contributing](CONTRIBUTING.md)
 
-## Local Verification
+## Citation And License
 
-The current runnable checks are (run them directly, or prefix with
-`nix develop --command` if you are not in the shell):
+For the released ontology, cite SSTIM `v0.5.0` using
+[10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975). Use the
+[concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
+across releases. Do not cite `0.6.0-dev` as an immutable release.
 
-```bash
-make validate  # SHACL over core + vocabulary + RDF instances
-make check     # SvelteKit sync + svelte-check
-make build     # Static production build into dist/
-make wasm      # Recompile static/worklets/bsc-osc.wasm from bsc-osc.wat
-```
-
-The SHACL pass currently conforms for the core ontology, vocabulary, and seeded
-RDF instances. A local `hooks/pre-commit` wrapper is planned for Phase 1.
-
-## Firebase Features
-
-RDF node annotations, profiles, and Patch Studio cloud patches are optional.
-To enable them locally, copy
-`.env.example` to `.env`, fill the `VITE_FIREBASE_*` values from a Firebase web
-app, and enable Email/Password, Google, and Anonymous providers in Firebase
-Auth. For GitHub Pages, add the same `VITE_FIREBASE_*` keys as repository
-Actions variables so the static build receives them. Deploy `firestore.rules`
-and `firestore.indexes.json` to keep user-owned documents scoped to the
-signed-in user.
-
----
-
-## Namespace convention
-
-SSTIM has one persistent registered namespace, with scoped paths for ontology
-terms, frameworks, and concrete implementations:
-
-- **`https://w3id.org/sstim`** — the ontology (OWL classes/properties, SKOS
-  vocabulary, SHACL shapes). Reusable by other projects. The w3id redirect is
-  live and should resolve to the GitHub Pages `/ontology/*.ttl` artifacts.
-- **`https://w3id.org/sstim/framework/bsc`** — the BSC framework: techniques,
-  composition rules, evidence rules, and design principles.
-- **`https://w3id.org/sstim/implementation/biosyncare`** — reserved for
-  public-safe BioSynCare implementation metadata if it is ever published; the
-  private BioSynCare catalog is not loaded by BSC Lab.
-- **`https://w3id.org/sstim/implementation/bsclab`** — the open BSC Lab
-  reference implementation and public seed/reference data.
-
-Implementation data uses implementation-scoped subpaths such as
-`/preset/{id}`, `/session/{id}`, `/annotation/{id}`, and `/evidence/{id}`.
-BSC itself is a framework, not a protocol, preset, or software app.
-
-Full discussion in [`CLAUDE.md` §5.1](CLAUDE.md) and
-[`ADR 0007`](docs/decisions/0007-framework-protocol-implementation.md).
-
----
-
-## Relationship to BioSynCare
-
-BioSynCare is the commercial application (React Native, separate repository,
-closed source). BSC Lab is the open-source research and development platform.
-The interface between them is the preset JSON format, SSTIM vocabulary, and
-shared implementation standards. The BioSynCare/BSC catalog remains private in
-the BioSynCare context and is not converted to Turtle in this repository.
-Neither repo imports from the other. Changes to the preset schema require
-coordination between both.
-
----
-
-## License and contact
-
-- **Software source code:** Apache License 2.0 — see [`LICENSE`](LICENSE).
-- **Ontology, vocabulary, documentation, and public BSC Lab seed/reference
-  data:** Creative Commons Attribution 4.0 International — see
-  [`LICENSE-ontology`](LICENSE-ontology).
-- **Current citable release (`v0.5.0`):**
-  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
-- **All archived versions:** concept DOI
-  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Maintainer:** Renato Fabbri — `renato.fabbri@gmail.com` —
-  ORCID [0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X)
-- **Contributions:** see [`CONTRIBUTING.md`](CONTRIBUTING.md). Bug reports
-  and discussion: GitHub issues on this repository.
+- Software: [Apache License 2.0](LICENSE).
+- Ontology, vocabulary, documentation, and public reference data:
+  [CC BY 4.0](LICENSE-ontology).
+- Maintainer: Renato Fabbri,
+  [ORCID 0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X).

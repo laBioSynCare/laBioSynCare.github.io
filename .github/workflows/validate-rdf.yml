@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'static/ontology/**'
+      - 'src/rdf/loader.js'
+      - 'scripts/sstim-quality-audit.py'
+      - 'scripts/sstim-exposure-sanity.mjs'
+      - 'scripts/export-ontology.py'
       - 'Makefile'
       - 'flake.nix'
       - 'flake.lock'
@@ -13,6 +17,10 @@ on:
       - main
     paths:
       - 'static/ontology/**'
+      - 'src/rdf/loader.js'
+      - 'scripts/sstim-quality-audit.py'
+      - 'scripts/sstim-exposure-sanity.mjs'
+      - 'scripts/export-ontology.py'
       - 'Makefile'
       - 'flake.nix'
       - 'flake.lock'
@@ -48,5 +56,5 @@ jobs:
       - name: Install dependencies
         run: nix develop --command npm ci
 
-      - name: Run SHACL, DL reasoner, and SPARQL validation
+      - name: Run RDF, SHACL, OWL, quality, query, and export validation
         run: nix develop --command make validate

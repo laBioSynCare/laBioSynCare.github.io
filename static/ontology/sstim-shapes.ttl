@@ -3,8 +3,8 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.5.0
-#  Date:       2026-06-17
+#  Version:    0.6.0-dev
+#  Date:       2026-07-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -23,11 +23,67 @@
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/shapes> a owl:Ontology ;
+    owl:versionInfo "0.6.0-dev" ;
+    dct:title "SSTIM SHACL Validation Shapes"@en ;
+    dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, and references."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-04-12"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Ontology module metadata shape
+###########################################################################
+
+sstim-sh:OntologyMetadataShape a sh:NodeShape ;
+    sh:targetClass owl:Ontology ;
+    sh:name "OWL ontology module metadata"@en ;
+    sh:property [
+        sh:path owl:versionInfo ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Every SSTIM ontology module must declare one owl:versionInfo value."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:title ; sh:minCount 1 ;
+        sh:message "Every SSTIM ontology module must declare dct:title."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "Every SSTIM ontology module must declare dct:description."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:creator ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every SSTIM ontology module must identify an IRI-valued dct:creator."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every SSTIM ontology module must declare one xsd:date dct:created value."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:modified ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every SSTIM ontology module must declare one xsd:date dct:modified value."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:license ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every SSTIM ontology module must declare an IRI-valued dct:license."@en ;
+    ] .
 
 
 ###########################################################################
@@ -43,6 +99,12 @@ sstim-sh:PresetShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:datatype xsd:string ;
         sh:message "Preset must have at least one rdfs:label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:description ;
+        sh:minCount 1 ;
+        sh:message "Preset must have a dct:description with conservative scope and use context."@en ;
     ] ;
 
     sh:property [
@@ -83,6 +145,27 @@ sstim-sh:PresetShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:class sstim:Voice ;
         sh:message "Preset must be composed of at least one Voice."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:forImplementation ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:SensoryStimulationImplementation ;
+        sh:message "Preset must identify exactly one implementation whose parameter model it configures."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:followsProtocol ;
+        sh:minCount 1 ;
+        sh:class sstim:SensoryStimulationProtocol ;
+        sh:message "Preset must follow at least one declared sensory stimulation protocol."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:hasPublicClaimLevel ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:PublicClaimLevel ;
+        sh:message "Preset must declare exactly one public claim level."@en ;
     ] ;
 
     # CLAUDE.md §4.5: hasBreathGuide is true iff exactly one composed voice is the
@@ -380,6 +463,16 @@ sstim-sh:EvidenceClaimShape a sh:NodeShape ;
     sh:name "EvidenceClaim"@en ;
 
     sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "EvidenceClaim must have a human-readable rdfs:label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "EvidenceClaim must describe the exact scoped assertion and its limits."@en ;
+    ] ;
+
+    sh:property [
         sh:path sstim:hasEvidenceTier ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -404,22 +497,35 @@ sstim-sh:EvidenceClaimShape a sh:NodeShape ;
         sh:message "supportsRelation must point to a sstim:Preset or sstim:SensoryStimulationTechnique."@en ;
     ] ;
 
-    # Optional evidence dimensions (P3 item 1): validated by type when present.
+    sh:or (
+        [ sh:path sstim:supportsRelation ; sh:minCount 1 ]
+        [ sh:path sstim-ex:concernsEffectDimension ; sh:minCount 1 ]
+    ) ;
+    sh:message "EvidenceClaim must identify its subject through supportsRelation or, for an ExposureEffectClaim, concernsEffectDimension."@en ;
+
     sh:property [
-        sh:path sstim:hasClaimDirection ; sh:maxCount 1 ; sh:class sstim:ClaimDirection ;
-        sh:message "hasClaimDirection must be a single sstim:ClaimDirection."@en ;
+        sh:path sstim:hasClaimDirection ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ClaimDirection ;
+        sh:message "EvidenceClaim must have exactly one sstim:ClaimDirection."@en ;
     ] ;
     sh:property [
         sh:path sstim:hasEffectDirection ; sh:maxCount 1 ; sh:class sstim:EffectDirection ;
         sh:message "hasEffectDirection must be a single sstim:EffectDirection."@en ;
     ] ;
     sh:property [
-        sh:path sstim:hasReviewStatus ; sh:maxCount 1 ; sh:class sstim:ReviewStatus ;
-        sh:message "hasReviewStatus must be a single sstim:ReviewStatus."@en ;
+        sh:path sstim:hasReviewStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ReviewStatus ;
+        sh:message "EvidenceClaim must have exactly one sstim:ReviewStatus."@en ;
     ] ;
     sh:property [
-        sh:path sstim:evidenceDate ; sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "evidenceDate must be a single xsd:date."@en ;
+        sh:path sstim:evidenceDate ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "EvidenceClaim must have one xsd:date evidence review date."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "EvidenceClaim must identify at least one IRI-valued responsible agent via prov:wasAttributedTo."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:modified ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "EvidenceClaim must declare one xsd:date dct:modified value."@en ;
     ] ;
     sh:property [
         sh:path sstim:evidenceOutcome ; sh:datatype xsd:string ;
@@ -467,6 +573,16 @@ sstim-sh:SessionSpecShape a sh:NodeShape ;
     sh:name "SessionSpecification"@en ;
 
     sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "SessionSpecification must have a human-readable rdfs:label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "SessionSpecification must have one immutable xsd:dateTime creation timestamp."@en ;
+    ] ;
+
+    sh:property [
         sh:path sstim:referencesPreset ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -504,6 +620,11 @@ sstim-sh:SessionInstanceShape a sh:NodeShape ;
     sh:name "SessionInstance"@en ;
 
     sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "SessionInstance must have a human-readable rdfs:label."@en ;
+    ] ;
+
+    sh:property [
         sh:path sstim:usesSpecification ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
@@ -527,6 +648,25 @@ sstim-sh:SessionInstanceShape a sh:NodeShape ;
         sh:datatype xsd:string ;
         sh:in ( "completed" "interrupted" "abandoned" ) ;
         sh:message "completionStatus must be 'completed', 'interrupted', or 'abandoned'."@en ;
+    ] ;
+
+    sh:property [
+        sh:path prov:startedAtTime ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:lessThan prov:endedAtTime ;
+        sh:message "SessionInstance must have one start timestamp earlier than its end timestamp."@en ;
+    ] ;
+
+    sh:property [
+        sh:path prov:endedAtTime ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "SessionInstance must have one xsd:dateTime end timestamp."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:hasSelfReport ;
+        sh:class sstim:SelfReport ;
+        sh:message "Each hasSelfReport value must be a sstim:SelfReport."@en ;
     ] .
 
 
@@ -581,19 +721,57 @@ sstim-sh:ReferenceShape a sh:NodeShape ;
         sh:minCount 1 ;
         sh:datatype xsd:string ;
         sh:message "PublicSafeReference must have a dct:title."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:creator ; sh:minCount 1 ;
+        sh:message "PublicSafeReference must identify at least one creator."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:issued ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:or ( [ sh:datatype xsd:date ] [ sh:datatype xsd:gYear ] ) ;
+        sh:message "PublicSafeReference must have one dct:issued date or year."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:identifier ; sh:minCount 1 ;
+        sh:datatype xsd:string ; sh:pattern "^doi:10\\." ; sh:flags "i" ;
+        sh:message "PublicSafeReference must include a DOI identifier beginning with doi:10."@en ;
     ] .
 
 ###########################################################################
 # Self-Report Shape
 #
-# All fields are optional in the model (self-report is collected only with
-# consent), so these constraints validate the value range when a field is
-# present rather than requiring it.
+# A self-report is optional and consent-governed. Once present, it must identify
+# its collection phase and timestamp and contain at least one report value;
+# individual report fields remain optional.
 ###########################################################################
 
 sstim-sh:SelfReportShape a sh:NodeShape ;
     sh:targetClass sstim:SelfReport ;
     sh:name "SelfReport"@en ;
+
+    sh:property [
+        sh:path sstim:hasReportPhase ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:SelfReportPhase ;
+        sh:message "SelfReport must identify exactly one collection phase."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:generatedAtTime ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "SelfReport must record one xsd:dateTime collection timestamp."@en ;
+    ] ;
+
+    sh:or (
+        [ sh:path sstim:primaryAffect ; sh:minCount 1 ]
+        [ sh:path sstim:focusRating ; sh:minCount 1 ]
+        [ sh:path sstim:sleepiness ; sh:minCount 1 ]
+        [ sh:path sstim:subjectiveQuality ; sh:minCount 1 ]
+        [ sh:path sstim:goalAchieved ; sh:minCount 1 ]
+    ) ;
+    sh:message "SelfReport must contain at least one report value."@en ;
 
     sh:property [
         sh:path sstim:primaryAffect ;
@@ -634,9 +812,8 @@ sstim-sh:SelfReportShape a sh:NodeShape ;
 ###########################################################################
 # Framework / Protocol / Implementation Shapes
 #
-# Minimal coverage: each must carry a human-readable rdfs:label, matching the
-# label requirement already imposed on Preset. Closes the framework/protocol/
-# implementation gap noted in docs/ontology/IMPROVEMENT_PLAN.md.
+# These shapes require the relations that make the framework → protocol →
+# implementation → preset chain queryable rather than label-only.
 ###########################################################################
 
 sstim-sh:FrameworkShape a sh:NodeShape ;
@@ -646,6 +823,15 @@ sstim-sh:FrameworkShape a sh:NodeShape ;
         sh:path rdfs:label ;
         sh:minCount 1 ;
         sh:message "SensoryStimulationFramework must have at least one rdfs:label."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "SensoryStimulationFramework must have a dct:description."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:definesTechnique ; sh:minCount 1 ;
+        sh:class sstim:SensoryStimulationTechnique ;
+        sh:message "SensoryStimulationFramework must define at least one technique."@en ;
     ] .
 
 sstim-sh:ProtocolShape a sh:NodeShape ;
@@ -655,7 +841,26 @@ sstim-sh:ProtocolShape a sh:NodeShape ;
         sh:path rdfs:label ;
         sh:minCount 1 ;
         sh:message "SensoryStimulationProtocol must have at least one rdfs:label."@en ;
-    ] .
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "SensoryStimulationProtocol must have a scoped dct:description."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:definedByFramework ; sh:minCount 1 ;
+        sh:class sstim:SensoryStimulationFramework ;
+        sh:message "SensoryStimulationProtocol must identify its defining framework."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:usesTechnique ;
+        sh:class sstim:SensoryStimulationTechnique ;
+        sh:message "Every usesTechnique value must be a declared sensory stimulation technique."@en ;
+    ] ;
+    sh:or (
+        [ sh:path sstim:usesTechnique ; sh:minCount 1 ]
+        [ sh:path skos:editorialNote ; sh:minCount 1 ]
+    ) ;
+    sh:message "Protocol must use at least one declared technique or explain in skos:editorialNote why it is a baseline/capability-boundary protocol."@en .
 
 sstim-sh:ImplementationShape a sh:NodeShape ;
     sh:targetClass sstim:SensoryStimulationImplementation ;
@@ -664,11 +869,20 @@ sstim-sh:ImplementationShape a sh:NodeShape ;
         sh:path rdfs:label ;
         sh:minCount 1 ;
         sh:message "SensoryStimulationImplementation must have at least one rdfs:label."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "SensoryStimulationImplementation must have a dct:description."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:implementsFramework ; sh:minCount 1 ;
+        sh:class sstim:SensoryStimulationFramework ;
+        sh:message "SensoryStimulationImplementation must identify at least one implemented framework."@en ;
     ] .
 
 
 ###########################################################################
-# Technique Shape (P1 item 1 — full, after P2 item 4)
+# Technique Shape
 #
 # Every Sensory Stimulation Technique must declare a proposed mechanism, a
 # stimulus temporal structure, and a delivery/perceived modality — UNLESS it is a
@@ -678,9 +892,8 @@ sstim-sh:ImplementationShape a sh:NodeShape ;
 # subclass instances (Entrainment-Based / Non-Entrainment) are covered via
 # rdfs:subClassOf closure when the core ontology is in scope.
 #
-# The BSC framework technique instances were aligned with this metadata model
-# (P2 item 4) so the temporal/modality requirements hold at Violation severity
-# without breaking `make validate`.
+# BSC framework technique instances follow this metadata model, so the
+# temporal/modality requirements hold at Violation severity.
 ###########################################################################
 
 sstim-sh:TechniqueShape a sh:NodeShape ;
@@ -699,11 +912,11 @@ sstim-sh:TechniqueShape a sh:NodeShape ;
 
 
 ###########################################################################
-# SKOS Concept Integrity Shape (P1 item 5 / P2 items 1 & 3)
+# SKOS Concept Integrity Shape
 #
 # Every controlled-vocabulary concept must sit in a scheme, carry an English
 # preferred label (the cross-language anchor used by the knowledge browser), and
-# carry a skos:notation. Notation policy (P2 item 3): every concept — including
+# carry a skos:notation. Every concept — including
 # structural roots such as sstim-v:allFrequencyBands (notation "all") — carries a
 # notation; coverage is 100% across the vocabulary and exposure modules.
 # Scheme-level navigability (top concepts) is enforced by ConceptSchemeShape.
@@ -720,43 +933,205 @@ sstim-sh:ConceptIntegrityShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path skos:prefLabel ;
+        sh:uniqueLang true ;
         sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ;
         sh:qualifiedMinCount 1 ;
-        sh:message "Every skos:Concept must have an English (@en) skos:prefLabel."@en ;
+        sh:message "Every skos:Concept must have an English prefLabel and no more than one prefLabel per language."@en ;
     ] ;
     sh:property [
         sh:path skos:notation ;
         sh:minCount 1 ;
-        sh:message "Every skos:Concept must declare a skos:notation."@en ;
+        sh:maxCount 1 ;
+        sh:message "Every skos:Concept must declare exactly one skos:notation."@en ;
+    ] ;
+
+    sh:or (
+        [ sh:path skos:definition ; sh:minCount 1 ]
+        [ sh:path skos:scopeNote ; sh:minCount 1 ]
+        [ sh:path skos:editorialNote ; sh:minCount 1 ]
+    ) ;
+    sh:message "Every skos:Concept must have a definition, scope note, or editorial note."@en ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "skos:topConceptOf must be materialized in the inverse scheme skos:hasTopConcept relation."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/2004/02/skos/core#topConceptOf> ?scheme .
+                FILTER NOT EXISTS {
+                    ?scheme <http://www.w3.org/2004/02/skos/core#hasTopConcept> $this .
+                }
+            }
+        """ ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "skos:broader must be materialized in the inverse skos:narrower relation."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/2004/02/skos/core#broader> ?broader .
+                FILTER NOT EXISTS {
+                    ?broader <http://www.w3.org/2004/02/skos/core#narrower> $this .
+                }
+            }
+        """ ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A SKOS concept must not participate in a skos:broader cycle."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/2004/02/skos/core#broader>+ $this .
+            }
+        """ ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "skos:notation must be unique within each concept scheme."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/2004/02/skos/core#inScheme> ?scheme ;
+                      <http://www.w3.org/2004/02/skos/core#notation> ?notation .
+                ?other <http://www.w3.org/2004/02/skos/core#inScheme> ?scheme ;
+                       <http://www.w3.org/2004/02/skos/core#notation> ?notation .
+                FILTER( ?other != $this )
+            }
+        """ ;
     ] .
 
 
 ###########################################################################
-# SKOS Concept Scheme Shape (P1 item 5 / P2 item 1)
+# SKOS Concept Scheme Shape
 #
-# Every concept scheme must be navigable from at least one top concept. With the
-# 2026-06 top-concept additions, all 11 schemes declare skos:hasTopConcept.
+# Every concept scheme must be navigable from at least one top concept. All
+# schemes in the live module set declare skos:hasTopConcept.
 ###########################################################################
 
 sstim-sh:ConceptSchemeShape a sh:NodeShape ;
     sh:targetClass skos:ConceptScheme ;
     sh:name "SKOS Concept Scheme"@en ;
     sh:property [
+        sh:path skos:prefLabel ; sh:minCount 1 ; sh:uniqueLang true ;
+        sh:message "Every skos:ConceptScheme must have a preferred label and no duplicate preferred-label language."@en ;
+    ] ;
+    sh:or (
+        [ sh:path skos:definition ; sh:minCount 1 ]
+        [ sh:path dct:description ; sh:minCount 1 ]
+    ) ;
+    sh:message "Every skos:ConceptScheme must have a definition or description."@en ;
+    sh:property [
         sh:path skos:hasTopConcept ;
         sh:minCount 1 ;
+        sh:class skos:Concept ;
         sh:message "Every skos:ConceptScheme must declare at least one skos:hasTopConcept (navigability)."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Each skos:hasTopConcept relation must have a materialized skos:topConceptOf inverse and the concept must belong to the same scheme."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/2004/02/skos/core#hasTopConcept> ?concept .
+                FILTER(
+                    NOT EXISTS { ?concept <http://www.w3.org/2004/02/skos/core#topConceptOf> $this . }
+                    || NOT EXISTS { ?concept <http://www.w3.org/2004/02/skos/core#inScheme> $this . }
+                )
+            }
+        """ ;
+    ] .
+
+
+###########################################################################
+# Caution metadata shapes
+###########################################################################
+
+sstim-sh:CautionSeverityShape a sh:NodeShape ;
+    sh:targetClass sstim:CautionSeverity ;
+    sh:name "CautionSeverity"@en ;
+    sh:property [
+        sh:path sstim:cautionSeverityRank ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 4 ;
+        sh:message "CautionSeverity must have exactly one integer rank from 1 through 4."@en ;
+    ] .
+
+sstim-sh:CautionTagShape a sh:NodeShape ;
+    sh:targetClass sstim:CautionTag ;
+    sh:name "CautionTag"@en ;
+    sh:property [
+        sh:path sstim:hasCautionSeverity ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:CautionSeverity ;
+        sh:message "CautionTag must have exactly one caution severity."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:triggerCondition ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:message "CautionTag must describe at least one trigger condition."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:affectedPopulation ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:message "CautionTag must state the users or contexts to which it applies."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:recommendedAction ;
+        sh:minCount 1 ; sh:datatype xsd:string ;
+        sh:message "CautionTag must provide at least one concrete recommended action."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:displayPriority ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:integer ; sh:minInclusive 1 ;
+        sh:message "CautionTag must have one positive integer display priority."@en ;
     ] .
 
 
 ###########################################################################
 # Exposure module shapes (sstim-ex:)
 #
-# These target the exposure terms added in module 0.4.0 (ADR 0011). They are
-# scoped narrowly to the new terms so that pre-0.4.0 committed instances are
-# not retroactively invalidated. Runtime flicker enforcement lives in
-# src/ui/safety/flashSafety.js; a conditional "UV/IR channel must declare an
-# optical boundary" shape is tracked as future work in IMPROVEMENT_PLAN.
+# These target the exposure terms introduced in module 0.4.0 (ADR 0011) and
+# strengthened on the live development line. Runtime flicker enforcement lives
+# in src/ui/safety/flashSafety.js; matching RDF boundary declarations are
+# enforced below by StimulusChannelShape.
 ###########################################################################
+
+sstim-sh:ExposureProfileShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:ExposureProfile ;
+    sh:name "ExposureProfile"@en ;
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "ExposureProfile must have a human-readable label."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:usesStimulusChannel ; sh:minCount 1 ;
+        sh:class sstim-ex:StimulusChannel ;
+        sh:message "ExposureProfile must use at least one declared StimulusChannel."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ;
+        sh:class sstim-ex:KnowledgeStatus ;
+        sh:message "ExposureProfile must declare at least one local knowledge status."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:hasEffectClaim ; sh:minCount 1 ;
+        sh:class sstim-ex:ExposureEffectClaim ;
+        sh:message "ExposureProfile must link its effects or risks through qualified ExposureEffectClaim nodes."@en ;
+    ] .
+
+sstim-sh:ExposureEffectClaimShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:ExposureEffectClaim ;
+    sh:name "ExposureEffectClaim"@en ;
+    sh:property [
+        sh:path sstim-ex:concernsEffectDimension ; sh:minCount 1 ;
+        sh:class sstim-ex:EffectDimension ;
+        sh:message "ExposureEffectClaim must identify at least one effect dimension."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ;
+        sh:class sstim-ex:KnowledgeStatus ;
+        sh:message "ExposureEffectClaim must declare at least one local knowledge status."@en ;
+    ] .
 
 sstim-sh:ExposureLimitShape a sh:NodeShape ;
     sh:targetClass sstim-ex:ExposureLimit ;
@@ -769,7 +1144,32 @@ sstim-sh:ExposureLimitShape a sh:NodeShape ;
     ] ;
 
     sh:property [
+        sh:path sstim-ex:limitQuantity ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "ExposureLimit must identify exactly one constrained quantity."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:limitUnit ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "ExposureLimit must identify exactly one unit."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:appliesToPlacement ; sh:minCount 1 ;
+        sh:class sstim-ex:BodyPlacement ;
+        sh:message "ExposureLimit must identify at least one applicable placement."@en ;
+    ] ;
+
+    sh:or (
+        [ sh:path sstim-ex:limitValue ; sh:minCount 1 ]
+        [ sh:path sstim-ex:limitMaxFrequencyHz ; sh:minCount 1 ]
+    ) ;
+    sh:message "ExposureLimit must provide a numeric limit value or maximum frequency."@en ;
+
+    sh:property [
         sh:path sstim-ex:limitMaxFrequencyHz ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "limitMaxFrequencyHz must be a non-negative decimal (Hz)."@en ;
@@ -777,6 +1177,7 @@ sstim-sh:ExposureLimitShape a sh:NodeShape ;
 
     sh:property [
         sh:path sstim-ex:limitValue ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "limitValue must be a non-negative decimal."@en ;
@@ -804,6 +1205,7 @@ sstim-sh:FlickerRateShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim-ex:hasFlickerRateHz ;
     sh:property [
         sh:path sstim-ex:hasFlickerRateHz ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "hasFlickerRateHz must be a non-negative decimal (Hz)."@en ;
@@ -813,6 +1215,7 @@ sstim-sh:FrequencyShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim-ex:hasFrequencyHz ;
     sh:property [
         sh:path sstim-ex:hasFrequencyHz ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "hasFrequencyHz must be a non-negative decimal (Hz)."@en ;
@@ -822,6 +1225,7 @@ sstim-sh:BeatFrequencyShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim-ex:hasBeatFrequencyHz ;
     sh:property [
         sh:path sstim-ex:hasBeatFrequencyHz ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "hasBeatFrequencyHz must be a non-negative decimal (Hz)."@en ;
@@ -831,6 +1235,7 @@ sstim-sh:DutyCycleShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim-ex:hasDutyCycle ;
     sh:property [
         sh:path sstim-ex:hasDutyCycle ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:maxInclusive 1 ;
@@ -841,10 +1246,32 @@ sstim-sh:GainLevelShape a sh:NodeShape ;
     sh:targetSubjectsOf sstim-ex:hasGainLevel ;
     sh:property [
         sh:path sstim-ex:hasGainLevel ;
+        sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:maxInclusive 1 ;
         sh:message "hasGainLevel must be a decimal in [0, 1]."@en ;
+    ] .
+
+sstim-sh:PhaseOffsetShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasPhaseOffset ;
+    sh:property [
+        sh:path sstim-ex:hasPhaseOffset ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ; sh:minInclusive 0 ; sh:maxInclusive 1 ;
+        sh:message "hasPhaseOffset must be a single decimal fraction in [0, 1]."@en ;
+    ] .
+
+sstim-sh:ReferencePitchShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:referencePitchHz ;
+    sh:property [
+        sh:path sstim-ex:referencePitchHz ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "referencePitchHz must be a single positive decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:referencePitchNote ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A reference-pitch value must identify exactly one reference note."@en ;
     ] .
 
 
@@ -861,6 +1288,35 @@ sstim-sh:GainLevelShape a sh:NodeShape ;
 sstim-sh:StimulusChannelShape a sh:NodeShape ;
     sh:targetClass sstim-ex:StimulusChannel ;
     sh:name "StimulusChannel"@en ;
+
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "StimulusChannel must have a human-readable label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:deliveryMedium ; sh:minCount 1 ;
+        sh:class sstim-ex:PhysicalDeliveryMedium ;
+        sh:message "StimulusChannel must identify at least one physical delivery medium."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:perceivedModality ; sh:minCount 1 ;
+        sh:class sstim-ex:PerceivedModality ;
+        sh:message "StimulusChannel must identify at least one perceived modality."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:hasBodyPlacement ; sh:minCount 1 ;
+        sh:class sstim-ex:BodyPlacement ;
+        sh:message "StimulusChannel must identify at least one body or near-body placement."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-ex:hasStimulusPattern ;
+        sh:class sstim-ex:StimulusPattern ;
+        sh:message "Every hasStimulusPattern value must be a declared StimulusPattern."@en ;
+    ] ;
 
     sh:sparql [
         a sh:SPARQLConstraint ;

@@ -7,8 +7,8 @@
 > are historical record. Do not add tasks to "Not yet" phases without
 > explicit instruction from Renato.
 >
-> **Current phase: 0 → 1 boundary.** Focus is on closing the public
-> foundation pass and hardening the initial knowledge-browser scaffold.
+> **Current phase: Phase 1 public foundation.** Phase 0 is complete. Focus is
+> on hardening the published ontology and initial knowledge-browser scaffold.
 > Do not build the Phase 2 stimulation player yet.
 
 ---
@@ -24,7 +24,7 @@
 ```
 
 Phase tags:
-- `P0` Bootstrap (now)
+- `P0` Bootstrap (complete)
 - `P1` Public Foundation (May–Jul 2026)
 - `P2` Stimulation Platform (Jul–Nov 2026)
 - `P3` Evidence Infrastructure (Nov 2026–Apr 2027)
@@ -33,14 +33,11 @@ Phase tags:
 
 ## Current Focus (update when focus shifts)
 
-**Week of April 21, 2026:**
-Phase 0 Public Foundation Pass is closing. The Phase 0 reference
-documents, four ontology `.ttl` files, docs index, instance-layout index,
-SvelteKit scaffold, RDF loader/query layer, ontology graph route, and basic
-SPARQL and preset routes exist. Current focus: keep BSC Lab seed/reference
-instances public and separate from the private BioSynCare/BSC catalog, keep
-namespace paths consistently scoped under SSTIM, and add local validation that
-mirrors CI.
+**Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
+SSTIM `0.5.0` is frozen and archived by Zenodo; editable sources are on the
+`0.6.0-dev` line. The current ontology focus is external review, WIDOCO and
+w3id publication, registry submissions, and a validated 0.6 whole-set release.
+Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -217,8 +214,13 @@ Turtle files are listed in section 1. After they exist:
       `python -m pyshacl -s static/ontology/sstim-shapes.ttl static/ontology/sstim-core.ttl`
 - [x] Run pySHACL against `sstim-vocab.ttl` with `sstim-shapes.ttl` `P1`
 - [x] Fix any SHACL violations before publishing `P1`
-- [ ] Run HermiT or ELK OWL reasoner on `sstim-core.ttl` to check
-      consistency (Protégé, command line, or robot verify) `P1`
+- [x] Run HermiT or ELK OWL reasoner on the complete ontology term space to
+      check consistency `P1`
+      *ROBOT/HermiT is part of `make validate` and RDF CI.*
+- [x] Add repository-wide RDF quality and competency-query audits `P1`
+      *`scripts/sstim-quality-audit.py` and
+      `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
+      safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
 - [ ] Generate WIDOCO HTML docs from `sstim-core.ttl` + `sstim-vocab.ttl` `P1`
       `java -jar widoco.jar -ontFile static/ontology/sstim-core.ttl -outFolder docs-site`
 - [ ] Deploy WIDOCO output to GitHub Pages `P1`
@@ -227,9 +229,9 @@ Turtle files are listed in section 1. After they exist:
       separate docs branch; do not commit generated HTML into `main`.*
 - [~] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
-      *Root RDF, module, Patch Studio, and versioned `0.1.0/` redirects are
-      live. Browser HTML currently points at the app root; WIDOCO remains the
-      open publication follow-up.*
+      *Root RDF, module, Patch Studio, and versioned snapshot redirects are
+      live. Multi-format rules are staged; browser HTML and final routing await
+      WIDOCO deployment and the external perma-id update.*
 - [x] Add `owl:versionIRI` pointing to immutable snapshot:
       `https://w3id.org/sstim/0.1.0` `P1`
       *`sstim-core.ttl` declares the version IRI, and
@@ -240,40 +242,36 @@ Turtle files are listed in section 1. After they exist:
       Turtle in BSC Lab `P1`
       *Decision recorded 2026-04-27: the catalog is private to BioSynCare/BSC
       and will not be used as BSC Lab data.*
-- [ ] Add only public BSC Lab seed/reference preset instances in
-      `static/ontology/instances/presets/` as needed for browser, evidence, and
-      SHACL examples `P1`
-      *Verify each public instance passes SHACL before committing.*
-- [ ] Convert Appendix A references to RDF in
+- [x] Add initial public BSC Lab seed/reference preset instances in
+      `static/ontology/instances/presets/` for browser, evidence, and SHACL
+      examples `P1`
+      *Both public presets are protocol-linked and included by the RDF loader.*
+- [~] Convert cleared public references to RDF in
       `static/ontology/instances/references/` `P1`
+      *Seven records are present; expand only with source and venue review.*
 - [x] Add RDF individuals for Binaural, Martigli, Symmetry, and
       Martigli-Binaural voice types as technique instances `P1`
       *Done 2026-04-28 in `static/ontology/instances/frameworks/bsc.ttl`.*
 
 ### Phase 2 ontology extensions
-- [ ] Model session instance class: `sstim:SessionInstance` with
-      `sstim:executedPreset`, `sstim:userRespirationDurationInitial`,
-      `sstim:userRespirationDurationFinal`, `sstim:sessionTimestamp` `P2`
+- [x] Model session specifications, executed session activities, phased
+      self-reports, and a non-personal synthetic example `P2`
 - [ ] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
-- [ ] Extend `sstim-alignments.ttl` with Music Ontology and NIFSTD
-      alignments once ontology is stable `P2`
+- [?] Extend external alignments only when an authoritative target is verified
+      and the mapping answers an interoperability need `P2`
+      *An unverified Music Ontology association and the incorrect MeSH D012910
+      candidate were removed in the 0.6 development pass.*
 
 ### Wikidata contribution
-- [ ] Create Wikidata item for "Martigli oscillation" technique
-      (does not exist) `P1`
-- [ ] Create Wikidata item for "Sonic symmetry entrainment" /
-      "Symmetry permutation entrainment" (does not exist) `P1`
-- [ ] Add `skos:exactMatch` links from `sstim-alignments.ttl` to:
-      - Brainwave entrainment: Q4957211 `P1`
-      - Binaural beats: Q858775 `P1`
-      - Alpha wave: Q398696 `P1`
-      - Neuromodulation: Q1749498 `P1`
-      - Meditation: Q45996 `P1`
-      - Isochronic tones: Q16956430 `P1`
-- [ ] Improve Wikipedia article on brainwave entrainment with
-      BSC vocabulary and references (human task, not Claude Code) `P1`
-- [ ] Improve Wikipedia article on binaural beats — add accurate
-      evidence tier context (human task) `P1`
+- [ ] Create one Wikidata item for the released SSTIM ontology after WIDOCO and
+      stable landing-page publication `P1`
+- [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
+      and equivalence have been checked against the live authoritative record
+      `P1`
+- [?] Create items for project-specific techniques only after independent
+      published sources establish notability `P2`
+- [?] Edit related Wikipedia articles only after independent sources support
+      the contribution; do not use Wikipedia to establish SSTIM notability `P2`
 
 ---
 
@@ -637,10 +635,13 @@ Not project-specific — run on a schedule.
 - [ ] Update `docs/ecosystem/TRADEMARK_STATUS.md` with filing progress `recurring`
 
 **Per release:**
-- [ ] Update `owl:versionIRI` in ontology header `recurring`
+- [ ] Update core `owl:versionIRI`, module `owl:versionInfo`, and all release
+      metadata consistently `recurring`
 - [ ] Run WIDOCO to regenerate docs `recurring`
-- [ ] Validate all public BSC Lab preset instances pass SHACL `recurring`
+- [ ] Run `make validate` and confirm all public instance graphs pass SHACL
+      `recurring`
 - [ ] Regenerate the public BSC Lab preset JSON bundle if the player uses it `recurring`
+- [ ] Confirm all earlier frozen ontology snapshots are byte-unchanged `recurring`
 - [ ] Tag release in git with semver `recurring`
 
 **Per new public BSC Lab reference preset added:**
@@ -651,5 +652,5 @@ Not project-specific — run on a schedule.
 
 ---
 
-*Last updated: 2026-06-11 — w3id PR #6184 merged and live routes verified*
-*Next update due: after WIDOCO publication path or defensive-publication submissions are filed*
+*Last updated: 2026-07-10 - SSTIM 0.6 development ontology/data quality pass*
+*Next update due: after WIDOCO deployment, external ontology review, or the 0.6 release*

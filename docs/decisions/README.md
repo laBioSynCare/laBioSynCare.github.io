@@ -44,6 +44,7 @@ annotations lives here.
 | [0018](0018-evidence-integrity-and-public-claim-governance.md) | Evidence integrity and public-claim governance | Accepted |
 | [0019](0019-modality-nomenclature-cleanup.md) | Modality nomenclature cleanup (somatosensory / haptic / tactile / vibrotactile) | Accepted |
 | [0020](0020-whole-set-snapshot-versioning.md) | Whole-set snapshot is the citable versioning unit (modules carry versionInfo only) | Accepted |
+| [0021](0021-controlled-value-semantics.md) | Controlled values describe categories, not their real-world referents | Accepted |
 
 ## Adding an ADR
 

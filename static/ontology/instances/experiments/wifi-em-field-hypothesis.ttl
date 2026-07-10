@@ -3,12 +3,19 @@
 @prefix sstim:  <https://w3id.org/sstim#> .
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/wifi-em-field-hypothesis#> .
 
 bsclab-experiment:wifi-em-field-hypothesis a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Wi-Fi electromagnetic-field exposure hypothesis"@en ;
     dct:description "Non-clinical modeling example for representing Wi-Fi, screen, cable, or nearby-device electromagnetic exposure as a physical delivery medium. It does not assert stimulation efficacy or physiological effect."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    skos:editorialNote "Capability-boundary hypothesis: electromagnetic-field exposure is represented for explicit uncertainty and is not mapped to a supported sensory stimulation technique."@en ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
     sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:noKnownEvidenceInSSTIM ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityAmbientRadioEmitter, sstim-ex:capabilitySensorInput ;
@@ -45,3 +52,17 @@ this:em-measurement-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
     sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectPhysiologicalResponse ;
     sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
+
+this:em-efficacy-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:em-measurement-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

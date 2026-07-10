@@ -3,12 +3,19 @@
 @prefix sstim:  <https://w3id.org/sstim#> .
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/smell-taste-device-boundary#> .
 
 bsclab-experiment:smell-taste-device-boundary a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Smell and taste device boundary"@en ;
     dct:description "Non-clinical modeling example that treats olfactory and gustatory modalities as SSTIM-relevant while marking ordinary phone smell, device taste, and perfume-on-device usage as outside current BSC Lab delivery capability."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    skos:editorialNote "Capability-boundary protocol: documents out-of-scope delivery paths and intentionally does not map them to a currently supported BSC stimulation technique."@en ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
     sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
     sstim-ex:hasExposureProfile this:profile .
@@ -60,3 +67,17 @@ this:gustatory-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClai
     sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness, sstim-ex:effectDiscomfort ;
     sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:olfactory-relevance-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:gustatory-boundary-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

@@ -1,799 +1,370 @@
-# BSC Ontology
+# Sensory Stimulation Ontology (SSTIM)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
 
-> **For AI agents:** Read this document before writing any code that
-> imports from `src/rdf/namespaces.js`, generates SPARQL queries, creates
-> RDF instances, or modifies any `*.ttl` file. The design decisions here
-> are fixed — they are not defaults open to re-interpretation.
-> The top-level Turtle files in this directory are scientific ontology
-> artifacts. The protected-file list lives in `CLAUDE.md`; modify protected
-> artifacts only with explicit human instruction.
-> list: modify them only with explicit human instruction.
+SSTIM is the reusable semantic layer of BSC Lab. It represents
+parameter-specified sensory stimulation techniques, protocols, implementations,
+presets, exposure channels, evidence claims, safety metadata, session plans,
+and recorded executions using OWL 2, SKOS, SHACL, PROV-O, VoID, and DCAT.
 
----
+This is a non-clinical vocabulary. A mechanism, intended effect, preset name,
+or evidence link does not establish treatment efficacy. Read
+[Scope](../../docs/concept/SCOPE.md),
+[Non-Scope](../../docs/concept/NON_SCOPE.md), and the
+[Evidence Framework](../../docs/concept/EVIDENCE_FRAMEWORK.md) before extending
+the graph.
 
-## What this is
+## Status
 
-The BSC ontology is a formal knowledge representation of the Sensory
-Stimulation domain: its techniques, protocols, evidence claims, frequency
-band taxonomy, session specifications, and participants. It is the
-knowledge layer of BSC Lab — the part that makes public reference presets and
-evidence metadata machine-readable, queryable, citable, and interoperable with
-external biomedical vocabularies.
+- Latest immutable release: `v0.5.0`, DOI
+  [10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
+- All-version DOI:
+  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
+- Live sources: `0.6.0-dev`; no development module claims an immutable
+  `owl:versionIRI`.
+- Current term graph: 5,820 unique triples, 56 named OWL classes, six anonymous
+  union-class expressions, 124 properties, 295 SKOS concepts, and 30 concept
+  schemes.
+- Public instance graph: 1,394 unique triples in 18 files.
+- Persistent namespace: `https://w3id.org/sstim`.
+- License: CC BY 4.0.
 
-The current ontology maturity backlog is maintained in
-[`docs/ontology/IMPROVEMENT_PLAN.md`](../../docs/ontology/IMPROVEMENT_PLAN.md).
-Consult it before broadening the ontology, adding validation scope, or changing
-modality/delivery semantics.
+The frozen [`0.5.0/`](0.5.0) directory is immutable. It remains the citable
+release while the top-level modules evolve toward the next release.
 
-The ontology is published at `https://w3id.org/sstim` under CC BY 4.0.
-BSC is represented as a framework at `https://w3id.org/sstim/framework/bsc`.
-Concrete implementations use scoped SSTIM paths, including
-`https://w3id.org/sstim/implementation/bsclab/` for BSC Lab and
-`https://w3id.org/sstim/implementation/biosyncare/` for BioSynCare.
-It is designed to be used by:
+## Files
 
-- The BSC Lab RDF browser and SPARQL interface (knowledge navigation)
-- Public BSC Lab reference preset validation and browsing
-- Researchers who want to cite or extend the vocabulary
-- The W3C Community Group (when formed) for standardization discussion
-- External tools that want to consume public BSC Lab metadata as Linked Data
-
----
-
-## File inventory
-
-```
+```text
 static/ontology/
-├── sstim-core.ttl        OWL class hierarchy, properties, axioms
-├── sstim-vocab.ttl       SKOS vocabulary (multilingual concepts)
-├── sstim-shapes.ttl      SHACL validation shapes
-├── sstim-alignments.ttl  External alignments (Wikidata, OBO Foundry)
-├── sstim-patch-studio.ttl Patch Studio model vocabulary
-├── sstim-exposure.ttl    Exposure, delivery, modality, and experiment vocabulary
-├── context.jsonld        JSON-LD context for compact public SSTIM data
-├── void.ttl              VoID/DCAT dataset description for FAIR publication
-├── 0.1.0/                Frozen ontology snapshot for version 0.1.0
-├── 0.2.0/                Frozen ontology snapshot for version 0.2.0
-├── 0.3.0/                Frozen ontology snapshot for version 0.3.0
-├── 0.5.0/                Frozen ontology snapshot for version 0.5.0
-└── instances/
-    ├── experiments/     Exploratory BSC Lab exposure experiment instances
-    ├── frameworks/      BSC framework identity and technique instances
-    ├── implementations/ BSC Lab / BioSynCare implementation identities
-    ├── presets/         Public BSC Lab reference preset instances
-    └── references/      Bibliographic reference instances
+|-- sstim-core.ttl          OWL domain model and core constraints
+|-- sstim-vocab.ttl         Multilingual SKOS controlled values
+|-- sstim-shapes.ttl        SHACL Core and SHACL-SPARQL shapes
+|-- sstim-alignments.ttl    Verified Wikidata and OBO alignments
+|-- sstim-patch-studio.ttl  Voice and authoring parameter properties
+|-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
+|-- context.jsonld          Public JSON-LD compaction context
+|-- void.ttl                VoID/DCAT publication metadata and checked counts
+|-- 0.1.0/ ... 0.5.0/      Immutable whole-set snapshots
+`-- instances/
+    |-- frameworks/         BSC framework and framework techniques
+    |-- implementations/    BSC Lab and public-safe BioSynCare identities
+    |-- protocols/          Public BSC Lab reference protocols
+    |-- presets/            Public reference preset fixtures
+    |-- evidence/           Technique and preset evidence claims
+    |-- references/         DOI-identified public-safe references
+    |-- experiments/        Exploratory exposure protocols and profiles
+    `-- sessions/           Explicitly synthetic session fixture only
 ```
 
-### `sstim-core.ttl` — OWL class hierarchy and properties
+All six `sstim-*.ttl` files declare an `owl:Ontology` node with title,
+description, creator, creation/modification dates, license, and version
+metadata. Modules carry `owl:versionInfo` only. The core receives a version IRI
+only when the whole set is frozen for release; see
+[ADR 0020](../../docs/decisions/0020-whole-set-snapshot-versioning.md).
 
-Contains OWL class declarations, object properties, datatype
-properties, domain/range axioms, and top-level individuals that
-serve as controlled vocabulary anchors. Aligns to BFO 2020 and declares
-`rdfs:subClassOf` alignments to OBI, IAO, and PROV-O.
+## Namespaces
 
-### `sstim-vocab.ttl` — SKOS multilingual vocabulary
-
-Contains all SKOS concept schemes and their members: frequency
-bands, evidence tier values, preset groups, sensory modalities,
-stimulation mechanisms, and permutation function types. Concepts
-carry labels in English, Italian, Portuguese, and Spanish.
-Uses dual-typing (see Section 4).
-
-### `sstim-shapes.ttl` — SHACL validation shapes
-
-Defines `sh:NodeShape` shapes for each key class. Used to validate
-preset instances, evidence claims, and session instances before
-export. Run via pySHACL or rdf-validate-shacl (browser).
-
-### `sstim-alignments.ttl` — External vocabulary links
-
-Contains `skos:exactMatch`, `skos:closeMatch`, `owl:equivalentClass`,
-and `skos:relatedMatch` statements to:
-- Wikidata entities (`wd:` prefix)
-- OBO Foundry terms (NBO, OMIT, NCIT as applicable)
-- DBpedia resources
-
-### `sstim-patch-studio.ttl` — Patch Studio vocabulary
-
-Defines the Patch Studio authoring model vocabulary used by the as-built
-real-time audiovisual designer. It is snapshotted with the other ontology
-modules so model terms remain citable alongside each release.
-
-### `sstim-exposure.ttl` — Exposure and experiment vocabulary
-
-Defines the exposure layer introduced by
-[ADR 0010](../../docs/decisions/0010-exposure-delivery-modality.md). It
-separates physical delivery medium, perceived modality, device capability, body
-placement, comfort boundary, effect claim, experiment context, and knowledge
-status. The module keeps `sstim:techniqueModality` as a coarse compatibility
-relation while giving new work explicit terms for haptics, visual noise,
-stereoscopy/VR, smell/taste boundaries, Wi-Fi/electromagnetic hypotheses, and
-future tactile or volumetric immersion.
-
-Module **0.4.0** ([ADR 0011](../../docs/decisions/0011-sensory-field-and-flash-safety.md))
-adds the vocabulary the Sensory Field interface emits: left/right laterality
-placements (`skos:broader` children of the bilateral parents), quantitative
-stimulus datatype properties (`hasFrequencyHz`, `hasFlickerRateHz`,
-`hasBeatFrequencyHz`, `hasDutyCycle`, `hasGainLevel`, `hasPhaseOffset`), the
-`sstim-ex:ExposureLimit` class with quantified flicker/hearing/optical limits
-citing external standards (linked from comfort boundaries), and the
-`affordsDeliveryMedium` capability→medium relation.
-
-### `context.jsonld` — JSON-LD compaction context
-
-Provides stable term aliases for public SSTIM JSON-LD consumers: namespace
-prefixes, SKOS label/notation/navigation predicates, core preset/evidence/public-
-claim terms, Patch Studio voice/session parameters, exposure-module predicates,
-implementation-data prefixes, and VoID/DCAT publication metadata. This is a
-hand-maintained public context, not a generated JSON-LD export.
-
-### `void.ttl` — VoID/DCAT dataset metadata
-
-Describes the published SSTIM ontology graph set for FAIR registries and
-Linked Data crawlers. It is served alongside the ontology files but is not part
-of the versioned term-space: it is not snapshotted, not exported by
-`make export`, and not SHACL-validated as ontology data.
-
-### Versioned snapshot directories
-
-Each semver directory contains byte-identical copies of the top-level Turtle
-modules for that ontology version. Generate future snapshots with
-`make snapshot` after bumping `owl:versionInfo` / `owl:versionIRI`; use
-`FORCE=1` only to correct an unpublished snapshot.
-
----
-
-## Namespace declarations
-
-All code that references BSC ontology terms must import namespaces
-from `src/rdf/namespaces.js`. Never hardcode IRI strings.
-
-```turtle
-# Common prefix declarations — mirror src/rdf/namespaces.js when used in code
-
-@prefix sstim:    <https://w3id.org/sstim#> .
-@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
-@prefix sstim-sh:   <https://w3id.org/sstim/shapes#> .
-@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
-@prefix bsc-fw:   <https://w3id.org/sstim/framework/bsc/> .
-@prefix bsclab-preset: <https://w3id.org/sstim/implementation/bsclab/preset/> .
-@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
-@prefix biosyncare-preset: <https://w3id.org/sstim/implementation/biosyncare/preset/> .
-
-# Upper ontology
-@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
-@prefix obi:      <http://purl.obolibrary.org/obo/OBI_> .
-@prefix iao:      <http://purl.obolibrary.org/obo/IAO_> .
-@prefix pato:     <http://purl.obolibrary.org/obo/PATO_> .
-@prefix eco:      <http://purl.obolibrary.org/obo/ECO_> .
-
-# W3C vocabularies
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
-@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
-@prefix sh:       <http://www.w3.org/ns/shacl#> .
-@prefix prov:     <http://www.w3.org/ns/prov#> .
-@prefix dct:      <http://purl.org/dc/terms/> .
-
-# External
-@prefix wd:       <http://www.wikidata.org/entity/> .
-@prefix wdt:      <http://www.wikidata.org/prop/direct/> .
-```
-
-One persistent namespace is registered at
-[perma-id/w3id.org](https://github.com/perma-id/w3id.org):
-
-- `https://w3id.org/sstim` — the ontology (classes, properties, SKOS
-  vocabulary, SHACL shapes). Content-negotiated to Turtle now; WIDOCO HTML is
-  blocked until the publication path is chosen.
-- `https://w3id.org/sstim/exposure` — exposure, physical delivery, perceived
-  modality, device capability, experiment context, and knowledge-status module.
-- `https://w3id.org/sstim/framework/bsc` — the BSC framework.
-- `https://w3id.org/sstim/implementation/bsclab/{preset,experiment,session,annotation,evidence}/...` —
-  BSC Lab implementation data under the same registered SSTIM namespace.
-- `https://w3id.org/sstim/implementation/biosyncare/...` —
-  reserved for public-safe BioSynCare implementation metadata if published. The
-  private BioSynCare/BSC catalog is not part of BSC Lab RDF data.
-
-Content negotiation rules live in the `sstim/` folder of that repository (see
-Section 10), including routing for the framework and implementation subpaths.
-
----
-
-## Design decision: OWL + SKOS dual-typing (Pattern 2)
-
-**Decision:** SKOS concepts are dual-typed as OWL named individuals.
-No OWL punning. No Linked Data Platform trick of making an IRI serve
-as both an OWL class and a SKOS concept.
-
-This is the most important design decision in the ontology and the
-one most likely to be misread. The full rationale follows.
-
-### The problem: three incompatible approaches
-
-**Pattern 1 — Pure OWL with no SKOS.** Frequency bands are OWL
-classes; `sstim:alpha rdfs:subClassOf sstim:FrequencyBand`. Hierarchy
-is expressed through subclass relationships. SPARQL traversal requires
-recursion (`rdfs:subClassOf*`) which is not supported in all SPARQL
-1.1 implementations without property paths.
-
-**Problem with Pattern 1:** SPARQL property paths over
-`rdfs:subClassOf*` are slow on large ontologies. More importantly,
-the resulting individuals would be class instances, making them
-harder to attach SKOS labels and scope notes without importing SKOS
-and using annotation properties in a non-standard way.
-
-**Pattern 2 (CHOSEN) — Dual-typed individuals.** OWL defines a class
-(`sstim:FrequencyBand`). SKOS defines concepts in a scheme. Each concept
-is both: it is a `skos:Concept` AND an instance (`owl:NamedIndividual`)
-of the OWL class. Hierarchy is expressed through `skos:narrower` /
-`skos:broader`. SPARQL traversal uses property paths:
-`skos:narrower*` or `skos:broader*`.
-
-**Pattern 3 — SKOS only, no OWL.** Pure SKOS ConceptScheme.
-Loses OWL reasoning, domain/range constraints, and integration
-with BFO alignment.
-
-### Why Pattern 2
-
-Pattern 2 provides:
-
-- **SPARQL traversal via property paths.** `skos:narrower*` is
-  standard SPARQL 1.1 property path syntax. Finding all sub-bands
-  of alpha is:
-  ```sparql
-  sstim-v:alpha skos:narrower+ ?subBand
-  ```
-
-- **OWL domain/range validation.** The property `sstim:targetsFrequencyBand`
-  with `rdfs:range sstim:FrequencyBand` validates correctly because
-  each concept individual is an instance of `sstim:FrequencyBand`.
-  An OWL reasoner will flag triples that link a preset to a
-  non-`FrequencyBand` individual.
-
-- **SKOS multilingual labels.** `skos:prefLabel` with language tags
-  provides clean multilingual support without custom annotation
-  properties. Tools that understand SKOS work immediately.
-
-- **No OWL punning.** OWL punning (declaring an IRI as both an OWL
-  class and an individual of another class simultaneously) is
-  permitted in OWL 2 Full but not in OWL 2 DL. Avoiding it keeps
-  the ontology within OWL 2 DL and compatible with DL reasoners
-  (HermiT, ELK, FaCT++).
-
-### What dual-typing looks like in practice
-
-```turtle
-# sstim-core.ttl — OWL class declaration
-sstim:FrequencyBand a owl:Class ;
-    rdfs:subClassOf iao:0000030 ;      # IAO: information content entity
-    rdfs:label "Frequency Band"@en .
-
-# sstim-vocab.ttl — SKOS concept, dual-typed as OWL individual
-sstim-v:alpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
-    skos:inScheme sstim-v:FrequencyBandScheme ;
-    skos:prefLabel "Alpha"@en, "Alfa"@it, "Alfa"@pt, "Alfa"@es ;
-    skos:notation "alpha" ;
-    skos:broader sstim-v:allFrequencyBands ;
-    skos:scopeNote "8–13 Hz. Relaxation, stress reduction, calm alertness."@en ;
-    skos:narrower sstim-v:lowAlpha,
-                  sstim-v:highAlpha,
-                  sstim-v:alpha10 ;
-    sstim:hzMin "8"^^xsd:decimal ;
-    sstim:hzMax "13"^^xsd:decimal .
-```
-
-**The class `sstim:FrequencyBand` is NOT punned.** There is no statement
-making `sstim:FrequencyBand` also a `skos:Concept`. It is a pure OWL
-class. The punning-free rule holds.
-
-### SPARQL consequence
-
-Sub-band traversal via property path:
-
-```sparql
-PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
-PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
-
-# All bands that are sub-bands of 'alpha' (excluding alpha itself)
-SELECT ?band WHERE {
-  sstim-v:alpha skos:narrower+ ?band .
-}
-
-# Alpha and all its sub-bands (including alpha itself)
-SELECT ?band WHERE {
-  sstim-v:alpha skos:narrower* ?band .
-}
-```
-
-**Important:** `skos:narrower` is NOT transitive in OWL / in
-the standard SKOS specification. Only `skos:narrowerTransitive`
-is declared transitive. The property path `skos:narrower+`
-is the correct SPARQL idiom for hierarchical traversal — it
-explicitly traverses links at any depth rather than relying
-on OWL transitivity inference.
-
----
-
-## Upper ontology alignment: BFO 2020
-
-The BSC ontology aligns to **Basic Formal Ontology 2020**
-(ISO/IEC 21838-2:2021, `http://purl.obolibrary.org/obo/bfo.owl`).
-BFO provides a domain-neutral upper ontology used by over 650
-biomedical ontologies in the OBO Foundry ecosystem.
-
-### BSC class placements in BFO
-
-| BSC class | BFO parent | Rationale |
+| Prefix | IRI | Purpose |
 |---|---|---|
-| `sstim:SensoryStimulation` | `bfo:0000015` (process) | A Sensory Stimulation session is a process unfolding in time |
-| `sstim:SensoryStimulationIntervention` | `obi:0000011` + `cob:0000082` (planned process) | An intervention is a planned, goal-directed process. `obi:0000011` is obsolete in OBI; `cob:0000082` is the current canonical term, and both are asserted for continuity |
-| `sstim:SensoryStimulationFramework` | `iao:0000030` (information content entity) | A documented family of principles and constraints |
-| `sstim:SensoryStimulationProtocol` | `iao:0000030` (information content entity) | A documented method specification |
-| `sstim:SensoryStimulationImplementation` | `iao:0000030` (information content entity) | SSTIM represents implementation identity and metadata |
-| `sstim:SensoryStimulationTechnique` | `obi:0000272` (protocol) | A reusable method specification; SSTIM still distinguishes technique from protocol at the domain-model layer |
-| `sstim:SessionInstance` | `prov:Activity` | A particular session execution |
-| `sstim:SessionSpecification` | `iao:0000030` (information content entity) | An information artifact specifying an intended execution |
-| `sstim:Preset` | `iao:0000030` (information content entity) | A reusable parameter configuration |
-| `sstim:FrequencyBand` | `iao:0000030` (information content entity) | A named design/category artifact for Hz ranges |
-| `sstim:EvidenceClaim` | `iao:0000030` (information content entity) | A claim is an information entity |
-| `sstim:EvidenceTierValue` | `iao:0000030` (information content entity) | A named evidence-strength category |
-| `sstim:SensoryModality` | `bfo:0000023` (role) | A channel role in the delivery of stimulation |
-| `sstim:StimulationMechanism` | `bfo:0000015` (process) | A mechanism is a type of causal process |
+| `sstim:` | `https://w3id.org/sstim#` | Core classes and properties |
+| `sstim-v:` | `https://w3id.org/sstim/vocab#` | Controlled SKOS values |
+| `sstim-sh:` | `https://w3id.org/sstim/shapes#` | SHACL shapes |
+| `sstim-ex:` | `https://w3id.org/sstim/exposure#` | Exposure and experiment terms |
+| `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework techniques |
+| `bsclab-protocol:` | `https://w3id.org/sstim/implementation/bsclab/protocol/` | Public BSC Lab protocols |
+| `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | Public BSC Lab presets |
+| `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab editorial claims |
+| `bsclab-session:` | `https://w3id.org/sstim/implementation/bsclab/session/` | Session data |
+| `sstim-ref:` | `https://w3id.org/sstim/ref/` | Reusable public references |
 
-### OBO Foundry imports
+The ontology, public implementation data, user annotations, and sessions are
+separate named graphs. Private BioSynCare catalog data is never converted into
+or loaded by this repository.
 
-The BSC ontology does not fully import OBO Foundry ontologies
-(which would cause import of tens of thousands of terms). Instead,
-it uses selected terms by their stable OBO IRIs with explicit
-`rdfs:subClassOf` declarations:
+## Modeling Levels
+
+SSTIM keeps these levels distinct:
+
+| Level | Meaning |
+|---|---|
+| `SensoryStimulationFramework` | Broad principles, evidence rules, techniques, and constraints |
+| `SensoryStimulationTechnique` | Reusable parameterizable method |
+| `SensoryStimulationProtocol` | Structured use specification combining techniques and constraints |
+| `SensoryStimulationImplementation` | Software, hardware, manual, or hybrid realization |
+| `Preset` | Versioned parameter configuration for one implementation |
+| `SessionSpecification` | Immutable `prov:Plan` for one intended execution |
+| `SessionInstance` | Actual `prov:Activity` and sensory stimulation intervention |
+| `SelfReport` | Consent-governed, phase-qualified subjective observation |
+
+BSC is a framework. BSC Lab and BioSynCare are implementations. A preset is not
+a protocol, and a recorded session is not a preset. See
+[ADR 0007](../../docs/decisions/0007-framework-protocol-implementation.md) and
+[ADR 0014](../../docs/decisions/0014-preset-is-not-a-protocol.md).
+
+## OWL And SKOS Pattern
+
+Controlled values use the dual-typing pattern from
+[ADR 0002](../../docs/decisions/0002-dual-typing-owl-skos.md):
 
 ```turtle
-# sstim-core.ttl excerpt — OBI alignment
-sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
-
-# IAO alignment
-sstim:Preset rdfs:subClassOf iao:0000030 .
-sstim:SensoryStimulationFramework rdfs:subClassOf iao:0000030 .
-
-# BFO alignment
-sstim:SensoryStimulation rdfs:subClassOf bfo:0000015 .
-sstim:SensoryModality rdfs:subClassOf bfo:0000023 .
-
-# ECO alignment (for evidence classification)
-sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
-# iao:0000030 = 'information content entity' in IAO
+sstim-v:modalityAuditory
+    a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
+    skos:inScheme sstim-v:SensoryModalityScheme ;
+    skos:topConceptOf sstim-v:SensoryModalityScheme ;
+    skos:prefLabel "Auditory"@en ;
+    skos:notation "auditory" ;
+    skos:definition "..."@en .
 ```
 
-This approach provides semantic alignment and OBO interoperability
-without bloating the ontology with unused terms.
+This supports SKOS browsing and OWL/SHACL range checks with one stable IRI.
+Value classes such as `SensoryModality`, `StimulationMechanism`, and
+`IntendedEffect` are information content entities: their concepts classify
+real-world channels, processes, or design intents but are not themselves those
+material entities. See
+[ADR 0021](../../docs/decisions/0021-controlled-value-semantics.md).
 
----
+SSTIM materializes both directions of every `hasTopConcept`/`topConceptOf` and
+`broader`/`narrower` pair because the web application does not run OWL inference
+for basic navigation. CI also checks one preferred label per language, one
+notation per concept, notation uniqueness within a scheme, documentation
+coverage, and absence of broader cycles.
 
-## SKOS concept scheme structure
+## Upper Model
 
-### `sstim-v:FrequencyBandScheme`
+The selected upper-model placements are deliberately small:
 
-The primary controlled vocabulary. All values valid in
-`header.targetBand` in preset JSON correspond to SKOS concepts
-in this scheme. The mapping between JSON string values (e.g., `"alpha"`)
-and ontology IRIs (e.g., `sstim-v:alpha`) is maintained in
-`src/rdf/namespaces.js`.
+| SSTIM class | Parent |
+|---|---|
+| `SensoryStimulation` | BFO process (`bfo:0000015`) |
+| `SensoryStimulationIntervention` | OBI/COB planned process |
+| `SensoryStimulationTechnique` | OBI protocol (`obi:0000272`) |
+| `SensoryStimulationFramework`, `Protocol`, `Preset` | IAO information content entity |
+| `SessionSpecification` | IAO information content entity and `prov:Plan` |
+| `SessionInstance` | `prov:Activity` and `SensoryStimulationIntervention` |
+| `SensoryStimulationImplementation` | `prov:Entity` |
+| controlled-value classes | IAO information content entity |
 
-Hierarchy (top-level concepts with narrower shown as indented):
+SSTIM references selected OBO IRIs instead of importing entire external
+ontologies. Alignments are conservative. In particular, no MeSH mapping is
+asserted for a supposed `D012910` Sensory Stimulation term: that identifier is
+Snake Venoms and was removed during the 0.6.0 audit.
 
+## Evidence Governance
+
+Evidence attaches to a scoped claim, never globally to "sensory stimulation":
+
+```turtle
+bsclab-evidence:ssvep-photic-response a sstim:EvidenceClaim ;
+    sstim:supportsRelation sstim-v:techPhoticDriving ;
+    sstim:hasEvidenceTier sstim-v:tierStrong ;
+    sstim:hasModalityTag sstim-v:modalityVIS, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:VIALATTE_2010 ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 ```
-sstim-v:delta (0.5–4 Hz)            [notation "delta"]
-  sstim-v:lowDelta  (0.5–2 Hz)
-  sstim-v:highDelta (2–4 Hz)
-sstim-v:theta (4–8 Hz)
-  sstim-v:lowTheta  (4–6 Hz)
-  sstim-v:highTheta (6–8 Hz)
-sstim-v:alpha (8–13 Hz)
-  sstim-v:lowAlpha  (8–10 Hz)
-  sstim-v:highAlpha (10–13 Hz)
-  sstim-v:alpha10   (10 Hz)    ← single-frequency target
-sstim-v:smr (12–15 Hz)
-sstim-v:beta (15–30 Hz)
-  sstim-v:lowBeta   (15–20 Hz)
-  sstim-v:midBeta   (20–25 Hz)
-  sstim-v:highBeta  (25–30 Hz)
-sstim-v:gamma (30–42 Hz)
-  sstim-v:gamma40   (40 Hz)    ← single-frequency target
 
-(IRI local names are camelCase; the skos:notation strings are hyphenated,
- e.g. sstim-v:lowAlpha has skos:notation "low-alpha".)
+Every claim requires a tier, modality tag, direction, review status, review
+date, modification date, accountable agent, and explicit subject. Claims at
+`tierRank >= 3` must cite a declared public-safe reference. Exploratory exposure
+claims remain speculative, inconclusive, and provisional unless audited
+evidence supports promotion.
+
+Public preset copy uses the C0-C5 claim-level scheme. SHACL rejects a public
+claim level above its evidence ceiling and always rejects medical/condition
+claims under the current policy. This is risk-reduction metadata, not legal
+advice; see [ADR 0018](../../docs/decisions/0018-evidence-integrity-and-public-claim-governance.md).
+
+## Safety Metadata
+
+`CautionTag` concepts now carry:
+
+- exactly one `CautionSeverity` with rank 1-4;
+- a trigger condition;
+- affected-user/context guidance;
+- a concrete recommended action;
+- a display priority.
+
+These are interface and validation instructions, not diagnoses. Exposure
+limits separately record a quantity, unit, placement, numeric threshold, and
+source standard. They do not assert that a particular delivery is safe. Runtime
+flicker enforcement remains in `src/ui/safety/flashSafety.js`.
+
+## Exposure Model
+
+The exposure module separates concerns that a single `techniqueModality` tag
+cannot represent:
+
+```text
+Protocol / Technique / Preset
+  -> ExposureProfile
+      -> StimulusChannel
+          -> PhysicalDeliveryMedium
+          -> PerceivedModality
+          -> DeviceCapability
+          -> BodyPlacement
+          -> StimulusPattern
+          -> ComfortBoundary -> ExposureLimit -> external standard
+      -> ExposureEffectClaim -> EffectDimension + KnowledgeStatus
 ```
 
-Note: `smr` (12–15 Hz) is a BSC operational category and overlaps
-the alpha/beta boundary. It does not have `skos:broader alpha` or
-`skos:broader beta` because it is not cleanly a sub-band of either.
-It is a top-level concept in the BSC scheme. This is an intentional
-representation of the BSC operational taxonomy, not an error.
+This supports auditory, visual, somatosensory, interoceptive, vestibular,
+olfactory, gustatory, environmental, and explicitly non-perceived physical
+exposure descriptions without equating the delivery medium with perception.
+The haptic/tactile/somatosensory/vibrotactile convention is fixed in
+[ADR 0019](../../docs/decisions/0019-modality-nomenclature-cleanup.md).
 
-### Other concept schemes in `sstim-vocab.ttl`
+## Session Data
 
-- `sstim-v:EvidenceTierScheme` — the six evidence tiers
-  (from `docs/concept/EVIDENCE_FRAMEWORK.md`)
-- `sstim-v:PresetGroupScheme` — Heal, Support, Perform, Indulge, Transcend
-- `sstim-v:SensoryModalityScheme` — auditory, visual, somatosensory,
-  interoceptive, vestibular, olfactory
-- `sstim-v:StimulationMechanismScheme` — the six proposed mechanisms
-- `sstim-v:VoiceTypeScheme` — Binaural, Martigli, Martigli-Binaural, Symmetry
-- `sstim-v:PermutationFunctionScheme` — identity, rotateForward,
-  rotateBackward, reversal, shuffle
-- `sstim-v:EvidenceModalityScheme` — AUD, AV, BREATH, GENERAL,
-  PRECLINICAL, REVIEW tags
-- `sstim-v:CautionTagScheme` — safety/usage advisory flags
-  (epilepsy-risk, drowsy-use, high-intensity, …)
-- `sstim-v:StimulusTemporalStructureScheme` — periodic, quasi-periodic,
-  aperiodic, adaptive
+The committed session is a synthetic, non-personal fixture. It demonstrates:
 
----
+- an immutable `SessionSpecification`/`prov:Plan` referencing one preset;
+- an executed `SessionInstance` with start/end time and completion status;
+- multiple `SelfReport` nodes rather than one overwritten report;
+- explicit pre-session and immediate-post collection phases;
+- collection timestamps and a statement that the values are not evidence.
 
-## Key properties
+Real participant records are not committed. A follow-up report is a separate
+node with its own phase and timestamp.
 
-### Object properties (sstim-core.ttl)
+## Validation
 
-| Property | Domain | Range | Description |
-|---|---|---|---|
-| `sstim:targetsFrequencyBand` | Preset | FrequencyBand | Links a preset to its target frequency band(s) |
-| `sstim:composedOf` | Preset | Voice | Links a preset to its voice components |
-| `sstim:inGroup` | Preset | PresetGroup | Preset's group classification |
-| `sstim:hasCautionTag` | Preset | CautionTag | Safety and usage flags |
-| `sstim:hasIntendedEffect` | Preset | IntendedEffect | Target state change the preset is designed to facilitate |
-| `sstim:proposedMechanism` | SensoryStimulationTechnique | StimulationMechanism | Proposed neurobiological mechanism |
-| `sstim:hasEvidenceTier` | EvidenceClaim | EvidenceTierValue | Evidence strength grade |
-| `sstim:hasModalityTag` | EvidenceClaim | EvidenceModalityTag | Type of supporting evidence |
-| `sstim:supportsRelation` | EvidenceClaim | (Preset/Technique) | What the claim supports |
-| `sstim:citesReference` | EvidenceClaim | PublicSafeReference | Cleared citation backing the claim |
-| `sstim:usesSpecification` | SessionInstance | SessionSpecification | The full execution spec |
-| `sstim:referencesPreset` | SessionSpecification | Preset | Preset referenced by spec (the preset that was run) |
-
-### Datatype properties (sstim-core.ttl, voice/session parameters in sstim-patch-studio.ttl)
-
-| Property | Domain | Range | Description |
-|---|---|---|---|
-| `sstim:hzMin` | FrequencyBand | xsd:decimal | Lower bound of band (Hz) |
-| `sstim:hzMax` | FrequencyBand | xsd:decimal | Upper bound of band (Hz) |
-| `sstim:platformDeliverable` | SensoryModality | xsd:boolean | Deliverable via standard digital platforms |
-| `sstim:tierRank` | EvidenceTierValue | xsd:integer | Ordinal rank (1=speculative, 6=established) |
-| `sstim:baseFrequency` | Voice | xsd:decimal | Base/carrier/center frequency being driven |
-| `sstim:beatHz` | Voice | xsd:decimal | Binaural beat frequency |
-| `sstim:durationSeconds` | SessionSpecification | xsd:integer | Intended session length |
-
----
-
-## SHACL validation
-
-`sstim-shapes.ttl` contains validation constraints that enforce:
-
-- Every `sstim:Preset` individual has exactly one `sstim:inGroup` link
-  pointing to a valid PresetGroup concept
-- Every `sstim:Preset` individual has at least one `sstim:targetsFrequencyBand`
-  link pointing to a concept in `sstim-v:FrequencyBandScheme`
-- Every `sstim:Voice` individual has exactly one `rdf:type` from the
-  permitted voice type class hierarchy
-- Every `sstim:EvidenceClaim` individual has exactly one `sstim:hasEvidenceTier`
-  link pointing to a concept in `sstim-v:EvidenceTierScheme`
-- `sstim:tierRank` values are integers in the range 1–6
-- Multilingual labels: every concept in the frequency band scheme
-  has exactly one `skos:prefLabel` in each of en, it, pt, es
-- `sstim:hzMin` ≤ `sstim:hzMax` for frequency band individuals
-
-**Running validation locally:**
+From the repository root, inside the Nix dev shell:
 
 ```bash
-# Validate core ontology
-python -m pyshacl \
-  -s static/ontology/sstim-shapes.ttl \
-  static/ontology/sstim-core.ttl \
-  --inference rdfs \
-  --format turtle
-
-# Validate vocabulary
-python -m pyshacl \
-  -s static/ontology/sstim-shapes.ttl \
-  static/ontology/sstim-vocab.ttl
-
-# Validate SHACL, OWL DL consistency, and SPARQL sanity with the CI command
 make validate
+```
 
-# Run only the ROBOT/HermiT consistency check
+That command runs:
+
+1. pySHACL over core, vocabulary, exposure, all six merged modules, and all
+   public instances;
+2. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
+   SKOS integrity, functional values, local IRI resolution, evidence provenance,
+   VoID counts, and competency thresholds;
+3. ROBOT with HermiT over the merged OWL module set;
+4. named-graph SPARQL competency queries through Comunica;
+5. graph-isomorphic JSON-LD and RDF/XML export round trips for every module.
+
+Useful narrower targets:
+
+```bash
+make shacl
+make quality-audit
 make reason
+make sparql-sanity
+make export-check
+make export EXPORT_DIR=/tmp/sstim-export
 ```
 
-The CI pipeline (`.github/workflows/validate-rdf.yml`) runs these on
-every PR that touches ontology files or validation tooling. PRs that fail
-SHACL validation, OWL DL consistency, or SPARQL sanity are not merged.
+CI runs the same pinned toolchain for any change to ontology data, the loader,
+or validation scripts.
 
-**Running validation in the browser (BSC Lab):**
+## Named Graphs
 
-```javascript
-import { validate } from '../src/rdf/validate.js'
-// validate() uses rdf-validate-shacl
-const report = await validate(dataStore, shapesStore)
-console.log(report.conforms)           // true if valid
-console.log(report.results)            // array of violations
+The runtime loader assigns these graph families:
+
+```text
+https://w3id.org/sstim/graph/core
+https://w3id.org/sstim/graph/vocab
+https://w3id.org/sstim/graph/shapes
+https://w3id.org/sstim/graph/alignments
+https://w3id.org/sstim/graph/patch-studio
+https://w3id.org/sstim/graph/exposure
+https://w3id.org/sstim/graph/frameworks
+https://w3id.org/sstim/graph/implementations
+https://w3id.org/sstim/implementation/bsclab/protocol/
+https://w3id.org/sstim/implementation/bsclab/preset/
+https://w3id.org/sstim/implementation/bsclab/evidence/
+https://w3id.org/sstim/implementation/bsclab/experiment/
+https://w3id.org/sstim/implementation/bsclab/session/
+https://w3id.org/sstim/ref/
 ```
 
----
+`src/rdf/loader.js` is an explicit browser manifest. Adding an instance file
+without adding it to that manifest fails the quality audit.
 
-## Named graphs architecture
-
-At runtime, `src/rdf/loader.js` assigns canonical named graph IRIs to every
-loaded Turtle source. Validation tools may still merge files into a default
-graph for standalone SHACL checks, but the browser knowledge graph preserves
-source provenance:
-
-```turtle
-# Ontology module graphs:
-<https://w3id.org/sstim/graph/core>
-<https://w3id.org/sstim/graph/vocab>
-<https://w3id.org/sstim/graph/shapes>
-<https://w3id.org/sstim/graph/alignments>
-
-# Public instance graphs:
-<https://w3id.org/sstim/graph/frameworks>
-<https://w3id.org/sstim/graph/implementations>
-<https://w3id.org/sstim/implementation/bsclab/preset/>
-<https://w3id.org/sstim/ref/>
-
-# Named graph for user annotations on ontology node X:
-<https://w3id.org/sstim/implementation/bsclab/annotation/{userId}>
-# Contains: skos:note, prov:wasAttributedTo, schema:comment triples
-
-# Named graph for session instances:
-<https://w3id.org/sstim/implementation/bsclab/session/{userId}>
-# Contains: sstim:SessionInstance individuals
-
-# Named graph for research evidence annotations:
-<https://w3id.org/sstim/implementation/bsclab/evidence/annotation>
-# Contains: disputed tier assignments, proposed corrections
-```
-
-User-contributed annotations and session data never write into ontology or
-public-instance graphs. This separation will be enforced in
-`src/rdf/annotations/AnnotationStore.js`.
-
----
-
-## RDF format and serialization
-
-**Master format:** Turtle (`.ttl`). All ontology files are written
-in Turtle. Turtle is human-readable, diff-friendly, and is the format
-in which all editing and review occurs.
-
-**Export format:** JSON-LD (`.jsonld`). Generated from Turtle for
-API consumers and for inclusion in HTML pages as `<script type="application/ld+json">`.
-JSON-LD is never the master — never edit exported JSON-LD and
-import it back.
-
-**Loading strategy (BSC Lab):** Option B — runtime HTTP fetch of TTL
-files. The application fetches and parses the TTL files at runtime
-using N3.js. This allows the ontology to be updated without
-redeploying the application, and allows researchers to point the
-browser at any version of the ontology.
-
----
-
-## Versioning
-
-The ontology uses `owl:versionIRI` for immutable version snapshots:
-
-```turtle
-# In sstim-core.ttl header
-<https://w3id.org/sstim> a owl:Ontology ;
-    owl:versionIRI <https://w3id.org/sstim/0.3.0> ;
-    owl:versionInfo "0.3.0" ;
-    dct:modified "2026-06-17"^^xsd:date .
-```
-
-Version IRIs point to immutable snapshots hosted on GitHub Pages through w3id:
-`https://w3id.org/sstim/0.3.0` redirects to the frozen
-`/ontology/0.3.0/sstim-core.ttl` document. The explicit file URL
-`https://w3id.org/sstim/0.3.0/sstim-core.ttl` is also available.
-
-**Versioning policy:**
-- **Patch (0.1.x):** Adds new instances, corrects labels, adds
-  SKOS scope notes. Does not add or remove classes or properties.
-- **Minor (0.x.0):** Adds new classes, properties, or concept
-  scheme entries. Does not change existing IRIs or remove terms.
-  Backward-compatible.
-- **Major (x.0.0):** Breaking changes — IRI changes, class
-  hierarchy restructuring, removal of terms. Requires migration
-  guide and a deprecation period.
-
-Terms are never deleted from the ontology — only deprecated
-using `owl:deprecated true` with a forwarding `rdfs:seeAlso`
-pointing to the replacement.
-
----
-
-## Content negotiation
-
-The persistent URI `https://w3id.org/sstim` delivers different
-representations based on the HTTP `Accept` header. This is configured
-in the `.htaccess` file at
-[perma-id/w3id.org/sstim/.htaccess](https://github.com/perma-id/w3id.org):
-
-```
-# Accept: text/turtle → Turtle artifact on GitHub Pages
-RewriteCond %{HTTP_ACCEPT} text/turtle
-RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.ttl [R=303,L]
-
-# Accept: application/rdf+xml → RDF/XML export, when generated
-RewriteCond %{HTTP_ACCEPT} application/rdf+xml
-RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.rdf [R=303,L]
-
-# Accept: application/ld+json → JSON-LD export, when generated
-RewriteCond %{HTTP_ACCEPT} application/ld+json
-RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.jsonld [R=303,L]
-
-# Default browser path while WIDOCO is blocked
-RewriteRule ^$ https://labiosyncare.github.io/ontology/sstim-core.ttl [R=303,L]
-
-# Future default after WIDOCO publication path is chosen:
-# RewriteRule ^$ https://labiosyncare.github.io/ontology/ [R=303,L]
-```
-
-The repo deploys the SvelteKit static build with `.github/workflows/pages.yml`;
-`static/ontology/*.ttl` is copied into `dist/ontology/` and published by GitHub
-Pages. WIDOCO is intentionally not committed to `main`. When enabled, generate
-WIDOCO in GitHub Actions and publish the output as a Pages artifact or a
-separate docs branch.
-
-The same `perma-id/w3id.org/sstim/.htaccess` file routes the BSC framework and
-public implementation instance paths such as
-`https://w3id.org/sstim/framework/bsc`,
-`https://w3id.org/sstim/implementation/bsclab/preset/...`, and any future
-public-safe BioSynCare metadata paths. It must not publish the private
-BioSynCare/BSC catalog.
-
-Full content negotiation includes sub-paths:
-- `https://w3id.org/sstim#alpha` → term documentation
-- `https://w3id.org/sstim/vocab#alpha` → SKOS concept documentation
-
----
-
-## How to extend the ontology
-
-**To add a new frequency band sub-concept:**
-
-1. Add the concept to `sstim-vocab.ttl` following the dual-typing pattern:
-
-```turtle
-sstim-v:midAlpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
-    skos:inScheme sstim-v:FrequencyBandScheme ;
-    skos:prefLabel "Mid-Alpha"@en, "Alfa Medio"@it,
-                   "Alfa Médio"@pt, "Alfa Medio"@es ;
-    skos:notation "mid-alpha" ;
-    skos:broader sstim-v:alpha ;
-    skos:definition
-        "Alpha sub-band 9–11 Hz, sometimes used for targeted
-         alpha-10 designs with slightly broader tolerances."@en ;
-    sstim:hzMin "9"^^xsd:decimal ;
-    sstim:hzMax "11"^^xsd:decimal .
-```
-
-2. Add the inverse `skos:narrower` link to `sstim-v:alpha`:
-
-```turtle
-sstim-v:alpha skos:narrower sstim-v:midAlpha .
-```
-
-3. Add the new value to `src/rdf/namespaces.js` in the
-   `FREQUENCY_BAND_VALUES` map.
-
-4. Run SHACL validation. Commit only if it passes.
-
-5. Update `docs/concept/SENSORY_STIMULATION.md` and the BSC
-   Reference Agent document to reference the new band.
-
-**To add a new OWL class:**
-
-1. Place it in `sstim-core.ttl` with a BFO parent.
-2. Add SHACL shape to `sstim-shapes.ttl`.
-3. Add SPARQL query template to `src/rdf/query.js`.
-4. Open a GitHub Issue to track the addition and its rationale.
-
-**Do not:**
-- Add class `rdfs:subClassOf` relationships to OBO Foundry classes
-  not already used in `sstim-core.ttl` without opening an issue
-  for discussion — new imports affect reasoning complexity.
-- Add `skos:exactMatch` to external vocabularies without verifying
-  the definition alignment — inexact matches should use
-  `skos:closeMatch` or `skos:relatedMatch`.
-- Rename existing IRIs — this is a breaking change requiring
-  a major version bump and deprecation process.
-
----
-
-## Querying the ontology
-
-The BSC Lab SPARQL interface uses Comunica over the N3.js in-memory
-store. All queries should use the prefix declarations from
-`src/rdf/namespaces.js`. Representative query patterns:
+## Query Examples
 
 ```sparql
-# All presets targeting the alpha band or any of its sub-bands
-PREFIX bsc:      <https://w3id.org/sstim#>
+PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
-PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-SELECT DISTINCT ?preset ?label WHERE {
+# Presets targeting alpha or a narrower alpha band.
+SELECT DISTINCT ?preset ?band WHERE {
   ?band skos:broader* sstim-v:alpha .
-  ?preset sstim:targetsFrequencyBand ?band ;
-          rdfs:label ?label .
+  ?preset a sstim:Preset ; sstim:targetsFrequencyBand ?band .
 }
 
-# All presets with an evidence claim at tier 'moderate' or better.
-# Evidence tiers live on sstim:EvidenceClaim, not directly on the preset.
-PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
-
-SELECT ?preset ?tier WHERE {
+# Fully attributable cited evidence trails.
+SELECT ?claim ?subject ?tier ?reference ?agent WHERE {
   ?claim a sstim:EvidenceClaim ;
-         sstim:supportsRelation ?preset ;
-         sstim:hasEvidenceTier ?tier .
-  ?tier sstim:tierRank ?rank .
-  FILTER(?rank >= 4)
+    sstim:supportsRelation ?subject ;
+    sstim:hasEvidenceTier ?tier ;
+    sstim:citesReference ?reference ;
+    <http://www.w3.org/ns/prov#wasAttributedTo> ?agent .
 }
-ORDER BY DESC(?rank)
 
-# Presets with breathing guide in the Heal group
-SELECT ?preset WHERE {
-  ?preset sstim:inGroup sstim-v:groupHeal ;
-          sstim:hasBreathGuide true .
+# Framework -> protocol -> preset chain.
+SELECT ?framework ?protocol ?preset WHERE {
+  ?protocol sstim:definedByFramework ?framework .
+  ?preset sstim:followsProtocol ?protocol .
 }
 ```
 
----
+## Versioning And Publication
+
+SSTIM versions the six modules as one citable set:
+
+1. Develop in top-level modules with a `-dev` `owl:versionInfo` and no
+   `owl:versionIRI`.
+2. Run the complete validation suite and review semantic diffs.
+3. Set the release version and core `owl:versionIRI`.
+4. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
+   sources and refuses to overwrite an existing snapshot.
+5. Tag and publish the GitHub release so Zenodo archives the same commit.
+6. Add the resulting version DOI without rewriting a published snapshot.
+
+Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
+master. `context.jsonld` is a hand-maintained compaction context, not a generated
+serialization.
+
+## Extension Checklist
+
+For a new controlled concept:
+
+1. Reuse an existing scheme when its scope fits.
+2. Add dual typing, one English preferred label, one notation, and a definition.
+3. Add all applicable language labels and the appropriate top/broader link.
+4. Materialize the inverse hierarchy link.
+5. Add evidence and caution metadata separately from the concept definition.
+6. Update `context.jsonld` if a new class or property was introduced.
+7. Add or update SHACL and competency queries.
+8. Run `make validate` and `make export`.
+9. Record a non-obvious modeling decision in an ADR.
+
+Do not add an `exactMatch` from label similarity alone, treat an intended effect
+as an observed outcome, attach evidence globally to a technique family, put
+private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-SSTIM `v0.5.0` is archived under the version DOI
-[10.5281/zenodo.21286975](https://doi.org/10.5281/zenodo.21286975).
-For references to SSTIM across all releases, use the concept DOI
-[10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-
-If you use SSTIM in a research paper or software system, cite:
+Use SSTIM `v0.5.0` for the current immutable citation:
 
 ```bibtex
-@misc{https://doi.org/10.5281/zenodo.21286975,
-  doi       = {10.5281/ZENODO.21286975},
-  url       = {https://zenodo.org/doi/10.5281/zenodo.21286975},
+@misc{fabbri_sstim_2026,
   author    = {Fabbri, Renato},
-  keywords  = {sensory stimulation, ontology, OWL, SKOS, SHACL, knowledge graph, linked data, brainwave entrainment, binaural beats, SSTIM, BFO, wellness},
-  title     = {BSC Lab — Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
-  publisher = {Zenodo},
+  title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
-  copyright = {Creative Commons Attribution 4.0 International}
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.21286975},
+  url       = {https://doi.org/10.5281/zenodo.21286975}
 }
 ```
 
----
-
-## Contact and contribution
-
-- GitHub Issues for bug reports, correction proposals, and scope discussions
-- GitHub Discussions for broader design and vocabulary questions
-- BSC Lab annotation interface for inline comments on specific ontology nodes
-- Email: renato.fabbri@gmail.com
-
-Ontology changes that affect the controlled vocabulary used in BioSynCare
-preset descriptions require coordination with the BioSynCare repository
-(see `CONTRIBUTING.md`).
-
----
-
-*Version: 0.5.0 (July 2026)*
-*Maintained by: Renato Fabbri*  
-*License: CC BY 4.0*  
-*Namespace (ontology): `https://w3id.org/sstim`*  
-*Namespace (BSC framework): `https://w3id.org/sstim/framework/bsc`*
-*Namespace (BSC Lab instances): `https://w3id.org/sstim/implementation/bsclab/`*
-*Namespace (BioSynCare public-safe metadata, reserved): `https://w3id.org/sstim/implementation/biosyncare/`*
+For SSTIM across all releases, use the concept DOI
+[10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974). Do not cite
+`0.6.0-dev` as immutable.

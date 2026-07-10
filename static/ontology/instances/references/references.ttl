@@ -8,7 +8,8 @@ sstim-ref:INGENDOH_2023 a sstim:PublicSafeReference ;
     dct:title "Binaural beats to entrain the brain? A systematic review of the effects of binaural beat stimulation on brain oscillatory activity, and the implications for psychological research and intervention" ;
     dct:creator "Ingendoh, Ruth Maria", "Posny, Ella S.", "Heine, Angela" ;
     dct:issued "2023-05-19"^^xsd:date ;
-    dct:identifier "doi:10.1371/journal.pone.0286023" .
+    dct:identifier "doi:10.1371/journal.pone.0286023" ;
+    dct:source <https://doi.org/10.1371/journal.pone.0286023> .
 
 # Venue audited 2026-07-08 (Crossref): International Journal of Audiology
 # (Informa UK / Taylor & Francis), vol. 42(4):177-219. Foundational ASSR review.
@@ -17,7 +18,8 @@ sstim-ref:PICTON_2003 a sstim:PublicSafeReference ;
     dct:title "Human auditory steady-state responses" ;
     dct:creator "Picton, Terence W.", "John, M. Sasha", "Dimitrijevic, Andrew", "Purcell, David" ;
     dct:issued "2003"^^xsd:gYear ;
-    dct:identifier "doi:10.3109/14992020309101316" .
+    dct:identifier "doi:10.3109/14992020309101316" ;
+    dct:source <https://doi.org/10.3109/14992020309101316> .
 
 # Venue audited 2026-07-08 (Crossref): Ear & Hearing (Wolters Kluwer),
 # vol. 31(3):302-324. Standard tutorial on the auditory brainstem/FFR response.
@@ -26,4 +28,45 @@ sstim-ref:SKOE_KRAUS_2010 a sstim:PublicSafeReference ;
     dct:title "Auditory brainstem response to complex sounds: a tutorial" ;
     dct:creator "Skoe, Erika", "Kraus, Nina" ;
     dct:issued "2010"^^xsd:gYear ;
-    dct:identifier "doi:10.1097/AUD.0b013e3181cdb272" .
+    dct:identifier "doi:10.1097/AUD.0b013e3181cdb272" ;
+    dct:source <https://doi.org/10.1097/AUD.0b013e3181cdb272> .
+
+# PubMed/Crossref audited 2026-07-10. Systematic review of slow breathing in
+# healthy participants; used only for measurable psychophysiological correlates.
+sstim-ref:ZACCARO_2018 a sstim:PublicSafeReference ;
+    sstim:referenceKey "ZACCARO_2018" ;
+    dct:title "How Breath-Control Can Change Your Life: A Systematic Review on Psycho-Physiological Correlates of Slow Breathing" ;
+    dct:creator "Zaccaro, Andrea", "Piarulli, Andrea", "Laurino, Marco",
+        "Garbella, Erika", "Menicucci, Danilo", "Neri, Bruno", "Gemignani, Angelo" ;
+    dct:issued "2018-09-07"^^xsd:date ;
+    dct:identifier "doi:10.3389/fnhum.2018.00353" ;
+    dct:source <https://doi.org/10.3389/fnhum.2018.00353> .
+
+# Crossref/PubMed audited 2026-07-10. Foundational SSVEP review in Progress in
+# Neurobiology; supports the measurable response, not downstream benefit.
+sstim-ref:VIALATTE_2010 a sstim:PublicSafeReference ;
+    sstim:referenceKey "VIALATTE_2010" ;
+    dct:title "Steady-state visually evoked potentials: focus on essential paradigms and future perspectives" ;
+    dct:creator "Vialatte, François-Benoît", "Maurice, Monique", "Dauwels, Justin", "Cichocki, Andrzej" ;
+    dct:issued "2010"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/j.pneurobio.2009.11.005" ;
+    dct:source <https://doi.org/10.1016/j.pneurobio.2009.11.005> .
+
+# PubMed audited 2026-07-10. Review of EEG-based SSSEP interfaces.
+sstim-ref:PETIT_2021 a sstim:PublicSafeReference ;
+    sstim:referenceKey "PETIT_2021" ;
+    dct:title "EEG-based brain-computer interfaces exploiting steady-state somatosensory-evoked potentials: a literature review" ;
+    dct:creator "Petit, Jimmy", "Rouillard, José", "Cabestaing, François" ;
+    dct:issued "2021-11-02"^^xsd:date ;
+    dct:identifier "doi:10.1088/1741-2552/ac2fc4" ;
+    dct:source <https://doi.org/10.1088/1741-2552/ac2fc4> .
+
+# PubMed audited 2026-07-10. General neural-mechanism review; not evidence that
+# an arbitrary cross-modal protocol has a beneficial outcome.
+sstim-ref:STEIN_STANFORD_2008 a sstim:PublicSafeReference ;
+    sstim:referenceKey "STEIN_STANFORD_2008" ;
+    dct:title "Multisensory integration: current issues from the perspective of the single neuron" ;
+    dct:creator "Stein, Barry E.", "Stanford, Terrence R." ;
+    dct:issued "2008"^^xsd:gYear ;
+    dct:identifier "doi:10.1038/nrn2331" ;
+    dct:source <https://doi.org/10.1038/nrn2331> .

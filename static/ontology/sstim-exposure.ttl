@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.4.1
-#  Date:       2026-07-09
+#  Version:    0.6.0-dev
+#  Date:       2026-07-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -36,19 +36,21 @@
     # frozen snapshot at static/ontology/<version>/ (identified by the core
     # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
     # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.4.1" ;
+    owl:versionInfo "0.6.0-dev" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-06-18"^^xsd:date ;
-    dct:modified "2026-07-09"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
     skos:historyNote "Initial exposure module for post-0.3.0 ontology work. The module does not assert physiological or health effects directly; those statements must be modeled as qualified claims with evidence or knowledge status."@en ;
     skos:historyNote "0.4.0 — added left/right laterality body placements, quantitative stimulus datatype properties (frequency, flicker rate, beat frequency, duty cycle, gain, phase), the ExposureLimit class with quantified optical/flicker/hearing safety boundaries citing external standards, and the affordsDeliveryMedium capability-to-medium relation. Grounds the Sensory Field interface (ADR 0011)."@en ;
-    skos:historyNote "0.4.1 — added the sstim-ex: to sstim-v: perceived-modality/sensory-channel closeMatch bridge and the somatosensory/haptic/tactile/vibrotactile convention scope notes (ADR 0019, P5.5). Released as part of SSTIM 0.5.0. Additive; no terms removed or renamed."@en .
+    skos:historyNote "0.4.1 — added the sstim-ex: to sstim-v: perceived-modality/sensory-channel closeMatch bridge and the somatosensory/haptic/tactile/vibrotactile convention scope notes (ADR 0019, P5.5). Released as part of SSTIM 0.5.0. Additive; no terms removed or renamed."@en ;
+    skos:historyNote "0.6.0-dev — completes operational definitions for every exposure concept, materializes SKOS inverse links for non-reasoning clients, adds precise union domains and scalar cardinalities, and strengthens exposure SHACL coverage. Additive at the term level."@en .
 
 
 ###########################################################################
@@ -178,6 +180,7 @@ sstim-ex:ExposureLimit a owl:Class ;
 ###########################################################################
 
 sstim-ex:hasExposureProfile a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim:SensoryStimulationTechnique sstim:Preset ) ] ;
     rdfs:range sstim-ex:ExposureProfile ;
     rdfs:label "has exposure profile"@en ;
     skos:definition "Links a protocol, technique, preset, or experiment instance to a structured exposure profile."@en ;
@@ -205,48 +208,56 @@ sstim-ex:perceivedModality a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:requiresDeviceCapability a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim:SensoryStimulationProtocol ) ] ;
     rdfs:range sstim-ex:DeviceCapability ;
     rdfs:label "requires device capability"@en ;
     skos:definition "Links an exposure profile, stimulus channel, or protocol to a hardware or environmental capability required for delivery."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasBodyPlacement a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range sstim-ex:BodyPlacement ;
     rdfs:label "has body placement"@en ;
     skos:definition "Links an exposure profile, stimulus channel, or capability to a body or near-body placement."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasComfortBoundary a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim-ex:ExposureProfile sstim-ex:StimulusChannel ) ] ;
     rdfs:range sstim-ex:ComfortBoundary ;
     rdfs:label "has comfort boundary"@en ;
     skos:definition "Links an exposure profile or stimulus channel to a comfort, discomfort, fatigue, awareness, or risk boundary."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasPerceptualGain a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ExposureProfile ;
     rdfs:range sstim-ex:PerceptualGain ;
     rdfs:label "has perceptual gain"@en ;
     skos:definition "Links an exposure profile or protocol to a perceived gain created by the setup."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasPerceptualLoss a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ExposureProfile ;
     rdfs:range sstim-ex:PerceptualLoss ;
     rdfs:label "has perceptual loss"@en ;
     skos:definition "Links an exposure profile or protocol to a perceived loss, cost, or limitation created by the setup."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasEffectClaim a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ExposureProfile ;
     rdfs:range sstim-ex:ExposureEffectClaim ;
     rdfs:label "has effect claim"@en ;
     skos:definition "Links an exposure profile or protocol to a qualified effect, measurement, hypothesis, or risk claim."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExperimentContext a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim-ex:ExposureProfile ) ] ;
     rdfs:range sstim-ex:ExperimentContext ;
     rdfs:label "has experiment context"@en ;
     skos:definition "Links an exploratory protocol or exposure profile to the context in which it is proposed or used."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasKnowledgeStatus a owl:ObjectProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim:EvidenceClaim ) ] ;
     rdfs:range sstim-ex:KnowledgeStatus ;
     rdfs:label "has knowledge status"@en ;
     skos:definition "Links a protocol, exposure profile, channel, capability, or claim to its local SSTIM/BSC Lab knowledge or capability status."@en ;
@@ -267,6 +278,7 @@ sstim-ex:concernsEffectDimension a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExposureLimit a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:ComfortBoundary ;
     rdfs:range sstim-ex:ExposureLimit ;
     rdfs:label "has exposure limit"@en ;
     skos:definition "Links a comfort boundary or device capability to a quantified exposure limit against which a delivery is checked."@en ;
@@ -292,42 +304,42 @@ sstim-ex:affordsDeliveryMedium a owl:ObjectProperty ;
     skos:definition "Links a device capability to the physical delivery medium it produces or affords, making the capability-to-medium pairing explicit rather than implied by naming."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasFrequencyHz a owl:DatatypeProperty ;
+sstim-ex:hasFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "frequency (Hz)"@en ;
     skos:definition "Carrier or tone frequency of a stimulus channel, in hertz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasFlickerRateHz a owl:DatatypeProperty ;
+sstim-ex:hasFlickerRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "flicker rate (Hz)"@en ;
     skos:definition "Blink, pulse, or flicker rate of a stimulus channel, in hertz. Visual flicker rate is subject to photosensitivity exposure limits."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasBeatFrequencyHz a owl:DatatypeProperty ;
+sstim-ex:hasBeatFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "beat frequency (Hz)"@en ;
     skos:definition "Monaural or binaural beat frequency (the difference frequency) of an audio stimulus channel, in hertz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasDutyCycle a owl:DatatypeProperty ;
+sstim-ex:hasDutyCycle a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "duty cycle"@en ;
     skos:definition "On-fraction of each blink or pulse cycle for a stimulus channel, between 0 and 1."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasGainLevel a owl:DatatypeProperty ;
+sstim-ex:hasGainLevel a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "gain level"@en ;
     skos:definition "Relative output amplitude of a stimulus channel, between 0 and 1. This is a relative level, not a calibrated physical intensity."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasPhaseOffset a owl:DatatypeProperty ;
+sstim-ex:hasPhaseOffset a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "phase offset"@en ;
@@ -338,7 +350,7 @@ sstim-ex:hasPhaseOffset a owl:DatatypeProperty ;
 # absolute pitch (carrier) of an audio stimulus channel — orthogonal to the
 # modulation/beat frequency (sstim-ex:hasBeatFrequencyHz, sstim:FrequencyBand).
 # Keep any reference-pitch effect claim disjoint from entrainment/beat evidence.
-sstim-ex:referencePitchNote a owl:DatatypeProperty ;
+sstim-ex:referencePitchNote a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:string ;
     rdfs:label "reference pitch note"@en ;
@@ -346,7 +358,7 @@ sstim-ex:referencePitchNote a owl:DatatypeProperty ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0017-reference-pitch-retuning.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:referencePitchHz a owl:DatatypeProperty ;
+sstim-ex:referencePitchHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "reference pitch (Hz)"@en ;
@@ -354,53 +366,53 @@ sstim-ex:referencePitchHz a owl:DatatypeProperty ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0017-reference-pitch-retuning.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:retunedFromReferenceHz a owl:DatatypeProperty ;
+sstim-ex:retunedFromReferenceHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "retuned from reference (Hz)"@en ;
     skos:definition "Standard reference frequency the tuning departs from, typically 440 Hz for A4."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:pitchShiftCents a owl:DatatypeProperty ;
+sstim-ex:pitchShiftCents a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "pitch shift (cents)"@en ;
     skos:definition "Resulting pitch shift in cents relative to the standard reference (e.g. about -31.77 cents for A4=432 versus A4=440)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitValue a owl:DatatypeProperty ;
+sstim-ex:limitValue a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:decimal ;
     rdfs:label "limit value"@en ;
     skos:definition "Numeric value of an exposure limit, interpreted together with limitUnit and limitQuantity."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitUnit a owl:DatatypeProperty ;
+sstim-ex:limitUnit a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:string ;
     rdfs:label "limit unit"@en ;
     skos:definition "Unit of an exposure limit value (for example \"dBA\" or \"J/m2\"). A QUDT unit IRI may be linked separately where precision is required."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitQuantity a owl:DatatypeProperty ;
+sstim-ex:limitQuantity a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:string ;
     rdfs:label "limit quantity"@en ;
     skos:definition "Physical quantity an exposure limit constrains (for example \"flash frequency\", \"sound pressure level\", or \"effective irradiance\")."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitAveragingTime a owl:DatatypeProperty ;
+sstim-ex:limitAveragingTime a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:duration ;
     rdfs:label "limit averaging time"@en ;
     skos:definition "Averaging or reference time over which an exposure limit is defined (for example an 8-hour dose), as an xsd:duration."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty ;
+sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:range xsd:decimal ;
     rdfs:label "limit maximum frequency (Hz)"@en ;
-    skos:definition "Maximum permitted frequency under an exposure limit, in hertz (for example a maximum safe flash rate)."@en ;
+    skos:definition "Maximum frequency permitted by a cited exposure or accessibility rule, in hertz; compliance with the value is not an individual safety guarantee."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 
@@ -625,7 +637,8 @@ sstim-ex:ComfortBoundaryScheme a skos:ConceptScheme ;
         sstim-ex:boundaryBodyContactComfort,
         sstim-ex:boundaryEnvironmentalAwareness,
         sstim-ex:boundaryIsolation,
-        sstim-ex:boundaryBalanceRisk .
+        sstim-ex:boundaryBalanceRisk,
+        sstim-ex:boundaryOpticalRadiation .
 
 
 ###########################################################################
@@ -1654,6 +1667,139 @@ sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension
 
 
 ###########################################################################
+# Operational definitions completed in 0.6.0-dev
+#
+# These annotations complete the previously label-only exposure concepts.
+# Effect terms name dimensions that may be measured or hypothesized; they do
+# not assert that an exposure changes the dimension.
+###########################################################################
+
+# Materialized inverse hierarchy links for clients without OWL inference.
+sstim-ex:placementEars skos:narrower sstim-ex:placementEarLeft, sstim-ex:placementEarRight .
+sstim-ex:placementEyes skos:narrower sstim-ex:placementEyeLeft, sstim-ex:placementEyeRight .
+
+# Body placements
+sstim-ex:placementEars skos:definition "Placement at, over, in, or immediately adjacent to both ears, including bilateral headphones or ear-level transducers."@en .
+sstim-ex:placementEyes skos:definition "Placement in front of or optically directed toward both eyes, including screens, head-mounted displays, and light sources."@en .
+sstim-ex:placementFeet skos:definition "Placement on, under, or mechanically coupled to one or both feet."@en .
+sstim-ex:placementHands skos:definition "Placement in contact with, held by, or immediately directed toward one or both hands."@en .
+sstim-ex:placementJoints skos:definition "Placement at or mechanically coupled to one or more articulated body joints."@en .
+sstim-ex:placementMouth skos:definition "Placement in, at, or immediately adjacent to the mouth for gustatory, airflow, or oral-contact delivery."@en .
+sstim-ex:placementNearbyEnvironment skos:definition "Placement in the participant's immediate environment without direct body contact, such as room speakers, lighting, or tracked objects."@en .
+sstim-ex:placementNose skos:definition "Placement at or immediately adjacent to the nose for olfactory or airflow delivery."@en .
+sstim-ex:placementTopOfHead skos:definition "Placement on or immediately above the superior surface of the head."@en .
+sstim-ex:placementTorso skos:definition "Placement on, around, or mechanically coupled to the chest, abdomen, or back."@en .
+sstim-ex:placementWholeBody skos:definition "Placement or exposure distributed across most of the body rather than localized to one site."@en .
+
+# Comfort and safety boundaries
+sstim-ex:boundaryBalanceRisk skos:definition "Boundary for loss of stable posture or spatial orientation during immersive, moving, or mechanically perturbed exposure."@en .
+sstim-ex:boundaryBodyContactComfort skos:definition "Boundary for pressure, friction, restriction, or other discomfort caused by direct-contact equipment or materials."@en .
+sstim-ex:boundaryEnvironmentalAwareness skos:definition "Boundary for retaining sufficient awareness of nearby people, obstacles, alarms, traffic, and other environmental events."@en .
+sstim-ex:boundaryEyeStrain skos:definition "Boundary for visual fatigue or discomfort associated with luminance, contrast, focus demand, stereo disparity, motion, or prolonged viewing."@en .
+sstim-ex:boundaryHearingRisk skos:definition "Boundary for calibrated sound level and exposure duration intended to limit excessive acoustic dose; consumer gain values alone cannot establish compliance."@en .
+sstim-ex:boundaryIsolation skos:definition "Boundary for discomfort, reduced situational awareness, or inability to communicate caused by sensory or social isolation."@en .
+sstim-ex:boundaryPhotosensitivity skos:definition "Boundary for flashing, rapid contrast change, or repetitive visual pattern exposure that requires photosensitivity safeguards."@en .
+sstim-ex:boundaryThermalComfort skos:definition "Boundary for avoiding uncomfortably hot or cold contact, airflow, liquid, or ambient conditions."@en .
+
+# Device capabilities
+sstim-ex:capabilityAirflowActuation skos:definition "Capability to produce controllable airflow with specified direction, rate, or temporal modulation."@en .
+sstim-ex:capabilityArGlasses skos:definition "Capability to overlay tracked visual content on a direct view of the physical environment through augmented-reality eyewear."@en .
+sstim-ex:capabilityBodyPositionTracking skos:definition "Capability to estimate the position or orientation of the head, limbs, torso, or whole body over time."@en .
+sstim-ex:capabilityDisplayFlicker skos:definition "Capability to modulate display luminance or contrast at a specified temporal frequency while enforcing flash-safety limits."@en .
+sstim-ex:capabilityDisplayLightOutput skos:definition "Capability to present controlled visible-light color and luminance through a display or luminaire."@en .
+sstim-ex:capabilityGravityCueing skos:definition "Capability to apply controlled inertial, tilt, load, or orientation cues that alter perceived body relation to gravity."@en .
+sstim-ex:capabilityHapticActuator skos:definition "Capability to deliver controlled tactile or mechanical stimulation through a contact actuator."@en .
+sstim-ex:capabilityHeadphones skos:definition "Capability to deliver ear-level audio with left and right channels isolated sufficiently for the intended presentation."@en .
+sstim-ex:capabilityHrtfSpatialAudio skos:definition "Capability to render direction-dependent binaural audio using head-related transfer functions or an equivalent spatialization model."@en .
+sstim-ex:capabilityJointForceActuation skos:definition "Capability to apply measured or controlled force, resistance, or motion at an articulated joint."@en .
+sstim-ex:capabilityLiquidGelTactileImmersion skos:definition "Capability to expose body surfaces to controlled liquid, gel, or compliant material for distributed tactile contact."@en .
+sstim-ex:capabilityMultiDeviceBodyPlacement skos:definition "Capability to coordinate multiple devices positioned at distinct body sites within one exposure."@en .
+sstim-ex:capabilityPhoneVibration skos:definition "Capability to deliver timed vibration through a mobile device's built-in actuator."@en .
+sstim-ex:capabilityRoomScaleTracking skos:definition "Capability to track participant movement and orientation across a defined physical area."@en .
+sstim-ex:capabilityScentDelivery skos:definition "Capability to release and clear identified odorants with controlled timing and exposure handling."@en .
+sstim-ex:capabilitySensorInput skos:definition "Capability to acquire a measured signal for monitoring, adaptation, or closed-loop control."@en .
+sstim-ex:capabilityStereoSeparation skos:definition "Capability to deliver distinguishable left and right audio signals without unacceptable channel leakage."@en .
+sstim-ex:capabilityTasteDelivery skos:definition "Capability to present identified gustatory substances or controlled taste-related stimulation with appropriate hygiene controls."@en .
+sstim-ex:capabilityThermalActuation skos:definition "Capability to apply controlled warming or cooling within defined contact and exposure limits."@en .
+sstim-ex:capabilityVrHeadset skos:definition "Capability to present tracked, stereoscopic, head-mounted virtual visual and audio content."@en .
+sstim-ex:capabilityWearableLightArray skos:definition "Capability to coordinate multiple body-worn visible-light emitters with specified spatial and temporal patterns."@en .
+sstim-ex:capabilityWearableSpeakerArray skos:definition "Capability to coordinate multiple body-worn or near-body acoustic transducers."@en .
+
+# Effect dimensions
+sstim-ex:effectArousal skos:definition "Measurement or hypothesis dimension concerning alertness, activation, or subjective arousal."@en .
+sstim-ex:effectBalanceRisk skos:definition "Measurement or risk-assessment dimension concerning postural instability, disorientation, or loss of balance."@en .
+sstim-ex:effectBloodPressure skos:definition "Physiological measurement dimension concerning arterial blood pressure; no direction or benefit is implied."@en .
+sstim-ex:effectBodyVibration skos:definition "Perceptual or physical measurement dimension concerning vibration transmitted to or perceived across the body."@en .
+sstim-ex:effectBreathRate skos:definition "Physiological measurement dimension concerning respiratory cycle frequency or pacing adherence."@en .
+sstim-ex:effectCalm skos:definition "Self-report dimension concerning perceived calmness or low activation."@en .
+sstim-ex:effectDiscomfort skos:definition "Self-report or observational dimension concerning unpleasant, painful, fatiguing, or intolerable experience."@en .
+sstim-ex:effectEyeStrain skos:definition "Self-report or observational dimension concerning visual fatigue, headache-like discomfort, focus demand, or ocular discomfort."@en .
+sstim-ex:effectGravityPerception skos:definition "Perceptual dimension concerning sensed orientation, load, or motion relative to gravity."@en .
+sstim-ex:effectHearingRisk skos:definition "Risk-assessment dimension concerning excessive sound level or duration and potential auditory harm."@en .
+sstim-ex:effectHeartRate skos:definition "Physiological measurement dimension concerning cardiac rate; no direction or health interpretation is implied."@en .
+sstim-ex:effectImmersion skos:definition "Self-report or behavioral dimension concerning the sense of presence, absorption, or enclosure in an exposure."@en .
+sstim-ex:effectPhotosensitivityRisk skos:definition "Risk-assessment dimension concerning adverse responses to flashing, rapid contrast changes, or repetitive visual patterns."@en .
+sstim-ex:effectPleasantness skos:definition "Self-report dimension concerning hedonic valence or how pleasant an exposure is perceived to be."@en .
+sstim-ex:effectProprioception skos:definition "Perceptual dimension concerning sensed body position, movement, and force."@en .
+sstim-ex:effectSocialConnectedness skos:definition "Self-report or behavioral dimension concerning perceived connection, coordination, or shared attention with other people."@en .
+sstim-ex:effectStress skos:definition "Self-report or physiological measurement dimension concerning perceived or measured stress; the term alone asserts no change."@en .
+sstim-ex:effectTactileSensation skos:definition "Perceptual dimension concerning touch, pressure, texture, or vibration sensed at the body."@en .
+sstim-ex:effectTemperaturePerception skos:definition "Perceptual dimension concerning sensed warmth, coolness, or thermal change."@en .
+
+# Experiment contexts and local knowledge status
+sstim-ex:contextBiohacking skos:definition "Exploratory self-experimentation context outside clinical care, requiring explicit uncertainty and safety boundaries."@en .
+sstim-ex:contextBscLabPrototype skos:definition "Prototype context used to test BSC Lab representation, controls, or delivery capabilities."@en .
+sstim-ex:contextCapabilityBoundary skos:definition "Design-analysis context used to document what current hardware or software can and cannot deliver."@en .
+sstim-ex:contextExploratoryNonClinical skos:definition "Research or demonstration context that does not provide clinical care, diagnosis, or treatment."@en .
+sstim-ex:contextSelfObservation skos:definition "Context in which a participant records their own experience or measurements without inferring general efficacy."@en .
+sstim-ex:contextSocialProtocol skos:definition "Context in which two or more participants coordinate, communicate, or share sensory events under an explicit protocol."@en .
+sstim-ex:notCurrentlyDeliverableByBSCLab skos:definition "Local status indicating that the current BSC Lab implementation cannot deliver the described exposure, even if the concept remains relevant to the domain."@en .
+sstim-ex:notCurrentlyUsedInBSCLab skos:definition "Local status indicating that BSC Lab does not currently use the described technique, capability, or exposure in its public implementation."@en .
+sstim-ex:outsideBSCLabScope skos:definition "Local status indicating that the resource is useful for boundary documentation but is not planned as a BSC Lab delivery feature."@en .
+
+# Perceived modalities
+sstim-ex:modalityAuditory skos:definition "Perceived-modality category for hearing or sound-related experience, independent of the physical delivery device."@en .
+sstim-ex:modalityVisual skos:definition "Perceived-modality category for sight, luminance, color, form, motion, or depth-related experience."@en .
+
+# Perceptual gains and losses
+sstim-ex:gainAudioImmersion skos:definition "Setup characteristic in which acoustic presentation increases perceived enclosure, presence, or separation from ambient sound."@en .
+sstim-ex:gainBodyVibration skos:definition "Setup characteristic in which mechanical coupling adds perceivable whole-body or localized vibration."@en .
+sstim-ex:gainSocialReflection skos:definition "Setup characteristic in which shared or represented participant activity supports reflection on social coordination or connection."@en .
+sstim-ex:gainSpatialAudio skos:definition "Setup characteristic in which directional rendering adds perceivable location, distance, or movement to sound."@en .
+sstim-ex:gainStereoDepth skos:definition "Setup characteristic in which binocular disparity or equivalent cues add perceived visual depth."@en .
+sstim-ex:gainTactileImmersion skos:definition "Setup characteristic in which distributed contact, texture, pressure, or vibration adds bodily presence."@en .
+sstim-ex:gainThermalProximity skos:definition "Setup characteristic in which localized temperature or airflow cues add a sense of nearness or environmental change."@en .
+sstim-ex:lossClaimCertainty skos:definition "Interpretive limitation indicating that evidence or mechanism uncertainty constrains what can responsibly be claimed."@en .
+sstim-ex:lossComfort skos:definition "Setup cost indicating reduced comfort or tolerability from equipment, intensity, posture, duration, or isolation."@en .
+sstim-ex:lossDeliverability skos:definition "Implementation limitation indicating that the described exposure cannot be delivered with the current platform."@en .
+sstim-ex:lossDeviceFeasibility skos:definition "Engineering limitation indicating unresolved hardware, calibration, synchronization, hygiene, or control requirements."@en .
+sstim-ex:lossEnvironmentalAwareness skos:definition "Setup cost indicating reduced awareness of nearby events, people, obstacles, or alarms."@en .
+sstim-ex:lossHorizontalField skos:definition "Visual limitation indicating a reduced horizontal field of view or occlusion of peripheral content."@en .
+sstim-ex:lossOutsideVision skos:definition "Visual limitation indicating that content outside the display or optical field cannot be perceived."@en .
+
+# Stimulus patterns and visual noise fields
+sstim-ex:patternAdaptive skos:definition "Pattern whose parameters change in response to time, participant input, sensed state, or a control algorithm."@en .
+sstim-ex:patternBlinking skos:definition "Pattern that alternates visible and non-visible or high- and low-luminance states with discrete transitions."@en .
+sstim-ex:patternChangingColor skos:definition "Pattern in which hue, saturation, or color mixture varies over time."@en .
+sstim-ex:patternContinuous skos:definition "Pattern delivered without intentional gaps across the specified exposure interval."@en .
+sstim-ex:patternFixedColor skos:definition "Pattern maintaining one specified color or color mixture over the exposure interval."@en .
+sstim-ex:patternMoving skos:definition "Pattern with controlled spatial translation, rotation, deformation, or apparent motion."@en .
+sstim-ex:patternNoise skos:definition "Pattern generated from a stochastic or pseudo-random distribution over time, space, intensity, or frequency."@en .
+sstim-ex:patternPulsed skos:definition "Pattern delivered as discrete on/off or amplitude-modulated events with specified timing."@en .
+sstim-ex:patternRhythmic skos:definition "Pattern with recurring temporal organization, whether strictly periodic or intentionally varied."@en .
+sstim-ex:patternStatic skos:definition "Pattern whose intended spatial and temporal parameters remain unchanged during presentation."@en .
+sstim-ex:patternStochastic skos:definition "Pattern whose event timing or values are sampled from a stated random process."@en .
+sstim-ex:patternTextured skos:definition "Pattern containing structured local variation in surface, spectrum, image, or amplitude rather than a uniform field."@en .
+sstim-ex:visualFieldBlack skos:definition "Uniform or near-uniform visual field rendered at the implementation's minimum available luminance."@en .
+sstim-ex:visualFieldStaticColor skos:definition "Uniform or spatially stable visual field rendered with a specified fixed color."@en .
+sstim-ex:visualFieldWhite skos:definition "Uniform or near-uniform high-luminance achromatic visual field within device and comfort limits."@en .
+sstim-ex:visualNoiseChromatic skos:definition "Visual noise whose random variation occurs primarily in color channels."@en .
+sstim-ex:visualNoiseLuminance skos:definition "Visual noise whose random variation occurs primarily in luminance or contrast."@en .
+sstim-ex:visualNoiseMoving skos:definition "Visual noise field whose samples or texture translate, flow, or otherwise evolve spatially over time."@en .
+sstim-ex:visualNoisePixel skos:definition "Visual noise represented as independently or locally varying display pixels or small image elements."@en .
+
+
+###########################################################################
 # Exposure limits (quantified safety thresholds, citing external standards)
 #
 # These record recognized thresholds against which a delivery is checked.
@@ -1662,14 +1808,14 @@ sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension
 ###########################################################################
 
 sstim-ex:limitFlickerWcag a owl:NamedIndividual, sstim-ex:ExposureLimit ;
-    rdfs:label "general-safe flash-rate limit"@en ;
+    rdfs:label "three-flash accessibility safeguard"@en ;
     sstim-ex:limitQuantity "flash frequency" ;
     sstim-ex:limitMaxFrequencyHz "3"^^xsd:decimal ;
     sstim-ex:limitUnit "Hz" ;
     sstim-ex:appliesToPlacement sstim-ex:placementEyes ;
     sstim-ex:conformsToStandard <https://www.w3.org/TR/WCAG21/#three-flashes-or-below-threshold> ,
         <https://www.itu.int/rec/R-REC-BT.1702> ;
-    skos:definition "No more than three general or red flashes per second; flashing above this rate (peak provocation roughly 15–25 Hz) requires explicit caution. Derived from WCAG 2.3.1 and ITU-R BT.1702 / Harding guidance."@en .
+    skos:definition "Accessibility safeguard derived from WCAG 2.3.1 and ITU-R BT.1702: content should not exceed three general flashes or three red flashes in one second unless the applicable below-threshold test is satisfied. This simplified frequency bound does not establish individual safety."@en .
 
 sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     rdfs:label "recommended sound-exposure limit"@en ;
@@ -1679,7 +1825,7 @@ sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
     sstim-ex:appliesToPlacement sstim-ex:placementEars ;
     sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/topics/noise/> ;
-    skos:definition "85 dBA averaged over 8 hours, with a 3 dB exchange rate (each +3 dB halves the safe duration). Derived from NIOSH recommended exposure limits. BSC Lab cannot measure delivered sound pressure level and treats this as advisory."@en .
+    skos:definition "NIOSH recommended exposure limit of 85 dBA averaged over 8 hours, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). BSC Lab cannot measure delivered sound pressure level and treats this record as advisory rather than a safety guarantee."@en .
 
 sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     rdfs:label "actinic ultraviolet exposure limit"@en ;

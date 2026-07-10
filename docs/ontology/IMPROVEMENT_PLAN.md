@@ -1,620 +1,224 @@
 # SSTIM Ontology Improvement Plan
 
-Status: active planning document
-Baseline reviewed: SSTIM ontology `0.3.0`
-Last reviewed: 2026-06-30
+Status: active maturity and release-planning document
 
-This document is the repo-truth backlog for ontology and vocabulary maturity
-work after the `0.3.0` release. It records known modeling gaps, the main
-design improvement to pursue next, and the priority order for follow-up tasks.
+Current release: SSTIM `0.5.0`
 
-It is not a release note and not an ADR. When a task below becomes a concrete
-modeling decision that changes semantics, create or update an ADR and link the
-affected RDF terms with `rdfs:seeAlso`.
+Development line: SSTIM `0.6.0-dev`
+Last reviewed: 2026-07-10
+
+This document records the current ontology assessment, the work completed on
+the live development line, and the remaining gates for the next release. It is
+not a release note or an architecture decision record (ADR). Semantic changes
+must be explained in an ADR and summarized in `CHANGELOG.md`.
 
 ## Current Assessment
 
-SSTIM `0.3.0` is publishable and useful as an application ontology for BSC Lab:
-versioning, frozen snapshots, w3id publication, SKOS labels, external
-alignment notes, and baseline SHACL validation are in place.
-
-It is not yet optimal as a mature research-grade domain ontology. The next
-phase should prioritize tighter validation contracts and cleaner conceptual
-separation over adding many new terms.
-
-Structured review snapshot:
-
-- SSTIM classes: 31
-- Object properties: 24
-- Datatype properties: 40
-- SKOS concept schemes: 11
-- SKOS concepts: 102
-- SHACL node shapes: 17 (+ exposure 0.4.0 shapes for `ExposureLimit`, the
-  `hasExposureLimit` link, and quantitative-property ranges) + 1 SHACL-SPARQL
-  constraint on `PresetShape` (breathing invariant)
-- Current validation command: `make validate PYSHACL='python3 -m pyshacl'`
-
-> Counts above are the `0.3.0` baseline plus the 2026-06 SHACL work; the class
-> and property counts grow as the P0/P3 tasks below add terms. Re-snapshot at the
-> next tagged release rather than per-commit.
-
-### 0.4.0 follow-up (exposure module / Sensory Field — ADR 0011)
-
-Delivered: per-ear / per-eye laterality placements (`skos:broader` children of
-the bilateral parents); quantitative stimulus datatype properties
-(`hasFrequencyHz`, `hasFlickerRateHz`, `hasBeatFrequencyHz`, `hasDutyCycle`,
-`hasGainLevel`, `hasPhaseOffset`); the `sstim-ex:ExposureLimit` class with
-quantified flicker/hearing/optical limits citing external standards, linked from
-comfort boundaries; `affordsDeliveryMedium`; and corrected UV/IR definitions.
-This substantially advances P3 item 3 (device capability vs modality) and part of
-P3 item 2 (safety metadata).
-
-**Done — 2026-06-21:** the **conditional** check that a `StimulusChannel`
-delivering UV or IR (or carrying a flicker rate) must declare the matching comfort
-boundary is now enforced by `StimulusChannelShape` (two `sh:SPARQLConstraint`s:
-UV/IR → `boundaryOpticalRadiation`, flicker → `boundaryPhotosensitivity`). The one
-affected committed instance (`wearable-light-audio-channel`) was reconciled.
-Runtime flicker enforcement also exists in `src/ui/safety/flashSafety.js`.
-
-### SHACL quick-wins (2026-06-20)
-
-Delivered the low-risk subset of P1 (Strengthen Validation):
-
-- `VoiceShape` now enforces subtype membership with `sh:xone` over the four
-  disjoint voice subtypes, replacing the weak `rdf:type sh:minCount 2` check.
-  pyshacl runs without OWL inference, so the `owl:AllDisjointClasses` axiom alone
-  was not validated at the data level.
-- `FrequencyBandShape` now checks `hzMin <= hzMax` via `sh:lessThanOrEquals`
-  (equality allowed for the single-point bands `alpha-10` and `gamma-40`).
-- `SelfReportShape` (P1 item 3) — 1–5 rating ranges and `goalAchieved` boolean
-  typing, all optional/consent-dependent.
-- `FrameworkShape` / `ProtocolShape` / `ImplementationShape` (P1 item 4) —
-  minimal `rdfs:label` requirement, matching the Preset label rule.
-- `sstim-exposure.ttl` version header reconciled to `0.4.0` with `owl:versionIRI`;
-  removed unused `eco:`/`rdf:` prefixes from core and shapes.
-
-Still open in P1: `TechniqueShape` (item 1), Martigli / Martigli-Binaural voice
-shapes (item 2), and SKOS integrity shapes (item 5).
-
-### SHACL P1 shapes — Technique + SKOS integrity (2026-06-20)
-
-Delivered the next tranche of P1, scoped to what the committed data supports at
-Violation severity (so `make validate` stays green without repo-wide
-`--allow-warnings`):
-
-- `TechniqueShape` (P1 item 1, partial) — every `sstim:SensoryStimulationTechnique`
-  must declare a `sstim:proposedMechanism`, **or** be flagged non-evidence-bearing
-  with a `skos:editorialNote` (`sh:or` admits either; the two folk techniques
-  `techSolfeggioTuning` / `techSubliminalAudio` take the editorial-note branch).
-  Temporal-structure and delivery-modality requirements are **deferred to P2 item
-  4**: the BSC framework technique instances (and `sstim-v:techUltrasoundNeuromod`)
-  lack that metadata, so enforcing it now would either fail validation or need
-  `--allow-warnings`. Align the instances first, then promote those to Violation.
-- `ConceptIntegrityShape` (P1 item 5, partial) — every `skos:Concept` must declare
-  at least one `skos:inScheme` and carry an English (`@en`) `skos:prefLabel`
-  (verified: 260/260 concepts already satisfy both). Top-concept structure for the
-  remaining flat schemes is **deferred to P2 item 1** (several schemes still have
-  no `skos:hasTopConcept`).
-
-### SHACL P1 shapes — Martigli voice shapes (2026-06-20)
-
-Resolved the last open P1 validation item (item 2) by first taking the modeling
-decision in [ADR 0012](../decisions/0012-martigli-voice-parameters.md) (Accepted,
-Option A):
-
-- Added six per-voice Martigli parameter properties to `sstim-patch-studio.ttl`
-  (`martigliCenterFreq`, `martigliAmplitude`, `martigliPeriodInitial`,
-  `martigliPeriodFinal`, `martigliTransitionDuration`, `isBreathReference`), each
-  with `rdfs:domain sstim:Voice` and `rdfs:seeAlso` to the ADR — distinct from the
-  session-level `breathingPeriod*` override properties.
-- `MartigliVoiceShape` requires `martigliCenterFreq` + the arc params and forbids
-  the carrier pair; `MartigliBinauralVoiceShape` requires the `carrierFreqLeft` /
-  `carrierFreqRight` pair + the arc params and forbids `martigliCenterFreq`. Both
-  enforce the CLAUDE.md §4.5 `mp0 ≥ 3 when isOn` rule via `sh:or`.
-- Added a breathing-enabled seed preset
-  (`instances/presets/heal-theta-breathing-seed.ttl`) with a Martigli-Binaural
-  breathing-reference voice and a non-reference Martigli textural voice, so both
-  shapes are exercised by `make validate` (negative-tested: deliberate violations
-  are caught).
-
-The preset-level breathing invariant (`hasBreathGuide` true iff exactly one voice
-has `isOn` = true; ≤ 1 breathing reference per preset) is now enforced too: a
-`sh:SPARQLConstraint` on `PresetShape` counts the breathing-reference voices and
-compares to `hasBreathGuide` (the first SHACL-SPARQL rule in the shapes graph;
-pyshacl runs it without extra flags). Negative-tested for both the wrong-count and
-wrong-flag cases.
-
-## Primary Design Improvement
-
-Separate physical delivery from perceived sensory modality.
-
-The current `sstim:techniqueModality` property links techniques directly to
-`sstim:SensoryModality`. That is adequate for simple audio cases, but it
-overloads at least three distinct questions:
-
-- what physical energy or medium is delivered;
-- what sensory or perceptual channel is engaged;
-- what device or hardware capability is required.
-
-Raw Portuguese/English maintainer notes that motivated the exposure model are
-preserved in
-[`raw-notes/2026-06-18-exposure-maintainer-notes.md`](raw-notes/2026-06-18-exposure-maintainer-notes.md).
-The normalized design question is: what can SSTIM represent about biohacking,
-sensory stimulation, delivery media, device capabilities, perceived modalities,
-body placement, evidence status, and BSC Lab's current delivery limits?
-
-This matters for cross-modal and non-consumer cases:
-
-- vibroacoustic stimulation is acoustic plus somatosensory;
-- focused ultrasound is physical acoustic energy but not ordinary auditory
-  perception;
-- visual flicker and photic stimulation need luminance/display constraints;
-- haptic stimulation needs actuator capability and body contact;
-- high-volume or low-frequency audio can become tactile or body-perceived, so
-  audio delivery should not be treated as purely auditory without body-contact,
-  amplitude, frequency, distance, and comfort context;
-- breath pacing is interoceptive/behavioral guidance rather than simply an
-  output modality;
-- stereoscopy, free-view 3D, phone-in-front-of-eye usage, VR headsets, AR
-  glasses, and hand-separated phone viewing require visual capability and
-  perceptual-loss modeling, not only a `visual` tag;
-- social-graph sensory protocols can combine visualized social structure,
-  conversation, sound, and collective aesthetic experience, so experiment
-  context must remain separate from the core exposure channel;
-- Wi-Fi, screen light, power cables, and other electromagnetic exposures are
-  modelable physical delivery media, but SSTIM should mark their stimulation
-  or physiological-effect status as unknown, speculative, or unsupported unless
-  an explicit reviewed evidence claim exists;
-- smell and taste are SSTIM-relevant modalities, but ordinary phone smell,
-  taste, perfumes on devices, or device-contact taste should be separated from
-  current BSC Lab delivery capability;
-- ideal tactile/VR immersion needs vocabulary for clothing contact, liquid or
-  gel immersion, rigid surfaces, moving/static textures, temperature, airflow or
-  fluid motion, pull/push on body points, joint force, gravity-like effects, and
-  wearable arrays of speakers or light emitters;
-- volumetric or room-scale immersion needs modeling for walking, movement,
-  body/position tracking, spatial presence, proprioception, vestibular cues,
-  scale, and environmental boundaries.
-
-Target model direction:
-
-- Keep `sstim:SensoryModality` for coarse perceived or engaged sensory
-  channels.
-- Keep `sstim:techniqueModality` unchanged for compatibility, but document it
-  as a coarse legacy/convenience relation.
-- Add the `sstim-ex:` exposure module with separate classes and properties for
-  exposure profile, stimulus channel, physical delivery medium, perceived
-  modality, device capability, body placement, comfort boundary, effect claim,
-  experiment context, and knowledge status.
-- Represent physiological, wellness, comfort, or risk statements as
-  `ExposureEffectClaim` resources with evidence/knowledge status, not as direct
-  unqualified health-benefit properties such as `usageForHealth` or
-  `healthImpact`.
-- Include explicit knowledge statuses for local certainty and local capability:
-  known in SSTIM, hypothesis in SSTIM, unknown to SSTIM, no known evidence in
-  SSTIM, not currently used in BSC Lab, not currently deliverable by BSC Lab,
-  and outside BSC Lab scope.
-- Maintain exploratory examples for Wi-Fi/EM exposure, haptic audio, blinking
-  visual fields, colored noise, darkness/silence, social-graph protocols,
-  smell/taste boundaries, and ideal tactile immersion.
-
-## Known Gaps
-
-### Validation Coverage
-
-SHACL now covers the major data paths evenly: presets, all four voice types,
-evidence claims (with `supportsRelation` range), techniques (mechanism + temporal +
-modality), self-reports, framework/protocol/implementation resources, frequency
-bands, exposure quantitative properties and limits, the preset breathing invariant
-(SHACL-SPARQL), and SKOS concept/scheme integrity (`inScheme`, `@en` label,
-`notation`, top-concept navigability). Remaining validation gaps:
-
-- evidence- and safety-dimension shapes, which depend on first adding those
-  dimensions (P3 items 1–2).
-
-(The conditional exposure check — UV/IR or flicker channels must declare the
-matching comfort boundary — was added 2026-06-21 as `StimulusChannelShape`.)
-
-(Self-report and framework/protocol/implementation shapes were added in the
-2026-06-20 SHACL quick-wins; `TechniqueShape` and `ConceptIntegrityShape` in the
-2026-06-20 P1 follow-up; `MartigliVoiceShape`/`MartigliBinauralVoiceShape` in the
-2026-06-20 Martigli work (ADR 0012); `TechniqueShape` was promoted to full
-metadata and `ConceptSchemeShape` added in the 2026-06-21 P2 work.)
-
-### Evidence Modeling
-
-`sstim:EvidenceClaim` is useful but still shallow. It does not yet distinguish
-outcome, population, comparator, claim direction, effect polarity, review date,
-or provenance of the tier assignment. This limits systematic evidence review
-and makes future claim updates harder to audit.
-
-The property `sstim:supportsRelation` has a domain but no range. Its definition
-says it links evidence claims to presets or techniques, but that target set is
-not machine-constrained.
-
-### Preset and Protocol Semantics
-
-`sstim:Preset` is currently aligned as an OBI protocol while its definition
-says a preset follows a protocol but is not itself the protocol. This tension
-should be resolved before the ontology is used by external consumers who will
-infer from upper-ontology alignments.
-
-Preferred direction:
-
-- keep `sstim:Preset` as an information content entity;
-- express protocol relation with `sstim:followsProtocol`;
-- reserve protocol alignment for `sstim:SensoryStimulationProtocol`.
-
-### SKOS Scheme Structure
-
-Several flat schemes are valid SKOS but have no `skos:hasTopConcept` values or
-scheme root. This weakens generic SKOS navigation and makes browser behavior
-more application-specific than it needs to be.
-
-Affected flat schemes include:
-
-- CautionTagScheme
-- EvidenceModalityScheme
-- PermutationFunctionScheme
-- SensoryModalityScheme
-- StimulationMechanismScheme
-- TechniqueScheme
-- VoiceTypeScheme
-
-### Technique Metadata Consistency
-
-The `0.3.0` technique vocabulary is rich, but not all technique individuals
-carry the same key metadata. Known gaps:
-
-- BSC framework technique instances lack delivery/perceived modality and
-  temporal-structure metadata.
-- `techUltrasoundNeuromod` lacks modality metadata under the current model.
-- Folk-technique entries intentionally lack proposed mechanisms; this exception
-  is now validated explicitly — `TechniqueShape` requires `proposedMechanism`
-  **or** a `skos:editorialNote` (`sh:or`), so the carve-out is machine-checked.
-
-### Safety Modeling
-
-Caution tags are useful as labels, but they do not yet model severity,
-triggering condition, affected population, recommended action, contraindication
-style warnings, display language, or device thresholds.
-
-Safety metadata should remain conservative: advisory wellness metadata, not
-medical contraindication claims.
-
-### External Alignments
-
-The verified external-reference layer is much stronger after the `0.2.0`
-erratum, but several alignments remain pending:
-
-- SNOMED CT sensory-stimulation procedure alignment;
-- MeSH sensory-stimulation alignment;
-- additional Wikidata technique items;
-- Music Ontology `mo:Score`, pending reliable host verification.
-
-The outward-facing publication and interlinking strategy (DBpedia Archivo,
-Wikidata, Wikimedia, OBO posture, LOV/BioPortal/OLS/FAIRsharing/Zenodo, FAIR
-packaging) is owned by a companion document,
-[`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md),
-and tracked here as **P6**.
-
-### Domain Content Coverage
-
-`0.3.0` is structurally sound but **auditory-skewed** in domain content. The
-technique vocabulary is explicitly "auditory and cross-modal"; visual and tactile
-stimulation are under-represented relative to the platform's audiovisual + haptic
-ambition. Known coverage gaps (tracked as **P5** below):
-
-- **Visual entrainment** — *addressed (ADR 0015):* `techPhoticDriving` and
-  `techColorFieldStimulation` added, plus the `mechSSVEP` mechanism. (Earlier gap:
-  visual driving existed only as the example string "photic driving".)
-- **Tactile / cross-modal** — *addressed (ADR 0015):* `techVibrotactileEntrainment`,
-  `techAudiovisualEntrainment`, and `techAudioTactile` added, plus `mechSSSEP` and
-  `mechMultisensory`. (Earlier gap: only the single `techVibroacoustic` entry.)
-- **No neutral reference-pitch vocabulary.** A=432 vs A=440 can only be filed
-  under the mystical `techSolfeggioTuning`. 432 Hz is a *carrier/reference-pitch*
-  claim, orthogonal to the *modulation/beat* frequency the whole `FrequencyBand`
-  evidence model is about — and it must be modeled disjoint from entrainment
-  evidence (the carrier-vs-modulation firewall) to keep a pseudoscience magnet
-  away from the standard's credibility. Tracked as P5.3 / ADR 0017.
-- **Evidence lives in prose, not data.** The richest evidence content sits in
-  `skos:definition`/`scopeNote` strings rather than queryable `EvidenceClaim`
-  instances citing cleared references — the new P3 claim dimensions are still
-  scaffolding without populated claims (P5.4).
-- **Evidence-modality tags are auditory-skewed.** `EvidenceModalityScheme` carries
-  only `AUD, AV, BREATH, GENERAL, PRECLINICAL, REVIEW`. The ADR 0015 visual/tactile
-  techniques have no matching evidence-modality tag, so the modality-match discount
-  cannot fire on them. Tracked as P5.6.
-- **Modality nomenclature drift.** The `modalitySomatosensory` label
-  "Somatosensory / Haptic" mixes a device word into a perceptual-channel concept,
-  and the two parallel modality vocabularies (`sstim-v:modality*` vs
-  `sstim-ex:modality*`) risk diverging (P5.5).
-
-### Evidence Integrity and Public-Claim Governance
-
-Independent external review (2026-06) surfaced a hardening gap and a governance
-need, both about keeping *claims within evidence* — the project's dominant risk:
-
-- **`EvidenceClaimShape` requires no citation.** It enforces a tier and a modality
-  tag but not a `citesReference`, so a claim can assert any tier with zero backing.
-  A blanket fix is wrong — the ~30 `ExposureEffectClaim` hypotheses are legitimately
-  uncited at `tierSpeculative`. The correct rule is **conditional**: tier ≥
-  preliminary (rank ≥ 3) ⇒ must cite a `PublicSafeReference`. Tracked as **P7.1**.
-- **No machine-checked public-claim ceiling.** There is no vocabulary or constraint
-  expressing that a public-facing claim level (descriptive → wellness → structure/
-  function → medical/condition → quantified) may not exceed what the supporting
-  evidence tier permits. A C0–C5 claim-level taxonomy + a SHACL legality constraint
-  would make over-claiming a validation failure. Reconcile with the BioSynCare
-  Reference's existing `publicClaimLevel`/`clinicalScope`/`marketScope` enum.
-  Tracked as **P7.2** / ADR 0018. (Crisis-routing/duty-of-care copy and the
-  condition-claim quarantine are product/legal surfaces, outside SSTIM.)
-
-## Remaining Work — Execution Order (2026-06-30)
-
-P1 validation is essentially complete (see the dated notes above): voice,
-technique, self-report, framework/protocol/implementation, and SKOS-integrity
-shapes are in place, plus the first SHACL-SPARQL constraint. The remaining
-backlog is sequenced below by dependency — later phases assume earlier ones.
-
-1. **P0 — semantic ambiguities** (foundational; external consumers infer from
-   these upper-ontology alignments). Resolve `supportsRelation` range and the
-   `Preset`-vs-protocol OBI alignment. Each is an ADR-bearing decision
-   (ADR 0013, ADR 0014).
-2. **P2 — vocabulary structure** (unblocks the P1 partials). Top concepts (P2.1)
-   let `ConceptIntegrityShape` require scheme navigability; aligning technique
-   instances (P2.4) lets `TechniqueShape` promote temporal/modality from absent
-   to required. Then definitions/scope notes (P2.2) and notation policy (P2.3).
-3. **Exposure conditional check** — **(Done — 2026-06-21)** `StimulusChannelShape`
-   (SHACL-SPARQL): a `StimulusChannel` delivering UV/IR or carrying a flicker rate
-   must declare the matching comfort boundary.
-4. **P3 — evidence & safety semantics**: evidence-claim dimensions (P3.1),
-   safety-metadata dimensions (P3.2), device capability vs modality (P3.3).
-5. **P4 — external alignment & interop**: SNOMED CT / MeSH / Wikidata (P4.1 —
-   every external identifier verified before it is added, never fabricated),
-   Music Ontology re-check (P4.2), JSON-LD context (P4.3), competency questions
-   and SPARQL query tests (P4.4).
-6. **P5 — domain content coverage**: visual + tactile/cross-modal technique
-   vocabulary (P5.1-2, done — ADR 0015), reference-pitch / 432 Hz vocabulary
-   (P5.3, ADR 0017), populated evidence-claim instances (P5.4), modality-
-   nomenclature cleanup (P5.5), and visual/tactile evidence-modality tags (P5.6).
-   Targets the `0.5.0` release. Additive vocabulary decisions (ADR-bearing).
-7. **P7 — evidence integrity & public-claim governance** (ADR 0018): the
-   conditional citation requirement (P7.1) and the C0–C5 public-claim-level
-   taxonomy + SHACL legality (P7.2). High priority — it is the project's dominant
-   risk surface — and it hardens, rather than extends, the evidence model, so it
-   can proceed alongside P5.
-8. **P6 — first-class publication & interlinking**: FAIR packaging, registries,
-   and external linkage, owned by
-   [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md).
-   Its FAIR-packaging phase (Phase 0) is semantics-free and may start immediately;
-   its registry/Wikidata/Archivo phases gate on P5 reaching `0.5.0` so the
-   published scope is not misleadingly auditory-only.
-
-Each phase ships as its own validated PR. As items land, their Priority-Task
-entry below is marked Done with the date and the delivering artifact.
-
-## Priority Tasks
-
-### P0: Correct Semantic Ambiguities
-
-1. Resolve `sstim:supportsRelation`. **(Done — 2026-06-21, [ADR 0013](../decisions/0013-evidence-support-relation-range.md))**
-   Constrained union range `Preset ∪ SensoryStimulationTechnique` (single property
-   kept), enforced at the data level by `EvidenceClaimShape`.
-
-2. Resolve `sstim:Preset` versus protocol semantics. **(Done — 2026-06-21, [ADR 0014](../decisions/0014-preset-is-not-a-protocol.md))**
-   `Preset` is `iao:0000030` only (OBI protocol alignment removed); the protocol
-   alignment now lives on `SensoryStimulationProtocol`, and `followsProtocol`
-   carries the preset→protocol relation. (Open: whether `SensoryStimulationTechnique`
-   should also drop `obi:0000272` — flagged in ADR 0014, tracked under P4.)
-
-3. Implement the exposure/delivery/modality separation.
-   ADR 0010 records the decision. The active work item is the `sstim-ex:`
-   exposure module plus exploratory BSC Lab experiment instances. Keep
-   `sstim:techniqueModality` as a coarse compatibility property.
-
-### P1: Strengthen Validation
-
-1. Add `TechniqueShape`. **(Done — 2026-06-21)**
-   Requires `proposedMechanism`, `hasStimulusTemporalStructure`, and
-   `techniqueModality` at Violation severity — or a `skos:editorialNote` marking a
-   deliberately catalogued entry (non-evidence-bearing folk technique, or a
-   no-perceived-modality entry such as `techUltrasoundNeuromod`). Enabled by the
-   P2 item 4 metadata alignment below.
-
-2. Add Martigli and Martigli-Binaural voice shapes. **(Done — 2026-06-20, via [ADR 0012](../decisions/0012-martigli-voice-parameters.md))**
-   `MartigliVoiceShape` and `MartigliBinauralVoiceShape` validate the amplitude,
-   breathing-period trio, carrier-pair (MB) / center-frequency (Martigli), and the
-   §4.5 `mp0 ≥ 3 when isOn` constraint, backed by the six new `martigli*` voice
-   properties (ADR 0012, Option A) and a breathing-enabled seed preset. The
-   preset-level `hasBreathGuide`/single-`isOn` invariant is also enforced now, via a
-   `sh:SPARQLConstraint` on `PresetShape`.
-
-3. Add `SelfReportShape`. **(Done — 2026-06-20)**
-   Validate 1-5 rating ranges, optional consent-dependent fields, and
-   `goalAchieved` boolean typing.
-
-4. Add framework/protocol/implementation shapes. **(Done — 2026-06-20, minimal)**
-   Require labels, definitions/descriptions, and the core relation fields that
-   make those resources navigable. Initial pass requires `rdfs:label` only;
-   definitions and relation-field coverage remain open.
-
-5. Add SKOS integrity shapes. **(Done — 2026-06-21)**
-   `ConceptIntegrityShape` requires `skos:inScheme`, an `@en` preferred label, and
-   `skos:notation` for every concept; `ConceptSchemeShape` requires every scheme to
-   declare at least one `skos:hasTopConcept` (navigability).
-
-### P2: Improve Vocabulary Structure
-
-1. Add top concepts or explicit scheme-root concepts to flat schemes. **(Done — 2026-06-21)**
-   All 7 previously-flat schemes (EvidenceModality, VoiceType, SensoryModality,
-   StimulationMechanism, PermutationFunction, CautionTag, Technique) now declare
-   `skos:hasTopConcept`; all 11 schemes are navigable and `ConceptSchemeShape`
-   enforces it.
-2. Complete definitions or scope notes for remaining lightly documented
-   concepts such as frequency sub-bands and basic sensory modalities. **(Done — 2026-06-21)**
-   Added `skos:scopeNote` to the 9 EEG sub-bands, a definition + notation to
-   `allFrequencyBands`, and definitions to `modalityAuditory`/`modalityVisual`.
-   Every concept now carries a definition or scope note.
-3. Add notation policy per scheme, including whether root concepts like
-   `allFrequencyBands` require notation. **(Done — 2026-06-21)**
-   Policy: every concept — including structural roots (`allFrequencyBands`,
-   notation `all`) — carries `skos:notation`. Coverage is 100% (260/260) and
-   `ConceptIntegrityShape` enforces it.
-4. Align BSC framework technique instances with the technique vocabulary
-   metadata model. **(Done — 2026-06-21)**
-   The four `bsc-fw-tech:*` techniques now declare `hasStimulusTemporalStructure`
-   and `techniqueModality`; `techUltrasoundNeuromod` is marked with an
-   `editorialNote` (no perceived modality). This unblocked the P1 item 1 promotion.
-
-### P3: Deepen Evidence and Safety Semantics
-
-1. Add evidence claim dimensions:
-   outcome, population, comparator, claim direction, effect polarity, evidence
-   date, reviewer, and review status.
-
-2. Add safety metadata dimensions:
-   severity, trigger condition, affected population, recommended action,
-   display priority, and device constraints.
-
-3. Model device capability separately from modality:
-   headphones, stereo separation, display flicker, haptic actuator, sensor,
-   wearable, ultrasound hardware, closed-loop EEG/sleep sensing, VR/AR
-   headsets, free-view stereoscopy, scent/taste delivery, temperature, airflow
-   or fluid-motion delivery, full-body tactile immersion, and wearable audio or
-   light arrays, tactile displays/cameras, infrared or ultraviolet output,
-   room-scale tracking, locomotion interfaces, and spatial presence support.
-
-### P4: External Alignment and Interoperability
-
-1. Verify and add pending SNOMED CT and MeSH alignments.
-2. Re-check Music Ontology availability before re-enabling `mo:Score`.
-3. Add JSON-LD context or examples if external consumers begin using SSTIM
-   outside the BSC Lab runtime. **(Context done — 2026-07-10 via P6 B4)**
-   `static/ontology/context.jsonld` now covers the 0.5.0/P6 public surface
-   (SKOS, evidence/public-claim governance, Patch Studio parameters, exposure
-   predicates, and VoID/DCAT metadata). Consumer-specific examples remain
-   optional follow-up work.
-4. Add competency questions and SPARQL query tests for the ontology use cases.
-
-### P5: Domain Content Coverage
-
-**Shipped as `0.5.0` — 2026-07-09** (tag `v0.5.0`; frozen snapshot
-`static/ontology/0.5.0/`; core `owl:versionInfo` 0.3.0 → 0.5.0, exposure module
-0.4.0 → 0.4.1). Each item was an additive, ADR-bearing vocabulary decision; none
-renamed or removed existing terms (minor version). This unblocks the P6
-registry/Zenodo/Archivo phases (they gated on P5 reaching 0.5.0).
-
-1. **Visual-entrainment technique vocabulary. (Done — 2026-06-30, [ADR 0015](../decisions/0015-visual-and-cross-modal-techniques.md))**
-   Added `techPhoticDriving` (flicker/SSVEP) and `techColorFieldStimulation`
-   (steady colour field, with an explicit `skos:editorialNote` chromotherapy
-   negative assertion mirroring `techSolfeggioTuning`), plus the `mechSSVEP`
-   mechanism. Photosensitivity stays modeled in the exposure layer.
-2. **Tactile / cross-modal technique vocabulary. (Done — 2026-06-30, [ADR 0015](../decisions/0015-visual-and-cross-modal-techniques.md))**
-   Added `techVibrotactileEntrainment` (distinct from vibroacoustic) and the
-   cross-modal `techAudiovisualEntrainment` and `techAudioTactile`, plus the
-   `mechSSSEP` and `mechMultisensory` mechanisms. Cross-modal is expressed as
-   multiple `techniqueModality` values, not a new class.
-3. **Reference-pitch vocabulary (432 Hz). (Done — 2026-06-30, [ADR 0017](../decisions/0017-reference-pitch-retuning.md))**
-   Added `sstim-v:techReferencePitchRetuning` (`NonEntrainmentTechnique`, with the
-   carrier-vs-modulation firewall in its scope/editorial/evidence notes), made
-   `techSolfeggioTuning skos:broader` it, and added carrier-pitch properties
-   (`referencePitchNote`, `referencePitchHz`, `retunedFromReferenceHz`,
-   `pitchShiftCents`) on the exposure `StimulusChannel`. Evidence kept disjoint
-   from entrainment/`FrequencyBand`; tier 2–3 ceiling recorded in `evidenceNotes`;
-   `editorialNote` negative assertion retained. Musical-interval/consonance terms
-   scoped out.
-4. **Populate evidence-claim instances. (Done — 2026-07-08)** Added
-   `instances/evidence/technique-evidence.ttl` — six queryable `EvidenceClaim`
-   individuals migrated from vocab prose: ASSR (`techIsochronicTones`, tier
-   strong, cites `PICTON_2003`) and FFR (`techMonauralBeats`, tier strong, cites
-   `SKOE_KRAUS_2010`) as *measurable-response* claims framed conservatively (no
-   wellness outcome asserted); the mixed binaural-beat state/EEG outcome
-   (`techBinauralBeats`, tier preliminary, cites `INGENDOH_2023`); and the three
-   explicit negative assertions (chromotherapy, Solfeggio, 432 Hz reference-pitch)
-   at tier ≤ 2, legitimately uncited per P7.1. Two new `PublicSafeReference`s with
-   **Crossref-audited venues** (Int. J. Audiology; Ear & Hearing). Wired into
-   `loader.js` as a new `bsclab-evidence` graph. Additive, `make validate` green;
-   vocab prose retained as human documentation. Remaining well-supported claims
-   (paced-breathing/HRV, rhythmic auditory cueing) can be populated incrementally.
-5. **Modality nomenclature cleanup. (Done — 2026-07-07, [ADR 0019](../decisions/0019-modality-nomenclature-cleanup.md))**
-   Adopted the convention **haptic = device/actuator, tactile = percept,
-   somatosensory = superordinate channel, vibrotactile = mechanism**: narrowed the
-   `modalitySomatosensory` "Somatosensory / Haptic" label to "Somatosensory" (+
-   definition and reworked scope note), completed the `skos:closeMatch` bridge
-   between `sstim-v:modality*` and `sstim-ex:modality*` for all six shared channels
-   (auditory/visual already linked; added somatosensory/interoceptive/vestibular/
-   olfactory), and documented tactile ⊂ somatosensory in scope notes. Additive,
-   `make validate` green. **Fixed in passing:** the `EvidenceModalityTag`
-   definition drift (6 → 9 values). **Two breaking items deferred to a major
-   bump** and scoped in ADR 0019: the `sstim-v:modality*` stem overload (channels
-   vs evidence tags) and the `SensoryModality`/`PerceivedModality` two-class-for-
-   one-concept unification. Motivated by
-   [`SENSORY_TAXONOMY_REVIEW.md`](SENSORY_TAXONOMY_REVIEW.md).
-6. **Visual/tactile evidence-modality tags. (Done — 2026-06-30)** Extended
-   `EvidenceModalityScheme` with `VIS`, `TACTILE`, and `MULTISENSORY` (each with a
-   one-tier-discount / no-direct-transfer note), so the ADR 0015 visual/tactile
-   techniques can carry evidence tagged with a matching modality. Additive.
-
-### P7: Evidence Integrity and Public-Claim Governance
-
-The project's dominant risk is over-claiming. SSTIM can make over-claiming a
-**validation failure**. ADR 0018. The invariant: *evidence attaches to technique ×
-modality × outcome × population × protocol* (already encoded via `supportsRelation`
-+ `hasModalityTag` + `studyPopulation` + `comparator` + `evidenceOutcome`), and a
-claim may never exceed what its evidence supports.
-
-1. **Conditional citation requirement. (Done — 2026-06-30, [ADR 0018](../decisions/0018-evidence-integrity-and-public-claim-governance.md))**
-   `sh:SPARQLConstraint` on `EvidenceClaimShape`: tier `tierRank ≥ 3` ⇒ at least one
-   `sstim:citesReference`. Speculative/anecdotal claims (and the `ExposureEffectClaim`
-   hypotheses) stay legitimately uncited. Passes all current data; negative-tested.
-2. **Public-claim-level taxonomy + legality. (Done — 2026-06-30, [ADR 0018](../decisions/0018-evidence-integrity-and-public-claim-governance.md))**
-   Added `sstim:PublicClaimLevel` + `sstim-v:PublicClaimLevelScheme` (C0 descriptive
-   → C5 quantified/superiority), each with `claimLevelRank` + `requiresEvidenceTierRank`;
-   `sstim:hasPublicClaimLevel` (Preset → level); and a `PresetShape` SHACL legality
-   constraint (C4 never publicly assertable via the sentinel-7 mapping; C5 needs
-   strong evidence; C3 moderate). Negative-tested on a C4 preset. **Still open:** the
-   level↔tier mapping is a PROVISIONAL default — reconcile with the BioSynCare
-   Reference's `publicClaimLevel`/`clinicalScope`/`marketScope` enum + legal review.
-
-> Out of SSTIM scope (product/legal, tracked elsewhere): crisis-routing /
-> duty-of-care copy, the condition-claim (suicidality/migraine/pain) quarantine,
-> dropping "neuromodulation"/"device" from marketing, and the GDPR/pilot documents.
-> SSTIM's job is to make the *permitted claim envelope* machine-checkable.
-
-### P6: First-Class Publication and External Interlinking
-
-Owned by [`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md).
-Summary of the recommended posture:
-
-1. **FAIR packaging (semantics-free; may start now):** multi-format
-   content-negotiation (Turtle/RDF-XML/JSON-LD/HTML via WIDOCO), `vann:`/VoID
-   metadata, DL-consistency check in CI **(done — 2026-07-10 via ROBOT/HermiT)**,
-   JSON-LD context, and Zenodo DOIs **(done — 2026-07-10; concept DOI
-   `10.5281/zenodo.21286974`, first version DOI `10.5281/zenodo.21286975`)**.
-2. **DBpedia — via DBpedia Archivo** (not direct): submit the dereferenceable URI,
-   iterate to a 4-star rating.
-3. **Wikidata — incremental:** one ontology item; conservative two-way `exact
-   match` (P2888) links for already-aligned notable concepts; defer the "SSTIM ID"
-   property and new concept items until adoption/notability.
-4. **Wikimedia/Wikipedia — defer** on notability; Commons diagrams optional (CC BY).
-5. **OBO — already linked by reference; deepen interoperability (BFO/IAO/OBI/RO),
-   do not seek full membership** in the current human-readable-IRI form; reserve a
-   dual-published OBO-ID bridge as a future ADR-gated option.
-6. **Registries:** prefix.cc, LOV, BARTOC, BioPortal, OLS, OntoBee, FAIRsharing.
-
-*(Proposed ADR 0016 records the publication/OBO posture.)*
-
-## Acceptance Criteria for Next Maturity Step
-
-The next maturity step should be considered complete when:
-
-- all P0 tasks are resolved or explicitly rejected with ADR rationale;
-- `make validate PYSHACL='python3 -m pyshacl'` covers techniques, self-reports,
-  framework/protocol/implementation resources, and key SKOS integrity rules;
-- every technique individual either has mechanism, temporal, and modality or
-  delivery metadata, or is explicitly marked as a non-evidence-bearing
-  catalogued entry;
-- flat SKOS schemes are navigable through top concepts or documented as
-  intentionally flat;
-- evidence and safety backlog items are represented in issues, ADRs, or RDF
-  tasks before the next ontology release.
+SSTIM is an application ontology and controlled vocabulary for describing
+sensory-stimulation techniques, delivery configurations, protocols, presets,
+evidence claims, cautions, sessions, and consent-dependent self-reports. It is
+intended for research, education, interoperability, and conservative wellness
+applications. It does not encode diagnoses, prescriptions, or treatment claims.
+
+The citable `0.5.0` release is frozen under `static/ontology/0.5.0/`. Editable
+module sources and public instance data are on the `0.6.0-dev` line. The six
+term-space modules are:
+
+1. `sstim-core.ttl`: OWL classes, properties, and evidence/safety contracts.
+2. `sstim-vocab.ttl`: SKOS controlled vocabularies.
+3. `sstim-exposure.ttl`: delivery, perception, device, placement, safety, and
+   experiment-context terms.
+4. `sstim-patch-studio.ttl`: authoring and voice-parameter model.
+5. `sstim-shapes.ttl`: SHACL validation contracts.
+6. `sstim-alignments.ttl`: conservative external mappings.
+
+The repository quality audit currently measures the live graph as:
+
+| Measure | Count |
+|---|---:|
+| Named OWL classes | 56 |
+| Anonymous union-class expressions | 6 |
+| RDF/OWL properties | 124 |
+| SKOS concepts | 295 |
+| SKOS concept schemes | 30 |
+| BSC framework techniques | 7 |
+| Public protocols | 12 |
+| Public reference presets | 2 |
+| Evidence claims | 38 |
+| Bibliographic references | 7 |
+| Exposure profiles | 10 |
+| Synthetic sessions / self-reports | 1 / 2 |
+
+Counts are regression thresholds, not quality targets. New terms should be
+added only when they answer a competency question or support a real data need.
+
+## 0.6 Development Work
+
+### Conceptual consistency
+
+- Reclassified controlled-value categories such as sensory modality,
+  stimulation mechanism, and intended effect as information-content
+  categories rather than biological processes, roles, or dispositions.
+- Distinguished protocol plans, preset specifications, implementation
+  resources, and executed sessions. Sessions are PROV activities; session
+  specifications are PROV plans; implementations are PROV entities.
+- Kept physical delivery, perceived modality, required device capability, body
+  placement, and experimental context separate in the exposure module.
+- Recorded the controlled-value decision and migration rationale in
+  [ADR 0021](../decisions/0021-controlled-value-semantics.md).
+
+### OWL and SKOS quality
+
+- Added ontology metadata and dependency declarations to every module while
+  preserving the whole-set snapshot policy from ADR 0020.
+- Added definitions to all public classes, properties, concept schemes, and
+  exposure concepts that previously lacked documentation.
+- Added functional-property semantics only to genuinely scalar values and
+  added validation against conflicting values.
+- Materialized `skos:topConceptOf` / `skos:hasTopConcept` and
+  `skos:broader` / `skos:narrower` inverse navigation.
+- Enforced one English preferred label, one notation per concept, scheme
+  membership, concept documentation, hierarchy acyclicity, and notation
+  uniqueness through SHACL and the repository audit.
+
+### Safety and evidence integrity
+
+- Added a caution-severity vocabulary with ordered ranks and structured
+  trigger, affected-population, recommended-action, and display-priority data.
+- Enriched every public caution tag with conservative operational guidance.
+- Required evidence claims to identify their tier, modality, direction, review
+  status/date, subject, modification date, and responsible PROV agent.
+- Retained the rule that stronger public claims require public-safe citations.
+- Added reviewed references and claim records for paced breathing, steady-state
+  visual evoked potentials, steady-state somatosensory evoked potentials, and
+  multisensory integration.
+- Kept exploratory exposure-effect records explicitly speculative,
+  inconclusive, provisional, and provenance-qualified.
+
+### Protocol and observation data
+
+- Expanded the BSC Lab framework to seven represented techniques.
+- Added two non-clinical reference protocols and linked both public presets to
+  protocols, implementation resources, caution tags, and claim levels.
+- Added one explicitly synthetic session example with pre-session and immediate
+  post-session reports. No personal or participant data is included.
+- Added self-report phases so observations are not implicitly post-session.
+- Added framework/protocol metadata or explicit baseline/boundary exceptions to
+  every public experiment record.
+
+### Alignment corrections
+
+- Retained external mappings only where equivalence or relatedness was checked.
+- Replaced over-broad whole-domain mappings with term-level mappings.
+- Added a related mapping for multisensory integration and narrowed the voice
+  mapping for binaural beats.
+- Removed an unverified Music Ontology association.
+- Rejected MeSH `D012910` as a sensory-stimulation mapping because the official
+  NLM record identifies it as *Snake Venoms*. No replacement MeSH identifier is
+  asserted without verification.
+
+### Executable quality controls
+
+- Expanded SHACL from basic structural checks to module metadata, evidence
+  provenance, protocol/preset relations, safety metadata, SKOS integrity,
+  exposure profiles, sessions, and self-reports.
+- Added `scripts/sstim-quality-audit.py` for repository-wide RDF, JSON-LD,
+  loader-manifest, VoID-count, functional-value, dangling-IRI, provenance, and
+  competency-threshold checks.
+- Expanded `scripts/sstim-exposure-sanity.mjs` into executable competency
+  queries spanning framework-to-preset paths, cited evidence, cautions, and
+  session reports.
+- Integrated parsing, SHACL, OWL reasoning, quality audit, SPARQL competency
+  checks, and graph-isomorphic JSON-LD/RDF/XML round trips under `make validate`
+  and CI.
+
+## Remaining Priorities
+
+### P0: release gates for 0.6
+
+1. Obtain at least one external ontology review of the controlled-value model,
+   protocol/session distinction, and upper-ontology alignments.
+2. Review every new evidence summary against the cited primary source; retain
+   conservative wording and record reviewer identity/date.
+3. Run the complete Nix validation suite, regenerate exports, verify that
+   generated serializations parse, and confirm frozen snapshots are unchanged.
+4. Decide the final `0.6.0` scope, replace development metadata with release
+   metadata, create `static/ontology/0.6.0/`, tag, and publish through Zenodo.
+5. Regenerate human-readable ontology documentation before the release tag.
+
+### P1: domain depth
+
+1. Add evidence claim families only where a stable technique, measurable
+   dimension, and auditable source can all be represented. Candidate areas are
+   rhythmic auditory cueing, vibroacoustic stimulation, audiovisual temporal
+   coordination, and additional sensory steady-state response literature.
+2. Replace remaining free-text evidence facets with controlled population,
+   comparator, outcome, and effect-polarity vocabularies when there are enough
+   claims to validate the abstraction.
+3. Add calibrated physical quantities and unit IRIs, preferably reusing QUDT,
+   where normalized gain or string-valued settings are insufficient for
+   reproducible protocols.
+4. Expand reference protocols and synthetic examples to cover visual,
+   vibrotactile, audiovisual, and accessibility-aware workflows.
+5. Add competency queries for contraindication retrieval, device-capability
+   matching, protocol comparison, and evidence changes across releases.
+
+### P2: interoperability and publication
+
+1. Publish WIDOCO documentation and make the stable HTML landing route part of
+   the release process.
+2. Complete the staged w3id routing update for VoID and all negotiated formats.
+3. Submit the stable ontology URI to appropriate registries: DBpedia Archivo,
+   LOV, BARTOC, BioPortal, OLS, and FAIRsharing.
+4. Create an ontology-level Wikidata item and reciprocal mappings only after
+   each identifier and equivalence claim is independently verified.
+5. Consider SOSA/SSN for sensors and observations only when SSTIM gains actual
+   measured-device data; do not import it speculatively.
+
+## Deliberate Boundaries
+
+The following are not growth targets for SSTIM:
+
+- disease, diagnosis, prescription, or treatment taxonomies;
+- claims that a stimulation setting causes a health or cognitive outcome
+  without qualified evidence;
+- extrasensory-perception or paranormal categories;
+- detailed receptor, pathway, or neuroanatomy duplication better supplied by
+  established biomedical ontologies;
+- deep smell or taste technique trees without implementation data or reviewed
+  evidence;
+- device-vendor catalogs or private BioSynCare preset/session data;
+- mappings selected by label similarity without checking the external record.
+
+These boundaries keep SSTIM useful as an interoperability layer rather than an
+unreviewed encyclopedia.
+
+## Acceptance Criteria for 0.6.0
+
+The next release is ready only when:
+
+- all editable Turtle parses and all SHACL targets conform;
+- OWL reasoning reports no inconsistency;
+- repository quality and competency-query audits pass;
+- every public term has an English label and definition;
+- SKOS hierarchy, notation, and inverse-navigation checks pass;
+- every evidence claim has provenance and every high-tier claim has a
+  public-safe citation;
+- every public preset follows a protocol and carries conservative safety and
+  public-claim metadata;
+- VoID counts, JSON-LD context terms, and loader manifests match live RDF;
+- no file under an earlier frozen snapshot changes;
+- changelog, citation metadata, exports, WIDOCO pages, release snapshot, tag,
+  and Zenodo record all describe the same version.
+
+## Change Discipline
+
+- Turtle is the editable source of truth; JSON-LD and RDF/XML are generated.
+- Existing IRIs are stable. Deprecate with an explicit replacement and history
+  note instead of silently changing identity.
+- Whole-set release snapshots are immutable.
+- New semantics require an ADR when the choice affects interoperability,
+  inference, evidence legality, or migration.
+- External identifiers must be checked against their authoritative source.
+- Real participant observations require a separate privacy and consent design;
+  synthetic examples must be visibly identified as synthetic.

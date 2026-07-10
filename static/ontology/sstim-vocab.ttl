@@ -3,8 +3,8 @@
 #  SSTIM Vocabulary  —  sstim-vocab.ttl
 #
 #  Namespace:  https://w3id.org/sstim/vocab#
-#  Version:    0.5.0
-#  Date:       2026-06-17
+#  Version:    0.6.0-dev
+#  Date:       2026-07-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -26,6 +26,23 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/vocab> a owl:Ontology ;
+    owl:versionInfo "0.6.0-dev" ;
+    dct:title "SSTIM Controlled Vocabulary"@en ;
+    dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-04-12"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:historyNote "0.6.0-dev adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en .
 
 
 ###########################################################################
@@ -534,6 +551,41 @@ sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concep
 
 
 ###########################################################################
+# Self-report collection phase scheme
+###########################################################################
+
+sstim-v:SelfReportPhaseScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Self-Report Phase Vocabulary"@en ;
+    skos:definition "Controlled phases for locating a consent-governed self-report relative to its associated session."@en ;
+    skos:hasTopConcept sstim-v:reportPreSession, sstim-v:reportImmediatePost,
+        sstim-v:reportFollowUp .
+
+sstim-v:reportPreSession a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
+    skos:inScheme sstim-v:SelfReportPhaseScheme ;
+    skos:topConceptOf sstim-v:SelfReportPhaseScheme ;
+    skos:prefLabel "Pre-session"@en, "Pre-sessione"@it,
+        "Pré-sessão"@pt, "Pre-sesión"@es ;
+    skos:notation "pre" ;
+    skos:definition "Self-report collected before stimulus delivery begins, usable as a within-session baseline without implying causation."@en .
+
+sstim-v:reportImmediatePost a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
+    skos:inScheme sstim-v:SelfReportPhaseScheme ;
+    skos:topConceptOf sstim-v:SelfReportPhaseScheme ;
+    skos:prefLabel "Immediate post-session"@en, "Immediatamente post-sessione"@it,
+        "Imediatamente pós-sessão"@pt, "Inmediatamente post-sesión"@es ;
+    skos:notation "post" ;
+    skos:definition "Self-report collected shortly after stimulus delivery ends."@en .
+
+sstim-v:reportFollowUp a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
+    skos:inScheme sstim-v:SelfReportPhaseScheme ;
+    skos:topConceptOf sstim-v:SelfReportPhaseScheme ;
+    skos:prefLabel "Follow-up"@en, "Follow-up"@it,
+        "Acompanhamento"@pt, "Seguimiento"@es ;
+    skos:notation "follow-up" ;
+    skos:definition "Self-report collected after a declared delay from session completion; the timestamp is required to make the delay interpretable."@en .
+
+
+###########################################################################
 # Part 5 — Voice Type Scheme
 ###########################################################################
 
@@ -659,7 +711,7 @@ sstim-v:mechAutonomic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Co
                    "Arrastamento Respiratório Autonômico"@pt,
                    "Arrastre Respiratorio Autonómico"@es ;
     skos:notation "AUTONOMIC" ;
-    skos:definition "Paced breathing at resonance frequency modulates respiratory sinus arrhythmia (RSA) and HRV via baroreflex. Primary mechanism for Martigli breathing oscillation. Evidence base: Lehrer & Gevirtz (2014), Zaccaro et al. (2018)."@en .
+    skos:definition "Proposed mechanism category for paced-breathing protocols that coordinate respiratory timing with respiratory sinus arrhythmia, heart-rate variability, and baroreflex dynamics. Used for Martigli breathing oscillation; protocol-specific effects require separate evidence claims."@en .
 
 sstim-v:mechStochastic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -668,7 +720,7 @@ sstim-v:mechStochastic a owl:NamedIndividual, sstim:StimulationMechanism, skos:C
                    "Ressonância Estocástica"@pt,
                    "Resonancia Estocástica"@es ;
     skos:notation "SR" ;
-    skos:definition "Calibrated noise improves subthreshold signal detection via threshold dynamics. Not entrainment; no periodic forcing required."@en .
+    skos:definition "Threshold-dynamics mechanism in which an appropriately calibrated noise level can change detection of an otherwise subthreshold signal. It is not entrainment and requires no periodic forcing; any improvement claim is condition- and evidence-specific."@en .
 
 sstim-v:mechAttentional a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -677,7 +729,7 @@ sstim-v:mechAttentional a owl:NamedIndividual, sstim:StimulationMechanism, skos:
                    "Ancoragem Atencional"@pt,
                    "Anclaje Atencional"@es ;
     skos:notation "ATTN" ;
-    skos:definition "Structured but undemanding sensory content occupies default mode network processing, reducing mind-wandering without requiring executive attention. Proposed mechanism for ambient Symmetry voices."@en .
+    skos:definition "Proposed mechanism in which structured, low-demand sensory content serves as an attentional reference. Whether it changes mind-wandering or task focus is protocol- and context-dependent and must be represented by a separate evidence claim."@en .
 
 sstim-v:mechGamma40 a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -686,7 +738,7 @@ sstim-v:mechGamma40 a owl:NamedIndividual, sstim:StimulationMechanism, skos:Conc
                    "Modulação Neuroimune Gama-40"@pt,
                    "Modulación Neuroinmune Gamma-40"@es ;
     skos:notation "GAMMA40NI" ;
-    skos:definition "Proposed mechanism from GENUS/Iaccarino literature: 40 Hz multisensory entrainment triggers microglial activation and amyloid clearance. Preclinical evidence in mice; early human studies ongoing. Contested and modality-specific (primarily visual in original studies)."@en .
+    skos:definition "Proposed mechanism category derived from GENUS research in which specific 40 Hz stimulation protocols were associated with microglial and amyloid-related changes in particular mouse models. Human relevance, protocol transfer, and modality generalization remain uncertain and require claim-level evidence."@en .
 
 
 sstim-v:mechASSR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
@@ -828,6 +880,44 @@ sstim-v:permIdentity a owl:NamedIndividual, sstim:PermutationFunction, skos:Conc
 # Part 9 — Caution Tag Scheme
 ###########################################################################
 
+sstim-v:CautionSeverityScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Caution Severity Vocabulary"@en ;
+    skos:definition "Ordinal interface-priority categories for SSTIM caution tags; not clinical risk probabilities."@en ;
+    skos:hasTopConcept sstim-v:cautionSeverityInfo, sstim-v:cautionSeverityLow,
+        sstim-v:cautionSeverityModerate, sstim-v:cautionSeverityHigh .
+
+sstim-v:cautionSeverityInfo a owl:NamedIndividual, sstim:CautionSeverity, skos:Concept ;
+    skos:inScheme sstim-v:CautionSeverityScheme ;
+    skos:topConceptOf sstim-v:CautionSeverityScheme ;
+    skos:prefLabel "Informational"@en, "Informativo"@it, "Informativo"@pt, "Informativo"@es ;
+    skos:notation "info" ;
+    skos:definition "Context or experience guidance that should be visible but does not normally require blocking playback."@en ;
+    sstim:cautionSeverityRank 1 .
+
+sstim-v:cautionSeverityLow a owl:NamedIndividual, sstim:CautionSeverity, skos:Concept ;
+    skos:inScheme sstim-v:CautionSeverityScheme ;
+    skos:topConceptOf sstim-v:CautionSeverityScheme ;
+    skos:prefLabel "Low"@en, "Basso"@it, "Baixo"@pt, "Bajo"@es ;
+    skos:notation "low" ;
+    skos:definition "Caution that should be shown before use and may warrant a setting or timing adjustment."@en ;
+    sstim:cautionSeverityRank 2 .
+
+sstim-v:cautionSeverityModerate a owl:NamedIndividual, sstim:CautionSeverity, skos:Concept ;
+    skos:inScheme sstim-v:CautionSeverityScheme ;
+    skos:topConceptOf sstim-v:CautionSeverityScheme ;
+    skos:prefLabel "Moderate"@en, "Moderato"@it, "Moderado"@pt, "Moderado"@es ;
+    skos:notation "moderate" ;
+    skos:definition "Caution requiring prominent confirmation, reduced intensity, closer monitoring, or avoidance by sensitive users."@en ;
+    sstim:cautionSeverityRank 3 .
+
+sstim-v:cautionSeverityHigh a owl:NamedIndividual, sstim:CautionSeverity, skos:Concept ;
+    skos:inScheme sstim-v:CautionSeverityScheme ;
+    skos:topConceptOf sstim-v:CautionSeverityScheme ;
+    skos:prefLabel "High"@en, "Alto"@it, "Alto"@pt, "Alto"@es ;
+    skos:notation "high" ;
+    skos:definition "Caution requiring an explicit stop, avoid, or disable action when the stated trigger or context applies."@en ;
+    sstim:cautionSeverityRank 4 .
+
 sstim-v:CautionTagScheme a skos:ConceptScheme ;
     skos:prefLabel "BSC Preset Caution Tag Vocabulary"@en ;
     skos:hasTopConcept sstim-v:cautionEpilepsyRisk, sstim-v:cautionStimulating,
@@ -841,76 +931,131 @@ sstim-v:cautionEpilepsyRisk a owl:NamedIndividual, sstim:CautionTag, skos:Concep
     skos:prefLabel "Epilepsy Risk"@en, "Rischio di Epilessia"@it,
                    "Risco de Epilepsia"@pt, "Riesgo de Epilepsia"@es ;
     skos:notation "epilepsy-risk" ;
-    skos:definition "Preset uses strobing visual stimulation; not safe for users with photosensitive epilepsy."@en .
+    skos:definition "Preset contains flashing or rapid contrast modulation and therefore requires the platform's photosensitivity safeguards and an explicit avoid option."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityHigh ;
+    sstim:triggerCondition "Flashing, strobing, or rapid high-contrast visual modulation is enabled." ;
+    sstim:affectedPopulation "People with known or suspected photosensitivity, or anyone who experiences discomfort from flashing or repetitive visual patterns." ;
+    sstim:recommendedAction "Disable the flashing visual channel or avoid the preset; stop immediately if discomfort or unusual symptoms occur." ;
+    sstim:displayPriority 1 .
 
 sstim-v:cautionStimulating a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Stimulating"@en, "Stimolante"@it, "Estimulante"@pt, "Estimulante"@es ;
     skos:notation "stimulating" ;
-    skos:definition "Activating preset; may not be suitable near sleep time."@en .
+    skos:definition "Preset is designed with comparatively activating, bright, rapid, or attention-demanding parameters and may not suit low-arousal contexts."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityLow ;
+    sstim:triggerCondition "The preset uses an activating design profile or is selected near an intended rest period." ;
+    sstim:affectedPopulation "Users seeking a low-arousal experience or preparing to rest." ;
+    sstim:recommendedAction "Choose a lower-intensity or slower alternative when a low-arousal context is intended." ;
+    sstim:displayPriority 9 .
 
 sstim-v:cautionDrowsyUse a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Drowsy Use"@en, "Uso in Sonnolenza"@it,
                    "Uso com Sonolência"@pt, "Uso con Somnolencia"@es ;
     skos:notation "drowsy-use" ;
-    skos:definition "Produces drowsiness; unsafe while driving or operating machinery."@en .
+    skos:definition "Preset is designed for a low-arousal context and may reduce alertness; it must not be used during safety-critical activity."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityHigh ;
+    sstim:triggerCondition "The preset is used while driving, cycling in traffic, operating machinery, supervising hazards, or performing another safety-critical task." ;
+    sstim:affectedPopulation "All users in safety-critical contexts, especially users who already feel tired or less alert." ;
+    sstim:recommendedAction "Stop playback and use only when seated or lying safely in a non-critical environment." ;
+    sstim:displayPriority 3 .
 
 sstim-v:cautionDrivingUnsafe a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Driving Unsafe"@en, "Non Sicuro alla Guida"@it,
                    "Inseguro ao Dirigir"@pt, "Inseguro al Conducir"@es ;
     skos:notation "driving-unsafe" ;
-    skos:definition "Do not use while operating vehicles."@en .
+    skos:definition "Preset requires attention, headphones, visual focus, or altered situational awareness that is incompatible with operating a vehicle or machinery."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityHigh ;
+    sstim:triggerCondition "A vehicle, bicycle, machine, tool, or other safety-critical system is being operated." ;
+    sstim:affectedPopulation "All users operating vehicles, machinery, tools, or supervising a hazardous environment." ;
+    sstim:recommendedAction "Do not start the preset; if already playing, stop it before continuing the activity." ;
+    sstim:displayPriority 2 .
 
 sstim-v:cautionNighttimeOnly a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Nighttime Only"@en, "Solo Notturno"@it,
                    "Apenas à Noite"@pt, "Solo Nocturno"@es ;
     skos:notation "nighttime-only" ;
-    skos:definition "Should only be used before sleep."@en .
+    skos:definition "Preset is designed specifically for a quiet pre-rest context and is not intended for tasks requiring sustained alertness."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityLow ;
+    sstim:triggerCondition "The preset is selected outside an appropriate pre-rest setting or before an alertness-dependent task." ;
+    sstim:affectedPopulation "Users who need to remain alert after the session." ;
+    sstim:recommendedAction "Use a neutral or daytime alternative when continued alertness is required." ;
+    sstim:displayPriority 10 .
 
 sstim-v:cautionFatigueSensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Fatigue Sensitive"@en, "Sensibile alla Fatica"@it,
                    "Sensível à Fadiga"@pt, "Sensible a la Fatiga"@es ;
     skos:notation "fatigue-sensitive" ;
-    skos:definition "May increase fatigue in susceptible users."@en .
+    skos:definition "Preset contains sustained, repetitive, visually demanding, or high-load stimulation that may be uncomfortable when the user is fatigued."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityModerate ;
+    sstim:triggerCondition "The user is already fatigued or develops strain, headache-like discomfort, or declining attention during use." ;
+    sstim:affectedPopulation "Users who are tired or sensitive to sustained sensory demand." ;
+    sstim:recommendedAction "Shorten the session, reduce intensity, take breaks, or stop when discomfort develops." ;
+    sstim:displayPriority 7 .
 
 sstim-v:cautionEmotionallySensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Emotionally Sensitive"@en, "Sensibile Emotivamente"@it,
                    "Sensível Emocionalmente"@pt, "Sensible Emocionalmente"@es ;
     skos:notation "emotionally-sensitive" ;
-    skos:definition "May surface strong emotional responses."@en .
+    skos:definition "Preset contains evocative sound, imagery, isolation, or social content that some users may experience as emotionally intense."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityModerate ;
+    sstim:triggerCondition "The content or context feels emotionally overwhelming, distressing, or difficult to disengage from." ;
+    sstim:affectedPopulation "Users who are sensitive to evocative, immersive, isolating, or socially charged content." ;
+    sstim:recommendedAction "Pause or stop, leave immersive mode, and choose neutral content or a supported setting." ;
+    sstim:displayPriority 8 .
 
 sstim-v:cautionHighIntensity a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "High Intensity"@en, "Alta Intensità"@it,
                    "Alta Intensidade"@pt, "Alta Intensidad"@es ;
     skos:notation "high-intensity" ;
-    skos:definition "Strong or overwhelming sensory impact; may not be suitable for first-time users."@en .
+    skos:definition "Preset uses comparatively strong, dense, bright, loud, fast, or multimodal parameters and requires conservative initial settings."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityModerate ;
+    sstim:triggerCondition "Multiple high-load parameters are enabled or the user reports discomfort, startle, strain, or overload." ;
+    sstim:affectedPopulation "First-time users and users sensitive to intense sensory input." ;
+    sstim:recommendedAction "Begin at low gain and visual intensity, increase only gradually, and stop at the first sign of discomfort." ;
+    sstim:displayPriority 5 .
 
 sstim-v:cautionAdvancedUser a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Advanced User"@en, "Utente Avanzato"@it,
                    "Usuário Avançado"@pt, "Usuario Avanzado"@es ;
     skos:notation "advanced-use" ;
-    skos:definition "Not recommended as a first BSC experience."@en .
+    skos:definition "Preset exposes complex controls, unusual routing, or demanding parameter combinations intended for experienced users or supervised demonstrations."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityInfo ;
+    sstim:triggerCondition "The user is unfamiliar with the controls, stop mechanism, or parameter effects." ;
+    sstim:affectedPopulation "First-time users or users unfamiliar with the implementation." ;
+    sstim:recommendedAction "Review the controls, verify the stop action, and begin with a simpler reference preset." ;
+    sstim:displayPriority 11 .
 
 sstim-v:cautionOverloadSensitive a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Overload Sensitive"@en, "Sensibile al Sovraccarico"@it,
                    "Sensível à Sobrecarga"@pt, "Sensible a la Sobrecarga"@es ;
     skos:notation "overload-sensitive" ;
-    skos:definition "May be too intense for sensory-sensitive users."@en .
+    skos:definition "Preset combines density, intensity, motion, contrast, or multiple modalities in a way that can be difficult for sensory-sensitive users."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityModerate ;
+    sstim:triggerCondition "The user experiences sensory overload, disorientation, distress, or difficulty stopping attention to the stimulus." ;
+    sstim:affectedPopulation "Users who identify as sensory-sensitive or who are currently stressed, tired, or overstimulated." ;
+    sstim:recommendedAction "Use one channel at a time at low intensity, shorten exposure, or stop and move to a quiet environment." ;
+    sstim:displayPriority 6 .
 
 sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:Concept ;
     skos:inScheme sstim-v:CautionTagScheme ;
     skos:prefLabel "Ultra-Slow Breathing"@en, "Respirazione Ultra-Lenta"@it,
                    "Respiração Ultra-Lenta"@pt, "Respiración Ultra-Lenta"@es ;
     skos:notation "ultra-slow-breathing" ;
-    skos:definition "Very slow breathing parameters (< 3 bpm). Consult physician if respiratory conditions are present."@en .
+    skos:definition "Preset requests a breathing cadence below 3 cycles per minute, outside the ordinary BSC guided-breathing range and unsuitable for forced following."@en ;
+    sstim:hasCautionSeverity sstim-v:cautionSeverityHigh ;
+    sstim:triggerCondition "The breathing guide requests fewer than 3 cycles per minute or following it causes breath hunger, dizziness, or discomfort." ;
+    sstim:affectedPopulation "All users, especially anyone with breathing limitations or unfamiliarity with very slow breathing practices." ;
+    sstim:recommendedAction "Do not force or hold the breath; disable the guide or stop immediately if the cadence is uncomfortable." ;
+    sstim:displayPriority 4 .
 
 ###########################################################################
 # Part 10 — Stimulus Temporal Structure Scheme
@@ -1409,6 +1554,140 @@ sstim-v:techSubliminalAudio a owl:NamedIndividual, sstim:NonEntrainmentTechnique
     skos:editorialNote "Catalogued for transparency and explicit negative assertion. Evidence for durable behavioral or mood change from semantic subliminal audio is weak to absent. Not an evidence-bearing technique."@en ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAperiodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .
+
+
+###########################################################################
+# Materialized SKOS inverse links
+#
+# SKOS defines hasTopConcept/topConceptOf and broader/narrower as inverse
+# pairs. They are asserted in both directions here because the browser and
+# many RDF clients do not run OWL inference.
+###########################################################################
+
+# Scheme scope definitions completed in 0.6.0-dev.
+sstim-v:CautionTagScheme skos:definition "Safety, comfort, attention, and context advisories that an implementation can attach to a preset."@en .
+sstim-v:ClaimDirectionScheme skos:definition "Categories describing whether a reviewed body of evidence supports, mixes, leaves inconclusive, or refutes an asserted relation."@en .
+sstim-v:EffectDirectionScheme skos:definition "Categories describing the observed direction of a measured outcome relative to a comparator."@en .
+sstim-v:EvidenceModalityScheme skos:definition "Tags identifying the stimulation modality and evidence-source context in which a result was obtained."@en .
+sstim-v:EvidenceTierScheme skos:definition "Ordinal evidence-strength categories used for claim-level assessment rather than technique-wide endorsement."@en .
+sstim-v:PermutationFunctionScheme skos:definition "Reordering functions available to cyclic BSC Symmetry note sequences."@en .
+sstim-v:PresetGroupScheme skos:definition "BSC implementation categories grouping presets by intended design character and use context."@en .
+sstim-v:PublicClaimLevelScheme skos:definition "Ordered ceilings on the kinds of statements allowed in public-facing preset descriptions under SSTIM evidence governance."@en .
+sstim-v:ReviewStatusScheme skos:definition "Workflow states describing whether an evidence-tier assignment is provisional, reviewed, or due for reassessment."@en .
+sstim-v:SensoryModalityScheme skos:definition "Broad sensory-channel categories used for technique and intervention annotation."@en .
+sstim-v:StimulationMechanismScheme skos:definition "Controlled categories for proposed neurobiological and psychophysiological response mechanisms, each requiring separate evidence qualification."@en .
+sstim-v:StimulusTemporalStructureScheme skos:definition "Categories describing whether a stimulus is periodic, quasi-periodic, aperiodic, or adaptively controlled."@en .
+sstim-v:TechniqueScheme skos:definition "Vendor-neutral catalog of parameterizable auditory, visual, somatosensory, and cross-modal sensory stimulation techniques."@en .
+sstim-v:VoiceTypeScheme skos:definition "BSC audio synthesis voice categories used by preset parameter bundles."@en .
+
+sstim-v:cautionAdvancedUser skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionDrivingUnsafe skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionDrowsyUse skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionEmotionallySensitive skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionEpilepsyRisk skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionFatigueSensitive skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionHighIntensity skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionNighttimeOnly skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionOverloadSensitive skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionStimulating skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:cautionUltraSlowBreathing skos:topConceptOf sstim-v:CautionTagScheme .
+sstim-v:claimInconclusive skos:topConceptOf sstim-v:ClaimDirectionScheme .
+sstim-v:claimMixed skos:topConceptOf sstim-v:ClaimDirectionScheme .
+sstim-v:claimRefutes skos:topConceptOf sstim-v:ClaimDirectionScheme .
+sstim-v:claimSupports skos:topConceptOf sstim-v:ClaimDirectionScheme .
+sstim-v:effectDecrease skos:topConceptOf sstim-v:EffectDirectionScheme .
+sstim-v:effectIncrease skos:topConceptOf sstim-v:EffectDirectionScheme .
+sstim-v:effectNoChange skos:topConceptOf sstim-v:EffectDirectionScheme .
+sstim-v:modalityAUD skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityAV skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityBREATH skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityGENERAL skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityMULTISENSORY skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityPRECLINICAL skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityREVIEW skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityTACTILE skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:modalityVIS skos:topConceptOf sstim-v:EvidenceModalityScheme .
+sstim-v:tierAnecdotal skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:tierEstablished skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:tierModerate skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:tierPreliminary skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:tierSpeculative skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:tierStrong skos:topConceptOf sstim-v:EvidenceTierScheme .
+sstim-v:permIdentity skos:topConceptOf sstim-v:PermutationFunctionScheme .
+sstim-v:permReverse skos:topConceptOf sstim-v:PermutationFunctionScheme .
+sstim-v:permRotateBackward skos:topConceptOf sstim-v:PermutationFunctionScheme .
+sstim-v:permRotateForward skos:topConceptOf sstim-v:PermutationFunctionScheme .
+sstim-v:permShuffle skos:topConceptOf sstim-v:PermutationFunctionScheme .
+sstim-v:groupHeal skos:topConceptOf sstim-v:PresetGroupScheme .
+sstim-v:groupIndulge skos:topConceptOf sstim-v:PresetGroupScheme .
+sstim-v:groupPerform skos:topConceptOf sstim-v:PresetGroupScheme .
+sstim-v:groupSupport skos:topConceptOf sstim-v:PresetGroupScheme .
+sstim-v:groupTranscend skos:topConceptOf sstim-v:PresetGroupScheme .
+sstim-v:claimC0Descriptive skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:claimC1Experiential skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:claimC2Wellness skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:claimC3StructureFunction skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:claimC4Medical skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:claimC5Quantified skos:topConceptOf sstim-v:PublicClaimLevelScheme .
+sstim-v:reviewNeedsUpdate skos:topConceptOf sstim-v:ReviewStatusScheme .
+sstim-v:reviewProvisional skos:topConceptOf sstim-v:ReviewStatusScheme .
+sstim-v:reviewReviewed skos:topConceptOf sstim-v:ReviewStatusScheme .
+sstim-v:modalityAuditory skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:modalityInteroceptive skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:modalityOlfactory skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:modalitySomatosensory skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:modalityVestibular skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:modalityVisual skos:topConceptOf sstim-v:SensoryModalityScheme .
+sstim-v:mechASSR skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechAttentional skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechAuditoryMotor skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechAutonomic skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechClosedLoopPhase skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechFFR skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechGamma40 skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechMasking skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechMechanoreceptive skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechMultisensory skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechSSSEP skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechSSVEP skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechStartle skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechStochastic skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechThalamocortical skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:mechUltrasonic skos:topConceptOf sstim-v:StimulationMechanismScheme .
+sstim-v:techASMR skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techAcousticStartle skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techAmplitudeModulation skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techAudioTactile skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techAudiovisualEntrainment skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techAuditoryIllusion skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techBinauralBeats skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techBroadbandNoise skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techClickTrain skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techClosedLoopAuditory skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techColorFieldStimulation skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techFractalRhythm skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techFrequencyModulation skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techGamma40Auditory skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techIsochronicTones skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techMonauralBeats skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techMusicStructural skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techNotchedSound skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techPhoticDriving skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techReferencePitchRetuning skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techRhythmicAuditoryCueing skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techRoughness skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techSonification skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techSpatialAuditory skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techSubliminalAudio skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techUltrasoundNeuromod skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techVibroacoustic skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techVibrotactileEntrainment skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techVoiceMantra skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:voiceBinaural skos:topConceptOf sstim-v:VoiceTypeScheme .
+sstim-v:voiceMartigli skos:topConceptOf sstim-v:VoiceTypeScheme .
+sstim-v:voiceMartigliBinaural skos:topConceptOf sstim-v:VoiceTypeScheme .
+sstim-v:voiceSymmetry skos:topConceptOf sstim-v:VoiceTypeScheme .
+sstim-v:techReferencePitchRetuning skos:narrower sstim-v:techSolfeggioTuning .
 
 
 ###########################################################################

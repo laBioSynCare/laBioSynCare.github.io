@@ -22,6 +22,8 @@
 @prefix sstim-ref: <https://w3id.org/sstim/ref/> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 
 # ── Best-supported auditory responses (measurable, cited) ────────────────────
 
@@ -38,7 +40,9 @@ bsclab-evidence:assr-isochronic-response a sstim:EvidenceClaim ;
     sstim:comparator "Unmodulated tone / no periodic stimulus" ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
 bsclab-evidence:ffr-monaural-response a sstim:EvidenceClaim ;
     rdfs:label "Subcortical frequency-following response to acoustically periodic stimuli" ;
@@ -53,7 +57,9 @@ bsclab-evidence:ffr-monaural-response a sstim:EvidenceClaim ;
     sstim:comparator "Aperiodic / non-envelope-modulated sound" ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
 bsclab-evidence:binaural-beats-state-mixed a sstim:EvidenceClaim ;
     rdfs:label "Binaural-beat effects on EEG oscillatory activity and psychological state are mixed" ;
@@ -68,13 +74,15 @@ bsclab-evidence:binaural-beats-state-mixed a sstim:EvidenceClaim ;
     sstim:comparator "Sham / no binaural beat" ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
 # ── Explicit negative assertions (tier <= 2, legitimately uncited) ───────────
 
 bsclab-evidence:color-field-chromotherapy-negative a sstim:EvidenceClaim ;
     rdfs:label "No established colour-specific physiological effect ('chromotherapy')" ;
-    dct:description "Migrated from techColorFieldStimulation's editorial note: there is no established neurophysiological mechanism and no controlled evidence that a specific colour produces a specific physiological or therapeutic effect. A steady colour field is an aesthetic/ambient stimulus; any calming effect is attentional and contextual." ;
+    dct:description "Migrated from techColorFieldStimulation's editorial note: there is no established neurophysiological mechanism and no controlled evidence that a specific colour produces a specific physiological or therapeutic effect. A steady colour field is an aesthetic/ambient stimulus; reported calming experiences should be represented as contextual self-report, not as a colour-specific physiological effect." ;
     sstim:supportsRelation sstim-v:techColorFieldStimulation ;
     sstim:hasEvidenceTier sstim-v:tierSpeculative ;
     sstim:hasModalityTag sstim-v:modalityVIS ;
@@ -82,7 +90,9 @@ bsclab-evidence:color-field-chromotherapy-negative a sstim:EvidenceClaim ;
     sstim:evidenceOutcome "No colour-specific physiological or therapeutic effect supported." ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
 bsclab-evidence:solfeggio-tuning-negative a sstim:EvidenceClaim ;
     rdfs:label "No tuning-specific physiological effect for 'Solfeggio' / mystical tunings" ;
@@ -94,7 +104,9 @@ bsclab-evidence:solfeggio-tuning-negative a sstim:EvidenceClaim ;
     sstim:evidenceOutcome "No tuning-specific physiological effect supported; use aesthetically and honestly." ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
 bsclab-evidence:reference-pitch-432-inconclusive a sstim:EvidenceClaim ;
     rdfs:label "432 Hz vs 440 Hz reference-pitch retuning — inconclusive for BSC use" ;
@@ -107,4 +119,76 @@ bsclab-evidence:reference-pitch-432-inconclusive a sstim:EvidenceClaim ;
     sstim:studyPopulation "Music-listening pilots (not BSC carrier-under-beat)" ;
     sstim:hasReviewStatus sstim-v:reviewReviewed ;
     sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date .
+    sstim:evidenceDate "2026-07-08"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+# ── Cross-modal and paced-cue measurable-response evidence ─────────────────
+
+bsclab-evidence:slow-breathing-physiology-review a sstim:EvidenceClaim ;
+    rdfs:label "Slow breathing is associated with measurable cardiorespiratory and central responses" ;
+    dct:description "A systematic review of slow breathing in healthy participants reports measurable cardiorespiratory and central nervous-system correlates, while noting heterogeneity across methods and outcomes. This supports the plausibility of a paced cue and mechanism research, not a guaranteed wellness or treatment outcome." ;
+    sstim:supportsRelation bsc-fw-tech:martigli-breathing-oscillation ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasModalityTag sstim-v:modalityBREATH, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:ZACCARO_2018 ;
+    sstim:evidenceOutcome "Slow breathing below 10 cycles per minute is associated with measurable respiratory, cardiovascular, and central correlates; direction and magnitude vary by protocol." ;
+    sstim:studyPopulation "Healthy human participants across studies in a systematic review" ;
+    sstim:comparator "Spontaneous breathing, baseline, or faster breathing conditions depending on study" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+bsclab-evidence:ssvep-photic-response a sstim:EvidenceClaim ;
+    rdfs:label "Periodic visual stimulation evokes a steady-state visual response" ;
+    dct:description "Periodic luminance or contrast stimulation can evoke a frequency-tagged steady-state visual response. This is a measurable electrophysiological response and does not establish a downstream cognitive, wellness, or clinical effect." ;
+    sstim:supportsRelation sstim-v:techPhoticDriving ;
+    sstim:hasEvidenceTier sstim-v:tierStrong ;
+    sstim:hasModalityTag sstim-v:modalityVIS, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:VIALATTE_2010 ;
+    sstim:evidenceOutcome "Frequency-specific phase-locked visual evoked activity can be measured during periodic visual stimulation." ;
+    sstim:studyPopulation "Human visual electrophysiology studies summarized in a review" ;
+    sstim:comparator "Non-periodic, non-matched, or alternative-frequency visual conditions depending on study" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+bsclab-evidence:sssep-vibrotactile-response a sstim:EvidenceClaim ;
+    rdfs:label "Periodic vibrotactile stimulation evokes a steady-state somatosensory response" ;
+    dct:description "A literature review of EEG-based interfaces documents phase-locked steady-state somatosensory responses to sustained periodic skin stimulation. The claim is limited to measurability of the response." ;
+    sstim:supportsRelation sstim-v:techVibrotactileEntrainment ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasModalityTag sstim-v:modalityTACTILE, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:PETIT_2021 ;
+    sstim:evidenceOutcome "Periodic mechanical skin stimulation can elicit an oscillatory, phase-locked EEG component described as SSSEP." ;
+    sstim:studyPopulation "Human participants in SSSEP and brain-computer-interface studies summarized in a review" ;
+    sstim:comparator "Alternative stimulation frequencies, attention conditions, or non-target channels depending on study" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+bsclab-evidence:multisensory-integration-mechanism a sstim:EvidenceClaim ;
+    rdfs:label "Convergent processing supports a multisensory integration mechanism" ;
+    dct:description "A neuroscience review supports the existence of integrative neural processing across sensory channels. It does not imply that merely combining arbitrary audio, visual, or tactile stimuli improves a wellness outcome." ;
+    sstim:supportsRelation sstim-v:techAudiovisualEntrainment ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasModalityTag sstim-v:modalityAV, sstim-v:modalityMULTISENSORY, sstim-v:modalityREVIEW ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:citesReference sstim-ref:STEIN_STANFORD_2008 ;
+    sstim:evidenceOutcome "Neural circuits can integrate information across modalities under context- and timing-dependent conditions." ;
+    sstim:studyPopulation "Neuroscience evidence reviewed across experimental models" ;
+    sstim:comparator "Unisensory and incongruent multisensory conditions depending on cited study" ;
+    sstim:hasReviewStatus sstim-v:reviewReviewed ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

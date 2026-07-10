@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest --passWithNoTests",
-    "validate": "make shacl",
+    "validate": "make validate",
     "check": "svelte-kit sync && svelte-check"
   },
   "dependencies": {

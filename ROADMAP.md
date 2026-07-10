@@ -4,7 +4,7 @@
 > phase the project is in, what is being built next, and what must not be
 > built yet. The granular task list is in `TODO.md`.
 >
-> **Current phase: 0 → 1 boundary.** The repository is being established.
+> **Current phase: Phase 1 public foundation.** Phase 0 is complete.
 > BSC Lab v0.1 (knowledge browser) is the nearest software milestone.
 > The stimulation player is Phase 2. Evidence collection is Phase 3.
 > Do not build Phase 3 infrastructure during Phase 1 work.
@@ -25,9 +25,10 @@
 
 ## Vision
 
-BSC Lab is the open scientific and technical infrastructure for sensory stimulation — the intentional design and delivery of auditory, visual, and
-haptic stimulation to induce desired changes in physiological, psychological,
-or cognitive state.
+BSC Lab is open scientific and technical infrastructure for sensory
+stimulation: the intentional, measurable design and delivery of auditory,
+visual, tactile, and cross-modal stimuli for research, education, and
+conservative non-clinical use.
 
 The long-term goal is a self-sustaining ecosystem with three mutually
 reinforcing layers:
@@ -39,8 +40,10 @@ taxonomy of sensory stimulation. The BSC framework lives under
 paths such as `w3id.org/sstim/implementation/bsclab/` and
 `w3id.org/sstim/implementation/biosyncare/` when public-safe implementation
 metadata is published. The private BioSynCare/BSC catalog is not a BSC Lab data
-source. Machine-readable, citable, linked to Wikidata and OBO Foundry. The
-foundation for scientific discussion and nomenclature standardization.
+source. The ontology is machine-readable and citable, reuses OBO ecosystem
+terms where semantically appropriate, and is prepared for conservative external
+knowledge-graph links. It is a foundation for scientific discussion and
+nomenclature standardization.
 
 **Platform layer:** An open-source multi-engine stimulation platform (this
 repository) that any researcher, developer, or institution can run, extend,
@@ -50,8 +53,7 @@ transparent, auditable form.
 **Community layer:** An international network of researchers, clinicians,
 and institutions (anchored by a W3C Community Group) that uses the knowledge
 and platform layers to advance evidence gathering, coordinate nomenclature,
-and advocate for sensory stimulation as a legitimate wellness and performance
-intervention.
+and support responsible sensory-stimulation research and practice.
 
 The commercial application **BioSynCare** (separate repository) funds the
 work at Phase 1-2. Revenue growth funds Phase 3 and beyond. BSC Lab's
@@ -83,7 +85,7 @@ primarily with AI-assisted development.
 
 ---
 
-## Current State (April 2026)
+## Baseline State (April 2026)
 
 - **BioSynCare** v2 just launched on App Store and Google Play with:
   Seraphony (AI on-demand session creation), Rooms (shared synchronous
@@ -102,6 +104,20 @@ primarily with AI-assisted development.
   Frontiers journals). Active collaborator and daily BSC user.
 - **IP:** No trademarks filed yet. No patents. Defensive publication
   strategy chosen over patent filing.
+
+### Repository update (July 2026)
+
+- **SSTIM:** `0.5.0` is frozen, tagged, and archived under a Zenodo version DOI;
+  the continuing project has a concept DOI.
+- **Development ontology:** the six editable modules are on `0.6.0-dev`, with
+  expanded sensory-domain vocabulary, evidence provenance, safety metadata,
+  SHACL, OWL reasoning, and executable quality/competency checks.
+- **Public data:** BSC Lab framework, implementation, protocols, reference
+  presets, evidence, references, experiments, and one synthetic session are
+  public. Private catalog and real participant data remain excluded.
+- **Publication work:** GitHub Pages and the stable w3id namespace are live;
+  WIDOCO HTML, final multi-format w3id routing, external review, and registry
+  submissions remain Phase 1 work.
 
 ---
 
@@ -148,13 +164,10 @@ All 31 reference documents exist in the repository. The ontology skeleton
 is valid Turtle and passes basic SHACL validation. The repo is public on
 GitHub. Nothing is deployed yet.
 
-**Status (2026-04-25):** all 31 reference documents are committed. The core
-ontology and vocabulary conform against `sstim-shapes.ttl`; the earlier
-`sstim-v:allFrequencyBands` SHACL issue is resolved. The repo is public on
-GitHub. A "Public Foundation Pass" has added the root README rewrite, docs
-index, instance-layout index, namespace convention lock-in, initial SvelteKit
-knowledge-browser scaffold, and local validation entrypoints. CI and final
-task-tracker reality sync close out the boundary into Phase 1.
+**Status (updated 2026-07-10): complete.** All reference documents are
+committed; the ontology, vocabulary, validation entrypoints, CI, namespace
+policy, public repository, and initial knowledge-browser scaffold exist. Phase
+1 now owns publication hardening, external review, and public discovery.
 
 ---
 

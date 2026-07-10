@@ -140,6 +140,10 @@ export const INSTANCE_URLS = {
   ],
   presets: [
     '/ontology/instances/presets/perform-alpha-10-seed.ttl',
+    '/ontology/instances/presets/heal-theta-breathing-seed.ttl',
+  ],
+  protocols: [
+    '/ontology/instances/protocols/bsc-reference-protocols.ttl',
   ],
   evidence: [
     '/ontology/instances/evidence/technique-evidence.ttl',
@@ -159,6 +163,9 @@ export const INSTANCE_URLS = {
   references: [
     '/ontology/instances/references/references.ttl',
   ],
+  sessions: [
+    '/ontology/instances/sessions/synthetic-reference-session.ttl',
+  ],
 }
 
 export const INSTANCE_SOURCES = {
@@ -174,6 +181,10 @@ export const INSTANCE_SOURCES = {
     url,
     graph: 'https://w3id.org/sstim/implementation/bsclab/preset/',
   })),
+  protocols: INSTANCE_URLS.protocols.map(url => ({
+    url,
+    graph: 'https://w3id.org/sstim/implementation/bsclab/protocol/',
+  })),
   evidence: INSTANCE_URLS.evidence.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/implementation/bsclab/evidence/',
@@ -185,6 +196,10 @@ export const INSTANCE_SOURCES = {
   references: INSTANCE_URLS.references.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/ref/',
+  })),
+  sessions: INSTANCE_URLS.sessions.map(url => ({
+    url,
+    graph: 'https://w3id.org/sstim/implementation/bsclab/session/',
   })),
 }
 

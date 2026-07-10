@@ -5,8 +5,9 @@ SSTIM ontology modules from their Turtle masters.
     python3 scripts/export-ontology.py [output_dir]
 
 For each top-level term-space module in static/ontology/*.ttl, this writes a
-byte-faithful re-serialization to `<output_dir>/<module>.jsonld` and
-`<output_dir>/<module>.rdf` (RDF/XML). Turtle stays the editable master
+graph-faithful re-serialization to `<output_dir>/<module>.jsonld` and
+`<output_dir>/<module>.rdf` (RDF/XML), parses it back, and verifies graph
+isomorphism with the Turtle source. Turtle stays the editable master
 (README: "JSON-LD is never the master — never edit exported JSON-LD and import
 it back"); these exports exist only so the published namespace can content-
 negotiate `application/ld+json` and `application/rdf+xml` (PUBLICATION plan B2).
@@ -25,6 +26,7 @@ from pathlib import Path
 
 try:
     from rdflib import Graph
+    from rdflib.compare import isomorphic
 except ImportError:
     sys.exit(
         "export-ontology: rdflib is required. In the repo devShell run "
@@ -68,8 +70,17 @@ def main() -> int:
         for fmt, ext in FORMATS.items():
             dest = out_dir / f"{stem}.{ext}"
             graph.serialize(destination=str(dest), format=fmt, auto_compact=True)
+            round_trip = Graph()
+            round_trip.parse(dest, format=fmt)
+            if not isomorphic(graph, round_trip):
+                print(
+                    f"export-ontology: ERROR {dest} does not round-trip "
+                    f"isomorphically from {src.relative_to(REPO_ROOT)}",
+                    file=sys.stderr,
+                )
+                return 1
             written += 1
-            print(f"export-ontology: wrote {dest}")
+            print(f"export-ontology: wrote and verified {dest}")
     print(f"export-ontology: {written} file(s) written to {out_dir}")
     return 0
 

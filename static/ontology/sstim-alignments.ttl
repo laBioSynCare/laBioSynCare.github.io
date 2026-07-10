@@ -3,12 +3,12 @@
 #  SSTIM External Alignments  —  sstim-alignments.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.5.0
-#  Date:       2026-06-17
+#  Version:    0.6.0-dev
+#  Date:       2026-07-10
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
-#  External vocabulary alignments: Wikidata, OBO Foundry, Music Ontology.
+#  External vocabulary alignments: Wikidata and OBO Foundry.
 #  Updated independently when external URIs change or new alignments
 #  are identified. Source of truth for all skos:exactMatch and
 #  owl:equivalentClass assertions to external vocabularies.
@@ -32,7 +32,23 @@
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 @prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
-@prefix mo:    <http://purl.org/ontology/mo/> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/alignments> a owl:Ontology ;
+    owl:versionInfo "0.6.0-dev" ;
+    dct:title "SSTIM External Alignments"@en ;
+    dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-04-12"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:historyNote "0.6.0-dev narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, and records the corrected MeSH audit."@en .
 
 
 ###########################################################################
@@ -58,16 +74,10 @@ sstim-v:beta skos:exactMatch wd:Q831014 .
 # gamma wave: https://www.wikidata.org/wiki/Q2623017
 sstim-v:gamma skos:exactMatch wd:Q2623017 .
 
-# binaural beats: https://www.wikidata.org/wiki/Q863539
-sstim-v:voiceBinaural skos:closeMatch wd:Q863539 .
-
-# brainwave entrainment (close match — covers AVE, binaural beats):
-# https://www.wikidata.org/wiki/Q3508179
-sstim:SensoryStimulation skos:closeMatch wd:Q3508179 .
-
-# sensory stimulation therapy (nearest general concept):
-# https://www.wikidata.org/wiki/Q17163316
-sstim:SensoryStimulation skos:closeMatch wd:Q17163316 .
+# A BSC binaural voice is a parameter bundle that can realize binaural beats;
+# it is not identical to the perceptual phenomenon or musical genre represented
+# by Wikidata Q863539.
+sstim-v:voiceBinaural skos:relatedMatch wd:Q863539 .
 
 # isochronic tones: https://www.wikidata.org/wiki/Q98000061
 sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
@@ -77,6 +87,11 @@ sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
 # neuromodulation, etc.) are pending Wikidata alignment — tracked in TODO.md.
 sstim-v:techIsochronicTones skos:closeMatch wd:Q98000061 .
 sstim-v:techBinauralBeats skos:exactMatch wd:Q863539 .
+
+# Multisensory integration: verified Wikidata concept Q17166073. SSTIM's term
+# is a proposed-mechanism category, so relatedMatch is intentionally weaker
+# than exactMatch.
+sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
 
 # Note: Wikidata items for Martigli oscillation, Sonic Symmetry permutation
 # technique, and the SSTIM ontology itself are pending — Wikidata contribution
@@ -111,14 +126,9 @@ sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
 # Reference → IAO document
 sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 
-# Sensory modality → BFO role
-sstim:SensoryModality rdfs:subClassOf bfo:0000023 .
-
-# Stimulation mechanism → BFO process
-sstim:StimulationMechanism rdfs:subClassOf bfo:0000015 .
-
-# Intended effect → BFO disposition
-sstim:IntendedEffect rdfs:subClassOf bfo:0000016 .
+# SSTIM controlled-value classes (including SensoryModality,
+# StimulationMechanism, and IntendedEffect) are information categories, not
+# the real-world roles, processes, or dispositions they classify (ADR 0021).
 
 # ECO (Evidence & Conclusion Ontology) classifies evidence by TYPE / provenance,
 # not by strength, so it has no clean match for the SSTIM evidence-tier concepts
@@ -126,19 +136,6 @@ sstim:IntendedEffect rdfs:subClassOf bfo:0000016 .
 # `sstim-v:tierEstablished skos:closeMatch eco:0006151` mapping was removed:
 # ECO_0006151 is "documented statement evidence", not a systematic review, and
 # ECO has no review/meta-analysis strength term. Left unmapped intentionally.
-
-
-###########################################################################
-# Music Ontology alignments
-###########################################################################
-
-# Sessions have musical / acoustic qualities; loose relationship only.
-# NOTE: the Music Ontology host (purl.org/ontology/mo/) returned 503 at audit
-# time (2026-06), so these could not be re-verified live. mo:MusicalWork is a
-# stable core MO class; mo:Score could not be confirmed to exist and is disabled
-# pending verification.
-sstim:SensoryStimulationTechnique skos:relatedMatch mo:MusicalWork .
-# sstim:Preset skos:relatedMatch mo:Score .   # unverified — re-enable once confirmed
 
 
 ###########################################################################
@@ -151,8 +148,6 @@ sstim:SensoryStimulationTechnique skos:relatedMatch mo:MusicalWork .
 ###########################################################################
 
 bfo:0000015 rdfs:label "process"@en .
-bfo:0000016 rdfs:label "disposition"@en .
-bfo:0000023 rdfs:label "role"@en .
 obi:0000011 rdfs:label "planned process (obsolete in OBI)"@en .
 obi:0000272 rdfs:label "protocol"@en .
 cob:0000082 rdfs:label "planned process"@en .
@@ -166,8 +161,9 @@ iao:0000030 rdfs:label "information content entity"@en .
 # TODO: SNOMED CT alignment for clinical context descriptions
 # SNOMED 229070002 = sensory stimulation (procedure) — verify current URI
 
-# TODO: MeSH alignment
-# MeSH D012910 = Sensory Stimulation — verify URI format for LOD
+# MeSH audit (2026-07-10): D012910 is Snake Venoms, not Sensory Stimulation.
+# No exact or close MeSH mapping is asserted. D012677 (Sensation) is adjacent
+# in scope but describes sensory transduction rather than designed stimulation.
 
 # TODO: NDF-RT / NCIm alignment for evidence claim mechanism terms
 

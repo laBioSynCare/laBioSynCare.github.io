@@ -1,6 +1,6 @@
 # ADR 0018 — Evidence integrity and public-claim governance
 
-**Status:** Accepted — 2026-06-30
+**Status:** Accepted - 2026-06-30; strengthened 2026-07-10
 
 ## Context
 
@@ -55,6 +55,14 @@ flagged in the RDF (`requiresEvidenceTierRank` definition, the scheme header) fo
 `clinicalScope` / `marketScope` enum** and a qualified EU MDR adviser before
 launch. The SSTIM-canonical scheme lands first; the Reference aligns to it.
 
+**P7.3 - Required review and provenance record (0.6.0-dev).** Every
+`EvidenceClaim` now requires an explicit claim direction, review status, evidence
+review date, `dct:modified`, and an IRI-valued `prov:wasAttributedTo` agent. A
+claim must identify its subject through `supportsRelation`, or, for an
+`ExposureEffectClaim`, through `concernsEffectDimension`. This separates a
+claim's content from responsibility for its current editorial assessment and
+makes stale or anonymous tier assignments fail validation.
+
 ## Alternatives considered
 
 - **Blanket `citesReference minCount 1`** (the reviewers' one-liner). Rejected: it
@@ -72,9 +80,9 @@ launch. The SSTIM-canonical scheme lands first; the Reference aligns to it.
 
 ## Consequences
 
-- No existing data breaks: every current claim is `tierSpeculative` (rank 1), and
-  only `perform-alpha-10-seed` declares a level (C2, which needs no evidence).
-  `make validate` green; both constraints negative-tested.
+- Published measurable-response claims cite public-safe references; exploratory
+  exposure claims remain speculative, inconclusive, and provisional. Every
+  claim now carries an accountable agent and review date.
 - Over-claiming is now a CI failure: a tier-3+ claim without a citation, or a
   preset promising above its evidence (C4 ever, C5 without strong evidence), fails
   `make validate` and cannot merge.

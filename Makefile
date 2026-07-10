@@ -26,7 +26,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev export preview reason shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev export export-check preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -60,6 +60,13 @@ shacl-vocab:
 shacl-exposure:
 	$(PYSHACL) -s $(SHAPES) $(EXPOSURE)
 
+## Validate the complete ontology module set, including module metadata
+shacl-modules:
+	@tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	cat $(ONTOLOGY_MODULES) > "$$tmp"; \
+	$(PYSHACL) -s $(SHAPES) "$$tmp"
+
 ## Validate RDF instances against shapes with ontology + vocabulary context
 shacl-instances:
 	@if [ -z "$(strip $(INSTANCE_FILES))" ]; then \
@@ -72,7 +79,7 @@ shacl-instances:
 	fi
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-instances
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
@@ -86,6 +93,10 @@ reason:
 sparql-sanity:
 	node scripts/sstim-exposure-sanity.mjs
 
+## Run repository-wide semantic integrity and competency checks
+quality-audit:
+	$(PYTHON) scripts/sstim-quality-audit.py
+
 ## Freeze the current ontology as an immutable versioned snapshot
 ## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
 ## Existing snapshots are protected; overwrite an unpublished one with FORCE=1.
@@ -96,8 +107,14 @@ snapshot:
 test:
 	npm test
 
+## Verify generated JSON-LD and RDF/XML round-trip to the source graphs
+export-check:
+	@tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	$(PYTHON) scripts/export-ontology.py "$$tmpdir"
+
 ## Run the current ontology validation suite
-validate: shacl reason sparql-sanity
+validate: shacl quality-audit reason sparql-sanity export-check
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -119,12 +136,15 @@ help:
 	@echo "  make test             Run Vitest"
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
+	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
+	@echo "  make shacl-modules    Validate the merged six-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
+	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
 	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

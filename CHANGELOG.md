@@ -16,11 +16,37 @@ file is the human-readable summary.
 ## [Unreleased]
 
 ### Added
+- Complete module-level ontology metadata for all six editable SSTIM modules,
+  including titles, descriptions, creators, licenses, dependencies, development
+  version identifiers, and change-history notes.
+- Structured caution governance: an ordered severity vocabulary plus trigger
+  condition, affected population, recommended action, and display priority for
+  every public caution tag.
+- Self-report phases and an explicitly synthetic reference session with
+  pre-session and immediate post-session observations; no personal data is
+  included.
+- Two non-clinical BSC Lab reference protocols, three additional framework
+  technique records, and protocol/safety/public-claim links for both public
+  reference presets.
+- Reviewed evidence records and public-safe references for paced breathing,
+  SSVEP, SSSEP, and multisensory integration, with claim-level PROV attribution
+  and review dates.
+- Repository-wide RDF quality and competency checks
+  (`scripts/sstim-quality-audit.py` and the expanded
+  `scripts/sstim-exposure-sanity.mjs`) covering metadata, SKOS integrity,
+  functional-value collisions, evidence provenance, cautions, protocol/preset
+  paths, sessions, loader coverage, dangling IRIs, and VoID counts.
+- Graph-isomorphic export verification for every generated JSON-LD and RDF/XML
+  module serialization, included in `make validate` and CI.
+- SHACL contracts for module metadata, evidence provenance, protocols,
+  implementations, caution severity, self-report phases, exposure profiles,
+  unique SKOS notation, hierarchy inverses, and cycle prevention.
 - VoID + DCAT dataset description (`static/ontology/void.ttl`) for FAIR
   publication: one `void:Dataset` with per-module subsets and Turtle/JSON-LD/
-  RDF-XML distributions, `void:uriSpace`, vocabularies used, and example
-  resources. Added a `void:inDataset` back-link on the ontology node so
-  registries discover it. Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
+  RDF-XML distributions, checked whole-set counts, a public-instance subset,
+  `void:uriSpace`, vocabularies used, and example resources. Added a
+  `void:inDataset` back-link on the ontology node so registries discover it.
+  Staged the `/sstim/void` w3id route. (PUBLICATION plan B3)
 - Staged JSON-LD / RDF-XML content-negotiation for core and every module in the
   w3id `.htaccess` (`Accept: application/ld+json` → `.jsonld`, `application/rdf+xml`
   → `.rdf`, else Turtle). Goes live via the next `main` deploy plus a
@@ -36,6 +62,42 @@ file is the human-readable summary.
   version DOI `10.5281/zenodo.21286975` and all-versions concept DOI
   `10.5281/zenodo.21286974`. Added the DOI links to the ontology and VoID/DCAT
   metadata, citation guidance, and JSON-LD context. (PUBLICATION plan B5)
+
+### Changed
+- Advanced editable module sources to `0.6.0-dev` while keeping `0.5.0` as the
+  latest citable, immutable whole-set snapshot. Only core release snapshots
+  carry `owl:versionIRI`; live module files carry development `owl:versionInfo`.
+- Reclassified sensory modality, stimulation mechanism, and intended effect as
+  information-content categories rather than biological processes, roles, or
+  dispositions. Session specifications are PROV plans, session executions are
+  PROV activities, and implementations are PROV entities.
+  ([ADR 0021](docs/decisions/0021-controlled-value-semantics.md))
+- Added operational definitions to all previously undocumented public
+  properties, concept schemes, and exposure concepts, including explicit
+  measurement-dimension wording for exposure effects.
+- Materialized SKOS `hasTopConcept`/`topConceptOf` and
+  `broader`/`narrower` inverse navigation throughout the live vocabulary.
+- Strengthened every evidence record with modality, direction, review status,
+  review date, modification date, subject, and responsible-agent provenance;
+  exploratory exposure claims are explicitly speculative, inconclusive, and
+  provisional.
+- Narrowed external alignment scope: whole-domain brainwave-entrainment and
+  therapy mappings were removed, the binaural voice relation was weakened to
+  `skos:relatedMatch`, and multisensory integration gained a verified related
+  mapping.
+- Expanded the RDF loader and JSON-LD context to cover protocols, both public
+  presets, synthetic sessions, safety terms, and PROV metadata.
+
+### Fixed
+- Removed the stale MeSH `D012910` candidate mapping after authoritative NLM
+  verification showed that the identifier denotes *Snake Venoms*, not sensory
+  stimulation.
+- Removed an unverified Music Ontology association and corrected overly broad
+  upper-ontology assertions on controlled-value classes.
+- Included the previously omitted theta breathing preset in the runtime RDF
+  loader.
+- Replaced hand-maintained/omitted VoID metrics with counts checked by the
+  repository quality audit.
 
 ## [0.5.0] — 2026-07-09
 

@@ -5,10 +5,16 @@
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/colored-audio-noise#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 
 bsclab-experiment:colored-audio-noise a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Colored audio noise exposure"@en ;
     dct:description "Non-clinical exploratory setup for comparing white, pink, brown/red, blue, violet/purple, grey, and black/silence audio conditions as defined stimulus patterns."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim:usesTechnique sstim-v:techBroadbandNoise ;
     sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBscLabPrototype ;
     sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
     sstim-ex:hasExposureProfile this:profile .
@@ -60,3 +66,24 @@ this:noise-definition-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim 
     sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+
+this:pleasantness-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:calm-stress-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:noise-definition-claim
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:hasReviewStatus sstim-v:reviewProvisional ;
+    sstim:evidenceDate "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

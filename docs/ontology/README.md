@@ -1,120 +1,84 @@
-# Ontology and Vocabulary Notes
+# Ontology Planning and Review
 
-This directory documents the semantic-web artifacts associated with the proposed Sensory Stimulation Vocabulary Community Group.
+This directory contains design reviews and forward plans for the Sensory
+Stimulation Ontology (SSTIM). The ontology sources and their technical guide
+live under [`static/ontology/`](../../static/ontology/README.md).
 
-## Initial Namespace
+## Current State
 
-```text
-https://w3id.org/sstim/
+- Stable namespace: `https://w3id.org/sstim`
+- Prefix: `sstim`
+- Current citable release: `0.5.0`
+- Editable development line: `0.6.0-dev`
+- Ontology license: CC BY 4.0
+- Current release DOI: `10.5281/zenodo.21286975`
+- All-versions concept DOI: `10.5281/zenodo.21286974`
+
+SSTIM is an OWL/SKOS model for sensory-stimulation techniques, delivery and
+perception, protocols, presets, evidence claims, cautions, sessions, and
+consent-dependent self-reports. Its scope is research, education,
+interoperability, and conservative non-clinical use. Describing a protocol or
+claim does not establish efficacy.
+
+## Live Modules
+
+| Module | Role |
+|---|---|
+| [`sstim-core.ttl`](../../static/ontology/sstim-core.ttl) | Core classes, properties, evidence, safety, protocol, and session semantics |
+| [`sstim-vocab.ttl`](../../static/ontology/sstim-vocab.ttl) | Multilingual SKOS controlled vocabularies |
+| [`sstim-exposure.ttl`](../../static/ontology/sstim-exposure.ttl) | Physical delivery, perceived modality, device capability, placement, limits, and experiment context |
+| [`sstim-patch-studio.ttl`](../../static/ontology/sstim-patch-studio.ttl) | Voice and session-authoring parameters |
+| [`sstim-shapes.ttl`](../../static/ontology/sstim-shapes.ttl) | SHACL integrity and publication contracts |
+| [`sstim-alignments.ttl`](../../static/ontology/sstim-alignments.ttl) | Verified, conservatively scoped external mappings |
+
+Public BSC Lab implementation data is under
+[`static/ontology/instances/`](../../static/ontology/instances/README.md). It
+contains framework, implementation, protocol, preset, evidence, reference,
+experiment, and synthetic session examples. Private BioSynCare catalog data and
+real participant records are excluded.
+
+## Planning Documents
+
+- [Ontology Improvement Plan](IMPROVEMENT_PLAN.md): current maturity
+  assessment, completed 0.6 development work, remaining semantic priorities,
+  release gates, and deliberate boundaries.
+- [Publication and External Interlinking Plan](PUBLICATION_AND_INTERLINKING_PLAN.md):
+  WIDOCO, w3id negotiation, DOI/version policy, registry submissions, and
+  conservative Wikidata/biomedical mapping policy.
+- [Sensory Taxonomy Review](SENSORY_TAXONOMY_REVIEW.md): assessment of a proposed
+  expanded-senses taxonomy against SSTIM's modeling boundaries.
+- [Raw maintainer notes](raw-notes/): provenance for design questions; these are
+  inputs to review, not normative ontology definitions.
+
+Architecture decisions are recorded separately in
+[`docs/decisions/`](../decisions/README.md). ADR 0021 documents the current
+controlled-value semantics; ADR 0020 defines whole-set release versioning.
+
+## Quality Gates
+
+From the repository root:
+
+```bash
+nix develop
+make validate
+make test
+make check
+make build
+make export
 ```
 
-## Initial Prefix
+`make validate` runs SHACL against individual and merged modules plus all public
+instances, HermiT consistency reasoning, repository-wide quality checks,
+SPARQL competency queries, and graph-isomorphic JSON-LD/RDF/XML round trips.
+`make export` writes those verified serializations from the Turtle masters.
 
-```text
-sstim
-```
+## Change Rules
 
-## Intended Artifact Types
-
-The vocabulary effort may include:
-
-- RDF vocabularies;
-- OWL ontology modules;
-- SKOS concept schemes;
-- SHACL validation profiles;
-- JSON-LD contexts;
-- examples in Turtle, RDF/XML, JSON-LD, and compact JSON where useful;
-- mappings to existing vocabularies.
-
-## BSC Lab Role
-
-BSC Lab should act as both:
-
-1. **Navigation and annotation interface**
-   A public interface for browsing, annotating, reviewing, and discussing the `sstim` vocabulary and ontology.
-
-2. **Reference implementation**
-   A working implementation environment for sensory stimulation techniques and protocols described through `sstim`.
-
-The reference implementation should help test whether vocabulary terms are usable in real software and hardware contexts, including session generation, stimulus parameters, device constraints, safety metadata, evidence annotations, and user-facing workflows.
-
-## Candidate Modules
-
-Candidate modules include:
-
-```text
-sstim-core
-sstim-vocab
-sstim-shapes
-sstim-alignments
-sstim-examples
-```
-
-## Candidate Top-Level Concepts
-
-Candidate top-level concepts include:
-
-- Sensory stimulation session
-- Stimulus
-- Modality
-- Auditory stimulus
-- Visual stimulus
-- Haptic stimulus
-- Respiratory guidance
-- Multimodal stimulus
-- Temporal pattern
-- Frequency band
-- Entrainment target
-- Parameter set
-- Protocol
-- Device context
-- Device capability
-- External protocol
-- Safety caution
-- Evidence annotation
-- Evidence strength
-- Claim strength
-- Intended use
-- Study metadata
-- Research population
-- Dataset
-- Provenance
-- Institutional communication context
-
-## Validation
-
-SHACL profiles should be used to validate concrete data structures such as session descriptors, dataset annotations, safety metadata, and implementation examples.
-
-## Maturity and Improvement Plan
-
-[`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md) is the canonical backlog for
-ontology maturity work after SSTIM `0.3.0`. It records known gaps, the priority
-order for validation/modeling work, and the next major design improvement:
-separating physical delivery from perceived sensory modality. Internal
-modeling/validation maturity (P0–P4) plus domain content coverage (P5) live here.
-
-## Sensory-Taxonomy Review
-
-[`SENSORY_TAXONOMY_REVIEW.md`](SENSORY_TAXONOMY_REVIEW.md) is a critical
-evaluation of an external "more than five senses" taxonomy proposal against
-SSTIM's actual state. It maps the proposal onto the existing exposure module,
-rejects its new-OWL-class approach (per ADR 0015), and distils the genuine gaps
-(chemesthesis, thermal-as-channel, the P5.5 modality-list divergence) into a
-maintainer decision set. Analysis only — no `.ttl` was changed.
-
-## Publication and External Interlinking Plan
-
-[`PUBLICATION_AND_INTERLINKING_PLAN.md`](PUBLICATION_AND_INTERLINKING_PLAN.md) is
-the canonical strategy for making SSTIM a first-class, publicly usable, well-linked
-artifact: FAIR packaging (multi-format dereferenceability, metadata, DOIs), and the
-external-linkage decisions for **DBpedia (via Archivo), Wikidata, Wikimedia, OBO**,
-and the public registries (LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing). It
-is tracked as **P6** in the improvement plan.
-
-## Evidence and Safety Metadata
-
-The vocabulary may describe evidence annotations and safety/caution metadata. It must not imply that a specific stimulation protocol is clinically effective merely because it can be described with the vocabulary.
-
-## BioSynCare/BSC Lab Relationship
-
-BioSynCare/BSC Lab may provide early implementation examples and pressure-test cases. The ontology and vocabulary should remain vendor-neutral.
+- Turtle is the editable source of truth.
+- Existing public IRIs remain stable; semantic replacements use deprecation and
+  migration metadata.
+- Frozen directories under `static/ontology/<version>/` are immutable.
+- Semantic changes require an ADR when they affect inference,
+  interoperability, evidence legality, or migration.
+- External mappings require authoritative identifier and scope verification.
+- Evidence and safety language remains qualified and non-clinical.

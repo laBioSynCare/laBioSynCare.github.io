@@ -1,400 +1,246 @@
-# SSTIM First-Class Publication & External Interlinking Plan
+# SSTIM Publication and External Interlinking Plan
 
-Status: active planning document
-Baseline reviewed: SSTIM `0.3.0` (+ exposure `0.4.0`)
+Status: active publication plan
+
+Current citable release: SSTIM `0.5.0`
+
+Development line: SSTIM `0.6.0-dev`
+
 Created: 2026-06-30
+
+Last reviewed: 2026-07-10
+
 Maintainer: Renato Fabbri
 
-This document is the repo-truth strategy for making the SSTIM ontology a
-**first-class, publicly usable, well-linked semantic-web artifact**. It answers
-three questions the maintainer raised:
+This document owns outward-facing publication, discovery, citation, and
+interlinking work. [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) owns internal
+ontology maturity and the next semantic release gates.
 
-1. How do we close the remaining *domain-content* gaps so the vocabulary is
-   complete enough to publish without embarrassment?
-2. How do we make the published artifact technically first-class (FAIR:
-   findable, accessible, interoperable, reusable)?
-3. Should we — and how would we — link into **Wikidata, DBpedia, Wikimedia,
-   and OBO**, and register the URIs in public namespaces?
+External identifiers must be checked against an authoritative source before
+they enter RDF. Label similarity is not sufficient evidence for an exact or
+close mapping.
 
-It is a companion to [`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md), which remains
-the canonical backlog for *internal* modeling/validation maturity (P0–P4). This
-file owns the *outward-facing* concerns. Where the two overlap, the split is:
+## Publication State
 
-- **IMPROVEMENT_PLAN.md** — what the ontology says and how it is validated
-  (classes, properties, SHACL, content coverage **P5**).
-- **this file** — how the ontology is *packaged, published, discovered, cited,
-  and cross-linked*.
+### Released and citable
 
-> **Scope guard.** This is a plan, not an ADR and not a change to any `.ttl`.
-> Every semantics-changing item below must land through an ADR + a validated PR,
-> and must respect the protected-file policy (CLAUDE.md §3.4). Every external
-> identifier (QID, PURL, MeSH/SNOMED code) must be **verified live before it is
-> written into RDF** — never fabricated — mirroring the discipline already set
-> in IMPROVEMENT_PLAN P4.1.
+- SSTIM `0.5.0` is frozen under `static/ontology/0.5.0/` and tagged `v0.5.0`.
+- Version DOI: [`10.5281/zenodo.21286975`](https://doi.org/10.5281/zenodo.21286975).
+- All-versions concept DOI:
+  [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
+- The GitHub-Zenodo integration is enabled for future GitHub releases.
+- The stable namespace is `https://w3id.org/sstim`.
 
----
+### Implemented in the repository
 
-## TL;DR — the recommendations
+- Turtle is the editable source; `make export` generates JSON-LD and RDF/XML
+  for all six modules.
+- The Pages build validates RDF before publishing generated serializations.
+- Core and module routing rules for Turtle, JSON-LD, and RDF/XML are staged in
+  `docs/ecosystem/w3id/sstim/.htaccess`.
+- Every module has machine-readable ontology metadata, licensing, dependency,
+  and development-version information.
+- `static/ontology/void.ttl` describes the module graph and public instance
+  data with VoID/DCAT distributions, examples, vocabularies, and checked counts.
+- The core ontology links back to the VoID dataset with `void:inDataset`.
+- `static/ontology/context.jsonld` covers the public ontology and instance-data
+  surface and is checked against the loader manifest and RDF terms.
+- `make validate` integrates Turtle parsing, SHACL, HermiT reasoning,
+  repository quality checks, SPARQL competency queries, and graph-isomorphic
+  JSON-LD/RDF/XML round trips.
 
-| Target | Recommendation | Why |
+### Still external or deployment-dependent
+
+1. Merge the perma-id/w3id.org routing update after all target files are live on
+   GitHub Pages, then test content negotiation through `w3id.org`.
+2. Generate WIDOCO HTML in CI and publish it outside the editable source tree.
+3. Route browser requests for the ontology IRI to the stable WIDOCO landing
+   page while retaining RDF negotiation for machine clients.
+4. Submit the stable release URI to selected ontology registries.
+5. Create conservative Wikidata links only after the ontology landing page and
+   registry metadata are stable.
+
+The `0.6.0-dev` files are not a new Zenodo release. A new DOI version is created
+only after the 0.6 release gates pass, the snapshot is frozen, and the GitHub
+release is published.
+
+## Identifier and Version Policy
+
+SSTIM keeps human-readable w3id IRIs such as
+`https://w3id.org/sstim#FrequencyBand`. This supports Web and W3C-community
+use and is the canonical identifier policy.
+
+Releases are versioned as one ontology set:
+
+- the core ontology carries the release `owl:versionIRI`;
+- module files carry `owl:versionInfo` but no independent release identity;
+- `static/ontology/<version>/` is the immutable, citable whole-set snapshot;
+- generated JSON-LD/RDF/XML files are serializations, not independent sources;
+- the Zenodo version DOI identifies the released archive and the concept DOI
+  identifies the continuing project.
+
+See [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).
+
+## Content Negotiation and Documentation
+
+The intended stable behavior is:
+
+| Request | Representation |
+|---|---|
+| `Accept: text/turtle` | Turtle source |
+| `Accept: application/ld+json` | generated JSON-LD |
+| `Accept: application/rdf+xml` | generated RDF/XML |
+| browser / HTML | WIDOCO documentation |
+
+The generated RDF targets must be deployed before the external w3id rule is
+merged. After deployment, verify the core IRI, every module IRI, the versioned
+IRI, and `/sstim/void` with explicit `Accept` headers and redirect checks.
+
+WIDOCO output must be reproducible in CI and must not be edited manually. The
+documentation should expose:
+
+- ontology metadata and citation;
+- class and property documentation;
+- SKOS schemes and concepts;
+- imported/reused vocabularies;
+- diagrams where they remain readable;
+- license and provenance;
+- links to SHACL, VoID, frozen versions, and source control.
+
+## Registry Strategy
+
+Registries should receive a released ontology URI, not a development branch.
+Submissions follow successful WIDOCO and w3id verification.
+
+| Channel | Decision | Purpose / constraint |
 |---|---|---|
-| **DBpedia** | **Yes — via [DBpedia Archivo](https://archivo.dbpedia.org), not "DBpedia" directly** | DBpedia core is extracted from Wikipedia; you don't submit a vocabulary to it. Archivo is the right channel: it crawls, versions, and *star-rates* dereferenceable OWL ontologies. Cheap, automated, gives an external quality signal. |
-| **Wikidata** | **Yes, incrementally** | Create one item for the ontology; complete the two-way `exact match` links for already-aligned concepts; defer a dedicated "SSTIM ID" property until there is adoption. Be conservative about minting brand-new concept items (notability). |
-| **Wikimedia / Wikipedia** | **Defer** | A Wikipedia article needs general notability (significant independent secondary coverage). Premature and risks looking promotional. Revisit after peer-reviewed publication / W3C CG traction. Commons can host CC BY diagrams now if useful. |
-| **OBO Foundry** | **Already linked by reference — keep interoperating; do NOT seek full membership in the current IRI form** | SSTIM is already BFO-2020/IAO/OBI/COB aligned. Full OBO *membership* requires numeric `obo/SSTIM_NNNNNNN` PURLs, which conflicts with SSTIM's deliberate human-readable w3id IRIs. Stay interoperable; reserve membership as a future, ADR-gated, dual-publication option. |
-| **Public registries** | **Yes — the real first-class levers** | LOV, prefix.cc, BARTOC, FAIRsharing, BioPortal, OLS, and Zenodo DOIs are where "first-class public usage" actually happens for a w3id-based OWL+SKOS vocabulary. |
+| DBpedia Archivo | Submit | External archiving and automated ontology-quality feedback. |
+| LOV | Submit | Vocabulary discovery and term search; requires stable dereferencing and metadata. |
+| prefix.cc | Submit | Public prefix-to-namespace lookup. |
+| BARTOC | Submit | Discovery for the SKOS terminology layer. |
+| BioPortal | Submit | Biomedical browsing, APIs, and candidate mapping discovery. |
+| OLS | Submit if accepted | OBO-adjacent browsing without changing SSTIM identifiers. |
+| FAIRsharing | Submit | FAIR standard/resource registration linked to the DOI. |
+| OpenAIRE | Submit after an accepted gateway record | Broader research-output discovery. |
+| Wikidata | Incremental | One ontology item, then conservative term links. |
+| Wikipedia | Defer | Requires independent secondary-source notability. |
+| OBO Foundry membership | Decline for now | Current human-readable IRIs do not follow the OBO numeric identifier policy. |
 
-The single highest-leverage move is **B2 + B3 + B5**: make the artifact fully
-dereferenceable in multiple formats with machine-readable metadata and a DOI.
-Everything else (Archivo stars, LOV acceptance, Wikidata links) depends on it.
+Registry records must use the stable ontology URI, concept DOI, current release
+DOI, CC BY 4.0 ontology license, creator ORCID, source repository, release date,
+and the exact released version.
 
----
+## External Mapping Policy
 
-## Part A — Close the domain-content gaps (tracked as P5 in IMPROVEMENT_PLAN)
+### Wikidata
 
-The structural/validation work (P0–P4) is largely done. The remaining
-*coverage* gaps are what stop SSTIM from being a credible general sensory-
-stimulation vocabulary rather than an auditory-first one. These are added to
-[`IMPROVEMENT_PLAN.md`](IMPROVEMENT_PLAN.md) as **P5: Domain Content Coverage**;
-summarized here because publication should not precede them.
+Create one item for SSTIM only after the HTML landing page is stable. Include
+the official website, ontology type, license, DOI, repository, and namespace
+using verified property/item identifiers.
 
-1. **Visual-entrainment technique vocabulary.** *Done — ADR 0015:*
-   `techPhoticDriving` (flicker/SSVEP) and `techColorFieldStimulation` (steady
-   colour field, with a chromotherapy negative-assertion `editorialNote`), plus
-   the `mechSSVEP` mechanism.
-2. **Tactile / haptic & cross-modal techniques.** *Done — ADR 0015:*
-   `techVibrotactileEntrainment`, `techAudiovisualEntrainment`, and
-   `techAudioTactile`, plus `mechSSSEP` and `mechMultisensory`. Cross-modal is
-   modeled as multiple `techniqueModality` values, not a new class.
-3. **Reference-pitch vocabulary (432 Hz).** *ADR 0017:* model 432/440 as
-   *reference-pitch retuning* (`techReferencePitchRetuning`, with
-   `techSolfeggioTuning skos:broader` it) + carrier-pitch properties on the
-   exposure `StimulusChannel` — kept **disjoint** from beat/`FrequencyBand`
-   evidence (the carrier-vs-modulation firewall), tier 2–3 with an `evidenceNotes`
-   caveat (pilots tested transposed *music*, not a 432 Hz carrier under a beat) and
-   the `editorialNote` negative-assertion discipline.
-4. **Populate `EvidenceClaim` instances.** Move the evidence knowledge that
-   currently lives in prose (`skos:definition` / `scopeNote`) into queryable
-   `EvidenceClaim` individuals citing `PublicSafeReference`s — starting with the
-   best-supported auditory claims (FFR/ASSR) and the explicit negative
-   assertions, **auditing each citation's venue** (exclude predatory journals).
-   This is what turns the P3 claim-dimension machinery from scaffolding into data.
-5. **Nomenclature cleanup.** Resolve the `modalitySomatosensory` label
-   "Somatosensory / Haptic" conflation and reduce drift between the two parallel
-   modality vocabularies (`sstim-v:modality*` vs `sstim-ex:modality*`) by adopting
-   the convention **haptic = device/actuator, tactile = percept, somatosensory =
-   superordinate channel, vibrotactile = mechanism** consistently.
-6. **Visual/tactile evidence-modality tags** (`VIS`, `TACTILE`, `MULTISENSORY`)
-   so ADR 0015's techniques carry evidence with a matching modality.
+Term-level mappings follow these rules:
 
-**Evidence integrity (P7, ADR 0018) is a publication prerequisite, not just
-content.** Before SSTIM is linked into external catalogs it must enforce that
-claims stay within evidence: the conditional citation requirement (tier ≥
-preliminary ⇒ must cite) and the C0–C5 public-claim-level legality constraint. A
-standards vocabulary that lets unsupported claims validate would fail exactly the
-credibility test registries and the W3C-CG audience apply.
+- `skos:exactMatch` only when identity is defensible in both directions;
+- `skos:closeMatch` when the concepts can be used similarly but differ in
+  extension or modeling granularity;
+- `skos:relatedMatch` for a useful thematic relationship without equivalence;
+- no reverse Wikidata statement until the SSTIM term is released and stable;
+- record the verification date and authoritative source in the alignment file.
 
-**Gate:** publication to external registries (Part C) should target the **0.5.0**
-release that lands P5 items 1–3 and at least a starter set for item 4. Linking a
-visibly auditory-only "sensory stimulation" vocabulary into Wikidata/OBO-adjacent
-catalogs would misrepresent scope.
+Do not create Wikidata items for project-specific techniques merely to obtain a
+mapping target. Independent published sources and notability must come first.
 
----
+### Biomedical ontologies
 
-## Part B — Make SSTIM technically first-class (FAIR packaging)
+SSTIM reuses BFO, IAO, OBI, and COB terms by stable PURL where their semantics
+fit. This is interoperability, not OBO Foundry membership.
 
-These are prerequisites for *every* external catalog. None changes domain
-semantics, so they are low-risk and can proceed in parallel with Part A.
+Future MeSH, SNOMED CT, NCIt, or other biomedical mappings must be individually
+verified. The previous MeSH `D012910` candidate was rejected on 2026-07-10
+because the official NLM record identifies it as *Snake Venoms*. SSTIM asserts
+no general MeSH mapping for sensory stimulation until a valid target is found.
 
-### B1 — Namespace & identifier policy (decision: keep human-readable w3id IRIs)
+BioPortal mapping suggestions may identify candidates, but suggestions are a
+review queue rather than evidence for an RDF assertion. Licensing constraints
+must also be checked before adding mappings.
 
-Keep `https://w3id.org/sstim#`-family IRIs with human-readable local names. This
-is a deliberate design value for the W3C-CG audience and is incompatible with OBO
-numeric PURLs (see C5). Document this as the canonical policy and the reason OBO
-membership is declined for now. *Proposed ADR 0016.*
+If OBO membership later becomes strategically important, evaluate a generated
+bridge rather than replacing canonical SSTIM IRIs. Any equivalent-class bridge
+requires an ADR, migration analysis, and external ontology review.
 
-### B2 — Content-negotiation hardening (multi-format dereferenceability)
+### DBpedia and Wikimedia
 
-Current state ([`docs/ecosystem/w3id`](../ecosystem/w3id/README.md)): w3id routes
-resolve each module to its **Turtle** file; JSON-LD and RDF/XML are "when
-generated" and **do not yet exist** in `static/ontology/`. Archivo, LOV, and many
-consumers expect the ontology IRI to dereference to RDF in the requested format.
+DBpedia core is derived from Wikimedia content; it is not the submission path
+for a standalone ontology. DBpedia Archivo is the appropriate ontology archive
+and quality channel.
 
-Actions:
-- **Done:** `*.jsonld` and `*.rdf` (RDF/XML) exports are generated from the Turtle
-  masters by the Pages build (`make export`, rdflib → `dist/ontology/`); Turtle
-  remains the editable master, exports are never hand-edited.
-- **Done (staged):** the `Accept`-routing for `application/ld+json` and
-  `application/rdf+xml` is in the repo's [`sstim/.htaccess`](../ecosystem/w3id/sstim/.htaccess)
-  for core and every module (plus the `/sstim/void` route); it goes live via a
-  perma-id/w3id.org PR after the `main` deploy serves the `*.jsonld`/`*.rdf` targets.
-- Unblock **WIDOCO** HTML docs (currently intentionally not on `main`): generate
-  in GitHub Actions, publish as a Pages artifact or docs branch, and switch the
-  w3id "browser" branch from the app root to the WIDOCO landing page.
-- **Versioned-IRI dereferenceability — decided (option a), [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).**
-  SSTIM is versioned as one whole set: the frozen snapshot `static/ontology/<version>/`
-  (identified by core `owl:versionIRI`) is the single citable, dereferenceable
-  unit, and modules carry `owl:versionInfo` only. Removed the exposure module's
-  independent `owl:versionIRI` / `owl:priorVersion` (which never dereferenced,
-  since `make snapshot` only writes whole-set `sstim/<version>/` dirs). The
-  rejected alternative — per-module snapshot lineage (a second snapshot axis +
-  w3id routes) — is recorded in ADR 0020 for revisiting if standalone module
-  citation is ever needed.
+Defer a Wikipedia article until independent reliable sources establish
+notability. Reusable diagrams may be published to Wikimedia Commons under CC BY
+4.0 after their terminology matches a released SSTIM version.
 
-### B3 — Machine-readable ontology metadata
+## Rollout
 
-State on the `owl:Ontology` node in `sstim-core.ttl`: `voaf:Vocabulary`,
-`vann:preferredNamespacePrefix`/`Uri`, `dct:license`/`cc:license`,
-`dct:title`/`description`/`creator`/`created`/`modified` are all **present ✓**.
+### Phase 0: complete FAIR deployment
 
-- **VoID/DCAT dataset description — DONE.** [`static/ontology/void.ttl`](../../static/ontology/void.ttl)
-  describes the published graph set (VoID + DCAT): one `void:Dataset` with a
-  per-module `void:subset`, distributions in Turtle/JSON-LD/RDF-XML with IANA
-  media types, `void:uriSpace`, `void:vocabulary`, `void:feature`, and
-  `void:exampleResource`. Deploys to `/ontology/void.ttl` **on merge to `main`**
-  (Pages deploys from `main` only); the `/sstim/void` w3id route is staged in-repo
-  and will resolve once (a) that deploy is live **and** (b) the rule ships in a
-  perma-id/w3id.org PR — and per the w3id README the Pages target must be live
-  before that rule merges. Not part of the versioned term-space (not
-  snapshotted/exported).
-  Follow-ups: (i) auto-generate `void:triples`/`classes`/`properties` counts in
-  the export pipeline (omitted here to avoid per-release drift); (ii) add a
-  discoverability back-link from the ontology node (`void:inDataset` /
-  `rdfs:seeAlso <…/void.ttl>`) — needs a `sstim-core.ttl` edit.
-- **DL-reasoner consistency check — DONE — 2026-07-10.** The pinned Nix
-  devShell now exposes ROBOT 1.9.10, and `make reason` merges the six SSTIM
-  term-space modules (`core`, `vocab`, `alignments`, `shapes`, `patch-studio`,
-  `exposure`) before running the HermiT reasoner. `make validate` includes this
-  check, so `.github/workflows/validate-rdf.yml` now runs SHACL validation, OWL
-  DL consistency, and SPARQL sanity through the same local command. HermiT is the
-  default for OWL-DL coverage; `REASONER=ELK` remains available for quick local
-  profile checks.
+- Run the full validation/export pipeline on `main`.
+- Deploy generated RDF serializations and the checked VoID description.
+- Publish WIDOCO HTML.
+- Merge and verify the staged w3id routing changes.
 
-### B4 — JSON-LD context (IMPROVEMENT_PLAN P4.3)
+### Phase 1: release 0.6
 
-**Done — 2026-07-10.** `static/ontology/context.jsonld` maps the public SSTIM
-namespaces, SKOS notation/label/navigation terms, core preset/evidence/public-
-claim predicates, Patch Studio voice/session parameters, exposure-module
-predicates, and VoID/DCAT dataset metadata to their IRIs. This gives downstream
-JSON consumers (and the `dist/presets.json` pipeline) a stable compaction layer
-for round-tripping to Linked Data, and provides the bridge for embedding
-`<script type="application/ld+json">` blocks in app pages. Future context work
-should be additive unless a versioned JSON-LD context policy is introduced.
+- Complete the modeling and evidence review gates in
+  `IMPROVEMENT_PLAN.md`.
+- Freeze `static/ontology/0.6.0/` from the validated live modules.
+- Update all version, citation, VoID, and documentation metadata together.
+- Tag and publish the GitHub release; verify the new Zenodo version record.
 
-### B5 — Versioned DOIs (citability)
+### Phase 2: registries
 
-**Done — 2026-07-10.** The GitHub↔Zenodo integration is enabled, and the first
-archived release is SSTIM `v0.5.0`: version DOI
-[`10.5281/zenodo.21286975`](https://doi.org/10.5281/zenodo.21286975), under the
-all-versions concept DOI
-[`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974). Both
-READMEs expose the concept badge, and the ontology README carries the canonical
-`@misc` citation. The ontology node and VoID/DCAT dataset description publish
-the concept DOI as `dct:identifier` and link the release DOI with
-`dct:hasVersion`. Future GitHub releases are archived automatically by the
-enabled integration.
+- Submit prefix.cc, LOV, BARTOC, BioPortal, OLS, and FAIRsharing records.
+- Submit to DBpedia Archivo and address actionable quality findings.
+- Register with OpenAIRE when an eligible gateway record is accepted.
+- Store submission URLs, dates, record identifiers, and status in the repo.
 
----
+### Phase 3: knowledge-graph links
 
-## Part C — External interlinking strategy (the core question)
+- Create the SSTIM ontology item in Wikidata.
+- Add reciprocal mappings only for released terms with verified equivalence.
+- Review candidate biomedical mappings with a domain/ontology expert.
 
-### C1 — Decision matrix
+## Publication Acceptance Criteria
 
-| Channel | Do now | Defer | Decline |
-|---|---|---|---|
-| DBpedia Archivo | ✅ submit URI after B2/B3 | | |
-| Wikidata — ontology item | ✅ | | |
-| Wikidata — concept `exact match` (P2888) | ✅ for notable, already-aligned concepts | | |
-| Wikidata — "SSTIM ID" property | | ⏳ until adoption/notability | |
-| Wikidata — new items (Martigli, Symmetry) | | ⏳ until published sources exist | |
-| Wikipedia article | | ⏳ until notability | |
-| Wikimedia Commons diagrams | optional (CC BY) | | |
-| OBO interoperability (BFO/IAO/OBI/RO) | ✅ deepen | | |
-| OBO Foundry membership | | | ❌ in current IRI form (ADR-gated future) |
-| LOV / prefix.cc / BARTOC | ✅ after B2/B3 | | |
-| BioPortal / OLS / OntoBee | ✅ | | |
-| FAIRsharing / Zenodo | ✅ | | |
+SSTIM is first-class for public reuse when:
 
-### C2 — Wikidata
+- the ontology and every module dereference through w3id to Turtle, JSON-LD,
+  RDF/XML, and stable HTML as requested;
+- generated serializations parse and represent the same source graphs;
+- SHACL, OWL reasoning, quality, and competency audits run in CI;
+- machine-readable metadata includes creator, license, namespace, version,
+  DOI, provenance, distributions, and checked graph counts;
+- every release has an immutable snapshot, Git tag, changelog entry, and Zenodo
+  version DOI under the same concept DOI;
+- WIDOCO documentation and citation instructions identify the current release;
+- accepted registry records link to the stable ontology URI and current DOI;
+- external mappings are conservative, source-verified, and review-dated;
+- no public metadata implies clinical efficacy or exposes private participant or
+  BioSynCare catalog data.
 
-**Can we / should we?** Yes, incrementally. Wikidata is CC0, so anything we *add
-there* is CC0 — compatible with our CC BY ontology (attribution lives on our side).
+## Submission Record Template
 
-- **Ontology item.** Create one Wikidata item for SSTIM: `instance of` (P31)
-  *ontology* (verify QID, ~Q324254) and/or *controlled vocabulary*; with
-  `official website`, `copyright license` (P275 → CC BY 4.0, verify QID),
-  `described at URL`, and namespace. This gives SSTIM a node others can link to.
-- **Concept-level `exact match` (P2888).** `sstim-alignments.ttl` already asserts
-  `skos:exactMatch`/`closeMatch` *from* SSTIM *to* Wikidata (alpha/theta/etc.,
-  binaural beats). The reverse direction — a `P2888` statement *on* the Wikidata
-  item pointing back to the sstim IRI — is allowed today (P2888 takes a URL) and
-  needs no property proposal. Add these only for clearly-equivalent, notable
-  concepts, and only after verifying each QID live.
-- **"SSTIM ID" external-identifier property.** A formatter-URL property
-  (`https://w3id.org/sstim/vocab#$1`) would make sstim a first-class Wikidata
-  identifier, but it requires the property-proposal process and demonstrated
-  stable use. **Defer** until SSTIM has external adoption to cite.
-- **New concept items** (Martigli oscillation, Symmetry permutation, the ontology
-  techniques pending in `alignments.ttl` TODO): **defer** until there are
-  independent/published sources — Wikidata notability and the no-original-research
-  norm make premature creation risky. Tie this to the eventual paper.
+For each external service, record:
 
-### C3 — DBpedia
+```text
+Service:
+Submitted URL:
+Submitted version:
+Release DOI:
+Date:
+Account/maintainer:
+External record ID or URL:
+Status:
+Required follow-up:
+```
 
-DBpedia's core knowledge graph is *extracted from Wikipedia*; there is no
-"submit my ontology to DBpedia" path that bypasses Wikipedia. The correct channel
-is **DBpedia Archivo** (`archivo.dbpedia.org`): an automated archive that, given a
-dereferenceable ontology URI, fetches it, stores every version, runs checks, and
-assigns a **4-star rating** (dereferenceable+parses → machine-readable license →
-logically consistent → no warnings / good metadata).
-
-Action: once B2 (multi-format dereference) and B3 (license + metadata +
-consistency) are done, **submit `https://w3id.org/sstim` to Archivo** and iterate
-until 4 stars. Archivo membership is itself a credibility signal and gives SSTIM
-permanent versioned snapshots independent of our hosting.
-
-### C4 — Wikimedia (Wikipedia / Commons)
-
-- **Wikipedia article: defer.** Notability requires significant coverage in
-  independent reliable secondary sources; a self-authored article on a new
-  ontology would likely be challenged as promotional. Revisit after a
-  peer-reviewed publication and/or W3C Community Group formation.
-- **Wikimedia Commons: optional now.** Class-hierarchy and exposure-model
-  diagrams can be uploaded under CC BY 4.0 for reuse in WIDOCO docs and papers.
-  Low priority, low risk.
-
-### C5 — OBO Foundry
-
-**Are we linked to OBO? Already, yes — and at the right level.** SSTIM aligns to
-**BFO 2020** (the OBO upper ontology) and reuses **IAO/OBI/COB** terms by stable
-PURL with `rdfs:subClassOf` (see `sstim-core.ttl` Part 1–6 and `alignments.ttl`).
-That *is* OBO interoperability.
-
-**Should we seek full OBO Foundry membership? Not in the current form.** OBO
-membership requires conforming to the OBO **identifier policy**: terms must live
-at `http://purl.obolibrary.org/obo/SSTIM_NNNNNNN` with a registered IDSPACE and
-opaque numeric local IDs. That directly conflicts with SSTIM's deliberate
-human-readable w3id IRIs (`sstim:FrequencyBand`), which are a usability value for
-the W3C-CG/web audience. Migrating would be a breaking, identity-level change for
-marginal benefit at this stage.
-
-Recommended posture:
-- **Deepen interoperability now:** use **RO** (Relation Ontology) properties where
-  our object properties have RO equivalents; keep IAO/OBI/COB alignments verified;
-  add `owl:equivalentClass`/`skos:exactMatch` to OBO terms where genuinely exact.
-- **Get OBO-adjacent discoverability** by registering in **OLS** and **OntoBee**
-  and **BioPortal** (C6) — you appear next to OBO ontologies without adopting the
-  PURL policy.
-- **Reserve membership as a future ADR-gated option:** if a biomedical-grade home
-  becomes strategically necessary, publish a *dual edition* — keep w3id IRIs as
-  canonical and generate an OBO-ID bridge layer
-  (`sstim:FrequencyBand owl:equivalentClass obo:SSTIM_0000001`). This preserves
-  both audiences. *Proposed ADR 0016 captures the decline-for-now + bridge option.*
-
-### C6 — Public registries (submit after B2/B3 + P5 0.5.0)
-
-| Registry | What it gives | Notes |
-|---|---|---|
-| **LOV** (Linked Open Vocabularies) | The canonical home for RDF vocabularies; discoverability + term search | Needs `vann:` namespace metadata (B3), dereferenceability (B2), and reuse of known vocabs (we use SKOS/PROV ✓). Submit via their GitHub issue. |
-| **prefix.cc** | Registers `sstim` → namespace; tooling auto-resolves the prefix | Quick win; do early. |
-| **BARTOC** | Registry of thesauri/ontologies/classifications; good for the SKOS layer | Web form. |
-| **BioPortal** (NCBO) | Browsing, REST API, Annotator, **automatic mapping suggestions to MeSH/SNOMED/NCIT** | Bonus: surfaces candidate alignments for IMPROVEMENT_PLAN P4.1. |
-| **OLS** (EBI) | OBO-adjacent browser/API | Accepts non-OBO via config; pairs with C5. |
-| **OntoBee** | Linked-data server for ontology terms | OBO-adjacent. |
-| **FAIRsharing** | Registers SSTIM as a standard; citable record | Pairs with Zenodo DOI (B5). One of three gateways required for OpenAIRE registration. |
-| **OpenDOAR** | [SHERPA directory of open-access repositories](https://v2.sherpa.ac.uk/opendoar/); broad academic discoverability | One of three gateways required for OpenAIRE registration. |
-| **Re3data** | [Registry of research data repositories](http://www.re3data.org/) | One of three gateways required for OpenAIRE registration. |
-| **OpenAIRE** | European open-science aggregator; surfaces the vocabulary to EU-funded researchers and funders | Requires prior registration in **OpenDOAR**, **Re3data**, or **FAIRsharing** before registering at [OpenAIRE Provide](https://provide.openaire.eu). |
-| **Zenodo** | Versioned DOIs per release | GitHub integration (B5). |
-
----
-
-## Part D — Licensing & provenance considerations
-
-- **Ontology license:** CC BY 4.0 (current). Acceptable to OBO and LOV; attribution
-  stays with us. Keep it.
-- **Wikidata contributions are CC0.** Statements we add to Wikidata (items, P2888
-  links) are released CC0 — fine, since the authoritative artifact and attribution
-  remain on the SSTIM side. Do not paste CC BY *text* (definitions) wholesale into
-  CC0 Wikidata fields; link instead.
-- **Provenance discipline:** every external identifier verified live before commit
-  (the `0.2.0` erratum exists precisely because unverified QIDs slipped in). Record
-  verification date in a comment, as `alignments.ttl` already does.
-
----
-
-## Part E — Phased rollout
-
-Each phase ships as its own validated PR; semantics-changing phases carry an ADR.
-
-- **Phase 0 — FAIR packaging (no semantics):** B2 (JSON-LD/RDF-XML exports +
-  htaccess), B3 (vann/VoID metadata + reasoner consistency check in CI), B4
-  (JSON-LD context), B5 (Zenodo DOI). *Unblocks everything; safe to start now.*
-
-  > **Partially delivered — 2026-06-30** (ADR 0016): `scripts/export-ontology.py`
-  > + `make export` generate JSON-LD + RDF/XML for all six modules into
-  > `dist/ontology/`, wired into the Pages build as a required deployment gate
-  > after a green CI run on 2026-07-10; `vann:`
-  > namespace metadata + `cc:license` added to the ontology node;
-  > `static/ontology/context.jsonld` added and completed for the 0.5.0/P6
-  > vocabulary surface; `.zenodo.json` added; the Nix
-  > devShell now exposes rdflib. **Further delivered — 2026-07-09/10:** VoID/DCAT
-  > metadata, the staged w3id `.htaccess` content-negotiation and `/void` route,
-  > the JSON-LD context completeness pass, and ROBOT/HermiT DL-consistency
-  > validation in `make validate` + CI. The GitHub↔Zenodo integration is enabled,
-  > with `v0.5.0` archived under version and concept DOIs. **Still open in Phase
-  > 0:** merge and verify the external perma-id PR and deliver the WIDOCO HTML
-  > branch.
-- **Phase 1 — content coverage:** IMPROVEMENT_PLAN **P5** items 1–3 (visual,
-  tactile/cross-modal, neutral tuning) → release **0.5.0**. ADRs for the new
-  schemes and the tuning property.
-- **Phase 2 — evidence as data:** P5 item 4 (populate `EvidenceClaim` instances +
-  cleared references), leveraging the P3 claim-dimension machinery.
-- **Phase 3 — registries:** submit to prefix.cc, LOV, BARTOC, BioPortal, OLS,
-  OntoBee, **FAIRsharing** (or **OpenDOAR** / **Re3data**); then register with
-  **OpenAIRE** (requires one of those three to be in place); submit to
-  **DBpedia Archivo**; iterate to 4 stars.
-- **Phase 4 — Wikidata:** ontology item + conservative P2888 links; *(later)*
-  SSTIM-ID property proposal once there is adoption to cite.
-- **Phase 5 — deep biomedical alignment:** P4.1 MeSH/SNOMED (aided by BioPortal
-  mapping suggestions), RO relations, OBO-bridge decision (ADR 0016).
-- **Deferred:** Wikipedia article; OBO Foundry membership (revisit only via ADR).
-
-Dependency order: **Phase 0 → Phase 1 → (Phase 2 ∥ Phase 3) → Phase 4 → Phase 5.**
-
----
-
-## Part F — Definition of "first-class" (acceptance criteria)
-
-SSTIM is publicly first-class when:
-
-- the ontology IRI dereferences to **Turtle, RDF/XML, JSON-LD, and HTML** by
-  content negotiation, and resolves the same way through w3id;
-- it carries complete machine-readable metadata (license, namespace prefix/URI,
-  VoID/DCAT) and is **logically consistent** under a DL reasoner in CI;
-- each tagged release from `v0.5.0` onward has a **Zenodo DOI** and a frozen
-  snapshot;
-- it is listed in **LOV, prefix.cc, BARTOC, BioPortal, OLS, FAIRsharing** (or
-  **OpenDOAR** / **Re3data**), and registered with **OpenAIRE**, and
-  archived with a **4-star DBpedia Archivo** rating;
-- a **Wikidata item** exists and a verified, conservative set of concept
-  `exact match` links is in place both directions;
-- the domain content gaps (P5 1–3) are released and a starter set of
-  `EvidenceClaim` instances (P5.4) is queryable;
-- OBO interoperability is documented (BFO/IAO/OBI/RO), with the
-  membership/bridge decision recorded in an ADR.
-
----
-
-## Proposed ADRs (to be created as decisions are taken)
-
-- **ADR 0015 — Visual & cross-modal technique vocabulary** (P5.1–2): scope of the
-  visual-entrainment scheme and cross-modal technique typing.
-- **ADR 0016 — External publication, OBO posture, and registry strategy:**
-  keep human-readable w3id IRIs; decline OBO membership for now; document the
-  OBO-ID bridge option; commit to LOV/Archivo/Wikidata channels.
-- **ADR 0017 — Neutral tuning vocabulary** (P5.3): `tuningReferenceHz` and the
-  scope decision on musical-interval/consonance terms.
-
-(Numbering continues from ADR 0014; confirm the next free number in
-[`docs/decisions/README.md`](../decisions/README.md) before creating.)
+This makes publication state auditable and prevents repository documentation
+from claiming an external registration before it is accepted and live.

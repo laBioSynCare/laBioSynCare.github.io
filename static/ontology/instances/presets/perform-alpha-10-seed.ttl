@@ -7,16 +7,22 @@
 @prefix sstim-ref:    <https://w3id.org/sstim/ref/> .
 @prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
 @prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix prov:         <http://www.w3.org/ns/prov#> .
 
 bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     rdfs:label "Perform Alpha 10 Seed" ;
     dct:description "Minimal Phase 1 RDF preset seed used to validate the BSC Lab preset instance model. This seed is not a clinical, health, or performance claim." ;
+    dct:created "2026-06-17"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha10 ;
     sstim:inGroup sstim-v:groupPerform ;
     sstim:hasBreathGuide false ;
     sstim:presetVersion "0.1.0" ;
-    sstim:hasPublicClaimLevel sstim-v:claimC2Wellness ;
+    sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
     sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
     sstim:composedOf preset-local:binaural-voice .
 
 preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;
@@ -37,4 +43,7 @@ bsclab-evidence:perform-alpha-10-seed-auditory-review a sstim:EvidenceClaim ;
     sstim:evidenceDate "2026-06-21"^^xsd:date ;
     sstim:studyPopulation "Healthy adults" ;
     sstim:comparator "Sham / no binaural beat audio" ;
-    sstim:reviewedBy "BSC Lab editorial" .
+    sstim:evidenceOutcome "The linked systematic review reports mixed results; this seed therefore makes no outcome claim." ;
+    sstim:reviewedBy "BSC Lab editorial" ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
