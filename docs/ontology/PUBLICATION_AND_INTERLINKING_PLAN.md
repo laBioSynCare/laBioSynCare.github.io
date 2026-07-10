@@ -161,17 +161,25 @@ State on the `owl:Ontology` node in `sstim-core.ttl`: `voaf:Vocabulary`,
   the export pipeline (omitted here to avoid per-release drift); (ii) add a
   discoverability back-link from the ontology node (`void:inDataset` /
   `rdfs:seeAlso <…/void.ttl>`) — needs a `sstim-core.ttl` edit.
-- **DL-reasoner consistency check — OPEN (main remaining B3 item).** Ensure the
-  ontology is logically consistent under a DL reasoner (HermiT/ELK) in CI —
-  Archivo's 4th star and OWL-DL credibility depend on it. No reasoner is in the
-  Nix flake yet; needs a tooling decision (ROBOT/ELK) plus a `validate-rdf.yml` step.
+- **DL-reasoner consistency check — DONE — 2026-07-10.** The pinned Nix
+  devShell now exposes ROBOT 1.9.10, and `make reason` merges the six SSTIM
+  term-space modules (`core`, `vocab`, `alignments`, `shapes`, `patch-studio`,
+  `exposure`) before running the HermiT reasoner. `make validate` includes this
+  check, so `.github/workflows/validate-rdf.yml` now runs SHACL validation, OWL
+  DL consistency, and SPARQL sanity through the same local command. HermiT is the
+  default for OWL-DL coverage; `REASONER=ELK` remains available for quick local
+  profile checks.
 
 ### B4 — JSON-LD context (IMPROVEMENT_PLAN P4.3)
 
-Ship `static/ontology/context.jsonld` mapping the SKOS notations and key terms to
-their IRIs, so downstream JSON consumers (and the `dist/presets.json` pipeline)
-can round-trip to Linked Data. This is also the bridge for embedding
-`<script type="application/ld+json">` blocks in app pages.
+**Done — 2026-07-10.** `static/ontology/context.jsonld` maps the public SSTIM
+namespaces, SKOS notation/label/navigation terms, core preset/evidence/public-
+claim predicates, Patch Studio voice/session parameters, exposure-module
+predicates, and VoID/DCAT dataset metadata to their IRIs. This gives downstream
+JSON consumers (and the `dist/presets.json` pipeline) a stable compaction layer
+for round-tripping to Linked Data, and provides the bridge for embedding
+`<script type="application/ld+json">` blocks in app pages. Future context work
+should be additive unless a versioned JSON-LD context policy is introduced.
 
 ### B5 — Versioned DOIs (citability)
 
@@ -318,13 +326,15 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
   > + `make export` generate JSON-LD + RDF/XML for all six modules into
   > `dist/ontology/`, wired into the Pages build (non-fatal); `vann:`
   > namespace metadata + `cc:license` added to the ontology node;
-  > `static/ontology/context.jsonld` added; `.zenodo.json` added; the Nix
-  > devShell now exposes rdflib. **Still open in Phase 0:** the external
-  > `.htaccess` `Accept`-routing for the new formats (per
-  > [`../ecosystem/w3id`](../ecosystem/w3id/README.md)), a VoID/DCAT dataset
-  > description, the WIDOCO HTML branch, a CI DL-consistency (reasoner) check,
-  > enabling the GitHub↔Zenodo webhook, and removing `continue-on-error` from
-  > the Pages export step after a green CI run.
+  > `static/ontology/context.jsonld` added and completed for the 0.5.0/P6
+  > vocabulary surface; `.zenodo.json` added; the Nix
+  > devShell now exposes rdflib. **Further delivered — 2026-07-09/10:** VoID/DCAT
+  > metadata, the staged w3id `.htaccess` content-negotiation and `/void` route,
+  > the JSON-LD context completeness pass, and ROBOT/HermiT DL-consistency
+  > validation in `make validate` + CI. **Still open in Phase 0:** merge and
+  > verify the external perma-id PR, the WIDOCO HTML branch, enabling the
+  > GitHub↔Zenodo webhook, and removing `continue-on-error` from the Pages export
+  > step after a green CI run.
 - **Phase 1 — content coverage:** IMPROVEMENT_PLAN **P5** items 1–3 (visual,
   tactile/cross-modal, neutral tuning) → release **0.5.0**. ADRs for the new
   schemes and the tuning property.

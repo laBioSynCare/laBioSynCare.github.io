@@ -25,6 +25,13 @@ file is the human-readable summary.
   w3id `.htaccess` (`Accept: application/ld+json` → `.jsonld`, `application/rdf+xml`
   → `.rdf`, else Turtle). Goes live via the next `main` deploy plus a
   perma-id/w3id.org PR. (PUBLICATION plan B2)
+- Expanded `static/ontology/context.jsonld` for the post-0.5.0/P6 public surface:
+  evidence and public-claim governance terms, Patch Studio voice/session
+  parameters, exposure-module predicates, implementation-data prefixes, and
+  VoID/DCAT metadata aliases. (PUBLICATION plan B4)
+- Added ROBOT/HermiT OWL DL consistency validation (`make reason`) over the
+  merged ontology term-space modules, wired into `make validate` and the RDF CI
+  workflow. (PUBLICATION plan B3)
 
 ## [0.5.0] — 2026-07-09
 

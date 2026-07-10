@@ -50,9 +50,12 @@ static/ontology/
 ├── sstim-alignments.ttl  External alignments (Wikidata, OBO Foundry)
 ├── sstim-patch-studio.ttl Patch Studio model vocabulary
 ├── sstim-exposure.ttl    Exposure, delivery, modality, and experiment vocabulary
+├── context.jsonld        JSON-LD context for compact public SSTIM data
+├── void.ttl              VoID/DCAT dataset description for FAIR publication
 ├── 0.1.0/                Frozen ontology snapshot for version 0.1.0
 ├── 0.2.0/                Frozen ontology snapshot for version 0.2.0
 ├── 0.3.0/                Frozen ontology snapshot for version 0.3.0
+├── 0.5.0/                Frozen ontology snapshot for version 0.5.0
 └── instances/
     ├── experiments/     Exploratory BSC Lab exposure experiment instances
     ├── frameworks/      BSC framework identity and technique instances
@@ -115,6 +118,21 @@ stimulus datatype properties (`hasFrequencyHz`, `hasFlickerRateHz`,
 `sstim-ex:ExposureLimit` class with quantified flicker/hearing/optical limits
 citing external standards (linked from comfort boundaries), and the
 `affordsDeliveryMedium` capability→medium relation.
+
+### `context.jsonld` — JSON-LD compaction context
+
+Provides stable term aliases for public SSTIM JSON-LD consumers: namespace
+prefixes, SKOS label/notation/navigation predicates, core preset/evidence/public-
+claim terms, Patch Studio voice/session parameters, exposure-module predicates,
+implementation-data prefixes, and VoID/DCAT publication metadata. This is a
+hand-maintained public context, not a generated JSON-LD export.
+
+### `void.ttl` — VoID/DCAT dataset metadata
+
+Describes the published SSTIM ontology graph set for FAIR registries and
+Linked Data crawlers. It is served alongside the ontology files but is not part
+of the versioned term-space: it is not snapshotted, not exported by
+`make export`, and not SHACL-validated as ontology data.
 
 ### Versioned snapshot directories
 
@@ -480,13 +498,16 @@ python -m pyshacl \
   -s static/ontology/sstim-shapes.ttl \
   static/ontology/sstim-vocab.ttl
 
-# Validate core, vocabulary, and instances with the same command CI runs
+# Validate SHACL, OWL DL consistency, and SPARQL sanity with the CI command
 make validate
+
+# Run only the ROBOT/HermiT consistency check
+make reason
 ```
 
 The CI pipeline (`.github/workflows/validate-rdf.yml`) runs these on
-every PR that touches any `.ttl` file. PRs that fail SHACL validation
-are not merged.
+every PR that touches ontology files or validation tooling. PRs that fail
+SHACL validation, OWL DL consistency, or SPARQL sanity are not merged.
 
 **Running validation in the browser (BSC Lab):**
 

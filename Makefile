@@ -1,6 +1,9 @@
 # pyshacl console script: provided by the Nix flake (top-level `pyshacl`) and by
 # `pip install pyshacl`. Override with `make PYSHACL='python3 -m pyshacl'` if needed.
+# ROBOT is provided by the Nix flake. Override with `ROBOT='java -jar /path/to/robot.jar'`.
 PYSHACL    ?= pyshacl
+ROBOT      ?= robot
+REASONER   ?= hermit
 PYTHON     ?= python3
 EXPORT_DIR ?= dist/ontology
 WAT2WASM   ?= wat2wasm
@@ -14,6 +17,8 @@ ONTOLOGY   := static/ontology/sstim-core.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
+PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
+ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE)
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/*/*.ttl)
 DEV_HOST   ?= 127.0.0.1
@@ -21,7 +26,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev export preview shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev export preview reason shacl shacl-core shacl-vocab shacl-exposure shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -69,6 +74,14 @@ shacl-instances:
 ## Run all SHACL validations
 shacl: shacl-core shacl-vocab shacl-exposure shacl-instances
 
+## Run ROBOT OWL DL consistency over the merged ontology term-space modules
+reason:
+	@tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	$(ROBOT) merge $(foreach file,$(ONTOLOGY_MODULES),--input $(file)) \
+		reason --reasoner $(REASONER) --output "$$tmpdir/sstim-reasoned.owl"; \
+	echo "reason: ROBOT $(REASONER) consistency check passed ($(words $(ONTOLOGY_MODULES)) modules)"
+
 ## Run ontology SPARQL sanity checks
 sparql-sanity:
 	node scripts/sstim-exposure-sanity.mjs
@@ -84,7 +97,7 @@ test:
 	npm test
 
 ## Run the current ontology validation suite
-validate: shacl sparql-sanity
+validate: shacl reason sparql-sanity
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -108,6 +121,7 @@ help:
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
+	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"

@@ -489,7 +489,11 @@ entry below is marked Done with the date and the delivering artifact.
 1. Verify and add pending SNOMED CT and MeSH alignments.
 2. Re-check Music Ontology availability before re-enabling `mo:Score`.
 3. Add JSON-LD context or examples if external consumers begin using SSTIM
-   outside the BSC Lab runtime.
+   outside the BSC Lab runtime. **(Context done — 2026-07-10 via P6 B4)**
+   `static/ontology/context.jsonld` now covers the 0.5.0/P6 public surface
+   (SKOS, evidence/public-claim governance, Patch Studio parameters, exposure
+   predicates, and VoID/DCAT metadata). Consumer-specific examples remain
+   optional follow-up work.
 4. Add competency questions and SPARQL query tests for the ontology use cases.
 
 ### P5: Domain Content Coverage
@@ -584,7 +588,8 @@ Summary of the recommended posture:
 
 1. **FAIR packaging (semantics-free; may start now):** multi-format
    content-negotiation (Turtle/RDF-XML/JSON-LD/HTML via WIDOCO), `vann:`/VoID
-   metadata, DL-consistency check in CI, JSON-LD context, and Zenodo DOIs.
+   metadata, DL-consistency check in CI **(done — 2026-07-10 via ROBOT/HermiT)**,
+   JSON-LD context, and Zenodo DOIs.
 2. **DBpedia — via DBpedia Archivo** (not direct): submit the dereferenceable URI,
    iterate to a 4-star rating.
 3. **Wikidata — incremental:** one ontology item; conservative two-way `exact

@@ -69,6 +69,35 @@
             pythonImportsCheck = [ "pyshacl" ];
             meta.mainProgram = "pyshacl";
           };
+
+          robot = pkgs.stdenvNoCC.mkDerivation rec {
+            pname = "robot";
+            version = "1.9.10";
+
+            src = pkgs.fetchurl {
+              url = "https://github.com/ontodev/robot/releases/download/v${version}/robot.jar";
+              hash = "sha256-Fqc8B08981mnM4qEtOB4h4X+BhF/kxu5eW6WGep3YQU=";
+            };
+
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            dontUnpack = true;
+
+            installPhase = ''
+              runHook preInstall
+              install -Dm444 "$src" "$out/share/java/robot.jar"
+              makeWrapper ${pkgs.jre_headless}/bin/java "$out/bin/robot" \
+                --add-flags "-jar $out/share/java/robot.jar"
+              runHook postInstall
+            '';
+
+            meta = {
+              description = "ROBOT ontology command-line tool";
+              homepage = "https://robot.obolibrary.org/";
+              license = pkgs.lib.licenses.bsd3;
+              mainProgram = "robot";
+              platforms = pkgs.lib.platforms.unix;
+            };
+          };
         in
         {
           default = pkgs.mkShell {
@@ -78,6 +107,7 @@
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
               (py.withPackages (ps: [ ps.rdflib ]))  # python3.12 + rdflib — `make export`, ad-hoc use
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
+              robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`
               pkgs.wabt           # wat2wasm for `make wasm` (bsc-osc.wat → .wasm)
               pkgs.gnumake        # the canonical task entrypoint (Makefile)
               pkgs.firebase-tools # `make deploy-firestore-rules` without npx
