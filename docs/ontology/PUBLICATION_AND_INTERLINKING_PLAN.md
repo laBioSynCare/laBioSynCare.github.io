@@ -324,7 +324,8 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
 
   > **Partially delivered — 2026-06-30** (ADR 0016): `scripts/export-ontology.py`
   > + `make export` generate JSON-LD + RDF/XML for all six modules into
-  > `dist/ontology/`, wired into the Pages build (non-fatal); `vann:`
+  > `dist/ontology/`, wired into the Pages build as a required deployment gate
+  > after a green CI run on 2026-07-10; `vann:`
   > namespace metadata + `cc:license` added to the ontology node;
   > `static/ontology/context.jsonld` added and completed for the 0.5.0/P6
   > vocabulary surface; `.zenodo.json` added; the Nix
@@ -333,8 +334,7 @@ Each phase ships as its own validated PR; semantics-changing phases carry an ADR
   > the JSON-LD context completeness pass, and ROBOT/HermiT DL-consistency
   > validation in `make validate` + CI. **Still open in Phase 0:** merge and
   > verify the external perma-id PR, the WIDOCO HTML branch, enabling the
-  > GitHub↔Zenodo webhook, and removing `continue-on-error` from the Pages export
-  > step after a green CI run.
+  > GitHub↔Zenodo webhook.
 - **Phase 1 — content coverage:** IMPROVEMENT_PLAN **P5** items 1–3 (visual,
   tactile/cross-modal, neutral tuning) → release **0.5.0**. ADRs for the new
   schemes and the tuning property.
