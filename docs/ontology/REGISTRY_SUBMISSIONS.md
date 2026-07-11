@@ -102,14 +102,22 @@ Required follow-up: none
 
 ### DBpedia Archivo — ready now
 
-Submit the ontology URI at the Archivo "add" endpoint; Archivo dereferences it,
-archives every version it can resolve, and returns an automated quality-star
-rating. No account.
+Submit the ontology URI; Archivo dereferences it, archives every version it can
+resolve, and returns an automated quality-star rating. No account.
 
-- **Entry point:** `https://archivo.dbpedia.org/add`
+- **Entry point:** `https://archivo.tools.dbpedia.org/add`
+  — the old `https://archivo.dbpedia.org/add` host is dead (404, bare nginx) as
+  of 2026-07-11; Archivo moved to the `archivo.tools.dbpedia.org` host.
 - **Provide:** ontology URI `https://w3id.org/sstim`
-- **After:** record the Archivo IRI + star rating; address any actionable
-  findings (compare against the 87.5% FOOPS result already on file).
+- **HTTP POST alternative:**
+  `curl -X POST https://archivo.tools.dbpedia.org/add --data-urlencode "suggestUrl=https://w3id.org/sstim"`
+- **Acceptance prerequisites — both verified met on 2026-07-11:**
+  (1) the URI content-negotiates to Turtle/RDF-XML/N-Triples ✅ (w3id → Pages);
+  (2) the `owl:Ontology` IRI in the returned document equals the submitted URL —
+  SSTIM's ontology subject is `<https://w3id.org/sstim>`, matching exactly ✅.
+- **After:** Archivo crawls every 8 h once accepted; record the Archivo IRI +
+  star rating and file any actionable findings against `IMPROVEMENT_PLAN.md`
+  (compare with the 87.5% FOOPS result already on file).
 
 ```text
 Service:            DBpedia Archivo
