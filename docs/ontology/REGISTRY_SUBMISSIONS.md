@@ -75,7 +75,7 @@ registration.
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
-| LOV | ✅ yes — form ready | no | high (submit next) |
+| LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | ✅ yes | no | medium |
 | BioPortal | ✅ yes | yes | medium |
 | FAIRsharing | ✅ yes | yes | medium |
@@ -213,14 +213,20 @@ quality metadata, identifiable publisher, versioning policy).
 ```text
 Service:            LOV (Linked Open Vocabularies)
 Submitted URL:      https://lov.linkeddata.es/dataset/suggest
-Submitted namespace: https://w3id.org/sstim#
+Submitted namespace: https://w3id.org/sstim
 Submitted version:  0.6.0
 Release DOI:        10.5281/zenodo.21302910
-Date:
-Account/maintainer: — (form; curator review)
-External record ID or URL:
-Status:
-Required follow-up:
+Date:               2026-07-10 (resubmitted 2026-07-11; both acknowledged)
+Account/maintainer: — (form; confirmation emailed to renato.fabbri@gmail.com)
+External record ID or URL:  (assigned on integration)
+Status:             SUBMITTED — pending manual curator review. Not yet in the
+                    catalog (vocab API returns 404 as of 2026-07-11). This is
+                    the expected queued state; LOV curation is manual and slow.
+Required follow-up: Wait for the curator email. Do NOT keep resubmitting — the
+                    form just re-acknowledges and it doesn't speed the queue. If
+                    no response in several weeks, email the curators
+                    (py.vandenbussche@gmail.com; ghislain.atemezing@gmail.com;
+                    mpoveda@fi.upm.es). On integration, record the LOV vocab URL.
 ```
 
 ### BARTOC — ready now
