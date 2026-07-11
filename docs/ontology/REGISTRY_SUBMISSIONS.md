@@ -119,6 +119,27 @@ resolve, and returns an automated quality-star rating. No account.
   star rating and file any actionable findings against `IMPROVEMENT_PLAN.md`
   (compare with the 87.5% FOOPS result already on file).
 
+**Rejection diagnosis (2026-07-11) — was transient; retry.** A first submission
+was rejected with "No RDF content accessible or parseable." Root-caused by
+reading Archivo's source (`archivo/crawling/best_effort_crawling.py`,
+`utils/parsing.py`): Archivo fetches the URI three times (rdf+xml, turtle,
+n-triples) and parses each response with **rapper (Raptor)** keyed to the
+**requested** format, not the response Content-Type; it accepts if any format
+yields >0 triples. The live w3id rules ignore `Accept` and always return Turtle,
+so only the Turtle branch can parse. Reproducing Archivo's exact pipeline
+(`requests` fetch → `rapper -i <fmt>`) on 2026-07-11 gave: rdf+xml → 0, **turtle
+→ 707**, n-triples → 0 — i.e. one parseable format, which is an **accept**. The
+rejection therefore required the Turtle fetch itself to have transiently failed
+(all three branches 0). **Action: resubmit**; no repo change is needed for
+acceptance.
+
+Robustness note: the rdf+xml and n-triples branches will keep yielding 0 (and
+logging errors) until real content negotiation is live — that is exactly what
+the pending perma-id **PR #6337** adds (`Accept: application/rdf+xml` →
+`sstim-core.rdf`). Until then Archivo relies on the single Turtle branch, so a
+transient Turtle-fetch failure fails the whole crawl (including the 8-hourly
+re-crawl). Merging #6337 gives Archivo two independent working formats.
+
 ```text
 Service:            DBpedia Archivo
 Submitted URL:
