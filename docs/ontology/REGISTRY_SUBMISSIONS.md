@@ -352,24 +352,20 @@ Required follow-up:
 
 ### FAIRsharing — ready now (account required)
 
-**Submission mechanism (confirmed 2026-07-11).** Create a record at
-`https://fairsharing.org/new/` — **requires a FAIRsharing account** (register with
-email or ORCID). Use `/new/`, not `/create` (only `/new/` is the real
-"Adding content" route; `/create` just falls back to the SPA shell).
+**Submission mechanism (confirmed by screenshots 2026-07-11).** Requires a
+FAIRsharing account (email or ORCID). Flow:
+1. `https://fairsharing.org/new/` is an **informational "What to add" landing** —
+   the four cards (Databases / Standards / Policies / Collections) are
+   descriptions, **not clickable**.
+2. Click **"ADD NEW RECORD"** (in the "Get Started!" box at the bottom) → opens
+   **`https://fairsharing.org/create`**, the actual record-creation form.
+3. On `/create`, select record type **Standard** → **terminology artifact**, then
+   fill the fields below.
 
-Flow, once logged in at `/new/`:
-1. **Duplicate-check search first** — type "Sensory Stimulation Ontology" / "SSTIM".
-   The record-type choice is gated behind this step.
-2. **Then choose registry Standard → type terminology artifact** — either as a
-   step after the search, or via a "Record type"/"Type of standard" dropdown on
-   the form itself.
-
-**Gotchas:** (a) the SPA serves the same shell for every URL and the route is
-auth-gated, so pasting `/new/` **while logged out renders a blank white page** —
-log in first; (b) if blank after login, hard-reload and disable ad-blockers (the
-SPA calls `api.fairsharing.org`); (c) if the type choice never appears, new
-accounts may need record-creation approval — email `contact@fairsharing.org`
-requesting access to register SSTIM (a terminology artifact).
+**Gotchas:** (a) the SPA is auth-gated — visiting `/new/` **while logged out
+renders a blank white page**; log in first. (b) FAIRsharing announced a **power
+outage 13–14 July 2026** (likely offline those days) — submit before/after.
+(c) If record creation is blocked, email `contact@fairsharing.org`.
 FAIRsharing mints its own record DOI on curator approval; you keep the Zenodo DOI
 as an identifier. Several fields are **controlled-vocabulary pickers** (subjects
 = SRAO, domains = DRAO, licence, organisations, related records) — pick from the
