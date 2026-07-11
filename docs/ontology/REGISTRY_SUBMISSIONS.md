@@ -238,34 +238,61 @@ form. BARTOC stores entries as JSKOS (`gbv/bartoc.org`); the fields below map
 SSTIM to that model. Alternative: open an issue on
 `https://github.com/gbv/bartoc.org` if the form blocks.
 
-**Field-by-field values to enter:**
+**Complete form guide (`bartoc.org/edit`, in field order).** SSTIM has no
+dedicated "URI" field — the vocabulary's own URI goes in **Identifier**; BARTOC
+assigns its own node URI on save.
 
-| BARTOC / JSKOS field | Value |
+*Basic information:*
+
+| Field | Value |
 |---|---|
-| URI | `https://w3id.org/sstim` |
-| prefLabel (en) | Sensory Stimulation Ontology (SSTIM) |
-| prefLabel (it) | Ontologia della Stimolazione Sensoriale (SSTIM) |
-| prefLabel (pt) | Ontologia de Estimulação Sensorial (SSTIM) |
-| prefLabel (es) | Ontología de Estimulación Sensorial (SSTIM) |
-| notation | `sstim` |
-| definition / description | *(short description from §1)* |
-| url (homepage) | `https://labiosyncare.github.io/` |
-| type | Ontology + SKOS ConceptScheme — pick the NKOS **ontology** type; SSTIM is an OWL ontology that also carries SKOS concept schemes |
-| languages | en, it, pt, es |
-| license | CC BY 4.0 (`https://creativecommons.org/licenses/by/4.0/`) |
-| publisher | BSC Lab / laBioSynCare (`https://github.com/laBioSynCare`) |
-| creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
-| identifier | DOI `10.5281/zenodo.21286974` (concept); URI `https://w3id.org/sstim` |
-| FORMAT | Online, SKOS, RDF (also OWL/Turtle/JSON-LD) |
-| access / distribution | Turtle: `https://labiosyncare.github.io/ontology/sstim-core.ttl`; HTML docs: `https://labiosyncare.github.io/ontology/docs/` |
-| startDate | 2026 |
+| Title (English) | Sensory Stimulation Ontology (SSTIM) |
+| Title (Italian) | Ontologia della Stimolazione Sensoriale (SSTIM) |
+| Title (Portuguese) | Ontologia de Estimulação Sensorial (SSTIM) |
+| Title (Spanish) | Ontología de Estimulación Sensorial (SSTIM) |
+| Abbreviation | `sstim` |
+| Identifier (row 1) | `https://w3id.org/sstim` ← the vocabulary URI; add this |
+| Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
+| Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
+| Languages | en, it, pt, es |
+| Size | `56 classes, 124 properties, 295 concepts, 30 concept schemes (2026-07)` |
 
-- **subject:** BARTOC uses a DDC picker. Candidates: **152.1** (sensory
-  perception) or **612.8** (neurophysiology & sensory reception). Pick in the
-  form; avoid a therapy/medicine class (scope: no clinical claims).
-- **No public SPARQL endpoint to list** — SSTIM's SPARQL is client-side
-  (Comunica in the browser), not a hosted endpoint. Give the Turtle/dump URLs
-  for access instead.
+*Structure:*
+
+| Field | Value |
+|---|---|
+| KOS Types | **Ontology** (primary) + **Terminology** (has a controlled SKOS vocabulary) |
+| Subjects (DDC) | search **152.1** (Sensory perception); alt **612.8** (neurophysiology & sensory reception). Avoid a therapy/medicine class (no clinical claims) |
+| Version of | *(leave empty)* |
+| Based on | *(leave empty)* |
+
+*Availability:*
+
+| Field | Value |
+|---|---|
+| Created | `2026` |
+| License | search "CC BY 4.0" → Creative Commons Attribution 4.0 International |
+| URL | `https://labiosyncare.github.io/ontology/docs/` (WIDOCO docs landing) |
+| Additional links | `https://github.com/laBioSynCare/laBioSynCare.github.io` ; `https://w3id.org/sstim` |
+| Formats | search + add **SKOS**, **RDF/XML**, **Turtle**, **JSON-LD**, **OWL** (whatever BARTOC lists) |
+| Access | **freely available** |
+| Publisher — Name | BSC Lab (laBioSynCare) |
+| Publisher — URI | `https://github.com/laBioSynCare` |
+| Address | optional — City: Modena, Country: Italy (or leave blank) |
+| Contact | `renato.fabbri@gmail.com` |
+| Listed In | optionally add **prefix.cc**; skip LOV until it's integrated (still queued) |
+| Vocabulary services (URL + API type) | *(leave empty — SSTIM's SPARQL is client-side Comunica, no hosted endpoint)* |
+
+*Display + concept mapping:*
+
+| Field | Value |
+|---|---|
+| hide notation | unchecked |
+| numerical notation | unchecked |
+| namespace / notation pattern / URI pattern / example notations | *(leave empty — SSTIM concepts are URI-identified, not notation-coded)* |
+
+Then **Save** (metadata is published PDDL/public-domain and community-editable —
+fine for public ontology metadata).
 
 ```text
 Service:            BARTOC
