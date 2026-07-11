@@ -74,7 +74,7 @@ registration.
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
-| DBpedia Archivo | ✅ yes | no | high (zero-effort quality feedback) |
+| DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | ✅ yes | no (form/issue) | high |
 | BARTOC | ✅ yes | no | medium |
 | BioPortal | ✅ yes | yes | medium |
@@ -133,12 +133,17 @@ rejection therefore required the Turtle fetch itself to have transiently failed
 (all three branches 0). **Action: resubmit**; no repo change is needed for
 acceptance.
 
-Robustness note: the rdf+xml and n-triples branches will keep yielding 0 (and
-logging errors) until real content negotiation is live — that is exactly what
-the pending perma-id **PR #6337** adds (`Accept: application/rdf+xml` →
-`sstim-core.rdf`). Until then Archivo relies on the single Turtle branch, so a
-transient Turtle-fetch failure fails the whole crawl (including the 8-hourly
-re-crawl). Merging #6337 gives Archivo two independent working formats.
+**Update 2026-07-11 — PR #6337 merged; content negotiation live.** Retried
+after the merge: the `application/rdf+xml` branch is now **green** (707 triples;
+Archivo receives real RDF/XML), Turtle is green (707), N-Triples stays orange
+(no `.nt` serialization/route — non-critical). Archivo reported "RDF content is
+accessible in 2 formats" and resolved the ontology ID — **full validation
+success**. The submission still ends "rejected" only at the final **Deployment
+to Databus** step, which fails server-side ("Could not deploy dataset to
+databus. Reason: Not found") on DBpedia's degraded `.tools.` host. Nothing to
+fix on our side; retry when Archivo infra is healthy. Full write-up, retry
+recipe, and a draft DBpedia bug report:
+[`reviews/2026-07-11-dbpedia-archivo-submission.md`](reviews/2026-07-11-dbpedia-archivo-submission.md).
 
 **Submission mechanism (verified 2026-07-11).** The `archivo.tools.dbpedia.org`
 form is CSRF-protected (Flask-WTF); a bare `curl --data-urlencode

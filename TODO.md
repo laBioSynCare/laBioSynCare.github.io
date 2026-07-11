@@ -232,13 +232,14 @@ Turtle files are listed in section 1. After they exist:
       *Publication path decided (ADR 0023): `pages.yml` generates into
       `dist/ontology/docs/` — deployed artifact only, never committed to
       `main`. First deploy verified live 2026-07-11.*
-- [~] Publish ontology at `https://w3id.org/sstim` with content
+- [x] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
-      *Root RDF, module, Patch Studio, and versioned snapshot redirects are
-      live. Multi-format rules are staged (perma-id PR #6337). Browser HTML
-      decision recorded in ADR 0023: the knowledge browser remains the
-      `text/html` target; WIDOCO docs live at `/ontology/docs/` and cross-link
-      with the graph view.*
+      *Done 2026-07-11: perma-id PR #6337 merged. Full route × representation
+      matrix (Turtle/RDF-XML/JSON-LD/HTML) live for all modules plus the new
+      `/sstim/exposure` and `/sstim/void` routes — verified in
+      `docs/ontology/reviews/2026-07-11-dbpedia-archivo-submission.md`. Browser
+      HTML target is the knowledge browser (ADR 0023); WIDOCO docs at
+      `/ontology/docs/` cross-link with the graph view.*
 - [x] Add `owl:versionIRI` pointing to immutable snapshot:
       `https://w3id.org/sstim/0.1.0` `P1`
       *`sstim-core.ttl` declares the version IRI, and
@@ -359,10 +360,11 @@ Do not start these until all Phase 0 documents are committed.
 - [x] Verify GitHub Pages serves `https://labiosyncare.github.io/ontology/sstim-core.ttl`
       and `https://labiosyncare.github.io/ontology/sstim-vocab.ttl` after the
       Pages workflow runs `P1`
-- [~] Verify content negotiation at `w3id.org/sstim`: Turtle for API,
-      browser path TBD until WIDOCO is chosen `P1`
-      *RDF redirects and versioned snapshot routes are live; browser-oriented
-      HTML remains blocked on the WIDOCO publication path.*
+- [x] Verify content negotiation at `w3id.org/sstim` `P1`
+      *Done 2026-07-11 (PR #6337 merged): Turtle/RDF-XML/JSON-LD negotiated per
+      `Accept`, browser HTML → knowledge browser (ADR 0023), for every module
+      plus `/sstim/exposure` and `/sstim/void`. Matrix in
+      `docs/ontology/reviews/2026-07-11-dbpedia-archivo-submission.md`.*
 - [ ] Optional Netlify/custom-domain deployment: `lab.biosyncare.com`
       (CNAME at Keliweb) `P2`
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,

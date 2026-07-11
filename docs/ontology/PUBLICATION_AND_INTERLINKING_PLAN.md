@@ -64,9 +64,15 @@ close mapping.
 
 ### Still external or deployment-dependent
 
-1. Merge the perma-id/w3id.org routing update after all target files are live on
-   GitHub Pages, then test content negotiation through `w3id.org`.
-2. Submit the stable release URI to selected ontology registries.
+1. ~~Merge the perma-id/w3id.org routing update and test content negotiation~~
+   — **done 2026-07-11** (PR #6337 merged). The `/sstim/exposure` and
+   `/sstim/void` routes and Turtle/RDF-XML/JSON-LD content negotiation are live;
+   the full route × representation matrix is verified in
+   [`reviews/2026-07-11-dbpedia-archivo-submission.md`](reviews/2026-07-11-dbpedia-archivo-submission.md).
+2. Submit the stable release URI to selected ontology registries
+   ([REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md)). DBpedia Archivo already
+   validates SSTIM ("accessible in 2 formats"); indexing is blocked only by a
+   DBpedia-side Databus outage — retry when their infrastructure recovers.
 3. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
 
