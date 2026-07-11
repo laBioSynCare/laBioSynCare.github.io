@@ -135,7 +135,7 @@ Submissions follow successful WIDOCO and w3id verification.
 |---|---|---|
 | DBpedia Archivo | Submit | External archiving and automated ontology-quality feedback. |
 | LOV | Submit | Vocabulary discovery and term search; requires stable dereferencing and metadata. |
-| prefix.cc | Submit | Public prefix-to-namespace lookup. |
+| prefix.cc | **Done** | Public prefix-to-namespace lookup (`sstim` registered). |
 | BARTOC | Submit | Discovery for the SKOS terminology layer. |
 | BioPortal | Submit | Biomedical browsing, APIs, and candidate mapping discovery. |
 | OLS | Submit if accepted | OBO-adjacent browsing without changing SSTIM identifiers. |
@@ -147,7 +147,9 @@ Submissions follow successful WIDOCO and w3id verification.
 
 Registry records must use the stable ontology URI, concept DOI, current release
 DOI, CC BY 4.0 ontology license, creator ORCID, source repository, release date,
-and the exact released version.
+and the exact released version. These values, the per-registry intake notes, and
+the submission-status records live in
+[REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md).
 
 ## External Mapping Policy
 

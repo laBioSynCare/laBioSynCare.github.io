@@ -193,9 +193,11 @@ indexed, examiner-searchable records.
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
       data under SSTIM. Do not publish or route the private BioSynCare/BSC
       catalog from BSC Lab.*
-- [ ] Register `sstim:` and scoped prefixes such as `bsc-fw:`,
+- [~] Register `sstim:` and scoped prefixes such as `bsc-fw:`,
       `bsclab-preset:`, and public-safe implementation prefixes at
       https://prefix.cc `P1`
+      *`sstim:` → `https://w3id.org/sstim#` is registered. Remaining registry
+      submissions are tracked in `docs/ontology/REGISTRY_SUBMISSIONS.md`.*
 - [x] Add `static/_headers` with COOP/COEP for future Netlify/custom hosting
       (required for SharedArrayBuffer and WASM threading) `P1`
       *Kept for future Netlify/custom hosting; GitHub Pages remains the
