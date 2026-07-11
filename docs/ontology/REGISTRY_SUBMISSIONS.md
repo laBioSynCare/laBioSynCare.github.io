@@ -353,13 +353,23 @@ Required follow-up:
 ### FAIRsharing — ready now (account required)
 
 **Submission mechanism (confirmed 2026-07-11).** Create a record at
-`https://fairsharing.org/new` — **requires a FAIRsharing account** (register with
-email or ORCID). Choose registry **Standard**, subtype **terminology artifact**.
-**Gotcha:** the SPA serves the same shell for every URL and the add-content route
-is auth-gated, so pasting `/new/` **while logged out renders a blank white page**.
-Log in at `fairsharing.org` first, then open the new-record form from the in-app
-"Add content" menu. If blank after login, hard-reload and disable ad-blockers
-(the SPA calls `api.fairsharing.org`); else email `support@fairsharing.org`.
+`https://fairsharing.org/new/` — **requires a FAIRsharing account** (register with
+email or ORCID). Use `/new/`, not `/create` (only `/new/` is the real
+"Adding content" route; `/create` just falls back to the SPA shell).
+
+Flow, once logged in at `/new/`:
+1. **Duplicate-check search first** — type "Sensory Stimulation Ontology" / "SSTIM".
+   The record-type choice is gated behind this step.
+2. **Then choose registry Standard → type terminology artifact** — either as a
+   step after the search, or via a "Record type"/"Type of standard" dropdown on
+   the form itself.
+
+**Gotchas:** (a) the SPA serves the same shell for every URL and the route is
+auth-gated, so pasting `/new/` **while logged out renders a blank white page** —
+log in first; (b) if blank after login, hard-reload and disable ad-blockers (the
+SPA calls `api.fairsharing.org`); (c) if the type choice never appears, new
+accounts may need record-creation approval — email `contact@fairsharing.org`
+requesting access to register SSTIM (a terminology artifact).
 FAIRsharing mints its own record DOI on curator approval; you keep the Zenodo DOI
 as an identifier. Several fields are **controlled-vocabulary pickers** (subjects
 = SRAO, domains = DRAO, licence, organisations, related records) — pick from the
