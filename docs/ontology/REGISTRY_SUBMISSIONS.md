@@ -78,7 +78,7 @@ registration.
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
 | BioPortal | ✅ yes | yes | medium |
-| FAIRsharing | ✅ yes | yes | medium |
+| FAIRsharing | ✅ yes — fields ready | yes (email/ORCID) | high (submit next) |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -352,22 +352,47 @@ Required follow-up:
 
 ### FAIRsharing — ready now (account required)
 
-FAIR standard/resource registration linked to the DOI. Register SSTIM as a
-terminology-artifact standard.
+**Submission mechanism (confirmed 2026-07-11).** Create a record at
+`https://fairsharing.org/new` — **requires a FAIRsharing account** (register with
+email or ORCID). Choose registry **Standard**, subtype **terminology artifact**.
+FAIRsharing mints its own record DOI on curator approval; you keep the Zenodo DOI
+as an identifier. Several fields are **controlled-vocabulary pickers** (subjects
+= SRAO, domains = DRAO, licence, organisations, related records) — pick from the
+autocomplete; the values below are the intended targets.
 
-- **Entry point:** `https://fairsharing.org/` → register a new record.
-- **Provide:** name, description, `https://w3id.org/sstim`, concept DOI
-  `10.5281/zenodo.21286974`, CC BY 4.0, creator ORCID, repository, subject
-  area, and the documentation URL.
+**Field-by-field values:**
+
+| FAIRsharing field | Value |
+|---|---|
+| Registry / type | Standard → **terminology artifact** |
+| Name | Sensory Stimulation Ontology |
+| Abbreviation | SSTIM |
+| Homepage | `https://labiosyncare.github.io/ontology/docs/` |
+| Description | An OWL 2 ontology with a multilingual SKOS vocabulary and SHACL shapes for parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims across auditory, visual, and tactile modalities. |
+| Year of creation | 2026 |
+| Status | ready / released |
+| Identifiers | vocabulary URI `https://w3id.org/sstim`; Zenodo concept DOI `10.5281/zenodo.21286974` (+ version DOI `10.5281/zenodo.21302910`) |
+| Licence / conditions of use | CC BY 4.0 (pick from licence list) |
+| Associated organisation | **BSC Lab (laBioSynCare)** — role Maintainer/Developer (`https://github.com/laBioSynCare`) |
+| Contact / creator | Renato Fabbri — ORCID `0000-0002-9699-629X`; `renato.fabbri@gmail.com` |
+| Country | Italy |
+| Subjects (SRAO picker) | **psychology**, **neuroscience** (add what the autocomplete offers) |
+| Domains (DRAO picker) | **sensory perception** (+ e.g. auditory/visual perception, brain if offered) |
+| Taxonomic range | **Not applicable** (no species scope) |
+| Support links | docs `…/ontology/docs/`; repo `https://github.com/laBioSynCare/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
+| Related standards | reuses **BFO, IAO, OBI, COB** by stable PURL — add as "imports"/related if they're in FAIRsharing |
+| Publications | none yet (cite the Zenodo record if a field allows) |
 
 ```text
 Service:            FAIRsharing
-Submitted URL:
+Submitted URL:      https://fairsharing.org/new
+Record type:        Standard / terminology artifact
+Name:               Sensory Stimulation Ontology (SSTIM)
 Submitted version:  0.6.0
 Concept DOI:        10.5281/zenodo.21286974
 Date:
-Account/maintainer:
-External record ID or URL:
+Account/maintainer: (FAIRsharing account — email/ORCID)
+External record ID or URL:  (FAIRsharing DOI/record, assigned on approval)
 Status:
 Required follow-up:
 ```
