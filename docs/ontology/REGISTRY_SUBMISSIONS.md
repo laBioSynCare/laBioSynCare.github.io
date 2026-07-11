@@ -315,11 +315,12 @@ Date:               2026-07-11
 Account/maintainer: @ttm (GitHub login; not on editor whitelist)
 External record ID or URL:  https://github.com/gbv/bartoc.org/issues/319
                             (pre-assigned node http://bartoc.org/en/node/21154)
-Status:             SUBMITTED via issue #319 — pending a BARTOC editor to add
-                    the vocabulary or whitelist @ttm.
-Required follow-up: Fix the ttps:// typo in the record; clarify on the issue
-                    that it is a submission, not a bug. On integration, record
-                    the live node URL.
+Status:             SUBMITTED via issue #319 — clarifying comment posted and the
+                    ttps:// typo corrected (2026-07-11). Cleanly pending a BARTOC
+                    editor to add the vocabulary or whitelist @ttm.
+Required follow-up: Wait for editor action. On integration, record the live node
+                    URL (reserved node 21154). Metadata is community-editable, so
+                    any field can be corrected after it goes live.
 ```
 
 ### BioPortal — ready now (account required)
