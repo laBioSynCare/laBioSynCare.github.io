@@ -76,7 +76,7 @@ registration.
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
-| BARTOC | ✅ yes — fields ready | yes (GitHub) | high (submit next) |
+| BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
 | BioPortal | ✅ yes | yes | medium |
 | FAIRsharing | ✅ yes | yes | medium |
 | OLS | ⚠️ if accepted | yes | low |
@@ -294,17 +294,32 @@ assigns its own node URI on save.
 Then **Save** (metadata is published PDDL/public-domain and community-editable —
 fine for public ontology metadata).
 
+**Submitted 2026-07-11 via the whitelist fallback.** Saving returned
+`403: A whitelist is in place, but authenticated user is not on the whitelist`
+— expected for a first-time contributor. BARTOC's form auto-created GitHub issue
+**[gbv/bartoc.org#319](https://github.com/gbv/bartoc.org/issues/319)** carrying
+the full JSKOS record; that issue **is** the submission (a BARTOC editor adds it
+or whitelists @ttm). BARTOC pre-assigned node `http://bartoc.org/en/node/21154`.
+Record used DDC 152, KOS types ontology+terminology, all four title languages,
+CC BY 4.0, formats SKOS/RDF/XML/JSON-LD/OWL. Two fixes noted on the issue: a
+`ttps://` → `https://` typo in an additional link, and confirm the publisher
+name ("BSC Lab (Æterni Anima)").
+
 ```text
 Service:            BARTOC
 Submitted URL:      https://bartoc.org/edit
 Submitted URI:      https://w3id.org/sstim
 Submitted version:  0.6.0
 Concept DOI:        10.5281/zenodo.21286974
-Date:
-Account/maintainer: — (GitHub login)
-External record ID or URL:  (BARTOC node URL, assigned on save)
-Status:
-Required follow-up:
+Date:               2026-07-11
+Account/maintainer: @ttm (GitHub login; not on editor whitelist)
+External record ID or URL:  https://github.com/gbv/bartoc.org/issues/319
+                            (pre-assigned node http://bartoc.org/en/node/21154)
+Status:             SUBMITTED via issue #319 — pending a BARTOC editor to add
+                    the vocabulary or whitelist @ttm.
+Required follow-up: Fix the ttps:// typo in the record; clarify on the issue
+                    that it is a submission, not a bug. On integration, record
+                    the live node URL.
 ```
 
 ### BioPortal — ready now (account required)
