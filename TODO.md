@@ -226,10 +226,10 @@ Turtle files are listed in section 1. After they exist:
       generates core-module reference docs; gap-filling metadata in
       `docs/ontology/widoco.properties`. SKOS vocabulary docs need a SKOS-aware
       generator (candidate: pyLODE SKOS profile) and remain open.*
-- [~] Deploy WIDOCO output to GitHub Pages `P1`
+- [x] Deploy WIDOCO output to GitHub Pages `P1`
       *Publication path decided (ADR 0023): `pages.yml` generates into
       `dist/ontology/docs/` — deployed artifact only, never committed to
-      `main`. Mark `[x]` once verified live after the next Pages run.*
+      `main`. First deploy verified live 2026-07-11.*
 - [~] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
       *Root RDF, module, Patch Studio, and versioned snapshot redirects are
@@ -365,10 +365,11 @@ Do not start these until all Phase 0 documents are committed.
       (CNAME at Keliweb) `P2`
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,
       server-side APIs, or custom-domain product positioning.*
-- [ ] Verify WIDOCO docs are live on GitHub Pages `P1`
-      *Unblocked by ADR 0023. After the next Pages deploy, check
-      `https://labiosyncare.github.io/ontology/docs/` and a term anchor
-      such as `/ontology/docs/#FrequencyBand`.*
+- [x] Verify WIDOCO docs are live on GitHub Pages `P1`
+      *Verified 2026-07-11: `https://labiosyncare.github.io/ontology/docs/`
+      serves the generated documentation (title, term anchors, knowledge-
+      browser cross-link) alongside the untouched app root and Turtle
+      artifacts.*
 
 ---
 

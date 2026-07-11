@@ -56,6 +56,8 @@ close mapping.
   module (WIDOCO 1.4.25 pinned in the flake; gap-filling metadata in
   `docs/ontology/widoco.properties`). `pages.yml` publishes it to
   `/ontology/docs/` in the deployed artifact only — never committed (ADR 0023).
+  Verified live at `https://labiosyncare.github.io/ontology/docs/` on
+  2026-07-11.
 - The documentation and the knowledge browser cross-link per term: WIDOCO
   anchors are term local names, and the graph view resolves the same
   `#LocalName` fragments to nodes.
@@ -64,11 +66,8 @@ close mapping.
 
 1. Merge the perma-id/w3id.org routing update after all target files are live on
    GitHub Pages, then test content negotiation through `w3id.org`.
-2. Verify the WIDOCO documentation at
-   `https://labiosyncare.github.io/ontology/docs/` (including a term anchor
-   such as `#FrequencyBand`) after the next Pages deploy.
-3. Submit the stable release URI to selected ontology registries.
-4. Create conservative Wikidata links only after the ontology landing page and
+2. Submit the stable release URI to selected ontology registries.
+3. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
 
 Browser requests for the ontology IRI keep resolving to the interactive
