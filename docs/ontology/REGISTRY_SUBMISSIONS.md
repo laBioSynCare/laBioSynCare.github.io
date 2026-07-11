@@ -75,7 +75,7 @@ registration.
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
-| LOV | ✅ yes | no (form/issue) | high |
+| LOV | ✅ yes — form ready | no | high (submit next) |
 | BARTOC | ✅ yes | no | medium |
 | BioPortal | ✅ yes | yes | medium |
 | FAIRsharing | ✅ yes | yes | medium |
@@ -180,23 +180,44 @@ Required follow-up: Re-submit later; if it persists, report the Databus
 
 ### LOV (Linked Open Vocabularies) — ready now
 
-LOV values complete metadata and stable dereferencing; SSTIM already carries
-`vann:preferredNamespacePrefix`/`Uri`, title, description, creator, and license,
-and the namespace resolves. Submit via the LOV suggestion form or a GitHub issue
-on the LOV repository — **confirm the current mechanism** before submitting.
+**Submission mechanism (confirmed 2026-07-11).** Web form at
+`https://lov.linkeddata.es/dataset/suggest` — no account. LOV's model is: you
+submit the **namespace URI**, LOV dereferences it and **auto-extracts the
+metadata from the vocabulary itself**, then a curator reviews it. So acceptance
+depends on the vocabulary carrying LOV-recommended metadata, which SSTIM does.
+Fallback if the form misbehaves: email the curators
+(py.vandenbussche@gmail.com; ghislain.atemezing@gmail.com; mpoveda@fi.upm.es).
+Note: LOV curation is manual and can be slow; the front-end is old but the
+service and catalog are live.
 
-- **Provide:** vocabulary URI `https://w3id.org/sstim`, prefix `sstim`,
-  the short description, license, and creator.
-- **Note:** LOV catalogues vocabularies (OWL/RDFS/SKOS terms), not instance
-  data — point it at the term namespace, not the BSC Lab instance graphs.
+- **Enter in the form:** namespace URI **`https://w3id.org/sstim#`** (LOV strips
+  the `#` and dereferences `https://w3id.org/sstim` → 200 Turtle). Add submitter
+  name/email if asked; everything else is auto-extracted.
+- **Point it at the term namespace, not instance data** — LOV catalogues
+  vocabularies (OWL/SKOS terms), not the BSC Lab instance graphs.
+
+**Metadata readiness — verified present in `sstim-core.ttl` (2026-07-11):**
+`a owl:Ontology, voaf:Vocabulary`; `vann:preferredNamespacePrefix "sstim"` +
+`vann:preferredNamespaceUri`; `dct:title`, `dct:description`, `dct:creator`
+(ORCID), `dct:publisher` (GitHub org), `dct:issued`, `dct:modified`,
+`dct:license`/`cc:license` (CC BY 4.0), `owl:versionInfo "0.6.0"` +
+`owl:versionIRI`; namespace dereferences to Turtle/RDF-XML/JSON-LD; WIDOCO HTML
+docs live. This satisfies LOV's quality bar (URI stability, standard formats,
+quality metadata, identifiable publisher, versioning policy).
+
+- **Optional polish (not required):** the creator/publisher are bare
+  ORCID/GitHub URIs with no inline `foaf:name`. LOV can resolve the ORCID, but
+  inlining `foaf:Person`/`foaf:Organization` names would render the Agents
+  section more cleanly. Skip unless a curator asks.
 
 ```text
-Service:            LOV
-Submitted URL:
+Service:            LOV (Linked Open Vocabularies)
+Submitted URL:      https://lov.linkeddata.es/dataset/suggest
+Submitted namespace: https://w3id.org/sstim#
 Submitted version:  0.6.0
 Release DOI:        10.5281/zenodo.21302910
 Date:
-Account/maintainer: —
+Account/maintainer: — (form; curator review)
 External record ID or URL:
 Status:
 Required follow-up:
