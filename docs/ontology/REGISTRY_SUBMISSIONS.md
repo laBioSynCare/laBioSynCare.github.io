@@ -355,6 +355,11 @@ Required follow-up:
 **Submission mechanism (confirmed 2026-07-11).** Create a record at
 `https://fairsharing.org/new` — **requires a FAIRsharing account** (register with
 email or ORCID). Choose registry **Standard**, subtype **terminology artifact**.
+**Gotcha:** the SPA serves the same shell for every URL and the add-content route
+is auth-gated, so pasting `/new/` **while logged out renders a blank white page**.
+Log in at `fairsharing.org` first, then open the new-record form from the in-app
+"Add content" menu. If blank after login, hard-reload and disable ad-blockers
+(the SPA calls `api.fairsharing.org`); else email `support@fairsharing.org`.
 FAIRsharing mints its own record DOI on curator approval; you keep the Zenodo DOI
 as an identifier. Several fields are **controlled-vocabulary pickers** (subjects
 = SRAO, domains = DRAO, licence, organisations, related records) — pick from the
