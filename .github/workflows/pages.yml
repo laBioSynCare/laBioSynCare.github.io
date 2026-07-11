@@ -61,6 +61,12 @@ jobs:
       - name: Export ontology serializations (JSON-LD + RDF/XML)
         run: nix develop --command make export EXPORT_DIR=dist/ontology
 
+      # WIDOCO reference documentation is generated into the artifact only —
+      # never committed to main (ADR 0023). It owns /ontology/docs/; the app
+      # keeps the site root and all existing routes.
+      - name: Generate ontology reference documentation (WIDOCO)
+        run: nix develop --command make ontology-docs DOCS_DIR=dist/ontology/docs
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
 

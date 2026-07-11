@@ -2,7 +2,7 @@
 
 > **Read this file completely before touching any other file in this repository.**
 > This directive applies to Claude Code, GitHub Copilot, Cursor, and all AI coding agents.
-> Last updated: 2026-05-31. Maintained by Renato Fabbri.
+> Last updated: 2026-07-11. Maintained by Renato Fabbri.
 
 ---
 
@@ -54,7 +54,7 @@ substitute alternatives without explicit instruction.
 | Haptic engine (default) | Web Vibration API | browser native | NullHapticEngine fallback for unsupported platforms |
 | App hosting | GitHub Pages | current | Client-only static app and `/ontology/*.ttl` artifacts; custom hosting deferred until headers or backend services are needed |
 | Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
-| Ontology docs | WIDOCO | blocked | HTML documentation from OWL; generate in CI and publish outside `main` after the publication path is chosen |
+| Ontology docs | WIDOCO | 1.4.25 (flake-pinned) | HTML reference docs; `make ontology-docs` runs in `pages.yml` → `/ontology/docs/` in the deployed artifact only, never committed (ADR 0023). Browser target at w3id stays the knowledge browser |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
 | PWA / offline | SvelteKit native service worker | built-in | Installable, offline-capable from the same static `dist/`. No `vite-plugin-pwa`. Three binding constraints — see ADR 0009 + `docs/technical/PWA_SERVICE_WORKER.md` |
 | Dev toolchain | Nix flake | flakes | First-class: `flake.nix` pins Node, Python+pySHACL, WABT; CI runs inside it. `flake.lock` is the source of truth — regenerate via `nix flake update` |
@@ -528,7 +528,7 @@ docs/
   │                             SENSORY_FIELD, PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
   │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE,
   │                             BREATHING_MODEL, SYMMETRY_SYSTEM, MARTIGLI_BINAURAL
-  decisions/                  ← ADRs 0001–0011 (+ README index)
+  decisions/                  ← ADRs 0001–0023 (+ README index)
   ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
                                 INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
                                 CONSORTIUM_INVITATION

@@ -53,6 +53,9 @@
     dcat:version "0.6.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
+    # WIDOCO reference documentation — generated per release in CI, never
+    # committed (ADR 0023). The landing page above stays the interactive app.
+    foaf:page <https://labiosyncare.github.io/ontology/docs/> ;
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;

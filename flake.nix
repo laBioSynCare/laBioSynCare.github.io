@@ -98,6 +98,37 @@
               platforms = pkgs.lib.platforms.unix;
             };
           };
+
+          widoco = pkgs.stdenvNoCC.mkDerivation rec {
+            pname = "widoco";
+            version = "1.4.25";
+
+            # The release ships one fat jar per supported JDK; pick the JDK-17
+            # build to match jre_headless.
+            src = pkgs.fetchurl {
+              url = "https://github.com/dgarijo/Widoco/releases/download/v${version}/widoco-${version}-jar-with-dependencies_JDK-17.jar";
+              hash = "sha256-vleicP/7keVYEPowhxfnBKROLnwCej1oElpJ2myLTis=";
+            };
+
+            nativeBuildInputs = [ pkgs.makeWrapper ];
+            dontUnpack = true;
+
+            installPhase = ''
+              runHook preInstall
+              install -Dm444 "$src" "$out/share/java/widoco.jar"
+              makeWrapper ${pkgs.jre_headless}/bin/java "$out/bin/widoco" \
+                --add-flags "-jar $out/share/java/widoco.jar"
+              runHook postInstall
+            '';
+
+            meta = {
+              description = "WIDOCO ontology documentation generator";
+              homepage = "https://github.com/dgarijo/Widoco";
+              license = pkgs.lib.licenses.asl20;
+              mainProgram = "widoco";
+              platforms = pkgs.lib.platforms.unix;
+            };
+          };
         in
         {
           default = pkgs.mkShell {
@@ -108,6 +139,7 @@
               (py.withPackages (ps: [ ps.rdflib ]))  # python3.12 + rdflib — `make export`, ad-hoc use
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
               robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`
+              widoco              # WIDOCO — ontology HTML reference docs for `make ontology-docs`
               pkgs.wabt           # wat2wasm for `make wasm` (bsc-osc.wat → .wasm)
               pkgs.gnumake        # the canonical task entrypoint (Makefile)
               pkgs.firebase-tools # `make deploy-firestore-rules` without npx

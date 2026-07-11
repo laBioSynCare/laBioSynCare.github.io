@@ -221,17 +221,22 @@ Turtle files are listed in section 1. After they exist:
       *`scripts/sstim-quality-audit.py` and
       `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
       safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
-- [ ] Generate WIDOCO HTML docs from `sstim-core.ttl` + `sstim-vocab.ttl` `P1`
-      `java -jar widoco.jar -ontFile static/ontology/sstim-core.ttl -outFolder docs-site`
-- [ ] Deploy WIDOCO output to GitHub Pages `P1`
-      *Blocked until the publication path is chosen. When enabled, generate
-      WIDOCO in GitHub Actions and publish the output as a Pages artifact or
-      separate docs branch; do not commit generated HTML into `main`.*
+- [~] Generate WIDOCO HTML docs from `sstim-core.ttl` `P1`
+      *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
+      generates core-module reference docs; gap-filling metadata in
+      `docs/ontology/widoco.properties`. SKOS vocabulary docs need a SKOS-aware
+      generator (candidate: pyLODE SKOS profile) and remain open.*
+- [~] Deploy WIDOCO output to GitHub Pages `P1`
+      *Publication path decided (ADR 0023): `pages.yml` generates into
+      `dist/ontology/docs/` — deployed artifact only, never committed to
+      `main`. Mark `[x]` once verified live after the next Pages run.*
 - [~] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
       *Root RDF, module, Patch Studio, and versioned snapshot redirects are
-      live. Multi-format rules are staged; browser HTML and final routing await
-      WIDOCO deployment and the external perma-id update.*
+      live. Multi-format rules are staged (perma-id PR #6337). Browser HTML
+      decision recorded in ADR 0023: the knowledge browser remains the
+      `text/html` target; WIDOCO docs live at `/ontology/docs/` and cross-link
+      with the graph view.*
 - [x] Add `owl:versionIRI` pointing to immutable snapshot:
       `https://w3id.org/sstim/0.1.0` `P1`
       *`sstim-core.ttl` declares the version IRI, and
@@ -290,11 +295,11 @@ Do not start these until all Phase 0 documents are committed.
       WASM/PWA plugin additions when those features land.*
 - [ ] Add pre-commit hook: Turtle syntax check + JSON preset schema
       validation `P1`
-- [~] Configure GitHub Actions: `validate-rdf.yml`, `pages.yml`,
+- [x] Configure GitHub Actions: `validate-rdf.yml`, `pages.yml`,
       `widoco-docs.yml`, `lint.yml` `P1`
-      *Done: `validate-rdf.yml`, `lint.yml`, `pages.yml`. Pending:
-      WIDOCO docs workflow, intentionally blocked until publication path
-      is chosen.*
+      *Done: `validate-rdf.yml`, `lint.yml`, `pages.yml`. A separate
+      `widoco-docs.yml` was superseded by ADR 0023 — WIDOCO runs inside
+      `pages.yml` (`make ontology-docs`).*
 - [x] `netlify.toml` and `static/_headers` configuration `P1`
 - [x] SvelteKit `src/app.html`, layout, ontology route, and SPARQL route `P1`
 
@@ -361,7 +366,9 @@ Do not start these until all Phase 0 documents are committed.
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,
       server-side APIs, or custom-domain product positioning.*
 - [ ] Verify WIDOCO docs are live on GitHub Pages `P1`
-      *Blocked until WIDOCO publication path is chosen.*
+      *Unblocked by ADR 0023. After the next Pages deploy, check
+      `https://labiosyncare.github.io/ontology/docs/` and a term anchor
+      such as `/ontology/docs/#FrequencyBand`.*
 
 ---
 
@@ -575,8 +582,10 @@ because financial sustainability constrains everything else.
 - [ ] Secret scanning enabled `P1`
 - [x] `.github/workflows/validate-rdf.yml` — pySHACL on every PR
       touching `static/ontology/` `P1`
-- [ ] `.github/workflows/widoco-docs.yml` — regenerate docs-site
+- [x] `.github/workflows/widoco-docs.yml` — regenerate docs-site
       on TTL file change `P1`
+      *Superseded by ADR 0023: WIDOCO generation runs inside `pages.yml`
+      (`make ontology-docs` → `dist/ontology/docs/`); no separate workflow.*
 - [x] `.github/workflows/pages.yml` — build SvelteKit static output and deploy
       `dist/` to GitHub Pages `P1`
 - [x] `.github/workflows/lint.yml` — Svelte type check and static build `P1`
@@ -652,5 +661,5 @@ Not project-specific — run on a schedule.
 
 ---
 
-*Last updated: 2026-07-10 - SSTIM 0.6 development ontology/data quality pass*
-*Next update due: after WIDOCO deployment, external ontology review, or the 0.6 release*
+*Last updated: 2026-07-11 - WIDOCO publication path implemented (ADR 0023)*
+*Next update due: after the WIDOCO Pages deploy is verified live or perma-id PR #6337 merges*

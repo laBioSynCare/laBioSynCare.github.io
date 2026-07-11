@@ -52,17 +52,29 @@ close mapping.
 - The post-release canonical FOOPS assessment scores 87.5%. Minimum metadata
   and both version-IRI checks pass; the remaining failures depend on public
   prefix and ontology registry discovery.
+- `make ontology-docs` generates WIDOCO reference documentation for the core
+  module (WIDOCO 1.4.25 pinned in the flake; gap-filling metadata in
+  `docs/ontology/widoco.properties`). `pages.yml` publishes it to
+  `/ontology/docs/` in the deployed artifact only — never committed (ADR 0023).
+- The documentation and the knowledge browser cross-link per term: WIDOCO
+  anchors are term local names, and the graph view resolves the same
+  `#LocalName` fragments to nodes.
 
 ### Still external or deployment-dependent
 
 1. Merge the perma-id/w3id.org routing update after all target files are live on
    GitHub Pages, then test content negotiation through `w3id.org`.
-2. Generate WIDOCO HTML in CI and publish it outside the editable source tree.
-3. Route browser requests for the ontology IRI to the stable WIDOCO landing
-   page while retaining RDF negotiation for machine clients.
-4. Submit the stable release URI to selected ontology registries.
-5. Create conservative Wikidata links only after the ontology landing page and
+2. Verify the WIDOCO documentation at
+   `https://labiosyncare.github.io/ontology/docs/` (including a term anchor
+   such as `#FrequencyBand`) after the next Pages deploy.
+3. Submit the stable release URI to selected ontology registries.
+4. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
+
+Browser requests for the ontology IRI keep resolving to the interactive
+knowledge browser, whose hash handling gives every SSTIM term a live graph
+view (ADR 0023). Revisit that routing only if a registry review requires
+static documentation at the IRI itself; the change is one `.htaccess` rule.
 
 The `0.6.0` term-space is released independently of WIDOCO and registry
 submission. Zenodo creates its version DOI from the GitHub release; the DOI is
@@ -94,7 +106,11 @@ The intended stable behavior is:
 | `Accept: text/turtle` | Turtle source |
 | `Accept: application/ld+json` | generated JSON-LD |
 | `Accept: application/rdf+xml` | generated RDF/XML |
-| browser / HTML | WIDOCO documentation |
+| browser / HTML | BSC Lab knowledge browser (interactive; term fragments select graph nodes) |
+
+WIDOCO reference documentation is published at
+`https://labiosyncare.github.io/ontology/docs/` and cross-linked with the
+knowledge browser rather than being the redirect target (ADR 0023).
 
 The generated RDF targets must be deployed before the external w3id rule is
 merged. After deployment, verify the core IRI, every module IRI, the versioned

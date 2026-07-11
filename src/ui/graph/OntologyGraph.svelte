@@ -620,6 +620,14 @@
     return '#' + curie
   }
 
+  // WIDOCO reference docs cover the core term-space only, and exist only in
+  // the deployed Pages artifact (`make ontology-docs` → /ontology/docs/) —
+  // the link 404s under `make dev`. Anchor ids are term local names.
+  function docsUrlForIri(iri) {
+    if (!iri || !iri.startsWith(SSTIM_BASE)) return null
+    return '/ontology/docs/#' + iri.slice(SSTIM_BASE.length)
+  }
+
   function writeHashForSelected() {
     const target = hashForIri(selected?.iri)
     if (window.location.hash === target) return
@@ -987,6 +995,7 @@
 
                 <dl class="meta">
                   {#if selected.iri}
+                    {@const docsUrl = docsUrlForIri(selected.iri)}
                     <div class="meta-row iri-row">
                       <dt>IRI</dt>
                       <dd>
@@ -996,6 +1005,14 @@
                         </button>
                       </dd>
                     </div>
+                    {#if docsUrl}
+                      <div class="meta-row">
+                        <dt>Docs</dt>
+                        <dd>
+                          <a href={docsUrl} target="_blank" rel="noreferrer" title="WIDOCO reference documentation for this term">Reference entry</a>
+                        </dd>
+                      </div>
+                    {/if}
                   {/if}
                   {#if selected.notation}
                     <div class="meta-row">
