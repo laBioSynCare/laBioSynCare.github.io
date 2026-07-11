@@ -41,8 +41,14 @@ self.addEventListener('install', (event) => {
   // Trap 1: no skipWaiting() here. The new worker installs and waits until the
   // page explicitly promotes it (see the `message` handler) or every old tab
   // closes.
+  //
+  // `cache: 'reload'` bypasses the browser HTTP cache so a stale entry can
+  // never poison the precache (observed 2026-07-11: a months-old copy of `/`
+  // ended up served cache-first for the lifetime of the worker version).
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(PRECACHE)),
+    caches.open(CACHE).then((cache) =>
+      cache.addAll(PRECACHE.map((path) => new Request(path, { cache: 'reload' }))),
+    ),
   )
 })
 
@@ -88,9 +94,12 @@ self.addEventListener('fetch', (event) => {
 async function respond(request, url) {
   const cache = await caches.open(CACHE)
 
-  // Precached immutable assets (hashed build chunks, prerendered shells,
-  // worklets, manifest, favicon): cache-first — a hit is always correct.
-  if (PRECACHE_SET.has(url.pathname)) {
+  // Precached immutable assets (hashed build chunks, worklets, manifest,
+  // favicon): cache-first — a hit is always correct. Navigations are excluded
+  // even though the prerendered shells are precached: pages are
+  // network-first per the spec (§3.3–3.4), so an online reload always sees
+  // the current deploy; the precached shell remains the offline fallback.
+  if (request.mode !== 'navigate' && PRECACHE_SET.has(url.pathname)) {
     const cached = await cache.match(request)
     if (cached) return cached
   }

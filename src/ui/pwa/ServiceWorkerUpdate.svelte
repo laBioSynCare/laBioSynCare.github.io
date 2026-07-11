@@ -32,9 +32,23 @@
       location.reload()
     })
 
+    // The browser only checks for a new worker on navigation, so a long-lived
+    // tab never learns about deploys. Re-check whenever the tab regains
+    // visibility; a found update surfaces the banner (never an auto-reload —
+    // Trap 1).
+    let activeRegistration = null
+    const checkForUpdate = () => {
+      if (document.visibilityState === 'visible') {
+        activeRegistration?.update().catch(() => {})
+      }
+    }
+    document.addEventListener('visibilitychange', checkForUpdate)
+
     navigator.serviceWorker
       .register('/service-worker.js', { type: 'classic' })
       .then((registration) => {
+        activeRegistration = registration
+
         // A worker downloaded on a previous visit may already be waiting.
         if (registration.waiting) promote(registration.waiting)
 
@@ -59,6 +73,8 @@
       waitingWorker = worker
       updateReady = true
     }
+
+    return () => document.removeEventListener('visibilitychange', checkForUpdate)
   })
 
   function applyUpdate() {

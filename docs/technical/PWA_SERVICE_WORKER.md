@@ -100,6 +100,12 @@ The deliberate omission is `skipWaiting()` in `install`. The new worker installs
 and **waits**. It activates only when every old tab is gone *or* when the page
 explicitly posts `SKIP_WAITING` (§5). This is Trap 1's enforcement point.
 
+Install-time precache fetches use `new Request(path, { cache: 'reload' })`,
+bypassing the browser HTTP cache. Without this, a stale HTTP-cache entry can
+poison the precache and then be served for the whole lifetime of the worker
+version (observed 2026-07-11: a months-old pre-app copy of `/` survived normal
+reloads indefinitely).
+
 ### 3.2 The precache set (Trap 3)
 
 One versioned cache, `bsc-lab-${version}`. Precached on install:
@@ -147,13 +153,18 @@ Firebase-safety mechanism. There is no allowlist to maintain.
 
 Same-origin `GET` strategy:
 
-- **Precached immutable assets** (path is in the precache set) → **cache-first**.
-  They are content-hashed or versioned, so a cache hit is always correct.
-- **Everything else same-origin** (prerendered navigations, `.ttl`, `.wav`,
-  icons) → **network-first, fall back to cache**, and populate the cache on a
-  successful, non-opaque (`response.type === 'basic'`) `GET`. Fresh when online;
-  available offline after first fetch; never caches an opaque cross-origin
-  response (those are already bypassed anyway).
+- **Precached immutable assets, excluding navigations** (path is in the
+  precache set and `request.mode !== 'navigate'`) → **cache-first**. They are
+  content-hashed or versioned, so a cache hit is always correct. The
+  navigation exclusion matters: the prerendered shells *are* precached (§3.2,
+  for offline fallback), but a page request must never be answered
+  cache-first — that would pin a stale shell for the lifetime of the worker
+  version (bug observed and fixed 2026-07-11).
+- **Everything else same-origin** (all navigations including prerendered
+  routes, `.ttl`, `.wav`, icons) → **network-first, fall back to cache**, and
+  populate the cache on a successful, non-opaque (`response.type === 'basic'`)
+  `GET`. Fresh when online; available offline after first fetch; never caches
+  an opaque cross-origin response (those are already bypassed anyway).
 - Offline navigation with no cached match falls back to the cached root shell.
 
 ### 3.4 Why network-first for pages
@@ -205,7 +216,11 @@ owns both registration and the update prompt. It is Svelte 5 runes (`$state`,
 2. **Detecting a ready update.** It watches the registration for a `waiting`
    worker (present immediately if one was downloaded on a previous visit) and for
    `updatefound` → the installing worker reaching `installed` while a controller
-   already exists. Either path sets `updateReady = true`.
+   already exists. Either path sets `updateReady = true`. Because the browser
+   only checks for a new worker script on navigation, the component also calls
+   `registration.update()` whenever the tab becomes visible again
+   (`visibilitychange`) — a long-lived tab learns about deploys promptly, but a
+   found update still only surfaces the banner, never an auto-reload (Trap 1).
 
 3. **The banner.** A small, dismissible, `role="status"` strip: *"A new version
    of BSC Lab is ready."* with **Reload** and **Later**. Copy is neutral — no
