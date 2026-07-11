@@ -140,16 +140,37 @@ the pending perma-id **PR #6337** adds (`Accept: application/rdf+xml` →
 transient Turtle-fetch failure fails the whole crawl (including the 8-hourly
 re-crawl). Merging #6337 gives Archivo two independent working formats.
 
+**Submission mechanism (verified 2026-07-11).** The `archivo.tools.dbpedia.org`
+form is CSRF-protected (Flask-WTF); a bare `curl --data-urlencode
+"suggestUrl=…"` returns HTTP 500. A working submission must GET `/add` first to
+capture the session cookie + `csrf_token`, then POST `csrf_token` + `suggestUrl`
++ `submit=Suggest` with that cookie. The plain-curl example printed on the page
+still points at the dead `archivo.dbpedia.org` host and does not work.
+
+**Attempt 2 result (2026-07-11): SSTIM passed all RDF checks; blocked by a
+DBpedia-side failure.** The crawl reported "Robot allowance check: OK" and
+**"RDF content is accessible in 2 formats"** (707 triples parsed) — so the
+transient "No RDF content accessible or parseable" rejection is resolved and the
+ontology is valid for Archivo. The submission still ended "rejected" at the final
+step: **"Deployment to Databus — Failed… Could not deploy dataset to databus.
+Reason: Not found."** That is a server-side failure of DBpedia's Databus backend
+on the `.tools.` host (the canonical `archivo.dbpedia.org` is down), not an
+ontology problem. Nothing to fix on our side — retry when DBpedia's Databus
+deployment / canonical host is healthy again.
+
 ```text
-Service:            DBpedia Archivo
-Submitted URL:
+Service:            DBpedia Archivo (archivo.tools.dbpedia.org)
+Submitted URL:      https://w3id.org/sstim
 Submitted version:  0.6.0
 Release DOI:        10.5281/zenodo.21302910
-Date:
-Account/maintainer: —
+Date:               2026-07-11
+Account/maintainer: — (anonymous suggestion)
 External record ID or URL:
-Status:
-Required follow-up:
+Status:             Passed RDF validation ("accessible in 2 formats", 707
+                    triples). NOT indexed — DBpedia Databus deployment failed
+                    server-side ("Not found"). Retry when Archivo infra healthy.
+Required follow-up: Re-submit later; if it persists, report the Databus
+                    deployment failure on the DBpedia forum / archivo GitHub.
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
