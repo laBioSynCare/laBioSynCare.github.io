@@ -76,7 +76,7 @@ registration.
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
-| BARTOC | ✅ yes | no | medium |
+| BARTOC | ✅ yes — fields ready | yes (GitHub) | high (submit next) |
 | BioPortal | ✅ yes | yes | medium |
 | FAIRsharing | ✅ yes | yes | medium |
 | OLS | ⚠️ if accepted | yes | low |
@@ -229,23 +229,53 @@ Required follow-up: Wait for the curator email. Do NOT keep resubmitting — the
                     mpoveda@fi.upm.es). On integration, record the LOV vocab URL.
 ```
 
-### BARTOC — ready now
+### BARTOC — ready now (GitHub login required)
 
-Discovery for the SKOS terminology layer (frequency bands, modalities,
-mechanisms, techniques, evidence/caution vocabularies). Submit via the BARTOC
-suggestion form — **confirm the current mechanism**.
+**Submission mechanism (confirmed 2026-07-11).** Web form at
+`https://bartoc.org/edit` — **requires login**; BARTOC's login server supports
+**GitHub** (which the maintainer has). Log in, then fill the "Add vocabulary"
+form. BARTOC stores entries as JSKOS (`gbv/bartoc.org`); the fields below map
+SSTIM to that model. Alternative: open an issue on
+`https://github.com/gbv/bartoc.org` if the form blocks.
 
-- **Provide:** title, `https://w3id.org/sstim` (and the vocab namespace
-  `https://w3id.org/sstim/vocab#`), description, license, language coverage
-  (en, it, pt, es), and the HTML documentation URL.
+**Field-by-field values to enter:**
+
+| BARTOC / JSKOS field | Value |
+|---|---|
+| URI | `https://w3id.org/sstim` |
+| prefLabel (en) | Sensory Stimulation Ontology (SSTIM) |
+| prefLabel (it) | Ontologia della Stimolazione Sensoriale (SSTIM) |
+| prefLabel (pt) | Ontologia de Estimulação Sensorial (SSTIM) |
+| prefLabel (es) | Ontología de Estimulación Sensorial (SSTIM) |
+| notation | `sstim` |
+| definition / description | *(short description from §1)* |
+| url (homepage) | `https://labiosyncare.github.io/` |
+| type | Ontology + SKOS ConceptScheme — pick the NKOS **ontology** type; SSTIM is an OWL ontology that also carries SKOS concept schemes |
+| languages | en, it, pt, es |
+| license | CC BY 4.0 (`https://creativecommons.org/licenses/by/4.0/`) |
+| publisher | BSC Lab / laBioSynCare (`https://github.com/laBioSynCare`) |
+| creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
+| identifier | DOI `10.5281/zenodo.21286974` (concept); URI `https://w3id.org/sstim` |
+| FORMAT | Online, SKOS, RDF (also OWL/Turtle/JSON-LD) |
+| access / distribution | Turtle: `https://labiosyncare.github.io/ontology/sstim-core.ttl`; HTML docs: `https://labiosyncare.github.io/ontology/docs/` |
+| startDate | 2026 |
+
+- **subject:** BARTOC uses a DDC picker. Candidates: **152.1** (sensory
+  perception) or **612.8** (neurophysiology & sensory reception). Pick in the
+  form; avoid a therapy/medicine class (scope: no clinical claims).
+- **No public SPARQL endpoint to list** — SSTIM's SPARQL is client-side
+  (Comunica in the browser), not a hosted endpoint. Give the Turtle/dump URLs
+  for access instead.
 
 ```text
 Service:            BARTOC
-Submitted URL:
+Submitted URL:      https://bartoc.org/edit
+Submitted URI:      https://w3id.org/sstim
 Submitted version:  0.6.0
+Concept DOI:        10.5281/zenodo.21286974
 Date:
-Account/maintainer: —
-External record ID or URL:
+Account/maintainer: — (GitHub login)
+External record ID or URL:  (BARTOC node URL, assigned on save)
 Status:
 Required follow-up:
 ```
