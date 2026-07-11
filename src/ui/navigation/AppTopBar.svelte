@@ -151,6 +151,9 @@
       <a href="/sparql/">SPARQL</a>
       <a href="/logbook/">Logbook</a>
       <a href="/settings/">Settings</a>
+      <!-- Generated WIDOCO output exists only in the deployed artifact;
+           rel="external" keeps the prerender crawler and router away from it -->
+      <a href="/ontology/docs/" rel="external">Ontology docs</a>
       <ProfileControl />
     </div>
   </details>

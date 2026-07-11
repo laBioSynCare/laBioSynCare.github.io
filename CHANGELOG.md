@@ -15,6 +15,12 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Added
+- `rdfs:seeAlso` from the core ontology node to the generated WIDOCO reference
+  documentation (`https://labiosyncare.github.io/ontology/docs/`), so
+  harvesters that read ontology metadata (e.g. LOV) discover the documentation
+  (ADR 0023).
+
 ## [0.6.0] - 2026-07-11
 
 Semantic-quality and FAIR-metadata release. No SSTIM term IRI was removed or

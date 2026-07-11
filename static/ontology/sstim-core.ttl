@@ -75,7 +75,8 @@
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;
     void:inDataset <https://w3id.org/sstim/void> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0016-publication-obo-posture-and-registries.md> ;
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0016-publication-obo-posture-and-registries.md> ,
+        <https://labiosyncare.github.io/ontology/docs/> ;
     skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,
         "v0.2.0 (2026-06): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; completed it/pt/es prefLabel coverage across the vocabulary; added external upper-ontology label stubs. Backward-compatible minor release (no terms removed or renamed)."@en,
         "v0.2.0 erratum (2026-06): Corrected external alignment IRIs that had been wrong since 0.1.0: every Wikidata QID (all resolved to unrelated entities), the EvidenceClaim parent (iao:0000001 'conditional specification' → iao:0000030 'information content entity'), the obsolete OBI planned-process parent (added cob:0000082), a non-existent ORCID (replaced with the verified ORCID 0000-0002-9699-629X), and a dead repository link. No vocabulary terms changed."@en,

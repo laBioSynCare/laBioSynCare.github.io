@@ -46,8 +46,10 @@ As of 2026-07-11:
   Sensory Field, logbook, profile, settings, and optional Firebase-backed user
   data are implemented as a static SvelteKit application.
 
-The deployed HTML ontology documentation is still the application/browser;
-WIDOCO publication and registry submissions remain post-release work. Real participant session data, the private
+Browsers at the ontology IRI get the interactive application, and the
+[WIDOCO reference documentation](https://labiosyncare.github.io/ontology/docs/)
+is regenerated on every deploy (ADR 0023); registry submissions remain
+post-release work. Real participant session data, the private
 BioSynCare catalog, clinical protocols, and clinical claims are not published
 here.
 

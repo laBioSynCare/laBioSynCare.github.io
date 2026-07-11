@@ -59,7 +59,7 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 5852 ;
+    void:triples 5853 ;
     void:classes 56 ;
     void:properties 124 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
