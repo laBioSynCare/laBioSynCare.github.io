@@ -78,7 +78,7 @@ registration.
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
 | BioPortal | 🕓 **submitted 2026-07-12, processing** (ontologies/SSTIM) | account ✓ (@rfabbri) | — |
-| FAIRsharing | 🕓 **record 8494 created; finish required curation** | yes | in progress |
+| FAIRsharing | 🕓 **record 8494 complete, awaiting curator review** (DOI pending) | yes | — |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -459,17 +459,16 @@ Concept DOI:        10.5281/zenodo.21286974
 Date:               2026-07-12 (skeleton record created)
 Account/maintainer: @renato.fabbri (FAIRsharing account)
 External record ID or URL:  https://fairsharing.org/8494 (hidden until approved)
-Status:             NEARLY COMPLETE (2026-07-12). Filled: contacts, object types
-                    (Protocol Or Workflow), subjects, domains, 3 data processes
-                    (Browse/Download/w3id), CC BY 4.0, maintainer BSC Lab, BFO/
-                    IAO/OBI extends, Zenodo cross-ref. ONLY required field left:
-                    **taxonomies** — must explicitly select "Not applicable"
-                    (display shows N/A but it isn't registering). Recommended-
-                    missing (funding org, publications, citations) intentionally
-                    skipped — won't block review/DOI.
-Required follow-up: Set Taxonomies = "Not applicable" explicitly → record becomes
-                    eligible for curation + FAIRsharing DOI ("Awaiting DOI").
-                    Note: outage 13-14 Jul.
+Status:             COMPLETE + AWAITING CURATOR REVIEW (2026-07-12). Taxonomies
+                    set to "Not Applicable" → record left "incomplete" and now
+                    reads "awaiting review by FAIRsharing curators". All required
+                    fields done; rich metadata (object types, subjects, domains
+                    incl. sensory-perception terms, 3 data processes, CC BY 4.0,
+                    BSC Lab maintainer, IAO/BFO/OBI extends, Zenodo cross-ref).
+                    Recommended-missing (funding org, publications, citations)
+                    intentionally skipped — do not block review/DOI.
+Required follow-up: Wait for curator approval → FAIRsharing DOI issued (currently
+                    "Awaiting DOI"). Record the DOI when it lands.
 ```
 
 ### OLS (Ontology Lookup Service) — only if accepted
