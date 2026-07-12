@@ -347,8 +347,9 @@ HermiT-consistent. Served at
 |---|---|
 | Acronym | `SSTIM` |
 | Name | Sensory Stimulation Ontology |
-| Ontology URL / pull location | `https://labiosyncare.github.io/ontology/sstim-full.owl` |
-| Format | **OWL** (RDF/XML) |
+| Location | **Load from URL** (NOT upload) → `https://labiosyncare.github.io/ontology/sstim-full.owl` — "loaded nightly", so Pages deploys flow in |
+| Representation language | **OWL** (RDF/XML) |
+| Status | production (or beta for pre-1.0) |
 | Contact | Renato Fabbri — `renato.fabbri@gmail.com` |
 | Homepage | `https://labiosyncare.github.io/ontology/docs/` |
 | Documentation | `https://labiosyncare.github.io/ontology/docs/` |
