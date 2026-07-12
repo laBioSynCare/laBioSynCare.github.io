@@ -425,11 +425,17 @@ Concept DOI:        10.5281/zenodo.21286974
 Date:               2026-07-12 (skeleton record created)
 Account/maintainer: @renato.fabbri (FAIRsharing account)
 External record ID or URL:  https://fairsharing.org/8494 (hidden until approved)
-Status:             CREATED but INCOMPLETE — hidden; not reviewed until required
-                    curation (contacts, object types, subjects, taxonomies, data
-                    processes) is finished. Then curator review.
-Required follow-up: Complete the REQUIRED fields above in the edit view, then it
-                    enters curation. Note: FAIRsharing outage announced 13-14 Jul.
+Status:             NEARLY COMPLETE (2026-07-12). Filled: contacts, object types
+                    (Protocol Or Workflow), subjects, domains, 3 data processes
+                    (Browse/Download/w3id), CC BY 4.0, maintainer BSC Lab, BFO/
+                    IAO/OBI extends, Zenodo cross-ref. ONLY required field left:
+                    **taxonomies** — must explicitly select "Not applicable"
+                    (display shows N/A but it isn't registering). Recommended-
+                    missing (funding org, publications, citations) intentionally
+                    skipped — won't block review/DOI.
+Required follow-up: Set Taxonomies = "Not applicable" explicitly → record becomes
+                    eligible for curation + FAIRsharing DOI ("Awaiting DOI").
+                    Note: outage 13-14 Jul.
 ```
 
 ### OLS (Ontology Lookup Service) — only if accepted
