@@ -265,6 +265,15 @@ Turtle files are listed in section 1. After they exist:
 - [x] Model session specifications, executed session activities, phased
       self-reports, and a non-personal synthetic example `P2`
 - [ ] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
+- [~] Stakeholder ecosystem (specialists, orgs, labs, research groups) `P2`
+      *Design + governance decided in ADR 0024 (reuse schema.org/ORG/FOAF +
+      ROR/ORCID/Wikidata; notify-and-honor consent with engagement-tracking
+      properties; curated instances at `/organization/{id}` & `/specialist/{id}`,
+      never in the term space or Zenodo snapshots). Implementation follow-ups:
+      the `sstim-ecosystem` term module, its SHACL shape, a graph-browser
+      "Stakeholders" scope, loader entries, and the first seed (organizations
+      first, then consented public figures). Reconcile with `docs/ecosystem/
+      PARTNERS.md` + `ADVISORY_BOARD.md`.*
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`
       *An unverified Music Ontology association and the incorrect MeSH D012910

@@ -47,6 +47,7 @@ annotations lives here.
 | [0021](0021-controlled-value-semantics.md) | Controlled values describe categories, not their real-world referents | Accepted |
 | [0022](0022-0.6-release-review-posture.md) | Maintainer acceptance is sufficient for the 0.6 release | Accepted |
 | [0023](0023-ontology-docs-publication-path.md) | WIDOCO docs: CI-generated Pages subpath; the app keeps the browser-facing IRI | Accepted |
+| [0024](0024-stakeholder-ecosystem-modeling.md) | Model the stakeholder ecosystem (reuse schema.org/ORG; notify-and-honor consent; curated instances, not snapshotted) | Accepted |
 
 ## Adding an ADR
 
