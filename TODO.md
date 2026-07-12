@@ -265,15 +265,18 @@ Turtle files are listed in section 1. After they exist:
 - [x] Model session specifications, executed session activities, phased
       self-reports, and a non-personal synthetic example `P2`
 - [ ] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
-- [~] Stakeholder ecosystem (specialists, orgs, labs, research groups) `P2`
-      *Design + governance decided in ADR 0024 (reuse schema.org/ORG/FOAF +
-      ROR/ORCID/Wikidata; notify-and-honor consent with engagement-tracking
+- [~] Ecosystem agents (specialists, orgs, labs, research groups) `P2`
+      *Design + governance decided in ADR 0024: neutral umbrella
+      `sstim-eco:EcosystemAgent` (⊑ `prov:Agent`); reuse schema.org/ORG/FOAF +
+      ROR/ORCID/Wikidata; "stakeholder"/"contributor" are relationshipType
+      values, not the class; notify-and-honor consent with engagement-tracking
       properties; curated instances at `/organization/{id}` & `/specialist/{id}`,
-      never in the term space or Zenodo snapshots). Implementation follow-ups:
-      the `sstim-ecosystem` term module, its SHACL shape, a graph-browser
-      "Stakeholders" scope, loader entries, and the first seed (organizations
-      first, then consented public figures). Reconcile with `docs/ecosystem/
-      PARTNERS.md` + `ADVISORY_BOARD.md`.*
+      never in the term space; live-only by default with a consent-gated
+      archival tier (`archivalConsent`). Implementation follow-ups: the
+      `sstim-ecosystem` term module, its SHACL shape, a graph-browser
+      "Ecosystem / agents" scope, loader entries, and the first seed
+      (organizations first, then consented public figures). Reconcile with
+      `docs/ecosystem/PARTNERS.md` + `ADVISORY_BOARD.md`.*
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`
       *An unverified Music Ontology association and the incorrect MeSH D012910
@@ -428,13 +431,45 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] `src/ui/player/ParameterDisplay.js` — real-time frequency,
       breathing period, entrainment target display `P2`
 
-### UI — Creator (real-time preset design)
-- [ ] `src/ui/creator/PresetCreator.js` — add/remove voices, set
-      group/targetBand/evidence tier `P2`
-- [ ] `src/ui/creator/VoiceEditor.js` — per-voice parameter sliders
-      with bounds from `PRESET_FORMAT.md` `P2`
-- [ ] `src/ui/creator/LivePreview.js` — plays current state in real
-      time as parameters are adjusted `P2`
+### UI — Patch Studio (`src/ui/creator/`)
+The real-time audiovisual designer shipped ahead of schedule (see Current Focus,
+May 2026). Spec: [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md).
+The improvement backlog below is grounded in that spec's §10 and gated by
+[ADR 0026](docs/decisions/0026-patch-studio-catalog-bridge.md).
+
+- [x] ~~`PresetCreator.svelte` — add/remove control/audio/visual/haptic
+      tracks, per-param knobs, modulation links, tempo sync, live engine
+      preview, cloud save~~ — shipped (`patch-studio-model-1`).
+
+**Bridge to the catalog / RDF (highest priority — PATCH_STUDIO.md §10.1, ADR 0026)**
+- [ ] `src/ui/creator/patchToPreset.js` — convert the mappable subset of a patch
+      (`BinauralBeat→Binaural`, `Symmetry`+`IsochronicTone→Symmetry`,
+      `Martigli`-modulated carrier→`Martigli`/`Martigli-Binaural`) to catalog
+      `header`+`voices`; report blocked/dropped tracks, never silently drop `P2`
+- [ ] Metadata-authoring panel for the required `header` fields
+      (`group`, `targetBand`, `evidenceTier`, `cautionTags`, multilingual
+      `desc*`/`med2*`/`techDesc*`, `headphonesMode`, …); no auto-derived
+      evidence/claims (`CLAUDE.md` §3.5) `P2`
+- [ ] Validate output against `schemas/preset.schema.json`, then emit a BSC Lab
+      reference preset + (second) its RDF instance under
+      `static/ontology/instances/presets/`, SHACL-gated (`CLAUDE.md` §5.4).
+      Pairs with the `src/rdf/export.js` RDF-pipeline task below `P2`
+
+**Decompose the monolith (PATCH_STUDIO.md §10.2)**
+- [ ] Extract pure `src/ui/creator/modulation.js` (`applyMods`,
+      `effectiveTempoValue`, `clampRange`, `controlTrackForTempo`,
+      `modAmountRange`, binaural center/beat↔L/R resolution) `P2`
+- [ ] Extract pure `src/ui/creator/waveformPaths.js` (SVG preview geometry) `P2`
+- [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
+      preserving the `AudioContext.currentTime` clock authority) `P2`
+- [ ] Extract a cloud-patches store over `src/firebase/patches.js`; split out
+      subcomponents (cloud menu, help overlay, semantic-info panel, mix stage,
+      track card) `P2`
+
+**Tests (PATCH_STUDIO.md §10.3)**
+- [ ] Unit tests for the extracted `modulation.js` (base + Σ amount·control,
+      clamp, mute→gain 0, tempo-sync resolution, virtual-param round-trip) and
+      `waveformPaths.js` `P2`
 
 ### RDF pipeline
 - [ ] `src/rdf/export.js` — optionally generate a public BSC Lab preset JSON
@@ -500,15 +535,14 @@ Do not start these until all Phase 0 documents are committed.
       about mechanism uncertainty `P1`
 
 ### W3C Community Group
-- [ ] Confirm 5 founding members (Renato + 4 from partner list) `P1`
-      *Do not submit CG proposal until 5 are confirmed. An empty or
-      low-activity CG closes and damages credibility.*
-- [ ] Create W3C account if not already exists: `https://www.w3.org/accounts/request` `P1`
-- [ ] Submit W3C Community Group proposal using `CHARTER.md` and `docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md` `P1`
-      *URL: https://www.w3.org/community/groups/proposed/*
-      *Name: "Sensory Stimulation Vocabulary Community Group" — confirm with
-      founding members before submission*
-- [ ] Announce CG on relevant mailing lists and forums after creation `P1`
+- [x] Submit and launch the W3C Community Group — **done; launched, charter not
+      yet ratified.** `P1`
+      *Participant growth (currently 4 → target ≥12 across ≥3 institutions) is now
+      an ongoing KPI — see `docs/ecosystem/ECOSYSTEM_INTEGRATION.md` Workstream 3.*
+- [x] Create W3C account `P1`
+- [x] Submit W3C Community Group proposal using `CHARTER.md` and `docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md` `P1`
+- [ ] Ratify the charter with participants `P1`
+- [ ] Announce CG on relevant mailing lists and forums `P1`
 - [ ] First CG meeting: agree on scope, initial vocabulary items,
       contribution process `P2`
 - [ ] First CG report: draft vocabulary specification for sensory
@@ -635,9 +669,9 @@ something that assumes an answer.
   that could stress the relationship. A named advisory role with no
   deliverables may be acceptable. Confirm directly.
 
-- [?] **W3C CG name**: current proposal uses "Sensory Stimulation Vocabulary
-  Community Group" to emphasize terminology and semantic interoperability.
-  Confirm with founding members before submitting proposal.
+- [x] **W3C CG name**: settled as "Sensory Stimulation Vocabulary Community
+  Group" (the launched group's name), emphasizing terminology and semantic
+  interoperability.
 
 - [?] **arXiv submission path**: Renato has a PhD in physics but may
   not have current institutional affiliation. arXiv cs.SD may require

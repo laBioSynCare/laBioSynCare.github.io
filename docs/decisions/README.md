@@ -47,7 +47,9 @@ annotations lives here.
 | [0021](0021-controlled-value-semantics.md) | Controlled values describe categories, not their real-world referents | Accepted |
 | [0022](0022-0.6-release-review-posture.md) | Maintainer acceptance is sufficient for the 0.6 release | Accepted |
 | [0023](0023-ontology-docs-publication-path.md) | WIDOCO docs: CI-generated Pages subpath; the app keeps the browser-facing IRI | Accepted |
-| [0024](0024-stakeholder-ecosystem-modeling.md) | Model the stakeholder ecosystem (reuse schema.org/ORG; notify-and-honor consent; curated instances, not snapshotted) | Accepted |
+| [0024](0024-stakeholder-ecosystem-modeling.md) | Model the ecosystem as neutral agents (`EcosystemAgent` ⊑ `prov:Agent`; reuse schema.org/ORG); notify-and-honor consent with a consent-gated archival tier | Accepted |
+| [0025](0025-hed-bids-interoperability-crosswalk.md) | SSTIM ↔ HED/BIDS: align as a crosswalk, do not subordinate; adopt via the HED process | Proposed |
+| [0026](0026-patch-studio-catalog-bridge.md) | Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not native catalog authoring | Proposed |
 
 ## Adding an ADR
 
