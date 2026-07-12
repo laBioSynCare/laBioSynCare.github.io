@@ -410,7 +410,7 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Organisation links | **maintaining** org = BSC Lab (laBioSynCare), `https://github.com/laBioSynCare`. Funding org: none (independent project) — leave if none |
 | Domains (DRAO) | **sensory perception** (+ auditory/visual perception if offered) |
 | Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
-| Record associations | link **BFO, IAO, OBI, COB** with relationship **extends** (SSTIM subclasses/aligns their terms; direction SSTIM→target). Fallback `related_to` if preferring not to imply a formal extension. Add each that exists in FAIRsharing |
+| Record associations | **Done 2026-07-12:** added **BFO, IAO, OBI** with relationship **extends**. **COB is not registered in FAIRsharing** (small/newer OBO layer) — skipped, no gap. |
 | Citation / Publications | cite the Zenodo record — DOI `10.5281/zenodo.21286974` |
 | Cross references (optional) | Zenodo DOI, w3id URI |
 
