@@ -22,6 +22,12 @@ ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
 PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
 ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE)
+# BioPortal ingests a single root file and does not follow dct:isPartOf, so the
+# browsable term modules are merged into one OWL file. SHACL shapes are excluded
+# (validation constraints, not browsable terms). Core is first so the merged
+# ontology inherits its IRI (https://w3id.org/sstim).
+BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO)
+BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/*/*.ttl)
 DEV_HOST   ?= 127.0.0.1
@@ -29,7 +35,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev export export-check ontology-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev export export-check bioportal-bundle ontology-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -125,6 +131,16 @@ validate: shacl quality-audit reason sparql-sanity export-check
 export:
 	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)
 
+## Merge the browsable term modules (core+vocab+alignments+exposure+patch-studio,
+## excl. SHACL shapes) into one RDF/XML OWL file for BioPortal ingest.
+## Generated into dist/ (deploy artifact only), never committed; override BIOPORTAL_OUT=.
+bioportal-bundle:
+	@mkdir -p $(dir $(BIOPORTAL_OUT))
+	$(ROBOT) merge $(foreach f,$(BIOPORTAL_MODULES),--input $(f)) \
+		annotate --ontology-iri https://w3id.org/sstim \
+		--output $(BIOPORTAL_OUT)
+	@echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules"
+
 ## Generate WIDOCO HTML reference documentation from the core ontology
 ## (default into dist/ontology/docs/ for the Pages artifact; override DOCS_DIR=).
 ## Output is generated, never committed — /ontology/docs/ belongs to the docs,
@@ -152,6 +168,7 @@ help:
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
+	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"

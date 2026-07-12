@@ -77,7 +77,7 @@ registration.
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
-| BioPortal | ✅ yes | yes | medium |
+| BioPortal | ✅ yes — merged bundle + fields ready | account ✓ (@rfabbri) | high (submit next) |
 | FAIRsharing | 🕓 **record 8494 created; finish required curation** | yes | in progress |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
@@ -323,31 +323,59 @@ Required follow-up: Wait for editor action. On integration, record the live node
                     any field can be corrected after it goes live.
 ```
 
-### BioPortal — ready now (account required)
+### BioPortal — ready now (account created @rfabbri)
 
-Biomedical browsing, APIs, and candidate-mapping discovery. Create/submit a new
-ontology; provide the URL and set metadata. **Licensing note:** SSTIM is CC BY
-4.0, which BioPortal supports; do not import any mapping target whose license
-forbids redistribution.
+Biomedical browsing, APIs, and candidate-mapping discovery. **Account created
+2026-07-12** (username `rfabbri`; API key in the gitignored
+`docs/credentials/bioportal.md`, never committed).
 
-- **Entry point:** `https://bioportal.bioontology.org/ontologies/new`
-- **Provide:** acronym (proposed: `SSTIM`), name, `https://w3id.org/sstim`,
-  a pull location for the Turtle
-  (`https://labiosyncare.github.io/ontology/sstim-core.ttl`), CC BY 4.0,
-  contact, description, homepage, documentation URL.
-- **Decide before submitting:** whether to register the core module only or
-  the whole merged set. Recommend core + vocab first.
+**Ingest artifact — merged bundle.** BioPortal ingests one root file and does
+**not** follow `dct:isPartOf`, so pointing it at `sstim-core` would miss the
+295-concept SKOS vocabulary. A merged OWL file is generated in CI
+(`make bioportal-bundle`; ADR-style: artifact only, never committed):
+**core + vocab + alignments + exposure + patch-studio**, excluding SHACL shapes.
+One clean ontology IRI `https://w3id.org/sstim`; 73 classes + 329 SKOS concepts;
+HermiT-consistent. Served at
+**`https://labiosyncare.github.io/ontology/sstim-full.owl`** (RDF/XML).
+
+- **Entry point:** `https://bioportal.bioontology.org/ontologies/new` (log in).
+- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl`
+
+**Form fields:**
+
+| Field | Value |
+|---|---|
+| Acronym | `SSTIM` |
+| Name | Sensory Stimulation Ontology |
+| Ontology URL / pull location | `https://labiosyncare.github.io/ontology/sstim-full.owl` |
+| Format | **OWL** (RDF/XML) |
+| Contact | Renato Fabbri — `renato.fabbri@gmail.com` |
+| Homepage | `https://labiosyncare.github.io/ontology/docs/` |
+| Documentation | `https://labiosyncare.github.io/ontology/docs/` |
+| Publications / DOI | `10.5281/zenodo.21286974` |
+| Licence | CC BY 4.0 (`https://creativecommons.org/licenses/by/4.0/`) |
+| Description | *(short description from §1)* |
+| Categories | Health, Phenotype/Behaviour, or nearest (pick from BioPortal's category list) |
+| Groups | none required |
+| Natural language | English |
+| Vocabulary/hierarchy | SKOS + OWL (BioPortal auto-detects) |
+
+- **Licensing note:** SSTIM is CC BY 4.0 (BioPortal supports it); do not import
+  any mapping target whose licence forbids redistribution.
+- **Visibility:** public.
 
 ```text
 Service:            BioPortal
-Submitted URL:
+Submitted URL:      https://bioportal.bioontology.org/ontologies/new
 Submitted acronym:  SSTIM
+Pull location:      https://labiosyncare.github.io/ontology/sstim-full.owl
 Submitted version:  0.6.0
 Date:
-Account/maintainer:
-External record ID or URL:
+Account/maintainer: @rfabbri (bioportal.bioontology.org)
+External record ID or URL:  https://bioportal.bioontology.org/ontologies/SSTIM (on ingest)
 Status:
-Required follow-up:
+Required follow-up: Confirm the pull parses in BioPortal (73 classes + 329
+                    concepts); it re-pulls on a schedule so Pages updates flow in.
 ```
 
 ### FAIRsharing — ready now (account required)
