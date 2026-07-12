@@ -411,8 +411,8 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Domains (DRAO) | **sensory perception** (+ auditory/visual perception if offered) |
 | Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
 | Record associations | **Done 2026-07-12:** added **BFO, IAO, OBI** with relationship **extends**. **COB is not registered in FAIRsharing** (small/newer OBO layer) — skipped, no gap. |
-| Citation / Publications | cite the Zenodo record — DOI `10.5281/zenodo.21286974` |
-| Cross references (optional) | Zenodo DOI, w3id URI |
+| Citation / Publications | **Skip** — recommended-only, and only for a journal paper describing the resource (none exists). The DOI-import hangs on Zenodo DOIs (FAIRsharing import is CrossRef/PubMed; Zenodo is DataCite) — reload to clear the spinner. If a citation is wanted, use "CREATE NEW PUBLICATION" manually. |
+| Cross references / identifiers | put the Zenodo DOI `10.5281/zenodo.21286974` + w3id URI here (Additional Information tab), **not** in Publications |
 
 ```text
 Service:            FAIRsharing
