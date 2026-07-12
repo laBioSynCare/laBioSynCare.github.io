@@ -77,7 +77,7 @@ registration.
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
-| BioPortal | ✅ yes — merged bundle + fields ready | account ✓ (@rfabbri) | high (submit next) |
+| BioPortal | 🕓 **submitted 2026-07-12, processing** (ontologies/SSTIM) | account ✓ (@rfabbri) | — |
 | FAIRsharing | 🕓 **record 8494 created; finish required curation** | yes | in progress |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
@@ -370,14 +370,18 @@ HermiT-consistent. Served at
 Service:            BioPortal
 Submitted URL:      https://bioportal.bioontology.org/ontologies/new
 Submitted acronym:  SSTIM
-Pull location:      https://labiosyncare.github.io/ontology/sstim-full.owl
+Pull location:      https://labiosyncare.github.io/ontology/sstim-full.owl (Load from URL, nightly)
 Submitted version:  0.6.0
-Date:
+Date:               2026-07-12
 Account/maintainer: @rfabbri (bioportal.bioontology.org)
-External record ID or URL:  https://bioportal.bioontology.org/ontologies/SSTIM (on ingest)
-Status:
-Required follow-up: Confirm the pull parses in BioPortal (73 classes + 329
-                    concepts); it re-pulls on a schedule so Pages updates flow in.
+External record ID or URL:  https://bioportal.bioontology.org/ontologies/SSTIM
+Status:             SUBMITTED 2026-07-12 — "submitted successfully", queued for
+                    processing (up to several hours before explorable).
+Required follow-up: After processing, confirm it parsed (73 classes + 329
+                    concepts, no parse errors); add documentation URL + Zenodo
+                    DOI (as publication) via the ontology Edit/metadata form if
+                    BioPortal didn't auto-extract them. Nightly re-pull means
+                    Pages deploys flow in.
 ```
 
 ### FAIRsharing — ready now (account required)
