@@ -412,7 +412,8 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
 | Record associations | **Done 2026-07-12:** added **BFO, IAO, OBI** with relationship **extends**. **COB is not registered in FAIRsharing** (small/newer OBO layer) — skipped, no gap. |
 | Citation / Publications | **Skip** — recommended-only, and only for a journal paper describing the resource (none exists). The DOI-import hangs on Zenodo DOIs (FAIRsharing import is CrossRef/PubMed; Zenodo is DataCite) — reload to clear the spinner. If a citation is wanted, use "CREATE NEW PUBLICATION" manually. |
-| Cross references / identifiers | put the Zenodo DOI `10.5281/zenodo.21286974` + w3id URI here (Additional Information tab), **not** in Publications |
+| Cross references / identifiers | Additional Information tab. Portal dropdown lists BioPortal/OLS/OBO Foundry/AgroPortal/re3data/SciCrunch/Other — for a Zenodo DOI use **portal = Other**. Real value: add **BioPortal**/**OLS**/**OBO Foundry** cross-refs once SSTIM is listed there. Optional. |
+| Associated tools | **Skip** (optional). The interactive browser is an integrated site feature → belongs under **Data processes** as "Browse", not as a standalone tool. |
 
 ```text
 Service:            FAIRsharing
