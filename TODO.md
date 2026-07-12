@@ -223,11 +223,11 @@ Turtle files are listed in section 1. After they exist:
       *`scripts/sstim-quality-audit.py` and
       `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
       safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
-- [~] Generate WIDOCO HTML docs from `sstim-core.ttl` `P1`
+- [x] Generate WIDOCO HTML docs from `sstim-core.ttl` `P1`
       *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
       generates core-module reference docs; gap-filling metadata in
-      `docs/ontology/widoco.properties`. SKOS vocabulary docs need a SKOS-aware
-      generator (candidate: pyLODE SKOS profile) and remain open.*
+      `docs/ontology/widoco.properties`. SKOS vocabulary docs done via pyLODE
+      2.13.2 `vocpub` (`make vocab-docs` → `/ontology/docs/vocab/`, ADR 0023).*
 - [x] Deploy WIDOCO output to GitHub Pages `P1`
       *Publication path decided (ADR 0023): `pages.yml` generates into
       `dist/ontology/docs/` — deployed artifact only, never committed to

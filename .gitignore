@@ -16,3 +16,6 @@ result-*
 docs/credentials/
 
 .playwright-cli/
+
+# pyLODE writes a run log in the working dir (make vocab-docs)
+pylode.log

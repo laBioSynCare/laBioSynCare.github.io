@@ -620,12 +620,16 @@
     return '#' + curie
   }
 
-  // WIDOCO reference docs cover the core term-space only, and exist only in
-  // the deployed Pages artifact (`make ontology-docs` → /ontology/docs/) —
-  // the link 404s under `make dev`. Anchor ids are term local names.
+  // Reference docs exist only in the deployed Pages artifact (404 under
+  // `make dev`): WIDOCO for core OWL terms (`/ontology/docs/`, anchors are
+  // term local names) and pyLODE for SKOS vocabulary concepts
+  // (`/ontology/docs/vocab/` — pyLODE anchors are label-derived, so link the
+  // page rather than a fragile per-term fragment).
   function docsUrlForIri(iri) {
-    if (!iri || !iri.startsWith(SSTIM_BASE)) return null
-    return '/ontology/docs/#' + iri.slice(SSTIM_BASE.length)
+    if (!iri) return null
+    if (iri.startsWith(SSTIM_BASE)) return '/ontology/docs/#' + iri.slice(SSTIM_BASE.length)
+    if (iri.startsWith(SSTIM_V_BASE)) return '/ontology/docs/vocab/'
+    return null
   }
 
   function writeHashForSelected() {

@@ -70,6 +70,35 @@
             meta.mainProgram = "pyshacl";
           };
 
+          # pyLODE 2.13.2 — SKOS-aware HTML docs (vocpub profile) for the
+          # vocabulary module. WIDOCO is OWL-centric; pyLODE renders SKOS
+          # concept schemes. Pinned at 2.x (setuptools, deps all in nixpkgs);
+          # 3.x pulls in kurra → shacl-rules/sparqlib, not worth the cascade.
+          pylode = py.pkgs.buildPythonApplication rec {
+            pname = "pyLODE";
+            version = "2.13.2";
+            format = "setuptools";
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-+NU+mbpvh7hly2yuuN+KrTxtc1cr/kIGq0fwl8g99kI=";
+            };
+            # The 2.13.2 sdist omits requirements.txt, which setup.py reads for
+            # install_requires. Recreate it; nix supplies the deps below.
+            preBuild = ''
+              printf 'rdflib\nrequests\njinja2\nmarkdown\n' > requirements.txt
+            '';
+            dependencies = [
+              py.pkgs.rdflib
+              py.pkgs.requests
+              py.pkgs.jinja2
+              py.pkgs.markdown
+            ];
+            dontCheckRuntimeDeps = true;
+            doCheck = false;
+            pythonImportsCheck = [ "pylode" ];
+            meta.mainProgram = "pylode";
+          };
+
           robot = pkgs.stdenvNoCC.mkDerivation rec {
             pname = "robot";
             version = "1.9.10";
@@ -138,6 +167,7 @@
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
               (py.withPackages (ps: [ ps.rdflib ]))  # python3.12 + rdflib — `make export`, ad-hoc use
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
+              pylode              # vendored `pylode` CLI — SKOS vocab HTML docs (`make vocab-docs`)
               robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`
               widoco              # WIDOCO — ontology HTML reference docs for `make ontology-docs`
               pkgs.wabt           # wat2wasm for `make wasm` (bsc-osc.wat → .wasm)

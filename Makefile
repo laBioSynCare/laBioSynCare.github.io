@@ -9,6 +9,8 @@ EXPORT_DIR ?= dist/ontology
 WIDOCO     ?= widoco
 DOCS_DIR   ?= dist/ontology/docs
 WIDOCO_CONF := docs/ontology/widoco.properties
+PYLODE     ?= pylode
+VOCAB_DOCS_DIR ?= dist/ontology/docs/vocab
 WAT2WASM   ?= wat2wasm
 FIREBASE   ?= npx firebase-tools
 FIREBASE_PROJECT ?= biosyncare-lab
@@ -35,7 +37,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev export export-check bioportal-bundle ontology-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -151,6 +153,15 @@ ontology-docs:
 		-rewriteAll -lang en -uniteSections -noPlaceHolderText
 	cp $(DOCS_DIR)/index-en.html $(DOCS_DIR)/index.html
 
+## Generate pyLODE SKOS docs for the vocabulary module (vocpub profile).
+## WIDOCO is OWL-centric; this documents the SKOS concept schemes.
+## Self-contained HTML into dist/ontology/docs/vocab/ (artifact only, never
+## committed); override VOCAB_DOCS_DIR=.
+vocab-docs:
+	@mkdir -p $(VOCAB_DOCS_DIR)
+	$(PYLODE) -i $(VOCAB) -p vocpub -c true -o $(VOCAB_DOCS_DIR)/index.html
+	@echo "vocab-docs: wrote $(VOCAB_DOCS_DIR)/index.html"
+
 ## Recompile the hand-written WASM oscillator kernel (bsc-osc.wat -> .wasm)
 wasm:
 	$(WAT2WASM) $(WASM_WAT) -o $(WASM_OUT)
@@ -168,6 +179,7 @@ help:
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
+	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"

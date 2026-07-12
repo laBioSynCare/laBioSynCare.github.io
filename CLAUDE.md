@@ -54,7 +54,7 @@ substitute alternatives without explicit instruction.
 | Haptic engine (default) | Web Vibration API | browser native | NullHapticEngine fallback for unsupported platforms |
 | App hosting | GitHub Pages | current | Client-only static app and `/ontology/*.ttl` artifacts; custom hosting deferred until headers or backend services are needed |
 | Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
-| Ontology docs | WIDOCO | 1.4.25 (flake-pinned) | HTML reference docs; `make ontology-docs` runs in `pages.yml` → `/ontology/docs/` in the deployed artifact only, never committed (ADR 0023). Browser target at w3id stays the knowledge browser |
+| Ontology docs | WIDOCO + pyLODE | 1.4.25 / 2.13.2 (flake-pinned) | HTML reference docs generated in `pages.yml`, artifact only, never committed (ADR 0023): WIDOCO (`make ontology-docs` → `/ontology/docs/`) for the OWL core; pyLODE `vocpub` (`make vocab-docs` → `/ontology/docs/vocab/`) for the SKOS vocabulary. Browser target at w3id stays the knowledge browser |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
 | PWA / offline | SvelteKit native service worker | built-in | Installable, offline-capable from the same static `dist/`. No `vite-plugin-pwa`. Three binding constraints — see ADR 0009 + `docs/technical/PWA_SERVICE_WORKER.md` |
 | Dev toolchain | Nix flake | flakes | First-class: `flake.nix` pins Node, Python+pySHACL, WABT; CI runs inside it. `flake.lock` is the source of truth — regenerate via `nix flake update` |

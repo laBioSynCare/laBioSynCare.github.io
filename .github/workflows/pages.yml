@@ -67,6 +67,12 @@ jobs:
       - name: Generate ontology reference documentation (WIDOCO)
         run: nix develop --command make ontology-docs DOCS_DIR=dist/ontology/docs
 
+      # SKOS vocabulary docs (pyLODE vocpub) — WIDOCO is OWL-centric, so the
+      # concept schemes get their own page at /ontology/docs/vocab/. Artifact
+      # only, never committed.
+      - name: Generate SKOS vocabulary documentation (pyLODE)
+        run: nix develop --command make vocab-docs VOCAB_DOCS_DIR=dist/ontology/docs/vocab
+
       # Merged single-file OWL bundle for BioPortal (which does not follow
       # dct:isPartOf). Generated into the artifact only, never committed.
       # Served at /ontology/sstim-full.owl.

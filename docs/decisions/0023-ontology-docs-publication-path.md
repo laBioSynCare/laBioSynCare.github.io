@@ -56,9 +56,13 @@ required by any current registry. The docs and the app cross-link instead:
 - Revisiting the browser target later is a one-rule `.htaccess` edit in a
   perma-id PR — reversible, and only warranted if a registry review requires
   static documentation at the ontology IRI itself.
-- WIDOCO documents the core module only; the SKOS vocabulary module is better
-  served by a SKOS-aware generator (e.g. pyLODE's SKOS profile) if term-level
-  vocabulary docs are needed — tracked in `TODO.md`, not part of this decision.
+- WIDOCO documents the core module only; the SKOS vocabulary module is served
+  by a SKOS-aware generator. **Done 2026-07-12:** pyLODE 2.13.2 (`vocpub`
+  profile, vendored in the flake) generates `/ontology/docs/vocab/` in CI
+  alongside WIDOCO; the two cross-link (WIDOCO abstract → vocab page; graph node
+  panel → vocab page for SKOS concepts). pyLODE 2.x was chosen over 3.x because
+  3.x pulls in `kurra` → `shacl-rules`/`sparqlib` (a heavy vendoring cascade and
+  a pyshacl version conflict); 2.13.2's deps are all in nixpkgs.
 
 ## Alternatives considered
 
