@@ -355,7 +355,8 @@ HermiT-consistent. Served at
 | Publications / DOI | `10.5281/zenodo.21286974` |
 | Licence | CC BY 4.0 (`https://creativecommons.org/licenses/by/4.0/`) |
 | Description | *(short description from §1)* |
-| Categories | Health, Phenotype/Behaviour, or nearest (pick from BioPortal's category list) |
+| Categories | **Vocabularies** (best fit — SKOS terminology) + **Health**; optional **Experimental Conditions** / **Biomedical Resources**. Avoid Neurologic Disease / Neurological Disorder (off non-clinical scope). "Phenotype" is a weak fit. |
+| View of another ontology? | **No** (off — SSTIM is not a view/slice) |
 | Groups | none required |
 | Natural language | English |
 | Vocabulary/hierarchy | SKOS + OWL (BioPortal auto-detects) |
