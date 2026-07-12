@@ -400,7 +400,7 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Object types | controlled picker — pick the closest to what SSTIM describes (e.g. **protocol**, **study/experimental process**); ≥1 required. If nothing fits, ask curators |
 | Subjects (SRAO) | **psychology**, **neuroscience** (≥1 required) |
 | Taxonomies | **Not applicable** (species irrelevant) |
-| Data processes & conditions | ≥1 "read" process whose name contains **Search/Browse/Download**. Add **Browse** → `https://labiosyncare.github.io/` (knowledge browser) and **Download** → `https://labiosyncare.github.io/ontology/sstim-core.ttl` (Turtle). Optionally note content-negotiated RDF at `https://w3id.org/sstim` |
+| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download SSTIM (Turtle)** — `…/ontology/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
 
 **RECOMMENDED (add for a strong, approvable record):**
 
