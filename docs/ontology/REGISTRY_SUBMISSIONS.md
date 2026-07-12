@@ -371,27 +371,37 @@ as an identifier. Several fields are **controlled-vocabulary pickers** (subjects
 = SRAO, domains = DRAO, licence, organisations, related records) — pick from the
 autocomplete; the values below are the intended targets.
 
-**Field-by-field values:**
+**Two-stage flow (confirmed by screenshots 2026-07-11).**
 
-| FAIRsharing field | Value |
+*Stage 1 — the `/create` skeleton form (fields shown, `*` = required):*
+
+| Field | Value |
 |---|---|
-| Registry / type | Standard → **terminology artifact** |
-| Name | Sensory Stimulation Ontology |
+| Logo | *(skip, optional)* |
+| Record Name * | Sensory Stimulation Ontology |
 | Abbreviation | SSTIM |
-| Homepage | `https://labiosyncare.github.io/ontology/docs/` |
-| Description | An OWL 2 ontology with a multilingual SKOS vocabulary and SHACL shapes for parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims across auditory, visual, and tactile modalities. |
+| Homepage * | `https://labiosyncare.github.io/ontology/docs/` |
 | Year of creation | 2026 |
-| Status | ready / released |
+| Countries | Italy |
+| **Registry and type *** | **Standard → terminology artifact** |
+| Status | Ready |
+| Description * | An OWL 2 ontology with a multilingual SKOS vocabulary and SHACL shapes for parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims across auditory, visual, and tactile modalities. |
+
+Then **CREATE RECORD** → opens the fuller edit view.
+
+*Stage 2 — the edit view (add the rest; many are controlled-vocabulary pickers):*
+
+| Field | Value |
+|---|---|
 | Identifiers | vocabulary URI `https://w3id.org/sstim`; Zenodo concept DOI `10.5281/zenodo.21286974` (+ version DOI `10.5281/zenodo.21302910`) |
 | Licence / conditions of use | CC BY 4.0 (pick from licence list) |
 | Associated organisation | **BSC Lab (laBioSynCare)** — role Maintainer/Developer (`https://github.com/laBioSynCare`) |
 | Contact / creator | Renato Fabbri — ORCID `0000-0002-9699-629X`; `renato.fabbri@gmail.com` |
-| Country | Italy |
-| Subjects (SRAO picker) | **psychology**, **neuroscience** (add what the autocomplete offers) |
-| Domains (DRAO picker) | **sensory perception** (+ e.g. auditory/visual perception, brain if offered) |
-| Taxonomic range | **Not applicable** (no species scope) |
+| Subjects (SRAO picker) | **psychology**, **neuroscience** |
+| Domains (DRAO picker) | **sensory perception** (+ auditory/visual perception if offered) |
+| Taxonomic range | **Not applicable** |
 | Support links | docs `…/ontology/docs/`; repo `https://github.com/laBioSynCare/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
-| Related standards | reuses **BFO, IAO, OBI, COB** by stable PURL — add as "imports"/related if they're in FAIRsharing |
+| Related standards | reuses **BFO, IAO, OBI, COB** by PURL — add as related/imports if in FAIRsharing |
 | Publications | none yet (cite the Zenodo record if a field allows) |
 
 ```text
