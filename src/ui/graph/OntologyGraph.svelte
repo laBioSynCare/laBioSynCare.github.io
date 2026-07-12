@@ -103,12 +103,47 @@
 
   const GRAPH_SCOPES = [
     { value: 'all', label: 'All rendered data' },
-    { value: 'core', label: 'Core classes' },
-    { value: 'vocabulary', label: 'Controlled vocabulary' },
+    { value: 'core', label: 'Core OWL classes' },
+    { value: 'vocabulary', label: 'All SKOS vocabulary' },
     { value: 'frequency', label: 'Frequency bands' },
-    { value: 'evidence', label: 'Evidence vocabulary' },
-    { value: 'voice', label: 'Voice vocabulary' },
+    { value: 'modality', label: 'Sensory modalities' },
+    { value: 'mechanism', label: 'Stimulation mechanisms' },
+    { value: 'technique', label: 'Techniques' },
+    { value: 'voice', label: 'Voice types & rhythm' },
+    { value: 'group', label: 'Preset groups' },
+    { value: 'evidence', label: 'Evidence & claims' },
+    { value: 'caution', label: 'Cautions & safety' },
+    { value: 'exposure', label: 'Exposure & delivery' },
   ]
+
+  // Thematic scope → the concept schemes it shows. graph.js renders every
+  // skos:Concept in the store (vocab + exposure) tagged with its scheme IRI,
+  // so filtering by scheme gives per-domain views. 'all'/'core'/'vocabulary'
+  // are handled directly in graphScopeNodeVisible.
+  const V_SCHEME = 'https://w3id.org/sstim/vocab#'
+  const EX_SCHEME = 'https://w3id.org/sstim/exposure#'
+  const SCOPE_SCHEMES = {
+    frequency: [V_SCHEME + 'FrequencyBandScheme'],
+    modality:  [V_SCHEME + 'SensoryModalityScheme', EX_SCHEME + 'PerceivedModalityScheme'],
+    mechanism: [V_SCHEME + 'StimulationMechanismScheme'],
+    technique: [V_SCHEME + 'TechniqueScheme'],
+    voice:     [V_SCHEME + 'VoiceTypeScheme', V_SCHEME + 'PermutationFunctionScheme', V_SCHEME + 'StimulusTemporalStructureScheme'],
+    group:     [V_SCHEME + 'PresetGroupScheme'],
+    evidence:  [V_SCHEME + 'EvidenceTierScheme', V_SCHEME + 'EvidenceModalityScheme', V_SCHEME + 'PublicClaimLevelScheme', V_SCHEME + 'ClaimDirectionScheme', V_SCHEME + 'ReviewStatusScheme', V_SCHEME + 'EffectDirectionScheme'],
+    caution:   [V_SCHEME + 'CautionTagScheme', V_SCHEME + 'CautionSeverityScheme'],
+    exposure:  [EX_SCHEME + 'DeliveryMediumScheme', EX_SCHEME + 'PerceivedModalityScheme', EX_SCHEME + 'DeviceCapabilityScheme', EX_SCHEME + 'BodyPlacementScheme', EX_SCHEME + 'StimulusPatternScheme', EX_SCHEME + 'ComfortBoundaryScheme', EX_SCHEME + 'AudioNoiseColorScheme', EX_SCHEME + 'VisualNoiseScheme', EX_SCHEME + 'PerceptualGainScheme', EX_SCHEME + 'PerceptualLossScheme', EX_SCHEME + 'EffectDimensionScheme', EX_SCHEME + 'ExperimentContextScheme', EX_SCHEME + 'KnowledgeStatusScheme'],
+  }
+  // Governing OWL classes to also include in a scope, for structural context.
+  const SCOPE_CLASSES = {
+    frequency: ['FrequencyBand', 'FrequencyBandGroup'],
+    evidence:  ['EvidenceClaim', 'EvidenceTierValue', 'EvidenceModalityTag', 'PublicSafeReference', 'PublicClaimLevel'],
+    voice:     ['Preset', 'Voice', 'BinauralVoice', 'MartigliVoice', 'MartigliBinauralVoice', 'SymmetryVoice', 'VoiceType'],
+    caution:   ['CautionTag', 'CautionSeverity'],
+    technique: ['SensoryStimulationTechnique'],
+    group:     ['PresetGroup'],
+    modality:  ['SensoryModality'],
+    mechanism: ['StimulationMechanism'],
+  }
 
   function localName(iri) {
     return iri?.split(/[#/]/).pop() ?? ''
@@ -209,27 +244,12 @@
     if (graphScope === 'all') return true
     if (graphScope === 'core') return ['owlClass', 'xsdType'].includes(data.kind)
     if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
-    if (graphScope === 'frequency') {
-      return data.scheme === 'https://w3id.org/sstim/vocab#FrequencyBandScheme' ||
-        data.iri === 'https://w3id.org/sstim#FrequencyBand' ||
-        data.iri === 'https://w3id.org/sstim#FrequencyBandGroup'
-    }
-    if (graphScope === 'evidence') {
-      return data.scheme === 'https://w3id.org/sstim/vocab#EvidenceTierScheme' ||
-        data.scheme === 'https://w3id.org/sstim/vocab#EvidenceModalityScheme' ||
-        [
-          'EvidenceClaim',
-          'EvidenceTierValue',
-          'EvidenceModalityTag',
-          'PublicSafeReference',
-        ].includes(localName(data.iri))
-    }
-    if (graphScope === 'voice') {
-      return data.scheme === 'https://w3id.org/sstim/vocab#VoiceTypeScheme' ||
-        ['Preset', 'Voice', 'BinauralVoice', 'MartigliVoice', 'MartigliBinauralVoice', 'SymmetryVoice']
-          .includes(localName(data.iri))
-    }
-    return true
+    const schemes = SCOPE_SCHEMES[graphScope]
+    const classes = SCOPE_CLASSES[graphScope]
+    if (!schemes && !classes) return true
+    if (schemes && data.kind === 'skosConcept' && schemes.includes(data.scheme)) return true
+    if (classes && classes.includes(localName(data.iri))) return true
+    return false
   }
 
   function edgeLayerVisible(kind) {
