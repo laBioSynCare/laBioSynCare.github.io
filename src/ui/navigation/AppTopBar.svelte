@@ -151,9 +151,11 @@
       <a href="/sparql/">SPARQL</a>
       <a href="/logbook/">Logbook</a>
       <a href="/settings/">Settings</a>
-      <!-- Generated WIDOCO output exists only in the deployed artifact;
-           rel="external" keeps the prerender crawler and router away from it -->
+      <!-- Generated docs (WIDOCO for OWL core, pyLODE for the SKOS vocabulary)
+           exist only in the deployed artifact; rel="external" keeps the
+           prerender crawler and router away from them -->
       <a href="/ontology/docs/" rel="external">Ontology docs</a>
+      <a href="/ontology/docs/vocab/" rel="external">Vocabulary docs</a>
       <ProfileControl />
     </div>
   </details>
