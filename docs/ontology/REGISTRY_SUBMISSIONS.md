@@ -77,7 +77,7 @@ registration.
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
-| BioPortal | 🕓 **submitted 2026-07-12, processing** (ontologies/SSTIM) | account ✓ (@rfabbri) | — |
+| BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
 | FAIRsharing | 🕓 **record 8494 complete, awaiting curator review** (DOI pending) | yes | — |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
@@ -375,13 +375,13 @@ Submitted version:  0.6.0
 Date:               2026-07-12
 Account/maintainer: @rfabbri (bioportal.bioontology.org)
 External record ID or URL:  https://bioportal.bioontology.org/ontologies/SSTIM
-Status:             SUBMITTED 2026-07-12 — "submitted successfully", queued for
-                    processing (up to several hours before explorable).
-Required follow-up: After processing, confirm it parsed (73 classes + 329
-                    concepts, no parse errors); add documentation URL + Zenodo
-                    DOI (as publication) via the ontology Edit/metadata form if
-                    BioPortal didn't auto-extract them. Nightly re-pull means
-                    Pages deploys flow in.
+Status:             PARSED OK 2026-07-12 — live at ontologies/SSTIM. Metrics:
+                    67 classes, 334 individuals (= the SKOS concepts, dual-typed),
+                    121 properties. Full class hierarchy + vocabulary ingested
+                    (merged bundle worked; core-only would show ~0 individuals).
+Required follow-up: Optional polish via the ontology Edit form — add documentation
+                    URL + Zenodo DOI (as publication) if not auto-extracted.
+                    Nightly re-pull means Pages deploys flow in automatically.
 ```
 
 ### FAIRsharing — ready now (account required)
