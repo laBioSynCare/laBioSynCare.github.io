@@ -78,7 +78,7 @@ registration.
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
 | BioPortal | ✅ yes | yes | medium |
-| FAIRsharing | ✅ yes — fields ready | yes (email/ORCID) | high (submit next) |
+| FAIRsharing | 🕓 **record 8494 created; finish required curation** | yes | in progress |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -389,33 +389,46 @@ autocomplete; the values below are the intended targets.
 
 Then **CREATE RECORD** → opens the fuller edit view.
 
-*Stage 2 — the edit view (add the rest; many are controlled-vocabulary pickers):*
+*Stage 2 — the edit view (record `8494`). The record is hidden and **not
+reviewed until all REQUIRED curation is done** (per the creation email).*
+
+**REQUIRED (must complete before curators look):**
 
 | Field | Value |
 |---|---|
-| Identifiers | vocabulary URI `https://w3id.org/sstim`; Zenodo concept DOI `10.5281/zenodo.21286974` (+ version DOI `10.5281/zenodo.21302910`) |
-| Licence / conditions of use | CC BY 4.0 (pick from licence list) |
-| Associated organisation | **BSC Lab (laBioSynCare)** — role Maintainer/Developer (`https://github.com/laBioSynCare`) |
-| Contact / creator | Renato Fabbri — ORCID `0000-0002-9699-629X`; `renato.fabbri@gmail.com` |
-| Subjects (SRAO picker) | **psychology**, **neuroscience** |
-| Domains (DRAO picker) | **sensory perception** (+ auditory/visual perception if offered) |
-| Taxonomic range | **Not applicable** |
-| Support links | docs `…/ontology/docs/`; repo `https://github.com/laBioSynCare/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
-| Related standards | reuses **BFO, IAO, OBI, COB** by PURL — add as related/imports if in FAIRsharing |
-| Publications | none yet (cite the Zenodo record if a field allows) |
+| Contacts | Renato Fabbri — `renato.fabbri@gmail.com` |
+| Object types | controlled picker — pick the closest to what SSTIM describes (e.g. **protocol**, **study/experimental process**); ≥1 required. If nothing fits, ask curators |
+| Subjects (SRAO) | **psychology**, **neuroscience** (≥1 required) |
+| Taxonomies | **Not applicable** (species irrelevant) |
+| Data processes & conditions | ≥1 "read" process whose name contains **Search/Browse/Download**. Add **Browse** → `https://labiosyncare.github.io/` (knowledge browser) and **Download** → `https://labiosyncare.github.io/ontology/sstim-core.ttl` (Turtle). Optionally note content-negotiated RDF at `https://w3id.org/sstim` |
+
+**RECOMMENDED (add for a strong, approvable record):**
+
+| Field | Value |
+|---|---|
+| Licences | CC BY 4.0 |
+| Organisation links | **maintaining** org = BSC Lab (laBioSynCare), `https://github.com/laBioSynCare`. Funding org: none (independent project) — leave if none |
+| Domains (DRAO) | **sensory perception** (+ auditory/visual perception if offered) |
+| Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
+| Record associations | link **BFO, IAO, OBI, COB** FAIRsharing records (SSTIM reuses them) |
+| Citation / Publications | cite the Zenodo record — DOI `10.5281/zenodo.21286974` |
+| Cross references (optional) | Zenodo DOI, w3id URI |
 
 ```text
 Service:            FAIRsharing
-Submitted URL:      https://fairsharing.org/new
+Record:             https://fairsharing.org/8494 (Sensory Stimulation Ontology)
 Record type:        Standard / terminology artifact
-Name:               Sensory Stimulation Ontology (SSTIM)
+Name:               Sensory Stimulation Ontology
 Submitted version:  0.6.0
 Concept DOI:        10.5281/zenodo.21286974
-Date:
-Account/maintainer: (FAIRsharing account — email/ORCID)
-External record ID or URL:  (FAIRsharing DOI/record, assigned on approval)
-Status:
-Required follow-up:
+Date:               2026-07-12 (skeleton record created)
+Account/maintainer: @renato.fabbri (FAIRsharing account)
+External record ID or URL:  https://fairsharing.org/8494 (hidden until approved)
+Status:             CREATED but INCOMPLETE — hidden; not reviewed until required
+                    curation (contacts, object types, subjects, taxonomies, data
+                    processes) is finished. Then curator review.
+Required follow-up: Complete the REQUIRED fields above in the edit view, then it
+                    enters curation. Note: FAIRsharing outage announced 13-14 Jul.
 ```
 
 ### OLS (Ontology Lookup Service) — only if accepted
