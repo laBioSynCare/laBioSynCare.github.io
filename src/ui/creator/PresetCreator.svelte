@@ -2080,17 +2080,21 @@
           <button type="button" class="semantic-close" aria-label="Close semantic info" onclick={closeSemanticInfo}>×</button>
         </header>
         <p>{semanticInfo.description}</p>
-        <dl>
-          <div>
-            <dt>CURIE</dt>
-            <dd>{localSemanticName(semanticInfo.uri)}</dd>
-          </div>
-          <div>
-            <dt>URI</dt>
-            <dd><code>{semanticInfo.uri}</code></dd>
-          </div>
-        </dl>
-        <a class="semantic-graph-link" href={semanticGraphHref(semanticInfo)}>Open in graph</a>
+        {#if semanticInfo.uri}
+          <dl>
+            <div>
+              <dt>CURIE</dt>
+              <dd>{localSemanticName(semanticInfo.uri)}</dd>
+            </div>
+            <div>
+              <dt>URI</dt>
+              <dd><code>{semanticInfo.uri}</code></dd>
+            </div>
+          </dl>
+          <a class="semantic-graph-link" href={semanticGraphHref(semanticInfo)}>Open in graph</a>
+        {:else}
+          <p class="semantic-unmapped"><small>Not yet mapped to an SSTIM ontology term.</small></p>
+        {/if}
       </div>
     </div>
   {/if}
@@ -2862,6 +2866,8 @@
     line-height: 1;
   }
   .semantic-close:hover { background: var(--acc-s); border-color: var(--acc); }
+
+  .semantic-unmapped { margin: 0.5rem 0 0; color: var(--mut); }
 
   .semantic-graph-link {
     display: inline-flex;

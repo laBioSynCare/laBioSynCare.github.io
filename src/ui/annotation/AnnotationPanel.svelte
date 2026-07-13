@@ -15,13 +15,13 @@
   let auth = $state({ ready: false, configured: false, user: null, error: null })
   let annotations = $state([])
   let annotationText = $state('')
-  let annotationVisibility = $state('public')
+  let annotationVisibility = $state('private')
   let error = $state(null)
   let saving = $state(false)
 
   let editingId = $state(null)
   let editText = $state('')
-  let editVisibility = $state('public')
+  let editVisibility = $state('private')
   let editError = $state(null)
 
   const unsubscribeAuth = authState.subscribe((value) => {

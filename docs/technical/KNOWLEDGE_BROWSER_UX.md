@@ -53,13 +53,15 @@ page (a dedicated `src/ui/sparql/` component is planned).
   `#sstim-v:highTheta` are accepted as a fallback. Selection writes back to the
   URL with `history.replaceState`, so the URL is bidirectionally shareable
   without polluting the back stack.
-- **Public / private annotations** — notes default to public so other readers
-  benefit from them; creators can mark a note private at write time, edit it
-  in place afterwards, and toggle visibility on edit. Unauthenticated visitors
-  see public notes (read-only); only the creator can edit or delete. Author
-  display name is captured at write time and shown on each note. Public notes
-  serialize into a shared RDF named graph; private notes stay in the per-user
-  graph.
+- **Public / private annotations** — notes default to private and fail closed
+  (an unrecognised visibility value is treated as private); creators can mark
+  a note public at write time, edit it in place afterwards, and toggle
+  visibility on edit. Unauthenticated visitors see public notes (read-only);
+  only the creator can edit or delete. Author display name is captured at
+  write time and shown on each note. Public notes serialize into a shared RDF
+  named graph; private notes stay in a per-user graph. RDF serialization uses
+  `oa:bodyValue`, whitelisted OA motivations, and pseudonymous agent IRIs —
+  the Firebase authentication ID never appears in exported RDF (audit KR-12).
 - **Author display name + profile page** — display name on signup is optional
   and falls back to the email's local-part instead of "Anonymous". A new
   `/profile/` route lets signed-in users edit their display name, affiliation,

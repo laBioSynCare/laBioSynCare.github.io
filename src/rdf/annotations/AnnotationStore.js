@@ -9,18 +9,45 @@ export const ANNOTATION_COLLECTION = 'rdfAnnotations'
 const VISIBILITY_VALUES = new Set(['public', 'private'])
 
 export function normalizeTargetIri(target) {
-  if (typeof target === 'string') return target
-  if (target?.value) return target.value
-  throw new Error('Annotation target must be an IRI string or RDF named node.')
+  const value = typeof target === 'string' ? target : target?.value
+  if (typeof value === 'string' && /^https?:\/\/\S+$/.test(value)) return value
+  throw new Error('Annotation target must be an absolute http(s) IRI or RDF named node.')
 }
 
-export function annotationGraphIri(userId) {
-  if (!userId) return 'https://w3id.org/sstim/implementation/bsclab/annotation/public'
-  return BSCLAB_ANNOTATION(encodeURIComponent(userId)).value
-}
-
+// Anything not explicitly 'public' is treated as private (fail closed).
 function safeVisibility(value) {
-  return VISIBILITY_VALUES.has(value) ? value : 'public'
+  return VISIBILITY_VALUES.has(value) ? value : 'private'
+}
+
+// The Web Annotation motivation vocabulary (https://www.w3.org/TR/annotation-vocab/).
+// Only these may become oa:motivatedBy IRIs; anything else falls back to
+// oa:commenting instead of minting an IRI from an unchecked string.
+const OA_MOTIVATIONS = new Set([
+  'assessing', 'bookmarking', 'classifying', 'commenting', 'describing',
+  'editing', 'highlighting', 'identifying', 'linking', 'moderating',
+  'questioning', 'replying', 'tagging',
+])
+
+function safeMotivation(value) {
+  return OA_MOTIVATIONS.has(value) ? value : 'commenting'
+}
+
+// RDF exports never carry the Firebase authentication ID. Agent and graph
+// IRIs use a deterministic SHA-256-derived pseudonym instead: stable enough
+// for attribution across exports, but not an authentication identifier.
+// Linking a pseudonym to a public identity requires explicit consent and is
+// deliberately not implemented here.
+const pseudonymCache = new Map()
+
+async function pseudonymFor(userId) {
+  if (!userId) return 'anonymous'
+  if (pseudonymCache.has(userId)) return pseudonymCache.get(userId)
+  const bytes = new TextEncoder().encode(`bsclab-annotation-agent:${userId}`)
+  const digest = await crypto.subtle.digest('SHA-256', bytes)
+  const hex = [...new Uint8Array(digest)].slice(0, 12)
+    .map((b) => b.toString(16).padStart(2, '0')).join('')
+  pseudonymCache.set(userId, hex)
+  return hex
 }
 
 function timestampToIso(value) {
@@ -55,7 +82,6 @@ export class AnnotationStore {
   constructor(userId, db) {
     this.userId = userId ?? null
     this.db = db
-    this.annotationGraphIri = annotationGraphIri(this.userId)
   }
 
   static async forUser(userId) {
@@ -73,7 +99,7 @@ export class AnnotationStore {
     return Boolean(this.userId)
   }
 
-  async add({ annotatesNode, annotationText, annotationType = 'commenting', visibility = 'public', userDisplayName = '' }) {
+  async add({ annotatesNode, annotationText, annotationType = 'commenting', visibility = 'private', userDisplayName = '' }) {
     if (!this.userId) throw new Error('Sign in to add annotations.')
     const text = annotationText?.trim()
     if (!text) throw new Error('Annotation text cannot be empty.')
@@ -177,20 +203,28 @@ export class AnnotationStore {
     await deleteDoc(doc(this.db, ANNOTATION_COLLECTION, id))
   }
 
-  toQuads(annotations) {
-    const fallbackGraph = namedNode(this.annotationGraphIri)
+  async toQuads(annotations) {
     const publicGraph = namedNode('https://w3id.org/sstim/implementation/bsclab/annotation/public')
+    const pseudonyms = new Map()
+    for (const annotation of annotations) {
+      if (!pseudonyms.has(annotation.userId)) {
+        pseudonyms.set(annotation.userId, await pseudonymFor(annotation.userId))
+      }
+    }
 
     return annotations.flatMap((annotation) => {
-      const ownerSegment = encodeURIComponent(annotation.userId || 'anonymous')
+      const ownerSegment = pseudonyms.get(annotation.userId)
       const annotationNode = BSCLAB_ANNOTATION(`${ownerSegment}/${annotation.id}`)
       const actor = namedNode(`https://w3id.org/sstim/implementation/bsclab/user/${ownerSegment}`)
-      const graph = annotation.visibility === 'public' ? publicGraph : fallbackGraph
+      // Fail closed: only an explicit 'public' reaches the public graph.
+      const graph = safeVisibility(annotation.visibility) === 'public'
+        ? publicGraph
+        : BSCLAB_ANNOTATION(ownerSegment)
       const quads = [
         quad(annotationNode, RDF('type'), OA('Annotation'), graph),
         quad(annotationNode, OA('hasTarget'), namedNode(annotation.targetIri), graph),
-        quad(annotationNode, OA('hasBody'), literal(annotation.annotationText), graph),
-        quad(annotationNode, OA('motivatedBy'), OA(annotation.annotationType), graph),
+        quad(annotationNode, OA('bodyValue'), literal(annotation.annotationText), graph),
+        quad(annotationNode, OA('motivatedBy'), OA(safeMotivation(annotation.annotationType)), graph),
         quad(annotationNode, PROV('wasAttributedTo'), actor, graph),
       ]
 
@@ -205,9 +239,9 @@ export class AnnotationStore {
     })
   }
 
-  serialize(annotations) {
+  async serialize(annotations) {
     const writer = new Writer({ prefixes: PREFIXES })
-    writer.addQuads(this.toQuads(annotations))
+    writer.addQuads(await this.toQuads(annotations))
     return new Promise((resolve, reject) => {
       writer.end((error, result) => {
         if (error) reject(error)

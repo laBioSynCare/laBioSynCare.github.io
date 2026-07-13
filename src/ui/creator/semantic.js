@@ -1,4 +1,4 @@
-import { SSTIM, SSTIM_V } from '../../rdf/namespaces.js'
+import { SSTIM, SSTIM_EX, SSTIM_V } from '../../rdf/namespaces.js'
 
 const TRACK_SEMANTICS = {
   BinauralBeat: {
@@ -111,34 +111,38 @@ const TRACK_SEMANTICS = {
   },
 }
 
+// Closed registry (KR-17): the third element is a fully resolved IRI that must
+// be declared in the live ontology modules, or null when no genuine term
+// exists yet. Never derive an IRI from a parameter name — semantic.test.js
+// checks every non-null entry against the parsed ontology.
 const PARAM_SEMANTICS = {
-  gain: ['Gain', 'Amplitude parameter', 'initialVolume', 'Voice output amplitude for this layer.'],
-  pan: ['Pan', 'Spatial parameter', 'panPosition', 'Stereo placement from left to right.'],
-  frequency: ['Frequency', 'Frequency parameter', 'baseFrequency', 'Base or carrier frequency in Hz.'],
-  pulseRate: ['Pulse rate', 'Rhythmic parameter', 'pulseRateHz', 'Rate of rhythmic pulses in Hz.'],
-  noteDurationFrac: ['Note duration', 'Envelope parameter', 'noteDurationFraction', 'Fraction of each pulse occupied by the active note envelope.'],
-  leftFreq: ['Left carrier frequency', 'Frequency parameter', 'carrierFreqLeft', 'Left-ear carrier frequency for binaural presentation.'],
-  rightFreq: ['Right carrier frequency', 'Frequency parameter', 'carrierFreqRight', 'Right-ear carrier frequency for binaural presentation.'],
-  centerFreq: ['Center frequency', 'Frequency parameter', 'baseFrequency', 'Center frequency around which binaural carriers are arranged.'],
-  beatFreq: ['Beat frequency', 'Rhythmic parameter', 'beatHz', 'Difference frequency of a binaural beat.'],
-  periodSec: ['Period', 'Timing parameter', 'breathingPeriodInitial', 'Initial cycle period for a breathing or control oscillation.'],
-  targetPeriodSec: ['Target period', 'Timing parameter', 'breathingPeriodFinal', 'Final cycle period reached by a breathing or control oscillation.'],
-  inhaleRatio: ['Inhale ratio', 'Timing parameter', 'breathingPhaseRatio', 'Fraction of a breathing cycle assigned to the inhale phase.'],
-  amplitude: ['Amplitude', 'Control parameter', 'breathingAmplitude', 'Control signal depth or excursion.'],
-  rateHz: ['Rate', 'Rhythmic parameter', 'pulseRateHz', 'Control or sequence step rate in Hz.'],
-  nnotes: ['Note count', 'Sequence parameter', 'noteCount', 'Number of notes or sequence positions in a Symmetry cycle.'],
-  noctaves: ['Octave span', 'Pitch parameter', 'octaveSpan', 'Pitch span covered by a Symmetry sequence.'],
-  cutoff: ['Cutoff', 'Filter parameter', 'filterCutoffHz', 'Filter cutoff / centre frequency in Hz applied to a broadband noise source.'],
-  resonance: ['Resonance', 'Filter parameter', 'filterResonanceQ', 'Filter resonance (Q) of the noise shaping filter.'],
-  detune: ['Detune', 'Pitch parameter', 'detuneCents', 'Detune spread in cents across a drone oscillator stack.'],
-  rotationSpeed: ['Rotation speed', 'Visual parameter', 'rotationSpeed', 'Visual rotation rate or angular speed.'],
-  sides: ['Sides', 'Visual parameter', 'visualSideCount', 'Number of sides used by a geometric visual form.'],
-  density: ['Density', 'Visual parameter', 'visualDensity', 'Density of rendered visual elements.'],
-  blinkRate: ['Blink rate', 'Visual parameter', 'flickerRateHz', 'Photic flicker rate in Hz for a blinking visual.'],
-  duty: ['Duty cycle', 'Visual parameter', 'dutyCycle', 'On-fraction of each blink cycle.'],
-  oscRate: ['Oscillation rate', 'Visual parameter', 'oscillationRateHz', 'Rate in Hz of a smooth visual oscillation.'],
-  intensity: ['Intensity', 'Haptic parameter', 'stimulationIntensity', 'Strength of haptic or sensory output.'],
-  pattern: ['Pattern', 'Haptic parameter', 'hapticPattern', 'Pattern index or selector for haptic delivery.'],
+  gain: ['Gain', 'Amplitude parameter', SSTIM('initialVolume').value, 'Voice output amplitude for this layer.'],
+  pan: ['Pan', 'Spatial parameter', SSTIM('panPosition').value, 'Stereo placement from left to right.'],
+  frequency: ['Frequency', 'Frequency parameter', SSTIM('baseFrequency').value, 'Base or carrier frequency in Hz.'],
+  pulseRate: ['Pulse rate', 'Rhythmic parameter', SSTIM('pulseRateHz').value, 'Rate of rhythmic pulses in Hz.'],
+  noteDurationFrac: ['Note duration', 'Envelope parameter', SSTIM('noteDurationFraction').value, 'Fraction of each pulse occupied by the active note envelope.'],
+  leftFreq: ['Left carrier frequency', 'Frequency parameter', SSTIM('carrierFreqLeft').value, 'Left-ear carrier frequency for binaural presentation.'],
+  rightFreq: ['Right carrier frequency', 'Frequency parameter', SSTIM('carrierFreqRight').value, 'Right-ear carrier frequency for binaural presentation.'],
+  centerFreq: ['Center frequency', 'Frequency parameter', SSTIM('baseFrequency').value, 'Center frequency around which binaural carriers are arranged.'],
+  beatFreq: ['Beat frequency', 'Rhythmic parameter', SSTIM('beatHz').value, 'Difference frequency of a binaural beat.'],
+  periodSec: ['Period', 'Timing parameter', SSTIM('breathingPeriodInitial').value, 'Initial cycle period for a breathing or control oscillation.'],
+  targetPeriodSec: ['Target period', 'Timing parameter', SSTIM('breathingPeriodFinal').value, 'Final cycle period reached by a breathing or control oscillation.'],
+  inhaleRatio: ['Inhale ratio', 'Timing parameter', SSTIM('breathingPhaseRatio').value, 'Fraction of a breathing cycle assigned to the inhale phase.'],
+  amplitude: ['Amplitude', 'Control parameter', SSTIM('breathingAmplitude').value, 'Control signal depth or excursion.'],
+  rateHz: ['Rate', 'Rhythmic parameter', SSTIM('pulseRateHz').value, 'Control or sequence step rate in Hz.'],
+  nnotes: ['Note count', 'Sequence parameter', SSTIM('noteCount').value, 'Number of notes or sequence positions in a Symmetry cycle.'],
+  noctaves: ['Octave span', 'Pitch parameter', SSTIM('octaveSpan').value, 'Pitch span covered by a Symmetry sequence.'],
+  cutoff: ['Cutoff', 'Filter parameter', null, 'Filter cutoff / centre frequency in Hz applied to a broadband noise source.'],
+  resonance: ['Resonance', 'Filter parameter', null, 'Filter resonance (Q) of the noise shaping filter.'],
+  detune: ['Detune', 'Pitch parameter', null, 'Detune spread in cents across a drone oscillator stack.'],
+  rotationSpeed: ['Rotation speed', 'Visual parameter', SSTIM('rotationSpeed').value, 'Visual rotation rate or angular speed.'],
+  sides: ['Sides', 'Visual parameter', SSTIM('visualSideCount').value, 'Number of sides used by a geometric visual form.'],
+  density: ['Density', 'Visual parameter', SSTIM('visualDensity').value, 'Density of rendered visual elements.'],
+  blinkRate: ['Blink rate', 'Visual parameter', SSTIM_EX('hasFlickerRateHz').value, 'Photic flicker rate in Hz for a blinking visual.'],
+  duty: ['Duty cycle', 'Visual parameter', SSTIM_EX('hasDutyCycle').value, 'On-fraction of each blink cycle.'],
+  oscRate: ['Oscillation rate', 'Visual parameter', null, 'Rate in Hz of a smooth visual oscillation.'],
+  intensity: ['Intensity', 'Haptic parameter', SSTIM('stimulationIntensity').value, 'Strength of haptic or sensory output.'],
+  pattern: ['Pattern', 'Haptic parameter', SSTIM('hapticPattern').value, 'Pattern index or selector for haptic delivery.'],
 }
 
 export function semanticForTrackType(type) {
@@ -153,16 +157,21 @@ export function semanticForTrackType(type) {
 export function semanticForParameter(_track, paramName) {
   const match = PARAM_SEMANTICS[paramName]
   if (!match) {
+    // Explicitly unmapped: never mint an sstim IRI from a parameter name.
     return {
       label: paramName,
       kind: 'Patch parameter',
-      uri: SSTIM(paramName).value,
-      description: 'A Patch Studio parameter.',
+      uri: null,
+      description: 'A Patch Studio parameter with no ontology term yet.',
     }
   }
-  const [label, kind, local, description] = match
-  return { label, kind, uri: SSTIM(local).value, description }
+  const [label, kind, uri, description] = match
+  return { label, kind, uri, description }
 }
+
+// Exported for the mapping-registry test only.
+export const KNOWN_TRACK_TYPES = Object.keys(TRACK_SEMANTICS)
+export const KNOWN_PARAMETERS = Object.keys(PARAM_SEMANTICS)
 
 export function localSemanticName(uri) {
   return uri?.split(/[#/]/).pop() ?? ''
