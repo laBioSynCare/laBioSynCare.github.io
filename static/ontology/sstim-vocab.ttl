@@ -537,19 +537,22 @@ sstim-v:reviewProvisional a owl:NamedIndividual, sstim:ReviewStatus, skos:Concep
     skos:inScheme sstim-v:ReviewStatusScheme ;
     skos:prefLabel "Provisional"@en ;
     skos:notation "provisional" ;
-    skos:definition "Tier assigned provisionally; not yet independently reviewed."@en .
+    skos:definition "Derived workflow summary (ADR 0027): no current review decision exists under the named rubric. Not authoritative data; derived from EvidenceReviewDecision records in the 0.7 compatibility view only."@en ;
+    skos:historyNote "Redefined 2026-07-13 (ADR 0027) from a stored status to a derived summary."@en .
 
 sstim-v:reviewReviewed a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
     skos:inScheme sstim-v:ReviewStatusScheme ;
     skos:prefLabel "Reviewed"@en ;
     skos:notation "reviewed" ;
-    skos:definition "Tier assignment has been independently reviewed."@en .
+    skos:definition "Derived workflow summary (ADR 0027): a current recorded review decision exists, regardless of its outcome or independence. Independence is a property of the review activity, never implied by this value."@en ;
+    skos:historyNote "Redefined 2026-07-13 (ADR 0027): the earlier definition claimed independent review that the recorded data could not establish."@en .
 
 sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
     skos:inScheme sstim-v:ReviewStatusScheme ;
     skos:prefLabel "Needs Update"@en ;
     skos:notation "needs-update" ;
-    skos:definition "Tier assignment is out of date and should be re-reviewed against current literature."@en .
+    skos:definition "Derived workflow summary (ADR 0027): the prior review decision was invalidated, or an explicit re-review trigger exists without a replacement decision."@en ;
+    skos:historyNote "Redefined 2026-07-13 (ADR 0027) from a stored status to a derived summary."@en .
 
 
 ###########################################################################
@@ -1690,6 +1693,369 @@ sstim-v:voiceMartigli skos:topConceptOf sstim-v:VoiceTypeScheme .
 sstim-v:voiceMartigliBinaural skos:topConceptOf sstim-v:VoiceTypeScheme .
 sstim-v:voiceSymmetry skos:topConceptOf sstim-v:VoiceTypeScheme .
 sstim-v:techReferencePitchRetuning skos:narrower sstim-v:techSolfeggioTuning .
+
+
+###########################################################################
+# Part 12 — Evidence Basis and Review Provenance Schemes (ADR 0027)
+#
+# Controlled values for the orthogonal evidence-basis axes and the review
+# axes. Pattern-2 dual typing (ADR 0002). English-only labels at
+# introduction; translations follow the normal review process.
+###########################################################################
+
+sstim-v:ModalityApplicabilityScheme a skos:ConceptScheme ;
+    skos:definition "Controlled statements of how sensory modality applies to an evidence source: mixed, unknown/not reported, or not applicable (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Evidence Modality Applicability Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:applicabilityMixedModalities,
+                       sstim-v:applicabilityUnknownModality,
+                       sstim-v:applicabilityNotApplicable .
+
+sstim-v:applicabilityMixedModalities a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
+    skos:inScheme sstim-v:ModalityApplicabilityScheme ;
+    skos:prefLabel "Mixed modalities"@en ;
+    skos:notation "mixed-modalities" ;
+    skos:definition "The source spans several sensory modalities; every canonical modality it actually supports is still listed explicitly."@en .
+
+sstim-v:applicabilityUnknownModality a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
+    skos:inScheme sstim-v:ModalityApplicabilityScheme ;
+    skos:prefLabel "Unknown / not reported"@en ;
+    skos:notation "unknown-modality" ;
+    skos:definition "The source does not report, or the extraction did not establish, the sensory modality."@en .
+
+sstim-v:applicabilityNotApplicable a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
+    skos:inScheme sstim-v:ModalityApplicabilityScheme ;
+    skos:prefLabel "Not applicable"@en ;
+    skos:notation "not-applicable-modality" ;
+    skos:definition "Sensory modality does not apply to this source (for example a paced-breathing intervention with no sensory delivery claim)."@en .
+
+
+sstim-v:StudyDesignScheme a skos:ConceptScheme ;
+    skos:definition "Controlled designs of the underlying studies contributing to an evidence source (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Study Design Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:designRandomizedControlledTrial, sstim-v:designControlledTrial,
+                       sstim-v:designObservational, sstim-v:designCaseReport,
+                       sstim-v:designPreclinicalExperiment, sstim-v:designMixedDesigns,
+                       sstim-v:designUnknownDesign .
+
+sstim-v:designRandomizedControlledTrial a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Randomized controlled trial"@en ;
+    skos:notation "rct" ;
+    skos:definition "Randomized allocation to intervention and control conditions."@en .
+
+sstim-v:designControlledTrial a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Controlled trial (non-randomized)"@en ;
+    skos:notation "controlled-trial" ;
+    skos:definition "Controlled comparison without randomized allocation."@en .
+
+sstim-v:designObservational a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Observational"@en ;
+    skos:notation "observational" ;
+    skos:definition "Observational design without experimenter-controlled allocation."@en .
+
+sstim-v:designCaseReport a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Case report / case series"@en ;
+    skos:notation "case-report" ;
+    skos:definition "Individual case descriptions without systematic comparison."@en .
+
+sstim-v:designPreclinicalExperiment a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Preclinical experiment"@en ;
+    skos:notation "preclinical-experiment" ;
+    skos:definition "Controlled experiment in a preclinical model rather than human participants."@en .
+
+sstim-v:designMixedDesigns a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Mixed designs"@en ;
+    skos:notation "mixed-designs" ;
+    skos:definition "The source aggregates studies of several designs (typical of reviews)."@en .
+
+sstim-v:designUnknownDesign a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
+    skos:inScheme sstim-v:StudyDesignScheme ;
+    skos:prefLabel "Unknown design"@en ;
+    skos:notation "unknown-design" ;
+    skos:definition "The underlying design was not reported or has not been extracted."@en .
+
+
+sstim-v:StudyModelScheme a skos:ConceptScheme ;
+    skos:definition "Controlled models or stages in which evidence was produced: human, preclinical animal, in vitro, computational (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Study Model Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:modelHuman, sstim-v:modelPreclinicalAnimal,
+                       sstim-v:modelInVitro, sstim-v:modelComputational,
+                       sstim-v:modelMixedModels, sstim-v:modelUnknownModel .
+
+sstim-v:modelHuman a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "Human participants"@en ;
+    skos:notation "human" ;
+    skos:definition "Findings produced with human participants."@en .
+
+sstim-v:modelPreclinicalAnimal a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "Preclinical animal model"@en ;
+    skos:notation "preclinical-animal" ;
+    skos:definition "Findings produced in a non-human animal model. Replaces the modality-tag misuse of PRECLINICAL as a modality."@en .
+
+sstim-v:modelInVitro a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "In vitro"@en ;
+    skos:notation "in-vitro" ;
+    skos:definition "Findings produced in vitro."@en .
+
+sstim-v:modelComputational a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "Computational model"@en ;
+    skos:notation "computational" ;
+    skos:definition "Findings produced by simulation or computational modeling."@en .
+
+sstim-v:modelMixedModels a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "Mixed models"@en ;
+    skos:notation "mixed-models" ;
+    skos:definition "The source aggregates findings across several models or stages."@en .
+
+sstim-v:modelUnknownModel a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
+    skos:inScheme sstim-v:StudyModelScheme ;
+    skos:prefLabel "Unknown model"@en ;
+    skos:notation "unknown-model" ;
+    skos:definition "The model or stage was not reported or has not been extracted."@en .
+
+
+sstim-v:EvidenceSynthesisTypeScheme a skos:ConceptScheme ;
+    skos:definition "Controlled synthesis levels of an evidence source, from primary study to meta-analysis (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Evidence Synthesis Type Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:synthesisPrimaryStudy, sstim-v:synthesisNarrativeReview,
+                       sstim-v:synthesisSystematicReview, sstim-v:synthesisMetaAnalysis,
+                       sstim-v:synthesisLiteratureReview, sstim-v:synthesisTutorial .
+
+sstim-v:synthesisPrimaryStudy a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Primary study"@en ;
+    skos:notation "primary-study" ;
+    skos:definition "An original empirical study, not a synthesis of other studies."@en .
+
+sstim-v:synthesisNarrativeReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Narrative review"@en ;
+    skos:notation "narrative-review" ;
+    skos:definition "A review without a systematic search and selection protocol."@en .
+
+sstim-v:synthesisSystematicReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Systematic review"@en ;
+    skos:notation "systematic-review" ;
+    skos:definition "A review with a documented systematic search, selection, and appraisal protocol. Matches the narrower meaning the legacy REVIEW tag claimed."@en .
+
+sstim-v:synthesisMetaAnalysis a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Meta-analysis"@en ;
+    skos:notation "meta-analysis" ;
+    skos:definition "A quantitative synthesis of results across studies."@en .
+
+sstim-v:synthesisLiteratureReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Literature review"@en ;
+    skos:notation "literature-review" ;
+    skos:definition "A survey of the literature without a documented systematic protocol or quantitative synthesis."@en .
+
+sstim-v:synthesisTutorial a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
+    skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
+    skos:prefLabel "Tutorial"@en ;
+    skos:notation "tutorial" ;
+    skos:definition "An instructional source synthesizing established methods and findings."@en .
+
+
+sstim-v:EvidencePropositionFormScheme a skos:ConceptScheme ;
+    skos:definition "Controlled logical forms of an assessment proposition; universal absence is named so validation can reject it (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Evidence Proposition Form Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:formBoundedRelation, sstim-v:formBoundedNullResult,
+                       sstim-v:formScopedSearchFinding, sstim-v:formUniversalAbsence .
+
+sstim-v:formBoundedRelation a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
+    skos:inScheme sstim-v:EvidencePropositionFormScheme ;
+    skos:prefLabel "Bounded relation"@en ;
+    skos:notation "bounded-relation" ;
+    skos:definition "The proposition asserts a relation, difference, or response within an explicit scope."@en .
+
+sstim-v:formBoundedNullResult a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
+    skos:inScheme sstim-v:EvidencePropositionFormScheme ;
+    skos:prefLabel "Bounded null result"@en ;
+    skos:notation "bounded-null-result" ;
+    skos:definition "The proposition asserts the absence of an effect within an explicit scope, backed by evidence that tested it."@en .
+
+sstim-v:formScopedSearchFinding a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
+    skos:inScheme sstim-v:EvidencePropositionFormScheme ;
+    skos:prefLabel "Scoped search finding"@en ;
+    skos:notation "scoped-search-finding" ;
+    skos:definition "The proposition states that no eligible evidence was found within a documented search scope as of a date. Requires an evidence search record basis."@en .
+
+sstim-v:formUniversalAbsence a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
+    skos:inScheme sstim-v:EvidencePropositionFormScheme ;
+    skos:prefLabel "Universal absence"@en ;
+    skos:notation "universal-absence" ;
+    skos:definition "The proposition asserts that no evidence or mechanism exists at all. Never conformant: a finite search cannot support it. Present in the vocabulary so validation can name and reject it."@en .
+
+
+sstim-v:ScopeMarkerScheme a skos:ConceptScheme ;
+    skos:definition "Controlled markers stating that a proposition scope axis is unknown, not reported, or not applicable (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Scope Marker Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:scopeUnknown, sstim-v:scopeNotReported, sstim-v:scopeNotApplicable .
+
+sstim-v:scopeUnknown a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
+    skos:inScheme sstim-v:ScopeMarkerScheme ;
+    skos:prefLabel "Unknown"@en ;
+    skos:notation "scope-unknown" ;
+    skos:definition "The value of this scope axis is unknown."@en .
+
+sstim-v:scopeNotReported a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
+    skos:inScheme sstim-v:ScopeMarkerScheme ;
+    skos:prefLabel "Not reported"@en ;
+    skos:notation "scope-not-reported" ;
+    skos:definition "The sources did not report a value for this scope axis."@en .
+
+sstim-v:scopeNotApplicable a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
+    skos:inScheme sstim-v:ScopeMarkerScheme ;
+    skos:prefLabel "Not applicable"@en ;
+    skos:notation "scope-not-applicable" ;
+    skos:definition "This scope axis does not apply to the proposition."@en .
+
+
+sstim-v:ReviewerRelationshipScheme a skos:ConceptScheme ;
+    skos:definition "Controlled relationships of a review agent to the assessed work (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Reviewer Relationship Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:reviewerSelf, sstim-v:reviewerSameOrganization,
+                       sstim-v:reviewerExternal, sstim-v:reviewerUnknownRelationship .
+
+sstim-v:reviewerSelf a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
+    skos:inScheme sstim-v:ReviewerRelationshipScheme ;
+    skos:prefLabel "Self"@en ;
+    skos:notation "self" ;
+    skos:definition "The reviewer is the author of the assessed work."@en .
+
+sstim-v:reviewerSameOrganization a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
+    skos:inScheme sstim-v:ReviewerRelationshipScheme ;
+    skos:prefLabel "Same organization"@en ;
+    skos:notation "same-organization" ;
+    skos:definition "The reviewer belongs to the same organization as the assessed work's authors."@en .
+
+sstim-v:reviewerExternal a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
+    skos:inScheme sstim-v:ReviewerRelationshipScheme ;
+    skos:prefLabel "External"@en ;
+    skos:notation "external" ;
+    skos:definition "The reviewer is external to the authoring organization. Never implies independence by itself."@en .
+
+sstim-v:reviewerUnknownRelationship a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
+    skos:inScheme sstim-v:ReviewerRelationshipScheme ;
+    skos:prefLabel "Unknown relationship"@en ;
+    skos:notation "unknown-relationship" ;
+    skos:definition "The reviewer's relationship to the assessed work is not established."@en .
+
+
+sstim-v:IndependenceDeterminationScheme a skos:ConceptScheme ;
+    skos:definition "Controlled policy-based reviewer-independence determinations (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Independence Determination Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:independenceIndependent, sstim-v:independenceNotIndependent,
+                       sstim-v:independenceUndetermined .
+
+sstim-v:independenceIndependent a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
+    skos:inScheme sstim-v:IndependenceDeterminationScheme ;
+    skos:prefLabel "Independent"@en ;
+    skos:notation "independent" ;
+    skos:definition "Determined independent under a named policy, with recorded conflict disclosure."@en .
+
+sstim-v:independenceNotIndependent a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
+    skos:inScheme sstim-v:IndependenceDeterminationScheme ;
+    skos:prefLabel "Not independent"@en ;
+    skos:notation "not-independent" ;
+    skos:definition "Determined not independent under a named policy, with recorded conflict disclosure."@en .
+
+sstim-v:independenceUndetermined a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
+    skos:inScheme sstim-v:IndependenceDeterminationScheme ;
+    skos:prefLabel "Undetermined"@en ;
+    skos:notation "undetermined" ;
+    skos:definition "No independence determination has been made."@en .
+
+
+sstim-v:ReviewDecisionScheme a skos:ConceptScheme ;
+    skos:definition "Controlled outcomes of an evidence review decision (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Review Decision Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:reviewConfirm, sstim-v:reviewRequestRevision, sstim-v:reviewReject .
+
+sstim-v:reviewConfirm a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
+    skos:inScheme sstim-v:ReviewDecisionScheme ;
+    skos:prefLabel "Confirm"@en ;
+    skos:notation "confirm" ;
+    skos:definition "The review confirms the assessment revision under the named rubric."@en .
+
+sstim-v:reviewRequestRevision a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
+    skos:inScheme sstim-v:ReviewDecisionScheme ;
+    skos:prefLabel "Request revision"@en ;
+    skos:notation "request-revision" ;
+    skos:definition "The review requests a new assessment revision."@en .
+
+sstim-v:reviewReject a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
+    skos:inScheme sstim-v:ReviewDecisionScheme ;
+    skos:prefLabel "Reject"@en ;
+    skos:notation "reject" ;
+    skos:definition "The review rejects the assessment revision under the named rubric."@en .
+
+
+sstim-v:ConflictDisclosureScheme a skos:ConceptScheme ;
+    skos:definition "Controlled conflict-of-interest disclosure records for reviews (ADR 0027)."@en ;
+    skos:prefLabel "SSTIM Conflict Disclosure Vocabulary"@en ;
+    skos:hasTopConcept sstim-v:noConflictDeclared .
+
+sstim-v:noConflictDeclared a owl:NamedIndividual, sstim:ConflictDisclosure, skos:Concept ;
+    skos:inScheme sstim-v:ConflictDisclosureScheme ;
+    skos:prefLabel "No conflict declared"@en ;
+    skos:notation "no-conflict-declared" ;
+    skos:definition "The explicit declaration that the reviewer declared no conflict of interest. Case-specific disclosures are separate ConflictDisclosure records."@en .
+
+
+# Materialized inverses for the Part 12 schemes (raw-RDF clients do not run inference).
+sstim-v:applicabilityMixedModalities skos:topConceptOf sstim-v:ModalityApplicabilityScheme .
+sstim-v:applicabilityUnknownModality skos:topConceptOf sstim-v:ModalityApplicabilityScheme .
+sstim-v:applicabilityNotApplicable skos:topConceptOf sstim-v:ModalityApplicabilityScheme .
+sstim-v:designRandomizedControlledTrial skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designControlledTrial skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designObservational skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designCaseReport skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designPreclinicalExperiment skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designMixedDesigns skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:designUnknownDesign skos:topConceptOf sstim-v:StudyDesignScheme .
+sstim-v:modelHuman skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:modelPreclinicalAnimal skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:modelInVitro skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:modelComputational skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:modelMixedModels skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:modelUnknownModel skos:topConceptOf sstim-v:StudyModelScheme .
+sstim-v:synthesisPrimaryStudy skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:synthesisNarrativeReview skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:synthesisSystematicReview skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:synthesisMetaAnalysis skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:synthesisLiteratureReview skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:synthesisTutorial skos:topConceptOf sstim-v:EvidenceSynthesisTypeScheme .
+sstim-v:formBoundedRelation skos:topConceptOf sstim-v:EvidencePropositionFormScheme .
+sstim-v:formBoundedNullResult skos:topConceptOf sstim-v:EvidencePropositionFormScheme .
+sstim-v:formScopedSearchFinding skos:topConceptOf sstim-v:EvidencePropositionFormScheme .
+sstim-v:formUniversalAbsence skos:topConceptOf sstim-v:EvidencePropositionFormScheme .
+sstim-v:scopeUnknown skos:topConceptOf sstim-v:ScopeMarkerScheme .
+sstim-v:scopeNotReported skos:topConceptOf sstim-v:ScopeMarkerScheme .
+sstim-v:scopeNotApplicable skos:topConceptOf sstim-v:ScopeMarkerScheme .
+sstim-v:reviewerSelf skos:topConceptOf sstim-v:ReviewerRelationshipScheme .
+sstim-v:reviewerSameOrganization skos:topConceptOf sstim-v:ReviewerRelationshipScheme .
+sstim-v:reviewerExternal skos:topConceptOf sstim-v:ReviewerRelationshipScheme .
+sstim-v:reviewerUnknownRelationship skos:topConceptOf sstim-v:ReviewerRelationshipScheme .
+sstim-v:independenceIndependent skos:topConceptOf sstim-v:IndependenceDeterminationScheme .
+sstim-v:independenceNotIndependent skos:topConceptOf sstim-v:IndependenceDeterminationScheme .
+sstim-v:independenceUndetermined skos:topConceptOf sstim-v:IndependenceDeterminationScheme .
+sstim-v:reviewConfirm skos:topConceptOf sstim-v:ReviewDecisionScheme .
+sstim-v:reviewRequestRevision skos:topConceptOf sstim-v:ReviewDecisionScheme .
+sstim-v:reviewReject skos:topConceptOf sstim-v:ReviewDecisionScheme .
+sstim-v:noConflictDeclared skos:topConceptOf sstim-v:ConflictDisclosureScheme .
 
 
 ###########################################################################

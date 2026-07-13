@@ -24,6 +24,7 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 
 
@@ -103,11 +104,14 @@ sstim-ex:ComfortBoundary a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:ExposureEffectClaim a owl:Class ;
+    owl:deprecated true ;
     rdfs:subClassOf sstim:EvidenceClaim ;
-    rdfs:label "Exposure Effect Claim"@en ;
-    skos:definition "Qualified claim about a hypothesized, measured, observed, or risk-related effect dimension of an exposure. This class is used instead of direct unqualified health-benefit properties."@en ;
+    rdfs:label "Exposure Effect Claim (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: this class mixed hypotheses, questions, boundary applicability, requirements, design objectives, planned outcomes, and status assertions under evidence semantics. Its instances migrate to the role-specific statement classes; removed no earlier than 1.0."@en ;
+    skos:historyNote "Deprecated 2026-07-13 by ADR 0027; the 27 live instances migrate per the ADR 0027 migration ledger."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> .
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> .
 
 sstim-ex:ExperimentContext a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
@@ -164,9 +168,9 @@ sstim-ex:VisualNoiseType a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:EffectDimension a owl:Class ;
-    rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf sstim:EvidenceOutcomeConcept ;
     rdfs:label "Effect Dimension"@en ;
-    skos:definition "Controlled vocabulary class for dimensions that an exposure effect claim can concern, including comfort, risk, perception, and physiological measures."@en ;
+    skos:definition "Controlled vocabulary class for comfort, risk, perception, and physiological dimensions that a hypothesis, research question, design objective, or planned outcome can concern. A subclass of sstim:EvidenceOutcomeConcept (ADR 0027), so existing dimension values are reusable as outcome concepts without ad hoc dual typing."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:ExposureLimit a owl:Class ;
@@ -245,10 +249,11 @@ sstim-ex:hasPerceptualLoss a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasEffectClaim a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:ExposureProfile ;
+    owl:deprecated true ;
     rdfs:range sstim-ex:ExposureEffectClaim ;
-    rdfs:label "has effect claim"@en ;
-    skos:definition "Links an exposure profile or protocol to a qualified effect, measurement, hypothesis, or risk claim."@en ;
+    rdfs:label "has effect claim (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the single link mixed hypotheses, questions, boundary applicability, requirements, design objectives, and planned outcomes. Use the role-specific hasHypothesis, hasResearchQuestion, hasBoundaryApplicability, hasProtocolRequirement, hasDesignObjective, hasPlannedOutcome, or hasKnowledgeStatusAssertion; removed no earlier than 1.0."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExperimentContext a owl:ObjectProperty ;
@@ -259,10 +264,9 @@ sstim-ex:hasExperimentContext a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasKnowledgeStatus a owl:ObjectProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim:EvidenceClaim ) ] ;
     rdfs:range sstim-ex:KnowledgeStatus ;
     rdfs:label "has knowledge status"@en ;
-    skos:definition "Links a protocol, exposure profile, channel, capability, or claim to its local SSTIM/BSC Lab knowledge or capability status."@en ;
+    skos:definition "Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled SSTIM/BSC Lab knowledge or capability status value. Carries no OWL domain (ADR 0027, KR-05): SHACL enforces allowed subjects, admitting the DeviceCapability use promised here and preventing status links from re-inferring evidence semantics."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasStimulusPattern a owl:ObjectProperty ;
@@ -273,10 +277,9 @@ sstim-ex:hasStimulusPattern a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:concernsEffectDimension a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:ExposureEffectClaim ;
     rdfs:range sstim-ex:EffectDimension ;
     rdfs:label "concerns effect dimension"@en ;
-    skos:definition "Links an exposure effect claim to the comfort, risk, perception, or physiological dimension it concerns."@en ;
+    skos:definition "Links a hypothesis, research question, design objective, or planned-outcome specification to the comfort, risk, perception, or physiological dimension it concerns. Carries no OWL domain (ADR 0027): allowed subjects are enforced in SHACL so use on a non-evidence statement cannot re-infer the deprecated ExposureEffectClaim."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExposureLimit a owl:ObjectProperty ;
@@ -1841,6 +1844,154 @@ sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
         <https://webstore.iec.ch/publication/7076> ;
     skos:definition "ICNIRP daily exposure limit of 30 J/m2 spectrally weighted effective ultraviolet radiant exposure for unprotected skin and eye, calculated over 180-400 nm. IEC 62471 supplies lamp photobiological risk classification; it is not the source of the 30 J/m2 value. BSC Lab does not deliver ultraviolet radiation at the body."@en ;
     skos:editorialNote "The historical IRI suffix 'Iec' is retained for identifier stability. The value is attributed explicitly to ICNIRP after the 2026-07-10 external review."@en .
+
+
+###########################################################################
+# Statement roles (ADR 0027)
+#
+# Non-evidence statement classes replacing the deprecated ExposureEffectClaim.
+# Exactly one epistemic role per statement node; the roles are pairwise
+# disjoint with sstim:EvidenceAssessmentClaim and with each other (intentional
+# subclassing such as ExposureMeasurementRequirement ⊑ ProtocolRequirement is
+# not a second role). Link properties carry no OWL domain; SHACL enforces the
+# allowed source classes.
+###########################################################################
+
+sstim-ex:ExposureHypothesis a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Exposure Hypothesis"@en ;
+    skos:definition "A testable proposition asserting an expected relation, difference, or direction for an exposure. Not evidence: it carries no tier, direction, basis, or review metadata and can never satisfy an evidence-assessment shape."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:ResearchQuestion a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Research Question"@en ;
+    skos:definition "An open question about an exposure that asserts no expected result."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:BoundaryApplicabilityStatement a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Boundary Applicability Statement"@en ;
+    skos:definition "A reasoned statement that a named comfort or safety boundary or exposure limit applies to a profile or channel. An applicability judgment, not an evidential finding."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:ProtocolRequirement a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Protocol Requirement"@en ;
+    skos:definition "A reproducibility, measurement, context, or study-design requirement constraining a protocol, profile, or channel."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:ExposureMeasurementRequirement a owl:Class ;
+    rdfs:subClassOf sstim-ex:ProtocolRequirement ;
+    rdfs:label "Exposure Measurement Requirement"@en ;
+    skos:definition "A protocol requirement identifying the exposure quantities and sensor capability that must be measured or recorded."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:ExposureDesignObjective a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Exposure Design Objective"@en ;
+    skos:definition "A desired delivery capability or experience that does not predict an observed effect. Any empirical expectation belongs in a separate hypothesis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:PlannedOutcomeSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Planned Outcome Specification"@en ;
+    skos:definition "A dimension and collection/comparison plan for an exposure — what would be collected and compared, not an observation result."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:KnowledgeStatusAssertion a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Knowledge Status Assertion"@en ;
+    skos:definition "An immutable, scoped, dated assertion assigning an existing controlled KnowledgeStatus value to an identified subject: exactly one subject link, one status value, one as-of date, and a named corpus scope or scope note. It states what a named corpus records as of a date — never a universal claim — and carries no evidence tier, direction, basis, or review metadata."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:KnowledgeStatusActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Knowledge Status Activity"@en ;
+    skos:definition "The PROV activity that generates a knowledge-status assertion, recording time, method/corpus revision, and a qualified responsible agent/role."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+# The epistemic roles are pairwise disjoint (ADR 0027). SHACL additionally
+# rejects any node carrying two top-level roles; these axioms reinforce, but
+# do not replace, the operational checks.
+[] a owl:AllDisjointClasses ;
+    owl:members ( sstim:EvidenceAssessmentClaim
+                  sstim-ex:ExposureHypothesis
+                  sstim-ex:ResearchQuestion
+                  sstim-ex:BoundaryApplicabilityStatement
+                  sstim-ex:ProtocolRequirement
+                  sstim-ex:ExposureDesignObjective
+                  sstim-ex:PlannedOutcomeSpecification
+                  sstim-ex:KnowledgeStatusAssertion ) .
+
+# ── Role-specific link properties (no OWL domains; SHACL enforces sources) ─
+
+sstim-ex:hasHypothesis a owl:ObjectProperty ;
+    rdfs:range sstim-ex:ExposureHypothesis ;
+    rdfs:label "has hypothesis"@en ;
+    skos:definition "Links an exposure profile or protocol to a stated hypothesis. Optional: a delivery-only profile states none, and generators must never fabricate one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasResearchQuestion a owl:ObjectProperty ;
+    rdfs:range sstim-ex:ResearchQuestion ;
+    rdfs:label "has research question"@en ;
+    skos:definition "Links an exposure profile or protocol to an open research question."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasBoundaryApplicability a owl:ObjectProperty ;
+    rdfs:range sstim-ex:BoundaryApplicabilityStatement ;
+    rdfs:label "has boundary applicability"@en ;
+    skos:definition "Links an exposure profile or stimulus channel to a qualified boundary-applicability statement. Direct hasComfortBoundary / hasExposureLimit links remain valid structural shortcuts; the qualified statement carries the rationale."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasProtocolRequirement a owl:ObjectProperty ;
+    rdfs:range sstim-ex:ProtocolRequirement ;
+    rdfs:label "has protocol requirement"@en ;
+    skos:definition "Links an exposure profile, stimulus channel, or protocol to a requirement that constrains it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasDesignObjective a owl:ObjectProperty ;
+    rdfs:range sstim-ex:ExposureDesignObjective ;
+    rdfs:label "has design objective"@en ;
+    skos:definition "Links an exposure profile or protocol to a desired delivery capability or experience objective."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasPlannedOutcome a owl:ObjectProperty ;
+    rdfs:range sstim-ex:PlannedOutcomeSpecification ;
+    rdfs:label "has planned outcome"@en ;
+    skos:definition "Links an exposure profile or protocol to a planned outcome-collection specification."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasKnowledgeStatusAssertion a owl:ObjectProperty ;
+    rdfs:range sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "has knowledge status assertion"@en ;
+    skos:definition "Links a preset, technique, protocol, exposure profile, or stimulus channel to a scoped, dated knowledge-status assertion about it. Each assertion has exactly one incoming subject link."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:appliesBoundary a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim-ex:ComfortBoundary sstim-ex:ExposureLimit ) ] ;
+    rdfs:label "applies boundary"@en ;
+    skos:definition "The named comfort boundary or exposure limit a boundary-applicability statement applies. Every such statement uses it at least once; the incoming profile/channel link identifies the application target."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:knowledgeAsOfDate a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "knowledge as-of date"@en ;
+    skos:definition "The date as of which a knowledge-status assertion holds for its named corpus."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:knowledgeScope a owl:ObjectProperty ;
+    rdfs:label "knowledge scope"@en ;
+    skos:definition "The identified corpus or repository a knowledge-status assertion is scoped to."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:knowledgeScopeNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "knowledge scope note"@en ;
+    skos:definition "A language-tagged description of the corpus or scope of a knowledge-status assertion, used when no scope IRI exists."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 
 ###########################################################################
