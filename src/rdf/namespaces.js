@@ -9,6 +9,7 @@ export const SSTIM    = ns('https://w3id.org/sstim#')
 export const SSTIM_V  = ns('https://w3id.org/sstim/vocab#')
 export const SSTIM_SH = ns('https://w3id.org/sstim/shapes#')
 export const SSTIM_EX = ns('https://w3id.org/sstim/exposure#')
+export const SSTIM_ECO = ns('https://w3id.org/sstim/ecosystem#')
 export const SSTIM_I  = ns('https://w3id.org/sstim/inst/')
 export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
 export const BSC_FRAMEWORK_IRI = namedNode('https://w3id.org/sstim/framework/bsc')
@@ -69,6 +70,7 @@ export const PREFIXES = {
   'sstim-v':  'https://w3id.org/sstim/vocab#',
   'sstim-sh': 'https://w3id.org/sstim/shapes#',
   'sstim-ex': 'https://w3id.org/sstim/exposure#',
+  'sstim-eco': 'https://w3id.org/sstim/ecosystem#',
   'sstim-i':  'https://w3id.org/sstim/inst/',
   'sstim-ref': 'https://w3id.org/sstim/ref/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',

@@ -21,11 +21,10 @@ the graph.
   IRI `https://w3id.org/sstim/0.6.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the validated `0.6.0` release sources; core claims the whole-set
-  `owl:versionIRI` and every module carries synchronized `owl:versionInfo`.
-- Current term graph: 5,852 unique triples, 56 named OWL classes, six anonymous
-  union-class expressions, 124 properties, 295 SKOS concepts, and 30 concept
-  schemes.
+- Live sources: the `0.7.0-dev` development line; the latest immutable release
+  remains `0.6.0`. Development sources carry no `owl:versionIRI`.
+- Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
+  published in `void.ttl` rather than duplicated here.
 - Public instance graph: 1,394 unique triples in 18 files.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
@@ -43,6 +42,7 @@ static/ontology/
 |-- sstim-alignments.ttl    Verified Wikidata and OBO alignments
 |-- sstim-patch-studio.ttl  Voice and authoring parameter properties
 |-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
+|-- sstim-ecosystem.ttl     Ecosystem agents, relationships, and consent lifecycle
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
 |-- 0.1.0/ ... 0.6.0/      Immutable whole-set snapshots
@@ -57,7 +57,7 @@ static/ontology/
     `-- sessions/           Explicitly synthetic session fixture only
 ```
 
-All six `sstim-*.ttl` files declare an `owl:Ontology` node with title,
+All seven `sstim-*.ttl` files declare an `owl:Ontology` node with title,
 description, creator, creation/modification dates, license, and version
 metadata. Modules carry `owl:versionInfo` only. The core receives a version IRI
 only when the whole set is frozen for release; see
@@ -71,6 +71,7 @@ only when the whole set is frozen for release; see
 | `sstim-v:` | `https://w3id.org/sstim/vocab#` | Controlled SKOS values |
 | `sstim-sh:` | `https://w3id.org/sstim/shapes#` | SHACL shapes |
 | `sstim-ex:` | `https://w3id.org/sstim/exposure#` | Exposure and experiment terms |
+| `sstim-eco:` | `https://w3id.org/sstim/ecosystem#` | Ecosystem relationship and consent terms |
 | `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework techniques |
 | `bsclab-protocol:` | `https://w3id.org/sstim/implementation/bsclab/protocol/` | Public BSC Lab protocols |
 | `bsclab-preset:` | `https://w3id.org/sstim/implementation/bsclab/preset/` | Public BSC Lab presets |
@@ -245,7 +246,7 @@ make validate
 
 That command runs:
 
-1. pySHACL over core, vocabulary, exposure, all six merged modules, and all
+1. pySHACL over core, vocabulary, exposure, all seven merged modules, and all
    public instances;
 2. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
    SKOS integrity, functional values, local IRI resolution, evidence provenance,
@@ -323,7 +324,7 @@ SELECT ?framework ?protocol ?preset WHERE {
 
 ## Versioning And Publication
 
-SSTIM versions the six modules as one citable set:
+SSTIM versions the seven modules as one citable set:
 
 1. Develop in top-level modules with a `-dev` `owl:versionInfo` and no
    `owl:versionIRI`.

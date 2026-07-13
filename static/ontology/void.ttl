@@ -3,7 +3,7 @@
 #  SSTIM — VoID + DCAT dataset description  —  void.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Date:       2026-07-11
+#  Date:       2026-07-13
 #  License:    CC BY 4.0
 #
 #  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
@@ -37,20 +37,20 @@
 <https://w3id.org/sstim/void>
     a void:Dataset, dcat:Dataset ;
     dct:title "Sensory Stimulation Ontology (SSTIM) — dataset"@en ;
-    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment and Patch Studio modules, plus public BSC Lab framework, protocol, preset, evidence, reference, and synthetic session data for sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
+    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules, plus public BSC Lab framework, protocol, preset, evidence, reference, and synthetic session data for sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-11"^^xsd:date ;
+    dct:modified "2026-07-13"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21302910> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.6.0" ;
+    dcat:version "0.7.0-dev" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -59,9 +59,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 5853 ;
-    void:classes 56 ;
-    void:properties 124 ;
+    void:triples 6175 ;
+    void:classes 58 ;
+    void:properties 141 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",
@@ -84,13 +84,15 @@
     void:exampleResource <https://w3id.org/sstim#SensoryStimulation>,
         <https://w3id.org/sstim#EvidenceClaim>,
         <https://w3id.org/sstim/vocab#alpha>,
-        <https://w3id.org/sstim/exposure#ExposureProfile> ;
+        <https://w3id.org/sstim/exposure#ExposureProfile>,
+        <https://w3id.org/sstim/ecosystem#EcosystemAgent> ;
     void:subset <https://w3id.org/sstim/void#core>,
         <https://w3id.org/sstim/void#vocab>,
         <https://w3id.org/sstim/void#shapes>,
         <https://w3id.org/sstim/void#alignments>,
         <https://w3id.org/sstim/void#patch-studio>,
         <https://w3id.org/sstim/void#exposure>,
+        <https://w3id.org/sstim/void#ecosystem>,
         <https://w3id.org/sstim/void#instances> ;
     # Primary distribution: the core OWL module in Turtle.
     dcat:distribution [
@@ -171,6 +173,17 @@
         [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.jsonld> ] ,
         [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.rdf> ] .
 
+<https://w3id.org/sstim/void#ecosystem>
+    a void:Dataset ;
+    dct:title "SSTIM Ecosystem Module"@en ;
+    dct:description "Neutral ecosystem-agent types, controlled relationship categories, provenance, engagement, notification, response, and archival-consent metadata."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/ecosystem> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/ecosystem> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-ecosystem.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-ecosystem.rdf> ] .
+
 <https://w3id.org/sstim/void#instances>
     a void:Dataset ;
     dct:title "BSC Lab public SSTIM instance data"@en ;
@@ -181,7 +194,8 @@
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ref/" ;
     void:vocabulary <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>,
-        <https://w3id.org/sstim/exposure>, <http://www.w3.org/ns/prov#> ;
+        <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem>,
+        <http://www.w3.org/ns/prov#> ;
     void:exampleResource <https://w3id.org/sstim/framework/bsc>,
         <https://w3id.org/sstim/implementation/bsclab/protocol/auditory-observation-reference>,
         <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed>,

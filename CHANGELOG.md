@@ -20,6 +20,9 @@ file is the human-readable summary.
   documentation (`https://labiosyncare.github.io/ontology/docs/`), so
   harvesters that read ontology metadata (e.g. LOV) discover the documentation
   (ADR 0023).
+- Initial `sstim-ecosystem` module for ecosystem agents, controlled relationship
+  types, engagement provenance, and consent lifecycle metadata, with SHACL
+  governance constraints and runtime/publication plumbing (ADR 0024).
 
 ## [0.6.0] - 2026-07-11
 

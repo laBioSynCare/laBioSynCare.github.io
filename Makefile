@@ -23,12 +23,13 @@ VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
 PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
-ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE)
+ECOSYSTEM  := static/ontology/sstim-ecosystem.ttl
+ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE) $(ECOSYSTEM)
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
 # (validation constraints, not browsable terms). Core is first so the merged
 # ontology inherits its IRI (https://w3id.org/sstim).
-BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO)
+BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO) $(ECOSYSTEM)
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/*/*.ttl)
@@ -85,7 +86,7 @@ shacl-instances:
 	else \
 		tmp="$$(mktemp)"; \
 		trap 'rm -f "$$tmp"' EXIT; \
-		cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(INSTANCE_FILES) > "$$tmp"; \
+		cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(ECOSYSTEM) $(INSTANCE_FILES) > "$$tmp"; \
 		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
 	fi
 
@@ -187,7 +188,7 @@ help:
 	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
 	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
-	@echo "  make shacl-modules    Validate the merged six-module ontology set"
+	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"

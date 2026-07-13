@@ -98,6 +98,7 @@ export const ONTOLOGY_URLS = {
   alignments: '/ontology/sstim-alignments.ttl',
   patchStudio:'/ontology/sstim-patch-studio.ttl',
   exposure:   '/ontology/sstim-exposure.ttl',
+  ecosystem:  '/ontology/sstim-ecosystem.ttl',
 }
 
 export const ONTOLOGY_SOURCES = {
@@ -124,6 +125,10 @@ export const ONTOLOGY_SOURCES = {
   exposure: {
     url: ONTOLOGY_URLS.exposure,
     graph: 'https://w3id.org/sstim/graph/exposure',
+  },
+  ecosystem: {
+    url: ONTOLOGY_URLS.ecosystem,
+    graph: 'https://w3id.org/sstim/graph/ecosystem',
   },
 }
 

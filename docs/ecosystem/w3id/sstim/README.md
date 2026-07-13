@@ -28,6 +28,7 @@ Future PRs touching `sstim/` will be authored or approved by
 | `/sstim/alignments`        | External alignments (BFO, OBI, IAO, Wikidata, …) |
 | `/sstim/patch-studio`      | Patch Studio authoring-model vocabulary          |
 | `/sstim/exposure`          | Exposure, delivery, and modality vocabulary      |
+| `/sstim/ecosystem`         | Ecosystem relationships and consent lifecycle    |
 | `/sstim/void`              | VoID + DCAT dataset description (Turtle only)    |
 | `/sstim/{major.minor.patch}` | Versioned immutable snapshots (Turtle only)    |
 

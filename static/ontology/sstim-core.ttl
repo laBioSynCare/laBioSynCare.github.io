@@ -3,8 +3,8 @@
 #  SSTIM Core Ontology  —  sstim-core.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.6.0
-#  Date:       2026-07-11
+#  Version:    0.7.0-dev
+#  Date:       2026-07-13
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -49,9 +49,8 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    owl:versionIRI <https://w3id.org/sstim/0.6.0> ;
-    owl:versionInfo "0.6.0" ;
-    owl:priorVersion <https://w3id.org/sstim/0.5.0> ;
+    owl:versionInfo "0.7.0-dev" ;
+    owl:priorVersion <https://w3id.org/sstim/0.6.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
@@ -61,7 +60,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-11"^^xsd:date ;
+    dct:modified "2026-07-13"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21302910> ;

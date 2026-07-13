@@ -31,6 +31,7 @@ PR merges. The [`sstim/.htaccess`](sstim/.htaccess) here is the exact submitted 
 | `https://w3id.org/sstim/alignments` | `/ontology/sstim-alignments.ttl` |
 | `https://w3id.org/sstim/patch-studio` | `/ontology/sstim-patch-studio.ttl` |
 | `https://w3id.org/sstim/exposure` | `/ontology/sstim-exposure.ttl` |
+| `https://w3id.org/sstim/ecosystem` | `/ontology/sstim-ecosystem.ttl` |
 | `https://w3id.org/sstim/void` | `/ontology/void.ttl` (VoID + DCAT dataset description) |
 | `https://w3id.org/sstim/0.5.0` | `/ontology/0.5.0/sstim-core.ttl` (frozen) |
 | `https://w3id.org/sstim/0.5.0/sstim-core.ttl` | `/ontology/0.5.0/sstim-core.ttl` (frozen) |
@@ -70,6 +71,7 @@ curl -sIL -H 'Accept: text/html'  https://w3id.org/sstim | grep -i location
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/vocab        | grep -i location
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/patch-studio | grep -i location
 curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/exposure     | grep -i location
+curl -sIL -H 'Accept: text/turtle' https://w3id.org/sstim/ecosystem    | grep -i location
 curl -sIL https://w3id.org/sstim/0.3.0/sstim-core.ttl                  | grep -i location
 
 # Round-trip parse check (n3 / rapper / riot)

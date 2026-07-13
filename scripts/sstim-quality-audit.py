@@ -25,15 +25,17 @@ MODULES = {
     ONTOLOGY_DIR / "sstim-alignments.ttl": URIRef("https://w3id.org/sstim/alignments"),
     ONTOLOGY_DIR / "sstim-patch-studio.ttl": URIRef("https://w3id.org/sstim/patch-studio"),
     ONTOLOGY_DIR / "sstim-exposure.ttl": URIRef("https://w3id.org/sstim/exposure"),
+    ONTOLOGY_DIR / "sstim-ecosystem.ttl": URIRef("https://w3id.org/sstim/ecosystem"),
 }
 
 SSTIM = Namespace("https://w3id.org/sstim#")
 VOCAB = Namespace("https://w3id.org/sstim/vocab#")
 EXPOSURE = Namespace("https://w3id.org/sstim/exposure#")
+ECOSYSTEM = Namespace("https://w3id.org/sstim/ecosystem#")
 VOID = Namespace("http://rdfs.org/ns/void#")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
-TERM_NAMESPACES = (str(SSTIM), str(VOCAB), str(EXPOSURE))
+TERM_NAMESPACES = (str(SSTIM), str(VOCAB), str(EXPOSURE), str(ECOSYSTEM))
 INSTANCE_PREFIXES = (
     "https://w3id.org/sstim/framework/",
     "https://w3id.org/sstim/implementation/",
@@ -87,7 +89,7 @@ declared_module_classes = list(void_graph.objects(dataset_iri, VOID.classes))
 declared_module_properties = list(void_graph.objects(dataset_iri, VOID.properties))
 declared_instance_triples = list(void_graph.objects(instance_dataset_iri, VOID.triples))
 if declared_module_triples != [Literal(len(modules))]:
-    fail(f"void.ttl: void:triples must be {len(modules)} for the six-module term graph")
+    fail(f"void.ttl: void:triples must be {len(modules)} for the term-module graph")
 if declared_module_classes != [Literal(len(named_classes))]:
     fail(f"void.ttl: void:classes must be {len(named_classes)} named OWL classes")
 if declared_module_properties != [Literal(len(declared_properties))]:

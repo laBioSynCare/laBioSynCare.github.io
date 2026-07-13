@@ -15,19 +15,19 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-07-11:
+As of 2026-07-13:
 
 - **Latest immutable release:** SSTIM `v0.6.0`, archived at
   [10.5281/zenodo.21302910](https://doi.org/10.5281/zenodo.21302910) and
   identified by `https://w3id.org/sstim/0.6.0`.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** the validated `0.6.0` release sources. The core
-  claims the whole-set `owl:versionIRI`; the other modules share synchronized
-  `owl:versionInfo` under ADR 0020.
+- **Live ontology sources:** the `0.7.0-dev` development line. All seven modules
+  share synchronized `owl:versionInfo`; development sources do not claim an
+  immutable `owl:versionIRI` (ADR 0020).
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **Ontology graph:** six Turtle modules, 56 named OWL classes, six anonymous
-  union-class expressions, 124 properties, and 295 SKOS concepts in 30 concept
+- **Ontology graph:** seven Turtle modules, 58 named OWL classes, six anonymous
+  union-class expressions, 141 properties, and 306 SKOS concepts in 31 concept
   schemes, plus VoID/DCAT and a JSON-LD context.
 - **Public example data:** 18 Turtle files containing the BSC framework, seven
   framework techniques, two implementations, 12 protocols, two reference
@@ -42,16 +42,23 @@ As of 2026-07-11:
   changes. Independent human ontology review is deferred under ADR 0022 and is
   not claimed for `0.6.0`. The deployed canonical FOOPS score is 87.5%; the
   remaining failures are registry-dependent.
+- **Registry discoverability:** the `sstim` prefix resolves at prefix.cc and the
+  ontology is parsed and browsable in
+  [BioPortal](https://bioportal.bioontology.org/ontologies/SSTIM); LOV,
+  [BARTOC](https://github.com/gbv/bartoc.org/issues/319), and FAIRsharing
+  (record 8494) submissions await curator review, and a DBpedia Archivo
+  submission passed RDF validation but is blocked by a Databus outage. Tracked in
+  [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
   Sensory Field, logbook, profile, settings, and optional Firebase-backed user
   data are implemented as a static SvelteKit application.
 
-Browsers at the ontology IRI get the interactive application, and the
-[WIDOCO reference documentation](https://labiosyncare.github.io/ontology/docs/)
-is regenerated on every deploy (ADR 0023); registry submissions remain
-post-release work. Real participant session data, the private
-BioSynCare catalog, clinical protocols, and clinical claims are not published
-here.
+Browsers at the ontology IRI get the interactive application; reference
+documentation is regenerated on every deploy (ADR 0023) —
+[WIDOCO](https://labiosyncare.github.io/ontology/docs/) for the OWL core and
+[pyLODE](https://labiosyncare.github.io/ontology/docs/vocab/) for the SKOS
+vocabulary. Real participant session data, the private BioSynCare catalog,
+clinical protocols, and clinical claims are not published here.
 
 ## SSTIM Modules
 
@@ -119,12 +126,12 @@ make validate   # SHACL + audit + HermiT + SPARQL + serialization round trips
 make test       # Vitest unit tests
 make check      # SvelteKit sync and svelte-check
 make build      # Static production bundle in dist/
-make export     # JSON-LD and RDF/XML serializations of all six modules
+make export     # JSON-LD and RDF/XML serializations of all seven modules
 ```
 
 `make validate` checks more than RDF syntax:
 
-1. SHACL validates each primary graph, all six merged modules, and all public
+1. SHACL validates each primary graph, all seven merged modules, and all public
    instances.
 2. `scripts/sstim-quality-audit.py` checks module metadata, JSON-LD context and
    loader completeness, SKOS uniqueness/inverses/cycles, local IRI resolution,

@@ -45,6 +45,7 @@ ONTOLOGY_FILES = [
     "sstim-alignments.ttl",
     "sstim-patch-studio.ttl",
     "sstim-exposure.ttl",
+    "sstim-ecosystem.ttl",
 ]
 
 # rdflib serializer name -> output extension. The flat "xml" writer (not

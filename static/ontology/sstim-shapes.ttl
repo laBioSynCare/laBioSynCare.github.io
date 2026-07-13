@@ -3,8 +3,8 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.6.0
-#  Date:       2026-07-11
+#  Version:    0.7.0-dev
+#  Date:       2026-07-13
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -21,6 +21,7 @@
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
 @prefix sstim-sh: <https://w3id.org/sstim/shapes#> .
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -37,16 +38,16 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.6.0" ;
+    owl:versionInfo "0.7.0-dev" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, and references."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-11"^^xsd:date ;
+    dct:modified "2026-07-13"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
@@ -1354,6 +1355,151 @@ sstim-sh:StimulusChannelShape a sh:NodeShape ;
                     $this <https://w3id.org/sstim/exposure#hasComfortBoundary>
                           <https://w3id.org/sstim/exposure#boundaryPhotosensitivity> .
                 }
+            }
+        """ ;
+    ] .
+
+
+###########################################################################
+# Ecosystem Agent Shape (ADR 0024)
+#
+# Validates curated ecosystem-agent records: required provenance, controlled
+# lifecycle values, date sanity, and the consent gates. Named agents are
+# implementation data; this shape is what makes the notify-and-honor
+# governance machine-checkable.
+###########################################################################
+
+sstim-sh:EcosystemAgentShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:EcosystemAgent ;
+    sh:name "Ecosystem agent"@en ;
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Every ecosystem agent must have at least one rdfs:label (the public name)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:recordSource ;
+        sh:minCount 1 ;
+        sh:message "Every ecosystem agent must declare sstim-eco:recordSource — the public provenance of its facts (ADR 0024 §5)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:relationshipType ;
+        sh:minCount 1 ;
+        sh:class sstim-eco:RelationshipType ;
+        sh:message "Every ecosystem agent must declare at least one controlled sstim-eco:relationshipType."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:consentStatus ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( "implicit-public" "notified" "consent-requested" "consent-granted" "consent-declined" "removal-requested" "withdrawn" ) ;
+        sh:message "Every ecosystem agent must declare exactly one controlled sstim-eco:consentStatus (ADR 0024 §5)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:notificationStatus ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:in ( "not-notified" "notified" "failed" ) ;
+        sh:message "Every ecosystem agent must declare exactly one controlled sstim-eco:notificationStatus."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:responseStatus ;
+        sh:maxCount 1 ;
+        sh:in ( "no-response" "acknowledged" "consented" "objected" "requested-removal" "requested-changes" ) ;
+        sh:message "sstim-eco:responseStatus must be one controlled value."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:contributionStatus ;
+        sh:maxCount 1 ;
+        sh:in ( "none" "potential" "active" "past" ) ;
+        sh:message "sstim-eco:contributionStatus must be one controlled value."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:archivalConsent ;
+        sh:maxCount 1 ; sh:datatype xsd:boolean ;
+        sh:message "sstim-eco:archivalConsent must be a single boolean (ADR 0024 §6)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:addedOn ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every ecosystem agent must declare exactly one xsd:date sstim-eco:addedOn."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:notifiedOn ;
+        sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "sstim-eco:notifiedOn must be a single xsd:date."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim-eco:respondedOn ;
+        sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "sstim-eco:respondedOn must be a single xsd:date."@en ;
+    ] ;
+
+    # A notified agent must carry the notification date.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An agent with notificationStatus 'notified' must declare sstim-eco:notifiedOn."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#notificationStatus> "notified" .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#notifiedOn> ?d .
+                }
+            }
+        """ ;
+    ] ;
+
+    # A recorded response requires both its status and its date.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An agent with a responseStatus other than 'no-response' must declare sstim-eco:respondedOn."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#responseStatus> ?s .
+                FILTER(?s != "no-response")
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#respondedOn> ?d .
+                }
+            }
+        """ ;
+    ] ;
+
+    # Archival consent must rest on an actual consent signal (ADR 0024 §6):
+    # either consentStatus 'consent-granted' or a 'consented' response.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "sstim-eco:archivalConsent true requires consentStatus 'consent-granted' or responseStatus 'consented' (ADR 0024 §6)."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#archivalConsent> true .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#consentStatus> "consent-granted" .
+                }
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#responseStatus> "consented" .
+                }
+            }
+        """ ;
+    ] ;
+
+    # An agent whose removal has been requested must not remain archival.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An agent with consentStatus 'removal-requested' or 'withdrawn' must not carry archivalConsent true."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#archivalConsent> true ;
+                      <https://w3id.org/sstim/ecosystem#consentStatus> ?s .
+                FILTER(?s IN ("removal-requested", "withdrawn"))
             }
         """ ;
     ] .

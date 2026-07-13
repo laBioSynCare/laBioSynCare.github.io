@@ -1,0 +1,275 @@
+###########################################################################
+#
+#  SSTIM Ecosystem Module  —  sstim-ecosystem.ttl
+#
+#  Namespace:  https://w3id.org/sstim/ecosystem#
+#  Module IRI: https://w3id.org/sstim/ecosystem
+#  Version:    0.7.0-dev
+#  Date:       2026-07-13
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0
+#
+#  Reusable terms for describing the people and organizations of the
+#  sensory-stimulation field and their engagement with SSTIM. Design and
+#  governance: ADR 0024. This module carries NO personal data — only the
+#  agent umbrella, the engagement/relationship properties, and the
+#  relationship vocabulary. Named agents are curated implementation data at
+#  /organization/{id} and /specialist/{id}, never in this term space.
+#
+#  Flat Turtle module. Runtime named graph:
+#  https://w3id.org/sstim/graph/ecosystem
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/ecosystem> a owl:Ontology ;
+    # New module on the live 0.7 development line (ADR 0024). Additive; frozen at the
+    # next whole-set snapshot. Modules carry owl:versionInfo only (ADR 0020).
+    owl:versionInfo "0.7.0-dev" ;
+    dct:title "SSTIM Ecosystem Module"@en ;
+    dct:description "Reusable SSTIM module for the sensory-stimulation ecosystem: a neutral agent umbrella (person or organization), the engagement/consent lifecycle and relationship properties, and a controlled relationship-type vocabulary. Carries no personal data; named agents are curated implementation data."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-07-12"^^xsd:date ;
+    dct:issued "2026-07-12"^^xsd:date ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md> ;
+    skos:historyNote "0.7.0-dev — initial ecosystem module (ADR 0024): sstim-eco:EcosystemAgent (subclass of prov:Agent), the engagement/consent lifecycle and relationship properties, and the EcosystemRelationScheme relationship vocabulary. No personal data in the term space; named agents are curated implementation instances with a consent-gated archival tier."@en .
+
+
+###########################################################################
+# Classes
+###########################################################################
+
+sstim-eco:EcosystemAgent a owl:Class ;
+    rdfs:subClassOf prov:Agent ;
+    rdfs:label "Ecosystem agent"@en ;
+    skos:definition "A person or organization active in, or relevant to, the field of sensory stimulation, recorded in the SSTIM ecosystem. Instances are additionally typed with schema.org/FOAF person or organization classes. The class is evaluatively neutral: whether an agent is a contributor, stakeholder, cited author, peer project, etc. is expressed by sstim-eco:relationshipType, not by this type."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md> .
+
+sstim-eco:RelationshipType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Ecosystem relationship type"@en ;
+    skos:definition "A controlled category describing how an ecosystem agent relates to sensory stimulation or to SSTIM (e.g. contributor, stakeholder, cited author). Instances are the dual-typed SKOS concepts of the EcosystemRelationScheme."@en .
+
+
+###########################################################################
+# Relationship and expertise properties
+###########################################################################
+
+sstim-eco:relationshipType a owl:ObjectProperty ;
+    rdfs:label "relationship type"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range sstim-eco:RelationshipType ;
+    skos:definition "Relates an ecosystem agent to one or more controlled relationship types describing how it engages with the field or with SSTIM."@en .
+
+sstim-eco:relatesTo a owl:ObjectProperty ;
+    rdfs:label "relates to"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    skos:definition "Links an ecosystem agent to the specific SSTIM resource it relates to (a technique, the framework, a reference, the community group, the platform), when applicable."@en .
+
+sstim-eco:expertiseArea a owl:ObjectProperty ;
+    rdfs:label "expertise area"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range skos:Concept ;
+    skos:definition "Links an ecosystem agent to SSTIM controlled concepts (modalities, mechanisms, techniques) it works on. A sourced claim about scope, not an assertion of rank or authority."@en .
+
+sstim-eco:hasContributedTo a owl:ObjectProperty ;
+    rdfs:label "has contributed to"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    skos:definition "An SSTIM area (technique, module, the community group) to which the agent has actually contributed."@en .
+
+sstim-eco:couldContributeTo a owl:ObjectProperty ;
+    rdfs:label "could contribute to"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    skos:definition "An SSTIM area to which the agent could plausibly contribute."@en .
+
+sstim-eco:curatedBy a owl:ObjectProperty ;
+    rdfs:label "curated by"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range prov:Agent ;
+    skos:definition "The agent (typically BSC Lab) responsible for creating and maintaining this ecosystem record."@en .
+
+
+###########################################################################
+# Engagement / consent lifecycle properties (ADR 0024 §5)
+#
+# These record OUR process (notification, response, consent), factually and
+# separately from claims about the agent. The status datatype properties take
+# controlled string values enumerated by sh:in in sstim-shapes.ttl.
+###########################################################################
+
+sstim-eco:recordSource a owl:DatatypeProperty ;
+    rdfs:label "record source"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    skos:definition "Provenance of the facts in this record: a public URL (Wikipedia, ORCID, ROR, homepage) or a phrase such as 'personal communication'. Required for every ecosystem agent."@en .
+
+sstim-eco:consentStatus a owl:DatatypeProperty ;
+    rdfs:label "consent status"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "Listing-tier consent state: implicit-public, notified, consent-requested, consent-granted, consent-declined, removal-requested, or withdrawn (ADR 0024)."@en .
+
+sstim-eco:archivalConsent a owl:DatatypeProperty ;
+    rdfs:label "archival consent"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:boolean ;
+    skos:definition "True only when the agent has given specific, informed consent that the record may enter a permanent, citable snapshot and cannot then be fully erased (ADR 0024 §6). Absent or false means live-only and erasable."@en .
+
+sstim-eco:notificationStatus a owl:DatatypeProperty ;
+    rdfs:label "notification status"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "Whether the agent has been notified of inclusion: not-notified, notified, or failed."@en .
+
+sstim-eco:notifiedOn a owl:DatatypeProperty ;
+    rdfs:label "notified on"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:date ;
+    skos:definition "The date the agent was notified of inclusion in SSTIM."@en .
+
+sstim-eco:notificationChannel a owl:DatatypeProperty ;
+    rdfs:label "notification channel"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "How the notification was sent (e.g. email, public message, institutional contact)."@en .
+
+sstim-eco:responseStatus a owl:DatatypeProperty ;
+    rdfs:label "response status"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "The agent's response: no-response, acknowledged, consented, objected, requested-removal, or requested-changes."@en .
+
+sstim-eco:respondedOn a owl:DatatypeProperty ;
+    rdfs:label "responded on"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:date ;
+    skos:definition "The date the agent responded to notification."@en .
+
+sstim-eco:responseNote a owl:DatatypeProperty ;
+    rdfs:label "response note"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "The substance of the agent's response, recorded verbatim or summarized."@en .
+
+sstim-eco:contributionStatus a owl:DatatypeProperty ;
+    rdfs:label "contribution status"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:string ;
+    skos:definition "The agent's contribution state relative to SSTIM: none, potential, active, or past."@en .
+
+sstim-eco:addedOn a owl:DatatypeProperty ;
+    rdfs:label "added on"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range xsd:date ;
+    skos:definition "The date this ecosystem record was created."@en .
+
+
+###########################################################################
+# Relationship-type vocabulary (SKOS)
+###########################################################################
+
+sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Ecosystem Relationship Vocabulary"@en ;
+    dct:description "Controlled ways an ecosystem agent relates to sensory stimulation or to SSTIM. Applied per agent, so a term such as 'contributor' or 'stakeholder' labels a kind of involvement rather than every agent."@en ;
+    skos:hasTopConcept sstim-eco:contributor, sstim-eco:stakeholder,
+        sstim-eco:researchCollaborator, sstim-eco:scientificAdvisor,
+        sstim-eco:citedAuthor, sstim-eco:toolVendor, sstim-eco:standardsBody,
+        sstim-eco:funder, sstim-eco:institutionalHost, sstim-eco:peerProject,
+        sstim-eco:referencedSource .
+
+sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Contributor"@en ;
+    skos:notation "contributor" ;
+    skos:definition "An agent that has contributed to the sensory-stimulation field — in knowledge, research, practice, or business."@en .
+
+sstim-eco:stakeholder a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Stakeholder"@en ;
+    skos:notation "stakeholder" ;
+    skos:definition "An agent with an active stake or investment in the sensory-stimulation field or in SSTIM."@en .
+
+sstim-eco:researchCollaborator a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Research collaborator"@en ;
+    skos:notation "research-collaborator" ;
+    skos:definition "An agent collaborating on research relevant to SSTIM."@en .
+
+sstim-eco:scientificAdvisor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Scientific advisor"@en ;
+    skos:notation "scientific-advisor" ;
+    skos:definition "An agent providing scientific guidance to the SSTIM/BSC Lab effort."@en .
+
+sstim-eco:citedAuthor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Cited author"@en ;
+    skos:notation "cited-author" ;
+    skos:definition "An author whose work is cited by SSTIM's evidence or references. Historical or current; implies no ongoing engagement."@en .
+
+sstim-eco:toolVendor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Tool vendor"@en ;
+    skos:notation "tool-vendor" ;
+    skos:definition "An organization producing tools, devices, or applications for sensory stimulation."@en .
+
+sstim-eco:standardsBody a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Standards body"@en ;
+    skos:notation "standards-body" ;
+    skos:definition "An organization that develops standards relevant to sensory stimulation or its interoperability."@en .
+
+sstim-eco:funder a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Funder"@en ;
+    skos:notation "funder" ;
+    skos:definition "An agent that funds work relevant to SSTIM or the field."@en .
+
+sstim-eco:institutionalHost a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Institutional host"@en ;
+    skos:notation "institutional-host" ;
+    skos:definition "An institution hosting people or projects that work in the field."@en .
+
+sstim-eco:peerProject a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Peer project"@en ;
+    skos:notation "peer-project" ;
+    skos:definition "A peer initiative or platform with goals adjacent to SSTIM/BSC Lab."@en .
+
+sstim-eco:referencedSource a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Referenced source"@en ;
+    skos:notation "referenced-source" ;
+    skos:definition "An agent that produces sources referenced by SSTIM, without a closer relationship."@en .
