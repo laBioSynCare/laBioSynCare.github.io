@@ -86,8 +86,9 @@ banner pointing to the as-built reference.
   [`../src/core/README.md`](../src/core/README.md) — layer-specific docs.
 - [`../static/ontology/README.md`](../static/ontology/README.md) — ontology design.
 - [`ontology/README.md`](ontology/README.md) — vocabulary / `sstim` notes.
-- [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — canonical
-  ontology maturity backlog after SSTIM `0.3.0`.
+- [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — active
+  RDF remediation and enhancement plan for the `0.7.0-dev` line, driven by the
+  [2026-07-13 RDF audit](ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md).
 - [`credentials/firebase.md`](credentials/firebase.md) — optional Firebase setup.
 
 ## `decisions/` — architecture decision records
@@ -130,9 +131,10 @@ alternatives, and consequences. See
   prospective labs, orgs, standards bodies, and events to engage, with the ask
   per target, the 90-day sequence, KPIs, and an outreach log (consent per
   [ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md)).
-- [`HED_BIDS_INTEROP.md`](ecosystem/HED_BIDS_INTEROP.md) — SSTIM ↔ HED/BIDS
-  interoperability strategy and draft field crosswalk ("align, don't subordinate";
-  the four-representation demonstrator). Companion to [ADR 0025](decisions/0025-hed-bids-interoperability-crosswalk.md).
+- [`HED_BIDS_INTEROP.md`](ecosystem/HED_BIDS_INTEROP.md) — SSTIM ↔ HED event
+  profile and research bindings (SSTIM-native session bundle; generated HED
+  annotations; BIDS Behavioral, then NWB, as optional container bindings).
+  Companion to [ADR 0025](decisions/0025-hed-bids-interoperability-crosswalk.md).
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
   approach over patents; trademark plan.
 - [`SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md) — recommended

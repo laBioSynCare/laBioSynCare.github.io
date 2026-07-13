@@ -55,7 +55,7 @@ represent those partial results as a fresh HermiT/pySHACL run.
 
 #### KR-01 — the live Sensory Field RDF export is not SHACL-conformant
 
-`src/ui/field/exposureProfile.js:95-105` and `147-170` create
+`src/ui/field/exposureProfile.js:95-105` and `147-171` create
 `sstim:EvidenceClaim` nodes without claim direction, review status, evidence
 date, modification date, or responsible agent. All five are mandatory in
 `sstim-shapes.ttl:517-539`. The same exporter creates an exploratory protocol at
@@ -117,7 +117,7 @@ machine-testable rather than leaving it only in comments.
 
 #### KR-04 — the public-claim authorization query can approve the wrong evidence
 
-The SPARQL constraint at `sstim-shapes.ttl:210-224` accepts any claim at a high
+The SPARQL constraint at `sstim-shapes.ttl:210-226` accepts any claim at a high
 enough tier. It does not require a supporting direction, compatible modality,
 population or outcome, current/reviewed status, or a valid citation. A strong
 refuting or mismatched claim can therefore satisfy the public-copy gate.

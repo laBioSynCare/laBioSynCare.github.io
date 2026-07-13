@@ -41,6 +41,32 @@ Contract repair therefore precedes term growth.
    context, fixtures, competency questions, migration notes, and application
    mappings change together.
 
+## Audit-finding coverage
+
+Every finding in the primary audit maps to at least one phase below. A phase is
+not complete until the dispositions of its findings are implemented or
+explicitly re-scoped with a recorded reason.
+
+| Finding | Short name | Resolved in |
+|---|---|---|
+| KR-01 | Sensory Field export not SHACL-conformant | 0.1 |
+| KR-02 | Three incompatible session contracts | 0.2 |
+| KR-03 | Self-report model unsafe for stated use | 2.1–2.3 |
+| KR-04 | Public-claim gate approves wrong evidence | 1.2 |
+| KR-05 | OWL domains contradict definitions | 1.1 |
+| KR-06 | `EvidenceClaim` overloaded | 1.2 |
+| KR-07 | Patch/preset validation weaker than claim | 1.3 |
+| KR-08 | Outcome prose inside physical categories | 1.4 |
+| KR-09 | Overstated `exactMatch` alignments | 1.4 |
+| KR-10 | Ordered/controlled values collapse to literals | 1.3, 1.4 |
+| KR-11 | Weak evidence review/provenance model | 1.2 |
+| KR-12 | Web Annotation RDF and privacy defaults | 1.5 |
+| KR-13 | Flattened ecosystem relationships/consent | 1.5 |
+| KR-14 | Release status and validation-coverage gaps | 0.3, 1.1 |
+| KR-15 | Ambiguous parallel technique identifiers | 1.4 |
+| KR-16 | Uneven language and fixture coverage | 1.4, 2.3, 4 |
+| KR-17 | Runtime mapping mints undeclared IRIs | 0.1, 0.3 |
+
 ## Work sequence
 
 ### Phase 0 — restore truth across existing contracts

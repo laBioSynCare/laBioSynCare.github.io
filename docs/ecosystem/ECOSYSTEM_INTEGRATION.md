@@ -27,7 +27,7 @@ conversion, not more construction:**
 Everything below serves one milestone:
 
 > **One outside lab, one real published protocol encoded in SSTIM, one
-> interoperability crosswalk, and one independent named review.**
+> validated interoperability artifact, and one independent named review.**
 
 ---
 

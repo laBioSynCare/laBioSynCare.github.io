@@ -74,7 +74,7 @@ the numbers below are stable IDs, not the display order.
   techniques, evidence tiers, exposure, and safety are modeled — then encode and
   reproduce a protocol across BIDS/HED/SSTIM.*
 - **Primary CTA:** **Explore the ontology** → the graph browser · **Query with SPARQL** → `/sparql`
-- **Secondary:** *See the HED/BIDS crosswalk* → [`../ecosystem/HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) · *Cite SSTIM* → `https://w3id.org/sstim` + DOI
+- **Secondary:** *See the HED/BIDS interoperability profile* → [`../ecosystem/HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) · *Cite SSTIM* → `https://w3id.org/sstim` + DOI
 
 ### ③ Build on it
 - **For:** implementers / developers.
