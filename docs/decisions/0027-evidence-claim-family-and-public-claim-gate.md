@@ -1,6 +1,6 @@
 # ADR 0027 — Separate evidence assessments from non-evidence statements
 
-**Status:** Proposed — 2026-07-13
+**Status:** Accepted — 2026-07-13
 
 Amends P7.1 and P7.3 of
 [ADR 0018](0018-evidence-integrity-and-public-claim-governance.md): evidence
@@ -515,9 +515,42 @@ assessment proposition/scope, evidence basis and axes, source governance,
 qualified provenance, compatibility window, observation firewall, and deferred
 public-claim scope are settled by this text and its ledger.
 
-**Recommended disposition: Accept.** The status remains Proposed until the
-maintainer explicitly accepts this final text. Acceptance authorizes the
+**Recommended disposition: Accept.** The status remained Proposed until the
+maintainer explicitly accepted this final text. Acceptance authorizes the
 ontology implementation described here; it does not accept ADR 0028 or 0029.
+
+**Accepted 2026-07-13.** The maintainer reviewed the atomized text and
+delegated the disposition with full in-session authorization; the reviewing
+agent's verification (38-node inventory, ledger row-by-row cross-check against
+the live graph, reference-key existence) found no discrepancy.
+
+### Implementation clarifications recorded at acceptance
+
+Three points the text left open are fixed as follows:
+
+1. **Outcome and descriptor IRIs are implementation-scoped named
+   individuals, not SKOS concepts.** The migration-minted
+   `EvidenceOutcomeConcept`, `PopulationDescriptor`, and
+   `ComparatorDescriptor` individuals live under the BSC Lab evidence path
+   per the ledger and are typed only with their `sstim:` classes — no
+   `skos:Concept` dual-typing, keeping CLAUDE.md §5.1 (no SKOS concepts under
+   implementation paths) intact. A value is promoted into `sstim-v:` (with a
+   mapping from the implementation IRI) only when vendor-neutral reuse
+   emerges. Controlled-value *schemes* introduced by this ADR
+   (`StudyDesign`, `StudyModel`, `ModalityApplicability`,
+   `EvidenceSynthesisType`, `EvidencePropositionForm`, `ScopeMarker`) are
+   reusable term space: classes in `sstim:`/`sstim-ex:`, values in `sstim-v:`
+   with the normal Pattern-2 dual-typing.
+2. **The 0.7 compatibility view is a build artifact, not committed data.**
+   It is generated at export time into the deployed `dist/ontology/` tree,
+   carries an explicit non-authoritative label in its header annotations, and
+   is excluded from pySHACL, the quality audit, and any authorization input
+   by construction (it never enters `static/ontology/`).
+3. **No new module.** Term placement follows the prefixes already used in
+   this ADR: evidence-assessment machinery in `sstim-core.ttl`, statement
+   roles and their link properties in `sstim-exposure.ttl`, controlled-value
+   schemes in `sstim-vocab.ttl`. The seven-module whole-set invariant
+   (ADR 0020) is unchanged.
 
 ## See also
 

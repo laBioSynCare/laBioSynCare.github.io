@@ -50,7 +50,7 @@ explicitly re-scoped with a recorded reason.
 | Finding | Short name | Resolved in |
 |---|---|---|
 | KR-01 | Sensory Field export not SHACL-conformant | 0.1 |
-| KR-02 | Three incompatible session contracts | 0.2 |No. I. Is about.
+| KR-02 | Three incompatible session contracts | 0.2 |
 | KR-03 | Self-report model unsafe for stated use | 2.1–2.3 |
 | KR-04 | Public-claim gate approves wrong evidence | 1.2b–1.2c |
 | KR-05 | OWL domains contradict definitions | 1.1 |
