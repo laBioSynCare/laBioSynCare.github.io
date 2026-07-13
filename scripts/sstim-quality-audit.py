@@ -65,6 +65,32 @@ modules = parse_graph(module_paths)
 instances = parse_graph(instance_paths)
 all_graph = modules + instances
 
+
+# All live modules must carry one identical whole-set version (ADR 0020), and
+# a development line must not present itself as released (audit KR-14).
+MOD = Namespace("https://w3id.org/mod#")
+module_versions: dict[str, str] = {}
+for path, module_iri in MODULES.items():
+    values = list(modules.objects(module_iri, OWL.versionInfo))
+    if len(values) != 1:
+        fail(f"{path.name}: expected exactly one owl:versionInfo, found {len(values)}")
+        continue
+    module_versions[path.name] = str(values[0])
+
+distinct_versions = set(module_versions.values())
+if len(distinct_versions) > 1:
+    fail(f"module owl:versionInfo values diverge: {sorted(module_versions.items())}")
+
+whole_set_version = next(iter(distinct_versions), "")
+if "-" in whole_set_version:
+    for path, module_iri in MODULES.items():
+        for status in modules.objects(module_iri, MOD.status):
+            if str(status).strip().lower() == "released":
+                fail(
+                    f"{path.name}: development version {whole_set_version} "
+                    'must not declare mod:status "released"'
+                )
+
 named_classes = {
     subject
     for subject in modules.subjects(RDF.type, OWL.Class)
@@ -375,6 +401,38 @@ for value in context.values():
 for term in local_terms:
     if str(term) not in mapped_context_iris:
         fail(f"context.jsonld: no compact term for {term}")
+
+
+# Context @type coercions must be compatible with every value the repository
+# graph actually holds (audit KR-14): an @id coercion tolerates only IRI or
+# blank-node objects, and a datatype coercion tolerates only literals of
+# exactly that datatype. Properties whose values legitimately vary must stay
+# uncoerced so explicit @value/@type objects survive compaction.
+for compact_term, spec in context.items():
+    if not isinstance(spec, dict) or "@type" not in spec or "@container" in spec:
+        continue
+    coerced_property = URIRef(expand_context_id(spec["@id"]))
+    coercion = spec["@type"]
+    for subject, obj in all_graph.subject_objects(coerced_property):
+        if coercion == "@id":
+            if isinstance(obj, Literal):
+                fail(
+                    f"context.jsonld: '{compact_term}' coerces {coerced_property} to @id "
+                    f"but {subject} holds the literal {obj!r}"
+                )
+        elif isinstance(obj, Literal):
+            expected = URIRef(expand_context_id(coercion))
+            actual = obj.datatype or XSD.string
+            if actual != expected:
+                fail(
+                    f"context.jsonld: '{compact_term}' coerces {coerced_property} to {coercion} "
+                    f"but {subject} holds a {actual} literal {obj!r}"
+                )
+        else:
+            fail(
+                f"context.jsonld: '{compact_term}' coerces {coerced_property} to {coercion} "
+                f"but {subject} holds the IRI {obj}"
+            )
 
 
 # The browser's explicit loader manifest must include every committed instance.

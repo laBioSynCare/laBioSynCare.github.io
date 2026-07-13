@@ -16,6 +16,11 @@
 // Existing snapshots are protected by default. Use --force only to correct a
 // snapshot that was never published. Cutting a real new release means bumping
 // owl:versionInfo / owl:versionIRI first, then snapshotting the new number.
+//
+// Release-readiness checks (improvement plan 0.3, audit KR-14): a snapshot is
+// refused unless the version is a plain release (no -dev/prerelease suffix),
+// every module declares that same owl:versionInfo, and sstim-core.ttl carries
+// the matching owl:versionIRI and mod:status "released".
 
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from 'node:fs'
 import { dirname, resolve, join } from 'node:path'
@@ -46,6 +51,45 @@ function declaredVersion() {
     throw new Error('Could not read owl:versionInfo from sstim-core.ttl')
   }
   return match[1]
+}
+
+// Pure release-readiness check, exported for unit tests. `files` maps module
+// file names to their Turtle text; returns a list of human-readable problems
+// (empty when the set is ready to snapshot as `version`).
+export function releaseProblems({ version, files }) {
+  const problems = []
+  if (version.includes('-')) {
+    problems.push(`"${version}" is a development/prerelease version; snapshots are cut only from plain release versions`)
+  }
+  for (const file of ONTOLOGY_FILES) {
+    const text = files.get(file)
+    if (typeof text !== 'string') {
+      problems.push(`${file}: module file is missing`)
+      continue
+    }
+    const match = text.match(/owl:versionInfo\s+"([^"]+)"/)
+    if (!match) {
+      problems.push(`${file}: missing owl:versionInfo`)
+    } else if (match[1] !== version) {
+      problems.push(`${file}: owl:versionInfo "${match[1]}" does not match snapshot version "${version}"`)
+    }
+  }
+  const core = files.get('sstim-core.ttl') ?? ''
+  if (!core.includes(`owl:versionIRI <https://w3id.org/sstim/${version}>`)) {
+    problems.push(`sstim-core.ttl: missing owl:versionIRI <https://w3id.org/sstim/${version}>`)
+  }
+  if (!/mod:status\s+"released"/.test(core)) {
+    problems.push('sstim-core.ttl: mod:status must be "released" at snapshot time')
+  }
+  return problems
+}
+
+function liveModuleFiles() {
+  const files = new Map()
+  for (const file of ONTOLOGY_FILES) {
+    files.set(file, readFileSync(join(ontologyDir, file), 'utf8'))
+  }
+  return files
 }
 
 function sourceCommit() {
@@ -102,45 +146,55 @@ function dirtyOntologyFiles() {
   }
 }
 
-let options
-try {
-  options = parseArgs(process.argv.slice(2))
-} catch (error) {
-  console.error(error.message)
-  usage()
-  process.exit(1)
-}
+function main() {
+  let options
+  try {
+    options = parseArgs(process.argv.slice(2))
+  } catch (error) {
+    console.error(error.message)
+    usage()
+    process.exit(1)
+  }
 
-const { version, force } = options
-if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)) {
-  console.error(`Refusing to snapshot non-semver version "${version}".`)
-  process.exit(1)
-}
+  const { version, force } = options
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)) {
+    console.error(`Refusing to snapshot non-semver version "${version}".`)
+    process.exit(1)
+  }
 
-const outDir = join(ontologyDir, version)
-const existingFiles = existsSync(outDir) ? readdirSync(outDir).filter((f) => f !== '.DS_Store') : []
-if (existingFiles.length && !force) {
-  console.error(`Refusing to overwrite existing snapshot static/ontology/${version}/.`)
-  console.error('Use --force only if this snapshot has not been published.')
-  process.exit(1)
-}
+  const problems = releaseProblems({ version, files: liveModuleFiles() })
+  if (problems.length) {
+    console.error(`Refusing to snapshot: the module set is not release-ready as "${version}":`)
+    for (const problem of problems) console.error(`  - ${problem}`)
+    console.error('Bump owl:versionInfo across all modules, set owl:versionIRI and')
+    console.error('mod:status "released" in sstim-core.ttl, then snapshot.')
+    process.exit(1)
+  }
 
-const dirty = dirtyOntologyFiles()
-if (dirty.length) {
-  console.error('Refusing to snapshot while source ontology files have uncommitted changes:')
-  for (const line of dirty) console.error(`  ${line}`)
-  console.error('Commit or discard those source changes before snapshotting.')
-  process.exit(1)
-}
+  const outDir = join(ontologyDir, version)
+  const existingFiles = existsSync(outDir) ? readdirSync(outDir).filter((f) => f !== '.DS_Store') : []
+  if (existingFiles.length && !force) {
+    console.error(`Refusing to overwrite existing snapshot static/ontology/${version}/.`)
+    console.error('Use --force only if this snapshot has not been published.')
+    process.exit(1)
+  }
 
-mkdirSync(outDir, { recursive: true })
+  const dirty = dirtyOntologyFiles()
+  if (dirty.length) {
+    console.error('Refusing to snapshot while source ontology files have uncommitted changes:')
+    for (const line of dirty) console.error(`  ${line}`)
+    console.error('Commit or discard those source changes before snapshotting.')
+    process.exit(1)
+  }
 
-for (const file of ONTOLOGY_FILES) {
-  copyFileSync(join(ontologyDir, file), join(outDir, file))
-}
+  mkdirSync(outDir, { recursive: true })
 
-const commit = sourceCommit()
-const readme = `# SSTIM ontology — frozen snapshot ${version}
+  for (const file of ONTOLOGY_FILES) {
+    copyFileSync(join(ontologyDir, file), join(outDir, file))
+  }
+
+  const commit = sourceCommit()
+  const readme = `# SSTIM ontology — frozen snapshot ${version}
 
 These files are a **byte-identical, immutable copy** of the SSTIM ontology as of
 version \`${version}\`. They exist so that
@@ -156,8 +210,14 @@ artifact that can be cited without ambiguity, even after the top-level
 
 Files: ${ONTOLOGY_FILES.map((f) => `\`${f}\``).join(', ')}.
 `
-writeFileSync(join(outDir, 'README.md'), readme)
+  writeFileSync(join(outDir, 'README.md'), readme)
 
-const written = readdirSync(outDir).sort()
-console.log(`snapshot: wrote static/ontology/${version}/ (${written.length} files)`)
-for (const f of written) console.log(`  ${f}`)
+  const written = readdirSync(outDir).sort()
+  console.log(`snapshot: wrote static/ontology/${version}/ (${written.length} files)`)
+  for (const f of written) console.log(`  ${f}`)
+}
+
+// Guarded so unit tests can import releaseProblems without side effects.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main()
+}

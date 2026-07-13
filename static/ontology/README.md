@@ -326,12 +326,17 @@ SELECT ?framework ?protocol ?preset WHERE {
 
 SSTIM versions the seven modules as one citable set:
 
-1. Develop in top-level modules with a `-dev` `owl:versionInfo` and no
-   `owl:versionIRI`.
+1. Develop in top-level modules with a `-dev` `owl:versionInfo`, no
+   `owl:versionIRI`, and `mod:status "under development"` in the core. The
+   quality audit enforces that all modules carry the same version and that a
+   `-dev` line never claims released status.
 2. Run the complete validation suite and review semantic diffs.
-3. Set the release version and core `owl:versionIRI`.
+3. Set the release version in **every** module, and the `owl:versionIRI` and
+   `mod:status "released"` in the core.
 4. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
-   sources and refuses to overwrite an existing snapshot.
+   sources, an existing snapshot, dev/prerelease versions, diverging module
+   versions, and missing release metadata
+   (`scripts/snapshot-ontology.test.mjs` covers these refusals).
 5. Tag and publish the GitHub release so Zenodo archives the same commit.
 6. Add the resulting version DOI without rewriting a published snapshot.
 
