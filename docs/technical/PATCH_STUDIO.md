@@ -233,3 +233,105 @@ sensory track exist; Martigli period ≥ 3 s (breathing minimum); Symmetry rate 
 
 Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
 [`tempo.test.js`](../../src/ui/creator/tempo.test.js).
+
+---
+
+## 10. Known gaps and planned improvements
+
+> **Forward-looking, not as-built.** §1–§9 mirror the code. This section records
+> the gaps identified for the planned Patch Studio improvement work and is the
+> shared reference for that effort. Each item is grounded in the current code so
+> the work can proceed against repo truth. Tracked as checkboxes in
+> [`../../TODO.md`](../../TODO.md) ("Software — Phase 2 → UI — Patch Studio").
+
+### 10.1 The export is a dead-end (highest priority)
+
+`buildPatchExport()` produces a `patch-studio-model-1` object (§8) that only
+`draftFromPatchExport()` and Firestore (`src/firebase/patches.js`) consume. There
+is **no bridge to the preset catalog JSON** ([`PRESET_FORMAT.md`](PRESET_FORMAT.md),
+`header` + `voices`) or to an RDF instance under
+`static/ontology/instances/presets/`. So a patch can be designed, played, and
+cloud-saved, but it cannot become a catalog preset — which is the artifact the
+BSC Lab → BioSynCare pipeline (`CLAUDE.md` §11) and the knowledge browser
+(`src/rdf/presets.js`) actually consume. The studio is a design surface wired to
+nothing downstream.
+
+The two models are **structurally divergent**, so this is a lossy, partial
+mapping — not a re-serialisation:
+
+| | Patch Studio (`patch-studio-model-1`) | Catalog preset (`PRESET_FORMAT.md`) |
+|---|---|---|
+| Shape | control tracks *modulate* sensory-track params (`{value, mods, tempoSync}`) | static `header` + parametric `voices[]` |
+| Audio types | `IsochronicTone`, `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample` | `Binaural`, `Martigli`, `Martigli-Binaural`, `Symmetry` only |
+| Non-audio | visual + haptic tracks | none (audio only) |
+| Metadata | `patchName` only | `group`, `targetBand`, `evidenceTier`, `cautionTags`, multilingual `desc*`/`med2*`/`uses*`/`techDesc*`, `headphonesMode`, … |
+| Breathing | Martigli **control track** modulating other tracks | Martigli / Martigli-Binaural **audible voice** |
+
+Consequences that must be decided before implementing (see
+[ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md)):
+
+- Only a **mappable subset** round-trips: `BinauralBeat → Binaural`; a `Symmetry`
+  control + `IsochronicTone` → `Symmetry` voice (isochronic, `noctaves: 0`); a
+  `Martigli` control modulating a carrier/binaural → `Martigli` /
+  `Martigli-Binaural`. `Carrier`/`Noise`/`Drone`/`Sample`, all visual, and all
+  haptic tracks have **no catalog voice** and are dropped or blocked.
+- The catalog `header` carries scientific/human metadata that **cannot be derived**
+  from a patch. A conversion needs a **metadata-authoring step** (the panel the
+  stale TODO called "set group/targetBand/evidence tier").
+- The public target is a **BSC Lab reference preset** (bsclab IRI +
+  `static/ontology/instances/presets/`), SHACL-validated per §5.4 before it is
+  emitted. The private BioSynCare/BSC catalog stays out of this repo.
+
+### 10.2 `PresetCreator.svelte` is a monolith
+
+The component is **~4,365 lines** (`<script>` 1–1282, markup ~985, `<style>`
+~2,100) with **~91 functions** in one file, mixing transport, engine lifecycle,
+modulation math, tempo sync, Firestore CRUD, keyboard + fullscreen handling, SVG
+waveform-path generation, validation display, and the help overlay. It works and
+respects the invariants, but the size is a growing maintenance and test liability.
+Decomposition (extract, do not rewrite behaviour):
+
+- ✅ **`modulation.js` (pure) — done.** `evalParamValue` (the live-value
+  evaluation `clamp(base + Σ amountᵢ·controlValueᵢ)`), `effectiveTempoValue`,
+  `clampRange`, `modAmountRange`, `sumMods`, and `resolveBinauralLR` (the
+  BinauralBeat `centerFreq`/`beatFreq` → `leftFreq`/`rightFreq` split). The
+  component keeps `applyMods` / `controlTrackForTempo` as thin wrappers that own
+  the `liveValues` cache, the change-detected `writeAudio`, and the reactive
+  `bpmEnabled()` read.
+- ✅ **`waveformPaths.js` (pure) — done.** `isoEnvSpec`, `rectanglePath`,
+  `sineWavePath`, `isoEnvelopeOutlinePath`, `isoWavePath`, `binauralSumPath`,
+  `binauralBeatEnvelopePath`, `noisePath`, `polygonPoints`, `adaptiveSamples`,
+  `binauralRowWindow` — SVG scope-preview geometry.
+- **`patchTransport.js` (controller):** `createEngine`, `togglePlay`,
+  `trackToVoiceSpec`, `startVoiceFor`, `stopVoiceFor`, `stopAllVoices`,
+  `restartVoice`, `restartSystem`, and the `rafTick` loop. Keeps the
+  `AudioContext.currentTime` clock authority (`CLAUDE.md` §3.1) in one place.
+- **Cloud store:** the `refreshCloudPatches`/`saveCloudPatch`/`loadCloudPatch`/
+  `renameCloudPatch`/`removeCloudPatch` glue over `src/firebase/patches.js`.
+- **Subcomponents:** cloud-patches menu, help overlay, semantic-info panel,
+  mix/fullscreen stage, per-track card.
+
+### 10.3 The hard logic is untested
+
+✅ **Addressed for the §10.2 extractions.** The modulation formula, tempo-sync
+resolution, binaural center/beat split, and scope geometry now have unit
+coverage in `src/ui/creator/modulation.test.js` and `waveformPaths.test.js`
+(creator suite 12 → 44 cases): base + Σ amount·control, clamp, mute→gain 0,
+tempo-sync duration/rate, the L/R carrier split, and path-string invariants.
+Remaining untested logic still lives in the component `<script>` (transport,
+`rafTick` orchestration, cloud CRUD) and becomes testable as §10.2 continues.
+
+### 10.4 Visual and haptic are previews, not engines
+
+Per §5 and §6, visual tracks render as CSS/DOM previews (target: the PixiJS
+engine in [`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md)) and
+haptics are preview-only. This is honest, roadmapped Phase-2 work
+([`ROADMAP.md`](../../ROADMAP.md)), not a defect — listed here so the improvement
+plan sees the whole surface. Lower priority than §10.1–§10.3.
+
+### 10.5 Minor
+
+`rafTick` allocates a `new Map()` per frame for control values. Harmless on the
+main thread (this is the rAF loop, **not** the worklet `process()` — `CLAUDE.md`
+§3.3 does not apply), but trivially hoistable if that loop is touched during
+§10.2.
