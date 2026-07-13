@@ -659,9 +659,14 @@
   {#if exportOpen}
     <div class="export-panel">
       <header>
-        <h3>Exposure profile (Turtle)</h3>
+        <h3>Exposure profile (Turtle) — draft</h3>
         <button type="button" class="linklike" onclick={() => (exportOpen = false)}>Close</button>
       </header>
+      <p class="export-note">
+        Lossy summary of the current field. It does not yet validate against the
+        SSTIM SHACL shapes and omits some visual parameters, so treat it as a
+        description of this session, not a conformant SSTIM artifact.
+      </p>
       <textarea readonly rows="12">{exportTtl}</textarea>
       <div class="export-actions">
         <button type="button" onclick={downloadProfile}>Download .ttl</button>
@@ -731,6 +736,7 @@
   .export-panel header { display: flex; justify-content: space-between; align-items: center; }
   .export-panel h3 { margin: 0; font-size: 0.95rem; }
   .export-panel textarea { width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 0.72rem; }
+  .export-note { color: var(--app-muted); font-size: 0.8rem; margin: 0.25rem 0 0.5rem; max-width: 70ch; }
   .export-actions { display: flex; gap: 0.5rem; }
   .export-actions button { width: auto; margin: 0; }
 

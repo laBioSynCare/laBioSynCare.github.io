@@ -100,9 +100,20 @@ delivered SPL — with conservative defaults and a NIOSH 85 dBA / 8 h note.
 ## 6. Exposure-profile emission
 
 Every configuration serialises to an `sstim-ex:ExposureProfile`
-([exposureProfile.js](../../src/ui/field/exposureProfile.js)), the same shape as the
+([exposureProfile.js](../../src/ui/field/exposureProfile.js)), modelled on the
 committed reference instance
 [`sensory-field-example.ttl`](../../static/ontology/instances/experiments/sensory-field-example.ttl).
+
+The runtime export is currently a **draft, lossy summary**, and the UI labels it
+as such: unlike the hand-curated reference, it does not yet satisfy the SSTIM
+SHACL contract (no protocol framework/technique links; no evidence-claim
+provenance the exporter could truthfully generate — audit finding KR-01, plan
+phase 0.1 in [IMPROVEMENT_PLAN.md](../ontology/IMPROVEMENT_PLAN.md)). The exact
+gap is pinned by the golden conformance suite
+[exposureProfile.shacl.test.js](../../src/ui/field/exposureProfile.shacl.test.js),
+which fails on any drift and flips to a strict conformance assertion once the
+exporter is repaired.
+
 Mapping:
 
 | UI concept | Exposure terms |
