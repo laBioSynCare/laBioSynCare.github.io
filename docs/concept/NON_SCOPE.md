@@ -1,6 +1,6 @@
 # Non-Scope
 
-This document defines what the proposed Sensory Stimulation Vocabulary Community Group should not do.
+This document defines what the Sensory Stimulation Vocabulary Community Group should not do.
 
 ## Not a Clinical Guideline Body
 

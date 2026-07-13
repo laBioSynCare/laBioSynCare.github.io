@@ -77,7 +77,8 @@ By end of Phase 2 (approximately 12–18 months from now):
 
 - [ ] At least 2 academic institutions using BSC Lab for research
 - [ ] At least 1 institution formally contributing to the SSTIM vocabulary
-- [ ] W3C CG with at least 5 founding participants from distinct institutions
+- [ ] W3C CG grown to ≥12 participants across ≥3 distinct institutions
+      (launched with 4; see `ECOSYSTEM_INTEGRATION.md` Workstream 3)
 - [ ] At least 1 published paper citing `https://w3id.org/sstim` as the
       ontology reference
 

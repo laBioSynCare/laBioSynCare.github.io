@@ -1,6 +1,6 @@
 # Sensory Stimulation Vocabulary Community Group — Draft Charter
 
-Status: Draft proposal
+Status: Draft charter — Community Group launched; charter not yet ratified
 Short name preference: `sstim`
 Initial namespace: `https://w3id.org/sstim/`
 
@@ -178,18 +178,26 @@ The group intends to maintain awareness of, and where useful coordinate with, ad
 - **Music therapy and rhythmic-stimulation research communities.** Rhythmic Auditory Stimulation (RAS) and Neurologic Music Therapy (NMT) overlap with sensory stimulation at the motor-entrainment end. The group may maintain liaison with bodies such as the World Federation of Music Therapy.
 - **Research and implementation partners.** The group welcomes liaison with research labs, open-science communities, accessibility organizations, and software/hardware implementation partners interested in shared sensory stimulation terminology.
 
-## Proposers and Initial Contacts
+## Chairs and Participants
 
-This proposal is being prepared by:
+The Community Group is **launched**; its charter is not yet ratified. Chairs,
+participants, and the current roster are listed on the group's W3C page, which is
+the authoritative record. Until the charter is ratified, Renato Fabbri retains
+editorial control of the SSTIM namespace (ORCID: 0000-0002-9699-629X, contact:
+renato.fabbri@gmail.com); on ratification, editorial control transfers to the CG.
 
-- **Renato Fabbri** — proposing contact for the Community Group, maintainer of the BSC Lab repository serving as the pre-submission anchor. ORCID: 0000-0002-9699-629X. Contact: renato.fabbri@gmail.com.
+The group continues to welcome participants from distinct institutions across
+sensory stimulation research, semantic-web engineering, accessibility, and
+software/hardware implementation. Named participants are added only after explicit
+consent.
 
-Additional initial supporters will be added only after explicit consent. Target: 3–5 founding participants from distinct institutions across sensory stimulation research, semantic-web engineering, accessibility, and software/hardware implementation.
+## Next Steps (post-launch)
 
-## Next Steps Before W3C Submission
+The Community Group is launched; the charter is not yet ratified. Remaining steps:
 
-- [ ] Confirm group name and short name.
-- [ ] Identify 3–5 additional founding participants willing to be named publicly.
-- [ ] Confirm W3C accounts for proposer and initial supporters.
-- [ ] Register `https://w3id.org/sstim` redirects at w3id.org.
-- [ ] Submit charter at https://www.w3.org/community/groups/proposed/.
+- [x] Submit the group to W3C — **done; the group is launched.**
+- [ ] Ratify this charter with the participants.
+- [ ] Grow participation across distinct institutions (W3C-growth KPI 4 → ≥12; see
+      [`docs/ecosystem/ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md)).
+- [ ] Confirm `https://w3id.org/sstim` redirects are registered and resolving.
+- [ ] Hold the first working session (encode one real study — Workstream 2).

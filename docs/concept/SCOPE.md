@@ -2,13 +2,13 @@
 
 This document covers two related but distinct scopes:
 
-1. The proposed **Sensory Stimulation Vocabulary Community Group** scope (the
+1. The **Sensory Stimulation Vocabulary Community Group** scope (the
    W3C Community Group proposal anchored in this repository).
 2. The **BSC Lab** scope — what BSC Lab itself does and explicitly does not
    claim, with regulatory and language guidance for contributors.
 
 See also [`NON_SCOPE.md`](./NON_SCOPE.md) for an explicit list of items that
-fall outside the proposed Community Group's remit.
+fall outside the Community Group's remit.
 
 ---
 
@@ -33,7 +33,7 @@ The vocabulary should help research become more shareable and representative, he
 
 ## In Scope
 
-The proposed group may work on open semantic descriptions for:
+The group may work on open semantic descriptions for:
 
 ### Sessions
 
@@ -146,7 +146,7 @@ sstim
 
 The vocabulary should support interoperability and clarity without implying that a described stimulation session has clinically validated effects.
 
-For an explicit list of items outside the proposed group's remit, see
+For an explicit list of items outside the group's remit, see
 [`NON_SCOPE.md`](./NON_SCOPE.md).
 
 ---

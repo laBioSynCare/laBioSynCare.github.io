@@ -22,7 +22,7 @@ banner pointing to the as-built reference.
 - [`SCOPE.md`](concept/SCOPE.md) — what BSC Lab claims and explicitly does
   not claim. Load-bearing for every user-facing string; see `CLAUDE.md` §3.5.
 - [`NON_SCOPE.md`](concept/NON_SCOPE.md) — what is explicitly out of scope for
-  the project and the proposed W3C Community Group.
+  the project and the W3C Community Group.
 - [`EVIDENCE_FRAMEWORK.md`](concept/EVIDENCE_FRAMEWORK.md) — the six-tier
   evidence system used throughout the ontology.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
@@ -56,6 +56,10 @@ banner pointing to the as-built reference.
   instance distinction. Source for `schemas/session.schema.json` (planned).
 - [`KNOWLEDGE_BROWSER_UX.md`](technical/KNOWLEDGE_BROWSER_UX.md) — UX design for
   the ontology graph, SPARQL, preset browser, and annotation surfaces.
+- [`PUBLIC_ENTRANCE.md`](technical/PUBLIC_ENTRANCE.md) — **target** audience-first
+  landing IA: 7 personas → 4 doors (Experience / Understand / Build / Join), per-door
+  copy + route map, safety routing, and the two conversion actions. Source for a
+  future `/` landing.
 - [`OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md`](technical/OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md) —
   **exploratory proposal (Phase 3, not built)** for using OpenClaw as a future
   conversational agent-automation layer around SSTIM intake, routing, review
@@ -116,6 +120,19 @@ alternatives, and consequences. See
 
 ## `ecosystem/` — IP, governance, outreach
 
+- [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
+  tracker** for ecosystem integration: the five workstreams (group-status
+  reconciliation, HED/BIDS/INCF interoperability, outreach targets + 90-day
+  sequence + KPIs, the expanded public-entrance / audience model, and the
+  [ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md) stakeholder RDF
+  module). Start here for outreach and positioning work.
+- [`OUTREACH_TARGETS.md`](ecosystem/OUTREACH_TARGETS.md) — working registry of
+  prospective labs, orgs, standards bodies, and events to engage, with the ask
+  per target, the 90-day sequence, KPIs, and an outreach log (consent per
+  [ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md)).
+- [`HED_BIDS_INTEROP.md`](ecosystem/HED_BIDS_INTEROP.md) — SSTIM ↔ HED/BIDS
+  interoperability strategy and draft field crosswalk ("align, don't subordinate";
+  the four-representation demonstrator). Companion to [ADR 0025](decisions/0025-hed-bids-interoperability-crosswalk.md).
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) — defensive-publication-first
   approach over patents; trademark plan.
 - [`SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md) — recommended
@@ -125,8 +142,8 @@ alternatives, and consequences. See
   filing tracker for the three technical defensive publications.
 - [`w3id/README.md`](ecosystem/w3id/README.md) — staged instructions and
   redirect rules for the `https://w3id.org/sstim` persistent namespace.
-- [`CHARTER.md`](../CHARTER.md) (repo root) — draft charter for the proposed
-  W3C Sensory Stimulation Vocabulary Community Group.
+- [`CHARTER.md`](../CHARTER.md) (repo root) — draft charter for the W3C Sensory
+  Stimulation Vocabulary Community Group (launched; charter not yet ratified).
 - [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md) —
   full proposal description, problem statement, deliverables, and submission
   checklist.

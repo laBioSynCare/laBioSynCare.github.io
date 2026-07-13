@@ -322,14 +322,15 @@ security surface is the preset catalog export pipeline.
 | Defensive publication modifications | Cannot be modified after first commit |
 | Preset catalog additions | Renato Fabbri |
 | W3C CG charter | CG chair + CG participants |
-| SSTIM namespace governance | W3C CG (when constituted) |
+| SSTIM namespace governance | Renato Fabbri; transfers to the W3C CG on charter ratification |
 
 ### W3C Sensory Stimulation Community Group
 
-The SSTIM namespace (`https://w3id.org/sstim`) is intended to be governed
-by the W3C Sensory Stimulation Community Group once constituted. BSC Lab will
-transfer editorial control of the vocabulary files to the CG. Until the CG is
-constituted, Renato Fabbri maintains editorial control.
+The SSTIM namespace (`https://w3id.org/sstim`) is governed by the W3C Sensory
+Stimulation Vocabulary Community Group, which is **launched** but whose
+**charter is not yet ratified**. Until the charter is ratified, Renato Fabbri
+retains editorial control of the vocabulary files; on ratification, BSC Lab
+transfers editorial control to the CG.
 
 CG participation is open to anyone. The CG will focus on:
 - Maintaining and extending the SSTIM vocabulary and ontology

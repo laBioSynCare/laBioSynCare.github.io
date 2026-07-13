@@ -34,9 +34,9 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.5.0` is frozen and archived by Zenodo; editable sources are on the
-`0.6.0-dev` line. The current ontology focus is external review, WIDOCO and
-w3id publication, registry submissions, and a validated 0.6 whole-set release.
+SSTIM `0.6.0` is frozen and archived by Zenodo; editable sources are on the
+`0.7.0-dev` line. The current ontology focus is registry review, ecosystem
+modeling, external human review, and a future validated 0.7 whole-set release.
 Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
@@ -272,9 +272,10 @@ Turtle files are listed in section 1. After they exist:
       values, not the class; notify-and-honor consent with engagement-tracking
       properties; curated instances at `/organization/{id}` & `/specialist/{id}`,
       never in the term space; live-only by default with a consent-gated
-      archival tier (`archivalConsent`). Implementation follow-ups: the
-      `sstim-ecosystem` term module, its SHACL shape, a graph-browser
-      "Ecosystem / agents" scope, loader entries, and the first seed
+      archival tier (`archivalConsent`). The `sstim-ecosystem` term module,
+      SHACL shape, loader/export/validation plumbing, and JSON-LD context are
+      implemented on `0.7.0-dev`. Remaining follow-ups: a graph-browser
+      "Ecosystem / agents" scope and the first seed
       (organizations first, then consented public figures). Reconcile with
       `docs/ecosystem/PARTNERS.md` + `ADVISORY_BOARD.md`.*
 - [?] Extend external alignments only when an authoritative target is verified
@@ -456,10 +457,13 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       Pairs with the `src/rdf/export.js` RDF-pipeline task below `P2`
 
 **Decompose the monolith (PATCH_STUDIO.md §10.2)**
-- [ ] Extract pure `src/ui/creator/modulation.js` (`applyMods`,
-      `effectiveTempoValue`, `clampRange`, `controlTrackForTempo`,
-      `modAmountRange`, binaural center/beat↔L/R resolution) `P2`
-- [ ] Extract pure `src/ui/creator/waveformPaths.js` (SVG preview geometry) `P2`
+- [x] ~~Extract pure `src/ui/creator/modulation.js`~~ — `evalParamValue`,
+      `effectiveTempoValue`, `clampRange`, `modAmountRange`, `sumMods`, and the
+      binaural center/beat→L/R `resolveBinauralLR`. `applyMods` /
+      `controlTrackForTempo` stay in the component as thin cache/reactive
+      wrappers (own `liveValues` + change-detected `writeAudio`).
+- [x] ~~Extract pure `src/ui/creator/waveformPaths.js`~~ — SVG scope geometry
+      + `isoEnvSpec`.
 - [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
       preserving the `AudioContext.currentTime` clock authority) `P2`
 - [ ] Extract a cloud-patches store over `src/firebase/patches.js`; split out
@@ -467,9 +471,10 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       track card) `P2`
 
 **Tests (PATCH_STUDIO.md §10.3)**
-- [ ] Unit tests for the extracted `modulation.js` (base + Σ amount·control,
-      clamp, mute→gain 0, tempo-sync resolution, virtual-param round-trip) and
-      `waveformPaths.js` `P2`
+- [x] ~~Unit tests for `modulation.js` + `waveformPaths.js`~~ —
+      `src/ui/creator/{modulation,waveformPaths}.test.js` (base + Σ amount·control,
+      clamp, mute→gain 0, tempo-sync resolution, binaural split, scope geometry);
+      creator suite 12 → 44 cases.
 
 ### RDF pipeline
 - [ ] `src/rdf/export.js` — optionally generate a public BSC Lab preset JSON
@@ -564,6 +569,15 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       Bologna neuroscience department about BSC Lab — local proximity `P2`
 - [ ] Contact Mind & Life Institute about BSC Lab alignment with
       contemplative neuroscience `P3`
+
+### Ecosystem integration & events
+> Targets, asks, consent status, the 90-day sequence, and KPIs live in
+> [`docs/ecosystem/OUTREACH_TARGETS.md`](docs/ecosystem/OUTREACH_TARGETS.md) and
+> [`docs/ecosystem/ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md).
+- [ ] ⏰ **Brain Innovation Days 2026 (Brussels, 18–19 Nov) — apply to the
+      Innovation Hall before 1 September 2026** `P1`
+      *Hard external deadline (~7 weeks out as of 2026-07-12). Verify exhibition
+      costs before committing. Present SSTIM/BSC Lab, not health claims (§3.5).*
 
 ---
 

@@ -1,10 +1,10 @@
 # Invitation to the W3C Sensory Stimulation Vocabulary Community Group
 
 > **Purpose:** This document is a template invitation letter and briefing
-> for prospective founding participants of the proposed W3C Sensory
-> Stimulation Vocabulary Community Group. Adapt the greeting and any
+> for prospective participants of the W3C Sensory Stimulation Vocabulary
+> Community Group (launched; charter not yet ratified). Adapt the greeting and any
 > institution-specific details before sending. Do not send to recipients before
-> confirming the charter status and the group's readiness with Renato Fabbri.
+> confirming timing with Renato Fabbri.
 
 ---
 
@@ -12,12 +12,12 @@
 
 ### What we are building
 
-The Sensory Stimulation Vocabulary Community Group is a proposed open
-community group at the World Wide Web Consortium that will develop shared
-terminology, semantic vocabularies, ontology modules, and implementation
-guidance for describing sensory stimulation sessions, stimuli, modalities,
-parameters, devices, safety metadata, evidence annotations, and related
-datasets on the Web.
+The Sensory Stimulation Vocabulary Community Group is a launched open
+Community Group at the World Wide Web Consortium (its charter is not yet
+ratified) that develops shared terminology, semantic vocabularies, ontology
+modules, and implementation guidance for describing sensory stimulation
+sessions, stimuli, modalities, parameters, devices, safety metadata, evidence
+annotations, and related datasets on the Web.
 
 The group's core deliverable is the **SSTIM (Sensory Stimulation) Ontology
 and Vocabulary**, a SKOS/OWL formal vocabulary published at
@@ -38,11 +38,11 @@ community-led vocabulary that is lightweight, open, machine-readable, and
 linked to existing ontologies like BFO, OBI, and Wikidata would be a meaningful
 contribution to the field's infrastructure.
 
-### What founding participation involves
+### What participation involves
 
-As a **founding participant** you would:
+As a **participant** you would:
 
-- Be named in the CG charter and in the SSTIM ontology metadata as a founding
+- Be named in the CG charter and in the SSTIM ontology metadata as a
   contributor (with your consent)
 - Have input on the initial vocabulary scope and the evidence framework design
 - Participate in approximately one monthly video call (optional) and occasional
@@ -59,13 +59,13 @@ license to patent claims over Community Group deliverables.
 
 ---
 
-Subject: Invitation to founding participation — W3C Sensory Stimulation Vocabulary Community Group
+Subject: Invitation to participate — W3C Sensory Stimulation Vocabulary Community Group
 
 Dear [Name],
 
-I am writing to invite you to participate as a founding member of the W3C
-Sensory Stimulation Vocabulary Community Group, a proposed open community at
-the World Wide Web Consortium.
+I am writing to invite you to participate in the W3C Sensory Stimulation
+Vocabulary Community Group, a launched open community at the World Wide Web
+Consortium (its charter is not yet ratified).
 
 The group's goal is to develop shared terminology, semantic vocabularies,
 ontology modules, JSON-LD contexts, SHACL validation profiles, and
@@ -73,7 +73,7 @@ implementation guidance for describing sensory stimulation sessions, stimuli,
 modalities, parameters, devices, safety metadata, evidence annotations, and
 related datasets on the Web.
 
-We are proposing a lightweight SKOS/OWL vocabulary published at
+The group develops a lightweight SKOS/OWL vocabulary published at
 `https://w3id.org/sstim`, aligned to BFO 2020 and the OBO Foundry
 ontologies your community already uses. The vocabulary currently covers
 frequency bands, evidence tiers, stimulation mechanisms, sensory modalities,
@@ -85,7 +85,7 @@ Given your work on [SPECIFIC RELEVANT WORK], I believe your perspective would
 be valuable in shaping the vocabulary scope and the evidence framework that
 governs what claims the ontology can represent.
 
-Founding participation requires:
+Participation requires:
 - Consent to be named in the charter and vocabulary metadata
 - Roughly 1–2 hours per month for async review and optional video calls
 - Signing the W3C Community Contributor License Agreement
