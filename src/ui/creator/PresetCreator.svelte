@@ -1,7 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
   import Knob from './Knob.svelte'
-  import { envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
   import { authState } from '../../firebase/auth.js'
   import { deletePatchStudioPatch, listPatchStudioPatches, savePatchStudioPatch } from '../../firebase/patches.js'
@@ -75,8 +74,26 @@
     formatTempoSyncReadout,
     isTempoSyncEnabled,
     tempoContextFromTiming,
-    tempoValueFromSync,
   } from './tempo.js'
+  import {
+    clampRange,
+    evalParamValue,
+    modAmountRange,
+    resolveBinauralLR,
+    effectiveTempoValue as tempoEffectiveValue,
+  } from './modulation.js'
+  import {
+    binauralBeatEnvelopePath,
+    binauralRowWindow,
+    binauralSumPath,
+    isoEnvSpec,
+    isoEnvelopeOutlinePath,
+    isoWavePath,
+    noisePath,
+    polygonPoints,
+    rectanglePath,
+    sineWavePath,
+  } from './waveformPaths.js'
 
   let draft = $state(creatorSession.draft)
   let statusMsg = $state(creatorSession.statusMsg)
@@ -238,12 +255,6 @@
 
   function modForControl(param, controlId) {
     return param.mods.find(m => m.controlId === controlId)
-  }
-
-  function modAmountRange(paramMin, paramMax, paramStep) {
-    const span = Math.max(0.01, Math.abs(num(paramMax) - num(paramMin)))
-    const stepValue = Math.max(0.0001, Math.abs(num(paramStep, span / 100)))
-    return [-span, span, stepValue]
   }
 
   function setModAmount(param, controlId, amount) {
@@ -421,15 +432,10 @@
     return bpmEnabled() && isTempoSyncEnabled(param?.tempoSync)
   }
 
+  // Thin wrapper over the pure modulation.effectiveTempoValue: injects the
+  // reactive bpmEnabled() read so all existing call sites keep their signature.
   function effectiveTempoValue(param, fallbackValue, tempoKind, tempoContext) {
-    if (!bpmEnabled()) return fallbackValue
-    return tempoValueFromSync(param?.tempoSync, tempoKind, tempoContext, fallbackValue)
-  }
-
-  function clampRange(value, ranges, name) {
-    const r = ranges?.[name]
-    if (!r) return value
-    return clamp(value, r[0], r[1])
+    return tempoEffectiveValue(param, fallbackValue, tempoKind, tempoContext, bpmEnabled())
   }
 
   function controlTrackForTempo(track, tempoContext) {
@@ -461,6 +467,8 @@
     return track
   }
 
+  // Thin cache/side-effect wrapper over the pure modulation.evalParamValue: owns
+  // the per-track liveValues cache and the change-detected writeAudio call.
   function applyMods(track, controlValues, ranges, writeAudio, paramNames, tempoContext) {
     if (!liveValues[track.id]) liveValues[track.id] = {}
     const base = liveValues[track.id]
@@ -468,18 +476,15 @@
       const param = track.params[name]
       if (!param) continue
       const prev = base[name]
-      const tempoKind = tempoSyncKindForTrackParam(track, name)
-      let v = tempoKind
-        ? effectiveTempoValue(param, param.value, tempoKind, tempoContext)
-        : param.value
-      for (const mod of param.mods) {
-        if (mod.enabled === false) continue
-        const cv = controlValues.get(mod.controlId)
-        if (cv == null) continue
-        v += (Number(mod.amount) || 0) * cv
-      }
-      v = clampRange(v, ranges, name)
-      if (track.muted && name === 'gain') v = 0
+      const v = evalParamValue(param, {
+        name,
+        ranges,
+        controlValues,
+        tempoKind: tempoSyncKindForTrackParam(track, name),
+        tempoContext,
+        bpmEnabled: bpmEnabled(),
+        muted: track.muted,
+      })
       base[name] = v
       if (writeAudio && (prev == null || Math.abs(prev - v) > 1e-6)) writeAudio(name, v)
     }
@@ -552,25 +557,15 @@
 
       const baseLeft  = liveValues[track.id]?.leftFreq  ?? track.params.leftFreq.value
       const baseRight = liveValues[track.id]?.rightFreq ?? track.params.rightFreq.value
-      let centerLive = (baseLeft + baseRight) / 2
-      let beatLive = effectiveTempoValue(track.params.beatFreq, baseRight - baseLeft, 'rate', liveTempo)
-
-      for (const mod of cMods) {
-        if (mod.enabled === false) continue
-        const cv = controlValues.get(mod.controlId)
-        if (cv == null) continue
-        centerLive += (Number(mod.amount) || 0) * cv
-      }
-      for (const mod of bMods) {
-        if (mod.enabled === false) continue
-        const cv = controlValues.get(mod.controlId)
-        if (cv == null) continue
-        beatLive += (Number(mod.amount) || 0) * cv
-      }
-
-      const [fmin, fmax] = AUDIO_PARAM_RANGE.leftFreq
-      const liveLeft  = clamp(centerLive - beatLive / 2, fmin, fmax)
-      const liveRight = clamp(centerLive + beatLive / 2, fmin, fmax)
+      const { leftFreq: liveLeft, rightFreq: liveRight } = resolveBinauralLR({
+        baseLeft,
+        baseRight,
+        beatBase: effectiveTempoValue(track.params.beatFreq, baseRight - baseLeft, 'rate', liveTempo),
+        centerMods: cMods,
+        beatMods: bMods,
+        controlValues,
+        range: AUDIO_PARAM_RANGE.leftFreq,
+      })
       if (!liveValues[track.id]) liveValues[track.id] = {}
       liveValues[track.id].leftFreq  = liveLeft
       liveValues[track.id].rightFreq = liveRight
@@ -1043,149 +1038,11 @@
   // as a wave, not a bar.
   const SCOPE_BAND_THRESHOLD = 600
 
-  function adaptiveSamples(cycles, perCycle = 6, base = 200, max = 1500) {
-    return Math.max(base, Math.min(max, Math.ceil(Math.abs(cycles) * perCycle)))
-  }
-
-  // Time-base for the L/R rows of a binaural scope: exactly ONE beat period
-  // (1/|beat|). This way the wave count visibly differs between channels —
-  // L draws floor(L/|beat|) cycles per beat, R draws floor(R/|beat|) cycles —
-  // and changing leftFreq / rightFreq / beat actually moves things. Capped at
-  // the user's screen so very small beats don't make the row way too long.
-  function binauralRowWindow(beatHz, userWinSec) {
-    const absBeat = Math.abs(beatHz)
-    if (!Number.isFinite(absBeat) || absBeat < 0.01) return userWinSec
-    return Math.min(userWinSec, 1 / absBeat)
-  }
-
   function fmtWin(s) {
     if (!Number.isFinite(s) || s <= 0) return '—'
     if (s >= 1) return `${s.toFixed(2)}s`
     if (s >= 0.01) return `${(s * 1000).toFixed(0)}ms`
     return `${(s * 1000).toFixed(1)}ms`
-  }
-
-  // Build the effective envelope spec from a track's user-set fields. The only
-  // auto-adjust we keep is a per-phase minimum (~0.5 ms absolute time) on
-  // attack/release/decay so they never produce clicks at high pulseRate. We do
-  // NOT clamp noteDurationFrac or override envelope type — the user's setting
-  // is final. Reads track.params.pulseRate.value (knob base, not the modulated
-  // live value) so the envelope shape stays stable under modulation.
-  function isoEnvSpec(track, noteDurationOverride = null) {
-    const pulseRate = clamp(num(track.params?.pulseRate?.value, 10), 0.5, 50)
-    const type = track.envelope ?? 'AR'
-    const def = ISO_ENVELOPE_DEFAULTS[type] ?? ISO_ENVELOPE_DEFAULTS.AR
-    const rawNoteDuration = noteDurationOverride ?? track.params?.noteDurationFrac?.value ?? track.noteDurationFrac
-    const noteDurationFrac = clamp(num(rawNoteDuration, 0.5), 0.01, 1)
-    let attackFrac = num(track.attackFrac, def.attackFrac)
-    let decayFrac = num(track.decayFrac, def.decayFrac)
-    let releaseFrac = num(track.releaseFrac, def.releaseFrac)
-    const sustainLevel = clamp(num(track.sustainLevel, def.sustainLevel), 0, 1)
-
-    const noteSec = noteDurationFrac / pulseRate
-    if (noteSec > 0) {
-      const minPhaseFrac = Math.min(0.4, 0.0005 / noteSec)
-      if (attackFrac > 0) attackFrac = Math.max(attackFrac, minPhaseFrac)
-      if (releaseFrac > 0) releaseFrac = Math.max(releaseFrac, minPhaseFrac)
-      if (decayFrac > 0) decayFrac = Math.max(decayFrac, minPhaseFrac)
-    }
-    return { type, attackFrac, decayFrac, sustainLevel, releaseFrac, noteDurationFrac }
-  }
-
-  function rectanglePath(xMin, xMax, yMid, yAmp) {
-    const top = (yMid - yAmp).toFixed(1)
-    const bot = (yMid + yAmp).toFixed(1)
-    return `M${xMin} ${top} L${xMax} ${top} L${xMax} ${bot} L${xMin} ${bot} Z`
-  }
-
-  function sineWavePath(xMin, xMax, yMid, yAmp, cycles, samples) {
-    const s = samples ?? adaptiveSamples(cycles)
-    const span = xMax - xMin
-    let d = ''
-    for (let i = 0; i <= s; i += 1) {
-      const u = i / s
-      const x = xMin + span * u
-      const y = yMid - yAmp * Math.sin(2 * Math.PI * cycles * u)
-      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
-    }
-    return d
-  }
-
-  function isoEnvelopeOutlinePath(xMin, xMax, yMid, yAmp, envSpec, envCycles, samples = 320) {
-    const span = xMax - xMin
-    let top = ''
-    let bot = ''
-    for (let i = 0; i <= samples; i += 1) {
-      const u = i / samples
-      const slotPhase = ((envCycles * u) % 1 + 1) % 1
-      const env = envelopeValueAt(envSpec, slotPhase)
-      const x = xMin + span * u
-      top += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + (yMid - yAmp * env).toFixed(1)
-      bot = ' L' + x.toFixed(1) + ' ' + (yMid + yAmp * env).toFixed(1) + bot
-    }
-    return top + bot + ' Z'
-  }
-
-  function isoWavePath(xMin, xMax, yMid, yAmp, carrierCycles, envSpec, envCycles, samples) {
-    const s = samples ?? adaptiveSamples(carrierCycles)
-    const span = xMax - xMin
-    let d = ''
-    for (let i = 0; i <= s; i += 1) {
-      const u = i / s
-      const slotPhase = ((envCycles * u) % 1 + 1) % 1
-      const env = envelopeValueAt(envSpec, slotPhase)
-      const v = env * Math.sin(2 * Math.PI * carrierCycles * u)
-      const x = xMin + span * u
-      const y = yMid - yAmp * v
-      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
-    }
-    return d
-  }
-
-  function binauralSumPath(xMin, xMax, yMid, yAmp, leftCycles, rightCycles, samples) {
-    const s = samples ?? adaptiveSamples(Math.max(Math.abs(leftCycles), Math.abs(rightCycles)))
-    const span = xMax - xMin
-    let d = ''
-    for (let i = 0; i <= s; i += 1) {
-      const u = i / s
-      const v = 0.5 * (Math.sin(2 * Math.PI * leftCycles * u) + Math.sin(2 * Math.PI * rightCycles * u))
-      const x = xMin + span * u
-      const y = yMid - yAmp * v
-      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
-    }
-    return d
-  }
-
-  function binauralBeatEnvelopePath(xMin, xMax, yMid, yAmp, beatCycles, samples = 240) {
-    const span = xMax - xMin
-    let top = ''
-    let bot = ''
-    for (let i = 0; i <= samples; i += 1) {
-      const u = i / samples
-      const env = Math.abs(Math.cos(Math.PI * beatCycles * u))
-      const x = xMin + span * u
-      top += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + (yMid - yAmp * env).toFixed(1)
-      bot = ' L' + x.toFixed(1) + ' ' + (yMid + yAmp * env).toFixed(1) + bot
-    }
-    return top + bot + ' Z'
-  }
-
-  // Deterministic low-passed noise trace for the Noise scope. Seeded so it does
-  // not flicker every render; cutoffNorm (0..1) controls how jagged it looks.
-  function noisePath(xMin, xMax, yMid, yAmp, cutoffNorm, samples = 120) {
-    const span = xMax - xMin
-    let seed = 0x2545f491
-    const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed / 0x7fffffff) * 2 - 1 }
-    const alpha = clamp(cutoffNorm, 0.04, 1)
-    let lp = 0
-    let d = ''
-    for (let i = 0; i <= samples; i += 1) {
-      lp += alpha * (rand() - lp)
-      const x = xMin + span * (i / samples)
-      const y = yMid - yAmp * lp * 1.6
-      d += (i === 0 ? 'M' : ' L') + x.toFixed(1) + ' ' + y.toFixed(1)
-    }
-    return d
   }
 
   function visualStyle(track) {
@@ -1219,16 +1076,6 @@
       `--haptic-scan-duration:${(pulse * 8).toFixed(3)}s`,
       `--haptic-pattern:${clamp(num(getLive(track, 'pattern'), 0), 0, 10).toFixed(1)}`,
     ].join(';')
-  }
-
-  function polygonPoints(rawSides) {
-    const sides = Math.round(clamp(num(rawSides, 3), 3, 12))
-    const points = []
-    for (let i = 0; i < sides; i += 1) {
-      const a = -Math.PI / 2 + (i / sides) * Math.PI * 2
-      points.push(`${(40 + Math.cos(a) * 20).toFixed(1)},${(25 + Math.sin(a) * 18).toFixed(1)}`)
-    }
-    return points.join(' ')
   }
 
   // Compute sum of absolute enabled mod amounts (used for range band width).
