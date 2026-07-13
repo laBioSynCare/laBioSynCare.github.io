@@ -126,38 +126,42 @@ consent posture.
 
 ---
 
-## Workstream 2 — SSTIM ↔ HED / BIDS interoperability
+## Workstream 2 — SSTIM ↔ HED event profile and research bindings
 
-**`[~] Drafted 2026-07-12 — strategy doc + Proposed ADR written; awaiting review + worked example.**
+**`[~] Revised 2026-07-13 — Proposed ADR + RDF plan written; implementation prerequisites and worked example remain.**
 
-**Artifacts:** [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md) (strategy + field
-crosswalk) and [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)
-(Proposed — "align as a crosswalk, do not subordinate").
+**Artifacts:** [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md) (event profile and
+binding contract), [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)
+(Proposed), and the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
-**Posture:** *align as a crosswalk, do not subordinate.* Do **not** replace HED,
-do **not** fork a competing HED library. Position HED/BIDS/INCF as **alignment
-partners, recruitment pools, and adoption channels** — not SSTIM's governing home.
+**Posture:** SSTIM is canonical for native sessions; HED is the generated event-
+semantic profile; BIDS Behavioral is the first optional research-container
+binding; NWB is use-case-triggered. Do **not** replace HED or fork a HED library
+without repeated reviewed gaps. These standards are partners, not SSTIM's
+governing home.
 
-**The demonstrator (one session, four coordinated representations):**
+**The core demonstrator (one synthetic ordinary session):**
 
-| Function | Representation | Already have? |
+| Function | Representation | Current state |
 |---|---|---|
-| Onset, duration, run structure | BIDS `events.tsv` | Timing exists in session model |
-| Experimental event meaning | HED annotations | New mapping needed |
-| Technique, waveform, modulation, device, exposure, evidence, safety | SSTIM RDF / JSON-LD | ✅ ontology + `sstim-ex:ExposureProfile` |
-| Executable stimulus | BSC Lab patch / protocol | ✅ Patch Studio export |
+| IDs, onset/duration, execution state | Native session/event bundle | Recorder/schema not implemented |
+| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented |
+| Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Model exists but audit repairs are required |
+| Executable stimulus | BSC Lab patch/configuration + hashes | Patch export exists; bridge/provenance incomplete |
+| Optional research packaging | Complete BIDS Behavioral binding | Not implemented |
 
-This is **buildable on what exists**: [Sensory Field](../technical/SENSORY_FIELD.md)
-already emits an `sstim-ex:ExposureProfile`, and [Patch Studio](../technical/PATCH_STUDIO.md)
-already exports patches. The new work is the BIDS/HED mapping layer, not new engines.
+The [2026-07-13 RDF audit](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md)
+shows that this requires a native recorder/schema, report/privacy semantics, and
+runtime RDF conformance before the HED and BIDS adapters. Existing Sensory Field
+and Patch Studio exports are inputs, not a finished bridge.
 
 **Next actions:**
-- [ ] Draft `docs/ecosystem/HED_BIDS_INTEROP.md` (or `docs/technical/…`) — the crosswalk
-      strategy, the field-by-field mapping table, the "align not subordinate" rationale.
-- [ ] Consider an ADR ("SSTIM aligns with HED/BIDS as a crosswalk, does not subordinate") —
-      it is a real architectural stance worth recording next to [ADR 0007](../decisions/0007-framework-protocol-implementation.md).
-- [ ] Define one concrete end-to-end example session to encode across all four representations.
-- [ ] Reference the HED schema-development process as the review channel (INCF-endorsed).
+- [x] Revise the event/binding profile and Proposed ADR.
+- [x] Audit the RDF and write the ordered remediation plan.
+- [ ] Implement and validate the native session/event/report contract.
+- [ ] Generate a version-pinned HED mapping and synthetic core bundle.
+- [ ] Add and validate the optional complete BIDS Behavioral binding.
+- [ ] Request HED Working Group review.
 
 **Reference (for §"what are these", so we don't re-look-up):**
 - **HED** — Hierarchical Event Descriptors: controlled vocabulary for *what occurred*
