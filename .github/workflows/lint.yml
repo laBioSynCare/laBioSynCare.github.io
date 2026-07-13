@@ -36,5 +36,10 @@ jobs:
       - name: Run Svelte checks
         run: nix develop --command npm run check
 
+      # Includes the runtime RDF conformance goldens (improvement plan 0.1):
+      # generated graphs are SHACL-checked here, not only curated fixtures.
+      - name: Run unit tests
+        run: nix develop --command make test
+
       - name: Build static site
         run: nix develop --command make build
