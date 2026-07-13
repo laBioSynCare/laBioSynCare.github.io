@@ -50,16 +50,16 @@ explicitly re-scoped with a recorded reason.
 | Finding | Short name | Resolved in |
 |---|---|---|
 | KR-01 | Sensory Field export not SHACL-conformant | 0.1 |
-| KR-02 | Three incompatible session contracts | 0.2 |
+| KR-02 | Three incompatible session contracts | 0.2 |No. I. Is about.
 | KR-03 | Self-report model unsafe for stated use | 2.1–2.3 |
-| KR-04 | Public-claim gate approves wrong evidence | 1.2 |
+| KR-04 | Public-claim gate approves wrong evidence | 1.2b–1.2c |
 | KR-05 | OWL domains contradict definitions | 1.1 |
-| KR-06 | `EvidenceClaim` overloaded | 1.2 |
+| KR-06 | `EvidenceClaim` overloaded | 1.2a |
 | KR-07 | Patch/preset validation weaker than claim | 1.3 |
 | KR-08 | Outcome prose inside physical categories | 1.4 |
 | KR-09 | Overstated `exactMatch` alignments | 1.4 |
 | KR-10 | Ordered/controlled values collapse to literals | 1.3, 1.4 |
-| KR-11 | Weak evidence review/provenance model | 1.2 |
+| KR-11 | Weak evidence review/provenance model | 1.2a |
 | KR-12 | Web Annotation RDF and privacy defaults | 1.5 |
 | KR-13 | Flattened ecosystem relationships/consent | 1.5 |
 | KR-14 | Release status and validation-coverage gaps | 0.3, 1.1 |
@@ -140,27 +140,59 @@ covered by tests.
 - Add a pinned minimal BFO/OBI/IAO/PROV import closure for CI reasoning, or
   explicitly narrow documentation to the local-graph consistency claim.
 
-#### 1.2 Refactor evidence and public-claim authorization
+#### 1.2 Refactor evidence and public-claim governance
+
+**1.2a — Evidence roles and provenance
+([ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md))**
 
 - Separate literature evidence assessments, hypotheses/research questions,
-  observations, and safety-boundary applicability. Do not require an effect
-  hypothesis on every exposure profile.
+  observations, boundary applicability, requirements, design objectives, and
+  planned outcomes. Do not require an effect hypothesis on every exposure
+  profile. Migrate every existing pseudo-claim through the reviewed ledger.
 - Replace the directionally misleading subject relation `supportsRelation` with
-  a neutral evaluated/about-subject relation, retaining a deprecated alias if
-  needed for compatibility.
-- Split evidence modality, study design/source type, population/model, and
-  synthesis level.
-- Model assessment and review as PROV activities with inputs, assessor IRI,
-  rubric/version, date, decision, and independence status.
-- Require sources or a reproducible search record for universal refutation or
-  absence-of-evidence claims. Otherwise state only that SSTIM has not assessed
-  or recorded evidence.
-- Rewrite the public-claim gate so a claim authorizes copy only when subject,
-  supporting direction, modality, population/context, review/currency, and
-  citation requirements all match.
-- Add adversarial fixtures: a high-tier refuting claim, an irrelevant modality,
-  an expired/provisional review, a dangling citation, and a population mismatch
-  must not authorize public copy.
+  the evidence-specific neutral `evaluatesSubject`, retaining a materialized
+  deprecated alias during the compatibility window.
+- Give every assessment one atomic bounded proposition and explicit outcome,
+  modality, population/model, protocol/context, and comparator scope. Require a
+  qualified evidence basis, a governance record for research outputs, and
+  separate source-level modality, intervention, study design, population/model,
+  synthesis, and observed-result metadata.
+- Deprecate the overloaded legacy modality-tag and assessment-summary fields;
+  expose only lossless mappings in the 0.7 compatibility view.
+- Model assessment, search, and review as PROV activities that generate
+  immutable assessment revisions, search records, and review decisions. Keep
+  reviewer relationship, independence determination, and decision as separate
+  axes without making external review a core validity requirement.
+- Recalculate migrated evidence tier and claim direction under the versioned
+  assessment method; legacy editorial ratings are inputs, not approved results.
+- Permit only scoped search findings from a reproducible search record. Use a
+  scoped, dated, attributed status assertion when SSTIM has not assessed or
+  recorded evidence; never assert that evidence or a mechanism universally
+  does not exist.
+
+**1.2b — Policy-neutral claim semantics
+([ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md))**
+
+- Separate atomic claim propositions from exact rendered/translated public
+  expressions and their revisions.
+- Replace the scalar C0–C5 authorization ladder with non-exclusive facets for
+  subject-matter domain, attribution/generalization, epistemic force,
+  expression form, and communicative role/polarity. Keep legacy C labels only
+  as reviewed migration hints.
+- Represent policy-scoped authorization decisions without embedding product
+  thresholds or legal conclusions in SSTIM core semantics.
+
+**1.2c — BSC Lab publication policy
+([ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md))**
+
+- Define a versioned BSC policy/profile whose obligations accumulate across
+  all claim facets and whose prohibitions override permissions.
+- Bind authorization to exact expression/proposition revisions, an identified
+  evidence corpus, explicit applicability, consent where relevant, and a
+  controlled release surface.
+- Build the trusted input and public-copy inventory outside RDF, then validate
+  the selected dataset and policy/as-of date with BSC-specific SHACL and
+  adversarial fixtures.
 
 #### 1.3 Complete the executable-parameter contract
 
@@ -352,7 +384,9 @@ round-trip authority.
 | A — Contract harness | Runtime golden RDF, per-artifact SHACL, context and namespace parity, negative fixtures | none |
 | B — Session v2 | Native schema, event timeline, hashes, RDF projection, corrected docs | A |
 | C — Observation/privacy | Qualified reports, helpfulness, unwanted experiences, missingness, consent/data classification | B; privacy review |
-| D — Exposure/evidence repair | Domain fixes, claim split, review provenance, public-copy authorization | A; [ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md) |
+| D — Exposure/evidence repair | Domain fixes, role split, bounded assessment propositions, qualified bases/source governance, review provenance | A; [ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md) |
+| D2 — Public-claim semantics | Atomic propositions/expressions, non-exclusive facets, generic decision record | D; [ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md) |
+| D3 — BSC publication profile | Versioned policy, applicability/consent rules, trusted input and publisher gate | C for testimonials; D2; [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md) |
 | E — SKOS/alignment repair | Neural/stimulus frequency split, roles, controlled-value plumbing, mapping provenance | D where evidence links migrate |
 | F — Ecosystem/annotation repair | Reified engagements, consent history, valid OA, private defaults | A; privacy review |
 | G — HED profile | Native event mapping, validator, synthetic demonstrator | B, C, D |

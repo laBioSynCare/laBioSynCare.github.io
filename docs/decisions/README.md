@@ -50,7 +50,9 @@ annotations lives here.
 | [0024](0024-stakeholder-ecosystem-modeling.md) | Model the ecosystem as neutral agents (`EcosystemAgent` ⊑ `prov:Agent`; reuse schema.org/ORG); notify-and-honor consent with a consent-gated archival tier | Accepted |
 | [0025](0025-hed-bids-interoperability-crosswalk.md) | SSTIM-native sessions with a generated HED event profile and optional BIDS/NWB research bindings | Proposed |
 | [0026](0026-patch-studio-catalog-bridge.md) | Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not native catalog authoring | Proposed |
-| [0027](0027-evidence-claim-family-and-public-claim-gate.md) | Split the evidence-claim family by epistemic role; neutral `aboutSubject`; PROV review provenance; strict public-claim gate | Proposed |
+| [0027](0027-evidence-claim-family-and-public-claim-gate.md) | Separate evidence assessments from non-evidence statements | Proposed |
+| [0028](0028-atomic-claim-propositions-and-public-expressions.md) | Atomic claim propositions, rendered public expressions, and non-exclusive facets | Proposed |
+| [0029](0029-bsc-lab-public-claim-publication-profile.md) | BSC Lab public-claim publication and authorization profile | Proposed |
 
 ## Adding an ADR
 

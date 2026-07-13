@@ -1,191 +1,529 @@
-# ADR 0027 — Evidence-claim family split, review provenance, and a strict public-claim gate
+# ADR 0027 — Separate evidence assessments from non-evidence statements
 
 **Status:** Proposed — 2026-07-13
 
-Amends [ADR 0018](0018-evidence-integrity-and-public-claim-governance.md)
-(evidence integrity and public-claim governance). Supersedes the property
-naming of [ADR 0013](0013-evidence-support-relation-range.md) while keeping
-its range decision. Implements the semantic core of change set D in the
-[RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md), resolving audit
-findings [KR-04, KR-06, and KR-11](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md).
+Amends P7.1 and P7.3 of
+[ADR 0018](0018-evidence-integrity-and-public-claim-governance.md): evidence
+constraints apply to evidence assessments, not hypotheses, questions, or
+observations, and every assessment has an identified evidence basis. It does
+not replace ADR 0018 P7.2; that preset-level claim check remains provisional
+until [ADR 0028](0028-atomic-claim-propositions-and-public-expressions.md) and
+[ADR 0029](0029-bsc-lab-public-claim-publication-profile.md) are accepted and
+their replacement is implemented for a named release surface.
+
+Supersedes only the property name chosen in
+[ADR 0013](0013-evidence-support-relation-range.md), preserving its
+`Preset ∪ SensoryStimulationTechnique` range. Implements KR-06 and the
+evidence-role/provenance part of KR-11 from the
+[RDF audit](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md).
+KR-04, exact public-copy authorization, remains open under ADRs 0028–0029.
 
 ## Context
 
-`sstim:EvidenceClaim` is currently one class family carrying four different
-kinds of statement:
+The live graph has 38 explicit `sstim:EvidenceClaim` nodes:
 
-1. **Literature assessments** — the 38 curated claims in
-   `instances/evidence/` with tier, direction, review status, and dates.
-2. **Hypotheses / research questions** — `sstim-ex:ExposureEffectClaim`
-   (⊑ `EvidenceClaim`) instances that record only "how does this delivery
-   relate to calm/arousal?", typed as tier-speculative claims.
-3. **Safety-boundary statements** — the photosensitivity flash-rate boundary
-   exported as a "speculative evidence claim" although it is an applicability
-   statement about a limit, not an evidential finding.
-4. **(Planned) participant observations** — phase 2 of the improvement plan
-   adds session reports, which must never read as evidence.
+- 10 literature-assessment candidates in `instances/evidence/`;
+- one preset-local assessment candidate; and
+- 27 experiment statements dual-typed as
+  `sstim-ex:ExposureEffectClaim` and `sstim:EvidenceClaim`.
 
-This overload produces concrete defects:
+The 27 experiment statements are heterogeneous. They include hypotheses,
+questions, boundary applicability, protocol requirements, design concepts,
+and capability-status declarations. Treating all of them as evidence gives
+tiers and review metadata to statements that have no evidence basis.
 
-- `sstim-sh:ExposureProfileShape` requires `hasEffectClaim ≥ 1`, so the
-  Sensory Field exporter **manufactures** a generic calm/arousal claim for
-  every profile, even a pure delivery description (KR-01/KR-06).
-- The public-claim authorization gate (`sstim-shapes.ttl:210-226`) accepts
-  *any* claim at a sufficient tier: a **refuting** high-tier claim, a claim
-  about an irrelevant modality, a provisional or stale review, or an uncited
-  universal-absence claim can all authorize public copy (KR-04).
-- `sstim:supportsRelation` names a direction ("supports") while carrying
-  refuting and inconclusive claims — the subject link and the direction are
-  conflated in the name (KR-04, KR-11).
-- `sstim-v:EvidenceModalityScheme` mixes sensory modalities (AUD, VIS, AV,
-  TACTILE) with study/source types (PRECLINICAL, REVIEW), so one tag slot
-  answers two different questions (KR-11).
-- `sstim-v:reviewReviewed` is defined as "independently reviewed" while every
-  current assessment names "BSC Lab editorial" / the maintainer — the data
-  cannot satisfy the definition (KR-11).
+The overload also makes `ExposureProfileShape` require `hasEffectClaim ≥ 1`.
+The Sensory Field exporter therefore fabricates a generic calm/arousal
+“evidence claim” for a profile that may only describe delivery. Meanwhile,
+`supportsRelation` encodes a supporting direction in the property name even
+when the assessment is refuting or inconclusive, and the current modality
+scheme mixes sensory modality with study model and synthesis type.
+
+The reviewed migration disposition for every affected node is normative input
+to this decision:
+[ADR 0027 migration ledger](../ontology/ADR_0027_MIGRATION_LEDGER.md).
 
 ## Decision
 
-1. **Split the family by epistemic role.** Four distinct kinds, only the
-   first of which is evidence:
+### 1. Classify by epistemic role
 
-   | Class | Superclass | Role | Can authorize public copy? |
-   |---|---|---|---|
-   | `sstim:EvidenceAssessment` | `sstim:EvidenceClaim` | Reviewed assessment of external evidence about a subject | yes, under the gate below |
-   | `sstim:ExposureHypothesis` | `iao:0000030` (not `EvidenceClaim`) | Stated, testable expectation or research question about a delivery configuration | never |
-   | `sstim:SafetyBoundaryApplicability` | `iao:0000030` (not `EvidenceClaim`) | Statement that a comfort boundary / exposure limit applies to a configuration, with rationale | never |
-   | `sstim:Observation` (phase 2) | `iao:0000030` (not `EvidenceClaim`) | A participant- or instrument-reported value from a session | never |
+Introduce or retain distinct information-artifact classes:
 
-   `sstim:EvidenceClaim` remains only as the deprecated abstract superclass
-   of `EvidenceAssessment` so existing consumer queries keep resolving for
-   literature assessments; direct instantiation is deprecated. The 38
-   curated instances retype to `EvidenceAssessment` in the same change set.
-   `sstim-ex:ExposureEffectClaim` is deprecated; its runtime uses migrate to
-   `ExposureHypothesis`, and the photosensitivity boundary statement becomes
-   a `SafetyBoundaryApplicability`.
+| Class | Meaning | Evidence-bearing? |
+|---|---|---|
+| `sstim:EvidenceAssessmentClaim` | A versioned assessment of an identified evidence basis, including literature or a governed study/analysis output | yes |
+| `sstim-ex:ExposureHypothesis` | A testable proposition asserting an expected relation, difference, or direction | no |
+| `sstim-ex:ResearchQuestion` | An open question that asserts no expected result | no |
+| `sstim-ex:BoundaryApplicabilityStatement` | A reasoned statement that a named comfort or safety boundary applies to a profile or channel | no |
+| `sstim-ex:ProtocolRequirement` | A reproducibility, measurement, context, or study-design requirement | no |
+| `sstim-ex:ExposureDesignObjective` | A desired delivery capability or experience that does not predict an observed effect | no |
+| `sstim-ex:PlannedOutcomeSpecification` | A dimension and collection/comparison plan, not an observation result | no |
+| `sstim-ex:KnowledgeStatusAssertion` | A scoped, dated assertion that assigns an existing controlled `KnowledgeStatus` value to an identified subject | no |
 
-2. **Stop requiring an effect claim on every exposure profile.**
-   `ExposureProfileShape` drops `hasEffectClaim minCount 1`. A delivery
-   record with no hypothesis carries no hypothesis. New optional links:
-   `sstim-ex:hasHypothesis` (profile/protocol → `ExposureHypothesis`) and
-   `sstim-ex:hasSafetyApplicability` (profile/channel →
-   `SafetyBoundaryApplicability`). The Sensory Field exporter stops
-   manufacturing the calm/arousal claim; its golden SHACL suite then moves
-   toward strict conformance.
+Existing `ExperimentContext`, `DeviceCapability`, `KnowledgeStatus`,
+`ComfortBoundary`, and `ExposureLimit` structures are reused for declarations
+that do not need a new statement node. `KnowledgeStatus` remains the class of
+controlled values; it is not used as the class of a status record. A
+`KnowledgeStatusAssertion` has exactly one incoming
+`sstim-ex:hasKnowledgeStatusAssertion` subject link, exactly one existing value
+through `sstim-ex:hasKnowledgeStatus`, exactly one
+`sstim-ex:knowledgeAsOfDate` (`xsd:date`), and at least one of:
 
-3. **Neutral subject relation.** `sstim:aboutSubject` replaces
-   `sstim:supportsRelation` as the subject link on all four kinds, keeping
-   ADR 0013's range (Preset ∪ Technique, SHACL-enforced). Direction stays
-   exclusively in `sstim:hasClaimDirection`. `supportsRelation` is kept for
-   one release as a deprecated subproperty of `aboutSubject`; curated
-   instances migrate immediately.
+- `sstim-ex:knowledgeScope`, an object property naming the corpus or scope; or
+- `sstim-ex:knowledgeScopeNote`, a datatype property with a language-tagged
+  literal.
 
-4. **Separate modality from study design.** `PRECLINICAL` and `REVIEW`
-   leave `EvidenceModalityScheme`, which becomes purely a delivery/sensory
-   axis. A new `sstim:StudyDesign` SKOS scheme (e.g. preclinical,
-   case-report, observational, small-controlled-trial, rct,
-   systematic-review) attaches to assessments via `sstim:hasStudyDesign`.
-   Claims currently tagged `PRECLINICAL`/`REVIEW` migrate their tag to the
-   new axis and keep (or gain) a genuine sensory modality tag.
+SHACL expresses that alternative with `sh:or`; the object and datatype
+properties remain distinct. The assertion is immutable and has exactly one
+`prov:wasGeneratedBy` `sstim-ex:KnowledgeStatusActivity`, a subclass of
+`prov:Activity`. That activity records time, method/corpus revision, and a
+qualified responsible agent/role. The assertion carries no evidence tier,
+claim direction, basis, or review metadata.
 
-5. **Review provenance becomes a PROV activity.** New
-   `sstim:ReviewActivity ⊑ prov:Activity` with: the assessing agent as an
-   IRI (`prov:wasAssociatedWith`), rubric and rubric version, end time,
-   decision, and an explicit `sstim:independentReview xsd:boolean`.
-   Assessments link via `sstim:reviewedIn`. The `reviewedBy` string literal
-   is deprecated in favour of agent IRIs. `sstim-v:reviewReviewed` is
-   redefined as "reviewed under a recorded review activity" — independence
-   is a property of the activity, not implied by the status value, so the
-   current editorial reviews become accurately representable
-   (`independentReview false`) instead of quietly overclaiming.
+`sstim:EvidenceAssessmentClaim` is the sole concrete evidence-assessment class
+introduced by this ADR. Every instance has exactly one `sstim:hasEvidenceTier`
+and exactly one `sstim:hasClaimDirection`, plus the qualified basis and bounded
+proposition defined below. No other role above may carry those evidence fields,
+and only an `EvidenceAssessmentClaim` may be reviewed by an
+`EvidenceReviewDecision`. It may become an input to a future authorization
+decision, but it never authorizes public copy by itself.
 
-6. **Absence and refutation discipline.** An assessment asserting that no
-   evidence or mechanism exists must carry at least one `citesReference` or
-   a reproducible `sstim:searchRecord` (sources, query, date). Without one,
-   the statement must be recorded as "not assessed in SSTIM" (a knowledge
-   status), not as a refuting assessment.
+`sstim:EvidenceClaim` remains a stable compatibility superclass and is not
+marked deprecated while active subclasses use it. SHACL rejects a bare direct
+instance that lacks a concrete evidence subtype. It also rejects a node typed
+both `EvidenceAssessmentClaim` and any non-evidence role. Every migrated
+top-level node governed by this split has exactly one epistemic role from the
+table. The role families are declared pairwise disjoint with
+`owl:AllDisjointClasses` and are exclusive in SHACL; intentional subclassing
+such as `ExposureMeasurementRequirement ⊆ ProtocolRequirement` does not count
+as a second role. These axioms reinforce, but do not replace, the operational
+checks.
 
-7. **Strict public-claim gate.** The SPARQL constraint is rewritten so a
-   claim level with `requiresEvidenceTierRank ≥ 1` is satisfiable only by a
-   node that is **all** of:
+Session reports and participant- or instrument-attributed observations are
+never `EvidenceClaim`. This ADR does not mint their final classes. ADR 0025,
+change set C, and a dedicated observation/privacy decision will define them.
+An observation can contribute to an assessment only through a separately
+governed study/analysis output with provenance, consent, and access controls.
 
-   - an `sstim:EvidenceAssessment` (hypotheses, observations, and safety
-     statements never match, regardless of tier);
-   - `aboutSubject` the preset under validation;
-   - `hasClaimDirection sstim-v:claimSupports`;
-   - at or above the required `tierRank`;
-   - `hasReviewStatus sstim-v:reviewReviewed` (a `reviewNeedsUpdate`
-     assessment never authorizes);
-   - modality-compatible: its modality tag is `GENERAL` or matches one of
-     the preset's delivery modalities; and
-   - backed by at least one `citesReference` resolving to a
-     `PublicSafeReference` present in the graph.
+### 2. Make exposure statements optional and role-specific
 
-   Population/context compatibility cannot yet be formalized; it remains
-   recorded (`studyPopulation`) and manually reviewed, and is named as an
-   explicit residual risk until phase 4 adds a population/context model.
-   The change set must include adversarial negative fixtures: a high-tier
-   refuting assessment, a mismatched modality, a provisional review, a
-   dangling citation, and a hypothesis typed at high tier — none may
-   authorize public copy.
+Remove `hasEffectClaim minCount 1` from `ExposureProfileShape`. A delivery
+profile with no hypothesis or question states neither. The runtime exporter
+must not generate placeholder hypotheses, questions, boundary statements, or
+evidence assessments.
 
-8. **One synchronized change set.** OWL terms, SKOS values, SHACL shapes,
-   JSON-LD context, curated instance migration, exporter changes, browser
-   labels, quality-audit count updates, `CLAUDE.md` §5.3 example queries
-   (which use `supportsRelation` today), `EVIDENCE_FRAMEWORK.md`, and
-   migration notes land together under change set D, gated by the existing
-   validation suite plus the new negative fixtures. Protected files are
-   edited only after this ADR is accepted.
+Replace the overloaded link with the following role-specific properties. They
+have the stated OWL ranges but no OWL domains; SHACL checks the allowed source
+classes without creating types by inference.
+
+| Property | Allowed source | Range |
+|---|---|---|
+| `sstim-ex:hasHypothesis` | `ExposureProfile` or `SensoryStimulationProtocol` | `ExposureHypothesis` |
+| `sstim-ex:hasResearchQuestion` | `ExposureProfile` or `SensoryStimulationProtocol` | `ResearchQuestion` |
+| `sstim-ex:hasBoundaryApplicability` | `ExposureProfile` or `StimulusChannel` | `BoundaryApplicabilityStatement` |
+| `sstim-ex:hasProtocolRequirement` | `ExposureProfile`, `StimulusChannel`, or `SensoryStimulationProtocol` | `ProtocolRequirement` |
+| `sstim-ex:hasDesignObjective` | `ExposureProfile` or `SensoryStimulationProtocol` | `ExposureDesignObjective` |
+| `sstim-ex:hasPlannedOutcome` | `ExposureProfile` or `SensoryStimulationProtocol` | `PlannedOutcomeSpecification` |
+| `sstim-ex:hasKnowledgeStatusAssertion` | `Preset`, `SensoryStimulationTechnique`, `SensoryStimulationProtocol`, `ExposureProfile`, or `StimulusChannel` | `KnowledgeStatusAssertion` |
+
+Every boundary-applicability statement uses
+`sstim-ex:appliesBoundary` at least once; its range is the union of
+`ComfortBoundary` and `ExposureLimit`. The incoming profile/channel link
+identifies the application target. Existing direct `hasComfortBoundary` and
+`hasExposureLimit` links remain valid structural shortcuts but do not replace
+the qualified applicability statement when a rationale is asserted.
+
+Requirements identify the protocol, profile, or channel they constrain. An
+`ExposureMeasurementRequirement` is a narrower `ProtocolRequirement`, not an
+effect claim. Design objectives and planned outcomes stay distinct from
+hypotheses and from observations actually collected during a session.
+
+`sstim-ex:concernsEffectDimension` loses its
+`ExposureEffectClaim` OWL domain. Its allowed subjects are enforced with
+role-specific SHACL so using it on a hypothesis or question cannot re-infer the
+deprecated class.
+
+`sstim-ex:hasKnowledgeStatus` also loses its incomplete OWL domain. SHACL
+permits it on protocols, profiles, channels, capabilities, the new statement
+roles, and `KnowledgeStatusAssertion` as appropriate. This both admits the
+`DeviceCapability` use promised by its definition and prevents a migrated
+non-evidence statement from being pushed back into `EvidenceClaim` semantics.
+
+Deprecate `sstim-ex:ExposureEffectClaim` and `sstim-ex:hasEffectClaim`. The 27
+active nodes migrate exactly as specified in the ledger. All lose evidence-only
+tier, direction, review, and evidence-modality properties; no blanket retype is
+permitted.
+
+### 3. Use a neutral subject relation for assessments
+
+Add `sstim:evaluatesSubject` with no OWL domain and the ADR 0013 range union of
+`sstim:Preset` and `sstim:SensoryStimulationTechnique`. Every assessment has
+exactly one value. Assessment direction remains exclusively in
+`sstim:hasClaimDirection`.
+
+Deprecate `sstim:supportsRelation` as a subproperty of
+`sstim:evaluatesSubject`. For 0.7.x, curated assessments explicitly materialize
+exactly one value for each predicate because raw-RDF clients do not necessarily
+run RDFS inference. SHACL `sh:equals` requires both predicates to name the same
+object before entailment. Remove the old OWL domain from `supportsRelation` as
+well. Authoritative SHACL validation runs over the asserted source graph before
+entailment and uses a SPARQL check for a direct
+`rdf:type sstim:EvidenceAssessmentClaim` triple; a legacy predicate alone can
+never create or validate an assessment.
+
+Other roles do not use `evaluatesSubject`; their profile, protocol, boundary,
+session, and dimension links remain role-specific.
+
+### 4. Require an evidence basis and separate evidence axes
+
+Introduce `sstim:BibliographicReference` as the general bibliographic-source
+class and make the existing `sstim:PublicSafeReference` its subclass. The
+latter remains a legacy metadata/venue-audit classification; neither class
+implies permission to quote, reproduce, or display a source.
+
+Every `EvidenceAssessmentClaim` has at least one qualified basis through
+`sstim:hasEvidenceBasis`. Each `sstim:EvidenceBasis` has exactly one
+`sstim:basisSource`, which is one of:
+
+- a `sstim:BibliographicReference`;
+- a `sstim:GovernedResearchOutput`; or
+- an immutable `sstim:EvidenceSearchRecord` supporting a scoped search result.
+
+`sstim:GovernedResearchOutput ⊑ prov:Entity` covers a versioned study record,
+dataset revision, or analysis output admitted as evidence. It has exactly one
+immutable `sstim:SourceGovernanceRecord` through
+`sstim:hasSourceGovernanceRecord`. That record identifies the source version
+and digest, custodian/owner, access classification, derivation provenance,
+applicable consent/ethics basis or an explicit not-applicable determination,
+and permitted use/release scope. It also records generation time and a
+qualified responsible agent/role. A bare `prov:Entity` or ungoverned dataset
+cannot satisfy `basisSource`.
+
+`sstim:citesReference` ranges over the general bibliographic class. For every
+bibliographic basis source, the assessment carries an explicit matching
+`citesReference` triple for 0.7 compatibility; a citation that is not connected
+to a qualified basis does not satisfy the assessment shape. Publication
+clearance belongs to ADR 0029.
+
+Because hypotheses no longer masquerade as evidence, ADR 0018's
+rank-conditional citation exception is retired: every evidence assessment has
+a basis, regardless of tier. A speculative hypothesis needs no basis because
+it is not an evidence assessment.
+
+Every assessment evaluates exactly one immutable, atomic
+`sstim:AssessmentProposition` through `sstim:assessesProposition`. The
+proposition has:
+
+- exactly one `sstim:propositionSubject`, in the ADR 0013 preset/technique
+  union, matching the assessment's materialized `evaluatesSubject` value;
+- exactly one `sstim:propositionOutcome`, an identified
+  `sstim:EvidenceOutcomeConcept`; existing exposure `EffectDimension` values
+  may be reused where their meaning fits;
+- exactly one `sstim:hasAssessmentScope` value;
+- exactly one `sstim:hasPropositionForm`; and
+- at least one exact `sstim:propositionText` language literal or immutable
+  `sstim:propositionDigest`.
+
+This ADR introduces `sstim:EvidenceOutcomeConcept` as a controlled endpoint,
+response, or mechanism category, not an observed result or benefit. The
+exposure class `sstim-ex:EffectDimension` becomes its subclass so existing
+dimension values can be reused without ad hoc dual typing. Multiple subjects or
+outcomes require separate propositions and assessments.
+An `sstim:AssessmentScope` records identified modality,
+population/study-model, protocol/context, and comparator values through
+`sstim:scopeSensoryModality`, `sstim:scopePopulationOrModel`,
+`sstim:scopeInterventionOrContext`, and `sstim:scopeComparator`. Each dimension has
+at least one named resource or an explicit controlled unknown, not-reported, or
+not-applicable value; omission never means universal applicability. Introduce
+`sstim:EvidencePropositionForm` as the controlled range of
+`hasPropositionForm`, with bounded relation, bounded null result, scoped search
+finding, and universal absence values. Universal-absence propositions never
+conform. A scoped search finding requires an `EvidenceSearchRecord` basis.
+
+The four scope properties are object properties:
+
+| Property | Allowed range |
+|---|---|
+| `sstim:scopeSensoryModality` | `sstim:SensoryModality` or `sstim:ScopeMarker` |
+| `sstim:scopePopulationOrModel` | `sstim:PopulationDescriptor`, `sstim:StudyModel`, or `sstim:ScopeMarker` |
+| `sstim:scopeInterventionOrContext` | `sstim:Preset`, `sstim:SensoryStimulationTechnique`, `sstim:SensoryStimulationProtocol`, `sstim:SensoryStimulationIntervention`, `sstim-ex:ExperimentContext`, `sstim-ex:ExposureProfile`, or `sstim:ScopeMarker` |
+| `sstim:scopeComparator` | `sstim:ComparatorDescriptor` or `sstim:ScopeMarker` |
+
+This ADR introduces `sstim:PopulationDescriptor`,
+`sstim:ComparatorDescriptor`, and `sstim:ScopeMarker` as identified
+information/controlled-value classes. Human explanation uses separate
+language-note properties, not mixed object/literal ranges. On each axis, one or
+more concrete values are mutually exclusive with the unknown, not-reported,
+and not-applicable markers; a shape rejects their co-occurrence.
+
+`hasClaimDirection` now means whether the qualified bases support, are mixed
+on, are inconclusive about, or refute that exact proposition. `hasEvidenceTier`
+rates that assessment, not the underlying source or public-copy permission.
+This bounded proposition/scope is the input later policy profiles use to test
+outcome, modality, population, and protocol applicability. If ADR 0028 is later
+accepted, it may align this assessment-specific proposition with the generic
+claim-proposition model without changing this ADR's evidence semantics.
+
+Each basis records orthogonal metadata rather than one overloaded modality tag:
+
+1. `sstim:basisSensoryModality`, using canonical `SensoryModality` values;
+2. `sstim:basisModalityApplicability`, with distinct controlled values for
+   mixed modalities, unknown/not reported, and not applicable;
+3. `sstim:basisIntervention`, identifying the studied technique, protocol,
+   intervention, or exposure profile;
+4. `sstim:basisStudyDesign`;
+5. `sstim:basisStudyModel` and `sstim:basisStudyPopulation`; and
+6. `sstim:basisSynthesisType`.
+
+Introduce controlled-value classes `sstim:ModalityApplicability`,
+`sstim:StudyDesign`, `sstim:StudyModel`, and `sstim:EvidenceSynthesisType` as
+the ranges of the corresponding properties. `basisSensoryModality` ranges over
+the existing `sstim:SensoryModality` class. `basisIntervention` ranges over the
+union of `sstim:SensoryStimulationTechnique`,
+`sstim:SensoryStimulationProtocol`, `sstim:SensoryStimulationIntervention`, and
+`sstim-ex:ExposureProfile`.
+
+Zero canonical sensory modalities is allowed only with an explicit
+modality-applicability value. Known combined modalities list every supported
+canonical modality and may additionally state mixed applicability.
+`PRECLINICAL` maps to model/stage, `REVIEW` to synthesis type, and `BREATH` to
+an explicit `basisIntervention`; `GENERAL` is not mapped as a wildcard because
+mixed, unknown, and not applicable are different states.
+
+Source-specific results use distinct basis properties:
+`sstim:basisObservedOutcome`, `sstim:basisStudyPopulation`,
+`sstim:basisComparator`, and `sstim:basisObservedEffectDirection`. Their values
+are IRIs in `sstim:EvidenceOutcomeConcept`, `sstim:PopulationDescriptor`,
+`sstim:ComparatorDescriptor`, and the existing `sstim:EffectDirection` class,
+respectively. Supplementary text uses distinct `sstim:basisOutcomeNote`,
+`sstim:basisPopulationNote`, and `sstim:basisComparatorNote` language-literal
+properties; it does not replace the assessment proposition. The legacy
+assessment-summary properties `sstim:evidenceOutcome`, `sstim:studyPopulation`,
+`sstim:comparator`, and `sstim:hasEffectDirection` are deprecated in
+authoritative data. A non-
+authoritative 0.7 compatibility view may derive them only when a single
+unambiguous basis makes the mapping lossless.
+
+When an assessment combines heterogeneous sources, metadata stays on the
+individual basis/source contribution rather than being flattened onto the
+assessment. The assessment proposition and scope state the narrower conclusion
+actually reached across those bases.
+
+Deprecate `sstim:hasModalityTag`, `sstim:EvidenceModalityTag`, and
+`sstim-v:EvidenceModalityScheme` for new authoritative data. A generated 0.7
+compatibility view may dual-publish only mappings the ledger marks lossless;
+the old property, class, scheme, and values are removed no earlier than 1.0.
+
+### 5. Record assessment, search, and review provenance without imposing policy
+
+An evidence assessment is an immutable revision. A correction creates a new
+IRI linked with `prov:wasRevisionOf`; the previous revision is explicitly
+superseded or invalidated. `dct:modified`, when present on a revision, is frozen
+at creation and is never advanced in place.
+
+An `sstim:EvidenceAssessmentActivity ⊑ prov:Activity` generates the revision:
+the assessment points to it with `prov:wasGeneratedBy`; the activity
+`prov:used` every qualified basis, its source, and the immutable rubric/method
+revision actually applied. Responsible agent and role use
+`prov:qualifiedAssociation` with `prov:agent` and `prov:hadRole`; activity times
+and rationale describe the assessment event. The rubric IRI/version,
+assessment date, and association are mandatory for new assessments.
+
+An `sstim:EvidenceReviewActivity ⊑ prov:Activity` `prov:used` exactly one
+assessment revision plus the review rubric/policy revision and generates an
+immutable `sstim:EvidenceReviewDecision`. Its qualified association identifies
+reviewer and role. The decision has `prov:wasGeneratedBy` that activity,
+identifies the same assessment through exactly one
+`sstim:reviewsAssessment`, identifies the rubric/policy through
+`sstim:reviewRubric`, records `prov:generatedAtTime`, and carries a matching
+`prov:qualifiedAttribution` for reviewer and role. It keeps three independent
+controlled properties/axes:
+
+- `sstim:hasReviewerRelationship`: self, same organization, external, or
+  unknown;
+- `sstim:hasIndependenceDetermination`: independent, not independent, or
+  undetermined. An independent/not-independent determination has exactly one
+  `sstim:independencePolicy` and at least one `sstim:conflictDisclosure`
+  record, including an explicit no-conflict-declared record where applicable;
+  and
+- `sstim:hasReviewDecision`: confirm, request revision, or reject.
+
+External relationship never implies independence. A later decision explicitly
+supersedes or invalidates the earlier decision; there is at most one
+non-invalidated decision per assessment revision and rubric/policy. No mutable
+“effective review” pointer is stored on the assessment.
+
+SHACL/SPARQL requires the decision's assessment, rubric/policy, reviewer/role,
+and generation time to equal the corresponding `prov:used`, qualified
+association, and activity-time values on its generating review activity. Merely
+co-occurring in the same graph is insufficient.
+
+The legacy `ReviewStatus` scheme becomes a derived workflow summary only:
+`reviewProvisional` means no current decision under the named rubric,
+`reviewReviewed` means a current recorded decision exists regardless of its
+outcome or independence, and `reviewNeedsUpdate` means the prior decision was
+invalidated or an explicit re-review trigger exists without a replacement.
+`reviewedBy`, `evidenceDate`, and `hasReviewStatus` are deprecated in
+authoritative data. A labeled, non-authoritative 0.7 compatibility view may
+derive them from the current decision and assessment generation date; it is
+excluded from validation and authorization.
+
+An `sstim:EvidenceSearchActivity ⊑ prov:Activity` generates an immutable
+`sstim:EvidenceSearchRecord`. The activity carries execution times and a
+qualified responsible agent/role. The record carries sources/databases, exact
+query, coverage dates, eligibility criteria, result count, and a content
+digest. A search basis points to that record through `basisSource`.
+
+A finite search supports only “no eligible evidence found within this scope as
+of this date.” It can never support the universal assertion that no evidence or
+mechanism exists. Empirical refutation must target a bounded proposition and
+have an evidence basis. Otherwise create a `KnowledgeStatusAssertion` such as
+`unknownToSSTIM` (“not assessed”) or `noKnownEvidenceInSSTIM` (“no evidence
+recorded in the named SSTIM corpus”), with its repository scope and as-of date.
+
+The migration does not invent historical review events, rubrics, searches, or
+dates. Each retained legacy candidate produces a new versioned assessment IRI
+through a migration-dated assessment activity. The new revision has
+`prov:wasDerivedFrom` the legacy record, and the activity has an honest
+qualified association. A review decision is added only if its provenance can
+be established. The legacy IRI becomes a deprecated tombstone linked to its
+replacement; it is not silently redefined as the first immutable revision.
+
+### 6. Preserve compatibility without preserving the semantic error
+
+For 0.7.x active data:
+
+- assessment nodes explicitly carry both `EvidenceAssessmentClaim` and
+  `EvidenceClaim`; this correct superclass typing may remain indefinitely;
+- assessment subject links carry both `evaluatesSubject` and deprecated
+  `supportsRelation`;
+- legacy evidence-modality tags occur only in the generated compatibility view
+  and only where the migration ledger defines a lossless mapping;
+- legacy outcome/population/comparator/effect-direction summaries occur only
+  in that view and only when a single basis makes them unambiguous; and
+- raw-RDF and RDFS-entailing compatibility queries are both tested.
+
+Deprecated `supportsRelation`, `ExposureEffectClaim`, `hasEffectClaim`, legacy
+review and evidence-summary properties, and obsolete modality terms are removed
+no earlier than 1.0. Active non-evidence nodes do not retain false
+`EvidenceClaim` typing for compatibility. The generated legacy view is labeled
+non-authoritative and excluded from validation and any authorization input.
+
+Implementation may land in reviewable internal patches, but the 0.7 release
+activates the new classes, shapes, context, migrated data, exporter, browser
+queries, documentation, and fixtures together. Protected ontology sources are
+changed only after this ADR is accepted.
+
+## Effect on public-claim governance
+
+This ADR deliberately does not redesign public claims. ADR 0018 P7.2 remains
+the live provisional preset-metadata check and must not be weakened while its
+replacement is Proposed or unimplemented. It is not an exact-copy authorization
+gate and must not be described as one. If ADR 0028 is accepted before an
+applicable profile is implemented, P7.2 becomes reject-only: passing it never
+authorizes publication, and publication fails closed.
+
+ADR 0028 will model atomic claim propositions, rendered expressions, and
+non-exclusive claim facets. ADR 0029 will own BSC-specific thresholds,
+prohibitions, consent, evidence applicability, trusted release inputs, and the
+publisher gate. Consequently, this ADR does not claim to resolve KR-04.
+
+## Required implementation fixtures
+
+Positive fixtures cover a literature assessment with its atomic proposition,
+scope, qualified basis, and assessment activity; a governed-research-output
+basis with its governance record; a scoped search finding and its search
+record/activity; an attributed scoped knowledge-status assertion; a review
+decision with all three review axes; a hypothesis; a research question; a
+boundary-applicability statement; a protocol requirement; a design objective;
+a planned-outcome specification; and a delivery-only profile.
+
+Negative fixtures prove that none of the following conforms:
+
+- a bare `EvidenceClaim`;
+- an assessment with no evidence basis;
+- an assessment missing or repeating its evidence tier or claim direction;
+- an assessment with no atomic proposition, outcome, complete explicit scope,
+  or exact proposition text/digest;
+- an assessment with no explicit `evaluatesSubject`, or a node that has only
+  deprecated `supportsRelation` and no direct assessment type;
+- an assessment whose `evaluatesSubject` and compatibility `supportsRelation`
+  values differ;
+- a bibliographic citation not represented by a matching qualified basis;
+- a governed research output with no complete source-governance record;
+- a basis with zero canonical modalities and no explicit applicability value;
+- a knowledge-status assertion missing its single subject/value, scope, or
+  as-of date, or lacking its attributed generating activity;
+- a review decision missing any review axis, or two non-invalidated decisions
+  for the same assessment and rubric/policy;
+- an independent/not-independent determination with no independence policy or
+  conflict-disclosure record;
+- a review decision whose assessment, rubric, attribution, or time disagrees
+  with its generating activity;
+- a hypothesis, question, requirement, design objective, planned outcome,
+  boundary statement, or observation with evidence-only tier/review metadata;
+- a node combining an assessment and non-evidence role;
+- a node assigned two top-level epistemic roles;
+- a boundary-applicability statement with no `appliesBoundary` value;
+- a proposition marked as universal absence/nonexistence even when a finite
+  search exists;
+- a scoped “no eligible evidence found” assessment without an
+  `EvidenceSearchRecord` basis;
+- `PRECLINICAL` or `REVIEW` used as sensory modality;
+- a generated delivery profile containing a fabricated placeholder statement;
+  or
+- a session observation satisfying an evidence-assessment shape.
+
+The migrated runtime artifact must be Turtle-parseable, SHACL-conformant, and
+semantically equivalent to its committed golden fixture. Compatibility tests
+must query 0.7.x assessment data through both old and new types/predicates
+without relying on inference.
 
 ## Alternatives considered
 
-- **Keep one class and add a "claim kind" property.** Rejected: gates and
-  queries must fail closed on `rdf:type`; a flag invites the same silent
-  misclassification this ADR removes.
-- **Keep requiring an effect claim per exposure profile.** Rejected: it is
-  the direct cause of manufactured evidence in the runtime exporter.
-- **Adopt SEPIO/OBI evidence modeling wholesale.** Deferred: it would pull a
-  heavy import closure into a browser-loaded graph; instead the new classes
-  stay locally defined with external alignment left to the mapping layer.
-- **Rename `sstim:EvidenceClaim` away entirely.** Rejected for citability:
-  0.6.0 consumers keep a working (deprecated) superclass; churn is limited
-  to one release of dual-reading.
-- **Reuse `dct:subject` instead of minting `sstim:aboutSubject`.** Rejected:
-  the subject link carries a SHACL-enforced domain-specific range
-  (ADR 0013) that general DCTERMS reuse would blur.
+- **Keep one class and add a role flag.** Rejected: a missing or forged flag
+  would let a non-evidence artifact satisfy evidence shapes again.
+- **Retype all 27 nodes as hypotheses.** Rejected: the reviewed ledger contains
+  questions, boundaries, requirements, design concepts, and status statements.
+- **Use one generic `aboutSubject` on all roles.** Rejected: sessions, profiles,
+  channels, limits, presets, and techniques do not share the ADR 0013 range.
+- **Keep rank-conditional evidence bases.** Rejected: the old exception exists
+  only because hypotheses were incorrectly typed as evidence.
+- **Require external-independent review in the core ontology.** Rejected:
+  review relationship is provenance; authorization requirements belong to a
+  named policy profile.
+- **Adopt SEPIO/OBI wholesale.** Deferred until the local operational model is
+  stable and the browser import cost is justified.
 
 ## Consequences
 
-- The Sensory Field exporter can finally be made truthful *and* conformant:
-  delivery-only profiles validate without invented claims, and the KR-01
-  golden suite flips to a strict conformance assertion.
-- Public-claim authorization becomes evidence-shaped instead of
-  tier-shaped; several currently latent misauthorization paths close.
-- Consumers filtering on `EvidenceClaim` keep finding literature
-  assessments during the deprecation window but must migrate to
-  `EvidenceAssessment` / `aboutSubject` before the aliases are dropped.
-- The review model admits what the project actually has today — accountable
-  editorial review — without overclaiming independence, and gives external
-  reviewers a first-class place to appear.
-- Modality queries stop returning study-design tags; downstream code using
-  `PRECLINICAL`/`REVIEW` notations must switch to `hasStudyDesign`.
+- Runtime delivery descriptions no longer invent evidence.
+- Literature and governed-study assessments remain queryable through the
+  compatibility superclass while non-evidence roles cannot enter evidence
+  workflows accidentally.
+- Existing experiment data requires deliberate migration, including removal of
+  misleading tier/review metadata.
+- Evidence provenance becomes more verbose but separates source characteristics
+  from the assessment made about them.
+- Public-claim authorization remains unresolved but is no longer falsely
+  claimed as part of this semantic repair.
 
-## Acceptance gates
+## Approval decision
 
-Move to **Accepted** when the maintainer confirms:
+The class boundary, per-instance migration, neutral subject relation, bounded
+assessment proposition/scope, evidence basis and axes, source governance,
+qualified provenance, compatibility window, observation firewall, and deferred
+public-claim scope are settled by this text and its ledger.
 
-1. the four-way split and the rule that only `EvidenceAssessment` can ever
-   authorize public copy;
-2. the `aboutSubject` rename with a one-release deprecated alias;
-3. the gate conditions in decision 7, including the residual
-   population-compatibility risk; and
-4. the review-provenance model, including recording current reviews as
-   non-independent editorial activities.
+**Recommended disposition: Accept.** The status remains Proposed until the
+maintainer explicitly accepts this final text. Acceptance authorizes the
+ontology implementation described here; it does not accept ADR 0028 or 0029.
 
 ## See also
 
-- [ADR 0013](0013-evidence-support-relation-range.md) — original subject-relation range.
-- [ADR 0018](0018-evidence-integrity-and-public-claim-governance.md) — evidence integrity and public-claim posture.
-- [ADR 0025](0025-hed-bids-interoperability-crosswalk.md) — observations-not-conclusions session posture this ADR protects.
-- [RDF audit 2026-07-13](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md) — findings KR-04, KR-06, KR-11.
-- [Improvement plan](../ontology/IMPROVEMENT_PLAN.md) — change set D and phase 1.2.
+- [ADR 0013](0013-evidence-support-relation-range.md) — original assessment-subject range.
+- [ADR 0018](0018-evidence-integrity-and-public-claim-governance.md) — evidence constraints and provisional preset-level claim check.
+- [ADR 0022](0022-0.6-release-review-posture.md) — maintainer review posture.
+- [ADR 0025](0025-hed-bids-interoperability-crosswalk.md) — observations-not-conclusions and privacy posture.
+- [ADR 0028](0028-atomic-claim-propositions-and-public-expressions.md) — policy-neutral public-claim semantics.
+- [ADR 0029](0029-bsc-lab-public-claim-publication-profile.md) — BSC Lab publication policy and release gate.
