@@ -352,7 +352,7 @@ round-trip authority.
 | A — Contract harness | Runtime golden RDF, per-artifact SHACL, context and namespace parity, negative fixtures | none |
 | B — Session v2 | Native schema, event timeline, hashes, RDF projection, corrected docs | A |
 | C — Observation/privacy | Qualified reports, helpfulness, unwanted experiences, missingness, consent/data classification | B; privacy review |
-| D — Exposure/evidence repair | Domain fixes, claim split, review provenance, public-copy authorization | A; semantic ADR |
+| D — Exposure/evidence repair | Domain fixes, claim split, review provenance, public-copy authorization | A; [ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md) |
 | E — SKOS/alignment repair | Neural/stimulus frequency split, roles, controlled-value plumbing, mapping provenance | D where evidence links migrate |
 | F — Ecosystem/annotation repair | Reified engagements, consent history, valid OA, private defaults | A; privacy review |
 | G — HED profile | Native event mapping, validator, synthetic demonstrator | B, C, D |
