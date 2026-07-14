@@ -456,33 +456,43 @@ for predicate in functional_properties:
             fail(f"{subject}: functional property {predicate} has {len(values)} values")
 
 
-# Evidence claims must remain scoped, reviewable, attributable, and citable.
+# Evidence assessments must be scoped, attributable, basis-backed, and never
+# bare EvidenceClaims (ADR 0027).
+EVASSESS = SSTIM.EvidenceAssessmentClaim
 claims = instances_of(SSTIM.EvidenceClaim)
+assessments = instances_of(EVASSESS)
 for claim in claims:
+    if claim not in assessments:
+        fail(f"{claim}: bare sstim:EvidenceClaim without the EvidenceAssessmentClaim subtype (ADR 0027)")
+for claim in assessments:
     requirements = (
         (RDFS.label, "rdfs:label"),
         (DCTERMS.description, "dct:description"),
         (SSTIM.hasEvidenceTier, "sstim:hasEvidenceTier"),
-        (SSTIM.hasModalityTag, "sstim:hasModalityTag"),
         (SSTIM.hasClaimDirection, "sstim:hasClaimDirection"),
-        (SSTIM.hasReviewStatus, "sstim:hasReviewStatus"),
-        (SSTIM.evidenceDate, "sstim:evidenceDate"),
+        (SSTIM.evaluatesSubject, "sstim:evaluatesSubject"),
+        (SSTIM.assessesProposition, "sstim:assessesProposition"),
+        (SSTIM.hasEvidenceBasis, "sstim:hasEvidenceBasis"),
         (DCTERMS.modified, "dct:modified"),
         (PROV.wasAttributedTo, "prov:wasAttributedTo"),
     )
     for predicate, name in requirements:
         if not objects(claim, predicate):
             fail(f"{claim}: missing {name}")
-    if not objects(claim, SSTIM.supportsRelation) and not objects(claim, EXPOSURE.concernsEffectDimension):
-        fail(f"{claim}: missing supportsRelation or concernsEffectDimension")
-    tiers = objects(claim, SSTIM.hasEvidenceTier)
-    if len(tiers) == 1:
-        ranks = list(all_graph.objects(tiers[0], SSTIM.tierRank))
-        if ranks and int(ranks[0]) >= 3 and not objects(claim, SSTIM.citesReference):
-            fail(f"{claim}: evidence tier >= 3 requires a cited public-safe reference")
+    # Deprecated evidence-only metadata must not remain on authoritative assessments.
+    for predicate, name in ((SSTIM.hasModalityTag, "sstim:hasModalityTag"),
+                            (SSTIM.hasReviewStatus, "sstim:hasReviewStatus"),
+                            (SSTIM.evidenceDate, "sstim:evidenceDate")):
+        if objects(claim, predicate):
+            fail(f"{claim}: deprecated {name} must not appear on an authoritative EvidenceAssessmentClaim (ADR 0027)")
+    # Every bibliographic basis source must be mirrored by a citesReference.
+    for basis in objects(claim, SSTIM.hasEvidenceBasis):
+        for source in objects(basis, SSTIM.basisSource):
+            if source in instances_of(SSTIM.BibliographicReference) and source not in objects(claim, SSTIM.citesReference):
+                fail(f"{claim}: bibliographic basis {source} lacks a matching citesReference")
     for reference in objects(claim, SSTIM.citesReference):
-        if reference not in instances_of(SSTIM.PublicSafeReference):
-            fail(f"{claim}: cites undeclared PublicSafeReference {reference}")
+        if reference not in instances_of(SSTIM.BibliographicReference):
+            fail(f"{claim}: cites undeclared BibliographicReference {reference}")
 
 
 # Bibliographic identifiers must resolve to the same DOI recorded as source.
@@ -618,7 +628,9 @@ counts = {
     "framework techniques": len(objects(URIRef("https://w3id.org/sstim/framework/bsc"), SSTIM.definesTechnique)),
     "protocols": len(protocols),
     "presets": len(presets),
-    "evidence claims": len(claims),
+    "evidence assessments": len(assessments),
+    "knowledge-status assertions": len(instances_of(EXPOSURE.KnowledgeStatusAssertion)),
+    "exposure hypotheses": len(instances_of(EXPOSURE.ExposureHypothesis)),
     "references": len(references),
     "exposure profiles": len(instances_of(EXPOSURE.ExposureProfile)),
     "sessions": len(sessions),
@@ -632,7 +644,9 @@ minimums = {
     "framework techniques": 7,
     "protocols": 12,
     "presets": 2,
-    "evidence claims": 38,
+    "evidence assessments": 8,
+    "knowledge-status assertions": 3,
+    "exposure hypotheses": 7,
     "references": 7,
     "exposure profiles": 10,
     "sessions": 1,

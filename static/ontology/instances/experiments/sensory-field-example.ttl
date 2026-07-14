@@ -30,7 +30,8 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
     sstim-ex:usesStimulusChannel this:visual-channel, this:left-ear-channel, this:right-ear-channel ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain, sstim-ex:boundaryHearingRisk ;
-    sstim-ex:hasEffectClaim this:photosensitivity-claim, this:calm-arousal-claim .
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-claim ;
+    sstim-ex:hasResearchQuestion this:calm-arousal-claim .
 
 this:visual-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Color-field visual channel"@en ;
@@ -42,7 +43,8 @@ this:visual-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasFlickerRateHz "3.0"^^xsd:decimal ;
     sstim-ex:hasDutyCycle "0.5"^^xsd:decimal ;
     sstim-ex:hasGainLevel "0.6"^^xsd:decimal ;
-    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain .
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-claim .
 
 this:left-ear-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Left-ear tone channel"@en ;
@@ -67,32 +69,19 @@ this:right-ear-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasGainLevel "0.18"^^xsd:decimal ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
 
-this:photosensitivity-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:photosensitivity-claim a sstim-ex:BoundaryApplicabilityStatement ;
     rdfs:label "Flicker photosensitivity boundary"@en ;
     dct:description "Marks the blinking visual field as bounded by a photosensitivity safeguard. The interface defaults to the three-flash frequency bound; this does not establish individual safety or replace the full WCAG below-threshold test."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectPhotosensitivityRisk ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+    sstim-ex:appliesBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:calm-arousal-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:calm-arousal-claim a sstim-ex:ResearchQuestion ;
     rdfs:label "Calm/arousal self-observation target"@en ;
     dct:description "Records the question of whether a static versus gently modulated color field and binaural tone relate to self-reported calm or arousal. No effect direction or magnitude is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAV ;
     sstim-ex:concernsEffectDimension sstim-ex:effectCalm, sstim-ex:effectArousal ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
-
-this:photosensitivity-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:calm-arousal-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

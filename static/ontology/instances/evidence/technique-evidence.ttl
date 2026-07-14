@@ -1,194 +1,616 @@
-# BSC Lab technique-level evidence claims (IMPROVEMENT_PLAN P5.4).
+# BSC Lab technique-level evidence assessments (ADR 0027 migration).
 #
-# Migrates the technique-evidence assessments that previously lived only in the
-# vocab prose (skos:scopeNote / editorialNote / sstim:evidenceNotes) into
-# queryable sstim:EvidenceClaim individuals. The vocab prose is retained as
-# human-facing documentation; these individuals add the queryable layer.
+# Migrated 2026-07-13 per the ADR 0027 migration ledger
+# (docs/ontology/ADR_0027_MIGRATION_LEDGER.md). Each retained legacy claim is
+# superseded by an immutable sstim:EvidenceAssessmentClaim revision with an
+# atomic bounded proposition, explicit scope, and qualified evidence basis;
+# the three universal refutations are retired into scoped, dated
+# KnowledgeStatusAssertions. Legacy IRIs remain as deprecated tombstones.
 #
-# Namespace: evidence is BSC Lab implementation/editorial data
-# (bsclab-evidence:, see instances/README.md); the claims support the
-# vendor-neutral sstim-v: technique vocabulary via sstim:supportsRelation.
+# Migration honesty (ledger rules): tier and direction are carried forward
+# from the legacy editorial rating as the initial migration assessment under
+# method/adr-0027-migration/1, pending re-assessment under a dedicated
+# rubric. No historical review activity, search, or independence is invented;
+# consequently no EvidenceReviewDecision exists yet and the derived workflow
+# summary for these revisions is "provisional".
 #
-# Discipline (ADR 0016 / ADR 0018): every citation venue is audited before use
-# (see references.ttl audit notes). Positive "measurable response" claims are
-# framed as electrophysiological responses, NOT wellness outcomes (SCOPE.md).
-# Negative assertions sit at tier <= 2 and are legitimately uncited (P7.1:
-# only tierRank >= 3 requires a PublicSafeReference).
+# Outcome, population, comparator, and intervention descriptors minted here
+# are implementation-scoped named individuals, not SKOS concepts
+# (ADR 0027 implementation clarifications; CLAUDE.md §5.1).
 
 @prefix bsclab-evidence: <https://w3id.org/sstim/implementation/bsclab/evidence/> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sstim: <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-ref: <https://w3id.org/sstim/ref/> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 
-# ── Best-supported auditory responses (measurable, cited) ────────────────────
+# ── Shared migration infrastructure ──────────────────────────────────────────
 
-bsclab-evidence:assr-isochronic-response a sstim:EvidenceClaim ;
-    rdfs:label "Auditory steady-state response to isochronic / amplitude-modulated auditory stimulation" ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1>
+    rdfs:label "ADR 0027 migration assessment method, revision 1"@en ;
+    dct:description "Initial migration method: the legacy BSC Lab editorial tier and direction are carried forward as the initial migration assessment, explicitly pending re-assessment under a dedicated evidence rubric. This method revision is immutable."@en ;
+    dct:created "2026-07-13"^^xsd:date .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor>
+    a prov:Role ;
+    rdfs:label "Migration editor"@en .
+
+# Outcome concepts (ledger: assessment propositions and scopes).
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/assr-component-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "ASSR component applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ffr-component-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "FFR component applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/binaural-state-response-reliability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Binaural-beat state-response reliability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/slow-breathing-component-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Slow-breathing component applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ssvep-component-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "SSVEP component applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/sssep-component-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "SSSEP component applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/audiovisual-integration-mechanism-applicability>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Audiovisual integration mechanism applicability"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/preset-binaural-state-response>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Preset binaural-component state response"@en .
+
+# Population descriptors.
+<https://w3id.org/sstim/implementation/bsclab/evidence/population/human-auditory-electrophysiology>
+    a sstim:PopulationDescriptor ;
+    rdfs:label "Healthy human participants in auditory electrophysiology studies"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human>
+    a sstim:PopulationDescriptor ;
+    rdfs:label "Healthy human participants"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/population/human-visual-electrophysiology>
+    a sstim:PopulationDescriptor ;
+    rdfs:label "Human participants in visual electrophysiology studies"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/population/human-sssep-bci>
+    a sstim:PopulationDescriptor ;
+    rdfs:label "Human participants in SSSEP and brain-computer-interface studies"@en .
+
+# Comparator descriptors.
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unmodulated-or-no-periodic-stimulus>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Unmodulated tone or no periodic stimulus"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/aperiodic-or-non-envelope-modulated>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Aperiodic or non-envelope-modulated sound"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/sham-or-no-beat>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Sham or no-binaural-beat condition"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/baseline-spontaneous-or-faster-breathing>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Baseline, spontaneous, or faster breathing"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/non-periodic-or-alternative-frequency>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Non-periodic or alternative-frequency visual condition"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/source-specific-conditions>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Source-specific comparator conditions"@en .
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unisensory-or-incongruent>
+    a sstim:ComparatorDescriptor ;
+    rdfs:label "Unisensory or incongruent multisensory condition"@en .
+
+# Studied intervention descriptor for the paced-breathing basis (the source
+# studies breathing behavior, not the Martigli auditory cue).
+<https://w3id.org/sstim/implementation/bsclab/evidence/intervention/paced-slow-breathing>
+    a sstim:SensoryStimulationIntervention ;
+    rdfs:label "Paced slow breathing (below ten cycles per minute)"@en .
+
+# ── 1. ASSR / isochronic component applicability ─────────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Auditory steady-state response to isochronic / amplitude-modulated auditory stimulation (assessment revision 1)" ;
     dct:description "Periodic auditory stimulation (isochronic tones, amplitude-modulated tones, click trains) reliably evokes a phase-locked auditory steady-state response (ASSR), most robust near 40 Hz. A measurable electrophysiological response — not a wellness outcome." ;
+    sstim:evaluatesSubject sstim-v:techIsochronicTones ;
     sstim:supportsRelation sstim-v:techIsochronicTones ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:PICTON_2003 ;
-    sstim:evidenceOutcome "Reliable phase-locked ASSR at the modulation/pulse rate; the modulation rate (not the carrier) sets the response frequency." ;
-    sstim:studyPopulation "Healthy adults (auditory electrophysiology)" ;
-    sstim:comparator "Unmodulated tone / no periodic stimulus" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:assr-isochronic-response ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-bsclab-evidence:ffr-monaural-response a sstim:EvidenceClaim ;
-    rdfs:label "Subcortical frequency-following response to acoustically periodic stimuli" ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techIsochronicTones ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/assr-component-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The periodic pulse or modulation component of the isochronic-tones technique, when delivered at a defined rate, can evoke a phase-locked auditory steady-state response at that rate; the source covers periodic auditory stimulation generally, not every isochronic implementation."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityAuditory ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-auditory-electrophysiology> ;
+    sstim:scopeInterventionOrContext sstim-v:techIsochronicTones ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unmodulated-or-no-periodic-stimulus> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:PICTON_2003 ;
+    sstim:basisSensoryModality sstim-v:modalityAuditory ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-auditory-electrophysiology> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/assr-component-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unmodulated-or-no-periodic-stimulus> ;
+    sstim:basisOutcomeNote "Reliable phase-locked ASSR at the modulation/pulse rate; the modulation rate (not the carrier) sets the response frequency."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/basis-1>,
+        sstim-ref:PICTON_2003,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:assr-isochronic-response
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── 2. FFR / monaural component applicability ────────────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Subcortical frequency-following response to acoustically periodic stimuli (assessment revision 1)" ;
     dct:description "Stimuli that carry a physical acoustic periodicity (monaural beats, isochronic tones) evoke a subcortical frequency-following response (FFR) that tracks the stimulus envelope. A measurable brainstem response; downstream cognitive or wellness effects are not asserted here." ;
+    sstim:evaluatesSubject sstim-v:techMonauralBeats ;
     sstim:supportsRelation sstim-v:techMonauralBeats ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:SKOE_KRAUS_2010 ;
-    sstim:evidenceOutcome "Envelope-tracking FFR is reliably recorded to periodic/complex sounds; distinct from binaural beats, whose beat has no acoustic periodicity." ;
-    sstim:studyPopulation "Healthy adults (auditory electrophysiology)" ;
-    sstim:comparator "Aperiodic / non-envelope-modulated sound" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:ffr-monaural-response ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-bsclab-evidence:binaural-beats-state-mixed a sstim:EvidenceClaim ;
-    rdfs:label "Binaural-beat effects on EEG oscillatory activity and psychological state are mixed" ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techMonauralBeats ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ffr-component-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The acoustically periodic envelope produced by the monaural-beats technique can evoke an envelope-tracking subcortical frequency-following response; the tutorial covers complex periodic sounds generally, not every monaural-beat implementation."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityAuditory ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-auditory-electrophysiology> ;
+    sstim:scopeInterventionOrContext sstim-v:techMonauralBeats ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/aperiodic-or-non-envelope-modulated> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:SKOE_KRAUS_2010 ;
+    sstim:basisSensoryModality sstim-v:modalityAuditory ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-auditory-electrophysiology> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisTutorial ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ffr-component-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/aperiodic-or-non-envelope-modulated> ;
+    sstim:basisOutcomeNote "Envelope-tracking FFR is reliably recorded to periodic/complex sounds; distinct from binaural beats, whose beat has no acoustic periodicity."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/basis-1>,
+        sstim-ref:SKOE_KRAUS_2010,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:ffr-monaural-response
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── 3. Binaural-beat state response (mixed) ──────────────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Binaural-beat effects on EEG oscillatory activity and psychological state are mixed (assessment revision 1)" ;
     dct:description "A systematic review finds the effects of binaural-beat stimulation on brain oscillatory activity and on psychological/cognitive state to be inconsistent across studies. The perceived beat is a central construct with no acoustic periodicity, so the subcortical FFR does not straightforwardly transfer." ;
+    sstim:evaluatesSubject sstim-v:techBinauralBeats ;
     sstim:supportsRelation sstim-v:techBinauralBeats ;
     sstim:hasEvidenceTier sstim-v:tierPreliminary ;
-    sstim:hasModalityTag sstim-v:modalityAUD, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimMixed ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:INGENDOH_2023 ;
-    sstim:evidenceOutcome "Reported effects on EEG and state are mixed/inconsistent; no reliable modality-matched outcome established." ;
-    sstim:studyPopulation "Healthy adults" ;
-    sstim:comparator "Sham / no binaural beat" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:binaural-beats-state-mixed ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-# ── Explicit negative assertions (tier <= 2, legitimately uncited) ───────────
+<https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techBinauralBeats ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/binaural-state-response-reliability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The binaural-beats technique produces a reliable, generalizable modality-matched state response under sham or no-beat comparison."@en .
 
-bsclab-evidence:color-field-chromotherapy-negative a sstim:EvidenceClaim ;
-    rdfs:label "No established colour-specific physiological effect ('chromotherapy')" ;
-    dct:description "Migrated from techColorFieldStimulation's editorial note: there is no established neurophysiological mechanism and no controlled evidence that a specific colour produces a specific physiological or therapeutic effect. A steady colour field is an aesthetic/ambient stimulus; reported calming experiences should be represented as contextual self-report, not as a colour-specific physiological effect." ;
-    sstim:supportsRelation sstim-v:techColorFieldStimulation ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityVIS ;
-    sstim:hasClaimDirection sstim-v:claimRefutes ;
-    sstim:evidenceOutcome "No colour-specific physiological or therapeutic effect supported." ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+<https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityAuditory ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:scopeInterventionOrContext sstim-v:techBinauralBeats ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/sham-or-no-beat> .
 
-bsclab-evidence:solfeggio-tuning-negative a sstim:EvidenceClaim ;
-    rdfs:label "No tuning-specific physiological effect for 'Solfeggio' / mystical tunings" ;
-    dct:description "Migrated from techSolfeggioTuning's editorial note: there is no established mechanism and no controlled evidence that 'Solfeggio' / mystical tunings (e.g. 432 Hz, 528 Hz) produce specific physiological effects beyond ordinary music, relaxation, and expectancy." ;
-    sstim:supportsRelation sstim-v:techSolfeggioTuning ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
-    sstim:hasClaimDirection sstim-v:claimRefutes ;
-    sstim:evidenceOutcome "No tuning-specific physiological effect supported; use aesthetically and honestly." ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+<https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:INGENDOH_2023 ;
+    sstim:basisSensoryModality sstim-v:modalityAuditory ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:basisStudyDesign sstim-v:designMixedDesigns ;
+    sstim:basisSynthesisType sstim-v:synthesisSystematicReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/binaural-state-response-reliability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/sham-or-no-beat> ;
+    sstim:basisOutcomeNote "Reported effects on EEG and state are mixed/inconsistent across the reviewed studies; no reliable modality-matched outcome established."@en .
 
-bsclab-evidence:reference-pitch-432-inconclusive a sstim:EvidenceClaim ;
-    rdfs:label "432 Hz vs 440 Hz reference-pitch retuning — inconclusive for BSC use" ;
-    dct:description "Migrated from techReferencePitchRetuning's evidenceNotes: the few small double-blind crossover pilots tested full transposed music, confounding absolute tuning with overall pitch-lowering and tempo, and none tested a retuned carrier under a binaural/isochronic beat — a modality/population mismatch that discounts transfer to BSC's use case. Honest ceiling: anecdotal / inconclusive. Audit any pilot's venue before promoting the tier above 2." ;
-    sstim:supportsRelation sstim-v:techReferencePitchRetuning ;
-    sstim:hasEvidenceTier sstim-v:tierAnecdotal ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:evidenceOutcome "No robust tuning-specific physiological effect for BSC's carrier-under-beat use case; pilot evidence confounded." ;
-    sstim:studyPopulation "Music-listening pilots (not BSC carrier-under-beat)" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-08"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+<https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/basis-1>,
+        sstim-ref:INGENDOH_2023,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
 
-# ── Cross-modal and paced-cue measurable-response evidence ─────────────────
+bsclab-evidence:binaural-beats-state-mixed
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
 
-bsclab-evidence:slow-breathing-physiology-review a sstim:EvidenceClaim ;
-    rdfs:label "Slow breathing is associated with measurable cardiorespiratory and central responses" ;
-    dct:description "A systematic review of slow breathing in healthy participants reports measurable cardiorespiratory and central nervous-system correlates, while noting heterogeneity across methods and outcomes. This supports the plausibility of a paced cue and mechanism research, not a guaranteed wellness or treatment outcome." ;
+# ── 4. Slow-breathing component applicability (indirect) ─────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Slow breathing is associated with measurable psychophysiological correlates (assessment revision 1)" ;
+    dct:description "Conditional, indirect component-applicability assessment: a systematic review of slow breathing in healthy participants reports measurable cardiorespiratory and central correlates. The source studies breathing behavior; it is not evidence about the Martigli auditory cue itself." ;
+    sstim:evaluatesSubject bsc-fw-tech:martigli-breathing-oscillation ;
     sstim:supportsRelation bsc-fw-tech:martigli-breathing-oscillation ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
-    sstim:hasModalityTag sstim-v:modalityBREATH, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:ZACCARO_2018 ;
-    sstim:evidenceOutcome "Slow breathing below 10 cycles per minute is associated with measurable respiratory, cardiovascular, and central correlates; direction and magnitude vary by protocol." ;
-    sstim:studyPopulation "Healthy human participants across studies in a systematic review" ;
-    sstim:comparator "Spontaneous breathing, baseline, or faster breathing conditions depending on study" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:slow-breathing-physiology-review ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-bsclab-evidence:ssvep-photic-response a sstim:EvidenceClaim ;
-    rdfs:label "Periodic visual stimulation evokes a steady-state visual response" ;
-    dct:description "Periodic luminance or contrast stimulation can evoke a frequency-tagged steady-state visual response. This is a measurable electrophysiological response and does not establish a downstream cognitive, wellness, or clinical effect." ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject bsc-fw-tech:martigli-breathing-oscillation ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/slow-breathing-component-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "If the breathing component of the Martigli breathing-oscillation technique actually elicits slow breathing below ten cycles per minute, that breathing behavior is associated with measurable psychophysiological correlates in healthy humans relative to baseline, spontaneous, or faster breathing; the proposition does not assess the auditory guidance itself."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:scopeNotApplicable ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:scopeInterventionOrContext bsc-fw-tech:martigli-breathing-oscillation ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/baseline-spontaneous-or-faster-breathing> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:ZACCARO_2018 ;
+    sstim:basisModalityApplicability sstim-v:applicabilityNotApplicable ;
+    sstim:basisIntervention <https://w3id.org/sstim/implementation/bsclab/evidence/intervention/paced-slow-breathing> ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:basisStudyDesign sstim-v:designMixedDesigns ;
+    sstim:basisSynthesisType sstim-v:synthesisSystematicReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/slow-breathing-component-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/baseline-spontaneous-or-faster-breathing> ;
+    sstim:basisOutcomeNote "Slow breathing below 10 cycles per minute is associated with measurable respiratory, cardiovascular, and central correlates; direction and magnitude vary by protocol."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/basis-1>,
+        sstim-ref:ZACCARO_2018,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:slow-breathing-physiology-review
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── 5. SSVEP / photic component applicability ────────────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Periodic visual stimulation evokes a steady-state visual response (assessment revision 1)" ;
+    dct:description "Periodic luminance or contrast stimulation can evoke a frequency-tagged steady-state visual response. A measurable electrophysiological response; no downstream cognitive, wellness, or clinical effect is established." ;
+    sstim:evaluatesSubject sstim-v:techPhoticDriving ;
     sstim:supportsRelation sstim-v:techPhoticDriving ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
-    sstim:hasModalityTag sstim-v:modalityVIS, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:VIALATTE_2010 ;
-    sstim:evidenceOutcome "Frequency-specific phase-locked visual evoked activity can be measured during periodic visual stimulation." ;
-    sstim:studyPopulation "Human visual electrophysiology studies summarized in a review" ;
-    sstim:comparator "Non-periodic, non-matched, or alternative-frequency visual conditions depending on study" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:ssvep-photic-response ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-bsclab-evidence:sssep-vibrotactile-response a sstim:EvidenceClaim ;
-    rdfs:label "Periodic vibrotactile stimulation evokes a steady-state somatosensory response" ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techPhoticDriving ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ssvep-component-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The periodic luminance or contrast component of the photic-driving technique can evoke frequency-specific phase-locked visual activity."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityVisual ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-visual-electrophysiology> ;
+    sstim:scopeInterventionOrContext sstim-v:techPhoticDriving ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/non-periodic-or-alternative-frequency> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:VIALATTE_2010 ;
+    sstim:basisSensoryModality sstim-v:modalityVisual ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-visual-electrophysiology> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/ssvep-component-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/non-periodic-or-alternative-frequency> ;
+    sstim:basisOutcomeNote "Frequency-specific phase-locked visual evoked activity can be measured during periodic visual stimulation."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/basis-1>,
+        sstim-ref:VIALATTE_2010,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:ssvep-photic-response
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── 6. SSSEP / vibrotactile component applicability ──────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Periodic vibrotactile stimulation evokes a steady-state somatosensory response (assessment revision 1)" ;
     dct:description "A literature review of EEG-based interfaces documents phase-locked steady-state somatosensory responses to sustained periodic skin stimulation. The claim is limited to measurability of the response." ;
+    sstim:evaluatesSubject sstim-v:techVibrotactileEntrainment ;
     sstim:supportsRelation sstim-v:techVibrotactileEntrainment ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
-    sstim:hasModalityTag sstim-v:modalityTACTILE, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:PETIT_2021 ;
-    sstim:evidenceOutcome "Periodic mechanical skin stimulation can elicit an oscillatory, phase-locked EEG component described as SSSEP." ;
-    sstim:studyPopulation "Human participants in SSSEP and brain-computer-interface studies summarized in a review" ;
-    sstim:comparator "Alternative stimulation frequencies, attention conditions, or non-target channels depending on study" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:sssep-vibrotactile-response ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-bsclab-evidence:multisensory-integration-mechanism a sstim:EvidenceClaim ;
-    rdfs:label "Convergent processing supports a multisensory integration mechanism" ;
-    dct:description "A neuroscience review supports the existence of integrative neural processing across sensory channels. It does not imply that merely combining arbitrary audio, visual, or tactile stimuli improves a wellness outcome." ;
+<https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techVibrotactileEntrainment ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/sssep-component-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The periodic skin-stimulation component of the vibrotactile-entrainment technique can evoke a phase-locked steady-state somatosensory response."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalitySomatosensory ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-sssep-bci> ;
+    sstim:scopeInterventionOrContext sstim-v:techVibrotactileEntrainment ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/source-specific-conditions> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:PETIT_2021 ;
+    sstim:basisSensoryModality sstim-v:modalitySomatosensory ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-sssep-bci> ;
+    sstim:basisStudyDesign sstim-v:designMixedDesigns ;
+    sstim:basisSynthesisType sstim-v:synthesisLiteratureReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/sssep-component-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/source-specific-conditions> ;
+    sstim:basisOutcomeNote "Periodic mechanical skin stimulation can elicit an oscillatory, phase-locked EEG component described as SSSEP."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/basis-1>,
+        sstim-ref:PETIT_2021,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:sssep-vibrotactile-response
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── 7. Multisensory integration mechanism (indirect) ─────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Convergent processing supports a multisensory integration mechanism (assessment revision 1)" ;
+    dct:description "Conditional, indirect mechanism-applicability assessment: a neuroscience review supports integrative neural processing across sensory channels under context- and timing-dependent conditions. It does not establish audiovisual entrainment or a wellness benefit." ;
+    sstim:evaluatesSubject sstim-v:techAudiovisualEntrainment ;
     sstim:supportsRelation sstim-v:techAudiovisualEntrainment ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
-    sstim:hasModalityTag sstim-v:modalityAV, sstim-v:modalityMULTISENSORY, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/basis-1> ;
     sstim:citesReference sstim-ref:STEIN_STANFORD_2008 ;
-    sstim:evidenceOutcome "Neural circuits can integrate information across modalities under context- and timing-dependent conditions." ;
-    sstim:studyPopulation "Neuroscience evidence reviewed across experimental models" ;
-    sstim:comparator "Unisensory and incongruent multisensory conditions depending on cited study" ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:reviewedBy "BSC Lab editorial" ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:multisensory-integration-mechanism ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:techAudiovisualEntrainment ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/audiovisual-integration-mechanism-applicability> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The auditory and visual components of the audiovisual-entrainment technique fall within modalities that can participate in context- and timing-dependent multisensory integration; this indirect mechanism applicability does not establish entrainment or benefit."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityAuditory, sstim-v:modalityVisual ;
+    sstim:scopePopulationOrModel sstim-v:modelMixedModels ;
+    sstim:scopeInterventionOrContext sstim-v:techAudiovisualEntrainment ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unisensory-or-incongruent> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:STEIN_STANFORD_2008 ;
+    sstim:basisSensoryModality sstim-v:modalityAuditory, sstim-v:modalityVisual ;
+    sstim:basisModalityApplicability sstim-v:applicabilityMixedModalities ;
+    sstim:basisStudyModel sstim-v:modelMixedModels ;
+    sstim:basisStudyDesign sstim-v:designMixedDesigns ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/audiovisual-integration-mechanism-applicability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/unisensory-or-incongruent> ;
+    sstim:basisOutcomeNote "Neural circuits can integrate information across modalities under context- and timing-dependent conditions; heterogeneous experimental models."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/basis-1>,
+        sstim-ref:STEIN_STANFORD_2008,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:multisensory-integration-mechanism
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+# ── Retired universal refutations → scoped knowledge-status assertions ────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/color-field-chromotherapy-negative/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for techColorFieldStimulation (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-07-13"^^xsd:date ;
+    sstim-ex:knowledgeScopeNote "No evidence of a colour-specific physiological or therapeutic effect is recorded in the BSC Lab curated SSTIM corpus as of this date; this is a statement about the named corpus, not a universal claim about the world."@en ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/color-field-chromotherapy-negative/status/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:color-field-chromotherapy-negative .
+
+sstim-v:techColorFieldStimulation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/color-field-chromotherapy-negative/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/color-field-chromotherapy-negative/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:color-field-chromotherapy-negative
+    owl:deprecated true ;
+    rdfs:label "Retired universal refutation; replaced by a scoped knowledge-status assertion"@en ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/color-field-chromotherapy-negative/status/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/solfeggio-tuning-negative/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for techSolfeggioTuning (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-07-13"^^xsd:date ;
+    sstim-ex:knowledgeScopeNote "No evidence of a tuning-specific physiological effect for Solfeggio / mystical tunings is recorded in the BSC Lab curated SSTIM corpus as of this date; a statement about the named corpus, not the world."@en ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/solfeggio-tuning-negative/status/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:solfeggio-tuning-negative .
+
+sstim-v:techSolfeggioTuning sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/solfeggio-tuning-negative/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/solfeggio-tuning-negative/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:solfeggio-tuning-negative
+    owl:deprecated true ;
+    rdfs:label "Retired universal refutation; replaced by a scoped knowledge-status assertion"@en ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/solfeggio-tuning-negative/status/1> ;
+    dct:modified "2026-07-13"^^xsd:date .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/reference-pitch-432-inconclusive/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for techReferencePitchRetuning (unknownToSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-07-13"^^xsd:date ;
+    sstim-ex:knowledgeScopeNote "The BSC Lab curated SSTIM corpus has not assessed 432 Hz reference-pitch retuning; small unidentified pilots are mentioned in the literature, so no-evidence-recorded would overstate the corpus scope. It may become an evidence assessment once a named basis is identified."@en ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/reference-pitch-432-inconclusive/status/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:reference-pitch-432-inconclusive .
+
+sstim-v:techReferencePitchRetuning sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/reference-pitch-432-inconclusive/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/reference-pitch-432-inconclusive/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:reference-pitch-432-inconclusive
+    owl:deprecated true ;
+    rdfs:label "Retired universal refutation; replaced by a scoped knowledge-status assertion"@en ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/reference-pitch-432-inconclusive/status/1> ;
+    dct:modified "2026-07-13"^^xsd:date .

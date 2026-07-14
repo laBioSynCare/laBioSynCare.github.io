@@ -59,7 +59,7 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 7152 ;
+    void:triples 7294 ;
     void:classes 92 ;
     void:properties 200 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
@@ -189,7 +189,7 @@
     dct:title "BSC Lab public SSTIM instance data"@en ;
     dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, and synthetic session records. Private BioSynCare catalog data and real participant records are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 1394 ;
+    void:triples 1523 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ref/" ;

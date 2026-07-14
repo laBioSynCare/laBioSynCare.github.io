@@ -37,65 +37,74 @@ beforeAll(() => {
   validator = new SHACLValidator(shapes)
   // The ontology modules supply the class hierarchy (e.g. ExploratoryProtocol
   // ⊑ SensoryStimulationProtocol) that sh:targetClass needs to reach the
-  // exported nodes, mirroring `make shacl-instances`.
-  baseQuads = ['sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-exposure.ttl'].flatMap(parseTtl)
+  // exported nodes; the BSC framework instance types the sstim:definedByFramework
+  // target the export references. Mirrors `make shacl-instances` against the
+  // authoritative graph the app loads at runtime.
+  baseQuads = [
+    'sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-exposure.ttl',
+    'instances/frameworks/bsc.ttl',
+  ].flatMap(parseTtl)
 })
 
-function violationKeys(state) {
+function report(state) {
   const data = new Store(baseQuads)
   for (const q of fieldStateToQuads(state, { id: EXPORT_ID, now: NOW })) data.add(q)
-  const report = validator.validate(data)
-  return report.results
+  return validator.validate(data)
+}
+
+function violationKeys(rep) {
+  return rep.results
     .map((r) => {
       const focus = r.focusNode?.value ?? ''
       const frag = focus.includes('#') ? focus.split('#')[1] : 'protocol'
-      const path = r.path?.value.split(/[#/]/).pop() ?? 'node'
+      const path = r.path?.value?.split(/[#/]/).pop() ?? 'node'
       return `${frag}:${path}`
     })
     .sort()
 }
 
-// Known KR-01 gaps: the exploratory protocol names no defining framework and
-// no technique/editorial-note baseline exception…
-const PROTOCOL_GAPS = ['protocol:definedByFramework', 'protocol:node']
-// …and each generated claim lacks the five mandatory EvidenceClaim fields.
-const claimGaps = (frag) => [
-  `${frag}:evidenceDate`,
-  `${frag}:hasClaimDirection`,
-  `${frag}:hasReviewStatus`,
-  `${frag}:modified`,
-  `${frag}:wasAttributedTo`,
-]
-const golden = (...claimFrags) =>
-  [...PROTOCOL_GAPS, ...claimFrags.flatMap(claimGaps)].sort()
-
+// ADR 0027 closed KR-01: the runtime export now carries a defining framework,
+// technique/editorial-note baseline, and role-specific statements (hypotheses,
+// research questions, boundary applicability) instead of manufactured evidence
+// claims. Every state in the matrix must produce a SHACL-conformant graph.
 const matrix = [
-  ['default (visual + audio, no beat)', (s) => s, golden('self-observation-claim')],
-  ['visual only', (s) => { s.audio.enabled = false }, golden('self-observation-claim')],
-  ['audio only', (s) => { s.visual.enabled = false }, golden('self-observation-claim')],
-  ['monaural beat', (s) => { s.audio.beatMode = 'monaural'; s.audio.beatRateHz = 4 }, golden('self-observation-claim')],
-  ['binaural beat', (s) => { s.audio.beatMode = 'binaural'; s.audio.beatRateHz = 4 }, golden('self-observation-claim')],
-  ['free-view depth', (s) => { s.depth.enabled = true }, golden('self-observation-claim', 'stereo-depth-claim')],
-  ['blinking field', (s) => { s.visual.blinkEnabled = true; s.visual.blinkRateHz = 3 }, golden('photosensitivity-claim', 'self-observation-claim')],
+  ['default (visual + audio, no beat)', (s) => s],
+  ['visual only', (s) => { s.audio.enabled = false }],
+  ['audio only', (s) => { s.visual.enabled = false }],
+  ['monaural beat', (s) => { s.audio.beatMode = 'monaural'; s.audio.beatRateHz = 4 }],
+  ['binaural beat', (s) => { s.audio.beatMode = 'binaural'; s.audio.beatRateHz = 4 }],
+  ['free-view depth', (s) => { s.depth.enabled = true }],
+  ['blinking field', (s) => { s.visual.blinkEnabled = true; s.visual.blinkRateHz = 3 }],
   ['mixed (blink + depth + binaural)', (s) => {
     s.visual.blinkEnabled = true
     s.visual.blinkRateHz = 3
     s.depth.enabled = true
     s.audio.beatMode = 'binaural'
     s.audio.beatRateHz = 4
-  }, golden('photosensitivity-claim', 'self-observation-claim', 'stereo-depth-claim')],
+  }],
 ]
 
 describe('exposureProfile SHACL conformance (golden, KR-01)', () => {
-  it.each(matrix)('%s produces exactly the known violation set', (_label, mutate, expected) => {
+  it.each(matrix)('%s exports a SHACL-conformant graph', (_label, mutate) => {
     const state = createFieldState()
     mutate(state)
-    expect(violationKeys(state)).toEqual(expected)
+    const rep = report(state)
+    expect(violationKeys(rep)).toEqual([])
+    expect(rep.conforms).toBe(true)
+  })
+
+  it('emits no deprecated evidence-claim typing', () => {
+    const state = createFieldState()
+    state.depth.enabled = true
+    state.visual.blinkEnabled = true
+    const objs = fieldStateToQuads(state, { id: EXPORT_ID, now: NOW }).map((q) => q.object.value)
+    expect(objs).not.toContain('https://w3id.org/sstim#EvidenceClaim')
+    expect(objs).not.toContain('https://w3id.org/sstim/exposure#ExposureEffectClaim')
   })
 
   it('validator sanity: the curated fixture conforms', () => {
     const data = new Store(baseQuads)
-    for (const q of ['instances/frameworks/bsc.ttl', 'instances/experiments/sensory-field-example.ttl'].flatMap(parseTtl)) {
+    for (const q of parseTtl('instances/experiments/sensory-field-example.ttl')) {
       data.add(q)
     }
     expect(validator.validate(data).conforms).toBe(true)

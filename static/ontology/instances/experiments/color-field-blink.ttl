@@ -24,7 +24,9 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
     sstim-ex:usesStimulusChannel this:visual-channel ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
-    sstim-ex:hasEffectClaim this:color-arousal-claim, this:photosensitivity-risk-claim, this:heart-rate-hypothesis .
+    sstim-ex:hasHypothesis this:color-arousal-claim ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-risk-claim ;
+    sstim-ex:hasResearchQuestion this:heart-rate-hypothesis .
 
 this:visual-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Blinking color-field visual channel"@en ;
@@ -33,49 +35,30 @@ this:visual-channel a sstim-ex:StimulusChannel ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
     sstim-ex:hasStimulusPattern sstim-ex:patternBlinking, sstim-ex:patternFixedColor, sstim-ex:patternChangingColor, sstim-ex:visualFieldStaticColor ;
-    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain .
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-risk-claim .
 
-this:color-arousal-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:color-arousal-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Color-field arousal hypothesis"@en ;
     dct:description "Hypothesizes that static or blinking color fields may differ in perceived arousal or discomfort. No direction or magnitude is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectArousal, sstim-ex:effectDiscomfort ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:photosensitivity-risk-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:photosensitivity-risk-claim a sstim-ex:BoundaryApplicabilityStatement ;
     rdfs:label "Photosensitivity risk boundary"@en ;
     dct:description "Marks flicker and high-intensity visual exposure as requiring conservative photosensitivity handling. No clinical screening rule is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectPhotosensitivityRisk ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
+    sstim-ex:appliesBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:heart-rate-hypothesis a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:heart-rate-hypothesis a sstim-ex:ResearchQuestion ;
     rdfs:label "Heart-rate response hypothesis"@en ;
     dct:description "Records a question about whether blinking or static color fields relate to heart-rate changes. SSTIM records no settled answer here."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectHeartRate, sstim-ex:effectBloodPressure, sstim-ex:effectBreathRate ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
-
-this:color-arousal-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:photosensitivity-risk-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:heart-rate-hypothesis
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

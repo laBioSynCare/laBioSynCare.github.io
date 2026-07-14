@@ -24,7 +24,9 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
     sstim-ex:usesStimulusChannel this:audio-channel ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk ;
-    sstim-ex:hasEffectClaim this:pleasantness-claim, this:calm-stress-claim, this:noise-definition-claim .
+    sstim-ex:hasHypothesis this:pleasantness-claim ;
+    sstim-ex:hasResearchQuestion this:calm-stress-claim ;
+    sstim-ex:hasProtocolRequirement this:noise-definition-claim .
 
 this:audio-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Colored-noise audio channel"@en ;
@@ -43,47 +45,26 @@ this:audio-channel a sstim-ex:StimulusChannel ;
         sstim-ex:audioNoiseBlackSilence ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
 
-this:pleasantness-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:pleasantness-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Noise pleasantness hypothesis"@en ;
     dct:description "Hypothesizes that named noise colors may differ in perceived pleasantness. The protocol must define spectral slope or generation method before comparison."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
     sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:calm-stress-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:calm-stress-claim a sstim-ex:ResearchQuestion ;
     rdfs:label "Calm/stress response hypothesis"@en ;
     dct:description "Records the question of whether different noise colors relate to calm or stress reports. No effect direction is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
     sstim-ex:concernsEffectDimension sstim-ex:effectCalm, sstim-ex:effectStress ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:noise-definition-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:noise-definition-claim a sstim-ex:ProtocolRequirement ;
     rdfs:label "Noise naming definition requirement"@en ;
     dct:description "Marks color-noise names as vocabulary labels that require spectral definition for reproducible experiments."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM .
-
-this:pleasantness-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:calm-stress-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:noise-definition-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

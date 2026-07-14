@@ -25,9 +25,7 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
     sstim-ex:usesStimulusChannel this:phone-smell-channel, this:perfume-device-channel, this:device-taste-channel ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery, sstim-ex:capabilityTasteDelivery ;
-    sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility ;
-    sstim-ex:hasEffectClaim this:olfactory-relevance-claim, this:gustatory-boundary-claim .
-
+    sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility  .
 this:phone-smell-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Phone smell channel"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumOlfactoryChemicalExposure ;
@@ -52,32 +50,3 @@ this:device-taste-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasBodyPlacement sstim-ex:placementMouth ;
     sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope .
 
-this:olfactory-relevance-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
-    rdfs:label "Olfactory modality relevance"@en ;
-    dct:description "States only that smell is a modelable sensory modality for SSTIM exposure profiles. It does not claim current BSC Lab scent-delivery capability."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness, sstim-ex:effectDiscomfort ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
-
-this:gustatory-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
-    rdfs:label "Gustatory delivery boundary"@en ;
-    dct:description "States that taste is modelable but current BSC Lab device workflows do not deliver taste stimuli."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness, sstim-ex:effectDiscomfort ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab .
-
-this:olfactory-relevance-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:gustatory-boundary-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

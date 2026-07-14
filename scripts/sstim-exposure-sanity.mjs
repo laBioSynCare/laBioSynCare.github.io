@@ -117,15 +117,15 @@ SELECT ?experiment ?capability WHERE {
 ORDER BY ?experiment ?capability
 `, 9)
 
-await assertRows(store, 'effect claims and knowledge status', `${prefixes}
+await assertRows(store, 'exposure hypotheses and knowledge status', `${prefixes}
 SELECT ?claim ?status WHERE {
   GRAPH ?g {
-    ?claim a sstim-ex:ExposureEffectClaim ;
+    ?claim a sstim-ex:ExposureHypothesis ;
       sstim-ex:hasKnowledgeStatus ?status .
   }
 }
 ORDER BY ?claim ?status
-`, 9)
+`, 7)
 
 await assertRows(store, 'not currently deliverable by BSC Lab', `${prefixes}
 SELECT ?resource WHERE {

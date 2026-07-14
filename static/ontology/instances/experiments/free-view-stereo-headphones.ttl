@@ -26,7 +26,8 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasPerceptualGain sstim-ex:gainStereoDepth, sstim-ex:gainAudioImmersion, sstim-ex:gainSpatialAudio ;
     sstim-ex:hasPerceptualLoss sstim-ex:lossHorizontalField, sstim-ex:lossEnvironmentalAwareness ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryEyeStrain, sstim-ex:boundaryHearingRisk ;
-    sstim-ex:hasEffectClaim this:stereo-depth-claim, this:audio-immersion-claim, this:eye-strain-risk-claim .
+    sstim-ex:hasHypothesis this:stereo-depth-claim, this:audio-immersion-claim ;
+    sstim-ex:hasBoundaryApplicability this:eye-strain-risk-claim .
 
 this:visual-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Free-view stereoscopic visual channel"@en ;
@@ -35,7 +36,8 @@ this:visual-channel a sstim-ex:StimulusChannel ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityFreeViewStereoscopy ;
     sstim-ex:hasBodyPlacement sstim-ex:placementEyes, sstim-ex:placementHands ;
     sstim-ex:hasStimulusPattern sstim-ex:patternStatic, sstim-ex:patternMoving ;
-    sstim-ex:hasComfortBoundary sstim-ex:boundaryEyeStrain .
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasBoundaryApplicability this:eye-strain-risk-claim .
 
 this:audio-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Headphone audio channel"@en ;
@@ -46,47 +48,27 @@ this:audio-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk, sstim-ex:boundaryEnvironmentalAwareness .
 
-this:stereo-depth-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:stereo-depth-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Stereo-depth perception hypothesis"@en ;
     dct:description "Hypothesizes increased perceived depth from free-view stereoscopy while noting reduced horizontal visual field."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAV ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectImmersion, sstim-ex:effectEyeStrain ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:concernsEffectDimension sstim-ex:effectImmersion ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:audio-immersion-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:audio-immersion-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Audio immersion hypothesis"@en ;
     dct:description "Hypothesizes greater perceived audio immersion from stereo-separated headphone presentation while noting environmental-awareness loss."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAUD ;
     sstim-ex:concernsEffectDimension sstim-ex:effectImmersion ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:eye-strain-risk-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:eye-strain-risk-claim a sstim-ex:BoundaryApplicabilityStatement ;
     rdfs:label "Eye-strain risk boundary"@en ;
     dct:description "Marks free-view or near-eye stereoscopic use as requiring an eye-comfort boundary. No clinical safety threshold is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectEyeStrain ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
-
-this:stereo-depth-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:audio-immersion-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:eye-strain-risk-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

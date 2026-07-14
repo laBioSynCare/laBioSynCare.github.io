@@ -659,13 +659,14 @@
   {#if exportOpen}
     <div class="export-panel">
       <header>
-        <h3>Exposure profile (Turtle) — draft</h3>
+        <h3>Exposure profile (Turtle)</h3>
         <button type="button" class="linklike" onclick={() => (exportOpen = false)}>Close</button>
       </header>
       <p class="export-note">
-        Lossy summary of the current field. It does not yet validate against the
-        SSTIM SHACL shapes and omits some visual parameters, so treat it as a
-        description of this session, not a conformant SSTIM artifact.
+        An SSTIM-conformant exposure profile for the current field: a delivery
+        description with qualified hypotheses, research questions, and boundary
+        applicability — never an efficacy claim. Some visual detail (colours,
+        depth grid) is still summarised rather than fully captured.
       </p>
       <textarea readonly rows="12">{exportTtl}</textarea>
       <div class="export-actions">

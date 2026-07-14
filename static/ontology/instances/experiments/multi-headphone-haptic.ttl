@@ -26,7 +26,8 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityMultiDeviceBodyPlacement ;
     sstim-ex:hasPerceptualGain sstim-ex:gainBodyVibration ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk, sstim-ex:boundaryBodyContactComfort ;
-    sstim-ex:hasEffectClaim this:tactile-audio-claim, this:hearing-boundary-claim .
+    sstim-ex:hasHypothesis this:tactile-audio-claim ;
+    sstim-ex:hasBoundaryApplicability this:hearing-boundary-claim .
 
 this:hand-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Hand-placed acoustic vibration channel"@en ;
@@ -53,32 +54,19 @@ this:head-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:patternRhythmic ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryBodyContactComfort .
 
-this:tactile-audio-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:tactile-audio-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Audio-as-tactile hypothesis"@en ;
     dct:description "Hypothesizes that sufficiently intense or contact-coupled audio may be perceived as tactile or body vibration. No comfort threshold or efficacy claim is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectTactileSensation, sstim-ex:effectBodyVibration ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:hearing-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:hearing-boundary-claim a sstim-ex:BoundaryApplicabilityStatement ;
     rdfs:label "Hearing comfort boundary"@en ;
     dct:description "Marks the need to separate body-vibration exploration from uncomfortable or unsafe hearing exposure."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectHearingRisk, sstim-ex:effectDiscomfort ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
-
-this:tactile-audio-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryHearingRisk ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:hearing-boundary-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

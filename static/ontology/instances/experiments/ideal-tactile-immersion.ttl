@@ -45,7 +45,10 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasPerceptualGain sstim-ex:gainTactileImmersion, sstim-ex:gainBodyVibration, sstim-ex:gainThermalProximity, sstim-ex:gainSpatialPresence ;
     sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryBodyContactComfort, sstim-ex:boundaryThermalComfort, sstim-ex:boundaryIsolation, sstim-ex:boundaryBalanceRisk ;
-    sstim-ex:hasEffectClaim this:tactile-immersion-claim, this:temperature-proximity-claim, this:gravity-joint-claim, this:wearable-array-claim, this:spatial-presence-claim, this:balance-boundary-claim .
+    sstim-ex:hasDesignObjective this:tactile-immersion-claim, this:gravity-joint-claim, this:wearable-array-claim ;
+    sstim-ex:hasHypothesis this:temperature-proximity-claim ;
+    sstim-ex:hasProtocolRequirement this:spatial-presence-claim ;
+    sstim-ex:hasBoundaryApplicability this:balance-boundary-claim .
 
 this:textile-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Textile/clothing tactile channel"@en ;
@@ -106,92 +109,50 @@ this:room-scale-locomotion-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternAdaptive ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryBalanceRisk, sstim-ex:boundaryEnvironmentalAwareness .
 
-this:tactile-immersion-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:tactile-immersion-claim a sstim-ex:ExposureDesignObjective ;
     rdfs:label "Full-body tactile immersion hypothesis"@en ;
     dct:description "Hypothesizes a future capability for full-body tactile immersion through multiple delivery media. Current BSC Lab systems do not deliver this."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectImmersion, sstim-ex:effectTactileSensation ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:temperature-proximity-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:temperature-proximity-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Temperature/proximity hypothesis"@en ;
     dct:description "Models temperature and airflow as possible cues for tactile proximity or environmental presence. No physiological benefit is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectTemperaturePerception ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:gravity-joint-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:gravity-joint-claim a sstim-ex:ExposureDesignObjective ;
     rdfs:label "Joint force and gravity-cue hypothesis"@en ;
     dct:description "Models pull, push, joint force, spinning, and gravity-like cueing as future immersion concepts requiring device capability review."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectGravityPerception, sstim-ex:effectImmersion ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:wearable-array-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:wearable-array-claim a sstim-ex:ExposureDesignObjective ;
     rdfs:label "Wearable speaker/light array concept"@en ;
     dct:description "Models clothing with distributed speakers, tactile display/camera concepts, and visible or invisible-spectrum light emitters as future device-capability concepts requiring literature and implementation review."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
     sstim-ex:concernsEffectDimension sstim-ex:effectBodyVibration, sstim-ex:effectImmersion ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:spatial-presence-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:spatial-presence-claim a sstim-ex:ProtocolRequirement ;
     rdfs:label "Walking/moving spatial-presence hypothesis"@en ;
     dct:description "Models volume immersion as requiring room-scale movement, position tracking, locomotion support, outside-vision occlusion, spatial audio, and visual motion/parallax. No guaranteed effect is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAV, sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectSpatialPresence, sstim-ex:effectProprioception ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:balance-boundary-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:balance-boundary-claim a sstim-ex:BoundaryApplicabilityStatement ;
     rdfs:label "Room-scale balance-risk boundary"@en ;
     dct:description "Marks walking or locomotion immersion as requiring explicit balance, environmental-awareness, and physical-space boundaries."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectBalanceRisk ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab .
-
-this:tactile-immersion-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryBalanceRisk, sstim-ex:boundaryEnvironmentalAwareness ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:notCurrentlyDeliverableByBSCLab ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:temperature-proximity-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:gravity-joint-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:wearable-array-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:spatial-presence-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
-
-this:balance-boundary-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .

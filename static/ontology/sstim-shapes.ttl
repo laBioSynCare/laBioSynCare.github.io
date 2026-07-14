@@ -466,114 +466,211 @@ sstim-sh:MartigliBinauralVoiceShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Evidence Claim Shape
+# Evidence Assessment Shapes (ADR 0027)
 ###########################################################################
 
+# EvidenceClaim is only a compatibility superclass: every instance must carry
+# the concrete EvidenceAssessmentClaim subtype. A bare EvidenceClaim is rejected.
 sstim-sh:EvidenceClaimShape a sh:NodeShape ;
     sh:targetClass sstim:EvidenceClaim ;
     sh:name "EvidenceClaim"@en ;
+    sh:class sstim:EvidenceAssessmentClaim ;
+    sh:message "A bare sstim:EvidenceClaim is not allowed: it must carry the concrete sstim:EvidenceAssessmentClaim subtype (ADR 0027)."@en .
+
+sstim-sh:EvidenceAssessmentClaimShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceAssessmentClaim ;
+    sh:name "EvidenceAssessmentClaim"@en ;
 
     sh:property [
         sh:path rdfs:label ; sh:minCount 1 ;
-        sh:message "EvidenceClaim must have a human-readable rdfs:label."@en ;
+        sh:message "EvidenceAssessmentClaim must have a human-readable rdfs:label."@en ;
     ] ;
-
     sh:property [
         sh:path dct:description ; sh:minCount 1 ;
-        sh:message "EvidenceClaim must describe the exact scoped assertion and its limits."@en ;
+        sh:message "EvidenceAssessmentClaim must describe the exact scoped assessment and its limits."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim:hasEvidenceTier ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:class sstim:EvidenceTierValue ;
-        sh:message "EvidenceClaim must have exactly one evidence tier from sstim:EvidenceTierValue."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:hasModalityTag ;
-        sh:minCount 1 ;
-        sh:class sstim:EvidenceModalityTag ;
-        sh:message "EvidenceClaim must have at least one modality tag from sstim:EvidenceModalityTag."@en ;
-    ] ;
-
-    # ADR 0013: when present, supportsRelation must point to a Preset or a Technique
-    # (range is not OWL-inferred under pyshacl, so enforce the union at the data
-    # level). Presence is not required: ExposureEffectClaim (ADR 0010) is dual-typed
-    # sstim:EvidenceClaim but links to its subject via sstim-ex:hasEffectClaim.
-    sh:property [
-        sh:path sstim:supportsRelation ;
+        sh:path sstim:evaluatesSubject ; sh:minCount 1 ; sh:maxCount 1 ;
         sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
-        sh:message "supportsRelation must point to a sstim:Preset or sstim:SensoryStimulationTechnique."@en ;
+        sh:message "EvidenceAssessmentClaim must evaluate exactly one Preset or Technique (ADR 0013 range)."@en ;
     ] ;
-
-    sh:or (
-        [ sh:path sstim:supportsRelation ; sh:minCount 1 ]
-        [ sh:path sstim-ex:concernsEffectDimension ; sh:minCount 1 ]
-    ) ;
-    sh:message "EvidenceClaim must identify its subject through supportsRelation or, for an ExposureEffectClaim, concernsEffectDimension."@en ;
-
+    # supportsRelation, when present as the 0.7 compatibility alias, must equal evaluatesSubject.
+    sh:property [
+        sh:path sstim:supportsRelation ; sh:equals sstim:evaluatesSubject ;
+        sh:message "Deprecated supportsRelation must materialize the same object as evaluatesSubject."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasEvidenceTier ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidenceTierValue ;
+        sh:message "EvidenceAssessmentClaim must have exactly one evidence tier."@en ;
+    ] ;
     sh:property [
         sh:path sstim:hasClaimDirection ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ClaimDirection ;
-        sh:message "EvidenceClaim must have exactly one sstim:ClaimDirection."@en ;
+        sh:message "EvidenceAssessmentClaim must have exactly one claim direction."@en ;
     ] ;
     sh:property [
-        sh:path sstim:hasEffectDirection ; sh:maxCount 1 ; sh:class sstim:EffectDirection ;
-        sh:message "hasEffectDirection must be a single sstim:EffectDirection."@en ;
+        sh:path sstim:assessesProposition ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:AssessmentProposition ;
+        sh:message "EvidenceAssessmentClaim must assess exactly one AssessmentProposition."@en ;
     ] ;
     sh:property [
-        sh:path sstim:hasReviewStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ReviewStatus ;
-        sh:message "EvidenceClaim must have exactly one sstim:ReviewStatus."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:evidenceDate ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "EvidenceClaim must have one xsd:date evidence review date."@en ;
+        sh:path sstim:hasEvidenceBasis ; sh:minCount 1 ; sh:class sstim:EvidenceBasis ;
+        sh:message "EvidenceAssessmentClaim must have at least one qualified evidence basis (ADR 0027 retires the rank-conditional citation exception)."@en ;
     ] ;
     sh:property [
         sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
-        sh:message "EvidenceClaim must identify at least one IRI-valued responsible agent via prov:wasAttributedTo."@en ;
+        sh:message "EvidenceAssessmentClaim must identify at least one IRI-valued responsible agent."@en ;
     ] ;
     sh:property [
         sh:path dct:modified ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "EvidenceClaim must declare one xsd:date dct:modified value."@en ;
+        sh:message "EvidenceAssessmentClaim must declare one xsd:date dct:modified value."@en ;
     ] ;
-    sh:property [
-        sh:path sstim:evidenceOutcome ; sh:datatype xsd:string ;
-        sh:message "evidenceOutcome must be a string."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:studyPopulation ; sh:datatype xsd:string ;
-        sh:message "studyPopulation must be a string."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:comparator ; sh:datatype xsd:string ;
-        sh:message "comparator must be a string."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim:reviewedBy ; sh:datatype xsd:string ;
-        sh:message "reviewedBy must be a string."@en ;
-    ] ;
-
-    # P7.1 (ADR 0018): evidence integrity. A claim at tier preliminary or stronger
-    # (tierRank >= 3) must cite at least one PublicSafeReference. Speculative/
-    # anecdotal claims — and the ExposureEffectClaim hypotheses (all tierSpeculative)
-    # — stay legitimately uncited. SHACL-SPARQL because it is conditional on the
-    # linked tier's rank (full IRIs avoid an sh:prefixes block; pyshacl runs it
-    # without extra flags).
+    # A node cannot be both an evidence assessment and a non-evidence statement role.
+    sh:not [ sh:class sstim-ex:ExposureHypothesis ] ;
+    sh:not [ sh:class sstim-ex:ResearchQuestion ] ;
+    sh:not [ sh:class sstim-ex:BoundaryApplicabilityStatement ] ;
+    sh:not [ sh:class sstim-ex:ProtocolRequirement ] ;
+    sh:not [ sh:class sstim-ex:ExposureDesignObjective ] ;
+    sh:not [ sh:class sstim-ex:PlannedOutcomeSpecification ] ;
+    sh:not [ sh:class sstim-ex:KnowledgeStatusAssertion ] ;
+    # For each bibliographic basis source, a matching citesReference must exist.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "An EvidenceClaim at tier preliminary or stronger (tierRank >= 3) must cite at least one PublicSafeReference via sstim:citesReference."@en ;
+        sh:message "Every bibliographic-reference evidence basis must be mirrored by a matching sstim:citesReference triple (ADR 0027)."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim#hasEvidenceTier> ?tier .
-                ?tier <https://w3id.org/sstim#tierRank> ?rank .
-                FILTER( ?rank >= 3 )
+                $this <https://w3id.org/sstim#hasEvidenceBasis> ?basis .
+                ?basis <https://w3id.org/sstim#basisSource> ?ref .
+                ?ref a <https://w3id.org/sstim#BibliographicReference> .
                 FILTER NOT EXISTS { $this <https://w3id.org/sstim#citesReference> ?ref . }
             }
         """ ;
     ] .
 
+sstim-sh:AssessmentPropositionShape a sh:NodeShape ;
+    sh:targetClass sstim:AssessmentProposition ;
+    sh:name "AssessmentProposition"@en ;
+    sh:property [
+        sh:path sstim:propositionSubject ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
+        sh:message "AssessmentProposition must have exactly one Preset/Technique subject."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:propositionOutcome ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidenceOutcomeConcept ;
+        sh:message "AssessmentProposition must identify exactly one outcome concept."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasAssessmentScope ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:AssessmentScope ;
+        sh:message "AssessmentProposition must have exactly one explicit scope."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasPropositionForm ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidencePropositionForm ;
+        sh:message "AssessmentProposition must have exactly one proposition form."@en ;
+    ] ;
+    sh:or (
+        [ sh:path sstim:propositionText ; sh:minCount 1 ]
+        [ sh:path sstim:propositionDigest ; sh:minCount 1 ]
+    ) ;
+    sh:message "AssessmentProposition must carry exact text or an immutable digest."@en ;
+    # Universal-absence propositions never conform.
+    sh:not [ sh:path sstim:hasPropositionForm ; sh:hasValue sstim-v:formUniversalAbsence ] .
+
+sstim-sh:AssessmentScopeShape a sh:NodeShape ;
+    sh:targetClass sstim:AssessmentScope ;
+    sh:name "AssessmentScope"@en ;
+    sh:property [
+        sh:path sstim:scopeSensoryModality ; sh:minCount 1 ;
+        sh:message "AssessmentScope must state a sensory modality or an explicit scope marker."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:scopePopulationOrModel ; sh:minCount 1 ;
+        sh:message "AssessmentScope must state a population/model or an explicit scope marker."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:scopeInterventionOrContext ; sh:minCount 1 ;
+        sh:message "AssessmentScope must state an intervention/context or an explicit scope marker."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:scopeComparator ; sh:minCount 1 ;
+        sh:message "AssessmentScope must state a comparator or an explicit scope marker."@en ;
+    ] .
+
+sstim-sh:EvidenceBasisShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceBasis ;
+    sh:name "EvidenceBasis"@en ;
+    sh:property [
+        sh:path sstim:basisSource ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "EvidenceBasis must have exactly one basisSource."@en ;
+    ] .
+
+sstim-sh:GovernedResearchOutputShape a sh:NodeShape ;
+    sh:targetClass sstim:GovernedResearchOutput ;
+    sh:name "GovernedResearchOutput"@en ;
+    sh:property [
+        sh:path sstim:hasSourceGovernanceRecord ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:SourceGovernanceRecord ;
+        sh:message "GovernedResearchOutput must have exactly one immutable source-governance record."@en ;
+    ] .
+
+sstim-sh:EvidenceSearchRecordShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceSearchRecord ;
+    sh:name "EvidenceSearchRecord"@en ;
+    sh:property [
+        sh:path sstim:searchQuery ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "EvidenceSearchRecord must record the exact query."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:searchCoverageEnd ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "EvidenceSearchRecord must record its as-of coverage-end date."@en ;
+    ] .
+
+sstim-sh:EvidenceReviewDecisionShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceReviewDecision ;
+    sh:name "EvidenceReviewDecision"@en ;
+    sh:property [
+        sh:path sstim:reviewsAssessment ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidenceAssessmentClaim ;
+        sh:message "EvidenceReviewDecision must review exactly one assessment revision."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasReviewerRelationship ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ReviewerRelationship ;
+        sh:message "EvidenceReviewDecision must record a reviewer relationship."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasIndependenceDetermination ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:IndependenceDetermination ;
+        sh:message "EvidenceReviewDecision must record an independence determination."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasReviewDecision ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:ReviewDecisionValue ;
+        sh:message "EvidenceReviewDecision must record a decision value."@en ;
+    ] .
+
+sstim-sh:BoundaryApplicabilityStatementShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:BoundaryApplicabilityStatement ;
+    sh:name "BoundaryApplicabilityStatement"@en ;
+    sh:property [
+        sh:path sstim-ex:appliesBoundary ; sh:minCount 1 ;
+        sh:or ( [ sh:class sstim-ex:ComfortBoundary ] [ sh:class sstim-ex:ExposureLimit ] ) ;
+        sh:message "BoundaryApplicabilityStatement must apply at least one ComfortBoundary or ExposureLimit."@en ;
+    ] .
+
+sstim-sh:KnowledgeStatusAssertionShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:KnowledgeStatusAssertion ;
+    sh:name "KnowledgeStatusAssertion"@en ;
+    sh:property [
+        sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim-ex:KnowledgeStatus ;
+        sh:message "KnowledgeStatusAssertion must assign exactly one controlled knowledge-status value."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:knowledgeAsOfDate ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "KnowledgeStatusAssertion must record exactly one as-of date."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:wasGeneratedBy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim-ex:KnowledgeStatusActivity ;
+        sh:message "KnowledgeStatusAssertion must be generated by exactly one KnowledgeStatusActivity."@en ;
+    ] ;
+    sh:or (
+        [ sh:path sstim-ex:knowledgeScope ; sh:minCount 1 ]
+        [ sh:path sstim-ex:knowledgeScopeNote ; sh:minCount 1 ]
+    ) ;
+    sh:message "KnowledgeStatusAssertion must name a corpus scope IRI or a scope note."@en .
 
 ###########################################################################
 # Session Specification Shape
@@ -1125,23 +1222,8 @@ sstim-sh:ExposureProfileShape a sh:NodeShape ;
         sh:message "ExposureProfile must declare at least one local knowledge status."@en ;
     ] ;
     sh:property [
-        sh:path sstim-ex:hasEffectClaim ; sh:minCount 1 ;
-        sh:class sstim-ex:ExposureEffectClaim ;
-        sh:message "ExposureProfile must link its effects or risks through qualified ExposureEffectClaim nodes."@en ;
-    ] .
-
-sstim-sh:ExposureEffectClaimShape a sh:NodeShape ;
-    sh:targetClass sstim-ex:ExposureEffectClaim ;
-    sh:name "ExposureEffectClaim"@en ;
-    sh:property [
-        sh:path sstim-ex:concernsEffectDimension ; sh:minCount 1 ;
-        sh:class sstim-ex:EffectDimension ;
-        sh:message "ExposureEffectClaim must identify at least one effect dimension."@en ;
-    ] ;
-    sh:property [
-        sh:path sstim-ex:hasKnowledgeStatus ; sh:minCount 1 ;
-        sh:class sstim-ex:KnowledgeStatus ;
-        sh:message "ExposureEffectClaim must declare at least one local knowledge status."@en ;
+        sh:path sstim-ex:hasBoundaryApplicability ; sh:class sstim-ex:BoundaryApplicabilityStatement ;
+        sh:message "hasBoundaryApplicability values must be BoundaryApplicabilityStatement nodes."@en ;
     ] .
 
 sstim-sh:ExposureLimitShape a sh:NodeShape ;

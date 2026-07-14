@@ -24,7 +24,8 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
     sstim-ex:usesStimulusChannel this:visual-social-channel, this:audio-social-channel, this:conversation-channel ;
     sstim-ex:hasPerceptualGain sstim-ex:gainSocialReflection, sstim-ex:gainAudioImmersion ;
-    sstim-ex:hasEffectClaim this:social-reflection-claim, this:conversation-context-claim .
+    sstim-ex:hasHypothesis this:social-reflection-claim ;
+    sstim-ex:hasProtocolRequirement this:conversation-context-claim .
 
 this:visual-social-channel a sstim-ex:StimulusChannel ;
     rdfs:label "Social-graph visualization channel"@en ;
@@ -50,32 +51,18 @@ this:conversation-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
     sstim-ex:hasStimulusPattern sstim-ex:patternAdaptive .
 
-this:social-reflection-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:social-reflection-claim a sstim-ex:ExposureHypothesis ;
     rdfs:label "Social reflection hypothesis"@en ;
     dct:description "Hypothesizes that seeing and hearing one's social structure during conversation may change perceived social reflection or connectedness. No therapeutic outcome is asserted."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityAV ;
     sstim-ex:concernsEffectDimension sstim-ex:effectSocialConnectedness, sstim-ex:effectImmersion ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM .
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:conversation-context-claim a sstim-ex:ExposureEffectClaim, sstim:EvidenceClaim ;
+this:conversation-context-claim a sstim-ex:ProtocolRequirement ;
     rdfs:label "Conversation context requirement"@en ;
     dct:description "Marks live or online conversation as part of the protocol context rather than as a guaranteed source of effect."@en ;
-    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
-    sstim:hasModalityTag sstim-v:modalityGENERAL ;
-    sstim-ex:concernsEffectDimension sstim-ex:effectSocialConnectedness ;
-    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM .
-
-this:social-reflection-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
-this:conversation-context-claim
-    sstim:hasClaimDirection sstim-v:claimInconclusive ;
-    sstim:hasReviewStatus sstim-v:reviewProvisional ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
-    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
