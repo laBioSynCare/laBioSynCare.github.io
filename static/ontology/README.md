@@ -156,20 +156,32 @@ See the [external review disposition](../../docs/ontology/reviews/2026-07-10-ext
 
 ## Evidence Governance
 
-Evidence attaches to a scoped claim, never globally to "sensory stimulation":
+Evidence attaches to a scoped assessment, never globally to "sensory
+stimulation". Since ADR 0027 an `sstim:EvidenceAssessmentClaim` is an immutable
+revision carrying an atomic bounded proposition, an explicit scope, and a
+qualified evidence basis (source-level modality, design, model, and synthesis
+kept separate). It evaluates its subject through the neutral
+`sstim:evaluatesSubject`; direction lives only in `hasClaimDirection`:
 
 ```turtle
-bsclab-evidence:ssvep-photic-response a sstim:EvidenceClaim ;
-    sstim:supportsRelation sstim-v:techPhoticDriving ;
+bsclab-evidence:ssvep-photic-response/revision/1
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    sstim:evaluatesSubject sstim-v:techPhoticDriving ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
-    sstim:hasModalityTag sstim-v:modalityVIS, sstim-v:modalityREVIEW ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition bsclab-evidence:ssvep-photic-response/revision/1/proposition ;
+    sstim:hasEvidenceBasis bsclab-evidence:ssvep-photic-response/revision/1/basis-1 ;
     sstim:citesReference sstim-ref:VIALATTE_2010 ;
-    sstim:hasReviewStatus sstim-v:reviewReviewed ;
-    sstim:evidenceDate "2026-07-10"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    prov:wasGeneratedBy bsclab-evidence:ssvep-photic-response/revision/1/activity ;
+    dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 ```
+
+Non-evidence statements (hypotheses, research questions, boundary
+applicability, requirements, design objectives, planned outcomes, and
+corpus-scoped knowledge-status assertions) are deliberately **not**
+`EvidenceClaim`s and never carry a tier — see
+[ADR 0027](../../docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md).
 
 Every claim requires a tier, modality tag, direction, review status, review
 date, modification date, accountable agent, and explicit subject. Claims at
@@ -308,8 +320,8 @@ SELECT DISTINCT ?preset ?band WHERE {
 
 # Fully attributable cited evidence trails.
 SELECT ?claim ?subject ?tier ?reference ?agent WHERE {
-  ?claim a sstim:EvidenceClaim ;
-    sstim:supportsRelation ?subject ;
+  ?claim a sstim:EvidenceAssessmentClaim ;
+    sstim:evaluatesSubject ?subject ;
     sstim:hasEvidenceTier ?tier ;
     sstim:citesReference ?reference ;
     <http://www.w3.org/ns/prov#wasAttributedTo> ?agent .

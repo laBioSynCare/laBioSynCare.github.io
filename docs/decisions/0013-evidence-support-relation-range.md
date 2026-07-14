@@ -1,6 +1,6 @@
 # ADR 0013 — Evidence `supportsRelation` range
 
-**Status:** Accepted — 2026-06-21
+**Status:** Accepted — 2026-06-21 (property renamed by [ADR 0027](0027-evidence-claim-family-and-public-claim-gate.md), 2026-07-14: `sstim:supportsRelation` → `sstim:evaluatesSubject`; this ADR's `Preset ∪ Technique` range is preserved on the replacement, and `supportsRelation` survives as a deprecated 0.7.x alias)
 
 ## Context
 

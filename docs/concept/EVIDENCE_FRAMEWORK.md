@@ -7,6 +7,19 @@
 > `docs/concept/SCOPE.md` implement these constraints. Evidence tiers
 > are formally encoded in `static/ontology/sstim-vocab.ttl`.
 
+> **⚠ RDF encoding revised by [ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md)
+> (2026-07-14).** The conceptual framework below — tiers, honest ceilings,
+> corpus-scoped negative assertions — still holds. The *RDF encoding* changed:
+> the single overloaded `sstim:EvidenceClaim` was split into the concrete
+> `sstim:EvidenceAssessmentClaim` (with an atomic proposition, explicit scope,
+> and qualified basis) plus non-evidence statement roles (hypothesis, research
+> question, boundary applicability, requirement, design objective, planned
+> outcome, knowledge-status assertion). `supportsRelation` → `evaluatesSubject`;
+> the overloaded modality tag split into orthogonal basis axes; review is a PROV
+> activity. Turtle blocks in the "How it's encoded" section below still show the
+> pre-0027 shapes and are pending a rewrite; treat the `.ttl` masters and ADR
+> 0027 as authoritative.
+
 ---
 
 ## What this is and why it exists

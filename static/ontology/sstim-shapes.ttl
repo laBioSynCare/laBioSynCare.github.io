@@ -543,6 +543,19 @@ sstim-sh:EvidenceAssessmentClaimShape a sh:NodeShape ;
                 FILTER NOT EXISTS { $this <https://w3id.org/sstim#citesReference> ?ref . }
             }
         """ ;
+    ] ;
+    # The assessment's proposition must be about the same subject it evaluates.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The assessed proposition's propositionSubject must equal the assessment's evaluatesSubject (ADR 0027)."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim#assessesProposition> ?prop ;
+                      <https://w3id.org/sstim#evaluatesSubject> ?subject .
+                ?prop <https://w3id.org/sstim#propositionSubject> ?psubject .
+                FILTER( ?subject != ?psubject )
+            }
+        """ ;
     ] .
 
 sstim-sh:AssessmentPropositionShape a sh:NodeShape ;
@@ -599,7 +612,14 @@ sstim-sh:EvidenceBasisShape a sh:NodeShape ;
     sh:property [
         sh:path sstim:basisSource ; sh:minCount 1 ; sh:maxCount 1 ;
         sh:message "EvidenceBasis must have exactly one basisSource."@en ;
-    ] .
+    ] ;
+    # Zero canonical sensory modalities is allowed only with an explicit
+    # modality-applicability value (ADR 0027): never a silent gap.
+    sh:or (
+        [ sh:path sstim:basisSensoryModality ; sh:minCount 1 ]
+        [ sh:path sstim:basisModalityApplicability ; sh:minCount 1 ]
+    ) ;
+    sh:message "EvidenceBasis must state at least one canonical sensory modality or an explicit modality-applicability value."@en .
 
 sstim-sh:GovernedResearchOutputShape a sh:NodeShape ;
     sh:targetClass sstim:GovernedResearchOutput ;

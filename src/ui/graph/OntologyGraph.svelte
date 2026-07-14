@@ -136,7 +136,7 @@
   // Governing OWL classes to also include in a scope, for structural context.
   const SCOPE_CLASSES = {
     frequency: ['FrequencyBand', 'FrequencyBandGroup'],
-    evidence:  ['EvidenceClaim', 'EvidenceTierValue', 'EvidenceModalityTag', 'PublicSafeReference', 'PublicClaimLevel'],
+    evidence:  ['EvidenceClaim', 'EvidenceAssessmentClaim', 'AssessmentProposition', 'AssessmentScope', 'EvidenceBasis', 'EvidenceOutcomeConcept', 'BibliographicReference', 'EvidenceTierValue', 'EvidenceModalityTag', 'PublicSafeReference', 'PublicClaimLevel'],
     voice:     ['Preset', 'Voice', 'BinauralVoice', 'MartigliVoice', 'MartigliBinauralVoice', 'SymmetryVoice', 'VoiceType'],
     caution:   ['CautionTag', 'CautionSeverity'],
     technique: ['SensoryStimulationTechnique'],

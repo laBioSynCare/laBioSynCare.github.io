@@ -1,6 +1,6 @@
 # ADR 0018 — Evidence integrity and public-claim governance
 
-**Status:** Accepted - 2026-06-30; strengthened 2026-07-10
+**Status:** Accepted - 2026-06-30; strengthened 2026-07-10; P7.1/P7.3 amended by [ADR 0027](0027-evidence-claim-family-and-public-claim-gate.md) (2026-07-14) — evidence constraints apply to `EvidenceAssessmentClaim`, every assessment has a qualified basis (the rank-conditional citation exception is retired), and review is modelled as a PROV activity. P7.2 (the provisional preset-level public-claim check) remains live until ADRs 0028–0029 replace it.
 
 ## Context
 

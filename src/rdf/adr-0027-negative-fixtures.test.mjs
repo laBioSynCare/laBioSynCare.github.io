@@ -70,7 +70,7 @@ ex:scope a sstim:AssessmentScope ;
     sstim:scopePopulationOrModel sstim-v:modelHuman ;
     sstim:scopeInterventionOrContext sstim-v:techBinauralBeats ;
     sstim:scopeComparator sstim-v:scopeNotApplicable .
-ex:basis a sstim:EvidenceBasis ; sstim:basisSource ex:ref .
+ex:basis a sstim:EvidenceBasis ; sstim:basisSource ex:ref ; sstim:basisSensoryModality sstim-v:modalityAuditory .
 `
 
 describe('ADR 0027 shapes — positive control', () => {
@@ -131,5 +131,15 @@ ex:ks a sstim-ex:KnowledgeStatusAssertion ; rdfs:label "k" ;
     sstim-ex:knowledgeScopeNote "corpus"@en ;
     prov:wasGeneratedBy ex:act .
 ex:act a sstim-ex:KnowledgeStatusActivity .`)).toBe(false)
+  })
+
+  // Note: the propositionSubject-must-equal-evaluatesSubject and
+  // citesReference-must-match-basis rules are sh:sparql constraints, enforced by
+  // pySHACL in `make validate` (the JS validator has no SPARQLConstraintComponent).
+
+  it('an evidence basis with neither a canonical modality nor an applicability value', () => {
+    expect(conforms(VALID_ASSESSMENT.replace(
+      'ex:basis a sstim:EvidenceBasis ; sstim:basisSource ex:ref ; sstim:basisSensoryModality sstim-v:modalityAuditory .',
+      'ex:basis a sstim:EvidenceBasis ; sstim:basisSource ex:ref ; sstim:basisStudyModel sstim-v:modelHuman .'))).toBe(false)
   })
 })
