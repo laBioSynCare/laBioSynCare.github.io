@@ -265,6 +265,15 @@ Turtle files are listed in section 1. After they exist:
 - [x] Model session specifications, executed session activities, phased
       self-reports, and a non-personal synthetic example `P2`
 - [ ] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
+- [ ] Record recognized **named methods / schools** (Snoezelen / MSE, Tomatis,
+      Bérard AIT, Ayres Sensory Integration, vibroacoustic therapy, sound baths,
+      …) as a neutral, evidence-scoped catalogue `P2`
+      *Gap identified 2026-07-14: SSTIM records mechanistic techniques but no
+      externally-named methods/schools. Modeling options + recommendation
+      (Option C: a `NamedStimulationMethod` catalogue) and a seed inventory are
+      in [ADR 0030](docs/decisions/0030-named-methods-and-schools.md) (Proposed).
+      Touches protected term files → needs approval; effect claims stay
+      evidence-scoped per [ADR 0027](docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md).*
 - [~] Ecosystem agents (specialists, orgs, labs, research groups) `P2`
       *Design + governance decided in ADR 0024: neutral umbrella
       `sstim-eco:EcosystemAgent` (⊑ `prov:Agent`); reuse schema.org/ORG/FOAF +

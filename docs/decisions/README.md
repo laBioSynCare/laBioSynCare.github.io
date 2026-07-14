@@ -53,6 +53,7 @@ annotations lives here.
 | [0027](0027-evidence-claim-family-and-public-claim-gate.md) | Separate evidence assessments from non-evidence statements | Accepted |
 | [0028](0028-atomic-claim-propositions-and-public-expressions.md) | Atomic claim propositions, rendered public expressions, and non-exclusive facets | Proposed |
 | [0029](0029-bsc-lab-public-claim-publication-profile.md) | BSC Lab public-claim publication and authorization profile | Proposed |
+| [0030](0030-named-methods-and-schools.md) | Record recognized named methods/schools (Snoezelen, Tomatis, …) as a neutral, evidence-scoped catalogue | Proposed |
 
 ## Adding an ADR
 
