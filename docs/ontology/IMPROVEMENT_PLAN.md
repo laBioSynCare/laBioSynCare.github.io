@@ -145,6 +145,15 @@ covered by tests.
 **1.2a — Evidence roles and provenance
 ([ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md))**
 
+> **`[x]` Implemented 2026-07-14 (ADR 0027 accepted).** Term layer, all 38
+> ledger nodes migrated (8 assessment revisions, 3 knowledge-status assertions,
+> 24 role statements, 3 retired), rewritten SHACL, a conformant Sensory Field
+> exporter (KR-01 closed), and positive/negative fixtures all landed and pass
+> `make validate`. Resolves KR-06 and the evidence-role/provenance half of KR-11.
+> Deferred as documented: the generated 0.7 compatibility view (a dist-only
+> build artifact) and re-assessment of migrated tiers under a dedicated rubric.
+> KR-04 (exact public-copy authorization) stays open under ADRs 0028–0029.
+
 - Separate literature evidence assessments, hypotheses/research questions,
   observations, boundary applicability, requirements, design objectives, and
   planned outcomes. Do not require an effect hypothesis on every exposure

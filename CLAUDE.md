@@ -383,8 +383,11 @@ Always use `src/rdf/query.js` for SPARQL execution. Standard patterns:
 
 ```javascript
 // Get all presets with their target bands and any evidence tier.
-// Evidence tiers live on sstim:EvidenceClaim (linked via supportsRelation),
-// not directly on the preset; preset rdfs:labels carry no language tag.
+// Evidence tiers live on sstim:EvidenceAssessmentClaim (ADR 0027; the concrete
+// evidence-bearing subtype of sstim:EvidenceClaim), linked to its subject via
+// sstim:evaluatesSubject — the neutral relation that replaced the directionally
+// misleading sstim:supportsRelation (kept as a deprecated 0.7.x alias). Tiers
+// are not on the preset; preset rdfs:labels carry no language tag.
 const PRESET_QUERY = `
 PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
@@ -397,8 +400,8 @@ SELECT ?preset ?label ?tier ?band ?bandLabel WHERE {
           sstim:targetsFrequencyBand ?band .
   ?band skos:prefLabel ?bandLabel .
   OPTIONAL {
-    ?claim a sstim:EvidenceClaim ;
-           sstim:supportsRelation ?preset ;
+    ?claim a sstim:EvidenceAssessmentClaim ;
+           sstim:evaluatesSubject ?preset ;
            sstim:hasEvidenceTier ?tier .
   }
   FILTER(LANG(?bandLabel) = "en")

@@ -50,8 +50,8 @@ WHERE {
 
   OPTIONAL {
     GRAPH ?claimGraph {
-      ?claim a sstim:EvidenceClaim ;
-             sstim:supportsRelation ?preset ;
+      ?claim a sstim:EvidenceAssessmentClaim ;
+             sstim:evaluatesSubject ?preset ;
              sstim:hasEvidenceTier ?tier .
     }
     OPTIONAL {
