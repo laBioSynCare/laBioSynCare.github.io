@@ -397,7 +397,7 @@ round-trip authority.
 | D2 — Public-claim semantics | Atomic propositions/expressions, non-exclusive facets, generic decision record | D; [ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md) |
 | D3 — BSC publication profile | Versioned policy, applicability/consent rules, trusted input and publisher gate | C for testimonials; D2; [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md) |
 | E — SKOS/alignment repair | Neural/stimulus frequency split, roles, controlled-value plumbing, mapping provenance | D where evidence links migrate |
-| F — Ecosystem/annotation repair | Reified engagements, consent history, valid OA, private defaults | A; privacy review |
+| F — Ecosystem/annotation repair | Reified engagements, consent history, valid OA, private defaults; operational sequence in [Ecosystem Integration, Workstream 5](../ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation) | A; privacy review |
 | G — HED profile | Native event mapping, validator, synthetic demonstrator | B, C, D |
 | H — BIDS binding | Complete optional Behavioral dataset and adapter tests | G |
 | I — NWB binding | Optional synchronized neurophysiology/behavior adapter | G; external use case |

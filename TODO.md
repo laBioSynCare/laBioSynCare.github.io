@@ -281,12 +281,15 @@ Turtle files are listed in section 1. After they exist:
       values, not the class; notify-and-honor consent with engagement-tracking
       properties; curated instances at `/organization/{id}` & `/specialist/{id}`,
       never in the term space; live-only by default with a consent-gated
-      archival tier (`archivalConsent`). The `sstim-ecosystem` term module,
-      SHACL shape, loader/export/validation plumbing, and JSON-LD context are
-      implemented on `0.7.0-dev`. Remaining follow-ups: a graph-browser
-      "Ecosystem / agents" scope and the first seed
-      (organizations first, then consented public figures). Reconcile with
-      `docs/ecosystem/PARTNERS.md` + `ADVISORY_BOARD.md`.*
+      archival tier (`archivalConsent`). The initial `sstim-ecosystem` term
+      module, context, and agent-level SHACL shape are implemented on
+      `0.7.0-dev`, but the 2026-07-13 audit's KR-13 finding means they are a
+      scaffold rather than a safe real-instance contract. Next: change set F's
+      qualified relationship/engagement, organization-membership,
+      implementation-responsibility, append-only lifecycle, public/private,
+      synthetic-fixture, and publication-plumbing gates. Do not commit real
+      named records before those gates. The canonical sequence is Workstream 5
+      of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`
       *An unverified Music Ontology association and the incorrect MeSH D012910

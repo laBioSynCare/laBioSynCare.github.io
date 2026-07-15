@@ -313,36 +313,149 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] In progress. Decision Accepted ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md), 2026-07-12); term module and validation plumbing implemented on `0.7.0-dev`, browser scope and curated instances remain.**
+**`[~] In progress. Decision Accepted ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md), 2026-07-12); the initial `0.7.0-dev` term module, context, and SHACL shape are a scaffold, not yet a safe contract for real named records. [KR-13](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md#kr-13--ecosystem-relationships-and-consent-are-flattened-onto-the-agent) and change set F remain open.**
 
-ADR 0024 decides *how* real people and organizations in sensory stimulation get
-modeled: a new `sstim-ecosystem` term module (`sstim-eco:`), reusing
-schema.org / ORG / FOAF, verified external IDs (ORCID / ROR / Wikidata), an
-engagement/relationship layer, and a **notify-and-honor** consent lifecycle.
+ADR 0024 established the initial direction for modeling real people and
+organizations in sensory stimulation: a new `sstim-ecosystem` term module
+(`sstim-eco:`), reuse of schema.org / ORG / FOAF, verified external IDs (ORCID /
+ROR / Wikidata), an engagement/relationship layer, and a **notify-and-honor**
+consent lifecycle. The later KR-13 audit finding requires an amending decision
+before the flat relationship/lifecycle design is used for real records.
 Instances are curated implementation data at `/organization/{id}` and
-`/specialist/{id}` — **never** in the reusable term space, **never** in the Zenodo
-snapshots, so a removal request affects live data + git history only and no
-DOI-archived snapshot ever contains a person's data.
+`/specialist/{id}` — **never** in the reusable term space. The default live-only
+tier is excluded from Zenodo snapshots, so a removal request affects live data
+and git history rather than a DOI archive. ADR 0024 envisages a separate
+explicit-consent archival tier, but that pipeline is not implemented and is not
+part of the first seed.
 
 This is the RDF counterpart to Workstreams 3–4: an outreach target (W3) becomes a
 recorded stakeholder here once notified/confirmed, and the graph-browser
 "Stakeholders" scope serves the Researcher / Standards-peer personas (W4).
 
-**Implementation follow-ups (from the ADR):**
-- [x] `static/ontology/sstim-ecosystem.ttl` — neutral umbrella
-      `sstim-eco:EcosystemAgent`, relationship/engagement properties, and the
-      controlled relationship vocabulary.
-- [x] SHACL shape in `sstim-shapes.ttl` for the engagement/consent fields.
-- [x] Loader, export/snapshot, quality-audit, JSON-LD-context, VoID, and
-      publication-route plumbing.
-- [ ] Graph-browser "Stakeholders" scope + loader entries.
-- [ ] First seed: organizations first, then consented public figures — each with
-      `recordSource` and a notification record.
-- [ ] Reconcile with `PARTNERS.md` / `ADVISORY_BOARD.md` (consent-of-record for named people).
+### SSTIM-wide prerequisite decision (2026-07-15)
 
-**Guardrail:** every named individual requires `recordSource` + notify-and-honor;
-no record implies endorsement, affiliation, or clinical efficacy (ADR 0024
-Governance; `CLAUDE.md` §3.5).
+SSTIM is structurally healthy: the pinned validation suite passes SHACL,
+repository quality checks, HermiT consistency, SPARQL sanity queries, and all
+module serialization round trips. There is no repository-wide validity failure
+and no need to redesign SSTIM before this workstream starts. The citable baseline
+remains `0.6.0`; the live `0.7.0-dev` graph is valid development work, not a
+finished release. The audit is also a dated finding list rather than a current
+status ledger: KR-01, KR-06, the evidence-provenance portion of KR-11, runtime
+KR-12/KR-17, and most KR-14 controls have since been repaired. Validation does
+not, however, make every proposed use ready:
+
+- **KR-13 is the direct blocker here.** Parallel agent-level relationship,
+  source, target, and consent fields become ambiguous as soon as an agent has
+  multiple roles or targets, while scalar lifecycle fields overwrite history.
+- **KR-02/KR-03 block real session bundles, participant observations, and the
+  HED/BIDS path, not ecosystem modeling.** Session change sets B/C are not
+  prerequisites for ecosystem change set F.
+- **KR-04 blocks automated public-claim authorization.** Do not treat evidence
+  tiers as an automatic permission to publish wording until ADRs 0028–0029 are
+  implemented.
+- **Residual KR-05, KR-07–KR-10, KR-14, and KR-15/KR-16 work contains important
+  semantic, reproducibility, validation-isolation, mapping, and coverage repairs
+  for the next SSTIM release, but it does not block designing or testing the
+  ecosystem contract.** The `0.7.0` release remains governed by the full [RDF
+  improvement plan](../ontology/IMPROVEMENT_PLAN.md).
+
+Therefore, work on the ecosystem may start now, but **only synthetic records and
+private drafts** may precede the readiness gate below. No real named ecosystem
+record should be committed or published against the current flat contract.
+
+### Minimum ecosystem scope
+
+The first useful ecosystem does require more than agents and implementations,
+but it does not require another broad catalogue of entity classes:
+
+1. **Agents:** people and organizations typed as `sstim-eco:EcosystemAgent` and
+   also with the appropriate Schema.org/FOAF/ORG class. Laboratories, research
+   groups, companies, and standards bodies are organization kinds, not new SSTIM
+   top-level classes.
+2. **Implementations:** existing `sstim:SensoryStimulationImplementation`
+   resources for software, hardware, manual, or hybrid realizations. An
+   implementation is not the company or person responsible for it.
+3. **Qualified ecosystem relationships/engagements:** one record binds an agent,
+   target resource, role/type, purpose, source, curator, validity interval, and
+   applicable publication/consent decision without cross-association.
+4. **Qualified organization memberships:** sourced, time-qualified person ↔
+   organization links with only the roles required by real seed cases. A vague
+   or unsourced “affiliation” is insufficient.
+5. **Implementation responsibility:** factual links identifying who develops,
+   publishes, maintains, provides, hosts, or funds an implementation, using a
+   qualified relation where source, role, and dates matter.
+6. **Provenance and engagement lifecycle:** append-only notification, response,
+   amendment, and withdrawal activities. The public graph exposes only the
+   minimal safe outcome; raw messages, contact channels, and consent evidence
+   stay in a private operational record.
+
+Frameworks, techniques, protocols, references, and implementations already
+provide relationship targets. Projects, products beyond the existing
+implementation model, job taxonomies, session data, observations, and new named
+method/school classes are not prerequisites for the first ecosystem seed.
+
+### Canonical readiness sequence
+
+This is the operational sequence for change set F. The
+[improvement plan §1.5](../ontology/IMPROVEMENT_PLAN.md#15-repair-privacy-sensitive-rdf-surfaces)
+remains authoritative for the semantic requirements.
+
+1. **F1 — approve the model and governance amendment.** Write a short successor
+   or amendment to ADR 0024 covering qualified relationships/engagements,
+   organization memberships, implementation responsibility, the public/private
+   split, correction/removal handling, and purpose-specific consent. Keep
+   live-only/non-archival publication as the default.
+2. **F1 — synchronize the contract.** With explicit approval for protected
+   files, update OWL, SHACL, JSON-LD context, JavaScript namespaces, migration
+   notes, and application mappings together. Deprecate or narrowly retain the
+   flat properties rather than silently changing their meaning.
+3. **F2 — prove the model with synthetic fixtures.** Add synthetic person and
+   organization examples plus positive and negative tests. The main fixture
+   must show one person with at least two memberships/roles and two engagements
+   without mixing their targets, sources, purposes, or consent decisions. Test
+   per-artifact/per-named-graph SHACL, JSON-LD graph isomorphism, local IRI
+   resolution, lifecycle ordering, and public/private exclusions.
+4. **F3 — complete instance publication plumbing.** Add a dedicated
+   `instances/ecosystem/` family and ecosystem-agent named graph, explicit loader
+   manifest entries, quality-audit coverage and counts, Schema.org/ORG context
+   support, VoID/data-dump metadata, and `/organization/{id}` and
+   `/specialist/{id}` dereferencing. Gate Pages publication on validation.
+5. **Release gate — stabilize the contract.** Run the pinned validation, test,
+   check, and build suites; record migration notes; and include the ecosystem
+   term contract in a stable citable release before presenting real records as
+   stable SSTIM data.
+6. **F4 — add the real seed.** Add verified organizations first; then Renato's
+   person record with an explicit self-publication decision; then sourced
+   memberships and implementation-responsibility records. Keep the first seed
+   live-only and non-archival. Add other people only after applying the
+   notify-and-honor process and reconciling `PARTNERS.md` /
+   `ADVISORY_BOARD.md`.
+7. **Discovery — expose the result.** Add an “Ecosystem / agents” browser scope,
+   ordinary-instance rendering, useful competency queries, and human-readable
+   profile routes. This can follow RDF authoring, but should precede outreach
+   that expects people to discover or inspect the records.
+
+### Readiness gate for real records
+
+Real named records may enter the public repository only when all of these are
+true:
+
+- the qualified relationship, membership, implementation-responsibility, and
+  lifecycle contracts are approved and synchronized across their representations;
+- synthetic positive and adversarial negative fixtures pass in isolated graphs;
+- public data cannot expose private correspondence, authentication identifiers,
+  private contact channels, or raw consent evidence;
+- every identity and public relationship has an authoritative source and review
+  date, and every person/organization/implementation has a distinct IRI;
+- loader, local-IRI, VoID, export, and dereferencing checks cover the new instance
+  family; and
+- the record subject has the required publication/notification status, with
+  archival publication disabled unless its separate higher consent and pipeline
+  are actually implemented.
+
+**Guardrail:** no record implies endorsement, affiliation, clinical efficacy, or
+that an implementation is identical to the person or organization responsible
+for it (ADR 0024 Governance; ADR 0007; `CLAUDE.md` §3.5).
 
 ---
 
