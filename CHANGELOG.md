@@ -25,6 +25,8 @@ the mutable external store required for real live-only records remains a
 post-release F3 gate.
 
 ### Added
+- Published SSTIM `v0.7.0` under version DOI `10.5281/zenodo.21380171`, retaining
+  `10.5281/zenodo.21286974` as the all-versions concept DOI.
 - `rdfs:seeAlso` from the core ontology node to the generated WIDOCO reference
   documentation (`https://labiosyncare.github.io/ontology/docs/`), so
   harvesters that read ontology metadata (e.g. LOV) discover the documentation

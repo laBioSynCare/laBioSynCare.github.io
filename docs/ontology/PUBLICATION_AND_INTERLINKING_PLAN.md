@@ -26,7 +26,7 @@ close mapping.
 
 - SSTIM `0.7.0` is frozen under `static/ontology/0.7.0/`, identified by
   `https://w3id.org/sstim/0.7.0`, and tagged `v0.7.0`.
-- Version DOI: pending automatic GitHub–Zenodo archival.
+- Version DOI: [`10.5281/zenodo.21380171`](https://doi.org/10.5281/zenodo.21380171).
 - All-versions concept DOI:
   [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
 - The GitHub-Zenodo integration is enabled for future GitHub releases.

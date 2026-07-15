@@ -47,6 +47,7 @@
     dct:issued "2026-04-12"^^xsd:date ;
     dct:modified "2026-07-15"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
@@ -60,7 +61,7 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 8171 ;
+    void:triples 8172 ;
     void:classes 105 ;
     void:properties 212 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",

@@ -55,8 +55,8 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 **Guardrails / caveats (carry forward, do not lose):**
 
 - **Version discipline.** The citable release is **SSTIM 0.7.0**, identified by
-  `https://w3id.org/sstim/0.7.0`; its release-specific Zenodo DOI is recorded
-  after automatic archival (per [`TODO.md`](../../TODO.md) current focus).
+  `https://w3id.org/sstim/0.7.0` and archived under release DOI
+  `10.5281/zenodo.21380171` (per [`TODO.md`](../../TODO.md) current focus).
 - **Do not hard-code live figures** (quad counts, concept counts, preset counts)
   from the source conversation into any doc — they drift; cite the live app instead.
 - **`01-Audiovisual_Entrainment.pdf`** (external, *not* in this repo) reportedly
@@ -462,8 +462,8 @@ remains authoritative for the semantic requirements.
    reports or private identifiers to public logs.
 5. **`[x]` Release gate — stabilize the contract.** SSTIM `0.7.0` includes the
    ecosystem term contract and migration notes after the pinned validation,
-   test, check, and build suites passed. Its Zenodo version DOI is recorded
-   after automatic archival. This closes the term-release gate only; F3 still
+   test, check, and build suites passed. Its Zenodo version DOI is
+   `10.5281/zenodo.21380171`. This closes the term-release gate only; F3 still
    blocks real records.
 6. **`[ ]` F4 — author each real RDF aggregate atomically, then activate it in
    the external mutable store.**

@@ -34,8 +34,8 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.7.0` is the validated release line; its release-specific DOI is added
-after the GitHub–Zenodo archive is minted. The immediate ontology focus is the
+SSTIM `0.7.0` is the validated release line, archived under release DOI
+`10.5281/zenodo.21380171`. The immediate ontology focus is the
 external mutable store/loader required before real ecosystem records, registry
 review, and future independent human review. Public BSC Lab data remains
 separate from the private BioSynCare/BSC catalog.
