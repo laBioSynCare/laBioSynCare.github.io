@@ -34,10 +34,11 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.6.0` is frozen and archived by Zenodo; editable sources are on the
-`0.7.0-dev` line. The current ontology focus is registry review, ecosystem
-modeling, external human review, and a future validated 0.7 whole-set release.
-Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
+SSTIM `0.7.0` is the validated release line; its release-specific DOI is added
+after the GitHub–Zenodo archive is minted. The immediate ontology focus is the
+external mutable store/loader required before real ecosystem records, registry
+review, and future independent human review. Public BSC Lab data remains
+separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -284,8 +285,8 @@ Turtle files are listed in section 1. After they exist:
       space; live-only by default with a consent-gated archival tier. Real
       live-only records must be served from a mutable store outside this
       Zenodo-tracked release repository; committed fixtures remain synthetic.
-      ADR 0031 and change-set F stages F1–F2 are implemented on
-      `0.7.0-dev`: qualified relationship/engagement, ORG membership,
+      ADR 0031 and change-set F stages F1–F2 are released in
+      `0.7.0`: qualified relationship/engagement, ORG membership,
       implementation responsibility, a retractable approved public projection,
       separate private-ledger validation policy, closed artifact profile, executable
       admission state, and synthetic/adversarial fixtures. F3 synthetic

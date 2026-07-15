@@ -2,13 +2,13 @@
 
 Status: active publication plan
 
-Current citable release: SSTIM `0.6.0`
+Current citable release: SSTIM `0.7.0`
 
 Next development line: not yet opened
 
 Created: 2026-06-30
 
-Last reviewed: 2026-07-11
+Last reviewed: 2026-07-15
 
 Maintainer: Renato Fabbri
 
@@ -24,9 +24,9 @@ close mapping.
 
 ### Released and citable
 
-- SSTIM `0.6.0` is frozen under `static/ontology/0.6.0/`, identified by
-  `https://w3id.org/sstim/0.6.0`, and tagged `v0.6.0`.
-- Version DOI: [`10.5281/zenodo.21302910`](https://doi.org/10.5281/zenodo.21302910).
+- SSTIM `0.7.0` is frozen under `static/ontology/0.7.0/`, identified by
+  `https://w3id.org/sstim/0.7.0`, and tagged `v0.7.0`.
+- Version DOI: pending automatic GitHub–Zenodo archival.
 - All-versions concept DOI:
   [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
 - The GitHub-Zenodo integration is enabled for future GitHub releases.
@@ -35,7 +35,7 @@ close mapping.
 ### Implemented in the repository
 
 - Turtle is the editable source; `make export` generates JSON-LD and RDF/XML
-  for all six modules.
+  for all seven public modules.
 - The Pages build validates RDF before publishing generated serializations.
 - Core and module routing rules for Turtle, JSON-LD, and RDF/XML are staged in
   `docs/ecosystem/w3id/sstim/.htaccess`.

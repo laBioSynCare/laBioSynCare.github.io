@@ -15,32 +15,36 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-07-13:
+As of 2026-07-15:
 
-- **Latest immutable release:** SSTIM `v0.6.0`, archived at
-  [10.5281/zenodo.21302910](https://doi.org/10.5281/zenodo.21302910) and
-  identified by `https://w3id.org/sstim/0.6.0`.
+- **Latest immutable release:** SSTIM `v0.7.0`, identified by
+  `https://w3id.org/sstim/0.7.0`. Its release-specific Zenodo DOI is added
+  after the GitHub–Zenodo archive is minted.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** the `0.7.0-dev` development line. All seven modules
-  share synchronized `owl:versionInfo`; development sources do not claim an
-  immutable `owl:versionIRI` (ADR 0020).
+- **Live ontology sources:** the validated `0.7.0` release sources. The core
+  claims the whole-set `owl:versionIRI`; all seven modules share synchronized
+  `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **Ontology graph:** seven Turtle modules, 58 named OWL classes, six anonymous
-  union-class expressions, 141 properties, and 306 SKOS concepts in 31 concept
+- **Ontology graph:** seven Turtle modules, 105 named OWL classes, 14 anonymous
+  class expressions, 212 properties, and 369 SKOS concepts in 43 concept
   schemes, plus VoID/DCAT and a JSON-LD context.
-- **Public example data:** 18 Turtle files containing the BSC framework, seven
+- **Public example data:** 19 Turtle files containing the BSC framework, seven
   framework techniques, two implementations, 12 protocols, two reference
-  presets, 38 evidence claims, seven DOI-identified references, ten exposure
-  profiles, and one explicitly synthetic session with pre/post reports.
+  presets, eight evidence assessments, three knowledge-status assertions, seven
+  exposure hypotheses, seven DOI-identified references, ten exposure profiles,
+  one explicitly synthetic session with pre/post reports, and one synthetic
+  ecosystem contract graph. No real ecosystem-agent record is included in the
+  release repository.
 - **Validation:** SHACL Core and SHACL-SPARQL, HermiT via ROBOT, repository-wide
   semantic integrity checks, and executable SPARQL competency queries run under
   the pinned Nix toolchain.
 - **External review:** the 2026-07-10
   [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
   is resolved for release, and the maintainer guided and accepted the ontology
-  changes. Independent human ontology review is deferred under ADR 0022 and is
-  not claimed for `0.6.0`. The deployed canonical FOOPS score is 87.5%; the
+  changes. The maintainer accepted `0.7.0` after the automated OWL, SHACL,
+  quality, round-trip, runtime, and build gates passed; independent human
+  ontology review is not claimed. The deployed canonical FOOPS score is 87.5%; the
   remaining failures are registry-dependent.
 - **Registry discoverability:** the `sstim` prefix resolves at prefix.cc and the
   ontology is parsed and browsable in
@@ -142,7 +146,7 @@ make export     # JSON-LD and RDF/XML serializations of all seven modules
 5. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
 
-The immutable [`static/ontology/0.6.0/`](static/ontology/0.6.0) snapshot is not
+The immutable [`static/ontology/0.7.0/`](static/ontology/0.7.0) snapshot is not
 edited after publication. Future releases are cut only after validation,
 version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 
@@ -212,9 +216,9 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.6.0` using
-[10.5281/zenodo.21302910](https://doi.org/10.5281/zenodo.21302910). Its stable
-version IRI is `https://w3id.org/sstim/0.6.0`. Use the
+For the released ontology, cite SSTIM `v0.7.0` using its stable version IRI,
+`https://w3id.org/sstim/0.7.0`; the release-specific Zenodo DOI is added here
+after automatic archival. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

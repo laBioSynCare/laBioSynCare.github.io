@@ -86,8 +86,8 @@ banner pointing to the as-built reference.
   [`../src/core/README.md`](../src/core/README.md) — layer-specific docs.
 - [`../static/ontology/README.md`](../static/ontology/README.md) — ontology design.
 - [`ontology/README.md`](ontology/README.md) — vocabulary / `sstim` notes.
-- [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — active
-  RDF remediation and enhancement plan for the `0.7.0-dev` line, driven by the
+- [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — implementation
+  ledger for the `0.7.0` release and remaining RDF roadmap, driven by the
   [2026-07-13 RDF audit](ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md).
 - [`credentials/firebase.md`](credentials/firebase.md) — optional Firebase setup.
 

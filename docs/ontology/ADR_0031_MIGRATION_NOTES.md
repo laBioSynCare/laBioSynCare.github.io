@@ -1,13 +1,13 @@
 # ADR 0031 migration notes
 
-**Applies to:** SSTIM `0.7.0-dev` ecosystem data  
-**Decision:** [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)  
-**Status:** F1/F2 contract migration complete; F3 deployment and stable release pending; no legacy instance conversion required
+**Applies to:** SSTIM `0.7.0` ecosystem data
+**Decision:** [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)
+**Status:** F1/F2 contract migration and stable term release complete; external-store F3 deployment pending; no legacy instance conversion required
 
 ## Baseline
 
 No real or synthetic `EcosystemAgent` instance data was committed under the
-original flat ADR 0024 contract. The `0.7.0-dev` change therefore migrates the
+original flat ADR 0024 contract. The `0.7.0` change therefore migrates the
 term and validation surface, but it does not rewrite any historical agent
 record. The committed `synthetic-ecosystem.ttl` graph is new contract-test data,
 not converted personal data.

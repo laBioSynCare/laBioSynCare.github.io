@@ -9,11 +9,11 @@ abstract: >-
   stimulation platform (Web Audio, AudioWorklets, PixiJS, haptics) with
   an open RDF knowledge graph — OWL classes, SKOS vocabulary, SHACL
   shapes, and linked evidence chains — describing stimulation
-  protocols, parameters, and supporting evidence.
+  protocols, parameters, qualified evidence assessments, and ecosystem
+  relationships. Committed ecosystem-agent fixtures are synthetic.
 type: software
-version: 0.6.0
-date-released: 2026-07-11
-doi: 10.5281/zenodo.21302910
+version: 0.7.0
+date-released: 2026-07-15
 authors:
   - family-names: Fabbri
     given-names: Renato

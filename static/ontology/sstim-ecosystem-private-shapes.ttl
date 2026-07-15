@@ -18,11 +18,12 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 
 <https://w3id.org/sstim/private-shapes/ecosystem> a owl:Ontology ;
-    owl:versionInfo "0.7.0-dev" ;
+    owl:versionInfo "0.7.0" ;
     dct:title "SSTIM private ecosystem audit shapes"@en ;
     dct:description "Validation profile for externally stored, access-controlled ecosystem audit events. It contains no private instance data and is not a public-projection profile."@en ;
     dct:isPartOf <https://w3id.org/sstim/shapes> ;
     dct:created "2026-07-15"^^xsd:date ;
+    dct:issued "2026-07-15"^^xsd:date ;
     dct:modified "2026-07-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 

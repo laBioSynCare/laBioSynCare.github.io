@@ -16,13 +16,14 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.6.0`, DOI
-  [10.5281/zenodo.21302910](https://doi.org/10.5281/zenodo.21302910), version
-  IRI `https://w3id.org/sstim/0.6.0`.
+- Latest immutable release: `v0.7.0`, version IRI
+  `https://w3id.org/sstim/0.7.0`. The release-specific Zenodo DOI is added
+  after automatic archival.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the `0.7.0-dev` development line; the latest immutable release
-  remains `0.6.0`. Development sources carry no `owl:versionIRI`.
+- Live sources: the validated `0.7.0` release sources; core claims the whole-set
+  `owl:versionIRI` and every public module carries synchronized
+  `owl:versionInfo`.
 - Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
   published in `void.ttl` rather than duplicated here.
 - Public instance and synthetic-fixture graph counts are published in
@@ -30,7 +31,7 @@ the graph.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
-The frozen [`0.6.0/`](0.6.0) directory is immutable and is the current citable
+The frozen [`0.7.0/`](0.7.0) directory is immutable and is the current citable
 whole-set release.
 
 ## Files
@@ -47,19 +48,19 @@ static/ontology/
 |-- sstim-ecosystem.ttl     Ecosystem agents, relationships, and consent lifecycle
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
-|-- 0.1.0/ ... 0.6.0/      Immutable whole-set snapshots
+|-- 0.1.0/ ... 0.7.0/      Immutable whole-set snapshots
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
     |-- implementations/    BSC Lab and public-safe BioSynCare identities
     |-- protocols/          Public BSC Lab reference protocols
     |-- presets/            Public reference preset fixtures
-    |-- evidence/           Technique and preset evidence claims
+    |-- evidence/           Technique and preset evidence assessments
     |-- references/         DOI-identified public-safe references
     |-- experiments/        Exploratory exposure protocols and profiles
     |-- sessions/           Explicitly synthetic session fixture only
     `-- ecosystem/
         |-- fixtures/      Synthetic ecosystem contract graph only
-        `-- agents/        Future real approved graph (empty before F4)
+        `-- agents/        Reserved contract graph; no committed real data
 ```
 
 All seven term/public-shape modules plus the separate private-audit shape file
@@ -446,7 +447,9 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.6.0` for the current immutable citation:
+Use SSTIM `v0.7.0` for the current immutable citation. Until the automatic
+Zenodo archive supplies its version DOI, the stable release identifier is
+`https://w3id.org/sstim/0.7.0`:
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -454,8 +457,7 @@ Use SSTIM `v0.6.0` for the current immutable citation:
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21302910},
-  url       = {https://doi.org/10.5281/zenodo.21302910}
+  url       = {https://w3id.org/sstim/0.7.0}
 }
 ```
 

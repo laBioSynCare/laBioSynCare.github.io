@@ -107,14 +107,16 @@ primarily with AI-assisted development.
 
 ### Repository update (July 2026)
 
-- **SSTIM:** `0.6.0` is frozen, tagged, and archived under a Zenodo version DOI;
-  the continuing project has a concept DOI.
-- **Development ontology:** the seven editable modules are on `0.7.0-dev`, with
-  expanded sensory-domain vocabulary, evidence provenance, safety metadata,
-  SHACL, OWL reasoning, and executable quality/competency checks.
+- **SSTIM:** `0.7.0` is the validated, frozen release line; its version DOI is
+  added after automatic GitHub–Zenodo archival, while the continuing project
+  retains its concept DOI.
+- **Ontology:** the seven release modules add qualified evidence governance and
+  ecosystem relationships alongside the sensory-domain vocabulary, safety
+  metadata, SHACL, OWL reasoning, and executable quality/competency checks.
 - **Public data:** BSC Lab framework, implementation, protocols, reference
-  presets, evidence, references, experiments, and one synthetic session are
-  public. Private catalog and real participant data remain excluded.
+  presets, evidence, references, experiments, one synthetic session, and a
+  synthetic ecosystem contract graph are public. Private catalog, real
+  participant data, and real live-only ecosystem records remain excluded.
 - **Publication work:** GitHub Pages, WIDOCO/pyLODE documentation, and the stable
   multi-format w3id namespace are live. Registry curation and independent human
   review remain Phase 1 work.

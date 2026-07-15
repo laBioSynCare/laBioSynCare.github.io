@@ -41,9 +41,11 @@ organizations), six qualified relationships (including two memberships and two
 implementation-responsibility records), fourteen engagement activities, and two
 ORG roles. `void.ttl` publishes and the quality audit verifies these counts.
 
-Across the directory there are 38 `EvidenceClaim` nodes. Claims about measurable
+Across the directory there are eight `EvidenceAssessmentClaim` nodes, three
+`KnowledgeStatusAssertion` nodes, and seven `ExposureHypothesis` nodes. These
+categories are deliberately distinct under ADR 0027. Assessments of measurable
 ASSR, FFR, SSVEP, SSSEP, slow-breathing correlates, and multisensory integration
-cite audited references. Exploratory exposure claims stay speculative,
+cite audited references. Exploratory exposure hypotheses stay speculative,
 inconclusive, and provisional.
 
 ## Data Rules

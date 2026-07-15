@@ -54,10 +54,9 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 
 **Guardrails / caveats (carry forward, do not lose):**
 
-- **Version discipline.** The citable release is **SSTIM 0.6.0** (frozen, Zenodo);
-  **0.7.0-dev is the live development line** (per [`TODO.md`](../../TODO.md)
-  current focus). External copy must distinguish development sources from the
-  immutable 0.6.0 release.
+- **Version discipline.** The citable release is **SSTIM 0.7.0**, identified by
+  `https://w3id.org/sstim/0.7.0`; its release-specific Zenodo DOI is recorded
+  after automatic archival (per [`TODO.md`](../../TODO.md) current focus).
 - **Do not hard-code live figures** (quad counts, concept counts, preset counts)
   from the source conversation into any doc — they drift; cite the live app instead.
 - **`01-Audiovisual_Entrainment.pdf`** (external, *not* in this repo) reportedly
@@ -320,7 +319,7 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] F1–F2 implemented 2026-07-15 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md): the qualified/current-state model, closed public profile, executable admission policy, and synthetic/adversarial proof are in place. F3 synthetic repository plumbing is staged, but the external mutable store for real live-only data and its dereferencing path are not implemented. A stable term release and that live-data boundary remain before F4. No real records have been added.**
+**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md): the qualified/current-state model, closed public profile, executable admission policy, and synthetic/adversarial proof are in place. F3 synthetic repository plumbing is staged, but the external mutable store for real live-only data and its dereferencing path are not implemented. That live-data boundary remains before F4. No real records have been added.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
@@ -353,8 +352,7 @@ SSTIM is structurally healthy: the pinned validation suite passes SHACL,
 repository quality checks, HermiT consistency, SPARQL sanity queries, and all
 module serialization round trips. There is no repository-wide validity failure
 and no need to redesign SSTIM before this workstream starts. The citable baseline
-remains `0.6.0`; the live `0.7.0-dev` graph is valid development work, not a
-finished release. The audit is also a dated finding list rather than a current
+is now `0.7.0`; the audit is a dated finding list rather than a current
 status ledger: KR-01, KR-06, the evidence-provenance portion of KR-11, runtime
 KR-12/KR-17, and most KR-14 controls have since been repaired. Validation does
 not, however, make every proposed use ready:
@@ -370,14 +368,14 @@ not, however, make every proposed use ready:
   implemented.
 - **Residual KR-05, KR-07–KR-10, KR-14, and KR-15/KR-16 work contains important
   semantic, reproducibility, validation-isolation, mapping, and coverage repairs
-  for the next SSTIM release, but it does not block designing or testing the
-  ecosystem contract.** The `0.7.0` release remains governed by the full [RDF
-  improvement plan](../ontology/IMPROVEMENT_PLAN.md).
+  for the post-0.7 roadmap, but it does not invalidate the bounded evidence and
+  ecosystem contracts released in `0.7.0`.** Their limits and dependencies
+  remain recorded in the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
-Therefore, the synthetic ecosystem contract and publication plumbing may be
-built independently of session work. **Only synthetic records and private
-drafts** may precede the release/readiness gate below; no real named ecosystem
-record should be presented as stable `0.7.0-dev` data.
+Therefore, the ecosystem contract is released independently of session work.
+**Only synthetic records and private drafts** may remain in this release
+repository; no real named ecosystem record may be published until the external
+mutable-store, loader/dereferencing, and private-ledger F3 gates below pass.
 
 ### Minimum ecosystem scope
 
@@ -462,10 +460,11 @@ remains authoritative for the semantic requirements.
    deliberately remain fail-closed while no such facility is provisioned.
    External-ledger diagnostics are redacted and must never print raw SHACL
    reports or private identifiers to public logs.
-5. **`[~]` Release gate — stabilize the contract.** Run the pinned validation, test,
-   check, and build suites; record migration notes; and include the ecosystem
-   term contract in a stable citable release before presenting real records as
-   stable SSTIM data.
+5. **`[x]` Release gate — stabilize the contract.** SSTIM `0.7.0` includes the
+   ecosystem term contract and migration notes after the pinned validation,
+   test, check, and build suites passed. Its Zenodo version DOI is recorded
+   after automatic archival. This closes the term-release gate only; F3 still
+   blocks real records.
 6. **`[ ]` F4 — author each real RDF aggregate atomically, then activate it in
    the external mutable store.**
    The first admitted aggregate contains Renato, the initial verified

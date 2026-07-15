@@ -7,7 +7,7 @@ All notable changes to the **SSTIM ontology** — the versioned, citable artifac
 version is frozen byte-identical under `static/ontology/X.Y.Z/`.
 
 **Scope.** This tracks the reusable ontology term-space — core, vocabulary, SHACL
-shapes, external alignments, the exposure module, and the patch-studio model.
+shapes, external alignments, the exposure, ecosystem, and Patch Studio modules.
 BSC Lab application and infrastructure work is tracked in [ROADMAP.md](ROADMAP.md)
 and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
@@ -15,14 +15,69 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-07-15
+
+Evidence- and ecosystem-governance release. No public term IRI was removed, but
+legacy flattened evidence and ecosystem properties are deprecated and rejected
+for newly authored conforming data. Consumers should follow the ADR 0027 and
+ADR 0031 migration notes. All committed ecosystem agent records are synthetic;
+the mutable external store required for real live-only records remains a
+post-release F3 gate.
+
 ### Added
 - `rdfs:seeAlso` from the core ontology node to the generated WIDOCO reference
   documentation (`https://labiosyncare.github.io/ontology/docs/`), so
   harvesters that read ontology metadata (e.g. LOV) discover the documentation
   (ADR 0023).
-- Initial `sstim-ecosystem` module for ecosystem agents, controlled relationship
-  types, engagement provenance, and consent lifecycle metadata, with SHACL
-  governance constraints and runtime/publication plumbing (ADR 0024).
+- Evidence-assessment contract (ADR 0027): immutable assessment revisions,
+  atomic bounded propositions, explicit scope axes, qualified evidence bases,
+  source/search governance, PROV assessment and review activities, conflict and
+  independence records, and orthogonal controlled values for modality, study
+  design/model, synthesis type, outcomes, and scope missingness.
+- `sstim-ecosystem` module (ADRs 0024 and 0031): neutral ecosystem agents,
+  qualified agent-target relationships, ORG memberships, implementation
+  responsibility, purpose-scoped engagement activities, and controlled
+  relationship/purpose/outcome vocabularies.
+- Closed SHACL publication profiles for evidence and ecosystem records,
+  including the separate reusable private-audit shape file, public/private
+  predicate boundaries, lifecycle ordering, terminal deletion, and
+  current-state projection rules.
+- Synthetic ecosystem fixtures demonstrating one person with multiple
+  memberships and implementation relationships without cross-association,
+  together with an executable admission harness, JSON-LD round-trip checks,
+  46 adversarial SHACL fixtures, and 11 runtime loader/graph tests.
+- Ecosystem named-graph, VoID, loader/context, quality-audit, Pages validation,
+  and staged w3id plumbing. Real live-only records are expressly excluded from
+  the Zenodo-tracked release repository.
+
+### Changed
+- Deprecated the overloaded `EvidenceModalityTag`, mutable review/status fields,
+  directionally misleading `supportsRelation`, and other flattened evidence
+  properties. A non-authoritative 0.7 compatibility export remains available;
+  authorization and validation use only the new contract.
+- Migrated the public evidence fixtures and runtime exporter to qualified bases,
+  explicit propositions/scopes, immutable provenance, identified agents, and
+  review decisions. Universal evidence-absence claims are forbidden; scoped
+  search findings require a reproducible search record.
+- Replaced the initial flat ecosystem surface with qualified relationship,
+  membership, implementation-responsibility, and engagement records. Public
+  data is an approved retractable current-state projection; negative,
+  disputed, amended, removed, and consent-evidence history belongs to an
+  access-controlled external ledger.
+- Made runtime Web Annotation serialization valid and private by default, and
+  tightened JSON-LD coercion, namespace parity, per-artifact validation,
+  release-version consistency, and snapshot refusal checks.
+- Clarified that `make snapshot` freezes only the seven ontology modules while
+  a GitHub–Zenodo release archives the complete repository state at its tag.
+  Real mutable ecosystem records must therefore be served outside this
+  release repository.
+
+### Fixed
+- Prevented public/private RDF leakage through nested or untyped auxiliary
+  nodes, ambiguous parallel consent/relationship values, orphan terminal
+  records, and mismatched public/private activity mirrors.
+- Removed unqualified universal-absence language and separated source-observed
+  results from SSTIM's assessment direction and public wording decisions.
 
 ## [0.6.0] - 2026-07-11
 
@@ -233,6 +288,7 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.7.0
 [0.6.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.6.0
 [0.5.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.5.0
