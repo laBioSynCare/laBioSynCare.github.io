@@ -12,9 +12,14 @@ export const SSTIM_EX = ns('https://w3id.org/sstim/exposure#')
 export const SSTIM_ECO = ns('https://w3id.org/sstim/ecosystem#')
 export const SSTIM_I  = ns('https://w3id.org/sstim/inst/')
 export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
+export const SSTIM_ORGANIZATION = ns('https://w3id.org/sstim/organization/')
+export const SSTIM_SPECIALIST = ns('https://w3id.org/sstim/specialist/')
+export const SSTIM_ECOSYSTEM_RECORD = ns('https://w3id.org/sstim/ecosystem-record/')
 export const BSC_FRAMEWORK_IRI = namedNode('https://w3id.org/sstim/framework/bsc')
 export const BIOSYNCARE_IRI = namedNode('https://w3id.org/sstim/implementation/biosyncare')
 export const BSCLAB_IRI = namedNode('https://w3id.org/sstim/implementation/bsclab')
+export const ECOSYSTEM_AGENTS_GRAPH_IRI = namedNode('https://w3id.org/sstim/graph/ecosystem-agents')
+export const ECOSYSTEM_FIXTURE_GRAPH_IRI = namedNode('https://w3id.org/sstim/graph/ecosystem-fixture')
 export const BSC_FRAMEWORK = ns('https://w3id.org/sstim/framework/bsc/')
 export const BSC_FRAMEWORK_TECHNIQUE = ns('https://w3id.org/sstim/framework/bsc/technique/')
 export const BIOSYNCARE = ns('https://w3id.org/sstim/implementation/biosyncare/')
@@ -38,10 +43,12 @@ export const SKOS = ns('http://www.w3.org/2004/02/skos/core#')
 export const SH   = ns('http://www.w3.org/ns/shacl#')
 export const PROV = ns('http://www.w3.org/ns/prov#')
 export const OA   = ns('http://www.w3.org/ns/oa#')
+export const ORG  = ns('http://www.w3.org/ns/org#')
 
 // ── Metadata vocabularies ─────────────────────────────────────────────────────
 export const DCT  = ns('http://purl.org/dc/terms/')
 export const FOAF = ns('http://xmlns.com/foaf/0.1/')
+export const SCHEMA = ns('https://schema.org/')
 
 // ── Upper ontologies (BFO / OBI / IAO / PATO / ECO) ──────────────────────────
 export const BFO  = ns('http://purl.obolibrary.org/obo/BFO_')
@@ -73,6 +80,9 @@ export const PREFIXES = {
   'sstim-eco': 'https://w3id.org/sstim/ecosystem#',
   'sstim-i':  'https://w3id.org/sstim/inst/',
   'sstim-ref': 'https://w3id.org/sstim/ref/',
+  'sstim-organization': 'https://w3id.org/sstim/organization/',
+  'sstim-specialist': 'https://w3id.org/sstim/specialist/',
+  'sstim-ecosystem-record': 'https://w3id.org/sstim/ecosystem-record/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
   'bsc-fw-tech': 'https://w3id.org/sstim/framework/bsc/technique/',
   'biosyncare': 'https://w3id.org/sstim/implementation/biosyncare/',
@@ -94,8 +104,10 @@ export const PREFIXES = {
   'sh':       'http://www.w3.org/ns/shacl#',
   'prov':     'http://www.w3.org/ns/prov#',
   'oa':       'http://www.w3.org/ns/oa#',
+  'org':      'http://www.w3.org/ns/org#',
   'dct':      'http://purl.org/dc/terms/',
   'foaf':     'http://xmlns.com/foaf/0.1/',
+  'schema':   'https://schema.org/',
   'bfo':      'http://purl.obolibrary.org/obo/BFO_',
   'obi':      'http://purl.obolibrary.org/obo/OBI_',
   'iao':      'http://purl.obolibrary.org/obo/IAO_',

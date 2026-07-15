@@ -1,0 +1,9 @@
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+# Overlay on the positive fixture. The Aurora consent activity belongs to the
+# Aurora membership, so linking it from the Resonance membership would share a
+# purpose-specific decision across two qualified records.
+
+<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-resonance>
+    sstim-eco:hasEngagementActivity
+        <https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-consent> .

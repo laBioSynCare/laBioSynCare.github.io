@@ -1,0 +1,108 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix private:  <https://example.org/private-ledger/> .
+@prefix record:   <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+# Synthetic policy fixture only. This file is outside static/ and therefore is
+# never loaded, published, included in VoID, or copied into a release artifact.
+
+private:operator a prov:Agent .
+
+private:withdrawn-agent a prov:Agent .
+private:amended-agent a prov:Agent .
+
+record:synthetic-withdrawn-private-only
+    a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Synthetic withdrawn relationship snapshot"@en ;
+    sstim-eco:relationshipAgent private:withdrawn-agent ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/withdrawn> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/withdrawn> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    sstim-eco:hasEngagementActivity private:prior-approval, private:withdrawal .
+
+private:prior-approval a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic prior private-ledger approval"@en ;
+    sstim-eco:engagementFor record:synthetic-withdrawn-private-only ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T14:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .
+
+private:withdrawal a sstim-eco:EngagementActivity,
+        sstim-eco:ConsentDecisionActivity, sstim-eco:WithdrawalActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic private-ledger consent withdrawal"@en ;
+    sstim-eco:engagementFor record:synthetic-withdrawn-private-only ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentWithdrawn ;
+    prov:endedAtTime "2026-07-15T15:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:prior-approval ;
+    prov:invalidated record:synthetic-withdrawn-private-only .
+
+record:synthetic-amended-private-only
+    a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Synthetic superseded relationship snapshot"@en ;
+    sstim-eco:relationshipAgent private:amended-agent ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/before-correction> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/before-correction> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    sstim-eco:hasEngagementActivity private:prior-amendment-approval,
+        private:amendment .
+
+record:synthetic-amendment-replacement-private
+    a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Synthetic corrected replacement relationship snapshot"@en ;
+    sstim-eco:relationshipAgent private:amended-agent ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/after-correction> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/after-correction> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    prov:wasRevisionOf record:synthetic-amended-private-only ;
+    sstim-eco:hasEngagementActivity private:replacement-approval .
+
+private:prior-amendment-approval a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic approval before correction"@en ;
+    sstim-eco:engagementFor record:synthetic-amended-private-only ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T16:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .
+
+private:amendment a sstim-eco:EngagementActivity,
+        sstim-eco:AmendmentActivity, prov:Activity ;
+    rdfs:label "Synthetic valid private amendment"@en ;
+    sstim-eco:engagementFor record:synthetic-amended-private-only ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeRecordAmended ;
+    prov:endedAtTime "2026-07-15T17:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:prior-amendment-approval ;
+    prov:generated record:synthetic-amendment-replacement-private ;
+    prov:invalidated record:synthetic-amended-private-only .
+
+private:replacement-approval a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic corrected replacement approval"@en ;
+    sstim-eco:engagementFor record:synthetic-amendment-replacement-private ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T18:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .

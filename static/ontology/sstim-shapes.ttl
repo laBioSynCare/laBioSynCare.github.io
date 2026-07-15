@@ -31,6 +31,9 @@
 @prefix sh:    <http://www.w3.org/ns/shacl#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix schema: <https://schema.org/> .
+@prefix org:    <http://www.w3.org/ns/org#> .
 
 
 ###########################################################################
@@ -40,15 +43,16 @@
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
     owl:versionInfo "0.7.0-dev" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
-    dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, and references."@en ;
+    dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-13"^^xsd:date ;
-    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+    dct:modified "2026-07-15"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 
 
 ###########################################################################
@@ -1463,145 +1467,900 @@ sstim-sh:StimulusChannelShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Ecosystem Agent Shape (ADR 0024)
+# Qualified ecosystem record shapes (ADR 0031)
 #
-# Validates curated ecosystem-agent records: required provenance, controlled
-# lifecycle values, date sanity, and the consent gates. Named agents are
-# implementation data; this shape is what makes the notify-and-honor
-# governance machine-checkable.
+# These shapes validate the public, live-only ecosystem profile. They reject
+# the flat ADR 0024 relation/lifecycle surface, bind every claim to one named
+# relationship record, enforce person/organization and implementation
+# separation, and keep private correspondence/contact predicates out of public
+# instance graphs.
 ###########################################################################
 
 sstim-sh:EcosystemAgentShape a sh:NodeShape ;
     sh:targetClass sstim-eco:EcosystemAgent ;
-    sh:name "Ecosystem agent"@en ;
+    sh:name "Qualified ecosystem agent"@en ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
 
     sh:property [
-        sh:path rdfs:label ;
-        sh:minCount 1 ;
-        sh:message "Every ecosystem agent must have at least one rdfs:label (the public name)."@en ;
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:nodeKind sh:Literal ;
+        sh:message "Every ecosystem agent must have a public rdfs:label."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim-eco:recordSource ;
-        sh:minCount 1 ;
-        sh:message "Every ecosystem agent must declare sstim-eco:recordSource — the public provenance of its facts (ADR 0024 §5)."@en ;
+        sh:path dct:source ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem agent must cite at least one IRI-valued authoritative public source."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim-eco:relationshipType ;
-        sh:minCount 1 ;
-        sh:class sstim-eco:RelationshipType ;
-        sh:message "Every ecosystem agent must declare at least one controlled sstim-eco:relationshipType."@en ;
+        sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every ecosystem agent must have one xsd:date creation date."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim-eco:consentStatus ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:in ( "implicit-public" "notified" "consent-requested" "consent-granted" "consent-declined" "removal-requested" "withdrawn" ) ;
-        sh:message "Every ecosystem agent must declare exactly one controlled sstim-eco:consentStatus (ADR 0024 §5)."@en ;
+        sh:path dct:modified ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every ecosystem agent must have one xsd:date identity-review date."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim-eco:notificationStatus ;
-        sh:minCount 1 ; sh:maxCount 1 ;
-        sh:in ( "not-notified" "notified" "failed" ) ;
-        sh:message "Every ecosystem agent must declare exactly one controlled sstim-eco:notificationStatus."@en ;
+        sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem agent record must identify exactly one curator by IRI."@en ;
     ] ;
-
     sh:property [
-        sh:path sstim-eco:responseStatus ;
-        sh:maxCount 1 ;
-        sh:in ( "no-response" "acknowledged" "consented" "objected" "requested-removal" "requested-changes" ) ;
-        sh:message "sstim-eco:responseStatus must be one controlled value."@en ;
+        sh:path sstim-eco:hasEcosystemRelationship ; sh:minCount 1 ;
+        sh:class sstim-eco:EcosystemRelationship ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem agent must link to at least one named qualified relationship."@en ;
     ] ;
+    # Optional public identity fields are declared directly so sh:closed admits
+    # them; the sh:or below still requires at least one resolvable identity IRI.
+    sh:property [ sh:path dct:description ; sh:nodeKind sh:Literal ;
+        sh:message "Public ecosystem descriptions must be literal text, never links to private evidence nodes."@en ] ;
+    sh:property [ sh:path schema:sameAs ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path owl:sameAs ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path schema:url ; sh:nodeKind sh:IRI ] ;
+    sh:not [ sh:class sstim:SensoryStimulationImplementation ] ;
 
-    sh:property [
-        sh:path sstim-eco:contributionStatus ;
-        sh:maxCount 1 ;
-        sh:in ( "none" "potential" "active" "past" ) ;
-        sh:message "sstim-eco:contributionStatus must be one controlled value."@en ;
-    ] ;
+    # Exactly one external identity kind, with the corresponding standard type.
+    sh:xone (
+        [
+            sh:property [ sh:path rdf:type ; sh:hasValue schema:Person ] ;
+            sh:property [ sh:path rdf:type ; sh:hasValue foaf:Person ] ;
+        ]
+        [
+            sh:property [ sh:path rdf:type ; sh:hasValue schema:Organization ] ;
+            sh:property [ sh:path rdf:type ; sh:hasValue org:Organization ] ;
+        ]
+    ) ;
 
-    sh:property [
-        sh:path sstim-eco:archivalConsent ;
-        sh:maxCount 1 ; sh:datatype xsd:boolean ;
-        sh:message "sstim-eco:archivalConsent must be a single boolean (ADR 0024 §6)."@en ;
-    ] ;
+    # A resolvable homepage or same-identity record is required in addition to
+    # claim-level provenance.
+    sh:or (
+        [ sh:property [ sh:path schema:sameAs ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ]
+        [ sh:property [ sh:path owl:sameAs ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ]
+        [ sh:property [ sh:path schema:url ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ]
+    ) ;
 
-    sh:property [
-        sh:path sstim-eco:addedOn ;
-        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "Every ecosystem agent must declare exactly one xsd:date sstim-eco:addedOn."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim-eco:notifiedOn ;
-        sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "sstim-eco:notifiedOn must be a single xsd:date."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim-eco:respondedOn ;
-        sh:maxCount 1 ; sh:datatype xsd:date ;
-        sh:message "sstim-eco:respondedOn must be a single xsd:date."@en ;
-    ] ;
-
-    # A notified agent must carry the notification date.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "An agent with notificationStatus 'notified' must declare sstim-eco:notifiedOn."@en ;
+        sh:message "Every hasEcosystemRelationship link must point to a record whose relationshipAgent is this agent."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim/ecosystem#notificationStatus> "notified" .
+                $this <https://w3id.org/sstim/ecosystem#hasEcosystemRelationship> ?relationship .
                 FILTER NOT EXISTS {
-                    $this <https://w3id.org/sstim/ecosystem#notifiedOn> ?d .
+                    ?relationship <https://w3id.org/sstim/ecosystem#relationshipAgent> $this .
                 }
             }
         """ ;
     ] ;
 
-    # A recorded response requires both its status and its date.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "An agent with a responseStatus other than 'no-response' must declare sstim-eco:respondedOn."@en ;
+        sh:message "Every ecosystem agent must have exactly one explicit schema kind: Person or Organization, never neither or both."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim/ecosystem#responseStatus> ?s .
-                FILTER(?s != "no-response")
-                FILTER NOT EXISTS {
-                    $this <https://w3id.org/sstim/ecosystem#respondedOn> ?d .
+                {
+                    FILTER NOT EXISTS { $this a <https://schema.org/Person> . }
+                    FILTER NOT EXISTS { $this a <https://schema.org/Organization> . }
+                }
+                UNION
+                {
+                    $this a <https://schema.org/Person>, <https://schema.org/Organization> .
                 }
             }
         """ ;
     ] ;
 
-    # Archival consent must rest on an actual consent signal (ADR 0024 §6):
-    # either consentStatus 'consent-granted' or a 'consented' response.
+    # New data must not use any flattened relation/lifecycle property retained
+    # solely for the 0.7 migration window.
+    sh:property [ sh:path sstim-eco:relationshipType ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:relatesTo ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:expertiseArea ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:hasContributedTo ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:couldContributeTo ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:curatedBy ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:recordSource ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:consentStatus ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:archivalConsent ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:notificationStatus ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:notifiedOn ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:notificationChannel ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:responseStatus ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:respondedOn ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:responseNote ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:contributionStatus ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:addedOn ; sh:maxCount 0 ] ;
+
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "sstim-eco:archivalConsent true requires consentStatus 'consent-granted' or responseStatus 'consented' (ADR 0024 §6)."@en ;
+        sh:message "New ecosystem agents must not use a deprecated flat relationship or lifecycle predicate; mint qualified records instead."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim/ecosystem#archivalConsent> true .
-                FILTER NOT EXISTS {
-                    $this <https://w3id.org/sstim/ecosystem#consentStatus> "consent-granted" .
-                }
-                FILTER NOT EXISTS {
-                    $this <https://w3id.org/sstim/ecosystem#responseStatus> "consented" .
-                }
+                $this ?legacyPredicate ?value .
+                FILTER(?legacyPredicate IN (
+                    <https://w3id.org/sstim/ecosystem#relationshipType>,
+                    <https://w3id.org/sstim/ecosystem#relatesTo>,
+                    <https://w3id.org/sstim/ecosystem#expertiseArea>,
+                    <https://w3id.org/sstim/ecosystem#hasContributedTo>,
+                    <https://w3id.org/sstim/ecosystem#couldContributeTo>,
+                    <https://w3id.org/sstim/ecosystem#curatedBy>,
+                    <https://w3id.org/sstim/ecosystem#recordSource>,
+                    <https://w3id.org/sstim/ecosystem#consentStatus>,
+                    <https://w3id.org/sstim/ecosystem#archivalConsent>,
+                    <https://w3id.org/sstim/ecosystem#notificationStatus>,
+                    <https://w3id.org/sstim/ecosystem#notifiedOn>,
+                    <https://w3id.org/sstim/ecosystem#notificationChannel>,
+                    <https://w3id.org/sstim/ecosystem#responseStatus>,
+                    <https://w3id.org/sstim/ecosystem#respondedOn>,
+                    <https://w3id.org/sstim/ecosystem#responseNote>,
+                    <https://w3id.org/sstim/ecosystem#contributionStatus>,
+                    <https://w3id.org/sstim/ecosystem#addedOn>
+                ))
             }
         """ ;
     ] ;
 
-    # An agent whose removal has been requested must not remain archival.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "An agent with consentStatus 'removal-requested' or 'withdrawn' must not carry archivalConsent true."@en ;
+        sh:message "schema:Person ecosystem agents must use /specialist/{id} IRIs and schema:Organization agents must use /organization/{id} IRIs."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
-                $this <https://w3id.org/sstim/ecosystem#archivalConsent> true ;
-                      <https://w3id.org/sstim/ecosystem#consentStatus> ?s .
-                FILTER(?s IN ("removal-requested", "withdrawn"))
+                {
+                    $this a <https://schema.org/Person> .
+                    FILTER(!STRSTARTS(STR($this), "https://w3id.org/sstim/specialist/"))
+                }
+                UNION
+                {
+                    $this a <https://schema.org/Organization> .
+                    FILTER(!STRSTARTS(STR($this), "https://w3id.org/sstim/organization/"))
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An ecosystem agent and a sensory-stimulation implementation must not be identified through schema:sameAs or owl:sameAs; model responsibility with a qualified relationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this ?sameAs ?identity .
+                FILTER(?sameAs IN (<https://schema.org/sameAs>,
+                                   <http://www.w3.org/2002/07/owl#sameAs>))
+                FILTER(
+                    STRSTARTS(STR(?identity), "https://w3id.org/sstim/implementation/") ||
+                    EXISTS {
+                        ?identity a <https://w3id.org/sstim#SensoryStimulationImplementation> .
+                    }
+                )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A person ecosystem agent must not be identified with an organization, and an organization agent must not be identified with a person, through schema:sameAs or owl:sameAs."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this ?sameAs ?identity .
+                FILTER(?sameAs IN (<https://schema.org/sameAs>,
+                                   <http://www.w3.org/2002/07/owl#sameAs>))
+                {
+                    $this a <https://schema.org/Person> .
+                    FILTER(
+                        STRSTARTS(STR(?identity), "https://w3id.org/sstim/organization/") ||
+                        EXISTS { ?identity a <https://schema.org/Organization> . } ||
+                        EXISTS { ?identity a <http://www.w3.org/ns/org#Organization> . }
+                    )
+                }
+                UNION
+                {
+                    $this a <https://schema.org/Organization> .
+                    FILTER(
+                        STRSTARTS(STR(?identity), "https://w3id.org/sstim/specialist/") ||
+                        EXISTS { ?identity a <https://schema.org/Person> . } ||
+                        EXISTS { ?identity a <http://xmlns.com/foaf/0.1/Person> . }
+                    )
+                }
+            }
+        """ ;
+    ] .
+
+
+sstim-sh:EcosystemImplementationSeparationShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationImplementation ;
+    sh:name "Implementation/agent identity separation"@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A SensoryStimulationImplementation must not also be typed as an ecosystem person or organization; model the responsible agent with a qualified relationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this a ?forbiddenType .
+                FILTER(?forbiddenType IN (
+                    <https://w3id.org/sstim/ecosystem#EcosystemAgent>,
+                    <https://schema.org/Person>,
+                    <http://xmlns.com/foaf/0.1/Person>,
+                    <https://schema.org/Organization>,
+                    <http://www.w3.org/ns/org#Organization>
+                ))
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A SensoryStimulationImplementation must not be identified with an ecosystem agent through schema:sameAs or owl:sameAs in either direction."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                {
+                    ?agent ?sameAs $this .
+                    FILTER(?sameAs IN (<https://schema.org/sameAs>,
+                                       <http://www.w3.org/2002/07/owl#sameAs>))
+                }
+                UNION
+                {
+                    $this ?sameAs ?agent .
+                    FILTER(?sameAs IN (<https://schema.org/sameAs>,
+                                       <http://www.w3.org/2002/07/owl#sameAs>))
+                }
+                FILTER(
+                    STRSTARTS(STR(?agent), "https://w3id.org/sstim/specialist/") ||
+                    STRSTARTS(STR(?agent), "https://w3id.org/sstim/organization/") ||
+                    EXISTS {
+                        ?agent a <https://w3id.org/sstim/ecosystem#EcosystemAgent> .
+                    }
+                )
+            }
+        """ ;
+    ] .
+
+
+sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:EcosystemRelationship ;
+    sh:name "Qualified ecosystem relationship"@en ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ;
+        sh:message "Every ecosystem relationship must have an rdfs:label."@en ] ;
+    sh:property [ sh:path sstim-eco:relationshipAgent ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemAgent ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem relationship must identify exactly one ecosystem agent."@en ] ;
+    sh:property [ sh:path sstim-eco:relationshipTarget ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:disjoint sstim-eco:relationshipAgent ;
+        sh:pattern "^(https://|http://www\\.wikidata\\.org/entity/)" ;
+        sh:message "Every ecosystem relationship must identify exactly one public-web IRI target; contact, file, and private identifier schemes are forbidden."@en ] ;
+    sh:property [ sh:path sstim-eco:hasRelationshipType ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:RelationshipType ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem relationship must identify exactly one controlled relationship type."@en ] ;
+    sh:property [ sh:path sstim-eco:relationshipPurpose ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemPurpose ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem relationship must identify exactly one controlled purpose."@en ] ;
+    sh:property [ sh:path dct:source ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem relationship must cite at least one IRI-valued public source."@en ] ;
+    sh:property [ sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every ecosystem relationship must have one xsd:date creation date."@en ] ;
+    sh:property [ sh:path sstim-eco:reviewedOn ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:date ;
+        sh:message "Every ecosystem relationship must have one xsd:date review date."@en ] ;
+    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "Every ecosystem relationship must identify one curator by IRI."@en ] ;
+    sh:property [ sh:path sstim-eco:validFrom ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path sstim-eco:validUntil ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path sstim-eco:hasEngagementActivity ; sh:minCount 1 ;
+        sh:class sstim-eco:EngagementActivity ; sh:nodeKind sh:IRI ;
+        sh:message "Every public ecosystem relationship must carry at least one named engagement/publication activity."@en ] ;
+    # Optional qualified-record fields and ORG specialization properties must
+    # be declared here as well as on subtype shapes so the public profile stays
+    # closed to unreviewed/private predicates.
+    sh:property [ sh:path dct:description ; sh:nodeKind sh:Literal ;
+        sh:message "Public ecosystem descriptions must be literal text, never links to private evidence nodes."@en ] ;
+    sh:property [ sh:path org:member ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path org:organization ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path org:role ; sh:nodeKind sh:IRI ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The relationship agent must link back to this relationship with sstim-eco:hasEcosystemRelationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#relationshipAgent> ?agent .
+                FILTER NOT EXISTS {
+                    ?agent <https://w3id.org/sstim/ecosystem#hasEcosystemRelationship> $this .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A public ecosystem relationship must not place a person in relationshipTarget; model the person as relationshipAgent so the person-publication gate applies."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#relationshipTarget> ?target .
+                FILTER(
+                    STRSTARTS(STR(?target), "https://w3id.org/sstim/specialist/") ||
+                    EXISTS { ?target a <https://schema.org/Person> . } ||
+                    EXISTS { ?target a <http://xmlns.com/foaf/0.1/Person> . }
+                )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "org:member, org:organization, and org:role may occur only on an OrganizationMembership relationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this ?property ?value .
+                FILTER(?property IN (
+                    <http://www.w3.org/ns/org#member>,
+                    <http://www.w3.org/ns/org#organization>,
+                    <http://www.w3.org/ns/org#role>
+                ))
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/ecosystem#OrganizationMembership> .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Every hasEngagementActivity link must point to an activity whose engagementFor is this relationship; one activity cannot be shared by several relationships."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?activity .
+                FILTER NOT EXISTS {
+                    ?activity <https://w3id.org/sstim/ecosystem#engagementFor> $this .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "validUntil must not be earlier than validFrom."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#validFrom> ?start ;
+                      <https://w3id.org/sstim/ecosystem#validUntil> ?end .
+                FILTER(?end < ?start)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "reviewedOn must not be earlier than the relationship creation date."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://purl.org/dc/terms/created> ?created ;
+                      <https://w3id.org/sstim/ecosystem#reviewedOn> ?reviewed .
+                FILTER(?reviewed < ?created)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The organizationMember relationship type requires explicit OrganizationMembership and org:Membership typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasRelationshipType>
+                    <https://w3id.org/sstim/ecosystem#organizationMember> .
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/ecosystem#OrganizationMembership>,
+                            <http://www.w3.org/ns/org#Membership> .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An implementation-responsibility relationship type requires explicit ImplementationResponsibility typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasRelationshipType> ?type .
+                FILTER(
+                    ?type IN (
+                        <https://w3id.org/sstim/ecosystem#implementationDeveloper>,
+                        <https://w3id.org/sstim/ecosystem#implementationPublisher>,
+                        <https://w3id.org/sstim/ecosystem#implementationMaintainer>,
+                        <https://w3id.org/sstim/ecosystem#implementationProvider>,
+                        <https://w3id.org/sstim/ecosystem#implementationOperator>
+                    ) || (
+                        ?type IN (
+                            <https://w3id.org/sstim/ecosystem#institutionalHost>,
+                            <https://w3id.org/sstim/ecosystem#funder>
+                        ) && EXISTS {
+                            $this <https://w3id.org/sstim/ecosystem#relationshipTarget> ?implementation .
+                            ?implementation a <https://w3id.org/sstim#SensoryStimulationImplementation> .
+                        }
+                    )
+                )
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/ecosystem#ImplementationResponsibility> .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Archival-purpose relationships are not accepted in the public ecosystem graph until the separate archival pipeline and consent-evidence gate exist."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#relationshipPurpose>
+                    <https://w3id.org/sstim/ecosystem#purposeArchivalPublication> .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Engagement activities for one public relationship must have distinct timestamps so its current admission state is unambiguous."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?first, ?second .
+                ?first <http://www.w3.org/ns/prov#endedAtTime> ?firstTime .
+                ?second <http://www.w3.org/ns/prov#endedAtTime> ?secondTime .
+                FILTER(?first != ?second && ?firstTime = ?secondTime)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Every relationship admitted to the public ecosystem graph must end in a unique latest PublicationDecisionActivity with outcome publication approved."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?approval .
+                    ?approval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                              <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                  <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> ;
+                              <http://www.w3.org/ns/prov#endedAtTime> ?approvalTime .
+                    FILTER NOT EXISTS {
+                        $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?later .
+                        ?later <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                        FILTER(?laterTime > ?approvalTime)
+                    }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The final publication approval must be associated with the relationship curator."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/ns/prov#wasAttributedTo> ?curator .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?approval .
+                    ?approval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                              <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                  <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> ;
+                              <http://www.w3.org/ns/prov#endedAtTime> ?approvalTime ;
+                              <http://www.w3.org/ns/prov#wasAssociatedWith> ?curator .
+                    FILTER NOT EXISTS {
+                        $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?later .
+                        ?later <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                        FILTER(?laterTime > ?approvalTime)
+                    }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Before final approval, a non-self-published relationship concerning a person in the public ecosystem dataset must have an earlier scoped consent grant."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#relationshipAgent> ?person .
+                ?person a <https://schema.org/Person> .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?approval .
+                    ?approval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                              <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                  <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> ;
+                              <http://www.w3.org/ns/prov#endedAtTime> ?approvalTime ;
+                              <http://www.w3.org/ns/prov#wasAssociatedWith> ?person .
+                    FILTER NOT EXISTS {
+                        $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?later .
+                        ?later <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                        FILTER(?laterTime > ?approvalTime)
+                    }
+                }
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?basis, ?finalApproval .
+                    ?basis <https://w3id.org/sstim/ecosystem#engagementOutcome> ?basisOutcome ;
+                           <http://www.w3.org/ns/prov#endedAtTime> ?basisTime .
+                    FILTER(?basisOutcome =
+                        <https://w3id.org/sstim/ecosystem#outcomeConsentGranted>)
+                    ?finalApproval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                                   <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                       <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> ;
+                                   <http://www.w3.org/ns/prov#endedAtTime> ?approvalTime .
+                    FILTER(?basisTime < ?approvalTime)
+                    FILTER NOT EXISTS {
+                        $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?later .
+                        ?later <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                        FILTER(?laterTime > ?approvalTime)
+                    }
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Amendment and withdrawal activities belong to the private audit ledger; remove invalidated identifying chains and publish only the approved current replacement."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?operationalEvent .
+                ?operationalEvent a ?eventType .
+                FILTER(?eventType IN (
+                    <https://w3id.org/sstim/ecosystem#AmendmentActivity>,
+                    <https://w3id.org/sstim/ecosystem#WithdrawalActivity>
+                ))
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A public relationship may expose only notification-sent, acknowledged, consent-granted, and publication-approved outcomes; all negative and operational states belong only to the private audit ledger."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?activity .
+                ?activity <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome NOT IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationSent>,
+                    <https://w3id.org/sstim/ecosystem#outcomeAcknowledged>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentGranted>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationApproved>
+                ))
+            }
+        """ ;
+    ] .
+
+
+sstim-sh:OrganizationMembershipShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:OrganizationMembership ;
+    sh:name "Qualified organization membership"@en ;
+    sh:property [ sh:path sstim-eco:validFrom ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:date ;
+        sh:message "OrganizationMembership must identify the date from which the sourced membership is known to apply."@en ] ;
+    sh:property [ sh:path sstim-eco:hasRelationshipType ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:hasValue sstim-eco:organizationMember ;
+        sh:message "OrganizationMembership must use relationship type organizationMember."@en ] ;
+    sh:property [ sh:path org:member ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class schema:Person ; sh:nodeKind sh:IRI ;
+        sh:message "OrganizationMembership must identify exactly one schema:Person member."@en ] ;
+    sh:property [ sh:path org:member ; sh:class sstim-eco:EcosystemAgent ] ;
+    sh:property [ sh:path org:organization ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class schema:Organization ; sh:nodeKind sh:IRI ;
+        sh:message "OrganizationMembership must identify exactly one schema:Organization."@en ] ;
+    sh:property [ sh:path org:organization ; sh:class sstim-eco:EcosystemAgent ] ;
+    sh:property [ sh:path org:role ; sh:minCount 1 ; sh:class org:Role ; sh:nodeKind sh:IRI ;
+        sh:message "OrganizationMembership must identify at least one IRI-valued org:Role."@en ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Membership org:member/org:organization must equal relationshipAgent/relationshipTarget respectively."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#relationshipAgent> ?agent ;
+                      <https://w3id.org/sstim/ecosystem#relationshipTarget> ?target ;
+                      <http://www.w3.org/ns/org#member> ?member ;
+                      <http://www.w3.org/ns/org#organization> ?organization .
+                FILTER(?agent != ?member || ?target != ?organization)
+            }
+        """ ;
+    ] .
+
+
+sstim-sh:ImplementationResponsibilityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:ImplementationResponsibility ;
+    sh:name "Implementation responsibility"@en ;
+    sh:property [ sh:path sstim-eco:relationshipTarget ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:SensoryStimulationImplementation ;
+        sh:message "ImplementationResponsibility must target one sstim:SensoryStimulationImplementation."@en ] ;
+    sh:property [ sh:path sstim-eco:hasRelationshipType ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:ImplementationResponsibilityType ;
+        sh:in ( sstim-eco:implementationDeveloper sstim-eco:implementationPublisher
+                sstim-eco:implementationMaintainer sstim-eco:implementationProvider
+                sstim-eco:implementationOperator sstim-eco:institutionalHost
+                sstim-eco:funder ) ;
+        sh:message "ImplementationResponsibility must use one controlled implementation responsibility type."@en ] .
+
+
+sstim-sh:EngagementActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:EngagementActivity ;
+    sh:name "Qualified ecosystem engagement activity"@en ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path sstim-eco:engagementFor ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemRelationship ; sh:nodeKind sh:IRI ;
+        sh:message "Every engagement activity must govern exactly one ecosystem relationship."@en ] ;
+    sh:property [ sh:path sstim-eco:engagementPurpose ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemPurpose ; sh:nodeKind sh:IRI ;
+        sh:message "Every engagement activity must identify exactly one controlled purpose."@en ] ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EngagementOutcome ; sh:nodeKind sh:IRI ;
+        sh:message "Every engagement activity must identify exactly one controlled outcome."@en ] ;
+    sh:property [ sh:path prov:endedAtTime ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:pattern "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|\\+00:00)$" ;
+        sh:message "Every engagement activity must have one UTC whole-second xsd:dateTime event timestamp (Z or +00:00 offset)."@en ] ;
+    sh:property [ sh:path prov:wasAssociatedWith ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class prov:Agent ; sh:nodeKind sh:IRI ;
+        sh:message "Every engagement activity must identify one responsible agent by IRI."@en ] ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:class sstim-eco:EngagementActivity ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path dct:description ; sh:nodeKind sh:Literal ;
+        sh:message "Public ecosystem descriptions must be literal text, never links to private evidence nodes."@en ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "The governed relationship must link back to the activity with hasEngagementActivity."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship .
+                FILTER NOT EXISTS {
+                    ?relationship <https://w3id.org/sstim/ecosystem#hasEngagementActivity> $this .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An engagement activity purpose must equal the purpose of its governed relationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <https://w3id.org/sstim/ecosystem#engagementPurpose> ?activityPurpose .
+                ?relationship <https://w3id.org/sstim/ecosystem#relationshipPurpose> ?relationshipPurpose .
+                FILTER(?activityPurpose != ?relationshipPurpose)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Every prov:wasInformedBy predecessor must be strictly earlier than the activity that cites it."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/ns/prov#endedAtTime> ?current ;
+                      <http://www.w3.org/ns/prov#wasInformedBy> ?previous .
+                ?previous <http://www.w3.org/ns/prov#endedAtTime> ?previousTime .
+                FILTER(?previousTime >= ?current)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Every prov:wasInformedBy predecessor must govern the same qualified relationship as the activity that cites it."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <http://www.w3.org/ns/prov#wasInformedBy> ?previous .
+                FILTER NOT EXISTS {
+                    ?previous <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Notification outcomes require explicit NotificationActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationSent>,
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationFailed>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#NotificationActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Response outcomes require explicit ResponseActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeAcknowledged>,
+                    <https://w3id.org/sstim/ecosystem#outcomeChangesRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeObjected>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#ResponseActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Publication outcomes require explicit PublicationDecisionActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationApproved>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationWithheld>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Consent outcomes require explicit ConsentDecisionActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentGranted>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentDeclined>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#ConsentDecisionActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Record-amended outcomes require explicit AmendmentActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                    <https://w3id.org/sstim/ecosystem#outcomeRecordAmended> .
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#AmendmentActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Removal or consent-withdrawn outcomes require explicit WithdrawalActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#WithdrawalActivity> . }
+            }
+        """ ;
+    ] .
+
+
+sstim-sh:NotificationActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:NotificationActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeNotificationSent sstim-eco:outcomeNotificationFailed ) ;
+        sh:message "NotificationActivity outcome must be notification sent or notification failed."@en ] .
+
+sstim-sh:ResponseActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:ResponseActivity ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:minCount 1 ;
+        sh:class sstim-eco:NotificationActivity ; sh:nodeKind sh:IRI ;
+        sh:message "ResponseActivity must identify at least one notification predecessor."@en ] ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeAcknowledged sstim-eco:outcomeChangesRequested
+                sstim-eco:outcomeObjected sstim-eco:outcomeRemovalRequested ) ;
+        sh:message "ResponseActivity must use one controlled response outcome."@en ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A response requires an earlier notification for the same qualified relationship."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <http://www.w3.org/ns/prov#endedAtTime> ?responseTime .
+                FILTER NOT EXISTS {
+                    ?notification a <https://w3id.org/sstim/ecosystem#NotificationActivity> ;
+                                  <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                                  <http://www.w3.org/ns/prov#endedAtTime> ?notificationTime .
+                    FILTER(?notificationTime < ?responseTime)
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A response recording removal requested must also be a WithdrawalActivity so invalidation is explicit."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                          <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested> .
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/ecosystem#WithdrawalActivity> .
+                }
+            }
+        """ ;
+    ] .
+
+sstim-sh:PublicationDecisionActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:PublicationDecisionActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomePublicationApproved sstim-eco:outcomePublicationWithheld ) ;
+        sh:message "PublicationDecisionActivity outcome must be publication approved or withheld."@en ] .
+
+sstim-sh:ConsentDecisionActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:ConsentDecisionActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeConsentGranted sstim-eco:outcomeConsentDeclined
+                sstim-eco:outcomeConsentWithdrawn ) ;
+        sh:message "ConsentDecisionActivity must use one controlled consent outcome."@en ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A person consent decision must be associated with the person who is the governed relationship's agent."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <http://www.w3.org/ns/prov#wasAssociatedWith> ?actor .
+                ?relationship <https://w3id.org/sstim/ecosystem#relationshipAgent> ?person .
+                ?person a <https://schema.org/Person> .
+                FILTER(?actor != ?person)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Archival consent grants are not accepted until the separate archival pipeline and consent-evidence gate are implemented."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementPurpose>
+                          <https://w3id.org/sstim/ecosystem#purposeArchivalPublication> ;
+                      <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                          <https://w3id.org/sstim/ecosystem#outcomeConsentGranted> .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A consent decision recording withdrawal must also be a WithdrawalActivity so invalidation is explicit."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                          <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn> .
+                FILTER NOT EXISTS {
+                    $this a <https://w3id.org/sstim/ecosystem#WithdrawalActivity> .
+                }
+            }
+        """ ;
+    ] .
+
+# Public ecosystem graphs fail closed if a deprecated private operational field
+# or common direct-contact predicate occurs anywhere in the graph.
+sstim-sh:PublicEcosystemPrivateDataShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-eco:notificationChannel,
+        sstim-eco:responseNote, foaf:mbox, schema:email, schema:telephone,
+        schema:contactPoint, schema:identifier ;
+    sh:property [ sh:path sstim-eco:notificationChannel ; sh:maxCount 0 ] ;
+    sh:property [ sh:path sstim-eco:responseNote ; sh:maxCount 0 ] ;
+    sh:property [ sh:path foaf:mbox ; sh:maxCount 0 ] ;
+    sh:property [ sh:path schema:email ; sh:maxCount 0 ] ;
+    sh:property [ sh:path schema:telephone ; sh:maxCount 0 ] ;
+    sh:property [ sh:path schema:contactPoint ; sh:maxCount 0 ] ;
+    sh:property [ sh:path schema:identifier ; sh:maxCount 0 ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Public ecosystem data must not contain contact channels, direct contact details, raw response text, or private consent evidence."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this ?privatePredicate ?value .
+                FILTER(?privatePredicate IN (
+                    <https://w3id.org/sstim/ecosystem#notificationChannel>,
+                    <https://w3id.org/sstim/ecosystem#responseNote>,
+                    <http://xmlns.com/foaf/0.1/mbox>,
+                    <https://schema.org/email>,
+                    <https://schema.org/telephone>,
+                    <https://schema.org/contactPoint>,
+                    <https://schema.org/identifier>
+                ))
             }
         """ ;
     ] .

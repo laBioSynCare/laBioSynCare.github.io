@@ -1,0 +1,5 @@
+@prefix schema: <https://schema.org/> .
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    schema:sameAs
+        <https://w3id.org/sstim/implementation/external/not-loaded> .

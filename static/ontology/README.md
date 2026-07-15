@@ -25,7 +25,8 @@ the graph.
   remains `0.6.0`. Development sources carry no `owl:versionIRI`.
 - Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
   published in `void.ttl` rather than duplicated here.
-- Public instance graph: 1,394 unique triples in 18 files.
+- Public instance and synthetic-fixture graph counts are published in
+  `void.ttl` and verified by the quality audit rather than duplicated here.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
@@ -39,6 +40,7 @@ static/ontology/
 |-- sstim-core.ttl          OWL domain model and core constraints
 |-- sstim-vocab.ttl         Multilingual SKOS controlled values
 |-- sstim-shapes.ttl        SHACL Core and SHACL-SPARQL shapes
+|-- sstim-ecosystem-private-shapes.ttl  Separate access-controlled audit profile (rules only)
 |-- sstim-alignments.ttl    Verified Wikidata and OBO alignments
 |-- sstim-patch-studio.ttl  Voice and authoring parameter properties
 |-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
@@ -54,10 +56,14 @@ static/ontology/
     |-- evidence/           Technique and preset evidence claims
     |-- references/         DOI-identified public-safe references
     |-- experiments/        Exploratory exposure protocols and profiles
-    `-- sessions/           Explicitly synthetic session fixture only
+    |-- sessions/           Explicitly synthetic session fixture only
+    `-- ecosystem/
+        |-- fixtures/      Synthetic ecosystem contract graph only
+        `-- agents/        Future real approved graph (empty before F4)
 ```
 
-All seven `sstim-*.ttl` files declare an `owl:Ontology` node with title,
+All seven term/public-shape modules plus the separate private-audit shape file
+declare an `owl:Ontology` node with title,
 description, creator, creation/modification dates, license, and version
 metadata. Modules carry `owl:versionInfo` only. The core receives a version IRI
 only when the whole set is frozen for release; see
@@ -78,6 +84,9 @@ only when the whole set is frozen for release; see
 | `bsclab-evidence:` | `https://w3id.org/sstim/implementation/bsclab/evidence/` | BSC Lab editorial claims |
 | `bsclab-session:` | `https://w3id.org/sstim/implementation/bsclab/session/` | Session data |
 | `sstim-ref:` | `https://w3id.org/sstim/ref/` | Reusable public references |
+| `sstim-organization:` | `https://w3id.org/sstim/organization/` | Public ecosystem organizations |
+| `sstim-specialist:` | `https://w3id.org/sstim/specialist/` | Public professional person records |
+| `sstim-ecosystem-record:` | `https://w3id.org/sstim/ecosystem-record/` | Qualified ecosystem relationships and engagement activities |
 
 The ontology, public implementation data, user annotations, and sessions are
 separate named graphs. Private BioSynCare catalog data is never converted into
@@ -97,6 +106,9 @@ SSTIM keeps these levels distinct:
 | `SessionSpecification` | Immutable `prov:Plan` for one intended execution |
 | `SessionInstance` | Actual `prov:Activity` and sensory stimulation intervention |
 | `SelfReport` | Consent-governed, phase-qualified subjective observation |
+| `EcosystemAgent` | Neutral person-or-organization umbrella, separate from implementations |
+| `EcosystemRelationship` | Sourced, purpose-specific qualified agent-to-resource record |
+| `EngagementActivity` | Purpose-scoped lifecycle event; only approved positive state is public |
 
 BSC is a framework. BSC Lab and BioSynCare are implementations. A preset is not
 a protocol, and a recorded session is not a preset. See
@@ -145,6 +157,9 @@ The selected upper-model placements are deliberately small:
 | `SessionSpecification` | IAO information content entity and `prov:Plan` |
 | `SessionInstance` | `prov:Activity` and `SensoryStimulationIntervention` |
 | `SensoryStimulationImplementation` | `prov:Entity` |
+| `EcosystemAgent` | `prov:Agent` |
+| `EcosystemRelationship` | IAO information content entity and `prov:Entity` |
+| `EngagementActivity` | `prov:Activity` |
 | controlled-value classes | IAO information content entity |
 
 SSTIM references selected OBO IRIs instead of importing entire external
@@ -235,6 +250,35 @@ exposure descriptions without equating the delivery medium with perception.
 The haptic/tactile/somatosensory/vibrotactile convention is fixed in
 [ADR 0019](../../docs/decisions/0019-modality-nomenclature-cleanup.md).
 
+## Ecosystem Data
+
+The ecosystem module keeps people, organizations, implementations, and the
+records connecting them distinct. An `EcosystemAgent` is explicitly typed as a
+Schema.org person or organization. Each relationship is a named
+`EcosystemRelationship` that binds one agent to one target, controlled type,
+purpose, source set, curator, and review date. `OrganizationMembership` reuses
+W3C ORG membership, member, organization, and role terms;
+`ImplementationResponsibility` identifies who develops, publishes, maintains,
+provides, operates, hosts, or funds an implementation without equating that
+agent with the implementation itself.
+
+The public graph is an approved current-state projection. Every relationship
+ends in a final publication approval by its curator; a person self-publishes or
+has an earlier scoped consent grant. Only notification-sent, acknowledged,
+consent-granted, and publication-approved outcomes may be public. Complete
+append-only history—including failure, dispute, correction, removal,
+correspondence, authentication IDs, and raw consent evidence—belongs only to
+the access-controlled private audit and must never appear in committed RDF.
+
+The current `instances/ecosystem/fixtures/` data is entirely synthetic and exists to
+exercise memberships, implementation responsibility, lifecycle ordering, and
+the public/private boundary. Real organizations and people require the ADR 0031
+readiness gate and remain live-only/non-archival by default. Because Zenodo
+archives the repository state associated with a published GitHub release—not
+only the output of `make snapshot`—real live-only ecosystem records must be
+served from the designated external mutable store and must not be committed to
+this repository. See the [publication plan](../../docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md#ontology-snapshot-versus-release-archive).
+
 ## Session Data
 
 The committed session is a synthetic, non-personal fixture. It demonstrates:
@@ -260,17 +304,26 @@ That command runs:
 
 1. pySHACL over core, vocabulary, exposure, all seven merged modules, and all
    public instances;
-2. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
+2. the isolated ecosystem contract: JSON-LD graph isomorphism, 34 adversarial
+   public SHACL overlays, six file-profile leakage overlays, six private-ledger
+   adversarial cases, a self-publication positive scenario, complete-history
+   mirroring and private-terminal deletion proofs, exact qualified
+   bindings, and runtime named-graph isolation;
+3. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
    SKOS integrity, functional values, local IRI resolution, evidence provenance,
-   VoID counts, and competency thresholds;
-3. ROBOT with HermiT over the merged OWL module set;
-4. named-graph SPARQL competency queries through Comunica;
-5. graph-isomorphic JSON-LD and RDF/XML export round trips for every module.
+   ecosystem namespace ownership, VoID counts, and competency thresholds;
+4. ROBOT with HermiT over the merged OWL module set;
+5. named-graph SPARQL competency queries through Comunica;
+6. graph-isomorphic JSON-LD and RDF/XML export round trips for every module.
 
 Useful narrower targets:
 
 ```bash
 make shacl
+make shacl-private-ecosystem
+make ecosystem-contract
+# Required once a real aggregate exists; the ledger path must be outside the repo:
+make ecosystem-contract PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl
 make quality-audit
 make reason
 make sparql-sanity
@@ -292,8 +345,11 @@ https://w3id.org/sstim/graph/shapes
 https://w3id.org/sstim/graph/alignments
 https://w3id.org/sstim/graph/patch-studio
 https://w3id.org/sstim/graph/exposure
+https://w3id.org/sstim/graph/ecosystem
 https://w3id.org/sstim/graph/frameworks
 https://w3id.org/sstim/graph/implementations
+https://w3id.org/sstim/graph/ecosystem-fixture
+https://w3id.org/sstim/graph/ecosystem-agents
 https://w3id.org/sstim/implementation/bsclab/protocol/
 https://w3id.org/sstim/implementation/bsclab/preset/
 https://w3id.org/sstim/implementation/bsclab/evidence/
@@ -310,6 +366,8 @@ without adding it to that manifest fails the quality audit.
 ```sparql
 PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
+PREFIX sstim-eco: <https://w3id.org/sstim/ecosystem#>
+PREFIX org: <http://www.w3.org/ns/org#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
 # Presets targeting alpha or a narrower alpha band.
@@ -332,6 +390,15 @@ SELECT ?framework ?protocol ?preset WHERE {
   ?protocol sstim:definedByFramework ?framework .
   ?preset sstim:followsProtocol ?protocol .
 }
+
+# Sourced person-to-organization memberships without role/source mixing.
+SELECT ?person ?organization ?role ?source WHERE {
+  ?membership a sstim-eco:OrganizationMembership ;
+    org:member ?person ;
+    org:organization ?organization ;
+    org:role ?role ;
+    <http://purl.org/dc/terms/source> ?source .
+}
 ```
 
 ## Versioning And Publication
@@ -349,8 +416,11 @@ SSTIM versions the seven modules as one citable set:
    sources, an existing snapshot, dev/prerelease versions, diverging module
    versions, and missing release metadata
    (`scripts/snapshot-ontology.test.mjs` covers these refusals).
-5. Tag and publish the GitHub release so Zenodo archives the same commit.
-6. Add the resulting version DOI without rewriting a published snapshot.
+5. Audit the entire tagged repository state—not only
+   `static/ontology/<version>/`—and confirm that it contains no private ledger
+   and no real live-only ecosystem records.
+6. Tag and publish the GitHub release so Zenodo archives the same commit.
+7. Add the resulting version DOI without rewriting a published snapshot.
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
 master. `context.jsonld` is a hand-maintained compaction context, not a generated

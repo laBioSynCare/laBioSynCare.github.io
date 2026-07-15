@@ -26,6 +26,8 @@
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix schema: <https://schema.org/> .
+@prefix org:   <http://www.w3.org/ns/org#> .
 @prefix cc:    <http://creativecommons.org/ns#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
@@ -37,13 +39,13 @@
 <https://w3id.org/sstim/void>
     a void:Dataset, dcat:Dataset ;
     dct:title "Sensory Stimulation Ontology (SSTIM) — dataset"@en ;
-    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules, plus public BSC Lab framework, protocol, preset, evidence, reference, and synthetic session data for sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
+    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules, plus public BSC Lab framework, protocol, preset, evidence, reference, synthetic session, and synthetic ecosystem contract data for sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-13"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21302910> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
@@ -59,9 +61,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 7308 ;
-    void:classes 92 ;
-    void:properties 200 ;
+    void:triples 8169 ;
+    void:classes 105 ;
+    void:properties 212 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",
@@ -79,6 +81,9 @@
         <http://creativecommons.org/ns#>,
         <http://www.w3.org/ns/shacl#>,
         <http://www.w3.org/ns/prov#>,
+        <https://schema.org/>,
+        <http://www.w3.org/ns/org#>,
+        <http://xmlns.com/foaf/0.1/>,
         <http://purl.obolibrary.org/obo/>,
         <http://www.wikidata.org/entity/> ;
     void:exampleResource <https://w3id.org/sstim#SensoryStimulation>,
@@ -187,17 +192,86 @@
 <https://w3id.org/sstim/void#instances>
     a void:Dataset ;
     dct:title "BSC Lab public SSTIM instance data"@en ;
-    dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, and synthetic session records. Private BioSynCare catalog data and real participant records are excluded."@en ;
+    dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 1523 ;
+    void:triples 1789 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
-        "https://w3id.org/sstim/ref/" ;
+        "https://w3id.org/sstim/ref/",
+        "https://w3id.org/sstim/organization/",
+        "https://w3id.org/sstim/specialist/",
+        "https://w3id.org/sstim/ecosystem-record/" ;
     void:vocabulary <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>,
         <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem>,
-        <http://www.w3.org/ns/prov#> ;
+        <http://www.w3.org/ns/prov#>, <https://schema.org/>,
+        <http://www.w3.org/ns/org#>, <http://xmlns.com/foaf/0.1/> ;
     void:exampleResource <https://w3id.org/sstim/framework/bsc>,
         <https://w3id.org/sstim/implementation/bsclab/protocol/auditory-observation-reference>,
         <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed>,
-        <https://w3id.org/sstim/implementation/bsclab/session/synthetic-reference-001> ;
+        <https://w3id.org/sstim/implementation/bsclab/session/synthetic-reference-001>,
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    void:subset <https://w3id.org/sstim/graph/ecosystem-agents>,
+        <https://w3id.org/sstim/graph/ecosystem-fixture> ;
     dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances> .
+
+
+# Reserved runtime named graph for reviewed real F4 ecosystem records. It is
+# deliberately empty until the release/readiness gate is complete. Each future
+# direct ecosystem/agents/*.ttl file must be listed as a data dump; the quality audit
+# checks full file, loader, graph, and dump coverage.
+<https://w3id.org/sstim/graph/ecosystem-agents>
+    a void:Dataset ;
+    dct:title "SSTIM reviewed ecosystem-agent instance graph"@en ;
+    dct:description "Reserved mutable public graph for reviewed real people, organizations, qualified relationships, and approved public-safe engagement state. It is empty until F4 and excludes private correspondence, contact channels, authentication identifiers, raw consent evidence, and the separate synthetic fixture graph."@en ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    void:triples 0 ;
+    void:classPartition
+        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemAgent> ; void:entities 0 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemRelationship> ; void:entities 0 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#OrganizationMembership> ; void:entities 0 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#ImplementationResponsibility> ; void:entities 0 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#EngagementActivity> ; void:entities 0 ],
+        [ void:class <http://www.w3.org/ns/org#Role> ; void:entities 0 ] ;
+    void:uriSpace "https://w3id.org/sstim/organization/",
+        "https://w3id.org/sstim/specialist/",
+        "https://w3id.org/sstim/ecosystem-record/" ;
+    void:vocabulary <https://w3id.org/sstim>,
+        <https://w3id.org/sstim/ecosystem>,
+        <https://schema.org/>,
+        <http://www.w3.org/ns/org#>,
+        <http://xmlns.com/foaf/0.1/>,
+        <http://www.w3.org/ns/prov#> ;
+    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances/ecosystem/agents> .
+
+
+# Runtime named graph for synthetic contract fixtures. Counts and complete dump
+# coverage are machine-checked independently from the reserved real graph.
+<https://w3id.org/sstim/graph/ecosystem-fixture>
+    a void:Dataset ;
+    dct:title "SSTIM synthetic ecosystem contract fixture graph"@en ;
+    dct:description "Synthetic, non-personal contract data exercising distinct people, organizations, qualified ORG memberships, implementation responsibility, and approved public-safe engagement outcomes. It contains no real named person, correspondence, contact channel, authentication identifier, or raw consent evidence."@en ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    void:triples 266 ;
+    void:classPartition
+        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemAgent> ; void:entities 3 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemRelationship> ; void:entities 6 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#OrganizationMembership> ; void:entities 2 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#ImplementationResponsibility> ; void:entities 2 ],
+        [ void:class <https://w3id.org/sstim/ecosystem#EngagementActivity> ; void:entities 14 ],
+        [ void:class <http://www.w3.org/ns/org#Role> ; void:entities 2 ] ;
+    void:uriSpace "https://w3id.org/sstim/organization/",
+        "https://w3id.org/sstim/specialist/",
+        "https://w3id.org/sstim/ecosystem-record/",
+        "https://w3id.org/sstim/implementation/bsclab/" ;
+    void:vocabulary <https://w3id.org/sstim>,
+        <https://w3id.org/sstim/ecosystem>,
+        <https://schema.org/>,
+        <http://www.w3.org/ns/org#>,
+        <http://xmlns.com/foaf/0.1/>,
+        <http://www.w3.org/ns/prov#> ;
+    void:exampleResource <https://w3id.org/sstim/specialist/synthetic-alex-rivera>,
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab>,
+        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>,
+        <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
+    void:dataDump <https://labiosyncare.github.io/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl> ;
+    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances/ecosystem/fixtures> .

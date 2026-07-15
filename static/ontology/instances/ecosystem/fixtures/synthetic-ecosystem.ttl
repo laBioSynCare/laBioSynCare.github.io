@@ -1,0 +1,356 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix foaf:      <http://xmlns.com/foaf/0.1/> .
+@prefix org:       <http://www.w3.org/ns/org#> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:    <https://schema.org/> .
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix activity: <https://w3id.org/sstim/ecosystem-record/activity/> .
+@prefix record:   <https://w3id.org/sstim/ecosystem-record/relationship/> .
+@prefix role:     <https://example.org/roles/> .
+
+# Synthetic, non-personal, public-safe fixture graph for ADR 0031. Every identity,
+# source, homepage, relationship, and lifecycle event is illustrative. The
+# example.org documents do not identify a real person or organization. This
+# graph grants no archival-publication permission and contains no private
+# correspondence, contact channel, authentication identifier, or consent
+# evidence.
+
+<https://example.org/agent/synthetic-curator> a prov:Agent ;
+    rdfs:label "Synthetic fixture curator"@en .
+
+
+###########################################################################
+# Synthetic identities
+###########################################################################
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    a sstim-eco:EcosystemAgent, prov:Agent, schema:Person, foaf:Person ;
+    rdfs:label "Alex Rivera (synthetic fixture)"@en ;
+    dct:description "A fictional person used to prove that several memberships and relationships remain separately qualified."@en ;
+    dct:source <https://example.org/directory/people/alex-rivera> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
+    schema:url <https://example.org/people/alex-rivera> ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEcosystemRelationship
+        record:alex-membership-aurora,
+        record:alex-membership-resonance,
+        record:alex-attribution-player,
+        record:alex-outreach-resonance .
+
+<https://w3id.org/sstim/organization/synthetic-aurora-lab>
+    a sstim-eco:EcosystemAgent, prov:Agent, schema:Organization, org:Organization ;
+    rdfs:label "Aurora Lab (synthetic fixture)"@en ;
+    dct:description "A fictional laboratory used only by the qualified-ecosystem contract fixture."@en ;
+    dct:source <https://example.org/directory/organizations/aurora-lab> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
+    schema:url <https://example.org/organizations/aurora-lab> ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEcosystemRelationship record:aurora-develops-player .
+
+<https://w3id.org/sstim/organization/synthetic-resonance-coop>
+    a sstim-eco:EcosystemAgent, prov:Agent, schema:Organization, org:Organization ;
+    rdfs:label "Resonance Cooperative (synthetic fixture)"@en ;
+    dct:description "A fictional cooperative used only by the qualified-ecosystem contract fixture."@en ;
+    dct:source <https://example.org/directory/organizations/resonance-coop> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
+    schema:url <https://example.org/organizations/resonance-coop> ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEcosystemRelationship record:resonance-provides-player .
+
+
+###########################################################################
+# Synthetic relationship targets and membership roles
+###########################################################################
+
+<https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player>
+    a sstim:SensoryStimulationImplementation ;
+    rdfs:label "Synthetic sensory player"@en ;
+    dct:description "A fictional implementation used only to exercise qualified implementation responsibility."@en ;
+    sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .
+
+role:researcher a org:Role ;
+    rdfs:label "Researcher (synthetic fixture role)"@en .
+
+role:maintainer a org:Role ;
+    rdfs:label "Maintainer (synthetic fixture role)"@en .
+
+
+###########################################################################
+# Two separately sourced, time-qualified memberships for the same person
+###########################################################################
+
+record:alex-membership-aurora
+    a sstim-eco:EcosystemRelationship, sstim-eco:OrganizationMembership,
+        org:Membership ;
+    rdfs:label "Alex Rivera synthetic membership in Aurora Lab"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    sstim-eco:hasRelationshipType sstim-eco:organizationMember ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    org:member <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    org:organization
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    org:role role:researcher ;
+    dct:source <https://example.org/sources/aurora-membership> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    sstim-eco:validFrom "2024-01-10"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity
+        activity:aurora-membership-consent,
+        activity:aurora-membership-publication .
+
+activity:aurora-membership-consent
+    a sstim-eco:EngagementActivity, sstim-eco:ConsentDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Aurora membership consent decision"@en ;
+    sstim-eco:engagementFor record:alex-membership-aurora ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T09:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .
+
+activity:aurora-membership-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Aurora membership publication decision"@en ;
+    sstim-eco:engagementFor record:alex-membership-aurora ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T09:01:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+record:alex-membership-resonance
+    a sstim-eco:EcosystemRelationship, sstim-eco:OrganizationMembership,
+        org:Membership ;
+    rdfs:label "Alex Rivera synthetic membership in Resonance Cooperative"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/organization/synthetic-resonance-coop> ;
+    sstim-eco:hasRelationshipType sstim-eco:organizationMember ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    org:member <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    org:organization
+        <https://w3id.org/sstim/organization/synthetic-resonance-coop> ;
+    org:role role:maintainer ;
+    dct:source <https://example.org/sources/resonance-membership> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    sstim-eco:validFrom "2023-02-01"^^xsd:date ;
+    sstim-eco:validUntil "2025-12-31"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity
+        activity:resonance-membership-consent,
+        activity:resonance-membership-publication .
+
+activity:resonance-membership-consent
+    a sstim-eco:EngagementActivity, sstim-eco:ConsentDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance membership consent decision"@en ;
+    sstim-eco:engagementFor record:alex-membership-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T09:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .
+
+activity:resonance-membership-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance membership publication decision"@en ;
+    sstim-eco:engagementFor record:alex-membership-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T09:06:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+
+###########################################################################
+# Two independently qualified relationships and lifecycle histories
+###########################################################################
+
+record:alex-attribution-player a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Alex Rivera synthetic contributor attribution"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicAttribution ;
+    dct:source <https://example.org/sources/player-contribution> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity
+        activity:player-attribution-notification,
+        activity:player-attribution-response,
+        activity:player-attribution-consent,
+        activity:player-attribution-publication .
+
+activity:player-attribution-notification
+    a sstim-eco:EngagementActivity, sstim-eco:NotificationActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic player-attribution notification"@en ;
+    sstim-eco:engagementFor record:alex-attribution-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeNotificationSent ;
+    prov:endedAtTime "2026-07-15T10:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+activity:player-attribution-response
+    a sstim-eco:EngagementActivity, sstim-eco:ResponseActivity, prov:Activity ;
+    rdfs:label "Synthetic player-attribution response"@en ;
+    sstim-eco:engagementFor record:alex-attribution-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeAcknowledged ;
+    prov:endedAtTime "2026-07-15T10:30:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> ;
+    prov:wasInformedBy activity:player-attribution-notification .
+
+activity:player-attribution-consent
+    a sstim-eco:EngagementActivity, sstim-eco:ConsentDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic player-attribution consent decision"@en ;
+    sstim-eco:engagementFor record:alex-attribution-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T10:31:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .
+
+activity:player-attribution-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic player-attribution publication decision"@en ;
+    sstim-eco:engagementFor record:alex-attribution-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T10:32:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+record:alex-outreach-resonance a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Alex Rivera synthetic outreach relationship"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/organization/synthetic-resonance-coop> ;
+    sstim-eco:hasRelationshipType sstim-eco:researchCollaborator ;
+    sstim-eco:relationshipPurpose sstim-eco:purposeOutreach ;
+    dct:source <https://example.org/sources/resonance-outreach> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity
+        activity:resonance-outreach-notification,
+        activity:resonance-outreach-response,
+        activity:resonance-outreach-consent,
+        activity:resonance-outreach-publication .
+
+activity:resonance-outreach-notification
+    a sstim-eco:EngagementActivity, sstim-eco:NotificationActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance outreach notification"@en ;
+    sstim-eco:engagementFor record:alex-outreach-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposeOutreach ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeNotificationSent ;
+    prov:endedAtTime "2026-07-15T11:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+activity:resonance-outreach-response
+    a sstim-eco:EngagementActivity, sstim-eco:ResponseActivity, prov:Activity ;
+    rdfs:label "Synthetic Resonance outreach response"@en ;
+    sstim-eco:engagementFor record:alex-outreach-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposeOutreach ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeAcknowledged ;
+    prov:endedAtTime "2026-07-15T11:45:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> ;
+    prov:wasInformedBy activity:resonance-outreach-notification .
+
+activity:resonance-outreach-consent
+    a sstim-eco:EngagementActivity, sstim-eco:ConsentDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance outreach consent decision"@en ;
+    sstim-eco:engagementFor record:alex-outreach-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposeOutreach ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T11:46:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .
+
+activity:resonance-outreach-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance outreach publication decision"@en ;
+    sstim-eco:engagementFor record:alex-outreach-resonance ;
+    sstim-eco:engagementPurpose sstim-eco:purposeOutreach ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T11:47:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+
+###########################################################################
+# Organization responsibility remains distinct from implementation identity
+###########################################################################
+
+record:aurora-develops-player
+    a sstim-eco:EcosystemRelationship,
+        sstim-eco:ImplementationResponsibility ;
+    rdfs:label "Aurora Lab develops the synthetic player"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
+    sstim-eco:hasRelationshipType sstim-eco:implementationDeveloper ;
+    sstim-eco:relationshipPurpose sstim-eco:purposeLivePublication ;
+    dct:source <https://example.org/sources/aurora-player-responsibility> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity activity:aurora-player-publication .
+
+activity:aurora-player-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Aurora responsibility publication decision"@en ;
+    sstim-eco:engagementFor record:aurora-develops-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposeLivePublication ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .
+
+record:resonance-provides-player
+    a sstim-eco:EcosystemRelationship,
+        sstim-eco:ImplementationResponsibility ;
+    rdfs:label "Resonance Cooperative provides the synthetic player"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/organization/synthetic-resonance-coop> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
+    sstim-eco:hasRelationshipType sstim-eco:implementationProvider ;
+    sstim-eco:relationshipPurpose sstim-eco:purposeLivePublication ;
+    dct:source <https://example.org/sources/resonance-player-responsibility> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity activity:resonance-player-publication .
+
+activity:resonance-player-publication
+    a sstim-eco:EngagementActivity, sstim-eco:PublicationDecisionActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic Resonance responsibility publication decision"@en ;
+    sstim-eco:engagementFor record:resonance-provides-player ;
+    sstim-eco:engagementPurpose sstim-eco:purposeLivePublication ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

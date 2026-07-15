@@ -43,8 +43,9 @@ Everything below serves one milestone:
   [`PARTNERS.md`](PARTNERS.md) or [`ADVISORY_BOARD.md`](ADVISORY_BOARD.md). → Workstream 3.
 - **A deeper public-entrance / audience model** than the current homepage. → Workstream 4.
 - **Stakeholder-ecosystem modeling** — formalized in parallel as [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)
-  (Accepted 2026-07-12): a new `sstim-ecosystem` RDF module + a notify-and-honor
-  consent posture for recording real people/organizations. → Workstream 5.
+  (Accepted 2026-07-12, amended by ADR 0031): a new `sstim-ecosystem` RDF
+  module, organization notify-and-honor, and relationship-scoped
+  self-publication/consent for named people. → Workstream 5.
 
 **Already ours (the source re-derived it; adds nothing):** the three-layer model
 ([`ROADMAP.md`](../../ROADMAP.md) Vision), and the vendor-neutral-SSTIM /
@@ -181,10 +182,14 @@ and Patch Studio exports are inputs, not a finished bridge.
 > **Consent & provenance ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)).**
 > The rows below are *outreach intentions*, not stakeholder records. The moment any
 > named person/org is published as a record — in `PARTNERS.md` / `ADVISORY_BOARD.md`
-> or in the Workstream 5 RDF module — the **notify-and-honor** posture applies:
-> notify best-effort, record `recordSource`, honor objections/removals promptly.
-> `PARTNERS.md` / `ADVISORY_BOARD.md` are the *consent-of-record* for named people;
-> confirmed entries mirror into RDF. The ask stays *"encode/reproduce a protocol,"*
+> or in the Workstream 5 RDF module — organizations use the **notify-and-honor**
+> posture: notify best-effort, record the source, and honor objections/removals
+> promptly. Because Git history and clones cannot be made fully erasable, a named
+> person enters the RDF dataset only by self-publication or earlier scoped consent;
+> notification alone is insufficient. `PARTNERS.md` / `ADVISORY_BOARD.md` are the
+> *consent-of-record* for named people only when confirmation covers the exact
+> relationship and purpose; confirmed entries may mirror into RDF after
+> the remaining F3/release gates. The ask stays *"encode/reproduce a protocol,"*
 > never *"endorse BSC"* — consistent with the ADR's no-endorsement / no-false-affiliation
 > rule. **Note:** this tracker itself names public professional figures in a public
 > repo; ADR 0024 permits that (public professional info only), but the best-effort
@@ -231,7 +236,9 @@ and Patch Studio exports are inputs, not a finished bridge.
 - [x] 90-day sequence + KPIs captured in `OUTREACH_TARGETS.md` (kept out of the phase-gated `TODO.md`).
 
 **Pending Renato (outward-facing — not mine to trigger):**
-- [ ] Actual outreach to each target (notify-and-honor attaches on first contact — [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)).
+- [ ] Actual outreach to each target (organization notification attaches on
+      first contact; publishing a person in RDF requires scoped consent or
+      self-publication — [ADRs 0024–0031](../decisions/0031-qualified-ecosystem-records.md)).
 - [ ] Decide the Charter-endorsement question for BioSynCare (ethical commitment only).
 
 ---
@@ -313,23 +320,31 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] In progress. Decision Accepted ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md), 2026-07-12); the initial `0.7.0-dev` term module, context, and SHACL shape are a scaffold, not yet a safe contract for real named records. [KR-13](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md#kr-13--ecosystem-relationships-and-consent-are-flattened-onto-the-agent) and change set F remain open.**
+**`[~] F1–F2 implemented 2026-07-15 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md): the qualified/current-state model, closed public profile, executable admission policy, and synthetic/adversarial proof are in place. F3 synthetic repository plumbing is staged, but the external mutable store for real live-only data and its dereferencing path are not implemented. A stable term release and that live-data boundary remain before F4. No real records have been added.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
 (`sstim-eco:`), reuse of schema.org / ORG / FOAF, verified external IDs (ORCID /
-ROR / Wikidata), an engagement/relationship layer, and a **notify-and-honor**
-consent lifecycle. The later KR-13 audit finding requires an amending decision
-before the flat relationship/lifecycle design is used for real records.
+ROR / Wikidata), an engagement/relationship layer, organization
+**notify-and-honor**, and stricter relationship-scoped person admission.
+[ADR 0031](../decisions/0031-qualified-ecosystem-records.md)
+now resolves the KR-13 design blocker with named, sourced, purpose-specific
+relationships, an approved public current-state projection, and a separate
+append-only private audit; the original flat properties remain deprecated
+compatibility terms and are rejected in new public data.
 Instances are curated implementation data at `/organization/{id}` and
 `/specialist/{id}` — **never** in the reusable term space. The default live-only
-tier is excluded from Zenodo snapshots, so a removal request affects live data
-and git history rather than a DOI archive. ADR 0024 envisages a separate
+tier must be served from an external mutable store, outside this
+Zenodo-tracked release repository. `make snapshot` copies only the ontology term
+modules, but that alone is not a DOI-archive boundary: Zenodo ingests the
+repository state associated with the GitHub release tag. The committed
+ecosystem files therefore remain synthetic. ADR 0024 envisages a separate
 explicit-consent archival tier, but that pipeline is not implemented and is not
 part of the first seed.
 
 This is the RDF counterpart to Workstreams 3–4: an outreach target (W3) becomes a
-recorded stakeholder here once notified/confirmed, and the graph-browser
+recorded agent here only after the applicable source, approval, and—when the
+agent is a person—self-publication or scoped-consent gate is satisfied. The graph-browser
 "Stakeholders" scope serves the Researcher / Standards-peer personas (W4).
 
 ### SSTIM-wide prerequisite decision (2026-07-15)
@@ -344,9 +359,9 @@ status ledger: KR-01, KR-06, the evidence-provenance portion of KR-11, runtime
 KR-12/KR-17, and most KR-14 controls have since been repaired. Validation does
 not, however, make every proposed use ready:
 
-- **KR-13 is the direct blocker here.** Parallel agent-level relationship,
-  source, target, and consent fields become ambiguous as soon as an agent has
-  multiple roles or targets, while scalar lifecycle fields overwrite history.
+- **KR-13's structural blocker is resolved by ADR 0031/F1–F2.** Qualified
+  records now keep each agent, target, type, purpose, source, curator, and
+  admission decision together; negative and terminal history remains private.
 - **KR-02/KR-03 block real session bundles, participant observations, and the
   HED/BIDS path, not ecosystem modeling.** Session change sets B/C are not
   prerequisites for ecosystem change set F.
@@ -359,9 +374,10 @@ not, however, make every proposed use ready:
   ecosystem contract.** The `0.7.0` release remains governed by the full [RDF
   improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
-Therefore, work on the ecosystem may start now, but **only synthetic records and
-private drafts** may precede the readiness gate below. No real named ecosystem
-record should be committed or published against the current flat contract.
+Therefore, the synthetic ecosystem contract and publication plumbing may be
+built independently of session work. **Only synthetic records and private
+drafts** may precede the release/readiness gate below; no real named ecosystem
+record should be presented as stable `0.7.0-dev` data.
 
 ### Minimum ecosystem scope
 
@@ -384,10 +400,13 @@ but it does not require another broad catalogue of entity classes:
 5. **Implementation responsibility:** factual links identifying who develops,
    publishes, maintains, provides, hosts, or funds an implementation, using a
    qualified relation where source, role, and dates matter.
-6. **Provenance and engagement lifecycle:** append-only notification, response,
-   amendment, and withdrawal activities. The public graph exposes only the
-   minimal safe outcome; raw messages, contact channels, and consent evidence
-   stay in a private operational record.
+6. **Provenance and engagement lifecycle:** notification, acknowledgement,
+   scoped consent, and final publication approval are public only while the
+   relationship remains admitted. The append-only private ledger holds failed,
+   declined, disputed, amended, removed, and withdrawn states plus raw messages,
+   contact channels, and consent evidence. It also retains the complete governed
+   relationship snapshot and an exact mirror of every public activity's core
+   fields; amendment replacements are complete revision-linked snapshots.
 
 Frameworks, techniques, protocols, references, and implementations already
 provide relationship targets. Projects, products beyond the existing
@@ -400,58 +419,114 @@ This is the operational sequence for change set F. The
 [improvement plan §1.5](../ontology/IMPROVEMENT_PLAN.md#15-repair-privacy-sensitive-rdf-surfaces)
 remains authoritative for the semantic requirements.
 
-1. **F1 — approve the model and governance amendment.** Write a short successor
+1. **`[x]` F1 — approve the model and governance amendment.** Write a short successor
    or amendment to ADR 0024 covering qualified relationships/engagements,
    organization memberships, implementation responsibility, the public/private
    split, correction/removal handling, and purpose-specific consent. Keep
    live-only/non-archival publication as the default.
-2. **F1 — synchronize the contract.** With explicit approval for protected
+2. **`[x]` F1 — synchronize the contract.** With explicit approval for protected
    files, update OWL, SHACL, JSON-LD context, JavaScript namespaces, migration
    notes, and application mappings together. Deprecate or narrowly retain the
    flat properties rather than silently changing their meaning.
-3. **F2 — prove the model with synthetic fixtures.** Add synthetic person and
+3. **`[x]` F2 — prove the model with synthetic fixtures.** Add synthetic person and
    organization examples plus positive and negative tests. The main fixture
    must show one person with at least two memberships/roles and two engagements
    without mixing their targets, sources, purposes, or consent decisions. Test
    per-artifact/per-named-graph SHACL, JSON-LD graph isomorphism, local IRI
    resolution, lifecycle ordering, and public/private exclusions.
-4. **F3 — complete instance publication plumbing.** Add a dedicated
-   `instances/ecosystem/` family and ecosystem-agent named graph, explicit loader
-   manifest entries, quality-audit coverage and counts, Schema.org/ORG context
-   support, VoID/data-dump metadata, and `/organization/{id}` and
-   `/specialist/{id}` dereferencing. Gate Pages publication on validation.
-5. **Release gate — stabilize the contract.** Run the pinned validation, test,
+4. **`[~]` F3 — complete instance publication plumbing.** The repository now has
+   a dedicated synthetic `instances/ecosystem/` family, named graph, explicit
+   loader manifest entries, quality-audit coverage, Schema.org/ORG context
+   support, VoID metadata, and synthetic routes. Keep those committed files
+   synthetic. Before F4, designate a mutable public store outside this
+   Zenodo-tracked repository, document its retention/removal controls, make the
+   loader consume its validated public dump, and route real `/organization/{id}`
+   and `/specialist/{id}` IRIs to that store. Gate publication on the same SHACL,
+   identity, local-IRI, and public/private checks used by the fixtures. This step
+   becomes complete only after the stable term routes, synthetic routes, and
+   external live-data path are deployed and verified.
+   Before any real record enters public F4 admission, designate an
+   access-controlled private ledger, its access owner and
+   retention policy, and test the append/retract procedure with the synthetic
+   terminal fixture. The public repository contains only the public profile and
+   synthetic guard; it is not the private ledger. Run the real admission gate as
+   `make ecosystem-contract PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`:
+   the supplied path must be outside the repository and its complete history
+   must exactly mirror every admitted relationship claim and the core fields of
+   every public activity. The current command validates repository fixtures and
+   the external-ledger boundary; F3 must extend the access-limited publication
+   job to supply a real candidate from the external mutable store. Before a real
+   aggregate can be published, that job must
+   securely materialize both the candidate public aggregate and that ledger;
+   the public repository workflows
+   deliberately remain fail-closed while no such facility is provisioned.
+   External-ledger diagnostics are redacted and must never print raw SHACL
+   reports or private identifiers to public logs.
+5. **`[~]` Release gate — stabilize the contract.** Run the pinned validation, test,
    check, and build suites; record migration notes; and include the ecosystem
    term contract in a stable citable release before presenting real records as
    stable SSTIM data.
-6. **F4 — add the real seed.** Add verified organizations first; then Renato's
-   person record with an explicit self-publication decision; then sourced
-   memberships and implementation-responsibility records. Keep the first seed
-   live-only and non-archival. Add other people only after applying the
-   notify-and-honor process and reconciling `PARTNERS.md` /
-   `ADVISORY_BOARD.md`.
-7. **Discovery — expose the result.** Add an “Ecosystem / agents” browser scope,
+6. **`[ ]` F4 — author each real RDF aggregate atomically, then activate it in
+   the external mutable store.**
+   The first admitted aggregate contains Renato, the initial verified
+   organizations, and at least one sourced relationship with final approval for
+   every agent. Organization records may be drafted first locally, but cannot
+   be admitted separately because Renato is their initial accountable curator
+   and every curator must already be a verified, related agent in that same
+   aggregate. Renato's initial relationship has him as both curator and final
+   approval actor. An agent cannot be published as a detached identity. Every
+   later membership or responsibility involving a person is a separate
+   relationship and needs its own self-approval or earlier
+   scoped consent grant. Keep the first seed live-only and non-archival. Add
+   other people only after explicit relationship-and-purpose-scoped consent and
+   reconciliation with `PARTNERS.md` / `ADVISORY_BOARD.md`; notification alone
+   does not admit a named person record. Stage exact per-resource w3id rules
+   with the private/local draft. After publishing the validated aggregate makes
+   the external target live, submit and verify those rules before announcing
+   the identifiers or enabling discovery; w3id cannot approve a redirect to a
+   target that is not yet served.
+7. **`[ ]` Discovery — expose the result.** Add an “Ecosystem / agents” browser scope,
    ordinary-instance rendering, useful competency queries, and human-readable
    profile routes. This can follow RDF authoring, but should precede outreach
    that expects people to discover or inspect the records.
 
 ### Readiness gate for real records
 
-Real named records may enter the public repository only when all of these are
-true:
+Real named records may enter the external public live dataset only when all of
+these are true; they remain prohibited from this Zenodo-tracked release
+repository unless the separate archival-consent pipeline is invoked:
 
 - the qualified relationship, membership, implementation-responsibility, and
   lifecycle contracts are approved and synchronized across their representations;
 - synthetic positive and adversarial negative fixtures pass in isolated graphs;
 - public data cannot expose private correspondence, authentication identifiers,
   private contact channels, or raw consent evidence;
+- every relationship target is an HTTPS public-web identifier (or canonical
+  Wikidata entity IRI), never a contact, file, or private identifier scheme;
 - every identity and public relationship has an authoritative source and review
   date, and every person/organization/implementation has a distinct IRI;
 - loader, local-IRI, VoID, export, and dereferencing checks cover the new instance
   family; and
-- the record subject has the required publication/notification status, with
-  archival publication disabled unless its separate higher consent and pipeline
-  are actually implemented.
+- every relationship ends in a final approval by its curator; a named
+  person is self-published or has an earlier scoped consent grant; no negative
+  or operational outcome appears publicly;
+- synthetic and real data use distinct graphs/dumps; the term contract and its
+  synthetic routes are deployed in a stable citable release; exact real routes
+  are staged and audited with the seed, then activated and verified immediately
+  after their external live target deploys and before announcement/discovery;
+  and
+- an access-controlled private ledger has a named access owner and retention
+  policy; the authenticated evidence for self-publication/consent is retained
+  there; the executable admission gate has verified that every public activity
+  is mirrored there, and the terminal-event retraction drill has removed the
+  relationship, its public activities/backlinks, and any orphaned agent; and
+- every real agent-record curator, relationship curator, and public activity
+  actor is a verified EcosystemAgent in the reviewed aggregate; for the first
+  seed Renato is the accountable curator, with self-publication authenticated by
+  a verified maintainer-account review, signed commit/review, or separately
+  authenticated private-ledger evidence; and
+- archival publication remains disabled unless its separate higher consent and
+  pipeline are actually implemented.
 
 **Guardrail:** no record implies endorsement, affiliation, clinical efficacy, or
 that an implementation is identical to the person or organization responsible

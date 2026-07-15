@@ -85,6 +85,29 @@ The `0.6.0` term-space is released independently of WIDOCO and registry
 submission. Zenodo creates its version DOI from the GitHub release; the DOI is
 then added to live publication metadata without rewriting the frozen snapshot.
 
+### Ontology snapshot versus release archive
+
+These are two different boundaries:
+
+- `make snapshot VERSION=X.Y.Z` creates the curated ontology snapshot under
+  `static/ontology/<version>/` from the seven reusable term modules;
+- publishing the tag as a GitHub release lets the enabled Zenodo integration
+  archive the repository state associated with that release and mint its DOI.
+
+Excluding a file from `make snapshot` therefore does **not** prove that it is
+absent from the Zenodo release deposit. GitHub describes release source archives
+as snapshots of a repository at a tag, while Zenodo ingests enabled GitHub
+releases. See the official [GitHub release-archive documentation](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)
+and [Zenodo GitHub integration documentation](https://help.zenodo.org/docs/github/archive-software/github-upload/).
+
+Release rule: this repository may contain reusable terms, public non-personal
+implementation data, and explicitly synthetic contract fixtures. Real
+ecosystem records in the default mutable/live-only tier must be published from
+an external store that is not part of this Zenodo-tracked repository. A real
+record may enter an immutable deposit only through the separately implemented
+archival-consent pipeline. The release checklist must verify this boundary
+before creating a tag.
+
 ## Identifier and Version Policy
 
 SSTIM keeps human-readable w3id IRIs such as
@@ -97,8 +120,10 @@ Releases are versioned as one ontology set:
 - module files carry `owl:versionInfo` but no independent release identity;
 - `static/ontology/<version>/` is the immutable, citable whole-set snapshot;
 - generated JSON-LD/RDF/XML files are serializations, not independent sources;
-- the Zenodo version DOI identifies the released archive and the concept DOI
-  identifies the continuing project.
+- the Zenodo version DOI identifies the complete deposited GitHub release
+  archive, within which `static/ontology/<version>/` is the authoritative
+  term-set snapshot; and
+- the concept DOI identifies the continuing project.
 
 See [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).
 
@@ -246,6 +271,8 @@ SSTIM is first-class for public reuse when:
   DOI, provenance, distributions, and checked graph counts;
 - every release has an immutable snapshot, Git tag, changelog entry, and Zenodo
   version DOI under the same concept DOI;
+- every release audits the complete tagged repository state and contains no
+  private ledger or real ecosystem record from the mutable/live-only tier;
 - WIDOCO documentation and citation instructions identify the current release;
 - accepted registry records link to the stable ontology URI and current DOI;
 - external mappings are conservative, source-verified, and review-dated;

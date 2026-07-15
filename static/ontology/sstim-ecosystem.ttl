@@ -5,7 +5,7 @@
 #  Namespace:  https://w3id.org/sstim/ecosystem#
 #  Module IRI: https://w3id.org/sstim/ecosystem
 #  Version:    0.7.0-dev
-#  Date:       2026-07-13
+#  Date:       2026-07-15
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -32,6 +32,8 @@
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix schema: <https://schema.org/> .
+@prefix org:    <http://www.w3.org/ns/org#> .
 
 
 ###########################################################################
@@ -43,17 +45,18 @@
     # next whole-set snapshot. Modules carry owl:versionInfo only (ADR 0020).
     owl:versionInfo "0.7.0-dev" ;
     dct:title "SSTIM Ecosystem Module"@en ;
-    dct:description "Reusable SSTIM module for the sensory-stimulation ecosystem: a neutral agent umbrella (person or organization), the engagement/consent lifecycle and relationship properties, and a controlled relationship-type vocabulary. Carries no personal data; named agents are curated implementation data."@en ;
+    dct:description "Reusable SSTIM module for the sensory-stimulation ecosystem: a neutral agent umbrella, qualified relationship and membership records, implementation responsibility, a retractable approved public projection, append-only private operational activities, and controlled relationship, purpose, and outcome vocabularies. Carries no personal data; named agents are curated implementation data."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-07-12"^^xsd:date ;
     dct:issued "2026-07-12"^^xsd:date ;
-    dct:modified "2026-07-13"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md> ;
-    skos:historyNote "0.7.0-dev — initial ecosystem module (ADR 0024): sstim-eco:EcosystemAgent (subclass of prov:Agent), the engagement/consent lifecycle and relationship properties, and the EcosystemRelationScheme relationship vocabulary. No personal data in the term space; named agents are curated implementation instances with a consent-gated archival tier."@en .
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> ;
+    skos:historyNote "0.7.0-dev — ADR 0031 replaces the initial flat agent-level relationship and consent surface with qualified relationship, membership, implementation-responsibility, and engagement records; the approved public graph is current-state while complete operational history is private and append-only. The original ADR 0024 properties remain deprecated for migration only."@en .
 
 
 ###########################################################################
@@ -62,8 +65,9 @@
 
 sstim-eco:EcosystemAgent a owl:Class ;
     rdfs:subClassOf prov:Agent ;
+    owl:disjointWith sstim:SensoryStimulationImplementation ;
     rdfs:label "Ecosystem agent"@en ;
-    skos:definition "A person or organization active in, or relevant to, the field of sensory stimulation, recorded in the SSTIM ecosystem. Instances are additionally typed with schema.org/FOAF person or organization classes. The class is evaluatively neutral: whether an agent is a contributor, stakeholder, cited author, peer project, etc. is expressed by sstim-eco:relationshipType, not by this type."@en ;
+    skos:definition "A person or organization active in, or relevant to, the field of sensory stimulation, recorded in the SSTIM ecosystem. Instances are additionally typed with schema.org/FOAF person or organization classes. The class is evaluatively neutral: contributor, stakeholder, cited-author, peer-project, and similar roles are assigned to qualified relationship records with sstim-eco:hasRelationshipType, not asserted as global agent types."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md> .
 
 sstim-eco:RelationshipType a owl:Class ;
@@ -71,39 +75,194 @@ sstim-eco:RelationshipType a owl:Class ;
     rdfs:label "Ecosystem relationship type"@en ;
     skos:definition "A controlled category describing how an ecosystem agent relates to sensory stimulation or to SSTIM (e.g. contributor, stakeholder, cited author). Instances are the dual-typed SKOS concepts of the EcosystemRelationScheme."@en .
 
+sstim-eco:ImplementationResponsibilityType a owl:Class ;
+    rdfs:subClassOf sstim-eco:RelationshipType ;
+    rdfs:label "Implementation responsibility type"@en ;
+    skos:definition "A controlled relationship type identifying how a person or organization is responsible for a sensory-stimulation implementation, such as developer, publisher, maintainer, provider, operator, host, or funder."@en .
+
+sstim-eco:EcosystemPurpose a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Ecosystem record purpose"@en ;
+    skos:definition "A controlled purpose for which an ecosystem relationship or engagement activity is recorded, such as public discovery, attribution, outreach, or live publication."@en .
+
+sstim-eco:EngagementOutcome a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Engagement outcome"@en ;
+    skos:definition "A controlled minimal outcome of an ecosystem engagement activity. Positive admission outcomes may appear in the public current-state graph; negative and operational outcomes remain private. No outcome publishes correspondence, contact details, or raw consent evidence."@en .
+
+sstim-eco:EcosystemRelationship a owl:Class ;
+    rdfs:subClassOf prov:Entity, iao:0000030 ;
+    rdfs:label "Ecosystem relationship"@en ;
+    skos:definition "A named, qualified record binding exactly one ecosystem agent to one target, relationship type, purpose, source set, curator, and review history so values cannot be cross-associated across several relationships."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
+
+sstim-eco:OrganizationMembership a owl:Class ;
+    rdfs:subClassOf sstim-eco:EcosystemRelationship, org:Membership ;
+    rdfs:label "Organization membership"@en ;
+    skos:definition "A sourced, time-qualified relationship in which a person is a member of an organization in an identified ORG role. The member and organization also fill the relationship-agent and relationship-target positions."@en .
+
+sstim-eco:ImplementationResponsibility a owl:Class ;
+    rdfs:subClassOf sstim-eco:EcosystemRelationship ;
+    rdfs:label "Implementation responsibility"@en ;
+    skos:definition "A qualified relationship identifying a person or organization that develops, publishes, maintains, provides, operates, hosts, or funds a specific sstim:SensoryStimulationImplementation."@en .
+
+sstim-eco:EngagementActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Ecosystem engagement activity"@en ;
+    skos:definition "A named activity recording one lifecycle event for one ecosystem relationship, with a purpose, controlled outcome, timestamp, and responsible agent. The private operational ledger is append-only; only approved positive state is projected publicly."@en .
+
+sstim-eco:NotificationActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Notification activity"@en ;
+    skos:definition "An activity recording that notification about an ecosystem relationship was sent or failed, without publishing its channel, address, or message."@en .
+
+sstim-eco:ResponseActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Response activity"@en ;
+    skos:definition "An activity recording a controlled response outcome for an ecosystem relationship without publishing response text or private evidence. Only acknowledged is public-safe; change, objection, and removal outcomes remain private."@en .
+
+sstim-eco:PublicationDecisionActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Publication decision activity"@en ;
+    skos:definition "An activity recording whether a qualified ecosystem relationship is approved or withheld for publication under its declared purpose. In a public SSTIM ecosystem artifact, the chronologically final activity for every admitted relationship is an approval decision."@en .
+
+sstim-eco:ConsentDecisionActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Consent decision activity"@en ;
+    skos:definition "An activity recording a controlled consent outcome for one relationship and purpose. Raw consent evidence remains private and is not represented by this public summary."@en .
+
+sstim-eco:AmendmentActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Amendment activity"@en ;
+    skos:definition "An operational activity recording that an ecosystem relationship was amended, with the revision chain expressed using PROV. Invalidated values and the detailed amendment event remain in the private audit ledger; the public graph publishes only the approved current replacement."@en .
+
+sstim-eco:WithdrawalActivity a owl:Class ;
+    rdfs:subClassOf sstim-eco:EngagementActivity ;
+    rdfs:label "Withdrawal activity"@en ;
+    skos:definition "An operational activity recording a removal request or consent withdrawal for one qualified ecosystem relationship. The event is retained in the private audit ledger while the withdrawn relationship and identifying public chain are removed from the current public graph."@en .
+
+
+###########################################################################
+# Qualified relationship and engagement properties (ADR 0031)
+###########################################################################
+
+sstim-eco:hasEcosystemRelationship a owl:ObjectProperty ;
+    owl:inverseOf sstim-eco:relationshipAgent ;
+    rdfs:label "has ecosystem relationship"@en ;
+    rdfs:domain sstim-eco:EcosystemAgent ;
+    rdfs:range sstim-eco:EcosystemRelationship ;
+    skos:definition "Links an ecosystem agent to one named qualified relationship record. The inverse relationshipAgent identifies the same agent from the record."@en .
+
+sstim-eco:relationshipAgent a owl:ObjectProperty ;
+    rdfs:label "relationship agent"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range sstim-eco:EcosystemAgent ;
+    skos:definition "Identifies the one ecosystem agent described by a qualified ecosystem relationship."@en .
+
+sstim-eco:relationshipTarget a owl:ObjectProperty ;
+    rdfs:label "relationship target"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    skos:definition "Identifies the one resource to which the agent is related in a qualified ecosystem relationship."@en .
+
+sstim-eco:hasRelationshipType a owl:ObjectProperty ;
+    rdfs:label "has relationship type"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range sstim-eco:RelationshipType ;
+    skos:definition "Assigns one controlled relationship type to one qualified ecosystem relationship record."@en .
+
+sstim-eco:relationshipPurpose a owl:ObjectProperty ;
+    rdfs:label "relationship purpose"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range sstim-eco:EcosystemPurpose ;
+    skos:definition "Identifies the one declared purpose for recording a qualified ecosystem relationship."@en .
+
+sstim-eco:validFrom a owl:DatatypeProperty ;
+    rdfs:label "valid from"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range xsd:date ;
+    skos:definition "The date from which a qualified ecosystem relationship is known to apply, when available."@en .
+
+sstim-eco:validUntil a owl:DatatypeProperty ;
+    rdfs:label "valid until"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range xsd:date ;
+    skos:definition "The date through which a qualified ecosystem relationship is known to apply, when it has ended."@en .
+
+sstim-eco:reviewedOn a owl:DatatypeProperty ;
+    rdfs:label "reviewed on"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range xsd:date ;
+    skos:definition "The date on which the qualified relationship, its public sources, and its publication status were last reviewed."@en .
+
+sstim-eco:hasEngagementActivity a owl:ObjectProperty ;
+    owl:inverseOf sstim-eco:engagementFor ;
+    rdfs:label "has engagement activity"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range sstim-eco:EngagementActivity ;
+    skos:definition "Links a qualified relationship to one engagement lifecycle activity. Public artifacts admit only positive activities ending in final approval; the complete append-only chain remains private."@en .
+
+sstim-eco:engagementFor a owl:ObjectProperty ;
+    rdfs:label "engagement for"@en ;
+    rdfs:domain sstim-eco:EngagementActivity ;
+    rdfs:range sstim-eco:EcosystemRelationship ;
+    skos:definition "Identifies the one qualified ecosystem relationship governed by an engagement activity."@en .
+
+sstim-eco:engagementPurpose a owl:ObjectProperty ;
+    rdfs:label "engagement purpose"@en ;
+    rdfs:domain sstim-eco:EngagementActivity ;
+    rdfs:range sstim-eco:EcosystemPurpose ;
+    skos:definition "Identifies the purpose to which a notification, response, decision, amendment, or withdrawal applies."@en .
+
+sstim-eco:engagementOutcome a owl:ObjectProperty ;
+    rdfs:label "engagement outcome"@en ;
+    rdfs:domain sstim-eco:EngagementActivity ;
+    rdfs:range sstim-eco:EngagementOutcome ;
+    skos:definition "Assigns one controlled minimal outcome to an engagement activity."@en .
+
 
 ###########################################################################
 # Relationship and expertise properties
 ###########################################################################
 
 sstim-eco:relationshipType a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:hasRelationshipType ;
     rdfs:label "relationship type"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range sstim-eco:RelationshipType ;
     skos:definition "Relates an ecosystem agent to one or more controlled relationship types describing how it engages with the field or with SSTIM."@en .
 
 sstim-eco:relatesTo a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:relationshipTarget ;
     rdfs:label "relates to"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     skos:definition "Links an ecosystem agent to the specific SSTIM resource it relates to (a technique, the framework, a reference, the community group, the platform), when applicable."@en .
 
 sstim-eco:expertiseArea a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:hasEcosystemRelationship ;
     rdfs:label "expertise area"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range skos:Concept ;
     skos:definition "Links an ecosystem agent to SSTIM controlled concepts (modalities, mechanisms, techniques) it works on. A sourced claim about scope, not an assertion of rank or authority."@en .
 
 sstim-eco:hasContributedTo a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:hasEcosystemRelationship ;
     rdfs:label "has contributed to"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     skos:definition "An SSTIM area (technique, module, the community group) to which the agent has actually contributed."@en .
 
 sstim-eco:couldContributeTo a owl:ObjectProperty ;
+    owl:deprecated true ;
     rdfs:label "could contribute to"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     skos:definition "An SSTIM area to which the agent could plausibly contribute."@en .
 
 sstim-eco:curatedBy a owl:ObjectProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy prov:wasAttributedTo ;
     rdfs:label "curated by"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range prov:Agent ;
@@ -119,65 +278,85 @@ sstim-eco:curatedBy a owl:ObjectProperty ;
 ###########################################################################
 
 sstim-eco:recordSource a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy dct:source ;
     rdfs:label "record source"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     skos:definition "Provenance of the facts in this record: a public URL (Wikipedia, ORCID, ROR, homepage) or a phrase such as 'personal communication'. Required for every ecosystem agent."@en .
 
 sstim-eco:consentStatus a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:ConsentDecisionActivity ;
     rdfs:label "consent status"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "Listing-tier consent state: implicit-public, notified, consent-requested, consent-granted, consent-declined, removal-requested, or withdrawn (ADR 0024)."@en .
 
 sstim-eco:archivalConsent a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:ConsentDecisionActivity ;
     rdfs:label "archival consent"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:boolean ;
-    skos:definition "True only when the agent has given specific, informed consent that the record may enter a permanent, citable snapshot and cannot then be fully erased (ADR 0024 §6). Absent or false means live-only and erasable."@en .
+    skos:definition "True only when the agent has given specific, informed consent that the record may enter a permanent, citable archive and cannot then be fully erased (ADR 0024 §6). Absent or false permits only mutable live publication outside the Zenodo-tracked release repository; removal can be honored in the controlled store, but third-party public copies cannot be recalled."@en .
 
 sstim-eco:notificationStatus a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:NotificationActivity ;
     rdfs:label "notification status"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "Whether the agent has been notified of inclusion: not-notified, notified, or failed."@en .
 
 sstim-eco:notifiedOn a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy prov:endedAtTime ;
     rdfs:label "notified on"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:date ;
     skos:definition "The date the agent was notified of inclusion in SSTIM."@en .
 
 sstim-eco:notificationChannel a owl:DatatypeProperty ;
+    owl:deprecated true ;
     rdfs:label "notification channel"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "How the notification was sent (e.g. email, public message, institutional contact)."@en .
 
 sstim-eco:responseStatus a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:ResponseActivity ;
     rdfs:label "response status"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "The agent's response: no-response, acknowledged, consented, objected, requested-removal, or requested-changes."@en .
 
 sstim-eco:respondedOn a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy prov:endedAtTime ;
     rdfs:label "responded on"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:date ;
     skos:definition "The date the agent responded to notification."@en .
 
 sstim-eco:responseNote a owl:DatatypeProperty ;
+    owl:deprecated true ;
     rdfs:label "response note"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "The substance of the agent's response, recorded verbatim or summarized."@en .
 
 sstim-eco:contributionStatus a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-eco:hasEcosystemRelationship ;
     rdfs:label "contribution status"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
     skos:definition "The agent's contribution state relative to SSTIM: none, potential, active, or past."@en .
 
 sstim-eco:addedOn a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy dct:created ;
     rdfs:label "added on"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:date ;
@@ -190,12 +369,15 @@ sstim-eco:addedOn a owl:DatatypeProperty ;
 
 sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Ecosystem Relationship Vocabulary"@en ;
-    dct:description "Controlled ways an ecosystem agent relates to sensory stimulation or to SSTIM. Applied per agent, so a term such as 'contributor' or 'stakeholder' labels a kind of involvement rather than every agent."@en ;
+    dct:description "Controlled types assigned to qualified ecosystem relationship records. A term such as contributor, stakeholder, organization member, or implementation developer describes one sourced agent-target relationship, not the agent globally."@en ;
     skos:hasTopConcept sstim-eco:contributor, sstim-eco:stakeholder,
         sstim-eco:researchCollaborator, sstim-eco:scientificAdvisor,
         sstim-eco:citedAuthor, sstim-eco:toolVendor, sstim-eco:standardsBody,
         sstim-eco:funder, sstim-eco:institutionalHost, sstim-eco:peerProject,
-        sstim-eco:referencedSource .
+        sstim-eco:referencedSource, sstim-eco:organizationMember,
+        sstim-eco:implementationDeveloper, sstim-eco:implementationPublisher,
+        sstim-eco:implementationMaintainer, sstim-eco:implementationProvider,
+        sstim-eco:implementationOperator .
 
 sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
@@ -246,14 +428,16 @@ sstim-eco:standardsBody a owl:NamedIndividual, sstim-eco:RelationshipType, skos:
     skos:notation "standards-body" ;
     skos:definition "An organization that develops standards relevant to sensory stimulation or its interoperability."@en .
 
-sstim-eco:funder a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+sstim-eco:funder a owl:NamedIndividual, sstim-eco:RelationshipType,
+        sstim-eco:ImplementationResponsibilityType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
     skos:prefLabel "Funder"@en ;
     skos:notation "funder" ;
     skos:definition "An agent that funds work relevant to SSTIM or the field."@en .
 
-sstim-eco:institutionalHost a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+sstim-eco:institutionalHost a owl:NamedIndividual, sstim-eco:RelationshipType,
+        sstim-eco:ImplementationResponsibilityType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
     skos:prefLabel "Institutional host"@en ;
@@ -273,3 +457,178 @@ sstim-eco:referencedSource a owl:NamedIndividual, sstim-eco:RelationshipType, sk
     skos:prefLabel "Referenced source"@en ;
     skos:notation "referenced-source" ;
     skos:definition "An agent that produces sources referenced by SSTIM, without a closer relationship."@en .
+
+sstim-eco:organizationMember a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Organization member"@en ;
+    skos:notation "organization-member" ;
+    skos:definition "A person related to an organization through a sourced, time-qualified org:Membership record and an identified ORG role."@en .
+
+sstim-eco:implementationDeveloper a owl:NamedIndividual,
+        sstim-eco:RelationshipType, sstim-eco:ImplementationResponsibilityType,
+        skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Implementation developer"@en ;
+    skos:notation "implementation-developer" ;
+    skos:definition "An agent responsible for developing a specific sensory-stimulation implementation."@en .
+
+sstim-eco:implementationPublisher a owl:NamedIndividual,
+        sstim-eco:RelationshipType, sstim-eco:ImplementationResponsibilityType,
+        skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Implementation publisher"@en ;
+    skos:notation "implementation-publisher" ;
+    skos:definition "An agent responsible for publishing or distributing a specific sensory-stimulation implementation."@en .
+
+sstim-eco:implementationMaintainer a owl:NamedIndividual,
+        sstim-eco:RelationshipType, sstim-eco:ImplementationResponsibilityType,
+        skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Implementation maintainer"@en ;
+    skos:notation "implementation-maintainer" ;
+    skos:definition "An agent responsible for maintaining a specific sensory-stimulation implementation."@en .
+
+sstim-eco:implementationProvider a owl:NamedIndividual,
+        sstim-eco:RelationshipType, sstim-eco:ImplementationResponsibilityType,
+        skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Implementation provider"@en ;
+    skos:notation "implementation-provider" ;
+    skos:definition "An agent that makes a specific sensory-stimulation implementation available for use without necessarily developing it."@en .
+
+sstim-eco:implementationOperator a owl:NamedIndividual,
+        sstim-eco:RelationshipType, sstim-eco:ImplementationResponsibilityType,
+        skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemRelationScheme ;
+    skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
+    skos:prefLabel "Implementation operator"@en ;
+    skos:notation "implementation-operator" ;
+    skos:definition "An agent responsible for operating a specific sensory-stimulation implementation in a declared context."@en .
+
+
+###########################################################################
+# Ecosystem-purpose vocabulary (SKOS)
+###########################################################################
+
+sstim-eco:EcosystemPurposeScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Ecosystem Purpose Vocabulary"@en ;
+    dct:description "Controlled purposes that scope qualified ecosystem relationships and their public engagement activities."@en ;
+    skos:hasTopConcept sstim-eco:purposePublicDiscovery,
+        sstim-eco:purposePublicAttribution, sstim-eco:purposeOutreach,
+        sstim-eco:purposeLivePublication, sstim-eco:purposeArchivalPublication .
+
+sstim-eco:purposePublicDiscovery a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemPurposeScheme ;
+    skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
+    skos:prefLabel "Public discovery"@en ;
+    skos:notation "public-discovery" ;
+    skos:definition "Recording a sourced professional relationship so users can discover relevant people and organizations."@en .
+
+sstim-eco:purposePublicAttribution a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemPurposeScheme ;
+    skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
+    skos:prefLabel "Public attribution"@en ;
+    skos:notation "public-attribution" ;
+    skos:definition "Recording a sourced relationship to give accurate public credit or responsibility attribution."@en .
+
+sstim-eco:purposeOutreach a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemPurposeScheme ;
+    skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
+    skos:prefLabel "Outreach"@en ;
+    skos:notation "outreach" ;
+    skos:definition "Recording an engagement for transparent ecosystem outreach and follow-up."@en .
+
+sstim-eco:purposeLivePublication a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemPurposeScheme ;
+    skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
+    skos:prefLabel "Live publication"@en ;
+    skos:notation "live-publication" ;
+    skos:definition "Publishing a record in a controlled mutable dataset outside the Zenodo-tracked release repository and its immutable DOI deposits."@en .
+
+sstim-eco:purposeArchivalPublication a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
+    skos:inScheme sstim-eco:EcosystemPurposeScheme ;
+    skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
+    skos:prefLabel "Archival publication"@en ;
+    skos:notation "archival-publication" ;
+    skos:definition "Eligibility for permanent citable archival publication. The archival pipeline is not implemented by ADR 0031."@en .
+
+
+###########################################################################
+# Engagement-outcome vocabulary (SKOS; public and private-ledger terms)
+###########################################################################
+
+sstim-eco:EngagementOutcomeScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Engagement Outcome Vocabulary"@en ;
+    dct:description "Minimal controlled outcomes for ecosystem engagement activities. Only positive admission outcomes may be projected publicly; negative and operational outcomes, messages, channels, and evidence remain private."@en ;
+    skos:hasTopConcept sstim-eco:outcomeNotificationSent,
+        sstim-eco:outcomeNotificationFailed, sstim-eco:outcomeAcknowledged,
+        sstim-eco:outcomeChangesRequested, sstim-eco:outcomeObjected,
+        sstim-eco:outcomeConsentGranted, sstim-eco:outcomeConsentDeclined,
+        sstim-eco:outcomePublicationApproved, sstim-eco:outcomePublicationWithheld,
+        sstim-eco:outcomeRecordAmended, sstim-eco:outcomeRemovalRequested,
+        sstim-eco:outcomeConsentWithdrawn .
+
+sstim-eco:outcomeNotificationSent a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Notification sent"@en ; skos:notation "notification-sent" ;
+    skos:definition "Notification was sent; no channel, address, or message is published."@en .
+
+sstim-eco:outcomeNotificationFailed a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Notification failed"@en ; skos:notation "notification-failed" ;
+    skos:definition "A notification attempt failed; operational details remain private."@en .
+
+sstim-eco:outcomeAcknowledged a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Acknowledged"@en ; skos:notation "acknowledged" ;
+    skos:definition "The subject acknowledged the engagement without this value implying broader consent."@en .
+
+sstim-eco:outcomeChangesRequested a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Changes requested"@en ; skos:notation "changes-requested" ;
+    skos:definition "The subject requested changes to the relationship record."@en .
+
+sstim-eco:outcomeObjected a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Objected"@en ; skos:notation "objected" ;
+    skos:definition "The subject objected to the scoped relationship or its publication."@en .
+
+sstim-eco:outcomeConsentGranted a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Consent granted"@en ; skos:notation "consent-granted" ;
+    skos:definition "Consent was granted for the activity's declared relationship and purpose only."@en .
+
+sstim-eco:outcomeConsentDeclined a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Consent declined"@en ; skos:notation "consent-declined" ;
+    skos:definition "Consent was declined for the activity's declared relationship and purpose only."@en .
+
+sstim-eco:outcomePublicationApproved a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Publication approved"@en ; skos:notation "publication-approved" ;
+    skos:definition "The curated record was approved for the relationship's declared purpose in the mutable live dataset."@en .
+
+sstim-eco:outcomePublicationWithheld a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Publication withheld"@en ; skos:notation "publication-withheld" ;
+    skos:definition "Publication was withheld for the activity's declared purpose."@en .
+
+sstim-eco:outcomeRecordAmended a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Record amended"@en ; skos:notation "record-amended" ;
+    skos:definition "The qualified relationship record was amended through an identified revision."@en .
+
+sstim-eco:outcomeRemovalRequested a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Removal requested"@en ; skos:notation "removal-requested" ;
+    skos:definition "Removal of the scoped live relationship record was requested."@en .
+
+sstim-eco:outcomeConsentWithdrawn a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
+    skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
+    skos:prefLabel "Consent withdrawn"@en ; skos:notation "consent-withdrawn" ;
+    skos:definition "Previously granted consent was withdrawn for the scoped relationship and purpose."@en .

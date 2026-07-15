@@ -1,0 +1,4 @@
+@prefix org: <http://www.w3.org/ns/org#> .
+
+<https://w3id.org/sstim/ecosystem-record/relationship/alex-attribution-player>
+    org:member <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .

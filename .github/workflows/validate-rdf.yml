@@ -4,10 +4,12 @@ on:
   pull_request:
     paths:
       - 'static/ontology/**'
-      - 'src/rdf/loader.js'
-      - 'scripts/sstim-quality-audit.py'
-      - 'scripts/sstim-exposure-sanity.mjs'
+      - 'test/**'
+      - 'src/rdf/**'
+      - 'scripts/sstim-*.py'
+      - 'scripts/sstim-*.mjs'
       - 'scripts/export-ontology.py'
+      - 'docs/ecosystem/w3id/**'
       - 'Makefile'
       - 'flake.nix'
       - 'flake.lock'
@@ -17,10 +19,12 @@ on:
       - main
     paths:
       - 'static/ontology/**'
-      - 'src/rdf/loader.js'
-      - 'scripts/sstim-quality-audit.py'
-      - 'scripts/sstim-exposure-sanity.mjs'
+      - 'test/**'
+      - 'src/rdf/**'
+      - 'scripts/sstim-*.py'
+      - 'scripts/sstim-*.mjs'
       - 'scripts/export-ontology.py'
+      - 'docs/ecosystem/w3id/**'
       - 'Makefile'
       - 'flake.nix'
       - 'flake.lock'
@@ -51,8 +55,8 @@ jobs:
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-${{ runner.os }}-
 
-      # `make validate` runs the SPARQL sanity script (scripts/sstim-exposure-sanity.mjs),
-      # which imports n3 and @comunica/query-sparql-rdfjs from node_modules.
+      # `make validate` runs the SPARQL sanity and ecosystem runtime contract
+      # suites, which import N3, Comunica, Vitest, and rdf-validate-shacl.
       - name: Install dependencies
         run: nix develop --command npm ci
 

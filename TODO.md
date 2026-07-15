@@ -278,17 +278,31 @@ Turtle files are listed in section 1. After they exist:
       *Design + governance decided in ADR 0024: neutral umbrella
       `sstim-eco:EcosystemAgent` (⊑ `prov:Agent`); reuse schema.org/ORG/FOAF +
       ROR/ORCID/Wikidata; "stakeholder"/"contributor" are relationshipType
-      values, not the class; notify-and-honor consent with engagement-tracking
-      properties; curated instances at `/organization/{id}` & `/specialist/{id}`,
-      never in the term space; live-only by default with a consent-gated
-      archival tier (`archivalConsent`). The initial `sstim-ecosystem` term
-      module, context, and agent-level SHACL shape are implemented on
-      `0.7.0-dev`, but the 2026-07-13 audit's KR-13 finding means they are a
-      scaffold rather than a safe real-instance contract. Next: change set F's
-      qualified relationship/engagement, organization-membership,
-      implementation-responsibility, append-only lifecycle, public/private,
-      synthetic-fixture, and publication-plumbing gates. Do not commit real
-      named records before those gates. The canonical sequence is Workstream 5
+      values, not the class; organization notify-and-honor plus
+      relationship-scoped self-publication/consent for named people; instance
+      IRIs at `/organization/{id}` & `/specialist/{id}`, never in the term
+      space; live-only by default with a consent-gated archival tier. Real
+      live-only records must be served from a mutable store outside this
+      Zenodo-tracked release repository; committed fixtures remain synthetic.
+      ADR 0031 and change-set F stages F1–F2 are implemented on
+      `0.7.0-dev`: qualified relationship/engagement, ORG membership,
+      implementation responsibility, a retractable approved public projection,
+      separate private-ledger validation policy, closed artifact profile, executable
+      admission state, and synthetic/adversarial fixtures. F3 synthetic
+      repository graph/loader/VoID/routing plumbing is staged, not live. Next:
+      deploy and verify term/synthetic dereferencing, designate the external
+      mutable public store and retention policy, extend the loader and
+      access-limited admission job for it, provision the private ledger and
+      retraction procedure, and complete the stable release gate. The admission
+      job must validate the external candidate together with
+      `PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`; the private history
+      mirrors all admitted public activities, and neither artifact is committed
+      here.
+      F4's first admitted aggregate is atomic: Renato, the initial verified
+      organizations, and at least one approved relationship for every agent.
+      Organization records may be drafted first, but are not admitted without
+      Renato as their verified curator; later memberships/responsibilities are
+      separately self-approved or scoped-consent. The canonical sequence is Workstream 5
       of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`

@@ -1,0 +1,7 @@
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+# Overlay on the positive fixture. New records must not place a deprecated flat
+# relationship type directly on the agent.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    sstim-eco:relationshipType sstim-eco:contributor .

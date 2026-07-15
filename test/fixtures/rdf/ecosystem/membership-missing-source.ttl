@@ -1,0 +1,42 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix org:       <http://www.w3.org/ns/org#> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/membership-missing-source/> .
+
+# Overlay on the positive fixture. The otherwise complete membership omits its
+# relationship-scoped dct:source.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    sstim-eco:hasEcosystemRelationship ex:membership .
+
+ex:membership
+    a sstim-eco:EcosystemRelationship, sstim-eco:OrganizationMembership,
+        org:Membership ;
+    rdfs:label "Unsourced synthetic membership"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    sstim-eco:hasRelationshipType sstim-eco:organizationMember ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    org:member <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    org:organization
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    org:role <https://example.org/roles/researcher> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    sstim-eco:validFrom "2026-01-01"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity ex:decision .
+
+ex:decision a sstim-eco:EngagementActivity,
+        sstim-eco:ConsentDecisionActivity, prov:Activity ;
+    rdfs:label "Unsourced-membership decision"@en ;
+    sstim-eco:engagementFor ex:membership ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T13:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

@@ -1,0 +1,8 @@
+@prefix schema: <https://schema.org/> .
+
+# Overlay on the positive fixture. Even fictional contact/authentication data
+# is forbidden on the public ecosystem surface.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    schema:contactPoint <https://example.org/contact/synthetic-private> ;
+    schema:identifier "synthetic-private-authentication-id" .

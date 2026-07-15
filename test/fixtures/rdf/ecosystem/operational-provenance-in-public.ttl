@@ -1,0 +1,13 @@
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# Overlay on the positive fixture. Correction and invalidation links belong to
+# the private audit ledger; an approved public activity cannot disguise them as
+# ordinary positive provenance.
+
+<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>
+    prov:wasRevisionOf
+        <https://w3id.org/sstim/ecosystem-record/relationship/private-prior-version> .
+
+<https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-publication>
+    prov:invalidated
+        <https://w3id.org/sstim/ecosystem-record/relationship/private-prior-version> .

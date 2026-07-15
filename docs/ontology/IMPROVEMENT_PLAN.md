@@ -236,6 +236,15 @@ covered by tests.
 
 #### 1.5 Repair privacy-sensitive RDF surfaces
 
+> **Ecosystem F1–F2 implemented 2026-07-15 ([ADR 0031](../decisions/0031-qualified-ecosystem-records.md)).**
+> Qualified relationships/memberships, a retractable approved public
+> projection, private append-only audit policy, closed artifact profile, and
+> isolated synthetic/adversarial fixtures are implemented. F3 synthetic
+> repository plumbing is staged, but the external mutable store and
+> loader/dereferencing/admission path for real live-only records are not; the
+> stable term release, F4 real data, and Web Annotation/KR-12 portion remain
+> open.
+
 - Model Web Annotation text with `oa:bodyValue` or `oa:TextualBody`, enumerate
   valid motivations, and validate target IRIs.
 - Default annotations to private and fail closed on invalid visibility.
@@ -244,7 +253,8 @@ covered by tests.
 - Reify ecosystem relationships/engagements so agent, target, type, source,
   purpose, curator, and consent decision remain associated.
 - Represent notification, response, amendment, and withdrawal as append-only
-  PROV activities rather than overwritten strings.
+  PROV activities in the private operational audit rather than overwritten
+  strings; publish only the retractable approved current-state projection.
 
 **Phase 1 gate:** OWL reasoning and domain/range lint pass; negative SHACL
 fixtures fail for the intended reasons; no public-claim authorization succeeds
@@ -397,7 +407,7 @@ round-trip authority.
 | D2 — Public-claim semantics | Atomic propositions/expressions, non-exclusive facets, generic decision record | D; [ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md) |
 | D3 — BSC publication profile | Versioned policy, applicability/consent rules, trusted input and publisher gate | C for testimonials; D2; [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md) |
 | E — SKOS/alignment repair | Neural/stimulus frequency split, roles, controlled-value plumbing, mapping provenance | D where evidence links migrate |
-| F — Ecosystem/annotation repair | Reified engagements, consent history, valid OA, private defaults; operational sequence in [Ecosystem Integration, Workstream 5](../ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation) | A; privacy review |
+| F — Ecosystem/annotation repair | Ecosystem F1–F2 implemented and synthetic F3 repository plumbing staged under ADR 0031; stable term/synthetic routes, an external mutable public store with loader/admission plumbing, access-controlled ledger readiness, real F4 records, and valid OA/private annotation defaults remain open. ADR 0031 resolves the ecosystem publication-policy decision; the separate OA/annotation privacy review remains open. Operational sequence: [Ecosystem Integration, Workstream 5](../ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation) | A; external-store and private-ledger readiness for ecosystem F4; privacy review for annotation surfaces |
 | G — HED profile | Native event mapping, validator, synthetic demonstrator | B, C, D |
 | H — BIDS binding | Complete optional Behavioral dataset and adapter tests | G |
 | I — NWB binding | Optional synchronized neurophysiology/behavior adapter | G; external use case |

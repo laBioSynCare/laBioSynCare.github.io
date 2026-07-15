@@ -17,5 +17,9 @@ docs/credentials/
 
 .playwright-cli/
 
+# Local Python validation bytecode
+__pycache__/
+*.py[cod]
+
 # pyLODE writes a run log in the working dir (make vocab-docs)
 pylode.log

@@ -47,13 +47,14 @@ annotations lives here.
 | [0021](0021-controlled-value-semantics.md) | Controlled values describe categories, not their real-world referents | Accepted |
 | [0022](0022-0.6-release-review-posture.md) | Maintainer acceptance is sufficient for the 0.6 release | Accepted |
 | [0023](0023-ontology-docs-publication-path.md) | WIDOCO docs: CI-generated Pages subpath; the app keeps the browser-facing IRI | Accepted |
-| [0024](0024-stakeholder-ecosystem-modeling.md) | Model the ecosystem as neutral agents (`EcosystemAgent` ⊑ `prov:Agent`; reuse schema.org/ORG); notify-and-honor consent with a consent-gated archival tier | Accepted |
+| [0024](0024-stakeholder-ecosystem-modeling.md) | Model the ecosystem as neutral agents (`EcosystemAgent` ⊑ `prov:Agent`; reuse schema.org/ORG); mutable external live-data tier plus consent-gated archival tier | Accepted |
 | [0025](0025-hed-bids-interoperability-crosswalk.md) | SSTIM-native sessions with a generated HED event profile and optional BIDS/NWB research bindings | Proposed |
 | [0026](0026-patch-studio-catalog-bridge.md) | Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not native catalog authoring | Proposed |
 | [0027](0027-evidence-claim-family-and-public-claim-gate.md) | Separate evidence assessments from non-evidence statements | Accepted |
 | [0028](0028-atomic-claim-propositions-and-public-expressions.md) | Atomic claim propositions, rendered public expressions, and non-exclusive facets | Proposed |
 | [0029](0029-bsc-lab-public-claim-publication-profile.md) | BSC Lab public-claim publication and authorization profile | Proposed |
 | [0030](0030-named-methods-and-schools.md) | Record recognized named methods/schools (Snoezelen, Tomatis, …) as a neutral, evidence-scoped catalogue | Proposed |
+| [0031](0031-qualified-ecosystem-records.md) | Qualified ecosystem relationships, externally stored approved public current state, and a private append-only engagement audit | Accepted |
 
 ## Adding an ADR
 

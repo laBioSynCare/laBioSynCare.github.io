@@ -1,4 +1,8 @@
 import { DataFactory, Parser, Store } from 'n3'
+import {
+  ECOSYSTEM_AGENTS_GRAPH_IRI,
+  ECOSYSTEM_FIXTURE_GRAPH_IRI,
+} from './namespaces.js'
 
 const { namedNode, quad: makeQuad } = DataFactory
 
@@ -171,6 +175,12 @@ export const INSTANCE_URLS = {
   sessions: [
     '/ontology/instances/sessions/synthetic-reference-session.ttl',
   ],
+  // Reviewed real records will be added here only after the F4 publication
+  // gate. Keep them distinct from contract fixtures at both path and graph level.
+  ecosystem: [],
+  ecosystemFixtures: [
+    '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl',
+  ],
 }
 
 export const INSTANCE_SOURCES = {
@@ -205,6 +215,14 @@ export const INSTANCE_SOURCES = {
   sessions: INSTANCE_URLS.sessions.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/implementation/bsclab/session/',
+  })),
+  ecosystem: INSTANCE_URLS.ecosystem.map(url => ({
+    url,
+    graph: ECOSYSTEM_AGENTS_GRAPH_IRI.value,
+  })),
+  ecosystemFixtures: INSTANCE_URLS.ecosystemFixtures.map(url => ({
+    url,
+    graph: ECOSYSTEM_FIXTURE_GRAPH_IRI.value,
   })),
 }
 

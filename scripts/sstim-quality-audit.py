@@ -17,6 +17,10 @@ from rdflib.namespace import DCTERMS, OWL, PROV, XSD
 ROOT = Path(__file__).resolve().parent.parent
 ONTOLOGY_DIR = ROOT / "static" / "ontology"
 INSTANCE_DIR = ONTOLOGY_DIR / "instances"
+ECOSYSTEM_INSTANCE_DIR = INSTANCE_DIR / "ecosystem"
+ECOSYSTEM_REAL_DIR = ECOSYSTEM_INSTANCE_DIR / "agents"
+ECOSYSTEM_FIXTURE_DIR = ECOSYSTEM_INSTANCE_DIR / "fixtures"
+W3ID_STAGING_FILE = ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
 
 MODULES = {
     ONTOLOGY_DIR / "sstim-core.ttl": URIRef("https://w3id.org/sstim"),
@@ -32,6 +36,8 @@ SSTIM = Namespace("https://w3id.org/sstim#")
 VOCAB = Namespace("https://w3id.org/sstim/vocab#")
 EXPOSURE = Namespace("https://w3id.org/sstim/exposure#")
 ECOSYSTEM = Namespace("https://w3id.org/sstim/ecosystem#")
+SCHEMA = Namespace("https://schema.org/")
+ORG = Namespace("http://www.w3.org/ns/org#")
 VOID = Namespace("http://rdfs.org/ns/void#")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 
@@ -40,7 +46,17 @@ INSTANCE_PREFIXES = (
     "https://w3id.org/sstim/framework/",
     "https://w3id.org/sstim/implementation/",
     "https://w3id.org/sstim/ref/",
+    "https://w3id.org/sstim/organization/",
+    "https://w3id.org/sstim/specialist/",
+    "https://w3id.org/sstim/ecosystem-record/",
 )
+ECOSYSTEM_INSTANCE_PREFIXES = (
+    "https://w3id.org/sstim/organization/",
+    "https://w3id.org/sstim/specialist/",
+    "https://w3id.org/sstim/ecosystem-record/",
+)
+ECOSYSTEM_AGENTS_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-agents")
+ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture")
 
 errors: list[str] = []
 
@@ -60,9 +76,23 @@ def parse_graph(paths: list[Path]) -> Graph:
 
 
 module_paths = list(MODULES)
-instance_paths = sorted(INSTANCE_DIR.glob("*/*.ttl"))
+instance_paths = sorted(INSTANCE_DIR.rglob("*.ttl"))
+ecosystem_real_paths = sorted(ECOSYSTEM_REAL_DIR.glob("*.ttl"))
+ecosystem_fixture_paths = sorted(ECOSYSTEM_FIXTURE_DIR.glob("*.ttl"))
+ecosystem_instance_paths = ecosystem_real_paths + ecosystem_fixture_paths
+unexpected_ecosystem_paths = sorted(
+    set(ECOSYSTEM_INSTANCE_DIR.rglob("*.ttl")) - set(ecosystem_instance_paths)
+)
+for path in unexpected_ecosystem_paths:
+    fail(
+        f"{path.relative_to(ROOT)}: ecosystem Turtle files must be direct files "
+        "under ecosystem/agents/ or ecosystem/fixtures/"
+    )
 modules = parse_graph(module_paths)
 instances = parse_graph(instance_paths)
+ecosystem_real_instances = parse_graph(ecosystem_real_paths)
+ecosystem_fixture_instances = parse_graph(ecosystem_fixture_paths)
+ecosystem_instances = parse_graph(ecosystem_instance_paths)
 all_graph = modules + instances
 
 
@@ -114,6 +144,26 @@ declared_module_triples = list(void_graph.objects(dataset_iri, VOID.triples))
 declared_module_classes = list(void_graph.objects(dataset_iri, VOID.classes))
 declared_module_properties = list(void_graph.objects(dataset_iri, VOID.properties))
 declared_instance_triples = list(void_graph.objects(instance_dataset_iri, VOID.triples))
+declared_ecosystem_triples = list(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.triples))
+declared_fixture_triples = list(void_graph.objects(ECOSYSTEM_FIXTURE_GRAPH, VOID.triples))
+
+
+def published_instance_url(path: Path) -> URIRef:
+    relative = path.relative_to(ONTOLOGY_DIR).as_posix()
+    return URIRef(f"https://labiosyncare.github.io/ontology/{relative}")
+
+
+expected_ecosystem_dumps = {published_instance_url(path) for path in ecosystem_real_paths}
+expected_fixture_dumps = {published_instance_url(path) for path in ecosystem_fixture_paths}
+expected_ecosystem_uri_spaces = {
+    Literal("https://w3id.org/sstim/organization/"),
+    Literal("https://w3id.org/sstim/specialist/"),
+    Literal("https://w3id.org/sstim/ecosystem-record/"),
+}
+expected_fixture_uri_spaces = {
+    *expected_ecosystem_uri_spaces,
+    Literal("https://w3id.org/sstim/implementation/bsclab/"),
+}
 if declared_module_triples != [Literal(len(modules))]:
     fail(f"void.ttl: void:triples must be {len(modules)} for the term-module graph")
 if declared_module_classes != [Literal(len(named_classes))]:
@@ -122,6 +172,28 @@ if declared_module_properties != [Literal(len(declared_properties))]:
     fail(f"void.ttl: void:properties must be {len(declared_properties)} OWL properties")
 if declared_instance_triples != [Literal(len(instances))]:
     fail(f"void.ttl: instance void:triples must be {len(instances)}")
+if declared_ecosystem_triples != [Literal(len(ecosystem_real_instances))]:
+    fail(
+        "void.ttl: ecosystem-agent graph void:triples must be "
+        f"{len(ecosystem_real_instances)}"
+    )
+if declared_fixture_triples != [Literal(len(ecosystem_fixture_instances))]:
+    fail(
+        "void.ttl: ecosystem-fixture graph void:triples must be "
+        f"{len(ecosystem_fixture_instances)}"
+    )
+if set(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.dataDump)) != expected_ecosystem_dumps:
+    fail("void.ttl: ecosystem-agent data dumps must cover every real ecosystem file exactly")
+if set(void_graph.objects(ECOSYSTEM_FIXTURE_GRAPH, VOID.dataDump)) != expected_fixture_dumps:
+    fail("void.ttl: ecosystem-fixture data dumps must cover every fixture file exactly")
+if set(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.uriSpace)) != expected_ecosystem_uri_spaces:
+    fail("void.ttl: ecosystem-agent graph uriSpace inventory is incomplete or has drifted")
+if set(void_graph.objects(ECOSYSTEM_FIXTURE_GRAPH, VOID.uriSpace)) != expected_fixture_uri_spaces:
+    fail("void.ttl: ecosystem-fixture graph uriSpace inventory is incomplete or has drifted")
+if (instance_dataset_iri, VOID.subset, ECOSYSTEM_AGENTS_GRAPH) not in void_graph:
+    fail("void.ttl: public instance dataset must include the ecosystem-agent graph as a subset")
+if (instance_dataset_iri, VOID.subset, ECOSYSTEM_FIXTURE_GRAPH) not in void_graph:
+    fail("void.ttl: public instance dataset must include the ecosystem-fixture graph as a subset")
 
 core_versions = list(modules.objects(URIRef("https://w3id.org/sstim"), OWL.versionInfo))
 dataset_versions = list(void_graph.objects(dataset_iri, DCAT.version))
@@ -150,6 +222,15 @@ def instances_of(class_iri: URIRef) -> set[URIRef]:
     return {
         subject
         for subject, type_iri in all_graph.subject_objects(RDF.type)
+        if isinstance(subject, URIRef) and type_iri in accepted_types
+    }
+
+
+def instances_of_in(graph: Graph, class_iri: URIRef) -> set[URIRef]:
+    accepted_types = subclasses(class_iri)
+    return {
+        subject
+        for subject, type_iri in graph.subject_objects(RDF.type)
         if isinstance(subject, URIRef) and type_iri in accepted_types
     }
 
@@ -446,6 +527,86 @@ for path in sorted(set(instance_paths) - manifest_paths):
 for path in sorted(manifest_paths - set(instance_paths)):
     fail(f"src/rdf/loader.js: manifest references missing file {path.relative_to(ROOT)}")
 
+# Real ecosystem records and synthetic contract fixtures have separate loader
+# families and runtime graphs. A newly committed file must appear in exactly the
+# family implied by its path, preventing fixtures from silently entering the
+# future public graph (or real records from hiding in fixture metadata).
+def loader_family_paths(family: str) -> set[Path]:
+    matches = re.findall(
+        rf"^  {re.escape(family)}:\s*\[(.*?)\],\s*$",
+        loader_text,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    if len(matches) != 1:
+        fail(f"src/rdf/loader.js: expected one INSTANCE_URLS.{family} array")
+        return set()
+    return {
+        INSTANCE_DIR / match
+        for match in re.findall(r"'/ontology/instances/([^']+\.ttl)'", matches[0])
+    }
+
+
+if loader_family_paths("ecosystem") != set(ecosystem_real_paths):
+    fail("src/rdf/loader.js: INSTANCE_URLS.ecosystem must contain every real ecosystem file and no fixtures")
+if loader_family_paths("ecosystemFixtures") != set(ecosystem_fixture_paths):
+    fail("src/rdf/loader.js: INSTANCE_URLS.ecosystemFixtures must contain every ecosystem fixture and no real files")
+
+namespaces_text = (ROOT / "src" / "rdf" / "namespaces.js").read_text(encoding="utf-8")
+expected_graph_declarations = {
+    "ECOSYSTEM_AGENTS_GRAPH_IRI": ECOSYSTEM_AGENTS_GRAPH,
+    "ECOSYSTEM_FIXTURE_GRAPH_IRI": ECOSYSTEM_FIXTURE_GRAPH,
+}
+for constant, graph_iri in expected_graph_declarations.items():
+    declaration = f"export const {constant} = namedNode('{graph_iri}')"
+    if declaration not in namespaces_text:
+        fail(f"src/rdf/namespaces.js: {constant} must identify {graph_iri}")
+    if constant not in loader_text or f"graph: {constant}.value" not in loader_text:
+        fail(f"src/rdf/loader.js: loader family must use shared {constant}")
+
+if "ecosystem: INSTANCE_URLS.ecosystem.map" not in loader_text:
+    fail("src/rdf/loader.js: real ecosystem instances need a dedicated INSTANCE_SOURCES family")
+if "ecosystemFixtures: INSTANCE_URLS.ecosystemFixtures.map" not in loader_text:
+    fail("src/rdf/loader.js: ecosystem fixtures need a dedicated INSTANCE_SOURCES family")
+
+
+# /organization/, /specialist/, and /ecosystem-record/ are owned exclusively by
+# the ecosystem instance family. This is both a namespace-boundary check and a
+# guard against accidentally placing named people in reusable ontology modules.
+instance_subject_owners: dict[URIRef, set[Path]] = defaultdict(set)
+for path in instance_paths:
+    graph = Graph()
+    try:
+        graph.parse(path, format="turtle")
+    except Exception:
+        # parse_graph() already emitted the actionable parse error above.
+        continue
+    for subject in graph.subjects():
+        if isinstance(subject, URIRef):
+            instance_subject_owners[subject].add(path)
+
+
+def ecosystem_owner_family(path: Path) -> str | None:
+    if path.parent == ECOSYSTEM_REAL_DIR:
+        return "real"
+    if path.parent == ECOSYSTEM_FIXTURE_DIR:
+        return "fixture"
+    return None
+
+
+for subject, owners in instance_subject_owners.items():
+    if not str(subject).startswith(ECOSYSTEM_INSTANCE_PREFIXES):
+        continue
+    families = {ecosystem_owner_family(owner) for owner in owners}
+    if None in families:
+        outside = sorted(
+            str(owner.relative_to(ROOT))
+            for owner in owners
+            if ecosystem_owner_family(owner) is None
+        )
+        fail(f"{subject}: reserved ecosystem instance IRI is declared outside its family in {outside}")
+    if len(families) > 1:
+        fail(f"{subject}: reserved ecosystem instance IRI is mixed across real and fixture files")
+
 
 # Functional properties are treated as operational single-value contracts.
 functional_properties = set(modules.subjects(RDF.type, OWL.FunctionalProperty))
@@ -607,6 +768,185 @@ for report in self_reports:
         fail(f"{report}: follow-up report timestamp must be after session end")
 
 
+# Ecosystem namespace and ownership contracts complement SHACL with repository-
+# level checks that know which file family owns each public IRI.
+ecosystem_agents = instances_of(ECOSYSTEM.EcosystemAgent)
+ecosystem_relationships = instances_of(ECOSYSTEM.EcosystemRelationship)
+organization_memberships = instances_of(ECOSYSTEM.OrganizationMembership)
+implementation_responsibilities = instances_of(ECOSYSTEM.ImplementationResponsibility)
+engagement_activities = instances_of(ECOSYSTEM.EngagementActivity)
+organization_roles = {
+    subject
+    for subject in ecosystem_instances.subjects(RDF.type, ORG.Role)
+    if isinstance(subject, URIRef)
+}
+
+# VoID partitions are checked independently for the empty reserved real graph
+# and the populated fixture graph; overlapping subclass counts are intentional.
+def ecosystem_partition_counts(graph: Graph) -> dict[URIRef, int]:
+    return {
+        ECOSYSTEM.EcosystemAgent: len(instances_of_in(graph, ECOSYSTEM.EcosystemAgent)),
+        ECOSYSTEM.EcosystemRelationship: len(instances_of_in(graph, ECOSYSTEM.EcosystemRelationship)),
+        ECOSYSTEM.OrganizationMembership: len(instances_of_in(graph, ECOSYSTEM.OrganizationMembership)),
+        ECOSYSTEM.ImplementationResponsibility: len(instances_of_in(graph, ECOSYSTEM.ImplementationResponsibility)),
+        ECOSYSTEM.EngagementActivity: len(instances_of_in(graph, ECOSYSTEM.EngagementActivity)),
+        ORG.Role: len({
+            subject
+            for subject in graph.subjects(RDF.type, ORG.Role)
+            if isinstance(subject, URIRef)
+        }),
+    }
+
+
+def check_void_partitions(dataset: URIRef, graph: Graph, label: str) -> None:
+    expected = ecosystem_partition_counts(graph)
+    declared: dict[URIRef, list[Literal]] = defaultdict(list)
+    for partition in void_graph.objects(dataset, VOID.classPartition):
+        partition_classes = list(void_graph.objects(partition, VOID["class"]))
+        partition_counts = list(void_graph.objects(partition, VOID.entities))
+        if len(partition_classes) != 1:
+            fail(f"void.ttl: each {label} void:classPartition must declare exactly one void:class")
+            continue
+        declared[partition_classes[0]].extend(partition_counts)
+    if set(declared) != set(expected):
+        fail(f"void.ttl: {label} classPartition inventory is incomplete or has drifted")
+    for class_iri, expected_count in expected.items():
+        values = declared.get(class_iri, [])
+        if values != [Literal(expected_count)]:
+            fail(f"void.ttl: {label} partition {class_iri} void:entities must be {expected_count}")
+
+
+check_void_partitions(ECOSYSTEM_AGENTS_GRAPH, ecosystem_real_instances, "ecosystem-agent")
+check_void_partitions(ECOSYSTEM_FIXTURE_GRAPH, ecosystem_fixture_instances, "ecosystem-fixture")
+
+# Every synthetic identity/relationship/activity has an exact staged w3id rule
+# to the fixture dump. The delimited block is audited as a set: a missing route,
+# a stale route, or an accidental broad route fails publication validation.
+w3id_prefix = "https://w3id.org/sstim/"
+expected_fixture_routes = {
+    str(subject).removeprefix(w3id_prefix)
+    for subject in ecosystem_fixture_instances.subjects()
+    if isinstance(subject, URIRef)
+    and (
+        str(subject).startswith(f"{w3id_prefix}specialist/")
+        or str(subject).startswith(f"{w3id_prefix}organization/")
+        or str(subject).startswith(f"{w3id_prefix}ecosystem-record/relationship/")
+        or str(subject).startswith(f"{w3id_prefix}ecosystem-record/activity/")
+    )
+}
+w3id_text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
+w3id_start = "# BEGIN audited synthetic ecosystem fixture routes"
+w3id_end = "# END audited synthetic ecosystem fixture routes"
+if w3id_text.count(w3id_start) != 1 or w3id_text.count(w3id_end) != 1:
+    fail("w3id staging: expected one delimited synthetic ecosystem fixture route block")
+else:
+    route_block = w3id_text.split(w3id_start, 1)[1].split(w3id_end, 1)[0]
+    fixture_target = (
+        "https://labiosyncare.github.io/ontology/instances/"
+        "ecosystem/fixtures/synthetic-ecosystem.ttl"
+    )
+
+    def staged_routes_for(target: str) -> set[str]:
+        patterns = re.findall(
+            rf"RewriteRule \^\(([^)\n]+)\)/\?\$ {re.escape(target)} \[R=303,L\]",
+            route_block,
+        )
+        return {route for pattern in patterns for route in pattern.split("|")}
+
+    rdf_routes = staged_routes_for(fixture_target)
+    html_routes = staged_routes_for("https://labiosyncare.github.io/")
+    if rdf_routes != expected_fixture_routes:
+        fail("w3id staging: Turtle fixture routes do not exactly cover synthetic agents/relationships/activities")
+    if html_routes != expected_fixture_routes:
+        fail("w3id staging: HTML routes do not exactly cover synthetic agents/relationships/activities")
+
+# Future real records are also fail-closed: every reserved real subject must
+# have one exact staged HTML rule and one exact RDF rule to its owning aggregate
+# file. An empty agents/ family therefore requires an empty delimited block.
+real_w3id_start = "# BEGIN audited real ecosystem routes"
+real_w3id_end = "# END audited real ecosystem routes"
+if w3id_text.count(real_w3id_start) != 1 or w3id_text.count(real_w3id_end) != 1:
+    fail("w3id staging: expected one delimited real ecosystem route block")
+else:
+    real_route_block = w3id_text.split(real_w3id_start, 1)[1].split(real_w3id_end, 1)[0]
+    expected_real_targets: dict[str, str] = {}
+    for path in ecosystem_real_paths:
+        graph = Graph().parse(path, format="turtle")
+        target = str(published_instance_url(path))
+        for subject in set(graph.subjects()):
+            if not isinstance(subject, URIRef):
+                continue
+            iri = str(subject)
+            if not (
+                iri.startswith(f"{w3id_prefix}specialist/")
+                or iri.startswith(f"{w3id_prefix}organization/")
+                or iri.startswith(f"{w3id_prefix}ecosystem-record/relationship/")
+                or iri.startswith(f"{w3id_prefix}ecosystem-record/activity/")
+            ):
+                continue
+            route = iri.removeprefix(w3id_prefix)
+            if route in expected_real_targets and expected_real_targets[route] != target:
+                fail(f"w3id staging: real route {route} is owned by several aggregate files")
+            expected_real_targets[route] = target
+
+    exact_rule = re.compile(
+        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
+        r"(https://labiosyncare\.github\.io/(?:|ontology/instances/ecosystem/agents/[^\s]+\.ttl)) "
+        r"\[R=303,L\]"
+    )
+    parsed_rules: list[tuple[list[str], str]] = []
+    for line in real_route_block.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("RewriteRule"):
+            continue
+        match = exact_rule.fullmatch(stripped)
+        if match is None:
+            fail("w3id staging: real ecosystem block contains a broad or malformed RewriteRule")
+            continue
+        parsed_rules.append((match.group(1).split("|"), match.group(2)))
+
+    real_html_routes: set[str] = set()
+    real_rdf_targets: dict[str, str] = {}
+    for routes, target in parsed_rules:
+        for route in routes:
+            if target == "https://labiosyncare.github.io/":
+                real_html_routes.add(route)
+            elif route in real_rdf_targets:
+                fail(f"w3id staging: duplicate real RDF route {route}")
+            else:
+                real_rdf_targets[route] = target
+
+    if real_html_routes != set(expected_real_targets):
+        fail("w3id staging: HTML routes do not exactly cover real ecosystem subjects")
+    if real_rdf_targets != expected_real_targets:
+        fail("w3id staging: RDF routes do not exactly map real ecosystem subjects to owning dumps")
+
+for agent in ecosystem_agents:
+    owners = instance_subject_owners.get(agent, set())
+    if not owners:
+        fail(f"{agent}: ecosystem agent has no owning instance file")
+    elif any(ecosystem_owner_family(owner) is None for owner in owners):
+        fail(f"{agent}: ecosystem agent must be owned by a real or fixture ecosystem file")
+
+    is_person = (agent, RDF.type, SCHEMA.Person) in all_graph
+    is_organization = (agent, RDF.type, SCHEMA.Organization) in all_graph
+    if is_person == is_organization:
+        fail(f"{agent}: expected exactly one explicit schema:Person/schema:Organization type")
+    elif is_person and not str(agent).startswith("https://w3id.org/sstim/specialist/"):
+        fail(f"{agent}: schema:Person must use the /specialist/ namespace")
+    elif is_organization and not str(agent).startswith("https://w3id.org/sstim/organization/"):
+        fail(f"{agent}: schema:Organization must use the /organization/ namespace")
+
+for record in ecosystem_relationships | engagement_activities:
+    if not str(record).startswith("https://w3id.org/sstim/ecosystem-record/"):
+        fail(f"{record}: qualified ecosystem records must use /ecosystem-record/ IRIs")
+    owners = instance_subject_owners.get(record, set())
+    if not owners:
+        fail(f"{record}: qualified ecosystem record has no owning instance file")
+    elif any(ecosystem_owner_family(owner) is None for owner in owners):
+        fail(f"{record}: qualified ecosystem record must be owned by a real or fixture ecosystem file")
+
+
 # Local object IRIs should resolve to a declared resource in the graph set.
 declared_subjects = {subject for subject in all_graph.subjects() if isinstance(subject, URIRef)}
 for _, _, obj in all_graph:
@@ -635,6 +975,12 @@ counts = {
     "exposure profiles": len(instances_of(EXPOSURE.ExposureProfile)),
     "sessions": len(sessions),
     "self reports": len(self_reports),
+    "ecosystem agents": len(ecosystem_agents),
+    "ecosystem relationships": len(ecosystem_relationships),
+    "organization memberships": len(organization_memberships),
+    "implementation responsibilities": len(implementation_responsibilities),
+    "engagement activities": len(engagement_activities),
+    "organization roles": len(organization_roles),
 }
 minimums = {
     "classes": 55,
@@ -651,6 +997,15 @@ minimums = {
     "exposure profiles": 10,
     "sessions": 1,
     "self reports": 2,
+    # F2's synthetic contract fixture must remain rich enough to exercise two
+    # memberships without cross-associating their organizations, roles, sources,
+    # or lifecycle activities, plus a distinct implementation responsibility.
+    "ecosystem agents": 3,
+    "ecosystem relationships": 6,
+    "organization memberships": 2,
+    "implementation responsibilities": 2,
+    "engagement activities": 14,
+    "organization roles": 2,
 }
 for name, minimum in minimums.items():
     if counts[name] < minimum:

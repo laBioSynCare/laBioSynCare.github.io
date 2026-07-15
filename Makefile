@@ -24,6 +24,10 @@ ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
 PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
 ECOSYSTEM  := static/ontology/sstim-ecosystem.ttl
+PRIVATE_ECOSYSTEM_SHAPES := static/ontology/sstim-ecosystem-private-shapes.ttl
+PRIVATE_ECOSYSTEM_FIXTURE := test/fixtures/rdf/ecosystem-private/synthetic-terminal-ledger.ttl
+PRIVATE_LEDGER ?=
+PRIVATE_LEDGER_ARG = $(if $(strip $(PRIVATE_LEDGER)),--private-ledger "$(PRIVATE_LEDGER)",)
 ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE) $(ECOSYSTEM)
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
@@ -32,13 +36,13 @@ ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO)
 BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO) $(ECOSYSTEM)
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
-INSTANCE_FILES := $(wildcard $(INSTANCE_ROOT)/*/*.ttl)
+INSTANCE_FILES := $(sort $(wildcard $(INSTANCE_ROOT)/*/*.ttl) $(wildcard $(INSTANCE_ROOT)/*/*/*.ttl))
 DEV_HOST   ?= 127.0.0.1
 DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev ecosystem-contract export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -90,8 +94,15 @@ shacl-instances:
 		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
 	fi
 
+## Validate the synthetic external/private audit ledger with its separate profile
+shacl-private-ecosystem:
+	@tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(ECOSYSTEM) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
+	$(PYSHACL) -s $(PRIVATE_ECOSYSTEM_SHAPES) -i rdfs "$$tmp"
+
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
@@ -110,6 +121,20 @@ sparql-sanity:
 quality-audit:
 	$(PYTHON) scripts/sstim-quality-audit.py
 
+## Prove the qualified ecosystem contract in isolation and at runtime
+ecosystem-contract:
+	@set -e; \
+	if [ "$(PYSHACL)" = "pyshacl" ]; then \
+		$(PYTHON) scripts/sstim-ecosystem-contract.py $(PRIVATE_LEDGER_ARG); \
+	else \
+		wrapper_dir="$$(mktemp -d)"; \
+		trap 'rm -rf "$$wrapper_dir"' EXIT; \
+		printf '%s\n' '#!/bin/sh' 'exec $(PYSHACL) "$$@"' > "$$wrapper_dir/pyshacl"; \
+		chmod +x "$$wrapper_dir/pyshacl"; \
+		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py $(PRIVATE_LEDGER_ARG); \
+	fi
+	npx vitest run src/rdf/ecosystem-contract.test.mjs
+
 ## Freeze the current ontology as an immutable versioned snapshot
 ## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
 ## Existing snapshots are protected; overwrite an unpublished one with FORCE=1.
@@ -127,7 +152,7 @@ export-check:
 	$(PYTHON) scripts/export-ontology.py "$$tmpdir"
 
 ## Run the current ontology validation suite
-validate: shacl quality-audit reason sparql-sanity export-check
+validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -190,6 +215,7 @@ help:
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
+	@echo "  make ecosystem-contract Validate ecosystem fixtures/history (PRIVATE_LEDGER=/external/path for real records)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
 	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

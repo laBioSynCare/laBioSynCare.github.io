@@ -1,0 +1,44 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix private: <https://example.org/private-ledger-negative/> .
+@prefix record:  <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+private:operator a prov:Agent .
+
+record:old-private-record a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Old relationship snapshot for invalid self-revision"@en ;
+    sstim-eco:relationshipAgent private:operator ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/self-revision> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/self-revision> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    prov:wasRevisionOf record:old-private-record ;
+    sstim-eco:hasEngagementActivity private:prior, private:self-revision .
+
+private:prior a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic prior decision"@en ;
+    sstim-eco:engagementFor record:old-private-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .
+
+private:self-revision a sstim-eco:EngagementActivity,
+        sstim-eco:AmendmentActivity, prov:Activity ;
+    rdfs:label "Invalid synthetic self-revision"@en ;
+    sstim-eco:engagementFor record:old-private-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeRecordAmended ;
+    prov:endedAtTime "2026-07-15T12:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:prior ;
+    prov:generated record:old-private-record ;
+    prov:invalidated record:old-private-record .

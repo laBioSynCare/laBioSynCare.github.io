@@ -1,0 +1,39 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix activity: <https://w3id.org/sstim/ecosystem-record/activity/> .
+@prefix record:   <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+# A person may self-publish when that same person is both the accountable
+# curator and the actor on the final approval. No separate notification or
+# consent event is required for this narrow self-publication case.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    sstim-eco:hasEcosystemRelationship record:synthetic-self-publication .
+
+record:synthetic-self-publication a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Synthetic self-publication relationship"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget <https://w3id.org/sstim> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicAttribution ;
+    dct:source <https://example.org/sources/synthetic-self-publication> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:hasEngagementActivity activity:synthetic-self-publication .
+
+activity:synthetic-self-publication a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic self-publication approval"@en ;
+    sstim-eco:engagementFor record:synthetic-self-publication ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T14:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .

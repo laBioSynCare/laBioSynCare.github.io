@@ -9,10 +9,13 @@
 
 ## Consent & framing rules (read before contacting anyone)
 
-- **Notify-and-honor** ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)):
-  public professional facts may be recorded, but every named entity is notified
-  best-effort, and objections / removals are honored promptly. `PARTNERS.md` /
-  `ADVISORY_BOARD.md` are the consent-of-record for named people.
+- **Admission and removal** ([ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md),
+  [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)): public
+  organization facts use notify-and-honor. A named person must
+  self-publish or give authenticated consent for the exact relationship and
+  purpose; notification alone is insufficient. A prose confirmation in
+  `PARTNERS.md` / `ADVISORY_BOARD.md` counts only when it explicitly covers that
+  scope. Objections and removals are honored promptly.
 - **The ask is "encode / reproduce a protocol," never "endorse BSC"** and never
   "validate our health benefits." Endorsement of a policy charter is an *ethical*
   commitment, not scientific or product validation.

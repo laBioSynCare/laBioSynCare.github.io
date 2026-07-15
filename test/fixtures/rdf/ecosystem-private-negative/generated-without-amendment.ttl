@@ -1,0 +1,32 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix private: <https://example.org/private-ledger-negative/generated/> .
+@prefix record:  <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+private:operator a prov:Agent .
+
+record:generated-without-amendment a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Relationship snapshot for invalid generation"@en ;
+    sstim-eco:relationshipAgent private:operator ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/generated> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/generated> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    sstim-eco:hasEngagementActivity private:invalid-generation .
+
+private:invalid-generation a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Invalid generation outside amendment"@en ;
+    sstim-eco:engagementFor record:generated-without-amendment ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:generated record:unlawful-replacement .

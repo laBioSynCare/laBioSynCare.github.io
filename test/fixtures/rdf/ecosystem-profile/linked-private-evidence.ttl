@@ -1,0 +1,8 @@
+@prefix ex:   <https://example.org/private-vocabulary/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-publication>
+    prov:generated ex:raw-consent-evidence .
+
+ex:raw-consent-evidence
+    ex:rawConsentEvidence "Synthetic private evidence — must not publish" .

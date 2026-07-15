@@ -2,6 +2,18 @@
 
 **Status:** Accepted — 2026-07-12
 
+> **Amended by [ADR 0031](0031-qualified-ecosystem-records.md), 2026-07-15.**
+> The identity and placement rules remain in force. Notify-and-honor applies to
+> organizations; a named person requires self-publication or scoped
+> consent under ADR 0031. The flat relationship and lifecycle properties in §§4–5 are superseded for new
+> data by qualified relationship records. ADR 0031 also separates the
+> retractable, approved public current-state projection from the append-only
+> private operational audit. **Archive-boundary clarification, 2026-07-15:**
+> `make snapshot` copies only ontology term modules, but the GitHub–Zenodo
+> integration archives the repository state at a release tag. Exclusion from
+> the ontology snapshot therefore does not by itself exclude a file from the
+> DOI deposit. The live-only placement rules below are corrected accordingly.
+
 ## Context
 
 SSTIM describes techniques, protocols, evidence, and safety, but not the
@@ -105,21 +117,28 @@ Exact names/cardinalities are finalized at implementation with a SHACL shape in
 
 ### 6. Placement — curated instances, consent-gated archival
 
-Instances live at `https://w3id.org/sstim/organization/{id}` and
-`.../specialist/{id}` under `static/ontology/instances/ecosystem/`, **never** in
-the reusable term space (§5.1). Archival is **tiered by consent**:
+Instances use `https://w3id.org/sstim/organization/{id}` and
+`.../specialist/{id}` and are **never** placed in the reusable term space
+(§5.1). Archival is **tiered by consent**:
 
-- **Default: live-only, not snapshotted.** Most agents (public facts, listing
-  consent or implicit-public) are served live and are freely editable and
-  erasable. They are excluded from the versioned Zenodo snapshots (the snapshot
-  script freezes only the term modules, ADR 0020), so a removal request touches
-  live data and git history only — **no DOI archive contains them.**
+- **Default: live-only, outside the release repository.** Approved current
+  records are served from a mutable publication store that is not included in
+  this Zenodo-tracked repository and is not automatically deposited in a DOI
+  archive. The store must support prompt correction/removal and have a
+  documented retention policy. Synthetic contract fixtures may remain under
+  `static/ontology/instances/ecosystem/`; real live-only records may not. The
+  `make snapshot` term-only exclusion is useful but is not the privacy boundary,
+  because a GitHub release deposit archives the repository state at its tag.
+  Third-party caches and copies of already served public facts can still exist;
+  that limitation must be disclosed before publishing a person.
 - **Opt-in: archival, on `archivalConsent`.** An agent who has given specific,
   informed consent that the entry is *permanent, citable, and not fully
-  erasable* becomes eligible for a snapshotted `ecosystem/archival/` subset —
-  used **freely for organizations** (legal entities, minimal personal-data risk)
-  and for **individuals only** with that explicit permanent-credit consent
-  (e.g., a named advisor who wants durable attribution).
+  erasable* becomes eligible for a separate archival deposit or an explicitly
+  release-included archival subset —
+  for **individuals only** with that explicit permanent-credit consent (e.g., a
+  named advisor who wants durable attribution). Organization archival also
+  remains disabled until a curator-authorization and notice policy is accepted;
+  organization status does not itself authorize permanent publication.
 
 This resolves the erasure-vs-immutability tension: personal data enters an
 immutable, citable archive **only** when the individual has knowingly chosen it.
@@ -131,23 +150,29 @@ immutable, citable archive **only** when the individual has knowingly chosen it.
    Wikipedia / ROR for verifiable identity, but a public professional presence
    elsewhere suffices. **Only public, professional information** — no private
    data, no non-professional contact details, no special-category data.
-2. **Consent posture — notify-and-honor.** Recording public professional facts
-   (live) does not require prior consent, but every agent is notified
-   (best-effort), the response is recorded (§5), and objections, changes, and
-   removals are **honored promptly**. Inclusion in the **citable archive** is a
-   higher bar: explicit `archivalConsent` (§6).
-3. **Provenance & verification.** Every factual claim carries `recordSource`;
-   external identity IDs are verified against the authoritative record.
+2. **Consent posture — notify-and-honor, tightened for people.**
+   Public organization facts may use notify-and-honor. A named person in this
+   public dataset must instead self-publish or give scoped consent before final
+   approval. Notification alone is insufficient. Objections, changes, and
+   removals are honored promptly in the active public graph. Public delivery
+   cannot promise erasure from third-party caches; permanent DOI archival is a
+   still higher, explicit-consent decision and is not yet implemented.
+3. **Provenance & verification.** Every new factual claim carries IRI-valued
+   `dct:source` on its qualified relationship; legacy `recordSource` is
+   deprecated. External identity IDs are verified against the authoritative
+   record.
 4. **No endorsement, no false affiliation.** Recording an agent's relationship to
    sensory stimulation does not imply it endorses SSTIM, BSC Lab, or BioSynCare,
    nor any affiliation unless stated with a source.
 5. **Non-clinical (CLAUDE.md §3.5).** No agent record implies clinical efficacy,
    medical endorsement, or that a named clinician certifies a protocol.
 6. **Data minimization.** Store the least that serves discovery and attribution.
-7. **Removal.** For live-only agents, delete from live data (git history retains
-   prior states, stated transparently; no snapshot includes them). For
-   archival-consented agents, honor removal going forward; prior DOI snapshots
-   persist, which the agent knowingly accepted.
+7. **Removal.** Record the terminal event in the access-controlled private
+   ledger, then remove the relationship, its public activities, backlinks, and
+   any orphaned agent from the active public graph. The controlled live store
+   must not retain the removed public version beyond its disclosed retention
+   policy. Third-party copies cannot be recalled; no identifying withdrawal
+   tombstone is retained publicly.
 8. **Review cadence.** Re-verify external IDs and refresh from public sources
    periodically; reconcile with `docs/ecosystem/PARTNERS.md` and
    `ADVISORY_BOARD.md`, whose consent caveats are authoritative for named people.
@@ -156,13 +181,19 @@ immutable, citable archive **only** when the individual has knowingly chosen it.
 
 - Adds a neutral ecosystem-agent layer, discoverable in the graph browser (an
   "Ecosystem / agents" scope) and queryable ("who works on binaural beats?").
-- Introduces the project's first modeling of real named individuals, with an
-  auditable consent/engagement trail rather than ad-hoc listing.
+- Introduces the project's first modeling of real named individuals, with a
+  minimal approved public state and a separate private consent/engagement audit
+  rather than ad-hoc listing.
 - The consent-gated archival tier preserves the erasure safety-valve by default
   while allowing durable credit for those who explicitly want it.
+- A mutable external publication store and loader/dereferencing path are now a
+  prerequisite for real live-only records. Until they exist, the repository
+  admits synthetic fixtures only.
 - Implementation follow-ups: the `sstim-ecosystem` module, its SHACL shape, a
-  graph-browser scope, loader entries, and the first seed (organizations first,
-  then consented public figures).
+  graph-browser scope, loader entries, and an atomic first admitted aggregate:
+  the accountable curator, initial organizations, and at least one approved
+  relationship for every included agent. Components may be drafted separately
+  but are not admitted as detached public identities.
 
 ## Alternatives considered
 
@@ -178,5 +209,7 @@ immutable, citable archive **only** when the individual has knowingly chosen it.
   engagement/relationship layer.
 - **Blanket "never snapshot personal data."** Softened to the consent-gated tier
   (§6): erasable by default, archivable only on explicit informed consent.
-- **Prose only (`PARTNERS.md`/`ADVISORY_BOARD.md`).** Kept as the consent-of-record
-  for named people; confirmed entries are mirrored into RDF.
+- **Prose only (`PARTNERS.md`/`ADVISORY_BOARD.md`).** Kept as a possible
+  consent-of-record for named people; an entry may mirror into RDF only when
+  its confirmation covers the specific relationship and purpose and every ADR
+  0031 admission gate passes.
