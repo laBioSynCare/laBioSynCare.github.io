@@ -99,7 +99,10 @@ ecosystem/agents/   https://w3id.org/sstim/graph/ecosystem-agents (reserved cont
 ```
 
 The browser cannot enumerate static directories, so the loader manifest is
-explicit. `scripts/sstim-quality-audit.py` fails if a committed Turtle file is
+explicit. The real ecosystem family points to the optional external live dump
+at `https://biosyncare-lab.web.app/current.ttl`; it is loaded into the distinct
+ecosystem-agent named graph and is never fetched by deterministic repository
+audits. `scripts/sstim-quality-audit.py` fails if a committed Turtle file is
 missing from the manifest, appears in the wrong real/fixture graph family, is
 omitted from its VoID dump inventory, or the manifest points to a missing file.
 
@@ -107,9 +110,9 @@ Run `make validate` from the repository root after any change. See the
 [ontology guide](../README.md) for modeling, evidence, versioning, and
 publication rules. Changes to the ecosystem family must also pass
 `make ecosystem-contract`; the canonical `make validate` target and CI both run
-that contract. The current command validates the committed synthetic profile
-and proves that a private ledger must be supplied from outside the repository.
-Before F4, the publication plumbing must be extended so an access-limited job
-can validate a real candidate from the external mutable store together with
-`PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`, without committing either
-artifact here.
+that contract. For real admission, supply both external work files as
+`PUBLIC_ECOSYSTEM=/secure/path/public.ttl` and
+`PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`. The private-first publisher
+and correction/removal sequence are documented in
+[`docs/ecosystem/ECOSYSTEM_OPERATIONS.md`](../../../docs/ecosystem/ECOSYSTEM_OPERATIONS.md).
+Neither artifact is committed here.

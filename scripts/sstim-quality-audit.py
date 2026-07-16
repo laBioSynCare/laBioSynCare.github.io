@@ -57,6 +57,14 @@ ECOSYSTEM_INSTANCE_PREFIXES = (
 )
 ECOSYSTEM_AGENTS_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-agents")
 ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture")
+ECOSYSTEM_PUBLIC_DUMP = URIRef(
+    "https://biosyncare-lab.web.app/current.ttl"
+)
+ECOSYSTEM_PUBLIC_ROUTES = {
+    "specialist/renato-fabbri": str(ECOSYSTEM_PUBLIC_DUMP),
+    "ecosystem-record/relationship/renato-develops-bsclab": str(ECOSYSTEM_PUBLIC_DUMP),
+    "ecosystem-record/activity/renato-bsclab-self-publication": str(ECOSYSTEM_PUBLIC_DUMP),
+}
 
 errors: list[str] = []
 
@@ -80,6 +88,11 @@ instance_paths = sorted(INSTANCE_DIR.rglob("*.ttl"))
 ecosystem_real_paths = sorted(ECOSYSTEM_REAL_DIR.glob("*.ttl"))
 ecosystem_fixture_paths = sorted(ECOSYSTEM_FIXTURE_DIR.glob("*.ttl"))
 ecosystem_instance_paths = ecosystem_real_paths + ecosystem_fixture_paths
+if ecosystem_real_paths:
+    fail(
+        "real ecosystem records must remain in the external mutable store, not "
+        "the Zenodo-tracked repository"
+    )
 unexpected_ecosystem_paths = sorted(
     set(ECOSYSTEM_INSTANCE_DIR.rglob("*.ttl")) - set(ecosystem_instance_paths)
 )
@@ -153,7 +166,7 @@ def published_instance_url(path: Path) -> URIRef:
     return URIRef(f"https://labiosyncare.github.io/ontology/{relative}")
 
 
-expected_ecosystem_dumps = {published_instance_url(path) for path in ecosystem_real_paths}
+expected_ecosystem_dumps = {ECOSYSTEM_PUBLIC_DUMP}
 expected_fixture_dumps = {published_instance_url(path) for path in ecosystem_fixture_paths}
 expected_ecosystem_uri_spaces = {
     Literal("https://w3id.org/sstim/organization/"),
@@ -172,10 +185,9 @@ if declared_module_properties != [Literal(len(declared_properties))]:
     fail(f"void.ttl: void:properties must be {len(declared_properties)} OWL properties")
 if declared_instance_triples != [Literal(len(instances))]:
     fail(f"void.ttl: instance void:triples must be {len(instances)}")
-if declared_ecosystem_triples != [Literal(len(ecosystem_real_instances))]:
+if declared_ecosystem_triples:
     fail(
-        "void.ttl: ecosystem-agent graph void:triples must be "
-        f"{len(ecosystem_real_instances)}"
+        "void.ttl: mutable ecosystem-agent graph must omit volatile void:triples counts"
     )
 if declared_fixture_triples != [Literal(len(ecosystem_fixture_instances))]:
     fail(
@@ -568,6 +580,31 @@ if "ecosystem: INSTANCE_URLS.ecosystem.map" not in loader_text:
 if "ecosystemFixtures: INSTANCE_URLS.ecosystemFixtures.map" not in loader_text:
     fail("src/rdf/loader.js: ecosystem fixtures need a dedicated INSTANCE_SOURCES family")
 
+ecosystem_url_blocks = re.findall(
+    r"^  ecosystem:\s*\[(.*?)\],\s*$",
+    loader_text,
+    flags=re.MULTILINE | re.DOTALL,
+)
+ecosystem_loader_urls = (
+    set(re.findall(r"'(https://[^']+\.ttl)'", ecosystem_url_blocks[0]))
+    if len(ecosystem_url_blocks) == 1
+    else set()
+)
+if len(ecosystem_url_blocks) != 1:
+    fail("src/rdf/loader.js: expected one external INSTANCE_URLS.ecosystem array")
+if ecosystem_loader_urls != {str(ECOSYSTEM_PUBLIC_DUMP)}:
+    fail("src/rdf/loader.js: real ecosystem family must load exactly the external mutable dump")
+ecosystem_source_block = re.search(
+    r"ecosystem: INSTANCE_URLS\.ecosystem\.map\(url => \(\{(.*?)\}\)\),",
+    loader_text,
+    flags=re.DOTALL,
+)
+if ecosystem_source_block is None or not all(
+    marker in ecosystem_source_block.group(1)
+    for marker in ("external: true", "optional: true")
+):
+    fail("src/rdf/loader.js: external ecosystem source must be marked external and optional")
+
 
 # /organization/, /specialist/, and /ecosystem-record/ are owned exclusively by
 # the ecosystem instance family. This is both a namespace-boundary check and a
@@ -781,8 +818,8 @@ organization_roles = {
     if isinstance(subject, URIRef)
 }
 
-# VoID partitions are checked independently for the empty reserved real graph
-# and the populated fixture graph; overlapping subclass counts are intentional.
+# VoID partitions are checked for the repository-owned fixture graph. The live
+# external graph is mutable, so volatile entity counts must not be frozen here.
 def ecosystem_partition_counts(graph: Graph) -> dict[URIRef, int]:
     return {
         ECOSYSTEM.EcosystemAgent: len(instances_of_in(graph, ECOSYSTEM.EcosystemAgent)),
@@ -816,7 +853,8 @@ def check_void_partitions(dataset: URIRef, graph: Graph, label: str) -> None:
             fail(f"void.ttl: {label} partition {class_iri} void:entities must be {expected_count}")
 
 
-check_void_partitions(ECOSYSTEM_AGENTS_GRAPH, ecosystem_real_instances, "ecosystem-agent")
+if list(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.classPartition)):
+    fail("void.ttl: mutable ecosystem-agent graph must omit volatile class partitions")
 check_void_partitions(ECOSYSTEM_FIXTURE_GRAPH, ecosystem_fixture_instances, "ecosystem-fixture")
 
 # Every synthetic identity/relationship/activity has an exact staged w3id rule
@@ -860,38 +898,19 @@ else:
     if html_routes != expected_fixture_routes:
         fail("w3id staging: HTML routes do not exactly cover synthetic agents/relationships/activities")
 
-# Future real records are also fail-closed: every reserved real subject must
-# have one exact staged HTML rule and one exact RDF rule to its owning aggregate
-# file. An empty agents/ family therefore requires an empty delimited block.
+# Real records are fail-closed: every external aggregate subject must have one
+# exact staged HTML rule and one exact RDF rule to the mutable public dump.
 real_w3id_start = "# BEGIN audited real ecosystem routes"
 real_w3id_end = "# END audited real ecosystem routes"
 if w3id_text.count(real_w3id_start) != 1 or w3id_text.count(real_w3id_end) != 1:
     fail("w3id staging: expected one delimited real ecosystem route block")
 else:
     real_route_block = w3id_text.split(real_w3id_start, 1)[1].split(real_w3id_end, 1)[0]
-    expected_real_targets: dict[str, str] = {}
-    for path in ecosystem_real_paths:
-        graph = Graph().parse(path, format="turtle")
-        target = str(published_instance_url(path))
-        for subject in set(graph.subjects()):
-            if not isinstance(subject, URIRef):
-                continue
-            iri = str(subject)
-            if not (
-                iri.startswith(f"{w3id_prefix}specialist/")
-                or iri.startswith(f"{w3id_prefix}organization/")
-                or iri.startswith(f"{w3id_prefix}ecosystem-record/relationship/")
-                or iri.startswith(f"{w3id_prefix}ecosystem-record/activity/")
-            ):
-                continue
-            route = iri.removeprefix(w3id_prefix)
-            if route in expected_real_targets and expected_real_targets[route] != target:
-                fail(f"w3id staging: real route {route} is owned by several aggregate files")
-            expected_real_targets[route] = target
+    expected_real_targets = ECOSYSTEM_PUBLIC_ROUTES
 
     exact_rule = re.compile(
         r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
-        r"(https://labiosyncare\.github\.io/(?:|ontology/instances/ecosystem/agents/[^\s]+\.ttl)) "
+        rf"(https://labiosyncare\.github\.io/|{re.escape(str(ECOSYSTEM_PUBLIC_DUMP))}) "
         r"\[R=303,L\]"
     )
     parsed_rules: list[tuple[list[str], str]] = []

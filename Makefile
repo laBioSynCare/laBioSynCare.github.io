@@ -26,7 +26,9 @@ PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
 ECOSYSTEM  := static/ontology/sstim-ecosystem.ttl
 PRIVATE_ECOSYSTEM_SHAPES := static/ontology/sstim-ecosystem-private-shapes.ttl
 PRIVATE_ECOSYSTEM_FIXTURE := test/fixtures/rdf/ecosystem-private/synthetic-terminal-ledger.ttl
+PUBLIC_ECOSYSTEM ?=
 PRIVATE_LEDGER ?=
+PUBLIC_ECOSYSTEM_ARG = $(if $(strip $(PUBLIC_ECOSYSTEM)),--public-candidate "$(PUBLIC_ECOSYSTEM)",)
 PRIVATE_LEDGER_ARG = $(if $(strip $(PRIVATE_LEDGER)),--private-ledger "$(PRIVATE_LEDGER)",)
 SHACL_WORKERS ?=
 SHACL_WORKERS_ARG = $(if $(strip $(SHACL_WORKERS)),--shacl-workers "$(SHACL_WORKERS)",)
@@ -44,7 +46,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev ecosystem-contract export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -127,15 +129,19 @@ quality-audit:
 ecosystem-contract:
 	@set -e; \
 	if [ "$(PYSHACL)" = "pyshacl" ]; then \
-		$(PYTHON) scripts/sstim-ecosystem-contract.py $(SHACL_WORKERS_ARG) $(PRIVATE_LEDGER_ARG); \
+		$(PYTHON) scripts/sstim-ecosystem-contract.py $(SHACL_WORKERS_ARG) $(PUBLIC_ECOSYSTEM_ARG) $(PRIVATE_LEDGER_ARG); \
 	else \
 		wrapper_dir="$$(mktemp -d)"; \
 		trap 'rm -rf "$$wrapper_dir"' EXIT; \
 		printf '%s\n' '#!/bin/sh' 'exec $(PYSHACL) "$$@"' > "$$wrapper_dir/pyshacl"; \
 		chmod +x "$$wrapper_dir/pyshacl"; \
-		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py --pyshacl-cli $(SHACL_WORKERS_ARG) $(PRIVATE_LEDGER_ARG); \
+		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py --pyshacl-cli $(SHACL_WORKERS_ARG) $(PUBLIC_ECOSYSTEM_ARG) $(PRIVATE_LEDGER_ARG); \
 	fi
 	npx vitest run src/rdf/ecosystem-contract.test.mjs
+
+## Validate and activate an external live ecosystem aggregate, private ledger first
+ecosystem-publish:
+	$(PYTHON) scripts/sstim-ecosystem-publish.py $(PUBLIC_ECOSYSTEM_ARG) $(PRIVATE_LEDGER_ARG) $(if $(DRY_RUN),--dry-run,)
 
 ## Freeze the current ontology as an immutable versioned snapshot
 ## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
@@ -217,7 +223,8 @@ help:
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
-	@echo "  make ecosystem-contract Validate ecosystem fixtures/history (PRIVATE_LEDGER=/external/path, SHACL_WORKERS=N)"
+	@echo "  make ecosystem-contract Validate ecosystem fixtures or an external candidate (PUBLIC_ECOSYSTEM=/external/public.ttl, PRIVATE_LEDGER=/external/audit.ttl, SHACL_WORKERS=N)"
+	@echo "  make ecosystem-publish Validate and publish an external aggregate (PUBLIC_ECOSYSTEM=, PRIVATE_LEDGER=, DRY_RUN=1)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
 	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

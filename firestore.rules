@@ -39,6 +39,12 @@ service cloud.firestore {
       allow delete: if signedIn()
         && resource.data.userId == request.auth.uid;
     }
+
+    // Server-admin-only SSTIM ecosystem audit ledger. Client SDK access is
+    // denied even to authenticated users; publication uses Google Cloud IAM.
+    match /sstimEcosystemAudit/{auditId} {
+      allow read, write: if false;
+    }
   }
 
   function signedIn() {

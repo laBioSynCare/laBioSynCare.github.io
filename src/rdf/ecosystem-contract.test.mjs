@@ -23,6 +23,7 @@ import {
 const { defaultGraph, namedNode, quad } = DataFactory
 const ONTOLOGY_DIR = new URL('../../static/ontology/', import.meta.url)
 const FIXTURE_URL = '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
+const PUBLIC_URL = 'https://biosyncare-lab.web.app/current.ttl'
 const FIXTURE_FILE = 'instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
 const GRAPH_IRI = 'https://w3id.org/sstim/graph/ecosystem-fixture'
 const REAL_GRAPH_IRI = 'https://w3id.org/sstim/graph/ecosystem-agents'
@@ -95,15 +96,22 @@ beforeAll(async () => {
 
 describe('synthetic ecosystem loader contract', () => {
   it('manifests the fixture exactly once in its dedicated graph family', () => {
-    expect(INSTANCE_URLS.ecosystem).toEqual([])
-    expect(INSTANCE_SOURCES.ecosystem).toEqual([])
+    expect(INSTANCE_URLS.ecosystem).toEqual([PUBLIC_URL])
+    expect(INSTANCE_SOURCES.ecosystem).toEqual([{
+      url: PUBLIC_URL,
+      graph: REAL_GRAPH_IRI,
+      external: true,
+      optional: true,
+    }])
     expect(INSTANCE_URLS.ecosystemFixtures).toEqual([FIXTURE_URL])
     expect(INSTANCE_SOURCES.ecosystemFixtures).toEqual([{
       url: FIXTURE_URL,
       graph: GRAPH_IRI,
     }])
     expect(instanceUrls().filter(url => url === FIXTURE_URL)).toHaveLength(1)
+    expect(instanceUrls().filter(url => url === PUBLIC_URL)).toHaveLength(1)
     expect(instanceSources().filter(source => source.url === FIXTURE_URL)).toHaveLength(1)
+    expect(instanceSources().filter(source => source.url === PUBLIC_URL)).toHaveLength(1)
     expect(ECOSYSTEM_AGENTS_GRAPH_IRI.value).toBe(REAL_GRAPH_IRI)
     expect(ECOSYSTEM_FIXTURE_GRAPH_IRI.value).toBe(GRAPH_IRI)
   })

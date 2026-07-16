@@ -35,9 +35,10 @@ Phase tags:
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
 SSTIM `0.7.0` is the validated release line, archived under release DOI
-`10.5281/zenodo.21380171`. The immediate ontology focus is the
-external mutable store/loader required before real ecosystem records, registry
-review, and future independent human review. Public BSC Lab data remains
+`10.5281/zenodo.21380171`. The external live-only ecosystem store, loader, and
+private admission ledger are operational, with Renato as the first admitted
+agent. The immediate focus is the exact w3id route merge, ecosystem discovery,
+registry review, and future independent human review. Public BSC Lab data remains
 separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
@@ -289,21 +290,18 @@ Turtle files are listed in section 1. After they exist:
       `0.7.0`: qualified relationship/engagement, ORG membership,
       implementation responsibility, a retractable approved public projection,
       separate private-ledger validation policy, closed artifact profile, executable
-      admission state, and synthetic/adversarial fixtures. F3 synthetic
-      repository graph/loader/VoID/routing plumbing is staged, not live. Next:
-      deploy and verify term/synthetic dereferencing, designate the external
-      mutable public store and retention policy, extend the loader and
-      access-limited admission job for it, provision the private ledger and
-      retraction procedure, and complete the stable release gate. The admission
-      job must validate the external candidate together with
-      `PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`; the private history
-      mirrors all admitted public activities, and neither artifact is committed
-      here.
-      F4's first admitted aggregate is atomic: Renato, the initial verified
-      organizations, and at least one approved relationship for every agent.
-      Organization records may be drafted first, but are not admitted without
-      Renato as their verified curator; later memberships/responsibilities are
-      separately self-approved or scoped-consent. The canonical sequence is Workstream 5
+      admission state, and synthetic/adversarial fixtures. F3's mutable external
+      projection, optional browser loader, VoID declaration, private Firestore
+      ledger, retention/removal runbook, and private-first publisher are now
+      operational. The first F4 aggregate is live-only and atomic: Renato plus
+      one sourced, self-approved implementation-developer relationship to BSC
+      Lab. The exact real w3id routes are staged locally but still need their
+      upstream merge and live verification; human-readable discovery also
+      remains. Organization records may be added later, but are not admitted
+      without a verified curator in the same aggregate; later memberships and
+      responsibilities are separately self-approved or scoped-consent. Neither
+      the public aggregate nor its private history is committed here. The
+      canonical sequence is Workstream 5
       of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`

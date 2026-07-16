@@ -31,7 +31,7 @@ async function loadRepoKnowledgeGraph() {
   const sources = [
     ...Object.values(ONTOLOGY_SOURCES),
     ...Object.values(INSTANCE_SOURCES).flat(),
-  ]
+  ].filter(source => !source.external)
 
   for (const source of sources) {
     const store = await sourceToStore(source)

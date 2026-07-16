@@ -58,9 +58,10 @@ RewriteRule ^(ecosystem-record/activity/aurora-player-publication|ecosystem-reco
 # END audited synthetic ecosystem fixture routes
 
 # BEGIN audited real ecosystem routes
-# F4 inserts exact per-resource HTML/RDF rules here. The quality audit compares
-# this block with ecosystem/agents/*.ttl and fails on missing, stale, or broad
-# routes. Keep the block empty until an access-approved real aggregate exists.
+RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)
+RewriteRule ^(specialist/renato-fabbri|ecosystem-record/relationship/renato-develops-bsclab|ecosystem-record/activity/renato-bsclab-self-publication)/?$ https://labiosyncare.github.io/ [R=303,L]
+
+RewriteRule ^(specialist/renato-fabbri|ecosystem-record/relationship/renato-develops-bsclab|ecosystem-record/activity/renato-bsclab-self-publication)/?$ https://biosyncare-lab.web.app/current.ttl [R=303,L]
 # END audited real ecosystem routes
 
 # -------------------------------------------------------------------------

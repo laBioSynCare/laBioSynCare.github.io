@@ -2,7 +2,7 @@
 
 **Applies to:** SSTIM `0.7.0` ecosystem data
 **Decision:** [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)
-**Status:** F1/F2 contract migration and stable term release complete; external-store F3 deployment pending; no legacy instance conversion required
+**Status:** F1/F2 contract migration and stable term release complete; F3 external live-data path operational and first F4 aggregate activated; exact w3id route merge/discovery pending; no legacy instance conversion required
 
 ## Baseline
 

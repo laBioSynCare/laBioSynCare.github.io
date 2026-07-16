@@ -319,7 +319,7 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md): the qualified/current-state model, closed public profile, executable admission policy, and synthetic/adversarial proof are in place. F3 synthetic repository plumbing is staged, but the external mutable store for real live-only data and its dereferencing path are not implemented. That live-data boundary remains before F4. No real records have been added.**
+**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The first F4 aggregate—Renato with a sourced, self-approved BSC Lab implementation-developer relationship—is live. Exact w3id routes are staged but still require the upstream merge and verification; human-readable ecosystem discovery remains pending.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
@@ -373,9 +373,9 @@ not, however, make every proposed use ready:
   remain recorded in the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
 Therefore, the ecosystem contract is released independently of session work.
-**Only synthetic records and private drafts** may remain in this release
-repository; no real named ecosystem record may be published until the external
-mutable-store, loader/dereferencing, and private-ledger F3 gates below pass.
+**Only synthetic records and contract code** may remain in this release
+repository. Real named records are admitted only through the now-operational
+external mutable-store, loader/dereferencing, and private-ledger gates below.
 
 ### Minimum ecosystem scope
 
@@ -415,7 +415,9 @@ method/school classes are not prerequisites for the first ecosystem seed.
 
 This is the operational sequence for change set F. The
 [improvement plan §1.5](../ontology/IMPROVEMENT_PLAN.md#15-repair-privacy-sensitive-rdf-surfaces)
-remains authoritative for the semantic requirements.
+remains authoritative for the semantic requirements. The concrete storage,
+publication, and removal procedure is recorded in
+[`ECOSYSTEM_OPERATIONS.md`](ECOSYSTEM_OPERATIONS.md).
 
 1. **`[x]` F1 — approve the model and governance amendment.** Write a short successor
    or amendment to ADR 0024 covering qualified relationships/engagements,
@@ -435,45 +437,40 @@ remains authoritative for the semantic requirements.
 4. **`[~]` F3 — complete instance publication plumbing.** The repository now has
    a dedicated synthetic `instances/ecosystem/` family, named graph, explicit
    loader manifest entries, quality-audit coverage, Schema.org/ORG context
-   support, VoID metadata, and synthetic routes. Keep those committed files
-   synthetic. Before F4, designate a mutable public store outside this
-   Zenodo-tracked repository, document its retention/removal controls, make the
-   loader consume its validated public dump, and route real `/organization/{id}`
-   and `/specialist/{id}` IRIs to that store. Gate publication on the same SHACL,
-   identity, local-IRI, and public/private checks used by the fixtures. This step
-   becomes complete only after the stable term routes, synthetic routes, and
-   external live-data path are deployed and verified.
-   Before any real record enters public F4 admission, designate an
-   access-controlled private ledger, its access owner and
-   retention policy, and test the append/retract procedure with the synthetic
-   terminal fixture. The public repository contains only the public profile and
-   synthetic guard; it is not the private ledger. Run the real admission gate as
-   `make ecosystem-contract PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`:
+   support, VoID metadata, and synthetic routes. Committed files remain
+   synthetic. The mutable public store is Firebase Hosting at
+   `https://biosyncare-lab.web.app/current.ttl`; the browser loads it optionally
+   into the real-agent graph, while CI never depends on the network. The
+   access-controlled ledger is the client-denied Firestore
+   `sstimEcosystemAudit` collection. Its access owner, active-plus-365-day
+   terminal retention policy, correction/removal procedure, and private-first
+   activation order are recorded in `ECOSYSTEM_OPERATIONS.md`. Run admission as
+   `make ecosystem-contract PUBLIC_ECOSYSTEM=/secure/path/public.ttl PRIVATE_LEDGER=/secure/path/ecosystem-audit.ttl`:
    the supplied path must be outside the repository and its complete history
    must exactly mirror every admitted relationship claim and the core fields of
    every public activity. The current command validates repository fixtures and
-   the external-ledger boundary; F3 must extend the access-limited publication
-   job to supply a real candidate from the external mutable store. Before a real
-   aggregate can be published, that job must
-   securely materialize both the candidate public aggregate and that ledger;
-   the public repository workflows
-   deliberately remain fail-closed while no such facility is provisioned.
+   the external-ledger boundary and accepts one candidate from an external
+   access-limited work path. `sstim-ecosystem-publish.py` validates both,
+   writes the hash-addressed private audit first, releases the public projection,
+   verifies bytes/MIME/CORS, and deletes superseded Hosting content versions.
    External-ledger diagnostics are redacted and must never print raw SHACL
    reports or private identifiers to public logs.
+   F3 remains marked in progress only because the staged exact w3id routes still
+   need their upstream merge and live verification.
 5. **`[x]` Release gate — stabilize the contract.** SSTIM `0.7.0` includes the
    ecosystem term contract and migration notes after the pinned validation,
    test, check, and build suites passed. Its Zenodo version DOI is
-   `10.5281/zenodo.21380171`. This closes the term-release gate only; F3 still
-   blocks real records.
-6. **`[ ]` F4 — author each real RDF aggregate atomically, then activate it in
+   `10.5281/zenodo.21380171`. This closes the term-release gate independently
+   from the mutable live-data channel.
+6. **`[~]` F4 — author each real RDF aggregate atomically, then activate it in
    the external mutable store.**
-   The first admitted aggregate contains Renato, the initial verified
-   organizations, and at least one sourced relationship with final approval for
-   every agent. Organization records may be drafted first locally, but cannot
-   be admitted separately because Renato is their initial accountable curator
-   and every curator must already be a verified, related agent in that same
-   aggregate. Renato's initial relationship has him as both curator and final
-   approval actor. An agent cannot be published as a detached identity. Every
+   The first aggregate was activated on 2026-07-16 UTC and contains Renato plus the
+   sourced `implementationDeveloper` relationship to the existing BSC Lab
+   implementation. Renato is both curator and final approval actor. Initial
+   organization records may follow in a replacement aggregate, but cannot be
+   admitted separately when Renato is their accountable curator: every curator
+   must already be a verified, related agent in that same aggregate. An agent
+   cannot be published as a detached identity. Every
    later membership or responsibility involving a person is a separate
    relationship and needs its own self-approval or earlier
    scoped consent grant. Keep the first seed live-only and non-archival. Add

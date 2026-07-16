@@ -62,15 +62,24 @@ export async function loadTurtle(url, options = {}) {
 /**
  * Load one source descriptor into a new Store.
  *
- * @param {string | { url: string, graph?: string, format?: string }} source
+ * An optional external source degrades to an empty graph when it is unavailable;
+ * the static ontology remains usable while live ecosystem discovery is offline.
+ *
+ * @param {string | { url: string, graph?: string, format?: string, optional?: boolean }} source
  * @returns {Promise<Store>}
  */
-export function loadSource(source) {
+export async function loadSource(source) {
   if (typeof source === 'string') return loadTurtle(source)
-  return loadTurtle(source.url, {
-    graph: source.graph,
-    format: source.format,
-  })
+  try {
+    return await loadTurtle(source.url, {
+      graph: source.graph,
+      format: source.format,
+    })
+  } catch (error) {
+    if (!source.optional) throw error
+    console.warn(`Optional RDF source unavailable: ${source.url}`, error)
+    return new Store()
+  }
 }
 
 /**
@@ -137,8 +146,9 @@ export const ONTOLOGY_SOURCES = {
 }
 
 /**
- * Committed RDF instance files. Browser builds cannot list directories, so this
- * manifest is the source of truth until a generated instance manifest exists.
+ * RDF instance sources. Browser builds cannot list directories, so this
+ * manifest is the source of truth. Real ecosystem data is deliberately served
+ * from a mutable external store and never copied into the citable repository.
  */
 export const INSTANCE_URLS = {
   frameworks: [
@@ -175,9 +185,9 @@ export const INSTANCE_URLS = {
   sessions: [
     '/ontology/instances/sessions/synthetic-reference-session.ttl',
   ],
-  // Reviewed real records will be added here only after the F4 publication
-  // gate. Keep them distinct from contract fixtures at both path and graph level.
-  ecosystem: [],
+  ecosystem: [
+    'https://biosyncare-lab.web.app/current.ttl',
+  ],
   ecosystemFixtures: [
     '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl',
   ],
@@ -219,6 +229,8 @@ export const INSTANCE_SOURCES = {
   ecosystem: INSTANCE_URLS.ecosystem.map(url => ({
     url,
     graph: ECOSYSTEM_AGENTS_GRAPH_IRI.value,
+    external: true,
+    optional: true,
   })),
   ecosystemFixtures: INSTANCE_URLS.ecosystemFixtures.map(url => ({
     url,

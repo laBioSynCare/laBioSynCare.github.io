@@ -3,7 +3,7 @@
 #  SSTIM — VoID + DCAT dataset description  —  void.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Date:       2026-07-13
+#  Date:       2026-07-17
 #  License:    CC BY 4.0
 #
 #  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
@@ -39,13 +39,13 @@
 <https://w3id.org/sstim/void>
     a void:Dataset, dcat:Dataset ;
     dct:title "Sensory Stimulation Ontology (SSTIM) — dataset"@en ;
-    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules, plus public BSC Lab framework, protocol, preset, evidence, reference, synthetic session, and synthetic ecosystem contract data for sensory stimulation. Turtle is the editable master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
+    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules; version-controlled public BSC Lab instances; and a separately hosted mutable live-only ecosystem projection. Turtle is the editable ontology master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-17"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
@@ -192,7 +192,7 @@
 <https://w3id.org/sstim/void#instances>
     a void:Dataset ;
     dct:title "BSC Lab public SSTIM instance data"@en ;
-    dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
+    dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     void:triples 1789 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
@@ -209,29 +209,22 @@
         <https://w3id.org/sstim/implementation/bsclab/protocol/auditory-observation-reference>,
         <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed>,
         <https://w3id.org/sstim/implementation/bsclab/session/synthetic-reference-001>,
-        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera>,
+        <https://w3id.org/sstim/specialist/renato-fabbri> ;
     void:subset <https://w3id.org/sstim/graph/ecosystem-agents>,
         <https://w3id.org/sstim/graph/ecosystem-fixture> ;
     dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances> .
 
 
-# Reserved runtime named graph for reviewed real F4 ecosystem records. It is
-# deliberately empty until the release/readiness gate is complete. Each future
-# direct ecosystem/agents/*.ttl file must be listed as a data dump; the quality audit
-# checks full file, loader, graph, and dump coverage.
+# Mutable runtime named graph for reviewed real ecosystem records. Its public
+# projection is kept outside the versioned/Zenodo-tracked repository so removal
+# and replacement remain operationally possible. Volatile counts are omitted.
 <https://w3id.org/sstim/graph/ecosystem-agents>
     a void:Dataset ;
     dct:title "SSTIM reviewed ecosystem-agent instance graph"@en ;
-    dct:description "Reserved mutable public graph for reviewed real people, organizations, qualified relationships, and approved public-safe engagement state. It is empty until F4 and excludes private correspondence, contact channels, authentication identifiers, raw consent evidence, and the separate synthetic fixture graph."@en ;
+    dct:description "Mutable public projection for reviewed real people, organizations, qualified relationships, and approved public-safe engagement state. It excludes private correspondence, contact channels, authentication identifiers, raw consent evidence, and the separate synthetic fixture graph; complete audit history remains access-controlled."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 0 ;
-    void:classPartition
-        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemAgent> ; void:entities 0 ],
-        [ void:class <https://w3id.org/sstim/ecosystem#EcosystemRelationship> ; void:entities 0 ],
-        [ void:class <https://w3id.org/sstim/ecosystem#OrganizationMembership> ; void:entities 0 ],
-        [ void:class <https://w3id.org/sstim/ecosystem#ImplementationResponsibility> ; void:entities 0 ],
-        [ void:class <https://w3id.org/sstim/ecosystem#EngagementActivity> ; void:entities 0 ],
-        [ void:class <http://www.w3.org/ns/org#Role> ; void:entities 0 ] ;
+    void:dataDump <https://biosyncare-lab.web.app/current.ttl> ;
     void:uriSpace "https://w3id.org/sstim/organization/",
         "https://w3id.org/sstim/specialist/",
         "https://w3id.org/sstim/ecosystem-record/" ;
@@ -241,7 +234,7 @@
         <http://www.w3.org/ns/org#>,
         <http://xmlns.com/foaf/0.1/>,
         <http://www.w3.org/ns/prov#> ;
-    dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances/ecosystem/agents> .
+    dcat:landingPage <https://biosyncare-lab.web.app/current.ttl> .
 
 
 # Runtime named graph for synthetic contract fixtures. Counts and complete dump

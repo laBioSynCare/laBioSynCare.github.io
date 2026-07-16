@@ -1271,9 +1271,15 @@ def run_pyshacl_cases(
         )
         for case in cases
     ]
-    with ProcessPoolExecutor(max_workers=min(workers, len(cases))) as executor:
-        for case_errors in executor.map(run_serialized_pyshacl, serialized_cases):
-            errors.extend(case_errors)
+    try:
+        with ProcessPoolExecutor(max_workers=min(workers, len(cases))) as executor:
+            for case_errors in executor.map(run_serialized_pyshacl, serialized_cases):
+                errors.extend(case_errors)
+    except PermissionError:
+        # Restricted macOS runners may deny the semaphore sysconf used by
+        # ProcessPoolExecutor. Preserve the same checks with a serial fallback.
+        for serialized_case in serialized_cases:
+            errors.extend(run_serialized_pyshacl(serialized_case))
     return errors
 
 
@@ -1296,6 +1302,15 @@ def main() -> int:
         help=(
             "Number of isolated in-process pySHACL workers "
             "(default: min(4, CPU count); use 1 for serial diagnostics)."
+        ),
+    )
+    parser.add_argument(
+        "--public-candidate",
+        type=Path,
+        help=(
+            "Path to one complete public ecosystem aggregate being considered "
+            "for the external mutable store; the path must be outside this "
+            "Zenodo-tracked repository."
         ),
     )
     parser.add_argument(
@@ -1370,14 +1385,36 @@ def main() -> int:
     public_paths = sorted(PUBLIC_ARTIFACT_DIR.glob("*.ttl"))
     require(
         len(public_paths) <= 1,
-        "F4 currently uses one self-contained aggregate public ecosystem file; "
+        "F4 uses one self-contained aggregate public ecosystem file; "
         f"found {[path.name for path in public_paths]}",
         errors,
     )
-    errors.extend(check_reserved_subject_ownership([FIXTURE, *public_paths]))
+    admission_paths = list(public_paths)
+    if args.public_candidate is not None:
+        candidate_path = args.public_candidate.expanduser().resolve()
+        require(
+            candidate_path.is_file(),
+            "public candidate path does not name a readable file",
+            errors,
+        )
+        require(
+            ROOT not in candidate_path.parents,
+            "public candidate must remain outside the Zenodo-tracked repository",
+            errors,
+        )
+        require(
+            not public_paths,
+            "an external public candidate cannot be combined with a committed "
+            "real ecosystem artifact",
+            errors,
+        )
+        if candidate_path.is_file() and ROOT not in candidate_path.parents:
+            admission_paths.append(candidate_path)
+
+    errors.extend(check_reserved_subject_ownership([FIXTURE, *admission_paths]))
     public_candidates: list[tuple[Path, Graph]] = []
     real_public = Graph()
-    for path in public_paths:
+    for path in admission_paths:
         artifact = parse_graph([path])
         for triple in artifact:
             real_public.add(triple)
@@ -1389,7 +1426,7 @@ def main() -> int:
         public_candidates.append((path, candidate))
 
     external_private_candidate: Graph | None = None
-    if public_paths and args.private_ledger is None:
+    if admission_paths and args.private_ledger is None:
         errors.append(
             "real public ecosystem records require --private-ledger pointing to "
             "their access-controlled complete audit history"
@@ -1546,7 +1583,7 @@ def main() -> int:
         f"{shacl_note}, {len(profile_negative_paths)} file-profile negatives rejected, "
         f"{len(private_negative_paths)} private-ledger negatives rejected, "
         f"{len(positive_paths)} positive policy scenario, "
-        f"{len(public_paths)} real public artifact(s), graph-boundary and "
+        f"{len(admission_paths)} real public artifact(s), graph-boundary and "
         "private-history mirroring and terminal deletion guards proved)"
     )
     return 0
