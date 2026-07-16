@@ -28,6 +28,8 @@ PRIVATE_ECOSYSTEM_SHAPES := static/ontology/sstim-ecosystem-private-shapes.ttl
 PRIVATE_ECOSYSTEM_FIXTURE := test/fixtures/rdf/ecosystem-private/synthetic-terminal-ledger.ttl
 PRIVATE_LEDGER ?=
 PRIVATE_LEDGER_ARG = $(if $(strip $(PRIVATE_LEDGER)),--private-ledger "$(PRIVATE_LEDGER)",)
+SHACL_WORKERS ?=
+SHACL_WORKERS_ARG = $(if $(strip $(SHACL_WORKERS)),--shacl-workers "$(SHACL_WORKERS)",)
 ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE) $(ECOSYSTEM)
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
@@ -125,13 +127,13 @@ quality-audit:
 ecosystem-contract:
 	@set -e; \
 	if [ "$(PYSHACL)" = "pyshacl" ]; then \
-		$(PYTHON) scripts/sstim-ecosystem-contract.py $(PRIVATE_LEDGER_ARG); \
+		$(PYTHON) scripts/sstim-ecosystem-contract.py $(SHACL_WORKERS_ARG) $(PRIVATE_LEDGER_ARG); \
 	else \
 		wrapper_dir="$$(mktemp -d)"; \
 		trap 'rm -rf "$$wrapper_dir"' EXIT; \
 		printf '%s\n' '#!/bin/sh' 'exec $(PYSHACL) "$$@"' > "$$wrapper_dir/pyshacl"; \
 		chmod +x "$$wrapper_dir/pyshacl"; \
-		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py $(PRIVATE_LEDGER_ARG); \
+		PATH="$$wrapper_dir:$$PATH" $(PYTHON) scripts/sstim-ecosystem-contract.py --pyshacl-cli $(SHACL_WORKERS_ARG) $(PRIVATE_LEDGER_ARG); \
 	fi
 	npx vitest run src/rdf/ecosystem-contract.test.mjs
 
@@ -215,7 +217,7 @@ help:
 	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
-	@echo "  make ecosystem-contract Validate ecosystem fixtures/history (PRIVATE_LEDGER=/external/path for real records)"
+	@echo "  make ecosystem-contract Validate ecosystem fixtures/history (PRIVATE_LEDGER=/external/path, SHACL_WORKERS=N)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
 	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"

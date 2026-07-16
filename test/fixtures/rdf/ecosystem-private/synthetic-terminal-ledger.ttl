@@ -7,8 +7,9 @@
 @prefix private:  <https://example.org/private-ledger/> .
 @prefix record:   <https://w3id.org/sstim/ecosystem-record/relationship/> .
 
-# Synthetic policy fixture only. This file is outside static/ and therefore is
-# never loaded, published, included in VoID, or copied into a release artifact.
+# Synthetic policy fixture only. This tracked source file is included in tagged
+# GitHub/Zenodo repository archives. Because it is outside static/, it is not
+# deployed by Pages, listed in VoID, or loaded as public ontology instance data.
 
 private:operator a prov:Agent .
 

@@ -12,15 +12,26 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ProcessPoolExecutor
+from functools import lru_cache
 from pathlib import Path
+from typing import NamedTuple
 
 from rdflib import Graph, Literal, Namespace, RDF, RDFS, URIRef
 from rdflib.compare import isomorphic
 from rdflib.namespace import DCTERMS, OWL, PROV, XSD
+
+try:
+    from pyshacl import validate as pyshacl_validate
+    from pyshacl.errors import ValidationFailure
+except ImportError:  # Preserve CLI-only installations and --skip-shacl.
+    pyshacl_validate = None
+    ValidationFailure = None
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -1127,6 +1138,21 @@ def check_private_diagnostic_redaction() -> list[str]:
     return errors
 
 
+@lru_cache(maxsize=2)
+def load_shapes(path: Path) -> Graph:
+    """Parse each public/private shape graph once for in-process validation."""
+    return parse_graph([path])
+
+
+class ShaclCase(NamedTuple):
+    data: Graph
+    label: str
+    expected_conforms: bool
+    expected_message: str | None = None
+    shapes: Path = SHAPES
+    redact_report: bool = False
+
+
 def run_pyshacl(
     data: Graph,
     label: str,
@@ -1134,51 +1160,120 @@ def run_pyshacl(
     expected_message: str | None = None,
     shapes: Path = SHAPES,
     redact_report: bool = False,
+    use_cli: bool = False,
 ) -> list[str]:
     errors: list[str] = []
-    with tempfile.TemporaryDirectory(prefix="sstim-ecosystem-") as tmp:
-        data_path = Path(tmp) / "data.ttl"
-        data.serialize(destination=data_path, format="turtle")
-        completed = subprocess.run(
-            [
-                "pyshacl",
-                "-s", str(shapes),
-                "-i", "rdfs",
-                "-f", "human",
-                str(data_path),
-            ],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
+    validation_failure = False
+    if not use_cli and pyshacl_validate is not None:
+        try:
+            conforms, report_graph, report = pyshacl_validate(
+                data,
+                shacl_graph=load_shapes(shapes),
+                inference="rdfs",
+                inplace=False,
+            )
+            report = str(report)
+            validation_failure = (
+                ValidationFailure is not None
+                and isinstance(report_graph, ValidationFailure)
+            )
+        except Exception as exc:  # Match the CLI path's controlled diagnostic.
+            report_for_error = validation_report_for_error(str(exc), redact_report)
+            errors.append(
+                f"{label}: in-process pySHACL validation failed:\n{report_for_error}"
+            )
+            return errors
+    else:
+        with tempfile.TemporaryDirectory(prefix="sstim-ecosystem-") as tmp:
+            data_path = Path(tmp) / "data.ttl"
+            data.serialize(destination=data_path, format="turtle")
+            completed = subprocess.run(
+                [
+                    "pyshacl",
+                    "-s", str(shapes),
+                    "-i", "rdfs",
+                    "-f", "human",
+                    str(data_path),
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
 
-    report = completed.stdout + completed.stderr
+        report = completed.stdout + completed.stderr
+        if completed.returncode not in (0, 1):
+            report_for_error = validation_report_for_error(report, redact_report)
+            errors.append(
+                f"{label}: pySHACL failed with exit {completed.returncode}:\n"
+                f"{report_for_error}"
+            )
+            return errors
+        conforms = completed.returncode == 0
+
     report_for_error = validation_report_for_error(report, redact_report)
-    if "Validation Failure result" in report:
+    if validation_failure or "Validation Failure result" in report:
         errors.append(
             f"{label}: pySHACL reported an invalid shapes/validation failure, "
             f"not an ordinary conformance result:\n{report_for_error}"
         )
         return errors
-    if completed.returncode not in (0, 1):
-        errors.append(
-            f"{label}: pySHACL failed with exit {completed.returncode}:\n"
-            f"{report_for_error}"
-        )
-        return errors
 
-    conforms = completed.returncode == 0
     if conforms != expected_conforms:
         expectation = "conform" if expected_conforms else "be rejected"
         errors.append(
-            f"{label}: expected graph to {expectation}, pySHACL exit was "
-            f"{completed.returncode}:\n{report_for_error}"
+            f"{label}: expected graph to {expectation}, pySHACL returned "
+            f"conforms={conforms}:\n{report_for_error}"
         )
     elif not expected_conforms and expected_message and expected_message not in report:
         errors.append(
             f"{label}: graph was rejected, but not for its intended contract; "
             f"expected report text {expected_message!r}:\n{report_for_error}"
         )
+    return errors
+
+
+def run_serialized_pyshacl(
+    case: tuple[str, str, bool, str | None, Path, bool],
+) -> list[str]:
+    """Validate one serialized case inside a worker process."""
+    data_text, label, expected_conforms, expected_message, shapes, redact = case
+    data = Graph().parse(data=data_text, format="turtle")
+    return run_pyshacl(
+        data,
+        label,
+        expected_conforms,
+        expected_message,
+        shapes,
+        redact,
+    )
+
+
+def run_pyshacl_cases(
+    cases: list[ShaclCase],
+    use_cli: bool,
+    workers: int,
+) -> list[str]:
+    """Validate isolated cases, parallelizing the importable API path."""
+    errors: list[str] = []
+    if use_cli or workers == 1 or len(cases) == 1:
+        for case in cases:
+            errors.extend(run_pyshacl(*case, use_cli=use_cli))
+        return errors
+
+    serialized_cases = [
+        (
+            case.data.serialize(format="turtle"),
+            case.label,
+            case.expected_conforms,
+            case.expected_message,
+            case.shapes,
+            case.redact_report,
+        )
+        for case in cases
+    ]
+    with ProcessPoolExecutor(max_workers=min(workers, len(cases))) as executor:
+        for case_errors in executor.map(run_serialized_pyshacl, serialized_cases):
+            errors.extend(case_errors)
     return errors
 
 
@@ -1190,6 +1285,20 @@ def main() -> int:
         help="Run structural/JSON-LD checks without pySHACL (diagnostics only).",
     )
     parser.add_argument(
+        "--pyshacl-cli",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--shacl-workers",
+        type=int,
+        default=min(4, os.cpu_count() or 1),
+        help=(
+            "Number of isolated in-process pySHACL workers "
+            "(default: min(4, CPU count); use 1 for serial diagnostics)."
+        ),
+    )
+    parser.add_argument(
         "--private-ledger",
         type=Path,
         help=(
@@ -1199,6 +1308,8 @@ def main() -> int:
         ),
     )
     args = parser.parse_args()
+    if args.shacl_workers < 1:
+        parser.error("--shacl-workers must be at least 1")
 
     errors: list[str] = []
     fixture = parse_graph([FIXTURE])
@@ -1358,17 +1469,22 @@ def main() -> int:
         )
 
     if not args.skip_shacl:
-        if shutil.which("pyshacl") is None:
+        use_pyshacl_cli = args.pyshacl_cli or pyshacl_validate is None
+        if use_pyshacl_cli and shutil.which("pyshacl") is None:
             errors.append(
-                "pyshacl is required; run inside `nix develop` or use "
+                "pyshacl Python API or CLI is required; run inside `nix develop` or use "
                 "--skip-shacl only for non-gating diagnostics"
             )
         else:
-            errors.extend(run_pyshacl(merged, "positive synthetic ecosystem", True))
+            shacl_cases = [ShaclCase(
+                merged,
+                "positive synthetic ecosystem",
+                True,
+            )]
             private_candidate = parse_graph([
                 *CONTEXT_FILES, FIXTURE, PRIVATE_LEDGER_FIXTURE
             ])
-            errors.extend(run_pyshacl(
+            shacl_cases.append(ShaclCase(
                 private_candidate,
                 "positive synthetic private ledger",
                 True,
@@ -1376,7 +1492,7 @@ def main() -> int:
             ))
             for path in private_negative_paths:
                 candidate = parse_graph([*CONTEXT_FILES, path])
-                errors.extend(run_pyshacl(
+                shacl_cases.append(ShaclCase(
                     candidate,
                     path.name,
                     False,
@@ -1384,11 +1500,19 @@ def main() -> int:
                     shapes=PRIVATE_SHAPES,
                 ))
             for path, candidate in positive_candidates:
-                errors.extend(run_pyshacl(candidate, path.name, True))
+                shacl_cases.append(ShaclCase(
+                    candidate,
+                    path.name,
+                    True,
+                ))
             for path, candidate in public_candidates:
-                errors.extend(run_pyshacl(candidate, path.name, True))
+                shacl_cases.append(ShaclCase(
+                    candidate,
+                    path.name,
+                    True,
+                ))
             if external_private_candidate is not None:
-                errors.extend(run_pyshacl(
+                shacl_cases.append(ShaclCase(
                     external_private_candidate,
                     "access-controlled real ecosystem audit ledger",
                     True,
@@ -1397,12 +1521,17 @@ def main() -> int:
                 ))
             for path in negative_paths:
                 candidate = parse_graph([*CONTEXT_FILES, FIXTURE, path])
-                errors.extend(run_pyshacl(
+                shacl_cases.append(ShaclCase(
                     candidate,
                     path.name,
                     False,
                     EXPECTED_NEGATIVE_MESSAGES.get(path.name),
                 ))
+            errors.extend(run_pyshacl_cases(
+                shacl_cases,
+                use_pyshacl_cli,
+                args.shacl_workers,
+            ))
 
     if errors:
         print(f"ecosystem-contract: FAILED ({len(errors)} issue(s))", file=sys.stderr)
