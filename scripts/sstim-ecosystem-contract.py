@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -66,6 +67,10 @@ CONTEXT_FILES = (
 IMPLEMENTATION_CATALOG = (
     ONTOLOGY_DIR / "instances" / "implementations" / "implementations.ttl"
 )
+W3ID_STAGING_FILE = (
+    ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
+)
+ECOSYSTEM_PUBLIC_DUMP = "https://biosyncare-lab.web.app/current.ttl"
 
 SSTIM = Namespace("https://w3id.org/sstim#")
 ECO = Namespace("https://w3id.org/sstim/ecosystem#")
@@ -858,6 +863,63 @@ def check_real_public_artifact(artifact: Graph, label: str) -> list[str]:
     return errors
 
 
+def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
+    """Require exact staged HTML/RDF routes for the complete live aggregate."""
+    errors: list[str] = []
+    w3id_prefix = "https://w3id.org/sstim/"
+    routed_prefixes = (
+        f"{w3id_prefix}specialist/",
+        f"{w3id_prefix}organization/",
+        f"{w3id_prefix}ecosystem-record/",
+    )
+    expected_routes = {
+        str(subject).removeprefix(w3id_prefix)
+        for subject in artifact.subjects()
+        if isinstance(subject, URIRef) and str(subject).startswith(routed_prefixes)
+    }
+
+    text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
+    start = "# BEGIN audited real ecosystem routes"
+    end = "# END audited real ecosystem routes"
+    if text.count(start) != 1 or text.count(end) != 1:
+        return [f"{label}: staged w3id file lacks one exact real ecosystem route block"]
+    block = text.split(start, 1)[1].split(end, 1)[0]
+    exact_rule = re.compile(
+        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
+        rf"(https://labiosyncare\.github\.io/|{re.escape(ECOSYSTEM_PUBLIC_DUMP)}) "
+        r"\[R=303,L\]"
+    )
+    html_routes: set[str] = set()
+    rdf_routes: set[str] = set()
+    for line in block.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("RewriteRule"):
+            continue
+        match = exact_rule.fullmatch(stripped)
+        if match is None:
+            errors.append(
+                f"{label}: real ecosystem route block contains a broad or malformed rule"
+            )
+            continue
+        routes = set(match.group(1).split("|"))
+        if match.group(2) == "https://labiosyncare.github.io/":
+            html_routes.update(routes)
+        else:
+            rdf_routes.update(routes)
+
+    require(
+        html_routes == expected_routes,
+        f"{label}: staged HTML routes differ from the complete real aggregate subjects",
+        errors,
+    )
+    require(
+        rdf_routes == expected_routes,
+        f"{label}: staged RDF routes differ from the complete real aggregate subjects",
+        errors,
+    )
+    return errors
+
+
 def check_real_artifact_guard() -> list[str]:
     """Prove the real/fixture boundary rejects implementation redeclaration."""
     candidate = Graph()
@@ -877,6 +939,7 @@ def check_real_artifact_guard() -> list[str]:
     candidate.add((probe_activity, RDF.type, ECO.EngagementActivity))
     candidate.add((probe_activity, PROV.wasAssociatedWith, external_actor))
     guard_errors = check_real_public_artifact(candidate, "real-guard-probe.ttl")
+    route_guard_errors = check_real_w3id_routes(candidate, "real-guard-probe.ttl")
     errors: list[str] = []
     require(
         any("must reference, not redeclare" in issue for issue in guard_errors),
@@ -897,6 +960,11 @@ def check_real_artifact_guard() -> list[str]:
     require(
         any("activity actor" in issue and "verified EcosystemAgent" in issue for issue in guard_errors),
         "real artifact guard did not reject an unverified public activity actor",
+        errors,
+    )
+    require(
+        any("routes differ" in issue for issue in route_guard_errors),
+        "real artifact guard did not reject an aggregate with stale exact routes",
         errors,
     )
     return errors
@@ -1421,6 +1489,7 @@ def main() -> int:
         candidate = build_validation_graph(artifact)
         errors.extend(check_public_artifact_profile(artifact, path.name))
         errors.extend(check_real_public_artifact(artifact, path.name))
+        errors.extend(check_real_w3id_routes(artifact, path.name))
         errors.extend(check_jsonld_round_trip(artifact))
         errors.extend(check_local_resolution(artifact, candidate, path.name))
         public_candidates.append((path, candidate))

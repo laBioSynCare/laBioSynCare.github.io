@@ -3,6 +3,7 @@
 @prefix sstim:  <https://w3id.org/sstim#> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
 
 @prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
 
@@ -11,11 +12,26 @@
     dct:description "Open research/reference implementation and knowledge platform for the BSC framework." ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-17"^^xsd:date ;
     dct:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    dct:hasPart <https://w3id.org/sstim/implementation/bsclab/component/patch-studio> ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> ;
     sstim:implementsProtocol bsclab-protocol:auditory-observation-reference,
         bsclab-protocol:guided-breathing-observation-reference .
+
+<https://w3id.org/sstim/implementation/bsclab/component/patch-studio>
+    a sstim:SensoryStimulationImplementation, prov:SoftwareAgent,
+        schema:SoftwareApplication ;
+    rdfs:label "Patch Studio"@en ;
+    dct:description "The real-time multisensory authoring and preview component of BSC Lab; distinct from the SSTIM Patch Studio ontology module that describes its reproducible parameters."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:created "2026-07-17"^^xsd:date ;
+    dct:modified "2026-07-17"^^xsd:date ;
+    dct:license <https://www.apache.org/licenses/LICENSE-2.0> ;
+    dct:isPartOf <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> ;
+    rdfs:seeAlso <https://w3id.org/sstim/patch-studio>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PATCH_STUDIO.md> .
 
 <https://w3id.org/sstim/implementation/biosyncare> a sstim:SensoryStimulationImplementation, prov:SoftwareAgent ;
     rdfs:label "BioSynCare" ;

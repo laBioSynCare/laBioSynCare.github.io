@@ -9,7 +9,9 @@ GitHub–Zenodo release deposit contains the repository state at its release tag
 Accordingly, committed ecosystem records in this directory are synthetic only.
 Future real records in the default live-only tier must be served from the
 external mutable store required by ADRs 0024 and 0031; they must not be committed
-here.
+here. The separately maintained exact w3id configuration may contain admitted
+real-subject IRI paths so those external records can dereference; it contains no
+real instance triples, but its historical identifier traces are not erasable.
 
 Public BSC Lab resources use
 `https://w3id.org/sstim/implementation/bsclab/...`. Reusable references use
@@ -26,7 +28,7 @@ BioSynCare catalog and real participant records are not present.
 | Directory | Contents |
 |---|---|
 | `frameworks/` | BSC framework identity and seven framework techniques |
-| `implementations/` | Public identity records for BSC Lab and BioSynCare |
+| `implementations/` | Public identity records for BSC Lab, the BioSynCare application, and the Patch Studio component |
 | `protocols/` | Two narrow, non-clinical BSC Lab reference protocols |
 | `presets/` | Two public reference preset fixtures |
 | `evidence/` | Scoped technique-level evidence assessments |
@@ -47,6 +49,23 @@ categories are deliberately distinct under ADR 0027. Assessments of measurable
 ASSR, FFR, SSVEP, SSSEP, slow-breathing correlates, and multisensory integration
 cite audited references. Exploratory exposure hypotheses stay speculative,
 inconclusive, and provisional.
+
+## BSC catalog identities
+
+The BSC catalog is a typed relationship graph, not a containment tree:
+
+| Resource | Kind | Catalog relationship |
+|---|---|---|
+| `https://w3id.org/sstim` | ontology/vocabulary | Describes BSC and other sensory-stimulation resources; it is not a component of BSC |
+| `https://w3id.org/sstim/framework/bsc` | framework | Defines the BSC techniques and guidance |
+| `https://w3id.org/sstim/implementation/bsclab` | reference implementation | `sstim:implementsFramework` BSC |
+| `https://w3id.org/sstim/implementation/biosyncare` | commercial application implementation | `sstim:implementsFramework` BSC; distinct from any BioSynCare organization agent |
+| `https://w3id.org/sstim/implementation/bsclab/component/patch-studio` | BSC Lab software component | Part of BSC Lab and implements BSC |
+| `https://w3id.org/sstim/patch-studio` | ontology module | Part of SSTIM and documents Patch Studio parameters; distinct from the running component |
+
+People and organizations connect to these resources through qualified ecosystem
+relationships in the external mutable graph. They are never merged with an
+implementation by `schema:sameAs` or `owl:sameAs`.
 
 ## Data Rules
 

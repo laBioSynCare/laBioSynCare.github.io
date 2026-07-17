@@ -60,10 +60,53 @@ ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture
 ECOSYSTEM_PUBLIC_DUMP = URIRef(
     "https://biosyncare-lab.web.app/current.ttl"
 )
+CATALOG_PUBLIC_ROUTES = {
+    "framework/bsc": (
+        "https://labiosyncare.github.io/ontology/instances/frameworks/bsc.ttl"
+    ),
+    "implementation/bsclab": (
+        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+    ),
+    "implementation/biosyncare": (
+        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+    ),
+    "implementation/bsclab/component/patch-studio": (
+        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+    ),
+}
+ECOSYSTEM_PUBLIC_ROUTE_PATHS = {
+    "specialist/renato-fabbri",
+    "organization/biosyncare",
+    "organization/junto-innovation-hub",
+    "organization/aeterni-anima",
+    "ecosystem-record/role/head-of-applied-science",
+    "ecosystem-record/role/chief-executive-officer",
+    "ecosystem-record/role/chief-technology-officer",
+    "ecosystem-record/relationship/renato-develops-bsclab",
+    "ecosystem-record/relationship/renato-develops-biosyncare",
+    "ecosystem-record/relationship/renato-develops-patch-studio",
+    "ecosystem-record/relationship/renato-created-sstim",
+    "ecosystem-record/relationship/renato-created-bsc-framework",
+    "ecosystem-record/relationship/renato-member-of-junto",
+    "ecosystem-record/relationship/renato-created-aeterni-anima",
+    "ecosystem-record/relationship/renato-leads-aeterni-anima",
+    "ecosystem-record/relationship/biosyncare-offers-sensory-stimulation-tools",
+    "ecosystem-record/relationship/junto-supports-biosyncare",
+    "ecosystem-record/relationship/aeterni-provides-sensory-stimulation-tools",
+    "ecosystem-record/activity/renato-bsclab-self-publication",
+    "ecosystem-record/activity/renato-biosyncare-self-publication",
+    "ecosystem-record/activity/renato-patch-studio-self-publication",
+    "ecosystem-record/activity/renato-sstim-self-publication",
+    "ecosystem-record/activity/renato-bsc-framework-self-publication",
+    "ecosystem-record/activity/renato-junto-self-publication",
+    "ecosystem-record/activity/renato-aeterni-creator-self-publication",
+    "ecosystem-record/activity/renato-aeterni-leadership-self-publication",
+    "ecosystem-record/activity/biosyncare-tools-publication",
+    "ecosystem-record/activity/junto-biosyncare-publication",
+    "ecosystem-record/activity/aeterni-tools-publication",
+}
 ECOSYSTEM_PUBLIC_ROUTES = {
-    "specialist/renato-fabbri": str(ECOSYSTEM_PUBLIC_DUMP),
-    "ecosystem-record/relationship/renato-develops-bsclab": str(ECOSYSTEM_PUBLIC_DUMP),
-    "ecosystem-record/activity/renato-bsclab-self-publication": str(ECOSYSTEM_PUBLIC_DUMP),
+    route: str(ECOSYSTEM_PUBLIC_DUMP) for route in ECOSYSTEM_PUBLIC_ROUTE_PATHS
 }
 
 errors: list[str] = []
@@ -857,6 +900,57 @@ if list(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.classPartition)):
     fail("void.ttl: mutable ecosystem-agent graph must omit volatile class partitions")
 check_void_partitions(ECOSYSTEM_FIXTURE_GRAPH, ecosystem_fixture_instances, "ecosystem-fixture")
 
+# The stable framework/implementation catalog is fail-closed as well: every
+# catalog identity has one exact HTML rule and one exact RDF rule to its owning
+# static instance file. This keeps similarly named resources (especially the
+# Patch Studio tool and ontology module) from being conflated by broad routes.
+w3id_text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
+catalog_w3id_start = "# BEGIN audited BSC catalog routes"
+catalog_w3id_end = "# END audited BSC catalog routes"
+if (
+    w3id_text.count(catalog_w3id_start) != 1
+    or w3id_text.count(catalog_w3id_end) != 1
+):
+    fail("w3id staging: expected one delimited BSC catalog route block")
+else:
+    catalog_route_block = w3id_text.split(catalog_w3id_start, 1)[1].split(
+        catalog_w3id_end, 1
+    )[0]
+    catalog_targets = set(CATALOG_PUBLIC_ROUTES.values())
+    target_pattern = "|".join(re.escape(target) for target in sorted(catalog_targets))
+    catalog_exact_rule = re.compile(
+        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
+        rf"(https://labiosyncare\.github\.io/|{target_pattern}) "
+        r"\[R=303,L\]"
+    )
+    catalog_html_routes: set[str] = set()
+    catalog_rdf_targets: dict[str, str] = {}
+    for line in catalog_route_block.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("RewriteRule"):
+            continue
+        match = catalog_exact_rule.fullmatch(stripped)
+        if match is None:
+            fail(
+                "w3id staging: BSC catalog block contains a broad or malformed "
+                "RewriteRule"
+            )
+            continue
+        routes = match.group(1).split("|")
+        target = match.group(2)
+        for route in routes:
+            if target == "https://labiosyncare.github.io/":
+                catalog_html_routes.add(route)
+            elif route in catalog_rdf_targets:
+                fail(f"w3id staging: duplicate BSC catalog RDF route {route}")
+            else:
+                catalog_rdf_targets[route] = target
+
+    if catalog_html_routes != set(CATALOG_PUBLIC_ROUTES):
+        fail("w3id staging: HTML routes do not exactly cover BSC catalog subjects")
+    if catalog_rdf_targets != CATALOG_PUBLIC_ROUTES:
+        fail("w3id staging: RDF routes do not exactly map BSC catalog subjects to owning dumps")
+
 # Every synthetic identity/relationship/activity has an exact staged w3id rule
 # to the fixture dump. The delimited block is audited as a set: a missing route,
 # a stale route, or an accidental broad route fails publication validation.
@@ -872,7 +966,6 @@ expected_fixture_routes = {
         or str(subject).startswith(f"{w3id_prefix}ecosystem-record/activity/")
     )
 }
-w3id_text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
 w3id_start = "# BEGIN audited synthetic ecosystem fixture routes"
 w3id_end = "# END audited synthetic ecosystem fixture routes"
 if w3id_text.count(w3id_start) != 1 or w3id_text.count(w3id_end) != 1:

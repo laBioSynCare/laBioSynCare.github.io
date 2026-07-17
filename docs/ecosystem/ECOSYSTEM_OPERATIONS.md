@@ -1,9 +1,11 @@
 # SSTIM ecosystem publication operations
 
-This runbook keeps real named ecosystem records outside the versioned,
+This runbook keeps real named ecosystem record triples outside the versioned,
 Zenodo-tracked source repository. The repository contains the ontology,
 validation contract, loader declaration, and exact redirect configuration—but
-not the live RDF aggregate or its private audit history.
+not the live RDF aggregate or its private audit history. Exact redirect paths
+are identifying configuration metadata and remain visible in Git history; they
+are not retractable instance data.
 
 ## Storage contract
 
@@ -30,6 +32,29 @@ The active audit document is retained while its public aggregate remains
 active. After a terminal removal, the final audit state is retained privately
 for 365 days and then deleted during the annual access/retention review. This
 live-only retention rule is not archival consent.
+
+## Current reviewed seed
+
+The complete enriched replacement is active at the mutable
+[`current.ttl`](https://biosyncare-lab.web.app/current.ttl) endpoint. To preserve
+the live-only boundary, this versioned runbook does not duplicate its current
+person names, professional titles, or complete relationship claims. Each public
+relationship remains separately approved and sourced. One current leadership
+claim uses an approved temporary self-attestation exception: the cited public
+pages establish the organization identity rather than the titles, and the
+authenticated authorization stays only in the access-controlled ledger until a
+canonical official-page or immutable-profile source exists. Unknown role-start
+dates are not invented; they mean only “known to apply from the reviewed source
+package.”
+
+The static catalog and mutable ecosystem projection remain separate. SSTIM is
+the ontology, BSC is the framework, BSC Lab and the BioSynCare application are
+implementations, and the Patch Studio software component is part of BSC Lab.
+An organization agent is distinct from its application implementation, and the
+Patch Studio ontology module is distinct from the software component. Exact w3id routes for
+the catalog and current live subjects are staged and audited; they must still be
+merged upstream and verified before the persistent identifiers are promoted in
+human-facing discovery.
 
 ## Admission and publication sequence
 
@@ -67,8 +92,13 @@ activities and backlink, and any now-orphaned agent. If no public records
 remain, release an empty Hosting version only after the terminal ledger state
 has been written. Delete older Hosting versions after verifying the replacement.
 Keep the final private terminal audit for 365 days, then delete it at the
-scheduled retention review. Third-party caches and previously downloaded copies
-cannot be recalled.
+scheduled retention review. Remove the affected paths from both audited route
+manifests, submit the corresponding upstream w3id rule removal, and verify that
+the active identifier no longer redirects to the mutable dump. Historical Git
+commits, w3id registry review history, third-party caches, and previously
+downloaded copies cannot be recalled. This limitation must be disclosed before
+admitting a semantic person/relationship slug; use opaque identifiers instead
+when even historical route metadata would be too identifying.
 
 Run the synthetic terminal-deletion guard before each operational change:
 

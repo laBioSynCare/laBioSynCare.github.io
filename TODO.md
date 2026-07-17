@@ -185,11 +185,14 @@ indexed, examiner-searchable records.
       submit PR. PR #6184 was merged on 2026-06-11; root RDF, module,
       Patch Studio, and versioned `0.1.0/` redirects are live. Keep the
       mirrored copy in `docs/ecosystem/w3id/` synchronized with the registry.*
-- [ ] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
+- [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
       public-safe `/implementation/biosyncare/...` identity/metadata paths if
       they are ever published `P1`
+      *Exact audited rules are staged for the BSC framework, BSC Lab,
+      the public BioSynCare application identity, and the Patch Studio component.
+      Deeper preset/session/annotation/evidence/reference routes remain.*
       *No second top-level w3id namespace. Keep room for future
       `/technique/{id}/`, `/protocol/{id}/`, `/framework/{id}/`,
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
@@ -293,12 +296,15 @@ Turtle files are listed in section 1. After they exist:
       admission state, and synthetic/adversarial fixtures. F3's mutable external
       projection, optional browser loader, VoID declaration, private Firestore
       ledger, retention/removal runbook, and private-first publisher are now
-      operational. The first F4 aggregate is live-only and atomic: Renato plus
-      one sourced, self-approved implementation-developer relationship to BSC
-      Lab. The exact real w3id routes are staged locally but still need their
+      operational. The enriched F4 aggregate is live-only and atomic, with
+      separate sourced or explicitly self-attested, approved person/organization
+      relationships. The exact real w3id
+      routes are staged locally but still need their
       upstream merge and live verification; human-readable discovery also
-      remains. Organization records may be added later, but are not admitted
-      without a verified curator in the same aggregate; later memberships and
+      remains. Replace the temporary leadership self-attestation exception with
+      a canonical official-page or immutable-profile source when one is
+      published. New organization records are not admitted without a verified
+      curator in the same aggregate; later memberships and
       responsibilities are separately self-approved or scoped-consent. Neither
       the public aggregate nor its private history is committed here. The
       canonical sequence is Workstream 5

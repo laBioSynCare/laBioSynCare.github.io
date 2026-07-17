@@ -319,7 +319,7 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The first F4 aggregate—Renato with a sourced, self-approved BSC Lab implementation-developer relationship—is live. Exact w3id routes are staged but still require the upstream merge and verification; human-readable ecosystem discovery remains pending.**
+**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The enriched F4 aggregate is live with separately approved person/organization relationships; one leadership relationship is an explicitly documented self-attestation pending a canonical public role source. Exact w3id routes are staged but still require the upstream merge and verification; human-readable ecosystem discovery remains pending.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
@@ -373,9 +373,15 @@ not, however, make every proposed use ready:
   remain recorded in the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
 Therefore, the ecosystem contract is released independently of session work.
-**Only synthetic records and contract code** may remain in this release
-repository. Real named records are admitted only through the now-operational
-external mutable-store, loader/dereferencing, and private-ledger gates below.
+**Only synthetic instance triples and reusable contract code** may remain in
+this release repository. Exact dereferencing configuration is the narrow
+exception: it contains the public IRI paths of admitted live subjects, but no
+agent descriptions or relationship triples. Those paths persist in Git and
+possibly w3id registry history even after an active rule is removed, so the
+live-only tier promises removal from the current RDF projection and active
+routes—not erasure of historical identifier traces. Real named record data is
+admitted only through the now-operational external mutable-store,
+loader/dereferencing, and private-ledger gates below.
 
 ### Minimum ecosystem scope
 
@@ -411,6 +417,44 @@ provide relationship targets. Projects, products beyond the existing
 implementation model, job taxonomies, session data, observations, and new named
 method/school classes are not prerequisites for the first ecosystem seed.
 
+### BSC catalog bridge and first enrichment (2026-07-17)
+
+The catalog is intentionally a typed relationship graph rather than a new
+container hierarchy. SSTIM is the ontology; BSC is a framework; BSC Lab and the
+BioSynCare application are distinct implementations of BSC. The Patch Studio
+software component is part of BSC Lab and implements BSC, while the separately
+identified Patch Studio ontology module is part of SSTIM and documents the
+component's parameters. A BioSynCare organization agent remains distinct from
+the BioSynCare application implementation.
+
+The implementation sequence is now recorded as follows:
+
+1. Add or revise stable non-personal framework, implementation, and component
+   identities in the version-controlled static catalog.
+2. Author the complete real-agent replacement aggregate and its complete
+   access-controlled audit ledger outside this repository.
+3. Validate isolated public SHACL, JSON-LD round trip, private mirroring,
+   implementation/agent separation, local-IRI resolution, and exact routes.
+4. Activate private-first: persist the audit ledger, publish the complete live
+   replacement, verify bytes/MIME/CORS, and remove superseded Hosting content.
+5. Deploy static catalog targets, merge and verify the exact upstream w3id
+   routes, then add human-readable discovery before wider outreach.
+6. Enrich incrementally through complete replacement aggregates; add another
+   person only with relationship-and-purpose-scoped self-publication or consent.
+
+The current enrichment applies this catalog to separately approved creator,
+implementation-responsibility, organization-membership, portfolio, and
+tool-vendor relationships. Unknown role-start dates use a conservative
+known-to-apply date rather than an invented employment-start date. One
+leadership claim is a temporary self-attestation exception: its cited pages
+establish the organization identity, while authenticated self-publication
+evidence stays private until a canonical public role source exists. To preserve
+the live-only boundary, the names, titles, and complete current claims are not
+duplicated in this versioned tracker; inspect the mutable
+[`current.ttl`](https://biosyncare-lab.web.app/current.ttl) projection. No
+organization-side record asserts endorsement, investment, ownership, or a
+legal form not established by its cited public sources.
+
 ### Canonical readiness sequence
 
 This is the operational sequence for change set F. The
@@ -437,8 +481,9 @@ publication, and removal procedure is recorded in
 4. **`[~]` F3 — complete instance publication plumbing.** The repository now has
    a dedicated synthetic `instances/ecosystem/` family, named graph, explicit
    loader manifest entries, quality-audit coverage, Schema.org/ORG context
-   support, VoID metadata, and synthetic routes. Committed files remain
-   synthetic. The mutable public store is Firebase Hosting at
+   support, VoID metadata, and synthetic routes. Committed instance data remains
+   synthetic; exact real-subject route paths are the documented dereferencing
+   metadata exception. The mutable public store is Firebase Hosting at
    `https://biosyncare-lab.web.app/current.ttl`; the browser loads it optionally
    into the real-agent graph, while CI never depends on the network. The
    access-controlled ledger is the client-denied Firestore
@@ -464,16 +509,17 @@ publication, and removal procedure is recorded in
    from the mutable live-data channel.
 6. **`[~]` F4 — author each real RDF aggregate atomically, then activate it in
    the external mutable store.**
-   The first aggregate was activated on 2026-07-16 UTC and contains Renato plus the
-   sourced `implementationDeveloper` relationship to the existing BSC Lab
-   implementation. Renato is both curator and final approval actor. Initial
-   organization records may follow in a replacement aggregate, but cannot be
-   admitted separately when Renato is their accountable curator: every curator
-   must already be a verified, related agent in that same aggregate. An agent
-   cannot be published as a detached identity. Every
+   The first aggregate was activated on 2026-07-16 UTC; the complete enriched
+   replacement was activated later that day UTC (2026-07-17 Europe/Rome). It
+   contains the scoped relationships recorded in the catalog-bridge section
+   above. The verified person agent is both curator and final approval actor.
+   Organization records cannot be admitted separately when that person is their
+   accountable curator:
+   every curator must already be a verified, related agent in that same
+   aggregate. An agent cannot be published as a detached identity. Every
    later membership or responsibility involving a person is a separate
    relationship and needs its own self-approval or earlier
-   scoped consent grant. Keep the first seed live-only and non-archival. Add
+   scoped consent grant. Keep the current seed live-only and non-archival. Add
    other people only after explicit relationship-and-purpose-scoped consent and
    reconciliation with `PARTNERS.md` / `ADVISORY_BOARD.md`; notification alone
    does not admit a named person record. Stage exact per-resource w3id rules
