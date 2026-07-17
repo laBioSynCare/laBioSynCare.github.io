@@ -55,6 +55,13 @@ ECOSYSTEM_INSTANCE_PREFIXES = (
     "https://w3id.org/sstim/specialist/",
     "https://w3id.org/sstim/ecosystem-record/",
 )
+# Live-projection subjects the static catalog may reference by IRI. Each entry
+# is a reviewed self-publication whose owning record lives in the mutable
+# aggregate, dereferenceable through the live namespace routes; keeping the
+# list exact preserves the dangling-reference check for everything else.
+LIVE_PROJECTION_REFERENCES = {
+    "https://w3id.org/sstim/organization/aeterni-anima",
+}
 ECOSYSTEM_AGENTS_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-agents")
 ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture")
 ECOSYSTEM_PUBLIC_DUMP = URIRef(
@@ -999,7 +1006,7 @@ for _, _, obj in all_graph:
         continue
     obj_text = str(obj)
     must_resolve = obj_text.startswith(TERM_NAMESPACES) or obj_text.startswith(INSTANCE_PREFIXES)
-    if must_resolve and obj not in declared_subjects:
+    if must_resolve and obj not in declared_subjects and obj_text not in LIVE_PROJECTION_REFERENCES:
         fail(f"dangling local IRI reference: {obj}")
 
 

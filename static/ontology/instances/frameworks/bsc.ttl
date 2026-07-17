@@ -10,8 +10,9 @@
     rdfs:label "BSC Framework" ;
     dct:description "Framework identity for the BioSynCare/BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance." ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     sstim:definesTechnique
         bsc-fw-tech:binaural-beat-stimulation,

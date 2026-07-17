@@ -184,6 +184,19 @@
     }[state] ?? 'unknown'
   }
 
+  const SOURCE_NOTES = {
+    ontology:
+      'Versioned OWL term modules and the multilingual SKOS vocabulary, ' +
+      'released and citable under w3id.org/sstim.',
+    catalog:
+      'Versioned public reference instances: the BSC framework, ' +
+      'implementations and components, presets, and evidence records.',
+    ecosystem:
+      'Live projection of people, organizations, and reviewed relationships. ' +
+      'Fetched at runtime, separately approved and sourced per record, ' +
+      'retractable, and excluded from citable releases.',
+  }
+
   function nodeColor(data) {
     if (data.kind === 'owlClass')    return COLORS.owlClass
     if (data.kind === 'xsdType')     return COLORS.xsdType
@@ -1062,15 +1075,15 @@
   <aside class="controls">
     <strong>Data sources</strong>
     <ul class="source-list">
-      <li>
+      <li title={SOURCE_NOTES.ontology}>
         <span class="source-dot versioned"></span>
         <span><b>Ontology & vocabulary</b><small>versioned</small></span>
       </li>
-      <li>
+      <li title={SOURCE_NOTES.catalog}>
         <span class="source-dot catalog"></span>
         <span><b>Catalog</b><small>versioned</small></span>
       </li>
-      <li>
+      <li title={SOURCE_NOTES.ecosystem}>
         <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>
         <span>
           <b>Ecosystem</b>
@@ -1078,6 +1091,13 @@
         </span>
       </li>
     </ul>
+    <details class="source-help">
+      <summary>What are these sources?</summary>
+      <p><b>Ontology &amp; vocabulary</b> — {SOURCE_NOTES.ontology}</p>
+      <p><b>Catalog</b> — {SOURCE_NOTES.catalog}</p>
+      <p><b>Ecosystem</b> — {SOURCE_NOTES.ecosystem}
+        See <a href="/about/">About</a> for the full picture.</p>
+    </details>
     {#if liveStatus?.message}
       <p class="source-message" title={liveStatus.message}>
         {liveStatus.state === 'available'
@@ -1511,6 +1531,26 @@
     font-size: 0.66rem;
     line-height: 1.35;
   }
+
+  .source-help {
+    margin: 0.45rem 0 0;
+  }
+
+  .source-help summary {
+    cursor: pointer;
+    color: var(--pico-muted-color);
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .source-help p {
+    margin: 0.35rem 0 0;
+    color: var(--pico-muted-color);
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .source-help b { color: var(--app-text, inherit); }
 
   .refresh-source {
     width: 100%;

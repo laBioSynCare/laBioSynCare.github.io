@@ -62,8 +62,17 @@ redirects to the frozen `sstim-core.ttl` document for that version.
    any already-live rules that are still valid.
 4. Open a PR. Keep the change scoped strictly to the new `sstim/` directory —
    the maintainers reject PRs that touch other namespaces.
-5. In the PR description, state the redirect targets and that the namespace is
-   for an OWL/SKOS ontology with a public CC BY 4.0 license.
+5. Write the PR description on top of the upstream template
+   (`.github/PULL_REQUEST_TEMPLATE.md` in `perma-id/w3id.org`); the
+   maintainers expect its structure (requested by @dgarijo on
+   [PR #6378](https://github.com/perma-id/w3id.org/pull/6378)). Keep the
+   template's sections and tick the checklists that apply: **Brief
+   Description**, the **General Checklist** (changes tested, minimal/squashed
+   commits, redirects-only content), and the **New** or **Update ID
+   Directory Checklist** (maintainer GitHub usernames listed in `.htaccess`
+   or `README.md`; the submitting account is one of those maintainers).
+6. In the Brief Description, state the redirect targets and that the
+   namespace is for an OWL/SKOS ontology with a public CC BY 4.0 license.
 
 After the PR merges, keep this staging copy and the live `.htaccess` in sync.
 Any change to the Pages layout, new module file, or new ontology version means

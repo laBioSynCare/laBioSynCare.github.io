@@ -160,6 +160,7 @@
     { label: 'Ontology reference docs', href: '/ontology/docs/', external: true },
     { label: 'Vocabulary docs', href: '/ontology/docs/vocab/', external: true },
     { label: 'Ontology DOI (all versions)', href: 'https://doi.org/10.5281/zenodo.21286974', external: true },
+    { label: 'W3C Community Group', href: 'https://www.w3.org/community/sstim/', external: true },
   ]
 </script>
 
@@ -271,6 +272,27 @@
       is validated with SHACL and an OWL reasoner, is published under
       <code>https://w3id.org/sstim</code>, and carries a citable DOI.
     </p>
+    <p class="section-intro">
+      Community coordination happens in the
+      <a href="https://www.w3.org/community/sstim/" rel="external">Sensory Stimulation
+      Vocabulary Community Group</a> at the W3C — an open group, proposed and chaired by
+      Renato Fabbri, for aligning sensory-stimulation vocabulary and interoperability work
+      across projects. Anyone can join and participate.
+    </p>
+  </section>
+
+  <section class="block">
+    <h2>Reading the data sources</h2>
+    <p class="section-intro">
+      The Graph's <strong>Data sources</strong> panel lists what is loaded and where it
+      comes from. The four words mean different things:
+    </p>
+    <ul class="module-list">
+      <li><strong>Ontology</strong> — the versioned OWL term modules: classes, properties, and axioms, released and citable under <code>w3id.org/sstim</code>.</li>
+      <li><strong>Vocabulary</strong> — the multilingual SKOS concept values (frequency bands, modalities, mechanisms, techniques…), dual-typed with the OWL classes.</li>
+      <li><strong>Catalog</strong> — versioned public reference instances: the BSC framework, the implementations and their components, presets, and evidence records.</li>
+      <li><strong>Ecosystem</strong> — a live projection of people, organizations, and reviewed relationships in the field. It is fetched at runtime, each record is separately approved and sourced, and it is retractable: it is deliberately excluded from citable releases and archives.</li>
+    </ul>
   </section>
 
   <section class="block">
