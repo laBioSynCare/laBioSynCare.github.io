@@ -59,7 +59,12 @@ human-facing discovery.
 ## Admission and publication sequence
 
 1. Author one self-contained public aggregate and a complete private ledger in
-   access-limited paths outside this repository.
+   access-limited paths outside this repository. The standing staging area on
+   the operator workstation is `~/.sstim/` (mode `700`); its
+   `fetch-active-ledger.py` helper recovers the active ledger from its
+   hash-addressed audit document (document id passed as the argument). Only
+   tooling persists there: private artifacts are deleted from the directory
+   once the publish is verified.
 2. Run the full admission contract, including public SHACL, JSON-LD round trip,
    identity/local-IRI checks, private SHACL, and exact public/private mirroring.
 3. Confirm the Firestore audit collection remains denied to every client SDK
@@ -75,8 +80,8 @@ The executable form is:
 
 ```sh
 python3 scripts/sstim-ecosystem-publish.py \
-  --public-candidate /secure/work/public-aggregate.ttl \
-  --private-ledger /secure/work/private-ledger.ttl
+  --public-candidate ~/.sstim/public-aggregate.ttl \
+  --private-ledger ~/.sstim/private-ledger.ttl
 ```
 
 Use `--dry-run` to run admission without changing cloud state. The publisher

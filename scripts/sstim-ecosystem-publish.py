@@ -320,13 +320,13 @@ def main() -> int:
 
     api = GoogleApi(gcloud_executable(), args.project)
     assert_hosting_site(api, args.project, args.site)
-    write_private_audit(api, args.project, private_bytes, public_bytes)
+    audit_document = write_private_audit(api, args.project, private_bytes, public_bytes)
     version = deploy_public_projection(api, args.site, public_bytes)
     verify_public_projection(args.site, public_bytes)
     delete_older_versions(api, args.site, version)
     print(
         "ecosystem-publish: activated validated public aggregate after "
-        "access-controlled audit write"
+        f"access-controlled audit write (audit document {audit_document})"
     )
     return 0
 
