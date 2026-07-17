@@ -56,13 +56,25 @@ on mount (browser autoplay policy). The engine is built by
 
 ---
 
-## `graph/` — ontology graph
+## `graph/` — unified SSTIM graph navigator
 
-`OntologyGraph.svelte` renders the SSTIM class hierarchy and instance graph with
-Cytoscape.js (lazy-loaded on first open). Edge/node layers can be toggled;
-nodes are searchable, centerable, and fit/relayout from the top bar.
-`graphSession.js` persists view state across navigation. Clicking a node opens
-the annotation panel for it.
+`OntologyGraph.svelte` renders three interlinked source layers with Cytoscape.js
+(lazy-loaded on first open): the versioned ontology/vocabulary, the versioned
+public catalog (BSC framework, BSC Lab, Patch Studio component, BioSynCare
+application), and the mutable approved public ecosystem. Qualified ecosystem
+records are projected as agent→target edges without discarding their record IRI,
+purpose, type, roles, sources, validity, or review date.
+
+The top-bar scope selector can show the full graph, Catalog + ecosystem,
+Ontology & vocabulary, Catalog focus, Ecosystem focus, or the existing thematic
+term views. Focus views retain one-hop ontology/catalog context. Search covers
+labels, aliases, and local names; colliding labels are visibly disambiguated
+(for example, `BioSynCare — application` and `BioSynCare — organization`). The
+left sidebar states which sources are versioned or live, shows live endpoint
+health, and offers a no-cache refresh. Edge/node layers can be toggled; nodes are
+searchable, centerable, and fit/relayout from the top bar. `graphSession.js`
+persists view state across navigation. Clicking a node opens the annotation
+panel; clicking a qualified relationship exposes its provenance.
 
 ---
 

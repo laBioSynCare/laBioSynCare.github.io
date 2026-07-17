@@ -5,6 +5,11 @@
  *   'owlClass'    — OWL class from sstim-core.ttl
  *   'skosConcept' — SKOS concept / dual-typed individual from sstim-vocab.ttl
  *   'xsdType'     — XSD datatype (target of datatype properties)
+ *   'ontologyResource' — an SSTIM ontology/module identity
+ *   'catalogFramework' — versioned framework catalog record
+ *   'catalogImplementation' — versioned implementation/component record
+ *   'catalogTechnique' — versioned framework technique record
+ *   'ecosystemPerson' / 'ecosystemOrganization' — live public agents
  *   'scheme'      — skos:ConceptScheme (used as group anchor, not rendered)
  *
  * Edge types (data.kind):
@@ -14,17 +19,30 @@
  *   'narrower'    — skos:narrower between concepts
  *   'related'     — skos:related / skos:broadMatch between concepts
  *   'instanceOf'  — OWL class membership of a SKOS concept (bridge edge)
+ *   'catalogRelation' — catalog composition/implementation/term link
+ *   'ecosystemRelationship' — projection of one qualified live record
  */
 
 import { select } from './query.js'
+import { DataFactory } from 'n3'
+
+const { namedNode } = DataFactory
 
 const OWL  = 'http://www.w3.org/2002/07/owl#'
 const RDF  = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 const RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
 const SKOS = 'http://www.w3.org/2004/02/skos/core#'
 const XSD  = 'http://www.w3.org/2001/XMLSchema#'
+const DCT  = 'http://purl.org/dc/terms/'
+const ORG  = 'http://www.w3.org/ns/org#'
+const SCHEMA = 'https://schema.org/'
 
 const SSTIM_NS = 'https://w3id.org/sstim#'
+const SSTIM_ECO = 'https://w3id.org/sstim/ecosystem#'
+const BSC_TECHNIQUE_NS = 'https://w3id.org/sstim/framework/bsc/technique/'
+const BIOSYNCARE_IMPLEMENTATION = 'https://w3id.org/sstim/implementation/biosyncare'
+const BIOSYNCARE_ORGANIZATION = 'https://w3id.org/sstim/organization/biosyncare'
+const PATCH_STUDIO_COMPONENT = 'https://w3id.org/sstim/implementation/bsclab/component/patch-studio'
 
 function localName(iri) {
   return iri.split(/[#/]/).pop()
@@ -34,12 +52,59 @@ function xsdLabel(iri) {
   return 'xsd:' + localName(iri)
 }
 
+function terms(store, subject, predicate) {
+  return store.getObjects(namedNode(subject), namedNode(predicate), null)
+}
+
+function preferredLiteral(values) {
+  return values.find(value => value.termType === 'Literal' && value.language === 'en') ??
+    values.find(value => value.termType === 'Literal' && !value.language) ??
+    values.find(value => value.termType === 'Literal')
+}
+
+function labelsFor(store, iri) {
+  const values = [
+    ...terms(store, iri, RDFS + 'label'),
+    ...terms(store, iri, SKOS + 'prefLabel'),
+    ...terms(store, iri, DCT + 'title'),
+  ].filter(value => value.termType === 'Literal')
+  const preferred = preferredLiteral(values)
+  const unique = [...new Set(values.map(value => value.value))]
+  if (preferred) unique.sort((a) => a === preferred.value ? -1 : 0)
+  return unique
+}
+
+function literalFor(store, iri, predicates) {
+  const values = predicates.flatMap(predicate => terms(store, iri, predicate))
+  return preferredLiteral(values)?.value ?? ''
+}
+
+function iriValues(store, iri, predicate) {
+  return [...new Set(
+    terms(store, iri, predicate)
+      .filter(value => value.termType === 'NamedNode')
+      .map(value => value.value),
+  )]
+}
+
+function displayLabel(iri, label) {
+  if (iri === BIOSYNCARE_IMPLEMENTATION) return `${label} — application`
+  if (iri === BIOSYNCARE_ORGANIZATION) return `${label} — organization`
+  if (iri === PATCH_STUDIO_COMPONENT) return `${label} — application component`
+  return label
+}
+
 export async function buildGraphElements(store) {
   const nodes = new Map()   // id → cy node data
   const edges = []
+  let projectedEdgeId = 0
 
   function addNode(id, data) {
     if (!nodes.has(id)) nodes.set(id, { data: { id, ...data } })
+  }
+
+  function addProjectedEdge(data) {
+    edges.push({ data: { id: `projected_${projectedEdgeId++}`, ...data } })
   }
 
   // ── 1. OWL Classes ─────────────────────────────────────────────────────────
@@ -60,6 +125,7 @@ export async function buildGraphElements(store) {
     if (id.startsWith(OWL)) continue   // skip owl:Class itself
     addNode(id, {
       kind: 'owlClass',
+      layer: 'ontology',
       label: r.label?.value ?? localName(id),
       definition: r.def?.value ?? '',
       iri: id,
@@ -145,7 +211,7 @@ export async function buildGraphElements(store) {
     if (!nodes.has(src)) continue
     // Add XSD node if needed
     if (!nodes.has(tgt)) {
-      addNode(tgt, { kind: 'xsdType', label: xsdLabel(tgt), iri: tgt })
+      addNode(tgt, { kind: 'xsdType', layer: 'ontology', label: xsdLabel(tgt), iri: tgt })
     }
     const propId = r.prop.value
     edges.push({ data: {
@@ -178,6 +244,7 @@ export async function buildGraphElements(store) {
     const id = r.concept.value
     addNode(id, {
       kind: 'skosConcept',
+      layer: 'vocabulary',
       label: r.label?.value ?? r.notation?.value ?? localName(id),
       scheme: r.scheme?.value ?? '',
       notation: r.notation?.value ?? '',
@@ -252,6 +319,228 @@ export async function buildGraphElements(store) {
       source: concept, target: owlClass,
       kind: 'instanceOf', label: 'a',
     }})
+  }
+
+
+  // ── 9. Ontology/module identities ─────────────────────────────────────────
+  // These make resource-level attributions (for example, “created SSTIM”) land
+  // on a visible node rather than stopping at an unrendered target IRI.
+  const ontologyResources = store.getSubjects(
+    namedNode(RDF + 'type'),
+    namedNode(OWL + 'Ontology'),
+    null,
+  )
+  for (const subject of ontologyResources) {
+    if (subject.termType !== 'NamedNode') continue
+    const id = subject.value
+    const aliases = labelsFor(store, id)
+    const baseLabel = aliases[0] ?? localName(id) ?? 'SSTIM'
+    const label = id === 'https://w3id.org/sstim'
+      ? 'SSTIM ontology'
+      : `${baseLabel} — ontology module`
+    addNode(id, {
+      kind: 'ontologyResource',
+      layer: 'ontology',
+      label,
+      aliases,
+      definition: literalFor(store, id, [DCT + 'description', SKOS + 'definition']),
+      iri: id,
+      searchText: [label, ...aliases, localName(id), 'ontology module'].join(' '),
+    })
+  }
+
+
+  // ── 10. Versioned framework / implementation catalog ──────────────────────
+  const catalogResources = new Map()
+  const addTypedCatalogResources = (type, kind) => {
+    for (const subject of store.getSubjects(namedNode(RDF + 'type'), namedNode(type), null)) {
+      if (subject.termType === 'NamedNode') catalogResources.set(subject.value, kind)
+    }
+  }
+  addTypedCatalogResources(SSTIM_NS + 'SensoryStimulationFramework', 'catalogFramework')
+  addTypedCatalogResources(SSTIM_NS + 'SensoryStimulationImplementation', 'catalogImplementation')
+  for (const subject of store.getSubjects(null, null, null)) {
+    if (subject.termType === 'NamedNode' && subject.value.startsWith(BSC_TECHNIQUE_NS)) {
+      catalogResources.set(subject.value, 'catalogTechnique')
+    }
+  }
+
+  for (const [id, kind] of catalogResources) {
+    const aliases = labelsFor(store, id)
+    const rawLabel = aliases[0] ?? localName(id)
+    const label = displayLabel(id, rawLabel)
+    addNode(id, {
+      kind,
+      layer: 'catalog',
+      sourceLabel: 'Versioned catalog',
+      label,
+      aliases,
+      definition: literalFor(store, id, [DCT + 'description', SKOS + 'definition']),
+      iri: id,
+      created: literalFor(store, id, [DCT + 'created']),
+      modified: literalFor(store, id, [DCT + 'modified']),
+      sourceLinks: [...new Set([
+        ...iriValues(store, id, DCT + 'source'),
+        ...iriValues(store, id, RDFS + 'seeAlso'),
+        ...iriValues(store, id, SCHEMA + 'url'),
+      ])],
+      searchText: [label, ...aliases, localName(id), 'versioned catalog'].join(' '),
+    })
+  }
+
+
+  // ── 11. Current public ecosystem agents ───────────────────────────────────
+  const agentType = SSTIM_ECO + 'EcosystemAgent'
+  const agentResources = new Set()
+  for (const subject of store.getSubjects(namedNode(RDF + 'type'), namedNode(agentType), null)) {
+    if (subject.termType !== 'NamedNode') continue
+    const id = subject.value
+    agentResources.add(id)
+    const typeIris = iriValues(store, id, RDF + 'type')
+    const isPerson = typeIris.includes(SCHEMA + 'Person')
+    const aliases = labelsFor(store, id)
+    const rawLabel = aliases[0] ?? localName(id)
+    const label = displayLabel(id, rawLabel)
+    addNode(id, {
+      kind: isPerson ? 'ecosystemPerson' : 'ecosystemOrganization',
+      layer: 'ecosystem',
+      sourceLabel: 'Live public ecosystem',
+      label,
+      aliases,
+      definition: literalFor(store, id, [DCT + 'description']),
+      iri: id,
+      created: literalFor(store, id, [DCT + 'created']),
+      modified: literalFor(store, id, [DCT + 'modified']),
+      sourceLinks: [...new Set([
+        ...iriValues(store, id, DCT + 'source'),
+        ...iriValues(store, id, SCHEMA + 'url'),
+      ])],
+      searchText: [
+        label,
+        ...aliases,
+        localName(id),
+        isPerson ? 'person live ecosystem' : 'organization live ecosystem',
+      ].join(' '),
+    })
+  }
+
+
+  // ── 12. Resource type and catalog relation bridges ─────────────────────────
+  for (const id of [...catalogResources.keys(), ...agentResources]) {
+    for (const type of iriValues(store, id, RDF + 'type')) {
+      if (!nodes.has(type)) continue
+      addProjectedEdge({
+        source: id,
+        target: type,
+        kind: 'instanceOf',
+        label: 'a',
+        sourceLabel: nodes.get(id).data.label,
+        targetLabel: nodes.get(type).data.label,
+      })
+    }
+  }
+
+  const catalogPredicates = new Map([
+    [SSTIM_NS + 'definesTechnique', 'defines technique'],
+    [SSTIM_NS + 'implementsFramework', 'implements'],
+    [DCT + 'hasPart', 'has part'],
+    [DCT + 'isPartOf', 'is part of'],
+    [DCT + 'requires', 'requires'],
+    [SKOS + 'relatedMatch', 'related match'],
+    [SSTIM_NS + 'proposedMechanism', 'proposed mechanism'],
+    [SSTIM_NS + 'hasStimulusTemporalStructure', 'temporal structure'],
+    [SSTIM_NS + 'techniqueModality', 'modality'],
+    [RDFS + 'seeAlso', 'see also'],
+  ])
+  const catalogEdgeKeys = new Set()
+  for (const [predicate, label] of catalogPredicates) {
+    for (const quad of store.getQuads(null, namedNode(predicate), null, null)) {
+      if (quad.subject.termType !== 'NamedNode' || quad.object.termType !== 'NamedNode') continue
+      const source = quad.subject.value
+      const target = quad.object.value
+      if (!nodes.has(source) || !nodes.has(target)) continue
+      if (!catalogResources.has(source) && nodes.get(source).data.kind !== 'ontologyResource') continue
+      const key = `${source}|${predicate}|${target}`
+      if (catalogEdgeKeys.has(key)) continue
+      catalogEdgeKeys.add(key)
+      addProjectedEdge({
+        source,
+        target,
+        kind: 'catalogRelation',
+        label,
+        iri: predicate,
+        sourceLabel: nodes.get(source).data.label,
+        targetLabel: nodes.get(target).data.label,
+      })
+    }
+  }
+
+
+  // ── 13. Qualified ecosystem records projected as inspectable edges ─────────
+  // The relationship record remains the edge IRI and carries its type, purpose,
+  // sources, roles, dates, and prose. We do not flatten lifecycle activities or
+  // infer stronger claims than the approved current-state publication asserts.
+  const relationshipClass = SSTIM_ECO + 'EcosystemRelationship'
+  const relationshipSubjects = store.getSubjects(
+    namedNode(RDF + 'type'),
+    namedNode(relationshipClass),
+    null,
+  )
+  for (const subject of relationshipSubjects) {
+    if (subject.termType !== 'NamedNode') continue
+    const iri = subject.value
+    const agent = iriValues(store, iri, SSTIM_ECO + 'relationshipAgent')[0]
+    const target = iriValues(store, iri, SSTIM_ECO + 'relationshipTarget')[0]
+    const relationshipType = iriValues(store, iri, SSTIM_ECO + 'hasRelationshipType')[0]
+    const purpose = iriValues(store, iri, SSTIM_ECO + 'relationshipPurpose')[0]
+    if (!agent || !target || !nodes.has(agent)) continue
+
+    if (!nodes.has(target)) {
+      const targetAliases = labelsFor(store, target)
+      const targetLabel = targetAliases[0] ?? localName(target)
+      addNode(target, {
+        kind: 'ecosystemTarget',
+        layer: 'ecosystem',
+        sourceLabel: 'Live public ecosystem',
+        label: targetLabel,
+        aliases: targetAliases,
+        definition: literalFor(store, target, [DCT + 'description', SKOS + 'definition']),
+        iri: target,
+        searchText: [targetLabel, ...targetAliases, localName(target), 'ecosystem target'].join(' '),
+      })
+    }
+
+    const roles = iriValues(store, iri, ORG + 'role')
+      .map(role => labelsFor(store, role)[0] ?? localName(role))
+    const typeLabel = relationshipType
+      ? labelsFor(store, relationshipType)[0] ?? localName(relationshipType)
+      : 'relationship'
+    const purposeLabel = purpose
+      ? labelsFor(store, purpose)[0] ?? localName(purpose)
+      : ''
+    const recordLabel = labelsFor(store, iri)[0] ?? typeLabel
+    addProjectedEdge({
+      source: agent,
+      target,
+      kind: 'ecosystemRelationship',
+      layer: 'ecosystem',
+      label: roles.length ? roles.join(' + ') : typeLabel,
+      recordLabel,
+      definition: literalFor(store, iri, [DCT + 'description']),
+      iri,
+      relationshipType: typeLabel,
+      relationshipTypeIri: relationshipType ?? '',
+      purpose: purposeLabel,
+      purposeIri: purpose ?? '',
+      roles,
+      sources: iriValues(store, iri, DCT + 'source'),
+      created: literalFor(store, iri, [DCT + 'created']),
+      reviewedOn: literalFor(store, iri, [SSTIM_ECO + 'reviewedOn']),
+      validFrom: literalFor(store, iri, [SSTIM_ECO + 'validFrom']),
+      validUntil: literalFor(store, iri, [SSTIM_ECO + 'validUntil']),
+      sourceLabel: nodes.get(agent).data.label,
+      targetLabel: nodes.get(target).data.label,
+    })
   }
 
   return [...nodes.values(), ...edges]

@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { loadKnowledgeGraph } from '../../rdf/loader.js'
+  import { loadStaticKnowledgeGraph } from '../../rdf/loader.js'
   import { listPresets } from '../../rdf/presets.js'
 
   let presets = $state([])
@@ -38,7 +38,7 @@
 
   onMount(async () => {
     try {
-      const store = await loadKnowledgeGraph()
+      const store = await loadStaticKnowledgeGraph()
       presets = await listPresets(store)
     } catch (e) {
       error = e.message

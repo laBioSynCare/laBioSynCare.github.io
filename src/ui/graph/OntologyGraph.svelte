@@ -1,12 +1,13 @@
 <script>
   import { onMount, onDestroy } from 'svelte'
+  import { replaceState } from '$app/navigation'
   import { buildGraphElements } from '../../rdf/graph.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
 
-  const { store } = $props()
+  const { store, liveStatus = null, onRefreshLive = null } = $props()
 
   let container = $state(null)
   let cy = $state(null)
@@ -24,6 +25,8 @@
   let showNarrower    = $state(graphSession.showNarrower)
   let showRelated     = $state(graphSession.showRelated)
   let showInstanceOf  = $state(graphSession.showInstanceOf)
+  let showCatalogRelation = $state(graphSession.showCatalogRelation ?? true)
+  let showEcosystemRelationship = $state(graphSession.showEcosystemRelationship ?? true)
 
   // Detail panel
   let selected = $state(null)
@@ -64,6 +67,13 @@
     owlClass: 'OWL class',
     skosConcept: 'SKOS concept',
     xsdType: 'XSD datatype',
+    ontologyResource: 'Ontology resource',
+    catalogFramework: 'Framework · versioned catalog',
+    catalogImplementation: 'Implementation · versioned catalog',
+    catalogTechnique: 'Technique · versioned catalog',
+    ecosystemPerson: 'Person · live ecosystem',
+    ecosystemOrganization: 'Organization · live ecosystem',
+    ecosystemTarget: 'Target · live ecosystem',
     objProp: 'Object property',
     dataProp: 'Datatype property',
   }
@@ -75,6 +85,8 @@
     narrower: 'narrower',
     related: 'related',
     instanceOf: 'type',
+    catalogRelation: 'catalog relation',
+    ecosystemRelationship: 'ecosystem relationship',
   }
 
   const COLORS = {
@@ -87,6 +99,15 @@
     narrower:    '#81c784',
     related:     '#f48fb1',
     instanceOf:  '#aaaaaa',
+    ontologyResource: '#29b6f6',
+    catalogFramework: '#ffd54f',
+    catalogImplementation: '#ffb74d',
+    catalogTechnique: '#ffe082',
+    ecosystemPerson: '#80cbc4',
+    ecosystemOrganization: '#4db6ac',
+    ecosystemTarget: '#90a4ae',
+    catalogRelation: '#ffca28',
+    ecosystemRelationship: '#26a69a',
   }
 
   const SCHEME_COLORS = {
@@ -102,7 +123,11 @@
   }
 
   const GRAPH_SCOPES = [
-    { value: 'all', label: 'All rendered data' },
+    { value: 'all', label: 'Full SSTIM · all real layers' },
+    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem' },
+    { value: 'terms', label: 'Ontology & vocabulary' },
+    { value: 'catalog', label: 'Catalog focus · versioned' },
+    { value: 'ecosystem', label: 'Ecosystem focus · live' },
     { value: 'core', label: 'Core OWL classes' },
     { value: 'vocabulary', label: 'All SKOS vocabulary' },
     { value: 'frequency', label: 'Frequency bands' },
@@ -149,10 +174,21 @@
     return iri?.split(/[#/]/).pop() ?? ''
   }
 
+  function liveStatusLabel(state) {
+    return {
+      available: 'available',
+      empty: 'empty',
+      unavailable: 'unavailable',
+      loading: 'refreshing',
+      disabled: 'disabled',
+    }[state] ?? 'unknown'
+  }
+
   function nodeColor(data) {
     if (data.kind === 'owlClass')    return COLORS.owlClass
     if (data.kind === 'xsdType')     return COLORS.xsdType
     if (data.kind === 'skosConcept') return SCHEME_COLORS[data.scheme] ?? COLORS.skosConcept
+    if (COLORS[data.kind])            return COLORS[data.kind]
     return '#888'
   }
 
@@ -167,8 +203,8 @@
           'text-halign': 'center',
           'text-wrap': 'wrap',
           'text-max-width': 90,
-          'width': 'label',
-          'height': 'label',
+          'width': (ele) => Math.min(110, Math.max(38, (ele.data('label')?.length ?? 0) * 5.5)),
+          'height': (ele) => (ele.data('label')?.length ?? 0) > 18 ? 34 : 22,
           'padding': 8,
           'shape': 'round-rectangle',
           'background-color': (ele) => nodeColor(ele.data()),
@@ -189,6 +225,30 @@
       {
         selector: 'node[kind="skosConcept"]',
         style: { shape: 'ellipse' }
+      },
+      {
+        selector: 'node[kind="ontologyResource"]',
+        style: { shape: 'tag', 'font-weight': 700 }
+      },
+      {
+        selector: 'node[kind="catalogFramework"]',
+        style: { shape: 'hexagon', 'font-weight': 700, 'border-width': 2 }
+      },
+      {
+        selector: 'node[kind="catalogImplementation"]',
+        style: { shape: 'round-rectangle', 'font-weight': 700, 'border-width': 2 }
+      },
+      {
+        selector: 'node[kind="catalogTechnique"]',
+        style: { shape: 'round-hexagon' }
+      },
+      {
+        selector: 'node[kind="ecosystemPerson"]',
+        style: { shape: 'ellipse', 'font-weight': 700, 'border-width': 2 }
+      },
+      {
+        selector: 'node[kind="ecosystemOrganization"]',
+        style: { shape: 'barrel', 'font-weight': 700, 'border-width': 2 }
       },
       {
         selector: 'node:selected',
@@ -236,12 +296,24 @@
         selector: 'edge[kind="instanceOf"]',
         style: { 'line-color': COLORS.instanceOf, 'target-arrow-color': COLORS.instanceOf, 'line-style': 'dotted', 'opacity': 0.5 }
       },
+      {
+        selector: 'edge[kind="catalogRelation"]',
+        style: { 'line-color': COLORS.catalogRelation, 'target-arrow-color': COLORS.catalogRelation, 'label': 'data(label)', 'line-style': 'dashed', 'width': 2 }
+      },
+      {
+        selector: 'edge[kind="ecosystemRelationship"]',
+        style: { 'line-color': COLORS.ecosystemRelationship, 'target-arrow-color': COLORS.ecosystemRelationship, 'label': 'data(label)', 'width': 2.5, 'opacity': 0.95 }
+      },
     ]
   }
 
   function graphScopeNodeVisible(data) {
     if (!data) return false
     if (graphScope === 'all') return true
+    if (graphScope === 'terms') return ['ontology', 'vocabulary'].includes(data.layer)
+    if (graphScope === 'catalog-ecosystem') return ['catalog', 'ecosystem'].includes(data.layer)
+    if (graphScope === 'catalog') return data.layer === 'catalog'
+    if (graphScope === 'ecosystem') return data.layer === 'ecosystem'
     if (graphScope === 'core') return ['owlClass', 'xsdType'].includes(data.kind)
     if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
     const schemes = SCOPE_SCHEMES[graphScope]
@@ -260,6 +332,8 @@
       narrower:    showNarrower,
       related:     showRelated,
       instanceOf:  showInstanceOf,
+      catalogRelation: showCatalogRelation,
+      ecosystemRelationship: showEcosystemRelationship,
     }
     return rules[kind] ?? true
   }
@@ -271,6 +345,27 @@
         .filter((element) => element.data?.kind !== 'xsdType' || showDataProp)
         .map((element) => element.data.id)
     )
+
+    // A focus layer keeps its immediate semantic targets visible. This is what
+    // lets an ecosystem-only view retain the catalog/ontology nodes each live
+    // relationship points to without recursively pulling in the whole graph.
+    const contextKinds = graphScope === 'ecosystem'
+      ? new Set(['ecosystemRelationship'])
+      : graphScope === 'catalog'
+        ? new Set(['catalogRelation', 'instanceOf'])
+        : graphScope === 'catalog-ecosystem'
+          ? new Set(['ecosystemRelationship', 'catalogRelation', 'instanceOf'])
+          : null
+    if (contextKinds) {
+      for (const element of allElements) {
+        const data = element.data
+        if (!data?.source || !contextKinds.has(data.kind) || !edgeLayerVisible(data.kind)) continue
+        if (visibleNodeIds.has(data.source) || visibleNodeIds.has(data.target)) {
+          visibleNodeIds.add(data.source)
+          visibleNodeIds.add(data.target)
+        }
+      }
+    }
 
     if (neighborhoodFocus && selected?.id && !selected.source && visibleNodeIds.has(selected.id)) {
       const focused = new Set([selected.id])
@@ -302,6 +397,7 @@
         id: element.data.id,
         label: element.data.label ?? localName(element.data.id),
         value: `${element.data.label ?? localName(element.data.id)} | ${localName(element.data.id)}`,
+        searchText: element.data.searchText ?? `${element.data.label ?? ''} ${localName(element.data.id)}`,
       }))
       .sort((a, b) => a.label.localeCompare(b.label))
   }
@@ -475,6 +571,8 @@
       showNarrower,
       showRelated,
       showInstanceOf,
+      showCatalogRelation,
+      showEcosystemRelationship,
       selectedIri: selected?.iri ?? '',
       neighborhoodFocus,
       connectionFilters: [...connectionFilters],
@@ -556,6 +654,11 @@
 
   function computeNeighbors(id) {
     if (!id) return []
+    const visibleNodeIds = new Set(
+      visibleElementsForCurrentView()
+        .filter((element) => !element.data?.source)
+        .map((element) => element.data.id),
+    )
     const nodeById = new Map()
     for (const element of allElements) {
       if (!element.data?.source) nodeById.set(element.data.id, element.data)
@@ -571,15 +674,19 @@
       const otherId = isOutgoing ? data.target : data.source
       const otherData = nodeById.get(otherId)
       if (!otherData) continue
-      if (!graphScopeNodeVisible(otherData)) continue
+      if (!visibleNodeIds.has(otherId)) continue
       if (otherData.kind === 'xsdType' && !showDataProp) continue
-      const key = `${otherId}|${data.kind}|${isOutgoing ? 'out' : 'in'}`
+      const edgeIdentity = data.kind === 'ecosystemRelationship'
+        ? data.iri
+        : data.label
+      const key = `${otherId}|${data.kind}|${isOutgoing ? 'out' : 'in'}|${edgeIdentity}`
       if (seen.has(key)) continue
       seen.set(key, {
         id: otherId,
         label: otherData.label ?? localName(otherId),
         kind: data.kind,
         edgeLabel: data.label || '',
+        edgeId: data.id,
         direction: isOutgoing ? 'out' : 'in',
       })
     }
@@ -657,7 +764,7 @@
     if (window.location.hash === target) return
     if (target === '' && !window.location.hash) return
     const url = window.location.pathname + window.location.search + target
-    history.replaceState(null, '', url || window.location.pathname)
+    replaceState(url || window.location.pathname, {})
   }
 
   function handleHashChange() {
@@ -706,7 +813,8 @@
     if (focusNodeQuery.trim()) {
       const query = focusNodeQuery.trim().toLowerCase()
       const match = focusNodeOptions.find((option) => option.value.toLowerCase() === query) ??
-        focusNodeOptions.find((option) => option.label.toLowerCase().includes(query))
+        focusNodeOptions.find((option) => option.label.toLowerCase().includes(query)) ??
+        focusNodeOptions.find((option) => option.searchText.toLowerCase().includes(query))
       id = match?.id
     }
 
@@ -746,6 +854,7 @@
     // re-run whenever any toggle changes
     showSubClassOf; showObjProp; showDataProp
     showNarrower; showRelated; showInstanceOf
+    showCatalogRelation; showEcosystemRelationship
     graphScope
     applyGraphDisplay()
   })
@@ -758,6 +867,7 @@
     // re-run when layer toggles or scope change since visibility affects neighbor list
     showSubClassOf; showObjProp; showDataProp
     showNarrower; showRelated; showInstanceOf
+    showCatalogRelation; showEcosystemRelationship
     graphScope
     neighborhoodFocus
     neighbors = computeNeighbors(selected.id)
@@ -922,6 +1032,8 @@
     { key: 'showNarrower',   label: 'narrower',     color: COLORS.narrower },
     { key: 'showRelated',    label: 'related',      color: COLORS.related },
     { key: 'showInstanceOf', label: 'instanceOf',   color: COLORS.instanceOf },
+    { key: 'showCatalogRelation', label: 'catalog relation', color: COLORS.catalogRelation },
+    { key: 'showEcosystemRelationship', label: 'ecosystem relation', color: COLORS.ecosystemRelationship },
   ]
 
   const toggles = {
@@ -937,6 +1049,10 @@
     set showRelated(v)    { showRelated = v },
     get showInstanceOf()  { return showInstanceOf },
     set showInstanceOf(v) { showInstanceOf = v },
+    get showCatalogRelation()  { return showCatalogRelation },
+    set showCatalogRelation(v) { showCatalogRelation = v },
+    get showEcosystemRelationship()  { return showEcosystemRelationship },
+    set showEcosystemRelationship(v) { showEcosystemRelationship = v },
   }
 </script>
 
@@ -944,7 +1060,41 @@
 
   <!-- Controls sidebar -->
   <aside class="controls">
-    <strong>Edge layers</strong>
+    <strong>Data sources</strong>
+    <ul class="source-list">
+      <li>
+        <span class="source-dot versioned"></span>
+        <span><b>Ontology & vocabulary</b><small>versioned</small></span>
+      </li>
+      <li>
+        <span class="source-dot catalog"></span>
+        <span><b>Catalog</b><small>versioned</small></span>
+      </li>
+      <li>
+        <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>
+        <span>
+          <b>Ecosystem</b>
+          <small>{liveStatusLabel(liveStatus?.state)}</small>
+        </span>
+      </li>
+    </ul>
+    {#if liveStatus?.message}
+      <p class="source-message" title={liveStatus.message}>
+        {liveStatus.state === 'available'
+          ? `${liveStatus.quadCount} current public quads`
+          : liveStatus.message}
+      </p>
+    {/if}
+    {#if onRefreshLive}
+      <button
+        type="button"
+        class="refresh-source"
+        onclick={onRefreshLive}
+        disabled={liveStatus?.state === 'loading'}
+      >Refresh live ecosystem</button>
+    {/if}
+
+    <strong style="margin-top:1rem;display:block">Edge layers</strong>
     <ul class="layer-list">
       {#each EDGE_KINDS as ek}
         <li>
@@ -962,6 +1112,12 @@
       <li><span class="swatch" style="background:{COLORS.owlClass}"></span><span class="legend-label">OWL class</span></li>
       <li><span class="swatch" style="background:{COLORS.skosConcept}"></span><span class="legend-label">SKOS concept</span></li>
       <li><span class="swatch" style="background:{COLORS.xsdType}"></span><span class="legend-label">XSD datatype</span></li>
+      <li><span class="swatch" style="background:{COLORS.ontologyResource}"></span><span class="legend-label">Ontology resource</span></li>
+      <li><span class="swatch" style="background:{COLORS.catalogFramework}"></span><span class="legend-label">Catalog framework</span></li>
+      <li><span class="swatch" style="background:{COLORS.catalogImplementation}"></span><span class="legend-label">Catalog implementation</span></li>
+      <li><span class="swatch" style="background:{COLORS.catalogTechnique}"></span><span class="legend-label">Catalog technique</span></li>
+      <li><span class="swatch" style="background:{COLORS.ecosystemPerson}"></span><span class="legend-label">Live person</span></li>
+      <li><span class="swatch" style="background:{COLORS.ecosystemOrganization}"></span><span class="legend-label">Live organization</span></li>
     </ul>
 
     <strong style="margin-top:1rem;display:block">SKOS schemes</strong>
@@ -1006,10 +1162,10 @@
         {#if selected}
           <section class="selection-panel">
             <header class="selection-header">
-              <span class="kind-tag">{KIND_LABELS[selected.kind] ?? selected.kind}</span>
+              <span class="kind-tag">{KIND_LABELS[selected.kind] ?? EDGE_KIND_LABELS[selected.kind] ?? selected.kind}</span>
               <button type="button" class="close" onclick={clearSelection} aria-label="Clear selection" title="Clear selection (Esc)">✕</button>
             </header>
-            <h2 class="selection-title">{selected.label}</h2>
+            <h2 class="selection-title">{selected.recordLabel ?? selected.label}</h2>
 
             <AnnotationPanel target={selected}>
               {#snippet between()}
@@ -1050,14 +1206,90 @@
                       <dd>{localName(selected.scheme).replace('Scheme', '')}</dd>
                     </div>
                   {/if}
+                  {#if selected.layer}
+                    <div class="meta-row">
+                      <dt>Layer</dt>
+                      <dd>{selected.layer === 'ecosystem'
+                        ? 'Live public ecosystem'
+                        : selected.layer === 'catalog'
+                          ? 'Versioned catalog'
+                          : selected.sourceLabel ?? selected.layer}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.recordLabel}
+                    <div class="meta-row">
+                      <dt>Record</dt>
+                      <dd>{selected.recordLabel}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.relationshipType}
+                    <div class="meta-row">
+                      <dt>Relation</dt>
+                      <dd>{selected.relationshipType}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.purpose}
+                    <div class="meta-row">
+                      <dt>Purpose</dt>
+                      <dd>{selected.purpose}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.roles?.length}
+                    <div class="meta-row">
+                      <dt>Role</dt>
+                      <dd>{selected.roles.join(', ')}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.validFrom || selected.validUntil}
+                    <div class="meta-row">
+                      <dt>Validity</dt>
+                      <dd>{selected.validFrom || '…'} → {selected.validUntil || 'current'}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.reviewedOn}
+                    <div class="meta-row">
+                      <dt>Reviewed</dt>
+                      <dd>{selected.reviewedOn}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.created}
+                    <div class="meta-row">
+                      <dt>Created</dt>
+                      <dd>{selected.created}</dd>
+                    </div>
+                  {/if}
+                  {#if selected.modified}
+                    <div class="meta-row">
+                      <dt>Modified</dt>
+                      <dd>{selected.modified}</dd>
+                    </div>
+                  {/if}
                   {#if selected.source}
                     <div class="meta-row">
                       <dt>Source</dt>
-                      <dd>{selected.sourceLabel ?? localName(selected.source)}</dd>
+                      <dd>
+                        <button type="button" class="meta-nav" onclick={() => selectNodeById(selected.source)}>
+                          {selected.sourceLabel ?? localName(selected.source)}
+                        </button>
+                      </dd>
                     </div>
                     <div class="meta-row">
                       <dt>Target</dt>
-                      <dd>{selected.targetLabel ?? localName(selected.target)}</dd>
+                      <dd>
+                        <button type="button" class="meta-nav" onclick={() => selectNodeById(selected.target)}>
+                          {selected.targetLabel ?? localName(selected.target)}
+                        </button>
+                      </dd>
+                    </div>
+                  {/if}
+                  {#if selected.sources?.length || selected.sourceLinks?.length}
+                    <div class="meta-row">
+                      <dt>Sources</dt>
+                      <dd class="source-links">
+                        {#each selected.sources ?? selected.sourceLinks as source, index}
+                          <a href={source} target="_blank" rel="noreferrer">{index + 1}</a>
+                        {/each}
+                      </dd>
                     </div>
                   {/if}
                 </dl>
@@ -1113,7 +1345,9 @@
                             type="button"
                             class="neighbor-btn neighbor-{n.direction}"
                             style="--edge-color: {COLORS[n.kind] ?? '#888'}"
-                            onclick={() => selectNodeById(n.id)}
+                            onclick={() => n.kind === 'ecosystemRelationship'
+                              ? selectElementById(n.edgeId)
+                              : selectNodeById(n.id)}
                           >
                             {#if n.direction === 'out'}
                               <span class="neighbor-edge">
@@ -1136,7 +1370,7 @@
                         <div class="connection-group">
                           <h4 class="sub-heading">Outgoing <span class="muted">({groupedNeighbors.out.length})</span></h4>
                           <ul>
-                            {#each groupedNeighbors.out as n (n.id + '|' + n.kind)}
+                            {#each groupedNeighbors.out as n (n.edgeId)}
                               {@render neighborCard(n)}
                             {/each}
                           </ul>
@@ -1146,7 +1380,7 @@
                         <div class="connection-group">
                           <h4 class="sub-heading">Incoming <span class="muted">({groupedNeighbors.inc.length})</span></h4>
                           <ul>
-                            {#each groupedNeighbors.inc as n (n.id + '|' + n.kind)}
+                            {#each groupedNeighbors.inc as n (n.edgeId)}
                               {@render neighborCard(n)}
                             {/each}
                           </ul>
@@ -1231,6 +1465,61 @@
   .controls strong,
   .stats h4 {
     color: var(--app-text-strong);
+  }
+
+  .source-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.45rem 0 0;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .source-list li {
+    display: grid;
+    grid-template-columns: 0.65rem 1fr;
+    align-items: start;
+    gap: 0.45rem;
+  }
+
+  .source-list b,
+  .source-list small {
+    display: block;
+    line-height: 1.25;
+  }
+
+  .source-list b { font-size: 0.76rem; }
+  .source-list small { color: var(--pico-muted-color); font-size: 0.66rem; }
+
+  .source-dot {
+    width: 0.58rem;
+    height: 0.58rem;
+    margin-top: 0.12rem;
+    border-radius: 50%;
+    background: var(--app-muted);
+  }
+  .source-dot.versioned { background: #4fc3f7; }
+  .source-dot.catalog { background: #ffca28; }
+  .source-dot.live.available { background: #2e7d32; }
+  .source-dot.live.empty { background: #f9a825; }
+  .source-dot.live.unavailable { background: #c62828; }
+  .source-dot.live.loading { background: #0288d1; }
+
+  .source-message {
+    margin: 0.45rem 0 0;
+    color: var(--pico-muted-color);
+    font-size: 0.66rem;
+    line-height: 1.35;
+  }
+
+  .refresh-source {
+    width: 100%;
+    margin: 0.45rem 0 0;
+    padding: 0.3rem 0.45rem;
+    font-size: 0.68rem;
+    background: transparent;
+    color: var(--app-text);
+    border: var(--app-border-width) solid var(--app-border);
   }
 
   .layer-list, .legend-list {
@@ -1422,6 +1711,35 @@
   .meta-row dd {
     margin: 0;
     word-break: break-word;
+  }
+
+  .source-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .source-links a {
+    display: inline-grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: 50%;
+    text-decoration: none;
+  }
+
+  .meta-nav {
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--app-accent);
+    font: inherit;
+    text-align: left;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .iri-row dd {

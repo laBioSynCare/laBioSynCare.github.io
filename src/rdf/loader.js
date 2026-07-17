@@ -49,11 +49,11 @@ export function parseIntoStore(text, format = 'text/turtle', graphIri) {
  * URL via a Vite plugin or a relative path under static/.
  *
  * @param {string} url  Absolute or root-relative URL.
- * @param {{ format?: string, graph?: string }} [options]
+ * @param {{ format?: string, graph?: string, fetchOptions?: RequestInit }} [options]
  * @returns {Promise<Store>}
  */
 export async function loadTurtle(url, options = {}) {
-  const res = await fetch(url)
+  const res = await fetch(url, options.fetchOptions)
   if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status} ${res.statusText}`)
   const text = await res.text()
   return parseIntoStore(text, options.format ?? 'text/turtle', options.graph)
@@ -74,6 +74,7 @@ export async function loadSource(source) {
     return await loadTurtle(source.url, {
       graph: source.graph,
       format: source.format,
+      fetchOptions: source.fetchOptions,
     })
   } catch (error) {
     if (!source.optional) throw error
@@ -91,6 +92,11 @@ export async function loadSource(source) {
  */
 export async function loadMerged(sources) {
   const stores = await Promise.all(sources.map(loadSource))
+  return mergeStores(...stores)
+}
+
+/** Merge one or more RDFJS stores without changing the inputs. */
+export function mergeStores(...stores) {
   const merged = new Store()
   for (const s of stores) {
     for (const quad of s) {
@@ -247,6 +253,109 @@ export function instanceSources() {
 }
 
 /**
+ * Committed instance data suitable for general in-browser queries.
+ *
+ * The mutable ecosystem projection and its synthetic contract fixture are
+ * intentionally opt-in. This prevents unrelated routes (notably Presets) from
+ * fetching named people and keeps test data out of user-facing query results.
+ */
+export function staticInstanceSources() {
+  return Object.entries(INSTANCE_SOURCES)
+    .filter(([group]) => group !== 'ecosystem' && group !== 'ecosystemFixtures')
+    .flatMap(([, sources]) => sources)
+}
+
+/**
+ * The deliberately small manifest used by the unified Graph navigator.
+ * It contains the citable term set, versioned catalog records, and optionally
+ * the mutable public ecosystem projection. Sessions, experiments, presets,
+ * evidence, references, and synthetic fixtures are outside this view.
+ */
+export function navigatorSources(options = {}) {
+  const sources = [
+    ...Object.values(ONTOLOGY_SOURCES),
+    ...INSTANCE_SOURCES.frameworks,
+    ...INSTANCE_SOURCES.implementations,
+  ]
+  if (options.includeLive !== false) sources.push(...INSTANCE_SOURCES.ecosystem)
+  return sources
+}
+
+export const LIVE_ECOSYSTEM_FETCH_OPTIONS = Object.freeze({
+  cache: 'no-store',
+  credentials: 'omit',
+  referrerPolicy: 'no-referrer',
+})
+
+/**
+ * Load the approved, current-state public ecosystem projection.
+ *
+ * Unlike the generic optional-source loader, this function preserves the
+ * difference between a valid empty publication and an unavailable endpoint so
+ * the UI can state what happened and offer a retry.
+ */
+export async function loadLiveEcosystem() {
+  const source = INSTANCE_SOURCES.ecosystem[0]
+  const fetchedAt = new Date().toISOString()
+  try {
+    const store = await loadTurtle(source.url, {
+      graph: source.graph,
+      format: source.format,
+      fetchOptions: LIVE_ECOSYSTEM_FETCH_OPTIONS,
+    })
+    return {
+      store,
+      status: {
+        state: store.size ? 'available' : 'empty',
+        source: source.url,
+        quadCount: store.size,
+        fetchedAt,
+        message: store.size
+          ? 'Current public ecosystem projection loaded.'
+          : 'The public ecosystem projection is valid but empty.',
+      },
+    }
+  } catch (error) {
+    console.warn(`Live ecosystem source unavailable: ${source.url}`, error)
+    return {
+      store: new Store(),
+      status: {
+        state: 'unavailable',
+        source: source.url,
+        quadCount: 0,
+        fetchedAt,
+        message: error instanceof Error ? error.message : String(error),
+      },
+    }
+  }
+}
+
+/** Load the selective, interlinked ontology + catalog + live navigator view. */
+export async function loadNavigatorGraph(options = {}) {
+  const includeLive = options.includeLive !== false
+  const staticSources = navigatorSources({ includeLive: false })
+  const [staticStore, live] = await Promise.all([
+    loadMerged(staticSources),
+    includeLive
+      ? loadLiveEcosystem()
+      : Promise.resolve({
+          store: new Store(),
+          status: {
+            state: 'disabled',
+            source: INSTANCE_URLS.ecosystem[0],
+            quadCount: 0,
+            fetchedAt: null,
+            message: 'Live ecosystem loading is disabled.',
+          },
+        }),
+  ])
+  return {
+    store: mergeStores(staticStore, live.store),
+    liveStatus: live.status,
+  }
+}
+
+/**
  * Load the canonical sstim ontology files into one merged store.
  * SHACL shapes are included so the store can be used for both querying
  * and validation without a second fetch.
@@ -256,15 +365,24 @@ export function instanceSources() {
  */
 export function loadOntology(options = {}) {
   const sources = Object.values(ONTOLOGY_SOURCES)
-  if (options.includeInstances) sources.push(...instanceSources())
+  if (options.includeInstances) sources.push(...staticInstanceSources())
   return loadMerged(sources)
 }
 
 /**
- * Load the ontology plus committed BSC Lab RDF instances.
+ * Backward-compatible name for the static, non-fixture knowledge graph.
  *
  * @returns {Promise<Store>}
  */
 export function loadKnowledgeGraph() {
-  return loadOntology({ includeInstances: true })
+  return loadStaticKnowledgeGraph()
+}
+
+
+/** Load the ontology and committed non-fixture instances, without live people. */
+export function loadStaticKnowledgeGraph() {
+  return loadMerged([
+    ...Object.values(ONTOLOGY_SOURCES),
+    ...staticInstanceSources(),
+  ])
 }

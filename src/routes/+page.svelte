@@ -1,21 +1,30 @@
 <script>
   import { onMount } from 'svelte'
-  import { loadOntology } from '../rdf/loader.js'
+  import { loadNavigatorGraph } from '../rdf/loader.js'
   import OntologyGraph from '../ui/graph/OntologyGraph.svelte'
 
   let store = $state(null)
   let error = $state(null)
   let loading = $state(true)
+  let liveStatus = $state({ state: 'loading', message: 'Loading current public ecosystem projection.' })
 
-  onMount(async () => {
+  async function loadGraph({ refresh = false } = {}) {
+    if (refresh) {
+      liveStatus = { ...liveStatus, state: 'loading', message: 'Refreshing current public ecosystem projection.' }
+    }
     try {
-      store = await loadOntology()
+      const result = await loadNavigatorGraph()
+      store = result.store
+      liveStatus = result.liveStatus
+      error = null
     } catch (e) {
       error = e.message
     } finally {
       loading = false
     }
-  })
+  }
+
+  onMount(loadGraph)
 </script>
 
 {#if loading}
@@ -23,5 +32,7 @@
 {:else if error}
   <p style="color:red;padding:2rem">{error}</p>
 {:else}
-  <OntologyGraph {store} />
+  {#key store}
+    <OntologyGraph {store} {liveStatus} onRefreshLive={() => loadGraph({ refresh: true })} />
+  {/key}
 {/if}

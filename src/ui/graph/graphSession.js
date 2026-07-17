@@ -7,6 +7,8 @@ export const graphSession = {
   showNarrower: true,
   showRelated: true,
   showInstanceOf: true,
+  showCatalogRelation: true,
+  showEcosystemRelationship: true,
   selectedIri: '',
   neighborhoodFocus: false,
   connectionFilters: [],

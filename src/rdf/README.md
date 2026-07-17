@@ -6,10 +6,10 @@
 > still planned. Annotation storage now has an env-gated Firebase Auth/Firestore
 > backend.
 
-The RDF subsystem loads the SSTIM ontology and public BSC Lab reference preset
-instances into an in-browser N3.js triple store, executes SPARQL queries via
-Comunica, and validates data with SHACL. It must not import, convert, or export
-the private BioSynCare/BSC catalog.
+The RDF subsystem loads the SSTIM ontology, versioned public catalog, approved
+live ecosystem projection, and public BSC Lab reference instances into scoped
+in-browser N3.js stores; executes SPARQL via Comunica; and validates data with
+SHACL. It must not import, convert, or export the private BioSynCare/BSC catalog.
 
 ---
 
@@ -72,13 +72,26 @@ single-file loading, a fixed canonical ontology merge, and a committed instance
 manifest for browser loading.
 
 ```javascript
-import { loadOntology, loadKnowledgeGraph, loadTurtle, loadMerged } from './loader.js'
+import {
+  loadOntology,
+  loadNavigatorGraph,
+  loadStaticKnowledgeGraph,
+  loadLiveEcosystem,
+  loadTurtle,
+  loadMerged,
+} from './loader.js'
 
-// Load the four canonical ontology files
+// Load the seven canonical ontology files
 const ontologyStore = await loadOntology()
 
-// Load ontology plus committed preset/reference instances
-const knowledgeStore = await loadKnowledgeGraph()
+// Graph navigator: terms + versioned catalog + mutable public ecosystem
+const { store: navigatorStore, liveStatus } = await loadNavigatorGraph()
+
+// General static queries: ontology + committed non-fixture instances
+const knowledgeStore = await loadStaticKnowledgeGraph()
+
+// Explicit live-only opt-in (used by SPARQL)
+const { store: liveStore, status } = await loadLiveEcosystem()
 
 // Load one Turtle file
 const coreStore = await loadTurtle('/ontology/sstim-core.ttl')
@@ -93,11 +106,20 @@ const combinedStore = await loadMerged([
 In the browser, files are fetched via the Fetch API from the Vite static asset
 server. Node.js filesystem loading is deferred to the export/test pipeline.
 
-**Named graphs:** `loadOntology()` and `loadKnowledgeGraph()` assign canonical
+**Named graphs:** all scoped loaders assign canonical
 graph IRIs at load time. Ontology modules use `https://w3id.org/sstim/graph/*`;
 committed instance files use their SSTIM-scoped graph IRIs. Browser queries that
 need loaded data should use `GRAPH ?g { ... }`. Annotations remain separate
 named graph records managed by `AnnotationStore.js`.
+
+**Source boundaries:** `loadNavigatorGraph()` deliberately loads only ontology
+and vocabulary terms, the versioned framework/implementation catalog, and the
+external approved current-state ecosystem. It excludes presets, experiments,
+sessions, evidence, references, and synthetic ecosystem fixtures. The live fetch
+uses `cache: 'no-store'`, omits credentials/referrer information, and returns an
+explicit `available`, `empty`, or `unavailable` status. `loadStaticKnowledgeGraph()`
+never fetches live agents or synthetic ecosystem fixtures; SPARQL users must opt
+in to the live source.
 
 ---
 

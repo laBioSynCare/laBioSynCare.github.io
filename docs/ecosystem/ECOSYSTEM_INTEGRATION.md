@@ -319,7 +319,7 @@ reachable from every door, not buried in one.
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The enriched F4 aggregate is live with separately approved person/organization relationships; one leadership relationship is an explicitly documented self-attestation pending a canonical public role source. Exact w3id routes are staged but still require the upstream merge and verification; human-readable ecosystem discovery remains pending.**
+**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The enriched F4 aggregate is live with separately approved person/organization relationships; one leadership relationship is an explicitly documented self-attestation pending a canonical public role source. The unified Graph navigator now renders the live ecosystem together with the versioned catalog and ontology/vocabulary, with focus filters and source/provenance disclosure. Exact w3id routes still require their upstream merge and verification; dedicated human profile routes remain optional follow-up.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
@@ -437,8 +437,8 @@ The implementation sequence is now recorded as follows:
    implementation/agent separation, local-IRI resolution, and exact routes.
 4. Activate private-first: persist the audit ledger, publish the complete live
    replacement, verify bytes/MIME/CORS, and remove superseded Hosting content.
-5. Deploy static catalog targets, merge and verify the exact upstream w3id
-   routes, then add human-readable discovery before wider outreach.
+5. Deploy static catalog targets and the unified human-readable Graph discovery;
+   merge and verify the exact upstream w3id routes before wider outreach.
 6. Enrich incrementally through complete replacement aggregates; add another
    person only with relationship-and-purpose-scoped self-publication or consent.
 
@@ -527,10 +527,12 @@ publication, and removal procedure is recorded in
    the external target live, submit and verify those rules before announcing
    the identifiers or enabling discovery; w3id cannot approve a redirect to a
    target that is not yet served.
-7. **`[ ]` Discovery — expose the result.** Add an “Ecosystem / agents” browser scope,
-   ordinary-instance rendering, useful competency queries, and human-readable
-   profile routes. This can follow RDF authoring, but should precede outreach
-   that expects people to discover or inspect the records.
+7. **`[~]` Discovery — unified Graph navigator implemented 2026-07-17.** The
+   browser renders ordinary framework/implementation/agent instances and
+   qualified relationships in one interlinked view, provides catalog/ecosystem/
+   term focus scopes, searches labels and aliases, discloses versioned-vs-live
+   provenance, and makes live SPARQL loading explicit. Dedicated profile routes
+   and curated competency-query shortcuts remain optional follow-up.
 
 ### Readiness gate for real records
 

@@ -37,9 +37,10 @@ Phase tags:
 SSTIM `0.7.0` is the validated release line, archived under release DOI
 `10.5281/zenodo.21380171`. The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
-agent. The immediate focus is the exact w3id route merge, ecosystem discovery,
-registry review, and future independent human review. Public BSC Lab data remains
-separate from the private BioSynCare/BSC catalog.
+agent. The unified Graph navigator now exposes the interlinked versioned catalog,
+live ecosystem, and SSTIM terms. The immediate focus is the exact w3id route
+merge/verification, registry review, and future independent human review. Public
+BSC Lab data remains separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -300,10 +301,12 @@ Turtle files are listed in section 1. After they exist:
       separate sourced or explicitly self-attested, approved person/organization
       relationships. The exact real w3id
       routes are staged locally but still need their
-      upstream merge and live verification; human-readable discovery also
-      remains. Replace the temporary leadership self-attestation exception with
-      a canonical official-page or immutable-profile source when one is
-      published. New organization records are not admitted without a verified
+      upstream merge and live verification. Human-readable discovery is now
+      implemented in the unified Graph navigator; dedicated profile pages and
+      canned competency queries remain optional. Replace the temporary
+      leadership self-attestation exception with a canonical official-page or
+      immutable-profile source when one is published. New organization records
+      are not admitted without a verified
       curator in the same aggregate; later memberships and
       responsibilities are separately self-approved or scoped-consent. Neither
       the public aggregate nor its private history is committed here. The

@@ -1,9 +1,14 @@
 <script>
   import { onMount } from 'svelte'
-  import { loadKnowledgeGraph } from '../../rdf/loader.js'
+  import {
+    loadLiveEcosystem,
+    loadStaticKnowledgeGraph,
+    mergeStores,
+  } from '../../rdf/loader.js'
   import { select } from '../../rdf/query.js'
 
   let store = $state(null)
+  let staticStore = $state(null)
   let query = $state(`PREFIX sstim: <https://w3id.org/sstim#>
 PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -19,16 +24,36 @@ ORDER BY ?label`)
   let error = $state(null)
   let running = $state(false)
   let loading = $state(true)
+  let includeLive = $state(false)
+  let loadingLive = $state(false)
+  let liveStatus = $state({ state: 'disabled', message: 'Live ecosystem data is not loaded.' })
 
   onMount(async () => {
     try {
-      store = await loadKnowledgeGraph()
+      staticStore = await loadStaticKnowledgeGraph()
+      store = staticStore
     } catch (e) {
       error = `Failed to load ontology: ${e.message}`
     } finally {
       loading = false
     }
   })
+
+  async function toggleLive(event) {
+    includeLive = event.currentTarget.checked
+    if (!includeLive) {
+      store = mergeStores(staticStore)
+      liveStatus = { state: 'disabled', message: 'Live ecosystem data is not loaded.' }
+      return
+    }
+
+    loadingLive = true
+    liveStatus = { state: 'loading', message: 'Loading current public ecosystem projection.' }
+    const live = await loadLiveEcosystem()
+    liveStatus = live.status
+    store = mergeStores(staticStore, live.store)
+    loadingLive = false
+  }
 
   async function run() {
     if (!store || running) return
@@ -49,12 +74,25 @@ ORDER BY ?label`)
 
 <hgroup>
   <h1>SPARQL Interface</h1>
-  <p>Query the sstim ontology in-browser via Comunica</p>
+  <p>Query versioned SSTIM data in-browser via Comunica; mutable public ecosystem data is opt-in.</p>
 </hgroup>
 
 {#if loading}
   <p aria-busy="true">Loading ontology…</p>
 {:else}
+  <fieldset>
+    <label>
+      <input type="checkbox" checked={includeLive} onchange={toggleLive} disabled={loadingLive} />
+      Include live public ecosystem
+    </label>
+    <small>
+      {#if liveStatus.state === 'available'}
+        Loaded {liveStatus.quadCount} current public quads. This source is not part of the citable release.
+      {:else}
+        {liveStatus.message}
+      {/if}
+    </small>
+  </fieldset>
   <textarea rows="10" bind:value={query} style="font-family:monospace;width:100%"></textarea>
   <button onclick={run} aria-busy={running} disabled={running}>Run</button>
 
