@@ -4,6 +4,6 @@
 # notification; this second predecessor belongs to a different relationship
 # and must not be accepted merely because it is also a valid notification.
 
-<https://w3id.org/sstim/ecosystem-record/activity/player-attribution-response>
+<https://w3id.org/sstim/ecosystem-record/activity/synthetic-player-attribution-response>
     prov:wasInformedBy
-        <https://w3id.org/sstim/ecosystem-record/activity/resonance-outreach-notification> .
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-resonance-outreach-notification> .

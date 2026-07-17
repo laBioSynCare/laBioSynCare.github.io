@@ -43,27 +43,27 @@ const parseFile = file => new Parser().parse(
 )
 
 const expectedRelationships = new Map([
-  [`${RECORD}alex-membership-aurora`, [
+  [`${RECORD}synthetic-alex-membership-aurora`, [
     PERSON, AURORA, `${ECO}organizationMember`, `${ECO}purposePublicDiscovery`,
     'https://example.org/sources/aurora-membership',
   ]],
-  [`${RECORD}alex-membership-resonance`, [
+  [`${RECORD}synthetic-alex-membership-resonance`, [
     PERSON, RESONANCE, `${ECO}organizationMember`, `${ECO}purposePublicDiscovery`,
     'https://example.org/sources/resonance-membership',
   ]],
-  [`${RECORD}alex-attribution-player`, [
+  [`${RECORD}synthetic-alex-attribution-player`, [
     PERSON, IMPLEMENTATION, `${ECO}contributor`, `${ECO}purposePublicAttribution`,
     'https://example.org/sources/player-contribution',
   ]],
-  [`${RECORD}alex-outreach-resonance`, [
+  [`${RECORD}synthetic-alex-outreach-resonance`, [
     PERSON, RESONANCE, `${ECO}researchCollaborator`, `${ECO}purposeOutreach`,
     'https://example.org/sources/resonance-outreach',
   ]],
-  [`${RECORD}aurora-develops-player`, [
+  [`${RECORD}synthetic-aurora-develops-player`, [
     AURORA, IMPLEMENTATION, `${ECO}implementationDeveloper`, `${ECO}purposeLivePublication`,
     'https://example.org/sources/aurora-player-responsibility',
   ]],
-  [`${RECORD}resonance-provides-player`, [
+  [`${RECORD}synthetic-resonance-provides-player`, [
     RESONANCE, IMPLEMENTATION, `${ECO}implementationProvider`, `${ECO}purposeLivePublication`,
     'https://example.org/sources/resonance-player-responsibility',
   ]],
@@ -170,21 +170,21 @@ describe('synthetic ecosystem qualified bindings', () => {
   })
 
   it('keeps membership roles and purpose-specific decisions separate', () => {
-    expect(objectValues(`${RECORD}alex-membership-aurora`, 'http://www.w3.org/ns/org#role'))
+    expect(objectValues(`${RECORD}synthetic-alex-membership-aurora`, 'http://www.w3.org/ns/org#role'))
       .toEqual(['https://example.org/roles/researcher'])
-    expect(objectValues(`${RECORD}alex-membership-resonance`, 'http://www.w3.org/ns/org#role'))
+    expect(objectValues(`${RECORD}synthetic-alex-membership-resonance`, 'http://www.w3.org/ns/org#role'))
       .toEqual(['https://example.org/roles/maintainer'])
 
     const hasActivity = `${ECO}hasEngagementActivity`
-    expect(objectValues(`${RECORD}alex-membership-aurora`, hasActivity))
+    expect(objectValues(`${RECORD}synthetic-alex-membership-aurora`, hasActivity))
       .toEqual([
-        'https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-consent',
-        'https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-publication',
+        'https://w3id.org/sstim/ecosystem-record/activity/synthetic-aurora-membership-consent',
+        'https://w3id.org/sstim/ecosystem-record/activity/synthetic-aurora-membership-publication',
       ])
-    expect(objectValues(`${RECORD}alex-membership-resonance`, hasActivity))
+    expect(objectValues(`${RECORD}synthetic-alex-membership-resonance`, hasActivity))
       .toEqual([
-        'https://w3id.org/sstim/ecosystem-record/activity/resonance-membership-consent',
-        'https://w3id.org/sstim/ecosystem-record/activity/resonance-membership-publication',
+        'https://w3id.org/sstim/ecosystem-record/activity/synthetic-resonance-membership-consent',
+        'https://w3id.org/sstim/ecosystem-record/activity/synthetic-resonance-membership-publication',
       ])
   })
 })

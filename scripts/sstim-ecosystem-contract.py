@@ -132,42 +132,42 @@ LOCAL_PREFIXES = (
 )
 
 EXPECTED_RELATIONSHIPS = {
-    URIRef(RECORD + "alex-membership-aurora"): (
+    URIRef(RECORD + "synthetic-alex-membership-aurora"): (
         PERSON,
         AURORA,
         ECO.organizationMember,
         ECO.purposePublicDiscovery,
         URIRef("https://example.org/sources/aurora-membership"),
     ),
-    URIRef(RECORD + "alex-membership-resonance"): (
+    URIRef(RECORD + "synthetic-alex-membership-resonance"): (
         PERSON,
         RESONANCE,
         ECO.organizationMember,
         ECO.purposePublicDiscovery,
         URIRef("https://example.org/sources/resonance-membership"),
     ),
-    URIRef(RECORD + "alex-attribution-player"): (
+    URIRef(RECORD + "synthetic-alex-attribution-player"): (
         PERSON,
         IMPLEMENTATION,
         ECO.contributor,
         ECO.purposePublicAttribution,
         URIRef("https://example.org/sources/player-contribution"),
     ),
-    URIRef(RECORD + "alex-outreach-resonance"): (
+    URIRef(RECORD + "synthetic-alex-outreach-resonance"): (
         PERSON,
         RESONANCE,
         ECO.researchCollaborator,
         ECO.purposeOutreach,
         URIRef("https://example.org/sources/resonance-outreach"),
     ),
-    URIRef(RECORD + "aurora-develops-player"): (
+    URIRef(RECORD + "synthetic-aurora-develops-player"): (
         AURORA,
         IMPLEMENTATION,
         ECO.implementationDeveloper,
         ECO.purposeLivePublication,
         URIRef("https://example.org/sources/aurora-player-responsibility"),
     ),
-    URIRef(RECORD + "resonance-provides-player"): (
+    URIRef(RECORD + "synthetic-resonance-provides-player"): (
         RESONANCE,
         IMPLEMENTATION,
         ECO.implementationProvider,
@@ -864,7 +864,7 @@ def check_real_public_artifact(artifact: Graph, label: str) -> list[str]:
 
 
 def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
-    """Require exact staged HTML/RDF routes for the complete live aggregate."""
+    """Require canonical namespace routes and routable live subject IRIs."""
     errors: list[str] = []
     w3id_prefix = "https://w3id.org/sstim/"
     routed_prefixes = (
@@ -872,49 +872,53 @@ def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
         f"{w3id_prefix}organization/",
         f"{w3id_prefix}ecosystem-record/",
     )
-    expected_routes = {
-        str(subject).removeprefix(w3id_prefix)
+    live_subject_pattern = re.compile(
+        r"^https://w3id\.org/sstim/"
+        r"(?:(?:specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+|"
+        r"ecosystem-record/(?:relationship|activity|role)/"
+        r"(?!synthetic-)[A-Za-z0-9._~-]+)$"
+    )
+    routed_subjects = {
+        str(subject)
         for subject in artifact.subjects()
         if isinstance(subject, URIRef) and str(subject).startswith(routed_prefixes)
     }
+    for subject in sorted(routed_subjects):
+        require(
+            live_subject_pattern.fullmatch(subject) is not None,
+            f"{label}: live subject is not covered by the ecosystem namespace routes: "
+            f"{subject}",
+            errors,
+        )
 
     text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
-    start = "# BEGIN audited real ecosystem routes"
-    end = "# END audited real ecosystem routes"
+    start = "# BEGIN audited live ecosystem namespace routes"
+    end = "# END audited live ecosystem namespace routes"
     if text.count(start) != 1 or text.count(end) != 1:
-        return [f"{label}: staged w3id file lacks one exact real ecosystem route block"]
+        return errors + [
+            f"{label}: staged w3id file lacks one live ecosystem namespace block"
+        ]
     block = text.split(start, 1)[1].split(end, 1)[0]
-    exact_rule = re.compile(
-        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
-        rf"(https://labiosyncare\.github\.io/|{re.escape(ECOSYSTEM_PUBLIC_DUMP)}) "
-        r"\[R=303,L\]"
+    directives = tuple(
+        line.strip()
+        for line in block.splitlines()
+        if line.strip().startswith(("RewriteCond", "RewriteRule"))
     )
-    html_routes: set[str] = set()
-    rdf_routes: set[str] = set()
-    for line in block.splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("RewriteRule"):
-            continue
-        match = exact_rule.fullmatch(stripped)
-        if match is None:
-            errors.append(
-                f"{label}: real ecosystem route block contains a broad or malformed rule"
-            )
-            continue
-        routes = set(match.group(1).split("|"))
-        if match.group(2) == "https://labiosyncare.github.io/":
-            html_routes.update(routes)
-        else:
-            rdf_routes.update(routes)
-
-    require(
-        html_routes == expected_routes,
-        f"{label}: staged HTML routes differ from the complete real aggregate subjects",
-        errors,
+    expected_directives = (
+        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        "https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        f"{ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        rf"(?!synthetic-)[A-Za-z0-9._~-]+/?$ {ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
     )
     require(
-        rdf_routes == expected_routes,
-        f"{label}: staged RDF routes differ from the complete real aggregate subjects",
+        directives == expected_directives,
+        f"{label}: staged live ecosystem routes are not the canonical namespace rules",
         errors,
     )
     return errors
@@ -931,9 +935,13 @@ def check_real_artifact_guard() -> list[str]:
     probe_relationship = URIRef(RECORD + "real-guard-probe")
     probe_activity = URIRef(ACTIVITY + "real-guard-probe")
     probe_agent = URIRef("https://w3id.org/sstim/specialist/real-guard-probe")
+    unroutable_agent = URIRef(
+        "https://w3id.org/sstim/specialist/nested/real-guard-probe"
+    )
     external_actor = URIRef("https://example.net/unverified-curator")
     candidate.add((probe_agent, RDF.type, ECO.EcosystemAgent))
     candidate.add((probe_agent, PROV.wasAttributedTo, external_actor))
+    candidate.add((unroutable_agent, RDF.type, ECO.EcosystemAgent))
     candidate.add((probe_relationship, RDF.type, ECO.EcosystemRelationship))
     candidate.add((probe_relationship, PROV.wasAttributedTo, external_actor))
     candidate.add((probe_activity, RDF.type, ECO.EngagementActivity))
@@ -963,8 +971,11 @@ def check_real_artifact_guard() -> list[str]:
         errors,
     )
     require(
-        any("routes differ" in issue for issue in route_guard_errors),
-        "real artifact guard did not reject an aggregate with stale exact routes",
+        any(
+            "not covered by the ecosystem namespace routes" in issue
+            for issue in route_guard_errors
+        ),
+        "real artifact guard did not reject a subject outside the live route grammar",
         errors,
     )
     return errors
@@ -1008,6 +1019,14 @@ def check_positive_contract(fixture: Graph, merged: Graph) -> list[str]:
     require(len(responsibilities) == 2,
             f"expected 2 implementation responsibilities, found {len(responsibilities)}", errors)
     require(len(activities) == 14, f"expected 14 engagement activities, found {len(activities)}", errors)
+
+    for subject in agents | relationships | activities:
+        slug = str(subject).rsplit("/", 1)[-1]
+        require(
+            slug.startswith("synthetic-"),
+            f"{subject}: routed fixture identifiers must reserve the synthetic-* slug",
+            errors,
+        )
 
     for relationship, expected in EXPECTED_RELATIONSHIPS.items():
         actual = (
@@ -1069,8 +1088,8 @@ def check_positive_contract(fixture: Graph, merged: Graph) -> list[str]:
                     require(next(iter(prior_times)).toPython() < current,
                             f"{event}: predecessor {predecessor} is not strictly earlier", errors)
 
-    aurora_membership = URIRef(RECORD + "alex-membership-aurora")
-    resonance_membership = URIRef(RECORD + "alex-membership-resonance")
+    aurora_membership = URIRef(RECORD + "synthetic-alex-membership-aurora")
+    resonance_membership = URIRef(RECORD + "synthetic-alex-membership-resonance")
     require(values(fixture, aurora_membership, ORG.role) == {
         URIRef("https://example.org/roles/researcher")
     }, "Aurora membership role was cross-associated", errors)

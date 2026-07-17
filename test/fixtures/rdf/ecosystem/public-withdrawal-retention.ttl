@@ -4,7 +4,7 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:        <https://example.org/negative/public-withdrawal/> .
 
-<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora>
     sstim-eco:hasEngagementActivity ex:withdrawal .
 
 ex:withdrawal a sstim-eco:EngagementActivity,
@@ -12,13 +12,13 @@ ex:withdrawal a sstim-eco:EngagementActivity,
         prov:Activity ;
     rdfs:label "Synthetic public withdrawal event"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora> ;
     sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
     sstim-eco:engagementOutcome sstim-eco:outcomeConsentWithdrawn ;
     prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;
     prov:wasAssociatedWith
         <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
     prov:wasInformedBy
-        <https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-consent> ;
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-aurora-membership-consent> ;
     prov:invalidated
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora> .
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora> .

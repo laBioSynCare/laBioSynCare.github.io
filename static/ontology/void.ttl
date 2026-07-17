@@ -267,7 +267,7 @@
         <http://www.w3.org/ns/prov#> ;
     void:exampleResource <https://w3id.org/sstim/specialist/synthetic-alex-rivera>,
         <https://w3id.org/sstim/organization/synthetic-aurora-lab>,
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>,
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora>,
         <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
     void:dataDump <https://labiosyncare.github.io/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl> ;
     dcat:landingPage <https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/static/ontology/instances/ecosystem/fixtures> .

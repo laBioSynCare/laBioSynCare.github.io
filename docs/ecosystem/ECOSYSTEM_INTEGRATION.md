@@ -481,9 +481,11 @@ publication, and removal procedure is recorded in
 4. **`[~]` F3 — complete instance publication plumbing.** The repository now has
    a dedicated synthetic `instances/ecosystem/` family, named graph, explicit
    loader manifest entries, quality-audit coverage, Schema.org/ORG context
-   support, VoID metadata, and synthetic routes. Committed instance data remains
-   synthetic; exact real-subject route paths are the documented dereferencing
-   metadata exception. The mutable public store is Firebase Hosting at
+   support, VoID metadata, and a synthetic fixture graph. Committed instance
+   data remains synthetic and reserves a `synthetic-*` subject slug; general
+   live namespace rules reject that prefix while dereferencing externally
+   stored real records without subject-specific paths here. The mutable public
+   store is Firebase Hosting at
    `https://biosyncare-lab.web.app/current.ttl`; the browser loads it optionally
    into the real-agent graph, while CI never depends on the network. The
    access-controlled ledger is the client-denied Firestore
@@ -500,7 +502,7 @@ publication, and removal procedure is recorded in
    verifies bytes/MIME/CORS, and deletes superseded Hosting content versions.
    External-ledger diagnostics are redacted and must never print raw SHACL
    reports or private identifiers to public logs.
-   F3 remains marked in progress only because the staged exact w3id routes still
+   F3 remains marked in progress only because the staged w3id namespace routes still
    need their upstream merge and live verification.
 5. **`[x]` Release gate — stabilize the contract.** SSTIM `0.7.0` includes the
    ecosystem term contract and migration notes after the pinned validation,
@@ -554,9 +556,11 @@ repository unless the separate archival-consent pipeline is invoked:
 - every relationship ends in a final approval by its curator; a named
   person is self-published or has an earlier scoped consent grant; no negative
   or operational outcome appears publicly;
-- synthetic and real data use distinct graphs/dumps; the term contract and its
-  synthetic routes are deployed in a stable citable release; exact real routes
-  are staged and audited with the seed, then activated and verified immediately
+- synthetic and real data use distinct graphs/dumps; the term contract and
+  fixture IRI grammar are deployed in a stable citable release, while current
+  synthetic subjects reserve a `synthetic-*` slug and have no fixture-specific
+  registry routes; general live
+  namespace routes are staged and audited, then activated and verified immediately
   after their external live target deploys and before announcement/discovery;
   and
 - an access-controlled private ledger has a named access owner and retention

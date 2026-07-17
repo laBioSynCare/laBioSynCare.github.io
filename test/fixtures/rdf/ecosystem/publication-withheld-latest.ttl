@@ -4,14 +4,14 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:        <https://example.org/negative/publication-withheld/> .
 
-<https://w3id.org/sstim/ecosystem-record/relationship/aurora-develops-player>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-aurora-develops-player>
     sstim-eco:hasEngagementActivity ex:withheld .
 
 ex:withheld a sstim-eco:EngagementActivity,
         sstim-eco:PublicationDecisionActivity, prov:Activity ;
     rdfs:label "Synthetic publication withheld"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/aurora-develops-player> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-aurora-develops-player> ;
     sstim-eco:engagementPurpose sstim-eco:purposeLivePublication ;
     sstim-eco:engagementOutcome sstim-eco:outcomePublicationWithheld ;
     prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;

@@ -41,7 +41,10 @@ BioSynCare catalog and real participant records are not present.
 The ecosystem fixture currently contains three agents (one person and two
 organizations), six qualified relationships (including two memberships and two
 implementation-responsibility records), fourteen engagement activities, and two
-ORG roles. `void.ttl` publishes and the quality audit verifies these counts.
+ORG roles. Current fixture subjects retain the IRI grammar required by the
+released SHACL contract while reserving a `synthetic-*` slug excluded by live
+namespace routes. They have no fixture-specific w3id.org routes. `void.ttl`
+publishes and the quality audit verifies these boundaries and counts.
 
 Across the directory there are eight `EvidenceAssessmentClaim` nodes, three
 `KnowledgeStatusAssertion` nodes, and seven `ExposureHypothesis` nodes. These

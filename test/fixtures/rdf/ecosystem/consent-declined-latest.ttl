@@ -4,14 +4,14 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:        <https://example.org/negative/consent-declined/> .
 
-<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora>
     sstim-eco:hasEngagementActivity ex:declined, ex:reapproval .
 
 ex:declined a sstim-eco:EngagementActivity,
         sstim-eco:ConsentDecisionActivity, prov:Activity ;
     rdfs:label "Synthetic later consent decline"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora> ;
     sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
     sstim-eco:engagementOutcome sstim-eco:outcomeConsentDeclined ;
     prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;
@@ -22,7 +22,7 @@ ex:reapproval a sstim-eco:EngagementActivity,
         sstim-eco:PublicationDecisionActivity, prov:Activity ;
     rdfs:label "Synthetic publication review after decline"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora> ;
     sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
     sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
     prov:endedAtTime "2026-07-15T13:01:00Z"^^xsd:dateTime ;

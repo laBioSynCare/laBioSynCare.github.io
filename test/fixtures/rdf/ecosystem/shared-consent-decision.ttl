@@ -4,6 +4,6 @@
 # Aurora membership, so linking it from the Resonance membership would share a
 # purpose-specific decision across two qualified records.
 
-<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-resonance>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-resonance>
     sstim-eco:hasEngagementActivity
-        <https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-consent> .
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-aurora-membership-consent> .

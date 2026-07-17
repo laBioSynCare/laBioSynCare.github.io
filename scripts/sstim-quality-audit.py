@@ -74,41 +74,6 @@ CATALOG_PUBLIC_ROUTES = {
         "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
     ),
 }
-ECOSYSTEM_PUBLIC_ROUTE_PATHS = {
-    "specialist/renato-fabbri",
-    "organization/biosyncare",
-    "organization/junto-innovation-hub",
-    "organization/aeterni-anima",
-    "ecosystem-record/role/head-of-applied-science",
-    "ecosystem-record/role/chief-executive-officer",
-    "ecosystem-record/role/chief-technology-officer",
-    "ecosystem-record/relationship/renato-develops-bsclab",
-    "ecosystem-record/relationship/renato-develops-biosyncare",
-    "ecosystem-record/relationship/renato-develops-patch-studio",
-    "ecosystem-record/relationship/renato-created-sstim",
-    "ecosystem-record/relationship/renato-created-bsc-framework",
-    "ecosystem-record/relationship/renato-member-of-junto",
-    "ecosystem-record/relationship/renato-created-aeterni-anima",
-    "ecosystem-record/relationship/renato-leads-aeterni-anima",
-    "ecosystem-record/relationship/biosyncare-offers-sensory-stimulation-tools",
-    "ecosystem-record/relationship/junto-supports-biosyncare",
-    "ecosystem-record/relationship/aeterni-provides-sensory-stimulation-tools",
-    "ecosystem-record/activity/renato-bsclab-self-publication",
-    "ecosystem-record/activity/renato-biosyncare-self-publication",
-    "ecosystem-record/activity/renato-patch-studio-self-publication",
-    "ecosystem-record/activity/renato-sstim-self-publication",
-    "ecosystem-record/activity/renato-bsc-framework-self-publication",
-    "ecosystem-record/activity/renato-junto-self-publication",
-    "ecosystem-record/activity/renato-aeterni-creator-self-publication",
-    "ecosystem-record/activity/renato-aeterni-leadership-self-publication",
-    "ecosystem-record/activity/biosyncare-tools-publication",
-    "ecosystem-record/activity/junto-biosyncare-publication",
-    "ecosystem-record/activity/aeterni-tools-publication",
-}
-ECOSYSTEM_PUBLIC_ROUTES = {
-    route: str(ECOSYSTEM_PUBLIC_DUMP) for route in ECOSYSTEM_PUBLIC_ROUTE_PATHS
-}
-
 errors: list[str] = []
 
 
@@ -686,6 +651,11 @@ for subject, owners in instance_subject_owners.items():
         fail(f"{subject}: reserved ecosystem instance IRI is declared outside its family in {outside}")
     if len(families) > 1:
         fail(f"{subject}: reserved ecosystem instance IRI is mixed across real and fixture files")
+    slug = str(subject).rsplit("/", 1)[-1]
+    if families == {"fixture"} and not slug.startswith("synthetic-"):
+        fail(f"{subject}: fixture ecosystem subjects must reserve the synthetic-* slug")
+    if families == {"real"} and slug.startswith("synthetic-"):
+        fail(f"{subject}: live ecosystem subjects must not use the synthetic-* slug")
 
 
 # Functional properties are treated as operational single-value contracts.
@@ -951,87 +921,50 @@ else:
     if catalog_rdf_targets != CATALOG_PUBLIC_ROUTES:
         fail("w3id staging: RDF routes do not exactly map BSC catalog subjects to owning dumps")
 
-# Every synthetic identity/relationship/activity has an exact staged w3id rule
-# to the fixture dump. The delimited block is audited as a set: a missing route,
-# a stale route, or an accidental broad route fails publication validation.
-w3id_prefix = "https://w3id.org/sstim/"
-expected_fixture_routes = {
-    str(subject).removeprefix(w3id_prefix)
-    for subject in ecosystem_fixture_instances.subjects()
-    if isinstance(subject, URIRef)
-    and (
-        str(subject).startswith(f"{w3id_prefix}specialist/")
-        or str(subject).startswith(f"{w3id_prefix}organization/")
-        or str(subject).startswith(f"{w3id_prefix}ecosystem-record/relationship/")
-        or str(subject).startswith(f"{w3id_prefix}ecosystem-record/activity/")
-    )
-}
-w3id_start = "# BEGIN audited synthetic ecosystem fixture routes"
-w3id_end = "# END audited synthetic ecosystem fixture routes"
-if w3id_text.count(w3id_start) != 1 or w3id_text.count(w3id_end) != 1:
-    fail("w3id staging: expected one delimited synthetic ecosystem fixture route block")
-else:
-    route_block = w3id_text.split(w3id_start, 1)[1].split(w3id_end, 1)[0]
-    fixture_target = (
-        "https://labiosyncare.github.io/ontology/instances/"
-        "ecosystem/fixtures/synthetic-ecosystem.ttl"
-    )
+# Fixture identities deliberately use the production IRI grammar required by
+# the released SHACL contract, but synthetic-* is a reserved, non-routed slug.
+fixture_route_markers = (
+    "# BEGIN audited synthetic ecosystem fixture routes",
+    "# END audited synthetic ecosystem fixture routes",
+    "synthetic-alex-rivera",
+    "synthetic-aurora-lab",
+    "synthetic-resonance-coop",
+    "ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl",
+)
+if any(marker in w3id_text for marker in fixture_route_markers):
+    fail("w3id staging: synthetic fixture identifiers must not have registry routes")
 
-    def staged_routes_for(target: str) -> set[str]:
-        patterns = re.findall(
-            rf"RewriteRule \^\(([^)\n]+)\)/\?\$ {re.escape(target)} \[R=303,L\]",
-            route_block,
-        )
-        return {route for pattern in patterns for route in pattern.split("|")}
-
-    rdf_routes = staged_routes_for(fixture_target)
-    html_routes = staged_routes_for("https://labiosyncare.github.io/")
-    if rdf_routes != expected_fixture_routes:
-        fail("w3id staging: Turtle fixture routes do not exactly cover synthetic agents/relationships/activities")
-    if html_routes != expected_fixture_routes:
-        fail("w3id staging: HTML routes do not exactly cover synthetic agents/relationships/activities")
-
-# Real records are fail-closed: every external aggregate subject must have one
-# exact staged HTML rule and one exact RDF rule to the mutable public dump.
-real_w3id_start = "# BEGIN audited real ecosystem routes"
-real_w3id_end = "# END audited real ecosystem routes"
+# Live records use stable namespace-level rules. Membership belongs to the
+# mutable aggregate, so adding or retracting a subject must not require a
+# person-specific registry change.
+real_w3id_start = "# BEGIN audited live ecosystem namespace routes"
+real_w3id_end = "# END audited live ecosystem namespace routes"
 if w3id_text.count(real_w3id_start) != 1 or w3id_text.count(real_w3id_end) != 1:
-    fail("w3id staging: expected one delimited real ecosystem route block")
+    fail("w3id staging: expected one delimited live ecosystem namespace block")
 else:
     real_route_block = w3id_text.split(real_w3id_start, 1)[1].split(real_w3id_end, 1)[0]
-    expected_real_targets = ECOSYSTEM_PUBLIC_ROUTES
-
-    exact_rule = re.compile(
-        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
-        rf"(https://labiosyncare\.github\.io/|{re.escape(str(ECOSYSTEM_PUBLIC_DUMP))}) "
-        r"\[R=303,L\]"
+    live_directives = tuple(
+        line.strip()
+        for line in real_route_block.splitlines()
+        if line.strip().startswith(("RewriteCond", "RewriteRule"))
     )
-    parsed_rules: list[tuple[list[str], str]] = []
-    for line in real_route_block.splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("RewriteRule"):
-            continue
-        match = exact_rule.fullmatch(stripped)
-        if match is None:
-            fail("w3id staging: real ecosystem block contains a broad or malformed RewriteRule")
-            continue
-        parsed_rules.append((match.group(1).split("|"), match.group(2)))
-
-    real_html_routes: set[str] = set()
-    real_rdf_targets: dict[str, str] = {}
-    for routes, target in parsed_rules:
-        for route in routes:
-            if target == "https://labiosyncare.github.io/":
-                real_html_routes.add(route)
-            elif route in real_rdf_targets:
-                fail(f"w3id staging: duplicate real RDF route {route}")
-            else:
-                real_rdf_targets[route] = target
-
-    if real_html_routes != set(expected_real_targets):
-        fail("w3id staging: HTML routes do not exactly cover real ecosystem subjects")
-    if real_rdf_targets != expected_real_targets:
-        fail("w3id staging: RDF routes do not exactly map real ecosystem subjects to owning dumps")
+    expected_live_directives = (
+        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        "https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        f"{ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        rf"(?!synthetic-)[A-Za-z0-9._~-]+/?$ {ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+    )
+    if live_directives != expected_live_directives:
+        fail(
+            "w3id staging: live ecosystem block must contain only the canonical "
+            "namespace-level HTML and RDF routes"
+        )
 
 for agent in ecosystem_agents:
     owners = instance_subject_owners.get(agent, set())

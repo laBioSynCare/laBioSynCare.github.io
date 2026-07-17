@@ -4,10 +4,10 @@
 # the private audit ledger; an approved public activity cannot disguise them as
 # ordinary positive provenance.
 
-<https://w3id.org/sstim/ecosystem-record/relationship/alex-membership-aurora>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-membership-aurora>
     prov:wasRevisionOf
         <https://w3id.org/sstim/ecosystem-record/relationship/private-prior-version> .
 
-<https://w3id.org/sstim/ecosystem-record/activity/aurora-membership-publication>
+<https://w3id.org/sstim/ecosystem-record/activity/synthetic-aurora-membership-publication>
     prov:invalidated
         <https://w3id.org/sstim/ecosystem-record/relationship/private-prior-version> .

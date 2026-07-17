@@ -4,26 +4,26 @@
 @prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
 @prefix ex:        <https://example.org/negative/objected-then-approved/> .
 
-<https://w3id.org/sstim/ecosystem-record/relationship/alex-attribution-player>
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-attribution-player>
     sstim-eco:hasEngagementActivity ex:objection, ex:reapproval .
 
 ex:objection a sstim-eco:EngagementActivity, sstim-eco:ResponseActivity,
         prov:Activity ;
     rdfs:label "Synthetic objection"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-attribution-player> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-attribution-player> ;
     sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
     sstim-eco:engagementOutcome sstim-eco:outcomeObjected ;
     prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;
     prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> ;
     prov:wasInformedBy
-        <https://w3id.org/sstim/ecosystem-record/activity/player-attribution-notification> .
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-player-attribution-notification> .
 
 ex:reapproval a sstim-eco:EngagementActivity,
         sstim-eco:PublicationDecisionActivity, prov:Activity ;
     rdfs:label "Synthetic reapproval after objection"@en ;
     sstim-eco:engagementFor
-        <https://w3id.org/sstim/ecosystem-record/relationship/alex-attribution-player> ;
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-attribution-player> ;
     sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
     sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
     prov:endedAtTime "2026-07-15T13:01:00Z"^^xsd:dateTime ;

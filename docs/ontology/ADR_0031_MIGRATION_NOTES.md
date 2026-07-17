@@ -2,7 +2,7 @@
 
 **Applies to:** SSTIM `0.7.0` ecosystem data
 **Decision:** [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)
-**Status:** F1/F2 contract migration and stable term release complete; F3 external live-data path operational and first F4 aggregate activated; exact w3id route merge/discovery pending; no legacy instance conversion required
+**Status:** F1/F2 contract migration and stable term release complete; F3 external live-data path operational and first F4 aggregate activated; w3id namespace-route merge/discovery pending; no legacy instance conversion required
 
 ## Baseline
 
@@ -19,14 +19,18 @@ flat property is asserted on an ecosystem agent.
 
 ## Identifier placement
 
-- Person identities: `https://w3id.org/sstim/specialist/{id}`
-- Organization identities: `https://w3id.org/sstim/organization/{id}`
+- Live person identities: `https://w3id.org/sstim/specialist/{id}`
+- Live organization identities: `https://w3id.org/sstim/organization/{id}`
 - Public current-state relationships:
   `https://w3id.org/sstim/ecosystem-record/relationship/{id}`
 - Public approved/positive lifecycle activities:
   `https://w3id.org/sstim/ecosystem-record/activity/{id}`
 - Implementations retain their existing
   `https://w3id.org/sstim/implementation/{scope}/{id}` identity.
+- Current synthetic contract fixtures retain the same path grammar while
+  reserving a `synthetic-*` slug rejected by the live namespace rules; no
+  fixture-specific registry routes are created. The immutable 0.7.0 snapshot
+  retains its released fixture identifiers.
 
 Identifiers are persistent, public, and role-specific. Never place an email,
 account identifier, contact address, or mutable job title in an IRI. A person,
