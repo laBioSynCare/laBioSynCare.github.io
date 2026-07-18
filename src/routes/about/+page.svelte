@@ -3,7 +3,7 @@
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
   const screens = [
     {
-      href: '/',
+      href: '/graph/',
       label: 'Graph',
       role: 'Knowledge browser',
       emoji: '🕸️',
@@ -233,7 +233,7 @@
       <div class="callout-body">
         <h3>Annotate the ontology</h3>
         <p>
-          Every term in SSTIM can carry notes, and the <a href="/">Graph knowledge browser</a>
+          Every term in SSTIM can carry notes, and the <a href="/graph/">Graph knowledge browser</a>
           is where you add them. Select a node and, in its detail panel, write a
           <strong>public</strong> note (readable by everyone) or a <strong>private</strong>
           one (only you). Notes are modeled as W3C Web Annotations and stored in named graphs
@@ -290,7 +290,7 @@
     <ul class="module-list">
       <li><strong>Ontology</strong> — the versioned OWL term modules: classes, properties, and axioms, released and citable under <code>w3id.org/sstim</code>.</li>
       <li><strong>Vocabulary</strong> — the multilingual SKOS concept values (frequency bands, modalities, mechanisms, techniques…), dual-typed with the OWL classes.</li>
-      <li><strong>Catalog</strong> — versioned public reference instances: the BSC framework, the implementations and their components, presets, and evidence records.</li>
+      <li><strong>Catalog</strong> — versioned public reference instances of frameworks, implementations and their components, presets, and evidence records.</li>
       <li><strong>Ecosystem</strong> — a live projection of people, organizations, and reviewed relationships in the field. It is fetched at runtime, each record is separately approved and sourced, and it is retractable: it is deliberately excluded from citable releases and archives.</li>
     </ul>
   </section>

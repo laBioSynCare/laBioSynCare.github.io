@@ -1473,7 +1473,7 @@
           <a href="/settings/">Settings</a>
           <a href="/presets/">Presets</a>
           <a href="/sparql/">SPARQL</a>
-          <a href="/">Graph</a>
+          <a href="/graph/">Graph</a>
         </div>
       </details>
     </div>

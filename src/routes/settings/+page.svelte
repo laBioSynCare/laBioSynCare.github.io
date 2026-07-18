@@ -61,7 +61,7 @@
       <p class="eyebrow">Interface</p>
       <h1>Settings</h1>
     </div>
-    <a class="back-link" href="/">Graph</a>
+    <a class="back-link" href="/graph/">Graph</a>
   </header>
 
   <section class="settings-section" aria-labelledby="skin-heading">

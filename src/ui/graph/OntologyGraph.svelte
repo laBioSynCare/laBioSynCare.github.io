@@ -15,7 +15,9 @@
   let loading = $state(true)
   let graphStats = $state(null)
   let allElements = $state([])
-  let graphScope = $state(graphSession.graphScope)
+  // 'terms' was folded into 'all' when the full view stopped showing the
+  // catalog/ecosystem instance layers; map stale sessions forward.
+  let graphScope = $state(graphSession.graphScope === 'terms' ? 'all' : graphSession.graphScope)
   let focusNodeQuery = $state(graphSession.focusNodeQuery)
 
   // Layer visibility
@@ -123,9 +125,8 @@
   }
 
   const GRAPH_SCOPES = [
-    { value: 'all', label: 'Full SSTIM · all real layers' },
+    { value: 'all', label: 'Full SSTIM · ontology & vocabulary' },
     { value: 'catalog-ecosystem', label: 'Catalog + ecosystem' },
-    { value: 'terms', label: 'Ontology & vocabulary' },
     { value: 'catalog', label: 'Catalog focus · versioned' },
     { value: 'ecosystem', label: 'Ecosystem focus · live' },
     { value: 'core', label: 'Core OWL classes' },
@@ -189,7 +190,7 @@
       'Versioned OWL term modules and the multilingual SKOS vocabulary, ' +
       'released and citable under w3id.org/sstim.',
     catalog:
-      'Versioned public reference instances: the BSC framework, ' +
+      'Versioned public reference instances of frameworks, ' +
       'implementations and components, presets, and evidence records.',
     ecosystem:
       'Live projection of people, organizations, and reviewed relationships. ' +
@@ -322,8 +323,10 @@
 
   function graphScopeNodeVisible(data) {
     if (!data) return false
-    if (graphScope === 'all') return true
-    if (graphScope === 'terms') return ['ontology', 'vocabulary'].includes(data.layer)
+    // The full SSTIM view is the released term space only; catalog and
+    // ecosystem instances (a framework, an implementation, a person) would
+    // otherwise gain unearned centrality. They live in the instance scopes.
+    if (graphScope === 'all') return ['ontology', 'vocabulary'].includes(data.layer)
     if (graphScope === 'catalog-ecosystem') return ['catalog', 'ecosystem'].includes(data.layer)
     if (graphScope === 'catalog') return data.layer === 'catalog'
     if (graphScope === 'ecosystem') return data.layer === 'ecosystem'
@@ -750,6 +753,18 @@
     return candidates[0].data.id
   }
 
+  // A deep link may target a catalog/ecosystem instance that the current
+  // scope hides (selection would land on a display:none node); widen to the
+  // instance scope so the target is actually visible.
+  function widenScopeToShow(id) {
+    const element = allElements.find((el) => !el.data?.source && el.data?.id === id)
+    if (!element || graphScopeNodeVisible(element.data)) return
+    if (['catalog', 'ecosystem'].includes(element.data.layer)) {
+      graphScope = 'catalog-ecosystem'
+      applyGraphDisplay({ animate: false })
+    }
+  }
+
   function hashForIri(iri) {
     if (!iri) return ''
     if (iri.startsWith(SSTIM_BASE) || iri.startsWith(SSTIM_V_BASE)) {
@@ -788,7 +803,10 @@
       return
     }
     const id = resolveHashToNodeId(hash)
-    if (id && id !== selected?.id) selectElementById(id)
+    if (id && id !== selected?.id) {
+      widenScopeToShow(id)
+      selectElementById(id)
+    }
   }
 
   async function copyIri() {
@@ -1005,7 +1023,10 @@
 
       if (initialHash) {
         const id = resolveHashToNodeId(initialHash)
-        if (id) selectElementById(id)
+        if (id) {
+          widenScopeToShow(id)
+          selectElementById(id)
+        }
       } else if (graphSession.selectedIri) {
         const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
         if (id) selectElementById(id)

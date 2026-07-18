@@ -132,16 +132,17 @@
   <button
     type="button"
     class="help-toggle"
-    aria-label="Show keyboard shortcuts"
+    aria-label={$graphNavigation.available ? 'Show keyboard shortcuts' : 'Show help'}
     aria-expanded={helpOpen}
-    title="Keyboard shortcuts (h)"
+    title={$graphNavigation.available ? 'Keyboard shortcuts (h)' : 'Help (h)'}
     onclick={toggleHelp}
   >?</button>
 
   <details class="global-menu">
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
-      <a href="/">Graph</a>
+      <a href="/">Home</a>
+      <a href="/graph/">Graph</a>
       <a href="/creator/">Patch Studio</a>
       <a href="/field/">Sensory Field</a>
       <a href="/field/tree/">Stereoscopic Tree</a>
@@ -168,24 +169,35 @@
     role="presentation"
     onclick={(event) => { if (event.target === event.currentTarget) closeHelp() }}
   >
-    <div class="help-card" role="dialog" aria-label="Keyboard shortcuts" aria-modal="true">
+    <div
+      class="help-card"
+      role="dialog"
+      aria-label={$graphNavigation.available ? 'Keyboard shortcuts' : 'Help'}
+      aria-modal="true"
+    >
       <header class="help-header">
-        <h3>Keyboard shortcuts</h3>
+        <h3>{$graphNavigation.available ? 'Keyboard shortcuts' : 'Explore'}</h3>
         <button type="button" class="help-close" aria-label="Close help" onclick={closeHelp}>✕</button>
       </header>
-      <dl class="help-list">
-        {#each SHORTCUTS as shortcut}
-          <div>
-            <dt>
-              {#each shortcut.keys as key, i}
-                {#if i > 0}<span class="sep">/</span>{/if}
-                <kbd>{key}</kbd>
-              {/each}
-            </dt>
-            <dd>{shortcut.desc}</dd>
-          </div>
-        {/each}
-      </dl>
+      {#if $graphNavigation.available}
+        <dl class="help-list">
+          {#each SHORTCUTS as shortcut}
+            <div>
+              <dt>
+                {#each shortcut.keys as key, i}
+                  {#if i > 0}<span class="sep">/</span>{/if}
+                  <kbd>{key}</kbd>
+                {/each}
+              </dt>
+              <dd>{shortcut.desc}</dd>
+            </div>
+          {/each}
+        </dl>
+      {:else}
+        <p class="help-fallback">
+          Click the tabs below or the buttons on the page to get around — explore at will.
+        </p>
+      {/if}
     </div>
   </div>
 {/if}
@@ -310,6 +322,13 @@
     line-height: 1;
   }
   .help-close:hover { background: var(--app-accent-soft); border-color: var(--app-accent); }
+
+  .help-fallback {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--app-text);
+  }
 
   .help-list {
     display: grid;

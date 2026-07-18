@@ -2,7 +2,7 @@
 
 > Living notes on UX and UI improvements for the BSC Lab knowledge browser
 > (RDF ontology graph viewer, annotation surface, SPARQL interface).
-> Last updated: 2026-04-30. Update when ideas land or get superseded.
+> Last updated: 2026-07-18. Update when ideas land or get superseded.
 
 This is not a hard roadmap. Items are unranked except by category. Each
 entry states the *user-visible value* and a one-line implementation hint.
@@ -68,6 +68,32 @@ page (a dedicated `src/ui/sparql/` component is planned).
   and bio; saving syncs the new display name back into Firebase Auth so
   subsequent annotations attribute correctly. Profile data lives in
   `users/{uid}` with owner-only Firestore rules.
+
+---
+
+## Decided — graph home moves to `/graph` behind the public entrance
+
+Per [`PUBLIC_ENTRANCE.md`](PUBLIC_ENTRANCE.md) (Workstream 4, decided
+2026-07-18): the audience-first entrance replaces the graph-first `/`, and
+the knowledge browser becomes a dedicated **`/graph`** route — door ②'s
+destination, not the front door. Consequences for this surface:
+
+- **Deep links.** `/#term` remains valid via a hash-forward shim on the
+  entrance (non-entrance hashes forward to `/graph` + hash with
+  `replaceState`); the canonical deep-link form becomes `/graph#term`.
+  The hash-resolution logic itself (bare local names, CURIE fallback,
+  bidirectional URL write-back) is unchanged.
+- **w3id.** The merged HTML conneg branches (routes live 2026-07-17,
+  perma-id/w3id.org#6378) all 303 to the bare root and keep working:
+  HTML-preferring visitors get orientation, one click from the browser.
+  Optionally retarget those branches to `/graph` in a future bundled
+  w3id PR.
+- **Loading.** Cytoscape + ontology parsing move off the site's first
+  paint entirely — the entrance stays featherweight and the heavy load
+  happens only when `/graph` (or a forwarded deep link) is opened.
+
+Build task: TODO.md §5 (Phase 2 UX). Blocked only on hero-copy
+confirmation.
 
 ---
 
@@ -167,13 +193,14 @@ page (a dedicated `src/ui/sparql/` component is planned).
   is already in the hash; extending the URL state to include scope and visible
   edge layers would make filter views shareable too.
 - **Permalinks per node.** A "share" button next to "Copy IRI" that copies the
-  full BSC Lab deep-link (`https://labiosyncare.github.io/#X`) rather than the
-  canonical IRI.
-- **w3id redirect routes.** Once the redirect config lives in the w3id repo,
-  point `https://w3id.org/sstim` and `https://w3id.org/sstim/vocab` at distinct
-  paths under `labiosyncare.github.io` (e.g. `/` and `/vocab/`) so the namespace
-  isn't lost across the fragment boundary. Both routes can render the same
-  graph page; the route distinguishes which prefix bare hashes resolve to first.
+  full BSC Lab deep-link (`https://labiosyncare.github.io/#X`; `/graph#X` once
+  the entrance ships) rather than the canonical IRI.
+- **w3id HTML branches → `/graph`.** The redirect config is merged and live
+  (2026-07-17, perma-id/w3id.org#6378); every HTML conneg branch currently
+  303s to the bare root. Once the entrance ships, optionally retarget the
+  HTML branches to `/graph` in a future bundled w3id PR. A per-route prefix
+  hint (`/graph` vs a `/graph/vocab` alias deciding whether bare hashes
+  resolve `sstim:` or `sstim-v:` first) remains possible then.
 - **Export as image.** PNG / SVG export of the current canvas viewport. PNG is
   built in to Cytoscape; SVG via `cytoscape-svg`.
 

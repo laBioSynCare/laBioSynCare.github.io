@@ -38,9 +38,14 @@ SSTIM `0.7.0` is the validated release line, archived under release DOI
 `10.5281/zenodo.21380171`. The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
 agent. The unified Graph navigator now exposes the interlinked versioned catalog,
-live ecosystem, and SSTIM terms. The immediate focus is the exact w3id route
-merge/verification, registry review, and future independent human review. Public
-BSC Lab data remains separate from the private BioSynCare/BSC catalog.
+live ecosystem, and SSTIM terms. The w3id catalog + live ecosystem routes are
+merged and verified (2026-07-17, perma-id/w3id.org#6378), and the live
+aggregate carries the W3C CG and Æterni Anima records — persistent
+identifiers may now be promoted in human-facing discovery. The immediate
+focus is outreach (Brain Innovation Days application by 1 Sept 2026) and the
+Phase-2 public entrance (`PUBLIC_ENTRANCE.md`, §5 build task); registry
+review and future independent human review continue. Public BSC Lab data
+remains separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -427,6 +432,32 @@ Do not start these until all Phase 0 documents are committed.
 ## 5. Software — Phase 2 (BSC Lab v0.2 Stimulation Player)
 
 **Do not start until Phase 1 is complete and deployed.**
+
+### UI — Public entrance (`/` + `/graph`)
+**Shipped 2026-07-18.** Spec: [`docs/technical/PUBLIC_ENTRANCE.md`](docs/technical/PUBLIC_ENTRANCE.md).
+- [x] Move the knowledge browser route `/` → `/graph` (route move only;
+      hash-resolution logic and deep-link write-back unchanged) `P2`
+- [x] Implement the `/` entrance: hero + four-door grid in display order
+      ② ① ③ ④ — Svelte 5 runes, Pico.css semantic HTML, theme-aware, doors
+      stack on mobile `P2`
+- [x] Hash-forward shim on `/`: any non-entrance `location.hash` forwards to
+      `/graph` + hash with `replaceState`, so published `/#term` links and
+      w3id HTML targets keep resolving `P2`
+- [x] `ConversionBar` (Join the W3C group / Contribute a protocol): lives
+      inline in door ④ plus a mobile-only sticky bar — not duplicated in a
+      hero/footer bar (three simultaneous copies read as clutter on review,
+      cut same day) `P2`
+- [x] "Contribute a protocol" opens `ContributeProtocolModal` (name +
+      description + optional contact → prefilled GitHub issue draft) instead
+      of linking straight to the 373-line `CONTRIBUTING.md`; parallel
+      `.github/ISSUE_TEMPLATE/protocol-contribution.md` for the direct-to-GitHub
+      path `P2`
+- [x] Safety routing: photosensitivity advisory inline on the door-①
+      demo path, never a gate on `/` (ADR 0011 flash cap stays default-on) `P2`
+- [x] Update site nav (`AppTopBar`, `AppBottomDock`) + internal graph links
+      for `/graph` `P2`
+- [ ] Optional follow-up: create the `protocol-proposal` GitHub label
+      referenced in the new issue template's frontmatter `P3`
 
 ### Engine interfaces and implementations
 - [ ] `src/engines/audio/IAudioEngine.js` `P2`

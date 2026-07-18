@@ -148,7 +148,7 @@
       {/if}
 
       <div class="actions">
-        <a class="back-link" href="/">Back to graph</a>
+        <a class="back-link" href="/graph/">Back to graph</a>
         <button type="submit" aria-busy={saving} disabled={saving}>Save profile</button>
       </div>
     </form>

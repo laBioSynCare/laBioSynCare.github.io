@@ -2,7 +2,7 @@
   import { page } from '$app/state'
 
   const items = [
-    { href: '/', label: 'Graph' },
+    { href: '/graph/', label: 'Graph' },
     { href: '/creator/', label: 'Patch Studio' },
     { href: '/field/', label: 'Field' },
     { href: '/presets/', label: 'Presets' },

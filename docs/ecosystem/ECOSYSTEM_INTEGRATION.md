@@ -244,9 +244,12 @@ and Patch Studio exports are inputs, not a finished bridge.
 
 ## Workstream 4 — The public entrance (audience model, deepened)
 
-**`[~] Spec written 2026-07-12 — [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md)
-(IA + per-door copy + route map). Implementation is Phase 2 UX (`src/routes/`);
-awaits Renato's confirmation of door order + hero copy.**
+**`[~] Spec complete 2026-07-18 — [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md)
+(IA, per-door copy, wireframe, route map). Door order decided (Understand
+leads); graph home decided (`/` → entrance, browser → `/graph` with
+hash-forward shim); folded into `KNOWLEDGE_BROWSER_UX.md`; build task open in
+TODO.md §5. Implementation is Phase 2 UX (`src/routes/`); the only open item
+is Renato's confirmation of the hero headline/subhead.**
 
 **Problem the source named:** the live root drops an unfamiliar visitor straight
 into an ontology graph + a photosensitivity notice. It signals technical
@@ -311,15 +314,16 @@ reachable from every door, not buried in one.
 
 **Next actions:**
 - [x] Draft entrance copy per door (§3.5-compliant) — done in [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md).
-- [~] Door order decided (**Understand leads**, 2026-07-13); hero copy still to confirm.
-- [ ] Wireframe the four-door grid + conversion bar; decide the graph browser's new home (`/graph` vs. section).
-- [ ] Fold into [`KNOWLEDGE_BROWSER_UX.md`](../technical/KNOWLEDGE_BROWSER_UX.md) and open a `src/routes/` build task (Phase 2).
+- [x] Wireframe the four-door grid + conversion bar — done 2026-07-18 (in the spec).
+- [x] Graph browser's new home decided 2026-07-18: `/graph` route + hash-forward shim on `/` (not a section).
+- [x] Fold into [`KNOWLEDGE_BROWSER_UX.md`](../technical/KNOWLEDGE_BROWSER_UX.md) and open a `src/routes/` build task — done 2026-07-18 (TODO.md §5).
+- [~] Door order decided (**Understand leads**, 2026-07-13); hero headline/subhead still to confirm — last item before build.
 
 ---
 
 ## Workstream 5 — Stakeholder-ecosystem RDF module (ADR 0024 implementation)
 
-**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The enriched F4 aggregate is live with separately approved person/organization relationships; one leadership relationship is an explicitly documented self-attestation pending a canonical public role source. The unified Graph navigator now renders the live ecosystem together with the versioned catalog and ontology/vocabulary, with focus filters and source/provenance disclosure. Exact w3id routes still require their upstream merge and verification; dedicated human profile routes remain optional follow-up.**
+**`[~] F1–F2 and the stable term release are complete in SSTIM 0.7.0 under [ADR 0031](../decisions/0031-qualified-ecosystem-records.md). F3's external mutable projection, optional loader, private ledger, retention/removal runbook, and private-first admission job are operational. The enriched F4 aggregate is live with separately approved person/organization relationships; one leadership relationship is an explicitly documented self-attestation pending a canonical public role source. The unified Graph navigator now renders the live ecosystem together with the versioned catalog and ontology/vocabulary, with focus filters and source/provenance disclosure. The w3id catalog + live namespace routes are merged and verified end-to-end (2026-07-17, perma-id/w3id.org#6378), and the live aggregate now carries the W3C CG and Æterni Anima records; dedicated human profile routes remain optional follow-up.**
 
 ADR 0024 established the initial direction for modeling real people and
 organizations in sensory stimulation: a new `sstim-ecosystem` term module
