@@ -584,6 +584,10 @@ The improvement backlog below is grounded in that spec's §10 and gated by
 - [ ] Contributor agreement / IP clarification with Riccardo Berti `P0`
       *This is the most time-sensitive legal task — do before next
       BioSynCare commit*
+- [ ] Role confirmation with Eva Castilho (Æterni Anima member; Head of
+      Communication and Marketing, BioSynCare) `P0`
+      *Notified 2026-07-18 with a request to review the knowledge graph
+      entry before it is marked approved.*
 
 ### Phase 1 community tasks
 - [ ] Personal message to each named partner (not mass email) with

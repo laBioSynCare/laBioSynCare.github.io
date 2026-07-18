@@ -43,8 +43,12 @@ ontology, or product. Their role is advisory and reviewal.
 Co-author of BSC Lab's scientific positioning; provided input on evidence tier
 criteria and the Sensory Stimulation domain definition.  
 **Engagement:** Evidence tier review for claims in Tier 4+; review of arXiv
-defensive publication submissions; named in W3C CG charter as scientific advisor.  
-**Status:** Role and public naming pending her formal confirmation.
+defensive publication submissions; named in W3C CG charter as scientific
+advisor; proposed as a member of the W3C Sensory Stimulation Vocabulary
+Community Group itself, alongside the advisory board role.  
+**Status:** Role and public naming pending her formal confirmation. Notified
+2026-07-18 with a request to review the knowledge graph entry before it is
+marked approved.
 
 ---
 
