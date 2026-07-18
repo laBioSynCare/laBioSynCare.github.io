@@ -13,14 +13,18 @@
         'multilingual SKOS concepts, object/data properties, and the links between them, ' +
         'drawn straight from the Turtle sources. It is also where you annotate the ontology.',
       how:
-        'Pick one of a dozen scopes (Core OWL classes, All SKOS vocabulary, Frequency ' +
-        'bands, Modalities, Mechanisms, Techniques, Voice types, Preset groups, Evidence, ' +
-        'Cautions, Exposure…) and toggle the edge layers — subClassOf, object/data ' +
-        'property, narrower, related, instanceOf. Press / to search, Enter to centre, and ' +
-        'c / f / r to centre, fit, or relayout (? lists every shortcut). Select any node to ' +
-        'open its detail panel: definition, a copyable IRI, a link to its generated ' +
-        'reference entry, and its incoming/outgoing connections — which you can filter by ' +
-        'edge kind or isolate with Focus neighborhood — plus a notes area for annotation.',
+        'Pick a scope: Full SSTIM shows the released ontology and vocabulary; Catalog + ' +
+        'ecosystem switches to the versioned catalog and live people/organizations (the ' +
+        'left rail explains what each data source is); or narrow to one thematic slice — ' +
+        'Core OWL classes, All SKOS vocabulary, Frequency bands, Modalities, Mechanisms, ' +
+        'Techniques, Voice types, Preset groups, Evidence, Cautions, Exposure, and more. ' +
+        'Toggle the edge layers — subClassOf, object/data property, narrower, related, ' +
+        'instanceOf, catalog relation, ecosystem relation. Press / to search, Enter to ' +
+        'centre, and c / f / r to centre, fit, or relayout (? lists every shortcut). Select ' +
+        'any node to open its detail panel: definition, a copyable IRI, a link to its ' +
+        'generated reference entry, and its incoming/outgoing connections — which you can ' +
+        'filter by edge kind or isolate with Focus neighborhood — plus a notes area for ' +
+        'annotation.',
     },
     {
       href: '/creator/',
@@ -84,10 +88,13 @@
         'A SPARQL 1.1 workbench that runs entirely in your browser (Comunica over an ' +
         'N3 store), querying the ontology and the public instance data together.',
       how:
-        'Edit the starter query or write your own, press Run, and read the results table. ' +
-        'Named graphs keep ontology terms, public reference data, and annotations separate, ' +
-        'so you can query across techniques, protocols, presets, evidence, and exposure ' +
-        'conditions with GRAPH patterns.',
+        'Pick one of eight example queries — vocabulary, ontology structure, catalog, ' +
+        'ecosystem, evidence, exposure, and external alignments to BFO/OBI/IAO and Wikidata ' +
+        '— or edit the starter query and write your own, then press Run and read the results ' +
+        'table. Named graphs keep ontology terms, public reference data, and annotations ' +
+        'separate, so cross-source queries need one GRAPH block per source; the "About this ' +
+        'endpoint" panel on the page explains why, and lists the raw Turtle URLs if you want ' +
+        'to query the same data from your own tooling instead.',
     },
     {
       href: '/logbook/',
