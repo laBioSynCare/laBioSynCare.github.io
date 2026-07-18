@@ -228,6 +228,23 @@ ORDER BY ?label`)
             per source (see the example queries), not one shared variable across the
             whole query.
           </p>
+          <h3>Connect your own tooling</h3>
+          <p>
+            Since there's no hosted endpoint to point a client at, the way to query
+            this data outside the browser is to fetch these same files with your
+            own SPARQL engine (Jena, rdflib, Oxigraph, a local Comunica script,
+            <code>curl</code> into any triple store) and query them there:
+          </p>
+          <ul class="source-urls">
+            <li><a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a> — citable, content-negotiated entry point</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-core.ttl" rel="external">…/ontology/sstim-core.ttl</a> — OWL core</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-vocab.ttl" rel="external">…/ontology/sstim-vocab.ttl</a> — SKOS vocabulary</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-shapes.ttl" rel="external">…/ontology/sstim-shapes.ttl</a> — SHACL shapes</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-alignments.ttl" rel="external">…/ontology/sstim-alignments.ttl</a> — BFO/OBI/IAO/Wikidata alignments</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-exposure.ttl" rel="external">…/ontology/sstim-exposure.ttl</a> — exposure module</li>
+            <li><a href="https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl" rel="external">…/ontology/sstim-ecosystem.ttl</a> — ecosystem module</li>
+            <li><a href="https://biosyncare-lab.web.app/current.ttl" rel="external">biosyncare-lab.web.app/current.ttl</a> — live public ecosystem (mutable, not citable)</li>
+          </ul>
           <h3>Querying another endpoint</h3>
           <p>
             The in-browser Comunica build used here (<code>@comunica/query-sparql-rdfjs</code>,
@@ -507,6 +524,15 @@ ORDER BY ?label`)
   .about-panel code {
     font-size: 0.82em;
     word-break: break-word;
+  }
+
+  .source-urls {
+    font-family: var(--app-font-mono);
+    font-size: 0.78rem;
+  }
+
+  .source-urls a {
+    word-break: break-all;
   }
 
   @media (max-width: 980px) {
