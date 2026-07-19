@@ -81,6 +81,24 @@ CATALOG_PUBLIC_ROUTES = {
         "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
     ),
 }
+# BSC framework technique identities (ADR 0033). The three BSC originated
+# resolve to the framework document that defines them; the four retired ones
+# resolve to the SKOS vocabulary now carrying their replacements. Audited
+# fail-closed and exactly, like the catalog block, so a retired slug can never
+# silently start resolving to the framework file as if it were still current.
+BSC_FRAMEWORK_DUMP = (
+    "https://labiosyncare.github.io/ontology/instances/frameworks/bsc.ttl"
+)
+VOCAB_DUMP = "https://labiosyncare.github.io/ontology/sstim-vocab.ttl"
+TECHNIQUE_PUBLIC_ROUTES = {
+    "framework/bsc/technique/martigli-breathing-oscillation": BSC_FRAMEWORK_DUMP,
+    "framework/bsc/technique/martigli-binaural-hybrid": BSC_FRAMEWORK_DUMP,
+    "framework/bsc/technique/symmetry-permutation-entrainment": BSC_FRAMEWORK_DUMP,
+    "framework/bsc/technique/binaural-beat-stimulation": VOCAB_DUMP,
+    "framework/bsc/technique/photic-rhythm-stimulation": VOCAB_DUMP,
+    "framework/bsc/technique/audiovisual-rhythm-coordination": VOCAB_DUMP,
+    "framework/bsc/technique/vibrotactile-rhythm-stimulation": VOCAB_DUMP,
+}
 errors: list[str] = []
 
 
@@ -882,51 +900,65 @@ check_void_partitions(ECOSYSTEM_FIXTURE_GRAPH, ecosystem_fixture_instances, "eco
 # static instance file. This keeps similarly named resources (especially the
 # Patch Studio tool and ontology module) from being conflated by broad routes.
 w3id_text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
-catalog_w3id_start = "# BEGIN audited BSC catalog routes"
-catalog_w3id_end = "# END audited BSC catalog routes"
-if (
-    w3id_text.count(catalog_w3id_start) != 1
-    or w3id_text.count(catalog_w3id_end) != 1
-):
-    fail("w3id staging: expected one delimited BSC catalog route block")
-else:
-    catalog_route_block = w3id_text.split(catalog_w3id_start, 1)[1].split(
-        catalog_w3id_end, 1
-    )[0]
-    catalog_targets = set(CATALOG_PUBLIC_ROUTES.values())
-    target_pattern = "|".join(re.escape(target) for target in sorted(catalog_targets))
-    catalog_exact_rule = re.compile(
+
+
+def check_exact_w3id_route_block(
+    block_name: str, expected_routes: dict[str, str]
+) -> None:
+    """Assert a delimited .htaccess block maps `expected_routes` exactly.
+
+    Every subject must carry one exact HTML rule and one exact RDF rule to its
+    owning dump, and the block may contain nothing else — a prefix wildcard or
+    an unlisted subject is a failure, not a warning.
+    """
+    start = f"# BEGIN audited {block_name} routes"
+    end = f"# END audited {block_name} routes"
+    if w3id_text.count(start) != 1 or w3id_text.count(end) != 1:
+        fail(f"w3id staging: expected one delimited {block_name} route block")
+        return
+
+    block = w3id_text.split(start, 1)[1].split(end, 1)[0]
+    target_pattern = "|".join(
+        re.escape(target) for target in sorted(set(expected_routes.values()))
+    )
+    exact_rule = re.compile(
         r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
         rf"(https://labiosyncare\.github\.io/|{target_pattern}) "
         r"\[R=303,L\]"
     )
-    catalog_html_routes: set[str] = set()
-    catalog_rdf_targets: dict[str, str] = {}
-    for line in catalog_route_block.splitlines():
+    html_routes: set[str] = set()
+    rdf_targets: dict[str, str] = {}
+    for line in block.splitlines():
         stripped = line.strip()
         if not stripped.startswith("RewriteRule"):
             continue
-        match = catalog_exact_rule.fullmatch(stripped)
+        match = exact_rule.fullmatch(stripped)
         if match is None:
             fail(
-                "w3id staging: BSC catalog block contains a broad or malformed "
+                f"w3id staging: {block_name} block contains a broad or malformed "
                 "RewriteRule"
             )
             continue
-        routes = match.group(1).split("|")
         target = match.group(2)
-        for route in routes:
+        for route in match.group(1).split("|"):
             if target == "https://labiosyncare.github.io/":
-                catalog_html_routes.add(route)
-            elif route in catalog_rdf_targets:
-                fail(f"w3id staging: duplicate BSC catalog RDF route {route}")
+                html_routes.add(route)
+            elif route in rdf_targets:
+                fail(f"w3id staging: duplicate {block_name} RDF route {route}")
             else:
-                catalog_rdf_targets[route] = target
+                rdf_targets[route] = target
 
-    if catalog_html_routes != set(CATALOG_PUBLIC_ROUTES):
-        fail("w3id staging: HTML routes do not exactly cover BSC catalog subjects")
-    if catalog_rdf_targets != CATALOG_PUBLIC_ROUTES:
-        fail("w3id staging: RDF routes do not exactly map BSC catalog subjects to owning dumps")
+    if html_routes != set(expected_routes):
+        fail(f"w3id staging: HTML routes do not exactly cover {block_name} subjects")
+    if rdf_targets != expected_routes:
+        fail(
+            f"w3id staging: RDF routes do not exactly map {block_name} subjects "
+            "to owning dumps"
+        )
+
+
+check_exact_w3id_route_block("BSC catalog", CATALOG_PUBLIC_ROUTES)
+check_exact_w3id_route_block("BSC technique", TECHNIQUE_PUBLIC_ROUTES)
 
 # Fixture identities deliberately use the production IRI grammar required by
 # the released SHACL contract, but synthetic-* is a reserved, non-routed slug.
