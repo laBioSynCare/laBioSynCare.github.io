@@ -519,12 +519,22 @@ export async function buildGraphElements(store) {
       ? labelsFor(store, purpose)[0] ?? localName(purpose)
       : ''
     const recordLabel = labelsFor(store, iri)[0] ?? typeLabel
+    // ADR 0032: a relationship may be admitted at any truthful non-approved
+    // status (e.g. notified), not only publication-approved. Absent entirely,
+    // it is the pre-ADR-0032 legacy case and treated as approved — never
+    // labeled, so approved relationships keep their existing plain look.
+    const publicationStatus = iriValues(store, iri, SSTIM_ECO + 'publicationStatus')[0]
+    const publicationStatusLabel = publicationStatus
+      ? labelsFor(store, publicationStatus)[0] ?? localName(publicationStatus)
+      : ''
+    const isPending = Boolean(publicationStatus) &&
+      publicationStatus !== SSTIM_ECO + 'outcomePublicationApproved'
     addProjectedEdge({
       source: agent,
       target,
       kind: 'ecosystemRelationship',
       layer: 'ecosystem',
-      label: roles.length ? roles.join(' + ') : typeLabel,
+      label: (roles.length ? roles.join(' + ') : typeLabel) + (isPending ? ` (${publicationStatusLabel})` : ''),
       recordLabel,
       definition: literalFor(store, iri, [DCT + 'description']),
       iri,
@@ -533,6 +543,9 @@ export async function buildGraphElements(store) {
       purpose: purposeLabel,
       purposeIri: purpose ?? '',
       roles,
+      publicationStatus: publicationStatusLabel,
+      publicationStatusIri: publicationStatus ?? '',
+      isPending,
       sources: iriValues(store, iri, DCT + 'source'),
       created: literalFor(store, iri, [DCT + 'created']),
       reviewedOn: literalFor(store, iri, [SSTIM_ECO + 'reviewedOn']),

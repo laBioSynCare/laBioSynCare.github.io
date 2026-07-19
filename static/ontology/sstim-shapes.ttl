@@ -1771,6 +1771,13 @@ sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
     sh:property [ sh:path org:member ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path org:organization ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path org:role ; sh:nodeKind sh:IRI ] ;
+    # ADR 0032: optional second admission basis. When present, must name exactly
+    # one controlled outcome; the SPARQL constraints below require it to match
+    # the relationship's chronologically latest activity and scope the person-
+    # consent gate to only the outcomePublicationApproved status.
+    sh:property [ sh:path sstim-eco:publicationStatus ; sh:maxCount 1 ;
+        sh:class sstim-eco:EngagementOutcome ; sh:nodeKind sh:IRI ;
+        sh:message "publicationStatus, when present, must name exactly one controlled engagement outcome."@en ] ;
 
     sh:sparql [
         a sh:SPARQLConstraint ;
@@ -1916,7 +1923,7 @@ sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
     ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "Every relationship admitted to the public ecosystem graph must end in a unique latest PublicationDecisionActivity with outcome publication approved."@en ;
+        sh:message "Every relationship admitted to the public ecosystem graph must end in a unique latest PublicationDecisionActivity with outcome publication approved (the legacy admission basis), or carry an explicit sstim-eco:publicationStatus that truthfully matches the outcome of its chronologically latest engagement activity (the ADR 0032 admission basis)."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
                 FILTER NOT EXISTS {
@@ -1931,6 +1938,17 @@ sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
                         FILTER(?laterTime > ?approvalTime)
                     }
                 }
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim/ecosystem#publicationStatus> ?status .
+                    $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?latest .
+                    ?latest <https://w3id.org/sstim/ecosystem#engagementOutcome> ?status ;
+                            <http://www.w3.org/ns/prov#endedAtTime> ?latestTime .
+                    FILTER NOT EXISTS {
+                        $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?later2 .
+                        ?later2 <http://www.w3.org/ns/prov#endedAtTime> ?laterTime2 .
+                        FILTER(?laterTime2 > ?latestTime)
+                    }
+                }
             }
         """ ;
     ] ;
@@ -1940,6 +1958,15 @@ sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
         sh:select """
             SELECT DISTINCT $this WHERE {
                 $this <http://www.w3.org/ns/prov#wasAttributedTo> ?curator .
+                # ADR 0032: this check concerns who performed the approval, so it
+                # only applies when this relationship actually claims an approval
+                # activity at all; a relationship admitted via publicationStatus
+                # alone (e.g. notified, no PublicationDecisionActivity present)
+                # has no approval to attribute and is not in scope here.
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?anyApproval .
+                ?anyApproval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                             <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                 <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> .
                 FILTER NOT EXISTS {
                     $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?approval .
                     ?approval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
@@ -1963,6 +1990,15 @@ sstim-sh:EcosystemRelationshipShape a sh:NodeShape ;
             SELECT DISTINCT $this WHERE {
                 $this <https://w3id.org/sstim/ecosystem#relationshipAgent> ?person .
                 ?person a <https://schema.org/Person> .
+                # ADR 0032: the consent gate concerns the outcomePublicationApproved
+                # claim specifically, so it only applies when this relationship
+                # actually claims that outcome; publicationStatus admission at any
+                # other truthful status (e.g. notified) needs no prior consent,
+                # precisely because it asserts no confirmation.
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?anyApproval .
+                ?anyApproval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;
+                             <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                                 <https://w3id.org/sstim/ecosystem#outcomePublicationApproved> .
                 FILTER NOT EXISTS {
                     $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?approval .
                     ?approval a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> ;

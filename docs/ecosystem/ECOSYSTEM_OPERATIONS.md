@@ -56,6 +56,38 @@ the catalog and current live subjects are staged and audited; they must still be
 merged upstream and verified before the persistent identifiers are promoted in
 human-facing discovery.
 
+## Admission basis: approved status vs. pending status
+
+[ADR 0032](../decisions/0032-visible-pending-status-ecosystem-records.md) adds a
+second, explicit admission basis alongside the original ADR 0031 approved-only
+path. A public `EcosystemRelationship` is admitted by exactly one of:
+
+- **Legacy / approved basis.** The relationship ends in a uniquely latest
+  `PublicationDecisionActivity` with `outcomePublicationApproved`, and (for a
+  named person) either self-publication or an earlier scoped
+  `outcomeConsentGranted`. This is the only basis on which a relationship is
+  presented as *confirmed*.
+- **`publicationStatus` / pending basis.** The relationship carries an explicit
+  `sstim-eco:publicationStatus` equal to the outcome of its chronologically
+  latest engagement activity — typically `outcomeNotificationSent` or
+  `outcomeAcknowledged` while a real person has not yet confirmed. No consent
+  is required to publish at this basis, because it makes no confirmation
+  claim; it only makes visible what the maintainer has done (notified this
+  person of this proposed record) and lets the subject review the record, in
+  full graph context, before deciding. The graph browser renders this as a
+  visible status chip and edge-label suffix, never silently.
+
+Use the pending basis when a record needs to exist publicly for the subject to
+review before they consent — the whole point is that they can only evaluate a
+proposed relationship if they can see it, including how it connects to the
+rest of SSTIM. Advance a relationship from pending to approved by appending a
+new engagement activity (acknowledgement, then consent grant, then a
+`PublicationDecisionActivity`/`outcomePublicationApproved`) to both the
+private ledger and the public aggregate, updating `publicationStatus` to
+match at each step, and republishing. Never invent an engagement activity
+that did not really happen at either basis — if a person has not actually
+responded, the record stays at `outcomeNotificationSent`, not further along.
+
 ## Admission and publication sequence
 
 1. Author one self-contained public aggregate and a complete private ledger in

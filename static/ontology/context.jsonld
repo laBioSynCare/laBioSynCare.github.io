@@ -154,6 +154,7 @@
     "relationshipTarget": { "@id": "sstim-eco:relationshipTarget", "@type": "@id" },
     "hasRelationshipType": { "@id": "sstim-eco:hasRelationshipType", "@type": "@id" },
     "relationshipPurpose": { "@id": "sstim-eco:relationshipPurpose", "@type": "@id" },
+    "publicationStatus": { "@id": "sstim-eco:publicationStatus", "@type": "@id" },
     "validFrom": { "@id": "sstim-eco:validFrom", "@type": "xsd:date" },
     "validUntil": { "@id": "sstim-eco:validUntil", "@type": "xsd:date" },
     "reviewedOn": { "@id": "sstim-eco:reviewedOn", "@type": "xsd:date" },

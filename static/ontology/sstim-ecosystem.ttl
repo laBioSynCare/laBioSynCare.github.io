@@ -52,11 +52,12 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-07-12"^^xsd:date ;
     dct:issued "2026-07-12"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-19"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0024-stakeholder-ecosystem-modeling.md>,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> ;
-    skos:historyNote "0.7.0 — ADR 0031 replaces the initial flat agent-level relationship and consent surface with qualified relationship, membership, implementation-responsibility, and engagement records; the approved public graph is current-state while complete operational history is private and append-only. The original ADR 0024 properties remain deprecated for migration only."@en .
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0032-visible-pending-status-ecosystem-records.md> ;
+    skos:historyNote "0.7.0 — ADR 0031 replaces the initial flat agent-level relationship and consent surface with qualified relationship, membership, implementation-responsibility, and engagement records; the approved public graph is current-state while complete operational history is private and append-only. The original ADR 0024 properties remain deprecated for migration only. 2026-07-19 — ADR 0032 adds sstim-eco:publicationStatus as a second, backward-compatible admission basis: a relationship may be admitted to the public graph at any truthful non-approved status (e.g. notified) so the person it describes can review it in context before consenting; the person-consent gate on a claimed publicationStatus of outcomePublicationApproved is unchanged."@en .
 
 
 ###########################################################################
@@ -193,6 +194,12 @@ sstim-eco:reviewedOn a owl:DatatypeProperty ;
     rdfs:domain sstim-eco:EcosystemRelationship ;
     rdfs:range xsd:date ;
     skos:definition "The date on which the qualified relationship, its public sources, and its publication status were last reviewed."@en .
+
+sstim-eco:publicationStatus a owl:ObjectProperty ;
+    rdfs:label "publication status"@en ;
+    rdfs:domain sstim-eco:EcosystemRelationship ;
+    rdfs:range sstim-eco:EngagementOutcome ;
+    skos:definition "The current lifecycle status of a qualified ecosystem relationship — one controlled outcome (e.g. notification sent, consent granted, publication approved) matching the engagementOutcome of the relationship's chronologically most recent engagement activity. Introduced by ADR 0032 as a second, explicit admission basis for the public ecosystem graph: a relationship may be admitted with any truthful status via this property, not only a final publication-approved one, so that the person or organization it describes — and anyone else — can see exactly where the relationship stands, including its context, without waiting for approval to become visible at all. Only a publicationStatus of outcomePublicationApproved for a relationship whose agent is a person still requires that person's own prior consent or self-publication; every other status requires no consent to display, precisely because it does not claim confirmation. A relationship admitted through the legacy path (ending in a PublicationDecisionActivity with no explicit publicationStatus) is treated as approved for backward compatibility."@en .
 
 sstim-eco:hasEngagementActivity a owl:ObjectProperty ;
     owl:inverseOf sstim-eco:engagementFor ;

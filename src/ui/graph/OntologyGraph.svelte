@@ -1269,6 +1269,17 @@
                       <dd>{selected.relationshipType}</dd>
                     </div>
                   {/if}
+                  {#if selected.publicationStatus}
+                    <div class="meta-row">
+                      <dt>Status</dt>
+                      <dd>
+                        <span class="status-chip" class:pending={selected.isPending}>{selected.publicationStatus}</span>
+                        {#if selected.isPending}
+                          <small class="status-note">Not yet confirmed by the person this record describes.</small>
+                        {/if}
+                      </dd>
+                    </div>
+                  {/if}
                   {#if selected.purpose}
                     <div class="meta-row">
                       <dt>Purpose</dt>
@@ -1772,6 +1783,32 @@
   .meta-row dd {
     margin: 0;
     word-break: break-word;
+  }
+
+  .status-chip {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 0.08rem 0.5rem;
+    border-radius: 999px;
+    background: var(--app-accent-soft);
+    color: var(--app-accent);
+    border: 1px solid var(--app-border);
+  }
+
+  .status-chip.pending {
+    background: color-mix(in srgb, var(--app-warn, #ad6600) 16%, transparent);
+    color: var(--app-warn, #ad6600);
+    border-color: color-mix(in srgb, var(--app-warn, #ad6600) 40%, transparent);
+  }
+
+  .status-note {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--pico-muted-color);
+    font-size: 0.68rem;
+    line-height: 1.4;
   }
 
   .source-links {

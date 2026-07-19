@@ -62,6 +62,11 @@ sstim-pv:PrivateRelationshipAuditShape a sh:NodeShape ;
     sh:property [ sh:path org:organization ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path org:role ; sh:nodeKind sh:IRI ] ;
     sh:property [ sh:path prov:wasRevisionOf ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    # ADR 0032: mirrors the public relationship shape's optional second
+    # admission basis so an amendment can add it to the private snapshot
+    # before the matching public value is mirrored.
+    sh:property [ sh:path sstim-eco:publicationStatus ; sh:maxCount 1 ;
+        sh:class sstim-eco:EngagementOutcome ; sh:nodeKind sh:IRI ] ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "Every activity linked from a private relationship snapshot must govern that same relationship IRI."@en ;
