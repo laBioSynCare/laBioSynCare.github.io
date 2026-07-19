@@ -529,6 +529,10 @@ export async function buildGraphElements(store) {
       : ''
     const isPending = Boolean(publicationStatus) &&
       publicationStatus !== SSTIM_ECO + 'outcomePublicationApproved'
+    // The pending note names the subject accurately: publicationStatus is
+    // generic, so an org-agent relationship must not be described as awaiting
+    // a "person" (ADR 0032 covers "the person or organization it describes").
+    const agentIsPerson = iriValues(store, agent, RDF + 'type').includes(SCHEMA + 'Person')
     addProjectedEdge({
       source: agent,
       target,
@@ -546,6 +550,7 @@ export async function buildGraphElements(store) {
       publicationStatus: publicationStatusLabel,
       publicationStatusIri: publicationStatus ?? '',
       isPending,
+      pendingSubjectNoun: agentIsPerson ? 'person' : 'organization',
       sources: iriValues(store, iri, DCT + 'source'),
       created: literalFor(store, iri, [DCT + 'created']),
       reviewedOn: literalFor(store, iri, [SSTIM_ECO + 'reviewedOn']),

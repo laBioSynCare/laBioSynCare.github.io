@@ -1275,7 +1275,7 @@
                       <dd>
                         <span class="status-chip" class:pending={selected.isPending}>{selected.publicationStatus}</span>
                         {#if selected.isPending}
-                          <small class="status-note">Not yet confirmed by the person this record describes.</small>
+                          <small class="status-note">Not yet confirmed by the {selected.pendingSubjectNoun ?? 'party'} this record describes.</small>
                         {/if}
                       </dd>
                     </div>
