@@ -288,6 +288,7 @@
     "hasStimulusTemporalStructure": { "@id": "sstim:hasStimulusTemporalStructure", "@type": "@id" },
     "composedOf": { "@id": "sstim:composedOf", "@type": "@id" },
     "definesTechnique": { "@id": "sstim:definesTechnique", "@type": "@id" },
+    "incorporatesTechnique": { "@id": "sstim:incorporatesTechnique", "@type": "@id" },
     "usesTechnique": { "@id": "sstim:usesTechnique", "@type": "@id" },
     "definedByFramework": { "@id": "sstim:definedByFramework", "@type": "@id" },
     "implementsFramework": { "@id": "sstim:implementsFramework", "@type": "@id" },

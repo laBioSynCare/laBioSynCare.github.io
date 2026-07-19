@@ -41,7 +41,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.7.0" ;
+    owl:versionInfo "0.8.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

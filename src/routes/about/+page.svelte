@@ -41,9 +41,9 @@
       how:
         'Add tracks from the palette and shape each parameter; many can be tempo-synced or ' +
         'modulated. Press play to preview audio and visuals together in real time. The audio ' +
-        'engine — Vanilla Web Audio, AudioWorklet, or AudioWorklet + WASM — is chosen in ' +
-        'Settings and applied on the next playback. Playback always starts from a tap or ' +
-        'click, per browser autoplay rules.',
+        'engine — Vanilla Web Audio, AudioWorklet, AudioWorklet + WASM, or the sound-free ' +
+        'Silent engine — is chosen in Settings and applied on the next playback. Playback ' +
+        'always starts from a tap or click, per browser autoplay rules.',
     },
     {
       href: '/field/',
@@ -128,27 +128,53 @@
     },
   ]
 
-  // The three parts of the ecosystem and how they relate.
+  // Who is responsible for what. Æterni Anima is the organization; BSC Lab and
+  // BioSynCare are the two platforms it is responsible for, and SSTIM and Patch
+  // Studio live inside BSC Lab rather than beside it.
   const layers = [
+    {
+      name: 'Æterni Anima',
+      tag: 'The organization',
+      color: 'var(--app-control)',
+      body:
+        'The organization behind all of this — BSC Lab, the SSTIM knowledge graph it ' +
+        'publishes, Patch Studio, and BioSynCare are all its responsibility. It is an ' +
+        'independent initiative rather than an incorporated company: the name the work is ' +
+        'developed, released, and credited under.',
+    },
+    {
+      name: 'BSC',
+      tag: 'The framework',
+      color: 'var(--app-ok)',
+      body:
+        'The framework both platforms build on: audio — Martigli respiratory waves, binaural ' +
+        'beats, Symmetry permutations, soundscapes and colored noises — together with visual ' +
+        'cues matched to the Martigli oscillation. It defines the three techniques it ' +
+        'originated (Martigli, Martigli-Binaural, Symmetry); the generic ones it applies are ' +
+        'incorporated from the SSTIM vocabulary rather than redefined.',
+    },
     {
       name: 'BSC Lab',
       tag: 'Open platform',
       color: 'var(--app-accent)',
       body:
-        'The open-source research and engineering platform you are using now: a stimulation ' +
-        'layer (this application) and a knowledge layer (the SSTIM sources it browses). ' +
-        'Software is Apache-2.0; the ontology, vocabulary, and public reference data are CC BY 4.0.',
+        'The open-source research and engineering platform you are using now. It holds the ' +
+        'SSTIM knowledge graph and its Turtle sources, Patch Studio, and the surfaces built ' +
+        'around them — Graph, Field, Presets, SPARQL, and Logbook. Software is Apache-2.0; ' +
+        'the ontology, vocabulary, and public reference data are CC BY 4.0.',
     },
     {
       name: 'SSTIM',
-      tag: 'The knowledge graph',
+      tag: 'Knowledge graph · in BSC Lab',
       color: 'var(--app-visual)',
       body:
         'The Sensory Stimulation Ontology — a public RDF knowledge graph of techniques, ' +
         'modalities, parameters, exposure conditions, safety metadata, evidence-qualified ' +
         'claims, protocols, presets, and sessions. OWL classes, a multilingual SKOS ' +
-        'vocabulary, and SHACL shapes under the stable namespace w3id.org/sstim. This is the ' +
-        'reusable, citable scientific artifact.',
+        'vocabulary, and SHACL shapes under the stable namespace w3id.org/sstim. Developed ' +
+        'and published within BSC Lab, it is the reusable, citable scientific artifact — and ' +
+        'namespace governance is set to pass to the W3C Community Group once its charter is ' +
+        'ratified.',
     },
     {
       name: 'BioSynCare',
@@ -157,8 +183,7 @@
       body:
         'A separate, closed-source commercial application in its own repository. It shares ' +
         'the preset JSON format and the SSTIM vocabulary with BSC Lab, but neither project ' +
-        'imports the other’s code or private data. BSC is a framework; BSC Lab and ' +
-        'BioSynCare are two implementations of it.',
+        'imports the other’s code or private data.',
     },
   ]
 
@@ -168,6 +193,8 @@
     { label: 'Vocabulary docs', href: '/ontology/docs/vocab/', external: true },
     { label: 'Ontology DOI (all versions)', href: 'https://doi.org/10.5281/zenodo.21286974', external: true },
     { label: 'W3C Community Group', href: 'https://www.w3.org/community/sstim/', external: true },
+    { label: 'Governance & charter', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CONTRIBUTING.md#8-governance', external: true },
+    { label: 'HED / BIDS interoperability', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ecosystem/HED_BIDS_INTEROP.md', external: true },
   ]
 </script>
 
@@ -197,10 +224,12 @@
   </header>
 
   <section class="block">
-    <h2>Three parts, one ecosystem</h2>
+    <h2>How the pieces fit</h2>
     <p class="section-intro">
-      BSC Lab, SSTIM, and BioSynCare are distinct but connected. Knowing which is which
-      makes the rest of the app easier to read.
+      Æterni Anima is the organization responsible for everything here. BSC Lab and
+      BioSynCare are its two platforms — SSTIM and Patch Studio live inside BSC Lab — and
+      BSC is the framework both platforms build on. Knowing which is which makes the rest
+      of the app easier to read.
     </p>
     <div class="layer-grid">
       {#each layers as layer}
@@ -410,9 +439,13 @@
   }
 
   /* ── Three-layer cards ────────────────────────────────────────────────── */
+  /* 280px min fits three across at the 960px page width, so the five cards
+     land as a balanced 3 + 2 rather than 2 + 2 + 1 with a lone orphan. The
+     card order also keeps the two green-ish borders (BSC, BioSynCare) off the
+     same row. */
   .layer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 0.9rem;
   }
 

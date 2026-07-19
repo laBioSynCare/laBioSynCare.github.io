@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
-    owl:versionInfo "0.7.0" ;
+    owl:versionInfo "0.8.0" ;
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

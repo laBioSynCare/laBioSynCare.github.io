@@ -27,7 +27,7 @@ BioSynCare catalog and real participant records are not present.
 
 | Directory | Contents |
 |---|---|
-| `frameworks/` | BSC framework identity and seven framework techniques |
+| `frameworks/` | BSC framework identity and the three techniques it originated (generic techniques it applies are incorporated from the vocabulary — [ADR 0033](../../../docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md)) |
 | `implementations/` | Public identity records for BSC Lab, the BioSynCare application, and the Patch Studio component |
 | `protocols/` | Two narrow, non-clinical BSC Lab reference protocols |
 | `presets/` | Two public reference preset fixtures |
@@ -60,7 +60,7 @@ The BSC catalog is a typed relationship graph, not a containment tree:
 | Resource | Kind | Catalog relationship |
 |---|---|---|
 | `https://w3id.org/sstim` | ontology/vocabulary | Describes BSC and other sensory-stimulation resources; it is not a component of BSC |
-| `https://w3id.org/sstim/framework/bsc` | framework | Defines the BSC techniques and guidance |
+| `https://w3id.org/sstim/framework/bsc` | framework | Defines the BSC-originated techniques and guidance; incorporates generic ones from the vocabulary |
 | `https://w3id.org/sstim/implementation/bsclab` | reference implementation | `sstim:implementsFramework` BSC |
 | `https://w3id.org/sstim/implementation/biosyncare` | commercial application implementation | `sstim:implementsFramework` BSC; distinct from any BioSynCare organization agent |
 | `https://w3id.org/sstim/implementation/bsclab/component/patch-studio` | BSC Lab software component | Part of BSC Lab and implements BSC |

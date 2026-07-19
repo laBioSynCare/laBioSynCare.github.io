@@ -56,6 +56,7 @@ annotations lives here.
 | [0030](0030-named-methods-and-schools.md) | Record recognized named methods/schools (Snoezelen, Tomatis, …) as a neutral, evidence-scoped catalogue | Proposed |
 | [0031](0031-qualified-ecosystem-records.md) | Qualified ecosystem relationships, externally stored approved public current state, and a private append-only engagement audit | Accepted |
 | [0032](0032-visible-pending-status-ecosystem-records.md) | Visible pending-status ecosystem records: `publicationStatus` as a second, consent-scoped public admission basis | Accepted |
+| [0033](0033-framework-scope-and-generic-technique-deduplication.md) | BSC framework scope; `incorporatesTechnique` for non-originated techniques; retire four generic-technique duplicates | Accepted |
 
 ## Adding an ADR
 

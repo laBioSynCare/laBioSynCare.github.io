@@ -6,31 +6,36 @@
 @prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 
+# BSC is a framework over audio (Martigli respiratory waves, binaural beats,
+# Symmetry permutations, soundscapes and colored noises) and visual cues matched
+# to the Martigli oscillation.
+#
+# It *defines* only the three techniques it originated (Martigli, the
+# Martigli-Binaural hybrid, and Symmetry permutation entrainment). The generic
+# techniques it applies — binaural beats, isochronic tones, broadband/colored
+# noise, photic driving, audiovisual and vibrotactile entrainment — are
+# vendor-neutral and already live in the SSTIM vocabulary as dual-typed
+# sstim-v:tech* concepts, so they are *incorporated*, not redefined here.
+# Framework-scoped duplicates of those were removed in ADR 0033.
 <https://w3id.org/sstim/framework/bsc> a sstim:SensoryStimulationFramework ;
     rdfs:label "BSC Framework" ;
-    dct:description "Framework identity for the BioSynCare/BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance." ;
+    dct:description "Framework identity for the BSC family of sensory stimulation principles, techniques, evidence rules, grouping logic, and implementation guidance. Its originated techniques are the Martigli respiratory oscillation, the Martigli-Binaural hybrid, and Symmetry permutation entrainment; the generic techniques it applies are incorporated from the SSTIM vocabulary." ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-17"^^xsd:date ;
+    dct:modified "2026-07-19"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     sstim:definesTechnique
-        bsc-fw-tech:binaural-beat-stimulation,
         bsc-fw-tech:martigli-breathing-oscillation,
         bsc-fw-tech:martigli-binaural-hybrid,
-        bsc-fw-tech:symmetry-permutation-entrainment,
-        bsc-fw-tech:photic-rhythm-stimulation,
-        bsc-fw-tech:audiovisual-rhythm-coordination,
-        bsc-fw-tech:vibrotactile-rhythm-stimulation .
-
-bsc-fw-tech:binaural-beat-stimulation a sstim:EntrainmentBasedTechnique ;
-    rdfs:label "Binaural beat stimulation"@en ;
-    dct:description "Auditory technique using two dichotic carrier tones whose frequency difference defines the beat target."@en ;
-    skos:relatedMatch sstim-v:voiceBinaural ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechThalamocortical ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
-    sstim:techniqueModality sstim-v:modalityAuditory ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/PRESET_FORMAT.md> .
+        bsc-fw-tech:symmetry-permutation-entrainment ;
+    sstim:incorporatesTechnique
+        sstim-v:techBinauralBeats,
+        sstim-v:techIsochronicTones,
+        sstim-v:techBroadbandNoise,
+        sstim-v:techPhoticDriving,
+        sstim-v:techAudiovisualEntrainment,
+        sstim-v:techVibrotactileEntrainment .
 
 bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
     rdfs:label "Martigli breathing oscillation"@en ;
@@ -59,26 +64,11 @@ bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/SYMMETRY_SYSTEM.md> .
 
-bsc-fw-tech:photic-rhythm-stimulation a sstim:EntrainmentBasedTechnique ;
-    rdfs:label "Photic rhythm stimulation"@en ;
-    dct:description "Visual technique using explicitly bounded periodic luminance or contrast modulation to elicit a measurable steady-state visual response; downstream wellness effects are not assumed."@en ;
-    skos:relatedMatch sstim-v:techPhoticDriving ;
-    sstim:proposedMechanism sstim-v:mechSSVEP ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
-    sstim:techniqueModality sstim-v:modalityVisual .
-
-bsc-fw-tech:audiovisual-rhythm-coordination a sstim:EntrainmentBasedTechnique ;
-    rdfs:label "Audiovisual rhythm coordination"@en ;
-    dct:description "Cross-modal technique coordinating bounded periodic visual and auditory channels while keeping each channel's physical parameters and evidence separately inspectable."@en ;
-    skos:relatedMatch sstim-v:techAudiovisualEntrainment ;
-    sstim:proposedMechanism sstim-v:mechASSR, sstim-v:mechSSVEP, sstim-v:mechMultisensory ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
-    sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityVisual .
-
-bsc-fw-tech:vibrotactile-rhythm-stimulation a sstim:EntrainmentBasedTechnique ;
-    rdfs:label "Vibrotactile rhythm stimulation"@en ;
-    dct:description "Somatosensory technique using periodic mechanical vibration with declared actuator, placement, frequency, and comfort constraints."@en ;
-    skos:relatedMatch sstim-v:techVibrotactileEntrainment ;
-    sstim:proposedMechanism sstim-v:mechSSSEP, sstim-v:mechMechanoreceptive ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
-    sstim:techniqueModality sstim-v:modalitySomatosensory .
+# Retired in ADR 0033 — these four were framework-scoped duplicates of concepts
+# that already exist, vendor-neutral, in sstim-vocab.ttl. They are now
+# incorporated by the framework above rather than redefined here:
+#
+#   bsc-fw-tech:binaural-beat-stimulation      → sstim-v:techBinauralBeats
+#   bsc-fw-tech:photic-rhythm-stimulation      → sstim-v:techPhoticDriving
+#   bsc-fw-tech:audiovisual-rhythm-coordination → sstim-v:techAudiovisualEntrainment
+#   bsc-fw-tech:vibrotactile-rhythm-stimulation → sstim-v:techVibrotactileEntrainment

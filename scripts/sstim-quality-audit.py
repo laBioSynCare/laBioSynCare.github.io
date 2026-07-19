@@ -1017,7 +1017,14 @@ counts = {
     "properties": len(declared_properties),
     "concepts": len(concepts),
     "schemes": len(schemes),
-    "framework techniques": len(objects(URIRef("https://w3id.org/sstim/framework/bsc"), SSTIM.definesTechnique)),
+    # Techniques the BSC framework covers, across both relations: the ones it
+    # originated (definesTechnique) and the vendor-neutral ones it applies but
+    # did not originate (incorporatesTechnique). Counting only the former would
+    # under-report coverage after the ADR 0033 deduplication.
+    "framework techniques": len(
+        set(objects(URIRef("https://w3id.org/sstim/framework/bsc"), SSTIM.definesTechnique))
+        | set(objects(URIRef("https://w3id.org/sstim/framework/bsc"), SSTIM.incorporatesTechnique))
+    ),
     "protocols": len(protocols),
     "presets": len(presets),
     "evidence assessments": len(assessments),

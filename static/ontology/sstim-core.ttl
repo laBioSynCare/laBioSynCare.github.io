@@ -50,9 +50,9 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    owl:versionIRI <https://w3id.org/sstim/0.7.0> ;
-    owl:versionInfo "0.7.0" ;
-    owl:priorVersion <https://w3id.org/sstim/0.6.0> ;
+    owl:versionIRI <https://w3id.org/sstim/0.8.0> ;
+    owl:versionInfo "0.8.0" ;
+    owl:priorVersion <https://w3id.org/sstim/0.7.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
@@ -580,6 +580,15 @@ sstim:definesTechnique a owl:ObjectProperty ;
     rdfs:range  sstim:SensoryStimulationTechnique ;
     rdfs:label  "defines technique"@en ;
     skos:definition "Links a sensory stimulation framework to a technique that it defines or governs."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:incorporatesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationFramework ;
+    rdfs:range  sstim:SensoryStimulationTechnique ;
+    rdfs:label  "incorporates technique"@en ;
+    skos:definition "Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from sstim:definesTechnique, which is reserved for techniques the framework itself defines or governs; a framework that merely applies binaural beats or photic driving incorporates them rather than defining them."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

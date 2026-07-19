@@ -33,7 +33,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.7.0" ;
+    owl:versionInfo "0.8.0" ;
     dct:title "SSTIM Patch Studio Parameter Module"@en ;
     dct:description "Datatype properties for reproducibly specifying SSTIM audio voices and Patch Studio session-authoring parameters."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
