@@ -26,6 +26,8 @@ the retirements are confined to the `framework/bsc/technique/` instance IRIs,
 which never resolved through w3id in any prior release.
 
 ### Added
+- Published SSTIM `v0.8.0` under version DOI `10.5281/zenodo.21462727`, retaining
+  `10.5281/zenodo.21286974` as the all-versions concept DOI.
 - `sstim:incorporatesTechnique` (ADR 0033): links a `SensoryStimulationFramework`
   to a pre-existing, vendor-neutral technique it applies without redefining.
   Additive — does not narrow or replace `sstim:definesTechnique`.

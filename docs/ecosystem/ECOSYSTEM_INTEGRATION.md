@@ -55,8 +55,8 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 **Guardrails / caveats (carry forward, do not lose):**
 
 - **Version discipline.** The citable release is **SSTIM 0.8.0**, identified by
-  `https://w3id.org/sstim/0.8.0` (version DOI added after automatic Zenodo
-  archival; per [`TODO.md`](../../TODO.md) current focus).
+  `https://w3id.org/sstim/0.8.0` and archived under release DOI
+  `10.5281/zenodo.21462727` (per [`TODO.md`](../../TODO.md) current focus).
 - **Do not hard-code live figures** (quad counts, concept counts, preset counts)
   from the source conversation into any doc — they drift; cite the live app instead.
 - **`01-Audiovisual_Entrainment.pdf`** (external, *not* in this repo) reportedly
