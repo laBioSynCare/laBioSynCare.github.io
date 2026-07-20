@@ -15,6 +15,35 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-20
+
+Framework-scope release. `sstim:definesTechnique` on the BSC framework is now
+reserved for the three techniques BSC actually originated; four framework-scoped
+duplicates of vendor-neutral vocabulary concepts are retired in favor of the
+new `sstim:incorporatesTechnique` relation (ADR 0033). No previously released
+term was removed from `sstim-core.ttl`, `sstim-vocab.ttl`, or `sstim-shapes.ttl`;
+the retirements are confined to the `framework/bsc/technique/` instance IRIs,
+which never resolved through w3id in any prior release.
+
+### Added
+- `sstim:incorporatesTechnique` (ADR 0033): links a `SensoryStimulationFramework`
+  to a pre-existing, vendor-neutral technique it applies without redefining.
+  Additive — does not narrow or replace `sstim:definesTechnique`.
+- w3id routes for all seven BSC framework technique IRIs (three originated, four
+  retired), each an exact rule rather than a prefix wildcard, audited fail-closed
+  by the quality-audit route checker. Previously no technique IRI under
+  `framework/bsc/technique/` resolved at all.
+
+### Changed
+- `bsc-fw-tech:binaural-beat-stimulation`, `photic-rhythm-stimulation`,
+  `audiovisual-rhythm-coordination`, and `vibrotactile-rhythm-stimulation` are
+  retired from `sstim:definesTechnique` on the BSC framework and re-expressed as
+  `sstim:incorporatesTechnique` over their existing vocabulary counterparts
+  (`sstim-v:techBinauralBeats`, `techPhoticDriving`, `techAudiovisualEntrainment`,
+  `techVibrotactileEntrainment`) — each already `skos:relatedMatch`-linked from
+  the retired term, so no relation is newly asserted, only relocated onto the
+  released IRI. `bsc-reference-protocols.ttl` follows the same substitution.
+
 ## [0.7.0] - 2026-07-15
 
 Evidence- and ecosystem-governance release. No public term IRI was removed, but
@@ -290,7 +319,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.8.0
 [0.7.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.7.0
 [0.6.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.6.0
 [0.5.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.5.0

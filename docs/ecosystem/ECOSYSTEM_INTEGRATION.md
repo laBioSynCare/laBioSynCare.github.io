@@ -54,9 +54,9 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 
 **Guardrails / caveats (carry forward, do not lose):**
 
-- **Version discipline.** The citable release is **SSTIM 0.7.0**, identified by
-  `https://w3id.org/sstim/0.7.0` and archived under release DOI
-  `10.5281/zenodo.21380171` (per [`TODO.md`](../../TODO.md) current focus).
+- **Version discipline.** The citable release is **SSTIM 0.8.0**, identified by
+  `https://w3id.org/sstim/0.8.0` (version DOI added after automatic Zenodo
+  archival; per [`TODO.md`](../../TODO.md) current focus).
 - **Do not hard-code live figures** (quad counts, concept counts, preset counts)
   from the source conversation into any doc — they drift; cite the live app instead.
 - **`01-Audiovisual_Entrainment.pdf`** (external, *not* in this repo) reportedly
@@ -356,7 +356,7 @@ SSTIM is structurally healthy: the pinned validation suite passes SHACL,
 repository quality checks, HermiT consistency, SPARQL sanity queries, and all
 module serialization round trips. There is no repository-wide validity failure
 and no need to redesign SSTIM before this workstream starts. The citable baseline
-is now `0.7.0`; the audit is a dated finding list rather than a current
+is now `0.8.0`; the audit is a dated finding list rather than a current
 status ledger: KR-01, KR-06, the evidence-provenance portion of KR-11, runtime
 KR-12/KR-17, and most KR-14 controls have since been repaired. Validation does
 not, however, make every proposed use ready:

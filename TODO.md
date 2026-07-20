@@ -34,8 +34,8 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.7.0` is the validated release line, archived under release DOI
-`10.5281/zenodo.21380171`. The external live-only ecosystem store, loader, and
+SSTIM `0.8.0` is the validated release line (version DOI added after automatic
+Zenodo archival). The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
 agent. The unified Graph navigator now exposes the interlinked versioned catalog,
 live ecosystem, and SSTIM terms. The w3id catalog + live ecosystem routes are
