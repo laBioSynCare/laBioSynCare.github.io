@@ -9,10 +9,11 @@
 
 <https://w3id.org/sstim/implementation/bsclab> a sstim:SensoryStimulationImplementation, prov:SoftwareAgent ;
     rdfs:label "BSC Lab" ;
-    dct:description "Open research/reference implementation and knowledge platform for the BSC framework." ;
+    dct:description "Open research/reference implementation and knowledge platform for the BSC framework. Developed and maintained within the Æterni Anima initiative." ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-17"^^xsd:date ;
+    dct:modified "2026-07-20"^^xsd:date ;
     dct:license <https://www.apache.org/licenses/LICENSE-2.0> ;
     dct:hasPart <https://w3id.org/sstim/implementation/bsclab/component/patch-studio> ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> ;
@@ -23,10 +24,11 @@
     a sstim:SensoryStimulationImplementation, prov:SoftwareAgent,
         schema:SoftwareApplication ;
     rdfs:label "Patch Studio"@en ;
-    dct:description "The real-time multisensory authoring and preview component of BSC Lab; distinct from the SSTIM Patch Studio ontology module that describes its reproducible parameters."@en ;
+    dct:description "The real-time multisensory authoring and preview component of BSC Lab; distinct from the SSTIM Patch Studio ontology module that describes its reproducible parameters. Developed and maintained within the Æterni Anima initiative."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     dct:created "2026-07-17"^^xsd:date ;
-    dct:modified "2026-07-17"^^xsd:date ;
+    dct:modified "2026-07-20"^^xsd:date ;
     dct:license <https://www.apache.org/licenses/LICENSE-2.0> ;
     dct:isPartOf <https://w3id.org/sstim/implementation/bsclab> ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> ;
@@ -35,8 +37,9 @@
 
 <https://w3id.org/sstim/implementation/biosyncare> a sstim:SensoryStimulationImplementation, prov:SoftwareAgent ;
     rdfs:label "BioSynCare" ;
-    dct:description "Commercial application implementation for the BSC framework; its curated catalog is private and is not loaded by BSC Lab." ;
+    dct:description "Commercial application implementation for the BSC framework; its curated catalog is private and is not loaded by BSC Lab. A product of the Æterni Anima initiative, which is responsible for it; there is no separate BioSynCare organization." ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-10"^^xsd:date ;
+    dct:modified "2026-07-20"^^xsd:date ;
     sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .
