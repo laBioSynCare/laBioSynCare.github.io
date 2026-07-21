@@ -15,6 +15,10 @@ export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
 export const SSTIM_ORGANIZATION = ns('https://w3id.org/sstim/organization/')
 export const SSTIM_SPECIALIST = ns('https://w3id.org/sstim/specialist/')
 export const SSTIM_ECOSYSTEM_RECORD = ns('https://w3id.org/sstim/ecosystem-record/')
+// These three bare-root IRIs (no sub-path) each have a matching per-entity
+// browser redirect in the external w3id.org registry — sstim/.htaccess's
+// "BEGIN audited BSC catalog routes" block (local clone: ~/rep/w3id.org).
+// If one of these ever changes, that block needs a matching PR there too.
 export const BSC_FRAMEWORK_IRI = namedNode('https://w3id.org/sstim/framework/bsc')
 export const BIOSYNCARE_IRI = namedNode('https://w3id.org/sstim/implementation/biosyncare')
 export const BSCLAB_IRI = namedNode('https://w3id.org/sstim/implementation/bsclab')
