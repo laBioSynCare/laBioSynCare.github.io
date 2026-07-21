@@ -15,9 +15,38 @@
   let loading = $state(true)
   let graphStats = $state(null)
   let allElements = $state([])
+
+  const GRAPH_SCOPES = [
+    { value: 'all', label: 'Full SSTIM · ontology & vocabulary' },
+    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem' },
+    { value: 'catalog', label: 'Catalog focus · versioned' },
+    { value: 'ecosystem', label: 'Ecosystem focus · live' },
+    { value: 'core', label: 'Core OWL classes' },
+    { value: 'vocabulary', label: 'All SKOS vocabulary' },
+    { value: 'frequency', label: 'Frequency bands' },
+    { value: 'modality', label: 'Sensory modalities' },
+    { value: 'mechanism', label: 'Stimulation mechanisms' },
+    { value: 'technique', label: 'Techniques' },
+    { value: 'voice', label: 'Voice types & rhythm' },
+    { value: 'group', label: 'Preset groups' },
+    { value: 'evidence', label: 'Evidence & claims' },
+    { value: 'caution', label: 'Cautions & safety' },
+    { value: 'exposure', label: 'Exposure & delivery' },
+  ]
+
+  // A `?view=<scope value>` query param lets a link (e.g. from w3id.org or
+  // another BSC Lab page) land directly on a specific filtered perspective,
+  // not just the default full graph. Takes priority over the saved session
+  // scope; an unrecognized/missing value falls back to the session as before.
+  function readScopeFromUrl() {
+    if (typeof window === 'undefined') return null
+    const value = new URLSearchParams(window.location.search).get('view')
+    return GRAPH_SCOPES.some((s) => s.value === value) ? value : null
+  }
+
   // 'terms' was folded into 'all' when the full view stopped showing the
   // catalog/ecosystem instance layers; map stale sessions forward.
-  let graphScope = $state(graphSession.graphScope === 'terms' ? 'all' : graphSession.graphScope)
+  let graphScope = $state(readScopeFromUrl() ?? (graphSession.graphScope === 'terms' ? 'all' : graphSession.graphScope))
   let focusNodeQuery = $state(graphSession.focusNodeQuery)
 
   // Layer visibility
@@ -123,24 +152,6 @@
     'https://w3id.org/sstim/vocab#PermutationFunctionScheme': '#a1887f',
     'https://w3id.org/sstim/vocab#CautionTagScheme':          '#ef9a9a',
   }
-
-  const GRAPH_SCOPES = [
-    { value: 'all', label: 'Full SSTIM · ontology & vocabulary' },
-    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem' },
-    { value: 'catalog', label: 'Catalog focus · versioned' },
-    { value: 'ecosystem', label: 'Ecosystem focus · live' },
-    { value: 'core', label: 'Core OWL classes' },
-    { value: 'vocabulary', label: 'All SKOS vocabulary' },
-    { value: 'frequency', label: 'Frequency bands' },
-    { value: 'modality', label: 'Sensory modalities' },
-    { value: 'mechanism', label: 'Stimulation mechanisms' },
-    { value: 'technique', label: 'Techniques' },
-    { value: 'voice', label: 'Voice types & rhythm' },
-    { value: 'group', label: 'Preset groups' },
-    { value: 'evidence', label: 'Evidence & claims' },
-    { value: 'caution', label: 'Cautions & safety' },
-    { value: 'exposure', label: 'Exposure & delivery' },
-  ]
 
   // Thematic scope → the concept schemes it shows. graph.js renders every
   // skos:Concept in the store (vocab + exposure) tagged with its scheme IRI,
@@ -728,7 +739,10 @@
       const local = value.slice(colon + 1)
       const base = PREFIXES[prefix]
       if (base) {
-        const iri = base + local
+        // Empty local (e.g. `#bsclab:`) addresses the namespace's own root
+        // resource — the base IRI minus its trailing separator — rather than
+        // a member under it. See hashForIri for the matching encode side.
+        const iri = local ? base + local : base.slice(0, -1)
         const exact = allElements.find((el) => el.data?.iri === iri)
         if (exact) return exact.data.id
       }
@@ -771,8 +785,15 @@
       return '#' + iri.split(/[#/]/).pop()
     }
     const curie = toCurie(iri)
-    if (curie === iri) return ''
-    return '#' + curie
+    if (curie !== iri) return '#' + curie
+    // toCurie only compacts a sub-path under a registered base. A namespace's
+    // own root resource (e.g. https://w3id.org/sstim/framework/bsc, which sits
+    // one level above the bsc-fw: base) has no local segment to compact, so
+    // back it into `prefix:` with an empty local instead of leaving it dangling.
+    for (const [prefix, base] of Object.entries(PREFIXES)) {
+      if (iri + '/' === base) return '#' + prefix + ':'
+    }
+    return ''
   }
 
   // Reference docs exist only in the deployed Pages artifact (404 under
@@ -793,6 +814,20 @@
     if (target === '' && !window.location.hash) return
     const url = window.location.pathname + window.location.search + target
     replaceState(url || window.location.pathname, {})
+  }
+
+  // Mirrors writeHashForSelected: keeps the address bar's `view=` param in
+  // sync with the active perspective so the current filtered view — Catalog +
+  // ecosystem, Core OWL classes, Frequency bands, etc. — is itself a
+  // copyable/bookmarkable link, not just the selected node.
+  function writeScopeToUrl() {
+    const params = new URLSearchParams(window.location.search)
+    if (graphScope === 'all') params.delete('view')
+    else params.set('view', graphScope)
+    const query = params.toString()
+    const url = window.location.pathname + (query ? '?' + query : '') + window.location.hash
+    if (url === window.location.pathname + window.location.search + window.location.hash) return
+    replaceState(url, {})
   }
 
   function handleHashChange() {
@@ -1057,6 +1092,12 @@
     selected
     if (!setupReady) return
     writeHashForSelected()
+  })
+
+  $effect(() => {
+    graphScope
+    if (!setupReady) return
+    writeScopeToUrl()
   })
 
   const EDGE_KINDS = [
