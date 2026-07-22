@@ -1092,6 +1092,29 @@ used for any field-wide coverage statement.
   assertions about the three `bsc-fw-tech:` instance subjects remain in their
   instance file. Sensory/neuromodulation entries receive valid temporal values;
   no generic placeholder is fabricated.
+- **`ExploratoryProtocol` reparenting is a ten-file instance migration, decided
+  per file, not a single core edit.** Reparenting the class (§7) silently removes
+  `SensoryStimulationProtocol` from every current instance, so each is retyped
+  explicitly or deliberately left neutral. The subjects live in
+  `static/ontology/instances/experiments/`: `colored-audio-noise`,
+  `color-field-blink`, `free-view-stereo-headphones`, `ideal-tactile-immersion`,
+  `multi-headphone-haptic`, `sensory-field-example`, `silence-darkness-baseline`,
+  `smell-taste-device-boundary`, `social-graph-sensory-protocol`, and
+  `wifi-em-field-hypothesis`. The criterion is the §1 route test — structured
+  input intended to engage canonical sensory transduction. A baseline defined by
+  the *absence* of stimulation (`silence-darkness-baseline`) and a
+  mere-exposure/ambient-field hypothesis (`wifi-em-field-hypothesis`) are the
+  cases the reparenting exists to stop mislabelling; each remaining file is
+  judged on the same criterion rather than by category, and the decision is
+  recorded in its file comment.
+- **Both standalone module gates shift, not only `shacl-vocab`.** Because
+  technique identity is vocabulary-owned while characteristic-medium assertions
+  are exposure-owned (§4), `make shacl-vocab` gains the core+vocabulary+exposure
+  closure (§8) and `make shacl-exposure` continues to validate the exposure file
+  alone — which stays meaningful precisely because the medium assertions it now
+  carries name subjects whose `rdf:type` is absent from that file, so no
+  technique shape targets them there. `make shacl-modules` remains the whole-set
+  authority. Neither gate is satisfied by duplicating assertions across files.
 - **Concept documentation:** revise the direct-neural-stimulation section to
   distinguish sensory route, sensory-system target, and incidental perception.
 - **Queries and graph UI:** add executable queries to
@@ -1110,6 +1133,23 @@ used for any field-wide coverage statement.
   its release `owl:versionIRI` and `mod:status "released"`. Frozen 0.3.0–0.8.0
   snapshots remain untouched. A snapshot is made only after the release commit
   is clean.
+
+  The seven are exactly `ONTOLOGY_MODULES` in the `Makefile` — core, vocabulary,
+  alignments, shapes, patch-studio, exposure, ecosystem — which is also the
+  0.8.0 snapshot's file set. `sstim-ecosystem-private-shapes.ttl` is an eighth
+  versioned file at `0.7.0`; it is neither snapshotted nor part of the whole-set
+  release, and it is deliberately left at `0.7.0` unless this migration changes
+  the private ledger profile. Its exclusion is not an oversight.
+- **DOI is recorded after the release, never in it.** Zenodo mints the version
+  DOI from the GitHub release archived off the tag, so the release commit leaves
+  the DOI pending in `CITATION.cff`, `CHANGELOG.md`, `README.md`, and the
+  ontology READMEs, and a separate follow-up commit fills it in once minted —
+  the shape used for 0.6.0, 0.7.0, and 0.8.0. The concept DOI is stable across
+  versions; only the version DOI is new.
+- **w3id routes need no change.** Every term added here is a fragment on the
+  already-routed `sstim#`, `sstim/vocab#`, and `sstim/exposure#` roots. No new
+  path is minted, so no `perma-id/w3id.org` PR is required by this ADR. This is
+  independent of the separately pending route work in PR #6393.
 - **Alignments:** external alignments for neuromodulation and named techniques
   are reviewed separately against live authoritative identifiers. No mapping is
   inferred from a label.
