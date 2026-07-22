@@ -50,7 +50,8 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    owl:versionInfo "0.9.0-dev" ;
+    owl:versionIRI <https://w3id.org/sstim/0.9.0> ;
+    owl:versionInfo "0.9.0" ;
     owl:priorVersion <https://w3id.org/sstim/0.8.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
@@ -61,7 +62,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-22"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
@@ -69,7 +70,7 @@
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
-    mod:status "under development"@en ;
+    mod:status "released"@en ;
     foaf:logo <https://labiosyncare.github.io/icons/icon.svg> ;
     vann:preferredNamespacePrefix "sstim" ;
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;
@@ -83,6 +84,7 @@
         "v0.3.0 (2026-06): Added sstim-v:TechniqueScheme — a vendor-neutral controlled vocabulary of auditory and cross-modal sensory stimulation techniques — together with seven new StimulationMechanism concepts (ASSR, auditory-motor coupling, closed-loop phase reinforcement, masking, vibrotactile mechanoreception, acoustic startle, ultrasonic neuromodulation) and the sstim:techniqueModality property. Two non-evidence-bearing folk techniques are catalogued and explicitly flagged via skos:editorialNote. Additive, backward-compatible release (no terms removed or renamed)."@en,
         "v0.5.0 (2026-07): Domain-content coverage (P5) and evidence-integrity governance (P7). Added visual, tactile, and cross-modal techniques with the steady-state evoked-potential mechanism family (SSVEP, SSSEP, multisensory integration) (ADR 0015); reference-pitch retuning with the carrier-vs-modulation evidence firewall (ADR 0017); the modality-nomenclature cleanup — the somatosensory/haptic/tactile/vibrotactile convention and the sstim-v: to sstim-ex: perceived-modality closeMatch bridge (ADR 0019); visual/tactile/multisensory evidence-modality tags (VIS, TACTILE, MULTISENSORY); the C0-C5 public-claim-level taxonomy with SHACL claim-legality and the conditional-citation constraint (ADR 0018); and the first populated technique EvidenceClaim instances (P5.4, instance data). Version 0.4.0 was the standalone exposure / Sensory Field module release (ADR 0010, 0011). Additive, backward-compatible (no terms removed or renamed)."@en,
         "v0.6.0 (2026-07): Semantic-quality release. Controlled vocabulary categories are modeled consistently as information content entities; session specifications are PROV plans and session instances are stimulation interventions; self-reports support explicit collection phases; caution tags carry machine-readable severity and action metadata; scalar cardinalities, definitions, evidence provenance, and integrity constraints are strengthened. An external automated audit removed the obsolete OBI planned-process superclass, narrowed the technique upper alignment, completed FAIR metadata, and corrected safety-source attribution. The maintainer guided and accepted the release review; independent human ontology review is deferred. See ADR 0021, ADR 0022, and the 2026-07-10 external automated review report."@en,
+        "v0.9.0 (2026-07): Stimulation and neuromodulation release (ADR 0034). Adds a neutral sstim:Stimulation umbrella and sstim:Neuromodulation sibling at the process, intervention, technique, and protocol layers, with the overlap named at each layer as a defined intersection class requiring an intended canonical sensory-transduction route: neither family subsumes the other. Adds five orthogonal facet axes — neural access route, delivery approach, neural target site, neural system, and neural phenomenon — kept separate because a route, a dynamic, a system, and an outcome domain are not values on one scale, and reused across intended, proposed-mechanism, and observed-outcome roles by distinct properties. Shared domains and ranges widen to the neutral parents so a non-sensory technique can be the subject of a conformant evidence assessment. Retypes focused-ultrasound neuromodulation off the sensory hierarchy and redefines it by its intended focused neural target rather than by absence of an audible percept; deprecates five response-as-mechanism entries (FFR, ASSR, SSVEP, SSSEP, acoustic startle) in favour of typed neural-phenomenon concepts, removing their mechanism typing and scheme topology rather than deprecating alone. Relabels TechniqueScheme, whose IRI was never sensory-scoped. Catalogues a six-technique non-sensory contrast set (rTMS, tDCS, tACS, DBS, VNS, targeted intrathecal delivery) so the route axis is exercised; none is referenced by any BSC preset, framework, protocol, or implementation, and inclusion asserts neither capability nor efficacy nor safety. Replaces the SHACL escape hatch in which any skos:editorialNote suppressed structural requirements with composed, disjointly-targeted shapes. Breaking on mutable latest for consumers of the retyped focused-ultrasound entry and the five deprecated mechanism IRIs; frozen 0.3.0-0.8.0 snapshots retain their published entailments."@en,
         "v0.7.0 (2026-07): Evidence and ecosystem governance release. ADR 0027 replaces overloaded evidence claims with immutable assessment revisions, atomic bounded propositions, qualified evidence bases, explicit scope axes, source/search governance, and PROV review decisions while retaining deprecated compatibility terms. ADRs 0024 and 0031 add the neutral EcosystemAgent module, qualified relationships and memberships, implementation responsibility, purpose-scoped admission activities, a closed public projection, and separate access-controlled audit shapes. Public fixtures are synthetic; real live-only ecosystem records remain outside the Zenodo-tracked release repository."@en .
 
 

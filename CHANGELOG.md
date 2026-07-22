@@ -15,6 +15,84 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-07-22
+
+Stimulation and neuromodulation release ([ADR 0034](docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md)).
+SSTIM gains a neutral stimulation layer and formalizes how sensory stimulation
+relates to neuromodulation: the two **overlap**, and neither subsumes the other.
+Subsuming sensory stimulation under neuromodulation would assert neural
+modulation for every delivery instance, smuggling a mechanism claim into a class
+defined as delivery-only and bypassing the evidence layer.
+
+**Breaking on mutable latest**, for consumers of the retyped focused-ultrasound
+technique and the five deprecated response-as-mechanism IRIs. Frozen `0.3.0`–
+`0.8.0` snapshots are untouched and retain their published entailments.
+
+### Added
+- Neutral `sstim:Stimulation` umbrella and `sstim:Neuromodulation` sibling at the
+  process, intervention, technique, and protocol layers, with the overlap named
+  at each layer as a defined `owl:intersectionOf` class requiring an intended
+  canonical sensory-transduction route.
+- Five orthogonal facet axes — neural access route, delivery approach, neural
+  target site, neural system, and neural phenomenon — as 56 new multilingual SKOS
+  concepts across five schemes, plus 13 facet properties. Kept separate because a
+  route, a dynamic, a system, and an outcome domain are not values on one scale;
+  one value set is reused across intended, proposed-mechanism, and
+  observed-outcome roles by distinct properties.
+- Six non-sensory neuromodulation techniques — rTMS, tDCS, tACS, DBS, vagus nerve
+  stimulation, and targeted intrathecal delivery — populating three distinct
+  routes so the route axis is exercised rather than single-valued. None is
+  referenced by any BSC preset, framework, protocol, or implementation; inclusion
+  asserts neither BSC Lab capability, nor efficacy, nor safety.
+- `sstim-ex:characteristicDeliveryMedium`, a delivery-medium hierarchy including
+  applied electric current, electric field, magnetic field, focused ultrasound,
+  and chemical/pharmacological agents, and a stimulus channel-role facet that
+  separates an intended causal channel from a concomitant one.
+- Six stimulus temporal structures for continuous, single-event, pulse-train,
+  scheduled, bolus, and infusion timing.
+- "Stimulation" and "Neuromodulation" graph perspectives, driven by a general
+  facet matcher in the navigator rather than by a `skos:Collection` minted in the
+  vocabulary: a UI view is not a citable domain category.
+
+### Changed
+- `techUltrasoundNeuromod` is retyped onto `sstim:NeuromodulationTechnique`, off
+  the sensory hierarchy, and defined by its intended focused neural target rather
+  than by the categorical absence of an audible percept.
+- `techGamma40Auditory` is narrowed so gamma-oscillation modulation is
+  definitional, then dual-typed into the sensory-route overlap. Broad techniques
+  such as `techPhoticDriving` deliberately stay sensory-only: a use-level
+  intention is not promoted into a universal property.
+- `TechniqueScheme` is relabelled "SSTIM Stimulation Technique Vocabulary". Its
+  IRI was never sensory-scoped, so only the label had been narrower than its own
+  identifier.
+- Shared domains and ranges widen to the neutral parents so a non-sensory
+  technique can be the subject of a conformant evidence assessment.
+  `definedByFramework` moves to the general OBI protocol class so a
+  capability-boundary or baseline protocol can be framework-authored without
+  becoming stimulation.
+- `sstim-ex:ExploratoryProtocol` no longer inherits a stimulation type. Seven
+  exploratory protocols now declare `SensoryStimulationProtocol` explicitly;
+  three — a silence/darkness baseline, a mere-exposure field hypothesis, and a
+  capability-boundary document — deliberately do not.
+- `make shacl-vocab` validates the core+vocabulary+exposure closure, since
+  technique identity is vocabulary-owned while characteristic media are
+  exposure-owned and a cycle would otherwise be required.
+
+### Removed
+- The SHACL escape hatch in which any `skos:editorialNote` suppressed a
+  technique's mechanism, temporal-structure, and modality requirements. Free text
+  must not control structural conformance. The five notes remain as annotations.
+  `TechniqueShape` keeps its published IRI, retargeted to the neutral technique
+  class and composed with six disjointly-targeted shapes.
+
+### Deprecated
+- `mechFFR`, `mechASSR`, `mechSSVEP`, `mechSSSEP`, and `mechStartle` denoted
+  evoked responses and a reflex, not causal mechanisms. Each keeps its IRI as a
+  tombstone with `dct:isReplacedBy` and is stripped of its
+  `StimulationMechanism`/`skos:Concept` typing and scheme topology — deprecation
+  alone would have preserved the false entailment. Seven replacement neural
+  phenomenon concepts are minted.
+
 ## [0.8.0] - 2026-07-20
 
 Framework-scope release. `sstim:definesTechnique` on the BSC framework is now

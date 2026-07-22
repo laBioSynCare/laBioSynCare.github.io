@@ -41,7 +41,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.9.0-dev" ;
+    owl:versionInfo "0.9.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -50,7 +50,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-22"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 

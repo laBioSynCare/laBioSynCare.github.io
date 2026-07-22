@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
-    owl:versionInfo "0.9.0-dev" ;
+    owl:versionInfo "0.9.0" ;
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -48,7 +48,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-22"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en .
 

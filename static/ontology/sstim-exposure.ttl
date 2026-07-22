@@ -38,7 +38,7 @@
     # frozen snapshot at static/ontology/<version>/ (identified by the core
     # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
     # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.9.0-dev" ;
+    owl:versionInfo "0.9.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,7 +47,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-18"^^xsd:date ;
     dct:issued "2026-06-18"^^xsd:date ;
-    dct:modified "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-22"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
