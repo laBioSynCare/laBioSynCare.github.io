@@ -9,6 +9,9 @@
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/silence-darkness-baseline#> .
 
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a baseline defined by the ABSENCE of stimulation: no technique, no
+# intended causal channel. Typing it as stimulation is exactly the mislabelling
+# ADR 0034 reparents ExploratoryProtocol to prevent.
 bsclab-experiment:silence-darkness-baseline a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Silence and darkness baseline"@en ;
     dct:description "Non-clinical baseline setup for modeling black visual field and silence/near-silence as an exposure profile with comfort and isolation boundaries."@en ;

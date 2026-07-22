@@ -937,10 +937,11 @@ sstim:usesTechnique a owl:ObjectProperty ;
 
 
 sstim:definedByFramework a owl:ObjectProperty ;
-    rdfs:domain sstim:SensoryStimulationProtocol ;
+    rdfs:domain obi:0000272 ;
     rdfs:range  sstim:SensoryStimulationFramework ;
     rdfs:label  "defined by framework"@en ;
-    skos:definition "Links a protocol to the broader framework that defines or constrains it."@en ;
+    skos:definition "Links a protocol to the broader framework that defines or constrains it. The domain is the general OBI protocol class, not a stimulation protocol: a capability-boundary or baseline protocol can be authored and constrained by a framework without thereby becoming stimulation (ADR 0034 §7)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

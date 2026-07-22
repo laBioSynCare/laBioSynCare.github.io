@@ -26,6 +26,7 @@
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 
 
 ###########################################################################
@@ -63,7 +64,7 @@
 sstim-ex:ExposureProfile a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Exposure Profile"@en ;
-    skos:definition "Information artifact describing how one exploratory or operational sensory-stimulation exposure is delivered, perceived, placed, bounded, and interpreted."@en ;
+    skos:definition "Information artifact describing how one exploratory or operational stimulation exposure is delivered, perceived, placed, bounded, and interpreted."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> .
 
@@ -126,9 +127,12 @@ sstim-ex:BiohackingContext a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:ExploratoryProtocol a owl:Class ;
-    rdfs:subClassOf sstim:SensoryStimulationProtocol ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf obi:0000272 ;
     rdfs:label "Exploratory Protocol"@en ;
     skos:definition "Non-clinical protocol used to explore an exposure idea, capability boundary, or perceptual hypothesis without asserting treatment, diagnosis, cure, or guaranteed effect."@en ;
+    skos:scopeNote "Deliberately not a subclass of any stimulation protocol: a baseline defined by the absence of stimulation, or a mere-exposure hypothesis, must not become stimulation by inheritance. An exploratory protocol that is genuinely stimulation declares that type explicitly (ADR 0034 §7)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:PerceptualGain a owl:Class ;
@@ -186,10 +190,11 @@ sstim-ex:ExposureLimit a owl:Class ;
 ###########################################################################
 
 sstim-ex:hasExposureProfile a owl:ObjectProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim:SensoryStimulationTechnique sstim:Preset ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulationProtocol sstim:StimulationTechnique sstim:Stimulation sstim:Preset ) ] ;
     rdfs:range sstim-ex:ExposureProfile ;
     rdfs:label "has exposure profile"@en ;
-    skos:definition "Links a protocol, technique, preset, or experiment instance to a structured exposure profile."@en ;
+    skos:definition "Links a protocol, technique, represented stimulation process or intervention, preset, or experiment instance to a structured exposure profile."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:usesStimulusChannel a owl:ObjectProperty ;
@@ -197,6 +202,41 @@ sstim-ex:usesStimulusChannel a owl:ObjectProperty ;
     rdfs:range sstim-ex:StimulusChannel ;
     rdfs:label "uses stimulus channel"@en ;
     skos:definition "Links an exposure profile to a channel through which part of the exposure is delivered or modeled."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+# ADR 0034 §4. Channel role separates an intended causal channel from an
+# associated one, so a TMS click or an ultrasound-associated sound can be
+# recorded without silently reclassifying the primary technique as sensory.
+# Only an intended channel is eligible to participate in sensory-route
+# classification, and its asserted neural access route still decides the
+# question — channel role alone never does. Omission is unknown, not
+# "intended". Role and perceived modality are independent.
+sstim-ex:StimulusChannelRole a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Channel Role"@en ;
+    skos:definition "A controlled category for the part a stimulus channel plays in an exposure: an intended causal intervention path, an associated concomitant exposure, a control or sham path, or a feedback path."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:channelRole a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range sstim-ex:StimulusChannelRole ;
+    rdfs:label "channel role"@en ;
+    skos:definition "Links a stimulus channel to the role it plays in the exposure. Deliberate co-stimulation is not concomitant: two or more causal channels may each be intended."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+# ADR 0034 §4. Coarse technique-level characteristic for catalog navigation and
+# querying, analogous to the retained coarse sstim:techniqueModality relation.
+# This property and the medium assertions for vocabulary-owned technique
+# subjects live here rather than in sstim-vocab.ttl: the exposure module already
+# depends on the vocabulary, and reversing that would create a module cycle.
+sstim-ex:characteristicDeliveryMedium a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationTechnique ;
+    rdfs:range sstim-ex:PhysicalDeliveryMedium ;
+    rdfs:label "characteristic delivery medium"@en ;
+    skos:definition "Links a stimulation technique to a physical energy, material, or chemical agent characteristic of the method. It does not describe an executed dose or imply perception or effect; use an exposure profile for channel-level delivery."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:deliveryMedium a owl:ObjectProperty ;
@@ -214,7 +254,7 @@ sstim-ex:perceivedModality a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:requiresDeviceCapability a owl:ObjectProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim:SensoryStimulationProtocol ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim:StimulationProtocol ) ] ;
     rdfs:range sstim-ex:DeviceCapability ;
     rdfs:label "requires device capability"@en ;
     skos:definition "Links an exposure profile, stimulus channel, or protocol to a hardware or environmental capability required for delivery."@en ;
@@ -257,7 +297,7 @@ sstim-ex:hasEffectClaim a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExperimentContext a owl:ObjectProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SensoryStimulationProtocol sstim-ex:ExposureProfile ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulationProtocol sstim-ex:ExposureProfile ) ] ;
     rdfs:range sstim-ex:ExperimentContext ;
     rdfs:label "has experiment context"@en ;
     skos:definition "Links an exploratory protocol or exposure profile to the context in which it is proposed or used."@en ;
@@ -426,27 +466,65 @@ sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
 # Controlled vocabulary schemes
 ###########################################################################
 
+sstim-ex:StimulusChannelRoleScheme a skos:ConceptScheme ;
+    skos:prefLabel "Stimulus Channel Role Scheme"@en ;
+    skos:definition "Roles a stimulus channel can play in an exposure profile: intended causal intervention, concomitant exposure, control or sham, or feedback."@en ;
+    skos:hasTopConcept
+        sstim-ex:roleIntendedIntervention,
+        sstim-ex:roleConcomitant,
+        sstim-ex:roleControlOrSham,
+        sstim-ex:roleFeedback .
+
+sstim-ex:roleIntendedIntervention a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
+    skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
+    skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
+    skos:prefLabel "intended intervention channel"@en ;
+    skos:notation "intended-intervention" ;
+    skos:definition "A channel intended to mediate the intervention objective. Only an intended channel is eligible to participate in sensory-route classification, and its asserted neural access route still decides that question."@en ;
+    skos:scopeNote "Deliberate co-stimulation is not concomitant: two or more causal channels may each carry this role."@en .
+
+sstim-ex:roleConcomitant a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
+    skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
+    skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
+    skos:prefLabel "concomitant channel"@en ;
+    skos:notation "concomitant" ;
+    skos:definition "An associated channel or exposure that accompanies the intervention but is not intended to mediate its objective — for example a TMS coil click or an ultrasound-associated sound."@en ;
+    skos:scopeNote "Reserved for unintended accompaniment. Recording a concomitant channel never reclassifies the primary technique, and such a channel cannot satisfy a route-consistency requirement."@en .
+
+sstim-ex:roleControlOrSham a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
+    skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
+    skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
+    skos:prefLabel "control or sham channel"@en ;
+    skos:notation "control-or-sham" ;
+    skos:definition "A channel serving as a control or sham condition rather than as the intended causal path."@en .
+
+sstim-ex:roleFeedback a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
+    skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
+    skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
+    skos:prefLabel "feedback channel"@en ;
+    skos:notation "feedback" ;
+    skos:definition "A channel that returns a measured or derived signal to the participant."@en .
+
 sstim-ex:DeliveryMediumScheme a skos:ConceptScheme ;
     skos:prefLabel "Delivery Medium Scheme"@en ;
     skos:definition "Physical media, energies, materials, and interfaces used to deliver or model an exposure."@en ;
     skos:hasTopConcept
-        sstim-ex:mediumAirConductedSound,
-        sstim-ex:mediumContactAcousticVibration,
-        sstim-ex:mediumMechanicalVibration,
-        sstim-ex:mediumVisualLight,
         sstim-ex:mediumElectromagneticField,
         sstim-ex:mediumRespiratoryCue,
         sstim-ex:mediumStereoscopicVisualPresentation,
-        sstim-ex:mediumOlfactoryChemicalExposure,
-        sstim-ex:mediumGustatoryChemicalExposure,
         sstim-ex:mediumLiquidGelImmersion,
         sstim-ex:mediumTextileClothingContact,
         sstim-ex:mediumRigidSurfaceContact,
-        sstim-ex:mediumThermalContact,
         sstim-ex:mediumAirflow,
         sstim-ex:mediumFluidMotion,
-        sstim-ex:mediumInfraredRadiation,
-        sstim-ex:mediumUltravioletRadiation .
+        sstim-ex:mediumAcousticEnergy,
+        sstim-ex:mediumMechanicalForce,
+        sstim-ex:mediumElectromagneticRadiation,
+        sstim-ex:mediumThermalEnergy,
+        sstim-ex:mediumChemicalAgent,
+        sstim-ex:mediumAppliedElectricCurrent,
+        sstim-ex:mediumAppliedElectricField,
+        sstim-ex:mediumAppliedMagneticField .
 
 sstim-ex:PerceivedModalityScheme a skos:ConceptScheme ;
     skos:prefLabel "Perceived Modality Scheme"@en ;
@@ -651,30 +729,125 @@ sstim-ex:ComfortBoundaryScheme a skos:ConceptScheme ;
 # Controlled vocabulary concepts
 ###########################################################################
 
-sstim-ex:mediumAirConductedSound a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+# ── ADR 0034: neutral medium parents and applied-energy media ────────────
+# Physical categories are not a disjoint flat list. Electric and magnetic
+# fields and optical radiation are all electromagnetic phenomena, but the
+# operational delivery distinctions stay useful: TMS applies a magnetic field
+# and induces an electric field in tissue, while tES applies current through
+# electrodes. Concepts are related by broader/narrower and are NOT declared
+# disjoint. mediumElectromagneticField is retained for compatibility and
+# generic exposure records; it is not the only value for electromagnetic
+# techniques.
+
+sstim-ex:mediumAcousticEnergy a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:narrower sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration,
+        sstim-ex:mediumFocusedUltrasound ;
+    skos:prefLabel "acoustic energy"@en ;
+    skos:notation "acoustic-energy" ;
+    skos:definition "Mechanical wave energy applied as a stimulus, whether or not it is audible."@en .
+
+sstim-ex:mediumFocusedUltrasound a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumAcousticEnergy ;
+    skos:prefLabel "focused ultrasound"@en ;
+    skos:notation "focused-ultrasound" ;
+    skos:definition "Acoustic energy focused on a spatial target, applied above the audible range as the intended causal medium."@en ;
+    skos:scopeNote "An audible or somatosensory concomitant may still be present and is recorded as a separate channel with a concomitant role, not by reclassifying this medium."@en .
+
+sstim-ex:mediumMechanicalForce a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:narrower sstim-ex:mediumMechanicalVibration ;
+    skos:prefLabel "mechanical force"@en ;
+    skos:notation "mechanical-force" ;
+    skos:definition "Applied mechanical force, displacement, or motion delivered to the body or a contacting surface."@en .
+
+sstim-ex:mediumElectromagneticRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:narrower sstim-ex:mediumVisualLight, sstim-ex:mediumInfraredRadiation,
+        sstim-ex:mediumUltravioletRadiation ;
+    skos:prefLabel "electromagnetic radiation"@en ;
+    skos:notation "electromagnetic-radiation" ;
+    skos:definition "Radiated electromagnetic energy applied as a stimulus, across the optical range and adjacent bands."@en .
+
+sstim-ex:mediumThermalEnergy a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:narrower sstim-ex:mediumThermalContact ;
+    skos:prefLabel "thermal energy"@en ;
+    skos:notation "thermal-energy" ;
+    skos:definition "Applied heating or cooling delivered as a stimulus by any transfer path."@en .
+
+sstim-ex:mediumChemicalAgent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:narrower sstim-ex:mediumPharmacologicalAgent, sstim-ex:mediumOlfactoryChemicalExposure,
+        sstim-ex:mediumGustatoryChemicalExposure ;
+    skos:prefLabel "chemical agent"@en ;
+    skos:notation "chemical-agent" ;
+    skos:definition "A chemical substance applied as the controlled input of a stimulation method."@en ;
+    skos:scopeNote "A neutral delivery category. Unlike the effect-oriented MeSH sense of chemical stimulation, it asserts no increase in any physiological or metabolic parameter, and no response at all; a chemical medium is not by itself neuromodulation, since olfactory and gustatory inputs are chemical and sensory."@en .
+
+sstim-ex:mediumPharmacologicalAgent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumChemicalAgent ;
+    skos:prefLabel "pharmacological agent"@en ;
+    skos:notation "pharmacological-agent" ;
+    skos:definition "A pharmacological substance delivered as the controlled input of a stimulation method."@en ;
+    skos:scopeNote "Ordinary systemic neuroactive pharmacotherapy is outside the neuromodulation technique catalog; a bounded method qualifies only with an explicit neuromodulatory objective and an identified neural target."@en .
+
+sstim-ex:mediumAppliedElectricCurrent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:related sstim-ex:mediumAppliedElectricField ;
+    skos:prefLabel "applied electric current"@en ;
+    skos:notation "applied-electric-current" ;
+    skos:definition "Electric current delivered through electrodes in contact with tissue or the body surface."@en ;
+    skos:scopeNote "Applied current is not by itself brain stimulation: peripheral nerve, muscle, and cardiac applications use the same medium and are separated by the route, approach, and target facets."@en .
+
+sstim-ex:mediumAppliedElectricField a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:related sstim-ex:mediumAppliedElectricCurrent ;
+    skos:prefLabel "applied electric field"@en ;
+    skos:notation "applied-electric-field" ;
+    skos:definition "An electric field present in tissue, whether applied directly or induced by a changing magnetic field."@en ;
+    skos:scopeNote "The field induced in tissue by TMS is an established physical transformation, so it is represented here as a secondary tissue-field interaction in the exposure or device description — not as a proposed mechanism. How that field produces a neural response remains a mechanism and evidence question."@en .
+
+sstim-ex:mediumAppliedMagneticField a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:prefLabel "applied magnetic field"@en ;
+    skos:notation "applied-magnetic-field" ;
+    skos:definition "A magnetic field applied by a coil or magnet as the primary delivered medium."@en .
+
+sstim-ex:mediumAirConductedSound a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
+    skos:inScheme sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumAcousticEnergy ;
     skos:prefLabel "air-conducted sound"@en ;
     skos:notation "air-conducted-sound" ;
     skos:definition "Sound delivered through air before reaching the ear or body."@en .
 
 sstim-ex:mediumContactAcousticVibration a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumAcousticEnergy ;
     skos:prefLabel "contact acoustic vibration"@en ;
     skos:notation "contact-acoustic-vibration" ;
     skos:definition "Acoustic energy delivered through contact with a vibrating object or surface."@en .
 
 sstim-ex:mediumMechanicalVibration a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumMechanicalForce ;
     skos:prefLabel "mechanical vibration"@en ;
     skos:notation "mechanical-vibration" ;
     skos:definition "Mechanical motion delivered by an actuator, transducer, surface, or object."@en .
 
 sstim-ex:mediumVisualLight a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumElectromagneticRadiation ;
     skos:prefLabel "visual light"@en ;
     skos:notation "visual-light" ;
     skos:definition "Visible light delivered by a display, lamp, projector, or environment."@en .
@@ -702,14 +875,14 @@ sstim-ex:mediumStereoscopicVisualPresentation a owl:NamedIndividual, sstim-ex:Ph
 
 sstim-ex:mediumOlfactoryChemicalExposure a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumChemicalAgent ;
     skos:prefLabel "olfactory chemical exposure"@en ;
     skos:notation "olfactory-chemical-exposure" ;
     skos:definition "Chemical exposure intended or likely to be perceived through smell."@en .
 
 sstim-ex:mediumGustatoryChemicalExposure a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumChemicalAgent ;
     skos:prefLabel "gustatory chemical exposure"@en ;
     skos:notation "gustatory-chemical-exposure" ;
     skos:definition "Chemical exposure intended or likely to be perceived through taste."@en .
@@ -737,7 +910,7 @@ sstim-ex:mediumRigidSurfaceContact a owl:NamedIndividual, sstim-ex:PhysicalDeliv
 
 sstim-ex:mediumThermalContact a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumThermalEnergy ;
     skos:prefLabel "thermal contact"@en ;
     skos:notation "thermal-contact" ;
     skos:definition "Temperature exposure delivered through contact or near-contact."@en .
@@ -758,14 +931,14 @@ sstim-ex:mediumFluidMotion a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMediu
 
 sstim-ex:mediumInfraredRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumElectromagneticRadiation ;
     skos:prefLabel "infrared radiation"@en ;
     skos:notation "infrared-radiation" ;
     skos:definition "Non-visible optical radiation in the infrared range, modeled as physical exposure without asserting perceptual or physiological effect."@en .
 
 sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
-    skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
+    skos:broader sstim-ex:mediumElectromagneticRadiation ;
     skos:prefLabel "ultraviolet radiation"@en ;
     skos:notation "ultraviolet-radiation" ;
     skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure. Any at-body delivery is bounded by the optical-radiation comfort boundary (sstim-ex:boundaryOpticalRadiation), which carries an exposure limit citing IEC 62471 / ICNIRP. BSC Lab does not currently deliver ultraviolet radiation at the body."@en ;

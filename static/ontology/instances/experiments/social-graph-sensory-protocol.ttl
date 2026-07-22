@@ -8,7 +8,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
-bsclab-experiment:social-graph-sensory-protocol a sstim-ex:ExploratoryProtocol ;
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:social-graph-sensory-protocol a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
     rdfs:label "Social graph sensory protocol"@en ;
     dct:description "Non-clinical exploratory setup combining social-graph visualization, conversation, and sound as an aesthetic self-observation protocol."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;

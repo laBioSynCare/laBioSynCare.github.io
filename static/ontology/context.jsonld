@@ -123,6 +123,7 @@
 
     "ExposureProfile": "sstim-ex:ExposureProfile",
     "StimulusChannel": "sstim-ex:StimulusChannel",
+    "StimulusChannelRole": "sstim-ex:StimulusChannelRole",
     "PhysicalDeliveryMedium": "sstim-ex:PhysicalDeliveryMedium",
     "PerceivedModality": "sstim-ex:PerceivedModality",
     "DeviceCapability": "sstim-ex:DeviceCapability",
@@ -512,6 +513,8 @@
     "hasExposureProfile": { "@id": "sstim-ex:hasExposureProfile", "@type": "@id" },
     "usesStimulusChannel": { "@id": "sstim-ex:usesStimulusChannel", "@type": "@id" },
     "deliveryMedium": { "@id": "sstim-ex:deliveryMedium", "@type": "@id" },
+    "characteristicDeliveryMedium": { "@id": "sstim-ex:characteristicDeliveryMedium", "@type": "@id" },
+    "channelRole": { "@id": "sstim-ex:channelRole", "@type": "@id" },
     "perceivedModality": { "@id": "sstim-ex:perceivedModality", "@type": "@id" },
     "requiresDeviceCapability": { "@id": "sstim-ex:requiresDeviceCapability", "@type": "@id" },
     "hasBodyPlacement": { "@id": "sstim-ex:hasBodyPlacement", "@type": "@id" },

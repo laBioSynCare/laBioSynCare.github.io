@@ -8,7 +8,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
-bsclab-experiment:colored-audio-noise a sstim-ex:ExploratoryProtocol ;
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:colored-audio-noise a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
     rdfs:label "Colored audio noise exposure"@en ;
     dct:description "Non-clinical exploratory setup for comparing white, pink, brown/red, blue, violet/purple, grey, and black/silence audio conditions as defined stimulus patterns."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;

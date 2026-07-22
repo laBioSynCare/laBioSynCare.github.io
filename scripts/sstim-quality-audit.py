@@ -1079,7 +1079,14 @@ minimums = {
     "concepts": 295,
     "schemes": 30,
     "framework techniques": 7,
-    "protocols": 12,
+    # ADR 0034 reparented sstim-ex:ExploratoryProtocol off SensoryStimulationProtocol
+    # so that a baseline defined by the absence of stimulation, a mere-exposure
+    # ambient-field hypothesis, and a capability-boundary document stop being
+    # typed as sensory stimulation by inheritance. Seven of the ten exploratory
+    # protocols now declare the sensory type explicitly; three deliberately do
+    # not. The floor drops from 12 to 9 to record that intended loss rather than
+    # to accommodate drift — a further drop still fails.
+    "protocols": 9,
     "presets": 2,
     "evidence assessments": 8,
     "knowledge-status assertions": 3,

@@ -8,7 +8,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 
-bsclab-experiment:multi-headphone-haptic a sstim-ex:ExploratoryProtocol ;
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:multi-headphone-haptic a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
     rdfs:label "Multi-headphone haptic placement"@en ;
     dct:description "Non-clinical exploratory setup for placing multiple audio devices near hands, feet, and the top of the head to model acoustic vibration as tactile or body-perceived stimulation."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;

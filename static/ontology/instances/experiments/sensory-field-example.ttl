@@ -14,7 +14,10 @@
 # the kind of profile the Sensory Field route emits at runtime; it is deliverable
 # by BSC Lab today, so its knowledge status is knownInSSTIM.
 
-bsclab-experiment:sensory-field-example a sstim-ex:ExploratoryProtocol ;
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:sensory-field-example a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
     rdfs:label "Sensory Field reference exposure"@en ;
     dct:description "Reference profile for the Sensory Field interface: a full-screen color field (static or gently blinking) with an independent per-ear tone forming a binaural beat. Non-clinical; no physiological benefit is asserted."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;

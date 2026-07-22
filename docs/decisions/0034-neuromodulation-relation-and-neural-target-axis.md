@@ -706,6 +706,19 @@ The following domain/range changes are required as one coordinated migration:
 - `usesTechnique`: domain and range change to `StimulationProtocol` and
   `StimulationTechnique`, so a neuromodulation protocol remains an information
   artifact and can name its method without acquiring a sensory type;
+- **`definedByFramework`: domain changes from `SensoryStimulationProtocol` to
+  `obi:0000272`.** Found during implementation, and required for the
+  `ExploratoryProtocol` reparenting above to have any effect: all ten current
+  exploratory protocols assert `definedByFramework`, so its sensory domain
+  re-infers under RDFS/OWL closure precisely the typing the reparenting removes,
+  including on the silence/darkness baseline and the mere-exposure field
+  hypothesis. Widening to `StimulationProtocol` would not fix it either — that
+  still asserts stimulation. The general OBI protocol class is the honest
+  domain: both `StimulationProtocol` and the reparented `ExploratoryProtocol`
+  are `obi:0000272`, so a boundary or baseline protocol can be authored and
+  constrained by a framework without becoming stimulation. The alternative,
+  deleting the framework link from the three neutral files, was rejected as
+  losing true provenance;
 - matching evidence SHACL class/union constraints change in lockstep.
 
 Definitions and shape messages change in the same migration. In particular,
@@ -1107,6 +1120,16 @@ used for any field-wide coverage statement.
   cases the reparenting exists to stop mislabelling; each remaining file is
   judged on the same criterion rather than by category, and the decision is
   recorded in its file comment.
+
+  Resolved during implementation: seven declare `sstim:usesTechnique` with real
+  sensory techniques and are retyped `sstim:SensoryStimulationProtocol`
+  explicitly. Three declare no technique at all and stay neutral — the two the
+  ADR named, plus `smell-taste-device-boundary`, whose own `skos:editorialNote`
+  records that it "intentionally does not map them to a currently supported BSC
+  stimulation technique" and whose every channel is `notCurrentlyDeliverableByBSCLab`
+  or `outsideBSCLabScope`. Consequently the quality audit's `protocols` competency
+  floor drops from 12 to 9, with the reason recorded at the threshold: it marks
+  an intended loss, and a further drop still fails.
 - **Both standalone module gates shift, not only `shacl-vocab`.** Because
   technique identity is vocabulary-owned while characteristic-medium assertions
   are exposure-owned (§4), `make shacl-vocab` gains the core+vocabulary+exposure

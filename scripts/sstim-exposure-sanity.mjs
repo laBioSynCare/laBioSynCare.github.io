@@ -188,7 +188,13 @@ ASK {
 }
 `)
 
-await assertAsk(store, 'every skos:broader placement resolves to a declared BodyPlacement', `${prefixes}
+// Body placement was once the only hierarchy in this module, so this check used
+// to hard-code BodyPlacement as the required type of every skos:broader target.
+// ADR 0034 gives delivery media a hierarchy too, so the check is generalized
+// rather than relaxed: a broader target must be a declared concept that shares
+// a value class with its narrower concept. That still catches a dangling or
+// cross-scheme broader link, which is what the original was protecting against.
+await assertAsk(store, 'every skos:broader target is a declared concept sharing its child value class', `${prefixes}
 ASK {
   FILTER NOT EXISTS {
     GRAPH <https://w3id.org/sstim/graph/exposure> {
@@ -196,7 +202,9 @@ ASK {
     }
     FILTER NOT EXISTS {
       GRAPH <https://w3id.org/sstim/graph/exposure> {
-        ?broad a sstim-ex:BodyPlacement .
+        ?broad a skos:Concept, ?valueClass .
+        ?narrow a ?valueClass .
+        FILTER(?valueClass != skos:Concept && ?valueClass != owl:NamedIndividual)
       }
     }
   }

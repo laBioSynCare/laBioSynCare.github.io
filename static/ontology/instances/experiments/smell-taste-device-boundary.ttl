@@ -9,6 +9,9 @@
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/smell-taste-device-boundary#> .
 
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a capability-boundary document. Its own editorial note records that it
+# intentionally maps to no supported stimulation technique, and every channel is
+# notCurrentlyDeliverableByBSCLab or outsideBSCLabScope.
 bsclab-experiment:smell-taste-device-boundary a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Smell and taste device boundary"@en ;
     dct:description "Non-clinical modeling example that treats olfactory and gustatory modalities as SSTIM-relevant while marking ordinary phone smell, device taste, and perfume-on-device usage as outside current BSC Lab delivery capability."@en ;

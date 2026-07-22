@@ -9,6 +9,8 @@
 @prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
 @prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/wifi-em-field-hypothesis#> .
 
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a mere-exposure ambient-field hypothesis with modalityNotDirectlyPerceived
+# and no intended causal channel. Ambient exposure is not stimulation.
 bsclab-experiment:wifi-em-field-hypothesis a sstim-ex:ExploratoryProtocol ;
     rdfs:label "Wi-Fi electromagnetic-field exposure hypothesis"@en ;
     dct:description "Non-clinical modeling example for representing Wi-Fi, screen, cable, or nearby-device electromagnetic exposure as a physical delivery medium. It does not assert stimulation efficacy or physiological effect."@en ;
