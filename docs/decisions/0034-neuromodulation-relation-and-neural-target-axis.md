@@ -1,6 +1,6 @@
 # ADR 0034 — Stimulation and neuromodulation: overlap, delivery, route, and neural-target axes
 
-**Status:** Proposed — 2026-07-22
+**Status:** Accepted — 2026-07-22 · implemented in SSTIM 0.9.0
 
 Introduces a neutral stimulation layer around SSTIM, formalizes the overlap
 between sensory stimulation and interventional neuromodulation, and establishes
@@ -15,9 +15,10 @@ This decision extends the boundary prose in
 `skos:editorialNote` validation escape hatch from the technique contract.
 
 The implementation touches protected term files
-([ADR 0004](0004-protected-ontology-files.md); `CLAUDE.md` §3.4). **This ADR does
-not authorize those edits.** Acceptance must record explicit approval for each
-protected file before implementation.
+([ADR 0004](0004-protected-ontology-files.md); `CLAUDE.md` §3.4). Maintainer
+approval to edit them was given in session on 2026-07-22 ("You have my full
+authorization to edit ttl files and whatever you need to accomplish this
+task"), and the migration shipped in SSTIM 0.9.0.
 
 ---
 

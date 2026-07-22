@@ -57,7 +57,7 @@ annotations lives here.
 | [0031](0031-qualified-ecosystem-records.md) | Qualified ecosystem relationships, externally stored approved public current state, and a private append-only engagement audit | Accepted |
 | [0032](0032-visible-pending-status-ecosystem-records.md) | Visible pending-status ecosystem records: `publicationStatus` as a second, consent-scoped public admission basis | Accepted |
 | [0033](0033-framework-scope-and-generic-technique-deduplication.md) | BSC framework scope; `incorporatesTechnique` for non-originated techniques; retire four generic-technique duplicates | Accepted |
-| [0034](0034-neuromodulation-relation-and-neural-target-axis.md) | Add neutral stimulation context; model sensory-route neuromodulation as an overlap; separate medium, route, approach, target, perception, and evidence; retire the SHACL editorialNote escape hatch | Proposed |
+| [0034](0034-neuromodulation-relation-and-neural-target-axis.md) | Add neutral stimulation context; model sensory-route neuromodulation as an overlap; separate medium, route, approach, target, perception, and evidence; retire the SHACL editorialNote escape hatch | Accepted |
 
 ## Adding an ADR
 
