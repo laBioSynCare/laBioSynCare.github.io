@@ -1,488 +1,1235 @@
-# ADR 0034 — Neuromodulation: overlap relation, neural-target axis, and route scoping
+# ADR 0034 — Stimulation and neuromodulation: overlap, delivery, route, and neural-target axes
 
 **Status:** Proposed — 2026-07-22
 
-Introduces `sstim:Neuromodulation` and formalizes its relation to
-`sstim:SensoryStimulation`. Supersedes nothing; extends the boundary prose in
-[`docs/concept/SENSORY_STIMULATION.md`](../concept/SENSORY_STIMULATION.md)
-§"Direct neural stimulation" into RDF, and retires the `skos:editorialNote`
-escape hatch in `sstim-sh:TechniqueShape`.
+Introduces a neutral stimulation layer around SSTIM, formalizes the overlap
+between sensory stimulation and interventional neuromodulation, and establishes
+how non-sensory electrical, magnetic/electromagnetic, acoustic/mechanical, and
+chemical stimulation techniques are represented without forcing them into a
+false class tree.
 
-Touches the protected term files ([ADR 0004](0004-protected-ontology-files.md);
-`CLAUDE.md` §3.4). **This ADR does not authorize those edits** — per
-[`IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md), each change set needs
-its own explicit approval. Implementation approval is recorded on acceptance.
+This decision extends the boundary prose in
+[`docs/concept/SENSORY_STIMULATION.md`](../concept/SENSORY_STIMULATION.md)
+§“Direct neural stimulation,” reuses the delivery/perception separation from
+[ADR 0010](0010-exposure-delivery-modality.md), and removes the
+`skos:editorialNote` validation escape hatch from the technique contract.
+
+The implementation touches protected term files
+([ADR 0004](0004-protected-ontology-files.md); `CLAUDE.md` §3.4). **This ADR does
+not authorize those edits.** Acceptance must record explicit approval for each
+protected file before implementation.
 
 ---
 
 ## Context
 
-SSTIM says "neuromodulation" exactly twice in the released term space, both times
-about focused ultrasound: `sstim-v:mechUltrasonic` and
-`sstim-v:techUltrasoundNeuromod`. The concept the field is organized around is
-otherwise absent, and the ontology cannot answer four questions a domain
-consumer will ask immediately:
+SSTIM currently uses “neuromodulation” only for focused ultrasound:
+`sstim-v:mechUltrasonic` and `sstim-v:techUltrasoundNeuromod`. The wider concept
+is absent. The graph therefore cannot represent the context needed to answer:
 
-1. How does sensory stimulation relate to neuromodulation?
-2. Does neuromodulation require stimulation?
-3. Which sensory techniques and modalities are most studied / best evidenced for
-   neural-level effects?
-4. Which claims and evidence link the two?
+1. How do stimulation, sensory stimulation, and neuromodulation relate?
+2. Which neuromodulation techniques are outside sensory stimulation?
+3. How can electrical, magnetic/electromagnetic, acoustic, optical, mechanical,
+   thermal, and chemical inputs be compared without treating any input kind as
+   automatically sensory, neural, or brain-targeted?
+4. Is a sensory system the *entry route*, the *target*, or merely the source of
+   an accompanying percept?
+5. Which proposed mechanisms, observations, and evidence claims connect a
+   sensory technique to a neural outcome?
 
-Three concrete symptoms of the gap:
+### Concrete defects in the current model
 
-**The SHACL escape hatch.** `sstim-sh:TechniqueShape`
-([`sstim-shapes.ttl:1023-1043`](../../static/ontology/sstim-shapes.ttl)) requires
-every technique to declare `sstim:techniqueModality`, then adds an `sh:or` branch
-exempting anything carrying a `skos:editorialNote`. That branch exists for one
-individual: `techUltrasoundNeuromod`, which has no perceived modality. An
-exemption keyed on the *presence of a free-text annotation* is not a constraint;
-it is an exception list that grows every time a boundary technique is cataloged.
+**The focused-ultrasound type is wrong, but retyping alone is insufficient.**
+`techUltrasoundNeuromod` is explicitly a `sstim:NonEntrainmentTechnique`, hence
+a `sstim:SensoryStimulationTechnique`, even though its intended intervention
+route is focused action at a neural target rather than auditory sensory
+transduction. Removing that explicit type would not solve the problem:
+`sstim:proposedMechanism` and `sstim:hasStimulusTemporalStructure` currently have
+`rdfs:domain sstim:SensoryStimulationTechnique`, so their retained triples would
+infer the sensory type again.
 
-**A mis-typed released individual.** `techUltrasoundNeuromod` is typed
-`sstim:NonEntrainmentTechnique` ⊑ `sstim:SensoryStimulationTechnique`, while its
-own `skos:definition` says it produces "no audible percept" and its
-`skos:editorialNote` says it has "no perceived sensory modality." A technique
-that reaches neural tissue without traversing a sensory receptor is not a sensory
-stimulation technique. The escape hatch is downstream of this type error.
+The correction must therefore introduce a neutral technique superclass and
+widen the domains of properties shared by sensory and non-sensory techniques
+*before* retyping focused ultrasound.
 
-**The boundary is stated only in prose.**
-[`SENSORY_STIMULATION.md:370-373`](../concept/SENSORY_STIMULATION.md) already
-names the discriminating axis — *"the practical boundary is the intended causal
-route: sensory stimulation acts through sensory receptors and afferent
-processing, while direct neurostimulation targets neural tissue through another
-energy-transfer mechanism"* — but nothing in the graph encodes it.
+**The SHACL escape hatch is structural, not ultrasound-specific.**
+`sstim-sh:TechniqueShape` currently allows any sensory technique with a
+`skos:editorialNote` to bypass its mechanism, temporal-structure, and modality
+requirements. Five technique concepts carry such a note; Solfeggio tuning and
+subliminal audio rely on the branch to omit a proposed mechanism, while focused
+ultrasound relies on it to omit sensory modality. Free text must not control
+structural conformance.
 
-### The preliminary model
+**The evidence layer is sensory-only.** `sstim:evaluatesSubject`,
+`sstim:propositionSubject`, `sstim:basisIntervention`, and
+`sstim:scopeInterventionOrContext`, together with their SHACL constraints,
+currently admit `SensoryStimulationTechnique` but not a neutral stimulation or
+neuromodulation technique. Cataloguing TMS, DBS, or targeted chemical delivery
+without widening those positions would create techniques about which SSTIM
+cannot make a conformant evidence assessment.
 
-A predecessor ontology (pre-SSTIM naming) placed `Neuromodulation` as a direct
-`owl:Thing` child with subclasses `BrainStimulation` (→ `ElectricalStimulation`),
-`ChemicalStimulation`, `CognitiveModulation` (→ `Context`, `Language`),
-`SensoryStimulation` (→ `AudiovisualStimulation`, `GuidingStimulation`,
-`TactileStimulation`), and `TranscranialStimulation` (→
-`TranscranialMagneticStimulation`).
+### What the preliminary tree gets wrong
 
-It is not adoptable as drawn, for reasons that are specific rather than
-structural:
+The predecessor diagram is useful as an inventory prompt, but not as a
+taxonomy. It puts `BrainStimulation`, `ChemicalStimulation`,
+`CognitiveModulation`, `SensoryStimulation`, and `TranscranialStimulation` under
+`Neuromodulation`, then places electrical, audiovisual, tactile, context, and
+language concepts below them. That mixes independent questions:
 
-- **`SensoryStimulation ⊑ Neuromodulation` is false and, worse, off-design.**
-  False because sensory substitution for accessibility, a sonification readout,
-  and an aesthetic soundscape are sensory stimulation without being
-  neuromodulation. Off-design because SSTIM defines `SensoryStimulation` as the
-  *delivery process only* — [`sstim-core.ttl:100`](../../static/ontology/sstim-core.ttl):
-  "The class identifies the delivery process; any mechanism, response, or outcome
-  is represented separately and requires its own evidence." Subsumption would
-  assert, for every instance, that neural activity is modulated — smuggling a
-  mechanism claim into the delivery class and bypassing the entire evidence layer
-  that [ADR 0027](0027-evidence-claim-family-and-public-claim-gate.md) exists to
-  enforce.
-- **Specific over-strong subsumptions.** `ElectricalStimulation ⊑
-  BrainStimulation` is false (TENS is electrical and peripheral).
-  `ChemicalStimulation ⊑ Neuromodulation` is false (gustatory and olfactory
-  stimulation are chemical and sensory).
-- **`CognitiveModulation → Context, Language`** is a category error: context and
-  language are not kinds of cognitive modulation.
-- **Modality-as-subclass** (`AudiovisualStimulation`, `TactileStimulation`)
-  reintroduces the combinatorial class explosion SSTIM avoids by putting modality
-  on a property (`sstim:techniqueModality`) against a modality vocabulary.
+- **objective/classification** — sensory stimulation or neuromodulation;
+- **applied energy or agent** — electrical current, magnetic field, acoustic
+  energy, light, mechanical force, heat, or a chemical agent;
+- **delivery approach** — environmental, transcutaneous, transcranial,
+  percutaneous, implanted, intrathecal, or systemic;
+- **biological access route** — canonical sensory-receptor afference, another
+  physical neural interaction, biochemical engagement, or an indirect
+  physiological route;
+- **anatomical target** — brain, spinal cord, cranial/peripheral nerve, sensory
+  organ, muscle, or another structure;
+- **perception and outcome** — what was perceived or measured.
 
-**Not a defect:** `BrainStimulation` and `TranscranialStimulation` being
-non-disjoint siblings with TMS under both. OWL siblings need not partition, and
-multiple inheritance is legitimate; a partition, where wanted, is asserted with
-`owl:disjointWith` / `owl:AllDisjointClasses` plus a covering axiom. The tree
-*rendering* forced TMS to appear under one parent only, which is a UI artifact,
-not an ontology error. This ADR takes the constructive form of that observation:
-where a class is genuinely determined by facet values, **define** it with a
-restriction rather than asserting a primitive subclass.
+The resulting subclass claims are false. Electrical stimulation is not
+necessarily brain stimulation (for example, muscle stimulation and cardiac
+pacing); chemical stimulation is not necessarily neuromodulation (olfactory and
+gustatory inputs are chemical and sensory); and a transcranial approach says
+nothing by itself about the energy used. Context and language are protocol or
+content features, not kinds of cognitive modulation. Audiovisual and tactile
+combinations are already handled by properties rather than a combinatorial OWL
+class hierarchy.
+
+The physical categories are not a disjoint flat list either. Electric and
+magnetic fields and optical radiation are electromagnetic phenomena, but the
+operational delivery distinctions remain useful. TMS applies a magnetic field
+and induces an electric field in tissue; tES applies current through electrodes.
+The model must allow such related or multi-stage descriptions without asserting
+that “electrical,” “magnetic,” and “electromagnetic” are mutually exclusive
+siblings. Reviews of neuromodulation methods likewise span electrical, magnetic,
+optical, thermal, acoustic/mechanical, and chemical approaches; that breadth is
+an inventory of applied methods, not a reason to collapse their other facets.
+
+### External terminology informs, but does not dictate, the model
+
+The International Neuromodulation Society defines therapeutic neuromodulation
+through targeted delivery of a stimulus and explicitly gives electrical
+stimulation and chemical agents as examples. This supports including both in
+SSTIM’s *interventional* scope. It does not imply that every electrical or
+chemical stimulation is neuromodulation, nor that every neuromodulation is
+sensory stimulation.
+
+NLM MeSH defines “chemical stimulation” in effect-oriented terms as an increase
+in a measurable physiological or metabolic parameter. SSTIM instead needs a
+neutral delivery category for a chemical agent, because delivery must not assert
+that a response increased—or occurred at all. Any future MeSH mapping is
+therefore broader/related at most, not an automatic `skos:exactMatch`.
+
+Finally, causal access is not always a cost-free physical fact. Experimental
+work has shown that some reported tACS effects can arise through transcutaneous
+peripheral-nerve stimulation, and human transcranial-ultrasound protocols can
+have auditory confounds. SSTIM must distinguish a technique’s declared/intended
+route from an experimentally established mechanism.
+
+Sources:
+
+- [International Neuromodulation Society — Neuromodulation Defined](https://www.neuromodulation.com/neuromodulation-defined)
+- [NLM MeSH — Stimulation, Chemical](https://meshb.nlm.nih.gov/record/ui?ui=D013268)
+- [Luan et al. — Neuromodulation: present and emerging methods](https://doi.org/10.3389/fneng.2014.00027)
+- [Black and Rogers — Sensory Neuromodulation](https://doi.org/10.3389/fnsys.2020.00012)
+- [Bikson et al. — Transcranial Electrical Stimulation Nomenclature](https://doi.org/10.1016/j.brs.2019.07.010)
+- [Asamoah et al. — tACS effects through peripheral nerves](https://doi.org/10.1038/s41467-018-08183-w)
+- [Braun et al. — auditory confounding in transcranial ultrasound](https://doi.org/10.1016/j.brs.2020.08.014)
 
 ---
 
 ## Decision
 
-### 1. Overlap, not subsumption
+### 1. Add a neutral stimulation umbrella
+
+SSTIM models deliberately applied interventions, not endogenous physiological
+neuromodulation. Within that operational scope, neuromodulation is a kind of
+stimulation, but it does not require *sensory* stimulation.
+
+The Turtle blocks in this ADR are abbreviated semantic signatures, not
+copy-ready term records. Implementation adds the repository-required labels,
+multilingual annotations where applicable, definitions, `rdfs:isDefinedBy`, and
+an `rdfs:seeAlso` link to this ADR for every new or semantically revised local
+term.
 
 ```turtle
-sstim:Neuromodulation a owl:Class ;
-    rdfs:subClassOf bfo:0000015 ;          # process
-    skos:definition "A process whose intended proximal target is the modulation
-      of neural activity, by any causal route. The class identifies the intended
-      target of the process; whether the modulation occurred is an evidence
-      question represented separately."@en .
+sstim:Stimulation a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    skos:definition """A deliberately parameterized process in which structured
+      physical energy, mechanical input, a chemical agent, or another controlled
+      input is applied as a stimulus with a declared design intent to elicit,
+      perturb, regulate, or probe an identified biological, sensory, or neural
+      process. Mere exposure, administration, or energy transfer without that
+      stimulation intent is insufficient. Classification does not assert
+      excitation, conscious perception, response, benefit, or safety."""@en .
 
-sstim:SensoryNeuromodulation a owl:Class ;
+sstim:SensoryStimulation rdfs:subClassOf sstim:Stimulation .
+
+sstim:Neuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation ;
+    skos:definition """In SSTIM, a deliberately applied stimulation process whose
+      declared intervention objective is to alter activity or function at an
+      identified neural target. Anatomical site and distributed neural system
+      are recorded on separate facets. Membership records target and design
+      intent; whether modulation occurred is represented separately through
+      observations and evidence."""@en ;
+    skos:scopeNote """This intervention-side class excludes endogenous
+      physiological neuromodulation and stimulation performed solely to probe or
+      measure a response without a neural-modulation objective. It does not mean
+      treatment or successful modulation."""@en .
+
+sstim:SensoryRouteNeuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulation, sstim:Neuromodulation ;
     owl:equivalentClass [ a owl:Class ; owl:intersectionOf
-        ( sstim:SensoryStimulation sstim:Neuromodulation ) ] .
+        ( sstim:SensoryStimulation
+          sstim:Neuromodulation
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom
+                sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] .
 ```
 
-`SensoryStimulation` and `Neuromodulation` **overlap**; neither subsumes the
-other. `SensoryNeuromodulation` is a *defined* class (the intersection), so it
-asserts nothing beyond the two memberships. A `skos:scopeNote` on both parents
-records why subsumption was rejected, so the question is not re-litigated.
+Revise `SensoryStimulation`’s definition/scope note in the same change: its
+defining intervention route engages canonical sensory transduction and afferent
+processing with structured input. Conscious perception is not required, and a
+mere incidental sensation from another primary route is insufficient.
 
-Answers **CQ1**: sensory stimulation is not a kind of neuromodulation, and only
-*some* sensory stimulation is neuromodulation — namely the part whose intended
-proximal target is neural activity.
+`SensoryStimulation` and `Neuromodulation` overlap; neither subsumes the other.
+The explicit `rdfs:subClassOf` axioms on the defined intersection are redundant
+for an OWL reasoner but deliberate: the current graph navigator renders named
+subclass edges and does not project `owl:intersectionOf` expressions.
 
-### 2. Three axes, kept separate
-
-The preliminary model tangled three things that SSTIM must keep apart, because
-each has a different epistemic cost and a different authority:
-
-| Axis | Question | Cost | Where it lives |
-|---|---|---|---|
-| **Route** | *How* is neural tissue reached? | Free — physical fact | `sstim:neuralAccessRoute` |
-| **Target** | *What* is the process aimed at? | Cheap — declarable design intent | class membership in `sstim:Neuromodulation`; `sstim:mechanismTargetLevel` |
-| **Effect** | *Did* it modulate neural activity? | Expensive — tiered evidence | `sstim:EvidenceAssessmentClaim` |
-
-Conflating target with effect is the standard over-claim failure in this
-literature and is exactly what ADR 0018/0027 guard against. Conflating route with
-target is what makes the preliminary tree unusable.
-
-### 3. `neuralAccessRoute` is scoped to where it varies
-
-Raised in review 2026-07-22: *every* sensory process reaches the nervous system
-through receptor-mediated afferent pathways, so a route property asserted across
-all sensory techniques is entailed rather than informative — it would be a
-constant column.
-
-This is correct, and it settles the property's scope: **route is declared only by
-non-sensory neuromodulation techniques, where it actually varies.**
+The existing planned-process layer receives the same neutral parent:
 
 ```turtle
+sstim:StimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation, cob:0000082 .
+
+sstim:SensoryStimulationIntervention
+    rdfs:subClassOf sstim:StimulationIntervention, cob:0000082 .
+
+sstim:NeuromodulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:StimulationIntervention, sstim:Neuromodulation .
+
+sstim:SensoryRouteNeuromodulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationIntervention,
+        sstim:NeuromodulationIntervention ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationIntervention
+          sstim:NeuromodulationIntervention
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom
+                sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] .
+```
+
+The same structure applies to reusable technique information artifacts:
+
+```turtle
+sstim:StimulationTechnique a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    skos:definition """A reusable information-content category for a
+      parameterizable stimulation method. Classification records the method's
+      declared design intent and characteristic delivery, not that any response
+      occurred."""@en .
+
+sstim:SensoryStimulationTechnique
+    rdfs:subClassOf sstim:StimulationTechnique, iao:0000030 .
+
 sstim:NeuromodulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:StimulationTechnique ;
+    skos:definition """A stimulation technique whose defining intervention
+      objective is to alter activity or function at an identified neural target,
+      with anatomical site and distributed neural system recorded separately.
+      Membership does not assert successful modulation, benefit, or safety."""@en .
+
+sstim:SensoryRouteNeuromodulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationTechnique,
+        sstim:NeuromodulationTechnique ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationTechnique
+          sstim:NeuromodulationTechnique
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom
+                sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] .
+```
+
+Protocol intent remains an information-artifact classification rather than a
+process type:
+
+```turtle
+sstim:StimulationProtocol a owl:Class ;
+    rdfs:subClassOf iao:0000030, obi:0000272 .
+
+sstim:SensoryStimulationProtocol
+    rdfs:subClassOf sstim:StimulationProtocol, iao:0000030, obi:0000272 .
+
+sstim:NeuromodulationProtocol a owl:Class ;
+    rdfs:subClassOf sstim:StimulationProtocol .
+
+sstim:SensoryRouteNeuromodulationProtocol a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationProtocol,
+        sstim:NeuromodulationProtocol ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationProtocol
+          sstim:NeuromodulationProtocol
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom
+                sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] .
+```
+
+No disjointness is asserted between the sensory and neuromodulation parents at
+any layer. Hybrid and multi-channel plans and techniques are legitimate.
+`EntrainmentBasedTechnique` and `NonEntrainmentTechnique` remain sensory-specific
+subclasses and therefore inherit the new neutral parent indirectly.
+
+These parent additions are additive. Existing direct upper-ontology axioms—most
+notably `SensoryStimulationTechnique → iao:0000030` and
+`SensoryStimulationProtocol → obi:0000272`—remain materialized because the
+repository quality contract tests those direct triples rather than inferred
+closure.
+
+### 2. Separate three meanings of “sensory”
+
+The following statements are independent:
+
+1. **Sensory-route neuromodulation:** canonical receptor transduction and
+   afferent processing are an intended causal route. An auditory or visual
+   rhythmic intervention with an explicit neural-modulation objective may fit.
+2. **Neuromodulation of a sensory system:** a sensory organ, nerve, pathway, or
+   function is the neural target. A cochlear or retinal neural interface may fit
+   without using the canonical receptor route.
+3. **Sensation associated with neuromodulation:** the participant perceives a
+   click, phosphene, tingling, warmth, vibration, or other concomitant effect.
+   Incidental perception does not turn the primary intervention route into
+   sensory stimulation.
+
+The route-qualified intersection classes represent the first meaning only. The
+second is queried through the target axis; the third through
+`sstim-ex:perceivedModality` and a channel role. No technique is classified as
+sensory merely because a percept is possible, and lack of conscious perception
+does not prove that a sensory route was absent.
+
+Technique typing also must not promote a use-level intention into a universal
+property. A broad technique such as flicker presentation can be used for an
+aesthetic display, a diagnostic frequency-tagging probe, or a neuromodulatory
+intervention. It is dual-typed only if neural-modulation intent is part of the
+technique concept’s definition. Otherwise the generic technique remains
+sensory-only. A protocol records the planned objective through
+`NeuromodulationProtocol` plus its route/target facets, and the realized
+intervention—not the protocol information artifact—is typed
+`SensoryRouteNeuromodulationIntervention`.
+
+A proposed neural mechanism or an immediate evoked response is not by itself a
+neuromodulation objective. The current `mechSSVEP`, `mechSSSEP`, `mechASSR`,
+`mechFFR`, and `mechStartle` placements are legacy category debt: these denote
+evoked responses or a reflex, not causal mechanisms. The 0.9.0 migration mints
+correctly named neural-phenomenon/evidence-outcome concepts and deprecates the
+legacy `mech*` IRIs with `dct:isReplacedBy` history. It also removes their
+`rdf:type sstim:StimulationMechanism`, `rdf:type skos:Concept`,
+`skos:inScheme`, top-concept, and broader/narrower mechanism-scheme topology;
+deprecation alone would preserve the false entailment. References from
+techniques are migrated away from `proposedMechanism`. Every remaining entry in
+`StimulationMechanismScheme` is audited under the same causal-mechanism
+criterion rather than accepted merely because its local name starts with
+`mech`. Thus broad `techPhoticDriving` can remain sensory-only, while the
+revised, purpose-bounded `techGamma40Auditory` seed can occupy the overlap.
+
+### 3. Use orthogonal facets, not a stimulation class tree
+
+| Facet | Question | Representation | Epistemic role |
+|---|---|---|---|
+| **Process family** | What kind of stimulation process or method is this? | `Stimulation`, `SensoryStimulation`, `Neuromodulation` and technique counterparts | declared classification and objective |
+| **Applied medium/agent** | What controlled physical or chemical input is applied? | `sstim-ex:characteristicDeliveryMedium` plus the detailed exposure-channel path | specified delivery, not a response |
+| **Delivery approach** | How is the input introduced or the interface positioned? | `sstim:stimulationDeliveryApproach` | specified setup; values may be multiple/hierarchical |
+| **Intended neural access** | Through which biological route is the target meant to be engaged? | `sstim:neuralAccessRoute` | design intention; actual route may remain disputed |
+| **Anatomical target** | Which nervous-system site is intended? | `sstim:intendedNeuralTargetSite` | target intention, not delivered dose or effect |
+| **Neural-system target** | Which distributed neural system is intended? | `sstim:intendedNeuralSystem` | sensory, motor, autonomic, or another system; independent of entry route |
+| **Functional target** | Which neural phenomenon is intended? | `sstim:intendedNeuralPhenomenon` | target intention, not an observed result |
+| **Perception** | Which modality is intended or concomitant, and what is known about it? | `techniqueModality`, exposure `perceivedModality`, channel role, and explicit knowledge status | sensory description, not classification by itself |
+| **Mechanism** | How is a response proposed to arise? | `proposedMechanism`, optionally tagged by mechanism route, site/system, and phenomenon properties | hypothesis/evidence interpretation |
+| **Observed effect** | What response, route, or target finding occurred, with what support? | observation records and ADR 0027 assessment/proposition/outcome chain, optionally tagged by outcome route, site/system, and phenomenon properties | evidence-qualified result |
+
+No facet property introduced here is functional. A technique may have multiple
+channels, approaches, plausible routes, or targets. Carrier, approach, route,
+target, and effect must never be inferred from one another solely by naming.
+
+Language, context, instruction, and cognitive tasks may be structured protocol
+content or intervention components. They are not delivery media and are not
+primitive children of `Neuromodulation`; a bounded “cognitive stimulation”
+method is a `StimulationTechnique`, and it becomes a neuromodulation technique
+only when neural-modulation objective and target are definitional.
+
+### 4. Reuse and extend the exposure delivery-medium model
+
+The exposure module already separates physical delivery medium, perceived
+modality, device capability, and body placement. It remains authoritative for
+detailed delivery:
+
+```text
+technique → hasExposureProfile → usesStimulusChannel
+          → deliveryMedium / perceivedModality / device / placement / dose
+```
+
+Add a non-functional channel-role facet with initial values for intended
+intervention input, concomitant/incidental exposure, control or sham, and
+feedback.
+Only an intended causal channel is eligible to participate in sensory-route
+classification, and its asserted neural-access route still decides the question;
+channel role alone never does. A TMS click or ultrasound-associated sound can
+therefore be recorded without silently reclassifying the primary technique;
+omission of a role is unknown, not “intended.”
+
+`sstim:neuralAccessRoute` is also allowed on `sstim-ex:StimulusChannel`. In a
+multi-channel profile this channel-level binding is authoritative, and route
+consistency is two-way:
+
+1. in a profile attached to a neuromodulation process, technique, protocol, or
+   intervention, every `roleIntendedIntervention` channel declares at least one
+   neural access route;
+2. each coarse route asserted on the process, technique, protocol, or
+   intervention is backed by an intended channel whose route equals or is
+   narrower than that coarse route; and
+3. each intended channel route is surfaced by an equal-or-broader coarse route.
+
+Both checks use the exact path
+`?channelRoute skos:broader* ?coarseRoute`, never mere shared ancestry. An
+intended channel on the canonical sensory route (or a narrower route) also
+requires the corresponding sensory class at that resource layer. If the
+resource is neuromodulation too, the ordinary dual-parent and overlap
+constraints apply. A protocol with intended direct and auditory channels cannot
+therefore publish only its bypass route to evade the sensory overlap. If no
+profile exists, the coarse route is the curated characteristic route.
+
+```turtle
+sstim-ex:StimulusChannelRole a owl:Class ;
     rdfs:subClassOf iao:0000030 .
 
-sstim:neuralAccessRoute a owl:ObjectProperty ;
-    rdfs:domain sstim:NeuromodulationTechnique ;
-    rdfs:range  sstim:NeuralAccessRoute .
-
-sstim-v:NeuralAccessRouteScheme a skos:ConceptScheme ;
-    skos:hasTopConcept
-        sstim-v:routeReceptorMediatedAfferent,   # sensory — definitional
-        sstim-v:routeTranscranialField,          # TMS, tES
-        sstim-v:routeImplantedElectrode,         # DBS, VNS
-        sstim-v:routeFocusedAcoustic,            # FUS
-        sstim-v:routeChemicalPharmacological .
+sstim-ex:channelRole a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range sstim-ex:StimulusChannelRole .
 ```
 
-For sensory techniques the route is definitional and left unstated; asserting it
-per-individual would be redundant annotation. The route vocabulary still lists
-`routeReceptorMediatedAfferent` because it is the value that *characterizes* the
-sensory branch in queries and in the `SensoryNeuromodulation` scopeNote.
+`sstim-ex:StimulusChannelRoleScheme` seeds
+`sstim-ex:roleIntendedIntervention`,
+`sstim-ex:roleConcomitant`, `sstim-ex:roleControlOrSham`, and
+`sstim-ex:roleFeedback`. Role and perceived modality are
+independent: an intended non-sensory channel may create a concomitant percept,
+and an explicit `modalityNotDirectlyPerceived` value is distinct from an omitted
+`perceivedModality` triple, which remains unknown or not assessed. Protocol- or
+session-specific perception reports stay in their scoped observation/evidence
+records.
 
-Answers **CQ2**: no, neuromodulation does not require stimulation, and the
-non-sensory routes enumerate exactly why — transcranial field, implanted
-electrode, focused acoustic, and pharmacological routes are neuromodulation
-without being sensory stimulation.
+Deliberate co-stimulation is not “concomitant” in this scheme: two or more causal
+channels may each carry `roleIntendedIntervention`. `roleConcomitant` is reserved
+for an associated channel/exposure not intended to mediate the intervention
+objective.
 
-**The requirement is enforced in SHACL, not OWL.** An `owl:hasValue` restriction
-on `SensoryStimulationTechnique` was considered and rejected — see Alternatives.
-
-The single `sstim-sh:TechniqueShape` with its `sh:or` is replaced by **two
-shapes with disjoint targets**, each stating one obligation:
-
-| Shape | Targets | Requires |
-|---|---|---|
-| `sstim-sh:SensoryTechniqueShape` | `sstim:SensoryStimulationTechnique` | `sstim:techniqueModality` `minCount 1` |
-| `sstim-sh:NeuromodulationTechniqueShape` | `sstim:NeuromodulationTechnique` | `sstim:neuralAccessRoute` `minCount 1` |
-
-This is strictly better than an `sh:or` over one shape. Each obligation attaches
-to the class that actually bears it; a technique that is *both* (sensory
-neuromodulation — `techGamma40Auditory`, `techPhoticDriving`) must satisfy both,
-which is correct and was not expressible before. The `skos:editorialNote` branch
-disappears entirely rather than being restated: there is no longer a condition to
-exempt, because the two populations are now distinguished by type instead of by
-the presence of free text.
-
-Matches house style — [`sstim-core.ttl:975`](../../static/ontology/sstim-core.ttl):
-"classes are enforced in SHACL, not by type inference."
-
-### 4. One target-level axis, reused for mechanisms and outcomes
-
-`sstim-v:StimulationMechanismScheme` already partitions along neural-target lines
-without any new data; nothing labels the partition:
-
-- **neural-oscillatory** — `mechFFR`, `mechASSR`, `mechSSVEP`, `mechSSSEP`,
-  `mechThalamocortical`, `mechGamma40`, `mechClosedLoopPhase`
-- **autonomic** — `mechAutonomic`
-- **perceptual-cognitive** — `mechAttentional`, `mechMasking`, `mechMultisensory`
-- **receptor-peripheral** — `mechMechanoreceptive`, `mechStochastic`,
-  `mechStartle`, `mechAuditoryMotor`
-- **neural-direct** — `mechUltrasonic`
-
-A single controlled axis serves two subjects:
+Add a coarse technique-level characteristic for catalog navigation and querying,
+analogous to the retained coarse `techniqueModality` relation:
 
 ```turtle
-sstim-v:TargetLevelScheme a skos:ConceptScheme ;
-    skos:hasTopConcept sstim-v:levelNeuralOscillatory, sstim-v:levelNeuralDirect,
-        sstim-v:levelAutonomic, sstim-v:levelPerceptualCognitive,
-        sstim-v:levelReceptorPeripheral .
-
-sstim:mechanismTargetLevel a owl:ObjectProperty ;
-    rdfs:domain sstim:StimulationMechanism ;   rdfs:range sstim:TargetLevel .
-
-sstim:outcomeTargetLevel a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceOutcomeConcept ; rdfs:range sstim:TargetLevel .
+sstim-ex:characteristicDeliveryMedium a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationTechnique ;
+    rdfs:range sstim-ex:PhysicalDeliveryMedium ;
+    skos:definition """Links a stimulation technique to a physical energy, material,
+      or chemical agent characteristic of the method. It does not describe an
+      executed dose or imply perception or effect; use an exposure profile for
+      channel-level delivery."""@en .
 ```
 
-Tagging mechanisms makes **CQ3** answerable today, from data already released.
-Tagging outcome concepts makes **CQ4** answerable as the evidence corpus grows —
-`EvidenceAssessmentClaim → AssessmentProposition → EvidenceOutcomeConcept`
-already exists per [ADR 0027](0027-evidence-claim-family-and-public-claim-gate.md)
-/ [ADR 0028](0028-atomic-claim-propositions-and-public-expressions.md); only the
-neural-level marker is missing.
+The property definition and medium assertions for vocabulary-owned technique
+subjects live in `sstim-exposure.ttl`, not `sstim-vocab.ttl`. The exposure module
+already depends on the vocabulary; reversing that dependency would create a
+module cycle. Technique identity and type remain in the vocabulary graph.
+Assertions for instance-owned subjects remain beside those instances (for
+example in `static/ontology/instances/frameworks/bsc.ttl`), which may depend on
+both modules without leaking instance data into the snapshotted term space.
 
-### 5. "Most studied" and "best evidenced" stay distinct
+Extend `sstim-ex:DeliveryMediumScheme` with neutral, operational concepts:
 
-Two different queries against two different structures, and the ontology asserts
-neither as a class-level fact:
+All medium and channel-role local names in this section use the `sstim-ex:`
+namespace.
 
-- **most studied** — count distinct `sstim:EvidenceBasis` / `BibliographicReference`
-  per technique. A bibliometric fact.
-- **best evidenced** — max `sstim:hasEvidenceTier` over claims whose proposition's
-  outcome is neural-level. An assessment fact.
+- `mediumAppliedElectricCurrent` and `mediumAppliedElectricField` as distinct,
+  related concepts;
+- `mediumAppliedMagneticField`;
+- `mediumElectromagneticRadiation`, with visible light, infrared, and ultraviolet
+  as narrower concepts where appropriate;
+- `mediumAcousticEnergy`, with air-conducted sound, contact acoustic vibration,
+  and `mediumFocusedUltrasound` as narrower concepts;
+- `mediumMechanicalForce`, with existing vibration media below it;
+- `mediumThermalEnergy`;
+- `mediumChemicalAgent` → `mediumPharmacologicalAgent`, with olfactory and
+  gustatory chemical delivery as sensory specializations.
 
-Neither is "most effective." Efficacy ranking is not a query SSTIM answers, and
-no property will be added that invites the reading. A `skos:scopeNote` on
-`TargetLevelScheme` states this.
+The existing `mediumElectromagneticField` remains for compatibility and generic
+exposure records. It is not the only value for electromagnetic techniques. TMS
+uses the applied-magnetic-field value; tDCS, tACS, DBS, and electrical nerve
+stimulation use applied-electric-current. The electric field induced by TMS is
+established physical transformation, so, when represented, it is a secondary
+tissue-field interaction in the exposure/device description—not merely a
+`proposedMechanism`. How that field produces a neural response remains a
+mechanism/evidence question. Concepts are related by
+`skos:broader`/`skos:narrower`; they are not declared disjoint.
 
-### 6. Graph navigator: facet scoping in software
+Electrical, magnetic, acoustic, optical, thermal, and chemical stimulation are
+therefore property-based views over `StimulationTechnique`, not primitive
+children of `Neuromodulation`. A convenience OWL class may be added later as a
+defined restriction if a demonstrated consumer needs one; it must not become a
+second manually maintained taxonomy.
 
-Per maintainer 2026-07-22: *change the BSC Lab software to allow correct
-navigation rather than distorting the RDF formalization.* A `skos:Collection`
-minted so a UI filter can match it would be a navigator artifact inside a citable
-released vocabulary. **Rejected on that basis.**
+### 5. Keep route, approach, target, and neural phenomenon separate
 
-A neuromodulation perspective is cross-cutting: the new OWL classes, the route
-scheme, and the *subset* of mechanisms whose `mechanismTargetLevel` is neural.
-`graphScopeNodeVisible`
-([`OntologyGraph.svelte:335-352`](../../src/ui/graph/OntologyGraph.svelte))
-currently matches only whole `skos:ConceptScheme` membership or class local name,
-so it cannot express "concepts with predicate P = value V". Three additive
-software changes, no RDF accommodation:
+The new facet classes are controlled information categories. Route, approach,
+site, system, and intended-phenomenon properties are allowed on stimulation
+processes, techniques, protocols, and planned/executed interventions through
+SHACL; route is additionally allowed on stimulus channels. They intentionally
+carry no OWL domain: one cross-layer property must not infer that a protocol
+information artifact is a technique or process.
 
-1. **`src/rdf/graph.js`** — the SKOS concept pass
-   ([`graph.js:231-253`](../../src/rdf/graph.js)) gains an optional facet
-   collection: for a configured predicate list, attach `data.facets` as
-   predicate→values. Additive to existing node data (`kind`, `layer`, `scheme`,
-   `notation`, `iri`); no existing consumer changes.
-2. **`OntologyGraph.svelte`** — a `SCOPE_FACETS` map beside `SCOPE_SCHEMES` /
-   `SCOPE_CLASSES`, and one matcher branch in `graphScopeNodeVisible`.
-3. **`GRAPH_SCOPES`** — a `{ value: 'neuromodulation', label: 'Neuromodulation' }`
-   entry, which inherits shareable `?view=neuromodulation` links from 2cee5ab at
-   no extra cost.
+```turtle
+sstim:NeuralAccessRoute a owl:Class ; rdfs:subClassOf iao:0000030 .
+sstim:CanonicalSensoryTransductionAccessRoute a owl:Class ;
+    rdfs:subClassOf sstim:NeuralAccessRoute .
+sstim:SensoryTransductionBypassingAccessRoute a owl:Class ;
+    rdfs:subClassOf sstim:NeuralAccessRoute .
+sstim:StimulationDeliveryApproach a owl:Class ; rdfs:subClassOf iao:0000030 .
+sstim:NeuralTargetSite a owl:Class ; rdfs:subClassOf iao:0000030 .
+sstim:NeuralSystem a owl:Class ; rdfs:subClassOf iao:0000030 .
+sstim:NeuralPhenomenon a owl:Class ; rdfs:subClassOf iao:0000030 .
 
-The facet matcher is general, not neuromodulation-specific: it is the mechanism
-any future value-based perspective needs.
+sstim:neuralAccessRoute a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralAccessRoute .
+sstim:stimulationDeliveryApproach a owl:ObjectProperty ;
+    rdfs:range sstim:StimulationDeliveryApproach .
+sstim:intendedNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralTargetSite .
+sstim:intendedNeuralSystem a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralSystem .
+sstim:intendedNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralPhenomenon .
+sstim:mechanismNeuralAccessRoute a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralAccessRoute .
+sstim:mechanismNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralTargetSite .
+sstim:mechanismNeuralSystem a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralSystem .
+sstim:mechanismNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralPhenomenon .
+sstim:outcomeNeuralAccessRoute a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralAccessRoute .
+sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralTargetSite .
+sstim:outcomeNeuralSystem a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralSystem .
+sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralPhenomenon .
+```
+
+`sstim-v:NeuralAccessRouteScheme` contains causal-route categories only. “Receptor” in
+this axis means a canonical sensory receptor, not a molecular drug receptor. Its
+initial hierarchy is:
+
+```text
+routeCanonicalSensoryTransductionAfferent
+routeBypassesCanonicalSensoryTransduction
+├── routePhysicalNeuralInteraction
+├── routeBiochemicalPharmacologicalNeuralInteraction
+└── routeIndirectNonSensoryPhysiologicalMediation
+```
+
+These controlled-value local names use the `sstim-v:` namespace.
+`routeCanonicalSensoryTransductionAfferent` is typed
+`CanonicalSensoryTransductionAccessRoute`; the bypass parent and its narrower
+values are typed `SensoryTransductionBypassingAccessRoute`. This lets core OWL
+restrictions refer to route classes without making the core module depend on
+vocabulary individuals.
+
+Mixed access is represented by multiple route values; it is not the same thing
+as uncertainty. “Unresolved” is an epistemic status recorded by a scoped
+knowledge-status assertion or evidence assessment, not a pseudo-route.
+
+Route values describe the *declared intended route*. Competing or demonstrated
+actual mechanisms remain evidence-qualified through a mechanism/outcome concept
+tagged by its route and target-role properties. For example, both an intended
+cortical tACS interaction and a peripheral-nerve explanation use the broad
+physical-neural route; the intended target is `sstim-v:targetCortex` via
+`sstim:intendedNeuralTargetSite`, while the evaluated outcome uses
+`sstim-v:targetPeripheralNerve` via `sstim:outcomeNeuralTargetSite`.
+Focused ultrasound can declare a physical neural route while an exposure profile
+records an auditory concomitant channel.
+
+`sstim-v:StimulationDeliveryApproachScheme` separately contains non-exclusive,
+coarse operational tags: `approachExternal`,
+`approachEnvironmentalReceptorFacing`, `approachTranscutaneous`,
+`approachTranscranial`, `approachPercutaneous`, `approachImplanted`,
+`approachIntracranial`, `approachEpidural`, `approachTargetedLocalInfusion`,
+`approachIntrathecal`, and `approachSystemic` (all `sstim-v:`). These deliberately
+summarize administration, invasiveness, and interface placement for
+cross-technique navigation. Detailed device, body placement, administration,
+and dose remain in the exposure profile; no one approach tag is inferred from
+another facet. A method may, for example, be external, transcutaneous, and
+transcranial.
+
+`sstim-v:NeuralTargetSiteScheme` contains controlled information categories for broad
+targets, not anatomical entities themselves. Its seed hierarchy covers:
+
+- `targetCentralNervousSystem` → `targetBrain` → `targetCortex` /
+  `targetDeepBrainStructure`;
+- `targetCentralNervousSystem` → `targetSpinalCord`;
+- `targetPeripheralNervousSystem` → `targetPeripheralNerve`;
+- `targetCranialNerve` as a separate seed category rather than a blanket child
+  of PNS, because cranial-nerve anatomy is not uniformly peripheral.
+
+All target local names above use the `sstim-v:` namespace.
+
+External anatomy alignment is a separate, evidence-checked pass. A local target
+category may have more than one broader concept; no forced single-parent tree is
+required.
+
+`sstim-v:NeuralSystemScheme` separately covers distributed organizational systems. Its
+initial `sstim-v:` concepts include `systemSensory`, `systemMotor`, and
+`systemAutonomic`; sensory has `systemAuditory`, `systemVisual`,
+`systemSomatosensory`, `systemOlfactory`, `systemGustatory`, `systemVestibular`,
+`systemProprioceptive`, and `systemInteroceptive` narrower concepts aligned
+to—but not identified with—the modality vocabulary. This is the axis for
+“neuromodulation of a sensory system”; it does not imply that the intervention
+entered through that sensory system.
+
+`sstim-v:NeuralPhenomenonScheme` contains coherent functional neural phenomena, such as
+`phenomenonExcitabilityOrFiring`, `phenomenonOscillatoryDynamics`,
+`phenomenonTemporalCoordination`, `phenomenonSynapticTransmission`,
+`phenomenonNeurochemicalSignaling`, `phenomenonConnectivityOrPlasticity`, and
+`phenomenonAutonomicNeuralRegulation` (all `sstim-v:`). The three phenomenon
+properties above reuse this value set while preserving proposed-mechanism,
+intended-target, and observed-outcome roles.
+
+This replaces the earlier proposed `TargetLevelScheme`. “Neural-direct” is a
+route, “oscillatory” is a dynamic, “autonomic” is a system/phenomenon, and
+“perceptual-cognitive” is an outcome domain; they are not values on one level
+axis. Perceptual, cognitive, motor, autonomic, physiological, and behavioral
+outcome domains may be modeled separately and non-exclusively. An autonomic
+outcome can also be neural; a controlled vocabulary must not force false
+partitions merely to simplify a query.
+
+### 6. Route and temporal requirements are explicit
+
+Every explicitly represented `Neuromodulation` process declares at least one
+`neuralAccessRoute`, `stimulationDeliveryApproach`, and
+`intendedNeuralTargetSite`, plus an exposure profile. The process-level SHACL
+shape makes the route-bearing intersection in §1 usable on data, rather than
+leaving process instances outside the allowed-subject contract.
+
+Every `NeuromodulationTechnique`, including a sensory-route neuromodulation
+technique, declares at least one:
+
+- `neuralAccessRoute`;
+- `stimulationDeliveryApproach`;
+- `intendedNeuralTargetSite`;
+- `characteristicDeliveryMedium`; and
+- `hasStimulusTemporalStructure`.
+
+The earlier proposal to omit route from sensory techniques created a
+contradiction: dual-typed sensory neuromodulation techniques were simultaneously
+said not to declare route and required by their neuromodulation shape to declare
+it. Within the neuromodulation population, canonical sensory-transduction and
+afferent access is not a redundant value—it is the fact that distinguishes the
+sensory-route overlap from approaches that bypass canonical sensory
+transduction. A technique in the named overlap must assert that route; an
+arbitrary dual type plus only a bypass route is non-conformant.
+
+Sensory-only techniques need not repeat `neuralAccessRoute` merely to restate
+their class definition, although they may use it when comparison or a detailed
+profile needs the explicit value. Every stimulation technique declares a
+characteristic medium. Sensory and neuromodulation techniques also declare
+temporal structure; a neutral umbrella technique that fixes no characteristic
+timing is not forced to invent one.
+
+The core `StimulusTemporalStructure` definition is widened from “sensory
+stimulus” to “applied stimulus or agent.” Its scheme retains periodic,
+quasi-periodic, aperiodic, and adaptive, and adds
+`sstim-v:temporalContinuousTonic`, `sstim-v:temporalSingleEvent`,
+`sstim-v:temporalPulseTrainOrBurst`, `sstim-v:temporalIntermittentScheduled`,
+`sstim-v:temporalBolus`, and `sstim-v:temporalContinuousInfusion`. Values are
+non-disjoint and may be combined: carrier periodicity, pulse pattern, and
+administration schedule are different temporal features. Detailed executed
+timing remains in the exposure profile.
+
+An asserted route below
+`sstim-v:routeBypassesCanonicalSensoryTransduction` positively identifies such
+a route; it does **not** prove that the whole technique is
+non-sensory, because a hybrid may also have an intended sensory route. Likewise,
+absence of `rdf:type sstim:SensoryStimulationTechnique` is not OWL negation.
+Queries therefore report “neuromodulation with a bypass route,” not a logical
+complement class. Under the open-world assumption, `FILTER NOT EXISTS` is not
+proof that something is non-sensory.
+
+### 7. Generalize shared properties and the evidence model
+
+The following domain/range changes are required as one coordinated migration:
+
+- `proposedMechanism` and `hasStimulusTemporalStructure`: domain changes from
+  `SensoryStimulationTechnique` to `StimulationTechnique`;
+- `sstim-ex:hasExposureProfile`: its sensory technique and protocol arms change
+  to `StimulationTechnique` and `StimulationProtocol`, and `Stimulation` is
+  admitted for represented stimulation processes (including interventions);
+- `sstim-ex:requiresDeviceCapability` and `sstim-ex:hasExperimentContext`:
+  their sensory-protocol union arms change to `StimulationProtocol`, aligning
+  the declared contract and SHACL allowed classes with non-sensory protocols;
+- `sstim-ex:ExploratoryProtocol`: parent changes from
+  `SensoryStimulationProtocol` to direct neutral `iao:0000030` and
+  `obi:0000272` parents. Existing silence/darkness baselines and mere-exposure
+  hypotheses therefore do not become stimulation by inheritance; actual
+  stimulation/sensory exploratory protocols receive explicit types selectively;
+- `evaluatesSubject`, deprecated `supportsRelation`, and `propositionSubject`:
+  technique range changes to `StimulationTechnique`;
+- `scopeInterventionOrContext` and `basisIntervention`: sensory technique,
+  protocol, and intervention alternatives change to their neutral stimulation
+  parents;
+- `usesTechnique`: domain and range change to `StimulationProtocol` and
+  `StimulationTechnique`, so a neuromodulation protocol remains an information
+  artifact and can name its method without acquiring a sensory type;
+- matching evidence SHACL class/union constraints change in lockstep.
+
+Definitions and shape messages change in the same migration. In particular,
+remove sensory-only wording from `proposedMechanism`,
+`hasStimulusTemporalStructure`, `EvidenceTierValue`, and `ExposureProfile`; a
+widened range with a still-sensory definition would be internally inconsistent.
+
+Widening the deprecated `supportsRelation` range is necessary despite its
+deprecated status: its current union range does not choose or infer one member
+class under OWL, but it still declares non-sensory techniques outside the
+contract and conflicts with the matching SHACL `sh:or`. Its history note
+continues to direct consumers to `evaluatesSubject`.
+
+For evidence whose scoped intervention has no applicable sensory modality, the
+existing triple
+`?scope sstim:scopeSensoryModality sstim-v:scopeNotApplicable` satisfies the
+proposition’s sensory-modality scope, while source-level
+`sstim:basisModalityApplicability` uses
+`sstim-v:applicabilityNotApplicable`. A fake sensory modality is never added
+merely to satisfy the evidence shapes.
+
+Sensory-framework properties `definesTechnique` and `incorporatesTechnique`
+remain ranged to `SensoryStimulationTechnique`. Generalizing `usesTechnique`
+does not add any link: cataloguing a non-sensory technique therefore does not
+imply that BSC or any sensory framework or protocol implements or incorporates
+it.
+
+This migration weakens old implicit inferences from the properties that have a
+*direct* sensory domain or range, notably `proposedMechanism`,
+`hasStimulusTemporalStructure`, and `usesTechnique`. OWL union domains/ranges do
+not infer a chosen union arm; their widening instead corrects the declared
+contract and SHACL validation. Both changes are intentional semantic changes to
+mutable latest. Frozen version snapshots retain their published entailments.
+
+### 8. Compose SHACL obligations; never branch on editorial prose
+
+Retain the published `sstim-sh:TechniqueShape` IRI, retarget it to
+`sstim:StimulationTechnique`, and compose it with more specific shapes:
+
+| Shape | Target | Required fields |
+|---|---|---|
+| `sstim-sh:NeuromodulationProcessShape` | `Neuromodulation` | exposure profile; neural access route; delivery approach; intended neural target site |
+| `sstim-sh:SensoryRouteNeuromodulationProcessShape` | processes that are both sensory stimulation and neuromodulation | canonical sensory-transduction/afferent route |
+| `sstim-sh:TechniqueShape` | `StimulationTechnique` | characteristic delivery medium |
+| `sstim-sh:SensoryTechniqueShape` | `SensoryStimulationTechnique` | coarse sensory modality; temporal structure |
+| `sstim-sh:NeuromodulationTechniqueShape` | `NeuromodulationTechnique` | temporal structure; neural access route; delivery approach; intended neural target site |
+| `sstim-sh:SensoryRouteNeuromodulationTechniqueShape` | nodes that are both sensory and neuromodulation techniques | canonical sensory-transduction/afferent route |
+| `sstim-sh:NeuromodulationProtocolShape` | `NeuromodulationProtocol` | used technique; neural access route; delivery approach; intended neural target site |
+| `sstim-sh:NeuromodulationInterventionShape` | `NeuromodulationIntervention` | exposure profile; neural access route; delivery approach; intended neural target site |
+| `sstim-sh:SensoryRouteNeuromodulationPlanShape` | protocols/interventions in both sensory and neuromodulation hierarchies | canonical sensory-transduction/afferent route |
+| `sstim-sh:RouteChannelConsistencyShape` | stimulation processes/techniques/protocols/interventions that have an exposure profile | every intended channel in a neuromodulation profile has a route; every coarse route is backed by an intended channel; every intended-channel route is surfaced coarsely; and an intended canonical sensory route requires the layer’s sensory type; route matching uses `?channelRoute skos:broader* ?coarseRoute` |
+| `sstim-sh:StimulationFacetSubjectShape` | `sh:targetSubjectsOf` each domainless route, approach, and intended-target property | all facets permit a stimulation process, technique, protocol, or intervention; route also permits a stimulus channel; each value has the declared value class |
+
+Targets overlap by design. A dual-typed process, technique, protocol, or
+intervention must satisfy all applicable shapes. The intersection-specific
+shapes use ordinary `sh:targetClass` on the neutral
+process/technique/protocol/intervention parent, then conditional `sh:sparql`
+constraints test membership in both hierarchies and require the canonical route
+or a narrower route by SKOS ancestry. They do not use `sh:SPARQLTarget`, which
+pySHACL ignores unless advanced mode is enabled; the repository’s current gates
+do not enable it.
+
+`StimulationFacetSubjectShape` is the enforcement counterpart of the deliberate
+no-domain design. Negative fixtures place each facet on an unrelated node and
+must fail: omitting an OWL domain avoids unwanted inference, but does not grant
+arbitrary subjects permission to use the property.
+
+`proposedMechanism` is no longer a required violation-level field. If no
+mechanism is asserted, SSTIM does not invent one merely to satisfy validation.
+Optional completeness findings stay in the separate quality-audit report; they
+are not `sh:Warning` results in the normative shape graph because the current
+pySHACL gate does not allow warnings. `skos:editorialNote` never suppresses
+structural constraints. The notes on color-field stimulation, reference-pitch
+retuning, Solfeggio tuning, subliminal audio, and focused ultrasound remain
+useful annotations; they cease to be validation switches.
+
+This preserves the current temporal obligation for sensory techniques, extends
+it to neuromodulation techniques with an adequate value set, and adds a medium
+obligation to the neutral technique layer.
+
+Because technique identity/type is vocabulary-owned while characteristic-medium
+assertions are exposure-owned, standalone `make shacl-vocab` can no longer
+validate `sstim-vocab.ttl` in isolation. That gate is changed to validate the
+core + vocabulary + exposure dependency closure; `make shacl-modules` remains
+the whole-set authority. Assertions are not duplicated merely to satisfy a
+file-local validation command.
+
+### 9. Retype focused ultrasound and add a representative contrast set
+
+Relabel `sstim-v:TechniqueScheme` from “Sensory Stimulation Technique
+Vocabulary” to **“SSTIM Stimulation Technique Vocabulary.”** Its IRI is unchanged.
+Its definition states that the scheme is a bounded, non-exhaustive catalog of
+sensory stimulation and interventional neuromodulation techniques used to place
+SSTIM’s core domain in context.
+
+Retype `techUltrasoundNeuromod` as `StimulationTechnique` and
+`NeuromodulationTechnique`, not `NonEntrainmentTechnique`. Rewrite its definition
+around the intended focused neural target rather than categorical absence of an
+audible percept. Auditory or somatosensory co-stimulation and confounds are
+protocol-dependent and belong in exposure profiles and evidence records; they
+do not decide the technique’s primary class.
+
+Revise `mechUltrasonic` in the same migration. It becomes an explicitly proposed,
+evidence-qualified mechanism family covering candidate acoustic-radiation-force,
+membrane, and mechanosensitive-channel pathways. Its definition no longer states
+“without an audible percept,” treats no candidate pathway as universally
+established, and does not use the mechanism term to decide sensory typing.
+
+Revise `techGamma40Auditory` narrowly enough that neural-oscillation modulation
+is part of the technique’s defining objective, then type it
+`SensoryRouteNeuromodulationTechnique` and assert the canonical sensory route.
+
+Use the following representative contrast table as classification guidance
+rather than attempting an exhaustive medical taxonomy. A row does not by itself
+require a new catalog IRI; the exact release seed follows the table.
+
+| Technique/example | Type in SSTIM | Characteristic medium | Intended route | Delivery approach | Intended target/context |
+|---|---|---|---|---|---|
+| olfactory or gustatory stimulation | sensory stimulation technique | chemical agent | canonical sensory-transduction/afferent access | environmental/receptor-facing | sensory receptor and sensory system; not automatically neuromodulation |
+| 40 Hz auditory gamma stimulation with a defining neural objective | sensory-route neuromodulation technique | air-conducted acoustic energy | canonical sensory-transduction/afferent access | external + environmental | cortex + auditory neural system; oscillatory dynamics |
+| TENS or peripheral electrical nerve stimulation | stimulation; neuromodulation only for a suitably defined method | applied electric current | physical peripheral-neural interaction bypassing canonical sensory transduction | external + transcutaneous | peripheral nerve; not brain stimulation by definition |
+| tDCS | neuromodulation technique | applied electric current | physical neural interaction bypassing canonical sensory transduction | external + transcutaneous + transcranial | brain/cortex |
+| tACS | neuromodulation technique | applied electric current | intended physical neural interaction bypassing canonical sensory transduction; peripheral explanations remain evidence questions | external + transcutaneous + transcranial | brain/cortex; oscillatory dynamics |
+| repetitive TMS with a defining modulation objective | neuromodulation technique; generic probe-only TMS remains stimulation-only in this classification | applied magnetic field | physical neural interaction bypassing canonical sensory transduction | external + transcranial | brain/cortex |
+| DBS | neuromodulation technique | applied electric current | physical neural interaction bypassing canonical sensory transduction | implanted + intracranial | deep-brain structure |
+| spinal cord stimulation | neuromodulation technique | applied electric current | physical neural interaction bypassing canonical sensory transduction | implanted + epidural | spinal cord |
+| vagus nerve stimulation | neuromodulation technique | applied electric current | physical peripheral-neural interaction bypassing canonical sensory transduction | implanted or external + transcutaneous, depending variant | cranial nerve; autonomic neural system |
+| focused-ultrasound neuromodulation | neuromodulation technique | focused acoustic energy | intended physical neural interaction bypassing canonical sensory transduction | external + transcranial | cortical or deep-brain target; auditory confounds modeled separately |
+| targeted intrathecal delivery of a neuromodulatory agent | neuromodulation technique only when neural-modulation objective is definitional | chemical/pharmacological agent | biochemical/pharmacological neural interaction bypassing canonical sensory transduction | targeted local infusion + intrathecal | central nervous system / spinal target |
+| neuromuscular electrical stimulation | stimulation technique | applied electric current | no neural-access value required for the neutral classification; a neural-targeting variant may assert physical peripheral-neural interaction | external + transcutaneous | muscle/motor unit; not automatically neuromodulation |
+
+The minimum released contrast set is exact rather than aspirational:
+`sstim-v:techRepetitiveTMS`, `sstim-v:techTDCS`, `sstim-v:techTACS`,
+`sstim-v:techDBS`, `sstim-v:techUltrasoundNeuromod`,
+`sstim-v:techVagusNerveStimulation`, and
+`sstim-v:techIntrathecalNeuromodulatoryAgentDelivery`. Existing
+`sstim-v:techGamma40Auditory` is revised as the required, definitionally
+dual-typed sensory-route seed for CQ1. The populated chemical and overlap
+examples are required; empty route categories would not demonstrate that the
+model works.
+
+Systemic remains a neutral delivery-approach value for representing a technique,
+protocol, or intervention. Ordinary systemic neuroactive pharmacotherapy is
+outside the initial neuromodulation technique catalog. It qualifies only if a
+future, bounded method has an explicit neuromodulatory objective and identified
+neural target; drug administration alone is insufficient.
+
+No new catalog entry is referenced by a BSC preset, framework, protocol, or
+implementation. Inclusion means “SSTIM can describe this boundary technique,”
+not “BSC Lab can deliver it” or “the technique is effective.”
+
+### 10. Evidence questions remain scoped
+
+“Most studied,” “highest evidence,” and “most effective” are different claims:
+
+- **Most represented in SSTIM’s current corpus** can be computed by counting
+  distinct `basisSource` values per technique, outcome, and compatible scope.
+- **Highest recorded evidence tier** is reported only for a bounded proposition
+  and its explicit population/model, intervention, comparator, outcome, and
+  as-of corpus. It is always shown with `hasClaimDirection`: a high-tier
+  refutation is not strong support. Ordering uses `sstim:tierRank`, not lexical
+  ordering of tier IRIs.
+- **Most studied in the field** requires a reproducible, sufficiently
+  comprehensive search record. Repository counts alone cannot establish it.
+- **Most effective** is not derived from evidence tier and is not a query SSTIM
+  answers.
+
+A maximum tier across heterogeneous outcomes or scopes is not “best evidenced.”
+Queries return the scoped tier/direction distribution or compare matched
+propositions. Default result sets exclude an assessment that is explicitly
+invalidated or is the object of a newer `prov:wasRevisionOf` link; historical
+queries may opt in to superseded revisions and must label them.
+
+### 11. Graph navigation follows the formalization
+
+No `skos:Collection` is minted solely to make a UI filter work. The graph
+navigator gains general facet support for:
+
+- stimulation and neuromodulation class membership;
+- characteristic delivery medium;
+- neural access route;
+- delivery approach;
+- anatomical target;
+- neural-system target;
+- intended, mechanism, and outcome roles for route, target site, neural system,
+  and neural phenomenon.
+
+Add `stimulation` and `neuromodulation` graph scopes. The matcher must support
+configured predicate paths and SKOS ancestry, not only whole concept schemes or
+class local names. The explicit named-parent axioms on the intersection classes
+ensure that both parents remain visible even before the renderer learns to
+project arbitrary OWL class expressions.
 
 ---
 
 ## Competency queries
 
-```sparql
-# CQ1 — sensory stimulation that is also neuromodulation
-SELECT ?p WHERE { ?p a sstim:SensoryStimulation, sstim:Neuromodulation }
+Prefixes are omitted below. Executable repository versions must use independent
+`GRAPH` blocks because core, vocabulary, exposure, and evidence data are loaded
+into separate named graphs.
 
-# CQ2 — neuromodulation techniques that are NOT sensory stimulation.
-# Post-§9 this returns five rows across three routes: TMS/tDCS/tACS
-# (transcranial field), DBS (implanted electrode), FUS (focused acoustic).
-SELECT ?t ?route WHERE {
-  ?t a sstim:NeuromodulationTechnique ; sstim:neuralAccessRoute ?route .
-  FILTER NOT EXISTS { ?t a sstim:SensoryStimulationTechnique }
+```sparql
+# CQ1 — techniques in the sensory-route neuromodulation overlap
+SELECT DISTINCT ?tech WHERE {
+  GRAPH ?gType {
+    ?tech a ?sensoryClass, ?neuromodulationClass .
+  }
+  GRAPH ?gSchema {
+    ?sensoryClass rdfs:subClassOf* sstim:SensoryStimulationTechnique .
+    ?neuromodulationClass rdfs:subClassOf* sstim:NeuromodulationTechnique .
+  }
+  GRAPH ?gRouteAssertion {
+    ?tech sstim:neuralAccessRoute ?route .
+  }
+  GRAPH ?gRouteScheme {
+    ?route skos:broader* sstim-v:routeCanonicalSensoryTransductionAfferent .
+  }
 }
 
-# CQ3a — sensory techniques proposing neural-level mechanisms ("most studied"
-#        needs the EvidenceBasis count; this is the mechanism-hypothesis view)
-SELECT ?tech (COUNT(DISTINCT ?mech) AS ?n) WHERE {
-  ?tech a sstim:SensoryStimulationTechnique ; sstim:proposedMechanism ?mech .
-  ?mech sstim:mechanismTargetLevel ?level .
-  FILTER(?level IN (sstim-v:levelNeuralOscillatory, sstim-v:levelNeuralDirect))
-} GROUP BY ?tech ORDER BY DESC(?n)
+# CQ2 — neuromodulation with at least one intended route that bypasses
+# canonical sensory transduction. Hybrid sensory + bypass techniques may appear.
+SELECT DISTINCT ?tech ?route WHERE {
+  GRAPH ?gType {
+    ?tech a ?neuromodulationClass .
+  }
+  GRAPH ?gSchema {
+    ?neuromodulationClass rdfs:subClassOf* sstim:NeuromodulationTechnique .
+  }
+  GRAPH ?gRouteAssertion {
+    ?tech sstim:neuralAccessRoute ?route .
+  }
+  GRAPH ?gRouteScheme {
+    ?route skos:broader* sstim-v:routeBypassesCanonicalSensoryTransduction .
+  }
+}
 
-# CQ4 — evidence linking a sensory technique to a neural-level outcome
-SELECT ?tech ?tier ?outcome WHERE {
-  ?claim a sstim:EvidenceAssessmentClaim ;
-         sstim:evaluatesSubject ?tech ;
-         sstim:hasEvidenceTier ?tier ;
-         sstim:assessesProposition ?prop .
-  ?prop  sstim:hasOutcomeConcept ?outcome .
-  ?outcome sstim:outcomeTargetLevel sstim-v:levelNeuralOscillatory .
-  ?tech  a sstim:SensoryStimulationTechnique .
-} ORDER BY DESC(?tier)
+# CQ3 — stimulation techniques by physical/chemical medium, independent of
+# sensory/neuromodulation classification
+SELECT DISTINCT ?tech ?medium
+       (EXISTS {
+          GRAPH ?gSensoryType { ?tech a ?sensoryClass }
+          GRAPH ?gSensorySchema {
+            ?sensoryClass rdfs:subClassOf* sstim:SensoryStimulationTechnique
+          }
+        }
+        AS ?isSensory)
+       (EXISTS {
+          GRAPH ?gNeuromodulationType { ?tech a ?neuromodulationClass }
+          GRAPH ?gNeuromodulationSchema {
+            ?neuromodulationClass
+                rdfs:subClassOf* sstim:NeuromodulationTechnique
+          }
+        }
+        AS ?isNeuromodulation)
+WHERE {
+  GRAPH ?gType {
+    ?tech a ?techniqueClass .
+  }
+  GRAPH ?gSchema {
+    ?techniqueClass rdfs:subClassOf* sstim:StimulationTechnique .
+  }
+  GRAPH ?gMedium {
+    ?tech sstim-ex:characteristicDeliveryMedium ?medium .
+  }
+}
+ORDER BY ?medium ?tech
+
+# CQ4 — evidence about a neural phenomenon, with the correct ADR 0027 path
+SELECT DISTINCT ?tech ?outcome ?phenomenon ?direction ?rank ?source WHERE {
+  GRAPH ?gClaim {
+    ?claim a sstim:EvidenceAssessmentClaim ;
+           sstim:evaluatesSubject ?tech ;
+           sstim:assessesProposition ?proposition ;
+           sstim:hasEvidenceTier ?tier ;
+           sstim:hasClaimDirection ?direction ;
+           sstim:hasEvidenceBasis ?basis .
+    ?proposition sstim:propositionOutcome ?outcome .
+    ?basis sstim:basisSource ?source .
+  }
+  GRAPH ?gType {
+    ?tech a ?techniqueClass .
+  }
+  GRAPH ?gSchema {
+    ?techniqueClass rdfs:subClassOf* sstim:StimulationTechnique .
+  }
+  GRAPH ?gOutcome {
+    ?outcome sstim:outcomeNeuralPhenomenon ?phenomenon .
+  }
+  GRAPH ?gTier {
+    ?tier sstim:tierRank ?rank .
+  }
+  FILTER NOT EXISTS {
+    GRAPH ?gNewer { ?newer prov:wasRevisionOf ?claim }
+  }
+  FILTER NOT EXISTS {
+    GRAPH ?gInvalidation { ?claim prov:invalidatedAtTime ?invalidatedAt }
+  }
+}
+ORDER BY ?tech ?outcome ?direction DESC(?rank)
+
+# CQ5 — sources represented in SSTIM, grouped by outcome, direction, and
+# normalized combinations of explicit scope-axis values rather than scope IRI
+SELECT ?tech ?outcome ?direction ?modality ?populationOrModel
+       ?interventionOrContext ?comparator
+       (COUNT(DISTINCT ?source) AS ?sourceCount)
+WHERE {
+  GRAPH ?gClaim {
+    ?claim a sstim:EvidenceAssessmentClaim ;
+           sstim:evaluatesSubject ?tech ;
+           sstim:assessesProposition ?proposition ;
+           sstim:hasClaimDirection ?direction ;
+           sstim:hasEvidenceBasis ?basis .
+    ?proposition sstim:propositionOutcome ?outcome ;
+                 sstim:hasAssessmentScope ?scope .
+    ?scope sstim:scopeSensoryModality ?modality ;
+           sstim:scopePopulationOrModel ?populationOrModel ;
+           sstim:scopeInterventionOrContext ?interventionOrContext ;
+           sstim:scopeComparator ?comparator .
+    ?basis sstim:basisSource ?source .
+  }
+  GRAPH ?gType {
+    ?tech a ?techniqueClass .
+  }
+  GRAPH ?gSchema {
+    ?techniqueClass rdfs:subClassOf* sstim:StimulationTechnique .
+  }
+  FILTER NOT EXISTS {
+    GRAPH ?gNewer { ?newer prov:wasRevisionOf ?claim }
+  }
+  FILTER NOT EXISTS {
+    GRAPH ?gInvalidation { ?claim prov:invalidatedAtTime ?invalidatedAt }
+  }
+}
+GROUP BY ?tech ?outcome ?direction ?modality ?populationOrModel
+         ?interventionOrContext ?comparator
+ORDER BY DESC(?sourceCount)
 ```
 
-CQ4 returns sparsely against the current corpus. That is the honest answer, not a
-defect: it reports how much neural-level evidence SSTIM actually holds.
+CQ5 treats each exact tuple of scope-axis values as a comparable cell. A
+multi-valued scope contributes to each explicit tuple; it is never collapsed to
+a wildcard. Production query code also returns the as-of corpus/search record
+used for any field-wide coverage statement.
 
 ---
 
-## Consequences
+## Consequences and migration
 
-- **`techUltrasoundNeuromod` is retyped** (§7) — the one genuinely breaking
-  element. It has shipped as a `NonEntrainmentTechnique` in snapshots 0.3.0
-  through 0.8.0; those remain immutable and resolvable.
-- **`sstim-v:TechniqueScheme` is relabelled** (§8). IRI unchanged, so no link rot
-  and no altered entailment; display consumers see a new string.
-- **Four new technique individuals** (§9), which grow
-  `skos:hasTopConcept` on the renamed scheme and appear in the `technique` graph
-  perspective. They are non-sensory, so they will render without a modality edge —
-  expected, not a data gap.
-- **`sstim-sh:TechniqueShape` is replaced by two targeted shapes**, so this
-  touches validation semantics. `make validate` must pass before and after, and
-  negative fixtures should assert both new failure modes: a
-  `SensoryStimulationTechnique` without `techniqueModality` fails (today it
-  passes by attaching any editorial note), and a `NeuromodulationTechnique`
-  without `neuralAccessRoute` fails.
-- **Version bump and snapshot.** Core, vocab, and shapes all gain terms →
-  0.9.0 + `static/ontology/0.9.0/`, per the release mechanism.
-- **WIDOCO / pyLODE regeneration** is automatic in `pages.yml` (artifact only,
-  ADR 0023) — no committed output.
-- **w3id routes.** New terms are fragments on the existing `sstim#` and
-  `sstim/vocab#` roots; no new route needed. The bare-root catalog coupling flagged
-  in 008ebc7 is unaffected.
-- **`sstim-alignments.ttl`** gains candidates — Wikidata has verified items for
-  neuromodulation, TMS, tDCS, and DBS. Alignment is deferred to its own pass,
-  consistent with the file's "verified against live Wikidata" discipline.
-- **No user-facing copy changes.** This ADR adds descriptive vocabulary about a
-  scientific domain; it authorizes no claim about BSC presets. `CLAUDE.md` §3.5
-  is untouched and unrelaxed — modeling neuromodulation is not claiming to
-  perform it, and the separation in §2 above is what keeps that true structurally
-  rather than by convention.
+- **Core ontology:** add neutral process, intervention, protocol, and technique
+  parents; neuromodulation and route-qualified overlap classes; route, approach,
+  target-site, neural-system, and phenomenon value classes/properties; and the
+  coordinated domain/range/definition migration. Revise the
+  `SensoryStimulation` definition/scope note so canonical sensory transduction
+  and afferent processing—not conscious perception—is the route criterion.
+- **Exposure module:** add the coarse characteristic-medium property, extend the
+  delivery-medium hierarchy, add channel-role support for intended versus
+  concomitant/control paths and two-way route consistency, widen
+  `hasExposureProfile`, and store all vocabulary-technique medium assertions
+  here. Existing sound, vibration,
+  visible/IR/UV, and olfactory/gustatory values that become narrower concepts
+  lose their old `skos:topConceptOf` and scheme `skos:hasTopConcept` assertions;
+  materialized `skos:broader`/`skos:narrower` inverses are updated together.
+- **Vocabulary:** relabel `TechniqueScheme`, retype and reword focused
+  ultrasound and the auditory-gamma overlap seed, populate the exact contrast
+  set, expand temporal structures, and add route, approach, target, system, and
+  phenomenon concepts. Replace legacy SSVEP, SSSEP, ASSR, FFR, and acoustic
+  startle response-as-mechanism placements with correctly typed
+  phenomenon/outcome concepts and explicit replacement history; remove the old
+  mechanism typing and scheme topology, and audit every remaining mechanism
+  entry by the same criterion. Rewrite `mechUltrasonic` as an uncertain proposed
+  mechanism family without a no-percept criterion. Every active value follows
+  the complete repository SKOS contract: OWL named-individual + value-class +
+  `skos:Concept` typing, four-language preferred labels, notation, English
+  definition/scope note, scheme membership, top/broader placement, and
+  materialized inverse topology.
+- **Shapes:** retain and generalize `TechniqueShape`; add process, sensory,
+  neuromodulation, overlap, protocol, intervention, facet-subject, and
+  route/channel-consistency shapes; remove the editorial-note branch; widen the
+  evidence constraints; and make the vocabulary SHACL gate load its
+  core/vocabulary/exposure dependency closure.
+- **Existing-data migration:** all 30 technique concepts in
+  `static/ontology/sstim-vocab.ttl` and the three framework-owned techniques in
+  `static/ontology/instances/frameworks/bsc.ttl` receive characteristic-medium
+  assertions. Assertions about the 30 vocabulary subjects are exposure-owned;
+  assertions about the three `bsc-fw-tech:` instance subjects remain in their
+  instance file. Sensory/neuromodulation entries receive valid temporal values;
+  no generic placeholder is fabricated.
+- **Concept documentation:** revise the direct-neural-stimulation section to
+  distinguish sensory route, sensory-system target, and incidental perception.
+- **Queries and graph UI:** add executable queries to
+  `scripts/sstim-exposure-sanity.mjs`; implement scopes/facet edges in
+  `src/ui/graph/OntologyGraph.svelte` and `src/rdf/graph.js`; extend
+  `src/rdf/graph.test.mjs` and the inference/quality regression script.
+- **Context and release metadata:** add every new local class/property to
+  `context.jsonld`; recalculate and revise the hand-maintained `void.ttl`; update
+  module metadata, ontology READMEs, `CHANGELOG.md`, `CITATION.cff`, and the
+  WIDOCO scope text in `docs/ontology/widoco.properties`.
+- **Versioning:** the semantic migration and new terms require a 0.9.0 whole-set
+  release. Before semantic edits, all seven live modules move together to
+  `0.9.0-dev`; the core drops `owl:versionIRI` and uses
+  `mod:status "under development"`. After the complete validation suite and
+  semantic-diff review, every live module moves to `0.9.0`, and the core restores
+  its release `owl:versionIRI` and `mod:status "released"`. Frozen 0.3.0–0.8.0
+  snapshots remain untouched. A snapshot is made only after the release commit
+  is clean.
+- **Alignments:** external alignments for neuromodulation and named techniques
+  are reviewed separately against live authoritative identifiers. No mapping is
+  inferred from a label.
+- **No capability or health claim:** catalog inclusion changes no BSC preset,
+  framework, implementation, or public copy. It asserts neither efficacy nor
+  safety.
+
+### Required regression tests
+
+1. Focused ultrasound is not inferred to be a
+   `SensoryStimulationTechnique` under RDFS closure despite retaining temporal
+   structure and proposed-mechanism triples; neither its technique nor mechanism
+   definition uses absence of an audible percept as a classifier.
+2. A sensory technique missing modality fails even when it has an
+   `skos:editorialNote`.
+3. A generic stimulation technique missing characteristic delivery medium
+   fails; a sensory or neuromodulation technique missing temporal structure
+   fails.
+4. A neuromodulation process, technique, protocol, or intervention missing its
+   applicable route, approach, target, or delivery fields fails.
+5. A dual sensory + neuromodulation resource at each modeled layer must satisfy
+   every applicable shape and assert the canonical sensory-transduction/afferent
+   route; a bypass route alone fails the overlap constraint.
+6. Route and approach may be multi-valued.
+7. When an exposure profile exists, every coarse route is backed by an
+   `roleIntendedIntervention` channel on the exact equal-or-narrower route path;
+   every intended-channel route is also surfaced by an equal-or-broader coarse
+   route, and every intended channel in a neuromodulation profile must declare a
+   route. Concomitant/control channels cannot satisfy either direction. Negative
+   fixtures prove that a route-less intended channel fails, two sibling routes
+   sharing only a broader ancestor do not match, and an intended canonical
+   sensory co-channel cannot be hidden behind only a bypass coarse route or a
+   non-sensory type.
+8. Each domainless route, approach, and intended-target property rejects an
+   unrelated subject; all accept a stimulation process, technique, protocol, or
+   intervention, while route additionally accepts a stimulus channel.
+9. A neuromodulation protocol can assert `requiresDeviceCapability` and
+   `hasExperimentContext` without being inferred as a sensory protocol; migrated
+   sensory exploratory protocols keep their intended sensory type.
+10. A conformant evidence assessment can target a bypass-route neuromodulation
+   technique without inferring sensory type, while a hybrid with both routes is
+   retained in both applicable query results.
+11. Competency queries use subclass closure in the non-entailing named-graph
+   store, return `techGamma40Auditory` for CQ1, preserve claim direction, exclude
+   explicitly superseded revisions by default, and group compatible scope-axis
+   values rather than revision-local scope IRIs.
+12. Graph tests cover route-qualified intersections and
+   medium/route/approach/site/system/phenomenon facets.
+13. Both dependency-closure SHACL validation and whole-module validation pass;
+    file ownership tests reject a vocabulary-to-exposure dependency cycle.
+14. Deprecated response-form `mech*` IRIs have no
+    `StimulationMechanism`/`skos:Concept` typing or mechanism-scheme topology, no
+    technique points to them through `proposedMechanism`, and every replacement
+    is correctly typed and linked with `dct:isReplacedBy`; the fixture includes
+    acoustic startle as well as SSVEP, SSSEP, ASSR, and FFR.
+
+Implementation runs `make validate`, including SHACL, domain/range inference
+checks, ontology quality audit, HermiT, named-graph SPARQL sanity queries, and
+export round trips. It also runs `make test`, `make check`, `make build`, and the
+final `make export`, because the migration changes graph code and Svelte UI as
+well as ontology modules. New SHACL rules receive both positive and negative
+fixtures.
+
+### Implementation order
+
+1. Put all seven live modules in the synchronized `0.9.0-dev` state, remove the
+   core `owl:versionIRI`, and mark the core under development.
+2. Add neutral classes and widen shared domains/ranges.
+3. Retype focused ultrasound and migrate existing technique metadata.
+4. Add controlled facets, representative techniques, and exposure profiles.
+5. Apply the composable shapes and evidence constraint changes.
+6. Add executable competency queries and graph facets.
+7. Run the complete validation, test, check, and build suite; review semantic
+   diffs; set synchronized 0.9.0 release metadata; generate final exports; and
+   rerun the applicable gates.
+8. Commit the release, then create the immutable snapshot from the clean commit.
+
+The order is normative: retyping focused ultrasound before widening the shared
+property domains recreates the sensory inference this ADR is intended to remove.
 
 ---
 
 ## Alternatives considered
 
-- **Adopt the preliminary tree as drawn.** Rejected: `SensoryStimulation ⊑
-  Neuromodulation` bypasses the evidence layer, and `ElectricalStimulation ⊑
-  BrainStimulation` / `ChemicalStimulation ⊑ Neuromodulation` /
-  `CognitiveModulation → Context, Language` are independently false.
-- **`Neuromodulation ⊑ SensoryStimulation`.** Rejected trivially: TMS, DBS, and
-  pharmacological neuromodulation traverse no sensory receptor.
-- **`owl:hasValue` restriction fixing the route on `SensoryStimulationTechnique`.**
-  Rejected, though note the reason changed once §7 was settled. Against the
-  *current* vocabulary the restriction is an entailment landmine: with
-  `neuralAccessRoute` functional and the route individuals mutually distinct, the
-  mis-typed `techUltrasoundNeuromod` would render the ontology *inconsistent*
-  under HermiT rather than merely non-conformant. §7 removes that individual from
-  the class, so the restriction would become consistent — but it stays rejected
-  on three grounds that do not depend on the type error: it asserts at schema
-  level exactly the constant column §3 declined to assert at instance level; it
-  buys no query power, since the class membership is already the answer; and it
-  would force `neuralAccessRoute`'s domain to widen into a union, which the
-  domain/range lint in [`IMPROVEMENT_PLAN.md`](../ontology/IMPROVEMENT_PLAN.md)
-  flags. Reasoner cost for zero information.
-- **Route property on every technique, sensory included.** Rejected per review:
-  constant across the sensory branch, therefore uninformative annotation cost on
-  ~28 individuals.
-- **Two target-level axes (one for mechanisms, one for outcomes).** Rejected: the
-  value set is identical, and a shared scheme is what lets CQ3 and CQ4 join.
-- **`skos:Collection` in `sstim-vocab.ttl` for the graph perspective.** Rejected
-  by maintainer 2026-07-22: the navigator must adapt to the formalization, not
-  the reverse.
-- **Document-only treatment** (extend `SENSORY_STIMULATION.md`, add no terms).
-  Rejected: leaves the SHACL escape hatch and the type error in place, and
-  answers none of CQ1–CQ4.
-
----
-
-## Resolved on review, 2026-07-22
-
-The three questions left open in the first draft are decided below. Two of them
-turned out to be forced by the design rather than open to preference.
-
-### 7. `techUltrasoundNeuromod` is retyped, not dual-typed
-
-`sstim:NonEntrainmentTechnique` is **removed**; `sstim:NeuromodulationTechnique`
-replaces it.
-
-Dual-typing is not a safe compatibility option here, because §3's two-shape
-formulation makes it *fail validation*. Retaining `NonEntrainmentTechnique` keeps
-the individual a `SensoryStimulationTechnique`, which puts it in the target of
-`sstim-sh:SensoryTechniqueShape` and therefore obliges it to declare a
-`sstim:techniqueModality`. It has none, and by its own `skos:definition` — "no
-audible percept" — it can never acquire one. The conservative-looking option
-produces a vocabulary that does not conform to its own shapes.
-
-So the choice is not "correct but breaking" versus "incorrect but safe." It is
-"correct" versus "non-conformant." That settles it.
-
-The breaking surface is also narrower than it first appears. Snapshots
-`0.3.0`–`0.8.0` are immutable and remain resolvable, so any consumer pinned to a
-released version is unaffected. Only a consumer tracking mutable latest observes
-the change, and what they observe is the withdrawal of a false statement — that
-focused ultrasound is a sensory stimulation technique — which is the kind of
-correction a versioned vocabulary is supposed to be able to make. The prior
-typing is recorded as a comment block in `sstim-vocab.ttl` rather than deleted
-silently, per the [ADR 0033](0033-framework-scope-and-generic-technique-deduplication.md)
-precedent.
-
-### 8. `TechniqueScheme` is relabelled "SSTIM Technique Vocabulary"
-
-Maintainer decision on review: rename rather than mint a sibling scheme or accept
-the mismatch. The argument for *which* name is that the identifier already made
-this decision.
-
-The scheme's IRI is `sstim-v:TechniqueScheme` — not `SensoryTechniqueScheme`.
-Only the `skos:prefLabel` ever said "Sensory Stimulation Technique Vocabulary."
-The label has therefore been narrower than its own identifier since 0.3.0, and
-this ADR does not widen the scheme so much as bring the label into line with the
-IRI that was chosen for it. Renaming to **"SSTIM Technique Vocabulary"** (with
-`it`/`pt`/`es` translations reduced correspondingly) also keeps the label stable
-against future widening: pharmacological neuromodulation, if ever cataloged,
-needs no third rename.
-
-Precision moves to a `skos:definition` on the scheme, which is where an extension
-that grows belongs — stating that the scheme covers sensory stimulation
-techniques and neuromodulation techniques, including non-sensory routes.
-
-A sibling `NeuromodulationTechniqueScheme` was rejected because the two
-populations **overlap** (§1): `techGamma40Auditory` and `techPhoticDriving` are
-both. Splitting the scheme would force either duplicate `skos:inScheme`
-membership or an arbitrary assignment of the overlap, and would break
-`skos:hasTopConcept` as a complete technique enumeration — which the graph
-navigator and the technique-scope perspective both rely on.
-
-This is the mildest class of change at the RDF level: the IRI is unchanged, so no
-link rot and no altered entailment. Display consumers see a different string;
-a `skos:historyNote` and a CHANGELOG entry record it.
-
-### 9. TMS, tDCS, tACS, and DBS are cataloged
-
-Four non-sensory neuromodulation techniques are added — `techTMS`, `techTDCS`,
-`techTACS`, `techDBS` — typed `sstim:NeuromodulationTechnique` and **not**
-`sstim:SensoryStimulationTechnique`.
-
-Three reasons, in ascending order of force:
-
-1. **Consistency.** The "domain completeness" rationale is already invoked, in
-   the released vocabulary, for focused ultrasound. Applying it to one technique
-   while excluding its four most obvious siblings is arbitrary — and reads to an
-   external consumer as an oversight rather than as a boundary.
-2. **The route axis is otherwise untestable.** With FUS alone, the new
-   `NeuralAccessRouteScheme` has exactly one populated value and CQ2 returns one
-   row. Nothing would demonstrate that the axis discriminates. These four
-   populate three distinct routes — transcranial field (TMS, tDCS, tACS),
-   implanted electrode (DBS), focused acoustic (FUS) — which is enough to
-   exercise the model. Pharmacological stays deliberately unpopulated; an empty
-   route value is honest, an untested axis is not.
-3. **tACS earns its entry specifically.** It is the direct non-sensory analogue
-   of sensory entrainment: periodic, and targeting neural oscillations. Without
-   it, `mechanismTargetLevel = levelNeuralOscillatory` is a sensory-only tag and
-   CQ3 cannot contrast *entrainment via receptor-mediated route* against
-   *entrainment via transcranial field*. That contrast is a substantial part of
-   why modeling neuromodulation is worth doing at all — it is what turns the
-   target-level axis from a label into a comparison.
-
-This is why §8 and §9 interlock: the rename is what makes room for these four,
-and these four are what make the renamed scheme's breadth real rather than
-notional.
-
-Scope risk is handled structurally, not by convention. Cataloging them as
-`NeuromodulationTechnique` and never `SensoryStimulationTechnique` is precisely
-what [`SENSORY_STIMULATION.md:364-384`](../concept/SENSORY_STIMULATION.md)
-already says of them — *adjacent to* the core sensory-stimulation category,
-named, not core. No BSC preset, framework, or implementation references them, and
-`sstim:incorporatesTechnique` ([ADR 0033](0033-framework-scope-and-generic-technique-deduplication.md))
-is the property that would have to be asserted for any capability implication to
-arise. It is not.
+- **Adopt the predecessor tree as drawn.** Rejected: it confuses objective,
+  applied medium, route, interface, target, perception, and outcome, producing
+  independently false subclass axioms.
+- **Model neuromodulation without a common `Stimulation` layer.** Rejected:
+  leaves electrical, magnetic, acoustic, mechanical, optical, thermal, and
+  chemical stimulation without a neutral home and obscures the user-facing
+  context this ADR is meant to provide.
+- **Make electrical, magnetic/electromagnetic, acoustic, or chemical stimulation
+  primitive subclasses of `Neuromodulation`.** Rejected: each medium also has
+  sensory or non-neural uses, and “electromagnetic” overlaps the others
+  physically.
+- **`SensoryStimulation ⊑ Neuromodulation`.** Rejected: accessibility,
+  sonification, aesthetic, diagnostic, and other sensory deliveries need not
+  have a neuromodulatory objective. It would also smuggle target/effect meaning
+  into SSTIM’s delivery class.
+- **`Neuromodulation ⊑ SensoryStimulation`.** Rejected: modulatory TMS variants,
+  DBS, focused ultrasound, direct nerve interfaces, and targeted delivery of a
+  neuromodulatory agent do not require canonical sensory transduction.
+- **Classify by the presence or absence of a percept.** Rejected: conscious
+  perception is not required for sensory transduction, and non-sensory
+  stimulation can produce incidental sensations or confounds.
+- **One mixed route or target-level scheme.** Rejected: “transcranial,”
+  “implanted,” “acoustic,” “chemical,” “oscillatory,” “autonomic,” and
+  “cognitive” answer different questions.
+- **Declare route only for non-sensory neuromodulation.** Rejected: the
+  canonical sensory-transduction/afferent value is needed to identify and
+  compare the overlap, and omitting it contradicts a shape targeting all
+  neuromodulation techniques.
+- **Treat a missing sensory type as proof of non-sensory status.** Rejected by
+  the open-world assumption. A positively asserted bypass route reports that
+  route but still does not exclude a hybrid sensory route.
+- **Split sensory and neuromodulation techniques into disjoint SKOS schemes.**
+  Rejected: the populations overlap. One bounded technique catalog with explicit
+  type/facet assignments avoids duplicate identifiers and arbitrary placement.
+- **Add a `skos:Collection` for the graph navigator.** Rejected: a UI view is not
+  a citable domain category. The navigator must project the formal facets.
+- **Document the boundary only in prose.** Rejected: leaves the RDFS inference
+  bug, SHACL escape hatch, evidence-range restriction, and competency-query gap
+  in place.
