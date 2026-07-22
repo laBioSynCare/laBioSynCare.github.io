@@ -17,6 +17,9 @@ file is the human-readable summary.
 
 ## [0.9.0] - 2026-07-22
 
+Published under version DOI `10.5281/zenodo.21493918`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
+
 Stimulation and neuromodulation release ([ADR 0034](docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md)).
 SSTIM gains a neutral stimulation layer and formalizes how sensory stimulation
 relates to neuromodulation: the two **overlap**, and neither subsumes the other.
