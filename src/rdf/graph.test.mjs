@@ -132,4 +132,49 @@ describe('unified navigator projection', () => {
       sources: ['https://example.org/source'],
     })
   })
+
+  // ADR 0034 §11: the navigator projects the formal facets. No skos:Collection
+  // is minted in the released vocabulary to make a UI filter match, so the
+  // graph builder must read the route/approach/target predicates directly.
+  it('collects stimulation facets onto the node that asserts them', async () => {
+    const facetFixture = `
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim: <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+
+sstim:NeuromodulationTechnique a owl:Class ; rdfs:label "Neuromodulation technique"@en .
+sstim-v:routePhysicalNeuralInteraction a skos:Concept ; skos:prefLabel "Physical neural interaction"@en .
+sstim-v:approachTranscranial a skos:Concept ; skos:prefLabel "Transcranial"@en .
+sstim-v:targetCortex a skos:Concept ; skos:prefLabel "Cortex"@en .
+sstim-ex:mediumAppliedElectricCurrent a skos:Concept ; skos:prefLabel "Applied electric current"@en .
+
+sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
+  skos:prefLabel "tACS"@en ;
+  sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+  sstim:stimulationDeliveryApproach sstim-v:approachTranscranial ;
+  sstim:intendedNeuralTargetSite sstim-v:targetCortex ;
+  sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+`
+    const store = await parseIntoStore(facetFixture, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+    const tacs = elements.find(e => e.data.iri === 'https://w3id.org/sstim/vocab#techTACS')?.data
+
+    expect(tacs.facets).toMatchObject({
+      neuralAccessRoute: ['https://w3id.org/sstim/vocab#routePhysicalNeuralInteraction'],
+      stimulationDeliveryApproach: ['https://w3id.org/sstim/vocab#approachTranscranial'],
+      intendedNeuralTargetSite: ['https://w3id.org/sstim/vocab#targetCortex'],
+      characteristicDeliveryMedium: ['https://w3id.org/sstim/exposure#mediumAppliedElectricCurrent'],
+    })
+  })
+
+  it('leaves facets undefined on a node that asserts none', async () => {
+    const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+    const modality = elements.find(e => e.data.iri === 'https://w3id.org/sstim/vocab#modalityAuditory')?.data
+
+    expect(modality.facets).toBeUndefined()
+  })
 })

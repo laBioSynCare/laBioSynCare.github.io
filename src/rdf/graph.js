@@ -38,6 +38,7 @@ const ORG  = 'http://www.w3.org/ns/org#'
 const SCHEMA = 'https://schema.org/'
 
 const SSTIM_NS = 'https://w3id.org/sstim#'
+const SSTIM_EX_NS = 'https://w3id.org/sstim/exposure#'
 const SSTIM_ECO = 'https://w3id.org/sstim/ecosystem#'
 const BSC_TECHNIQUE_NS = 'https://w3id.org/sstim/framework/bsc/technique/'
 const BIOSYNCARE_IMPLEMENTATION = 'https://w3id.org/sstim/implementation/biosyncare'
@@ -250,6 +251,54 @@ export async function buildGraphElements(store) {
       notation: r.notation?.value ?? '',
       iri: id,
     })
+  }
+
+  // ── 5b. Stimulation facets (ADR 0034) ───────────────────────────────────────
+  // A neuromodulation perspective is cross-cutting: it needs the new OWL
+  // classes, the route/approach/target schemes, AND the subset of concepts
+  // carrying a given facet value. Scheme membership and class local name cannot
+  // express "has predicate P". Rather than minting a skos:Collection in the
+  // released vocabulary purely so a UI filter can match it — a navigator
+  // artifact inside a citable scientific artifact — the navigator learns to
+  // read the facets that already exist. Attached as data.facets, keyed by
+  // predicate local name; additive, so no existing consumer changes.
+  const FACET_PREDICATES = [
+    'neuralAccessRoute', 'stimulationDeliveryApproach',
+    'intendedNeuralTargetSite', 'intendedNeuralSystem', 'intendedNeuralPhenomenon',
+    'mechanismNeuralAccessRoute', 'mechanismNeuralTargetSite',
+    'mechanismNeuralSystem', 'mechanismNeuralPhenomenon',
+    'outcomeNeuralAccessRoute', 'outcomeNeuralTargetSite',
+    'outcomeNeuralSystem', 'outcomeNeuralPhenomenon',
+  ]
+  const facetValues = FACET_PREDICATES.map((p) => `<${SSTIM_NS}${p}>`).join(' ')
+  const facetRows = await select(store, `
+    SELECT ?subject ?predicate ?value WHERE {
+      GRAPH ?g {
+        ?subject ?predicate ?value .
+        VALUES ?predicate { ${facetValues} }
+      }
+    }`)
+
+  for (const r of facetRows) {
+    const node = nodes.get(r.subject.value)
+    if (!node) continue
+    const key = localName(r.predicate.value)
+    node.data.facets ??= {}
+    ;(node.data.facets[key] ??= []).push(r.value.value)
+  }
+
+  // The coarse technique-level medium lives in the exposure namespace but is
+  // the same kind of facet for navigation purposes.
+  const mediumRows = await select(store, `
+    SELECT ?subject ?value WHERE {
+      GRAPH ?g { ?subject <${SSTIM_EX_NS}characteristicDeliveryMedium> ?value . }
+    }`)
+
+  for (const r of mediumRows) {
+    const node = nodes.get(r.subject.value)
+    if (!node) continue
+    node.data.facets ??= {}
+    ;(node.data.facets.characteristicDeliveryMedium ??= []).push(r.value.value)
   }
 
   // ── 6. skos:narrower edges ──────────────────────────────────────────────────

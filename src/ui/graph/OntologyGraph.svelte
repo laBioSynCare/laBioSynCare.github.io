@@ -32,6 +32,8 @@
     { value: 'evidence', label: 'Evidence & claims' },
     { value: 'caution', label: 'Cautions & safety' },
     { value: 'exposure', label: 'Exposure & delivery' },
+    { value: 'stimulation', label: 'Stimulation · neutral layer' },
+    { value: 'neuromodulation', label: 'Neuromodulation' },
   ]
 
   // A `?view=<scope value>` query param lets a link (e.g. from w3id.org or
@@ -168,8 +170,31 @@
     group:     [V_SCHEME + 'PresetGroupScheme'],
     evidence:  [V_SCHEME + 'EvidenceTierScheme', V_SCHEME + 'EvidenceModalityScheme', V_SCHEME + 'PublicClaimLevelScheme', V_SCHEME + 'ClaimDirectionScheme', V_SCHEME + 'ReviewStatusScheme', V_SCHEME + 'EffectDirectionScheme'],
     caution:   [V_SCHEME + 'CautionTagScheme', V_SCHEME + 'CautionSeverityScheme'],
+    neuromodulation: [V_SCHEME + 'NeuralAccessRouteScheme', V_SCHEME + 'StimulationDeliveryApproachScheme',
+      V_SCHEME + 'NeuralTargetSiteScheme', V_SCHEME + 'NeuralSystemScheme',
+      V_SCHEME + 'NeuralPhenomenonScheme'],
+    stimulation: [V_SCHEME + 'TechniqueScheme', V_SCHEME + 'StimulusTemporalStructureScheme',
+      EX_SCHEME + 'DeliveryMediumScheme'],
     exposure:  [EX_SCHEME + 'DeliveryMediumScheme', EX_SCHEME + 'PerceivedModalityScheme', EX_SCHEME + 'DeviceCapabilityScheme', EX_SCHEME + 'BodyPlacementScheme', EX_SCHEME + 'StimulusPatternScheme', EX_SCHEME + 'ComfortBoundaryScheme', EX_SCHEME + 'AudioNoiseColorScheme', EX_SCHEME + 'VisualNoiseScheme', EX_SCHEME + 'PerceptualGainScheme', EX_SCHEME + 'PerceptualLossScheme', EX_SCHEME + 'EffectDimensionScheme', EX_SCHEME + 'ExperimentContextScheme', EX_SCHEME + 'KnowledgeStatusScheme'],
   }
+  // Facet-value scoping (ADR 0034 §11). A neuromodulation perspective is
+  // cross-cutting — classes, schemes, AND every concept carrying one of these
+  // predicates — which whole-scheme and class-local-name matching cannot
+  // express. Rather than distorting the RDF with a navigator-only
+  // skos:Collection, the matcher reads facets collected in src/rdf/graph.js.
+  // Listing a predicate here includes any node that asserts it.
+  const SCOPE_FACETS = {
+    neuromodulation: [
+      'neuralAccessRoute', 'stimulationDeliveryApproach', 'intendedNeuralTargetSite',
+      'intendedNeuralSystem', 'intendedNeuralPhenomenon',
+      'mechanismNeuralAccessRoute', 'mechanismNeuralTargetSite',
+      'mechanismNeuralSystem', 'mechanismNeuralPhenomenon',
+      'outcomeNeuralAccessRoute', 'outcomeNeuralTargetSite',
+      'outcomeNeuralSystem', 'outcomeNeuralPhenomenon',
+    ],
+    stimulation: ['characteristicDeliveryMedium'],
+  }
+
   // Governing OWL classes to also include in a scope, for structural context.
   const SCOPE_CLASSES = {
     frequency: ['FrequencyBand', 'FrequencyBandGroup'],
@@ -180,6 +205,20 @@
     group:     ['PresetGroup'],
     modality:  ['SensoryModality'],
     mechanism: ['StimulationMechanism'],
+    stimulation: [
+      'Stimulation', 'StimulationTechnique', 'StimulationProtocol',
+      'StimulationIntervention', 'SensoryStimulation', 'SensoryStimulationTechnique',
+      'SensoryStimulationProtocol', 'SensoryStimulationIntervention',
+    ],
+    neuromodulation: [
+      'Neuromodulation', 'NeuromodulationTechnique', 'NeuromodulationProtocol',
+      'NeuromodulationIntervention', 'SensoryRouteNeuromodulation',
+      'SensoryRouteNeuromodulationTechnique', 'SensoryRouteNeuromodulationProtocol',
+      'SensoryRouteNeuromodulationIntervention', 'Stimulation', 'SensoryStimulation',
+      'NeuralAccessRoute', 'CanonicalSensoryTransductionAccessRoute',
+      'SensoryTransductionBypassingAccessRoute', 'StimulationDeliveryApproach',
+      'NeuralTargetSite', 'NeuralSystem', 'NeuralPhenomenon',
+    ],
   }
 
   function localName(iri) {
@@ -345,9 +384,13 @@
     if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
     const schemes = SCOPE_SCHEMES[graphScope]
     const classes = SCOPE_CLASSES[graphScope]
-    if (!schemes && !classes) return true
+    const facets  = SCOPE_FACETS[graphScope]
+    if (!schemes && !classes && !facets) return true
     if (schemes && data.kind === 'skosConcept' && schemes.includes(data.scheme)) return true
     if (classes && classes.includes(localName(data.iri))) return true
+    // A node qualifies by asserting any of the scope's facet predicates. This
+    // is what lets a perspective span classes, schemes, and tagged concepts.
+    if (facets && data.facets && facets.some((p) => data.facets[p]?.length)) return true
     return false
   }
 
