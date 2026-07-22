@@ -72,9 +72,17 @@ preview: build
 shacl-core:
 	$(PYSHACL) -s $(SHAPES) $(ONTOLOGY)
 
-## Validate vocabulary against shapes
+## Validate the vocabulary against shapes, in its dependency closure.
+## ADR 0034: technique identity/type is vocabulary-owned while characteristic
+## delivery media are exposure-owned, so the vocabulary can no longer be
+## validated in isolation. Loading core+vocabulary+exposure is the fix;
+## duplicating assertions across files to keep a file-local command working
+## is not. `shacl-modules` remains the whole-set authority.
 shacl-vocab:
-	$(PYSHACL) -s $(SHAPES) $(VOCAB)
+	@tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) > "$$tmp"; \
+	$(PYSHACL) -s $(SHAPES) "$$tmp"
 
 ## Validate exposure ontology module against shapes
 shacl-exposure:

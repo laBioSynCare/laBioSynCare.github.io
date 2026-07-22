@@ -686,20 +686,23 @@ sstim-v:modalityOlfactory a owl:NamedIndividual, sstim:SensoryModality, skos:Con
 
 sstim-v:StimulationMechanismScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Stimulation Mechanism Vocabulary"@en ;
-    skos:hasTopConcept sstim-v:mechFFR, sstim-v:mechThalamocortical, sstim-v:mechAutonomic,
-        sstim-v:mechStochastic, sstim-v:mechAttentional, sstim-v:mechGamma40, sstim-v:mechASSR,
+    skos:hasTopConcept sstim-v:mechThalamocortical, sstim-v:mechAutonomic,
+        sstim-v:mechStochastic, sstim-v:mechAttentional, sstim-v:mechGamma40,
         sstim-v:mechAuditoryMotor, sstim-v:mechClosedLoopPhase, sstim-v:mechMasking,
-        sstim-v:mechMechanoreceptive, sstim-v:mechStartle, sstim-v:mechUltrasonic,
-        sstim-v:mechSSVEP, sstim-v:mechSSSEP, sstim-v:mechMultisensory .
+        sstim-v:mechMechanoreceptive, sstim-v:mechUltrasonic, sstim-v:mechMultisensory .
 
-sstim-v:mechFFR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
-    skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Frequency-Following Response"@en,
+# ADR 0034: mechFFR denoted an evoked response or a reflex, not a causal
+# mechanism. Deprecated and stripped of its StimulationMechanism/skos:Concept
+# typing, scheme membership, and top-concept placement — deprecation alone
+# would have preserved the false entailment. Replaced by sstim-v:phenomenonFrequencyFollowingResponse.
+sstim-v:mechFFR a owl:NamedIndividual ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-v:phenomenonFrequencyFollowingResponse ;
+    rdfs:label "Frequency-Following Response"@en,
                    "Risposta di Inseguimento della Frequenza"@it,
                    "Resposta de Seguimento de Frequência"@pt,
-                   "Respuesta de Seguimiento de Frecuencia"@es ;
-    skos:notation "FFR" ;
-    skos:definition "Subcortical brainstem and inferior colliculus response that tracks the envelope of a periodic acoustic stimulus. Best-supported mechanistic claim for binaural beats and isochronic tones."@en .
+                   "Respuesta de Seguimiento de Frecuencia"@es  ;
+    skos:historyNote "Deprecated in 0.9.0 (ADR 0034): a response form catalogued as a causal mechanism. Use sstim-v:phenomenonFrequencyFollowingResponse with sstim:intendedNeuralPhenomenon, sstim:mechanismNeuralPhenomenon, or sstim:outcomeNeuralPhenomenon according to role. Frozen 0.3.0-0.8.0 snapshots retain the original typing."@en .
 
 sstim-v:mechThalamocortical a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -747,14 +750,18 @@ sstim-v:mechGamma40 a owl:NamedIndividual, sstim:StimulationMechanism, skos:Conc
     skos:definition "Proposed mechanism category derived from GENUS research in which specific 40 Hz stimulation protocols were associated with microglial and amyloid-related changes in particular mouse models. Human relevance, protocol transfer, and modality generalization remain uncertain and require claim-level evidence."@en .
 
 
-sstim-v:mechASSR a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
-    skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Auditory Steady-State Response"@en,
+# ADR 0034: mechASSR denoted an evoked response or a reflex, not a causal
+# mechanism. Deprecated and stripped of its StimulationMechanism/skos:Concept
+# typing, scheme membership, and top-concept placement — deprecation alone
+# would have preserved the false entailment. Replaced by sstim-v:phenomenonAuditorySteadyStateResponse.
+sstim-v:mechASSR a owl:NamedIndividual ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-v:phenomenonAuditorySteadyStateResponse ;
+    rdfs:label "Auditory Steady-State Response"@en,
                    "Risposta Uditiva di Stato Stazionario"@it,
                    "Resposta Auditiva de Estado Estacionário"@pt,
-                   "Respuesta Auditiva de Estado Estacionario"@es ;
-    skos:notation "ASSR" ;
-    skos:definition "Sustained, phase-locked EEG/MEG response to a periodically modulated sound (amplitude-modulated tones, click trains, isochronic tones), most robust near 40 Hz. The canonical electrophysiological correlate of auditory entrainment; related to but distinct from the subcortical Frequency-Following Response."@en .
+                   "Respuesta Auditiva de Estado Estacionario"@es  ;
+    skos:historyNote "Deprecated in 0.9.0 (ADR 0034): a response form catalogued as a causal mechanism. Use sstim-v:phenomenonAuditorySteadyStateResponse with sstim:intendedNeuralPhenomenon, sstim:mechanismNeuralPhenomenon, or sstim:outcomeNeuralPhenomenon according to role. Frozen 0.3.0-0.8.0 snapshots retain the original typing."@en .
 
 sstim-v:mechAuditoryMotor a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -792,14 +799,18 @@ sstim-v:mechMechanoreceptive a owl:NamedIndividual, sstim:StimulationMechanism, 
     skos:notation "MECHANO" ;
     skos:definition "Activation of skin and deep-tissue mechanoreceptors (e.g. Pacinian corpuscles) by low-frequency vibration delivered through body transducers. Couples a somatosensory pathway alongside any auditory percept; primary mechanism for vibroacoustic stimulation."@en .
 
-sstim-v:mechStartle a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
-    skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Acoustic Startle Reflex"@en,
+# ADR 0034: mechStartle denoted an evoked response or a reflex, not a causal
+# mechanism. Deprecated and stripped of its StimulationMechanism/skos:Concept
+# typing, scheme membership, and top-concept placement — deprecation alone
+# would have preserved the false entailment. Replaced by sstim-v:phenomenonAcousticStartleReflex.
+sstim-v:mechStartle a owl:NamedIndividual ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-v:phenomenonAcousticStartleReflex ;
+    rdfs:label "Acoustic Startle Reflex"@en,
                    "Riflesso di Trasalimento Acustico"@it,
                    "Reflexo de Sobressalto Acústico"@pt,
-                   "Reflejo de Sobresalto Acústico"@es ;
-    skos:notation "STARTLE" ;
-    skos:definition "A fast brainstem-mediated motor reflex to an intense, abrupt sound, and its modulation (e.g. prepulse inhibition). Used mainly as a research/clinical probe of sensorimotor gating rather than as a wellness stimulus."@en .
+                   "Reflejo de Sobresalto Acústico"@es  ;
+    skos:historyNote "Deprecated in 0.9.0 (ADR 0034): a response form catalogued as a causal mechanism. Use sstim-v:phenomenonAcousticStartleReflex with sstim:intendedNeuralPhenomenon, sstim:mechanismNeuralPhenomenon, or sstim:outcomeNeuralPhenomenon according to role. Frozen 0.3.0-0.8.0 snapshots retain the original typing."@en .
 
 sstim-v:mechUltrasonic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -808,27 +819,38 @@ sstim-v:mechUltrasonic a owl:NamedIndividual, sstim:StimulationMechanism, skos:C
                    "Neuromodulação Mecânica Ultrassônica"@pt,
                    "Neuromodulación Mecánica Ultrasónica"@es ;
     skos:notation "USND" ;
-    skos:definition "Modulation of neural activity by focused ultrasound via acoustic radiation force and mechanosensitive ion channels, without an audible percept. A genuine neuromodulation modality included for domain completeness; not ordinary auditory stimulation and not consumer-platform deliverable."@en .
+    skos:definition "A family of explicitly proposed, evidence-qualified pathways by which focused ultrasound may modulate neural activity, spanning candidate acoustic-radiation-force, membrane, and mechanosensitive-ion-channel accounts."@en ;
+    skos:scopeNote "No candidate pathway is treated as universally established, and this mechanism term never decides sensory typing. Absence of an audible percept is deliberately not part of the definition: auditory confounds in human transcranial-ultrasound protocols are a real, protocol-dependent evidence question, recorded through exposure channels and outcome concepts rather than by definition."@en ;
+    sstim:mechanismNeuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:mechanismNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring .
 
 # Steady-state evoked-potential family — visual and somatosensory counterparts of
 # mechASSR — plus cross-modal integration (ADR 0015).
-sstim-v:mechSSVEP a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
-    skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Steady-State Visual Evoked Potential"@en,
+# ADR 0034: mechSSVEP denoted an evoked response or a reflex, not a causal
+# mechanism. Deprecated and stripped of its StimulationMechanism/skos:Concept
+# typing, scheme membership, and top-concept placement — deprecation alone
+# would have preserved the false entailment. Replaced by sstim-v:phenomenonVisualSteadyStateResponse.
+sstim-v:mechSSVEP a owl:NamedIndividual ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-v:phenomenonVisualSteadyStateResponse ;
+    rdfs:label "Steady-State Visual Evoked Potential"@en,
                    "Potenziale Evocato Visivo di Stato Stazionario"@it,
                    "Potencial Evocado Visual de Estado Estacionário"@pt,
-                   "Potencial Evocado Visual de Estado Estacionario"@es ;
-    skos:notation "SSVEP" ;
-    skos:definition "Sustained, phase-locked occipital EEG response to a periodically flickering visual stimulus — the visual counterpart of the ASSR and the canonical electrophysiological correlate of photic driving. A measurable response; downstream cognitive or wellness effects of driving it are less certain."@en .
+                   "Potencial Evocado Visual de Estado Estacionario"@es  ;
+    skos:historyNote "Deprecated in 0.9.0 (ADR 0034): a response form catalogued as a causal mechanism. Use sstim-v:phenomenonVisualSteadyStateResponse with sstim:intendedNeuralPhenomenon, sstim:mechanismNeuralPhenomenon, or sstim:outcomeNeuralPhenomenon according to role. Frozen 0.3.0-0.8.0 snapshots retain the original typing."@en .
 
-sstim-v:mechSSSEP a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
-    skos:inScheme sstim-v:StimulationMechanismScheme ;
-    skos:prefLabel "Steady-State Somatosensory Evoked Potential"@en,
+# ADR 0034: mechSSSEP denoted an evoked response or a reflex, not a causal
+# mechanism. Deprecated and stripped of its StimulationMechanism/skos:Concept
+# typing, scheme membership, and top-concept placement — deprecation alone
+# would have preserved the false entailment. Replaced by sstim-v:phenomenonSomatosensorySteadyStateResponse.
+sstim-v:mechSSSEP a owl:NamedIndividual ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-v:phenomenonSomatosensorySteadyStateResponse ;
+    rdfs:label "Steady-State Somatosensory Evoked Potential"@en,
                    "Potenziale Evocato Somatosensoriale di Stato Stazionario"@it,
                    "Potencial Evocado Somatossensorial de Estado Estacionário"@pt,
-                   "Potencial Evocado Somatosensorial de Estado Estacionario"@es ;
-    skos:notation "SSSEP" ;
-    skos:definition "Sustained, phase-locked cortical response to periodic vibrotactile stimulation — the somatosensory counterpart of the ASSR and SSVEP. The electrophysiological correlate of vibrotactile entrainment; a measurable response whose downstream effects remain under study."@en .
+                   "Potencial Evocado Somatosensorial de Estado Estacionario"@es  ;
+    skos:historyNote "Deprecated in 0.9.0 (ADR 0034): a response form catalogued as a causal mechanism. Use sstim-v:phenomenonSomatosensorySteadyStateResponse with sstim:intendedNeuralPhenomenon, sstim:mechanismNeuralPhenomenon, or sstim:outcomeNeuralPhenomenon according to role. Frozen 0.3.0-0.8.0 snapshots retain the original typing."@en .
 
 sstim-v:mechMultisensory a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -1074,8 +1096,12 @@ sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:
 
 sstim-v:StimulusTemporalStructureScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Stimulus Temporal Structure Vocabulary"@en ;
+    skos:definition "Temporal organizations of an applied stimulus or agent. Values are non-disjoint and may be combined: carrier periodicity, pulse pattern, and administration schedule are different temporal features."@en ;
     skos:hasTopConcept sstim-v:temporalPeriodic, sstim-v:temporalQuasiPeriodic,
-                       sstim-v:temporalAperiodic, sstim-v:temporalAdaptive .
+                       sstim-v:temporalAperiodic, sstim-v:temporalAdaptive,
+                       sstim-v:temporalContinuousTonic, sstim-v:temporalSingleEvent,
+                       sstim-v:temporalPulseTrainOrBurst, sstim-v:temporalIntermittentScheduled,
+                       sstim-v:temporalBolus, sstim-v:temporalContinuousInfusion .
 
 sstim-v:temporalPeriodic a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
     skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
@@ -1121,10 +1147,12 @@ sstim-v:temporalAdaptive a owl:NamedIndividual, sstim:StimulusTemporalStructure,
 ###########################################################################
 
 sstim-v:TechniqueScheme a skos:ConceptScheme ;
-    skos:prefLabel "SSTIM Sensory Stimulation Technique Vocabulary"@en ,
-                   "Vocabolario delle Tecniche di Stimolazione Sensoriale SSTIM"@it ,
-                   "Vocabulário de Técnicas de Estimulação Sensorial SSTIM"@pt ,
-                   "Vocabulario de Técnicas de Estimulación Sensorial SSTIM"@es ;
+    skos:prefLabel "SSTIM Stimulation Technique Vocabulary"@en ,
+                   "Vocabolario delle Tecniche di Stimolazione SSTIM"@it ,
+                   "Vocabulário de Técnicas de Estimulação SSTIM"@pt ,
+                   "Vocabulario de Técnicas de Estimulación SSTIM"@es ;
+    skos:definition "A bounded, non-exhaustive catalog of sensory stimulation and interventional neuromodulation techniques, used to place SSTIM's core domain in context."@en ;
+    skos:historyNote "Relabelled in 0.9.0 (ADR 0034). The scheme IRI has always been sstim-v:TechniqueScheme, never SensoryTechniqueScheme, so only the label was narrower than its own identifier; this brings the label into line rather than widening the scheme. Precision moved to the definition, which keeps the label stable against future widening. Cataloguing a technique means SSTIM can describe it, never that BSC Lab delivers it."@en ;
     skos:hasTopConcept sstim-v:techAmplitudeModulation, sstim-v:techClickTrain,
         sstim-v:techIsochronicTones, sstim-v:techMonauralBeats, sstim-v:techBinauralBeats,
         sstim-v:techFrequencyModulation, sstim-v:techGamma40Auditory,
@@ -1136,7 +1164,13 @@ sstim-v:TechniqueScheme a skos:ConceptScheme ;
         sstim-v:techAcousticStartle, sstim-v:techReferencePitchRetuning, sstim-v:techSubliminalAudio,
         sstim-v:techPhoticDriving, sstim-v:techAudiovisualEntrainment,
         sstim-v:techColorFieldStimulation, sstim-v:techVibrotactileEntrainment,
-        sstim-v:techAudioTactile .
+        sstim-v:techAudioTactile,
+        sstim-v:techRepetitiveTMS,
+        sstim-v:techTDCS,
+        sstim-v:techTACS,
+        sstim-v:techDBS,
+        sstim-v:techVagusNerveStimulation,
+        sstim-v:techIntrathecalNeuromodulatoryAgentDelivery .
 
 # ── Periodic auditory entrainment ───────────────────────────────────────
 
@@ -1149,7 +1183,7 @@ sstim-v:techAmplitudeModulation a owl:NamedIndividual, sstim:EntrainmentBasedTec
     skos:notation "amplitude-modulation" ;
     skos:definition "A carrier tone or noise whose amplitude (loudness) is sinusoidally modulated at a target rate. The canonical stimulus for evoking auditory steady-state responses at the modulation frequency."@en ;
     skos:scopeNote "Well-established ASSR/entrainment stimulus; the modulation rate, not the carrier, sets the response frequency."@en ;
-    sstim:proposedMechanism sstim-v:mechASSR, sstim-v:mechFFR ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAuditorySteadyStateResponse, sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .
 
@@ -1162,7 +1196,7 @@ sstim-v:techClickTrain a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, s
     skos:notation "click-train" ;
     skos:definition "Repeated short impulses (clicks, ticks, grains) presented at a target rate to drive steady-state responses."@en ;
     skos:scopeNote "Strong for probing entrainment, but clicks are perceptually salient and can become fatiguing relative to smoother stimuli."@en ;
-    sstim:proposedMechanism sstim-v:mechASSR, sstim-v:mechFFR ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAuditorySteadyStateResponse, sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .
 
@@ -1174,7 +1208,7 @@ sstim-v:techIsochronicTones a owl:NamedIndividual, sstim:EntrainmentBasedTechniq
                    "Estimulación con Tonos Isócronos"@es ;
     skos:notation "isochronic-tones" ;
     skos:definition "A single tone switched on and off at evenly spaced intervals (a gated pulse train) at a target rate; a monaural, single-channel entrainment stimulus."@en ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechASSR ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonAuditorySteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
     skos:related sstim-v:voiceSymmetry .
@@ -1187,7 +1221,7 @@ sstim-v:techMonauralBeats a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
                    "Estimulación con Pulsaciones Monoaurales"@es ;
     skos:notation "monaural-beats" ;
     skos:definition "Two close-frequency tones summed in a single channel, producing a physically present amplitude beat at their difference frequency. Distinct from binaural beats, where the beat is a neural construct from dichotic presentation."@en ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechASSR ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonAuditorySteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
     skos:related sstim-v:techBinauralBeats .
@@ -1201,7 +1235,8 @@ sstim-v:techBinauralBeats a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
     skos:notation "binaural-beats" ;
     skos:definition "Two sine tones at slightly different frequencies presented dichotically (one per ear), producing a perceived beat at their difference frequency that arises centrally rather than in the air."@en ;
     skos:scopeNote "The most-studied consumer auditory-entrainment technique; effects on EEG and state are reported but mixed across studies."@en ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechThalamocortical ;
+    sstim:proposedMechanism sstim-v:mechThalamocortical ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
     skos:related sstim-v:voiceBinaural, sstim-v:techMonauralBeats .
@@ -1215,23 +1250,36 @@ sstim-v:techFrequencyModulation a owl:NamedIndividual, sstim:SensoryStimulationT
     skos:notation "frequency-modulation" ;
     skos:definition "A tone whose pitch sweeps over time — vibrato, chirps, adaptive glissandi. Spans both fast modulation (which can evoke frequency-following responses) and slow, breathing-rate modulation (which engages autonomic rather than entrainment pathways)."@en ;
     skos:scopeNote "Typed as the generic technique because entrainment status depends on rate. Slow breathing-paced FM should be distinguished from non-breathing FM voices."@en ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAutonomic ;
+    sstim:proposedMechanism sstim-v:mechAutonomic ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
     skos:related sstim-v:voiceMartigli .
 
-sstim-v:techGamma40Auditory a owl:NamedIndividual, sstim:EntrainmentBasedTechnique, skos:Concept ;
+# ADR 0034: the required sensory-route neuromodulation seed. Narrowed so that
+# modulation of gamma-band oscillatory dynamics is part of the technique
+# concept's OWN definition — that is what licenses the dual type. A broad
+# technique such as techPhoticDriving, whose definition admits aesthetic,
+# diagnostic, and neuromodulatory uses alike, deliberately stays sensory-only:
+# a use-level intention must never be promoted into a universal property.
+sstim-v:techGamma40Auditory a owl:NamedIndividual, sstim:EntrainmentBasedTechnique,
+        sstim:SensoryRouteNeuromodulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "40 Hz Auditory Gamma Stimulation"@en,
                    "Stimolazione Gamma Uditiva a 40 Hz"@it,
                    "Estimulação Gama Auditiva de 40 Hz"@pt,
                    "Estimulación Gamma Auditiva de 40 Hz"@es ;
     skos:notation "gamma-40-auditory" ;
-    skos:definition "Auditory entrainment specifically at 40 Hz — 40 Hz clicks, amplitude-modulated tones, or noise — associated with the GENUS neuroimmune research lineage."@en ;
-    skos:scopeNote "Human auditory-only evidence is limited; the stronger findings are preclinical and multisensory. Frame as gamma/auditory support or research-facing, not as a treatment for any condition."@en ;
-    sstim:proposedMechanism sstim-v:mechGamma40, sstim-v:mechASSR ;
+    skos:definition "Auditory stimulation at 40 Hz — 40 Hz clicks, amplitude-modulated tones, or noise — delivered with the defining objective of modulating gamma-band neural oscillatory dynamics, associated with the GENUS research lineage."@en ;
+    skos:scopeNote "The neural-modulation objective is definitional here, which is why this concept occupies the sensory-route neuromodulation overlap: it is both sensory stimulation and neuromodulation, entering through canonical auditory transduction. Membership asserts intent and route, never that modulation occurs. Human auditory-only evidence is limited; the stronger findings are preclinical and multisensory. Frame as gamma/auditory support or research-facing, never as a treatment for any condition."@en ;
+    sstim:proposedMechanism sstim-v:mechGamma40 ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCortex ;
+    sstim:intendedNeuralSystem sstim-v:systemAuditory ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
     skos:related sstim-v:gamma40 .
 
 # ── Rhythmic / musical ──────────────────────────────────────────────────
@@ -1410,22 +1458,34 @@ sstim-v:techVibroacoustic a owl:NamedIndividual, sstim:NonEntrainmentTechnique, 
     skos:notation "vibroacoustic" ;
     skos:definition "Low-frequency sound delivered through body transducers, chairs, beds, or wearables, so it is felt as well as heard."@en ;
     skos:scopeNote "Cross-modal: auditory plus tactile-mechanical. Studied in contexts such as fibromyalgia; best treated as its own (partly somatosensory) modality, not pure audio."@en ;
-    sstim:proposedMechanism sstim-v:mechMechanoreceptive, sstim-v:mechFFR ;
+    sstim:proposedMechanism sstim-v:mechMechanoreceptive ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalitySomatosensory .
 
-sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
+# ADR 0034: retyped off sstim:NonEntrainmentTechnique (hence off
+# SensoryStimulationTechnique). Its intended intervention route is focused
+# action at a neural target, not auditory sensory transduction. Retyping alone
+# was insufficient — proposedMechanism and hasStimulusTemporalStructure had a
+# sensory domain that re-inferred the sensory type, so those domains were
+# widened to sstim:StimulationTechnique first. Prior typing, 0.3.0-0.8.0:
+#   a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept
+# Frozen snapshots keep the old typing; this is a correction on mutable latest.
+sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
-    skos:prefLabel "Ultrasound Neuromodulation"@en,
-                   "Neuromodulazione a Ultrasuoni"@it,
-                   "Neuromodulação por Ultrassom"@pt,
-                   "Neuromodulación por Ultrasonido"@es ;
+    skos:prefLabel "Focused-Ultrasound Neuromodulation"@en,
+                   "Neuromodulazione a Ultrasuoni Focalizzati"@it,
+                   "Neuromodulação por Ultrassom Focalizado"@pt,
+                   "Neuromodulación por Ultrasonido Focalizado"@es ;
     skos:notation "ultrasound-neuromodulation" ;
-    skos:definition "Modulation of neural activity by focused ultrasound, with no audible percept. A genuine neuromodulation field, included for domain completeness."@en ;
-    skos:scopeNote "Not ordinary auditory stimulation and not consumer web/mobile feasible; requires dedicated hardware. Catalogued so the ontology can describe it, not because it is a lightweight delivery method."@en ;
+    skos:definition "Application of spatially focused acoustic energy to an identified neural target with the objective of altering its activity or function."@en ;
+    skos:scopeNote "Defined by its intended focused neural target, not by the categorical absence of an audible percept. Auditory or somatosensory co-stimulation and confounds are protocol-dependent and belong in exposure profiles and evidence records; they do not decide the technique's primary class. Requires dedicated hardware and is not consumer web/mobile feasible. Catalogued so the ontology can describe it, never because BSC Lab delivers it."@en ;
     sstim:proposedMechanism sstim-v:mechUltrasonic ;
-    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
-    skos:editorialNote "Deliberately catalogued for domain completeness. Has no perceived sensory modality (direct neuromodulation with no audible percept), so it is exempt from the techniqueModality requirement; the exposure module captures its delivery/perception profile."@en .
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCortex, sstim-v:targetDeepBrainStructure ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring .
 
 sstim-v:techAcousticStartle a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -1436,7 +1496,7 @@ sstim-v:techAcousticStartle a owl:NamedIndividual, sstim:NonEntrainmentTechnique
     skos:notation "acoustic-startle" ;
     skos:definition "Intense, abrupt sounds (with or without a prepulse) used to elicit and probe the acoustic startle reflex and sensorimotor gating."@en ;
     skos:scopeNote "A research/clinical assessment domain (e.g. prepulse inhibition), not a comfortable wellness experience."@en ;
-    sstim:proposedMechanism sstim-v:mechStartle ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAcousticStartleReflex ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAperiodic ;
     sstim:techniqueModality sstim-v:modalityAuditory .
 
@@ -1451,7 +1511,8 @@ sstim-v:techPhoticDriving a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
     skos:notation "photic-driving" ;
     skos:definition "Periodic visual flicker — a light source or whole-screen field switched or modulated at a target rate — used to drive occipital rhythms at the flicker frequency. The visual counterpart of isochronic/amplitude-modulated auditory entrainment; at alpha rates it can also evoke stroboscopic imagery (the 'flicker' / Dreamachine phenomenon)."@en ;
     skos:scopeNote "Subject to photosensitivity exposure limits — model the flicker rate and the photosensitivity comfort boundary via the exposure module (sstim-ex:hasFlickerRateHz, sstim-ex:boundaryPhotosensitivity, ADR 0011). Avoid high-contrast full-field flicker around 15–25 Hz in unscreened users. At 40 Hz this is the GENUS visual-gamma case (preclinical-strongest, contested in humans), which additionally invokes sstim-v:mechGamma40."@en ;
-    sstim:proposedMechanism sstim-v:mechSSVEP, sstim-v:mechGamma40 ;
+    sstim:proposedMechanism sstim-v:mechGamma40 ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonVisualSteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityVisual ;
     skos:related sstim-v:techIsochronicTones, sstim-v:gamma40 .
@@ -1465,7 +1526,8 @@ sstim-v:techAudiovisualEntrainment a owl:NamedIndividual, sstim:EntrainmentBased
     skos:notation "audiovisual-entrainment" ;
     skos:definition "Light and sound pulsed at the same target rate (the classic 'mind machine' / AVE configuration), so auditory and visual driving reinforce one another. Cross-modal: it engages auditory and visual steady-state responses together with multisensory integration."@en ;
     skos:scopeNote "Combines the auditory and visual flicker constraints; the visual channel is subject to photosensitivity limits. Reported effects on state and EEG are mixed across studies; frame conservatively. At 40 Hz this is the multisensory GENUS configuration."@en ;
-    sstim:proposedMechanism sstim-v:mechASSR, sstim-v:mechSSVEP, sstim-v:mechMultisensory ;
+    sstim:proposedMechanism sstim-v:mechMultisensory ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAuditorySteadyStateResponse, sstim-v:phenomenonVisualSteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityVisual ;
     skos:related sstim-v:techPhoticDriving, sstim-v:techGamma40Auditory, sstim-v:techIsochronicTones .
@@ -1493,7 +1555,8 @@ sstim-v:techVibrotactileEntrainment a owl:NamedIndividual, sstim:EntrainmentBase
     skos:notation "vibrotactile-entrainment" ;
     skos:definition "Rhythmic vibrotactile pulses delivered to the skin (wrist, fingertips, torso, or a wearable) at a target rate to drive somatosensory cortical rhythms. The tactile counterpart of isochronic auditory entrainment; deliverable on consumer hardware via the Web Vibration API."@en ;
     skos:scopeNote "Distinct from vibroacoustic stimulation: here the pulse rate — not low-frequency audio energy — is the driver, and the percept is primarily tactile. Web Vibration API is Android-only; absent on iOS Safari (sstim-v:modalitySomatosensory scope note)."@en ;
-    sstim:proposedMechanism sstim-v:mechSSSEP, sstim-v:mechMechanoreceptive ;
+    sstim:proposedMechanism sstim-v:mechMechanoreceptive ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonSomatosensorySteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalitySomatosensory ;
     skos:related sstim-v:techVibroacoustic, sstim-v:techIsochronicTones .
@@ -1507,7 +1570,8 @@ sstim-v:techAudioTactile a owl:NamedIndividual, sstim:EntrainmentBasedTechnique,
     skos:notation "audio-tactile" ;
     skos:definition "An auditory pulse train (isochronic, monaural, or binaural) and a vibrotactile pulse delivered in phase at the same target rate, so hearing and touch are driven together. Cross-modal: auditory and somatosensory steady-state responses plus multisensory integration."@en ;
     skos:scopeNote "A natural pairing for the BSC breathing/haptic pulse — the isOn breathing-reference voice already drives both the visual breathing animation and the haptic pulse. The tactile channel is Android-only via the Web Vibration API."@en ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechSSSEP, sstim-v:mechMultisensory ;
+    sstim:proposedMechanism sstim-v:mechMultisensory ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonSomatosensorySteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalitySomatosensory ;
     skos:related sstim-v:techVibrotactileEntrainment, sstim-v:techIsochronicTones, sstim-v:techBinauralBeats .
@@ -1644,19 +1708,14 @@ sstim-v:modalityOlfactory skos:topConceptOf sstim-v:SensoryModalityScheme .
 sstim-v:modalitySomatosensory skos:topConceptOf sstim-v:SensoryModalityScheme .
 sstim-v:modalityVestibular skos:topConceptOf sstim-v:SensoryModalityScheme .
 sstim-v:modalityVisual skos:topConceptOf sstim-v:SensoryModalityScheme .
-sstim-v:mechASSR skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechAttentional skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechAuditoryMotor skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechAutonomic skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechClosedLoopPhase skos:topConceptOf sstim-v:StimulationMechanismScheme .
-sstim-v:mechFFR skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechGamma40 skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechMasking skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechMechanoreceptive skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechMultisensory skos:topConceptOf sstim-v:StimulationMechanismScheme .
-sstim-v:mechSSSEP skos:topConceptOf sstim-v:StimulationMechanismScheme .
-sstim-v:mechSSVEP skos:topConceptOf sstim-v:StimulationMechanismScheme .
-sstim-v:mechStartle skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechStochastic skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechThalamocortical skos:topConceptOf sstim-v:StimulationMechanismScheme .
 sstim-v:mechUltrasonic skos:topConceptOf sstim-v:StimulationMechanismScheme .
@@ -1664,6 +1723,12 @@ sstim-v:techASMR skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAcousticStartle skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAmplitudeModulation skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAudioTactile skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techRepetitiveTMS skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techTDCS skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techTACS skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techDBS skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techVagusNerveStimulation skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techIntrathecalNeuromodulatoryAgentDelivery skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAudiovisualEntrainment skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAuditoryIllusion skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techBinauralBeats skos:topConceptOf sstim-v:TechniqueScheme .
@@ -2062,3 +2127,712 @@ sstim-v:noConflictDeclared skos:topConceptOf sstim-v:ConflictDisclosureScheme .
 ###########################################################################
 # End of sstim-vocab.ttl
 ###########################################################################
+
+
+###########################################################################
+# Part 12 — Stimulation Facet Schemes (ADR 0034)
+#
+# Route, approach, target site, neural system, and neural phenomenon answer
+# different questions and are therefore five schemes, not one "level" axis.
+# "Transcranial", "implanted", "acoustic", "chemical", "oscillatory",
+# "autonomic", and "cognitive" are not values on a common scale.
+###########################################################################
+
+sstim-v:NeuralAccessRouteScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Neural Access Route Vocabulary"@en ,
+                   "Vocabolario delle Vie di Accesso Neurale SSTIM"@it ,
+                   "Vocabulário de Vias de Acesso Neural SSTIM"@pt ,
+                   "Vocabulario de Vías de Acceso Neural SSTIM"@es ;
+    skos:definition "Causal-route categories for how a stimulation process is intended to engage a neural target. Contains routes only — not media, approaches, targets, or outcomes."@en ;
+    skos:scopeNote "'Receptor' here means a canonical sensory receptor, never a molecular drug receptor. Mixed access is several values; an unresolved route is an epistemic status recorded elsewhere, not a pseudo-route."@en ;
+    skos:hasTopConcept sstim-v:routeCanonicalSensoryTransductionAfferent,
+        sstim-v:routeBypassesCanonicalSensoryTransduction .
+
+sstim-v:routeCanonicalSensoryTransductionAfferent a owl:NamedIndividual, sstim:CanonicalSensoryTransductionAccessRoute, skos:Concept ;
+    skos:inScheme sstim-v:NeuralAccessRouteScheme ;
+    skos:topConceptOf sstim-v:NeuralAccessRouteScheme ;
+    skos:prefLabel "canonical sensory transduction and afferent access"@en,
+                   "accesso per trasduzione sensoriale canonica e via afferente"@it,
+                   "acesso por transdução sensorial canónica e via aferente"@pt,
+                   "acceso por transducción sensorial canónica y vía aferente"@es ;
+    skos:notation "route-canonical-sensory-transduction-afferent" ;
+    skos:definition "Engagement of a neural target through canonical sensory receptor transduction and afferent processing."@en ;
+    skos:scopeNote "Within the neuromodulation population this is not a redundant value: it is the fact that distinguishes the sensory-route overlap from approaches that bypass canonical sensory transduction. Conscious perception is not required."@en .
+
+sstim-v:routeBypassesCanonicalSensoryTransduction a owl:NamedIndividual, sstim:SensoryTransductionBypassingAccessRoute, skos:Concept ;
+    skos:inScheme sstim-v:NeuralAccessRouteScheme ;
+    skos:topConceptOf sstim-v:NeuralAccessRouteScheme ;
+    skos:narrower sstim-v:routePhysicalNeuralInteraction, sstim-v:routeBiochemicalPharmacologicalNeuralInteraction, sstim-v:routeIndirectNonSensoryPhysiologicalMediation ;
+    skos:prefLabel "bypasses canonical sensory transduction"@en,
+                   "elude la trasduzione sensoriale canonica"@it,
+                   "contorna a transdução sensorial canónica"@pt,
+                   "elude la transducción sensorial canónica"@es ;
+    skos:notation "route-bypasses-canonical-sensory-transduction" ;
+    skos:definition "Engagement of a neural target without canonical sensory receptor transduction."@en ;
+    skos:scopeNote "Asserting this route positively identifies such a route; it does not prove the technique is non-sensory, because a hybrid may also declare an intended sensory route."@en .
+
+sstim-v:routePhysicalNeuralInteraction a owl:NamedIndividual, sstim:SensoryTransductionBypassingAccessRoute, skos:Concept ;
+    skos:inScheme sstim-v:NeuralAccessRouteScheme ;
+    skos:broader sstim-v:routeBypassesCanonicalSensoryTransduction ;
+    skos:prefLabel "physical neural interaction"@en,
+                   "interazione neurale fisica"@it,
+                   "interação neural física"@pt,
+                   "interacción neural física"@es ;
+    skos:notation "route-physical-neural-interaction" ;
+    skos:definition "Direct physical interaction with neural tissue by an applied electric current or field, magnetic field, acoustic energy, or comparable physical means."@en ;
+    skos:scopeNote "Both an intended cortical tACS interaction and a competing peripheral-nerve explanation use this broad route; they are separated by the intended target site versus the evaluated outcome target site, not by inventing two routes."@en .
+
+sstim-v:routeBiochemicalPharmacologicalNeuralInteraction a owl:NamedIndividual, sstim:SensoryTransductionBypassingAccessRoute, skos:Concept ;
+    skos:inScheme sstim-v:NeuralAccessRouteScheme ;
+    skos:broader sstim-v:routeBypassesCanonicalSensoryTransduction ;
+    skos:prefLabel "biochemical or pharmacological neural interaction"@en,
+                   "interazione neurale biochimica o farmacologica"@it,
+                   "interação neural bioquímica ou farmacológica"@pt,
+                   "interacción neural bioquímica o farmacológica"@es ;
+    skos:notation "route-biochemical-pharmacological-neural-interaction" ;
+    skos:definition "Engagement of a neural target by a chemical or pharmacological agent acting on neural tissue."@en .
+
+sstim-v:routeIndirectNonSensoryPhysiologicalMediation a owl:NamedIndividual, sstim:SensoryTransductionBypassingAccessRoute, skos:Concept ;
+    skos:inScheme sstim-v:NeuralAccessRouteScheme ;
+    skos:broader sstim-v:routeBypassesCanonicalSensoryTransduction ;
+    skos:prefLabel "indirect non-sensory physiological mediation"@en,
+                   "mediazione fisiologica indiretta non sensoriale"@it,
+                   "mediação fisiológica indireta não sensorial"@pt,
+                   "mediación fisiológica indirecta no sensorial"@es ;
+    skos:notation "route-indirect-non-sensory-physiological-mediation" ;
+    skos:definition "Engagement of a neural target through an intermediate physiological process that is not canonical sensory transduction, such as a vascular, endocrine, or muscular pathway."@en .
+
+sstim-v:StimulationDeliveryApproachScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Stimulation Delivery Approach Vocabulary"@en ,
+                   "Vocabolario degli Approcci di Somministrazione della Stimolazione SSTIM"@it ,
+                   "Vocabulário de Abordagens de Administração da Estimulação SSTIM"@pt ,
+                   "Vocabulario de Enfoques de Administración de la Estimulación SSTIM"@es ;
+    skos:definition "Coarse, non-exclusive operational tags summarizing administration, invasiveness, and interface placement for cross-technique navigation."@en ;
+    skos:scopeNote "Deliberately non-exclusive and deliberately coarse: a method may be external, transcutaneous, and transcranial at once. Detailed device, body placement, administration, and dose remain in the exposure profile, and no approach tag is inferred from another facet."@en ;
+    skos:hasTopConcept sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial, sstim-v:approachPercutaneous, sstim-v:approachImplanted, sstim-v:approachIntracranial, sstim-v:approachEpidural, sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal, sstim-v:approachSystemic .
+
+sstim-v:approachExternal a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "external"@en,
+                   "esterno"@it,
+                   "externo"@pt,
+                   "externo"@es ;
+    skos:notation "approach-external" ;
+    skos:definition "Applied from outside the body without breaching the skin."@en .
+
+sstim-v:approachEnvironmentalReceptorFacing a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "environmental / receptor-facing"@en,
+                   "ambientale / rivolto ai recettori"@it,
+                   "ambiental / voltado para recetores"@pt,
+                   "ambiental / orientado a receptores"@es ;
+    skos:notation "approach-environmental-receptor-facing" ;
+    skos:definition "Presented in the surrounding environment toward sensory receptors, without a body-mounted interface."@en .
+
+sstim-v:approachTranscutaneous a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "transcutaneous"@en,
+                   "transcutaneo"@it,
+                   "transcutâneo"@pt,
+                   "transcutáneo"@es ;
+    skos:notation "approach-transcutaneous" ;
+    skos:definition "Delivered across intact skin."@en .
+
+sstim-v:approachTranscranial a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "transcranial"@en,
+                   "transcranico"@it,
+                   "transcraniano"@pt,
+                   "transcraneal"@es ;
+    skos:notation "approach-transcranial" ;
+    skos:definition "Delivered across the skull toward an intracranial target."@en .
+
+sstim-v:approachPercutaneous a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "percutaneous"@en,
+                   "percutaneo"@it,
+                   "percutâneo"@pt,
+                   "percutáneo"@es ;
+    skos:notation "approach-percutaneous" ;
+    skos:definition "Delivered through a needle or comparable skin puncture without a permanent implant."@en .
+
+sstim-v:approachImplanted a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "implanted"@en,
+                   "impiantato"@it,
+                   "implantado"@pt,
+                   "implantado"@es ;
+    skos:notation "approach-implanted" ;
+    skos:definition "Delivered by a surgically placed device remaining in the body."@en .
+
+sstim-v:approachIntracranial a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "intracranial"@en,
+                   "intracranico"@it,
+                   "intracraniano"@pt,
+                   "intracraneal"@es ;
+    skos:notation "approach-intracranial" ;
+    skos:definition "Delivered from within the cranial cavity."@en .
+
+sstim-v:approachEpidural a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "epidural"@en,
+                   "epidurale"@it,
+                   "epidural"@pt,
+                   "epidural"@es ;
+    skos:notation "approach-epidural" ;
+    skos:definition "Delivered into the epidural space."@en .
+
+sstim-v:approachTargetedLocalInfusion a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "targeted local infusion"@en,
+                   "infusione locale mirata"@it,
+                   "infusão local dirigida"@pt,
+                   "infusión local dirigida"@es ;
+    skos:notation "approach-targeted-local-infusion" ;
+    skos:definition "An agent infused at or near an identified target rather than distributed systemically."@en .
+
+sstim-v:approachIntrathecal a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "intrathecal"@en,
+                   "intratecale"@it,
+                   "intratecal"@pt,
+                   "intratecal"@es ;
+    skos:notation "approach-intrathecal" ;
+    skos:definition "Delivered into the intrathecal space."@en .
+
+sstim-v:approachSystemic a owl:NamedIndividual, sstim:StimulationDeliveryApproach, skos:Concept ;
+    skos:inScheme sstim-v:StimulationDeliveryApproachScheme ;
+    skos:topConceptOf sstim-v:StimulationDeliveryApproachScheme ;
+    skos:prefLabel "systemic"@en,
+                   "sistemico"@it,
+                   "sistémico"@pt,
+                   "sistémico"@es ;
+    skos:notation "approach-systemic" ;
+    skos:definition "Distributed through the body as a whole rather than applied at an identified site."@en .
+
+sstim-v:NeuralTargetSiteScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Neural Target Site Vocabulary"@en ,
+                   "Vocabolario dei Siti Bersaglio Neurali SSTIM"@it ,
+                   "Vocabulário de Locais-Alvo Neurais SSTIM"@pt ,
+                   "Vocabulario de Sitios Diana Neurales SSTIM"@es ;
+    skos:definition "Controlled information categories for broad anatomical targets of stimulation. These classify a target; they are not the anatomical entities themselves."@en ;
+    skos:scopeNote "A category may have more than one broader concept; no forced single-parent tree is required. External anatomy alignment is a separate, evidence-checked pass."@en ;
+    skos:hasTopConcept sstim-v:targetCentralNervousSystem,
+        sstim-v:targetPeripheralNervousSystem, sstim-v:targetCranialNerve .
+
+sstim-v:targetCentralNervousSystem a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:topConceptOf sstim-v:NeuralTargetSiteScheme ;
+    skos:narrower sstim-v:targetBrain, sstim-v:targetSpinalCord ;
+    skos:prefLabel "central nervous system"@en,
+                   "sistema nervoso centrale"@it,
+                   "sistema nervoso central"@pt,
+                   "sistema nervioso central"@es ;
+    skos:notation "target-central-nervous-system" ;
+    skos:definition "The brain and spinal cord as a broad stimulation target."@en .
+
+sstim-v:targetBrain a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:broader sstim-v:targetCentralNervousSystem ;
+    skos:narrower sstim-v:targetCortex, sstim-v:targetDeepBrainStructure ;
+    skos:prefLabel "brain"@en,
+                   "encefalo"@it,
+                   "encéfalo"@pt,
+                   "encéfalo"@es ;
+    skos:notation "target-brain" ;
+    skos:definition "The brain as a broad stimulation target."@en .
+
+sstim-v:targetCortex a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:broader sstim-v:targetBrain ;
+    skos:prefLabel "cortex"@en,
+                   "corteccia"@it,
+                   "córtex"@pt,
+                   "corteza"@es ;
+    skos:notation "target-cortex" ;
+    skos:definition "Cortical tissue as a stimulation target."@en .
+
+sstim-v:targetDeepBrainStructure a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:broader sstim-v:targetBrain ;
+    skos:prefLabel "deep brain structure"@en,
+                   "struttura cerebrale profonda"@it,
+                   "estrutura cerebral profunda"@pt,
+                   "estructura cerebral profunda"@es ;
+    skos:notation "target-deep-brain-structure" ;
+    skos:definition "A subcortical or deep brain structure as a stimulation target."@en .
+
+sstim-v:targetSpinalCord a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:broader sstim-v:targetCentralNervousSystem ;
+    skos:prefLabel "spinal cord"@en,
+                   "midollo spinale"@it,
+                   "medula espinal"@pt,
+                   "médula espinal"@es ;
+    skos:notation "target-spinal-cord" ;
+    skos:definition "The spinal cord as a stimulation target."@en .
+
+sstim-v:targetPeripheralNervousSystem a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:topConceptOf sstim-v:NeuralTargetSiteScheme ;
+    skos:narrower sstim-v:targetPeripheralNerve ;
+    skos:prefLabel "peripheral nervous system"@en,
+                   "sistema nervoso periferico"@it,
+                   "sistema nervoso periférico"@pt,
+                   "sistema nervioso periférico"@es ;
+    skos:notation "target-peripheral-nervous-system" ;
+    skos:definition "Neural tissue outside the brain and spinal cord as a broad stimulation target."@en .
+
+sstim-v:targetPeripheralNerve a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:broader sstim-v:targetPeripheralNervousSystem ;
+    skos:prefLabel "peripheral nerve"@en,
+                   "nervo periferico"@it,
+                   "nervo periférico"@pt,
+                   "nervio periférico"@es ;
+    skos:notation "target-peripheral-nerve" ;
+    skos:definition "A peripheral nerve as a stimulation target."@en .
+
+sstim-v:targetCranialNerve a owl:NamedIndividual, sstim:NeuralTargetSite, skos:Concept ;
+    skos:inScheme sstim-v:NeuralTargetSiteScheme ;
+    skos:topConceptOf sstim-v:NeuralTargetSiteScheme ;
+    skos:prefLabel "cranial nerve"@en,
+                   "nervo cranico"@it,
+                   "nervo craniano"@pt,
+                   "nervio craneal"@es ;
+    skos:notation "target-cranial-nerve" ;
+    skos:definition "A cranial nerve as a stimulation target."@en ;
+    skos:scopeNote "Kept as a separate seed category rather than a blanket child of the peripheral nervous system, because cranial-nerve anatomy is not uniformly peripheral."@en .
+
+sstim-v:NeuralSystemScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Neural System Vocabulary"@en ,
+                   "Vocabolario dei Sistemi Neurali SSTIM"@it ,
+                   "Vocabulário de Sistemas Neurais SSTIM"@pt ,
+                   "Vocabulario de Sistemas Neurales SSTIM"@es ;
+    skos:definition "Distributed organizational neural systems used as a target axis, aligned to but not identified with the sensory modality vocabulary."@en ;
+    skos:scopeNote "This is the axis for neuromodulation OF a sensory system. It says nothing about the entry route: a cochlear or retinal neural interface targets a sensory system without using the canonical receptor route."@en ;
+    skos:hasTopConcept sstim-v:systemSensory, sstim-v:systemMotor, sstim-v:systemAutonomic .
+
+sstim-v:systemSensory a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:topConceptOf sstim-v:NeuralSystemScheme ;
+    skos:narrower sstim-v:systemAuditory, sstim-v:systemVisual, sstim-v:systemSomatosensory, sstim-v:systemOlfactory, sstim-v:systemGustatory, sstim-v:systemVestibular, sstim-v:systemProprioceptive, sstim-v:systemInteroceptive ;
+    skos:prefLabel "sensory system"@en,
+                   "sistema sensoriale"@it,
+                   "sistema sensorial"@pt,
+                   "sistema sensorial"@es ;
+    skos:notation "system-sensory" ;
+    skos:definition "The sensory nervous system as a distributed target."@en .
+
+sstim-v:systemMotor a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:topConceptOf sstim-v:NeuralSystemScheme ;
+    skos:prefLabel "motor system"@en,
+                   "sistema motorio"@it,
+                   "sistema motor"@pt,
+                   "sistema motor"@es ;
+    skos:notation "system-motor" ;
+    skos:definition "The motor nervous system as a distributed target."@en .
+
+sstim-v:systemAutonomic a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:topConceptOf sstim-v:NeuralSystemScheme ;
+    skos:prefLabel "autonomic system"@en,
+                   "sistema autonomo"@it,
+                   "sistema autónomo"@pt,
+                   "sistema autónomo"@es ;
+    skos:notation "system-autonomic" ;
+    skos:definition "The autonomic nervous system as a distributed target."@en .
+
+sstim-v:systemAuditory a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "auditory system"@en,
+                   "sistema uditivo"@it,
+                   "sistema auditivo"@pt,
+                   "sistema auditivo"@es ;
+    skos:notation "system-auditory" ;
+    skos:definition "The auditory neural system as a distributed target."@en .
+
+sstim-v:systemVisual a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "visual system"@en,
+                   "sistema visivo"@it,
+                   "sistema visual"@pt,
+                   "sistema visual"@es ;
+    skos:notation "system-visual" ;
+    skos:definition "The visual neural system as a distributed target."@en .
+
+sstim-v:systemSomatosensory a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "somatosensory system"@en,
+                   "sistema somatosensoriale"@it,
+                   "sistema somatossensorial"@pt,
+                   "sistema somatosensorial"@es ;
+    skos:notation "system-somatosensory" ;
+    skos:definition "The somatosensory neural system as a distributed target."@en .
+
+sstim-v:systemOlfactory a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "olfactory system"@en,
+                   "sistema olfattivo"@it,
+                   "sistema olfativo"@pt,
+                   "sistema olfativo"@es ;
+    skos:notation "system-olfactory" ;
+    skos:definition "The olfactory neural system as a distributed target."@en .
+
+sstim-v:systemGustatory a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "gustatory system"@en,
+                   "sistema gustativo"@it,
+                   "sistema gustativo"@pt,
+                   "sistema gustativo"@es ;
+    skos:notation "system-gustatory" ;
+    skos:definition "The gustatory neural system as a distributed target."@en .
+
+sstim-v:systemVestibular a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "vestibular system"@en,
+                   "sistema vestibolare"@it,
+                   "sistema vestibular"@pt,
+                   "sistema vestibular"@es ;
+    skos:notation "system-vestibular" ;
+    skos:definition "The vestibular neural system as a distributed target."@en .
+
+sstim-v:systemProprioceptive a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "proprioceptive system"@en,
+                   "sistema propriocettivo"@it,
+                   "sistema propriocetivo"@pt,
+                   "sistema propioceptivo"@es ;
+    skos:notation "system-proprioceptive" ;
+    skos:definition "The proprioceptive neural system as a distributed target."@en .
+
+sstim-v:systemInteroceptive a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept ;
+    skos:inScheme sstim-v:NeuralSystemScheme ;
+    skos:broader sstim-v:systemSensory ;
+    skos:prefLabel "interoceptive system"@en,
+                   "sistema interocettivo"@it,
+                   "sistema interocetivo"@pt,
+                   "sistema interoceptivo"@es ;
+    skos:notation "system-interoceptive" ;
+    skos:definition "The interoceptive neural system as a distributed target."@en .
+
+sstim-v:NeuralPhenomenonScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Neural Phenomenon Vocabulary"@en ,
+                   "Vocabolario dei Fenomeni Neurali SSTIM"@it ,
+                   "Vocabulário de Fenómenos Neurais SSTIM"@pt ,
+                   "Vocabulario de Fenómenos Neurales SSTIM"@es ;
+    skos:definition "Coherent functional neural phenomena, reused across the proposed-mechanism, intended-target, and observed-outcome roles by three separate properties."@en ;
+    skos:scopeNote "This scheme replaces any single target-level axis. A route, a dynamic, a system, and an outcome domain are not values on one scale, and an autonomic outcome can also be neural. Perceptual, cognitive, motor, physiological, and behavioural outcome domains are modelled separately and non-exclusively; a controlled vocabulary must not force false partitions to simplify a query."@en ;
+    skos:hasTopConcept sstim-v:phenomenonExcitabilityOrFiring, sstim-v:phenomenonOscillatoryDynamics, sstim-v:phenomenonTemporalCoordination, sstim-v:phenomenonSynapticTransmission, sstim-v:phenomenonNeurochemicalSignaling, sstim-v:phenomenonConnectivityOrPlasticity, sstim-v:phenomenonAutonomicNeuralRegulation, sstim-v:phenomenonEvokedResponse, sstim-v:phenomenonReflexResponse .
+
+sstim-v:phenomenonExcitabilityOrFiring a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "excitability or firing"@en,
+                   "eccitabilità o scarica"@it,
+                   "excitabilidade ou disparo"@pt,
+                   "excitabilidad o descarga"@es ;
+    skos:notation "phenomenon-excitability-or-firing" ;
+    skos:definition "Change in neuronal excitability or firing."@en .
+
+sstim-v:phenomenonOscillatoryDynamics a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "oscillatory dynamics"@en,
+                   "dinamiche oscillatorie"@it,
+                   "dinâmicas oscilatórias"@pt,
+                   "dinámicas oscilatorias"@es ;
+    skos:notation "phenomenon-oscillatory-dynamics" ;
+    skos:definition "Change in the amplitude, frequency, or phase of neural oscillations."@en .
+
+sstim-v:phenomenonTemporalCoordination a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "temporal coordination"@en,
+                   "coordinazione temporale"@it,
+                   "coordenação temporal"@pt,
+                   "coordinación temporal"@es ;
+    skos:notation "phenomenon-temporal-coordination" ;
+    skos:definition "Change in the temporal alignment or coordination of neural activity."@en .
+
+sstim-v:phenomenonSynapticTransmission a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "synaptic transmission"@en,
+                   "trasmissione sinaptica"@it,
+                   "transmissão sináptica"@pt,
+                   "transmisión sináptica"@es ;
+    skos:notation "phenomenon-synaptic-transmission" ;
+    skos:definition "Change in synaptic transmission."@en .
+
+sstim-v:phenomenonNeurochemicalSignaling a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "neurochemical signaling"@en,
+                   "segnalazione neurochimica"@it,
+                   "sinalização neuroquímica"@pt,
+                   "señalización neuroquímica"@es ;
+    skos:notation "phenomenon-neurochemical-signaling" ;
+    skos:definition "Change in neurochemical or neurotransmitter signaling."@en .
+
+sstim-v:phenomenonConnectivityOrPlasticity a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "connectivity or plasticity"@en,
+                   "connettività o plasticità"@it,
+                   "conetividade ou plasticidade"@pt,
+                   "conectividad o plasticidad"@es ;
+    skos:notation "phenomenon-connectivity-or-plasticity" ;
+    skos:definition "Change in functional connectivity or in plasticity."@en .
+
+sstim-v:phenomenonAutonomicNeuralRegulation a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:prefLabel "autonomic neural regulation"@en,
+                   "regolazione neurale autonoma"@it,
+                   "regulação neural autónoma"@pt,
+                   "regulación neural autónoma"@es ;
+    skos:notation "phenomenon-autonomic-neural-regulation" ;
+    skos:definition "Change in autonomic neural regulation."@en .
+
+sstim-v:temporalContinuousTonic a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Continuous / Tonic"@en, "Continuo/Tonico"@it, "Contínuo/Tónico"@pt, "Continuo/Tónico"@es ;
+    skos:notation "temporal-continuous-tonic" ;
+    skos:definition "Applied continuously at a sustained level rather than as discrete events, such as a constant direct current."@en .
+
+sstim-v:temporalSingleEvent a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Single Event"@en, "Evento Singolo"@it, "Evento Único"@pt, "Evento Único"@es ;
+    skos:notation "temporal-single-event" ;
+    skos:definition "A single discrete application, such as one pulse."@en .
+
+sstim-v:temporalPulseTrainOrBurst a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Pulse Train / Burst"@en, "Treno di Impulsi/Raffica"@it, "Trem de Impulsos/Rajada"@pt, "Tren de Pulsos/Ráfaga"@es ;
+    skos:notation "temporal-pulse-train-or-burst" ;
+    skos:definition "Discrete pulses delivered in trains or bursts."@en ;
+    skos:scopeNote "Combinable with a carrier periodicity value: a pulse train may itself be periodic or irregular."@en .
+
+sstim-v:temporalIntermittentScheduled a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Intermittent / Scheduled"@en, "Intermittente/Programmato"@it, "Intermitente/Programado"@pt, "Intermitente/Programado"@es ;
+    skos:notation "temporal-intermittent-scheduled" ;
+    skos:definition "Applied in separated episodes on a schedule rather than continuously."@en .
+
+sstim-v:temporalBolus a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Bolus"@en, "Bolo"@it, "Bólus"@pt, "Bolo"@es ;
+    skos:notation "temporal-bolus" ;
+    skos:definition "An agent administered as a single discrete dose."@en .
+
+sstim-v:temporalContinuousInfusion a owl:NamedIndividual, sstim:StimulusTemporalStructure, skos:Concept ;
+    skos:inScheme sstim-v:StimulusTemporalStructureScheme ;
+    skos:topConceptOf sstim-v:StimulusTemporalStructureScheme ;
+    skos:prefLabel "Continuous Infusion"@en, "Infusione Continua"@it, "Infusão Contínua"@pt, "Infusión Continua"@es ;
+    skos:notation "temporal-continuous-infusion" ;
+    skos:definition "An agent administered continuously over time."@en .
+
+sstim-v:phenomenonEvokedResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:narrower sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonAuditorySteadyStateResponse, sstim-v:phenomenonVisualSteadyStateResponse, sstim-v:phenomenonSomatosensorySteadyStateResponse ;
+    skos:prefLabel "evoked or driven response"@en,
+                   "risposta evocata o indotta"@it,
+                   "resposta evocada ou induzida"@pt,
+                   "respuesta evocada o inducida"@es ;
+    skos:notation "phenomenon-evoked-response" ;
+    skos:definition "A neural response evoked or driven by an applied stimulus."@en ;
+    skos:scopeNote "These are response forms, not causal mechanisms. They replace the mechanism-scheme entries deprecated in 0.9.0: a measurable evoked response describes what happens, while how it arises remains a separate mechanism and evidence question."@en .
+
+sstim-v:phenomenonFrequencyFollowingResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:broader sstim-v:phenomenonEvokedResponse ;
+    skos:prefLabel "frequency-following response"@en,
+                   "risposta di inseguimento della frequenza"@it,
+                   "resposta de seguimento de frequência"@pt,
+                   "respuesta de seguimiento de frecuencia"@es ;
+    skos:notation "phenomenon-frequency-following-response" ;
+    skos:definition "A neural response that follows the periodicity of an applied stimulus."@en .
+
+sstim-v:phenomenonAuditorySteadyStateResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:broader sstim-v:phenomenonEvokedResponse ;
+    skos:prefLabel "auditory steady-state response"@en,
+                   "risposta uditiva di stato stazionario"@it,
+                   "resposta auditiva de estado estacionário"@pt,
+                   "respuesta auditiva de estado estacionario"@es ;
+    skos:notation "phenomenon-auditory-steady-state-response" ;
+    skos:definition "A steady-state neural response frequency-tagged to a periodic auditory stimulus."@en .
+
+sstim-v:phenomenonVisualSteadyStateResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:broader sstim-v:phenomenonEvokedResponse ;
+    skos:prefLabel "visual steady-state response"@en,
+                   "risposta visiva di stato stazionario"@it,
+                   "resposta visual de estado estacionário"@pt,
+                   "respuesta visual de estado estacionario"@es ;
+    skos:notation "phenomenon-visual-steady-state-response" ;
+    skos:definition "A steady-state neural response frequency-tagged to a periodic visual stimulus."@en .
+
+sstim-v:phenomenonSomatosensorySteadyStateResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:broader sstim-v:phenomenonEvokedResponse ;
+    skos:prefLabel "somatosensory steady-state response"@en,
+                   "risposta somatosensoriale di stato stazionario"@it,
+                   "resposta somatossensorial de estado estacionário"@pt,
+                   "respuesta somatosensorial de estado estacionario"@es ;
+    skos:notation "phenomenon-somatosensory-steady-state-response" ;
+    skos:definition "A steady-state neural response frequency-tagged to a periodic somatosensory stimulus."@en .
+
+sstim-v:phenomenonReflexResponse a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:topConceptOf sstim-v:NeuralPhenomenonScheme ;
+    skos:narrower sstim-v:phenomenonAcousticStartleReflex ;
+    skos:prefLabel "reflex response"@en,
+                   "risposta riflessa"@it,
+                   "resposta reflexa"@pt,
+                   "respuesta refleja"@es ;
+    skos:notation "phenomenon-reflex-response" ;
+    skos:definition "A reflex response elicited by an applied stimulus."@en .
+
+sstim-v:phenomenonAcousticStartleReflex a owl:NamedIndividual, sstim:NeuralPhenomenon, skos:Concept ;
+    skos:inScheme sstim-v:NeuralPhenomenonScheme ;
+    skos:broader sstim-v:phenomenonReflexResponse ;
+    skos:prefLabel "acoustic startle reflex"@en,
+                   "riflesso di trasalimento acustico"@it,
+                   "reflexo de sobressalto acústico"@pt,
+                   "reflejo de sobresalto acústico"@es ;
+    skos:notation "phenomenon-acoustic-startle-reflex" ;
+    skos:definition "The startle reflex elicited by a sudden intense acoustic stimulus."@en .
+
+# ── ADR 0034: non-sensory neuromodulation contrast set ──────────────────
+# Catalogued so the ontology can DESCRIBE these boundary methods, and so the
+# neural-access-route axis is exercised across three distinct routes rather
+# than left single-valued. None is referenced by any BSC preset, framework,
+# protocol, or implementation, and none is linked by definesTechnique or
+# incorporatesTechnique: inclusion asserts neither BSC Lab capability, nor
+# efficacy, nor safety. Characteristic delivery media are asserted in
+# sstim-exposure.ttl, which already depends on this module.
+
+sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Repetitive Transcranial Magnetic Stimulation"@en,
+                   "Stimolazione Magnetica Transcranica Ripetitiva"@it,
+                   "Estimulação Magnética Transcraniana Repetitiva"@pt,
+                   "Estimulación Magnética Transcraneal Repetitiva"@es ;
+    skos:notation "repetitive-tms" ;
+    skos:definition "Repeated magnetic pulses applied by a coil over the scalp, inducing an electric field in underlying tissue, with the objective of altering cortical activity or excitability."@en ;
+    skos:scopeNote "Typed as neuromodulation because the modulation objective is definitional for the repetitive protocol. A single-pulse probe used only to elicit and measure a response is stimulation without being neuromodulation, since measuring is not modulating. The induced electric field is an established physical transformation and belongs in the exposure or device description, not in a proposed mechanism; how that field produces a neural response remains an evidence question."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
+    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and not consumer-platform feasible."@en .
+
+sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Transcranial Direct Current Stimulation"@en,
+                   "Stimolazione Transcranica a Corrente Continua"@it,
+                   "Estimulação Transcraniana por Corrente Contínua"@pt,
+                   "Estimulación Transcraneal por Corriente Continua"@es ;
+    skos:notation "tdcs" ;
+    skos:definition "A weak constant electric current applied through scalp electrodes with the objective of altering cortical excitability."@en ;
+    skos:scopeNote "Applied electric current is not by itself brain stimulation — peripheral, muscular, and cardiac applications share the medium and are separated here by route, approach, and target."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalContinuousTonic ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
+    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+
+sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Transcranial Alternating Current Stimulation"@en,
+                   "Stimolazione Transcranica a Corrente Alternata"@it,
+                   "Estimulação Transcraniana por Corrente Alternada"@pt,
+                   "Estimulación Transcraneal por Corriente Alterna"@es ;
+    skos:notation "tacs" ;
+    skos:definition "An oscillating electric current applied through scalp electrodes with the objective of altering the amplitude, frequency, or phase of cortical oscillations."@en ;
+    skos:scopeNote "The direct non-sensory analogue of sensory entrainment: periodic, and targeting oscillatory dynamics. Its intended route is a physical cortical interaction, but reported effects can also arise through transcutaneous peripheral-nerve stimulation. That competing account is an evidence question, recorded on an outcome concept via sstim:outcomeNeuralTargetSite, and it never rewrites this declared intended route."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
+    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+
+sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Deep Brain Stimulation"@en,
+                   "Stimolazione Cerebrale Profonda"@it,
+                   "Estimulação Cerebral Profunda"@pt,
+                   "Estimulación Cerebral Profunda"@es ;
+    skos:notation "dbs" ;
+    skos:definition "Electrical stimulation delivered by surgically implanted intracranial electrodes to a deep brain structure with the objective of altering its activity."@en ;
+    skos:scopeNote "A clinical neurosurgical method, catalogued so the ontology can describe the implanted-electrode route. It is emphatically outside any consumer or wellness context."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachImplanted, sstim-v:approachIntracranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetDeepBrainStructure ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
+    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and outside its scope entirely."@en .
+
+sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Vagus Nerve Stimulation"@en,
+                   "Stimolazione del Nervo Vago"@it,
+                   "Estimulação do Nervo Vago"@pt,
+                   "Estimulación del Nervio Vago"@es ;
+    skos:notation "vagus-nerve-stimulation" ;
+    skos:definition "Electrical stimulation of the vagus nerve, by an implanted device or through the skin at an accessible branch, with the objective of altering autonomic neural regulation."@en ;
+    skos:scopeNote "Shows why route, approach, and target must stay independent: implanted and transcutaneous variants share a target and a route while differing in approach. Targeting a cranial nerve and the autonomic system says nothing about entering through a sensory system."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachImplanted, sstim-v:approachExternal, sstim-v:approachTranscutaneous ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCranialNerve ;
+    sstim:intendedNeuralSystem sstim-v:systemAutonomic ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonAutonomicNeuralRegulation ;
+    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+
+sstim-v:techIntrathecalNeuromodulatoryAgentDelivery a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Targeted Intrathecal Neuromodulatory Agent Delivery"@en,
+                   "Somministrazione Intratecale Mirata di Agente Neuromodulatore"@it,
+                   "Administração Intratecal Dirigida de Agente Neuromodulador"@pt,
+                   "Administración Intratecal Dirigida de Agente Neuromodulador"@es ;
+    skos:notation "intrathecal-neuromodulatory-agent-delivery" ;
+    skos:definition "Infusion of a neuromodulatory agent into the intrathecal space, targeted at an identified central nervous system site with the objective of altering its activity or function."@en ;
+    skos:scopeNote "The populated chemical example, included because an empty route category would not demonstrate that the model works. It qualifies as neuromodulation only because the neuromodulatory objective and the identified neural target are definitional; ordinary systemic neuroactive pharmacotherapy does not qualify, since drug administration alone is insufficient."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalContinuousInfusion ;
+    sstim:neuralAccessRoute sstim-v:routeBiochemicalPharmacologicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal ;
+    sstim:intendedNeuralTargetSite sstim-v:targetCentralNervousSystem, sstim-v:targetSpinalCord ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonNeurochemicalSignaling ;
+    skos:editorialNote "Catalogued for domain completeness. A clinical method, not deliverable by BSC Lab."@en .
+

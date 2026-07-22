@@ -2,6 +2,7 @@
 @prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
 @prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix sstim-v: <https://w3id.org/sstim/vocab#> .
 @prefix bsc-fw-tech: <https://w3id.org/sstim/framework/bsc/technique/> .
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
@@ -44,24 +45,29 @@ bsc-fw-tech:martigli-breathing-oscillation a sstim:NonEntrainmentTechnique ;
     sstim:proposedMechanism sstim-v:mechAutonomic ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityInteroceptive ;
+    sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/BREATHING_MODEL.md> .
 
 bsc-fw-tech:martigli-binaural-hybrid a sstim:SensoryStimulationTechnique ;
     rdfs:label "Martigli-Binaural hybrid"@en ;
     dct:description "Hybrid auditory technique combining a maintained binaural beat difference with Martigli carrier-frequency breathing motion."@en ;
     skos:relatedMatch sstim-v:voiceMartigliBinaural ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAutonomic ;
+    sstim:proposedMechanism sstim-v:mechAutonomic ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalQuasiPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory, sstim-v:modalityInteroceptive ;
+    sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/MARTIGLI_BINAURAL.md> .
 
 bsc-fw-tech:symmetry-permutation-entrainment a sstim:EntrainmentBasedTechnique ;
     rdfs:label "Symmetry permutation entrainment"@en ;
     dct:description "Auditory technique using cyclic pitch permutations; the isochronic special case uses pulse rate as the target."@en ;
     skos:relatedMatch sstim-v:voiceSymmetry ;
-    sstim:proposedMechanism sstim-v:mechFFR, sstim-v:mechAttentional ;
+    sstim:proposedMechanism sstim-v:mechAttentional ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
+    sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/technical/SYMMETRY_SYSTEM.md> .
 
 # Retired in ADR 0033 — these four were framework-scoped duplicates of concepts

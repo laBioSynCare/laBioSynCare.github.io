@@ -1014,33 +1014,154 @@ sstim-sh:ImplementationShape a sh:NodeShape ;
 
 
 ###########################################################################
-# Technique Shape
+# Technique, process, protocol, and intervention shapes (ADR 0034 §8)
 #
-# Every Sensory Stimulation Technique must declare a proposed mechanism, a
-# stimulus temporal structure, and a delivery/perceived modality — UNLESS it is a
-# deliberately catalogued entry flagged with skos:editorialNote (a
-# non-evidence-bearing folk technique, or a no-perceived-modality entry such as
-# ultrasound neuromodulation). sh:or admits either branch. Targets the base class;
-# subclass instances (Entrainment-Based / Non-Entrainment) are covered via
-# rdfs:subClassOf closure when the core ontology is in scope.
+# The published sstim-sh:TechniqueShape IRI is retained but retargeted to the
+# neutral sstim:StimulationTechnique and composed with more specific shapes.
+# The former sh:or branch that let ANY skos:editorialNote suppress the
+# mechanism, temporal-structure, and modality requirements is removed: free
+# text must never control structural conformance. The five editorial notes on
+# colour-field stimulation, reference-pitch retuning, Solfeggio tuning,
+# subliminal audio, and focused ultrasound remain useful annotations; they
+# have ceased to be validation switches.
 #
-# BSC framework technique instances follow this metadata model, so the
-# temporal/modality requirements hold at Violation severity.
+# Targets overlap by design. A dual-typed technique must satisfy every
+# applicable shape, which is what makes the sensory-route overlap checkable.
+#
+# proposedMechanism is deliberately NOT a required violation-level field any
+# more. If no mechanism is asserted, SSTIM does not invent one to satisfy
+# validation; completeness findings live in the quality-audit report, not as
+# sh:Warning results, because the current pySHACL gate does not allow warnings.
 ###########################################################################
 
 sstim-sh:TechniqueShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulationTechnique ;
+    sh:name "StimulationTechnique"@en ;
+    sh:property [
+        sh:path sstim-ex:characteristicDeliveryMedium ; sh:minCount 1 ;
+        sh:message "Every stimulation technique must declare at least one sstim-ex:characteristicDeliveryMedium."@en ;
+    ] .
+
+sstim-sh:SensoryTechniqueShape a sh:NodeShape ;
     sh:targetClass sstim:SensoryStimulationTechnique ;
     sh:name "SensoryStimulationTechnique"@en ;
+    sh:property [
+        sh:path sstim:techniqueModality ; sh:minCount 1 ;
+        sh:message "Every sensory stimulation technique must declare at least one sstim:techniqueModality. A no-perceived-modality method is not a sensory technique."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasStimulusTemporalStructure ; sh:minCount 1 ;
+        sh:message "Every sensory stimulation technique must declare at least one sstim:hasStimulusTemporalStructure."@en ;
+    ] .
 
+sstim-sh:NeuromodulationTechniqueShape a sh:NodeShape ;
+    sh:targetClass sstim:NeuromodulationTechnique ;
+    sh:name "NeuromodulationTechnique"@en ;
+    sh:property [
+        sh:path sstim:hasStimulusTemporalStructure ; sh:minCount 1 ;
+        sh:message "Every neuromodulation technique must declare at least one sstim:hasStimulusTemporalStructure."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:neuralAccessRoute ; sh:minCount 1 ;
+        sh:message "Every neuromodulation technique must declare at least one sstim:neuralAccessRoute. Within this population the canonical sensory-transduction value is not redundant — it is what distinguishes the sensory-route overlap from a bypassing approach."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:stimulationDeliveryApproach ; sh:minCount 1 ;
+        sh:message "Every neuromodulation technique must declare at least one sstim:stimulationDeliveryApproach."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:intendedNeuralTargetSite ; sh:minCount 1 ;
+        sh:message "Every neuromodulation technique must declare at least one sstim:intendedNeuralTargetSite."@en ;
+    ] .
+
+# The overlap constraint. Conditional sh:sparql rather than sh:SPARQLTarget:
+# pySHACL ignores SPARQL-based targets unless advanced mode is enabled, and the
+# repository gates do not enable it, whereas sh:sparql CONSTRAINTS are core
+# SHACL-SPARQL and run under the ordinary gate. Route matching walks
+# skos:broader* so a narrower sensory route also satisfies it; mere shared
+# ancestry never does.
+sstim-sh:SensoryRouteNeuromodulationTechniqueShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulationTechnique ;
+    sh:name "Sensory-route neuromodulation technique"@en ;
+    sh:sparql [
+        sh:message "A technique in both the sensory and neuromodulation hierarchies must assert the canonical sensory-transduction/afferent route, or a route narrower than it. A bypass route alone does not place a technique in the overlap."@en ;
+        sh:select """
+            SELECT $this WHERE {
+              $this <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>/<http://www.w3.org/2000/01/rdf-schema#subClassOf>* <https://w3id.org/sstim#SensoryStimulationTechnique> .
+              $this <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>/<http://www.w3.org/2000/01/rdf-schema#subClassOf>* <https://w3id.org/sstim#NeuromodulationTechnique> .
+              FILTER NOT EXISTS {
+                $this <https://w3id.org/sstim#neuralAccessRoute> ?route .
+                ?route <http://www.w3.org/2004/02/skos/core#broader>* <https://w3id.org/sstim/vocab#routeCanonicalSensoryTransductionAfferent> .
+              }
+            }
+        """ ;
+    ] .
+
+sstim-sh:NeuromodulationProcessShape a sh:NodeShape ;
+    sh:targetClass sstim:Neuromodulation ;
+    sh:name "Neuromodulation process"@en ;
+    sh:property [
+        sh:path sstim:neuralAccessRoute ; sh:minCount 1 ;
+        sh:message "Every explicitly represented neuromodulation process must declare at least one sstim:neuralAccessRoute."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:stimulationDeliveryApproach ; sh:minCount 1 ;
+        sh:message "Every explicitly represented neuromodulation process must declare at least one sstim:stimulationDeliveryApproach."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:intendedNeuralTargetSite ; sh:minCount 1 ;
+        sh:message "Every explicitly represented neuromodulation process must declare at least one sstim:intendedNeuralTargetSite."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim-ex:hasExposureProfile ; sh:minCount 1 ;
+        sh:message "Every explicitly represented neuromodulation process must declare an exposure profile."@en ;
+    ] .
+
+sstim-sh:NeuromodulationProtocolShape a sh:NodeShape ;
+    sh:targetClass sstim:NeuromodulationProtocol ;
+    sh:name "NeuromodulationProtocol"@en ;
+    sh:property [
+        sh:path sstim:usesTechnique ; sh:minCount 1 ;
+        sh:message "Every neuromodulation protocol must name at least one technique via sstim:usesTechnique."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:neuralAccessRoute ; sh:minCount 1 ;
+        sh:message "Every neuromodulation protocol must declare at least one sstim:neuralAccessRoute."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:stimulationDeliveryApproach ; sh:minCount 1 ;
+        sh:message "Every neuromodulation protocol must declare at least one sstim:stimulationDeliveryApproach."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:intendedNeuralTargetSite ; sh:minCount 1 ;
+        sh:message "Every neuromodulation protocol must declare at least one sstim:intendedNeuralTargetSite."@en ;
+    ] .
+
+# Permitted subjects for the deliberately domainless facet properties.
+# Omitting an rdfs:domain avoids unwanted inference; it does not grant
+# arbitrary subjects permission to use the property. Route additionally
+# permits a stimulus channel, where the channel-level binding is authoritative.
+sstim-sh:StimulationFacetSubjectShape a sh:NodeShape ;
+    sh:name "Stimulation facet subject"@en ;
+    sh:targetSubjectsOf sstim:stimulationDeliveryApproach, sstim:intendedNeuralTargetSite,
+        sstim:intendedNeuralSystem, sstim:intendedNeuralPhenomenon ;
     sh:or (
-        [ sh:path skos:editorialNote ; sh:minCount 1 ]
-        [ sh:and (
-            [ sh:path sstim:proposedMechanism ; sh:minCount 1 ]
-            [ sh:path sstim:hasStimulusTemporalStructure ; sh:minCount 1 ]
-            [ sh:path sstim:techniqueModality ; sh:minCount 1 ]
-        ) ]
+        [ sh:class sstim:Stimulation ]
+        [ sh:class sstim:StimulationTechnique ]
+        [ sh:class sstim:StimulationProtocol ]
     ) ;
-    sh:message "Technique must declare sstim:proposedMechanism, sstim:hasStimulusTemporalStructure, and sstim:techniqueModality — or be a deliberately catalogued entry flagged with a skos:editorialNote (non-evidence-bearing folk technique, or a no-perceived-modality entry such as ultrasound neuromodulation)."@en .
+    sh:message "A stimulation facet property may only be asserted on a stimulation process, technique, protocol, or intervention."@en .
+
+sstim-sh:NeuralAccessRouteSubjectShape a sh:NodeShape ;
+    sh:name "Neural access route subject"@en ;
+    sh:targetSubjectsOf sstim:neuralAccessRoute ;
+    sh:or (
+        [ sh:class sstim:Stimulation ]
+        [ sh:class sstim:StimulationTechnique ]
+        [ sh:class sstim:StimulationProtocol ]
+        [ sh:class sstim-ex:StimulusChannel ]
+    ) ;
+    sh:message "sstim:neuralAccessRoute may only be asserted on a stimulation process, technique, protocol, intervention, or stimulus channel."@en .
 
 
 ###########################################################################
