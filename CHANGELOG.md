@@ -15,6 +15,12 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-07-24
+
+Version DOI pending — Zenodo mints it from the GitHub release archived off the
+`v0.11.0` tag; a follow-up commit records it. `10.5281/zenodo.21286974` remains
+the all-versions concept DOI.
+
 Gate A (release integrity) + Gate B (semantic stabilization) of the
 [2026-07-24 RDF structure and publication audit](docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md).
 Additive and backward-compatible: no term removed; the only narrowing
@@ -106,11 +112,9 @@ adds real new classes and properties on top of Gate A's metadata-only fixes.
   lint workflow, so Pages could publish while one of them failed.
 
 ### Still open (this pass does not do this)
-- The Zenodo DOI for `0.11.0` has not been reserved, and `make snapshot 0.11.0`
-  has not been run — both require the maintainer's action. An erratum still
-  needs to be published against the already-archived `0.8.0`-`0.10.0` Zenodo
-  records noting their self-citation defect; that content cannot be corrected
-  in place.
+- An erratum still needs to be published against the already-archived
+  `0.8.0`-`0.10.0` Zenodo records noting their self-citation defect; that
+  content cannot be corrected in place.
 - The whole-set version-manifest/checksums for a *dereferenceable* frozen
   closure (RDF-03, beyond the checksum ledger) and RDF-06/07/08 (full
   split)/10/14/16/18/19 are separate, larger gates and are not part of this

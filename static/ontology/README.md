@@ -16,12 +16,11 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.10.0`, DOI
-  [10.5281/zenodo.21528717](https://doi.org/10.5281/zenodo.21528717), version
-  IRI `https://w3id.org/sstim/0.10.0`.
+- Latest immutable release: `v0.11.0`, version DOI pending — Zenodo mints it
+  from the `v0.11.0` tag — version IRI `https://w3id.org/sstim/0.11.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the validated `0.10.0` release sources; core claims the whole-set
+- Live sources: the validated `0.11.0` release sources; core claims the whole-set
   `owl:versionIRI` and every public module carries synchronized
   `owl:versionInfo`.
 - Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
@@ -31,7 +30,7 @@ the graph.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
-The frozen [`0.10.0/`](0.10.0) directory is immutable and is the current citable
+The frozen [`0.11.0/`](0.11.0) directory is immutable and is the current citable
 whole-set release.
 
 ## Files
@@ -447,7 +446,8 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.10.0` for the current immutable citation:
+Use SSTIM `v0.11.0` for the current immutable citation (version DOI pending;
+the concept DOI below applies meanwhile):
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -455,8 +455,8 @@ Use SSTIM `v0.10.0` for the current immutable citation:
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21528717},
-  url       = {https://doi.org/10.5281/zenodo.21528717}
+  doi       = {10.5281/zenodo.21286974},
+  url       = {https://doi.org/10.5281/zenodo.21286974}
 }
 ```
 
