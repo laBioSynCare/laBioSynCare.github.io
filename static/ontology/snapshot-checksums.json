@@ -71,5 +71,14 @@
     "sstim-patch-studio.ttl": "908189a7e4a9dfac6c6dd65555971cf4ae30f4a27c9dc94a603527153c8851c1",
     "sstim-exposure.ttl": "fb84a07c8581ec9d5bff74f34452188b1dc6c8f54b4ce4d844382a1eea0596ae",
     "sstim-ecosystem.ttl": "837bed43bb186fc94ca560072f7587b989d50138865ab98be3a279e26e9a705a"
+  },
+  "0.11.0": {
+    "sstim-core.ttl": "8ea6859e29f89e70bdab4a31774e4ceffc95c3e7b8a3d082c29c52f4364e711f",
+    "sstim-vocab.ttl": "59650690ca114b125c39cb785028793a9e9a89d1302b6b58b47088360a84ee87",
+    "sstim-shapes.ttl": "8a6ac655222eaaa1994ddd59b933d863e42781bedd6a960c2cac35ec6bfd6c59",
+    "sstim-alignments.ttl": "418052508cb48015edc2ca40bedd520894d952ae1ae35bea1a970af117f120e3",
+    "sstim-patch-studio.ttl": "824ea887ba0a51eb5ac32c33440cffdc99f34c219a8178c40884e7c4cba198f7",
+    "sstim-exposure.ttl": "19cfef89a8f684bdd2809e76335ea0d5eab1a176c6d51bf0bd3c90e8a809c77e",
+    "sstim-ecosystem.ttl": "91162534ab94f9ca8cfefb944ba5445d621ad18820ad9b53169fccc44ec8eaa9"
   }
 }
