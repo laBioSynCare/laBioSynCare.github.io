@@ -14,10 +14,7 @@ abstract: >-
 type: software
 version: 0.10.0
 date-released: 2026-07-24
-# Version DOI pending: Zenodo mints it from the GitHub release archived off
-# the v0.10.0 tag, so it is recorded in a follow-up commit. 10.5281/zenodo.21286974
-# remains the all-versions concept DOI.
-doi: 10.5281/zenodo.21286974
+doi: 10.5281/zenodo.21528717
 authors:
   - family-names: Fabbri
     given-names: Renato

@@ -11,7 +11,7 @@ live under [`static/ontology/`](../../static/ontology/README.md).
 - Current citable release: `0.10.0`
 - Next development line: not yet opened
 - Ontology license: CC BY 4.0
-- Current release DOI: `10.5281/zenodo.21493918`
+- Current release DOI: `10.5281/zenodo.21528717`
 - All-versions concept DOI: `10.5281/zenodo.21286974`
 
 SSTIM is an OWL/SKOS model for sensory-stimulation techniques, delivery and

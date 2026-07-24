@@ -18,7 +18,7 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 As of 2026-07-24:
 
 - **Latest immutable release:** SSTIM `v0.10.0`, archived at
-  *version DOI pending — Zenodo mints it from the `v0.10.0` tag* and
+  [10.5281/zenodo.21528717](https://doi.org/10.5281/zenodo.21528717) and
   identified by `https://w3id.org/sstim/0.10.0`.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
@@ -217,8 +217,8 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.10.0` (version DOI pending — Zenodo
-mints it from the `v0.10.0` tag). Its stable
+For the released ontology, cite SSTIM `v0.10.0` using
+[10.5281/zenodo.21528717](https://doi.org/10.5281/zenodo.21528717). Its stable
 version IRI is `https://w3id.org/sstim/0.10.0`. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.

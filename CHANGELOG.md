@@ -17,9 +17,8 @@ file is the human-readable summary.
 
 ## [0.10.0] - 2026-07-24
 
-Version DOI pending — Zenodo mints it from the GitHub release archived off the
-`v0.10.0` tag; a follow-up commit records it. `10.5281/zenodo.21286974` remains
-the all-versions concept DOI.
+Published under version DOI `10.5281/zenodo.21528717`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
 
 Participant engagement and neurostimulation release
 ([ADR 0035](docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md),

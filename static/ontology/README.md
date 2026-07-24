@@ -16,8 +16,9 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.10.0`, version DOI pending (Zenodo mints it from
-  the `v0.10.0` tag), version IRI `https://w3id.org/sstim/0.10.0`.
+- Latest immutable release: `v0.10.0`, DOI
+  [10.5281/zenodo.21528717](https://doi.org/10.5281/zenodo.21528717), version
+  IRI `https://w3id.org/sstim/0.10.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
 - Live sources: the validated `0.10.0` release sources; core claims the whole-set
@@ -446,8 +447,7 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.10.0` for the current immutable citation (version DOI pending;
-the concept DOI below applies meanwhile):
+Use SSTIM `v0.10.0` for the current immutable citation:
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -455,8 +455,8 @@ the concept DOI below applies meanwhile):
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21286974},
-  url       = {https://doi.org/10.5281/zenodo.21286974}
+  doi       = {10.5281/zenodo.21528717},
+  url       = {https://doi.org/10.5281/zenodo.21528717}
 }
 ```
 
