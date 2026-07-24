@@ -4,7 +4,7 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.10.1
+#  Version:    0.11.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -38,7 +38,7 @@
     # frozen snapshot at static/ontology/<version>/ (identified by the core
     # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
     # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.10.1" ;
+    owl:versionInfo "0.11.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -261,7 +261,8 @@ sstim-ex:requiresDeviceCapability a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasBodyPlacement a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:domain [ a owl:Class ; owl:unionOf
+        ( sstim-ex:ExposureProfile sstim-ex:StimulusChannel sstim-ex:DeviceCapability ) ] ;
     rdfs:range sstim-ex:BodyPlacement ;
     rdfs:label "has body placement"@en ;
     skos:definition "Links an exposure profile, stimulus channel, or capability to a body or near-body placement."@en ;
@@ -275,14 +276,16 @@ sstim-ex:hasComfortBoundary a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasPerceptualGain a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:ExposureProfile ;
+    rdfs:domain [ a owl:Class ; owl:unionOf
+        ( sstim-ex:ExposureProfile sstim:StimulationProtocol ) ] ;
     rdfs:range sstim-ex:PerceptualGain ;
     rdfs:label "has perceptual gain"@en ;
     skos:definition "Links an exposure profile or protocol to a perceived gain created by the setup."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasPerceptualLoss a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:ExposureProfile ;
+    rdfs:domain [ a owl:Class ; owl:unionOf
+        ( sstim-ex:ExposureProfile sstim:StimulationProtocol ) ] ;
     rdfs:range sstim-ex:PerceptualLoss ;
     rdfs:label "has perceptual loss"@en ;
     skos:definition "Links an exposure profile or protocol to a perceived loss, cost, or limitation created by the setup."@en ;
@@ -323,7 +326,8 @@ sstim-ex:concernsEffectDimension a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasExposureLimit a owl:ObjectProperty ;
-    rdfs:domain sstim-ex:ComfortBoundary ;
+    rdfs:domain [ a owl:Class ; owl:unionOf
+        ( sstim-ex:ComfortBoundary sstim-ex:DeviceCapability ) ] ;
     rdfs:range sstim-ex:ExposureLimit ;
     rdfs:label "has exposure limit"@en ;
     skos:definition "Links a comfort boundary or device capability to a quantified exposure limit against which a delivery is checked."@en ;

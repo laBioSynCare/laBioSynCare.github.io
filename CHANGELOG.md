@@ -15,29 +15,82 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Release-integrity corrective patch (RDF-01, from the
-[2026-07-24 RDF structure and publication audit](docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md)).
-The frozen `0.8.0`-`0.10.0` snapshots each self-cite the `v0.7.0` Zenodo DOI
-(`10.5281/zenodo.21380171`) and citation string instead of their own version
-DOI, and `sstim-core.ttl`'s `v0.10.0` history entry retained a leftover "under
-development" qualifier alongside `mod:status "released"`. This patch corrects
-the drift going forward:
+Gate A (release integrity) + Gate B (semantic stabilization) of the
+[2026-07-24 RDF structure and publication audit](docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md).
+Additive and backward-compatible: no term removed; the only narrowing
+(`sstim:SelfDirectedNeuromodulation`, see below) had zero instance-level blast
+radius. Targets `0.11.0` — bumped from a MINOR, not a patch, because Gate B
+adds real new classes and properties on top of Gate A's metadata-only fixes.
 
-### Fixed
-- Removed the stale `dct:hasVersion` / `dct:bibliographicCitation` from
-  `sstim-core.ttl` and `void.ttl` pending the `0.10.1` Zenodo DOI reservation
-  (the `0.5.0` release shipped under the same no-version-DOI-at-freeze-time
-  precedent).
-- Fixed the `v0.10.0` history entry's "under development" qualifier.
+### Fixed (Gate A — release integrity)
+- The frozen `0.8.0`-`0.10.0` snapshots each self-cite the `v0.7.0` Zenodo DOI
+  (`10.5281/zenodo.21380171`) and citation string instead of their own version
+  DOI (RDF-01). Removed the stale `dct:hasVersion` / `dct:bibliographicCitation`
+  from `sstim-core.ttl` and `void.ttl` pending this version's Zenodo DOI
+  reservation (the `0.5.0` release shipped under the same
+  no-version-DOI-at-freeze-time precedent).
+- Fixed the `v0.10.0` history entry's leftover "under development" qualifier
+  against its own `mod:status "released"`.
 - Synchronized every module's `owl:versionInfo` and header `# Version:` /
   `# Date:` comments (six modules still said `0.7.0`).
-- Fixed `void.ttl`'s stale `dct:modified` date and `void:triples` count.
-- Fixed the repository-root `README.md`'s stale ontology-graph counts (105/14/214/369/43 → 131/18/230/445/50) and protocol count (12 → 9).
+- Fixed `void.ttl`'s stale `dct:modified` date and `void:triples`/`void:classes`/
+  `void:properties` counts (updated again after Gate B's new terms).
+- Fixed the repository-root `README.md`'s stale ontology-graph counts
+  (105/14/214/369/43 → 134/18/231/445/50) and protocol count (12 → 9).
 - Removed the `"@type": "@id"` coercion on `dcat:distribution` in
   `context.jsonld` (RDF-02): it silently dropped all 96 triples describing
   `void.ttl`'s blank-node distributions when compacted with RDFLib.
 
+### Fixed (Gate B — semantic stabilization, [ADR 0037](docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md))
+- `sstim:SelfDirectedNeuromodulation` contradicted its own inherited genus
+  (`sstim:Stimulation` requires an applied input; the class's own definition
+  included practices with none) (RDF-04). Added `sstim:DeliberateSelfRegulation`
+  as the neutral genus above no-applied-stimulus practices (unguided
+  meditation, volitional breathwork); narrowed `SelfDirectedNeuromodulation`
+  to stimulus-mediated cases only (neurofeedback, biofeedback,
+  paced-breathing guidance).
+- The sensory branch of `sstim:Neurostimulation` was named in prose but never
+  asserted in the class hierarchy, so neurostimulation-hierarchy queries
+  silently excluded sensory examples (RDF-05). Added
+  `sstim:SensoryNeurostimulation` / `sstim:SensoryNeurostimulationTechnique`
+  as the intersection of `Neurostimulation` and `SensoryRouteNeuromodulation`
+  (not a blanket subclass axiom, so self-directed sensory-route cases like
+  sonification biofeedback correctly stay excluded); retyped
+  `sstim-v:techGamma40Auditory` accordingly.
+- Documented (not restructured) the decision to keep `sstim-v:techBiofeedback`
+  a broad, neutral technique rather than split it into narrower
+  neural/peripheral variants, since the neural-modulation objective is not
+  equally definitional across its autonomic/muscular/electrodermal forms.
+- Three `sstim-exposure.ttl` properties (`hasBodyPlacement`,
+  `hasPerceptualGain`, `hasPerceptualLoss`, `hasExposureLimit`) had an RDFS
+  domain narrower than their own definitions documented; widened to accurate
+  union domains (RDF-09).
+- Removed two duplicate scheme definitions (`StimulusTemporalStructureScheme`,
+  `TechniqueScheme` — the latter's second definition was stale and
+  sensory-only) and fixed the stale Sensory Field SHACL test preamble comment
+  that still described the export as non-conformant (RDF-15).
+- Completed the `EvidenceModalityScheme`/`EvidenceModalityTag` deprecation:
+  the scheme and its nine concept values stayed active while the class and
+  property were already deprecated (RDF-13); all now carry `owl:deprecated
+  true` and point to the replacement basis-axis properties.
+- `sstim:targetsFrequencyBand`'s "first entry is primary" claim doesn't hold —
+  RDF property values are unordered (RDF-08, concrete sub-bug only). Added
+  `sstim:primaryFrequencyBand`, a functional sub-property, with a SHACL-SPARQL
+  constraint requiring it to be one of the preset's own `targetsFrequencyBand`
+  values. The larger RDF-08 finding (oscillation-band vs. stimulus-target vs.
+  outcome-hypothesis conflation) is deferred — see `FrequencyBandScheme`'s
+  `skos:editorialNote`.
+- Re-audited the five frequency-band-to-Wikidata `skos:exactMatch` mappings
+  (RDF-17): downgraded to `skos:closeMatch`, since each Wikidata item is the
+  observed-EEG-oscillation sense while SSTIM's bands are also used, unsplit,
+  as stimulus-frequency targets — extensional identity can't be claimed at
+  `exactMatch`'s confidence until RDF-08's split lands.
+- Added the missing `bfo:0000016` ("disposition") display-label stub, used by
+  `sstim:Neuroplasticity` (RDF-17).
+
 ### Added
+- `sstim:DeliberateSelfRegulation`, `sstim:SensoryNeurostimulation`,
+  `sstim:SensoryNeurostimulationTechnique`, `sstim:primaryFrequencyBand`.
 - `scripts/context-roundtrip-check.py` + `make context-roundtrip`: round-trips
   every top-level and instance document through the *published*
   `context.jsonld` (not RDFLib's auto-generated one), wired into
@@ -52,15 +105,16 @@ the drift going forward:
   goldens and ecosystem-contract tests previously ran only in the independent
   lint workflow, so Pages could publish while one of them failed.
 
-### Still open (this patch does not do this)
-- The Zenodo DOI for `0.10.1` has not been reserved, and `make snapshot 0.10.1`
+### Still open (this pass does not do this)
+- The Zenodo DOI for `0.11.0` has not been reserved, and `make snapshot 0.11.0`
   has not been run — both require the maintainer's action. An erratum still
   needs to be published against the already-archived `0.8.0`-`0.10.0` Zenodo
   records noting their self-citation defect; that content cannot be corrected
   in place.
 - The whole-set version-manifest/checksums for a *dereferenceable* frozen
-  closure (RDF-03) and the semantic findings (RDF-04 through RDF-19) are
-  separate, larger gates and are not part of this patch.
+  closure (RDF-03, beyond the checksum ledger) and RDF-06/07/08 (full
+  split)/10/14/16/18/19 are separate, larger gates and are not part of this
+  pass.
 
 ## [0.10.0] - 2026-07-24
 

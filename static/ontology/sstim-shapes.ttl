@@ -3,7 +3,7 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.10.1
+#  Version:    0.11.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -41,7 +41,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.10.1" ;
+    owl:versionInfo "0.11.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -128,6 +128,28 @@ sstim-sh:PresetShape a sh:NodeShape ;
         sh:maxCount 2 ;
         sh:class sstim:FrequencyBand ;
         sh:message "Preset must target 1–2 frequency bands from sstim:FrequencyBand."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:primaryFrequencyBand ;
+        sh:maxCount 1 ;
+        sh:class sstim:FrequencyBand ;
+        sh:message "primaryFrequencyBand, if present, must be a single sstim:FrequencyBand."@en ;
+    ] ;
+
+    # RDF-08 (2026-07-24 audit): primaryFrequencyBand must be one of the
+    # preset's own targetsFrequencyBand values, not an unrelated band.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "primaryFrequencyBand must be one of the preset's own targetsFrequencyBand values."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#primaryFrequencyBand> ?primary .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim#targetsFrequencyBand> ?primary .
+                }
+            }
+        """ ;
     ] ;
 
     sh:property [

@@ -22,14 +22,15 @@ As of 2026-07-24:
   identified by `https://w3id.org/sstim/0.10.0`.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** a release-integrity corrective patch (`0.10.1`,
-  unreleased — see CHANGELOG) over the validated `0.10.0` release sources,
-  fixing the RDF-01 version/DOI citation drift found in the 2026-07-24 audit.
+- **Live ontology sources:** a Gate A/B stabilization pass (`0.11.0`, unreleased
+  — see CHANGELOG) over the validated `0.10.0` release sources, from the
+  2026-07-24 audit: release-integrity fixes (RDF-01/02/03/11/12) plus
+  semantic-stabilization fixes (RDF-04/05/08 partial/09/13/15/17, ADR 0037).
   The core claims the whole-set `owl:versionIRI`; all seven modules share
   synchronized `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **Ontology graph:** seven Turtle modules, 131 named OWL classes, 18 anonymous
-  class expressions, 230 properties, and 445 SKOS concepts in 50 concept
+- **Ontology graph:** seven Turtle modules, 134 named OWL classes, 18 anonymous
+  class expressions, 231 properties, and 445 SKOS concepts in 50 concept
   schemes, plus VoID/DCAT and a JSON-LD context.
 - **Public example data:** 19 Turtle files containing the BSC framework, nine
   framework techniques (three originated by BSC, six vendor-neutral techniques

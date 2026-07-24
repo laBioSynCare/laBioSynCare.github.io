@@ -60,6 +60,7 @@ annotations lives here.
 | [0034](0034-neuromodulation-relation-and-neural-target-axis.md) | Add neutral stimulation context; model sensory-route neuromodulation as an overlap; separate medium, route, approach, target, perception, and evidence; retire the SHACL editorialNote escape hatch | Accepted |
 | [0035](0035-participant-engagement-mode-and-endogenous-self-regulation.md) | Add participant-engagement-mode facet; catalogue ECT and neutral-typed neurofeedback/biofeedback; invasive/non-invasive rollup; defer neurostim⊂neuromod and endogenous-self-regulation-as-neuromodulation (Theo Marins interview) | Accepted |
 | [0036](0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md) | Disambiguate neuromodulation's intervention vs effect senses; add Neurostimulation (delivery), self-directed/interventional split, Neuroplasticity disposition; bring neurofeedback/biofeedback under neuromodulation; effect sense stays a facet collection (resolves ADR 0035 notes 4 & 5) | Accepted |
+| [0037](0037-self-regulation-genus-and-sensory-neurostimulation-branch.md) | Add DeliberateSelfRegulation as the neutral genus above no-applied-stimulus self-directed practices; assert SensoryNeurostimulation/-Technique below Neurostimulation as an intersection class; keep generic biofeedback neutral; add primaryFrequencyBand (resolves audit RDF-04, RDF-05, and the ordering sub-bug of RDF-08) | Accepted |
 
 ## Adding an ADR
 

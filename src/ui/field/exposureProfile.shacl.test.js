@@ -8,13 +8,13 @@ import { fieldStateToQuads } from './exposureProfile.js'
 // Runtime SHACL conformance harness for the Sensory Field RDF export
 // (improvement plan phase 0.1, Gate P0-A; audit finding KR-01).
 //
-// The export is currently NOT conformant: the shapes require evidence-claim
-// provenance the exporter cannot truthfully supply, and an ExposureProfile is
-// required to carry an effect claim at all (KR-06). Until that semantic
-// change set is approved, this suite pins the exact violation set so any
-// drift — a new violation, or an exporter change that silently alters the
-// contract — fails the build. The golden sets below may only shrink; when the
-// exporter is repaired, replace them with `expect(report.conforms).toBe(true)`.
+// KR-01 is closed (ADR 0027): the exporter emits a defining framework,
+// technique/editorial-note baseline, and role-specific statements (hypotheses,
+// research questions, boundary applicability) instead of manufactured
+// evidence claims, so every state in the matrix below must produce a
+// SHACL-conformant graph (`expect(rep.conforms).toBe(true)`). This suite
+// pins that as a regression test — an exporter change that silently breaks
+// the contract fails the build — not a violation-set golden.
 //
 // sh:sparql constraints are stripped before validating: rdf-validate-shacl
 // has no SPARQLConstraintComponent validator. Those constraints gate preset

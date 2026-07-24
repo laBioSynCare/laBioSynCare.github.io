@@ -48,13 +48,13 @@
     dct:modified "2026-07-24"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     # dct:hasVersion (version-specific DOI) intentionally omitted pending the
-    # 0.10.1 Zenodo DOI reservation — see sstim-core.ttl and the RDF-01 finding
+    # 0.11.0 Zenodo DOI reservation — see sstim-core.ttl and the RDF-01 finding
     # in docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md.
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.10.1" ;
+    dcat:version "0.11.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -63,9 +63,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 9824 ;
-    void:classes 131 ;
-    void:properties 230 ;
+    void:triples 9929 ;
+    void:classes 134 ;
+    void:properties 231 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",
@@ -196,7 +196,7 @@
     dct:title "BSC Lab public SSTIM instance data"@en ;
     dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 1785 ;
+    void:triples 1787 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ref/",

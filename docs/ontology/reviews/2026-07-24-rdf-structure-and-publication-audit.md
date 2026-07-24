@@ -15,12 +15,21 @@ top-level and instance Turtle documents through the published `context.jsonld`
 the other 27). All counts, citations, and quotations held; none required
 correction.
 
-**Implementation status (2026-07-24, same day):** Gate A (below) is implemented
-except for the three sub-items that require the maintainer's own action outside
-this repository. RDF-01, RDF-02, and RDF-11 are fixed; RDF-03 and RDF-12 are
-partially fixed. See the "Status" note under each finding and the checked-off
-Gate A list for specifics. `make validate` and the full Vitest suite (19 files,
-151 tests) pass with these changes in place.
+**Implementation status (2026-07-24, same day):** Gate A is implemented except
+for the three sub-items that require the maintainer's own action outside this
+repository (RDF-01, RDF-02, RDF-11 fixed; RDF-03, RDF-12 partially fixed).
+Gate B is also implemented for the findings a same-session pass could
+responsibly close: RDF-04, RDF-05, RDF-17 fixed; RDF-08, RDF-09, RDF-13,
+RDF-15 partially fixed where the remainder is either a maintainer policy
+decision (ADR 0020/RDF-12) or a separate, larger modeling project (the full
+oscillation-band/stimulus-target split of RDF-08) rather than a mechanical
+fix. See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
+the "Status" note under each finding, and the checked-off Gate A/B lists for
+specifics. `make validate` and the full Vitest suite (19 files, 151 tests)
+pass with all of these changes in place. The version bumped to `0.11.0`
+(unreleased) — a MINOR, not a patch, because Gate B adds real new terms.
+RDF-06, RDF-07, RDF-10, RDF-14, RDF-16, RDF-18, and RDF-19 (Gates C/D/E) are
+untouched.
 
 ## Executive assessment
 
@@ -34,7 +43,7 @@ The repository nevertheless has three release-level defects that should be
 corrected before the next ordinary feature release:
 
 1. the frozen `0.10.0` RDF identifies itself as `0.10.0` while citing the
-   `0.7.0` version DOI and citation — **fixed as an unreleased `0.10.1` patch**
+   `0.7.0` version DOI and citation — **fixed as an unreleased `0.11.0` patch**
    in the live tree; still needs a reserved DOI, a real snapshot, and a visible
    erratum against the archived `0.8.0`-`0.10.0` records (see RDF-01's status);
 2. the public JSON-LD context loses the 96 blank-node distribution-description
@@ -48,16 +57,22 @@ corrected before the next ordinary feature release:
 
 There are also substantive semantic defects that automated reasoning cannot
 see because they are contradictions between prose definitions and asserted
-class relations. Most notably, `SelfDirectedNeuromodulation` inherits from
+class relations. Most notably, `SelfDirectedNeuromodulation` inherited from
 `Stimulation`, whose definition requires an applied controlled input, while
-the subclass explicitly includes practices with no applied stimulus. The new
-sensory branch of `Neurostimulation` is described in prose but is not represented
-in the class hierarchy.
+the subclass explicitly included practices with no applied stimulus — **fixed**
+via a new neutral genus, `sstim:DeliberateSelfRegulation` (RDF-04's status).
+The sensory branch of `Neurostimulation` was described in prose but not
+represented in the class hierarchy — **fixed** via
+`sstim:SensoryNeurostimulation` / `sstim:SensoryNeurostimulationTechnique`,
+defined as an intersection rather than a blanket subclass axiom so
+self-directed sensory-route cases correctly stay excluded (RDF-05's status).
+See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md).
 
 The right conclusion is not that the RDF is broken. It is that the syntactic
 and conformance engineering is ahead of release-integrity checks, semantic
-review, and contract integration. The next release should be a stabilization
-release, not another scope-expansion release.
+review, and contract integration. Gate A and the closeable half of Gate B are
+now done (2026-07-24); the remaining P1/P2 findings and the full RDF-08 split
+are the next stabilization work, still ahead of any scope-expansion release.
 
 ### Readiness by use
 
@@ -65,7 +80,7 @@ release, not another scope-expansion release.
 |---|---|
 | Vocabulary browsing, competency queries, and synthetic examples | Ready, with the documented semantic caveats |
 | Reuse of individual public modules | Usable, but consumers need a version-specific immutable dependency manifest (checksums for existing snapshots now exist; a discoverable manifest/aggregate at the version IRI does not yet) |
-| Citation of `0.10.0` RDF metadata | Fix prepared as an unreleased `0.10.1` patch (live tree only); still needs a reserved Zenodo DOI, `make snapshot 0.10.1`, and a visible erratum against the already-archived `0.8.0`-`0.10.0` records |
+| Citation of `0.10.0` RDF metadata | Fix prepared as an unreleased `0.11.0` patch (live tree only); still needs a reserved Zenodo DOI, `make snapshot 0.11.0`, and a visible erratum against the already-archived `0.8.0`-`0.10.0` records |
 | RDFLib compact export with `context.jsonld` | Fixed — all 28 top-level and instance documents now round-trip isomorphically; gated by `make context-roundtrip` in `make validate` |
 | Public-copy authorization | Not implemented; the legacy gate is reject-only |
 | Acoustically identical session reproduction | Not supported by the captured contract |
@@ -237,17 +252,19 @@ version-specific metadata sidecar whose lifecycle is explicitly separate from
 the immutable Turtle snapshot.
 
 **Status (2026-07-24):** the live tree (not `0.10.0` or any other frozen
-snapshot) now carries an unreleased `0.10.1` corrective patch: `owl:versionIRI`
-/ `owl:versionInfo` bumped, `dct:hasVersion` / `dct:bibliographicCitation`
-removed pending a real `0.10.1` DOI (the `0.5.0` no-version-DOI-at-freeze
-precedent), the `v0.10.0` history note's "under development" vs. `released`
-contradiction fixed, all seven module header comments and `void.ttl`'s
-`dct:modified` / `void:triples` synced, and the stale README counts corrected.
-`CHANGELOG.md` records the patch under `[Unreleased]`. Three items remain,
-outside what a repository edit can do: reserve the `0.10.1` Zenodo DOI, run
-`make snapshot 0.10.1` once that DOI is filled back in, and publish a visible
-erratum against the already-archived `0.8.0`-`0.10.0` Zenodo records (their
-content cannot be corrected in place). The cross-checking release gate is not
+snapshot) now carries an unreleased `0.11.0` Gate A/B stabilization pass:
+`owl:versionIRI` / `owl:versionInfo` bumped (to `0.11.0`, a MINOR bump — Gate
+B below adds real terms, so this outgrew a patch), `dct:hasVersion` /
+`dct:bibliographicCitation` removed pending a real `0.11.0` DOI (the `0.5.0`
+no-version-DOI-at-freeze precedent), the `v0.10.0` history note's "under
+development" vs. `released` contradiction fixed, all seven module header
+comments and `void.ttl`'s `dct:modified` / `void:triples` synced, and the
+stale README counts corrected. `CHANGELOG.md` records it under `[Unreleased]`.
+Three items remain, outside what a repository edit can do: reserve the
+`0.11.0` Zenodo DOI, run `make snapshot 0.11.0` once that DOI is filled back
+in, and publish a visible erratum against the already-archived
+`0.8.0`-`0.10.0` Zenodo records (their content cannot be corrected in place).
+The cross-checking release gate is not
 yet built as a single manifest — see RDF-11's status.
 
 #### RDF-02 — RDFLib compact serialization with the public context loses VoID distribution details
@@ -354,6 +371,15 @@ cases under stimulation when an actual stimulus is part of the process. An
 alternative is to broaden `Stimulation`, but that would weaken the useful
 applied-input boundary throughout the ontology.
 
+**Status (2026-07-24): fixed** ([ADR 0037](../../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)).
+Added `sstim:DeliberateSelfRegulation` as the neutral genus, not a subclass of
+`Stimulation`. Narrowed `SelfDirectedNeuromodulation` to the stimulus-mediated
+cases only (neurofeedback, biofeedback, paced-breathing guidance); pure
+practices with no applied stimulus are now `DeliberateSelfRegulation` only. No
+individual in the graph was typed `SelfDirectedNeuromodulation` directly, so
+the narrowing has zero instance-level blast radius. `make validate` and the
+full Vitest suite stay green.
+
 #### RDF-05 — the stated sensory branch of neurostimulation is absent
 
 The definitions of `Neurostimulation` and `NeurostimulationTechnique` say that
@@ -383,6 +409,19 @@ focused ADR. Add a narrower sensory-neurostimulation class for passive/applied
 cases, or revise the prose and query expectations. Keep generic biofeedback
 neutral and type narrower neural/autonomic variants where the neural-modulation
 objective is definitional.
+
+**Status (2026-07-24): fixed** ([ADR 0037](../../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)).
+Added `sstim:SensoryNeurostimulation` / `sstim:SensoryNeurostimulationTechnique`
+as the intersection of `Neurostimulation` and `SensoryRouteNeuromodulation` —
+not a blanket subclass axiom, so the flagged risk (self-directed sensory-route
+cases like sonification biofeedback) correctly stays excluded, since
+`Neurostimulation` already excludes self-directed cases by its own
+definition. `sstim-v:techGamma40Auditory` is now explicitly retyped
+`NeuromodulationTechnique`, `NeurostimulationTechnique`, and
+`SensoryNeurostimulationTechnique`, so it is discoverable by
+neurostimulation-hierarchy queries. Generic biofeedback was kept neutral per
+this finding's own recommendation; a `skos:editorialNote` on
+`sstim-v:techBiofeedback` now records that as a deliberate decision.
 
 #### RDF-06 — the session contract and reproducibility promise disagree
 
@@ -482,6 +521,22 @@ secondary targets with distinct properties or a ranked association. Re-audit
 each `skos:exactMatch` and attach mapping provenance, rationale, reviewer, and
 date.
 
+**Status (2026-07-24): partially fixed** ([ADR 0037](../../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)).
+The concrete, unambiguous sub-bug is fixed: `sstim:primaryFrequencyBand`, a
+functional sub-property of `targetsFrequencyBand`, replaces the "first entry
+is primary" claim, with a SHACL-SPARQL constraint requiring it to be one of
+the preset's own targeted bands; both existing seed presets are migrated. The
+five frequency-band `skos:exactMatch` mappings to Wikidata were re-audited and
+downgraded to `skos:closeMatch`, with a dated, attributed rationale: each
+Wikidata item is the observed-oscillation sense only, while SSTIM's bands are
+also used, unsplit, as stimulus targets. The larger finding — splitting
+oscillation-band and stimulus-target senses into distinct classes and moving
+outcome language into qualified evidence records — remains open and is now
+tracked by a `skos:editorialNote` on `FrequencyBandScheme` pointing back to
+this finding and the ADR: it is a separate, larger modeling project that a
+same-session pass alongside RDF-04/05/09/13/15/17 could not responsibly also
+complete.
+
 #### RDF-09 — several OWL domains and operational constraints remain unsafe
 
 Some exposure property definitions permit subjects that their RDFS domains do
@@ -509,6 +564,15 @@ used for claim authorization.
 subproperties, or no domain plus SHACL subject rules. Add entailment fixtures.
 Define a stricter evidence/publication profile in which every relevant axis has
 either a concrete value or an explicit unknown/not-applicable marker.
+
+**Status (2026-07-24): the domain half is fixed;** the evidence-basis half is
+not. `hasBodyPlacement`, `hasPerceptualGain`, `hasPerceptualLoss`, and
+`hasExposureLimit` now use `owl:unionOf` domains matching their own
+definitions exactly (the same pattern `hasComfortBoundary` already used).
+Entailment fixtures were not added. `EvidenceBasisShape`'s minimum
+requirements are unchanged: strengthening them is tied to accepting ADRs
+0028/0029 (RDF-07), which remain proposed, not a mechanical fix available on
+its own.
 
 #### RDF-10 — self-report RDF is not ready for real participant data
 
@@ -631,6 +695,16 @@ authoring context and, if needed, a separately versioned legacy context.
 Require replacement, migration, and removal-window annotations for every
 deprecated term.
 
+**Status (2026-07-24): the deprecation-completeness sub-item is fixed;**
+everything else in this finding is unchanged. `EvidenceModalityScheme` and its
+nine concept values now all carry `owl:deprecated true` (matching the class
+and property, which were already deprecated), with `dct:isReplacedBy` pointing
+to the five basis-axis properties collectively — a many-to-many
+restructuring, not a 1:1 successor, so no single replacement is claimed per
+concept. The private shape file's version/metadata policy, the 29 exposed
+deprecated-term context aliases, and the other deprecated ecosystem fields
+with no explicit replacement are untouched.
+
 #### RDF-14 — mutable ecosystem publication is not failure-safe or continuously checked
 
 The private-first ecosystem publisher has valuable controls, but it writes a
@@ -683,6 +757,15 @@ language-tagged definitions are intentionally used. Generate counts and release
 identity from one manifest. Add a documentation drift checklist to release
 review.
 
+**Status (2026-07-24): the two duplicate definitions and the stale test
+comment are fixed;** the one-manifest and drift-checklist recommendations are
+not. Both stale duplicate `skos:definition` triples were removed —
+`StimulusTemporalStructureScheme` and `TechniqueScheme` each now have exactly
+one definition, verified via `rdflib`. The `exposureProfile.shacl.test.js`
+preamble comment was rewritten to state the true current condition (KR-01
+closed, every state must and does conform) instead of describing a
+"non-conformant, pinned-violation-set" state that no longer existed.
+
 #### RDF-16 — quantities and controlled implementation values are weakly represented
 
 Patch numeric properties encode units in labels and prose. Exposure limits use
@@ -716,6 +799,16 @@ non-reasoning browsers.
 
 **What to do:** add targeted category fixtures, re-audit exact mappings, qualify
 mapping assertions, and keep the external display-stub inventory complete.
+
+**Status (2026-07-24): the display-stub gap and the frequency-band mapping
+re-audit are fixed;** category fixtures and disjointness are untouched. The
+missing `bfo:0000016` ("disposition") label stub was added, matching the
+existing pattern for `bfo:0000015`. The five frequency-band `exactMatch`
+mappings were re-audited and downgraded to `closeMatch` with a dated,
+attributed rationale — see RDF-08's status. `techBinauralBeats`'s `exactMatch`
+was left as-is (a technique-to-technique match, not the flagged operational-band
+case). No targeted category fixtures or new disjointness/anti-co-typing
+constraints were added.
 
 #### RDF-18 — language coverage, reference documentation, and external review lag growth
 
@@ -799,8 +892,8 @@ Complete before publishing more ontology scope:
    (`make context-roundtrip`);
 3. ☐ cut a corrective release with coherent version, DOI, status, dates,
    citation, VoID, history, counts, and generated documentation —
-   **metadata coherence prepared in the live tree as unreleased `0.10.1`;
-   cutting the actual release needs a reserved DOI, then `make snapshot 0.10.1`**;
+   **metadata coherence prepared in the live tree as unreleased `0.11.0`;
+   cutting the actual release needs a reserved DOI, then `make snapshot 0.11.0`**;
 4. ☐ publish a versioned whole-set manifest or aggregate with checksums —
    **checksums done for existing snapshots (`snapshot-checksums.json`,
    `make verify-snapshots`); a discoverable manifest/aggregate at the version
@@ -818,16 +911,35 @@ alone.
 
 ### Gate B — semantic stabilization
 
-1. repair the self-directed-neuromodulation genus;
-2. decide and encode the sensory-neurostimulation branch;
-3. narrow generic biofeedback classification;
-4. repair exposure domains;
-5. remove duplicate definitions and complete deprecations;
-6. split neural oscillation bands from stimulus frequency targets; and
-7. re-audit exact external mappings.
+1. ☑ repair the self-directed-neuromodulation genus — **done**
+   (`sstim:DeliberateSelfRegulation`, ADR 0037);
+2. ☑ decide and encode the sensory-neurostimulation branch — **done**
+   (`sstim:SensoryNeurostimulation`/`-Technique`, ADR 0037);
+3. ☑ narrow generic biofeedback classification — **decided and documented,
+   not restructured**: kept neutral per this gate's own recommendation, with
+   the reasoning recorded so it reads as deliberate, not an oversight;
+4. ☑ repair exposure domains — **done** for the three flagged properties;
+   the `EvidenceBasisShape` strengthening is separately gated on RDF-07/ADR
+   0028-0029 acceptance;
+5. ☑ remove duplicate definitions and complete deprecations — **done**
+   (`StimulusTemporalStructureScheme`/`TechniqueScheme` duplicates,
+   `EvidenceModalityScheme`/`EvidenceModalityTag` deprecation); the private
+   shape file's version policy (RDF-13) and the 29 exposed deprecated-term
+   context aliases are untouched;
+6. ☐ split neural oscillation bands from stimulus frequency targets —
+   **open**: only the concrete ordering sub-bug is fixed
+   (`sstim:primaryFrequencyBand`); the class/scheme split and outcome-language
+   migration to evidence records is a separate, larger project, now tracked
+   by a `skos:editorialNote` on `FrequencyBandScheme`; and
+7. ☑ re-audit exact external mappings — **done** for the five frequency-band
+   mappings (downgraded to `closeMatch` with dated, attributed rationale) and
+   the missing `bfo:0000016` display-label stub; broader disjointness/category
+   fixtures (RDF-17) are untouched.
 
 **Exit criterion:** prose definitions, class axioms, SHACL usage, expected
-queries, and examples express the same model.
+queries, and examples express the same model. **Not yet fully met** — item 6
+(the full RDF-08 split) remains, and RDF-13's private-shape-file policy and
+context-alias exposure are outside this gate's scope as originally listed.
 
 ### Gate C — executable contracts
 

@@ -3,7 +3,7 @@
 #  SSTIM Core Ontology  —  sstim-core.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.10.1
+#  Version:    0.11.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -50,8 +50,8 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    owl:versionIRI <https://w3id.org/sstim/0.10.1> ;
-    owl:versionInfo "0.10.1" ;
+    owl:versionIRI <https://w3id.org/sstim/0.11.0> ;
+    owl:versionInfo "0.11.0" ;
     owl:priorVersion <https://w3id.org/sstim/0.10.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
@@ -66,10 +66,10 @@
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
     # dct:hasVersion / dct:bibliographicCitation (version-specific DOI) intentionally
-    # omitted pending 0.10.1 Zenodo DOI reservation — see the RDF-01 finding in
+    # omitted pending 0.11.0 Zenodo DOI reservation — see the RDF-01 finding in
     # docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md.
     # 0.5.0 shipped under the same precedent (no version DOI at freeze time).
-    # Fill both back in with the reserved 0.10.1 DOI before running `make snapshot 0.10.1`.
+    # Fill both back in with the reserved 0.11.0 DOI before running `make snapshot 0.11.0`.
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
@@ -90,7 +90,7 @@
         "v0.9.0 (2026-07): Stimulation and neuromodulation release (ADR 0034). Adds a neutral sstim:Stimulation umbrella and sstim:Neuromodulation sibling at the process, intervention, technique, and protocol layers, with the overlap named at each layer as a defined intersection class requiring an intended canonical sensory-transduction route: neither family subsumes the other. Adds five orthogonal facet axes — neural access route, delivery approach, neural target site, neural system, and neural phenomenon — kept separate because a route, a dynamic, a system, and an outcome domain are not values on one scale, and reused across intended, proposed-mechanism, and observed-outcome roles by distinct properties. Shared domains and ranges widen to the neutral parents so a non-sensory technique can be the subject of a conformant evidence assessment. Retypes focused-ultrasound neuromodulation off the sensory hierarchy and redefines it by its intended focused neural target rather than by absence of an audible percept; deprecates five response-as-mechanism entries (FFR, ASSR, SSVEP, SSSEP, acoustic startle) in favour of typed neural-phenomenon concepts, removing their mechanism typing and scheme topology rather than deprecating alone. Relabels TechniqueScheme, whose IRI was never sensory-scoped. Catalogues a six-technique non-sensory contrast set (rTMS, tDCS, tACS, DBS, VNS, targeted intrathecal delivery) so the route axis is exercised; none is referenced by any BSC preset, framework, protocol, or implementation, and inclusion asserts neither capability nor efficacy nor safety. Replaces the SHACL escape hatch in which any skos:editorialNote suppressed structural requirements with composed, disjointly-targeted shapes. Breaking on mutable latest for consumers of the retyped focused-ultrasound entry and the five deprecated mechanism IRIs; frozen 0.3.0-0.8.0 snapshots retain their published entailments."@en,
         "v0.7.0 (2026-07): Evidence and ecosystem governance release. ADR 0027 replaces overloaded evidence claims with immutable assessment revisions, atomic bounded propositions, qualified evidence bases, explicit scope axes, source/search governance, and PROV review decisions while retaining deprecated compatibility terms. ADRs 0024 and 0031 add the neutral EcosystemAgent module, qualified relationships and memberships, implementation responsibility, purpose-scoped admission activities, a closed public projection, and separate access-controlled audit shapes. Public fixtures are synthetic; real live-only ecosystem records remain outside the Zenodo-tracked release repository."@en,
         "v0.10.0 (2026-07-24): Participant-engagement and contrast-set completion release (ADR 0035), from the 2026-07-22 Theo Marins interview. Adds a sixth orthogonal facet, sstim:ParticipantEngagementMode with the sstim:participantEngagementMode property and a passive-receptive / guided-following / active-self-regulatory scheme, distinguishing self-regulatory and cue-following practices from receptive exposure without touching the ADR 0034 axes. Catalogues electroconvulsive therapy in the non-sensory neuromodulation contrast set, and catalogues neurofeedback and biofeedback at the neutral sstim:StimulationTechnique layer — sensory-in, endogenous self-regulation out — rather than reopening sstim:Neuromodulation's exclusion of endogenous physiological neuromodulation. Names an invasive/minimally-invasive/non-invasive rollup over the delivery-approach values as SKOS collections, not a new primitive axis. ADR 0036 then resolves the two questions ADR 0035 parked: it disambiguates neuromodulation's intervention sense (pinned on sstim:Neuromodulation, its exclusion refined to admit deliberate self-directed but not spontaneous physiological modulation) from its effect sense (kept as a facet over sstim:outcomeNeuralPhenomenon, named by the sstim-v:NeuromodulatoryEffectCollection); adds sstim:Neurostimulation as the stimulation-based branch of interventional neuromodulation, with electric/magnetic/sensory as facet views rather than subclasses; adds the sstim:SelfDirectedNeuromodulation / sstim:InterventionalNeuromodulation split and re-types neurofeedback and biofeedback as self-directed neuromodulation techniques; and adds sstim:Neuroplasticity as a disposition stub. Additive and backward-compatible on mutable latest apart from one scope-note refinement on sstim:Neuromodulation and the two technique re-typings; no term removed or renamed."@en,
-        "v0.10.1 (2026-07-24): Release-integrity corrective patch (RDF-01, 2026-07-24 RDF structure and publication audit). The frozen 0.8.0-0.10.0 snapshots each self-cite the v0.7.0 Zenodo DOI (10.5281/zenodo.21380171) and citation string instead of their own version DOI; this went uncaught because no release gate cross-checked header version, status, history text, version DOI, and citation together. Corrects that drift going forward: removes the stale dct:hasVersion / dct:bibliographicCitation pending the 0.10.1 Zenodo DOI reservation (0.5.0 precedent), fixes the v0.10.0 history entry's leftover 'under development' qualifier against its own mod:status \"released\", and synchronizes every module's owl:versionInfo and header comment. No class, property, or concept changed. The affected 0.8.0-0.10.0 snapshots remain byte-identical historical records; see the audit for the planned erratum."@en .
+        "v0.11.0 (2026-07-24): Gate A/B stabilization release (2026-07-24 RDF structure and publication audit). Gate A (release integrity, RDF-01/02/03/11/12): the frozen 0.8.0-0.10.0 snapshots each self-cite the v0.7.0 Zenodo DOI (10.5281/zenodo.21380171) and citation string instead of their own version DOI, uncaught for lack of a release gate cross-checking header version, status, history text, version DOI, and citation together; corrected going forward by removing the stale dct:hasVersion / dct:bibliographicCitation pending this version's Zenodo DOI reservation (0.5.0 precedent), fixing the v0.10.0 history entry's leftover 'under development' qualifier, and synchronizing every module's owl:versionInfo and header comment. The affected 0.8.0-0.10.0 snapshots remain byte-identical historical records pending a visible erratum. Gate B (semantic stabilization, ADR 0037): adds sstim:DeliberateSelfRegulation as the neutral genus above no-applied-stimulus self-directed practices, narrowing sstim:SelfDirectedNeuromodulation to stimulus-mediated cases only (RDF-04); asserts sstim:SensoryNeurostimulation / sstim:SensoryNeurostimulationTechnique below sstim:Neurostimulation as an intersection class, retyping sstim-v:techGamma40Auditory accordingly (RDF-05); repairs three sstim-exposure.ttl property domains to union types matching their own definitions (RDF-09); removes two duplicate scheme definitions and completes the EvidenceModalityScheme/EvidenceModalityTag deprecation (RDF-13/RDF-15); adds sstim:primaryFrequencyBand replacing the unordered-property 'first entry is primary' claim, and downgrades five frequency-band-to-Wikidata mappings from exactMatch to closeMatch pending the deferred oscillation-band/stimulus-target split (RDF-08 partial); and adds the missing bfo:0000016 display-label stub (RDF-17). Additive and backward-compatible: no term removed; the only narrowing (SelfDirectedNeuromodulation) had zero instance-level blast radius."@en .
 
 
 ###########################################################################
@@ -130,7 +130,7 @@ sstim:Neuromodulation a owl:Class ;
                "Neuromodulación"@es ;
     skos:definition "In SSTIM, a deliberately applied stimulation process whose declared intervention objective is to alter activity or function at an identified neural target. Anatomical site and distributed neural system are recorded on separate facets. Membership records target and design intent; whether modulation occurred is represented separately through observations and evidence."@en ;
     skos:scopeNote "This is the INTERVENTION sense of neuromodulation — a deliberately applied process with the intent to modulate — as distinct from the physiological EFFECT sense (the resulting neural change), which is recorded on the outcome facet (sstim:outcomeNeuralPhenomenon), not here (ADR 0036). It excludes SPONTANEOUS physiological, neurotransmitter-level endogenous neuromodulation and stimulation performed solely to probe or measure a response; but DELIBERATE self-directed neuromodulation IS in scope (sstim:SelfDirectedNeuromodulation, ADR 0036). It does not mean treatment or successful modulation. It neither subsumes nor is subsumed by sstim:SensoryStimulation; the two overlap, and the overlap is named by sstim:SensoryRouteNeuromodulation (ADR 0034)."@en ;
-    skos:note "Two different definitions live in the word 'neuromodulation'; SSTIM keeps them apart. (1) By SENSE: this class is neuromodulation as INTERVENTION — an applied process intending to modulate. The neurophysiological EFFECT sense — the resulting change in neural activity — is not this class but a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon); the state-change effects are grouped by sstim-v:NeuromodulatoryEffectCollection. (2) By PARTICIPANT ENGAGEMENT: neuromodulation WITHOUT active engagement of the individual is interventional (sstim:InterventionalNeuromodulation — e.g. neurostimulation); neuromodulation WITH the individual's deliberate self-regulation is self-directed (sstim:SelfDirectedNeuromodulation — e.g. neurofeedback, meditation). This engagement axis is the one Theo Marins raised on 2026-07-22 (ADR 0035/0036)."@en ;
+    skos:note "Two different definitions live in the word 'neuromodulation'; SSTIM keeps them apart. (1) By SENSE: this class is neuromodulation as INTERVENTION — an applied process intending to modulate. The neurophysiological EFFECT sense — the resulting change in neural activity — is not this class but a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon); the state-change effects are grouped by sstim-v:NeuromodulatoryEffectCollection. (2) By PARTICIPANT ENGAGEMENT: neuromodulation WITHOUT active engagement of the individual is interventional (sstim:InterventionalNeuromodulation — e.g. neurostimulation); neuromodulation WITH the individual's deliberate self-regulation is self-directed (sstim:SelfDirectedNeuromodulation — e.g. neurofeedback, biofeedback; unguided meditation has no applied stimulus and is sstim:DeliberateSelfRegulation only, ADR 0037). This engagement axis is the one Theo Marins raised on 2026-07-22 (ADR 0035/0036)."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md>,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
@@ -174,15 +174,34 @@ sstim:InterventionalNeuromodulation a owl:Class ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
+# ADR 0037 (RDF-04, 2026-07-24 audit): sstim:Stimulation requires a controlled
+# input to be applied. A practice with no applied input cannot truthfully be a
+# Stimulation no matter how deliberate or goal-directed, so the genus above
+# such practices must not itself be a Stimulation. This class supplies that
+# neutral genus; sstim:SelfDirectedNeuromodulation (below) is narrowed to the
+# stimulus-mediated cases that do satisfy Stimulation's requirement.
+sstim:DeliberateSelfRegulation a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:label "Deliberate Self-Regulation"@en,
+               "Autoregolazione Deliberata"@it,
+               "Autorregulação Deliberada"@pt,
+               "Autorregulación Deliberada"@es ;
+    skos:definition "A deliberate process in which an individual attempts to regulate their own neural, physiological, or affective state, whether or not an external stimulus, cue, or delivery mechanism is part of the process. The neutral genus for self-directed practices: unlike sstim:Stimulation, it carries no commitment to an applied controlled input."@en ;
+    skos:scopeNote "Practices that also involve an applied stimulus, cue, or feedback delivery — neurofeedback, biofeedback, paced-breathing guidance — are additionally sstim:SelfDirectedNeuromodulation, since they meet sstim:Stimulation's applied-input requirement through sstim:Neuromodulation. Pure practices with no applied stimulus — unguided meditation, volitional breathwork — are sstim:DeliberateSelfRegulation only: SSTIM does not represent them as a stimulation, a neuromodulation, or a stimulation technique, however deliberate or goal-directed (ADR 0037)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
 sstim:SelfDirectedNeuromodulation a owl:Class ;
-    rdfs:subClassOf sstim:Neuromodulation ;
+    rdfs:subClassOf sstim:Neuromodulation, sstim:DeliberateSelfRegulation ;
     rdfs:label "Self-Directed Neuromodulation"@en,
                "Neuromodulazione Autodiretta"@it,
                "Neuromodulação Autodirigida"@pt,
                "Neuromodulación Autodirigida"@es ;
-    skos:definition "Neuromodulation produced by the individual's own deliberate self-regulation, corresponding on techniques to the active-self-regulatory participant-engagement mode (ADR 0035). Feedback- or cue-mediated forms — neurofeedback, biofeedback, paced-breathing guidance — have a delivery and are catalogued as techniques; pure practices with no applied stimulus, such as unguided meditation and volitional breathwork, are self-directed neuromodulation processes but fall outside the stimulation-technique catalogue (which requires a delivery medium)."@en ;
-    skos:scopeNote "Distinct from the spontaneous physiological, neurotransmitter-level endogenous neuromodulation that sstim:Neuromodulation excludes: self-directed neuromodulation is deliberate. Whether it is a strict subtype of intervention is a terminological choice; SSTIM files it under Neuromodulation because it is deliberate and goal-directed, while marking the no-applied-stimulus boundary (ADR 0036)."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    skos:definition "Neuromodulation produced by the individual's own deliberate self-regulation via an applied stimulus, cue, or feedback delivery — for example neurofeedback, biofeedback, or paced-breathing guidance — corresponding on techniques to the active-self-regulatory participant-engagement mode (ADR 0035). Requires a delivery medium, like every sstim:Stimulation; a practice with no applied stimulus is sstim:DeliberateSelfRegulation but not this class (ADR 0037)."@en ;
+    skos:scopeNote "Distinct from the spontaneous physiological, neurotransmitter-level endogenous neuromodulation that sstim:Neuromodulation excludes: self-directed neuromodulation is deliberate and stimulus-mediated. sstim:DeliberateSelfRegulation is the neutral genus that also covers practices with no applied stimulus (unguided meditation, volitional breathwork), which are not this class (ADR 0037)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -199,9 +218,29 @@ sstim:Neurostimulation a owl:Class ;
                "Neuroestimulación"@es ;
     skos:definition "Interventional neuromodulation delivered by applied stimulation — energy applied to neural tissue (electrical, magnetic/electromagnetic, acoustic/ultrasonic) or, as its sensory branch, canonical sensory stimulation with a neural-modulation objective. It is the DELIVERY, distinct from the neuromodulatory EFFECT it is intended to cause (recorded on sstim:outcomeNeuralPhenomenon; ADR 0036)."@en ;
     skos:scopeNote "Recovers 'neurostimulation is a type of neuromodulation' as a true statement under the intervention sense (ADR 0036). Kinds such as electric, magnetic, and sensory neurostimulation are views over the delivery-medium and route facets, not primitive subclasses: the sensory kind is sstim:SensoryRouteNeuromodulation. Stimulation applied solely to probe or measure is not neurostimulation in this sense (it lacks the modulation objective), and pharmacological neuromodulation is not neurostimulation at all."@en ;
-    skos:note "How this term is defined, on two axes. (1) DELIVERY vs. EFFECT: neurostimulation is the delivery — the applied stimulation itself — not the neuromodulatory effect it aims to produce. The effect (the resulting change in neural activity) is a separate thing, recorded as a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon), never as this class. (2) PARTICIPANT ENGAGEMENT: neurostimulation is the branch of neuromodulation applied WITHOUT active engagement of the individual — they receive it — as opposed to self-directed neuromodulation (neurofeedback, meditation) which the individual actively self-regulates. Theo Marins (2026-07-22) framed neurostimulation precisely as the neuromodulation that does not require the individual's active engagement (see the participant-engagement facet, ADR 0035, and ADR 0036)."@en ;
+    skos:note "How this term is defined, on two axes. (1) DELIVERY vs. EFFECT: neurostimulation is the delivery — the applied stimulation itself — not the neuromodulatory effect it aims to produce. The effect (the resulting change in neural activity) is a separate thing, recorded as a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon), never as this class. (2) PARTICIPANT ENGAGEMENT: neurostimulation is the branch of neuromodulation applied WITHOUT active engagement of the individual — they receive it — as opposed to self-directed neuromodulation (neurofeedback, biofeedback) which the individual actively self-regulates. Theo Marins (2026-07-22) framed neurostimulation precisely as the neuromodulation that does not require the individual's active engagement (see the participant-engagement facet, ADR 0035, and ADR 0036)."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md>,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0037 (RDF-05, 2026-07-24 audit): the sensory kind of neurostimulation the
+# scope notes above already name in prose, now actually asserted below
+# sstim:Neurostimulation. Defined as the intersection of Neurostimulation and
+# SensoryRouteNeuromodulation rather than a blanket subclass axiom on the
+# latter: Neurostimulation's own definition already excludes self-directed
+# cases, so a sensory-route case that is instead self-directed (e.g.
+# sonification-based biofeedback) correctly fails to qualify.
+sstim:SensoryNeurostimulation a owl:Class ;
+    rdfs:subClassOf sstim:Neurostimulation, sstim:SensoryRouteNeuromodulation ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:Neurostimulation
+          sstim:SensoryRouteNeuromodulation
+        ) ] ;
+    rdfs:label "Sensory Neurostimulation"@en ;
+    skos:definition "The sensory kind of neurostimulation: canonical sensory stimulation delivered without the individual's active self-regulation, with a neural-modulation objective. The intersection of sstim:Neurostimulation and sstim:SensoryRouteNeuromodulation, not a further primitive class."@en ;
+    skos:scopeNote "A sensory-route neuromodulation case that is instead self-directed (for example sonification-based biofeedback) is sstim:SensoryRouteNeuromodulation but not this class, because it does not meet sstim:Neurostimulation's own exclusion of self-directed cases (ADR 0036)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -312,7 +351,7 @@ sstim:NeurostimulationTechnique a owl:Class ;
                "Técnica de Neuroestimulação"@pt,
                "Técnica de Neuroestimulación"@es ;
     skos:definition "A neuromodulation technique that delivers applied stimulation — energy applied to neural tissue — rather than a pharmacological agent or the individual's own self-regulation. The technique-layer counterpart of sstim:Neurostimulation, and the browsable parent of the electrical, magnetic, and acoustic/ultrasonic neurostimulation entries."@en ;
-    skos:scopeNote "Its members share an energy-delivery route (physical neural interaction). The electric/magnetic/acoustic kinds are delivery-medium facet views, not subclasses; the sensory kind is sstim:SensoryRouteNeuromodulationTechnique. Pharmacological neuromodulation (e.g. intrathecal agent delivery) and self-directed neuromodulation (e.g. neurofeedback) are neuromodulation techniques but not neurostimulation, and are deliberately excluded."@en ;
+    skos:scopeNote "Its members share an energy-delivery route (physical neural interaction). The electric/magnetic/acoustic kinds are delivery-medium facet views, not subclasses; the sensory kind is sstim:SensoryNeurostimulationTechnique. Pharmacological neuromodulation (e.g. intrathecal agent delivery) and self-directed neuromodulation (e.g. neurofeedback) are neuromodulation techniques but not neurostimulation, and are deliberately excluded."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
@@ -329,6 +368,29 @@ sstim:SensoryRouteNeuromodulationTechnique a owl:Class ;
     rdfs:label "Sensory-Route Neuromodulation Technique"@en ;
     skos:definition "A technique that is both a sensory stimulation technique and a neuromodulation technique, declaring canonical sensory transduction and afferent processing as an intended causal route. A technique is dual-typed here only when neural-modulation intent is part of the technique concept's own definition, never because one possible use is neuromodulatory."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0037 (RDF-05, 2026-07-24 audit): the technique-layer counterpart of
+# sstim:SensoryNeurostimulation, actually asserted below sstim:NeurostimulationTechnique.
+# Defined as the intersection of NeurostimulationTechnique and
+# SensoryRouteNeuromodulationTechnique: NeurostimulationTechnique's own
+# definition already excludes self-directed techniques (e.g. neurofeedback),
+# so a sensory-route technique that is instead self-directed correctly fails
+# to qualify without a blanket subclass axiom on the broader class. Members
+# are asserted explicitly on each technique (see sstim-vocab.ttl) — kept ALSO
+# typed sstim:NeuromodulationTechnique and sstim:NeurostimulationTechnique so
+# their SHACL shapes still fire, because the validation gate runs without
+# subclass inference.
+sstim:SensoryNeurostimulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:NeurostimulationTechnique, sstim:SensoryRouteNeuromodulationTechnique ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:NeurostimulationTechnique
+          sstim:SensoryRouteNeuromodulationTechnique
+        ) ] ;
+    rdfs:label "Sensory Neurostimulation Technique"@en ;
+    skos:definition "The technique-layer counterpart of sstim:SensoryNeurostimulation: a sensory-route neuromodulation technique delivered without the individual's active self-regulation. The intersection of sstim:NeurostimulationTechnique and sstim:SensoryRouteNeuromodulationTechnique, not a further primitive class."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -767,7 +829,16 @@ sstim:targetsFrequencyBand a owl:ObjectProperty ;
     rdfs:domain sstim:Preset ;
     rdfs:range  sstim:FrequencyBand ;
     rdfs:label  "targets frequency band"@en ;
-    skos:definition "Links a preset to 1–2 target frequency bands. First entry is the primary band."@en ;
+    skos:definition "Links a preset to 1–2 target frequency bands. RDF property values are unordered; use sstim:primaryFrequencyBand to identify which one is primary (RDF-08, 2026-07-24 audit)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:primaryFrequencyBand a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:targetsFrequencyBand ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "primary frequency band"@en ;
+    skos:definition "The single primary band among a preset's sstim:targetsFrequencyBand values, when more than one is declared. Corrects the former convention of an implicit 'first entry is primary' ordering, which RDF property values do not carry (RDF-08, 2026-07-24 audit)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

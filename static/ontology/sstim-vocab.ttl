@@ -3,7 +3,7 @@
 #  SSTIM Vocabulary  —  sstim-vocab.ttl
 #
 #  Namespace:  https://w3id.org/sstim/vocab#
-#  Version:    0.10.1
+#  Version:    0.11.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -33,7 +33,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/vocab> a owl:Ontology ;
-    owl:versionInfo "0.10.1" ;
+    owl:versionInfo "0.11.0" ;
     dct:title "SSTIM Controlled Vocabulary"@en ;
     dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -58,6 +58,7 @@ sstim-v:FrequencyBandScheme a skos:ConceptScheme ;
                    "Vocabulário de Bandas de Frequência SSTIM"@pt,
                    "Vocabulario de Bandas de Frecuencia SSTIM"@es ;
     dct:description "Controlled vocabulary of neural oscillation frequency bands used in BSC protocol design. BSC operational taxonomy — not a medical diagnostic taxonomy."@en ;
+    skos:editorialNote "Known conflation, tracked as RDF-08 (2026-07-24 audit): these concepts are used both as the observed-EEG-oscillation sense (what this scheme's own description names) and, via sstim:targetsFrequencyBand, as the stimulus-frequency-target sense — a temporal frequency a preset applies, which is a different thing from an observed brain rhythm. Per-band skos:scopeNote text also carries informal outcome associations (sleep, mood, focus, and similar) that are not qualified evidence records and must not be read as such; see sstim:EvidenceAssessmentClaim for the authoritative evidence model. Splitting the two senses into distinct classes and migrating the outcome language into qualified evidence records is deferred pending a dedicated ADR — not completed in the 2026-07-24 Gate B pass, which only fixed the concrete, unambiguous sub-bug (sstim:primaryFrequencyBand replacing the unordered-property 'first entry is primary' claim)."@en ;
     skos:hasTopConcept sstim-v:allFrequencyBands .
 
 
@@ -341,43 +342,62 @@ sstim-v:tierEstablished a owl:NamedIndividual, sstim:EvidenceTierValue, skos:Con
 # Part 4 — Evidence Modality Tag Scheme
 ###########################################################################
 
+# RDF-13 (2026-07-24 audit): the scheme and its nine values are now marked
+# deprecated to match sstim:EvidenceModalityTag and sstim:hasModalityTag,
+# which have been deprecated since ADR 0027. They previously stayed active
+# while their class and property were already deprecated. dct:isReplacedBy
+# points to the orthogonal basis-axis properties collectively, since the
+# replacement is a many-to-many restructuring (e.g. BREATH's intervention
+# sense and REVIEW's synthesis-type sense were never one axis), not a 1:1
+# per-tag successor.
 sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
-    skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary"@en ;
+    owl:deprecated true ;
+    skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: superseded by the orthogonal basis axes (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention). Survives only for the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
+    dct:isReplacedBy sstim:basisSensoryModality, sstim:basisModalityApplicability,
+        sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
     skos:hasTopConcept sstim-v:modalityAUD, sstim-v:modalityAV, sstim-v:modalityBREATH,
         sstim-v:modalityGENERAL, sstim-v:modalityPRECLINICAL, sstim-v:modalityREVIEW,
         sstim-v:modalityVIS, sstim-v:modalityTACTILE, sstim-v:modalityMULTISENSORY .
 
 sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Auditory"@en, "Uditivo"@it, "Auditivo"@pt, "Auditivo"@es ;
     skos:notation "AUD" ;
     skos:definition "Evidence from auditory-only stimulation. Applies directly to BSC presets."@en .
 
 sstim-v:modalityAV a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Audiovisual"@en, "Audiovisivo"@it, "Audiovisual"@pt, "Audiovisual"@es ;
     skos:notation "AV" ;
     skos:definition "Evidence from combined audiovisual stimulation. Applies to BSC with one tier discount for auditory-only claims."@en .
 
 sstim-v:modalityBREATH a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Breathing"@en, "Respirazione"@it, "Respiração"@pt, "Respiración"@es ;
     skos:notation "BREATH" ;
     skos:definition "Evidence from paced breathing / HRV biofeedback. Applies directly to Martigli breathing guidance component."@en .
 
 sstim-v:modalityGENERAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "General / Mixed"@en, "Generale / Misto"@it, "Geral / Misto"@pt, "General / Mixto"@es ;
     skos:notation "GENERAL" ;
     skos:definition "Evidence from mixed or unspecified modalities. Must state indirectness in techDesc."@en .
 
 sstim-v:modalityPRECLINICAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Preclinical"@en, "Preclinico"@it, "Pré-clínico"@pt, "Preclínico"@es ;
     skos:notation "PRECLINICAL" ;
     skos:definition "Evidence from animal or in-vitro studies. Maximum tier contribution: Tier 3 for human wellness claims."@en .
 
 sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Review"@en, "Revisione"@it, "Revisão"@pt, "Revisión"@es ;
     skos:notation "REVIEW" ;
@@ -388,18 +408,21 @@ sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
 # without a tier discount, and multisensory (e.g. GENUS) results do not transfer
 # directly to any single modality.
 sstim-v:modalityVIS a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Visual"@en, "Visivo"@it, "Visual"@pt, "Visual"@es ;
     skos:notation "VIS" ;
     skos:definition "Evidence from visual-only stimulation (e.g. photic/flicker driving, SSVEP). Applies directly to visual techniques; one tier discount for auditory-only claims."@en .
 
 sstim-v:modalityTACTILE a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Tactile"@en, "Tattile"@it, "Tátil"@pt, "Táctil"@es ;
     skos:notation "TACTILE" ;
     skos:definition "Evidence from tactile / vibrotactile stimulation (e.g. vibrotactile pulse, SSSEP, vibroacoustic). Applies directly to tactile techniques; one tier discount for auditory-only claims."@en .
 
 sstim-v:modalityMULTISENSORY a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
+    owl:deprecated true ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Multisensory"@en, "Multisensoriale"@it, "Multissensorial"@pt, "Multisensorial"@es ;
     skos:notation "MULTISENSORY" ;
@@ -1266,8 +1289,15 @@ sstim-v:techFrequencyModulation a owl:NamedIndividual, sstim:SensoryStimulationT
 # technique such as techPhoticDriving, whose definition admits aesthetic,
 # diagnostic, and neuromodulatory uses alike, deliberately stays sensory-only:
 # a use-level intention must never be promoted into a universal property.
+# ADR 0037 (RDF-05, 2026-07-24 audit): also explicitly typed
+# sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, and
+# sstim:SensoryNeurostimulationTechnique — it is delivered without active
+# self-regulation, so it satisfies the sensory-neurostimulation intersection
+# and should be discoverable by neurostimulation-hierarchy queries.
 sstim-v:techGamma40Auditory a owl:NamedIndividual, sstim:EntrainmentBasedTechnique,
-        sstim:SensoryRouteNeuromodulationTechnique, skos:Concept ;
+        sstim:SensoryRouteNeuromodulationTechnique, sstim:NeuromodulationTechnique,
+        sstim:NeurostimulationTechnique, sstim:SensoryNeurostimulationTechnique,
+        skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "40 Hz Auditory Gamma Stimulation"@en,
                    "Stimolazione Gamma Uditiva a 40 Hz"@it,
@@ -1653,8 +1683,6 @@ sstim-v:PublicClaimLevelScheme skos:definition "Ordered ceilings on the kinds of
 sstim-v:ReviewStatusScheme skos:definition "Workflow states describing whether an evidence-tier assignment is provisional, reviewed, or due for reassessment."@en .
 sstim-v:SensoryModalityScheme skos:definition "Broad sensory-channel categories used for technique and intervention annotation."@en .
 sstim-v:StimulationMechanismScheme skos:definition "Controlled categories for proposed neurobiological and psychophysiological response mechanisms, each requiring separate evidence qualification."@en .
-sstim-v:StimulusTemporalStructureScheme skos:definition "Categories describing whether a stimulus is periodic, quasi-periodic, aperiodic, or adaptively controlled."@en .
-sstim-v:TechniqueScheme skos:definition "Vendor-neutral catalog of parameterizable auditory, visual, somatosensory, and cross-modal sensory stimulation techniques."@en .
 sstim-v:VoiceTypeScheme skos:definition "BSC audio synthesis voice categories used by preset parameter bundles."@en .
 
 sstim-v:cautionAdvancedUser skos:topConceptOf sstim-v:CautionTagScheme .
@@ -2996,6 +3024,7 @@ sstim-v:techBiofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, s
     skos:notation "biofeedback" ;
     skos:definition "A closed-loop practice in which a measured physiological signal (heart rate, heart-rate variability, respiration, muscle tension, or skin conductance) is rendered back to the individual as sensory feedback so that they can learn to self-regulate that function."@en ;
     skos:scopeNote "Self-directed neuromodulation (ADR 0036), marked by the active-self-regulatory engagement mode. Its neuromodulation status is clearest for autonomically mediated forms — heart-rate-variability biofeedback trains vagal and baroreflex regulation; peripheral forms such as EMG muscle biofeedback sit closer to motor self-regulation than to neural modulation, so the neural target is recorded broadly. Auditory biofeedback is the sonification case (sstim-v:techSonification); HRV/paced-breathing biofeedback connects to BSC's Martigli breathing component. Theo Marins (2026-07-22) placed biofeedback closer to neuromodulation than to neurostimulation, which ADR 0036 adopts."@en ;
+    skos:editorialNote "Deliberately kept as one neutral technique rather than split into narrower neural-only and peripheral-only variants (ADR 0037, RDF-05 of the 2026-07-24 audit): the neural-modulation objective is not equally definitional across its autonomic, muscular, and electrodermal forms, so a narrower neuromodulation-only subtype would misrepresent the peripheral cases. sstim:techNeurofeedback already exists as the separate, narrower technique for which the neural-modulation objective is definitional."@en ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAdaptive ;
     sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
     sstim:stimulationDeliveryApproach sstim-v:approachExternal ;

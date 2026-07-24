@@ -13,6 +13,7 @@ bsclab-preset:heal-theta-breathing-seed a sstim:Preset ;
     dct:created "2026-06-17"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:theta ;
+    sstim:primaryFrequencyBand sstim-v:theta ;
     sstim:inGroup sstim-v:groupHeal ;
     sstim:hasBreathGuide true ;
     sstim:presetVersion "0.1.0" ;

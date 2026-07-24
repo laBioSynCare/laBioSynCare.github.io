@@ -3,7 +3,7 @@
 #  SSTIM External Alignments  —  sstim-alignments.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.10.1
+#  Version:    0.11.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
-    owl:versionInfo "0.10.1" ;
+    owl:versionInfo "0.11.0" ;
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -60,21 +60,31 @@
 # All QIDs below were verified against live Wikidata (2026-06). The prior
 # QIDs in this section were incorrect (they resolved to unrelated entities
 # such as a Van Halen album and a stock exchange) and were replaced.
+#
+# Re-audited 2026-07-24 (RDF-08/RDF-17, 2026-07-24 audit; reviewer: Renato
+# Fabbri). Downgraded exactMatch to closeMatch: each Wikidata item is the
+# observed-EEG-oscillation sense of the band (a neurophysiological phenomenon),
+# while sstim-v:alpha/delta/theta/beta/gamma are also used, unsplit, as
+# stimulus-frequency targets (sstim:targetsFrequencyBand). SSTIM's own
+# FrequencyBandScheme currently conflates those two senses (RDF-08); until
+# they are split into distinct classes, extensional identity with the
+# single-sense Wikidata items cannot be claimed with exactMatch's confidence.
+# Revisit once RDF-08's oscillation-band/stimulus-target split lands.
 
 # alpha wave: https://www.wikidata.org/wiki/Q2469782
-sstim-v:alpha skos:exactMatch wd:Q2469782 .
+sstim-v:alpha skos:closeMatch wd:Q2469782 .
 
 # delta wave: https://www.wikidata.org/wiki/Q2623205
-sstim-v:delta skos:exactMatch wd:Q2623205 .
+sstim-v:delta skos:closeMatch wd:Q2623205 .
 
 # theta rhythm: https://www.wikidata.org/wiki/Q2370623
-sstim-v:theta skos:exactMatch wd:Q2370623 .
+sstim-v:theta skos:closeMatch wd:Q2370623 .
 
 # beta wave: https://www.wikidata.org/wiki/Q831014
-sstim-v:beta skos:exactMatch wd:Q831014 .
+sstim-v:beta skos:closeMatch wd:Q831014 .
 
 # gamma wave: https://www.wikidata.org/wiki/Q2623017
-sstim-v:gamma skos:exactMatch wd:Q2623017 .
+sstim-v:gamma skos:closeMatch wd:Q2623017 .
 
 # A BSC binaural voice is a parameter bundle that can realize binaural beats;
 # it is not identical to the perceptual phenomenon or musical genre represented
@@ -156,6 +166,7 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 ###########################################################################
 
 bfo:0000015 rdfs:label "process"@en .
+bfo:0000016 rdfs:label "disposition"@en .
 obi:0000272 rdfs:label "protocol"@en .
 cob:0000082 rdfs:label "planned process"@en .
 iao:0000030 rdfs:label "information content entity"@en .

@@ -85,8 +85,11 @@
     "ParticipantEngagementMode": "sstim:ParticipantEngagementMode",
     "Neurostimulation": "sstim:Neurostimulation",
     "NeurostimulationTechnique": "sstim:NeurostimulationTechnique",
+    "SensoryNeurostimulation": "sstim:SensoryNeurostimulation",
+    "SensoryNeurostimulationTechnique": "sstim:SensoryNeurostimulationTechnique",
     "InterventionalNeuromodulation": "sstim:InterventionalNeuromodulation",
     "SelfDirectedNeuromodulation": "sstim:SelfDirectedNeuromodulation",
+    "DeliberateSelfRegulation": "sstim:DeliberateSelfRegulation",
     "Neuroplasticity": "sstim:Neuroplasticity",
 
     "SensoryStimulation": "sstim:SensoryStimulation",
@@ -303,6 +306,7 @@
     "relatedMatch": { "@id": "skos:relatedMatch", "@type": "@id" },
 
     "targetsFrequencyBand": { "@id": "sstim:targetsFrequencyBand", "@type": "@id" },
+    "primaryFrequencyBand": { "@id": "sstim:primaryFrequencyBand", "@type": "@id" },
     "hasEvidenceTier": { "@id": "sstim:hasEvidenceTier", "@type": "@id" },
     "hasModalityTag": { "@id": "sstim:hasModalityTag", "@type": "@id" },
     "supportsRelation": { "@id": "sstim:supportsRelation", "@type": "@id" },

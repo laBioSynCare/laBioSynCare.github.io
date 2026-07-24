@@ -17,6 +17,7 @@ bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
     dct:created "2026-06-17"^^xsd:date ;
     dct:modified "2026-07-10"^^xsd:date ;
     sstim:targetsFrequencyBand sstim-v:alpha10 ;
+    sstim:primaryFrequencyBand sstim-v:alpha10 ;
     sstim:inGroup sstim-v:groupPerform ;
     sstim:hasBreathGuide false ;
     sstim:presetVersion "0.1.0" ;
