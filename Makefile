@@ -46,7 +46,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -167,8 +167,20 @@ export-check:
 	trap 'rm -rf "$$tmpdir"' EXIT; \
 	$(PYTHON) scripts/export-ontology.py "$$tmpdir"
 
+## Verify the published context.jsonld round-trips every top-level and instance
+## document without triple loss (RDF-02, 2026-07-24 audit) — distinct from
+## export-check, which uses RDFLib's own generated context, not context.jsonld.
+context-roundtrip:
+	$(PYTHON) scripts/context-roundtrip-check.py
+
+## Verify every recorded static/ontology/<version>/ snapshot still matches its
+## checksum ledger (RDF-12, 2026-07-24 audit): catches silent drift in an
+## already-published, supposedly-immutable snapshot.
+verify-snapshots:
+	node scripts/verify-snapshot-checksums.mjs
+
 ## Run the current ontology validation suite
-validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check
+validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -220,6 +232,8 @@ help:
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
+	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
+	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"

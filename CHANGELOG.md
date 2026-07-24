@@ -15,6 +15,53 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Release-integrity corrective patch (RDF-01, from the
+[2026-07-24 RDF structure and publication audit](docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md)).
+The frozen `0.8.0`-`0.10.0` snapshots each self-cite the `v0.7.0` Zenodo DOI
+(`10.5281/zenodo.21380171`) and citation string instead of their own version
+DOI, and `sstim-core.ttl`'s `v0.10.0` history entry retained a leftover "under
+development" qualifier alongside `mod:status "released"`. This patch corrects
+the drift going forward:
+
+### Fixed
+- Removed the stale `dct:hasVersion` / `dct:bibliographicCitation` from
+  `sstim-core.ttl` and `void.ttl` pending the `0.10.1` Zenodo DOI reservation
+  (the `0.5.0` release shipped under the same no-version-DOI-at-freeze-time
+  precedent).
+- Fixed the `v0.10.0` history entry's "under development" qualifier.
+- Synchronized every module's `owl:versionInfo` and header `# Version:` /
+  `# Date:` comments (six modules still said `0.7.0`).
+- Fixed `void.ttl`'s stale `dct:modified` date and `void:triples` count.
+- Fixed the repository-root `README.md`'s stale ontology-graph counts (105/14/214/369/43 → 131/18/230/445/50) and protocol count (12 → 9).
+- Removed the `"@type": "@id"` coercion on `dcat:distribution` in
+  `context.jsonld` (RDF-02): it silently dropped all 96 triples describing
+  `void.ttl`'s blank-node distributions when compacted with RDFLib.
+
+### Added
+- `scripts/context-roundtrip-check.py` + `make context-roundtrip`: round-trips
+  every top-level and instance document through the *published*
+  `context.jsonld` (not RDFLib's auto-generated one), wired into
+  `make validate`.
+- `scripts/verify-snapshot-checksums.mjs` + `make verify-snapshots`:
+  checksums every recorded `static/ontology/<version>/` snapshot against
+  `static/ontology/snapshot-checksums.json` and fails on drift; every future
+  `make snapshot` records its own checksums automatically. Wired into
+  `make validate`.
+- The GitHub Pages workflow now runs `make test` (the full Vitest suite)
+  before publishing, not only `make validate` (RDF-11): the runtime SHACL
+  goldens and ecosystem-contract tests previously ran only in the independent
+  lint workflow, so Pages could publish while one of them failed.
+
+### Still open (this patch does not do this)
+- The Zenodo DOI for `0.10.1` has not been reserved, and `make snapshot 0.10.1`
+  has not been run — both require the maintainer's action. An erratum still
+  needs to be published against the already-archived `0.8.0`-`0.10.0` Zenodo
+  records noting their self-citation defect; that content cannot be corrected
+  in place.
+- The whole-set version-manifest/checksums for a *dereferenceable* frozen
+  closure (RDF-03) and the semantic findings (RDF-04 through RDF-19) are
+  separate, larger gates and are not part of this patch.
+
 ## [0.10.0] - 2026-07-24
 
 Published under version DOI `10.5281/zenodo.21528717`, with

@@ -22,17 +22,19 @@ As of 2026-07-24:
   identified by `https://w3id.org/sstim/0.10.0`.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** the validated `0.10.0` release sources. The core
-  claims the whole-set `owl:versionIRI`; all seven modules share synchronized
-  `owl:versionInfo` under ADR 0020.
+- **Live ontology sources:** a release-integrity corrective patch (`0.10.1`,
+  unreleased — see CHANGELOG) over the validated `0.10.0` release sources,
+  fixing the RDF-01 version/DOI citation drift found in the 2026-07-24 audit.
+  The core claims the whole-set `owl:versionIRI`; all seven modules share
+  synchronized `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **Ontology graph:** seven Turtle modules, 105 named OWL classes, 14 anonymous
-  class expressions, 214 properties, and 369 SKOS concepts in 43 concept
+- **Ontology graph:** seven Turtle modules, 131 named OWL classes, 18 anonymous
+  class expressions, 230 properties, and 445 SKOS concepts in 50 concept
   schemes, plus VoID/DCAT and a JSON-LD context.
 - **Public example data:** 19 Turtle files containing the BSC framework, nine
   framework techniques (three originated by BSC, six vendor-neutral techniques
   it incorporates from the SSTIM vocabulary — ADR 0033), two implementations,
-  12 protocols, two reference presets, eight evidence assessments, three
+  nine protocols, two reference presets, eight evidence assessments, three
   knowledge-status assertions, seven exposure hypotheses, seven DOI-identified
   references, ten exposure profiles, one explicitly synthetic session with
   pre/post reports, and one synthetic ecosystem contract graph. No real

@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.7.0
-#  Date:       2026-07-15
+#  Version:    0.10.1
+#  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -38,7 +38,7 @@
     # frozen snapshot at static/ontology/<version>/ (identified by the core
     # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
     # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.10.0" ;
+    owl:versionInfo "0.10.1" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

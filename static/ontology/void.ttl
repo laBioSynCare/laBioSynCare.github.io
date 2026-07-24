@@ -3,7 +3,7 @@
 #  SSTIM — VoID + DCAT dataset description  —  void.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Date:       2026-07-17
+#  Date:       2026-07-24
 #  License:    CC BY 4.0
 #
 #  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
@@ -45,14 +45,16 @@
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-22"^^xsd:date ;
+    dct:modified "2026-07-24"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
-    dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
+    # dct:hasVersion (version-specific DOI) intentionally omitted pending the
+    # 0.10.1 Zenodo DOI reservation — see sstim-core.ttl and the RDF-01 finding
+    # in docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md.
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.10.0" ;
+    dcat:version "0.10.1" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -61,7 +63,7 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 9825 ;
+    void:triples 9824 ;
     void:classes 131 ;
     void:properties 230 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",

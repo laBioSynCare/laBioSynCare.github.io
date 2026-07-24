@@ -269,7 +269,7 @@
     "primaryTopic": { "@id": "foaf:primaryTopic", "@type": "@id" },
     "landingPage": { "@id": "dcat:landingPage", "@type": "@id" },
     "keyword": "dcat:keyword",
-    "distribution": { "@id": "dcat:distribution", "@type": "@id" },
+    "distribution": "dcat:distribution",
     "accessURL": { "@id": "dcat:accessURL", "@type": "@id" },
     "downloadURL": { "@id": "dcat:downloadURL", "@type": "@id" },
     "mediaType": { "@id": "dcat:mediaType", "@type": "@id" },

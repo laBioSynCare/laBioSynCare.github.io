@@ -48,6 +48,14 @@ jobs:
       - name: Validate RDF contract before publication
         run: nix develop --command make validate
 
+      # RDF-11 (2026-07-24 audit): make validate alone omits the Vitest suite —
+      # the runtime SHACL goldens for Sensory Field, the ADR 0027 negative
+      # fixtures, and the navigator/loader graph tests. Those previously ran
+      # only in the independent lint workflow, so Pages could publish while one
+      # of them failed. Block publication on the full suite too.
+      - name: Run runtime RDF unit tests before publication
+        run: nix develop --command make test
+
       - name: Build static site
         run: nix develop --command npm run build
         env:

@@ -21,6 +21,11 @@
 // refused unless the version is a plain release (no -dev/prerelease suffix),
 // every module declares that same owl:versionInfo, and sstim-core.ttl carries
 // the matching owl:versionIRI and mod:status "released".
+//
+// Every successful snapshot also records its files' checksums into
+// static/ontology/snapshot-checksums.json (RDF-03/RDF-12, 2026-07-24 audit),
+// so `make verify-snapshots` can catch silent drift in an already-published
+// snapshot for the rest of its life.
 
 import { readFileSync, writeFileSync, mkdirSync, copyFileSync, readdirSync, existsSync } from 'node:fs'
 import { dirname, resolve, join } from 'node:path'
@@ -215,6 +220,18 @@ Files: ${ONTOLOGY_FILES.map((f) => `\`${f}\``).join(', ')}.
   const written = readdirSync(outDir).sort()
   console.log(`snapshot: wrote static/ontology/${version}/ (${written.length} files)`)
   for (const f of written) console.log(`  ${f}`)
+
+  // RDF-03/RDF-12 (2026-07-24 audit): every new snapshot gets its checksums
+  // recorded immediately, so `make verify-snapshots` can catch drift in it for
+  // the rest of its life. Skipped under --force re-cuts of an unpublished
+  // snapshot whose checksums are already recorded — record() itself refuses
+  // to silently overwrite a recorded version.
+  try {
+    execFileSync('node', [join(here, 'verify-snapshot-checksums.mjs'), 'record', version], { stdio: 'inherit' })
+  } catch {
+    console.error(`snapshot: wrote the files but could not record checksums for ${version}.`)
+    console.error(`Run \`node scripts/verify-snapshot-checksums.mjs record ${version}\` by hand once resolved.`)
+  }
 }
 
 // Guarded so unit tests can import releaseProblems without side effects.

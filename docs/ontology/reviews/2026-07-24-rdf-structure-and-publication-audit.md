@@ -4,6 +4,24 @@
 This review added only this document; it did not alter ontology, shape, context,
 instance, or release files.
 
+**Verification (2026-07-24):** every statistic, file/line citation, and quotation
+below was independently re-checked against the repository at the same commit —
+`make validate` (SHACL, ecosystem contract, quality audit, HermiT, SPARQL
+sanity, export round-trip), the full Vitest suite (19 files, 151 tests), and
+standalone scripts for the two claims neither target covers: a triple count
+over the seven public modules, and a compact/expand round trip of all 28
+top-level and instance Turtle documents through the published `context.jsonld`
+(confirming the 308-to-212, 96-triple loss on `void.ttl` and a clean pass on
+the other 27). All counts, citations, and quotations held; none required
+correction.
+
+**Implementation status (2026-07-24, same day):** Gate A (below) is implemented
+except for the three sub-items that require the maintainer's own action outside
+this repository. RDF-01, RDF-02, and RDF-11 are fixed; RDF-03 and RDF-12 are
+partially fixed. See the "Status" note under each finding and the checked-off
+Gate A list for specifics. `make validate` and the full Vitest suite (19 files,
+151 tests) pass with these changes in place.
+
 ## Executive assessment
 
 SSTIM is structurally strong and unusually well tested for a young ontology.
@@ -16,12 +34,17 @@ The repository nevertheless has three release-level defects that should be
 corrected before the next ordinary feature release:
 
 1. the frozen `0.10.0` RDF identifies itself as `0.10.0` while citing the
-   `0.7.0` version DOI and citation;
+   `0.7.0` version DOI and citation — **fixed as an unreleased `0.10.1` patch**
+   in the live tree; still needs a reserved DOI, a real snapshot, and a visible
+   erratum against the archived `0.8.0`-`0.10.0` records (see RDF-01's status);
 2. the public JSON-LD context loses the 96 blank-node distribution-description
-   triples in `void.ttl` in the repository's RDFLib compact/parse path; and
+   triples in `void.ttl` in the repository's RDFLib compact/parse path —
+   **fixed and gated** (see RDF-02's status); and
 3. the whole-set version IRI returns only the core file and provides no
    version-specific, machine-discoverable representation of the seven-module
-   release closure.
+   release closure — **partially fixed**: existing snapshots now have
+   CI-checked checksums, but no discoverable manifest/aggregate exists yet at
+   the version IRI (see RDF-03's status).
 
 There are also substantive semantic defects that automated reasoning cannot
 see because they are contradictions between prose definitions and asserted
@@ -41,9 +64,9 @@ release, not another scope-expansion release.
 | Use | Assessment |
 |---|---|
 | Vocabulary browsing, competency queries, and synthetic examples | Ready, with the documented semantic caveats |
-| Reuse of individual public modules | Usable, but consumers need a version-specific immutable dependency manifest |
-| Citation of `0.10.0` RDF metadata | Needs an erratum or corrected patch release |
-| RDFLib compact export with `context.jsonld` | Lossy for `void.ttl` in the tested compact/parse path |
+| Reuse of individual public modules | Usable, but consumers need a version-specific immutable dependency manifest (checksums for existing snapshots now exist; a discoverable manifest/aggregate at the version IRI does not yet) |
+| Citation of `0.10.0` RDF metadata | Fix prepared as an unreleased `0.10.1` patch (live tree only); still needs a reserved Zenodo DOI, `make snapshot 0.10.1`, and a visible erratum against the already-archived `0.8.0`-`0.10.0` records |
+| RDFLib compact export with `context.jsonld` | Fixed — all 28 top-level and instance documents now round-trip isomorphically; gated by `make context-roundtrip` in `make validate` |
 | Public-copy authorization | Not implemented; the legacy gate is reject-only |
 | Acoustically identical session reproduction | Not supported by the captured contract |
 | Real participant/session data | Not ready; observation, consent, privacy, and unwanted-experience modeling are incomplete |
@@ -213,6 +236,20 @@ generated counts. Reserve the Zenodo DOI before freezing, or publish a
 version-specific metadata sidecar whose lifecycle is explicitly separate from
 the immutable Turtle snapshot.
 
+**Status (2026-07-24):** the live tree (not `0.10.0` or any other frozen
+snapshot) now carries an unreleased `0.10.1` corrective patch: `owl:versionIRI`
+/ `owl:versionInfo` bumped, `dct:hasVersion` / `dct:bibliographicCitation`
+removed pending a real `0.10.1` DOI (the `0.5.0` no-version-DOI-at-freeze
+precedent), the `v0.10.0` history note's "under development" vs. `released`
+contradiction fixed, all seven module header comments and `void.ttl`'s
+`dct:modified` / `void:triples` synced, and the stale README counts corrected.
+`CHANGELOG.md` records the patch under `[Unreleased]`. Three items remain,
+outside what a repository edit can do: reserve the `0.10.1` Zenodo DOI, run
+`make snapshot 0.10.1` once that DOI is filled back in, and publish a visible
+erratum against the already-archived `0.8.0`-`0.10.0` Zenodo records (their
+content cannot be corrected in place). The cross-checking release gate is not
+yet built as a single manifest — see RDF-11's status.
+
 #### RDF-02 — RDFLib compact serialization with the public context loses VoID distribution details
 
 `static/ontology/context.jsonld:272` defines `dcat:distribution` with
@@ -247,6 +284,13 @@ RDFLib workaround; stable IRIs for distributions or a different serializer
 may be preferable. Keep the existing object-type compatibility audit, but do
 not treat it as a substitute for a real JSON-LD round trip.
 
+**Status (2026-07-24): fixed.** `context.jsonld`'s `distribution` term dropped
+the `"@type": "@id"` coercion (the confirmed RDFLib workaround). All 28
+top-level and instance documents now round-trip isomorphically, including
+`void.ttl` (308-to-308). `scripts/context-roundtrip-check.py` performs this
+check against the published context for every such document and is wired into
+`make validate` as `make context-roundtrip`, so this can't regress silently.
+
 #### RDF-03 — the version IRI does not expose a discoverable seven-module closure
 
 The project says the seven modules are one citable versioned set. In the staged
@@ -274,6 +318,20 @@ version-specific module distributions and checksums. Keep SHACL separate from
 the OWL logical import if appropriate. Serve the root namespace in a way that
 allows every root term to be discovered, and add a persistent route for the
 public context.
+
+**Status (2026-07-24): partially fixed.** `static/ontology/snapshot-checksums.json`
+now records a sha256 per file for all nine existing frozen snapshots (bootstrapped
+from their current on-disk content), and `make verify-snapshots` (wired into
+`make validate`) fails if any recorded snapshot's checksum drifts — this closes
+the "no CI check that historical directories still match release-tag
+checksums" half of the finding (shared with RDF-12) and gives every future
+snapshot the same protection automatically (`snapshot-ontology.mjs` now records
+a new version's checksums right after writing it). What remains open: the
+version IRI itself still redirects to only `sstim-core.ttl`; there is still no
+single discoverable manifest/aggregate enumerating the seven-module closure at
+`https://w3id.org/sstim/<version>`; `dct:requires` still doesn't form an OWL
+import closure; and the root-namespace/Patch-Studio term dereferenceability gap
+is untouched.
 
 ### P1 — semantic and contract repair
 
@@ -513,6 +571,15 @@ artifact with an explicit dependency closure, then validate the union. Replace
 loose floors with a checked inventory and reviewed expected deltas. Add
 mutation tests for the quality audit and fail on a missing manifest member.
 
+**Status (2026-07-24): the Pages/`make test` gap is fixed;** everything else in
+this finding is still open. `.github/workflows/pages.yml` now runs `make test`
+(the full Vitest suite) before publishing, in the same job as `make validate`,
+so Pages can no longer advance while a runtime RDF test fails. The JS-SHACL
+`sh:sparql`-stripping, the concatenated instance-validation graph, the loose
+quality-audit count floors (55/120/295/30), the duplicated module inventories,
+the RDF workflow's missing `src/ui/field/` and `package.json` path-filter
+coverage, and the fails-open resolver-prefix allowlist are all unchanged.
+
 #### RDF-12 — immutable snapshot enforcement is mostly procedural
 
 The snapshot tool refuses an existing directory by default and refuses dirty
@@ -531,6 +598,15 @@ attributes that synchronization to ADR 0020.
 versions became policy. Publish a checksum manifest bound to the release tag,
 and make CI reject any historical snapshot drift. Restrict overwrite to an
 explicit unpublished staging location rather than a released version path.
+
+**Status (2026-07-24): the checksum/CI half is fixed;** the ADR 0020 policy
+conflict and the `--force`/overwrite-location gap are not addressed by this
+pass, since resolving them is a maintainer policy decision (whether
+synchronized versionInfo supersedes ADR 0020, or ADR 0020 gets amended to
+match current tooling), not a mechanical fix. See RDF-03's status for the new
+`snapshot-checksums.json` / `make verify-snapshots` mechanism, which is the
+concrete answer to "no CI check that historical directories still match
+release-tag checksums."
 
 #### RDF-13 — support artifacts and compatibility terms lack a clear lifecycle
 
@@ -716,18 +792,29 @@ mapping provenance, and full runtime/publication-boundary validation.
 
 Complete before publishing more ontology scope:
 
-1. publish an erratum for the incorrect `0.8.0`-`0.10.0` RDF citations;
-2. fix the public-context/RDFLib export interaction and test all 28 top-level
-   and committed instance Turtle documents with it;
-3. cut a corrective release with coherent version, DOI, status, dates,
-   citation, VoID, history, counts, and generated documentation;
-4. publish a versioned whole-set manifest or aggregate with checksums;
-5. make historical snapshot checksums immutable in CI; and
-6. make Pages depend on the runtime RDF tests as well as `make validate`.
+1. ☐ publish an erratum for the incorrect `0.8.0`-`0.10.0` RDF citations —
+   **open; requires the maintainer's Zenodo access**;
+2. ☑ fix the public-context/RDFLib export interaction and test all 28 top-level
+   and committed instance Turtle documents with it — **done**
+   (`make context-roundtrip`);
+3. ☐ cut a corrective release with coherent version, DOI, status, dates,
+   citation, VoID, history, counts, and generated documentation —
+   **metadata coherence prepared in the live tree as unreleased `0.10.1`;
+   cutting the actual release needs a reserved DOI, then `make snapshot 0.10.1`**;
+4. ☐ publish a versioned whole-set manifest or aggregate with checksums —
+   **checksums done for existing snapshots (`snapshot-checksums.json`,
+   `make verify-snapshots`); a discoverable manifest/aggregate at the version
+   IRI itself is still open**;
+5. ☑ make historical snapshot checksums immutable in CI — **done**
+   (`make verify-snapshots`, wired into `make validate`); and
+6. ☑ make Pages depend on the runtime RDF tests as well as `make validate` —
+   **done** (`pages.yml` runs `make test`).
 
 **Exit criterion:** a consumer can start from the version IRI, discover the
 entire frozen set, verify it, use the public context without graph loss, and
-obtain one unambiguous citation.
+obtain one unambiguous citation. **Not yet met** — items 1, 3, and the manifest
+half of item 4 remain, and none of them can be closed by an in-repository edit
+alone.
 
 ### Gate B — semantic stabilization
 

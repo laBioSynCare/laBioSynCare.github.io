@@ -1,0 +1,75 @@
+{
+  "0.1.0": {
+    "sstim-core.ttl": "db69a5d20a8f2f3a3a98e79db12d2d080a35aa2124860a433b861cf9018be5c8",
+    "sstim-vocab.ttl": "2750136581d88acc749192ef60ac19b3a402ec0ec0a8db0f736d1560f19d96bb",
+    "sstim-shapes.ttl": "402a302c592104be19595e58fe11f9c8fb5989afa46da60345492308b2d2c6e9",
+    "sstim-alignments.ttl": "62bb8a3a8ada32ee0381663339bd2397b2b3b652d4b272db198ec8b2d6fa7503",
+    "sstim-patch-studio.ttl": "d3d4546691dcb02b49cec13f3741c12e5206fe42c9ee2e3988567dd9ca207488"
+  },
+  "0.2.0": {
+    "sstim-core.ttl": "c04237083c94c6e0d07636e52c6edeb36d6336d5b80c08fb17118bfd1f562a0a",
+    "sstim-vocab.ttl": "570f87d585ca1bafdfe6191fd4dcffeb8bc311db7a26e4b9cf46b481b5f386ea",
+    "sstim-shapes.ttl": "978a99bb0cab5e1f2fd9258bfa73f7ceaaf52d34f84d7b9d25d2ec38504d94d1",
+    "sstim-alignments.ttl": "be1b328427224668923c8172d3b0115da8e6f35e0ab4285da5b7968cf9e86b1b",
+    "sstim-patch-studio.ttl": "926901ffe0b0f5062ec2dd166aac6af451435dd705ef800f9310c6f77816bb1d"
+  },
+  "0.3.0": {
+    "sstim-core.ttl": "09157fc2c3cfd324be563c73ad7872e1ebf966798f3d6eb819548891b3aeb15b",
+    "sstim-vocab.ttl": "f4c3b9f8caedf4605211003cb096688e272ecd1750d788de465105b097f3d420",
+    "sstim-shapes.ttl": "6076f7a6f03aa16a2b02109f77546e96641e4a5e642fbf65969acbc31db6e878",
+    "sstim-alignments.ttl": "75013e2b52a9d66b6dcd73f12bc9a8f9a9c381ed7b1fe5ff93cf9b5b696d19a5",
+    "sstim-patch-studio.ttl": "8b6a666c7751a03eba5127b0bde77453b3da4f8816d016e901648e76a5d34088"
+  },
+  "0.5.0": {
+    "sstim-core.ttl": "f8b90fac776f268dd35ad2ba1494baa6ef661d58a28f85c83d3208b14ebd73bd",
+    "sstim-vocab.ttl": "96b4e3084b960185ca31d89fe10bc55fe7de5d8a7ddf3d9f3af503352e342939",
+    "sstim-shapes.ttl": "b6f9d884183eabd8237e0a2a04da29cae58e3c4c46808f7253c1827b9d44e984",
+    "sstim-alignments.ttl": "7113488f306fa5f4c2a6afab1e37f86f25e6a3edc61f87b9d154e9c7d7e45b30",
+    "sstim-patch-studio.ttl": "486b5649ddcb381e3db90a70c50f59451f37c2969363e73c7a0ae442ee11cd9b",
+    "sstim-exposure.ttl": "9563c69c2685327f61ac6f420dd28be03e4119563ac5bcf3b2290fccfffd4d95"
+  },
+  "0.6.0": {
+    "sstim-core.ttl": "37914c5177f5cce3591826169b6d5fa2ffde87289cf94d9c177bf6ad96bf665e",
+    "sstim-vocab.ttl": "730e1e5241e13aa03cf1f1cdd54f9e6ef0ed8eb994126478330c327964873768",
+    "sstim-shapes.ttl": "e23606c3d50c98baf5e39516ed8f542b9a1c4533e7864f36957f82f30d0fbed0",
+    "sstim-alignments.ttl": "7436956d432c65bf11b7302453fc61e001909b5b1b4a94b4cde2dca0c1a1b352",
+    "sstim-patch-studio.ttl": "d7fd5f47ec014e9a926ff6f50add60597f19aebe367a8e91b417bfbcb2cff39f",
+    "sstim-exposure.ttl": "1e9e0b8c9e9730951342dfa4a8d239dc7a6f5c433b42821c3ea8307ecce9e42b"
+  },
+  "0.7.0": {
+    "sstim-core.ttl": "f4800dda1fdc555887ed7c9bcc5ca5bc4ca000e444a6b00e045ca53f81b749e0",
+    "sstim-vocab.ttl": "ec1c48a7d8560310a532ae2498a65f90526b751f46361b9c26cf80e0b52223a2",
+    "sstim-shapes.ttl": "2f4b919b9ba859b3cfed631b8d5804ee2daf038bff7c965299a68b18fd40876e",
+    "sstim-alignments.ttl": "e95560e3fe93e3662f0aeafba2b88f9910151fd86a2c8a44bd64b18e44138742",
+    "sstim-patch-studio.ttl": "3ee6db10a5b9f67cbcb36ea39845efd5610c6ce78b50247528e10f0d6000f014",
+    "sstim-exposure.ttl": "af046d9eb663de5c056a38de0b9aada728be9b1b6067835a4f0f7d117734bed0",
+    "sstim-ecosystem.ttl": "ed83953bc306eed8e533cd13db952b095095afb9df8cc67eb9c2ddbc6c58a3dd"
+  },
+  "0.8.0": {
+    "sstim-core.ttl": "ddb3a1767842050861b1181261339acd1712c04353b0756b63a274b3df567a0d",
+    "sstim-vocab.ttl": "b596d5e7307e3076959417613ec241c6f96121dc2c28ca32daf16b3ee421f3b0",
+    "sstim-shapes.ttl": "29f17b08a34f49b5ad0496c93e87fa069c66af169c56ddcd87ff715678e33b65",
+    "sstim-alignments.ttl": "8d546ff3a38c35a1430dec272918e8078e640c4e5f26aded695831f7839a0ff1",
+    "sstim-patch-studio.ttl": "551f531ef01230d3dd1fca8e49ebb238b22931b973b2e7c64b7c9945951deda2",
+    "sstim-exposure.ttl": "d12e82a18c7515bec4d8f307ef836fbe1f910c3e7dea51e1a39b8e63b33c70b7",
+    "sstim-ecosystem.ttl": "6aa6b77db7f5d1dd74a629aacee170f0d9c0343f7bf79f3f7e3e927d1df2979d"
+  },
+  "0.9.0": {
+    "sstim-core.ttl": "648a0db698ce1aba2c0de89d91a5bd993bab768908096633083cd6d633ec1f99",
+    "sstim-vocab.ttl": "8f573a7b017ac4df140c32f0dd95cb8df9ccfa0581e9647106d924971b3a6bcc",
+    "sstim-shapes.ttl": "7efcdf9c14276a7a77b99b43c353d855c57a3d3f180c2fc1ecead8e0d5b137a5",
+    "sstim-alignments.ttl": "fc31e5ebab4f95a69d29150e4ffef81946b5b834d56e7f67e890996fb1afe683",
+    "sstim-patch-studio.ttl": "79e0772f7e569cfc3dd613aaa081d5e4ead9780c277c83ce2f05931837342c07",
+    "sstim-exposure.ttl": "a80b664368dfff062be4358e04f690f939a72bf8fd855b259c821d56cd63fa83",
+    "sstim-ecosystem.ttl": "4972e737adff38b4c2b7e067772168baa24f409505be5230d729aa06a31dc434"
+  },
+  "0.10.0": {
+    "sstim-core.ttl": "c7c6ba2821321c809dcb4bf34ff0168bc1222bc55680e7f93b451ccdad7eba08",
+    "sstim-vocab.ttl": "e8cb71e9f694874d267fb157d8465aa124d381d630ad51bece31e5229d077fc2",
+    "sstim-shapes.ttl": "30cb98ed842720a8859f5d4cba68e94df10ad2b947147417e97d33fdfcab55fe",
+    "sstim-alignments.ttl": "ca196d9b43fd8705d9594a4506427cf14d0a8a014f3cd771d489900f463f4dcc",
+    "sstim-patch-studio.ttl": "908189a7e4a9dfac6c6dd65555971cf4ae30f4a27c9dc94a603527153c8851c1",
+    "sstim-exposure.ttl": "fb84a07c8581ec9d5bff74f34452188b1dc6c8f54b4ce4d844382a1eea0596ae",
+    "sstim-ecosystem.ttl": "837bed43bb186fc94ca560072f7587b989d50138865ab98be3a279e26e9a705a"
+  }
+}
