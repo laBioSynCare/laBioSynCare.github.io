@@ -33,7 +33,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/vocab> a owl:Ontology ;
-    owl:versionInfo "0.9.0" ;
+    owl:versionInfo "0.10.0" ;
     dct:title "SSTIM Controlled Vocabulary"@en ;
     dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -42,7 +42,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-22"^^xsd:date ;
+    dct:modified "2026-07-23"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en ;
     skos:historyNote "0.7.0 adds orthogonal evidence-basis, proposition, scope, search, source-governance, review, and ecosystem relationship/purpose/outcome controlled values. Legacy overloaded evidence tags remain deprecated for compatibility."@en .
@@ -1170,7 +1170,10 @@ sstim-v:TechniqueScheme a skos:ConceptScheme ;
         sstim-v:techTACS,
         sstim-v:techDBS,
         sstim-v:techVagusNerveStimulation,
-        sstim-v:techIntrathecalNeuromodulatoryAgentDelivery .
+        sstim-v:techIntrathecalNeuromodulatoryAgentDelivery,
+        sstim-v:techElectroconvulsiveTherapy,
+        sstim-v:techNeurofeedback,
+        sstim-v:techBiofeedback .
 
 # ── Periodic auditory entrainment ───────────────────────────────────────
 
@@ -1239,6 +1242,7 @@ sstim-v:techBinauralBeats a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
     sstim:techniqueModality sstim-v:modalityAuditory ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
     skos:related sstim-v:voiceBinaural, sstim-v:techMonauralBeats .
 
 sstim-v:techFrequencyModulation a owl:NamedIndividual, sstim:SensoryStimulationTechnique, skos:Concept ;
@@ -1378,7 +1382,8 @@ sstim-v:techClosedLoopAuditory a owl:NamedIndividual, sstim:EntrainmentBasedTech
     skos:scopeNote "Strong conceptual fit for sleep slow-oscillation work; requires real-time sensing, so not a client-only lightweight feature."@en ;
     sstim:proposedMechanism sstim-v:mechClosedLoopPhase ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAdaptive ;
-    sstim:techniqueModality sstim-v:modalityAuditory .
+    sstim:techniqueModality sstim-v:modalityAuditory ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive .
 
 sstim-v:techSonification a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -1391,7 +1396,9 @@ sstim-v:techSonification a owl:NamedIndividual, sstim:NonEntrainmentTechnique, s
     skos:scopeNote "Requires sensors or user interaction; well suited to adaptive sessions and research."@en ;
     sstim:proposedMechanism sstim-v:mechClosedLoopPhase, sstim-v:mechAttentional ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalAdaptive ;
-    sstim:techniqueModality sstim-v:modalityAuditory .
+    sstim:techniqueModality sstim-v:modalityAuditory ;
+    sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory ;
+    skos:related sstim-v:techBiofeedback .
 
 # ── Perceptual / aesthetic ──────────────────────────────────────────────
 
@@ -1471,7 +1478,7 @@ sstim-v:techVibroacoustic a owl:NamedIndividual, sstim:NonEntrainmentTechnique, 
 # widened to sstim:StimulationTechnique first. Prior typing, 0.3.0-0.8.0:
 #   a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Concept
 # Frozen snapshots keep the old typing; this is a correction on mutable latest.
-sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Focused-Ultrasound Neuromodulation"@en,
                    "Neuromodulazione a Ultrasuoni Focalizzati"@it,
@@ -1729,6 +1736,9 @@ sstim-v:techTACS skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techDBS skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techVagusNerveStimulation skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techIntrathecalNeuromodulatoryAgentDelivery skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techElectroconvulsiveTherapy skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techNeurofeedback skos:topConceptOf sstim-v:TechniqueScheme .
+sstim-v:techBiofeedback skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAudiovisualEntrainment skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techAuditoryIllusion skos:topConceptOf sstim-v:TechniqueScheme .
 sstim-v:techBinauralBeats skos:topConceptOf sstim-v:TechniqueScheme .
@@ -2321,6 +2331,35 @@ sstim-v:approachSystemic a owl:NamedIndividual, sstim:StimulationDeliveryApproac
     skos:notation "approach-systemic" ;
     skos:definition "Distributed through the body as a whole rather than applied at an identified site."@en .
 
+# Invasiveness rollup (ADR 0035, from the 2026-07-22 Theo Marins interview, who
+# noted that neuromodulation divides first into invasive and non-invasive
+# techniques). Expressed as SKOS collections that GROUP the delivery-approach
+# values, not as a new primitive axis or a subsumption layer: ADR 0034
+# deliberately kept delivery approach coarse and non-exclusive, and invasive vs.
+# non-invasive is a rollup of it, not an independent facet. Collections leave the
+# scheme's top-concept structure untouched and add no OWL entailment. Systemic
+# distribution is deliberately in none of them: it is a route of distribution,
+# orthogonal to depth of tissue penetration.
+sstim-v:NonInvasiveApproachCollection a skos:Collection ;
+    rdfs:label "Non-invasive delivery approaches"@en ;
+    skos:definition "The rollup of delivery approaches that do not breach the skin or body: external, environmental / receptor-facing, transcutaneous, and transcranial."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    skos:member sstim-v:approachExternal, sstim-v:approachEnvironmentalReceptorFacing,
+        sstim-v:approachTranscutaneous, sstim-v:approachTranscranial .
+
+sstim-v:MinimallyInvasiveApproachCollection a skos:Collection ;
+    rdfs:label "Minimally-invasive delivery approaches"@en ;
+    skos:definition "The rollup of delivery approaches that cross the skin by needle puncture without leaving a permanent implant: percutaneous."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    skos:member sstim-v:approachPercutaneous .
+
+sstim-v:InvasiveApproachCollection a skos:Collection ;
+    rdfs:label "Invasive delivery approaches"@en ;
+    skos:definition "The rollup of delivery approaches that place a device or agent inside the body: implanted, intracranial, epidural, targeted local infusion, and intrathecal."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    skos:member sstim-v:approachImplanted, sstim-v:approachIntracranial, sstim-v:approachEpidural,
+        sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal .
+
 sstim-v:NeuralTargetSiteScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Neural Target Site Vocabulary"@en ,
                    "Vocabolario dei Siti Bersaglio Neurali SSTIM"@it ,
@@ -2730,6 +2769,68 @@ sstim-v:phenomenonAcousticStartleReflex a owl:NamedIndividual, sstim:NeuralPheno
     skos:notation "phenomenon-acoustic-startle-reflex" ;
     skos:definition "The startle reflex elicited by a sudden intense acoustic stimulus."@en .
 
+# ADR 0036: names "neuromodulation-as-effect" WITHOUT minting a class. A SKOS
+# collection grouping the state-change neural phenomena — the outcomes that
+# constitute an ongoing or lasting modulation of neural state — and deliberately
+# EXCLUDING the evoked/driven and reflex responses, which are the nervous system
+# following a stimulus rather than a modulation of its state. The effect sense
+# stays a facet over sstim:outcomeNeuralPhenomenon; this collection is the
+# queryable, legible handle (ADR 0036 Q2).
+sstim-v:NeuromodulatoryEffectCollection a skos:Collection ;
+    rdfs:label "Neuromodulatory effect (neural phenomena)"@en ;
+    skos:definition "The state-change neural phenomena that constitute a neuromodulatory effect when asserted in the outcome role (sstim:outcomeNeuralPhenomenon): changes in excitability or firing, oscillatory dynamics, temporal coordination, synaptic transmission, neurochemical signaling, connectivity or plasticity, and autonomic neural regulation. Evoked or driven responses and reflex responses are excluded: they are the nervous system following a stimulus, not a modulation of its state (ADR 0036)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    skos:member sstim-v:phenomenonExcitabilityOrFiring, sstim-v:phenomenonOscillatoryDynamics,
+        sstim-v:phenomenonTemporalCoordination, sstim-v:phenomenonSynapticTransmission,
+        sstim-v:phenomenonNeurochemicalSignaling, sstim-v:phenomenonConnectivityOrPlasticity,
+        sstim-v:phenomenonAutonomicNeuralRegulation .
+
+
+###########################################################################
+# Part 12b — Participant Engagement Mode Facet (ADR 0035)
+#
+# The sixth facet, orthogonal to the five ADR 0034 axes. It answers a question
+# none of them does: how much active participation does the method demand of the
+# individual? Raised in the 2026-07-22 Theo Marins interview, from the
+# observation that neurofeedback, biofeedback, meditation, and breathwork are set
+# apart from receptive stimulation by requiring the individual's own engagement.
+###########################################################################
+
+sstim-v:ParticipantEngagementModeScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Participant Engagement Mode Vocabulary"@en ,
+                   "Vocabolario delle Modalità di Coinvolgimento del Partecipante SSTIM"@it ,
+                   "Vocabulário de Modos de Envolvimento do Participante SSTIM"@pt ,
+                   "Vocabulario de Modos de Participación del Participante SSTIM"@es ;
+    skos:definition "The degree and kind of active participation a method requires of the individual, from passive reception through cue-following to active self-regulation."@en ;
+    skos:scopeNote "A single coarse ordinal-ish axis, deliberately orthogonal to route, approach, target site, system, and phenomenon (ADR 0034). Engagement mode is a property of the method, not a claim about efficacy, and does not by itself decide whether a method is neuromodulation (ADR 0035)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    skos:hasTopConcept sstim-v:engagementPassiveReceptive, sstim-v:engagementGuidedFollowing,
+        sstim-v:engagementActiveSelfRegulatory .
+
+sstim-v:engagementPassiveReceptive a owl:NamedIndividual, sstim:ParticipantEngagementMode, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantEngagementModeScheme ;
+    skos:topConceptOf sstim-v:ParticipantEngagementModeScheme ;
+    skos:prefLabel "Passive / Receptive"@en, "Passivo / Ricettivo"@it,
+                   "Passivo / Recetivo"@pt, "Pasivo / Receptivo"@es ;
+    skos:notation "engagement-passive-receptive" ;
+    skos:definition "The method delivers to a receptive individual who is not required to act on their own state — for example binaural beats played to a resting listener, photic driving, or an anaesthetised recipient of ECT. A closed-loop automated system (such as sleep-phase-locked auditory stimulation) is still passive when the individual does not self-regulate."@en .
+
+sstim-v:engagementGuidedFollowing a owl:NamedIndividual, sstim:ParticipantEngagementMode, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantEngagementModeScheme ;
+    skos:topConceptOf sstim-v:ParticipantEngagementModeScheme ;
+    skos:prefLabel "Guided / Cue-Following"@en, "Guidato / A Seguito di Segnale"@it,
+                   "Guiado / A Seguir Sinal"@pt, "Guiado / Siguiendo Señal"@es ;
+    skos:notation "engagement-guided-following" ;
+    skos:definition "The individual actively follows an external pacing cue but does not regulate from their own internal feedback — for example following BSC's Martigli paced-breathing guidance or a movement cue. Between passive reception and self-regulation."@en .
+
+sstim-v:engagementActiveSelfRegulatory a owl:NamedIndividual, sstim:ParticipantEngagementMode, skos:Concept ;
+    skos:inScheme sstim-v:ParticipantEngagementModeScheme ;
+    skos:topConceptOf sstim-v:ParticipantEngagementModeScheme ;
+    skos:prefLabel "Active / Self-Regulatory"@en, "Attivo / Autoregolatorio"@it,
+                   "Ativo / Autorregulatório"@pt, "Activo / Autorregulatorio"@es ;
+    skos:notation "engagement-active-self-regulatory" ;
+    skos:definition "The method's mechanism requires the individual to actively regulate their own state, typically toward a goal they perceive — for example meditation, volitional breathwork, neurofeedback, and biofeedback. The modulation is produced endogenously by the individual, which is the crux discussed in ADR 0035."@en .
+
 # ── ADR 0034: non-sensory neuromodulation contrast set ──────────────────
 # Catalogued so the ontology can DESCRIBE these boundary methods, and so the
 # neural-access-route axis is exercised across three distinct routes rather
@@ -2739,7 +2840,7 @@ sstim-v:phenomenonAcousticStartleReflex a owl:NamedIndividual, sstim:NeuralPheno
 # efficacy, nor safety. Characteristic delivery media are asserted in
 # sstim-exposure.ttl, which already depends on this module.
 
-sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Repetitive Transcranial Magnetic Stimulation"@en,
                    "Stimolazione Magnetica Transcranica Ripetitiva"@it,
@@ -2755,7 +2856,7 @@ sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique,
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
     skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and not consumer-platform feasible."@en .
 
-sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Transcranial Direct Current Stimulation"@en,
                    "Stimolazione Transcranica a Corrente Continua"@it,
@@ -2771,7 +2872,7 @@ sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Con
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
     skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
 
-sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Transcranial Alternating Current Stimulation"@en,
                    "Stimolazione Transcranica a Corrente Alternata"@it,
@@ -2787,7 +2888,7 @@ sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Con
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
     skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
 
-sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Deep Brain Stimulation"@en,
                    "Stimolazione Cerebrale Profonda"@it,
@@ -2803,7 +2904,7 @@ sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Conc
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
     skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and outside its scope entirely."@en .
 
-sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
     skos:prefLabel "Vagus Nerve Stimulation"@en,
                    "Stimolazione del Nervo Vago"@it,
@@ -2835,4 +2936,72 @@ sstim-v:techIntrathecalNeuromodulatoryAgentDelivery a owl:NamedIndividual, sstim
     sstim:intendedNeuralTargetSite sstim-v:targetCentralNervousSystem, sstim-v:targetSpinalCord ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonNeurochemicalSignaling ;
     skos:editorialNote "Catalogued for domain completeness. A clinical method, not deliverable by BSC Lab."@en .
+
+# ADR 0035: electroconvulsive therapy, added at the suggestion of Theo Marins
+# (2026-07-22). It completes the contrast set's coverage of the established
+# convulsive branch of brain-stimulation therapies and, as the recipient is
+# anaesthetised, exercises the passive extreme of the new engagement axis.
+sstim-v:techElectroconvulsiveTherapy a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Electroconvulsive Therapy"@en,
+                   "Terapia Elettroconvulsivante"@it,
+                   "Eletroconvulsoterapia"@pt,
+                   "Terapia Electroconvulsiva"@es ;
+    skos:notation "electroconvulsive-therapy" ;
+    skos:definition "Brief electrical stimulation applied through scalp electrodes to deliberately induce a generalized seizure under anaesthesia, with the objective of altering brain activity."@en ;
+    skos:scopeNote "A clinical psychiatric neuromodulation method, catalogued only so the ontology can describe the convulsive branch of established brain-stimulation therapy. Emphatically outside any consumer or wellness context and not deliverable by BSC Lab. The induced seizure is the deliberate mechanism, which separates it from stimulation applied merely to probe a response; efficacy and safety remain evidence questions this catalogue does not answer."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
+    sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain ;
+    sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
+    sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
+    skos:editorialNote "Catalogued for domain completeness at the suggestion of Theo Marins (2026-07-22 interview, ADR 0035). Not deliverable by BSC Lab and outside its scope entirely."@en .
+
+
+# ── ADR 0035: closed-loop self-regulation techniques ────────────────────
+# Neurofeedback and biofeedback. Theo Marins (2026-07-22) places both closer to
+# neuromodulation than to neurostimulation. They are typed at the NEUTRAL
+# sstim:StimulationTechnique layer, not as sstim:NeuromodulationTechnique or
+# sstim:SensoryStimulationTechnique: the feedback signal enters through canonical
+# sensory transduction, yet the modulation is produced by the individual's own
+# endogenous self-regulation, which the current sstim:Neuromodulation definition
+# excludes. Neutral typing records the method without prejudging that scope
+# question, which ADR 0035 keeps open rather than reopening ADR 0034's frozen
+# 0.9.0 decision. They exercise the active extreme of the engagement axis.
+
+sstim-v:techNeurofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Neurofeedback"@en,
+                   "Neurofeedback"@it,
+                   "Neurofeedback"@pt,
+                   "Neurofeedback"@es ;
+    skos:notation "neurofeedback" ;
+    skos:definition "A closed-loop practice in which a measured brain signal (typically EEG) is rendered back to the individual as sensory feedback so that they can learn to self-regulate that neural activity."@en ;
+    skos:scopeNote "Self-directed neuromodulation (ADR 0036): a neuromodulation technique whose agency is the individual's own regulation, marked by the active-self-regulatory engagement mode. The feedback enters through canonical sensory transduction (its declared route) and is presented externally; the neural change itself is the intended effect, recorded on the outcome facet, not asserted as achieved here. Theo Marins (2026-07-22) placed neurofeedback closer to neuromodulation than to neurostimulation, which ADR 0036 adopts."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalAdaptive ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal ;
+    sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
+    sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory ;
+    skos:related sstim-v:techSonification, sstim-v:techClosedLoopAuditory ;
+    skos:editorialNote "Added from the 2026-07-22 Theo Marins interview; typed as self-directed neuromodulation by ADR 0036."@en .
+
+sstim-v:techBiofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
+    skos:inScheme sstim-v:TechniqueScheme ;
+    skos:prefLabel "Biofeedback"@en,
+                   "Biofeedback"@it,
+                   "Biofeedback"@pt,
+                   "Biofeedback"@es ;
+    skos:notation "biofeedback" ;
+    skos:definition "A closed-loop practice in which a measured physiological signal (heart rate, heart-rate variability, respiration, muscle tension, or skin conductance) is rendered back to the individual as sensory feedback so that they can learn to self-regulate that function."@en ;
+    skos:scopeNote "Self-directed neuromodulation (ADR 0036), marked by the active-self-regulatory engagement mode. Its neuromodulation status is clearest for autonomically mediated forms — heart-rate-variability biofeedback trains vagal and baroreflex regulation; peripheral forms such as EMG muscle biofeedback sit closer to motor self-regulation than to neural modulation, so the neural target is recorded broadly. Auditory biofeedback is the sonification case (sstim-v:techSonification); HRV/paced-breathing biofeedback connects to BSC's Martigli breathing component. Theo Marins (2026-07-22) placed biofeedback closer to neuromodulation than to neurostimulation, which ADR 0036 adopts."@en ;
+    sstim:hasStimulusTemporalStructure sstim-v:temporalAdaptive ;
+    sstim:neuralAccessRoute sstim-v:routeCanonicalSensoryTransductionAfferent ;
+    sstim:stimulationDeliveryApproach sstim-v:approachExternal ;
+    sstim:intendedNeuralTargetSite sstim-v:targetPeripheralNervousSystem ;
+    sstim:intendedNeuralSystem sstim-v:systemAutonomic ;
+    sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory ;
+    skos:related sstim-v:techSonification ;
+    skos:editorialNote "Added from the 2026-07-22 Theo Marins interview; typed as self-directed neuromodulation by ADR 0036."@en .
 

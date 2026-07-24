@@ -33,7 +33,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.9.0" ;
+    owl:versionInfo "0.10.0" ;
     dct:title "SSTIM Patch Studio Parameter Module"@en ;
     dct:description "Datatype properties for reproducibly specifying SSTIM audio voices and Patch Studio session-authoring parameters."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -42,7 +42,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-17"^^xsd:date ;
     dct:issued "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-22"^^xsd:date ;
+    dct:modified "2026-07-23"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
