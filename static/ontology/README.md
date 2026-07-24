@@ -16,12 +16,11 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.9.0`, DOI
-  [10.5281/zenodo.21493918](https://doi.org/10.5281/zenodo.21493918), version
-  IRI `https://w3id.org/sstim/0.9.0`.
+- Latest immutable release: `v0.10.0`, version DOI pending (Zenodo mints it from
+  the `v0.10.0` tag), version IRI `https://w3id.org/sstim/0.10.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the validated `0.9.0` release sources; core claims the whole-set
+- Live sources: the validated `0.10.0` release sources; core claims the whole-set
   `owl:versionIRI` and every public module carries synchronized
   `owl:versionInfo`.
 - Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
@@ -31,7 +30,7 @@ the graph.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
-The frozen [`0.9.0/`](0.9.0) directory is immutable and is the current citable
+The frozen [`0.10.0/`](0.10.0) directory is immutable and is the current citable
 whole-set release.
 
 ## Files
@@ -48,7 +47,7 @@ static/ontology/
 |-- sstim-ecosystem.ttl     Ecosystem agents, relationships, and consent lifecycle
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
-|-- 0.1.0/ ... 0.9.0/      Immutable whole-set snapshots
+|-- 0.1.0/ ... 0.10.0/     Immutable whole-set snapshots
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
     |-- implementations/    BSC Lab and public-safe BioSynCare identities
@@ -447,7 +446,8 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.9.0` for the current immutable citation:
+Use SSTIM `v0.10.0` for the current immutable citation (version DOI pending;
+the concept DOI below applies meanwhile):
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -455,8 +455,8 @@ Use SSTIM `v0.9.0` for the current immutable citation:
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21493918},
-  url       = {https://doi.org/10.5281/zenodo.21493918}
+  doi       = {10.5281/zenodo.21286974},
+  url       = {https://doi.org/10.5281/zenodo.21286974}
 }
 ```
 

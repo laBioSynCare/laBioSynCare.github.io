@@ -8,7 +8,7 @@ live under [`static/ontology/`](../../static/ontology/README.md).
 
 - Stable namespace: `https://w3id.org/sstim`
 - Prefix: `sstim`
-- Current citable release: `0.9.0`
+- Current citable release: `0.10.0`
 - Next development line: not yet opened
 - Ontology license: CC BY 4.0
 - Current release DOI: `10.5281/zenodo.21493918`
@@ -54,7 +54,7 @@ real participant records are excluded.
 - [External automated review - 2026-07-10](reviews/2026-07-10-external-automated-review.md):
   OOPS/FOOPS results, authoritative identifier and safety-source checks, and
   accepted/rejected finding dispositions. The maintainer accepted `0.6.0`;
-  `0.7.0` and `0.9.0` subsequently passed the expanded automated OWL, SHACL,
+  `0.7.0`, `0.9.0`, and `0.10.0` subsequently passed the expanded automated OWL, SHACL,
   quality, round-trip, runtime, and build gates. Independent human review
   remains desirable and is not claimed. The post-0.6 canonical FOOPS rerun
   scores 87.5%.

@@ -12,9 +12,12 @@ abstract: >-
   protocols, parameters, qualified evidence assessments, and ecosystem
   relationships. Committed ecosystem-agent fixtures are synthetic.
 type: software
-version: 0.9.0
-date-released: 2026-07-22
-doi: 10.5281/zenodo.21493918
+version: 0.10.0
+date-released: 2026-07-24
+# Version DOI pending: Zenodo mints it from the GitHub release archived off
+# the v0.10.0 tag, so it is recorded in a follow-up commit. 10.5281/zenodo.21286974
+# remains the all-versions concept DOI.
+doi: 10.5281/zenodo.21286974
 authors:
   - family-names: Fabbri
     given-names: Renato

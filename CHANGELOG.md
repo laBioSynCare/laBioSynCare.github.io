@@ -15,6 +15,48 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-07-24
+
+Version DOI pending — Zenodo mints it from the GitHub release archived off the
+`v0.10.0` tag; a follow-up commit records it. `10.5281/zenodo.21286974` remains
+the all-versions concept DOI.
+
+Participant engagement and neurostimulation release
+([ADR 0035](docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md),
+[ADR 0036](docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md)),
+from the 2026-07-22 Dr. Theo Marins (University of Graz) interview on
+neuromodulation. Additive; no term removed or renamed. Frozen `0.3.0`–`0.9.0`
+snapshots are untouched.
+
+### Added
+- Participant-engagement-mode facet: `sstim:ParticipantEngagementMode` class,
+  `sstim:participantEngagementMode` property, and a three-concept scheme
+  (passive-receptive / guided-following / active-self-regulatory) — a sixth axis
+  orthogonal to the five ADR 0034 facets.
+- `sstim:Neurostimulation` (the stimulation-based branch of interventional
+  neuromodulation) and the browsable `sstim:NeurostimulationTechnique`, with the
+  seven energy techniques (rTMS, tDCS, tACS, DBS, VNS, ECT, focused-ultrasound)
+  typed under it; the self-directed / interventional split
+  (`sstim:SelfDirectedNeuromodulation`, `sstim:InterventionalNeuromodulation`);
+  and `sstim:Neuroplasticity` as a `bfo:disposition` stub.
+- `sstim-v:techElectroconvulsiveTherapy` in the non-sensory contrast set;
+  `sstim-v:techNeurofeedback` and `sstim-v:techBiofeedback` as self-directed
+  neuromodulation techniques.
+- `sstim-v:NeuromodulatoryEffectCollection` naming the effect sense of
+  neuromodulation over the outcome-phenomenon facet; invasive /
+  minimally-invasive / non-invasive SKOS collections over the delivery-approach
+  values.
+
+### Changed
+- `sstim:Neuromodulation` scope refined: pinned to the intervention sense
+  (distinct from the physiological effect sense), excluding spontaneous
+  physiological neurotransmitter-level modulation but admitting deliberate
+  self-directed neuromodulation. `skos:note`s on `sstim:Neuromodulation` and
+  `sstim:Neurostimulation` spell out the intervention-vs-effect and
+  with-vs-without-participant-engagement axes.
+- `sstim-v:techNeurofeedback` and `sstim-v:techBiofeedback` re-typed from the
+  neutral `sstim:StimulationTechnique` layer to `sstim:NeuromodulationTechnique`.
+
 ## [0.9.0] - 2026-07-22
 
 Published under version DOI `10.5281/zenodo.21493918`, with

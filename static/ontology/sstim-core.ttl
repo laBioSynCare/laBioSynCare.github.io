@@ -62,7 +62,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-23"^^xsd:date ;
+    dct:modified "2026-07-24"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
     dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
@@ -70,7 +70,7 @@
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
-    mod:status "under development"@en ;
+    mod:status "released"@en ;
     foaf:logo <https://labiosyncare.github.io/icons/icon.svg> ;
     vann:preferredNamespacePrefix "sstim" ;
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;

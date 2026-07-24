@@ -50,7 +50,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-23"^^xsd:date ;
+    dct:modified "2026-07-24"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 

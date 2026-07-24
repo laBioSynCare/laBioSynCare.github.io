@@ -15,14 +15,14 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-07-22:
+As of 2026-07-24:
 
-- **Latest immutable release:** SSTIM `v0.9.0`, archived at
-  [10.5281/zenodo.21493918](https://doi.org/10.5281/zenodo.21493918) and
-  identified by `https://w3id.org/sstim/0.9.0`.
+- **Latest immutable release:** SSTIM `v0.10.0`, archived at
+  *version DOI pending — Zenodo mints it from the `v0.10.0` tag* and
+  identified by `https://w3id.org/sstim/0.10.0`.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** the validated `0.9.0` release sources. The core
+- **Live ontology sources:** the validated `0.10.0` release sources. The core
   claims the whole-set `owl:versionIRI`; all seven modules share synchronized
   `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
@@ -43,7 +43,7 @@ As of 2026-07-22:
 - **External review:** the 2026-07-10
   [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
   is resolved for release, and the maintainer guided and accepted the ontology
-  changes. The maintainer accepted `0.9.0` after the automated OWL, SHACL,
+  changes. The maintainer accepted `0.10.0` after the automated OWL, SHACL,
   quality, round-trip, runtime, and build gates passed; independent human
   ontology review is not claimed. The deployed canonical FOOPS score is 87.5%; the
   remaining failures are registry-dependent.
@@ -147,7 +147,7 @@ make export     # JSON-LD and RDF/XML serializations of all seven modules
 5. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
 
-The immutable [`static/ontology/0.9.0/`](static/ontology/0.9.0) snapshot is not
+The immutable [`static/ontology/0.10.0/`](static/ontology/0.10.0) snapshot is not
 edited after publication. Future releases are cut only after validation,
 version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 
@@ -217,9 +217,9 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.9.0` using
-[10.5281/zenodo.21493918](https://doi.org/10.5281/zenodo.21493918). Its stable
-version IRI is `https://w3id.org/sstim/0.9.0`. Use the
+For the released ontology, cite SSTIM `v0.10.0` (version DOI pending — Zenodo
+mints it from the `v0.10.0` tag). Its stable
+version IRI is `https://w3id.org/sstim/0.10.0`. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

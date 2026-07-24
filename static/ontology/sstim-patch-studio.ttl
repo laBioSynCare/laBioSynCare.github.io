@@ -42,7 +42,7 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-17"^^xsd:date ;
     dct:issued "2026-06-17"^^xsd:date ;
-    dct:modified "2026-07-23"^^xsd:date ;
+    dct:modified "2026-07-24"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
