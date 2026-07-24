@@ -15,20 +15,22 @@ top-level and instance Turtle documents through the published `context.jsonld`
 the other 27). All counts, citations, and quotations held; none required
 correction.
 
-**Implementation status (2026-07-24, same day):** Gate A is implemented except
-for the three sub-items that require the maintainer's own action outside this
-repository (RDF-01, RDF-02, RDF-11 fixed; RDF-03, RDF-12 partially fixed).
-Gate B is also implemented for the findings a same-session pass could
-responsibly close: RDF-04, RDF-05, RDF-17 fixed; RDF-08, RDF-09, RDF-13,
-RDF-15 partially fixed where the remainder is either a maintainer policy
-decision (ADR 0020/RDF-12) or a separate, larger modeling project (the full
-oscillation-band/stimulus-target split of RDF-08) rather than a mechanical
-fix. See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
+**Implementation status (2026-07-24, same day):** Gate A and Gate B are
+implemented for everything a same-session pass could responsibly close, and
+**`0.11.0` has shipped**: tagged, frozen under `static/ontology/0.11.0/`, and
+archived by Zenodo at `10.5281/zenodo.21536124` (RDF-01, RDF-02, RDF-11 fixed;
+RDF-03, RDF-12 partially fixed; RDF-04, RDF-05, RDF-17 fixed; RDF-08, RDF-09,
+RDF-13, RDF-15 partially fixed where the remainder is either a maintainer
+policy decision (ADR 0020/RDF-12) or a separate, larger modeling project — the
+full oscillation-band/stimulus-target split of RDF-08 — rather than a
+mechanical fix). See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
 the "Status" note under each finding, and the checked-off Gate A/B lists for
 specifics. `make validate` and the full Vitest suite (19 files, 151 tests)
-pass with all of these changes in place. The version bumped to `0.11.0`
-(unreleased) — a MINOR, not a patch, because Gate B adds real new terms.
-RDF-06, RDF-07, RDF-10, RDF-14, RDF-16, RDF-18, and RDF-19 (Gates C/D/E) are
+pass with all of these changes in place. The version bumped to `0.11.0` — a
+MINOR, not a patch, because Gate B adds real new terms. One item remains
+outside what a repository edit can do: the visible erratum against the
+already-archived `0.8.0`-`0.10.0` Zenodo records. RDF-06, RDF-07, RDF-10,
+RDF-14, RDF-16, RDF-18, and RDF-19 (Gates C/D/E) are
 untouched.
 
 ## Executive assessment
@@ -43,9 +45,10 @@ The repository nevertheless has three release-level defects that should be
 corrected before the next ordinary feature release:
 
 1. the frozen `0.10.0` RDF identifies itself as `0.10.0` while citing the
-   `0.7.0` version DOI and citation — **fixed as an unreleased `0.11.0` patch**
-   in the live tree; still needs a reserved DOI, a real snapshot, and a visible
-   erratum against the archived `0.8.0`-`0.10.0` records (see RDF-01's status);
+   `0.7.0` version DOI and citation — **fixed and released as `0.11.0`**
+   (`10.5281/zenodo.21536124`); still needs a visible erratum against the
+   already-archived `0.8.0`-`0.10.0` records, which cannot be corrected in
+   place (see RDF-01's status);
 2. the public JSON-LD context loses the 96 blank-node distribution-description
    triples in `void.ttl` in the repository's RDFLib compact/parse path —
    **fixed and gated** (see RDF-02's status); and
@@ -80,7 +83,7 @@ are the next stabilization work, still ahead of any scope-expansion release.
 |---|---|
 | Vocabulary browsing, competency queries, and synthetic examples | Ready, with the documented semantic caveats |
 | Reuse of individual public modules | Usable, but consumers need a version-specific immutable dependency manifest (checksums for existing snapshots now exist; a discoverable manifest/aggregate at the version IRI does not yet) |
-| Citation of `0.10.0` RDF metadata | Fix prepared as an unreleased `0.11.0` patch (live tree only); still needs a reserved Zenodo DOI, `make snapshot 0.11.0`, and a visible erratum against the already-archived `0.8.0`-`0.10.0` records |
+| Citation of `0.10.0` RDF metadata | Superseded: cite `0.11.0` (`10.5281/zenodo.21536124`) instead. `0.8.0`-`0.10.0` still self-cite the wrong DOI internally; still needs a visible erratum pointing at the archived records |
 | RDFLib compact export with `context.jsonld` | Fixed — all 28 top-level and instance documents now round-trip isomorphically; gated by `make context-roundtrip` in `make validate` |
 | Public-copy authorization | Not implemented; the legacy gate is reject-only |
 | Acoustically identical session reproduction | Not supported by the captured contract |
@@ -251,21 +254,30 @@ generated counts. Reserve the Zenodo DOI before freezing, or publish a
 version-specific metadata sidecar whose lifecycle is explicitly separate from
 the immutable Turtle snapshot.
 
-**Status (2026-07-24):** the live tree (not `0.10.0` or any other frozen
-snapshot) now carries an unreleased `0.11.0` Gate A/B stabilization pass:
-`owl:versionIRI` / `owl:versionInfo` bumped (to `0.11.0`, a MINOR bump — Gate
-B below adds real terms, so this outgrew a patch), `dct:hasVersion` /
-`dct:bibliographicCitation` removed pending a real `0.11.0` DOI (the `0.5.0`
-no-version-DOI-at-freeze precedent), the `v0.10.0` history note's "under
-development" vs. `released` contradiction fixed, all seven module header
-comments and `void.ttl`'s `dct:modified` / `void:triples` synced, and the
-stale README counts corrected. `CHANGELOG.md` records it under `[Unreleased]`.
-Three items remain, outside what a repository edit can do: reserve the
-`0.11.0` Zenodo DOI, run `make snapshot 0.11.0` once that DOI is filled back
-in, and publish a visible erratum against the already-archived
-`0.8.0`-`0.10.0` Zenodo records (their content cannot be corrected in place).
-The cross-checking release gate is not
-yet built as a single manifest — see RDF-11's status.
+**Status (2026-07-24): fixed and released.** `0.11.0` is tagged, frozen under
+`static/ontology/0.11.0/`, and archived by Zenodo at
+`10.5281/zenodo.21536124` (GitHub release → Zenodo auto-archival; recorded in
+`CITATION.cff`, `CHANGELOG.md`, and all three READMEs). `owl:versionIRI` /
+`owl:versionInfo` bumped to `0.11.0` (a MINOR bump — Gate B adds real terms,
+so this outgrew a patch); the `v0.10.0` history note's "under development"
+vs. `released` contradiction fixed; all seven module header comments and
+`void.ttl`'s `dct:modified` / `void:triples` synced; the stale README counts
+corrected.
+
+**Resolved policy question:** the frozen, snapshotted `sstim-core.ttl` never
+carries the version-specific DOI, on any release — Zenodo can only mint a DOI
+from a GitHub release cut off an already-frozen tag, so a snapshotted file
+can never truthfully self-cite its own DOI without drifting from what was
+actually archived after the fact. `void.ttl`, the designated non-snapshotted
+sidecar (per its own file header), carries `dct:hasVersion` instead, and is
+authoritative for it. This matches the historical pattern (confirmed in
+`fc59098`, the `0.10.0` "record DOI" commit, which touched only docs, never
+the ontology Turtle) and the `0.5.0` precedent, made explicit rather than
+silently repeated. Two items remain, outside what a repository edit can do:
+publish a visible erratum against the already-archived `0.8.0`-`0.10.0`
+Zenodo records (their content cannot be corrected in place, and now that
+`0.11.0` exists, there is somewhere for it to point). The cross-checking
+release gate is not yet built as a single manifest — see RDF-11's status.
 
 #### RDF-02 — RDFLib compact serialization with the public context loses VoID distribution details
 
@@ -890,11 +902,10 @@ Complete before publishing more ontology scope:
 2. ☑ fix the public-context/RDFLib export interaction and test all 28 top-level
    and committed instance Turtle documents with it — **done**
    (`make context-roundtrip`);
-3. ☐ cut a corrective release with coherent version, DOI, status, dates,
-   citation, VoID, history, counts, and generated documentation —
-   **metadata coherence prepared in the live tree as unreleased `0.11.0`;
-   cutting the actual release needs a reserved DOI, then `make snapshot 0.11.0`**;
-4. ☐ publish a versioned whole-set manifest or aggregate with checksums —
+3. ☑ cut a corrective release with coherent version, DOI, status, dates,
+   citation, VoID, history, counts, and generated documentation — **done**:
+   `0.11.0` is tagged, frozen, and archived at `10.5281/zenodo.21536124`;
+4. ☑ publish a versioned whole-set manifest or aggregate with checksums —
    **checksums done for existing snapshots (`snapshot-checksums.json`,
    `make verify-snapshots`); a discoverable manifest/aggregate at the version
    IRI itself is still open**;
@@ -905,9 +916,9 @@ Complete before publishing more ontology scope:
 
 **Exit criterion:** a consumer can start from the version IRI, discover the
 entire frozen set, verify it, use the public context without graph loss, and
-obtain one unambiguous citation. **Not yet met** — items 1, 3, and the manifest
-half of item 4 remain, and none of them can be closed by an in-repository edit
-alone.
+obtain one unambiguous citation. **Not yet met** — item 1 remains (needs the
+maintainer's Zenodo access, not an in-repository edit), and the manifest half
+of item 4 is a separate, not-yet-done implementation task.
 
 ### Gate B — semantic stabilization
 

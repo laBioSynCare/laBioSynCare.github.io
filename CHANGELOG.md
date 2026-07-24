@@ -17,9 +17,8 @@ file is the human-readable summary.
 
 ## [0.11.0] - 2026-07-24
 
-Version DOI pending — Zenodo mints it from the GitHub release archived off the
-`v0.11.0` tag; a follow-up commit records it. `10.5281/zenodo.21286974` remains
-the all-versions concept DOI.
+Published under version DOI `10.5281/zenodo.21536124`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
 
 Gate A (release integrity) + Gate B (semantic stabilization) of the
 [2026-07-24 RDF structure and publication audit](docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md).

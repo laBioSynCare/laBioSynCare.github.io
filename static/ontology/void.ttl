@@ -47,9 +47,15 @@
     dct:issued "2026-04-12"^^xsd:date ;
     dct:modified "2026-07-24"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
-    # dct:hasVersion (version-specific DOI) intentionally omitted pending the
-    # 0.11.0 Zenodo DOI reservation — see sstim-core.ttl and the RDF-01 finding
-    # in docs/ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md.
+    # RDF-01 policy resolution (2026-07-24 audit): void.ttl is the designated,
+    # non-snapshotted sidecar (see this file's own header), so it is the
+    # authoritative place for the version-specific DOI Zenodo mints only after
+    # the release exists. sstim-core.ttl, which IS snapshotted, deliberately
+    # does not carry it — the chicken-and-egg problem is real (Zenodo cannot
+    # mint a DOI for a release that has not been cut yet), and updating the
+    # live core.ttl post-freeze would only diverge it from the already-frozen
+    # static/ontology/0.11.0/ copy without fixing anything.
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21536124> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
