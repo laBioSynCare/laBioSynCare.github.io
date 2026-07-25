@@ -111,8 +111,8 @@
           value={$graphNavigation.strayMode}
           onchange={(event) => $graphNavigation.setStrayMode(event.currentTarget.value)}
         >
-          <option value="all">Grid all disconnected</option>
-          <option value="singletons">Grid singletons only</option>
+          <option value="all">Set aside all disconnected</option>
+          <option value="singletons">Set aside singletons only</option>
         </select>
         <button type="button" class="topbar-control secondary" title="Center on selected node (c)" onclick={$graphNavigation.center} disabled={!$graphNavigation.canCenter}>
           Center
@@ -219,7 +219,9 @@
     flex: 1;
     min-width: 0;
     display: grid;
-    grid-template-columns: minmax(160px, 240px) minmax(220px, 1fr) auto;
+    /* Wide enough for the longest scope label ("Full SSTIM · ontology &
+       vocabulary") to read without truncating. */
+    grid-template-columns: minmax(180px, 290px) minmax(200px, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
   }

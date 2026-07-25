@@ -21,16 +21,22 @@
     <script>
       // Apply the stored (or default) skin before first paint to avoid a
       // flash of the wrong theme. Must stay in sync with src/ui/theme/skins.js.
+      // data-theme is set alongside data-skin because Pico's dark palette is
+      // scoped to `:root:not([data-theme])` under a prefers-color-scheme
+      // media query; without it, a light skin on a dark-mode OS inherits
+      // Pico's dark text on our light surfaces.
       (function () {
+        var ids = ['midnight', 'aurora', 'ember', 'daylight', 'paper'];
+        var darkIds = ['midnight', 'aurora', 'ember'];
+        var fallback = 'paper';
+        var skin = fallback;
         try {
-          var ids = ['midnight', 'aurora', 'ember', 'daylight', 'paper'];
-          var fallback = 'paper';
           var stored = localStorage.getItem('bsclab.skin');
-          document.documentElement.dataset.skin =
-            ids.indexOf(stored) !== -1 ? stored : fallback;
-        } catch (e) {
-          document.documentElement.dataset.skin = 'paper';
-        }
+          if (ids.indexOf(stored) !== -1) skin = stored;
+        } catch (e) { /* private mode / storage blocked — keep the default */ }
+        document.documentElement.dataset.skin = skin;
+        document.documentElement.dataset.theme =
+          darkIds.indexOf(skin) !== -1 ? 'dark' : 'light';
       })();
     </script>
     %sveltekit.head%

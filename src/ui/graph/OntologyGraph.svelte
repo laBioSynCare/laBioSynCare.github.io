@@ -6,6 +6,7 @@
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
+  import { activeSkin } from '../theme/skins.js'
 
   const { store, liveStatus = null, onRefreshLive = null } = $props()
 
@@ -256,12 +257,47 @@
     return '#888'
   }
 
+  // The node palette is fixed (it encodes term kind, not skin), but the
+  // chrome around it — selection ring, edge labels, node outlines — has to
+  // track the active skin. Hardcoded light-on-dark values disappear on the
+  // paper/daylight skins, so resolve the real tokens from the container.
+  function themeTokens() {
+    const fallback = {
+      accent: '#3b9eff', canvas: '#0b0b0c', text: '#d7e1ec',
+      muted: '#8292a7', font: 'Inter, system-ui, sans-serif', dark: true,
+    }
+    if (typeof window === 'undefined' || !container) return fallback
+    const cs = getComputedStyle(container)
+    const read = (name, fb) => cs.getPropertyValue(name).trim() || fb
+    const canvas = read('--app-canvas', fallback.canvas)
+    return {
+      accent: read('--app-accent', fallback.accent),
+      canvas,
+      text: read('--app-text-strong', fallback.text),
+      muted: read('--app-muted', fallback.muted),
+      font: read('--app-font-ui', fallback.font),
+      dark: isDarkColor(canvas),
+    }
+  }
+
+  // Relative luminance of a #rgb/#rrggbb token; drives whether outlines and
+  // label halos are drawn light-on-dark or dark-on-light.
+  function isDarkColor(value) {
+    const hex = value.replace('#', '')
+    const full = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex
+    if (full.length < 6) return true
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16) / 255)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b < 0.5
+  }
+
   function styleSheet() {
+    const theme = themeTokens()
     return [
       {
         selector: 'node',
         style: {
           'label': 'data(label)',
+          'font-family': theme.font,
           'font-size': 11,
           'text-valign': 'center',
           'text-halign': 'center',
@@ -273,9 +309,11 @@
           'shape': 'round-rectangle',
           'background-color': (ele) => nodeColor(ele.data()),
           'border-width': 1.5,
-          'border-color': 'rgba(255, 255, 255, 0.13)',
+          'border-color': theme.dark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(23, 19, 13, 0.22)',
           'color': '#111',
           'font-weight': 500,
+          'transition-property': 'border-color, border-width, opacity',
+          'transition-duration': '120ms',
         }
       },
       {
@@ -316,7 +354,25 @@
       },
       {
         selector: 'node:selected',
-        style: { 'border-width': 3, 'border-color': '#fff', 'z-index': 999 }
+        style: {
+          'border-width': 3.5,
+          'border-color': theme.accent,
+          'z-index': 999,
+        }
+      },
+      // Hover affordance — cytoscape has no :hover selector, so the class is
+      // toggled from mouseover/mouseout handlers in onMount.
+      {
+        selector: 'node.hovered',
+        style: {
+          'border-width': 3,
+          'border-color': theme.accent,
+          'z-index': 900,
+        }
+      },
+      {
+        selector: 'edge.hovered',
+        style: { 'width': 3, 'opacity': 1, 'z-index': 900 }
       },
       {
         selector: 'edge:selected',
@@ -329,8 +385,15 @@
           'target-arrow-shape': 'triangle',
           'curve-style': 'bezier',
           'label': '',
+          'font-family': theme.font,
           'font-size': 9,
-          'color': '#ccc',
+          'color': theme.muted,
+          // A halo in the canvas colour keeps property labels readable where
+          // they cross edges or sit over a dense cluster.
+          'text-background-color': theme.canvas,
+          'text-background-opacity': 0.82,
+          'text-background-shape': 'roundrectangle',
+          'text-background-padding': 2,
           'text-rotation': 'autorotate',
           'text-margin-y': -8,
           'opacity': 0.8,
@@ -357,8 +420,17 @@
         style: { 'line-color': COLORS.related, 'target-arrow-color': COLORS.related, 'line-style': 'dashed', 'target-arrow-shape': 'none' }
       },
       {
+        // instanceOf is by far the densest layer (typically ~70% of all edges).
+        // Kept recessive so the semantic structure — subClassOf, narrower,
+        // properties — stays readable through it.
         selector: 'edge[kind="instanceOf"]',
-        style: { 'line-color': COLORS.instanceOf, 'target-arrow-color': COLORS.instanceOf, 'line-style': 'dotted', 'opacity': 0.5 }
+        style: {
+          'line-color': COLORS.instanceOf,
+          'target-arrow-color': COLORS.instanceOf,
+          'line-style': 'dotted',
+          'width': 1,
+          'opacity': 0.32,
+        }
       },
       {
         selector: 'edge[kind="catalogRelation"]',
@@ -543,27 +615,126 @@
     return core
   }
 
+  // Lay out one disconnected island on its own terms. Most are hub-and-spoke
+  // (a class and the instances typed by it), which a tree or force layout
+  // stretches into a wide fan that eats horizontal space; concentric puts the
+  // hub in the middle with its members ringed around it — compact, and it
+  // states the shape of the island at a glance. Only genuinely large islands
+  // fall back to a force pass. The bounding box is a sizing *hint*:
+  // packStrayNodes re-measures the finished result before placing it, so a
+  // layout that overflows its hint can still never overlap a neighbour.
+  function layoutStrayIsland(island) {
+    const nodes = island.nodes()
+    const n = nodes.length
+
+    if (n === 2) {
+      // Two nodes and an edge: no layout engine needed, just sit them together.
+      nodes[0].position({ x: 0, y: 0 })
+      nodes[1].position({ x: 150, y: 0 })
+      return
+    }
+
+    if (n <= 30) {
+      island.layout({
+        name: 'concentric',
+        fit: false,
+        avoidOverlap: true,
+        concentric: (node) => node.degree(),
+        levelWidth: () => 1,
+        minNodeSpacing: 26,
+        spacingFactor: 1,
+        boundingBox: { x1: 0, y1: 0, x2: 10, y2: 10 },
+      }).run()
+      return
+    }
+
+    const side = Math.max(320, Math.round(Math.sqrt(n) * 135))
+    island.layout({
+      name: 'cose', animate: false, fit: false,
+      nodeRepulsion: () => 6000, idealEdgeLength: () => 60,
+      edgeElasticity: () => 100, gravity: 0.5, numIter: 600,
+      boundingBox: { x1: 0, y1: 0, x2: side, y2: side },
+    }).run()
+  }
+
+  function measureBlock(eles) {
+    const bb = eles.boundingBox()
+    return { eles, w: bb.w, h: bb.h, x1: bb.x1, y1: bb.y1 }
+  }
+
   // cose tiles disconnected components into a long strip across an edge, leaving
   // the real cluster crammed into one corner. Instead we lay out only the core
-  // with cose, then pack the stray nodes into a compact grid beside it so they
-  // fill the otherwise-empty space without distorting the cluster.
+  // with cose, then handle each stray *component* as its own block: multi-node
+  // islands keep their internal structure via their own layout, and the truly
+  // edgeless singles share one compact grid.
+  //
+  // Blocks are then shelf-packed by their MEASURED extent, not by a guess from
+  // node count — measuring after layout is what makes overlap impossible, and
+  // guessing is what made the earlier version collide.
   function packStrayNodes(strays, core) {
-    const bb = core.boundingBox()
-    const n = strays.length
-    const cols = Math.max(1, Math.round(Math.sqrt(n) * 1.3))
-    const rows = Math.ceil(n / cols)
-    const cellW = 165
-    const cellH = 48
-    const blockH = rows * cellH
-    const x1 = bb.x2 + 90
-    const y1 = bb.y1 + Math.max(0, (bb.h - blockH) / 2)
-    strays.layout({
-      name: 'grid',
-      fit: false,
-      avoidOverlap: true,
-      cols,
-      boundingBox: { x1, y1, x2: x1 + cols * cellW, y2: y1 + blockH },
-    }).run()
+    // Generous enough that neighbouring islands read as separate groups rather
+    // than one field of nodes.
+    const GAP = 60
+    const GUTTER = 140
+    const coreBB = core.boundingBox()
+
+    let singles = cy.collection()
+    const islands = []
+    for (const comp of strays.components()) {
+      if (comp.nodes().length <= 1) singles = singles.union(comp)
+      else islands.push(comp)
+    }
+
+    const blocks = []
+    for (const island of islands) {
+      layoutStrayIsland(island)
+      blocks.push(measureBlock(island.nodes()))
+    }
+    if (singles.length) {
+      const cellW = 170
+      const cellH = 54
+      const cols = Math.max(1, Math.round(Math.sqrt(singles.length) * 1.35))
+      const rows = Math.ceil(singles.length / cols)
+      singles.layout({
+        name: 'grid', fit: false, avoidOverlap: true, cols,
+        boundingBox: { x1: 0, y1: 0, x2: cols * cellW, y2: rows * cellH },
+      }).run()
+      blocks.push(measureBlock(singles))
+    }
+    if (!blocks.length) return
+
+    // Shelf-pack tallest-first (keeps rows tight) into a block roughly as tall
+    // as the core it sits beside, so the two read as one balanced composition.
+    blocks.sort((a, b) => b.h - a.h)
+    const totalArea = blocks.reduce((sum, b) => sum + (b.w + GAP) * (b.h + GAP), 0)
+    const targetH = Math.max(coreBB.h, 420)
+    const maxRowW = Math.min(4000, Math.max(360, totalArea / (targetH * 0.8)))
+
+    let cursorX = 0
+    let cursorY = 0
+    let rowH = 0
+    for (const block of blocks) {
+      if (cursorX > 0 && cursorX + block.w > maxRowW) {
+        cursorX = 0
+        cursorY += rowH + GAP
+        rowH = 0
+      }
+      block.tx = cursorX
+      block.ty = cursorY
+      cursorX += block.w + GAP
+      rowH = Math.max(rowH, block.h)
+    }
+
+    const blockH = cursorY + rowH
+    const originX = coreBB.x2 + GUTTER
+    const originY = coreBB.y1 + (coreBB.h - blockH) / 2
+
+    for (const block of blocks) {
+      block.eles.shift({
+        x: originX + block.tx - block.x1,
+        y: originY + block.ty - block.y1,
+      })
+    }
   }
 
   const COSE_OPTIONS = {
@@ -584,13 +755,17 @@
     if (!visible.nodes().length) return
 
     // Choose what gets gridded vs. kept in the force layout (see strayMode).
-    let core, strayNodes
+    // strayElements carries nodes AND their internal edges (never edges to
+    // core — components are disjoint by construction) so packStrayNodes can
+    // tell islands apart from true singletons.
+    let core, strayElements
     if (strayMode === 'singletons') {
-      strayNodes = visible.nodes().filter(isVisiblyIsolated)
+      const strayNodes = visible.nodes().filter(isVisiblyIsolated)
+      strayElements = strayNodes
       core = visible.not(strayNodes)
     } else {
       core = largestComponent(visible)
-      strayNodes = visible.nodes().not(core.nodes())
+      strayElements = visible.not(core)
     }
 
     // Degenerate case (e.g. every node is a singleton): just tile a grid.
@@ -602,7 +777,7 @@
 
     // cose with animate:false runs synchronously, so positions are final here.
     core.layout({ ...COSE_OPTIONS }).run()
-    if (strayNodes.length) packStrayNodes(strayNodes, core)
+    if (strayElements.length) packStrayNodes(strayElements, core)
     fitGraph()
   }
 
@@ -769,6 +944,7 @@
 
   let setupReady = false
   let initialHash = ''
+  let unsubscribeSkin = null
 
   function resolveHashToNodeId(rawHash) {
     if (!rawHash || !allElements.length) return null
@@ -1093,6 +1269,24 @@
         if (evt.target === cy) clearSelection()
       })
 
+      // Hover feedback: the element highlights and the cursor signals that it
+      // is clickable, so the canvas reads as navigable rather than a picture.
+      cy.on('mouseover', 'node, edge', (evt) => {
+        evt.target.addClass('hovered')
+        if (container) container.style.cursor = 'pointer'
+      })
+      cy.on('mouseout', 'node, edge', (evt) => {
+        evt.target.removeClass('hovered')
+        if (container) container.style.cursor = ''
+      })
+
+      // The node palette is skin-independent, but the selection ring, label
+      // halos and outlines are not — restyle when the skin changes.
+      unsubscribeSkin = activeSkin.subscribe(() => {
+        if (!cy) return
+        cy.style().fromJson(styleSheet()).update()
+      })
+
       applyGraphDisplay({ animate: false })
       // Re-run through relayoutGraph so the initial paint gets the same
       // stray-node packing as manual Relayout (the inline cose above only gives
@@ -1127,6 +1321,7 @@
     window.removeEventListener('keydown', handleGraphKeydown)
     window.removeEventListener('hashchange', handleHashChange)
     clearTimeout(iriCopyTimer)
+    unsubscribeSkin?.()
     resetGraphNavigation()
     cy?.destroy()
   })
