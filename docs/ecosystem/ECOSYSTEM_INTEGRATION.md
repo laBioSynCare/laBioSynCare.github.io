@@ -54,9 +54,10 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 
 **Guardrails / caveats (carry forward, do not lose):**
 
-- **Version discipline.** The citable release is **SSTIM 0.8.0**, identified by
-  `https://w3id.org/sstim/0.8.0` and archived under release DOI
-  `10.5281/zenodo.21462727` (per [`TODO.md`](../../TODO.md) current focus).
+- **Version discipline.** The citable release is **SSTIM 0.11.0**, identified by
+  `https://w3id.org/sstim/0.11.0` and archived under release DOI
+  `10.5281/zenodo.21536124` (per [`TODO.md`](../../TODO.md) current focus).
+  This line moves with each release — check `TODO.md` before quoting it.
 - **Do not hard-code live figures** (quad counts, concept counts, preset counts)
   from the source conversation into any doc — they drift; cite the live app instead.
 - **`01-Audiovisual_Entrainment.pdf`** (external, *not* in this repo) reportedly
@@ -244,12 +245,15 @@ and Patch Studio exports are inputs, not a finished bridge.
 
 ## Workstream 4 — The public entrance (audience model, deepened)
 
-**`[~] Spec complete 2026-07-18 — [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md)
+**`[x] Shipped 2026-07-18 — [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md)
 (IA, per-door copy, wireframe, route map). Door order decided (Understand
 leads); graph home decided (`/` → entrance, browser → `/graph` with
-hash-forward shim); folded into `KNOWLEDGE_BROWSER_UX.md`; build task open in
-TODO.md §5. Implementation is Phase 2 UX (`src/routes/`); the only open item
-is Renato's confirmation of the hero headline/subhead.**
+hash-forward shim); folded into `KNOWLEDGE_BROWSER_UX.md`. Built and deployed
+the same day — see TODO.md §5 for the per-item record. Hero copy is confirmed
+(headline as-is, subhead trimmed on review), so no wording question remains.
+One open item, deliberately not decided here: whether Sensory Field stays a
+distinct low-commitment on-ramp or folds into Patch Studio — an architecture
+call (engine sharing, route consolidation, UX model), not entrance copy.**
 
 **Problem the source named:** the live root drops an unfamiliar visitor straight
 into an ontology graph + a photosensitivity notice. It signals technical
@@ -317,7 +321,9 @@ reachable from every door, not buried in one.
 - [x] Wireframe the four-door grid + conversion bar — done 2026-07-18 (in the spec).
 - [x] Graph browser's new home decided 2026-07-18: `/graph` route + hash-forward shim on `/` (not a section).
 - [x] Fold into [`KNOWLEDGE_BROWSER_UX.md`](../technical/KNOWLEDGE_BROWSER_UX.md) and open a `src/routes/` build task — done 2026-07-18 (TODO.md §5).
-- [~] Door order decided (**Understand leads**, 2026-07-13); hero headline/subhead still to confirm — last item before build.
+- [x] Door order decided (**Understand leads**, 2026-07-13); hero headline/subhead confirmed 2026-07-18 (subhead trimmed on review).
+- [x] Build the entrance and move the browser to `/graph` — shipped 2026-07-18 (TODO.md §5).
+- [ ] Open, not entrance scope: Sensory Field × Patch Studio — keep as two surfaces or merge? Architecture decision; see [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md) "Decisions & open questions".
 
 ---
 

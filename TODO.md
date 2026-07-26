@@ -34,18 +34,23 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.8.0` is the validated release line, archived under release DOI
-`10.5281/zenodo.21462727`. The external live-only ecosystem store, loader, and
+SSTIM `0.11.0` is the validated release line (tag `v0.11.0`, version IRI
+`https://w3id.org/sstim/0.11.0`), archived under release DOI
+`10.5281/zenodo.21536124`; cite the concept DOI `10.5281/zenodo.21286974`
+across releases. The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
 agent. The unified Graph navigator now exposes the interlinked versioned catalog,
 live ecosystem, and SSTIM terms. The w3id catalog + live ecosystem routes are
 merged and verified (2026-07-17, perma-id/w3id.org#6378), and the live
 aggregate carries the W3C CG and Æterni Anima records — persistent
-identifiers may now be promoted in human-facing discovery. The immediate
-focus is outreach (Brain Innovation Days application by 1 Sept 2026) and the
-Phase-2 public entrance (`PUBLIC_ENTRANCE.md`, §5 build task); registry
-review and future independent human review continue. Public BSC Lab data
-remains separate from the private BioSynCare/BSC catalog.
+identifiers may now be promoted in human-facing discovery. The Phase-2 public
+entrance shipped 2026-07-18 (four doors on `/`, browser moved to `/graph` —
+see §5 and [`PUBLIC_ENTRANCE.md`](docs/technical/PUBLIC_ENTRANCE.md)). The
+immediate focus is outreach (Brain Innovation Days application by
+1 Sept 2026); registry review and future independent human review continue.
+One entrance decision stays open — whether Sensory Field remains a distinct
+on-ramp or folds into Patch Studio — and is an architecture call, not copy.
+Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice

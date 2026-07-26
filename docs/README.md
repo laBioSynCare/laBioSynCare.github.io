@@ -56,10 +56,10 @@ banner pointing to the as-built reference.
   instance distinction. Source for `schemas/session.schema.json` (planned).
 - [`KNOWLEDGE_BROWSER_UX.md`](technical/KNOWLEDGE_BROWSER_UX.md) — UX design for
   the ontology graph, SPARQL, preset browser, and annotation surfaces.
-- [`PUBLIC_ENTRANCE.md`](technical/PUBLIC_ENTRANCE.md) — **target** audience-first
-  landing IA: 7 personas → 4 doors (Experience / Understand / Build / Join), per-door
-  copy + route map, safety routing, and the two conversion actions. Source for a
-  future `/` landing.
+- [`PUBLIC_ENTRANCE.md`](technical/PUBLIC_ENTRANCE.md) — audience-first landing
+  IA: 7 personas → 4 doors (Experience / Understand / Build / Join), per-door
+  copy + route map, safety routing, and the two conversion actions. **Shipped
+  2026-07-18** as the `/` entrance, with the knowledge browser at `/graph`.
 - [`OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md`](technical/OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md) —
   **exploratory proposal (Phase 3, not built)** for using OpenClaw as a future
   conversational agent-automation layer around SSTIM intake, routing, review
