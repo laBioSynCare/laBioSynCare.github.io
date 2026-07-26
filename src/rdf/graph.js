@@ -45,8 +45,12 @@ const BIOSYNCARE_IMPLEMENTATION = 'https://w3id.org/sstim/implementation/biosync
 const BIOSYNCARE_ORGANIZATION = 'https://w3id.org/sstim/organization/biosyncare'
 const PATCH_STUDIO_COMPONENT = 'https://w3id.org/sstim/implementation/bsclab/component/patch-studio'
 
+// Last *non-empty* segment: a namespace-root IRI ends in a separator
+// (…/framework/bsc/), and naively popping the split yields '' — which then
+// surfaces as an unlabelled node on the canvas.
 function localName(iri) {
-  return iri.split(/[#/]/).pop()
+  const parts = iri.split(/[#/]/).filter(Boolean)
+  return parts[parts.length - 1] ?? iri
 }
 
 function xsdLabel(iri) {
@@ -608,6 +612,41 @@ export async function buildGraphElements(store) {
       sourceLabel: nodes.get(agent).data.label,
       targetLabel: nodes.get(target).data.label,
     })
+  }
+
+  // ── 12. Annotation enrichment ───────────────────────────────────────────────
+  // Definitions and notes were previously read only where a section's SPARQL
+  // happened to ask for them — OWL classes got skos:definition, SKOS concepts
+  // got none, and scope/history/editorial notes were dropped everywhere. The
+  // vocabulary carries all of these (hundreds of skos:definition, plus
+  // scopeNote/altLabel/example), so enrich every node from the store here
+  // rather than adding OPTIONALs to each query, which would risk cross
+  // products. Reading straight from the N3 store is also far cheaper.
+  for (const node of nodes.values()) {
+    const iri = node.data.iri
+    if (!iri) continue
+    if (!node.data.definition) {
+      node.data.definition = literalFor(store, iri, [
+        SKOS + 'definition', DCT + 'description', RDFS + 'comment',
+      ])
+    }
+    const scopeNote     = literalFor(store, iri, [SKOS + 'scopeNote'])
+    const example       = literalFor(store, iri, [SKOS + 'example'])
+    const note          = literalFor(store, iri, [SKOS + 'note'])
+    const historyNote   = literalFor(store, iri, [SKOS + 'historyNote'])
+    const editorialNote = literalFor(store, iri, [SKOS + 'editorialNote'])
+    const altLabels = [...new Set(
+      terms(store, iri, SKOS + 'altLabel')
+        .filter(value => value.termType === 'Literal' &&
+          (!value.language || value.language === 'en'))
+        .map(value => value.value),
+    )]
+    if (scopeNote)     node.data.scopeNote = scopeNote
+    if (example)       node.data.example = example
+    if (note)          node.data.note = note
+    if (historyNote)   node.data.historyNote = historyNote
+    if (editorialNote) node.data.editorialNote = editorialNote
+    if (altLabels.length) node.data.altLabels = altLabels
   }
 
   return [...nodes.values(), ...edges]

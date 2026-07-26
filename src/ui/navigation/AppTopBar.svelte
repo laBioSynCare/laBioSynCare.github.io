@@ -1,10 +1,12 @@
 <script>
   import { onMount } from 'svelte'
   import ProfileControl from './ProfileControl.svelte'
+  import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
 
   let searchInput = $state(null)
   let helpOpen = $state(false)
+  let scopeGuideOpen = $state(false)
 
   const SHORTCUTS = [
     { keys: ['/'], desc: 'Focus the search field' },
@@ -75,16 +77,27 @@
 <header class="app-topbar">
   <div class="topbar-main">
     {#if $graphNavigation.available}
-      <select
-        class="topbar-control scope-field"
-        aria-label="Scope"
-        value={$graphNavigation.scope}
-        onchange={(event) => $graphNavigation.setScope(event.currentTarget.value)}
-      >
-        {#each $graphNavigation.scopes as scope}
-          <option value={scope.value}>{scope.label}</option>
-        {/each}
-      </select>
+      <div class="scope-group">
+        <select
+          class="topbar-control scope-field"
+          aria-label="SSTIM subgraph perspective"
+          title="Choose which part of the SSTIM knowledge graph to show"
+          value={$graphNavigation.scope}
+          onchange={(event) => $graphNavigation.setScope(event.currentTarget.value)}
+        >
+          {#each $graphNavigation.scopes as scope}
+            <option value={scope.value}>{scope.label}</option>
+          {/each}
+        </select>
+        <button
+          type="button"
+          class="scope-info"
+          aria-label="About SSTIM subgraph perspectives"
+          aria-expanded={scopeGuideOpen}
+          title="What is this? — explains each SSTIM subgraph perspective"
+          onclick={() => (scopeGuideOpen = true)}
+        >ⓘ</button>
+      </div>
 
       <input
         class="topbar-control focus-field"
@@ -202,6 +215,25 @@
   </div>
 {/if}
 
+<InfoModal
+  title="SSTIM subgraph perspectives"
+  subtitle="Every perspective is a filter over one knowledge graph — the same triples, never a separate dataset. Pick one to narrow what the canvas draws."
+  open={scopeGuideOpen}
+  onClose={() => (scopeGuideOpen = false)}
+>
+  <dl class="scope-guide">
+    {#each $graphNavigation.scopes as scope}
+      <div class:current={scope.value === $graphNavigation.scope}>
+        <dt>
+          {scope.label}
+          {#if scope.value === $graphNavigation.scope}<span class="current-tag">showing</span>{/if}
+        </dt>
+        <dd>{scope.about ?? ''}</dd>
+      </div>
+    {/each}
+  </dl>
+</InfoModal>
+
 <style>
   .app-topbar {
     height: var(--app-header-height, 56px);
@@ -220,8 +252,9 @@
     min-width: 0;
     display: grid;
     /* Wide enough for the longest scope label ("Full SSTIM · ontology &
-       vocabulary") to read without truncating. */
-    grid-template-columns: minmax(180px, 290px) minmax(200px, 1fr) auto;
+       vocabulary") to read without truncating, including the ⓘ button that
+       shares the column with the select. */
+    grid-template-columns: minmax(190px, 325px) minmax(190px, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
   }
@@ -254,6 +287,85 @@
     display: flex;
     gap: 0.4rem;
     align-items: center;
+  }
+
+  /* Scope picker + its "what is this?" affordance travel together. */
+  .scope-group {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .scope-group .scope-field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .scope-info {
+    flex-shrink: 0;
+    width: 1.7rem;
+    height: 1.7rem;
+    margin: 0;
+    padding: 0;
+    border: var(--app-border-width) solid transparent;
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--app-muted);
+    font-size: 0.9rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .scope-info:hover {
+    background: var(--app-accent-soft);
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+  }
+
+  .scope-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 0;
+  }
+
+  .scope-guide > div {
+    padding: 0.5rem 0.6rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-left: 3px solid transparent;
+    border-radius: var(--app-radius);
+    background: var(--app-surface-2);
+  }
+  .scope-guide > div.current { border-left-color: var(--app-accent); }
+
+  .scope-guide dt {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--app-text-strong);
+  }
+
+  .scope-guide dd {
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--app-text);
+  }
+
+  .current-tag {
+    flex-shrink: 0;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.05rem 0.3rem;
+    border-radius: 999px;
+    background: var(--app-accent-soft);
+    color: var(--app-accent);
   }
 
   .help-toggle {

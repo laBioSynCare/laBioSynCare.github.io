@@ -6,6 +6,7 @@
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
+  import InfoModal from '../navigation/InfoModal.svelte'
   import { activeSkin } from '../theme/skins.js'
 
   const { store, liveStatus = null, onRefreshLive = null } = $props()
@@ -17,24 +18,46 @@
   let graphStats = $state(null)
   let allElements = $state([])
 
+  // Each entry is a *perspective* on the one SSTIM knowledge graph — a filter
+  // over the same underlying triples, never a separate dataset. The `about`
+  // text is surfaced in the scope guide (the ⓘ next to the picker) so the
+  // difference between, say, "Catalog focus" and "Ecosystem focus" is
+  // discoverable without reading the ADRs.
   const GRAPH_SCOPES = [
-    { value: 'all', label: 'Full SSTIM · ontology & vocabulary' },
-    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem' },
-    { value: 'catalog', label: 'Catalog focus · versioned' },
-    { value: 'ecosystem', label: 'Ecosystem focus · live' },
-    { value: 'core', label: 'Core OWL classes' },
-    { value: 'vocabulary', label: 'All SKOS vocabulary' },
-    { value: 'frequency', label: 'Frequency bands' },
-    { value: 'modality', label: 'Sensory modalities' },
-    { value: 'mechanism', label: 'Stimulation mechanisms' },
-    { value: 'technique', label: 'Techniques' },
-    { value: 'voice', label: 'Voice types & rhythm' },
-    { value: 'group', label: 'Preset groups' },
-    { value: 'evidence', label: 'Evidence & claims' },
-    { value: 'caution', label: 'Cautions & safety' },
-    { value: 'exposure', label: 'Exposure & delivery' },
-    { value: 'stimulation', label: 'Stimulation · neutral layer' },
-    { value: 'neuromodulation', label: 'Neuromodulation' },
+    { value: 'all', label: 'Full SSTIM · ontology & vocabulary',
+      about: 'The released term space: every OWL class and SKOS concept of the SSTIM ontology and vocabulary. Catalog and ecosystem instances are excluded here so that published terms — not example data — define the shape of the graph.' },
+    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem',
+      about: 'The instance layers together: versioned public reference records (frameworks, implementations, techniques, presets) alongside the live ecosystem projection of people and organizations, plus the terms they point at.' },
+    { value: 'catalog', label: 'Catalog focus · versioned',
+      about: 'Versioned public reference instances only — frameworks, implementations and their components, techniques, presets, and evidence records. Citable and frozen per release.' },
+    { value: 'ecosystem', label: 'Ecosystem focus · live',
+      about: 'The live projection of people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
+    { value: 'core', label: 'Core OWL classes',
+      about: 'The OWL class skeleton and XSD datatypes on their own — the formal backbone of the ontology, without the SKOS vocabulary hanging off it.' },
+    { value: 'vocabulary', label: 'All SKOS vocabulary',
+      about: 'Every skos:Concept across all concept schemes, with their broader/narrower and related links. The controlled terms used to describe stimulation, without the OWL scaffolding.' },
+    { value: 'frequency', label: 'Frequency bands',
+      about: 'The frequency band vocabulary — delta through gamma, their sub-bands and single-frequency targets — with the FrequencyBand classes that govern them.' },
+    { value: 'modality', label: 'Sensory modalities',
+      about: 'Sensory modality concepts (auditory, visual, tactile and beyond) together with the perceived-modality vocabulary used by the exposure model.' },
+    { value: 'mechanism', label: 'Stimulation mechanisms',
+      about: 'The mechanisms by which a stimulus is thought to act — the StimulationMechanism class and its concept scheme.' },
+    { value: 'technique', label: 'Techniques',
+      about: 'Named stimulation techniques and the SensoryStimulationTechnique class they instantiate.' },
+    { value: 'voice', label: 'Voice types & rhythm',
+      about: 'The preset voice model: Binaural, Martigli, Martigli-Binaural and Symmetry voice types, permutation functions, and the temporal structure of a stimulus.' },
+    { value: 'group', label: 'Preset groups',
+      about: 'The five catalog groups — Heal, Support, Perform, Indulge, Transcend — and the PresetGroup class.' },
+    { value: 'evidence', label: 'Evidence & claims',
+      about: 'The evidence model: assessment claims, propositions and scope, evidence tiers and modality tags, bibliographic and public-safe references, claim and effect direction, review status.' },
+    { value: 'caution', label: 'Cautions & safety',
+      about: 'Caution tags and their severity levels — the vocabulary behind safety messaging and contraindication flags.' },
+    { value: 'exposure', label: 'Exposure & delivery',
+      about: 'How a stimulus reaches a person: delivery media, device capabilities, body placement, stimulus patterns, comfort boundaries, perceptual gains and losses, and experiment context.' },
+    { value: 'stimulation', label: 'Stimulation · neutral layer',
+      about: 'The modality-neutral stimulation layer — Stimulation, techniques, protocols and interventions — described without committing to a neural mechanism.' },
+    { value: 'neuromodulation', label: 'Neuromodulation',
+      about: 'A cross-cutting view (ADR 0034/0036): neuromodulation classes, neural access routes, delivery approaches, target sites, systems and phenomena, plus every concept that asserts one of those facets.' },
   ]
 
   // A `?view=<scope value>` query param lets a link (e.g. from w3id.org or
@@ -112,6 +135,17 @@
     dataProp: 'Datatype property',
   }
 
+  // SKOS annotation properties worth showing under the definition, in the
+  // order a reader wants them: what it covers, then an example, then the
+  // curation trail. Rendered only when the term actually carries the property.
+  const ANNOTATION_NOTES = [
+    { key: 'scopeNote', label: 'Scope', hint: 'skos:scopeNote — how the term is meant to be applied' },
+    { key: 'example', label: 'Example', hint: 'skos:example' },
+    { key: 'note', label: 'Note', hint: 'skos:note' },
+    { key: 'editorialNote', label: 'Editorial note', hint: 'skos:editorialNote — curation guidance' },
+    { key: 'historyNote', label: 'History', hint: 'skos:historyNote — how the term changed across releases' },
+  ]
+
   const EDGE_KIND_LABELS = {
     subClassOf: 'subClassOf',
     objProp: 'object property',
@@ -155,6 +189,26 @@
     'https://w3id.org/sstim/vocab#PermutationFunctionScheme': '#a1887f',
     'https://w3id.org/sstim/vocab#CautionTagScheme':          '#ef9a9a',
   }
+
+  // The node-type legend is generated from this list so the swatch, the count
+  // and the click target can never drift apart from the styles in styleSheet().
+  const NODE_KINDS = [
+    { kind: 'owlClass',              label: 'OWL class' },
+    { kind: 'skosConcept',           label: 'SKOS concept' },
+    { kind: 'xsdType',               label: 'XSD datatype' },
+    { kind: 'ontologyResource',      label: 'Ontology resource' },
+    { kind: 'catalogFramework',      label: 'Catalog framework' },
+    { kind: 'catalogImplementation', label: 'Catalog implementation' },
+    { kind: 'catalogTechnique',      label: 'Catalog technique' },
+    { kind: 'ecosystemPerson',       label: 'Live person' },
+    { kind: 'ecosystemOrganization', label: 'Live organization' },
+    { kind: 'ecosystemTarget',       label: 'Live target' },
+  ]
+
+  // Clicking a legend row spotlights that node type (or concept scheme):
+  // matching nodes keep full strength, everything else recedes. null = off.
+  let typeHighlight = $state(null)   // { mode: 'kind' | 'scheme', value }
+  let sourceGuideOpen = $state(false)
 
   // Thematic scope → the concept schemes it shows. graph.js renders every
   // skos:Concept in the store (vocab + exposure) tagged with its scheme IRI,
@@ -222,8 +276,11 @@
     ],
   }
 
+  // Mirrors src/rdf/graph.js: take the last non-empty segment so a
+  // namespace-root IRI (…/framework/bsc/) does not render as an empty label.
   function localName(iri) {
-    return iri?.split(/[#/]/).pop() ?? ''
+    const parts = iri?.split(/[#/]/).filter(Boolean) ?? []
+    return parts[parts.length - 1] ?? ''
   }
 
   function liveStatusLabel(state) {
@@ -373,6 +430,21 @@
       {
         selector: 'edge.hovered',
         style: { 'width': 3, 'opacity': 1, 'z-index': 900 }
+      },
+      // Legend spotlight (see applyTypeHighlight). Dimmed elements stay on
+      // screen — the point is to locate a type within its context, not to
+      // filter the graph, which the scope picker already does.
+      {
+        selector: '.type-dim',
+        style: { 'opacity': 0.07, 'text-opacity': 0.07 }
+      },
+      {
+        selector: 'node.type-hit',
+        style: {
+          'border-width': 3,
+          'border-color': theme.accent,
+          'z-index': 850,
+        }
       },
       {
         selector: 'edge:selected',
@@ -546,6 +618,54 @@
 
   const focusNodeOptions = $derived(nodeOptionsForCurrentView())
 
+  // Spotlight the nodes of one type/scheme by pushing everything else back.
+  // Runs on the cytoscape side (classes, not re-filtering) so it composes with
+  // the visibility layers instead of fighting them.
+  function applyTypeHighlight() {
+    if (!cy) return
+    cy.batch(() => {
+      cy.elements().removeClass('type-dim type-hit')
+      if (!typeHighlight) return
+      const key = typeHighlight.mode === 'kind' ? 'kind' : 'scheme'
+      const matched = cy.nodes().filter((node) =>
+        node.style('display') !== 'none' && node.data(key) === typeHighlight.value)
+      if (!matched.length) return
+      matched.addClass('type-hit')
+      cy.elements().not(matched).addClass('type-dim')
+    })
+  }
+
+  function toggleTypeHighlight(mode, value) {
+    typeHighlight = typeHighlight?.mode === mode && typeHighlight?.value === value
+      ? null
+      : { mode, value }
+  }
+
+  $effect(() => {
+    typeHighlight
+    applyTypeHighlight()
+  })
+
+  // Counts drive the legend: a type with nothing on screen is dimmed and
+  // non-clickable, which makes the current scope's composition legible at a
+  // glance instead of listing every type the app could ever draw.
+  const visibleKindCounts = $derived(new Map(graphStats?.nodeCounts ?? []))
+  const visibleSchemeCounts = $derived(new Map(graphStats?.schemeCounts ?? []))
+
+  const selectedKind = $derived(selected && !selected.source ? selected.kind : null)
+  const selectedScheme = $derived(selected && !selected.source ? selected.scheme : null)
+
+  // The legend sits below the fold in a short window, so marking the selected
+  // node's type there is only useful if the row is actually brought into view.
+  $effect(() => {
+    const kind = selectedKind
+    if (!kind || typeof document === 'undefined') return
+    const row = document.querySelector(`.legend-btn[data-kind="${CSS.escape(kind)}"]`)
+    if (!row) return
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    row.scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' })
+  })
+
   function applyGraphDisplay({ animate = true } = {}) {
     if (!cy) return null
     const visible = visibleElementsForCurrentView()
@@ -594,6 +714,9 @@
 
     visibleSet = newIds
     graphStats = computeGraphStats(visible)
+    // Visibility just changed, so a spotlight set from the previous view may
+    // now cover hidden nodes — recompute it against what is actually on screen.
+    applyTypeHighlight()
     return cy.elements().filter((element) => newIds.has(element.id()))
   }
 
@@ -1109,6 +1232,7 @@
   function computeGraphStats(elements) {
     const nodeCounts = new Map()
     const edgeCounts = new Map()
+    const schemeCounts = new Map()
     const graphTerms = new Set()
 
     for (const element of elements) {
@@ -1118,6 +1242,7 @@
         edgeCounts.set(data.kind, (edgeCounts.get(data.kind) ?? 0) + 1)
       } else {
         nodeCounts.set(data.kind, (nodeCounts.get(data.kind) ?? 0) + 1)
+        if (data.scheme) schemeCounts.set(data.scheme, (schemeCounts.get(data.scheme) ?? 0) + 1)
       }
     }
 
@@ -1132,6 +1257,7 @@
       edges: elements.filter((element) => element.data?.source).length,
       nodeCounts: [...nodeCounts.entries()].sort(([a], [b]) => a.localeCompare(b)),
       edgeCounts: [...edgeCounts.entries()].sort(([a], [b]) => a.localeCompare(b)),
+      schemeCounts: [...schemeCounts.entries()],
     }
   }
 
@@ -1369,52 +1495,80 @@
   }
 </script>
 
+<!-- The transition control governs the focus/fit/pan animation, so it lives
+     with the Focus neighborhood button that triggers the most visible one —
+     rendered there when a node is selected, and in the idle stats panel
+     otherwise, so it is always reachable without occupying the sidebar. -->
+{#snippet transitionControl(hint)}
+  <div class="anim-control">
+    <div class="anim-label">
+      <label for="graph-transition-ms">Transition</label>
+      <span class="anim-value">{transitionMs === 0 ? 'off' : `${transitionMs} ms`}</span>
+    </div>
+    <input
+      id="graph-transition-ms"
+      type="range"
+      min="0"
+      max="800"
+      step="20"
+      bind:value={transitionMs}
+      aria-label="Animation duration in milliseconds"
+    />
+    <small class="anim-hint">{hint}</small>
+  </div>
+{/snippet}
+
 <div class="graph-shell">
 
   <!-- Controls sidebar -->
   <aside class="controls">
-    <strong>Data sources</strong>
+    <div class="panel-head">
+      <strong>Data sources</strong>
+      <div class="panel-head-actions">
+        {#if onRefreshLive}
+          <button
+            type="button"
+            class="icon-btn"
+            onclick={onRefreshLive}
+            disabled={liveStatus?.state === 'loading'}
+            title="Refresh the live ecosystem layer"
+            aria-label="Refresh live ecosystem"
+          >
+            <svg viewBox="0 0 16 16" aria-hidden="true" class:spinning={liveStatus?.state === 'loading'}>
+              <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13 2v3h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        {/if}
+        <button
+          type="button"
+          class="icon-btn"
+          onclick={() => (sourceGuideOpen = true)}
+          title="What are these sources?"
+          aria-label="About the data sources"
+        >ⓘ</button>
+      </div>
+    </div>
     <ul class="source-list">
-      <li title={SOURCE_NOTES.ontology}>
+      <!-- The two versioned layers carry no varying state, so their names get
+           the full row; only the live layer shows a status word. -->
+      <li title="Versioned · {SOURCE_NOTES.ontology}">
         <span class="source-dot versioned"></span>
-        <span><b>Ontology & vocabulary</b><small>versioned</small></span>
+        <span class="source-name">Ontology &amp; vocabulary</span>
       </li>
-      <li title={SOURCE_NOTES.catalog}>
+      <li title="Versioned · {SOURCE_NOTES.catalog}">
         <span class="source-dot catalog"></span>
-        <span><b>Catalog</b><small>versioned</small></span>
+        <span class="source-name">Catalog</span>
       </li>
-      <li title={SOURCE_NOTES.ecosystem}>
+      <li title={liveStatus?.message ?? SOURCE_NOTES.ecosystem}>
         <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>
-        <span>
-          <b>Ecosystem</b>
-          <small>{liveStatusLabel(liveStatus?.state)}</small>
-        </span>
+        <span class="source-name">Ecosystem</span>
+        <span class="source-state">{liveStatusLabel(liveStatus?.state)}</span>
       </li>
     </ul>
-    <details class="source-help">
-      <summary>What are these sources?</summary>
-      <p><b>Ontology &amp; vocabulary</b> — {SOURCE_NOTES.ontology}</p>
-      <p><b>Catalog</b> — {SOURCE_NOTES.catalog}</p>
-      <p><b>Ecosystem</b> — {SOURCE_NOTES.ecosystem}
-        See <a href="/about/">About</a> for the full picture.</p>
-    </details>
-    {#if liveStatus?.message}
-      <p class="source-message" title={liveStatus.message}>
-        {liveStatus.state === 'available'
-          ? `${liveStatus.quadCount} current public quads`
-          : liveStatus.message}
-      </p>
-    {/if}
-    {#if onRefreshLive}
-      <button
-        type="button"
-        class="refresh-source"
-        onclick={onRefreshLive}
-        disabled={liveStatus?.state === 'loading'}
-      >Refresh live ecosystem</button>
-    {/if}
 
-    <strong style="margin-top:1rem;display:block">Edge layers</strong>
+    <div class="panel-head spaced">
+      <strong>Edge layers</strong>
+    </div>
     <ul class="layer-list">
       {#each EDGE_KINDS as ek}
         <li>
@@ -1427,43 +1581,69 @@
       {/each}
     </ul>
 
-    <strong style="margin-top:1rem;display:block">Node types</strong>
+    <div class="panel-head spaced">
+      <strong>Node types</strong>
+      {#if typeHighlight?.mode === 'kind'}
+        <button type="button" class="clear-highlight" onclick={() => (typeHighlight = null)}>clear</button>
+      {/if}
+    </div>
     <ul class="legend-list">
-      <li><span class="swatch" style="background:{COLORS.owlClass}"></span><span class="legend-label">OWL class</span></li>
-      <li><span class="swatch" style="background:{COLORS.skosConcept}"></span><span class="legend-label">SKOS concept</span></li>
-      <li><span class="swatch" style="background:{COLORS.xsdType}"></span><span class="legend-label">XSD datatype</span></li>
-      <li><span class="swatch" style="background:{COLORS.ontologyResource}"></span><span class="legend-label">Ontology resource</span></li>
-      <li><span class="swatch" style="background:{COLORS.catalogFramework}"></span><span class="legend-label">Catalog framework</span></li>
-      <li><span class="swatch" style="background:{COLORS.catalogImplementation}"></span><span class="legend-label">Catalog implementation</span></li>
-      <li><span class="swatch" style="background:{COLORS.catalogTechnique}"></span><span class="legend-label">Catalog technique</span></li>
-      <li><span class="swatch" style="background:{COLORS.ecosystemPerson}"></span><span class="legend-label">Live person</span></li>
-      <li><span class="swatch" style="background:{COLORS.ecosystemOrganization}"></span><span class="legend-label">Live organization</span></li>
-    </ul>
-
-    <strong style="margin-top:1rem;display:block">SKOS schemes</strong>
-    <ul class="legend-list">
-      {#each Object.entries(SCHEME_COLORS) as [iri, color]}
-        {@const schemeName = iri.split('#')[1].replace('Scheme', '')}
-        <li><span class="swatch" style="background:{color}"></span><span class="legend-label" title={schemeName}>{schemeName}</span></li>
+      {#each NODE_KINDS as nk}
+        {@const count = visibleKindCounts.get(nk.kind) ?? 0}
+        <li>
+          <button
+            type="button"
+            class="legend-btn"
+            data-kind={nk.kind}
+            class:on={typeHighlight?.mode === 'kind' && typeHighlight.value === nk.kind}
+            class:current={selectedKind === nk.kind}
+            class:empty={count === 0}
+            disabled={count === 0}
+            aria-pressed={typeHighlight?.mode === 'kind' && typeHighlight.value === nk.kind}
+            title={count === 0
+              ? `${nk.label} — none in this view`
+              : `Spotlight the ${count} ${nk.label} node${count === 1 ? '' : 's'}`}
+            onclick={() => toggleTypeHighlight('kind', nk.kind)}
+          >
+            <span class="swatch" style="background:{COLORS[nk.kind]}"></span>
+            <span class="legend-label">{nk.label}</span>
+            <span class="legend-count">{count}</span>
+          </button>
+        </li>
       {/each}
     </ul>
 
-    <strong style="margin-top:1rem;display:block">Animation</strong>
-    <div class="anim-control">
-      <div class="anim-label">
-        <span>Transition speed</span>
-        <span class="anim-value">{transitionMs === 0 ? 'off' : `${transitionMs} ms`}</span>
-      </div>
-      <input
-        type="range"
-        min="0"
-        max="800"
-        step="20"
-        bind:value={transitionMs}
-        aria-label="Animation duration in milliseconds"
-      />
-      <small class="anim-hint">Used by fade, pan, and fit. 0 disables animation.</small>
+    <div class="panel-head spaced">
+      <strong>SKOS schemes</strong>
+      {#if typeHighlight?.mode === 'scheme'}
+        <button type="button" class="clear-highlight" onclick={() => (typeHighlight = null)}>clear</button>
+      {/if}
     </div>
+    <ul class="legend-list">
+      {#each Object.entries(SCHEME_COLORS) as [iri, color]}
+        {@const schemeName = iri.split('#')[1].replace('Scheme', '')}
+        {@const count = visibleSchemeCounts.get(iri) ?? 0}
+        <li>
+          <button
+            type="button"
+            class="legend-btn"
+            class:on={typeHighlight?.mode === 'scheme' && typeHighlight.value === iri}
+            class:current={selectedScheme === iri}
+            class:empty={count === 0}
+            disabled={count === 0}
+            aria-pressed={typeHighlight?.mode === 'scheme' && typeHighlight.value === iri}
+            title={count === 0
+              ? `${schemeName} — none in this view`
+              : `Spotlight the ${count} ${schemeName} concept${count === 1 ? '' : 's'}`}
+            onclick={() => toggleTypeHighlight('scheme', iri)}
+          >
+            <span class="swatch" style="background:{color}"></span>
+            <span class="legend-label">{schemeName}</span>
+            <span class="legend-count">{count}</span>
+          </button>
+        </li>
+      {/each}
+    </ul>
   </aside>
 
   <section class="graph-workspace">
@@ -1493,16 +1673,51 @@
                   <p class="description">{selected.definition}</p>
                 {/if}
 
+                <!-- SKOS annotations. These were previously read only for OWL
+                     classes, so concepts — the bulk of the vocabulary — showed
+                     no definition at all. graph.js now enriches every node. -->
+                {#if selected.altLabels?.length}
+                  <p class="alt-labels">
+                    <span class="alt-labels-tag">also</span>
+                    {selected.altLabels.join(' · ')}
+                  </p>
+                {/if}
+
+                {#each ANNOTATION_NOTES as note}
+                  {#if selected[note.key]}
+                    <section class="note note-{note.key}">
+                      <h3 class="note-heading" title={note.hint}>{note.label}</h3>
+                      <p>{selected[note.key]}</p>
+                    </section>
+                  {/if}
+                {/each}
+
                 <dl class="meta">
                   {#if selected.iri}
                     {@const docsUrl = docsUrlForIri(selected.iri)}
+                    <!-- The copy control sits with the "IRI" label so the value
+                         itself gets the full width of the card and truncates
+                         with an ellipsis instead of wrapping or overflowing. -->
                     <div class="meta-row iri-row">
-                      <dt>IRI</dt>
+                      <dt>
+                        IRI
+                        <button
+                          type="button"
+                          class="copy-btn"
+                          class:copied={iriCopied}
+                          onclick={copyIri}
+                          title={iriCopied ? 'Copied' : `Copy ${selected.iri}`}
+                          aria-label="Copy full IRI"
+                        >
+                          {#if iriCopied}
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                          {:else}
+                            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.5 3.5h-7a1 1 0 0 0-1 1v7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                          {/if}
+                        </button>
+                      </dt>
                       <dd>
                         <a href={selected.iri} target="_blank" rel="noreferrer" title={selected.iri}>{toCurie(selected.iri)}</a>
-                        <button type="button" class="copy-btn" onclick={copyIri} title={`Copy ${selected.iri}`} aria-label="Copy full IRI">
-                          {iriCopied ? 'Copied' : 'Copy'}
-                        </button>
                       </dd>
                     </div>
                     {#if docsUrl}
@@ -1647,6 +1862,10 @@
                       </button>
                     </header>
 
+                    <div class="focus-transition">
+                      {@render transitionControl('Speed of the focus, fit and pan animation.')}
+                    </div>
+
                     {#if connectionKinds.length > 1}
                       <div class="kind-pills" role="group" aria-label="Filter connections by edge kind">
                         {#each connectionKinds as [kind, count]}
@@ -1763,6 +1982,9 @@
                   <li><span>{kind}</span><strong>{count}</strong></li>
                 {/each}
               </ul>
+
+              <h4>Motion</h4>
+              {@render transitionControl('Applies to focus, fit and pan. 0 disables animation.')}
             </section>
           {/if}
         {/if}
@@ -1771,6 +1993,41 @@
   </section>
 
 </div>
+
+<InfoModal
+  title="Data sources"
+  subtitle="The canvas draws three layers at once. They differ in how they are governed, not just in where they come from."
+  open={sourceGuideOpen}
+  onClose={() => (sourceGuideOpen = false)}
+>
+  <dl class="source-guide">
+    <div>
+      <dt><span class="source-dot versioned"></span>Ontology &amp; vocabulary <span class="guide-tag">versioned</span></dt>
+      <dd>{SOURCE_NOTES.ontology}</dd>
+    </div>
+    <div>
+      <dt><span class="source-dot catalog"></span>Catalog <span class="guide-tag">versioned</span></dt>
+      <dd>{SOURCE_NOTES.catalog}</dd>
+    </div>
+    <div>
+      <dt>
+        <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>Ecosystem
+        <span class="guide-tag live">{liveStatusLabel(liveStatus?.state)}</span>
+      </dt>
+      <dd>
+        {SOURCE_NOTES.ecosystem}
+        {#if liveStatus?.message}
+          <span class="guide-status">
+            {liveStatus.state === 'available'
+              ? `Currently ${liveStatus.quadCount} public quads.`
+              : liveStatus.message}
+          </span>
+        {/if}
+      </dd>
+    </div>
+  </dl>
+  <p class="guide-footer">See <a href="/about/">About</a> for the full picture.</p>
+</InfoModal>
 
 <style>
   .graph-shell {
@@ -1783,7 +2040,7 @@
   }
 
   .controls {
-    width: 210px;
+    width: 248px;
     flex-shrink: 0;
     padding: 0.75rem;
     overflow-y: auto;
@@ -1798,36 +2055,109 @@
     color: var(--app-text-strong);
   }
 
+  /* Section header: title plus its inline affordances (refresh, "what is
+     this?"). Keeps each block's controls on the title line rather than
+     spending a full row of the sidebar on them. */
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    min-height: 1.5rem;
+  }
+  .panel-head.spaced { margin-top: 0.9rem; }
+
+  .panel-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+  }
+
+  .icon-btn {
+    width: 1.4rem;
+    height: 1.4rem;
+    margin: 0;
+    padding: 0;
+    border: var(--app-border-width) solid transparent;
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--app-muted);
+    font-size: 0.8rem;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .icon-btn svg { width: 0.85rem; height: 0.85rem; display: block; }
+  .icon-btn:hover:not(:disabled) {
+    background: var(--app-accent-soft);
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+  }
+  .icon-btn:disabled { opacity: 0.45; cursor: default; }
+
+  .icon-btn svg.spinning {
+    animation: icon-spin 1s linear infinite;
+    transform-origin: 50% 50%;
+  }
+  @keyframes icon-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .icon-btn svg.spinning { animation: none; }
+  }
+
+  .clear-highlight {
+    margin: 0;
+    padding: 0.05rem 0.35rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--app-muted);
+    font-size: 0.62rem;
+    line-height: 1.4;
+    cursor: pointer;
+    width: auto;
+  }
+  .clear-highlight:hover { border-color: var(--app-accent); color: var(--app-text-strong); }
+
   .source-list {
     list-style: none;
     padding: 0;
-    margin: 0.45rem 0 0;
+    margin: 0.35rem 0 0;
     display: grid;
-    gap: 0.4rem;
+    gap: 0.2rem;
   }
 
+  /* One compact line per source: dot, name, state. */
   .source-list li {
     display: grid;
-    grid-template-columns: 0.65rem 1fr;
-    align-items: start;
-    gap: 0.45rem;
+    grid-template-columns: 0.55rem 1fr auto;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
   }
 
-  .source-list b,
-  .source-list small {
-    display: block;
-    line-height: 1.25;
+  .source-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--app-text-strong);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .source-list b { font-size: 0.76rem; }
-  .source-list small { color: var(--pico-muted-color); font-size: 0.66rem; }
+  .source-state {
+    font-size: 0.56rem;
+    color: var(--app-muted);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
 
   .source-dot {
-    width: 0.58rem;
-    height: 0.58rem;
-    margin-top: 0.12rem;
+    width: 0.55rem;
+    height: 0.55rem;
     border-radius: 50%;
     background: var(--app-muted);
+    flex-shrink: 0;
   }
   .source-dot.versioned { background: #4fc3f7; }
   .source-dot.catalog { background: #ffca28; }
@@ -1836,56 +2166,118 @@
   .source-dot.live.unavailable { background: #c62828; }
   .source-dot.live.loading { background: #0288d1; }
 
-  .source-message {
-    margin: 0.45rem 0 0;
-    color: var(--pico-muted-color);
-    font-size: 0.66rem;
-    line-height: 1.35;
+  /* Data-source guide (inside the modal) */
+  .source-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin: 0;
   }
-
-  .source-help {
-    margin: 0.45rem 0 0;
+  .source-guide dt {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--app-text-strong);
   }
-
-  .source-help summary {
-    cursor: pointer;
-    color: var(--pico-muted-color);
-    font-size: 0.66rem;
-    line-height: 1.35;
+  .source-guide dd {
+    margin: 0.25rem 0 0 1rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
   }
-
-  .source-help p {
-    margin: 0.35rem 0 0;
-    color: var(--pico-muted-color);
-    font-size: 0.66rem;
-    line-height: 1.35;
+  .guide-tag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.05rem 0.35rem;
+    border-radius: 999px;
+    background: var(--app-surface-3);
+    color: var(--app-muted);
   }
-
-  .source-help b { color: var(--app-text, inherit); }
-
-  .refresh-source {
-    width: 100%;
-    margin: 0.45rem 0 0;
-    padding: 0.3rem 0.45rem;
-    font-size: 0.68rem;
-    background: transparent;
-    color: var(--app-text);
-    border: var(--app-border-width) solid var(--app-border);
+  .guide-status {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--app-muted);
+    font-size: 0.74rem;
+  }
+  .guide-footer {
+    margin: 0.9rem 0 0;
+    font-size: 0.75rem;
+    color: var(--app-muted);
   }
 
   .layer-list, .legend-list {
     list-style: none;
     padding: 0;
-    margin: 0.4rem 0 0;
+    margin: 0.35rem 0 0;
   }
   .layer-list li, .legend-list li {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 0;
     color: var(--app-text);
   }
+  .layer-list li { padding: 3px 0; }
   .layer-list label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  /* Legend rows are buttons: click to spotlight that type in the canvas. */
+  .legend-btn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+    padding: 2px 4px;
+    border: var(--app-border-width) solid transparent;
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--app-text);
+    font-size: inherit;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+  }
+  .legend-btn:hover:not(:disabled) {
+    background: var(--app-surface-2);
+    border-color: var(--app-border);
+  }
+  /* Spotlight active */
+  .legend-btn.on {
+    background: var(--app-accent-soft);
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+    font-weight: 600;
+  }
+  /* Type of the currently selected node — a readout, not a mode, so it is
+     marked with an edge bar rather than the filled accent used by .on. */
+  .legend-btn.current {
+    color: var(--app-text-strong);
+    font-weight: 600;
+    padding-left: 7px;
+    box-shadow: inset 3px 0 0 var(--app-accent);
+  }
+  .legend-btn.current::after {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--app-accent);
+    flex-shrink: 0;
+  }
+  .legend-btn.empty { opacity: 0.4; cursor: default; }
+
+  .legend-count {
+    font-size: 0.58rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--app-muted);
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .legend-btn.on .legend-count { color: var(--app-accent); }
 
   .swatch {
     display: inline-block;
@@ -1895,21 +2287,20 @@
     flex-shrink: 0;
   }
 
-  /* Long scheme/type names (e.g. "StimulationMechanism") get an ellipsis and a
-     tooltip instead of being clipped by the fixed-width sidebar. */
+  /* Long scheme/type names ("Catalog implementation", "StimulationMechanism")
+     wrap rather than truncate — an abbreviated legend entry is guesswork, and
+     these names are the vocabulary the rest of the UI refers to. */
   .legend-label {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
   }
 
   .anim-control {
-    margin-top: 0.4rem;
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.2rem;
   }
 
   .anim-label {
@@ -1917,9 +2308,10 @@
     align-items: baseline;
     justify-content: space-between;
     gap: 0.4rem;
-    font-size: 0.74rem;
+    font-size: 0.7rem;
     color: var(--pico-muted-color);
   }
+  .anim-label label { margin: 0; cursor: pointer; }
 
   .anim-value {
     font-variant-numeric: tabular-nums;
@@ -2119,16 +2511,23 @@
     cursor: pointer;
   }
 
-  .iri-row dd {
+  /* The copy button rides on the "IRI" label line, leaving the whole value
+     column for the IRI itself — long CURIEs then truncate cleanly instead of
+     pushing the button out of the card. */
+  .iri-row dt {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
+  }
+
+  .iri-row dd {
+    min-width: 0;
   }
 
   .iri-row a {
+    display: block;
     color: inherit;
     opacity: 0.85;
-    flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2137,17 +2536,77 @@
 
   .copy-btn {
     flex-shrink: 0;
-    width: auto;
+    width: 1.15rem;
+    height: 1.15rem;
     margin: 0;
-    padding: 0.15rem 0.45rem;
-    font-size: 0.68rem;
+    padding: 0;
     background: transparent;
-    border: var(--app-border-width) solid var(--app-border);
+    border: var(--app-border-width) solid transparent;
     border-radius: var(--app-radius);
-    color: inherit;
+    color: var(--pico-muted-color);
+    display: grid;
+    place-items: center;
     cursor: pointer;
   }
-  .copy-btn:hover { background: var(--app-accent-soft); border-color: var(--app-accent); }
+  .copy-btn svg { width: 0.7rem; height: 0.7rem; display: block; }
+  .copy-btn:hover {
+    background: var(--app-accent-soft);
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+  }
+  .copy-btn.copied { color: var(--app-ok); border-color: var(--app-ok); }
+
+  /* SKOS annotation blocks under the definition */
+  .alt-labels {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin: 0;
+    font-size: 0.76rem;
+    color: var(--app-muted);
+  }
+  .alt-labels-tag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-muted-2);
+  }
+
+  .note {
+    margin: 0;
+    padding: 0.45rem 0.6rem;
+    border-left: 2px solid var(--app-border);
+    background: var(--app-surface-2);
+    border-radius: 0 var(--app-radius) var(--app-radius) 0;
+  }
+  .note-heading {
+    margin: 0 0 0.15rem;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+    cursor: help;
+  }
+  .note p {
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+  .note-scopeNote { border-left-color: var(--app-accent); }
+  .note-example { border-left-color: var(--app-ok); }
+  .note-historyNote, .note-editorialNote { border-left-color: var(--app-muted-2); }
+
+  /* Transition control, shown next to Focus neighborhood */
+  .focus-transition {
+    margin: 0 0 0.6rem;
+    padding: 0.4rem 0.55rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface-2);
+  }
 
   .section-heading {
     margin: 0 0 0.4rem;
