@@ -370,7 +370,7 @@ export async function buildGraphElements(store) {
     edges.push({ data: {
       id: `inst_${localName(concept)}_${localName(owlClass)}`,
       source: concept, target: owlClass,
-      kind: 'instanceOf', label: 'a',
+      kind: 'instanceOf', label: 'type',
     }})
   }
 
@@ -486,7 +486,7 @@ export async function buildGraphElements(store) {
         source: id,
         target: type,
         kind: 'instanceOf',
-        label: 'a',
+        label: 'type',
         sourceLabel: nodes.get(id).data.label,
         targetLabel: nodes.get(type).data.label,
       })

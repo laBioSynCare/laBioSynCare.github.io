@@ -327,13 +327,17 @@
     const cs = getComputedStyle(container)
     const read = (name, fb) => cs.getPropertyValue(name).trim() || fb
     const canvas = read('--app-canvas', fallback.canvas)
+    const dark = isDarkColor(canvas)
     return {
       accent: read('--app-accent', fallback.accent),
       canvas,
       text: read('--app-text-strong', fallback.text),
       muted: read('--app-muted', fallback.muted),
       font: read('--app-font-ui', fallback.font),
-      dark: isDarkColor(canvas),
+      dark,
+      // Neutral grey for the type/instanceOf layer, inverted per skin so it
+      // reads against the canvas rather than dissolving into it.
+      instanceOf: dark ? '#aaaaaa' : '#7f7f7f',
     }
   }
 
@@ -492,16 +496,18 @@
         style: { 'line-color': COLORS.related, 'target-arrow-color': COLORS.related, 'line-style': 'dashed', 'target-arrow-shape': 'none' }
       },
       {
-        // instanceOf is by far the densest layer (typically ~70% of all edges).
-        // Kept recessive so the semantic structure — subClassOf, narrower,
-        // properties — stays readable through it.
+        // instanceOf is the densest layer (typically ~70% of all edges), so it
+        // stays dotted and thin to keep subClassOf/narrower readable through
+        // it — but it is a real semantic relation and must be legible. The
+        // neutral grey has to follow the skin: one fixed grey is either
+        // invisible on the light canvas or glaring on the dark one.
         selector: 'edge[kind="instanceOf"]',
         style: {
-          'line-color': COLORS.instanceOf,
-          'target-arrow-color': COLORS.instanceOf,
+          'line-color': theme.instanceOf,
+          'target-arrow-color': theme.instanceOf,
           'line-style': 'dotted',
-          'width': 1,
-          'opacity': 0.32,
+          'width': 1.4,
+          'opacity': 0.75,
         }
       },
       {
@@ -1470,7 +1476,10 @@
     { key: 'showDataProp',   label: 'data property', color: COLORS.dataProp },
     { key: 'showNarrower',   label: 'narrower',     color: COLORS.narrower },
     { key: 'showRelated',    label: 'related',      color: COLORS.related },
-    { key: 'showInstanceOf', label: 'instanceOf',   color: COLORS.instanceOf },
+    // Named "type" throughout — it projects rdf:type, and the detail panel and
+    // connection pills already used that word. The internal kind stays
+    // 'instanceOf'; only the human-facing label is unified here.
+    { key: 'showInstanceOf', label: 'type',         color: COLORS.instanceOf },
     { key: 'showCatalogRelation', label: 'catalog relation', color: COLORS.catalogRelation },
     { key: 'showEcosystemRelationship', label: 'ecosystem relation', color: COLORS.ecosystemRelationship },
   ]
