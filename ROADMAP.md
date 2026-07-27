@@ -210,9 +210,11 @@ by [ADR 0031](docs/decisions/0031-qualified-ecosystem-records.md) and
   WABT, and Firebase tooling across Linux and macOS. CI runs every command
   inside it, so contributor and CI toolchains match exactly.
 - GitHub Actions for build, check, validate, and Pages deploy.
-- w3id.org routing merged upstream twice: PR #6337 (2026-07-11, full
-  route × representation matrix) and PR #6378 (2026-07-17, catalog and live
-  ecosystem routes). PR #6393 (graph deep links) is open.
+- w3id.org routing merged upstream three times: PR #6337 (2026-07-11, full
+  route × representation matrix), PR #6378 (2026-07-17, catalog and live
+  ecosystem routes), and PR #6393 (2026-07-21, HTML-accept deep links into the
+  graph browser). One identifier now serves both audiences: a browser hitting
+  `w3id.org/sstim` lands in the live graph navigator, a machine gets Turtle.
 
 ---
 
@@ -313,9 +315,11 @@ the knowledge navigation layer.
       implementation instances under `/framework/bsc`, `/implementation/bsclab`,
       and public-safe `/implementation/biosyncare` metadata if needed (PR to
       perma-id/w3id.org). Do not publish the private BioSynCare/BSC catalog
-      through BSC Lab. *(perma-id/w3id.org #6337 merged 2026-07-11, #6378 merged
-      2026-07-17 adding catalog and live ecosystem routes; #6393 open for
-      HTML-accept graph deep links)*
+      through BSC Lab. *(three upstream merges into perma-id/w3id.org: #6337
+      2026-07-11 route × representation matrix, #6378 2026-07-17 catalog and live
+      ecosystem routes, #6393 2026-07-21 HTML-accept deep links into the graph
+      browser. Verified live: `Accept: text/html` on `w3id.org/sstim` resolves to
+      `/graph/`, `Accept: text/turtle` to `sstim-core.ttl`)*
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
       *(submission material prepared in `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md`;
@@ -328,8 +332,9 @@ the knowledge navigation layer.
 
 ### Community and IP protection
 
-- [ ] File Brazilian INPI trademarks: BioSynCare, Sensory Stimulation /
-      Captação Sensorial, BSC Lab (Classes 9, 41, 44)
+- [ ] File trademarks in both jurisdictions — Brazil (INPI) first, then EU
+      (EUIPO). Per-mark classes, costs, and priorities are tracked in
+      `TODO.md` under "Trademark filings"; do not duplicate filing detail here
 - [ ] Add scientific advisory board page to biosyncare.com with Juliana
       and other named advisors
 - [ ] Publish first web article: "Facilitating dedication with sensory
@@ -444,13 +449,13 @@ concrete rather than abstract.
 - [x] First partner collaboration: ontology annotation session with at
       least one named partner (Theo Marins or Olimpia Pino most likely —
       both have neuroscience domain expertise) *(Theo Marins, University of
-      Graz, interviewed 2026-07-22. Outcome: the engagement-mode facet, the
-      neurostimulation/neuromodulation two-senses split, and the
-      self-regulation genus — [ADR 0035](docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md),
-      [ADR 0036](docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md),
-      [ADR 0037](docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
-      released in SSTIM 0.10.0–0.11.0)*
-- [ ] File EU trademark: BioSynCare at EUIPO (Class 9 minimum)
+      Graz, interviewed 2026-07-22. Outcome: the engagement-mode facet and the
+      neurostimulation/neuromodulation two-senses split —
+      [ADR 0035](docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md)
+      and [ADR 0036](docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md),
+      released in SSTIM 0.10.0.
+      [ADR 0037](docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)
+      then corrected a genus defect this work exposed, in 0.11.0)*
 - [ ] Add Wikidata items for concepts not yet present: Martigli oscillation,
       Symmetry permutation entrainment, BSC frequency band taxonomy
 
