@@ -4,22 +4,29 @@
 > phase the project is in, what is being built next, and what must not be
 > built yet. The granular task list is in `TODO.md`.
 >
-> **Current phase: Phase 1 public foundation.** Phase 0 is complete.
-> BSC Lab v0.1 (knowledge browser) is the nearest software milestone.
-> The stimulation player is Phase 2. Evidence collection is Phase 3.
-> Do not build Phase 3 infrastructure during Phase 1 work.
+> **Current phase: Phase 1 public foundation, with much of Phase 2 software
+> already shipped.** Phase 0 is complete. The BSC Lab v0.1 knowledge browser is
+> substantially delivered; what remains in Phase 1 is non-software — defensive
+> publication filings, trademarks, the first web article, and partner/advisory
+> commitments. Evidence collection is Phase 3 and must still not be built now.
 >
-> **Implementation note (ahead of schedule).** Two early Phase-2 artifacts
-> already exist: the **Patch Studio** — a real-time audiovisual designer with four
+> **Checkbox legend:** `[x]` shipped · `[~]` partially shipped, qualifier in the
+> item text · `[ ]` not started. A `[~]` means *do not assume this works
+> end-to-end* — read the qualifier before building on it.
+>
+> **Implementation note (ahead of schedule).** Several Phase-2 artifacts already
+> exist: the **Patch Studio** — a real-time audiovisual designer with four
 > selectable audio engines and a photosensitivity safety layer
-> ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)) — and the
+> ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)) — the
 > **Sensory Field** (`/field/`), a minimal stimulation instrument that emits an
 > `sstim-ex:ExposureProfile` and adds a runtime flash-rate safety cap
 > ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
-> [ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)). Both are
-> prototypes ahead of the formal Phase 2 schedule; the `core/` orchestration
-> layer and the GPU visual/haptic engines remain Phase 2 work, and Phase 3
-> infrastructure still must not be built during Phase 1.
+> [ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)) — the
+> installable **PWA** layer, and a Phase-3 **WASM** audio path. The `core/`
+> orchestration layer (three-clock scheduler, `StimulationOrchestrator`,
+> `SessionRecorder`) and the GPU visual and haptic engines remain unbuilt. See
+> [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
+> for everything shipped that this roadmap never listed.
 
 ---
 
@@ -123,6 +130,92 @@ primarily with AI-assisted development.
 
 ---
 
+## Delivered Outside the Original Plan
+
+This roadmap was written in April 2026, when the ontology had no tagged
+releases and the repository had no release engineering. The work below was
+delivered since and appears nowhere in the phase deliverables above. It is
+recorded here so that the phase lists are not mistaken for the full scope of
+what exists.
+
+### Release engineering and citability
+
+- Nine tagged releases, `v0.2.0` (2026-06-12) through `v0.11.0` (2026-07-24).
+  No release tag existed when the phases below were written.
+- Zenodo archiving enabled at `v0.5.0`: an all-versions concept DOI plus a
+  distinct version DOI per release, carried into the ontology metadata,
+  VoID/DCAT, citation guidance, and the JSON-LD context.
+- Immutable whole-set snapshots under `static/ontology/0.1.0/` … `0.11.0/`
+  ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)), with a
+  `make verify-snapshots` checksum gate against silent edits.
+- `CHANGELOG.md` as the release history of record.
+- `make validate` as a single composite gate: six SHACL suites, ecosystem
+  contract, quality audit, OWL DL reasoning, SPARQL sanity, export check,
+  JSON-LD context round-trip, and snapshot verification — all mirrored in CI.
+
+### Ontology modules and quality infrastructure
+
+- Three release modules beyond the original four: `sstim-exposure.ttl`,
+  `sstim-ecosystem.ttl`, `sstim-patch-studio.ttl`, plus
+  `sstim-ecosystem-private-shapes.ttl`, `void.ttl`, and `context.jsonld`.
+- ROBOT/HermiT OWL DL consistency reasoning over the merged term space
+  (`make reason`).
+- Executable competency and quality checks (`make sparql-sanity`,
+  `make quality-audit`) rather than prose competency questions.
+- Multi-format serialization export (`make export` → JSON-LD and RDF/XML) and a
+  JSON-LD context round-trip test.
+- pyLODE `vocpub` SKOS documentation alongside WIDOCO's OWL reference docs
+  ([ADR 0023](docs/decisions/0023-ontology-docs-publication-path.md)).
+- BioPortal ingest bundle (`make bioportal-bundle`) and submission; FOOPS
+  reassessed at 87.5% with only registry-dependent checks outstanding.
+- 37 accepted ADRs (0001–0037). Roughly a handful existed in April 2026.
+
+### Ecosystem and stakeholder layer
+
+Not in any phase list. Introduced by
+[ADR 0024](docs/decisions/0024-stakeholder-ecosystem-modeling.md) and hardened
+by [ADR 0031](docs/decisions/0031-qualified-ecosystem-records.md) and
+[ADR 0032](docs/decisions/0032-visible-pending-status-ecosystem-records.md).
+
+- Qualified ecosystem records for people and organizations with a visible
+  consent lifecycle (notified → approved), a private ledger, a
+  retention/removal runbook, and a private-first admission job.
+- A live, mutable public projection (`current.ttl`) kept outside the citable
+  releases and opt-in in the app, with source and provenance disclosure.
+- `make ecosystem-contract` and `make ecosystem-publish` operational tooling.
+- Supporting documents: `ECOSYSTEM_INTEGRATION.md`, `ECOSYSTEM_OPERATIONS.md`,
+  `OUTREACH_TARGETS.md`, `HED_BIDS_INTEROP.md`, `SSTIM_LLM_MESSAGING.md`,
+  `DEFENSIVE_PUBLICATIONS.md`.
+
+### Application surfaces
+
+- **Sensory Field** (`/field/`) with three scenes, `ExposureProfile` emission,
+  and a runtime flash-rate cap ([ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)).
+- **Logbook**, **Profile**, **Settings**, and **About** routes.
+- **Entrance/conversion layer**: citation modal, protocol-contribution modal,
+  and conversion bar for the four-door entrance.
+- **Graph navigator** far beyond "class hierarchy + SKOS scheme": legend
+  spotlighting, subgraph guides, facet-based navigation across stimulation and
+  neuromodulation, live-ecosystem overlay, provenance disclosure, and
+  deep-linkable IRI targets.
+- **PWA layer**: manifest, service worker, offline runtime caching, and a
+  session-safe update banner ([ADR 0009](docs/decisions/0009-pwa.md)).
+- Photosensitivity safety layer, theme/skin system, generated CC0 ambient
+  samples (`scripts/gen-ambiences.mjs`) with a `Sample` track type, and vitest
+  unit suites beside the source they cover.
+
+### Toolchain and publication path
+
+- A Nix flake pinning Node, Python + pySHACL, ROBOT/HermiT, WIDOCO, pyLODE,
+  WABT, and Firebase tooling across Linux and macOS. CI runs every command
+  inside it, so contributor and CI toolchains match exactly.
+- GitHub Actions for build, check, validate, and Pages deploy.
+- w3id.org routing merged upstream twice: PR #6337 (2026-07-11, full
+  route × representation matrix) and PR #6378 (2026-07-17, catalog and live
+  ecosystem routes). PR #6393 (graph deep links) is open.
+
+---
+
 ## Phase 0 — Repository Bootstrap
 **April 2026 — Ongoing now**
 
@@ -158,7 +251,7 @@ build in subsequent phases.
 - [x] `static/ontology/sstim-alignments.ttl` — Wikidata/DBpedia links
 - [x] `src/README.md` — full software architecture
 - [x] `src/engines/README.md`, `src/core/README.md`, `src/rdf/README.md`, `src/ui/README.md`
-- [~] `README.md`, [x] `CONTRIBUTING.md`
+- [x] `README.md`, [x] `CONTRIBUTING.md`
 
 ### Phase 0 is complete when
 
@@ -187,33 +280,47 @@ the knowledge navigation layer.
 
 - [x] SvelteKit 2 + Svelte 5 + Vite 6 project scaffold
 - [x] RDF loader: fetch and parse ontology TTL files at runtime (N3.js)
-- [~] SPARQL query interface (Comunica, lazy-loaded)
-- [~] Preset browser: list public BSC Lab seed/reference presets, filter by
+- [x] SPARQL query interface (Comunica, lazy-loaded): editor, worked examples,
+      results table, documented sources, opt-in live ecosystem graph
+- [x] Preset browser: list public BSC Lab seed/reference presets, filter by
       group / frequency band / evidence tier, show full metadata
-- [ ] Evidence chain view: for each preset, show evidence claims →
-      references → public-safe flag
-- [ ] SHACL validation: validate any preset on demand, display violations
+- [x] Evidence chain view: each preset resolves through
+      `sstim:EvidenceAssessmentClaim` → ranked evidence tier →
+      `sstim:citesReference` → reference title. The public-safe decision is now
+      a publication gate applied before data is committed, not a per-preset UI
+      flag — see [ADR 0027](docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md)
+      and [ADR 0029](docs/decisions/0029-bsc-lab-public-claim-publication-profile.md)
+- [~] SHACL validation: six shape suites run in CI and in the vitest suites via
+      `rdf-validate-shacl`/pySHACL (`make shacl`). On-demand in-browser
+      validation of an arbitrary preset with a violations panel is not built
 - [x] Ontology graph view: Cytoscape.js visualization of class hierarchy
-      and SKOS concept scheme (lazy-loaded)
-- [~] Basic annotation: add a text note to any ontology node, stored in
+      and SKOS concept scheme (lazy-loaded); since extended well past this
+      scope — see [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
+- [x] Basic annotation: add a text note to any ontology node, stored in
       per-user named graph metadata and Firestore when Firebase is configured
 - [x] GitHub Pages deployment for the client-only static build and
       `/ontology/*.ttl` artifacts
 - [ ] Custom-domain hosting deployment: `lab.biosyncare.com` (CNAME at Keliweb)
       when custom headers, WASM threading, or backend services justify it
+      *(deliberately deferred — nothing shipped needs custom headers yet)*
 - [x] WIDOCO-generated ontology HTML docs, generated by CI and published
       outside the `main` source tree
 
 ### Ontology and IP
 
 - [x] Register `https://w3id.org/sstim` namespace for the ontology
-- [ ] Extend `https://w3id.org/sstim` namespace routing for BSC framework and
+- [x] Extend `https://w3id.org/sstim` namespace routing for BSC framework and
       implementation instances under `/framework/bsc`, `/implementation/bsclab`,
       and public-safe `/implementation/biosyncare` metadata if needed (PR to
       perma-id/w3id.org). Do not publish the private BioSynCare/BSC catalog
-      through BSC Lab.
+      through BSC Lab. *(perma-id/w3id.org #6337 merged 2026-07-11, #6378 merged
+      2026-07-17 adding catalog and live ecosystem routes; #6393 open for
+      HTML-accept graph deep links)*
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
+      *(submission material prepared in `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md`;
+      blocked on choosing a venue and securing an arXiv endorser. The repository
+      commits already establish the disclosure date)*
 - [x] Publish `static/ontology/sstim-core.ttl` and `sstim-vocab.ttl` at
       w3id.org/sstim with content negotiation
 - [x] WIDOCO documentation generated by GitHub Actions and deployed without
@@ -228,9 +335,11 @@ the knowledge navigation layer.
 - [ ] Publish first web article: "Facilitating dedication with sensory
       stimulation" on biosyncare.com (personal, phenomenological, honest
       about mechanism uncertainty)
-- [ ] Personal outreach to each named partner with the specific ask:
+- [~] Personal outreach to each named partner with the specific ask:
       join the BSC scientific advisory board and eventually co-found the
-      W3C Community Group
+      W3C Community Group *(Theo Marins interviewed 2026-07-22; contributed
+      terminology is now in ADRs 0035–0037 and published as an ecosystem record
+      at notified status. Remaining partners not yet approached with this ask)*
 
 ### BioSynCare (commercial, parallel track)
 
@@ -249,6 +358,13 @@ Brazilian trademarks are in application. At least three of the named
 partners have agreed to the advisory board ask. BioSynCare has its
 first meaningful cohort of active users.
 
+**Status (updated 2026-07-27): software done, non-software outstanding.** The
+v0.1 browser is deployed and exceeded, and the namespace resolves in every
+format. What still gates Phase 1 is all non-code: defensive publication
+filings, INPI/EUIPO trademarks, the first web article, the advisory-board ask
+to named partners, and the BioSynCare user cohort. Registry curation and
+independent human ontology review are also still open.
+
 ---
 
 ## Phase 2 — Stimulation Platform
@@ -261,19 +377,35 @@ concrete rather than abstract.
 
 ### Software: BSC Lab v0.2 (Stimulation Player)
 
-- [ ] Pluggable audio engine: IAudioEngine interface with VanillaWebAudio
-      and ToneJs implementations
-- [ ] AudioWorklet processors: binaural, Martigli, Symmetry (in
-      `static/worklets/`, never bundled)
+- [x] Pluggable audio engine: `IAudioEngine` interface with four registered
+      implementations — Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, and
+      Null — selected through the registry/factory in
+      `src/engines/audio/audioEngines.js`. Tone.js was dropped; the second
+      comparison engine is the AudioWorklet path instead
+- [~] AudioWorklet processors (in `static/worklets/`, never bundled): the unified
+      `bsc-voice.worklet.js` renders `Carrier`, `IsochronicTone`, and
+      `BinauralBeat` entirely on the audio thread. The catalog voice types
+      `Martigli`, `Symmetry`, and `Martigli-Binaural` are not yet on the worklet
+      path
 - [ ] Three-clock architecture: AudioContext master, Worker scheduler,
-      rAF renderer
-- [ ] PixiJS v8 visual engine: breathing animation, entrainment visuals
-      synchronized to AudioContext.currentTime
-- [ ] Haptic engine: VibrationApi + NullHapticEngine fallback
+      rAF renderer *(`src/core/` is still README-only; no Worker scheduler)*
+- [~] PixiJS v8 visual engine: breathing animation, entrainment visuals
+      synchronized to AudioContext.currentTime *(nine Patch Studio visual track
+      types with blend modes and a fullscreen stage, plus 2D-canvas Sensory
+      Field scenes, are shipped. `IVisualEngine` and the PixiJS/WebGPU renderer
+      are not built)*
+- [~] Haptic engine: VibrationApi + NullHapticEngine fallback *(the `Vibration`
+      track type, its parameters, and modulation routing exist in the patch
+      model; no `IHapticEngine` and no `navigator.vibrate` code path yet, so
+      haptic tracks are authored but not emitted)*
 - [ ] StimulationOrchestrator: wires all three engines via interface only
-- [ ] Session player UI: play/pause/stop, duration display, preset info
-- [ ] Engine selector UI: switch audio and visual engine mid-session
-      (for comparison purposes — a key research feature)
+- [~] Session player UI: play/pause/stop, duration display, preset info
+      *(Patch Studio transport and Sensory Field run controls exist; there is no
+      player that takes a catalog preset and plays it)*
+- [~] Engine selector UI: switch audio and visual engine mid-session
+      (for comparison purposes — a key research feature) *(audio engines are
+      selectable in Settings with capability gating, but the choice applies on
+      next playback, not mid-session; there is no visual engine to select)*
 - [x] Real-time designer with live audio preview — the **Patch Studio**
       (`patch-studio-model-1`); shipped ahead of schedule
 - [ ] Bridge the Patch Studio to the catalog preset / RDF instance formats
@@ -281,18 +413,25 @@ concrete rather than abstract.
       [ADR 0026](docs/decisions/0026-patch-studio-catalog-bridge.md)
 - [ ] SessionRecorder: records preset + user-defined params → complete
       reproducible session specification
-- [ ] PWA: offline support for cached presets, service worker
+- [x] PWA: offline support for cached presets, service worker *(manifest,
+      service worker, runtime caching of heavy ontology/audio assets, and a
+      session-safe update banner — [ADR 0009](docs/decisions/0009-pwa.md),
+      [`docs/technical/PWA_SERVICE_WORKER.md`](docs/technical/PWA_SERVICE_WORKER.md))*
 
 ### Software: BSC Lab v0.2 (RDF layer additions)
 
 - [ ] Optional RDF export pipeline: public BSC Lab preset instances →
-      runtime JSON for the BSC Lab player
-- [ ] Public BSC Lab reference preset instances grow only from explicit,
+      runtime JSON for the BSC Lab player *(`make export` covers ontology
+      serializations — JSON-LD and RDF/XML — not preset→runtime JSON.
+      `src/rdf/export.js` does not exist)*
+- [x] Public BSC Lab reference preset instances grow only from explicit,
       publishable examples; the private BioSynCare/BSC catalog remains outside
-      this repository
+      this repository *(standing policy, held through every release)*
 - [ ] SPARQL-driven preset routing: query by user need → ranked preset
       suggestions with evidence tier display
-- [ ] Enhanced annotation: named graph per user/session, export as Turtle
+- [~] Enhanced annotation: named graph per user/session, export as Turtle
+      *(per-user named graph and N3-Writer Turtle export shipped, with
+      authentication IDs excluded from exports; per-session graphs not yet)*
 
 ### Community
 
@@ -301,9 +440,16 @@ concrete rather than abstract.
       4 → ≥12 as an ongoing KPI — see `docs/ecosystem/ECOSYSTEM_INTEGRATION.md`)
 - [ ] BSC Lab GitHub Discussions enabled: initial threads on frequency
       band taxonomy, evidence tier definitions, Sensory Stimulation definition
-- [ ] First partner collaboration: ontology annotation session with at
+      *(verified still disabled on the repository)*
+- [x] First partner collaboration: ontology annotation session with at
       least one named partner (Theo Marins or Olimpia Pino most likely —
-      both have neuroscience domain expertise)
+      both have neuroscience domain expertise) *(Theo Marins, University of
+      Graz, interviewed 2026-07-22. Outcome: the engagement-mode facet, the
+      neurostimulation/neuromodulation two-senses split, and the
+      self-regulation genus — [ADR 0035](docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md),
+      [ADR 0036](docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md),
+      [ADR 0037](docs/decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
+      released in SSTIM 0.10.0–0.11.0)*
 - [ ] File EU trademark: BioSynCare at EUIPO (Class 9 minimum)
 - [ ] Add Wikidata items for concepts not yet present: Martigli oscillation,
       Symmetry permutation entrainment, BSC frequency band taxonomy
@@ -324,6 +470,13 @@ members. BioSynCare revenue has meaningfully reduced financial pressure.
 Public BSC Lab reference presets are available as RDF, with runtime JSON
 generated only for BSC Lab if the player needs it.
 
+**Status (updated 2026-07-27): partially met, out of the planned order.** Four
+swappable audio engines work end-to-end inside the Patch Studio, and public
+reference presets are published as RDF. But the swappable engines drive
+*patches*, not catalog presets: there is no preset player, no orchestrator, no
+session recorder, and no preset→runtime JSON path. The CG is launched with 4
+participants against a ≥ 5 target. BioSynCare revenue remains negligible.
+
 ---
 
 ## Phase 3 — Evidence Infrastructure
@@ -341,8 +494,12 @@ or group.
 - [ ] User feedback mechanism: post-session self-report (affect, focus,
       subjective state) with GDPR/LGPD-compliant consent flow
 - [ ] Data download: users can export their own session history
-- [ ] WASM audio engine: Rust→WASM AudioWorklet processors for Martigli
-      and Symmetry (better precision, fewer GC stalls)
+- [~] WASM audio engine: Rust→WASM AudioWorklet processors for Martigli
+      and Symmetry (better precision, fewer GC stalls) *(arrived early and by a
+      different route: a hand-written WAT sine-LUT kernel — `bsc-osc.wat` →
+      `bsc-osc.wasm`, rebuilt with `make wasm` — loaded by
+      `bsc-voice-wasm.worklet.js` behind `WasmAudioWorkletEngine`. No Rust
+      toolchain; Martigli and Symmetry are not ported yet)*
 - [ ] Expanded SPARQL interface: query across session history, correlation
       views between preset type and self-report
 
@@ -435,16 +592,22 @@ until BioSynCare reaches acquisition-relevant scale.
 
 | Feature | Phase | Build now? |
 |---|---|---|
-| RDF loader + N3.js store | 1 | Yes |
-| SPARQL browser + evidence chain view | 1 | Yes |
-| Cytoscape.js ontology graph | 1 | Yes |
-| Basic annotation (Firebase-gated named graph records) | 1 | Yes |
-| AudioWorklet stimulation engine | 2 | Not yet |
-| PixiJS visual engine | 2 | Not yet |
-| Patch Studio (real-time designer) | 2 | Yes |
+| RDF loader + N3.js store | 1 | Shipped — extend, don't rebuild |
+| SPARQL browser + evidence chain view | 1 | Shipped — extend, don't rebuild |
+| Cytoscape.js ontology graph | 1 | Shipped — extend, don't rebuild |
+| Basic annotation (Firebase-gated named graph records) | 1 | Shipped — extend, don't rebuild |
+| On-demand in-browser SHACL validation UI | 1 | Yes |
+| PWA / service worker | 2 | Shipped — see ADR 0009 before touching |
+| AudioWorklet stimulation engine | 2 | Shipped for patch track types; Martigli/Symmetry ports: yes |
+| Patch Studio (real-time designer) | 2 | Shipped — extend, don't rebuild |
+| PixiJS visual engine + `IVisualEngine` | 2 | Not yet |
+| Haptic engine (`IHapticEngine`, vibrate path) | 2 | Not yet |
+| Three-clock architecture / Worker scheduler | 2 | Not yet |
+| StimulationOrchestrator | 2 | Not yet |
+| Catalog preset session player | 2 | Not yet |
 | Patch Studio → catalog/RDF bridge | 2 | Not yet |
 | Session recorder | 2 | Not yet |
-| WASM audio processors | 3 | Not yet |
+| WASM audio processors | 3 | Shipped early (WAT kernel); further DSP ports: yes |
 | User feedback / self-report collection | 3 | Not yet |
 | Session data export pipeline | 3 | Not yet |
 | Multi-user annotation (server-side) | 3 | Not yet |
@@ -464,4 +627,9 @@ strategic decision changes the sequencing. Granular tasks (individual
 issues, feature work, ecosystem events) are tracked in `TODO.md`.
 Historical milestones are recorded in `CHANGELOG.md`.
 
-*Last updated: April 2026 — Renato Fabbri*
+When marking an item shipped, prefer `[~]` with a one-line qualifier over `[x]`
+whenever the delivered thing differs from what the item describes. An
+unqualified `[x]` that overstates reality is worse than an honest `[~]`.
+
+*Last updated: 2026-07-27 — Renato Fabbri. Status reconciled against the
+repository at `v0.11.0`; the phase lists above had drifted since April 2026.*
