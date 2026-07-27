@@ -22,6 +22,14 @@
 // every module declares that same owl:versionInfo, and sstim-core.ttl carries
 // the matching owl:versionIRI and mod:status "released".
 //
+// Release dates (2026-07-27): every module header must also carry
+// `dct:issued` = `dct:modified` = the release date (today, or --release-date).
+// `dct:issued` is what registries read as the version's release date —
+// BioPortal's "Released" column, DBpedia Archivo, OLS — so a stale value makes
+// every published version look like it shipped on the ontology's first issue
+// date. `dct:created` stays the module's original creation date and only has
+// to be no later than the release.
+//
 // Every successful snapshot also records its files' checksums into
 // static/ontology/snapshot-checksums.json (RDF-03/RDF-12, 2026-07-24 audit),
 // so `make verify-snapshots` can catch silent drift in an already-published
@@ -58,10 +66,54 @@ function declaredVersion() {
   return match[1]
 }
 
+// Returns the module's `<iri> a owl:Ontology ; ... .` header statement, or ''
+// when there is none. Scans for the statement-terminating "." while tracking
+// Turtle string literals, so a "." inside a historyNote — or a dct:issued on a
+// bibliographic reference further down the file — is never mistaken for the
+// header. sstim-shapes.ttl in particular carries several unrelated dct:issued
+// occurrences inside SHACL property shapes.
+export function ontologyHeader(text) {
+  const start = text.search(/^\s*<[^>]+>\s+a\s+owl:Ontology\b/m)
+  if (start === -1) return ''
+  let quote = null // '"""' or '"' while inside a literal
+  for (let i = start; i < text.length; i += 1) {
+    if (quote) {
+      if (text[i] === '\\') { i += 1; continue }
+      if (text.startsWith(quote, i)) { i += quote.length - 1; quote = null }
+      continue
+    }
+    if (text.startsWith('"""', i)) { quote = '"""'; i += 2; continue }
+    if (text[i] === '"') { quote = '"'; continue }
+    if (text[i] === '#') { // comment to end of line
+      const nl = text.indexOf('\n', i)
+      if (nl === -1) break
+      i = nl
+      continue
+    }
+    if (text[i] === '.' && /[\s\r\n]|^$/.test(text[i + 1] ?? '\n')) {
+      return text.slice(start, i + 1)
+    }
+  }
+  return text.slice(start)
+}
+
+function headerDate(header, property) {
+  const match = header.match(new RegExp(`${property}\\s+"(\\d{4}-\\d{2}-\\d{2})"\\s*\\^\\^xsd:date`))
+  return match ? match[1] : null
+}
+
+// Local calendar date as YYYY-MM-DD (not toISOString(), which is UTC and would
+// report yesterday/tomorrow for maintainers outside UTC).
+export function todayIso(now = new Date()) {
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+}
+
 // Pure release-readiness check, exported for unit tests. `files` maps module
-// file names to their Turtle text; returns a list of human-readable problems
-// (empty when the set is ready to snapshot as `version`).
-export function releaseProblems({ version, files }) {
+// file names to their Turtle text; `releaseDate` is the YYYY-MM-DD date the
+// release is issued on (defaults to today). Returns a list of human-readable
+// problems (empty when the set is ready to snapshot as `version`).
+export function releaseProblems({ version, files, releaseDate = todayIso() }) {
   const problems = []
   if (version.includes('-')) {
     problems.push(`"${version}" is a development/prerelease version; snapshots are cut only from plain release versions`)
@@ -77,6 +129,26 @@ export function releaseProblems({ version, files }) {
       problems.push(`${file}: missing owl:versionInfo`)
     } else if (match[1] !== version) {
       problems.push(`${file}: owl:versionInfo "${match[1]}" does not match snapshot version "${version}"`)
+    }
+
+    // Release dates. The whole set is re-issued together (ADR 0020), so every
+    // module carries the same dct:issued / dct:modified = the release date.
+    const header = ontologyHeader(text)
+    const issued = headerDate(header, 'dct:issued')
+    const modified = headerDate(header, 'dct:modified')
+    const created = headerDate(header, 'dct:created')
+    if (!issued) {
+      problems.push(`${file}: missing dct:issued "${releaseDate}"^^xsd:date in the ontology header`)
+    } else if (issued !== releaseDate) {
+      problems.push(`${file}: dct:issued "${issued}" is not the release date "${releaseDate}" — bump it in every module when cutting a release (registries read it as the version's release date)`)
+    }
+    if (!modified) {
+      problems.push(`${file}: missing dct:modified "${releaseDate}"^^xsd:date in the ontology header`)
+    } else if (modified !== releaseDate) {
+      problems.push(`${file}: dct:modified "${modified}" is not the release date "${releaseDate}"`)
+    }
+    if (created && created > releaseDate) {
+      problems.push(`${file}: dct:created "${created}" is later than the release date "${releaseDate}"`)
     }
   }
   const core = files.get('sstim-core.ttl') ?? ''
@@ -106,12 +178,15 @@ function sourceCommit() {
 }
 
 function usage() {
-  console.log(`Usage: node scripts/snapshot-ontology.mjs [version] [--force]
+  console.log(`Usage: node scripts/snapshot-ontology.mjs [version] [--force] [--release-date=YYYY-MM-DD]
 
 Copies static/ontology/*.ttl into static/ontology/<version>/.
 
 Options:
   --force   Overwrite an existing snapshot directory. Use only before publish.
+  --release-date=YYYY-MM-DD
+            The date this version is issued; every module header must declare
+            it as dct:issued and dct:modified. Defaults to today.
   -h, --help
             Show this help.
 `)
@@ -120,10 +195,16 @@ Options:
 function parseArgs(argv) {
   let version = null
   let force = false
+  let releaseDate = todayIso()
 
   for (const arg of argv) {
     if (arg === '--force') {
       force = true
+    } else if (arg.startsWith('--release-date=')) {
+      releaseDate = arg.slice('--release-date='.length)
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) {
+        throw new Error(`--release-date must be YYYY-MM-DD, got "${releaseDate}"`)
+      }
     } else if (arg === '-h' || arg === '--help') {
       usage()
       process.exit(0)
@@ -136,7 +217,7 @@ function parseArgs(argv) {
     }
   }
 
-  return { version: version ?? declaredVersion(), force }
+  return { version: version ?? declaredVersion(), force, releaseDate }
 }
 
 function dirtyOntologyFiles() {
@@ -161,18 +242,19 @@ function main() {
     process.exit(1)
   }
 
-  const { version, force } = options
+  const { version, force, releaseDate } = options
   if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(version)) {
     console.error(`Refusing to snapshot non-semver version "${version}".`)
     process.exit(1)
   }
 
-  const problems = releaseProblems({ version, files: liveModuleFiles() })
+  const problems = releaseProblems({ version, files: liveModuleFiles(), releaseDate })
   if (problems.length) {
-    console.error(`Refusing to snapshot: the module set is not release-ready as "${version}":`)
+    console.error(`Refusing to snapshot: the module set is not release-ready as "${version}" (release date ${releaseDate}):`)
     for (const problem of problems) console.error(`  - ${problem}`)
-    console.error('Bump owl:versionInfo across all modules, set owl:versionIRI and')
-    console.error('mod:status "released" in sstim-core.ttl, then snapshot.')
+    console.error('Bump owl:versionInfo and dct:issued / dct:modified across all modules,')
+    console.error('set owl:versionIRI and mod:status "released" in sstim-core.ttl, then snapshot.')
+    console.error('Pass --release-date=YYYY-MM-DD if the release is dated other than today.')
     process.exit(1)
   }
 

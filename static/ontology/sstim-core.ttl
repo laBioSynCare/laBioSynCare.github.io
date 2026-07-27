@@ -61,7 +61,7 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:issued "2026-04-12"^^xsd:date ;
+    dct:issued "2026-07-24"^^xsd:date ;
     dct:modified "2026-07-24"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;

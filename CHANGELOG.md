@@ -15,6 +15,18 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release dates are now part of the release gate.** `make snapshot` refuses a
+  snapshot unless every module header declares `dct:issued` = `dct:modified` =
+  the release date (today, or `RELEASE_DATE=YYYY-MM-DD`), with `dct:created`
+  no later. `dct:issued` had never been bumped past the ontology's first issue
+  date, so registries that read it as the version release date reported every
+  version as released on 2026-04-12 — visible as BioPortal's **Released** column
+  across all eight SSTIM submissions, corrected there by hand on 2026-07-27.
+  Metadata and tooling only; no term changed. See
+  [`docs/ontology/README.md`](docs/ontology/README.md#release-gate-make-snapshot).
+
 ## [0.11.0] - 2026-07-24
 
 Published under version DOI `10.5281/zenodo.21536124`, with

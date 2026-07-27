@@ -47,7 +47,7 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:issued "2026-04-12"^^xsd:date ;
+    dct:issued "2026-07-24"^^xsd:date ;
     dct:modified "2026-07-24"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en .

@@ -384,6 +384,40 @@ Required follow-up: Optional polish via the ontology Edit form — add documenta
                     Nightly re-pull means Pages deploys flow in automatically.
 ```
 
+**Release dates — BioPortal reads `dct:issued`.** The submission list's
+**Released** column is populated from the root ontology's `dct:issued`, not from
+the upload date. Because `dct:issued` had never been bumped past the ontology's
+first issue date, all eight submissions (0.6.0 → 0.11.0) reported
+`Released 2026-04-12`. Corrected 2026-07-27 by patching each submission:
+
+```bash
+curl -X PATCH "https://data.bioontology.org/ontologies/SSTIM/submissions/<id>" \
+  -H "Authorization: apikey token=$BIOPORTAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"released":"2026-07-24T00:00:00+00:00"}'      # HTTP 204 on success
+```
+
+| Submission | Version | Released |
+|---|---|---|
+| 8 | 0.11.0 | 2026-07-24 |
+| 7 | 0.9.0 | 2026-07-22 |
+| 6 | 0.8.0 | 2026-07-20 |
+| 5, 4 | 0.7.0 | 2026-07-15 |
+| 3, 2 | 0.7.0-dev | 2026-07-14, 2026-07-13 |
+| 1 | 0.6.0 | 2026-07-11 |
+
+Patched submissions keep their corrected date, but **each new nightly pull
+creates a submission carrying whatever `dct:issued` the deployed file declares**
+— so the durable fix is bumping `dct:issued` at release time, now enforced by
+the `make snapshot` release gate (see
+[`README.md`](README.md#release-gate-make-snapshot)).
+
+Two further observations from the same submission list, neither harmful:
+0.10.0 has **no** submission (it and 0.11.0 both deployed on 2026-07-24 and the
+daily pull sampled once); and 0.7.0 and 0.7.0-dev each produced **two**
+submissions, because the pull creates one whenever the deployed bytes change
+even if `owl:versionInfo` did not move.
+
 ### FAIRsharing — ready now (account required)
 
 **Submission mechanism (confirmed by screenshots 2026-07-11).** Requires a

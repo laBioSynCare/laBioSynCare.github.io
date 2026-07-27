@@ -85,6 +85,32 @@ SPARQL competency queries, and graph-isomorphic JSON-LD/RDF/XML round trips.
 The 2026-07-13 audit additionally requires per-runtime-artifact validation;
 that gate is planned and must not be implied by the current static suite.
 
+### Release gate (`make snapshot`)
+
+`scripts/snapshot-ontology.mjs` refuses to freeze a snapshot unless the whole
+module set is coherent. Cutting a release therefore means updating, in **every**
+module header, before running `make snapshot`:
+
+| Property | Rule |
+|---|---|
+| `owl:versionInfo` | the new version, identical across all seven modules |
+| `owl:versionIRI` | `https://w3id.org/sstim/<version>` (core only, ADR 0020) |
+| `mod:status` | `"released"` (core only) |
+| **`dct:issued`** | **the release date — bump it every release** |
+| **`dct:modified`** | the release date (the whole set is re-issued together) |
+| `dct:created` | unchanged; the module's original creation date |
+
+The date rules exist because `dct:issued` is what registries read as the
+version's release date — it is BioPortal's **Released** column, and Archivo and
+OLS use it the same way. Leaving it at the ontology's first issue date makes
+every published version look like it shipped that day, which is what happened to
+SSTIM submissions 1–8 on BioPortal (all showed `2026-04-12`; corrected by hand
+2026-07-27). `dct:created` is the property that legitimately stays fixed.
+
+The gate dates a release **today** by default; pass
+`make snapshot RELEASE_DATE=YYYY-MM-DD` when the headers were prepared on an
+earlier day. Unit coverage: `scripts/snapshot-ontology.test.mjs`.
+
 ## Change Rules
 
 - Turtle is the editable source of truth.

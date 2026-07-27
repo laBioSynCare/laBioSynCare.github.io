@@ -155,7 +155,7 @@ ecosystem-publish:
 ## (version defaults to owl:versionInfo in sstim-core.ttl; override: make snapshot VERSION=0.2.0)
 ## Existing snapshots are protected; overwrite an unpublished one with FORCE=1.
 snapshot:
-	node scripts/snapshot-ontology.mjs $(VERSION) $(if $(FORCE),--force,)
+	node scripts/snapshot-ontology.mjs $(VERSION) $(if $(FORCE),--force,) $(if $(RELEASE_DATE),--release-date=$(RELEASE_DATE),)
 
 ## Run Vitest
 test:
@@ -249,4 +249,4 @@ help:
 	@echo "  make ecosystem-publish Validate and publish an external aggregate (PUBLIC_ECOSYSTEM=, PRIVATE_LEDGER=, DRY_RUN=1)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"
 	@echo "  make sparql-sanity    Run ontology SPARQL sanity checks"
-	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1)"
+	@echo "  make snapshot         Freeze ontology as static/ontology/<version>/ (VERSION=, FORCE=1, RELEASE_DATE=YYYY-MM-DD)"
