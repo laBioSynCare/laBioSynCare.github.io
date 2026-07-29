@@ -527,11 +527,18 @@ Required follow-up:
 Submit only after an eligible gateway/aggregator record exists (per the plan).
 Not actionable yet.
 
-### Wikidata — deferred (Phase 4)
+### Wikidata — deferred (Phase 4) for *publishing*; contribution is open now
 
 One ontology item first, then conservative term-level links, only after the
 HTML landing page and registry metadata are stable. Governed by the External
 Mapping Policy in the publication plan; not part of this round.
+
+**This deferral covers publishing SSTIM *into* Wikidata — the ontology item,
+term-level equivalences, identifiers, a property proposal. It does not cover
+contributing *to* Wikidata**, which asserts nothing on SSTIM's behalf and is
+unblocked today. Conflating the two left the second undone. The staged plan,
+with the gate that applies at each step, is in
+[`WIKIDATA_CONTRIBUTION.md`](WIKIDATA_CONTRIBUTION.md).
 
 ---
 

@@ -328,8 +328,17 @@ Turtle files are listed in section 1. After they exist:
       candidate were removed in the 0.6 development pass.*
 
 ### Wikidata contribution
+
+*Staged plan with per-stage gates:
+[`docs/ontology/WIKIDATA_CONTRIBUTION.md`](docs/ontology/WIKIDATA_CONTRIBUTION.md).
+Stage 0 — multilingual labels and references on existing items — has no gate and
+is unblocked today; the Phase 4 deferral in `REGISTRY_SUBMISSIONS.md` governs
+publishing SSTIM into Wikidata, not contributing to it.*
+
 - [ ] Create one Wikidata item for the released SSTIM ontology after WIDOCO and
       stable landing-page publication `P1`
+      *Gate met: WIDOCO output ships from CI and `w3id.org/sstim` resolves in
+      four formats. Needs a decision, not more work.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
