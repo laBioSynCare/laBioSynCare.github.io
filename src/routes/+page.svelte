@@ -4,6 +4,9 @@
   import ConversionBar from '../ui/entrance/ConversionBar.svelte'
   import ContributeProtocolModal from '../ui/entrance/ContributeProtocolModal.svelte'
   import CiteSstimModal from '../ui/entrance/CiteSstimModal.svelte'
+  // General homepage citation points at the concept DOI (all versions), not a
+  // pinned release — see src/ui/entrance/releaseMetadata.js.
+  import { CONCEPT_DOI, doiUrl } from '../ui/entrance/releaseMetadata.js'
 
   const GH = 'https://github.com/laBioSynCare/laBioSynCare.github.io'
   const GH_BLOB = GH + '/blob/main/'
@@ -145,7 +148,7 @@
     <p class="footer-links">
       <a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a>
       <span aria-hidden="true"> · </span>
-      <a href="https://doi.org/10.5281/zenodo.21380171" rel="external">DOI 10.5281/zenodo.21380171</a>
+      <a href={doiUrl(CONCEPT_DOI)} rel="external">DOI {CONCEPT_DOI}</a>
       <span aria-hidden="true"> · </span>
       <a href={GH} rel="external">GitHub</a>
       <span aria-hidden="true"> · </span>

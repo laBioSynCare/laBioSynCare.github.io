@@ -1,6 +1,8 @@
 <script>
   // Static content page — no runes needed. The bottom-dock screens, described
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
+  import { CONCEPT_DOI, doiUrl } from '../../ui/entrance/releaseMetadata.js'
+
   const screens = [
     {
       href: '/graph/',
@@ -191,7 +193,7 @@
     { label: 'Source repository', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io', external: true },
     { label: 'Ontology reference docs', href: '/ontology/docs/', external: true },
     { label: 'Vocabulary docs', href: '/ontology/docs/vocab/', external: true },
-    { label: 'Ontology DOI (all versions)', href: 'https://doi.org/10.5281/zenodo.21286974', external: true },
+    { label: 'Ontology DOI (all versions)', href: doiUrl(CONCEPT_DOI), external: true },
     { label: 'W3C Community Group', href: 'https://www.w3.org/community/sstim/', external: true },
     { label: 'Governance & charter', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CONTRIBUTING.md#8-governance', external: true },
     { label: 'HED / BIDS interoperability', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ecosystem/HED_BIDS_INTEROP.md', external: true },

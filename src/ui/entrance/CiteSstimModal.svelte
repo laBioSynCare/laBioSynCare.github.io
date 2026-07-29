@@ -4,13 +4,17 @@
   // in a bibliography. This surfaces the actual citation forms from
   // CITATION.cff / README.md's "Citation And License" section in place,
   // same overlay/card pattern as ContributeProtocolModal.
+  import {
+    CONCEPT_DOI,
+    NAMESPACE_IRI,
+    RELEASE_DATE,
+    RELEASE_VERSION as VERSION,
+    VERSION_DOI,
+    VERSION_IRI,
+  } from './releaseMetadata.js'
+
   const { open = false, onClose } = $props()
 
-  const VERSION = '0.7.0'
-  const VERSION_DOI = '10.5281/zenodo.21380171'
-  const CONCEPT_DOI = '10.5281/zenodo.21286974'
-  const VERSION_IRI = 'https://w3id.org/sstim/0.7.0'
-  const NAMESPACE_IRI = 'https://w3id.org/sstim'
   const README_CITATION_URL =
     'https://github.com/laBioSynCare/laBioSynCare.github.io#citation-and-license'
 
@@ -23,7 +27,7 @@
     `  author  = {Fabbri, Renato},\n` +
     `  title   = {{BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology}},\n` +
     `  version = {${VERSION}},\n` +
-    `  date    = {2026-07-15},\n` +
+    `  date    = {${RELEASE_DATE}},\n` +
     `  doi     = {${VERSION_DOI}},\n` +
     `  url     = {${VERSION_IRI}},\n` +
     `  license = {CC-BY-4.0}\n` +
