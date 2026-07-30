@@ -118,18 +118,50 @@ patterns below should serve any project with that shape.
 - An **OCI image** built from the same derivation, for operators without Nix
 - A pinned, tested production configuration example
 
-### 3.2 Backend adapter contract
+### 3.2 Backend adapter contract — two seams, not one
 
-An explicit interface between the application and any cloud service, with at
-minimum:
+Firebase currently does two separable jobs: it establishes **identity** and it
+**stores data**. Collapsing them into a single adapter would reproduce the coupling
+the adapter exists to remove, because most alternative identity providers store
+nothing at all.
 
-- a **null implementation** — local-only, no authentication, the default
-- the existing **Firebase implementation**, moved behind the interface
-- a **self-hosted implementation** over an open protocol
+**Two interfaces:**
 
-The nine current import sites become the refactor's scope. Conformance tests run
-against every implementation, so "works with Firebase" and "works self-hosted" are
-the same assertion twice.
+**Identity provider** — establishes who a user is, and nothing else.
+
+- **Anonymous** (default): no identity, local data only
+- **Firebase Auth**: the existing implementation, moved behind the interface
+- **Fediverse / Mastodon OAuth**: viable from a static app. Mastodon supports
+  **PKCE since 4.3.0** (S256 only) and **dynamic app registration** via
+  `POST /api/v1/apps`, so no pre-registration and no server are required — the
+  pattern used by client-side Mastodon clients such as Pinafore, Semaphore and Elk.
+  *Known compromise:* Mastodon provisions **confidential clients only** and always
+  returns a `client_secret`, which a browser cannot keep secret. PKCE mitigates
+  interception; the secret's presence remains a wart the ecosystem is addressing
+  through Client ID Metadata Documents.
+- **IndieAuth** ([W3C](https://www.w3.org/TR/indieauth/)): identity is a URL the
+  user controls, and the client is identified by *its own* URL — DNS replaces
+  client registration entirely. **No registration step and no client secret**,
+  which makes it strictly cleaner than Mastodon OAuth for a static deployment, and
+  a natural fit for a project whose whole data model is dereferenceable
+  identifiers. Mastodon does not implement IndieAuth, so the two are complementary
+  rather than alternatives.
+
+**Storage provider** — persists annotations, patches, logbook entries and profile.
+
+- **Local-first** (default): IndexedDB, no account required
+- **Firestore**: the existing implementation
+- **Self-hosted**: an open protocol over an operator-run endpoint
+
+The nine current import sites are the refactor's scope. A shared conformance suite
+runs against every implementation of each interface, so "works with Firebase" and
+"works self-hosted" become the same assertion twice.
+
+**Why local-first is the default rather than a fallback.** An identity provider
+that stores nothing — which is true of Mastodon OAuth and IndieAuth alike — is only
+useful once data has somewhere to live that does not depend on an account. Local
+storage plus the export package (§3.3) is that somewhere. Identity then becomes
+optional attribution rather than a gate on the user's own records.
 
 ### 3.3 Portable data
 
@@ -166,7 +198,8 @@ code exists.
 |---|---|---|---|
 | Reproducible toolchain | Pinned Nix dev/CI environment (§1.3) | Production package and NixOS module | A fresh machine deploys a working instance from one documented command |
 | Core application | Static SvelteKit build (§1.1) | Independent institutional deployment | An instance runs with no BioSynCare and no Firebase credentials |
-| Hosted services | Firebase optional, nine import sites (§1.2) | Backend adapter + self-hosted implementation | The same conformance suite passes against null, Firebase and self-hosted backends |
+| Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
+| Storage | Firestore when configured (§1.2) | Storage-provider interface: local-first, Firestore, self-hosted | The same conformance suite passes against every storage implementation |
 | Patch data | Portable `patch-studio-model-1` (§1.4) | File import/export and version migration | A patch exported from instance A imports identically into instance B |
 | RDF data | Ontology and annotation serialisation (§1.4) | Versioned complete export package | An export validates against its schema and its checksums verify |
 | Migration | Not implemented (G8, G9) | Automated backup/restore and cross-instance migration | Two independently deployed instances pass a migration test in CI |

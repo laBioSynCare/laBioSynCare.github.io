@@ -453,9 +453,12 @@ that distinction is the substance of this workstream.
 - [ ] Production Nix package building the static site deterministically (G1)
 - [ ] NixOS module exposing an instance as a declarative service (G2)
 - [ ] OCI image from the same derivation, for operators without Nix (G3)
-- [ ] Backend adapter contract — null, Firebase and self-hosted implementations
-      behind one interface, with a shared conformance suite. Refactor surface is
-      nine import sites across seven files (G4, G5, G6)
+- [ ] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,
+      Fediverse/Mastodon OAuth, IndieAuth) and a storage provider (local-first,
+      Firestore, self-hosted), each with a shared conformance suite. Refactor
+      surface is nine import sites across seven files (G4, G5, G6)
+- [ ] Local-first storage as the default, so identity becomes optional attribution
+      rather than a gate on a user's own records (G5)
 - [ ] Versioned instance export package with manifest and checksums (G7)
 - [ ] Backup, restore, and verified migration between two independently deployed
       instances (G8, G9)
