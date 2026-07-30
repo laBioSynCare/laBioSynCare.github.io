@@ -92,7 +92,8 @@
       pendingImport = null
       refreshSummary()
       dataNote = `Restored ${result.restoredLogbooks} logbook${result.restoredLogbooks === 1 ? '' : 's'}`
-        + (result.restoredAnnotations ? ` and ${result.restoredAnnotations} annotation${result.restoredAnnotations === 1 ? '' : 's'}` : '')
+        + (result.restoredAnnotations ? `, ${result.restoredAnnotations} annotation${result.restoredAnnotations === 1 ? '' : 's'}` : '')
+        + (result.restoredPatches ? ` and ${result.restoredPatches} patch${result.restoredPatches === 1 ? '' : 'es'}` : '')
         + '. Reload the page to see them.'
     } catch (e) {
       dataNote = `Import failed: ${e.message}`
@@ -279,6 +280,7 @@
           {dataSummary.logbooks} logbook{dataSummary.logbooks === 1 ? '' : 's'} ·
           {dataSummary.entries} entr{dataSummary.entries === 1 ? 'y' : 'ies'}
           {#if dataSummary.annotations > 0}· {dataSummary.annotations} annotation{dataSummary.annotations === 1 ? '' : 's'}{/if}
+          {#if dataSummary.patches > 0}· {dataSummary.patches} patch{dataSummary.patches === 1 ? '' : 'es'}{/if}
           {#if dataSummary.legacyEntries > 0}· {dataSummary.legacyEntries} unmigrated{/if}
         </p>
       {/if}
@@ -301,7 +303,8 @@
           <p>
             It holds {pendingImport.summary.logbooks} logbook{pendingImport.summary.logbooks === 1 ? '' : 's'},
             {pendingImport.summary.entries} entr{pendingImport.summary.entries === 1 ? 'y' : 'ies'}
-            and {pendingImport.summary.annotations} annotation{pendingImport.summary.annotations === 1 ? '' : 's'}.
+            {pendingImport.summary.annotations} annotation{pendingImport.summary.annotations === 1 ? '' : 's'}
+            and {pendingImport.summary.patches} patch{pendingImport.summary.patches === 1 ? '' : 'es'}.
             Logbooks with the same storage scope will be overwritten. This cannot be undone —
             export first if you want to keep what is here.
           </p>

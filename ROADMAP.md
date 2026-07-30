@@ -455,8 +455,10 @@ that distinction is the substance of this workstream.
       --rebuild`; `nix flake check` builds it. Required pinning SvelteKit's version
       name via `BSC_BUILD_VERSION` — the default timestamp reached every content
       hash)*
-- [ ] NixOS module exposing an instance as a declarative service (G2)
-- [ ] OCI image from the same derivation, for operators without Nix (G3)
+- [x] NixOS module exposing an instance as a declarative service (G2)
+      *(`services.bsc-lab.enable`; verified by booting a clean NixOS VM in CI)*
+- [x] OCI image from the same derivation, for operators without Nix (G3)
+      *(`packages.x86_64-linux.oci`, non-root, loaded and asserted live in CI)*
 - [~] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,
       Fediverse/Mastodon OAuth, IndieAuth) and a storage provider (local-first,
       Firestore, self-hosted), each with a shared conformance suite (G4, G5, G6)
@@ -469,14 +471,17 @@ that distinction is the substance of this workstream.
       rather than a gate on a user's own records (G5)
       *(true for patches, annotations and profile — all work with no account and
       no Firebase. A *shared* self-hosted backend others can read is still absent)*
-- [~] Versioned instance export package with manifest and checksums (G7)
+- [x] Versioned instance export package with manifest and checksums (G7)
       *(`Settings → Your data`: logbooks, **annotations**, **profile**, unmigrated
       v1 entries and preferences export as one SHA-256-checksummed file and
       round-trip between instances with no account and no Firebase; exports carry
-      no auth identifier. Local patches and Firestore-held records remain outside)*
+      no auth identifier. Now covers **everything kept on the device**, including
+      saved patches; Firestore-held account records remain outside)*
 - [ ] Backup, restore, and verified migration between two independently deployed
       instances (G8, G9)
-- [ ] Deployment and migration conformance tests in CI (G12)
+- [~] Deployment and migration conformance tests in CI (G12)
+      *(`scripts/smoke-http.sh` is one contract asserted against both the NixOS VM
+      and the container; migration conformance is still unit-level)*
 - [x] Security policy and documented data boundaries (`SECURITY.md`) (G11 partial
       — threat model and automated boundary tests still open)
 

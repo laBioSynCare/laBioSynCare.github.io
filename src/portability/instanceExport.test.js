@@ -265,6 +265,57 @@ describe('instance export — annotations', () => {
   })
 })
 
+describe('instance export — local patches', () => {
+  const patchRecord = (id, name) => ({
+    id, patchName: name, model: 'patch-studio-model-1',
+    patch: { model: 'patch-studio-model-1', patchName: name, audioTracks: [], visualTracks: [] },
+    createdAt: '2026-07-31T10:00:00.000Z', updatedAt: '2026-07-31T10:00:00.000Z',
+  })
+
+  it('carries locally saved patches and restores them', async () => {
+    const source = memoryStorage({
+      'bsclab.patchStudio.patches.v1': JSON.stringify([patchRecord('p1', 'Alpha'), patchRecord('p2', 'Beta')]),
+    })
+    const envelope = await buildInstanceExport(source)
+
+    expect(summarizeInstanceExport(envelope.payload).patches).toBe(2)
+
+    const target = memoryStorage()
+    const result = applyInstanceExport(target, await parseInstanceExport(JSON.stringify(envelope)))
+
+    expect(result.restoredPatches).toBe(2)
+    expect(JSON.parse(target.getItem('bsclab.patchStudio.patches.v1'))).toHaveLength(2)
+  })
+
+  it('preserves the patch body so it still loads after migration', async () => {
+    const source = memoryStorage({
+      'bsclab.patchStudio.patches.v1': JSON.stringify([patchRecord('p1', 'Alpha')]),
+    })
+    const envelope = await buildInstanceExport(source)
+    const target = memoryStorage()
+    applyInstanceExport(target, await parseInstanceExport(JSON.stringify(envelope)))
+
+    const [restored] = JSON.parse(target.getItem('bsclab.patchStudio.patches.v1'))
+    expect(restored.patch.model).toBe('patch-studio-model-1')
+    expect(restored.patchName).toBe('Alpha')
+  })
+
+  it('omits the section when there are none', () => {
+    expect(collectInstanceData(memoryStorage()).patches).toBeUndefined()
+  })
+
+  it('keeps patches inside the checksum', async () => {
+    const storage = memoryStorage({
+      'bsclab.patchStudio.patches.v1': JSON.stringify([patchRecord('p1', 'Alpha')]),
+    })
+    const envelope = await buildInstanceExport(storage)
+    envelope.payload.patches[0].patchName = 'tampered'
+
+    await expect(parseInstanceExport(JSON.stringify(envelope)))
+      .rejects.toThrow(/integrity check/i)
+  })
+})
+
 describe('instance export — helpers', () => {
   it('summarizes what an import would restore', () => {
     const storage = memoryStorage({
@@ -273,7 +324,7 @@ describe('instance export — helpers', () => {
     })
 
     expect(summarizeInstanceExport(collectInstanceData(storage)))
-      .toMatchObject({ logbooks: 1, entries: 2, annotations: 0, hasProfile: false, legacyEntries: 0, hasPreferences: true })
+      .toMatchObject({ logbooks: 1, entries: 2, annotations: 0, patches: 0, hasProfile: false, legacyEntries: 0, hasPreferences: true })
   })
 
   it('dates the download filename', () => {

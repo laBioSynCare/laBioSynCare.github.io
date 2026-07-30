@@ -123,11 +123,11 @@ Firebase**. Implementation in `src/portability/instanceExport.js`.
 | Lossless | Export → import → export is a fixed point, verified by checksum, so repeated migration cannot drift the data |
 | Confirmed before overwriting | Import parses and verifies first, shows what would land, and asks |
 
-**Covered today:** logbooks and their entries, **local annotations**, **local
-profile**, unmigrated v1 entries, appearance preference. **Not covered:** locally
-saved patches, and anything held in Firestore for a signed-in account. Individual
-patches are separately portable as files through Patch Studio's Download and
-Import.
+**Covered today:** everything BSC Lab keeps on the device — logbooks and their
+entries, local annotations, local profile, **locally saved patches**, unmigrated
+v1 entries, and the appearance preference. **Not covered:** records held in
+Firestore for a signed-in account. Individual patches remain separately portable
+as files through Patch Studio's Download and Import.
 
 ### 1.6 The patch storage seam
 
@@ -167,6 +167,36 @@ The Firestore implementation is tested against an in-memory fake, which fixes
 the contract but does **not** prove Firebase is reachable; that still needs the
 real backend.
 
+### 1.6b Deployment paths, and one conformance contract
+
+Three ways to run BSC Lab, all from the same derivation — the application is
+never rebuilt for a different path, so they cannot drift:
+
+| Path | Command | Verified by |
+|---|---|---|
+| Static artifact | `nix build` / `make package` | `nix build --rebuild` (bit-reproducible) + `make smoke-static` |
+| NixOS service | `services.bsc-lab.enable = true;` | A clean NixOS VM booted in CI |
+| OCI container | `nix build .#packages.x86_64-linux.oci` | Loaded, run and asserted live in CI, as a non-root process |
+
+**`scripts/smoke-http.sh` is the single definition of a correct deployment**, run
+against both the VM and the container. Two hand-written approximations would
+diverge, and the point of supporting more than one path is that they behave
+identically. It asserts the application is served, all eight prerendered routes
+return their own page, Turtle and JSON-LD carry the media types RDF clients
+need, the manifest does too, COOP/COEP/CORP are applied, and an unknown path is a
+real 404 rather than a soft homepage.
+
+The script is confirmed to discriminate: run against the dev server it fails the
+three cross-origin assertions, and passes only where the headers are genuinely
+applied.
+
+**Both self-hosted paths fix something the public instance gets wrong.**
+`static/_headers` records the intended cross-origin isolation policy, but it is
+Netlify syntax and GitHub Pages ignores it — so on the public deployment that
+policy is aspirational. And `.ttl`/`.jsonld` are absent from nginx's default
+`mime.types`, so an unconfigured server would publish the knowledge graph as
+`application/octet-stream`. Both are handled explicitly and asserted.
+
 ### 1.7 Public/private separation exists in the data model
 
 Annotations live in per-user named graphs, never the default graph
@@ -189,17 +219,17 @@ Stated plainly, with no partial credit.
 | # | Gap | Current state |
 |---|---|---|
 | ~~G1~~ | ~~No production package~~ | ✅ **Closed 2026-07-30.** `nix build` produces a bit-reproducible static package; `nix flake check` builds it |
-| G2 | No NixOS module or service definition | An operator has no declarative way to run an instance |
-| G3 | No container image | No OCI alternative for non-Nix operators |
+| ~~G2~~ | ~~No NixOS module or service definition~~ | ✅ **Closed 2026-07-31.** `services.bsc-lab.enable = true;` — verified by booting a clean NixOS VM in CI |
+| ~~G3~~ | ~~No container image~~ | ✅ **Closed 2026-07-31.** `packages.x86_64-linux.oci`, built from the same store path, run non-root, asserted live in CI |
 | ~~G4~~ | ~~No backend adapter interface~~ | ✅ **Closed 2026-07-31 for storage.** Patches, annotations and profile each have local and Firestore implementations behind a shared contract. The **identity** seam is untouched — six of the original nine import sites are `authState` |
 | ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31.** Patches, annotations and profile all work with no account and no Firebase, kept on the device. A *shared* self-hosted backend — one others can read — is still absent |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
-| ~~G7~~ | ~~No complete export package~~ | ⚠️ **Largely closed 2026-07-31.** The versioned, checksummed export now carries logbooks, **annotations**, **profile**, unmigrated v1 entries and preferences. Local patches and any Firestore-held records are still outside it |
+| ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything BSC Lab keeps on the device. Firestore-held records for a signed-in account remain outside |
 | G8 | No backup or restore | — |
 | G9 | No cross-instance migration | Nothing verifies that instance A's data loads into instance B |
 | G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |
 | ~~G11~~ | ~~No threat model, no `SECURITY.md`~~ | ⚠️ **Partly closed.** `SECURITY.md` documents the data boundaries, the authentication-identifier exclusion and self-hosting expectations. A formal threat model and automated boundary tests are still open |
-| G12 | No deployment conformance tests | Nothing asserts that a fresh deployment is correct |
+| ~~G12~~ | ~~No deployment conformance tests~~ | ✅ **Closed 2026-07-31.** `scripts/smoke-http.sh` is one contract run against **both** the NixOS VM and the container in CI |
 
 ---
 

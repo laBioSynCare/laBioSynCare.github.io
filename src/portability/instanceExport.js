@@ -33,6 +33,10 @@ const SKIN_KEY = 'bsclab.skin'
 // and usable wherever a Storage-like object is available.
 const ANNOTATION_KEY = 'bsclab.annotations.v1'
 const PROFILE_KEY = 'bsclab.profile.v1'
+// Locally saved Patch Studio patches, written by
+// src/storage/localPatchStore.js. Referenced by key rather than imported
+// so this module stays dependency-free.
+const PATCH_KEY = 'bsclab.patchStudio.patches.v1'
 
 /** Scope names used in the file. Deliberately not the storage keys. */
 const SCOPE_ANONYMOUS = 'anonymous'
@@ -121,9 +125,11 @@ export function collectInstanceData(storage, { uid = null } = {}) {
   const annotations = parseStoredArray(storage.getItem(ANNOTATION_KEY))
 
   const profile = parseStored(storage.getItem(PROFILE_KEY))
+  const patches = parseStoredArray(storage.getItem(PATCH_KEY))
 
   return {
     logbooks,
+    ...(patches.length > 0 ? { patches } : {}),
     ...(legacy ? { legacyLogbookEntries: legacy } : {}),
     ...(annotations.length > 0 ? { annotations } : {}),
     ...(profile ? { profile } : {}),
@@ -160,6 +166,7 @@ export function summarizeInstanceExport(payload) {
     logbooks: books,
     entries,
     annotations: payload.annotations?.length ?? 0,
+    patches: payload.patches?.length ?? 0,
     hasProfile: Boolean(payload.profile),
     legacyEntries: payload.legacyLogbookEntries?.length ?? 0,
     hasPreferences: Object.keys(payload.preferences ?? {}).length > 0,
@@ -219,7 +226,7 @@ export async function parseInstanceExport(text) {
  * none. That is what makes this portable between instances rather than merely
  * a backup of one browser.
  *
- * @returns {{ restoredLogbooks: number, restoredAnnotations: number, restoredPreferences: number }}
+ * @returns {{ restoredLogbooks: number, restoredAnnotations: number, restoredPatches: number, restoredPreferences: number }}
  */
 export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
   const payload = parsed.payload
@@ -242,6 +249,12 @@ export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
     restoredAnnotations = payload.annotations.length
   }
 
+  let restoredPatches = 0
+  if (Array.isArray(payload.patches) && payload.patches.length > 0) {
+    storage.setItem(PATCH_KEY, JSON.stringify(payload.patches))
+    restoredPatches = payload.patches.length
+  }
+
   if (payload.profile && typeof payload.profile === 'object' && !Array.isArray(payload.profile)) {
     storage.setItem(PROFILE_KEY, JSON.stringify(payload.profile))
   }
@@ -253,7 +266,7 @@ export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
     restoredPreferences++
   }
 
-  return { restoredLogbooks, restoredAnnotations, restoredPreferences }
+  return { restoredLogbooks, restoredAnnotations, restoredPatches, restoredPreferences }
 }
 
 /** Filename for a download, dated so successive exports do not collide. */
