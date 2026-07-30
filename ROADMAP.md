@@ -457,12 +457,17 @@ that distinction is the substance of this workstream.
       hash)*
 - [ ] NixOS module exposing an instance as a declarative service (G2)
 - [ ] OCI image from the same derivation, for operators without Nix (G3)
-- [ ] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,
+- [~] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,
       Fediverse/Mastodon OAuth, IndieAuth) and a storage provider (local-first,
-      Firestore, self-hosted), each with a shared conformance suite. Refactor
-      surface is nine import sites across seven files (G4, G5, G6)
-- [ ] Local-first storage as the default, so identity becomes optional attribution
+      Firestore, self-hosted), each with a shared conformance suite (G4, G5, G6)
+      *(storage seam shipped for **patches**: `src/storage/` defines a `PatchStore`
+      contract with local and Firestore implementations and one shared conformance
+      suite. Profile and annotations still call Firestore directly; the identity
+      seam is not started — of the nine original import sites, six are identity)*
+- [~] Local-first storage as the default, so identity becomes optional attribution
       rather than a gate on a user's own records (G5)
+      *(true for patches — saving needs no account and no Firebase; not yet for
+      profile or annotations)*
 - [~] Versioned instance export package with manifest and checksums (G7)
       *(`Settings → Your data`: logbooks, unmigrated v1 entries and preferences
       export as one SHA-256-checksummed file and round-trip between instances

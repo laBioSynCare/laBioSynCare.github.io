@@ -3,7 +3,11 @@
   import Knob from './Knob.svelte'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
   import { authState } from '../../firebase/auth.js'
-  import { deletePatchStudioPatch, listPatchStudioPatches, savePatchStudioPatch } from '../../firebase/patches.js'
+  // Patches go through the storage seam rather than straight to Firestore, so
+  // saving works with no account and no Firebase at all — see ADR 0038 and
+  // docs/technical/PORTABLE_DEPLOYMENT.md §3.2.
+  import { requireFirebaseClient } from '../../firebase/client.js'
+  import { defaultPatchStore } from '../../storage/patchStores.js'
   import { visualStimulationOn } from '../../ui/safety/visualSafety.js'
   import {
     FLASH_SAFE_MAX_HZ, clampFlashRate, flashRiskLevel, flashRiskMessage,
@@ -103,15 +107,23 @@
   let helpOpen = $state(false)
   let semanticInfo = $state(null)
   let auth = $state({ ready: false, configured: false, user: null, error: null })
-  let cloudOpen = $state(false)
-  let cloudPatches = $state([])
-  let cloudLoading = $state(false)
-  let cloudSaving = $state(false)
-  let cloudError = $state(null)
-  let currentCloudPatchId = $state(null)
-  let currentCloudPatchName = $state(null)
-  let cloudBusyPatchId = $state(null)
+  let saveMenuOpen = $state(false)
+  let savedPatches = $state([])
+  let storeLoading = $state(false)
+  let storeSaving = $state(false)
+  let storeError = $state(null)
+  let currentPatchId = $state(null)
+  let currentPatchName = $state(null)
+  let busyPatchId = $state(null)
   let lastPatchUid = null
+
+  // Local storage when signed out or unconfigured; the account when both are
+  // available, so a signed-in user's patches follow them between devices.
+  const patchStore = $derived(defaultPatchStore({
+    uid: auth.user?.uid ?? null,
+    firebaseConfigured: auth.configured,
+    requireClient: requireFirebaseClient,
+  }))
 
   const unsubscribeAuth = authState.subscribe((value) => {
     auth = value
@@ -166,11 +178,13 @@
     const uid = auth.user?.uid ?? null
     if (uid === lastPatchUid) return
     lastPatchUid = uid
-    currentCloudPatchId = null
-    currentCloudPatchName = null
-    cloudPatches = []
-    cloudError = null
-    if (uid && auth.configured) refreshCloudPatches({ silent: true })
+    currentPatchId = null
+    currentPatchName = null
+    savedPatches = []
+    storeError = null
+    // Refresh regardless of sign-in: signing out reveals the local store
+    // rather than leaving the panel empty.
+    refreshSavedPatches({ silent: true })
   })
 
   const STUDIO_HELP = [
@@ -691,9 +705,9 @@
       return
     }
 
-    if (event.key === 'Escape' && cloudOpen) {
+    if (event.key === 'Escape' && saveMenuOpen) {
       event.preventDefault()
-      cloudOpen = false
+      saveMenuOpen = false
       return
     }
 
@@ -818,9 +832,9 @@
       resetLiveDraftState(nextDraft)
       // An imported patch is not the cloud patch that was open: saving should
       // create a new record rather than silently overwrite the previous one.
-      currentCloudPatchId = null
-      currentCloudPatchName = null
-      cloudOpen = false
+      currentPatchId = null
+      currentPatchName = null
+      saveMenuOpen = false
       tip(`Imported ${nextDraft.patchName}.`)
     } catch (e) {
       tip(`Import failed: ${e.message}`)
@@ -840,94 +854,98 @@
     syncCreatorSession()
   }
 
-  async function refreshCloudPatches({ silent = false } = {}) {
-    const uid = auth.user?.uid
-    if (!uid || !auth.configured) {
-      cloudPatches = []
+  async function refreshSavedPatches({ silent = false } = {}) {
+    const store = patchStore
+    if (!store) {
+      savedPatches = []
       return
     }
+    // Guard against a slow list resolving after the account changed underneath.
+    const uid = auth.user?.uid ?? null
 
-    cloudLoading = true
-    cloudError = null
+    storeLoading = true
+    storeError = null
     try {
-      const patches = await listPatchStudioPatches(uid)
-      if (uid === auth.user?.uid) {
-        cloudPatches = patches
-        const active = currentCloudPatchId ? patches.find(patch => patch.id === currentCloudPatchId) : null
+      const patches = await store.list()
+      if ((auth.user?.uid ?? null) === uid) {
+        savedPatches = patches
+        const active = currentPatchId ? patches.find(patch => patch.id === currentPatchId) : null
         if (active) {
-          currentCloudPatchName = active.patchName
-        } else if (currentCloudPatchId) {
-          currentCloudPatchId = null
-          currentCloudPatchName = null
+          currentPatchName = active.patchName
+        } else if (currentPatchId) {
+          currentPatchId = null
+          currentPatchName = null
         }
       }
-      if (!silent) tip(patches.length ? `Loaded ${patches.length} cloud patches.` : 'No cloud patches yet.')
+      if (!silent) tip(patches.length ? `Loaded ${patches.length} patches.` : 'No saved patches yet.')
     } catch (e) {
-      cloudError = e.message
-      if (!silent) tip(`Cloud load failed: ${e.message}`)
+      storeError = e.message
+      if (!silent) tip(`Load failed: ${e.message}`)
     } finally {
-      cloudLoading = false
+      storeLoading = false
     }
   }
 
-  async function saveCloudPatch() {
-    if (!auth.user) {
-      tip('Sign in to save cloud patches.')
+  async function saveCurrentPatch() {
+    // No sign-in check: local storage is always available, and that is the
+    // point of the seam. Only a genuinely broken patch blocks a save.
+    if (!patchStore) {
+      tip('No storage available in this browser.')
       return
     }
     if (hasErrors) {
-      tip('Fix patch errors before saving to Firebase.')
+      tip('Fix patch errors before saving.')
       return
     }
 
-    cloudSaving = true
-    cloudError = null
+    storeSaving = true
+    storeError = null
     try {
       const exported = buildPatchExport(draft)
       const currentName = normalizePatchName(exported.patchName)
-      const loadedName = normalizePatchName(currentCloudPatchName)
-      const sameLoadedPatch = currentCloudPatchId && currentName && currentName === loadedName
-      const sameNamedPatch = cloudPatches.find(patch => normalizePatchName(patch.patchName) === currentName)
-      const targetPatchId = sameLoadedPatch ? currentCloudPatchId : sameNamedPatch?.id ?? null
+      const loadedName = normalizePatchName(currentPatchName)
+      const sameLoadedPatch = currentPatchId && currentName && currentName === loadedName
+      const sameNamedPatch = savedPatches.find(patch => normalizePatchName(patch.patchName) === currentName)
+      const targetPatchId = sameLoadedPatch ? currentPatchId : sameNamedPatch?.id ?? null
 
-      currentCloudPatchId = await savePatchStudioPatch(auth.user.uid, exported, targetPatchId)
-      currentCloudPatchName = exported.patchName
-      await refreshCloudPatches({ silent: true })
-      tip(targetPatchId ? 'Updated in Firebase.' : 'Saved to Firebase.')
+      currentPatchId = await patchStore.save(exported, targetPatchId)
+      currentPatchName = exported.patchName
+      await refreshSavedPatches({ silent: true })
+      tip(`${targetPatchId ? 'Updated' : 'Saved'} — ${patchStore.label.toLowerCase()}.`)
     } catch (e) {
-      cloudError = e.message
-      tip(`Cloud save failed: ${e.message}`)
+      storeError = e.message
+      tip(`Save failed: ${e.message}`)
     } finally {
-      cloudSaving = false
+      storeSaving = false
     }
   }
 
-  function loadCloudPatch(savedPatch) {
+  function loadSavedPatch(savedPatch) {
     try {
       const nextDraft = draftFromPatchExport(savedPatch.patch)
       resetLiveDraftState(nextDraft)
-      currentCloudPatchId = savedPatch.id
-      currentCloudPatchName = savedPatch.patchName
-      cloudOpen = false
+      currentPatchId = savedPatch.id
+      currentPatchName = savedPatch.patchName
+      saveMenuOpen = false
       tip(`Loaded ${nextDraft.patchName}.`)
     } catch (e) {
-      cloudError = e.message
-      tip(`Cloud patch failed: ${e.message}`)
+      storeError = e.message
+      tip(`Could not load that patch: ${e.message}`)
     }
   }
 
   function reset() {
     resetLiveDraftState(createDraft())
-    currentCloudPatchId = null
-    currentCloudPatchName = null
+    currentPatchId = null
+    currentPatchName = null
     tip('Reset.')
   }
 
   function clearStudio() {
     if (!confirm('Clear the current patch studio? Unsaved changes will be lost.')) return
     resetLiveDraftState(createEmptyDraft())
-    currentCloudPatchId = null
-    currentCloudPatchName = null
+    currentPatchId = null
+    currentPatchName = null
     tip('Cleared.')
   }
 
@@ -939,60 +957,60 @@
     return `${value ?? ''}`.trim().toLocaleLowerCase()
   }
 
-  async function renameCloudPatch(savedPatch) {
-    if (!auth.user || cloudSaving) return
+  async function renameSavedPatch(savedPatch) {
+    if (!patchStore || storeSaving) return
     const nextName = prompt('Rename patch', savedPatch.patchName)?.trim()
     if (!nextName || nextName === savedPatch.patchName) return
     const normalized = normalizePatchName(nextName)
-    if (cloudPatches.some(patch => patch.id !== savedPatch.id && normalizePatchName(patch.patchName) === normalized)) {
-      cloudError = 'A patch with that name already exists.'
-      tip(cloudError)
+    if (savedPatches.some(patch => patch.id !== savedPatch.id && normalizePatchName(patch.patchName) === normalized)) {
+      storeError = 'A patch with that name already exists.'
+      tip(storeError)
       return
     }
 
-    cloudSaving = true
-    cloudBusyPatchId = savedPatch.id
-    cloudError = null
+    storeSaving = true
+    busyPatchId = savedPatch.id
+    storeError = null
     try {
       const patch = { ...savedPatch.patch, patchName: nextName }
-      await savePatchStudioPatch(auth.user.uid, patch, savedPatch.id)
-      if (currentCloudPatchId === savedPatch.id) {
-        currentCloudPatchName = nextName
+      await patchStore.save(patch, savedPatch.id)
+      if (currentPatchId === savedPatch.id) {
+        currentPatchName = nextName
         draft.patchName = nextName
         syncCreatorSession()
       }
-      await refreshCloudPatches({ silent: true })
+      await refreshSavedPatches({ silent: true })
       tip('Renamed in Firebase.')
     } catch (e) {
-      cloudError = e.message
+      storeError = e.message
       tip(`Rename failed: ${e.message}`)
     } finally {
-      cloudBusyPatchId = null
-      cloudSaving = false
+      busyPatchId = null
+      storeSaving = false
     }
   }
 
-  async function removeCloudPatch(savedPatch) {
-    if (!auth.user || cloudSaving) return
-    if (!confirm(`Delete "${savedPatch.patchName}" from Firebase?`)) return
+  async function removeSavedPatch(savedPatch) {
+    if (!patchStore || storeSaving) return
+    if (!confirm(`Delete "${savedPatch.patchName}" from ${patchStore.label.toLowerCase()}?`)) return
 
-    cloudSaving = true
-    cloudBusyPatchId = savedPatch.id
-    cloudError = null
+    storeSaving = true
+    busyPatchId = savedPatch.id
+    storeError = null
     try {
-      await deletePatchStudioPatch(auth.user.uid, savedPatch.id)
-      if (currentCloudPatchId === savedPatch.id) {
-        currentCloudPatchId = null
-        currentCloudPatchName = null
+      await patchStore.remove(savedPatch.id)
+      if (currentPatchId === savedPatch.id) {
+        currentPatchId = null
+        currentPatchName = null
       }
-      await refreshCloudPatches({ silent: true })
-      tip('Deleted from Firebase.')
+      await refreshSavedPatches({ silent: true })
+      tip('Deleted.')
     } catch (e) {
-      cloudError = e.message
+      storeError = e.message
       tip(`Delete failed: ${e.message}`)
     } finally {
-      cloudBusyPatchId = null
-      cloudSaving = false
+      busyPatchId = null
+      storeSaving = false
     }
   }
 
@@ -1420,48 +1438,48 @@
       />
       <details
         class="cloud-menu"
-        bind:open={cloudOpen}
+        bind:open={saveMenuOpen}
         ontoggle={(event) => {
-          cloudOpen = event.currentTarget.open
-          if (cloudOpen && auth.user && auth.configured) refreshCloudPatches({ silent: true })
+          saveMenuOpen = event.currentTarget.open
+          if (saveMenuOpen) refreshSavedPatches({ silent: true })
         }}
       >
-        <summary title="Save and load Firebase patches">Save / Load</summary>
+        <summary title="Save and load patches">Save / Load</summary>
         <div class="cloud-panel">
-          {#if !auth.ready}
-            <p class="cloud-status">Loading account...</p>
-          {:else if !auth.configured}
-            <p class="cloud-status">Firebase config required.</p>
-          {:else if !auth.user}
-            <p class="cloud-status">Sign in from the + menu to save patches.</p>
+          {#if !patchStore}
+            <p class="cloud-status">No storage available in this browser.</p>
           {:else}
+            <p class="cloud-status store-target">
+              Saving to <strong>{patchStore.label.toLowerCase()}</strong>.
+              {#if patchStore.id === 'local'}Sign in to keep patches with your account instead.{/if}
+            </p>
             <div class="cloud-actions">
               <button
                 type="button"
                 class="cloud-action"
-                onclick={saveCloudPatch}
-                disabled={cloudSaving || hasErrors}
+                onclick={saveCurrentPatch}
+                disabled={storeSaving || hasErrors}
               >
-                {cloudSaving ? 'Saving...' : 'Save'}
+                {storeSaving ? 'Saving...' : 'Save'}
               </button>
               <button
                 type="button"
                 class="cloud-action secondary"
-                onclick={() => refreshCloudPatches()}
-                disabled={cloudLoading}
+                onclick={() => refreshSavedPatches()}
+                disabled={storeLoading}
               >
-                {cloudLoading ? 'Loading...' : 'Refresh'}
+                {storeLoading ? 'Loading...' : 'Refresh'}
               </button>
             </div>
-            {#if cloudError}
-              <p class="cloud-error">{cloudError}</p>
+            {#if storeError}
+              <p class="cloud-error">{storeError}</p>
             {/if}
-            {#if cloudLoading && !cloudPatches.length}
+            {#if storeLoading && !savedPatches.length}
               <p class="cloud-status">Loading patches...</p>
-            {:else if cloudPatches.length}
+            {:else if savedPatches.length}
               <ul class="cloud-list">
-                {#each cloudPatches as patch (patch.id)}
-                  <li class:active={patch.id === currentCloudPatchId}>
+                {#each savedPatches as patch (patch.id)}
+                  <li class:active={patch.id === currentPatchId}>
                     <div class="cloud-item-main">
                       <span>{patch.patchName}</span>
                       <small>{shortDate(patch.updatedAt || patch.createdAt)}</small>
@@ -1470,24 +1488,24 @@
                       <button
                         type="button"
                         class="cloud-row-action primary"
-                        onclick={() => loadCloudPatch(patch)}
-                        disabled={cloudSaving}
+                        onclick={() => loadSavedPatch(patch)}
+                        disabled={storeSaving}
                       >
                         Load
                       </button>
                       <button
                         type="button"
                         class="cloud-row-action"
-                        onclick={() => renameCloudPatch(patch)}
-                        disabled={cloudSaving}
+                        onclick={() => renameSavedPatch(patch)}
+                        disabled={storeSaving}
                       >
-                        {cloudBusyPatchId === patch.id && cloudSaving ? '...' : 'Rename'}
+                        {busyPatchId === patch.id && storeSaving ? '...' : 'Rename'}
                       </button>
                       <button
                         type="button"
                         class="cloud-row-action danger"
-                        onclick={() => removeCloudPatch(patch)}
-                        disabled={cloudSaving}
+                        onclick={() => removeSavedPatch(patch)}
+                        disabled={storeSaving}
                       >
                         Delete
                       </button>
@@ -1496,7 +1514,7 @@
                 {/each}
               </ul>
             {:else}
-              <p class="cloud-status">No Firebase patches yet.</p>
+              <p class="cloud-status">No saved patches yet.</p>
             {/if}
           {/if}
         </div>
@@ -2486,6 +2504,11 @@
   }
   .act-btn:hover { color: var(--txt); border-color: var(--acc); }
   .act-btn:disabled { opacity: .3; cursor: default; }
+
+  .store-target {
+    margin-bottom: 0.5rem;
+    opacity: 0.85;
+  }
 
   .cloud-menu {
     position: relative;

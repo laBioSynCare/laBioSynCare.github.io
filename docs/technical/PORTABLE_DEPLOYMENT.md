@@ -127,14 +127,38 @@ preference. **Not covered:** annotations, profile and saved patches, which live 
 Firestore and wait on the storage adapter (G4/G5). Individual patches are separately
 portable as files through Patch Studio's Download and Import.
 
-### 1.6 Public/private separation exists in the data model
+### 1.6 The patch storage seam
+
+`src/storage/` defines a `PatchStore` contract and two implementations:
+
+| Implementation | Available when | Backing |
+|---|---|---|
+| `local` — "On this device" | **Always** | `localStorage`, exportable through §1.5 |
+| `firestore` — "Your account" | Firebase configured **and** signed in | The collection and document shape unchanged from before |
+
+Local is the default and always present; an account **adds** a second place to
+keep patches rather than being the price of keeping any. Saving a patch no
+longer requires sign-in or a configured Firebase project.
+
+**One conformance suite runs against both** (`patchStore.conformance.test.js`),
+so "works on device" and "works in the account" are the same assertions run
+twice — the property that makes this an interface rather than a swap. A future
+self-hosted implementation is finished when it passes that file unchanged.
+Validation and ordering live in the shared contract module, so implementations
+cannot drift on what they accept or how they sort.
+
+The Firestore implementation is tested against an in-memory fake, which fixes
+the contract but does **not** prove Firebase is reachable; that still needs the
+real backend.
+
+### 1.7 Public/private separation exists in the data model
 
 Annotations live in per-user named graphs, never the default graph
 (`AnnotationStore`, ADR 0003). Authoritative ontology data and user contributions
 are therefore distinguishable at the triple level, and exports carry no
 authentication identifiers.
 
-### 1.7 Offline and integrity properties
+### 1.8 Offline and integrity properties
 
 The PWA service worker (ADR 0009) caches for offline use, returns early for any
 cross-origin request, and never auto-reloads a running session. Ontology IRIs
@@ -151,8 +175,8 @@ Stated plainly, with no partial credit.
 | ~~G1~~ | ~~No production package~~ | ✅ **Closed 2026-07-30.** `nix build` produces a bit-reproducible static package; `nix flake check` builds it |
 | G2 | No NixOS module or service definition | An operator has no declarative way to run an instance |
 | G3 | No container image | No OCI alternative for non-Nix operators |
-| G4 | No backend adapter interface | Firebase is imported directly at nine sites; there is no seam to substitute an implementation |
-| G5 | No self-hosted alternative to Firebase | Cloud features require Firebase or are simply absent |
+| ~~G4~~ | ~~No backend adapter interface~~ | ⚠️ **Partly closed 2026-07-30.** A `PatchStore` contract with local and Firestore implementations, exercised by one shared conformance suite. Profile and annotations still call Firestore directly |
+| ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Partly closed 2026-07-30.** Patches now save with no account and no Firebase. Profile and annotations still require it |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
 | ~~G7~~ | ~~No complete export package~~ | ⚠️ **Partly closed 2026-07-30.** A versioned, checksummed instance export covers local data — logbooks, unmigrated v1 entries, preferences — and round-trips between instances with no cloud. Firestore-held annotations, profile and saved patches are **not** included and wait on the storage adapter (G4/G5) |
 | G8 | No backup or restore | — |
@@ -268,7 +292,7 @@ code exists.
 | Reproducible toolchain | Pinned Nix dev/CI environment **and a bit-reproducible `nix build` package** (§1.3) | NixOS module and OCI image | A fresh machine deploys a working instance from one documented command |
 | Core application | Static SvelteKit build (§1.1) | Independent institutional deployment | An instance runs with no BioSynCare and no Firebase credentials |
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
-| Storage | Firestore when configured (§1.2) | Storage-provider interface: local-first, Firestore, self-hosted | The same conformance suite passes against every storage implementation |
+| Storage | **Patches: local-first by default, Firestore when signed in, one shared conformance suite (§1.6).** Profile and annotations still Firestore-only | Extend the seam to profile and annotations; add a self-hosted implementation | The same conformance suite passes against every storage implementation |
 | Patch data | Portable `patch-studio-model-1` (§1.4) | File import/export and version migration | A patch exported from instance A imports identically into instance B |
 | Local user data | Versioned instance export with SHA-256 integrity (§1.5) | Extend to Firestore-held annotations, profile and patches once the storage seam exists | An export validates and its checksum verifies; export→import→export is a fixed point |
 | Migration | Not implemented (G8, G9) | Automated backup/restore and cross-instance migration | Two independently deployed instances pass a migration test in CI |
