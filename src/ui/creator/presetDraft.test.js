@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
+  PATCH_FILE_MAX_BYTES,
   buildPatchExport,
   createAudioTrack,
   createDraft,
   createEmptyDraft,
   createMod,
   createTempoSyncConfig,
+  createVisualTrack,
   draftFromPatchExport,
+  draftFromPatchFileText,
   validateDraft,
 } from './presetDraft.js'
 
@@ -135,5 +138,134 @@ describe('preset draft tempo model', () => {
     expect(draft.audioTracks).toEqual([])
     expect(draft.visualTracks).toEqual([])
     expect(draft.hapticTracks).toEqual([])
+  })
+})
+
+describe('patch file import', () => {
+  // The file path is the one that must work without Firebase: a patch exported
+  // from any instance has to load into any other instance, including one built
+  // with no VITE_FIREBASE_* configuration at all.
+
+  it('round-trips a fully populated patch through downloaded file text', () => {
+    const draft = createDraft()
+    draft.patchName = 'File Round Trip'
+    draft.timing.bpmEnabled = true
+    draft.timing.bpm.value = 84
+    draft.timing.lengthSec = 1200
+    draft.timing.bpm.mods.push(createMod(draft.controlTracks[0].id, 3))
+    draft.visualTracks.push(createVisualTrack('Mandala'))
+    draft.audioTracks[0].params.pulseRate.tempoSync = createTempoSyncConfig({
+      enabled: true,
+      mode: 'division',
+      division: '1/16',
+    })
+
+    // Exactly what download() writes to disk.
+    const fileText = JSON.stringify(buildPatchExport(draft), null, 2)
+    const imported = draftFromPatchFileText(fileText)
+
+    expect(imported.patchName).toBe('File Round Trip')
+    expect(imported.playing).toBe(false)
+    expect(imported.timing.lengthSec).toBe(1200)
+    expect(imported.timing.bpm).toMatchObject({ value: 84 })
+    expect(imported.timing.bpm.mods).toHaveLength(1)
+    expect(imported.controlTracks).toHaveLength(draft.controlTracks.length)
+    expect(imported.audioTracks).toHaveLength(draft.audioTracks.length)
+    expect(imported.visualTracks.map(t => t.trackType)).toContain('Mandala')
+    expect(imported.audioTracks[0].params.pulseRate.tempoSync).toMatchObject({
+      enabled: true,
+      division: '1/16',
+    })
+    expect(validateDraft(imported).filter(issue => issue.level === 'error')).toEqual([])
+  })
+
+  it('produces a stable export when the imported draft is exported again', () => {
+    const draft = createDraft()
+    draft.patchName = 'Stability'
+    draft.visualTracks.push(createVisualTrack('Ripple'))
+
+    const first = JSON.stringify(buildPatchExport(draft), null, 2)
+    const second = JSON.stringify(buildPatchExport(draftFromPatchFileText(first)), null, 2)
+
+    // Import → export must be a fixed point, or migrating between instances
+    // would drift the patch a little on every hop.
+    expect(second).toEqual(first)
+  })
+
+  it('keeps an empty patch importable', () => {
+    const fileText = JSON.stringify(buildPatchExport(createEmptyDraft()))
+    const imported = draftFromPatchFileText(fileText)
+
+    expect(imported.controlTracks).toEqual([])
+    expect(imported.audioTracks).toEqual([])
+    expect(imported.visualTracks).toEqual([])
+    expect(imported.hapticTracks).toEqual([])
+  })
+
+  it('rejects an empty file', () => {
+    expect(() => draftFromPatchFileText('')).toThrow(/empty/i)
+    expect(() => draftFromPatchFileText('   ')).toThrow(/empty/i)
+  })
+
+  it('rejects a non-string argument', () => {
+    expect(() => draftFromPatchFileText(null)).toThrow(/empty/i)
+    expect(() => draftFromPatchFileText(undefined)).toThrow(/empty/i)
+  })
+
+  it('rejects malformed JSON with a readable message', () => {
+    expect(() => draftFromPatchFileText('{ not json')).toThrow(/not valid JSON/i)
+  })
+
+  it('rejects JSON that is not an object', () => {
+    expect(() => draftFromPatchFileText('[1,2,3]')).toThrow(/patch object/i)
+    expect(() => draftFromPatchFileText('"a string"')).toThrow(/patch object/i)
+    expect(() => draftFromPatchFileText('null')).toThrow(/patch object/i)
+    expect(() => draftFromPatchFileText('42')).toThrow(/patch object/i)
+  })
+
+  it('rejects an object with no model field', () => {
+    // draftFromPatchExport tolerates this for backward compatibility; a file
+    // picked off disk must be explicit about what it is.
+    expect(() => draftFromPatchFileText('{"patchName":"No Model"}'))
+      .toThrow(/model/i)
+  })
+
+  it('rejects a foreign model', () => {
+    const foreign = JSON.stringify({ model: 'some-other-model-2', patchName: 'Nope' })
+    expect(() => draftFromPatchFileText(foreign)).toThrow(/Unsupported patch model/i)
+  })
+
+  it('rejects a file larger than the size ceiling', () => {
+    const huge = `{"model":"patch-studio-model-1","pad":"${'x'.repeat(PATCH_FILE_MAX_BYTES)}"}`
+    expect(() => draftFromPatchFileText(huge)).toThrow(/too large/i)
+  })
+
+  it('survives a truncated file', () => {
+    const full = JSON.stringify(buildPatchExport(createDraft()))
+    expect(() => draftFromPatchFileText(full.slice(0, full.length / 2)))
+      .toThrow(/not valid JSON/i)
+  })
+
+  it('tolerates missing track arrays without inventing tracks', () => {
+    const sparse = JSON.stringify({
+      model: 'patch-studio-model-1',
+      patchName: 'Sparse',
+      timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+    })
+    const imported = draftFromPatchFileText(sparse)
+
+    expect(imported.patchName).toBe('Sparse')
+    expect(imported.controlTracks).toEqual([])
+    expect(imported.audioTracks).toEqual([])
+    expect(imported.visualTracks).toEqual([])
+    expect(imported.hapticTracks).toEqual([])
+  })
+
+  it('never imports a patch in the playing state', () => {
+    const playing = createDraft()
+    playing.playing = true
+    const imported = draftFromPatchFileText(JSON.stringify(buildPatchExport(playing)))
+
+    expect(imported.playing).toBe(false)
   })
 })

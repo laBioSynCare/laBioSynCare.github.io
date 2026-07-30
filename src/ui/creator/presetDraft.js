@@ -668,6 +668,48 @@ export function draftFromPatchExport(exported) {
   return draft
 }
 
+// Largest patch file we will attempt to parse. A patch is a few KB of JSON; this
+// only exists so a mis-picked file fails fast with a clear message instead of
+// hanging the tab on a parse.
+export const PATCH_FILE_MAX_BYTES = 2 * 1024 * 1024
+
+/**
+ * Parse the text of a downloaded patch file back into a live draft.
+ *
+ * Kept here rather than in the component so the whole import path — parse,
+ * validate, reconstruct — is testable without a DOM. The component only reads
+ * the file and reports what this throws.
+ *
+ * @param {string} text raw file contents
+ * @returns {ReturnType<typeof draftFromPatchExport>}
+ */
+export function draftFromPatchFileText(text) {
+  if (typeof text !== 'string' || text.trim() === '') {
+    throw new Error('The file is empty.')
+  }
+  if (text.length > PATCH_FILE_MAX_BYTES) {
+    throw new Error('That file is too large to be a patch.')
+  }
+
+  let parsed
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new Error('That file is not valid JSON.')
+  }
+
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('That file does not contain a patch object.')
+  }
+  // draftFromPatchExport tolerates a missing model for backward compatibility;
+  // a file picked off disk should be explicit about what it is.
+  if (!parsed.model) {
+    throw new Error('That file is missing a "model" field — it is not a Patch Studio export.')
+  }
+
+  return draftFromPatchExport(parsed)
+}
+
 export function createTiming(overrides = {}) {
   return {
     lengthSec: 900,

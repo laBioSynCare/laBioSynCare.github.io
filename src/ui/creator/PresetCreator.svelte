@@ -45,6 +45,7 @@
     VISUAL_PARAM_RANGE,
     VISUAL_PARAMS,
     VISUAL_TRACK_TYPES,
+    PATCH_FILE_MAX_BYTES,
     TIMING_PARAM_RANGE,
     buildPatchExport,
     createAudioTrack,
@@ -55,6 +56,7 @@
     createMod,
     createVisualTrack,
     draftFromPatchExport,
+    draftFromPatchFileText,
     patchSummary,
     tempoSyncKindForTrackParam,
     validateDraft,
@@ -790,6 +792,41 @@
     catch { tip('Clipboard unavailable.') }
   }
 
+  // Import is the other half of Download: a patch exported from any instance —
+  // including one built without Firebase — loads here with no account involved.
+  // Parsing and validation live in presetDraft.js so they stay testable.
+  let importInput = $state(null)
+
+  function pickImportFile() {
+    importInput?.click()
+  }
+
+  async function importFile(event) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    // Clear immediately so re-picking the same file fires change again.
+    input.value = ''
+    if (!file) return
+
+    if (file.size > PATCH_FILE_MAX_BYTES) {
+      tip('That file is too large to be a patch.')
+      return
+    }
+
+    try {
+      const nextDraft = draftFromPatchFileText(await file.text())
+      resetLiveDraftState(nextDraft)
+      // An imported patch is not the cloud patch that was open: saving should
+      // create a new record rather than silently overwrite the previous one.
+      currentCloudPatchId = null
+      currentCloudPatchName = null
+      cloudOpen = false
+      tip(`Imported ${nextDraft.patchName}.`)
+    } catch (e) {
+      tip(`Import failed: ${e.message}`)
+    }
+  }
+
   function resetLiveDraftState(nextDraft) {
     stopAllVoices()
     draft = nextDraft
@@ -1373,6 +1410,14 @@
       {/if}
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
+      <button class="act-btn" onclick={pickImportFile} title="Load a patch JSON file exported from any BSC Lab instance">Import</button>
+      <input
+        bind:this={importInput}
+        type="file"
+        accept="application/json,.json"
+        onchange={importFile}
+        hidden
+      />
       <details
         class="cloud-menu"
         bind:open={cloudOpen}
