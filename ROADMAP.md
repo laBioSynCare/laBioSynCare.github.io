@@ -477,8 +477,11 @@ that distinction is the substance of this workstream.
       round-trip between instances with no account and no Firebase; exports carry
       no auth identifier. Now covers **everything kept on the device**, including
       saved patches; Firestore-held account records remain outside)*
-- [ ] Backup, restore, and verified migration between two independently deployed
+- [~] Backup, restore, and verified migration between two independently deployed
       instances (G8, G9)
+      *(`make migrate-test` migrates every local record between two origins with
+      separate localStorage and proves export→migrate→re-export is a fixed point;
+      backup scheduling and retention orchestration are absent)*
 - [~] Deployment and migration conformance tests in CI (G12)
       *(`scripts/smoke-http.sh` is one contract asserted against both the NixOS VM
       and the container; migration conformance is still unit-level)*

@@ -197,6 +197,27 @@ policy is aspirational. And `.ttl`/`.jsonld` are absent from nginx's default
 `mime.types`, so an unconfigured server would publish the knowledge graph as
 `application/octet-stream`. Both are handled explicitly and asserted.
 
+### 1.6c Migration between instances is tested, not asserted
+
+`make migrate-test` serves the build on **two ports — two origins, so genuinely
+separate `localStorage`** — each with its own browser profile, and performs a
+real migration:
+
+1. instance A seeds a logbook, an annotation, a saved patch, a profile and a
+   preference, in exactly the storage shape the application writes;
+2. A exports;
+3. the file is checked to contain **no account identifier**;
+4. instance B starts empty, verifies the checksum, and imports **under a
+   different account**;
+5. every record is verified individually — including that the patch body still
+   carries its control and audio tracks;
+6. B re-exports, and its checksum must equal A's.
+
+That last step is the one that matters: **export → migrate → re-export is a
+fixed point**, so moving between instances repeatedly cannot drift the data.
+A unit round-trip proves the format is symmetric in one process; this proves the
+migration works between separately hosted instances.
+
 ### 1.7 Public/private separation exists in the data model
 
 Annotations live in per-user named graphs, never the default graph
@@ -225,8 +246,8 @@ Stated plainly, with no partial credit.
 | ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31.** Patches, annotations and profile all work with no account and no Firebase, kept on the device. A *shared* self-hosted backend — one others can read — is still absent |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
 | ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything BSC Lab keeps on the device. Firestore-held records for a signed-in account remain outside |
-| G8 | No backup or restore | — |
-| G9 | No cross-instance migration | Nothing verifies that instance A's data loads into instance B |
+| ~~G8~~ | ~~No backup or restore~~ | ⚠️ **Partly closed 2026-07-31.** Export is the backup and import is the restore for all local data; scheduling and retention orchestration are absent |
+| ~~G9~~ | ~~No cross-instance migration~~ | ✅ **Closed for local data 2026-07-31.** `make migrate-test` moves everything between two genuinely separate origins and proves the re-export matches byte-for-byte |
 | G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |
 | ~~G11~~ | ~~No threat model, no `SECURITY.md`~~ | ⚠️ **Partly closed.** `SECURITY.md` documents the data boundaries, the authentication-identifier exclusion and self-hosting expectations. A formal threat model and automated boundary tests are still open |
 | ~~G12~~ | ~~No deployment conformance tests~~ | ✅ **Closed 2026-07-31.** `scripts/smoke-http.sh` is one contract run against **both** the NixOS VM and the container in CI |
@@ -341,7 +362,7 @@ code exists.
 | Storage | **Patches: local-first by default, Firestore when signed in, one shared conformance suite (§1.6).** Profile and annotations still Firestore-only | Extend the seam to profile and annotations; add a self-hosted implementation | The same conformance suite passes against every storage implementation |
 | Patch data | Portable `patch-studio-model-1` (§1.4) | File import/export and version migration | A patch exported from instance A imports identically into instance B |
 | Local user data | Versioned instance export with SHA-256 integrity (§1.5) | Extend to Firestore-held annotations, profile and patches once the storage seam exists | An export validates and its checksum verifies; export→import→export is a fixed point |
-| Migration | Not implemented (G8, G9) | Automated backup/restore and cross-instance migration | Two independently deployed instances pass a migration test in CI |
+| Migration | **Two-origin migration test** (`make migrate-test`) | Backup/restore orchestration and schema-version migration | Two independently deployed instances pass a migration test |
 | Security | Public/private boundaries in the data model (§1.5) | Threat model and safe deployment defaults | `SECURITY.md` published and automated boundary tests pass |
 
 ---

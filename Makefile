@@ -46,7 +46,7 @@ DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 
-.PHONY: build check deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check migrate-test deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -55,6 +55,13 @@ build:
 ## Run SvelteKit sync and static checks
 check:
 	npm run check
+
+## Prove a person can leave one instance and arrive at another intact: serves
+## the build on two ports (two origins, so genuinely separate localStorage),
+## exports everything from A, imports into B under a different account, and
+## checks the re-export from B matches A byte-for-byte.
+migrate-test:
+	node scripts/migration-two-origin.mjs
 
 ## Build the static site as an immutable Nix package (result/share/bsc-lab).
 ## Bit-reproducible: `nix build --rebuild` produces an identical output.
