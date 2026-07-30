@@ -62,6 +62,8 @@ annotations lives here.
 | [0036](0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md) | Disambiguate neuromodulation's intervention vs effect senses; add Neurostimulation (delivery), self-directed/interventional split, Neuroplasticity disposition; bring neurofeedback/biofeedback under neuromodulation; effect sense stays a facet collection (resolves ADR 0035 notes 4 & 5) | Accepted |
 | [0037](0037-self-regulation-genus-and-sensory-neurostimulation-branch.md) | Add DeliberateSelfRegulation as the neutral genus above no-applied-stimulus self-directed practices; assert SensoryNeurostimulation/-Technique below Neurostimulation as an intersection class; keep generic biofeedback neutral; add primaryFrequencyBand (resolves audit RDF-04, RDF-05, and the ordering sub-bug of RDF-08) | Accepted |
 
+| [0038](0038-identity-providers-and-the-two-seam-adapter.md) | Split the backend adapter into identity and storage seams; local-first storage as the default; Mastodon OAuth as the first identity provider and IndieAuth as the second, with both implemented to prove the seam is an interface rather than a swap | Proposed |
+
 ## Adding an ADR
 
 1. Copy the structure of an existing file.

@@ -130,22 +130,32 @@ nothing at all.
 **Identity provider** — establishes who a user is, and nothing else.
 
 - **Anonymous** (default): no identity, local data only
+- **Fediverse / Mastodon OAuth** — *first implementation*. Viable from a static
+  app: Mastodon supports **PKCE since 4.3.0** (S256 only) and **dynamic app
+  registration** via `POST /api/v1/apps`, so no pre-registration and no server are
+  required — the pattern used by client-side Mastodon clients such as Pinafore,
+  Semaphore and Elk. A Mastodon **actor URI is a dereferenceable agent
+  identifier** and additionally an ActivityPub actor, so it serves the named-graph
+  annotation model directly. *Known compromise:* Mastodon provisions
+  **confidential clients only** and always returns a `client_secret`, which a
+  browser cannot keep secret. PKCE mitigates interception; the secret's presence
+  remains a wart the ecosystem is addressing through Client ID Metadata Documents.
+- **IndieAuth** ([W3C](https://www.w3.org/TR/indieauth/)) — *second
+  implementation*. Identity is a URL the user controls, and the client is
+  identified by *its own* URL, so DNS replaces client registration: **no
+  registration step and no client secret at all**. Mechanically cleaner than
+  Mastodon OAuth for a static deployment, though not semantically superior — an
+  actor URI dereferences just as well. Mastodon does not implement IndieAuth, so
+  the two are complementary rather than alternatives.
 - **Firebase Auth**: the existing implementation, moved behind the interface
-- **Fediverse / Mastodon OAuth**: viable from a static app. Mastodon supports
-  **PKCE since 4.3.0** (S256 only) and **dynamic app registration** via
-  `POST /api/v1/apps`, so no pre-registration and no server are required — the
-  pattern used by client-side Mastodon clients such as Pinafore, Semaphore and Elk.
-  *Known compromise:* Mastodon provisions **confidential clients only** and always
-  returns a `client_secret`, which a browser cannot keep secret. PKCE mitigates
-  interception; the secret's presence remains a wart the ecosystem is addressing
-  through Client ID Metadata Documents.
-- **IndieAuth** ([W3C](https://www.w3.org/TR/indieauth/)): identity is a URL the
-  user controls, and the client is identified by *its own* URL — DNS replaces
-  client registration entirely. **No registration step and no client secret**,
-  which makes it strictly cleaner than Mastodon OAuth for a static deployment, and
-  a natural fit for a project whose whole data model is dereferenceable
-  identifiers. Mastodon does not implement IndieAuth, so the two are complementary
-  rather than alternatives.
+
+**Why two, and why Mastodon first** — see
+[ADR 0038](../decisions/0038-identity-providers-and-the-two-seam-adapter.md).
+Briefly: one provider is a swap, two are an interface; and Mastodon is the
+reference Fediverse implementation, whereas IndieAuth belongs to the allied but
+separate IndieWeb. Consuming a Mastodon instance as an OAuth provider needs no
+ActivityPub server, no inbox and no moderation capacity, so it does not reopen
+[ADR 0008](../decisions/0008-activitypub.md).
 
 **Storage provider** — persists annotations, patches, logbook entries and profile.
 
