@@ -1,5 +1,8 @@
 <script>
   import { onMount } from 'svelte'
+  // Same value the Nix package pins via BSC_BUILD_VERSION (svelte.config.js),
+  // so an export records which build produced it.
+  import { version as appVersion } from '$app/environment'
   import { activeSkin, applySkin, initSkin, skins } from '../../ui/theme/skins.js'
   import {
     activeAudioEngineId,
@@ -16,11 +19,83 @@
     resetPhotoAdvisory,
     visualStimulationOn,
   } from '../../ui/safety/visualSafety.js'
+  import { authState } from '../../firebase/auth.js'
+  import {
+    applyInstanceExport,
+    buildInstanceExport,
+    collectInstanceData,
+    instanceExportFilename,
+    parseInstanceExport,
+    summarizeInstanceExport,
+  } from '../../portability/instanceExport.js'
 
   let selectedSkin = $state('midnight')
   let selectedEngine = $state('vanilla')
   let caps = $state({ webAudio: true, audioWorklet: true, wasm: true })
   let visualOn = $state(true)
+
+  // ── Instance export / import ────────────────────────────────────────────────
+  // Works with no Firebase configured: everything portable lives in
+  // localStorage. See docs/technical/PORTABLE_DEPLOYMENT.md (gap G7).
+  let auth = $state({ ready: false, configured: false, user: null })
+  let dataSummary = $state(null)
+  let dataNote = $state('')
+  let importInput = $state(null)
+  let pendingImport = $state(null)
+
+  const currentUid = $derived(auth.user?.uid ?? null)
+
+  function refreshSummary() {
+    if (typeof localStorage === 'undefined') return
+    dataSummary = summarizeInstanceExport(collectInstanceData(localStorage, { uid: currentUid }))
+  }
+
+  async function exportInstance() {
+    try {
+      const envelope = await buildInstanceExport(localStorage, {
+        uid: currentUid,
+        appVersion,
+      })
+      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = instanceExportFilename()
+      a.click()
+      URL.revokeObjectURL(url)
+      dataNote = 'Exported.'
+    } catch (e) {
+      dataNote = `Export failed: ${e.message}`
+    }
+  }
+
+  async function stageImport(event) {
+    const input = event.currentTarget
+    const file = input.files?.[0]
+    input.value = ''
+    if (!file) return
+    try {
+      const parsed = await parseInstanceExport(await file.text())
+      // Verified but not applied: importing replaces a person's own notes, so
+      // it asks first and says exactly what would land.
+      pendingImport = { parsed, summary: summarizeInstanceExport(parsed.payload) }
+      dataNote = ''
+    } catch (e) {
+      pendingImport = null
+      dataNote = `Import failed: ${e.message}`
+    }
+  }
+
+  function confirmImport() {
+    try {
+      const result = applyInstanceExport(localStorage, pendingImport.parsed, { uid: currentUid })
+      pendingImport = null
+      refreshSummary()
+      dataNote = `Restored ${result.restoredLogbooks} logbook${result.restoredLogbooks === 1 ? '' : 's'}. Reload the Logbook to see them.`
+    } catch (e) {
+      dataNote = `Import failed: ${e.message}`
+    }
+  }
 
   onMount(() => {
     selectedSkin = initSkin()
@@ -30,7 +105,10 @@
     const unsubSkin = activeSkin.subscribe((skinId) => { selectedSkin = skinId })
     const unsubEngine = activeAudioEngineId.subscribe((id) => { selectedEngine = id })
     const unsubVisual = visualStimulationOn.subscribe((on) => { visualOn = on })
-    return () => { unsubSkin(); unsubEngine(); unsubVisual() }
+    // Auth only decides which logbook scope is in play; export works signed out.
+    const unsubAuth = authState.subscribe((value) => { auth = value; refreshSummary() })
+    refreshSummary()
+    return () => { unsubSkin(); unsubEngine(); unsubVisual(); unsubAuth() }
   })
 
   function selectSkin(id) {
@@ -175,6 +253,62 @@
         <span class="engine-tagline">No visual stimulation</span>
         <span class="engine-desc">All flashing and moving visuals are suppressed; audio and editing are unaffected.</span>
       </button>
+    </div>
+  </section>
+
+  <section class="settings-section" aria-labelledby="data-heading">
+    <div class="section-copy">
+      <h2 id="data-heading">Your data</h2>
+      <p>
+        Everything BSC Lab keeps about you on this device — your logbooks, their entries, and
+        your appearance preference — travels in one file. Take it to another BSC Lab instance,
+        including one you host yourself, or keep it as a backup. No account is required and
+        nothing is uploaded.
+      </p>
+      <p class="data-privacy">
+        The file contains your own written notes. It carries no sign-in identifier, so it is
+        safe to move between accounts — but treat it as personal, because it is.
+      </p>
+    </div>
+
+    <div class="data-panel">
+      {#if dataSummary}
+        <p class="data-summary">
+          {dataSummary.logbooks} logbook{dataSummary.logbooks === 1 ? '' : 's'} ·
+          {dataSummary.entries} entr{dataSummary.entries === 1 ? 'y' : 'ies'}
+          {#if dataSummary.legacyEntries > 0}· {dataSummary.legacyEntries} unmigrated{/if}
+        </p>
+      {/if}
+
+      <div class="data-actions">
+        <button type="button" class="data-btn" onclick={exportInstance}>Export my data</button>
+        <button type="button" class="data-btn" onclick={() => importInput?.click()}>Import a file</button>
+        <input
+          bind:this={importInput}
+          type="file"
+          accept="application/json,.json"
+          onchange={stageImport}
+          hidden
+        />
+      </div>
+
+      {#if pendingImport}
+        <div class="data-confirm" role="alertdialog" aria-labelledby="import-confirm-heading">
+          <p id="import-confirm-heading"><strong>Replace your data with this file?</strong></p>
+          <p>
+            It holds {pendingImport.summary.logbooks} logbook{pendingImport.summary.logbooks === 1 ? '' : 's'}
+            and {pendingImport.summary.entries} entr{pendingImport.summary.entries === 1 ? 'y' : 'ies'}.
+            Logbooks with the same storage scope will be overwritten. This cannot be undone —
+            export first if you want to keep what is here.
+          </p>
+          <div class="data-actions">
+            <button type="button" class="data-btn data-btn-danger" onclick={confirmImport}>Replace</button>
+            <button type="button" class="data-btn" onclick={() => { pendingImport = null }}>Cancel</button>
+          </div>
+        </div>
+      {/if}
+
+      {#if dataNote}<p class="data-note">{dataNote}</p>{/if}
     </div>
   </section>
 </main>
@@ -366,6 +500,70 @@
     cursor: pointer;
   }
   .review-link:hover { color: var(--app-text-strong); }
+
+  .data-privacy {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    opacity: 0.78;
+  }
+
+  .data-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .data-summary {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  .data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .data-btn {
+    padding: 0.55rem 1rem;
+    border: 1px solid color-mix(in srgb, var(--app-text) 22%, transparent);
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--app-text) 6%, transparent);
+    color: var(--app-text);
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .data-btn:hover {
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+  }
+
+  .data-btn-danger {
+    border-color: color-mix(in srgb, #e0554b 55%, transparent);
+    color: #e0554b;
+  }
+
+  .data-confirm {
+    padding: 0.9rem 1rem;
+    border: 1px solid color-mix(in srgb, #e0554b 45%, transparent);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, #e0554b 8%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .data-confirm p { margin: 0; }
+
+  .data-note {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--app-accent);
+  }
 
   .settings-section + .settings-section {
     margin-top: 2rem;

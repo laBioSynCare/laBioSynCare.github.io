@@ -107,14 +107,34 @@ for ordinary builds, obtained here structurally rather than by convention.
 | Patch Studio | A portable `patch-studio-model-1` object | Serialises and reloads faithfully, but converts to **neither** the catalogue preset format **nor** SSTIM RDF — documented as a dead end (ADR 0026) |
 | Release snapshots | Immutable per-version trees under `static/ontology/<version>/` | Integrity enforced by `make verify-snapshots` checksums (ADR 0020) |
 
-### 1.5 Public/private separation exists in the data model
+### 1.5 Instance export and import
+
+`Settings → Your data` exports everything BSC Lab holds locally as one versioned,
+checksummed file, and imports it back — on any instance, with **no account and no
+Firebase**. Implementation in `src/portability/instanceExport.js`.
+
+| Property | How |
+|---|---|
+| Versioned | `model: "bsc-lab-instance-export-1"`; unknown or absent models are refused |
+| Integrity-checked | SHA-256 over a canonically-ordered payload, so key order cannot change the digest; a tampered or truncated file is refused rather than half-applied |
+| Free of authentication identifiers | Logbooks are keyed `bsclab_logbook_v2:<uid>` in storage but exported by **scope** (`anonymous` / `account`), so the Firebase uid never enters the file — the rule `AnnotationStore` already follows for RDF |
+| Portable across accounts | Account-scoped data is re-keyed to whoever imports, and restores anonymously when nobody is signed in |
+| Lossless | Export → import → export is a fixed point, verified by checksum, so repeated migration cannot drift the data |
+| Confirmed before overwriting | Import parses and verifies first, shows what would land, and asks |
+
+**Covered today:** logbooks and their entries, unmigrated v1 entries, appearance
+preference. **Not covered:** annotations, profile and saved patches, which live in
+Firestore and wait on the storage adapter (G4/G5). Individual patches are separately
+portable as files through Patch Studio's Download and Import.
+
+### 1.6 Public/private separation exists in the data model
 
 Annotations live in per-user named graphs, never the default graph
 (`AnnotationStore`, ADR 0003). Authoritative ontology data and user contributions
 are therefore distinguishable at the triple level, and exports carry no
 authentication identifiers.
 
-### 1.6 Offline and integrity properties
+### 1.7 Offline and integrity properties
 
 The PWA service worker (ADR 0009) caches for offline use, returns early for any
 cross-origin request, and never auto-reloads a running session. Ontology IRIs
@@ -134,7 +154,7 @@ Stated plainly, with no partial credit.
 | G4 | No backend adapter interface | Firebase is imported directly at nine sites; there is no seam to substitute an implementation |
 | G5 | No self-hosted alternative to Firebase | Cloud features require Firebase or are simply absent |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
-| G7 | No complete export package | Ontology and annotations serialise separately; there is no single versioned instance export |
+| ~~G7~~ | ~~No complete export package~~ | ⚠️ **Partly closed 2026-07-30.** A versioned, checksummed instance export covers local data — logbooks, unmigrated v1 entries, preferences — and round-trips between instances with no cloud. Firestore-held annotations, profile and saved patches are **not** included and wait on the storage adapter (G4/G5) |
 | G8 | No backup or restore | — |
 | G9 | No cross-instance migration | Nothing verifies that instance A's data loads into instance B |
 | G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |
@@ -250,7 +270,7 @@ code exists.
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
 | Storage | Firestore when configured (§1.2) | Storage-provider interface: local-first, Firestore, self-hosted | The same conformance suite passes against every storage implementation |
 | Patch data | Portable `patch-studio-model-1` (§1.4) | File import/export and version migration | A patch exported from instance A imports identically into instance B |
-| RDF data | Ontology and annotation serialisation (§1.4) | Versioned complete export package | An export validates against its schema and its checksums verify |
+| Local user data | Versioned instance export with SHA-256 integrity (§1.5) | Extend to Firestore-held annotations, profile and patches once the storage seam exists | An export validates and its checksum verifies; export→import→export is a fixed point |
 | Migration | Not implemented (G8, G9) | Automated backup/restore and cross-instance migration | Two independently deployed instances pass a migration test in CI |
 | Security | Public/private boundaries in the data model (§1.5) | Threat model and safe deployment defaults | `SECURITY.md` published and automated boundary tests pass |
 

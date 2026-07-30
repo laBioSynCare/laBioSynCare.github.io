@@ -463,7 +463,11 @@ that distinction is the substance of this workstream.
       surface is nine import sites across seven files (G4, G5, G6)
 - [ ] Local-first storage as the default, so identity becomes optional attribution
       rather than a gate on a user's own records (G5)
-- [ ] Versioned instance export package with manifest and checksums (G7)
+- [~] Versioned instance export package with manifest and checksums (G7)
+      *(`Settings → Your data`: logbooks, unmigrated v1 entries and preferences
+      export as one SHA-256-checksummed file and round-trip between instances
+      with no account and no Firebase; exports carry no auth identifier.
+      Firestore-held annotations, profile and patches wait on the storage seam)*
 - [ ] Backup, restore, and verified migration between two independently deployed
       instances (G8, G9)
 - [ ] Deployment and migration conformance tests in CI (G12)
