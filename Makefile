@@ -56,6 +56,14 @@ build:
 check:
 	npm run check
 
+## Build the static site as an immutable Nix package (result/share/bsc-lab).
+## Bit-reproducible: `nix build --rebuild` produces an identical output.
+## Closes the production-package gap only — this is not a NixOS module and not
+## a self-hosting solution. See docs/technical/PORTABLE_DEPLOYMENT.md.
+package:
+	nix build
+	@echo "package: result/share/bsc-lab — serve with any static web server"
+
 ## Build with NO Firebase configuration and prove the result is a working,
 ## credential-free static deployment.
 ##

@@ -118,9 +118,19 @@ the cloud-backed features (sign-in, annotations, saved patches, profile) become
 unavailable.
 
 The pinned Nix flake reproduces the **development, build and validation**
-toolchain, and CI runs inside it. It does **not** yet provide a production package,
-a NixOS module, a container image, a self-hosted replacement for the optional cloud
-services, or complete backup and cross-instance migration.
+toolchain, and CI runs inside it. `nix build` (or `make package`) additionally
+produces the static site as an immutable, **bit-reproducible** package at
+`result/share/bsc-lab`, servable by any static web server — `nix build --rebuild`
+yields an identical output, and `nix flake check` builds it.
+
+That is a reproducible *package*, not self-hosting. There is still no NixOS module,
+no container image, no self-hosted replacement for the optional cloud services, and
+no complete backup or cross-instance migration.
+
+Every commit is also verified as a **credential-free static deployment**:
+`make smoke-static` rebuilds with no Firebase configuration, serves the result over
+plain HTTP, and asserts that all primary routes, the ontology Turtle and the PWA
+assets are served, that an unknown path 404s, and that no API key was inlined.
 
 Existing portability foundations:
 

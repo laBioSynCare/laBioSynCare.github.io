@@ -450,7 +450,11 @@ reproduces the development, build and validation toolchain but exposes only
 `devShells` and `formatter`; **there is no production deployment output yet**, and
 that distinction is the substance of this workstream.
 
-- [ ] Production Nix package building the static site deterministically (G1)
+- [x] Production Nix package building the static site deterministically (G1)
+      *(`nix build` / `make package`; bit-reproducible, verified with `nix build
+      --rebuild`; `nix flake check` builds it. Required pinning SvelteKit's version
+      name via `BSC_BUILD_VERSION` — the default timestamp reached every content
+      hash)*
 - [ ] NixOS module exposing an instance as a declarative service (G2)
 - [ ] OCI image from the same derivation, for operators without Nix (G3)
 - [ ] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,

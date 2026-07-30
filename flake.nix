@@ -182,6 +182,87 @@
           };
         });
 
+      # `nix build` — the static BSC Lab site as an immutable package.
+      #
+      # This closes gap G1 in docs/technical/PORTABLE_DEPLOYMENT.md and nothing
+      # more. It is *not* self-hosting: there is deliberately no NixOS module,
+      # no service definition and no container image yet. What it gives an
+      # operator is a reproducible artifact they can serve with any static web
+      # server, built from a pinned toolchain rather than from whatever Node
+      # happened to be on the build machine.
+      #
+      # Credential-free by construction. The flake source is the git-tracked
+      # tree, so an untracked, gitignored .env cannot enter the sandbox — the
+      # build cannot inline a developer's Firebase key even by accident. That is
+      # the same property `make smoke-static` asserts for ordinary builds, here
+      # obtained structurally instead of by convention.
+      packages = forAllSystems (pkgs: {
+        default = pkgs.buildNpmPackage (finalAttrs: {
+          pname = "bsc-lab";
+          version = "0.1.0";           # tracks package.json
+          src = self;
+
+          # Regenerate after any package-lock.json change:
+          #   nix build 2>&1 | grep -A2 'specified:'
+          # or: nix run nixpkgs#prefetch-npm-deps -- package-lock.json
+          npmDepsHash = "sha256-Pd1cIphKqxXDckz5jqCl+SCuM7eJQz6wjYm9K4KTObI=";
+
+          nodejs = pkgs.nodejs_24;     # same major as the dev shell and CI
+
+          # `npm run build` → vite build → dist/ (adapter-static).
+          npmBuildScript = "build";
+
+          # Pin SvelteKit's version name to the revision being built. Left to its
+          # default it is a timestamp, which lands in every content hash and makes
+          # the output differ on every run. A revision is stable for identical
+          # sources and still changes whenever the source does, so the service
+          # worker's cache name keeps invalidating correctly (ADR 0009).
+          BSC_BUILD_VERSION = self.shortRev or self.dirtyShortRev or "unknown";
+
+          # Vite would otherwise read a project-root .env in every mode. There is
+          # none in the sandbox, but point envDir at an empty path so the intent
+          # is explicit and a future stray file cannot change the output.
+          preBuild = ''
+            export BSC_ENV_DIR="$TMPDIR/bsc-empty-env"
+            mkdir -p "$BSC_ENV_DIR"
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            mkdir -p "$out/share/bsc-lab"
+            cp -r dist/. "$out/share/bsc-lab/"
+            runHook postInstall
+          '';
+
+          # Fail the build rather than ship an empty or credentialed artifact.
+          doInstallCheck = true;
+          installCheckPhase = ''
+            runHook preInstallCheck
+            test -f "$out/share/bsc-lab/index.html" \
+              || { echo "no index.html in package output"; exit 1; }
+            test -f "$out/share/bsc-lab/ontology/sstim-core.ttl" \
+              || { echo "ontology assets missing from package output"; exit 1; }
+            if grep -rEq 'AIza[0-9A-Za-z_-]{20,}' "$out/share/bsc-lab"; then
+              echo "a Firebase API key was inlined into the package output"; exit 1
+            fi
+            runHook postInstallCheck
+          '';
+
+          meta = {
+            description = "BSC Lab — static sensory-stimulation workbench and SSTIM knowledge browser";
+            homepage = "https://labiosyncare.github.io/";
+            license = pkgs.lib.licenses.asl20;
+            platforms = pkgs.lib.platforms.all;
+          };
+        });
+      });
+
+      # `nix flake check` builds the package, so a broken build fails the same
+      # gate as a broken evaluation.
+      checks = forAllSystems (pkgs: {
+        package = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      });
+
       # `nix fmt` formats the Nix sources in this repo.
       formatter = forAllSystems (pkgs: pkgs.nixpkgs-fmt);
     };

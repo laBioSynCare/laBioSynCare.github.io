@@ -64,18 +64,39 @@ files** — `src/ui/creator/PresetCreator.svelte`, `src/ui/auth/SignInForm.svelt
 `src/routes/logbook/+page.svelte`, `src/routes/profile/+page.svelte`, and
 `src/rdf/annotations/AnnotationStore.js`.
 
-### 1.3 The Nix flake reproduces the *toolchain*, not a deployment
+### 1.3 The Nix flake: reproducible toolchain **and** a reproducible package
 
-`flake.nix` exposes **`devShells` and `formatter` only**. It pins Node, Python with
-pySHACL, ROBOT/HermiT, WIDOCO, pyLODE, WABT and Firebase tooling across Linux and
-macOS, and CI runs every command inside it, so contributor and CI environments match
-exactly.
+`flake.nix` pins Node, Python with pySHACL, ROBOT/HermiT, WIDOCO, pyLODE, WABT and
+Firebase tooling across Linux and macOS, and CI runs every command inside it, so
+contributor and CI environments match exactly.
 
-It does **not** expose `packages`, `nixosModules`, `nixosConfigurations` or `apps`.
+**`nix build` (or `make package`) now produces the static site as an immutable
+package** at `result/share/bsc-lab`, servable by any static web server. It is
+**bit-reproducible**: `nix build --rebuild` yields an identical output, verified
+2026-07-30. `nix flake check` builds it, so a broken build fails the same gate as a
+broken evaluation. The derivation refuses to install an artifact missing
+`index.html` or the ontology assets, or one containing an inlined Firebase key.
 
-> **This distinction is the point of the whole document.** BSC Lab has a
-> reproducible **development, build and validation** environment. It does not have
-> reproducible **production deployment**. Conflating the two is easy and misleading.
+**Credential-free by construction.** The flake source is the git-tracked tree, so an
+untracked, gitignored `.env` cannot enter the sandbox — the build cannot inline a
+developer's key even by accident. That is the property `make smoke-static` asserts
+for ordinary builds, obtained here structurally rather than by convention.
+
+> **Reproducibility needed one fix, worth recording.** SvelteKit's version name
+> defaults to a build timestamp, which is embedded as the `__sveltekit_<id>` global
+> and therefore lands in every content hash — two builds of identical sources
+> differed in every chunk filename. It could not simply be pinned to a constant,
+> because the same value is the service worker's cache name
+> (`bsc-lab-${version}`), and a frozen cache name means clients never receive an
+> update (ADR 0009). It is now overridable through `BSC_BUILD_VERSION`, which the
+> Nix package sets to the revision being built: stable for identical sources,
+> changing whenever the source changes. Unset, the SvelteKit default applies and
+> ordinary builds are unaffected.
+
+> **What this does and does not close.** Gap G1 only. There is still **no NixOS
+> module** (G2), **no container image** (G3), no service configuration, and no
+> backup or migration orchestration. A reproducible package is not self-hosting;
+> it is the first of the pieces that would make self-hosting possible.
 
 ### 1.4 Data surfaces that already serialise
 
@@ -107,7 +128,7 @@ Stated plainly, with no partial credit.
 
 | # | Gap | Current state |
 |---|---|---|
-| G1 | No production package | The flake builds a dev shell, not the application |
+| ~~G1~~ | ~~No production package~~ | ✅ **Closed 2026-07-30.** `nix build` produces a bit-reproducible static package; `nix flake check` builds it |
 | G2 | No NixOS module or service definition | An operator has no declarative way to run an instance |
 | G3 | No container image | No OCI alternative for non-Nix operators |
 | G4 | No backend adapter interface | Firebase is imported directly at nine sites; there is no seam to substitute an implementation |
@@ -224,7 +245,7 @@ code exists.
 
 | Area | Exists now | Proposed work | Acceptance criterion |
 |---|---|---|---|
-| Reproducible toolchain | Pinned Nix dev/CI environment (§1.3) | Production package and NixOS module | A fresh machine deploys a working instance from one documented command |
+| Reproducible toolchain | Pinned Nix dev/CI environment **and a bit-reproducible `nix build` package** (§1.3) | NixOS module and OCI image | A fresh machine deploys a working instance from one documented command |
 | Core application | Static SvelteKit build (§1.1) | Independent institutional deployment | An instance runs with no BioSynCare and no Firebase credentials |
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
 | Storage | Firestore when configured (§1.2) | Storage-provider interface: local-first, Firestore, self-hosted | The same conformance suite passes against every storage implementation |

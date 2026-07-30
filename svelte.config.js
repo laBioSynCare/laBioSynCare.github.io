@@ -1,7 +1,23 @@
 import adapter from '@sveltejs/adapter-static'
 
+// SvelteKit's version name defaults to a build timestamp. It is embedded in the
+// client bundle as the `__sveltekit_<id>` global and feeds the service worker's
+// cache name (`bsc-lab-${version}`, src/service-worker.js), so a fresh timestamp
+// changes every content hash in the build — which makes `nix build` output
+// differ on every run even from identical sources.
+//
+// It cannot simply be pinned to a constant: the cache name would stop changing
+// between deploys and clients would never pick up an update (ADR 0009).
+//
+// So it is overridable instead. A build that sets BSC_BUILD_VERSION to something
+// stable-per-revision — a commit SHA, as the Nix package does — is reproducible
+// *and* still invalidates caches whenever the source changes. Unset, the
+// SvelteKit default applies and behaviour is unchanged.
+const buildVersion = process.env.BSC_BUILD_VERSION
+
 export default {
   kit: {
+    ...(buildVersion ? { version: { name: buildVersion } } : {}),
     adapter: adapter({
       pages: 'dist',
       assets: 'dist',
