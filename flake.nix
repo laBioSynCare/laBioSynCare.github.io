@@ -257,11 +257,31 @@
         });
       });
 
+      # A NixOS service module, so an operator can run an instance
+      # declaratively. See nix/modules/bsc-lab.nix — it owns the two things the
+      # hosting platform otherwise decides for us: ontology MIME types and the
+      # cross-origin isolation headers that GitHub Pages cannot apply.
+      nixosModules.default = import ./nix/modules/bsc-lab.nix;
+
       # `nix flake check` builds the package, so a broken build fails the same
-      # gate as a broken evaluation.
-      checks = forAllSystems (pkgs: {
-        package = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
-      });
+      # gate as a broken evaluation. On Linux it additionally boots a clean
+      # NixOS VM with the module enabled and asserts the deployment is correct —
+      # routes, media types, headers, real 404s, no embedded credentials.
+      # The VM test is Linux-only; on macOS the check set is just the package
+      # and CI is the machine that boots the VM.
+      checks = forAllSystems (pkgs:
+        let system = pkgs.stdenv.hostPlatform.system;
+        in
+        {
+          package = self.packages.${system}.default;
+        }
+        // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          nixos-vm = import ./nix/tests/bsc-lab.nix {
+            inherit pkgs;
+            bscLabModule = self.nixosModules.default;
+            bscLabPackage = self.packages.${system}.default;
+          };
+        });
 
       # `nix fmt` formats the Nix sources in this repo.
       formatter = forAllSystems (pkgs: pkgs.nixpkgs-fmt);

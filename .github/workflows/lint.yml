@@ -51,3 +51,31 @@ jobs:
       # a Firebase API key.
       - name: Verify credential-free static deployment
         run: nix develop --command make smoke-static
+
+  # A separate job: this boots a real NixOS virtual machine, which needs KVM and
+  # takes minutes, so it must not gate the fast feedback above. It is the
+  # difference between "the module evaluates" and "an operator who enables it
+  # gets a correct instance" — routes, ontology media types, cross-origin
+  # headers, real 404s, and no credential in the artifact.
+  nixos-vm:
+    name: NixOS VM deployment test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Enable KVM for the test VM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Boot a clean NixOS VM and verify the deployment
+        run: nix build .#checks.x86_64-linux.nixos-vm -L
