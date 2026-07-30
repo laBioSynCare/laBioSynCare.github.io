@@ -79,6 +79,12 @@ function byId(elements, id) {
 }
 
 describe('unified navigator projection', () => {
+  // Each case parses the whole Turtle fixture and builds the full Cytoscape
+  // projection: ~1.5s in isolation, but over vitest's 5s default when the
+  // suite runs in parallel. An explicit budget stops this failing
+  // intermittently in CI, which a flaky suite makes worthless.
+  const PROJECTION_TIMEOUT_MS = 30_000
+
   it('interlinks versioned catalog, live agents, ontology, and vocabulary', async () => {
     const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
     const elements = await buildGraphElements(store)
@@ -113,7 +119,7 @@ describe('unified navigator projection', () => {
         label: 'modality',
       }) }),
     ]))
-  })
+  }, PROJECTION_TIMEOUT_MS)
 
   it('keeps qualified relationship provenance on the projected edge', async () => {
     const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
@@ -131,7 +137,7 @@ describe('unified navigator projection', () => {
       roles: ['Technical lead'],
       sources: ['https://example.org/source'],
     })
-  })
+  }, PROJECTION_TIMEOUT_MS)
 
   // ADR 0034 §11: the navigator projects the formal facets. No skos:Collection
   // is minted in the released vocabulary to make a UI filter match, so the
@@ -168,7 +174,7 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
       intendedNeuralTargetSite: ['https://w3id.org/sstim/vocab#targetCortex'],
       characteristicDeliveryMedium: ['https://w3id.org/sstim/exposure#mediumAppliedElectricCurrent'],
     })
-  })
+  }, PROJECTION_TIMEOUT_MS)
 
   it('leaves facets undefined on a node that asserts none', async () => {
     const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
@@ -176,5 +182,5 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
     const modality = elements.find(e => e.data.iri === 'https://w3id.org/sstim/vocab#modalityAuditory')?.data
 
     expect(modality.facets).toBeUndefined()
-  })
+  }, PROJECTION_TIMEOUT_MS)
 })
