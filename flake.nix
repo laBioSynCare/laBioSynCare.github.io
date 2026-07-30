@@ -255,6 +255,15 @@
             platforms = pkgs.lib.platforms.all;
           };
         });
+      }
+      # An OCI image for operators who do not run Nix. Linux-only, and built
+      # from the *same* store path the NixOS module serves — the application is
+      # never rebuilt for it, so the deployment paths cannot drift.
+      // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        oci = import ./nix/oci.nix {
+          inherit pkgs;
+          bscLabPackage = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
       });
 
       # A NixOS service module, so an operator can run an instance
@@ -280,6 +289,8 @@
             inherit pkgs;
             bscLabModule = self.nixosModules.default;
             bscLabPackage = self.packages.${system}.default;
+            # One definition of a correct deployment, shared with the OCI image.
+            smokeScript = ./scripts/smoke-http.sh;
           };
         });
 

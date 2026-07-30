@@ -79,3 +79,44 @@ jobs:
 
       - name: Boot a clean NixOS VM and verify the deployment
         run: nix build .#checks.x86_64-linux.nixos-vm -L
+
+  # The container path. Built from the same store path the NixOS module serves,
+  # then actually run and asserted against with the same conformance script, so
+  # "we also ship an image" is a tested claim rather than a build artifact.
+  oci-image:
+    name: OCI container deployment test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build the image
+        run: nix build .#packages.x86_64-linux.oci -L
+
+      - name: Load and run the container
+        run: |
+          docker load < result
+          docker run -d --name bsc-lab -p 8080:8080 bsc-lab:latest
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Assert the deployment conformance contract
+        run: bash scripts/smoke-http.sh http://localhost:8080
+
+      - name: Confirm the server does not run as root
+        run: |
+          user="$(docker exec bsc-lab id -u)"
+          echo "container uid: $user"
+          test "$user" != "0"
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs bsc-lab || true
