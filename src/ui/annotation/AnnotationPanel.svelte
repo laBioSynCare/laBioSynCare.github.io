@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte'
   import { authState, defaultDisplayNameFromEmail } from '../../firebase/auth.js'
   import { createAnnotationStore } from '../../rdf/annotations/AnnotationStore.js'
+  import { LOCAL_USER_ID } from '../../rdf/annotations/localAnnotationStore.js'
 
   function deriveDisplayName(user) {
     if (!user) return ''
@@ -152,8 +153,16 @@
     }).format(new Date(value))
   }
 
+  // Ownership is a property of the store that produced the record, not of the
+  // Firebase uid: a local annotation was written by this device, so it is the
+  // reader's own even with nobody signed in.
+  function isOwnAnnotation(annotation) {
+    if (annotation.userId === LOCAL_USER_ID) return true
+    return Boolean(auth.user?.uid) && auth.user.uid === annotation.userId
+  }
+
   function authorLabel(annotation) {
-    if (auth.user?.uid === annotation.userId) return 'You'
+    if (isOwnAnnotation(annotation)) return 'You'
     const name = annotation.userDisplayName?.trim()
     return name || 'Anonymous'
   }
@@ -217,10 +226,10 @@
     </div>
   {/if}
 
-  {#if auth.configured && annotations.length}
+  {#if annotations.length}
     <ul class="notes-list">
       {#each annotations as annotation (annotation.id)}
-        {@const isMine = auth.user?.uid === annotation.userId}
+        {@const isMine = isOwnAnnotation(annotation)}
         <li class:editing={editingId === annotation.id}>
           {#if editingId === annotation.id}
             <form onsubmit={saveEdit} class="edit-form">

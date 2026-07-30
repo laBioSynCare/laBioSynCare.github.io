@@ -37,8 +37,9 @@ are absent:
 > features.`
 
 Consequence: **a build with no `VITE_FIREBASE_*` values produces a working
-application with no embedded credentials.** Annotations, saved patches, sign-in and
-profile become unavailable; everything else works.
+application with no embedded credentials.** Sign-in becomes unavailable, and
+annotations, patches and profile are kept on the device instead of an account
+(§1.6); everything else is unchanged.
 
 **This is verified on every commit, not asserted.** `make smoke-static` rebuilds
 with no configuration, serves `dist-smoke/` over plain HTTP from a dependency-free
@@ -197,7 +198,7 @@ Stated plainly, with no partial credit.
 | G8 | No backup or restore | — |
 | G9 | No cross-instance migration | Nothing verifies that instance A's data loads into instance B |
 | G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |
-| G11 | No threat model, no `SECURITY.md` | Public/private boundaries are implemented but not documented as a security contract |
+| ~~G11~~ | ~~No threat model, no `SECURITY.md`~~ | ⚠️ **Partly closed.** `SECURITY.md` documents the data boundaries, the authentication-identifier exclusion and self-hosting expectations. A formal threat model and automated boundary tests are still open |
 | G12 | No deployment conformance tests | Nothing asserts that a fresh deployment is correct |
 
 ---

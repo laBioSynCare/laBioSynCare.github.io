@@ -58,8 +58,8 @@ As of 2026-07-24:
   submission passed RDF validation but is blocked by a Databus outage. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
-  Sensory Field, logbook, profile, settings, and optional Firebase-backed user
-  data are implemented as a static SvelteKit application.
+  Sensory Field, logbook, profile and settings are implemented as a static
+  SvelteKit application, usable with no account; Firebase-backed sync is optional.
 
 Browsers at the ontology IRI get the interactive application; reference
 documentation is regenerated on every deploy (ADR 0023) —
@@ -100,8 +100,9 @@ surfaces are:
   AudioWorklet/WASM options, modulation, and photosensitivity safeguards.
 - **Sensory Field:** bounded visual/audio exposure prototyping that emits the
   exposure vocabulary used by the knowledge graph.
-- **Logbook and profile:** optional user-owned records when Firebase is
-  configured.
+- **Logbook, annotations, patches and profile:** kept in your browser by
+  default, with no account required. Signing in (when Firebase is configured)
+  keeps them with your account instead so they follow you between devices.
 
 Architecture details are in [src/README.md](src/README.md),
 [Patch Studio](docs/technical/PATCH_STUDIO.md), and the
@@ -113,9 +114,9 @@ BSC Lab builds as a static SvelteKit application. The knowledge browser, SPARQL
 workbench, Patch Studio, Sensory Field and reference data all operate client-side,
 so the core application is hostable on any static file server. Firebase is
 optional: configuration comes from build-time `VITE_FIREBASE_*` variables, and a
-build without them produces a working instance with no embedded credentials — only
-the cloud-backed features (sign-in, annotations, saved patches, profile) become
-unavailable.
+build without them produces a working instance with no embedded credentials. Only
+**sign-in** becomes unavailable — annotations, saved patches, the logbook and the
+profile are kept on the device instead of an account.
 
 The pinned Nix flake reproduces the **development, build and validation**
 toolchain, and CI runs inside it. `nix build` (or `make package`) additionally
@@ -159,9 +160,10 @@ The default development URL is `http://127.0.0.1:4173`. `direnv allow` can load
 the dev shell automatically. Without Nix, provide compatible Node 24, Python
 3.12 with `rdflib` and `pyshacl`, ROBOT/HermiT, WABT, and GNU Make yourself.
 
-Firebase is optional. Copy `.env.example` to `.env` and provide the
-`VITE_FIREBASE_*` values only when testing authentication, annotations,
-profiles, or cloud patches.
+Firebase is optional and the application is fully usable without it —
+annotating, saving patches, the logbook and the profile all work on-device.
+Copy `.env.example` to `.env` and provide the `VITE_FIREBASE_*` values only
+when testing sign-in or account-backed sync.
 
 ## Verification
 

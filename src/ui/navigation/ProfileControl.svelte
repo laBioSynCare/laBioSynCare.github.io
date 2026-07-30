@@ -52,7 +52,7 @@
   {#if !state.ready}
     <p><small>Loading account...</small></p>
   {:else if !state.configured}
-    <p><small>Firebase is not configured for annotations.</small></p>
+    <p><small><strong>On-device</strong> — notes, patches and your profile are kept in this browser.</small></p>
   {:else if state.user}
     <p class="profile-name">{userLabel}</p>
     <p><small>{state.user.isAnonymous ? 'Anonymous annotation account' : state.user.email ?? 'Signed in for annotations'}</small></p>
@@ -64,7 +64,7 @@
       Log out
     </button>
   {:else}
-    <p><small>Sign in to save RDF annotations.</small></p>
+    <p><small>Notes, patches and your profile are kept in this browser. Sign in to keep them with your account instead.</small></p>
     <SignInForm />
   {/if}
 </section>
