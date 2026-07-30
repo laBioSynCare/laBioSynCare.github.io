@@ -24,3 +24,6 @@ __pycache__/
 
 # pyLODE writes a run log in the working dir (make vocab-docs)
 pylode.log
+
+# Credential-free build produced by `make smoke-static`
+dist-smoke/

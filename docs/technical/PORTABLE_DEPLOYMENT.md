@@ -40,6 +40,24 @@ Consequence: **a build with no `VITE_FIREBASE_*` values produces a working
 application with no embedded credentials.** Annotations, saved patches, sign-in and
 profile become unavailable; everything else works.
 
+**This is verified on every commit, not asserted.** `make smoke-static` rebuilds
+with no configuration, serves `dist-smoke/` over plain HTTP from a dependency-free
+Node server, and checks that all nine primary routes return their own prerendered
+HTML, that an unknown path returns 404 (so a fallback-everything host cannot make
+the other assertions vacuous), that the ontology Turtle is served same-origin, that
+the service worker and manifest are present, that **no Firebase API key is inlined
+in any bundle file**, and that the unconfigured-Firebase guard shipped. It runs in
+CI after the build.
+
+> **A trap worth knowing about.** Vite loads the project-root `.env` in *every*
+> mode, so unsetting `VITE_FIREBASE_*` in the shell is **not** enough — a
+> developer's local `.env` is still inlined, and a naive test passes while proving
+> nothing. This was observed in practice: a build made with the variables
+> explicitly unset still shipped a working API key. `make smoke-static` therefore
+> points Vite at an empty `envDir` via `BSC_ENV_DIR`. The key-leak assertion is
+> confirmed to fail against an ordinary configured build, so it is a real check
+> rather than a decorative one.
+
 The coupling surface is small and countable: **nine import sites across seven
 files** — `src/ui/creator/PresetCreator.svelte`, `src/ui/auth/SignInForm.svelte`,
 `src/ui/annotation/AnnotationPanel.svelte`, `src/ui/navigation/ProfileControl.svelte`,

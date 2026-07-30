@@ -43,3 +43,11 @@ jobs:
 
       - name: Build static site
         run: nix develop --command make build
+
+      # Rebuilds with no Firebase configuration at all and serves the result over
+      # plain HTTP, so "the core application runs as a credential-free static
+      # deployment" (docs/technical/PORTABLE_DEPLOYMENT.md) is verified on every
+      # commit rather than argued from the source. Also fails if a build inlines
+      # a Firebase API key.
+      - name: Verify credential-free static deployment
+        run: nix develop --command make smoke-static

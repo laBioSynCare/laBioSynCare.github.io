@@ -56,6 +56,24 @@ build:
 check:
 	npm run check
 
+## Build with NO Firebase configuration and prove the result is a working,
+## credential-free static deployment.
+##
+## BSC_ENV_DIR points Vite at an empty directory: Vite loads the project-root
+## .env in every mode, so merely unsetting VITE_FIREBASE_* still inlines a
+## developer's local key and the test would pass while proving nothing.
+##
+## Note this rebuilds dist/ without credentials, then moves it to dist-smoke/.
+## Run `make build` afterwards if you need a configured dist/ back.
+smoke-static:
+	@rm -rf dist-smoke
+	@tmp=$$(mktemp -d); \
+		BSC_ENV_DIR=$$tmp npm run build >/dev/null; \
+		status=$$?; rmdir $$tmp; \
+		[ $$status -eq 0 ] || exit $$status
+	@mv dist dist-smoke
+	@node scripts/smoke-static.mjs dist-smoke
+
 ## Start the local Vite dev server on the standard host/port
 dev:
 	npm run dev -- --host $(DEV_HOST) --port $(DEV_PORT)
