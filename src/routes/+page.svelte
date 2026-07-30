@@ -44,13 +44,14 @@
     {
       id: 'door-build',
       eyebrow: 'Build',
-      title: 'Build on the open platform.',
-      copy: 'Run BSC Lab locally and extend the audio engines or RDF pipeline.',
+      title: 'Deploy and extend the open platform.',
+      copy: 'Run BSC Lab locally today. The core application is static and Firebase is optional; reproducible institutional deployment, backup, restore and instance migration are the next portability layer.',
       primary: [
-        { label: 'Read the architecture', href: GH_BLOB + 'src/README.md', external: true },
+        { label: 'Deployment and portability', href: GH_BLOB + 'docs/technical/PORTABLE_DEPLOYMENT.md', external: true },
         { label: 'Run it locally', href: GH + '#readme', external: true },
       ],
       secondary: [
+        { label: 'Read the architecture', href: GH_BLOB + 'src/README.md', external: true },
         { label: 'The four audio engines', href: GH_BLOB + 'src/engines/README.md', external: true },
       ],
     },

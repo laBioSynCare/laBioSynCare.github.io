@@ -6,9 +6,14 @@
 > four selectable audio engines (see [`engines/README.md`](engines/README.md)
 > and [`../docs/technical/PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)).
 > Still planned: the `core/` orchestration layer (clock, scheduler worker,
-> orchestrator), the GPU `visual/`+`haptic/` engines, `rdf/export.js`, JSON
-> Schemas, and the test subtree. Items below are marked **(planned)** where they
-> do not yet exist. See `ROADMAP.md` for phase definitions.
+> orchestrator), the GPU `visual/`+`haptic/` engines, `rdf/export.js`, and JSON
+> Schemas. A dedicated `tests/` subtree is also planned — note that this does
+> **not** mean the code is untested: vitest suites live beside the source they
+> cover (`ui/creator/*.test.js`, `rdf/*.test.mjs`, `ui/field/*.test.js`) and run
+> in CI. Items below are marked **(planned)** where they do not yet exist. See
+> `ROADMAP.md` for phase definitions and
+> [`../docs/technical/PORTABLE_DEPLOYMENT.md`](../docs/technical/PORTABLE_DEPLOYMENT.md)
+> for the deployment and portability baseline.
 
 This directory contains the BSC Lab application: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL

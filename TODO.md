@@ -7,9 +7,18 @@
 > are historical record. Do not add tasks to "Not yet" phases without
 > explicit instruction from Renato.
 >
-> **Current phase: Phase 1 public foundation.** Phase 0 is complete. Focus is
-> on hardening the published ontology and initial knowledge-browser scaffold.
-> Do not build the Phase 2 stimulation player yet.
+> **Current phase: Phase 1 public foundation.** Phase 0 is complete. Focus is on
+> hardening the published ontology and the knowledge browser, which is deployed
+> and well past scaffold stage.
+>
+> Several Phase-2 artifacts shipped ahead of schedule — the Patch Studio, four
+> selectable audio engines, the Sensory Field and the PWA layer. What remains
+> deferred is not "the stimulation player" as a whole but three specific pieces:
+> the `core/` orchestration layer (three-clock scheduler, `StimulationOrchestrator`),
+> a player that takes a **catalogue preset** and plays it, and the
+> `SessionRecorder`. See `ROADMAP.md` for per-item status and
+> [`docs/technical/PORTABLE_DEPLOYMENT.md`](docs/technical/PORTABLE_DEPLOYMENT.md)
+> for the deployment and portability baseline.
 
 ---
 

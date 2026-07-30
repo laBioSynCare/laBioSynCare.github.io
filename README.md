@@ -107,6 +107,34 @@ Architecture details are in [src/README.md](src/README.md),
 [Patch Studio](docs/technical/PATCH_STUDIO.md), and the
 [Session Model](docs/technical/SESSION_MODEL.md).
 
+## Deployment And Portability
+
+BSC Lab builds as a static SvelteKit application. The knowledge browser, SPARQL
+workbench, Patch Studio, Sensory Field and reference data all operate client-side,
+so the core application is hostable on any static file server. Firebase is
+optional: configuration comes from build-time `VITE_FIREBASE_*` variables, and a
+build without them produces a working instance with no embedded credentials — only
+the cloud-backed features (sign-in, annotations, saved patches, profile) become
+unavailable.
+
+The pinned Nix flake reproduces the **development, build and validation**
+toolchain, and CI runs inside it. It does **not** yet provide a production package,
+a NixOS module, a container image, a self-hosted replacement for the optional cloud
+services, or complete backup and cross-instance migration.
+
+Existing portability foundations:
+
+- versioned, checksum-verified ontology releases ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md));
+- JSON-LD and RDF/XML ontology export via `make export`;
+- RDF serialization of annotations with authentication identifiers excluded;
+- the portable `patch-studio-model-1` representation;
+- separation of public reference data, per-user annotation graphs and private records.
+
+The next portability layer — reproducible institutional deployment, explicit
+service adapters, complete export/import packages and independently tested
+migration between instances — is specified with acceptance criteria in
+[Portable Deployment and Migration](docs/technical/PORTABLE_DEPLOYMENT.md).
+
 ## Quick Start
 
 The canonical environment is the pinned Nix flake:

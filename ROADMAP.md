@@ -438,6 +438,31 @@ concrete rather than abstract.
       *(per-user named graph and N3-Writer Turtle export shipped, with
       authentication IDs excluded from exports; per-session graphs not yet)*
 
+### Software: portable deployment and migration
+
+Making BSC Lab runnable by institutions and communities rather than only by its
+maintainers. Baseline, gaps G1–G12 and per-item acceptance criteria are specified
+in [`docs/technical/PORTABLE_DEPLOYMENT.md`](docs/technical/PORTABLE_DEPLOYMENT.md).
+
+The application is already static and Firebase is already optional — a build with
+no `VITE_FIREBASE_*` values runs with no embedded credentials. The Nix flake
+reproduces the development, build and validation toolchain but exposes only
+`devShells` and `formatter`; **there is no production deployment output yet**, and
+that distinction is the substance of this workstream.
+
+- [ ] Production Nix package building the static site deterministically (G1)
+- [ ] NixOS module exposing an instance as a declarative service (G2)
+- [ ] OCI image from the same derivation, for operators without Nix (G3)
+- [ ] Backend adapter contract — null, Firebase and self-hosted implementations
+      behind one interface, with a shared conformance suite. Refactor surface is
+      nine import sites across seven files (G4, G5, G6)
+- [ ] Versioned instance export package with manifest and checksums (G7)
+- [ ] Backup, restore, and verified migration between two independently deployed
+      instances (G8, G9)
+- [ ] Deployment and migration conformance tests in CI (G12)
+- [x] Security policy and documented data boundaries (`SECURITY.md`) (G11 partial
+      — threat model and automated boundary tests still open)
+
 ### Community
 
 - [x] W3C Community Group "Sensory Stimulation Vocabulary Community Group"
