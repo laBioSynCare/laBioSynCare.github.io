@@ -28,6 +28,11 @@ export const INSTANCE_EXPORT_MAX_BYTES = 16 * 1024 * 1024
 const LOGBOOK_PREFIX = 'bsclab_logbook_v2'
 const LOGBOOK_LEGACY = 'bsclab_logbook_v1'
 const SKIN_KEY = 'bsclab.skin'
+// Local annotations, written by src/rdf/annotations/localAnnotationStore.js.
+// Referenced by key rather than imported so this module stays dependency-free
+// and usable wherever a Storage-like object is available.
+const ANNOTATION_KEY = 'bsclab.annotations.v1'
+const PROFILE_KEY = 'bsclab.profile.v1'
 
 /** Scope names used in the file. Deliberately not the storage keys. */
 const SCOPE_ANONYMOUS = 'anonymous'
@@ -59,6 +64,16 @@ async function sha256Hex(text) {
 /** Checksum of the payload, exposed so callers can verify without importing. */
 export function payloadChecksum(payload) {
   return sha256Hex(canonical(payload))
+}
+
+function parseStoredArray(raw) {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed.filter((r) => r && typeof r === 'object') : []
+  } catch {
+    return []
+  }
 }
 
 function parseStored(raw) {
@@ -101,9 +116,17 @@ export function collectInstanceData(storage, { uid = null } = {}) {
 
   const skin = storage.getItem(SKIN_KEY)
 
+  // Local annotations carry no account identifier — the local store attributes
+  // them to a device constant, and RDF export pseudonymises before publishing.
+  const annotations = parseStoredArray(storage.getItem(ANNOTATION_KEY))
+
+  const profile = parseStored(storage.getItem(PROFILE_KEY))
+
   return {
     logbooks,
     ...(legacy ? { legacyLogbookEntries: legacy } : {}),
+    ...(annotations.length > 0 ? { annotations } : {}),
+    ...(profile ? { profile } : {}),
     preferences: skin ? { skin } : {},
   }
 }
@@ -136,6 +159,8 @@ export function summarizeInstanceExport(payload) {
   return {
     logbooks: books,
     entries,
+    annotations: payload.annotations?.length ?? 0,
+    hasProfile: Boolean(payload.profile),
     legacyEntries: payload.legacyLogbookEntries?.length ?? 0,
     hasPreferences: Object.keys(payload.preferences ?? {}).length > 0,
   }
@@ -194,7 +219,7 @@ export async function parseInstanceExport(text) {
  * none. That is what makes this portable between instances rather than merely
  * a backup of one browser.
  *
- * @returns {{ restoredLogbooks: number, restoredPreferences: number }}
+ * @returns {{ restoredLogbooks: number, restoredAnnotations: number, restoredPreferences: number }}
  */
 export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
   const payload = parsed.payload
@@ -211,6 +236,16 @@ export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
     storage.setItem(LOGBOOK_LEGACY, JSON.stringify(payload.legacyLogbookEntries))
   }
 
+  let restoredAnnotations = 0
+  if (Array.isArray(payload.annotations) && payload.annotations.length > 0) {
+    storage.setItem(ANNOTATION_KEY, JSON.stringify(payload.annotations))
+    restoredAnnotations = payload.annotations.length
+  }
+
+  if (payload.profile && typeof payload.profile === 'object' && !Array.isArray(payload.profile)) {
+    storage.setItem(PROFILE_KEY, JSON.stringify(payload.profile))
+  }
+
   let restoredPreferences = 0
   const skin = payload.preferences?.skin
   if (typeof skin === 'string' && skin) {
@@ -218,7 +253,7 @@ export function applyInstanceExport(storage, parsed, { uid = null } = {}) {
     restoredPreferences++
   }
 
-  return { restoredLogbooks, restoredPreferences }
+  return { restoredLogbooks, restoredAnnotations, restoredPreferences }
 }
 
 /** Filename for a download, dated so successive exports do not collide. */

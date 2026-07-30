@@ -207,6 +207,64 @@ describe('instance export — cross-instance round trip', () => {
   })
 })
 
+describe('instance export — annotations', () => {
+  const annotation = (id, text) => ({
+    id, userId: 'local-device', targetIri: 'https://w3id.org/sstim#Preset',
+    annotationType: 'commenting', annotationText: text, visibility: 'private',
+    createdAt: '2026-07-31T10:00:00.000Z', updatedAt: '2026-07-31T10:00:00.000Z',
+  })
+
+  it('carries local annotations and restores them', async () => {
+    const source = memoryStorage({
+      'bsclab.annotations.v1': JSON.stringify([annotation('a1', 'one'), annotation('a2', 'two')]),
+    })
+    const envelope = await buildInstanceExport(source)
+
+    expect(summarizeInstanceExport(envelope.payload).annotations).toBe(2)
+
+    const target = memoryStorage()
+    const result = applyInstanceExport(target, await parseInstanceExport(JSON.stringify(envelope)))
+
+    expect(result.restoredAnnotations).toBe(2)
+    expect(JSON.parse(target.getItem('bsclab.annotations.v1'))).toHaveLength(2)
+  })
+
+  it('carries and restores a local profile', async () => {
+    const source = memoryStorage({
+      'bsclab.profile.v1': JSON.stringify({ displayName: 'Ada', bio: 'Notes', affiliation: '', email: '' }),
+    })
+    const envelope = await buildInstanceExport(source)
+
+    expect(summarizeInstanceExport(envelope.payload).hasProfile).toBe(true)
+
+    const target = memoryStorage()
+    applyInstanceExport(target, await parseInstanceExport(JSON.stringify(envelope)))
+
+    expect(JSON.parse(target.getItem('bsclab.profile.v1')).displayName).toBe('Ada')
+  })
+
+  it('omits the section entirely when there are none', () => {
+    expect(collectInstanceData(memoryStorage()).annotations).toBeUndefined()
+  })
+
+  it('ignores a corrupted annotation key rather than failing the export', () => {
+    const storage = memoryStorage({ 'bsclab.annotations.v1': 'not json' })
+
+    expect(collectInstanceData(storage).annotations).toBeUndefined()
+  })
+
+  it('keeps annotations inside the checksum', async () => {
+    const storage = memoryStorage({
+      'bsclab.annotations.v1': JSON.stringify([annotation('a1', 'one')]),
+    })
+    const envelope = await buildInstanceExport(storage)
+    envelope.payload.annotations[0].annotationText = 'tampered'
+
+    await expect(parseInstanceExport(JSON.stringify(envelope)))
+      .rejects.toThrow(/integrity check/i)
+  })
+})
+
 describe('instance export — helpers', () => {
   it('summarizes what an import would restore', () => {
     const storage = memoryStorage({
@@ -215,7 +273,7 @@ describe('instance export — helpers', () => {
     })
 
     expect(summarizeInstanceExport(collectInstanceData(storage)))
-      .toMatchObject({ logbooks: 1, entries: 2, legacyEntries: 0, hasPreferences: true })
+      .toMatchObject({ logbooks: 1, entries: 2, annotations: 0, hasProfile: false, legacyEntries: 0, hasPreferences: true })
   })
 
   it('dates the download filename', () => {

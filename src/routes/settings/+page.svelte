@@ -91,7 +91,9 @@
       const result = applyInstanceExport(localStorage, pendingImport.parsed, { uid: currentUid })
       pendingImport = null
       refreshSummary()
-      dataNote = `Restored ${result.restoredLogbooks} logbook${result.restoredLogbooks === 1 ? '' : 's'}. Reload the Logbook to see them.`
+      dataNote = `Restored ${result.restoredLogbooks} logbook${result.restoredLogbooks === 1 ? '' : 's'}`
+        + (result.restoredAnnotations ? ` and ${result.restoredAnnotations} annotation${result.restoredAnnotations === 1 ? '' : 's'}` : '')
+        + '. Reload the page to see them.'
     } catch (e) {
       dataNote = `Import failed: ${e.message}`
     }
@@ -261,7 +263,7 @@
       <h2 id="data-heading">Your data</h2>
       <p>
         Everything BSC Lab keeps about you on this device — your logbooks, their entries, and
-        your appearance preference — travels in one file. Take it to another BSC Lab instance,
+        your annotations, and your appearance preference — travels in one file. Take it to another BSC Lab instance,
         including one you host yourself, or keep it as a backup. No account is required and
         nothing is uploaded.
       </p>
@@ -276,6 +278,7 @@
         <p class="data-summary">
           {dataSummary.logbooks} logbook{dataSummary.logbooks === 1 ? '' : 's'} ·
           {dataSummary.entries} entr{dataSummary.entries === 1 ? 'y' : 'ies'}
+          {#if dataSummary.annotations > 0}· {dataSummary.annotations} annotation{dataSummary.annotations === 1 ? '' : 's'}{/if}
           {#if dataSummary.legacyEntries > 0}· {dataSummary.legacyEntries} unmigrated{/if}
         </p>
       {/if}
@@ -296,8 +299,9 @@
         <div class="data-confirm" role="alertdialog" aria-labelledby="import-confirm-heading">
           <p id="import-confirm-heading"><strong>Replace your data with this file?</strong></p>
           <p>
-            It holds {pendingImport.summary.logbooks} logbook{pendingImport.summary.logbooks === 1 ? '' : 's'}
-            and {pendingImport.summary.entries} entr{pendingImport.summary.entries === 1 ? 'y' : 'ies'}.
+            It holds {pendingImport.summary.logbooks} logbook{pendingImport.summary.logbooks === 1 ? '' : 's'},
+            {pendingImport.summary.entries} entr{pendingImport.summary.entries === 1 ? 'y' : 'ies'}
+            and {pendingImport.summary.annotations} annotation{pendingImport.summary.annotations === 1 ? '' : 's'}.
             Logbooks with the same storage scope will be overwritten. This cannot be undone —
             export first if you want to keep what is here.
           </p>

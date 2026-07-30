@@ -1,54 +1,22 @@
-import { DataFactory, Writer } from 'n3'
-import { requireFirebaseClient } from '../../firebase/client.js'
-import { BSCLAB_ANNOTATION, DCT, OA, PREFIXES, PROV, RDF, XSD } from '../namespaces.js'
+// Firestore-backed annotations, and the factory that picks an implementation.
+//
+// Validation, pseudonymisation and RDF projection live in annotationRdf.js so
+// this store and the local one cannot drift on them — a disagreement about
+// visibility handling would be a privacy bug, not a formatting difference.
 
-const { literal, namedNode, quad } = DataFactory
+import { isFirebaseConfigured, requireFirebaseClient } from '../../firebase/client.js'
+import { createLocalAnnotationStore } from './localAnnotationStore.js'
+import {
+  annotationsToQuads,
+  normalizeAnnotationInput,
+  normalizeTargetIri,
+  safeVisibility,
+  serializeAnnotations,
+} from './annotationRdf.js'
+
+export { normalizeTargetIri }
 
 export const ANNOTATION_COLLECTION = 'rdfAnnotations'
-
-const VISIBILITY_VALUES = new Set(['public', 'private'])
-
-export function normalizeTargetIri(target) {
-  const value = typeof target === 'string' ? target : target?.value
-  if (typeof value === 'string' && /^https?:\/\/\S+$/.test(value)) return value
-  throw new Error('Annotation target must be an absolute http(s) IRI or RDF named node.')
-}
-
-// Anything not explicitly 'public' is treated as private (fail closed).
-function safeVisibility(value) {
-  return VISIBILITY_VALUES.has(value) ? value : 'private'
-}
-
-// The Web Annotation motivation vocabulary (https://www.w3.org/TR/annotation-vocab/).
-// Only these may become oa:motivatedBy IRIs; anything else falls back to
-// oa:commenting instead of minting an IRI from an unchecked string.
-const OA_MOTIVATIONS = new Set([
-  'assessing', 'bookmarking', 'classifying', 'commenting', 'describing',
-  'editing', 'highlighting', 'identifying', 'linking', 'moderating',
-  'questioning', 'replying', 'tagging',
-])
-
-function safeMotivation(value) {
-  return OA_MOTIVATIONS.has(value) ? value : 'commenting'
-}
-
-// RDF exports never carry the Firebase authentication ID. Agent and graph
-// IRIs use a deterministic SHA-256-derived pseudonym instead: stable enough
-// for attribution across exports, but not an authentication identifier.
-// Linking a pseudonym to a public identity requires explicit consent and is
-// deliberately not implemented here.
-const pseudonymCache = new Map()
-
-async function pseudonymFor(userId) {
-  if (!userId) return 'anonymous'
-  if (pseudonymCache.has(userId)) return pseudonymCache.get(userId)
-  const bytes = new TextEncoder().encode(`bsclab-annotation-agent:${userId}`)
-  const digest = await crypto.subtle.digest('SHA-256', bytes)
-  const hex = [...new Uint8Array(digest)].slice(0, 12)
-    .map((b) => b.toString(16).padStart(2, '0')).join('')
-  pseudonymCache.set(userId, hex)
-  return hex
-}
 
 function timestampToIso(value) {
   if (!value) return ''
@@ -74,10 +42,6 @@ function annotationFromDoc(docSnapshot) {
   }
 }
 
-function dateTimeLiteral(value) {
-  return literal(value, XSD('dateTime'))
-}
-
 export class AnnotationStore {
   constructor(userId, db) {
     this.userId = userId ?? null
@@ -95,23 +59,25 @@ export class AnnotationStore {
     return new AnnotationStore(null, db)
   }
 
+  get id() { return 'firestore' }
+  get label() { return 'Your account' }
+
   get isAuthenticated() {
     return Boolean(this.userId)
   }
 
-  async add({ annotatesNode, annotationText, annotationType = 'commenting', visibility = 'private', userDisplayName = '' }) {
+  async add(input) {
     if (!this.userId) throw new Error('Sign in to add annotations.')
-    const text = annotationText?.trim()
-    if (!text) throw new Error('Annotation text cannot be empty.')
+    const normalized = normalizeAnnotationInput(input)
 
     const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
     const docRef = await addDoc(collection(this.db, ANNOTATION_COLLECTION), {
       userId: this.userId,
-      userDisplayName: typeof userDisplayName === 'string' ? userDisplayName.slice(0, 200) : '',
-      targetIri: normalizeTargetIri(annotatesNode),
-      annotationType,
-      annotationText: text,
-      visibility: safeVisibility(visibility),
+      userDisplayName: normalized.userDisplayName,
+      targetIri: normalized.targetIri,
+      annotationType: normalized.annotationType,
+      annotationText: normalized.annotationText,
+      visibility: normalized.visibility,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     })
@@ -203,54 +169,32 @@ export class AnnotationStore {
     await deleteDoc(doc(this.db, ANNOTATION_COLLECTION, id))
   }
 
-  async toQuads(annotations) {
-    const publicGraph = namedNode('https://w3id.org/sstim/implementation/bsclab/annotation/public')
-    const pseudonyms = new Map()
-    for (const annotation of annotations) {
-      if (!pseudonyms.has(annotation.userId)) {
-        pseudonyms.set(annotation.userId, await pseudonymFor(annotation.userId))
-      }
-    }
-
-    return annotations.flatMap((annotation) => {
-      const ownerSegment = pseudonyms.get(annotation.userId)
-      const annotationNode = BSCLAB_ANNOTATION(`${ownerSegment}/${annotation.id}`)
-      const actor = namedNode(`https://w3id.org/sstim/implementation/bsclab/user/${ownerSegment}`)
-      // Fail closed: only an explicit 'public' reaches the public graph.
-      const graph = safeVisibility(annotation.visibility) === 'public'
-        ? publicGraph
-        : BSCLAB_ANNOTATION(ownerSegment)
-      const quads = [
-        quad(annotationNode, RDF('type'), OA('Annotation'), graph),
-        quad(annotationNode, OA('hasTarget'), namedNode(annotation.targetIri), graph),
-        quad(annotationNode, OA('bodyValue'), literal(annotation.annotationText), graph),
-        quad(annotationNode, OA('motivatedBy'), OA(safeMotivation(annotation.annotationType)), graph),
-        quad(annotationNode, PROV('wasAttributedTo'), actor, graph),
-      ]
-
-      if (annotation.createdAt) {
-        quads.push(quad(annotationNode, DCT('created'), dateTimeLiteral(annotation.createdAt), graph))
-      }
-      if (annotation.updatedAt) {
-        quads.push(quad(annotationNode, DCT('modified'), dateTimeLiteral(annotation.updatedAt), graph))
-      }
-
-      return quads
-    })
-  }
-
-  async serialize(annotations) {
-    const writer = new Writer({ prefixes: PREFIXES })
-    writer.addQuads(await this.toQuads(annotations))
-    return new Promise((resolve, reject) => {
-      writer.end((error, result) => {
-        if (error) reject(error)
-        else resolve(result)
-      })
-    })
-  }
+  async toQuads(annotations) { return annotationsToQuads(annotations) }
+  async serialize(annotations) { return serializeAnnotations(annotations) }
 }
 
-export function createAnnotationStore(userId) {
-  return userId ? AnnotationStore.forUser(userId) : AnnotationStore.forReader()
+/**
+ * The annotation store for the current context.
+ *
+ * Local-first: with no Firebase configured, annotations are kept on the device
+ * and the knowledge browser stays writable rather than read-only. Where
+ * Firebase *is* configured, behaviour is unchanged — signed in writes to the
+ * account, signed out reads public annotations others have shared.
+ *
+ * @param {string|null} userId
+ */
+export async function createAnnotationStore(userId) {
+  if (isFirebaseConfigured()) {
+    return userId ? AnnotationStore.forUser(userId) : AnnotationStore.forReader()
+  }
+  if (typeof localStorage === 'undefined') {
+    throw new Error('No annotation storage is available in this browser.')
+  }
+  return createLocalAnnotationStore(localStorage)
+}
+
+/** The local store regardless of sign-in state, for the instance export. */
+export function localAnnotationStore() {
+  if (typeof localStorage === 'undefined') return null
+  return createLocalAnnotationStore(localStorage)
 }

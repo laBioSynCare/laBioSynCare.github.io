@@ -460,19 +460,20 @@ that distinction is the substance of this workstream.
 - [~] Adapter contract, **two seams**: an identity provider (anonymous, Firebase,
       Fediverse/Mastodon OAuth, IndieAuth) and a storage provider (local-first,
       Firestore, self-hosted), each with a shared conformance suite (G4, G5, G6)
-      *(storage seam shipped for **patches**: `src/storage/` defines a `PatchStore`
-      contract with local and Firestore implementations and one shared conformance
-      suite. Profile and annotations still call Firestore directly; the identity
-      seam is not started — of the nine original import sites, six are identity)*
+      *(storage seam shipped for **patches, annotations and profile** — each has
+      local and Firestore implementations behind a shared contract, with a
+      conformance suite for patches and dedicated suites for the others. The
+      **identity** seam is not started: of the nine original import sites, six are
+      `authState`, and that is the work that leads to Mastodon/IndieAuth)*
 - [~] Local-first storage as the default, so identity becomes optional attribution
       rather than a gate on a user's own records (G5)
-      *(true for patches — saving needs no account and no Firebase; not yet for
-      profile or annotations)*
+      *(true for patches, annotations and profile — all work with no account and
+      no Firebase. A *shared* self-hosted backend others can read is still absent)*
 - [~] Versioned instance export package with manifest and checksums (G7)
-      *(`Settings → Your data`: logbooks, unmigrated v1 entries and preferences
-      export as one SHA-256-checksummed file and round-trip between instances
-      with no account and no Firebase; exports carry no auth identifier.
-      Firestore-held annotations, profile and patches wait on the storage seam)*
+      *(`Settings → Your data`: logbooks, **annotations**, **profile**, unmigrated
+      v1 entries and preferences export as one SHA-256-checksummed file and
+      round-trip between instances with no account and no Firebase; exports carry
+      no auth identifier. Local patches and Firestore-held records remain outside)*
 - [ ] Backup, restore, and verified migration between two independently deployed
       instances (G8, G9)
 - [ ] Deployment and migration conformance tests in CI (G12)

@@ -122,10 +122,11 @@ Firebase**. Implementation in `src/portability/instanceExport.js`.
 | Lossless | Export → import → export is a fixed point, verified by checksum, so repeated migration cannot drift the data |
 | Confirmed before overwriting | Import parses and verifies first, shows what would land, and asks |
 
-**Covered today:** logbooks and their entries, unmigrated v1 entries, appearance
-preference. **Not covered:** annotations, profile and saved patches, which live in
-Firestore and wait on the storage adapter (G4/G5). Individual patches are separately
-portable as files through Patch Studio's Download and Import.
+**Covered today:** logbooks and their entries, **local annotations**, **local
+profile**, unmigrated v1 entries, appearance preference. **Not covered:** locally
+saved patches, and anything held in Firestore for a signed-in account. Individual
+patches are separately portable as files through Patch Studio's Download and
+Import.
 
 ### 1.6 The patch storage seam
 
@@ -135,6 +136,20 @@ portable as files through Patch Studio's Download and Import.
 |---|---|---|
 | `local` — "On this device" | **Always** | `localStorage`, exportable through §1.5 |
 | `firestore` — "Your account" | Firebase configured **and** signed in | The collection and document shape unchanged from before |
+
+**The same pattern now covers annotations and profile.** Annotating the knowledge
+graph, and editing the display name attached to those annotations, both work with
+no account and no Firebase — the browser is writable on a self-hosted instance
+rather than read-only. Validation, pseudonymisation and RDF projection live in
+`annotationRdf.js` shared by both implementations, because a disagreement about
+visibility handling between them would be a privacy bug rather than a formatting
+difference.
+
+Two honest differences in the local annotation store, inherent rather than
+unfinished: there is no *other* user, so every local annotation is your own and
+"public" only decides which RDF graph it exports into; and subscriptions are
+same-origin only, notified on local writes and the browser's `storage` event,
+because `localStorage` has no cross-device channel.
 
 Local is the default and always present; an account **adds** a second place to
 keep patches rather than being the price of keeping any. Saving a patch no
@@ -175,10 +190,10 @@ Stated plainly, with no partial credit.
 | ~~G1~~ | ~~No production package~~ | ✅ **Closed 2026-07-30.** `nix build` produces a bit-reproducible static package; `nix flake check` builds it |
 | G2 | No NixOS module or service definition | An operator has no declarative way to run an instance |
 | G3 | No container image | No OCI alternative for non-Nix operators |
-| ~~G4~~ | ~~No backend adapter interface~~ | ⚠️ **Partly closed 2026-07-30.** A `PatchStore` contract with local and Firestore implementations, exercised by one shared conformance suite. Profile and annotations still call Firestore directly |
-| ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Partly closed 2026-07-30.** Patches now save with no account and no Firebase. Profile and annotations still require it |
+| ~~G4~~ | ~~No backend adapter interface~~ | ✅ **Closed 2026-07-31 for storage.** Patches, annotations and profile each have local and Firestore implementations behind a shared contract. The **identity** seam is untouched — six of the original nine import sites are `authState` |
+| ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31.** Patches, annotations and profile all work with no account and no Firebase, kept on the device. A *shared* self-hosted backend — one others can read — is still absent |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
-| ~~G7~~ | ~~No complete export package~~ | ⚠️ **Partly closed 2026-07-30.** A versioned, checksummed instance export covers local data — logbooks, unmigrated v1 entries, preferences — and round-trips between instances with no cloud. Firestore-held annotations, profile and saved patches are **not** included and wait on the storage adapter (G4/G5) |
+| ~~G7~~ | ~~No complete export package~~ | ⚠️ **Largely closed 2026-07-31.** The versioned, checksummed export now carries logbooks, **annotations**, **profile**, unmigrated v1 entries and preferences. Local patches and any Firestore-held records are still outside it |
 | G8 | No backup or restore | — |
 | G9 | No cross-instance migration | Nothing verifies that instance A's data loads into instance B |
 | G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |

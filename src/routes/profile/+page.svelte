@@ -21,17 +21,13 @@
   })
 
   $effect(() => {
+    if (!auth.ready) return
+    // A signed-out profile is the local one — the display name attached to
+    // annotations written on this device.
     const uid = auth.user?.uid ?? null
-    if (!uid || !auth.configured) {
-      displayName = ''
-      bio = ''
-      affiliation = ''
-      initialDisplayName = ''
-      lastLoadedUid = null
-      return
-    }
-    if (uid === lastLoadedUid) return
-    lastLoadedUid = uid
+    const loadKey = uid ?? 'local'
+    if (loadKey === lastLoadedUid) return
+    lastLoadedUid = loadKey
 
     loading = true
     error = null
@@ -56,16 +52,16 @@
 
   async function handleSubmit(event) {
     event.preventDefault()
-    if (!auth.user || saving) return
+    if (saving) return
     saving = true
     error = null
     savedAt = null
     try {
-      await saveProfile(auth.user.uid, {
+      await saveProfile(auth.user?.uid ?? null, {
         displayName,
         bio,
         affiliation,
-        email: auth.user.email ?? '',
+        email: auth.user?.email ?? '',
       })
       const cleanedName = (displayName ?? '').trim()
       if (cleanedName !== initialDisplayName) {
@@ -95,11 +91,7 @@
   </header>
 
   {#if !auth.ready}
-    <p>Loading account…</p>
-  {:else if !auth.configured}
-    <p>Firebase config required to manage profile data.</p>
-  {:else if !auth.user}
-    <p>Sign in from the menu (top-right `+`) to edit your profile.</p>
+    <p>Loading…</p>
   {:else if loading}
     <p>Loading profile…</p>
   {:else}
@@ -110,7 +102,7 @@
           type="text"
           bind:value={displayName}
           maxlength="200"
-          placeholder={auth.user.email?.split('@')[0] ?? 'Your name'}
+          placeholder={auth.user?.email?.split('@')[0] ?? 'Your name'}
           disabled={saving}
         />
         <small>Shown next to public notes you leave. Falls back to the part of your email before "@".</small>
@@ -138,7 +130,15 @@
         ></textarea>
       </label>
 
-      <p class="email-row"><small>Account: {auth.user.email ?? '(no email on this account)'}</small></p>
+      <p class="email-row">
+        <small>
+          {#if auth.user}
+            Account: {auth.user.email ?? '(no email on this account)'}
+          {:else}
+            Kept on this device. Sign in to keep your profile with an account.
+          {/if}
+        </small>
+      </p>
 
       {#if error}
         <p class="profile-error"><small>{error}</small></p>

@@ -40,7 +40,9 @@
     annotations = []
     error = null
 
-    if (!targetIri || !auth.configured) return
+    // No auth.configured gate: with Firebase absent the store is local,
+    // which keeps the browser writable on a self-hosted instance.
+    if (!targetIri) return
 
     let cancelled = false
     let unsubscribeAnnotations = null
@@ -73,12 +75,12 @@
   async function saveAnnotation(event) {
     event.preventDefault()
     const text = annotationText.trim()
-    if (!text || !auth.user || saving || !target?.iri) return
+    if (!text || saving || !target?.iri) return
 
     saving = true
     error = null
     try {
-      const store = await createAnnotationStore(auth.user.uid)
+      const store = await createAnnotationStore(auth.user?.uid ?? null)
       await store.add({
         annotatesNode: target.iri,
         annotationType: 'commenting',
@@ -109,12 +111,12 @@
   async function saveEdit(event) {
     event.preventDefault()
     const text = editText.trim()
-    if (!text || !auth.user || saving) return
+    if (!text || saving) return
 
     saving = true
     editError = null
     try {
-      const store = await createAnnotationStore(auth.user.uid)
+      const store = await createAnnotationStore(auth.user?.uid ?? null)
       await store.update(editingId, {
         annotationText: text,
         visibility: editVisibility,
@@ -128,12 +130,12 @@
   }
 
   async function removeAnnotation(id) {
-    if (!auth.user || saving) return
+    if (saving) return
 
     saving = true
     error = null
     try {
-      const store = await createAnnotationStore(auth.user.uid)
+      const store = await createAnnotationStore(auth.user?.uid ?? null)
       await store.remove(id)
     } catch (e) {
       error = e.message
@@ -159,11 +161,12 @@
 
 <div class="annotations">
   {#if !auth.ready}
-    <p class="status"><small>Loading account…</small></p>
-  {:else if !auth.configured}
-    <p class="status"><small>Firebase config required.</small></p>
+    <p class="status"><small>Loading…</small></p>
   {:else}
-    {#if auth.user && target?.iri}
+    {#if !auth.configured}
+      <p class="status"><small>Notes are kept on this device.</small></p>
+    {/if}
+    {#if target?.iri}
       <form onsubmit={saveAnnotation} class="annotation-form">
         <textarea
           rows="3"
