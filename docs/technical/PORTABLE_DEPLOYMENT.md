@@ -243,7 +243,7 @@ Stated plainly, with no partial credit.
 | ~~G2~~ | ~~No NixOS module or service definition~~ | ✅ **Closed 2026-07-31.** `services.bsc-lab.enable = true;` — verified by booting a clean NixOS VM in CI |
 | ~~G3~~ | ~~No container image~~ | ✅ **Closed 2026-07-31.** `packages.x86_64-linux.oci`, built from the same store path, run non-root, asserted live in CI |
 | ~~G4~~ | ~~No backend adapter interface~~ | ✅ **Closed 2026-07-31 for storage.** Patches, annotations and profile each have local and Firestore implementations behind a shared contract. The **identity** seam is untouched — six of the original nine import sites are `authState` |
-| ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31.** Patches, annotations and profile all work with no account and no Firebase, kept on the device. A *shared* self-hosted backend — one others can read — is still absent |
+| ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31, and deliberately bounded.** Patches, annotations and profile all work with no account and no Firebase. Per [ADR 0039](../decisions/0039-sharing-model-and-the-shared-backend-question.md) the gap splits: *sync my own data across devices* stays open work, gated on the identity seam; *a multi-user backend hosting one person's content for others* is **declined**, and sharing is met by publication instead |
 | G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
 | ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything BSC Lab keeps on the device. Firestore-held records for a signed-in account remain outside |
 | ~~G8~~ | ~~No backup or restore~~ | ⚠️ **Partly closed 2026-07-31.** Export is the backup and import is the restore for all local data; scheduling and retention orchestration are absent |
@@ -253,6 +253,25 @@ Stated plainly, with no partial credit.
 | ~~G12~~ | ~~No deployment conformance tests~~ | ✅ **Closed 2026-07-31.** `scripts/smoke-http.sh` is one contract run against **both** the NixOS VM and the container in CI |
 
 ---
+
+## 2b. How sharing works without a backend
+
+Recorded in full in
+[ADR 0039](../decisions/0039-sharing-model-and-the-shared-backend-question.md).
+Four tiers, none requiring a service:
+
+| Tier | Mechanism | Status |
+|---|---|---|
+| **Link** | Patch compressed into a URL **fragment** (never sent to a server), under ~1 kB | Proposed |
+| **File** | Patch download/import; whole-instance export | **Shipped** |
+| **Publication** | Stable URL, fetched by "open from URL"; as SSTIM RDF once G10 lands. One-click targets: **Zenodo** (DOI, archival) and **Mastodon** (federated post from the user's own account) | Proposed |
+| **Contribution** | Into the curated public graph via the existing consent-gated review (ADR 0031/0032) | Partly exists |
+
+**WebRTC with QR signalling** is retained as a *synchronous* transfer channel for
+people in the same room — the camera is the signalling channel, so no STUN, TURN
+or server is involved, and it works with no internet at all. It is not a
+substitute for publication: it cannot reach someone absent, offers no discovery,
+and leaves no citable artifact.
 
 ## 3. Proposed architecture
 
