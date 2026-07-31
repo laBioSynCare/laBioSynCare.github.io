@@ -140,8 +140,8 @@ const harnessA = `<!doctype html><meta charset="utf-8"><title>A</title><body>
   // the comparison on B is not vacuous.
   const draft = createDraft()
   draft.patchName = 'Conformance Reference Session'
-  const control = createControlTrack('Martigli')
-  draft.controlTracks = [control, createControlTrack('Symmetry')]
+  const control = createControlTrack('LFO')
+  draft.controlTracks = [control, createControlTrack('Permutation')]
   draft.audioTracks = [
     ...draft.audioTracks,
     createAudioTrack('BinauralBeat'),
@@ -264,11 +264,11 @@ const harnessB = `<!doctype html><meta charset="utf-8"><title>B</title><body>
       opened.report.unmapped.length === projB.report.unmapped.length &&
       opened.report.structuralFindings.length > 0,
       opened.report.structuralFindings.map((f) => f.id).join(', '))
-    check('L1', 'the projection is a typed sstim:Patch with typed tracks',
-      /a sstim:Patch/.test(opened.turtle) &&
+    check('L1', 'the projection is a typed sstim:Preset with typed tracks',
+      /a sstim:Preset/.test(opened.turtle) &&
       /a sstim:AudioTrack/.test(opened.turtle) &&
       /sstim:composedOfTrack/.test(opened.turtle),
-      'ADR 0040')
+      'ADR 0041')
     check('L1', 'the projection is not a session specification',
       !/sstim:SessionSpecification/.test(opened.turtle))
     check('L1', 'the package still asserts no evidence or outcome',

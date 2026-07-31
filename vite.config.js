@@ -27,4 +27,14 @@ export default defineConfig({
   build: {
     target: 'es2022',
   },
+
+  test: {
+    // Several suites run real SHACL validation over the parsed ontology modules,
+    // which takes 1–2 s alone and has been observed above 5 s when the rest of
+    // the suite competes for CPU. Those are slow correct runs, not hangs, and
+    // against Vitest's 5 s default they surface as an intermittent "timed out"
+    // that says nothing about the ontology — and, worse, moves between files, so
+    // raising it per-test just relocates the flake.
+    testTimeout: 30_000,
+  },
 })

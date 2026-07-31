@@ -134,8 +134,8 @@ describe('the mapping table is grounded in the ontology', () => {
       ['stimulationIntensity', 'HapticTrack'], ['hapticPattern', 'HapticTrack'],
       ['martigliPeriodInitial', 'ControlTrack'], ['breathingPhaseRatio', 'ControlTrack'],
       ['noteCount', 'ControlTrack'],
-      ['tempoBpm', 'Patch'], ['beatsPerBar', 'Patch'],
-      ['durationSeconds', 'Patch'], ['masterVolume', 'Patch'],
+      ['tempoBpm', 'Preset'], ['beatsPerBar', 'Preset'],
+      ['durationSeconds', 'Preset'], ['masterVolume', 'Preset'],
     ]
     const missing = needed.filter(([prop, cls]) => !(allProps[prop] ?? []).includes(cls))
       .map(([prop, cls]) => `${prop} does not admit sstim:${cls}`)
@@ -172,7 +172,7 @@ const sample = () => {
   draft.patchName = 'Projection Sample'
   draft.audioTracks = [...draft.audioTracks, createAudioTrack('BinauralBeat')]
   draft.visualTracks = [createVisualTrack('Geometry')]
-  draft.controlTracks = [createControlTrack('Martigli')]
+  draft.controlTracks = [createControlTrack('LFO')]
   return buildPatchExport(draft)
 }
 
@@ -216,16 +216,16 @@ describe('projection', () => {
     expect(undeclared, `emitted but not declared in SSTIM: ${undeclared.join(', ')}`).toEqual([])
   })
 
-  it('types the patch and its tracks', () => {
+  it('types the configuration and its tracks', () => {
     const { turtle } = projectPatch(sample(), OPTIONS)
-    expect(turtle).toMatch(/a sstim:Patch/)
+    expect(turtle).toMatch(/a sstim:Preset/)
     expect(turtle).toMatch(/a sstim:AudioTrack/)
     expect(turtle).toMatch(/a sstim:VisualTrack/)
     expect(turtle).toMatch(/a sstim:ControlTrack/)
     expect(turtle).toMatch(/sstim:composedOfTrack/)
   })
 
-  it('never types a patch as a session specification', () => {
+  it('never types a configuration as a session specification', () => {
     // A shape forbids it; emitting it would be an object that both does and does
     // not execute a catalog preset.
     const { turtle } = projectPatch(sample(), OPTIONS)
@@ -275,7 +275,7 @@ describe('the mapping report tells the truth about what did not travel', () => {
     // Kept rather than deleted: packages built before ADR 0040 carry them as
     // open, and a reader comparing two packages should see what changed.
     expect(report.structuralFindings.every((f) => f.severity === 'resolved')).toBe(true)
-    expect(report.structuralFindings.every((f) => f.resolvedIn === 'ADR 0040')).toBe(true)
+    expect(report.structuralFindings.every((f) => /ADR 004[01]/.test(f.resolvedIn))).toBe(true)
   })
 
   it('states what the projection is and what it still does not assert', () => {
@@ -284,6 +284,8 @@ describe('the mapping report tells the truth about what did not travel', () => {
     expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
     // The line that must never soften: RDF validity is not scientific warrant.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
+    // Nor is a configuration a description of the stimulation (ADR 0041 §3).
+    expect(report.conformance).toMatch(/sstim:StimulusSpecification, which does not exist yet/)
   })
 
   it('keeps the structural findings in sync with the module docs', () => {

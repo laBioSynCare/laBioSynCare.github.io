@@ -479,9 +479,13 @@ sstim:Preset a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Preset"@en,
                "Preset"@it, "Preset"@pt, "Preset"@es ;
-    skos:definition "A reusable, versioned parameter configuration for a sensory stimulation implementation, specifying audio architecture, target frequency bands, evidence grounding, safety metadata, and multilingual content for a possible session. A preset follows a protocol or framework but is not itself the protocol."@en ;
+    skos:altLabel "Patch"@en ;
+    skos:definition "A reusable, versioned parameter configuration that makes a particular engine, instrument or design produce an intended sensory stimulation. A preset follows a protocol or framework but is not itself the protocol, and it is not the stimulation: it is the set of settings from which one engine reproduces it."@en ;
+    skos:scopeNote "Engine-dependent by nature. Two engines that produce identical stimulation may have entirely unrelated presets, and two research groups will have unrelated schemas, so the field list is a property of a schema rather than of this class. The BSC catalog format and Patch Studio's patch-studio-model-1 are two such schemas; they are conformance profiles of this class, not distinct classes. \"Patch\" is a synonym, from modular-synthesis usage. The engine-independent description of what actually reaches the subject is sstim:StimulusSpecification, which is a different layer (ADR 0041)."@en ;
+    skos:historyNote "Until 0.11.x the definition named \"audio architecture\" as a constituent. That described the BSC catalog format, not presets: a sensory stimulation preset may carry visual, haptic, respiratory, olfactory, gustatory or electromagnetic layers, as sstim-ex:StimulusChannel already recognises. Corrected by ADR 0041."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ;
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -778,10 +782,16 @@ sstim:PublicSafeReference a owl:Class ;
 ###########################################################################
 
 sstim:Voice a owl:Class ;
+    # sstim:Voice rdfs:subClassOf sstim:AudioTrack is asserted in
+    # sstim-patch-studio.ttl, not here: AudioTrack is defined there, and that
+    # module already dct:requires this one. Stating it here would invert the
+    # dependency and leave `make shacl-core` referencing an undefined term.
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Voice"@en ;
-    skos:definition "An audio layer within a BSC preset, identified by its technique type (Binaural, Martigli, Martigli-Binaural, Symmetry) and carrying the parameters that fully specify that voice. A preset contains 1–6 voices."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0006-one-class-per-technique.md> ;
+    skos:definition "An audio layer within a BSC catalog preset, identified by its technique type (Binaural, Martigli, Martigli-Binaural, Symmetry) and carrying the parameters that fully specify that voice. A catalog preset contains 1–6 voices."@en ;
+    skos:scopeNote "The catalog-model specialisation of sstim:AudioTrack: every voice is an audio track, while an audio track in another schema need not be one of the four catalog technique types."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0006-one-class-per-technique.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -1362,14 +1372,14 @@ sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
 
 
 sstim:durationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
-    # Union admits sstim:Patch, which carries its own duration exactly as a
-    # session specification does (ADR 0040, finding V1). Existing session data is
-    # unaffected; the widening only stops a patch from being entailed to be a
-    # SessionSpecification, which ADR 0040 establishes it is not.
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
+    # A configuration may carry a default duration, which a session may override;
+    # ADR 0041 §3 treats "changing the default duration, if the preset has one"
+    # as one of the liberties a session takes. The union admits both without
+    # entailing that a preset is a session specification.
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range  xsd:integer ;
     rdfs:label  "duration (seconds)"@en ;
-    skos:definition "Intended total duration of a session specification or patch in seconds."@en ;
+    skos:definition "Intended total duration in seconds, either of a session specification or as the default carried by a preset."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -1398,11 +1408,11 @@ sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty
 
 
 sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
-    # As sstim:durationSeconds above — a patch carries its own master gain.
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
+    # As sstim:durationSeconds above — a configuration may carry a default gain.
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "master volume"@en ;
-    skos:definition "Normalized master output gain requested by the session specification or patch, from 0 (silent) to 1 (implementation maximum); not a calibrated sound-pressure level."@en ;
+    skos:definition "Normalized master output gain, from 0 (silent) to 1 (implementation maximum); an engine control, not a calibrated sound-pressure level. The delivered level belongs to sstim:StimulusSpecification (ADR 0041)."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

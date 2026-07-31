@@ -8,6 +8,9 @@ import {
   createMod,
   createTempoSyncConfig,
   createVisualTrack,
+  CONTROL_TYPES,
+  LEGACY_CONTROL_TYPES,
+  createControlTrack,
   draftFromPatchExport,
   draftFromPatchFileText,
   validateDraft,
@@ -120,7 +123,7 @@ describe('preset draft tempo model', () => {
       model: 'patch-studio-model-1',
       patchName: 'Stored',
       timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
-      controlTracks: [{ id: 'ctl-900', type: 'Martigli', name: 'Ctl' }],
+      controlTracks: [{ id: 'ctl-900', type: 'LFO', name: 'Ctl' }],
       audioTracks: [{ id: 'audio-901', trackType: 'Carrier', name: 'Carrier' }],
       visualTracks: [],
       hapticTracks: [],
@@ -267,5 +270,60 @@ describe('patch file import', () => {
     const imported = draftFromPatchFileText(JSON.stringify(buildPatchExport(playing)))
 
     expect(imported.playing).toBe(false)
+  })
+})
+
+
+describe('control-track rename migration (ADR 0041)', () => {
+  // The rename is silent-corruption territory: `choice` falls back to the first
+  // valid option, so without the migration map a saved Symmetry track reopens as
+  // an LFO and quietly becomes a different kind of control signal.
+  const patchWith = (controlTracks) => ({
+    ...buildPatchExport(createDraft()),
+    controlTracks,
+  })
+
+  it('carries a stored Martigli track across as an LFO', () => {
+    const draft = draftFromPatchExport(patchWith([
+      { id: 'ctl-1', type: 'Martigli', name: 'Breath', periodSec: 12, targetPeriodSec: 18, inhaleRatio: 0.4 },
+    ]))
+    const [control] = draft.controlTracks
+    expect(control.type).toBe('LFO')
+    expect(control.periodSec).toBe(12)
+    expect(control.targetPeriodSec).toBe(18)
+    expect(control.inhaleRatio).toBe(0.4)
+  })
+
+  it('carries a stored Symmetry track across as a Permutation, not an LFO', () => {
+    const draft = draftFromPatchExport(patchWith([
+      { id: 'ctl-2', type: 'Symmetry', name: 'Seq', nnotes: 6, rateHz: 3 },
+    ]))
+    const [control] = draft.controlTracks
+    expect(control.type).toBe('Permutation')
+    expect(control.nnotes).toBe(6)
+    expect(control.rateHz).toBe(3)
+  })
+
+  it('leaves current names untouched', () => {
+    for (const type of CONTROL_TYPES) {
+      const draft = draftFromPatchExport(patchWith([{ id: 'c', type, name: type }]))
+      expect(draft.controlTracks[0].type).toBe(type)
+    }
+  })
+
+  it('still defaults a genuinely unknown type rather than throwing', () => {
+    const draft = draftFromPatchExport(patchWith([{ id: 'c', type: 'NotAThing', name: 'x' }]))
+    expect(CONTROL_TYPES).toContain(draft.controlTracks[0].type)
+  })
+
+  it('maps every legacy name to a current one', () => {
+    for (const [legacy, current] of Object.entries(LEGACY_CONTROL_TYPES)) {
+      expect(CONTROL_TYPES, `${legacy} maps to ${current}, which is not a valid type`).toContain(current)
+    }
+  })
+
+  it('creates current types by default', () => {
+    expect(createControlTrack().type).toBe('LFO')
+    expect(createControlTrack('Permutation').type).toBe('Permutation')
   })
 })

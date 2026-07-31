@@ -105,9 +105,21 @@ sstim-sh:OntologyMetadataShape a sh:NodeShape ;
 # Preset Shape
 ###########################################################################
 
-sstim-sh:PresetShape a sh:NodeShape ;
-    sh:targetClass sstim:Preset ;
-    sh:name "Preset"@en ;
+sstim-sh:BscCatalogPresetShape a sh:NodeShape ;
+    # Targets anything bearing a catalog-model predicate, rather than every
+    # sstim:Preset (ADR 0041): a configuration that uses the catalog vocabulary
+    # owes the catalog's curation metadata, and one that does not is not held to
+    # it. Several predicates rather than one, because targeting only
+    # sstim:composedOf would let a half-written catalog entry escape the profile
+    # by omitting its voices — the union closes that without needing SPARQL
+    # targets, which the browser validator does not implement, or a marker
+    # property on every published instance.
+    sh:targetSubjectsOf sstim:composedOf ;
+    sh:targetSubjectsOf sstim:inGroup ;
+    sh:targetSubjectsOf sstim:presetVersion ;
+    sh:targetSubjectsOf sstim:targetsFrequencyBand ;
+    sh:targetSubjectsOf sstim:hasBreathGuide ;
+    sh:name "BSC catalog preset"@en ;
 
     sh:property [
         sh:path rdfs:label ;
@@ -2544,42 +2556,29 @@ sstim-sh:PublicEcosystemPrivateDataShape a sh:NodeShape ;
             }
         """ ;
     ] .
-
-
 ###########################################################################
-# Patch Studio shapes  (ADR 0040 — findings S1, S2, V1)
+# Engine-configuration shapes  (ADR 0041)
 #
-# Deliberately lighter than the Preset and SessionSpecification shapes. A patch
-# is an authoring object exchanged between instances, not a curated catalog
-# entry: it carries no evidence grounding, no multilingual copy and no safety
-# metadata, and requiring them would make every real patch invalid. What is
-# constrained here is structural integrity — a patch identifies itself, has a
-# duration, and is composed of well-formed tracks.
+# ADR 0040 put these constraints on a sstim:Patch class. That class is withdrawn:
+# "patch" and "preset" name the same layer, so the constraints belong to
+# sstim:Preset. What differs between BSC's two serialisations is a schema, and a
+# schema is a conformance profile rather than a class.
+#
+# Hence two shapes. sstim-sh:PresetShape holds what is true of *any* engine
+# configuration. sstim-sh:BscCatalogPresetShape holds the BSC catalog profile —
+# target bands, group, evidence-facing metadata — and targets configurations
+# built from catalog sstim:Voice instances rather than the class, so a Patch
+# Studio configuration is not required to carry catalog curation it does not have.
 ###########################################################################
 
-sstim-sh:PatchShape a sh:NodeShape ;
-    sh:targetClass sstim:Patch ;
-    sh:name "Patch"@en ;
+sstim-sh:PresetShape a sh:NodeShape ;
+    sh:targetClass sstim:Preset ;
+    sh:name "Preset"@en ;
 
     sh:property [
         sh:path rdfs:label ;
         sh:minCount 1 ;
-        sh:message "Patch must have at least one rdfs:label."@en ;
-    ] ;
-
-    sh:property [
-        sh:path dct:created ;
-        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
-        sh:message "Patch must have one xsd:dateTime creation timestamp."@en ;
-    ] ;
-
-    sh:property [
-        sh:path sstim:durationSeconds ;
-        sh:maxCount 1 ;
-        sh:datatype xsd:integer ;
-        sh:minInclusive 1 ;
-        sh:maxInclusive 86400 ;
-        sh:message "Patch durationSeconds must be a positive integer no greater than 86400."@en ;
+        sh:message "Preset must have at least one rdfs:label."@en ;
     ] ;
 
     sh:property [
@@ -2588,18 +2587,30 @@ sstim-sh:PatchShape a sh:NodeShape ;
         sh:message "composedOfTrack must point at a well-formed track."@en ;
     ] ;
 
+    # Everything below is bounded *if present* and required *never*. A preset is
+    # whatever the engine's designer decided to save, so absence carries no
+    # information: a pink-noise stimulation has no tempo, most catalog presets
+    # carry no duration, and a silence baseline may have no layers at all
+    # (static/ontology/instances/experiments/silence-darkness-baseline.ttl is
+    # exactly that). Requiring any of them would invalidate real presets in order
+    # to make the shape look thorough.
+    sh:property [
+        sh:path sstim:durationSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:minInclusive 1 ; sh:maxInclusive 86400 ;
+        sh:message "A preset default duration, if present, must be a positive integer no greater than 86400 s."@en ;
+    ] ;
+
     sh:property [
         sh:path sstim:tempoBpm ;
         sh:maxCount 1 ; sh:datatype xsd:decimal ;
         sh:minExclusive 0 ; sh:maxInclusive 400 ;
-        sh:message "tempoBpm must be a positive decimal no greater than 400."@en ;
+        sh:message "tempoBpm, if present, must be a positive decimal no greater than 400."@en ;
     ] ;
 
-    # A patch is not a session specification. Asserting both would mean the
-    # object both does and does not execute a catalog preset, which is exactly
-    # the confusion ADR 0040 exists to remove.
+    # A configuration is not an execution of itself.
     sh:not [ sh:class sstim:SessionSpecification ] ;
-    sh:message "A Patch must not also be typed as a SessionSpecification: a patch references no preset."@en .
+    sh:message "A Preset must not also be typed as a SessionSpecification: the configuration and its execution are different objects."@en .
 
 
 sstim-sh:TrackShape a sh:NodeShape ;

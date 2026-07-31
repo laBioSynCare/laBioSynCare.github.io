@@ -23,7 +23,7 @@ const sample = () => {
   draft.patchName = 'Package Sample'
   draft.audioTracks = [...draft.audioTracks, createAudioTrack('BinauralBeat')]
   draft.visualTracks = [createVisualTrack('Geometry')]
-  draft.controlTracks = [createControlTrack('Martigli')]
+  draft.controlTracks = [createControlTrack('LFO')]
   return buildPatchExport(draft)
 }
 
@@ -211,5 +211,6 @@ describe('the mapping report travels with the package', () => {
     // this is the sentence that must never soften.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
     expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
+    expect(report.conformance).toMatch(/sstim:StimulusSpecification, which does not exist yet/)
   })
 })

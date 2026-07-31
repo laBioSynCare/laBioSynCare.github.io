@@ -15,7 +15,22 @@ import {
 export const PATCH_STUDIO_MODEL = 'patch-studio-model-1'
 
 // Control track types
-export const CONTROL_TYPES = ['Martigli', 'Symmetry']
+export const CONTROL_TYPES = ['LFO', 'Permutation']
+
+/**
+ * Stored control-track types from before ADR 0041, and what they became.
+ *
+ * The old names put a *technique* label on a *mechanism*: "Martigli" named both
+ * an audible catalog voice and a silent modulator, and "Symmetry" named the
+ * theory rather than what the track does. Renaming them means a patch is
+ * Martigli-shaped because of its parameters — a breathing-range period driving a
+ * carrier — rather than because a field says so.
+ *
+ * This map is required, not cosmetic: `choice` falls back to the first valid
+ * option, so without it every stored `Symmetry` track would silently reopen as
+ * an LFO and lose its meaning.
+ */
+export const LEGACY_CONTROL_TYPES = { Martigli: 'LFO', Symmetry: 'Permutation' }
 
 // Martigli waveform shapes for breath curve
 export const MARTIGLI_WAVEFORMS = ['sine', 'triangle', 'square']
@@ -323,7 +338,10 @@ function normalizeTiming(source = {}) {
 
 function normalizeControlTrack(source) {
   const stored = plainObject(source)
-  const type = choice(stored.type, CONTROL_TYPES, 'Martigli')
+  // Migrate before validating: a pre-0041 name is not in CONTROL_TYPES, so
+  // `choice` would discard it for the default rather than carry it across.
+  const stored_type = LEGACY_CONTROL_TYPES[stored.type] ?? stored.type
+  const type = choice(stored_type, CONTROL_TYPES, 'LFO')
   const base = createControlTrack(type)
   const track = {
     ...base,
@@ -332,7 +350,7 @@ function normalizeControlTrack(source) {
     name: safeText(stored.name, base.name),
   }
 
-  if (type === 'Martigli') {
+  if (type === 'LFO') {
     track.waveform = choice(stored.waveform, MARTIGLI_WAVEFORMS, base.waveform)
     track.periodSec = rangedNumber(stored.periodSec, MARTIGLI_PARAM_RANGE.periodSec, base.periodSec)
     track.targetPeriodSec = rangedNumber(stored.targetPeriodSec, MARTIGLI_PARAM_RANGE.targetPeriodSec, base.targetPeriodSec)
@@ -438,7 +456,7 @@ function bumpNextIdFromDraft(draft) {
   ].flatMap((track) => [
     track.id,
     ...Object.values(track.params ?? {}).flatMap((param) => (param.mods ?? []).map((mod) => mod.id)),
-    ...(track.type === 'Martigli'
+    ...(track.type === 'LFO'
       ? []
       : []),
   ])
@@ -455,11 +473,11 @@ function bumpNextIdFromDraft(draft) {
 
 // ── Control tracks ──────────────────────────────────────────────────────────
 
-export function createMartigliTrack(overrides = {}) {
+export function createLfoTrack(overrides = {}) {
   return {
     id: uid('ctl'),
-    type: 'Martigli',
-    name: 'Primary Martigli',
+    type: 'LFO',
+    name: 'Primary LFO',
     waveform: 'sine',
     periodSec: 10,
     targetPeriodSec: 20,
@@ -473,11 +491,11 @@ export function createMartigliTrack(overrides = {}) {
   }
 }
 
-export function createSymmetryTrack(overrides = {}) {
+export function createPermutationTrack(overrides = {}) {
   return {
     id: uid('ctl'),
-    type: 'Symmetry',
-    name: 'Primary Symmetry',
+    type: 'Permutation',
+    name: 'Primary Permutation',
     nnotes: 4,
     rateHz: 2,
     amplitude: 1.0,
@@ -489,10 +507,10 @@ export function createSymmetryTrack(overrides = {}) {
   }
 }
 
-export function createControlTrack(type = 'Martigli', overrides = {}) {
-  return type === 'Symmetry'
-    ? createSymmetryTrack(overrides)
-    : createMartigliTrack(overrides)
+export function createControlTrack(type = 'LFO', overrides = {}) {
+  return type === 'Permutation'
+    ? createPermutationTrack(overrides)
+    : createLfoTrack(overrides)
 }
 
 // ── Mod slot (per-parameter modulation link) ────────────────────────────────
@@ -605,7 +623,7 @@ export function createHapticTrack(trackType = 'Vibration', overrides = {}) {
 // ── Draft ─────────────────────────────────────────────────────────────────────
 
 export function createDraft() {
-  const ctrl = createMartigliTrack({ name: 'Primary Martigli', periodSec: 10, targetPeriodSec: 20 })
+  const ctrl = createLfoTrack({ name: 'Primary LFO', periodSec: 10, targetPeriodSec: 20 })
 
   const audio = createAudioTrack('IsochronicTone', { name: 'Isochronic Tone' })
   audio.params.gain.value = 0.5

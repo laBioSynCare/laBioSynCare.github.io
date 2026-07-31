@@ -130,7 +130,6 @@
     "MartigliBinauralVoice": "sstim:MartigliBinauralVoice",
     "SymmetryVoice": "sstim:SymmetryVoice",
 
-    "Patch": "sstim:Patch",
     "Track": "sstim:Track",
     "AudioTrack": "sstim:AudioTrack",
     "VisualTrack": "sstim:VisualTrack",

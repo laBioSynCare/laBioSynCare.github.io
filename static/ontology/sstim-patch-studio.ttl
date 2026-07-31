@@ -26,7 +26,6 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix sstim: <https://w3id.org/sstim#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
-@prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 
 
@@ -251,14 +250,14 @@ sstim:hapticPattern a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:tempoBpm a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "tempo BPM"@en ;
     skos:definition "Optional authoring tempo in beats per minute."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:beatsPerBar a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "beats per bar"@en ;
     skos:definition "Number of beats in one authoring tempo bar."@en ;
@@ -270,36 +269,27 @@ sstim:beatsPerBar a owl:DatatypeProperty, owl:FunctionalProperty ;
 
 
 ###########################################################################
-# Patch Studio structural classes
+# Layers within an engine configuration
 #
-# Resolves findings S1, S2 and V1 recorded in docs/technical/SESSION_PACKAGE.md
-# and ADR 0040. Before these terms existed, a Patch Studio patch could only be
-# projected into RDF as an untyped prov:Entity: typing it as a
-# sstim:SessionSpecification failed SHACL, because that class is the execution
-# of a catalog preset and a patch executes none, and its layers matched none of
-# the four catalog sstim:Voice subtypes.
+# ADR 0041. An earlier version of this block (ADR 0040) also declared
+# sstim:Patch, on the reasoning that a patch and a preset were different kinds
+# of thing. That was wrong and the class is withdrawn: "patch" and "preset" name
+# the same layer — a saved parameter configuration for some engine or design —
+# and the difference between BSC's two serialisations is a fact about BSC, not
+# about sensory stimulation. Engine-specific schemas are conformance profiles of
+# sstim:Preset, not classes in the shared term space (CLAUDE.md 5.1).
 #
-# The catalog model is untouched. sstim:Preset, sstim:SessionSpecification and
-# sstim:Voice keep their meanings exactly; these classes sit beside them as the
-# authoring counterpart, not above or below them.
+# sstim:Track survives that withdrawal because it is genuinely general: any
+# multi-layer configuration has layers, whatever it calls them, and both the BSC
+# catalog and Patch Studio have them.
 ###########################################################################
-
-sstim:Patch a owl:Class ;
-    rdfs:subClassOf iao:0000030, prov:Plan ;
-    rdfs:label "Patch"@en ;
-    skos:definition "A directly executable specification of a sensory stimulation arrangement, authored in a patch studio rather than delivered through a catalog. A patch is composed of tracks and carries its own timing; unlike a session specification it references no preset, and unlike a preset it is not a catalog delivery artifact awaiting curation. The unit of exchange between patch-authoring instances."@en ;
-    skos:scopeNote "Sibling of sstim:Preset, not a subclass: a preset is a curated catalog entry carrying evidence grounding, safety metadata and multilingual content, none of which a patch asserts. Converting a patch to a preset is a gated, partial, human-supervised step."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0026-patch-studio-catalog-bridge.md> ,
-        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0040-patch-studio-native-session-and-track-classes.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
 
 sstim:Track a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Track"@en ;
-    skos:definition "A single layer within a patch, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
-    skos:scopeNote "Parallel to sstim:Voice rather than hierarchically related to it. A voice is an audio layer of a catalog preset, constrained to four technique types; a track is a layer of a patch and may be visual or haptic, or a control signal that modulates other tracks rather than producing output itself."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0040-patch-studio-native-session-and-track-classes.md> ;
+    skos:definition "A single layer within an engine configuration, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
+    skos:scopeNote "Currently parallel to sstim:Voice rather than above it. A voice is the audio layer of a BSC catalog preset, constrained to four technique types; whether sstim:Voice should be asserted as a subclass of sstim:AudioTrack is an open question deferred by ADR 0041 — it becomes clean once Patch Studio control tracks are renamed to LFO and Permutation, which removes the case where one name covers both an audible layer and a silent one."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -340,8 +330,28 @@ sstim:ControlTrack a owl:Class ;
 
 
 sstim:composedOfTrack a owl:ObjectProperty ;
-    rdfs:domain sstim:Patch ;
+    rdfs:domain sstim:Preset ;
     rdfs:range  sstim:Track ;
     rdfs:label  "composed of track"@en ;
-    skos:definition "Links a patch to the tracks it is composed of. The patch counterpart of sstim:composedOf, which links a catalog preset to its voices."@en ;
+    skos:definition "Links an engine configuration to the layers it is composed of. Distinct from sstim:composedOf, which links a BSC catalog preset to its voices: a configuration whose schema has generic layers uses this, one whose schema has the four catalog voice types uses that."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# A voice is an audible layer, which is exactly what sstim:AudioTrack is.
+#
+# ADR 0040 declined this subsumption on reasoning that did not survive review:
+# that a voice carries catalog-specific semantics (a subclass is *allowed* to be
+# more specific) and that a control track is silent (irrelevant — a voice sits
+# under AudioTrack, not under Track). What genuinely blocked it was that
+# "Martigli" named an audible catalog voice and a silent Patch Studio controller
+# at once. Renaming the controller to LFO (ADR 0041) removed the collision and
+# the subsumption is now simply true.
+#
+# Asserted here rather than beside sstim:Voice in sstim-core.ttl because
+# sstim:AudioTrack is defined in this module, which already dct:requires core.
+# The reverse would invert the module dependency.
+#
+# Backward-compatible: it adds an entailment about existing voices and removes
+# none. pyshacl runs without OWL inference, so no shape targeting AudioTrack
+# begins firing on catalog voices as a side effect.
+sstim:Voice rdfs:subClassOf sstim:AudioTrack .

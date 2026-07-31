@@ -460,7 +460,7 @@
   }
 
   function controlTrackForTempo(track, tempoContext) {
-    if (track.type === 'Martigli') {
+    if (track.type === 'LFO') {
       return {
         ...track,
         periodSec: clampRange(
@@ -475,7 +475,7 @@
         ),
       }
     }
-    if (track.type === 'Symmetry') {
+    if (track.type === 'Permutation') {
       return {
         ...track,
         rateHz: clampRange(
@@ -526,11 +526,11 @@
       for (const c of draft.controlTracks) {
         const effectiveTrack = controlTrackForTempo(c, tempoContext)
         let st
-        if (c.type === 'Martigli') {
+        if (c.type === 'LFO') {
           st = (sessionElapsed != null)
             ? computeMartigliState(effectiveTrack, sessionElapsed, sessionLength)
             : computeMartigliStateFree(effectiveTrack, tNow)
-        } else if (c.type === 'Symmetry') {
+        } else if (c.type === 'Permutation') {
           const ts = sessionElapsed != null ? sessionElapsed : tNow
           st = computeSymmetryState(effectiveTrack, ts)
         } else {
@@ -633,7 +633,7 @@
     // Keep direct control-track previews aligned with tempo-synced values.
     for (const track of draft.controlTracks) {
       if (!liveValues[track.id]) liveValues[track.id] = {}
-      if (track.type === 'Martigli') {
+      if (track.type === 'LFO') {
         for (const name of ['periodSec', 'targetPeriodSec']) {
           liveValues[track.id][name] = clampRange(
             effectiveTempoValue({ tempoSync: track.tempoSync?.[name] }, track[name], 'duration', liveTempo),
@@ -641,7 +641,7 @@
             name
           )
         }
-      } else if (track.type === 'Symmetry') {
+      } else if (track.type === 'Permutation') {
         liveValues[track.id].rateHz = clampRange(
           effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, track.rateHz, 'rate', liveTempo),
           SYMMETRY_PARAM_RANGE,
@@ -1697,7 +1697,7 @@
               <button class="x-btn" onclick={() => removeControl(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
-              {#if track.type === 'Martigli'}
+              {#if track.type === 'LFO'}
                 <label class="wave-field">
                   <span>Waveform</span>
                   <select bind:value={track.waveform}>

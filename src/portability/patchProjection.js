@@ -6,26 +6,27 @@
 // half of that: it never claims more than it can support, and it makes the gap
 // machine-readable instead of leaving it to a footnote.
 //
-// ## The projection is a `sstim:Patch`
+// ## The projection is a `sstim:Preset`
 //
-// It was not always. Until ADR 0040 the only available typing was an untyped
-// `prov:Entity`: a patch typed as `sstim:SessionSpecification` failed SHACL
-// because that class is the *execution of a catalog preset* and a patch executes
-// none, and its layers matched none of the four catalog `sstim:Voice` subtypes.
-// Those were findings S1 and S2, and a third — V1 — recorded that the visual and
-// haptic properties were session-scoped in the ontology but track-scoped in a
-// patch.
+// It has been three things. Originally an untyped `prov:Entity`, because typing
+// a patch as `sstim:SessionSpecification` failed SHACL — that class is the
+// execution of a catalog preset and a patch executes none. ADR 0040 then minted
+// `sstim:Patch` to fix that, which was the wrong repair: it put an
+// engine-specific serialisation into the shared term space.
 //
-// All three are now closed in the ontology itself. `sstim-patch-studio.ttl`
-// declares `sstim:Patch` and `sstim:Track` with four disjoint subtypes, and the
-// parameter domains admit them; `sstim-shapes.ttl` constrains them. So the
-// projection emits properly typed, SHACL-validated RDF, and a patch is no longer
-// a second-class citizen of its own ontology.
+// ADR 0041 withdrew it. "Patch" and "preset" name the same layer — a saved
+// parameter configuration for some engine — and the difference between BSC's two
+// serialisations is a fact about BSC, not about sensory stimulation. So the
+// projection is a `sstim:Preset` composed of `sstim:Track` instances, and the
+// BSC catalog's curation requirements moved to a profile shape targeting
+// configurations built from catalog `sstim:Voice`s.
 //
-// The catalog model is untouched: `Preset`, `SessionSpecification` and `Voice`
-// keep their meanings, and a patch is explicitly *not* a SessionSpecification —
-// a shape enforces that, because asserting both would mean an object that both
-// does and does not execute a preset.
+// What a preset is *not* is the stimulation itself. The engine-independent
+// description of what reaches the subject is `sstim:StimulusSpecification`,
+// which does not exist yet: `gain: 0.5` is an engine control, `65 dB SPL at the
+// ear` is a stimulus property, and only the second is reproducible on an engine
+// nobody has built yet. That gap is ADR 0041 §3, and it is the reason this
+// projection describes settings rather than stimulation.
 
 import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
 
@@ -82,13 +83,13 @@ export const PARAM_PROPERTIES = {
 
 /** Control-track parameters, keyed by control type then parameter. */
 export const CONTROL_PROPERTIES = {
-  Martigli: {
+  LFO: {
     periodSec:       { property: 'martigliPeriodInitial', domain: 'Voice', datatype: 'decimal' },
     targetPeriodSec: { property: 'martigliPeriodFinal',   domain: 'Voice', datatype: 'decimal' },
     inhaleRatio:     { property: 'breathingPhaseRatio',   domain: 'Voice', datatype: 'decimal' },
     amplitude:       { property: 'martigliAmplitude',     domain: 'Voice', datatype: 'decimal' },
   },
-  Symmetry: {
+  Permutation: {
     nnotes:          { property: 'noteCount',             domain: 'Voice', datatype: 'integer' },
     rateHz:          { property: 'pulseRateHz',           domain: 'Voice', datatype: 'decimal' },
     amplitude:       { property: 'breathingAmplitude',    domain: 'Voice', datatype: 'decimal' },
@@ -122,41 +123,44 @@ export const DELIBERATELY_UNUSED = {
 /**
  * Structural divergences between the two models, reported with every package.
  *
- * All three are **resolved** as of ADR 0040 (2026-07-31). They are kept, rather
- * than deleted, because packages built before that date carry them as open
- * findings and a reader comparing two packages should be able to see what
- * changed and when. A `resolved` entry is not a warning.
+ * S1 and S2 were resolved by ADR 0040 and then *re-resolved differently* by
+ * ADR 0041, which withdrew the classes 0040 added. They are kept rather than
+ * deleted because packages built on 2026-07-31 carry the intermediate answer,
+ * and a reader comparing packages should be able to see the sequence.
+ *
+ * V1 remains resolved: the widened property domains survived, only their union
+ * members changed.
  */
 export const STRUCTURAL_FINDINGS = [
   {
     id: 'S1',
     severity: 'resolved',
-    resolvedIn: 'ADR 0040',
-    finding: 'SSTIM had no patch-studio-native session class.',
+    resolvedIn: 'ADR 0041 (superseding ADR 0040)',
+    finding: 'A Patch Studio configuration had no SSTIM class it could claim.',
     detail:
-      'Typing the projection as sstim:SessionSpecification failed SHACL: that shape requires exactly one sstim:referencesPreset pointing at a sstim:Preset, and a patch executes no catalog preset.',
+      'sstim:SessionSpecification requires exactly one sstim:referencesPreset and a configuration executes no catalog preset. ADR 0040 answered by minting sstim:Patch; ADR 0041 withdrew that as an engine-specific serialisation in a shared term space (CLAUDE.md §5.1).',
     consequence:
-      'sstim:Patch now exists in sstim-patch-studio.ttl as an information content entity and prov:Plan, sibling to sstim:Preset. A SHACL shape additionally forbids typing one object as both a Patch and a SessionSpecification.',
+      'The projection is a sstim:Preset — the engine-configuration layer, of which "patch" is a synonym. Curation requirements moved to a BSC catalog profile shape, so a configuration is not required to carry metadata it does not have.',
   },
   {
     id: 'S2',
     severity: 'resolved',
-    resolvedIn: 'ADR 0040',
-    finding: 'Patch Studio track types had no corresponding sstim:Voice subtype.',
+    resolvedIn: 'ADR 0040, retained by ADR 0041',
+    finding: 'Configuration layers had no SSTIM class.',
     detail:
-      'sstim-sh:VoiceShape requires sh:xone of BinauralVoice, MartigliVoice, MartigliBinauralVoice or SymmetryVoice. Carrier, Noise, Drone, Sample, the nine visual types and Vibration match none of them.',
+      'sstim-sh:VoiceShape requires one of four catalog voice types, which Carrier, Noise, Drone, Sample, the nine visual types and Vibration are not.',
     consequence:
-      'sstim:Track now exists with four disjoint subtypes — AudioTrack, VisualTrack, HapticTrack, ControlTrack — parallel to sstim:Voice rather than hierarchically related to it, and sstim:composedOfTrack links a patch to them.',
+      'sstim:Track with four disjoint subtypes, linked by sstim:composedOfTrack. Retained by ADR 0041 as genuinely general: any multi-layer configuration has layers. Whether sstim:Voice is a sstim:AudioTrack is still open.',
   },
   {
     id: 'V1',
     severity: 'resolved',
-    resolvedIn: 'ADR 0040',
-    finding: 'Visual and haptic properties were session-scoped in SSTIM but track-scoped in Patch Studio.',
+    resolvedIn: 'ADR 0040, adjusted by ADR 0041',
+    finding: 'Visual and haptic properties were session-scoped but are layer-scoped in a configuration.',
     detail:
-      'rotationSpeed, visualSideCount, visualDensity, stimulationIntensity and hapticPattern had rdfs:domain sstim:SessionSpecification, implying one visual and one haptic configuration per session, while a patch may carry nine visual tracks.',
+      'rotationSpeed, visualSideCount, visualDensity, stimulationIntensity and hapticPattern had rdfs:domain sstim:SessionSpecification, implying one visual and one haptic configuration per session.',
     consequence:
-      'Twenty-three property domains were widened to unions admitting the corresponding patch class. Existing catalog data is unaffected: a union domain is a weaker entailment, so every prior assertion remains valid.',
+      'Domains widened to unions admitting the layer classes. A union domain is a weaker entailment, so no prior catalog assertion changed meaning.',
   },
 ]
 
@@ -228,7 +232,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
   const nodes = []
 
   const sessionStatements = [
-    ['a', 'sstim:Patch'],
+    ['a', 'sstim:Preset'],
     ['rdfs:label', `"${escapeLiteral(patchExport.patchName ?? 'Untitled Patch')}"`],
     ['dct:created', `"${created}"^^xsd:dateTime`],
     ['dct:conformsTo', `<https://w3id.org/sstim/patch-studio>`],
@@ -333,7 +337,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     structuralFindings: STRUCTURAL_FINDINGS,
     // Stated plainly so no downstream reader mistakes this for catalog RDF.
     conformance:
-      'SHACL-validated SSTIM projection: the patch is a sstim:Patch composed of typed sstim:Track instances (ADR 0040). It is deliberately not a sstim:SessionSpecification, which executes a catalog preset, and it asserts no evidence, outcome or safety metadata — those are authored by a human through the gated catalog bridge (ADR 0026). The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
+      'SHACL-validated SSTIM projection: a sstim:Preset — the engine-configuration layer — composed of typed sstim:Track instances (ADR 0041). It is deliberately not a sstim:SessionSpecification, which is an execution rather than a configuration, and it asserts no evidence, outcome or safety metadata: those are authored by a human through the gated catalog bridge (ADR 0026). It is also not a description of the stimulation itself — that is sstim:StimulusSpecification, which does not exist yet (ADR 0041 §3), so these are engine settings rather than delivered stimulus properties. The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
   }
 
   return { turtle, jsonld: toJsonLd(nodes), report }

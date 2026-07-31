@@ -146,13 +146,13 @@ export function evaluateSymmetry(track, t) {
 
 export function evaluateControl(track, t, sessionElapsed, sessionLength) {
   if (!track) return 0
-  if (track.type === 'Martigli') {
+  if (track.type === 'LFO') {
     const inSession = Number.isFinite(sessionElapsed) && Number.isFinite(sessionLength) && sessionLength > 0
     return inSession
       ? computeMartigliState(track, sessionElapsed, sessionLength).value
       : computeMartigliStateFree(track, t).value
   }
-  if (track.type === 'Symmetry') {
+  if (track.type === 'Permutation') {
     const ts = Number.isFinite(sessionElapsed) ? sessionElapsed : t
     return computeSymmetryState(track, ts).value
   }
