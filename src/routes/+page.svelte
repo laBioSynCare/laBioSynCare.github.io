@@ -45,7 +45,7 @@
       id: 'door-build',
       eyebrow: 'Build',
       title: 'Deploy and extend the open platform.',
-      copy: 'Run BSC Lab locally today. The core application is static and Firebase is optional; reproducible institutional deployment, backup, restore and instance migration are the next portability layer.',
+      copy: 'Run BSC Lab locally today, or host it yourself: one bit-reproducible package deploys as a NixOS service, a container, or plain static files, and is configured at deployment rather than at build. Your data exports and migrates between instances with no account.',
       primary: [
         { label: 'Deployment and portability', href: GH_BLOB + 'docs/technical/PORTABLE_DEPLOYMENT.md', external: true },
         { label: 'Run it locally', href: GH + '#readme', external: true },

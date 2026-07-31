@@ -59,8 +59,13 @@ privacy defect, not a formatting bug.
 
 ## Secrets and configuration
 
-- Firebase configuration comes **only** from build-time `VITE_FIREBASE_*`
-  environment variables. Never commit them.
+- Firebase configuration comes from build-time `VITE_FIREBASE_*` environment
+  variables, or from the deployment-time `runtime-config.json` beside the
+  artifact, which takes precedence and lets one immutable package be repointed
+  or run local-only without a rebuild. Never commit either.
+- **Absence of `runtime-config.json` changes nothing**: a package built with
+  credentials keeps using them. Invalid configuration degrades to local-only and
+  reports why, rather than half-enabling an account system.
 - A build with no `VITE_FIREBASE_*` values is valid and supported: the application
   runs with no embedded credentials and cloud features are unavailable.
 - Firebase web configuration values are not secrets in the cryptographic sense, but
@@ -96,8 +101,11 @@ For operators running their own instance:
 - The core application needs no inbound network access beyond static file serving.
 - If Firebase is enabled, Firestore security rules are your access control — review
   them before exposing an instance to users.
-- Back up before upgrading. Complete instance backup, restore and cross-instance
-  migration are **not yet implemented**; see
+- Back up before upgrading. `Settings → Your data` exports everything held
+  locally as one versioned, checksummed file and imports it back on any instance,
+  with no account; `make migrate-test` proves the round trip across two genuinely
+  separate origins. Scheduling and encryption of those backups are still the
+  operator's problem — see
   [`docs/technical/PORTABLE_DEPLOYMENT.md`](docs/technical/PORTABLE_DEPLOYMENT.md).
 
 ## Known gaps
@@ -105,9 +113,13 @@ For operators running their own instance:
 Stated openly, because an operator deserves to know what has not been done:
 
 - **No formal threat model** yet — this policy is the current substitute.
-- **No automated public/private boundary tests.** The separation is implemented and
-  unit-tested in places, but not asserted end-to-end in CI.
-- **No backup encryption specification**, since backup is not yet implemented.
+- **Boundary tests exist but are not comprehensive.** Session packages are scanned
+  for Firebase API keys, the `local-device` pseudonym and uid fields on build *and*
+  on parse, and `make session-conformance` re-checks the boundary cross-origin with
+  a real account identifier present on the sending instance. Feeds, published
+  objects and the identity seam are not yet covered.
+- **No backup encryption specification.** Export produces plaintext JSON holding
+  personal notes; protecting it at rest is currently the operator's responsibility.
 - **No independent security audit** has been performed.
 - **No isolated staging environment** for the published instance.
 

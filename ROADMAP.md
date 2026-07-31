@@ -114,7 +114,7 @@ primarily with AI-assisted development.
 
 ### Repository update (July 2026)
 
-- **SSTIM:** `0.11.0` is the validated, frozen release line, archived under
+- **SSTIM:** `0.12.0` is the validated, frozen release line, archived under
   version DOI `10.5281/zenodo.21536124`; the continuing project retains
   concept DOI `10.5281/zenodo.21286974`.
 - **Ontology:** the seven release modules add qualified evidence governance and
@@ -140,12 +140,12 @@ what exists.
 
 ### Release engineering and citability
 
-- Nine tagged releases, `v0.2.0` (2026-06-12) through `v0.11.0` (2026-07-24).
+- Ten tagged releases, `v0.2.0` (2026-06-12) through `v0.12.0` (2026-07-31).
   No release tag existed when the phases below were written.
 - Zenodo archiving enabled at `v0.5.0`: an all-versions concept DOI plus a
   distinct version DOI per release, carried into the ontology metadata,
   VoID/DCAT, citation guidance, and the JSON-LD context.
-- Immutable whole-set snapshots under `static/ontology/0.1.0/` … `0.11.0/`
+- Immutable whole-set snapshots under `static/ontology/0.1.0/` … `0.12.0/`
   ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)), with a
   `make verify-snapshots` checksum gate against silent edits.
 - `CHANGELOG.md` as the release history of record.

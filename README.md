@@ -15,23 +15,26 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-07-24:
+As of 2026-07-31:
 
-- **Latest immutable release:** SSTIM `v0.11.0`, archived at
-  [10.5281/zenodo.21536124](https://doi.org/10.5281/zenodo.21536124) and
-  identified by `https://w3id.org/sstim/0.11.0`. A Gate A/B stabilization pass
-  over `0.10.0` (2026-07-24 audit): release-integrity fixes
-  (RDF-01/02/03/11/12) plus semantic-stabilization fixes
-  (RDF-04/05/08 partial/09/13/15/17, ADR 0037).
+- **Latest immutable release:** SSTIM `v0.12.0`, archived at
+  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988) and
+  identified by `https://w3id.org/sstim/0.12.0`. The description-layer release
+  (ADR 0041, ADR 0042): separates the stimulation process, an engine-independent
+  description of it, the engine configuration that produces it, and the
+  execution of that configuration. Adds `sstim:StimulusSpecification` in a new
+  module, redefines `sstim:Preset` as the engine-configuration layer, and admits
+  non-human, object and unoccupied-space stimulation targets.
 - **All-version DOI:**
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology sources:** the validated `0.11.0` release sources. The core
-  claims the whole-set `owl:versionIRI`; all seven modules share synchronized
+- **Live ontology sources:** the validated `0.12.0` release sources. The core
+  claims the whole-set `owl:versionIRI`; all eight modules share synchronized
   `owl:versionInfo` under ADR 0020.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **Ontology graph:** seven Turtle modules, 134 named OWL classes, 18 anonymous
-  class expressions, 231 properties, and 445 SKOS concepts in 50 concept
-  schemes, plus VoID/DCAT and a JSON-LD context.
+- **Ontology graph:** eight Turtle modules, 140 named OWL classes, 50 anonymous
+  class expressions, 245 properties, and 445 SKOS concepts in 50 concept
+  schemes, plus VoID/DCAT and a JSON-LD context. These counts are checked
+  against the modules themselves by `make truth-audit`, not maintained by hand.
 - **Public example data:** 19 Turtle files containing the BSC framework, nine
   framework techniques (three originated by BSC, six vendor-neutral techniques
   it incorporates from the SSTIM vocabulary — ADR 0033), two implementations,
@@ -77,7 +80,9 @@ clinical protocols, and clinical claims are not published here.
 | [`sstim-shapes.ttl`](static/ontology/sstim-shapes.ttl) | SHACL constraints for modules, SKOS integrity, evidence, protocols, presets, safety, exposure, and sessions |
 | [`sstim-alignments.ttl`](static/ontology/sstim-alignments.ttl) | Conservatively scoped, verified Wikidata and OBO Foundry links |
 | [`sstim-patch-studio.ttl`](static/ontology/sstim-patch-studio.ttl) | Reproducible voice and authoring parameter properties |
+| [`sstim-stimulus.ttl`](static/ontology/sstim-stimulus.ttl) | Engine-independent stimulus description in physical units, the stimulation target axis, and session liberties |
 | [`sstim-exposure.ttl`](static/ontology/sstim-exposure.ttl) | Delivery media, perceived modalities, devices, placement, stimulus patterns, limits, effects, and knowledge status |
+| [`sstim-ecosystem.ttl`](static/ontology/sstim-ecosystem.ttl) | Neutral ecosystem agents, qualified relationships, and consent-scoped publication status |
 | [`context.jsonld`](static/ontology/context.jsonld) | Public JSON-LD compaction context |
 | [`void.ttl`](static/ontology/void.ttl) | VoID/DCAT publication metadata and checked graph counts |
 | [`instances/`](static/ontology/instances) | Public BSC Lab framework, protocol, preset, evidence, experiment, reference, and synthetic session data |
@@ -197,7 +202,7 @@ make validate   # SHACL + audit + HermiT + SPARQL + serialization round trips
 make test       # Vitest unit tests
 make check      # SvelteKit sync and svelte-check
 make build      # Static production bundle in dist/
-make export     # JSON-LD and RDF/XML serializations of all seven modules
+make export     # JSON-LD and RDF/XML serializations of all eight modules
 ```
 
 `make validate` checks more than RDF syntax:
@@ -213,7 +218,7 @@ make export     # JSON-LD and RDF/XML serializations of all seven modules
 5. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
 
-The immutable [`static/ontology/0.10.0/`](static/ontology/0.10.0) snapshot is not
+The immutable [`static/ontology/0.12.0/`](static/ontology/0.12.0) snapshot is not
 edited after publication. Future releases are cut only after validation,
 version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 
@@ -283,9 +288,9 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.11.0` using
-[10.5281/zenodo.21536124](https://doi.org/10.5281/zenodo.21536124). Its stable
-version IRI is `https://w3id.org/sstim/0.11.0`. Use the
+For the released ontology, cite SSTIM `v0.12.0` using
+[10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988). Its stable
+version IRI is `https://w3id.org/sstim/0.12.0`. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

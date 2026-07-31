@@ -48,7 +48,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -73,6 +73,13 @@ migrate-test:
 ## (rendered-signal comparison) is declared not attempted.
 session-conformance:
 	node scripts/session-conformance.mjs
+
+## Assert the repository's prose matches the repository. Derives the release
+## version, DOI and module list from the ontology and the snapshot script, then
+## checks README/SECURITY/PORTABLE_DEPLOYMENT/ROADMAP/TODO/homepage against them
+## — including claims that a shipped capability is still future work.
+truth-audit:
+	node scripts/truth-audit.mjs
 
 ## Assert a deployed instance serves the commit it should. Fetches
 ## build-info.json from DEPLOY_URL and compares against COMMIT (default: local
@@ -231,7 +238,7 @@ verify-snapshots:
 	node scripts/verify-snapshot-checksums.mjs
 
 ## Run the current ontology validation suite
-validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots
+validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -275,6 +282,7 @@ wasm:
 help:
 	@echo "Available targets:"
 	@echo "  make build            Build the production bundle"
+	@echo "  make truth-audit      Assert the docs match the repository (versions, counts, claims)"
 	@echo "  make verify-deploy    Assert DEPLOY_URL serves COMMIT (default: git HEAD)"
 	@echo "  make session-conformance Package a session on instance A, verify it on instance B"
 	@echo "  make check            Run SvelteKit sync and static checks"

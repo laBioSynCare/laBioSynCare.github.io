@@ -12,6 +12,31 @@ what works is worse than none, because someone will try to follow it.
 
 ---
 
+## 0. Evidence matrix
+
+Every capability below is asserted by a command that fails if the capability
+regresses. Nothing here is a claim about intent.
+
+| Capability | Evidence | Verified by |
+|---|---|---|
+| Reproducible package | Identical output across builds of identical sources | `nix build --rebuild` |
+| NixOS deployment | Clean VM boots, serves, and satisfies the deployment contract | `nix flake check` → `checks.nixos-vm` |
+| OCI deployment | Same store path, run non-root, same contract | `nix build .#oci` + container job in CI |
+| Runtime configuration | One artifact, two configurations, two instances | Two-machine VM subtest; two-container CI job |
+| Deployment identity | The live site reports the commit it was built from | `make verify-deploy` |
+| Credential-free build | No API key in any bundle file | `make smoke-static` |
+| Instance migration | Export from A imports into B and re-exports byte-identically | `make migrate-test` |
+| Session interoperability | Level 1 semantic + Level 2 execution-parameter equivalence across origins | `make session-conformance` |
+| Privacy boundary | No provider identifier survives packaging, on build and on parse | `make session-conformance` (privacy assertions) |
+| Ontology integrity | SHACL, OWL DL consistency, SPARQL competency, snapshot checksums | `make validate` |
+| Documentation truth | Prose matches the repository's own facts | `make truth-audit` |
+
+The deployment paths share **one** contract, `scripts/smoke-http.sh`, so "it
+works as a container" and "it works as a NixOS service" are the same assertion
+run twice rather than two hand-written approximations that drift.
+
+---
+
 ## 1. Current verified baseline
 
 Everything in this section was checked against the working tree on 2026-07-30.
@@ -94,10 +119,10 @@ for ordinary builds, obtained here structurally rather than by convention.
 > changing whenever the source changes. Unset, the SvelteKit default applies and
 > ordinary builds are unaffected.
 
-> **What this does and does not close.** Gap G1 only. There is still **no NixOS
-> module** (G2), **no container image** (G3), no service configuration, and no
-> backup or migration orchestration. A reproducible package is not self-hosting;
-> it is the first of the pieces that would make self-hosting possible.
+> **What this closed, and what followed.** Written when only G1 was closed. G2
+> (NixOS module), G3 (container image) and G6 (runtime configuration) closed on
+> 2026-07-31 and are covered below; backup and migration are §1.5. A reproducible
+> package is not self-hosting on its own — it was the first of the pieces.
 
 ### 1.4 Data surfaces that already serialise
 
@@ -308,11 +333,11 @@ Stated plainly, with no partial credit.
 | ~~G3~~ | ~~No container image~~ | ✅ **Closed 2026-07-31.** `packages.x86_64-linux.oci`, built from the same store path, run non-root, asserted live in CI |
 | ~~G4~~ | ~~No backend adapter interface~~ | ✅ **Closed 2026-07-31 for storage.** Patches, annotations and profile each have local and Firestore implementations behind a shared contract. The **identity** seam is untouched — six of the original nine import sites are `authState` |
 | ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31, and deliberately bounded.** Patches, annotations and profile all work with no account and no Firebase. Per [ADR 0039](../decisions/0039-sharing-model-and-the-shared-backend-question.md) the gap splits: *sync my own data across devices* stays open work, gated on the identity seam; *a multi-user backend hosting one person's content for others* is **declined**, and sharing is met by publication instead |
-| G6 | Firebase config is build-time only | An operator must rebuild to change backends; no runtime configuration |
+| ~~G6~~ | ~~Firebase config is build-time only~~ | ✅ **Closed 2026-07-31.** `runtime-config.json` beside the artifact selects instance identity and providers; the NixOS module generates it declaratively and the container mounts it read-only. One package, two configurations, verified in the VM test and against two containers (ADR 0041 §2) |
 | ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything BSC Lab keeps on the device. Firestore-held records for a signed-in account remain outside |
 | ~~G8~~ | ~~No backup or restore~~ | ⚠️ **Partly closed 2026-07-31.** Export is the backup and import is the restore for all local data; scheduling and retention orchestration are absent |
 | ~~G9~~ | ~~No cross-instance migration~~ | ✅ **Closed for local data 2026-07-31.** `make migrate-test` moves everything between two genuinely separate origins and proves the re-export matches byte-for-byte |
-| G10 | Patch export is a dead end | No bridge to catalogue JSON or SSTIM RDF (ADR 0026) |
+| ~~G10~~ | ~~Patch export is a dead end~~ | ⚠️ **Largely closed 2026-07-31.** A checksummed session package carries the lossless patch plus a SHACL-validated SSTIM projection and a mapping report; `make session-conformance` proves Level 1 + Level 2 equivalence across two origins ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)). The gated *catalog preset* conversion of ADR 0026 remains open |
 | ~~G11~~ | ~~No threat model, no `SECURITY.md`~~ | ⚠️ **Partly closed.** `SECURITY.md` documents the data boundaries, the authentication-identifier exclusion and self-hosting expectations. A formal threat model and automated boundary tests are still open |
 | ~~G12~~ | ~~No deployment conformance tests~~ | ✅ **Closed 2026-07-31.** `scripts/smoke-http.sh` is one contract run against **both** the NixOS VM and the container in CI |
 
