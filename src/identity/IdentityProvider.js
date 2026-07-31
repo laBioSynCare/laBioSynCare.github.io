@@ -9,7 +9,8 @@
 // This is the seam. A provider answers three things — who is signed in, how to
 // sign in or out, and what the provider can do — and the application asks
 // nothing else. `runtime-config.json` selects which provider is active
-// (ADR 0041 §2), so the same immutable package runs with accounts or without.
+// (ADR 0038 splits identity from storage; the runtime-config mechanism is gap G6
+// in PORTABLE_DEPLOYMENT), so the same package runs with accounts or without.
 //
 // **The normalized identity deliberately does not expose a provider's own user
 // id to the application.** `subject` exists because storage needs a key, but
@@ -30,8 +31,10 @@
  * @property {string} displayName Human-readable, possibly empty. Never an id.
  * @property {string|null} email
  *   Contact address where the provider supplies one, null otherwise. A standard
- *   claim rather than an identifier — but still personal, so it is excluded from
- *   public attribution and from every export.
+ *   identity claim **and a direct personal identifier** — available to account
+ *   UI, excluded from public attribution, from portable exports and from
+ *   scientific objects. Calling it "not an identifier" was wrong: for a privacy
+ *   boundary an email names a person as surely as a uid does.
  * @property {boolean} authenticated Whether someone actually signed in.
  * @property {string[]} grantedScopes
  *   Permissions the person granted. Empty for identity-only sign-in; a future

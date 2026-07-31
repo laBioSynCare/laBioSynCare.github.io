@@ -115,9 +115,9 @@ primarily with AI-assisted development.
 ### Repository update (July 2026)
 
 - **SSTIM:** `0.12.0` is the validated, frozen release line, archived under
-  version DOI `10.5281/zenodo.21536124`; the continuing project retains
+  version DOI `10.5281/zenodo.21717988`; the continuing project retains
   concept DOI `10.5281/zenodo.21286974`.
-- **Ontology:** the seven release modules add qualified evidence governance and
+- **Ontology:** the eight release modules add qualified evidence governance and
   ecosystem relationships alongside the sensory-domain vocabulary, safety
   metadata, SHACL, OWL reasoning, and executable quality/competency checks.
 - **Public data:** BSC Lab framework, implementation, protocols, reference

@@ -206,3 +206,147 @@ describe('a provider identifier never becomes public', () => {
     expect(publicAttribution(id).agentIri).toBeNull()
   })
 })
+
+// ── provider selection matrix ───────────────────────────────────────────────
+//
+// The two seams are independent (ADR 0038). An earlier version of
+// identityProvider() read `(wantsFirebase || isFirebaseConfigured()) &&
+// isFirebaseConfigured()`, which reduces to `isFirebaseConfigured()` — so the
+// identity choice was dead code, and because that helper is true when *either*
+// seam selects Firebase, `identity: anonymous` + `storage: firestore` silently
+// activated Firebase identity. These cases pin every combination.
+
+import { applyRuntimeConfig, resetRuntimeConfig, RUNTIME_CONFIG_MODEL } from '../config/runtimeConfig.js'
+import { identityProvider } from './identityState.js'
+
+const FIREBASE_CREDS = {
+  apiKey: 'key', authDomain: 'x.firebaseapp.com', projectId: 'x', appId: '1:2:web:3',
+}
+
+const configure = (identity, storage, { credentials = true } = {}) => {
+  resetRuntimeConfig()
+  applyRuntimeConfig(
+    {
+      model: RUNTIME_CONFIG_MODEL,
+      identity: { provider: identity },
+      storage: { provider: storage },
+      ...(credentials ? { firebase: FIREBASE_CREDS } : {}),
+    },
+    { buildTimeFirebase: null },
+  )
+  setIdentityProvider(null)
+  return identityProvider().id
+}
+
+describe('identity provider selection matrix', () => {
+  beforeEach(() => { resetRuntimeConfig(); setIdentityProvider(null) })
+
+  it('anonymous + local → anonymous', () => {
+    expect(configure('anonymous', 'local')).toBe('anonymous')
+  })
+
+  it('firebase + local → firebase', () => {
+    expect(configure('firebase', 'local')).toBe('firebase')
+  })
+
+  it('firebase + firestore → firebase', () => {
+    expect(configure('firebase', 'firestore')).toBe('firebase')
+  })
+
+  it('anonymous + firestore → anonymous, not firebase', () => {
+    // The regression. Choosing Firestore for *storage* must never hand someone
+    // a Firebase *identity* they did not ask for.
+    expect(configure('anonymous', 'firestore')).toBe('anonymous')
+  })
+
+  it('firebase requested without credentials → anonymous', () => {
+    // runtimeConfig downgrades the provider when credentials are absent, so the
+    // request cannot half-succeed into an account system that cannot store.
+    expect(configure('firebase', 'local', { credentials: false })).toBe('anonymous')
+  })
+
+  it('explicit anonymous overrides compiled-in credentials', () => {
+    resetRuntimeConfig()
+    applyRuntimeConfig(
+      { model: RUNTIME_CONFIG_MODEL, identity: { provider: 'anonymous' }, storage: { provider: 'local' } },
+      { buildTimeFirebase: FIREBASE_CREDS },
+    )
+    setIdentityProvider(null)
+    expect(identityProvider().id).toBe('anonymous')
+  })
+})
+
+
+// ── the real Firebase adapter, through the same contract ────────────────────
+//
+// The suite above runs against a stub, which constrains the *interface* but
+// proves nothing about the adapter that ships. Mocking firebase/auth.js lets the
+// actual createFirebaseIdentityProvider() take the same tests — otherwise
+// "two implementations pass one conformance suite" would be an overstatement.
+
+vi.mock('../firebase/auth.js', () => {
+  const { readable } = require('svelte/store')
+  return {
+    authState: readable({
+      ready: true,
+      configured: true,
+      user: { uid: 'firebase-uid-1', email: 'ada@example.org', displayName: 'Ada Lovelace' },
+      error: null,
+    }),
+    signInWithEmail: vi.fn(async () => {}),
+    createEmailAccount: vi.fn(async () => {}),
+    signInWithGoogle: vi.fn(async () => {}),
+    signOutCurrentUser: vi.fn(async () => {}),
+    updateAuthProfile: vi.fn(async () => {}),
+    defaultDisplayNameFromEmail: (e) => (e ? e.split('@')[0] : ''),
+  }
+})
+
+describe('the Firebase adapter satisfies the contract', () => {
+  let provider
+  beforeEach(async () => {
+    const { createFirebaseIdentityProvider } = await import('./firebaseIdentityProvider.js')
+    provider = createFirebaseIdentityProvider()
+  })
+
+  it('reports capabilities and follows the store contract', () => {
+    expect(provider.id).toBe('firebase')
+    const caps = provider.getCapabilities()
+    expect(caps.canSignIn).toBe(true)
+    expect(caps.providesAgentIri).toBe(false)
+    const seen = []
+    const stop = provider.subscribe((s) => seen.push(s))
+    expect(seen).toHaveLength(1)
+    stop()
+  })
+
+  it('maps a Firebase user onto the normalized identity', () => {
+    let state
+    provider.subscribe((s) => { state = s })()
+    expect(state.identity.provider).toBe('firebase')
+    expect(state.identity.subject).toBe('firebase-uid-1')
+    expect(state.identity.displayName).toBe('Ada Lovelace')
+    expect(state.identity.email).toBe('ada@example.org')
+    expect(state.identity.authenticated).toBe(true)
+  })
+
+  it('never publishes the uid or the email', () => {
+    let state
+    provider.subscribe((s) => { state = s })()
+    // A uid is a key into one vendor's database, not a name anyone can resolve.
+    expect(state.identity.agentIri).toBeNull()
+    const serialized = JSON.stringify(publicAttribution(state.identity))
+    expect(serialized).not.toContain('firebase-uid-1')
+    expect(serialized).not.toContain('ada@example.org')
+  })
+
+  it('routes each sign-in method through the provider', async () => {
+    const auth = await import('../firebase/auth.js')
+    await provider.signIn({ method: 'google' })
+    expect(auth.signInWithGoogle).toHaveBeenCalled()
+    await provider.signIn({ method: 'create', email: 'a@b.c', password: 'p', displayName: 'N' })
+    expect(auth.createEmailAccount).toHaveBeenCalledWith('a@b.c', 'p', 'N')
+    await provider.signIn({ email: 'a@b.c', password: 'p' })
+    expect(auth.signInWithEmail).toHaveBeenCalledWith('a@b.c', 'p')
+  })
+})

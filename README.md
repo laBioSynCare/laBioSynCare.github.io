@@ -207,7 +207,7 @@ make export     # JSON-LD and RDF/XML serializations of all eight modules
 
 `make validate` checks more than RDF syntax:
 
-1. SHACL validates each primary graph, all seven merged modules, and all public
+1. SHACL validates each primary graph, all eight merged modules, and all public
    instances.
 2. `scripts/sstim-quality-audit.py` checks module metadata, JSON-LD context and
    loader completeness, SKOS uniqueness/inverses/cycles, local IRI resolution,

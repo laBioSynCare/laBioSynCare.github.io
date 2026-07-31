@@ -21,6 +21,18 @@ import {
   validateRecord,
 } from './privateSync.js'
 
+/**
+ * Deep copy at every store boundary.
+ *
+ * Spreading a record — `{ ...record }` — copies only its top level, leaving
+ * `body` shared with the store. A caller could then mutate a returned record and
+ * change stored data without calling `write`, without supplying the expected
+ * revision, without receiving a new revision and without any conflict check.
+ * That silently defeats the concurrency control this protocol exists to provide,
+ * so nothing crosses the boundary by reference.
+ */
+const clone = (value) => (value == null ? value : JSON.parse(JSON.stringify(value)))
+
 export function createMemoryPrivateSync() {
   /** @type {Map<string, Map<string, object>>} scope → id → record */
   const scopes = new Map()
@@ -53,7 +65,7 @@ export function createMemoryPrivateSync() {
         .filter((r) => (type ? r.type === type : true))
         .filter((r) => (includeDeleted ? true : !r.deleted))
         .sort((a, b) => b.updatedAt - a.updatedAt || a.id.localeCompare(b.id))
-      return all.slice(0, Math.min(limit, MAX_PAGE)).map((r) => ({ ...r }))
+      return all.slice(0, Math.min(limit, MAX_PAGE)).map(clone)
     },
 
     async read(scope, id) {
@@ -61,7 +73,7 @@ export function createMemoryPrivateSync() {
       // Absent and belongs-to-someone-else are the same answer on purpose:
       // distinguishing them would confirm the record exists.
       if (!record) throw new ScopeError()
-      return { ...record }
+      return clone(record)
     },
 
     /** Current revision, or null when the record does not exist in this scope. */
@@ -83,7 +95,7 @@ export function createMemoryPrivateSync() {
 
       const saved = { ...clean, revision: nextRevision(), updatedAt: ++clock }
       store.set(saved.id, saved)
-      return { ...saved }
+      return clone(saved)
     },
 
     /**
@@ -108,13 +120,13 @@ export function createMemoryPrivateSync() {
         updatedAt: ++clock,
       }
       store.set(id, tombstone)
-      return { ...tombstone }
+      return clone(tombstone)
     },
 
     /** Everything in this scope, in the shape a file export also takes. */
     async exportAll(scope) {
       const records = [...bucket(scope).values()].sort((a, b) => a.id.localeCompare(b.id))
-      return exportEnvelope(records.map((r) => ({ ...r })), { scope })
+      return exportEnvelope(records.map(clone), { scope })
     },
 
     /**

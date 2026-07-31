@@ -337,3 +337,25 @@ describe('instance export — helpers', () => {
     expect(logbookStorageKey('a b')).toBe('bsclab_logbook_v2:a%20b')
   })
 })
+
+describe('a portable export carries no personal identifier', () => {
+  // The profile is saved with whatever the identity provider supplied. An email
+  // names a person as directly as a uid does, and the export travels.
+  it('strips email and uid from the local profile', async () => {
+    const storage = memoryStorage({
+      'bsclab.profile.v1': JSON.stringify({
+        displayName: 'Ada Lovelace',
+        bio: 'Analytical engines',
+        email: 'ada@example.org',
+        uid: 'firebase-uid-must-not-travel',
+      }),
+    })
+    const envelope = await buildInstanceExport(storage, { uid: 'firebase-uid-must-not-travel' })
+    const serialized = JSON.stringify(envelope)
+    expect(serialized).not.toContain('ada@example.org')
+    expect(serialized).not.toContain('firebase-uid-must-not-travel')
+    // and keeps what is legitimately the person's own content
+    expect(serialized).toContain('Ada Lovelace')
+    expect(serialized).toContain('Analytical engines')
+  })
+})

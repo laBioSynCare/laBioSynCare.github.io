@@ -1,7 +1,8 @@
 // The single place the application asks who someone is.
 //
 // Which provider backs this is a deployment decision, not an application one:
-// `runtime-config.json` selects it (ADR 0041 §2), so one immutable package runs
+// `runtime-config.json` selects it (ADR 0038; the runtime-config mechanism is
+// gap G6 in PORTABLE_DEPLOYMENT), so one immutable package runs
 // with accounts or without. Consumers import `identity` and never learn which.
 
 import { derived, readable } from 'svelte/store'
@@ -16,14 +17,18 @@ let provider = null
 /**
  * The provider this deployment selected.
  *
- * Firebase requires both that credentials exist *and* that the deployment chose
- * it — `isFirebaseConfigured()` already encodes both — so an operator can hand
- * out a package built with credentials and still run it without accounts.
+ * Strictly: the deployment must have chosen Firebase for *identity*, and
+ * credentials must exist. An earlier version read
+ * `(wantsFirebase || isFirebaseConfigured()) && isFirebaseConfigured()`, which
+ * reduces to `isFirebaseConfigured()` — the choice was dead code. Because that
+ * helper is true when *either* seam selects Firebase, a deployment configured
+ * `identity: anonymous` with `storage: firestore` silently got Firebase
+ * identity, defeating the two-seam split (ADR 0038).
  */
 export function identityProvider() {
   if (!provider) {
     const wantsFirebase = getRuntimeConfig().identity.provider === 'firebase'
-    provider = (wantsFirebase || isFirebaseConfigured()) && isFirebaseConfigured()
+    provider = wantsFirebase && isFirebaseConfigured()
       ? createFirebaseIdentityProvider()
       : createAnonymousIdentityProvider()
   }

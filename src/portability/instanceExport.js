@@ -20,6 +20,8 @@
 //      in the envelope, so a truncated or edited file is refused rather than
 //      half-applied.
 
+import { PRIVATE_IDENTITY_FIELDS } from '../identity/IdentityProvider.js'
+
 export const INSTANCE_EXPORT_MODEL = 'bsc-lab-instance-export-1'
 
 /** Largest export we will parse. Logbooks are text; this guards a mis-picked file. */
@@ -37,6 +39,22 @@ const PROFILE_KEY = 'bsclab.profile.v1'
 // src/storage/localPatchStore.js. Referenced by key rather than imported
 // so this module stays dependency-free.
 const PATCH_KEY = 'bsclab.patchStudio.patches.v1'
+
+/**
+ * Identity fields that must never travel in a portable export.
+ *
+ * Kept in step with the identity seam's own PRIVATE_IDENTITY_FIELDS rather than
+ * restated, so one policy governs exports, session packages and private sync.
+ */
+export function stripPrivateIdentity(value) {
+  if (!value || typeof value !== 'object') return value
+  const out = Array.isArray(value) ? [] : {}
+  for (const [key, v] of Object.entries(value)) {
+    if (PRIVATE_IDENTITY_FIELDS.includes(key) || key === 'uid') continue
+    out[key] = v && typeof v === 'object' ? stripPrivateIdentity(v) : v
+  }
+  return out
+}
 
 /** Scope names used in the file. Deliberately not the storage keys. */
 const SCOPE_ANONYMOUS = 'anonymous'
@@ -124,7 +142,13 @@ export function collectInstanceData(storage, { uid = null } = {}) {
   // them to a device constant, and RDF export pseudonymises before publishing.
   const annotations = parseStoredArray(storage.getItem(ANNOTATION_KEY))
 
-  const profile = parseStored(storage.getItem(PROFILE_KEY))
+  // The profile is stored with whatever the identity provider supplied,
+  // including an email. An email names a person as directly as a uid does, and
+  // the export travels — to another instance, another account, a file someone
+  // shares. So it is stripped here rather than trusted not to be there: the
+  // identity provider still has it for account UI, and nothing downstream needs
+  // it. Same rule as the uid, applied to the field that was quietly exempt.
+  const profile = stripPrivateIdentity(parseStored(storage.getItem(PROFILE_KEY)))
   const patches = parseStoredArray(storage.getItem(PATCH_KEY))
 
   return {

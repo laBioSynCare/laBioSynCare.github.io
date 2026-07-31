@@ -41,8 +41,12 @@ A conforming implementation must hold all five. The suite in
 Reading, listing or deleting across scopes is impossible.
 
 Cross-scope reads answer **404, not 403** — telling a caller that a record exists
-but belongs to someone else is itself a disclosure. The suite asserts that an
-absent record and someone else's record produce *identical* answers.
+but belongs to someone else is itself a disclosure. Absent and out-of-scope raise
+the *same* error, with a neutral code (`not-found`) and message
+(`Record not found.`): an earlier version used `forbidden` and "That record
+belongs to another account", which disclosed exactly what the 404 was for. The
+suite compares the whole public error shape rather than the status alone, since
+two 404s with different bodies still leak.
 
 **2. Conflicts are detected, never resolved.** A write carries the revision it
 expects; a stale one fails with `409` **and returns the current record** so the
@@ -99,6 +103,13 @@ A **record**:
 }
 ```
 
+**There is no pagination.** `MAX_PAGE` caps a single `list` response; the
+protocol has no cursor, offset or continuation, so a scope holding more than 500
+records cannot be fully enumerated. Incremental synchronisation — a cursor, and a
+since-revision query so a device fetches only what changed — is unresolved, and
+is funded work rather than a detail left out of the document. The protocol is
+specified and conformance-tested; it is not operationally complete.
+
 `revision` is **opaque**. The reference implementation uses a counter; a
 networked one would more likely use an ETag or a row version. Nothing outside the
 implementation parses it — only equality matters.
@@ -115,7 +126,7 @@ version, `404` out of scope.
 |---|---|
 | `src/sync/privateSync.js` | Protocol constants, validation, conflict semantics, error types |
 | `src/sync/memoryPrivateSync.js` | Complete in-memory reference implementation |
-| `src/sync/privateSync.conformance.test.js` | 32 assertions any implementation must pass |
+| `src/sync/privateSync.conformance.test.js` | 49 assertions any implementation must pass |
 
 The suite is written against the *interface*, not the in-memory store, so a
 networked implementation inherits it unchanged. That is the point of specifying

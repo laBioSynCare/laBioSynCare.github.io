@@ -113,12 +113,34 @@ for (const file of PROSE) {
   if (!text) continue
   for (const [n, word] of Object.entries(NUMBER_WORDS)) {
     if (Number(n) === MODULE_COUNT) continue
-    const re = new RegExp(`\\b${word}\\s+(ontology\\s+)?modules\\b`, 'i')
+    // Allow an intervening adjective: "seven release modules" slipped past a
+    // pattern that only knew "seven modules" and "seven ontology modules".
+    const re = new RegExp(`\\b${word}\\s+(\\w+\\s+)?modules\\b`, 'i')
     const line = text.split('\n').findIndex((l) => re.test(l))
     if (line >= 0) fail(`${file}:${line + 1}`, `says "${word} modules"; there are ${MODULE_COUNT}`)
   }
 }
 ok('no superseded version or module count in prose')
+
+// A superseded DOI in prose is the same class of error as a superseded version,
+// and the first pass checked DOIs only among the machine-readable files.
+if (DOI) {
+  const doiPattern = /10\.5281\/zenodo\.\d+/g
+  const conceptDoi = core?.match(/dct:identifier\s+"([^"]+)"/)?.[1]
+  for (const file of PROSE) {
+    const text = read(file)
+    if (!text) continue
+    text.split('\n').forEach((line, i) => {
+      if (IS_HISTORY.test(line)) return
+      for (const m of line.matchAll(doiPattern)) {
+        // The concept DOI names every version and is correct anywhere.
+        if (m[0] === DOI || m[0] === conceptDoi) continue
+        fail(`${file}:${i + 1}`, `cites DOI ${m[0]}; the current version DOI is ${DOI}`)
+      }
+    })
+  }
+  ok('no superseded DOI in prose')
+}
 
 // ── 3. claims that a shipped capability is future work ───────────────────────
 //

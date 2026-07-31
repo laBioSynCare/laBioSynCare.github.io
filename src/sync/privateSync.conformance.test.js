@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
+  FORBIDDEN_RECORD_FIELDS,
   MAX_RECORD_BYTES,
   PRIVATE_SYNC_MODEL,
+  RECORD_ID_PATTERN,
   RECORD_TYPES,
   newRecordId,
 } from './privateSync.js'
@@ -43,22 +45,28 @@ describe.each(IMPLEMENTATIONS)('private-sync conformance: %s', (_name, make) => 
 
     it('refuses to read another scope record', async () => {
       const saved = await sync.write(ALICE, entry())
-      await expect(sync.read(BOB, saved.id)).rejects.toMatchObject({ code: 'forbidden' })
+      // 'not-found', not 'forbidden': the code itself must not disclose that
+      // the record exists somewhere else.
+      await expect(sync.read(BOB, saved.id)).rejects.toMatchObject({ code: 'not-found', status: 404 })
     })
 
-    it('answers 404 rather than 403, so existence is not confirmed', async () => {
+    it('answers identically for absent and for another scope record', async () => {
       const saved = await sync.write(ALICE, entry())
-      const other = sync.read(BOB, saved.id).catch((e) => e)
-      const absent = sync.read(BOB, 'nonexistent').catch((e) => e)
-      // Identical answers: a caller cannot tell "someone else has it" from
-      // "nobody has it", which is the disclosure this prevents.
-      expect((await other).status).toBe((await absent).status)
-      expect((await other).status).toBe(404)
+      const other = await sync.read(BOB, saved.id).catch((e) => e)
+      const absent = await sync.read(BOB, newRecordId()).catch((e) => e)
+      // The *whole* public response, not just the status. Two 404s with
+      // different codes or messages still disclose that the record exists —
+      // an earlier version of this test compared only `status` and would have
+      // passed against a body saying "belongs to another account".
+      expect(other.publicShape()).toEqual(absent.publicShape())
+      expect(other.publicShape()).toEqual({ code: 'not-found', message: 'Record not found.', status: 404 })
+      // And the message must not hint at the alternative.
+      expect(other.message).not.toMatch(/another|account|forbidden|permission/i)
     })
 
     it('does not delete another scope records', async () => {
       const saved = await sync.write(ALICE, entry())
-      await expect(sync.remove(BOB, saved.id, saved.revision)).rejects.toMatchObject({ code: 'forbidden' })
+      await expect(sync.remove(BOB, saved.id, saved.revision)).rejects.toMatchObject({ code: 'not-found' })
       expect((await sync.read(ALICE, saved.id)).id).toBe(saved.id)
     })
 
@@ -70,8 +78,8 @@ describe.each(IMPLEMENTATIONS)('private-sync conformance: %s', (_name, make) => 
     })
 
     it('rejects a missing or empty scope outright', async () => {
-      await expect(sync.list('')).rejects.toMatchObject({ code: 'forbidden' })
-      await expect(sync.list(null)).rejects.toMatchObject({ code: 'forbidden' })
+      await expect(sync.list('')).rejects.toMatchObject({ code: 'not-found' })
+      await expect(sync.list(null)).rejects.toMatchObject({ code: 'not-found' })
     })
   })
 
@@ -273,5 +281,96 @@ describe.each(IMPLEMENTATIONS)('private-sync conformance: %s', (_name, make) => 
     const dump = await sync.exportAll(ALICE)
     expect(dump.records).toHaveLength(1)
     expect(dump.records[0].deleted).toBe(true)
+  })
+})
+
+
+// ── corrections after review ────────────────────────────────────────────────
+
+describe.each(IMPLEMENTATIONS)('nothing crosses the boundary by reference: %s', (_name, make) => {
+  let sync
+  beforeEach(() => { sync = make() })
+
+  // A shallow spread leaves `body` shared with the store, so a caller could
+  // change stored data without a write, without the expected revision, without
+  // a new revision and without any conflict check — silently defeating the
+  // concurrency control this protocol exists to provide.
+  it('mutating a read result does not change stored state', async () => {
+    const saved = await sync.write(ALICE, entry())
+    const first = await sync.read(ALICE, saved.id)
+    first.body.text = 'mutated'
+    expect((await sync.read(ALICE, saved.id)).body.text).toBe('First session')
+  })
+
+  it('mutating a write result does not change stored state', async () => {
+    const saved = await sync.write(ALICE, entry())
+    saved.body.text = 'mutated'
+    expect((await sync.read(ALICE, saved.id)).body.text).toBe('First session')
+  })
+
+  it('mutating a list result does not change stored state', async () => {
+    await sync.write(ALICE, entry())
+    const [listed] = await sync.list(ALICE)
+    listed.body.text = 'mutated'
+    expect((await sync.list(ALICE))[0].body.text).toBe('First session')
+  })
+
+  it('mutating an export does not change stored state', async () => {
+    await sync.write(ALICE, entry())
+    const dump = await sync.exportAll(ALICE)
+    dump.records[0].body.text = 'mutated'
+    expect((await sync.exportAll(ALICE)).records[0].body.text).toBe('First session')
+  })
+
+  it('mutating the record handed back with a conflict does not change stored state', async () => {
+    const saved = await sync.write(ALICE, entry())
+    await sync.write(ALICE, { ...saved, body: { text: 'winner' } }, saved.revision)
+    const err = await sync.write(ALICE, { ...saved, body: { text: 'loser' } }, saved.revision).catch((e) => e)
+    err.current.body.text = 'mutated'
+    expect((await sync.read(ALICE, saved.id)).body.text).toBe('winner')
+  })
+
+  it('the caller keeps no reference into the store after writing', async () => {
+    const record = entry()
+    await sync.write(ALICE, record)
+    record.body.text = 'mutated after write'
+    expect((await sync.read(ALICE, record.id)).body.text).toBe('First session')
+  })
+})
+
+describe.each(IMPLEMENTATIONS)('identifier rejection is exhaustive: %s', (_name, make) => {
+  let sync
+  beforeEach(() => { sync = make() })
+
+  // The earlier validator rejected `subject` and `email` while accepting a plain
+  // `uid` — the same leak under a different name — and the export test that was
+  // meant to catch it never submitted one.
+  it.each(FORBIDDEN_RECORD_FIELDS)('rejects a record carrying "%s"', async (field) => {
+    await expect(sync.write(ALICE, entry({ body: { [field]: 'value' } })))
+      .rejects.toMatchObject({ code: 'invalid' })
+  })
+
+  it('rejects a forbidden field nested deep in the body', async () => {
+    await expect(sync.write(ALICE, entry({ body: { a: { b: { uid: 'x' } } } })))
+      .rejects.toMatchObject({ code: 'invalid' })
+  })
+
+  it('rejects the authenticated scope value anywhere in the record', async () => {
+    await expect(sync.write(ALICE, entry({ body: { note: ALICE } })))
+      .rejects.toMatchObject({ code: 'invalid' })
+  })
+
+  it('does not false-positive on a scope that is a substring of a hex id', async () => {
+    // `id.includes(scope)` rejected almost any hex id for a short scope,
+    // because "a" is a substring of nearly everything.
+    const shortScope = 'a'
+    await expect(sync.write(shortScope, entry())).resolves.toBeTruthy()
+  })
+
+  it('enforces the documented record-id format', async () => {
+    for (const bad of ['not-hex', 'ABCDEF0123456789abcdef0123456789', 'abc', '']) {
+      await expect(sync.write(ALICE, entry({ id: bad }))).rejects.toMatchObject({ code: 'invalid' })
+    }
+    expect(newRecordId()).toMatch(RECORD_ID_PATTERN)
   })
 })
