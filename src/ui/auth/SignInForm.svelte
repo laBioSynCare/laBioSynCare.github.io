@@ -1,10 +1,11 @@
 <script>
-  import {
-    createEmailAccount,
-    defaultDisplayNameFromEmail,
-    signInWithEmail,
-    signInWithGoogle,
-  } from '../../firebase/auth.js'
+  // Sign-in is requested through the identity seam, so this form works for any
+  // provider that reports canSignIn — it never learns which one is active.
+  import { signIn } from '../../identity/identityState.js'
+
+  /** Placeholder hint from whatever has been typed. Presentation, not identity. */
+  const nameHintFrom = (value) =>
+    typeof value === 'string' && value.includes('@') ? value.split('@')[0] : ''
 
   let email       = $state('')
   let password    = $state('')
@@ -28,15 +29,15 @@
 
   function submitSignIn(event) {
     event.preventDefault()
-    return runAuth(() => signInWithEmail(email, password))
+    return runAuth(() => signIn({ method: 'email', email, password }))
   }
 
   function submitCreate() {
-    return runAuth(() => createEmailAccount(email, password, displayName))
+    return runAuth(() => signIn({ method: 'create', email, password, displayName }))
   }
 
   function submitGoogle() {
-    return runAuth(signInWithGoogle)
+    return runAuth(() => signIn({ method: 'google' }))
   }
 </script>
 
@@ -56,7 +57,7 @@
         type="text"
         autocomplete="nickname"
         bind:value={displayName}
-        placeholder={defaultDisplayNameFromEmail(email) || 'Your name (new accounts)'}
+        placeholder={nameHintFrom(email) || 'Your name (new accounts)'}
         disabled={busy}
       />
     </label>

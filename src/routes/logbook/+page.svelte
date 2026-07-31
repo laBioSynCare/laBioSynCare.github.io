@@ -1,18 +1,19 @@
 <script>
   import { onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
-  import { authState } from '../../firebase/auth.js'
+  import { identityState, identityCapabilities } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   import SignInForm from '../../ui/auth/SignInForm.svelte'
 
   // ── Auth gate ──────────────────────────────────────────────────────────
-  let auth = $state({ ready: false, configured: false, user: null })
-  const unsubAuth = authState.subscribe((v) => { auth = v })
+  let auth = $state(pendingState('anonymous'))
+  const unsubAuth = identityState.subscribe((v) => { auth = v })
   onDestroy(unsubAuth)
 
   // Firebase-configured deployments keep the logbook behind auth. Local/static
   // deployments without Firebase still get a browser-local logbook.
-  let logbookAccessible = $derived(auth.ready && (!auth.configured || Boolean(auth.user)))
-  let gateVisible = $derived(auth.ready && auth.configured && !auth.user)
+  let logbookAccessible = $derived(auth.ready && (!identityCapabilities().canSignIn || auth.identity.authenticated))
+  let gateVisible = $derived(auth.ready && identityCapabilities().canSignIn && !auth.identity.authenticated)
 
   function dismissGate() {
     goto('/')
@@ -155,8 +156,8 @@
   }
 
   function storeKeyForAuth() {
-    return auth.configured && auth.user?.uid
-      ? `${STORE_KEY}:${encodeURIComponent(auth.user.uid)}`
+    return auth.identity.subject
+      ? `${STORE_KEY}:${encodeURIComponent(auth.identity.subject)}`
       : STORE_KEY
   }
 

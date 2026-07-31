@@ -1,6 +1,7 @@
 <script>
   import { onDestroy } from 'svelte'
-  import { authState, defaultDisplayNameFromEmail } from '../../firebase/auth.js'
+  import { identityState, identityCapabilities } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   import { createAnnotationStore } from '../../rdf/annotations/AnnotationStore.js'
   import { LOCAL_USER_ID } from '../../rdf/annotations/localAnnotationStore.js'
 
@@ -13,7 +14,7 @@
 
   const { target, between } = $props()
 
-  let auth = $state({ ready: false, configured: false, user: null, error: null })
+  let auth = $state(pendingState('anonymous'))
   let annotations = $state([])
   let annotationText = $state('')
   let annotationVisibility = $state('private')
@@ -25,7 +26,7 @@
   let editVisibility = $state('private')
   let editError = $state(null)
 
-  const unsubscribeAuth = authState.subscribe((value) => {
+  const unsubscribeAuth = identityState.subscribe((value) => {
     auth = value
   })
 
@@ -37,7 +38,7 @@
 
   $effect(() => {
     const targetIri = target?.iri
-    const userId = auth.user?.uid ?? null
+    const userId = auth.identity.subject
     annotations = []
     error = null
 
@@ -81,13 +82,13 @@
     saving = true
     error = null
     try {
-      const store = await createAnnotationStore(auth.user?.uid ?? null)
+      const store = await createAnnotationStore(auth.identity.subject)
       await store.add({
         annotatesNode: target.iri,
         annotationType: 'commenting',
         annotationText: text,
         visibility: annotationVisibility,
-        userDisplayName: deriveDisplayName(auth.user),
+        userDisplayName: auth.identity.displayName,
       })
       annotationText = ''
     } catch (e) {
@@ -117,7 +118,7 @@
     saving = true
     editError = null
     try {
-      const store = await createAnnotationStore(auth.user?.uid ?? null)
+      const store = await createAnnotationStore(auth.identity.subject)
       await store.update(editingId, {
         annotationText: text,
         visibility: editVisibility,
@@ -136,7 +137,7 @@
     saving = true
     error = null
     try {
-      const store = await createAnnotationStore(auth.user?.uid ?? null)
+      const store = await createAnnotationStore(auth.identity.subject)
       await store.remove(id)
     } catch (e) {
       error = e.message
@@ -158,7 +159,7 @@
   // reader's own even with nobody signed in.
   function isOwnAnnotation(annotation) {
     if (annotation.userId === LOCAL_USER_ID) return true
-    return Boolean(auth.user?.uid) && auth.user.uid === annotation.userId
+    return Boolean(auth.identity.subject) && auth.identity.subject === annotation.userId
   }
 
   function authorLabel(annotation) {
@@ -172,7 +173,7 @@
   {#if !auth.ready}
     <p class="status"><small>Loading…</small></p>
   {:else}
-    {#if !auth.configured}
+    {#if !identityCapabilities().canSignIn}
       <p class="status"><small>Notes are kept on this device.</small></p>
     {/if}
     {#if target?.iri}
@@ -209,7 +210,7 @@
           </button>
         </div>
       </form>
-    {:else if auth.user}
+    {:else if auth.identity.authenticated}
       <p class="status"><small>No annotatable IRI selected.</small></p>
     {:else}
       <p class="status"><small>Sign in to add or edit notes.</small></p>

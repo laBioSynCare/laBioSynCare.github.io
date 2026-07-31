@@ -1,9 +1,10 @@
 <script>
   import { onDestroy } from 'svelte'
-  import { authState, updateAuthProfile } from '../../firebase/auth.js'
+  import { identityState, updateIdentityProfile, identityCapabilities } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   import { loadProfile, saveProfile } from '../../firebase/profile.js'
 
-  let auth = $state({ ready: false, configured: false, user: null })
+  let auth = $state(pendingState('anonymous'))
   let loading = $state(false)
   let saving = $state(false)
   let error = $state(null)
@@ -16,7 +17,7 @@
 
   let lastLoadedUid = null
 
-  const unsubscribeAuth = authState.subscribe((value) => {
+  const unsubscribeAuth = identityState.subscribe((value) => {
     auth = value
   })
 
@@ -24,7 +25,7 @@
     if (!auth.ready) return
     // A signed-out profile is the local one — the display name attached to
     // annotations written on this device.
-    const uid = auth.user?.uid ?? null
+    const uid = auth.identity.subject
     const loadKey = uid ?? 'local'
     if (loadKey === lastLoadedUid) return
     lastLoadedUid = loadKey
@@ -33,7 +34,7 @@
     error = null
     loadProfile(uid)
       .then((profile) => {
-        const fallback = auth.user?.displayName ?? ''
+        const fallback = auth.identity.displayName
         const stored = profile?.displayName?.trim() ?? ''
         displayName = stored || fallback
         bio = profile?.bio ?? ''
@@ -57,15 +58,15 @@
     error = null
     savedAt = null
     try {
-      await saveProfile(auth.user?.uid ?? null, {
+      await saveProfile(auth.identity.subject, {
         displayName,
         bio,
         affiliation,
-        email: auth.user?.email ?? '',
+        email: auth.identity.email ?? '',
       })
       const cleanedName = (displayName ?? '').trim()
       if (cleanedName !== initialDisplayName) {
-        await updateAuthProfile({ displayName: cleanedName })
+        await updateIdentityProfile({ displayName: cleanedName })
         initialDisplayName = cleanedName
       }
       savedAt = new Date()
@@ -102,7 +103,7 @@
           type="text"
           bind:value={displayName}
           maxlength="200"
-          placeholder={auth.user?.email?.split('@')[0] ?? 'Your name'}
+          placeholder={auth.identity.email?.split('@')[0] ?? 'Your name'}
           disabled={saving}
         />
         <small>Shown next to public notes you leave. Falls back to the part of your email before "@".</small>
@@ -132,8 +133,8 @@
 
       <p class="email-row">
         <small>
-          {#if auth.user}
-            Account: {auth.user.email ?? '(no email on this account)'}
+          {#if auth.identity.authenticated}
+            Account: {auth.identity.email ?? '(no email on this account)'}
           {:else}
             Kept on this device. Sign in to keep your profile with an account.
           {/if}

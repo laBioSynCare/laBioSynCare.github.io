@@ -19,7 +19,8 @@
     resetPhotoAdvisory,
     visualStimulationOn,
   } from '../../ui/safety/visualSafety.js'
-  import { authState } from '../../firebase/auth.js'
+  import { identityState } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   import { getRuntimeConfig, getRuntimeConfigProblems } from '../../config/runtimeConfig.js'
   import {
     applyInstanceExport,
@@ -38,7 +39,7 @@
   // ── Instance export / import ────────────────────────────────────────────────
   // Works with no Firebase configured: everything portable lives in
   // localStorage. See docs/technical/PORTABLE_DEPLOYMENT.md (gap G7).
-  let auth = $state({ ready: false, configured: false, user: null })
+  let auth = $state(pendingState('anonymous'))
   let dataSummary = $state(null)
   let dataNote = $state('')
   let importInput = $state(null)
@@ -50,7 +51,7 @@
   let deployment = $state(getRuntimeConfig())
   let deploymentProblems = $state([])
 
-  const currentUid = $derived(auth.user?.uid ?? null)
+  const currentUid = $derived(auth.identity.subject)
 
   function refreshSummary() {
     if (typeof localStorage === 'undefined') return
@@ -116,7 +117,7 @@
     const unsubEngine = activeAudioEngineId.subscribe((id) => { selectedEngine = id })
     const unsubVisual = visualStimulationOn.subscribe((on) => { visualOn = on })
     // Auth only decides which logbook scope is in play; export works signed out.
-    const unsubAuth = authState.subscribe((value) => { auth = value; refreshSummary() })
+    const unsubAuth = identityState.subscribe((value) => { auth = value; refreshSummary() })
     deployment = getRuntimeConfig()
     deploymentProblems = getRuntimeConfigProblems()
     refreshSummary()

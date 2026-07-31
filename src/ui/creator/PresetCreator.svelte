@@ -2,7 +2,8 @@
   import { onDestroy, onMount } from 'svelte'
   import Knob from './Knob.svelte'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
-  import { authState } from '../../firebase/auth.js'
+  import { identityState } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   // Patches go through the storage seam rather than straight to Firestore, so
   // saving works with no account and no Firebase at all — see ADR 0038 and
   // docs/technical/PORTABLE_DEPLOYMENT.md §3.2.
@@ -111,7 +112,7 @@
   let expandedMod = $state(creatorSession.expandedMod) // "trackId:paramName"
   let helpOpen = $state(false)
   let semanticInfo = $state(null)
-  let auth = $state({ ready: false, configured: false, user: null, error: null })
+  let auth = $state(pendingState('anonymous'))
   let saveMenuOpen = $state(false)
   let savedPatches = $state([])
   let storeLoading = $state(false)
@@ -125,12 +126,14 @@
   // Local storage when signed out or unconfigured; the account when both are
   // available, so a signed-in user's patches follow them between devices.
   const patchStore = $derived(defaultPatchStore({
-    uid: auth.user?.uid ?? null,
-    firebaseConfigured: auth.configured,
+    uid: auth.identity.subject,
+    // A Firestore patch store needs a Firebase subject, which only the Firebase
+    // identity provider yields — so provider identity, not a global config flag.
+    firebaseConfigured: auth.identity.provider === 'firebase',
     requireClient: requireFirebaseClient,
   }))
 
-  const unsubscribeAuth = authState.subscribe((value) => {
+  const unsubscribeAuth = identityState.subscribe((value) => {
     auth = value
   })
 
@@ -180,7 +183,7 @@
 
   $effect(() => {
     if (!auth.ready) return
-    const uid = auth.user?.uid ?? null
+    const uid = auth.identity.subject
     if (uid === lastPatchUid) return
     lastPatchUid = uid
     currentPatchId = null
@@ -945,13 +948,13 @@
       return
     }
     // Guard against a slow list resolving after the account changed underneath.
-    const uid = auth.user?.uid ?? null
+    const uid = auth.identity.subject
 
     storeLoading = true
     storeError = null
     try {
       const patches = await store.list()
-      if ((auth.user?.uid ?? null) === uid) {
+      if (auth.identity.subject === uid) {
         savedPatches = patches
         const active = currentPatchId ? patches.find(patch => patch.id === currentPatchId) : null
         if (active) {

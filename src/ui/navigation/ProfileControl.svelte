@@ -1,17 +1,14 @@
 <script>
   import { onDestroy } from 'svelte'
-  import {
-    authState,
-    defaultDisplayNameFromEmail,
-    signOutCurrentUser,
-  } from '../../firebase/auth.js'
+  import { identityState, identityCapabilities, signOut } from '../../identity/identityState.js'
+  import { pendingState } from '../../identity/IdentityProvider.js'
   import SignInForm from '../auth/SignInForm.svelte'
 
-  let state = $state({ ready: false, configured: false, user: null, error: null })
+  let state = $state(pendingState('anonymous'))
   let busy = $state(false)
   let error = $state(null)
 
-  const unsubscribe = authState.subscribe((value) => {
+  const unsubscribe = identityState.subscribe((value) => {
     state = value
     if (value.error) error = value.error.message
   })
@@ -31,19 +28,19 @@
   }
 
   function submitSignOut() {
-    return runAuth(signOutCurrentUser)
+    return runAuth(signOut)
   }
 
   const userLabel = $derived.by(() => {
-    if (!state.user) return ''
-    const name = state.user.displayName?.trim()
+    if (!state.identity.authenticated) return ''
+    const name = state.identity.displayName?.trim()
     if (name) return name
-    if (state.user.email) return defaultDisplayNameFromEmail(state.user.email) || state.user.email
-    if (state.user.isAnonymous) return 'Anonymous account'
+    if (state.identity.displayName) return state.identity.displayName
+    if (state.identity.email) return state.identity.email
     return 'Account'
   })
 
-  const shortUid = $derived(state.user?.uid ? `${state.user.uid.slice(0, 8)}...` : '')
+  const shortUid = $derived('')
 </script>
 
 <section class="profile-control">
@@ -51,11 +48,11 @@
 
   {#if !state.ready}
     <p><small>Loading account...</small></p>
-  {:else if !state.configured}
+  {:else if !identityCapabilities().canSignIn}
     <p><small><strong>On-device</strong> — notes, patches and your profile are kept in this browser.</small></p>
-  {:else if state.user}
+  {:else if state.identity.authenticated}
     <p class="profile-name">{userLabel}</p>
-    <p><small>{state.user.isAnonymous ? 'Anonymous annotation account' : state.user.email ?? 'Signed in for annotations'}</small></p>
+    <p><small>{state.identity.email ?? 'Signed in for annotations'}</small></p>
     {#if shortUid}
       <p><small>UID {shortUid}</small></p>
     {/if}
