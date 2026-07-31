@@ -330,7 +330,13 @@ ActivityPub server, no inbox and no moderation capacity, so it does not reopen
 
 - **Local-first** (default): IndexedDB, no account required
 - **Firestore**: the existing implementation
-- **Self-hosted**: an open protocol over an operator-run endpoint
+- **Private sync** (future): an operator-run or user-controlled endpoint storing
+  **only the authenticated user's own records**. It does not serve one user's
+  content to another, and provides no public discovery, comments or collaborative
+  editing — that boundary is the decision in
+  [ADR 0039](../decisions/0039-sharing-model-and-the-shared-backend-question.md),
+  which declines a multi-user content backend and meets sharing through
+  publication instead
 
 The nine current import sites are the refactor's scope. A shared conformance suite
 runs against every implementation of each interface, so "works with Firebase" and
@@ -375,13 +381,15 @@ code exists.
 
 | Area | Exists now | Proposed work | Acceptance criterion |
 |---|---|---|---|
-| Reproducible toolchain | Pinned Nix dev/CI environment **and a bit-reproducible `nix build` package** (§1.3) | NixOS module and OCI image | A fresh machine deploys a working instance from one documented command |
-| Core application | Static SvelteKit build (§1.1) | Independent institutional deployment | An instance runs with no BioSynCare and no Firebase credentials |
+| Reproducible toolchain | Pinned Nix dev/CI environment, a bit-reproducible `nix build` package, **a NixOS module and an OCI image**, all three held to one conformance contract (§1.3) | — | ✅ A fresh machine deploys a working instance from one documented command |
+| Core application | Static SvelteKit build (§1.1), verified credential-free by `make smoke-static` | Independent institutional deployment | ✅ An instance runs with no BioSynCare and no Firebase credentials |
+| Runtime configuration | Build-time only — instance identity and provider selection are baked into the package | Versioned runtime config file, generated declaratively by the NixOS module and mounted read-only into the container | One package byte-for-byte, deployed twice with different configuration, yields two instances differing only as configured; absent or invalid config falls back to local-only |
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
-| Storage | **Patches: local-first by default, Firestore when signed in, one shared conformance suite (§1.6).** Profile and annotations still Firestore-only | Extend the seam to profile and annotations; add a self-hosted implementation | The same conformance suite passes against every storage implementation |
-| Patch data | Portable `patch-studio-model-1` (§1.4) | File import/export and version migration | A patch exported from instance A imports identically into instance B |
-| Local user data | Versioned instance export with SHA-256 integrity (§1.5) | Extend to Firestore-held annotations, profile and patches once the storage seam exists | An export validates and its checksum verifies; export→import→export is a fixed point |
-| Migration | **Two-origin migration test** (`make migrate-test`) | Backup/restore orchestration and schema-version migration | Two independently deployed instances pass a migration test |
+| Storage | **Patches, annotations and profile are all local-first by default and Firestore when signed in, behind one shared conformance suite** (§1.6) | Private-sync implementation (see §3.2), gated on the identity seam | ✅ The same conformance suite passes against every storage implementation |
+| Patch data | Portable `patch-studio-model-1` (§1.4), file import/export shipped | Deterministic SSTIM RDF projection (G10) | ✅ A patch exported from instance A imports identically into instance B |
+| Local user data | Versioned instance export with SHA-256 integrity, covering patches, annotations, logbook, profile and skin (§1.5) | — | ✅ An export validates and its checksum verifies; export→import→export is a fixed point |
+| Migration | **Two-origin migration test** (`make migrate-test`), 15 assertions across two separate origins | Schema-version migration for future model revisions | ✅ Two independently deployed instances pass a migration test |
+| Deployment truth | `build-info.json` published with every build; CI asserts the deployed commit equals the built commit | — | ✅ The live site reports the commit it was built from, and a mismatch fails CI |
 | Security | Public/private boundaries in the data model (§1.5) | Threat model and safe deployment defaults | `SECURITY.md` published and automated boundary tests pass |
 
 ---

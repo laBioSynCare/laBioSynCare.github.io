@@ -96,6 +96,15 @@ else
   bad "unknown path" "expected 404, got $code"
 fi
 
+# 7. The instance states which commit it was built from. Without this, a
+#    deployment that silently serves the wrong artifact — or nothing at all —
+#    is indistinguishable from a correct one from the outside.
+if fetch "/build-info.json" && grep -q 'bsc-lab-build-info-1' "$TMP/body"; then
+  ok "GET /build-info.json declares its build"
+else
+  bad "GET /build-info.json" "missing or not a build-info document"
+fi
+
 echo
 if [ "$fails" -eq 0 ]; then
   echo "smoke-http: PASS"

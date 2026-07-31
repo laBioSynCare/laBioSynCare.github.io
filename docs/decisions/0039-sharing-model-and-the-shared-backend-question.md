@@ -56,10 +56,19 @@ are static, content-negotiated, versioned, DOI-bearing files at
 `w3id.org/sstim`, and nobody runs a service for them. User content travels the
 same road. Four tiers, none requiring a backend:
 
-**Tier 1 — Link.** A patch export is roughly 2.7 kB; compressed and base64'd into
-a **URL fragment** it is under a thousand characters. Fragments are never sent to
-a server, so `…/creator/#patch=<blob>` shares a working patch with no
-infrastructure and no storage whatsoever. Paste into chat; the recipient opens it.
+**Tier 1 — Link.** A patch export compressed and base64url-encoded into a **URL
+fragment** — `…/creator/#patch=<blob>` — shares a working patch with no
+infrastructure and no storage whatsoever, because fragments are never sent to a
+server. Paste into chat; the recipient opens it.
+
+*A measured typical patch is roughly 2.7 kB, compressing to under a thousand
+characters — but that is one sample, not a property of the format.* Patches with
+many tracks, dense modulation or embedded sample references will be far larger,
+and browser and chat-client URL limits are real. The implementation therefore
+needs a versioned envelope, a strict maximum decoded size, an integrity field,
+and a clean failure into file export when a patch does not fit — never a silent
+truncation. Nothing outside the patch travels: no profile, logbook, annotations
+or other local storage.
 
 **Tier 2 — File.** Already shipped: Patch Studio download/import, and the whole
 instance export. Email, repository, USB stick. No discovery, but functional today.
@@ -90,6 +99,21 @@ implementing.
 | **Mastodon** | A federated, boostable post with a real URL | `POST /api/v1/statuses` under `write:statuses`, with media attached by id |
 | OSF ⚠️ | DOIs, research-artifact oriented | Unverified |
 | GitHub Gist / Codeberg ⚠️ | Raw URLs, revision history | Unverified |
+
+**"One-click" is the goal, not the first increment.** Every target above needs a
+write-scoped credential, and BSC Lab is a static application with no server to hold
+one. A long-lived Zenodo personal access token in `localStorage` is a genuine
+credential surface — Zenodo's own documentation treats such tokens as secrets — and
+the same applies to a Mastodon `write:statuses` token. So the ordering is:
+
+1. produce the **research-object bundle** and Zenodo-shaped metadata as a local
+   download — no credential involved, useful immediately, and the part that carries
+   the scientific value;
+2. design token storage, scope consent and the threat model explicitly;
+3. only then wire direct API publication, proven first against the Zenodo sandbox.
+
+Publishing consent must stay a separate act from signing in: a token that posts on
+someone's behalf is not something to acquire silently during login.
 
 ### 4. The Fediverse connection is publication from *your* account
 
@@ -131,12 +155,21 @@ unspecified by the protocol and needs an out-of-band channel; *STUN* is a
 third-party dependency; *TURN* relays real traffic when NAT traversal fails, and
 is the most server-like component in the design.
 
-**QR signalling removes all three** for co-located use: the camera is the
-signalling channel, and on a shared network no STUN or TURN is involved. That
-makes a genuinely good scenario possible — a workshop where everyone scans one
-code and leaves with the patch, a lab group sharing a configuration, a training
-session where practitioners take home the settings they just experienced. It
-works with **no internet at all**.
+**QR signalling removes the signalling server** — the camera carries the offer and
+answer out of band, so no application service is involved. It does **not** remove
+STUN and TURN as a general matter, and an earlier draft of this ADR claiming it did
+was wrong. Signalling and ICE are separate concerns: once peers have exchanged
+descriptions they still negotiate candidates, and browsers now obscure local IPs
+behind mDNS candidates, so even same-network connections depend on the browser's
+privacy behaviour and the network's topology (client isolation on guest Wi-Fi
+defeats it outright). Where a direct host-to-host route does exist, no external
+server is contacted at all and the exchange works with **no internet whatsoever**;
+where it does not, STUN or TURN is still required.
+
+That good case is worth having — a workshop where everyone scans one code and
+leaves with the patch, a lab group sharing a configuration, a training session
+where practitioners take home the settings they just experienced — but it is a
+best case to be detected and fallen back from, not a guarantee to design around.
 
 **The unresolved part is scope, not transport.** Moving your own data means the
 whole instance export, private notes included. Sharing with another person means

@@ -45,8 +45,9 @@ DEV_HOST   ?= 127.0.0.1
 DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
+DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check migrate-test verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -63,10 +64,17 @@ check:
 migrate-test:
 	node scripts/migration-two-origin.mjs
 
+## Assert a deployed instance serves the commit it should. Fetches
+## build-info.json from DEPLOY_URL and compares against COMMIT (default: local
+## git HEAD). Run against the live site after a deploy, or any self-hosted
+## instance. See scripts/gen-build-info.mjs for why this exists.
+verify-deploy:
+	node scripts/verify-deploy.mjs $(DEPLOY_URL) $(COMMIT)
+
 ## Build the static site as an immutable Nix package (result/share/bsc-lab).
 ## Bit-reproducible: `nix build --rebuild` produces an identical output.
-## Closes the production-package gap only — this is not a NixOS module and not
-## a self-hosting solution. See docs/technical/PORTABLE_DEPLOYMENT.md.
+## Deployable as a NixOS module (nixosModules.default) or an OCI image
+## (nix build .#oci). See docs/technical/PORTABLE_DEPLOYMENT.md.
 package:
 	nix build
 	@echo "package: result/share/bsc-lab — serve with any static web server"
@@ -257,6 +265,7 @@ wasm:
 help:
 	@echo "Available targets:"
 	@echo "  make build            Build the production bundle"
+	@echo "  make verify-deploy    Assert DEPLOY_URL serves COMMIT (default: git HEAD)"
 	@echo "  make check            Run SvelteKit sync and static checks"
 	@echo "  make deploy-firestore-rules Deploy firestore.rules to $(FIREBASE_PROJECT)"
 	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/gen-build-info.mjs",
     "preview": "vite preview",
     "test": "vitest --passWithNoTests",
     "validate": "make validate",

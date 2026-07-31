@@ -124,9 +124,21 @@ produces the static site as an immutable, **bit-reproducible** package at
 `result/share/bsc-lab`, servable by any static web server — `nix build --rebuild`
 yields an identical output, and `nix flake check` builds it.
 
-That is a reproducible *package*, not self-hosting. There is still no NixOS module,
-no container image, no self-hosted replacement for the optional cloud services, and
-no complete backup or cross-instance migration.
+That same package deploys three ways from one source: a **NixOS module**
+(`nixosModules.default`) that configures a hardened nginx with the required MIME
+types and headers, an **OCI container image** (`nix build .#oci`) running unprivileged,
+and any plain static host. All three are held to a single deployment-conformance
+contract, `scripts/smoke-http.sh`, exercised in CI against both a NixOS VM and the
+container.
+
+Local user data is fully portable: a **versioned instance export** covers patches,
+annotations, logbook, profile and skin with SHA-256 integrity, and `make migrate-test`
+proves it across two genuinely separate origins — export from instance A, import into
+instance B, re-export, byte-identical.
+
+What remains open is **runtime configuration** of the immutable package, a private
+cross-device sync service, and the identity seam that must precede it
+([ADR 0039](docs/decisions/0039-sharing-model-and-the-shared-backend-question.md)).
 
 Every commit is also verified as a **credential-free static deployment**:
 `make smoke-static` rebuilds with no Firebase configuration, serves the result over
