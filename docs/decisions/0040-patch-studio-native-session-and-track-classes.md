@@ -1,6 +1,23 @@
 # ADR 0040 — A patch is a first-class SSTIM object
 
-**Status:** Accepted — 2026-07-31
+**Status:** **Superseded by [ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md)** — 2026-07-31
+
+> This ADR was accepted and implemented on 2026-07-31 (commit `002201c`) and
+> superseded the same day. It is kept unedited below as the record of what was
+> decided and why it did not hold.
+>
+> **What was wrong.** A SHACL failure was treated as a modelling requirement:
+> `sstim:Patch` was minted in the reusable `sstim:` term space to make a Patch
+> Studio projection validate, without first asking whether an engine-specific
+> serialisation belongs in a shared ontology at all (`CLAUDE.md` §5.1). The
+> justification for keeping `Patch` and `Preset` distinct changed three times
+> under review — none of the three, including the one written below, was the
+> real reason. The claim that a preset is "audio-only" is also false: it is true
+> of the current BSC catalog format, not of presets.
+>
+> ADR 0041 withdraws `sstim:Patch`, redefines `sstim:Preset` as the
+> engine-dependent layer it actually is, and records the two things SSTIM does
+> not have: an engine-independent stimulus description, and a canonical schema.
 
 Adds `sstim:Patch` and `sstim:Track` (with four disjoint subtypes) to the
 ontology, and widens twenty-three parameter domains to admit them. Resolves
