@@ -218,6 +218,70 @@ fixed point**, so moving between instances repeatedly cannot drift the data.
 A unit round-trip proves the format is symmetric in one process; this proves the
 migration works between separately hosted instances.
 
+### 1.6d One package, many operators: runtime configuration
+
+An immutable, bit-reproducible package and a deployment someone else can shape
+pull against each other, because everything that distinguished one instance from
+another used to live in `import.meta.env.VITE_*` — read when the bundle was
+compiled. An operator who wanted their own Firebase project, or none, had to
+rebuild, at which point it was no longer the same artifact.
+
+The resolution is a single document the running application fetches,
+`runtime-config.json`, versioned as `bsc-lab-runtime-config-1`:
+
+```json
+{
+  "model": "bsc-lab-runtime-config-1",
+  "instance": { "id": "https://lab.example.org/", "name": "Example Research Lab" },
+  "identity": { "provider": "anonymous" },
+  "storage":  { "provider": "local" }
+}
+```
+
+Each deployment path supplies it the way that path naturally does. The NixOS
+module generates it from `services.bsc-lab.settings` and serves it from the
+store; the container takes it as a read-only mount at
+`/config/runtime-config.json`; a plain static host drops it beside `index.html`.
+The package itself is untouched in every case.
+
+Two rules make it safe to hand to someone else
+([`src/config/runtimeConfig.js`](../../src/config/runtimeConfig.js)):
+
+**Absence changes nothing.** No file is the normal case, not an error — and a
+bundle built with credentials keeps using them. Adding this could not be allowed
+to silently take accounts away from a running deployment, so the document is
+purely additive.
+
+**Invalid configuration degrades, never escalates.** Every failure path lands on
+local-only, which needs no credentials and no network. An unrecognised `model`
+is refused wholesale rather than partially applied; an unknown provider name
+falls back; and asking for Firebase without credentials to reach it downgrades
+rather than producing an instance that offers accounts it cannot honour. What
+was rejected and why is reported in **Settings → This instance**, so a
+misconfigured deployment says so instead of behaving mysteriously.
+
+Both halves are tested end to end, not asserted. The NixOS VM test boots **two
+machines from the same derivation** — one unconfigured, one with an operator's
+settings — and checks that the first 404s the document, the second serves
+exactly what was declared, and both return byte-identical application and
+`build-info.json`. The container job does the same with one image and a mount.
+
+### 1.6e The deployed instance names its own commit
+
+Every build writes `build-info.json` — commit, provenance, app version, SSTIM
+version, build time — and `scripts/verify-deploy.mjs` fetches it back from a
+deployed URL and compares against the commit CI built. It runs in `pages.yml`
+immediately after deployment, and as `make verify-deploy DEPLOY_URL=…` against
+any instance.
+
+This exists because of a specific failure. GitHub Pages was configured to
+publish the `main` branch while CI uploaded an Actions artifact; the build output
+is gitignored, so the repository root had no `index.html` and the live site
+returned 404 — including the ontology Turtle that `w3id.org` redirects to. Every
+workflow run reported success throughout, and two separate reviews then disagreed
+about whether the site was merely serving stale content, neither able to check.
+A green deploy step is not evidence that a deployment happened.
+
 ### 1.7 Public/private separation exists in the data model
 
 Annotations live in per-user named graphs, never the default graph
@@ -383,7 +447,7 @@ code exists.
 |---|---|---|---|
 | Reproducible toolchain | Pinned Nix dev/CI environment, a bit-reproducible `nix build` package, **a NixOS module and an OCI image**, all three held to one conformance contract (§1.3) | — | ✅ A fresh machine deploys a working instance from one documented command |
 | Core application | Static SvelteKit build (§1.1), verified credential-free by `make smoke-static` | Independent institutional deployment | ✅ An instance runs with no BioSynCare and no Firebase credentials |
-| Runtime configuration | Build-time only — instance identity and provider selection are baked into the package | Versioned runtime config file, generated declaratively by the NixOS module and mounted read-only into the container | One package byte-for-byte, deployed twice with different configuration, yields two instances differing only as configured; absent or invalid config falls back to local-only |
+| Runtime configuration | **`runtime-config.json`, generated declaratively by the NixOS module and mounted read-only into the container (§1.6d)** | Provider selection for identity seams beyond Firebase, once they exist | ✅ One package byte-for-byte, deployed twice with different configuration, yields two instances differing only as configured; absent or invalid config falls back to local-only |
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
 | Storage | **Patches, annotations and profile are all local-first by default and Firestore when signed in, behind one shared conformance suite** (§1.6) | Private-sync implementation (see §3.2), gated on the identity seam | ✅ The same conformance suite passes against every storage implementation |
 | Patch data | Portable `patch-studio-model-1` (§1.4), file import/export shipped | Deterministic SSTIM RDF projection (G10) | ✅ A patch exported from instance A imports identically into instance B |

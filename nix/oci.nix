@@ -62,6 +62,28 @@ let
         location / {
           try_files $uri $uri/ $uri/index.html =404;
         }
+
+        # Deployment configuration (gap G6). The package root is a read-only
+        # store path shared by every deployment, so the operator's document is
+        # taken from a mount instead:
+        #
+        #   docker run -v ./runtime-config.json:/config/runtime-config.json:ro
+        #
+        # With nothing mounted this 404s, which the application reads as
+        # "unconfigured" and runs exactly as built. That is the intended
+        # default, not a failure — so the location must not be conditional on
+        # the file existing.
+        location = /runtime-config.json {
+          alias /config/runtime-config.json;
+          default_type application/json;
+          add_header Cache-Control "no-store" always;
+
+          # add_header does not inherit into a location declaring its own, and
+          # under COEP the document cannot fetch this without CORP.
+          add_header Cross-Origin-Opener-Policy   "same-origin" always;
+          add_header Cross-Origin-Embedder-Policy "require-corp" always;
+          add_header Cross-Origin-Resource-Policy "same-origin" always;
+        }
       }
     }
   '';
@@ -87,7 +109,7 @@ pkgs.dockerTools.buildLayeredImage {
 
   # nginx needs its user to exist and its temp directories to be present.
   extraCommands = ''
-    mkdir -p tmp var/log/nginx var/cache/nginx etc
+    mkdir -p tmp var/log/nginx var/cache/nginx etc config
     chmod 1777 tmp
     echo "nginx:x:${toString uid}:${toString gid}:nginx:/tmp:/bin/false" > etc/passwd
     echo "nginx:x:${toString gid}:" > etc/group

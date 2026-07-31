@@ -20,6 +20,7 @@
     visualStimulationOn,
   } from '../../ui/safety/visualSafety.js'
   import { authState } from '../../firebase/auth.js'
+  import { getRuntimeConfig, getRuntimeConfigProblems } from '../../config/runtimeConfig.js'
   import {
     applyInstanceExport,
     buildInstanceExport,
@@ -42,6 +43,12 @@
   let dataNote = $state('')
   let importInput = $state(null)
   let pendingImport = $state(null)
+
+  // ── This deployment ─────────────────────────────────────────────────────────
+  // Read after mount, because the root layout fetches runtime-config.json in the
+  // browser only — during prerender there is nothing to report.
+  let deployment = $state(getRuntimeConfig())
+  let deploymentProblems = $state([])
 
   const currentUid = $derived(auth.user?.uid ?? null)
 
@@ -110,6 +117,8 @@
     const unsubVisual = visualStimulationOn.subscribe((on) => { visualOn = on })
     // Auth only decides which logbook scope is in play; export works signed out.
     const unsubAuth = authState.subscribe((value) => { auth = value; refreshSummary() })
+    deployment = getRuntimeConfig()
+    deploymentProblems = getRuntimeConfigProblems()
     refreshSummary()
     return () => { unsubSkin(); unsubEngine(); unsubVisual(); unsubAuth() }
   })
@@ -318,9 +327,87 @@
       {#if dataNote}<p class="data-note">{dataNote}</p>{/if}
     </div>
   </section>
+
+  <section class="settings-section" aria-labelledby="deployment-heading">
+    <div class="section-copy">
+      <h2 id="deployment-heading">This instance</h2>
+      <p>
+        Which build you are running and how this deployment is configured. BSC Lab ships as one
+        immutable package that anyone can host; everything below is chosen by whoever deployed it,
+        not compiled in.
+      </p>
+    </div>
+
+    <div class="data-panel">
+      <dl class="deployment-facts">
+        <dt>Instance</dt>
+        <dd>
+          {deployment.instance.name}
+          {#if deployment.instance.id}<br /><code>{deployment.instance.id}</code>{/if}
+        </dd>
+
+        <dt>Sign-in</dt>
+        <dd>{deployment.identity.provider === 'firebase' ? 'Accounts available' : 'This device only'}</dd>
+
+        <dt>Storage</dt>
+        <dd>{deployment.storage.provider === 'firestore' ? 'This device, and your account when signed in' : 'This device'}</dd>
+
+        <dt>Build</dt>
+        <dd><code>{appVersion}</code></dd>
+      </dl>
+
+      {#if deploymentProblems.length > 0}
+        <div class="deployment-problems" role="status">
+          <p>
+            <strong>This instance's configuration was not fully applied.</strong>
+            BSC Lab fell back to safe defaults and kept running. Whoever hosts it may want to know:
+          </p>
+          <ul>
+            {#each deploymentProblems as problem (problem)}<li>{problem}</li>{/each}
+          </ul>
+        </div>
+      {/if}
+    </div>
+  </section>
 </main>
 
 <style>
+  .deployment-facts {
+    display: grid;
+    grid-template-columns: minmax(6rem, auto) 1fr;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .deployment-facts dt {
+    font-weight: 600;
+    opacity: 0.7;
+  }
+
+  .deployment-facts dd {
+    margin: 0;
+  }
+
+  .deployment-facts code {
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+  }
+
+  .deployment-problems {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--app-accent) 40%, transparent);
+    background: color-mix(in srgb, var(--app-accent) 8%, transparent);
+    font-size: 0.85rem;
+  }
+
+  .deployment-problems ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.25rem;
+  }
+
   .settings-page {
     min-height: calc(100vh - 56px);
     padding: 2rem clamp(1rem, 3vw, 2.5rem);

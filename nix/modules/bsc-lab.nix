@@ -20,6 +20,16 @@
 
 let
   cfg = config.services.bsc-lab;
+
+  # The deployment document, generated declaratively from `settings`. The
+  # package itself stays untouched and identical across every deployment; this
+  # file is the only thing that differs, and nginx serves it from the store
+  # beside the site.
+  runtimeConfigFile = pkgs.writeText "bsc-lab-runtime-config.json"
+    (builtins.toJSON (
+      { model = "bsc-lab-runtime-config-1"; }
+      // (if cfg.settings == null then { } else cfg.settings)
+    ));
 in
 {
   options.services.bsc-lab = {
@@ -52,6 +62,31 @@ in
       type = lib.types.bool;
       default = false;
       description = "Open the configured port in the firewall.";
+    };
+
+    settings = lib.mkOption {
+      type = lib.types.nullOr (lib.types.attrsOf lib.types.anything);
+      default = null;
+      example = lib.literalExpression ''
+        {
+          instance = { id = "https://lab.example.org/"; name = "Example Research Lab"; };
+          identity.provider = "anonymous";
+          storage.provider = "local";
+        }
+      '';
+      description = ''
+        Deployment configuration, served as `runtime-config.json` beside the
+        application and read by it at startup.
+
+        This is what makes one immutable package serve many operators: the
+        package is bit-reproducible and identical for everyone, and everything
+        that distinguishes this deployment lives here instead of in the build.
+        Leave it null to run exactly as the package was built.
+
+        `model` is supplied automatically. Invalid values do not break the
+        instance — the application falls back to local-only operation and
+        reports why.
+      '';
     };
   };
 
@@ -89,6 +124,25 @@ in
           location / {
             try_files $uri $uri/ $uri/index.html =404;
           }
+${lib.optionalString (cfg.settings != null) ''
+            # Deployment configuration. Served from the store rather than the
+            # package root, which is read-only and shared by every deployment.
+            # Never cached: an operator who changes this expects the change to
+            # take effect on the next load, not after a cache expires.
+            location = /runtime-config.json {
+              alias ${runtimeConfigFile};
+              default_type application/json;
+              add_header Cache-Control "no-store" always;
+
+              # add_header does not inherit into a location that sets any of its
+              # own, so the isolation policy is repeated rather than lost. CORP
+              # in particular is load-bearing: under COEP the document cannot
+              # fetch a same-origin subresource without it.
+              add_header Cross-Origin-Opener-Policy   "same-origin" always;
+              add_header Cross-Origin-Embedder-Policy "require-corp" always;
+              add_header Cross-Origin-Resource-Policy "same-origin" always;
+            }
+          ''}
         '';
       };
     };

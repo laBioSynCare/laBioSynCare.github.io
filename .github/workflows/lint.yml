@@ -117,6 +117,51 @@ jobs:
           echo "container uid: $user"
           test "$user" != "0"
 
+      # Gap G6: the same image, run a second time with an operator's
+      # configuration mounted, must serve that configuration — and the first
+      # container, with nothing mounted, must keep 404ing it. One artifact, two
+      # deployments, no rebuild.
+      - name: Confirm an unconfigured container reports no configuration
+        run: |
+          code="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/runtime-config.json)"
+          echo "unconfigured runtime-config.json: HTTP $code"
+          test "$code" = "404"
+
+      - name: Run a second container with a mounted configuration
+        run: |
+          cat > /tmp/runtime-config.json <<'JSON'
+          {
+            "model": "bsc-lab-runtime-config-1",
+            "instance": { "id": "https://lab.example.org/", "name": "Example Research Lab" },
+            "identity": { "provider": "anonymous" },
+            "storage": { "provider": "local" }
+          }
+          JSON
+          docker run -d --name bsc-lab-configured -p 8081:8080 \
+            -v /tmp/runtime-config.json:/config/runtime-config.json:ro \
+            bsc-lab:latest
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8081/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Assert the configured container serves the operator's document
+        run: |
+          bash scripts/smoke-http.sh http://localhost:8081
+          body="$(curl -sf http://localhost:8081/runtime-config.json)"
+          echo "$body"
+          echo "$body" | grep -q 'Example Research Lab'
+          echo "$body" | grep -q 'bsc-lab-runtime-config-1'
+
+      - name: Assert both containers serve the identical application
+        run: |
+          a="$(curl -sf http://localhost:8080/build-info.json)"
+          b="$(curl -sf http://localhost:8081/build-info.json)"
+          test "$a" = "$b" || { echo "build-info diverged:"; echo "$a"; echo "$b"; exit 1; }
+          echo "both containers report: $a"
+
       - name: Container logs on failure
         if: failure()
-        run: docker logs bsc-lab || true
+        run: |
+          docker logs bsc-lab || true
+          docker logs bsc-lab-configured || true

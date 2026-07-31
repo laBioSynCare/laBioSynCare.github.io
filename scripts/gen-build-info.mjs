@@ -60,10 +60,15 @@ function resolveOntologyVersion() {
   }
 }
 
-function resolveBuiltAt() {
-  const epoch = process.env.SOURCE_DATE_EPOCH;
-  if (epoch) {
-    const seconds = Number.parseInt(epoch, 10);
+/**
+ * Bit-reproducibility is a property of the Nix *package*, not of every build, so
+ * the frozen timestamp applies only there. CI runs its commands inside
+ * `nix develop`, which also exports SOURCE_DATE_EPOCH — honouring it everywhere
+ * made the deployed site report that it was built in 1980.
+ */
+function resolveBuiltAt(commitSource) {
+  if (commitSource === 'nix') {
+    const seconds = Number.parseInt(process.env.SOURCE_DATE_EPOCH ?? '', 10);
     if (Number.isFinite(seconds)) return new Date(seconds * 1000).toISOString();
   }
   return new Date().toISOString();
@@ -78,7 +83,7 @@ const info = {
   commitSource,
   appVersion: pkg.version ?? 'unknown',
   ontologyVersion: resolveOntologyVersion(),
-  builtAt: resolveBuiltAt(),
+  builtAt: resolveBuiltAt(commitSource),
 };
 
 const target = resolve(OUT_DIR, 'build-info.json');

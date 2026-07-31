@@ -1,4 +1,5 @@
 import { browser } from '$app/environment'
+import { getRuntimeConfig, isRuntimeConfigLoaded } from '../config/runtimeConfig.js'
 
 const CONFIG_FIELDS = [
   ['apiKey', 'VITE_FIREBASE_API_KEY'],
@@ -9,7 +10,8 @@ const CONFIG_FIELDS = [
 
 let clientPromise = null
 
-export function getFirebaseConfig() {
+/** Firebase values compiled into this bundle, if any. */
+export function buildTimeFirebaseConfig() {
   return {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -21,6 +23,18 @@ export function getFirebaseConfig() {
   }
 }
 
+/**
+ * The Firebase configuration actually in force.
+ *
+ * Runtime configuration wins over compiled-in values, so an operator can point
+ * the immutable package at their own project — or, by selecting local
+ * providers, decline to use Firebase at all — without rebuilding it (gap G6).
+ */
+export function getFirebaseConfig() {
+  const runtime = getRuntimeConfig().firebase
+  return runtime ?? buildTimeFirebaseConfig()
+}
+
 export function missingFirebaseConfigKeys() {
   const config = getFirebaseConfig()
   return CONFIG_FIELDS
@@ -28,8 +42,25 @@ export function missingFirebaseConfigKeys() {
     .map(([, envKey]) => envKey)
 }
 
+/**
+ * Whether this deployment should use Firebase at all.
+ *
+ * Two conditions, and both matter. Credentials must exist, and the deployment
+ * must have *selected* Firebase for identity or storage. The second is what
+ * makes local-only a real deployment mode rather than an accident of missing
+ * environment variables: an operator can hand out a package built with
+ * credentials and still run it without accounts.
+ *
+ * Before the runtime config has loaded the selection is unknown, so this falls
+ * back to the historical build-time behaviour and the root layout loads the
+ * config before any provider is constructed.
+ */
 export function isFirebaseConfigured() {
-  return missingFirebaseConfigKeys().length === 0
+  if (missingFirebaseConfigKeys().length > 0) return false
+  if (!isRuntimeConfigLoaded()) return true
+
+  const { identity, storage } = getRuntimeConfig()
+  return identity.provider === 'firebase' || storage.provider === 'firestore'
 }
 
 export async function getFirebaseClient() {

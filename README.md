@@ -136,8 +136,19 @@ annotations, logbook, profile and skin with SHA-256 integrity, and `make migrate
 proves it across two genuinely separate origins — export from instance A, import into
 instance B, re-export, byte-identical.
 
-What remains open is **runtime configuration** of the immutable package, a private
-cross-device sync service, and the identity seam that must precede it
+The package is **configured at deployment, not at build**: a `runtime-config.json`
+beside the site names the instance and selects identity and storage providers, so
+one byte-identical artifact serves many operators. The NixOS module generates it
+from `services.bsc-lab.settings`; the container takes it as a read-only mount.
+Absence changes nothing, and invalid configuration degrades to local-only and
+says why in Settings.
+
+Every build publishes **`build-info.json`** naming the commit it came from, and CI
+fetches it back from the deployed URL after publishing — so "the live site is the
+commit we built" is checked rather than assumed.
+
+What remains open is a private cross-device sync service and the identity seam
+that must precede it
 ([ADR 0039](docs/decisions/0039-sharing-model-and-the-shared-backend-question.md)).
 
 Every commit is also verified as a **credential-free static deployment**:
