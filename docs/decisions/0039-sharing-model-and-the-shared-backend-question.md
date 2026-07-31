@@ -61,14 +61,39 @@ fragment** — `…/creator/#patch=<blob>` — shares a working patch with no
 infrastructure and no storage whatsoever, because fragments are never sent to a
 server. Paste into chat; the recipient opens it.
 
-*A measured typical patch is roughly 2.7 kB, compressing to under a thousand
-characters — but that is one sample, not a property of the format.* Patches with
-many tracks, dense modulation or embedded sample references will be far larger,
-and browser and chat-client URL limits are real. The implementation therefore
-needs a versioned envelope, a strict maximum decoded size, an integrity field,
-and a clean failure into file export when a patch does not fit — never a silent
-truncation. Nothing outside the patch travels: no profile, logbook, annotations
-or other local storage.
+**Shipped 2026-07-31** as `src/portability/patchLink.js`. Measured rather than
+estimated — an earlier draft of this ADR guessed "about 1 kB" from a single
+sample, and a review rightly objected that one measurement is not a property of
+the format:
+
+| Patch | JSON | Link |
+|---|---|---|
+| Default draft | 1 125 | **662** |
+| Eight tracks | 2 932 | **1 042** |
+| 23 tracks, modulation on every one | 9 748 | **1 637** |
+
+Patch JSON is highly repetitive, so deflate does unusually well: even a maximal
+patch lands at about a fifth of the 8 000-character ceiling. The objection was still
+correct in principle, and the guards exist regardless of how comfortable the
+numbers look — a versioned envelope, a hard decompressed-size cap, a checksum,
+and a clean refusal into file export rather than any silent truncation. Nothing
+outside the patch travels: the module reads no storage at all, so no profile,
+logbook or annotation can leak into a link even by a later mistake.
+
+The ceiling is a *sharing* limit rather than a browser one. Chrome and Firefox
+accept far longer fragments; chat clients, issue trackers and mail agents are
+what wrap and truncate, and a silently corrupted patch is worse than a refused
+one.
+
+**"Fragments are never sent to a server" is verified, not assumed.** Loading a
+768-character patch link in a real browser against a logging HTTP server
+produced 49 requests, none containing `patch=`; the server saw only
+`GET /creator/`. The claim this whole tier rests on is therefore an observation.
+
+An incoming link is **offered, never applied** — it names the patch and its
+track counts and waits, because accepting replaces whatever the recipient had
+open. The fragment is cleared afterwards so a reload does not re-offer a patch
+they already decided about.
 
 **Tier 2 — File.** Already shipped: Patch Studio download/import, and the whole
 instance export. Email, repository, USB stick. No discovery, but functional today.

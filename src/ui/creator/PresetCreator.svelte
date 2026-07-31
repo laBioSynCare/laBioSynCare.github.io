@@ -68,6 +68,11 @@
     voiceParamNames,
   } from './presetDraft.js'
   import {
+    buildPatchLink,
+    decodePatchLink,
+    readPatchLinkFrom,
+  } from '../../portability/patchLink.js'
+  import {
     localSemanticName,
     semanticForParameter,
     semanticForTrackType,
@@ -748,6 +753,8 @@
 
   onMount(() => {
     syncCreatorSession()
+    // A patch may have arrived in the URL fragment. Offered, never applied.
+    readIncomingLink()
     rafId = requestAnimationFrame(rafTick)
     window.addEventListener('keydown', handleWindowKeydown)
     document.addEventListener('fullscreenchange', handleFullscreenChange)
@@ -804,6 +811,83 @@
   async function copyJson() {
     try { await navigator.clipboard.writeText(jsonExport); tip('Copied.') }
     catch { tip('Clipboard unavailable.') }
+  }
+
+  // ── Share as a link (ADR 0039, Tier 1) ─────────────────────────────────────
+  // A fragment never reaches a server, so this shares a working patch with no
+  // infrastructure at all. Only the patch travels: patchLink.js reads no
+  // storage, so a logbook or annotation cannot leak into a link.
+  async function copyLink() {
+    try {
+      const result = await buildPatchLink(buildPatchExport(draft), window.location.href)
+      if (!result.ok) {
+        tip(`Too large to share as a link (${result.chars} of ${result.limit} characters). Use Download.`)
+        return
+      }
+      await navigator.clipboard.writeText(result.url)
+      tip(`Link copied — ${result.chars} characters.`)
+    } catch (e) {
+      tip(`Could not build a link: ${e.message}`)
+    }
+  }
+
+  // patchSummary returns counts, not prose. Render them as a phrase so someone
+  // deciding whether to accept a stranger's link can see what is in it.
+  function describePatch(d) {
+    const s = patchSummary(d)
+    const parts = []
+    if (s.audioCount) parts.push(`${s.audioCount} audio`)
+    if (s.visualCount) parts.push(`${s.visualCount} visual`)
+    if (s.hapticCount) parts.push(`${s.hapticCount} haptic`)
+    if (s.controlCount) parts.push(`${s.controlCount} control`)
+
+    const total = s.audioCount + s.visualCount + s.hapticCount + s.controlCount
+    if (total === 0) return 'an empty patch'
+
+    const tracks = `${parts.join(', ')} track${total === 1 ? '' : 's'}`
+    if (!s.modLinks) return tracks
+    return `${tracks} · ${s.modLinks} modulation link${s.modLinks === 1 ? '' : 's'}`
+  }
+
+  // An incoming link is offered, never applied: it would otherwise replace
+  // whatever the person already had open, with no way back.
+  let incomingLink = $state(null)
+
+  async function readIncomingLink() {
+    const encoded = readPatchLinkFrom(window.location.hash)
+    if (!encoded) return
+    try {
+      const patch = await decodePatchLink(encoded)
+      const nextDraft = draftFromPatchExport(patch)
+      incomingLink = {
+        draft: nextDraft,
+        name: patch.patchName || 'Untitled Patch',
+        summary: describePatch(nextDraft),
+      }
+    } catch (e) {
+      tip(`That patch link could not be opened: ${e.message}`)
+      clearLinkFragment()
+    }
+  }
+
+  function clearLinkFragment() {
+    // Drop the fragment so a reload does not re-offer a patch the person
+    // already accepted or dismissed.
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+  }
+
+  function acceptIncomingLink() {
+    resetLiveDraftState(incomingLink.draft)
+    currentPatchId = null
+    currentPatchName = null
+    tip(`Opened ${incomingLink.name}.`)
+    incomingLink = null
+    clearLinkFragment()
+  }
+
+  function declineIncomingLink() {
+    incomingLink = null
+    clearLinkFragment()
   }
 
   // Import is the other half of Download: a patch exported from any instance —
@@ -1185,6 +1269,25 @@
 
 <div class="studio" class:playing={draft.playing}>
 
+  {#if incomingLink}
+    <div class="link-offer" role="alertdialog" aria-labelledby="link-offer-heading">
+      <div class="link-offer-body">
+        <p id="link-offer-heading"><strong>Open the patch from this link?</strong></p>
+        <p>
+          <strong>{incomingLink.name}</strong> — {incomingLink.summary}
+        </p>
+        <p class="link-offer-note">
+          It came from the link itself, not from a server, and nothing was uploaded to open it.
+          Opening replaces what you have here, so download first if you want to keep it.
+        </p>
+        <div class="link-offer-actions">
+          <button class="act-btn" onclick={acceptIncomingLink}>Open it</button>
+          <button class="act-btn" onclick={declineIncomingLink}>Keep what I have</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId, customOnchange, tempoKind, allowMods = true)}
     {@const isOpen = expandedMod === rowKey}
     {@const hasLinkedMods = allowMods && param.mods.length > 0}
@@ -1428,6 +1531,7 @@
       {/if}
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
+      <button class="act-btn" onclick={copyLink} disabled={hasErrors} title="Copy a link that carries this patch. Nothing is uploaded — the patch travels inside the link itself.">Share link</button>
       <button class="act-btn" onclick={pickImportFile} title="Load a patch JSON file exported from any BSC Lab instance">Import</button>
       <input
         bind:this={importInput}
@@ -2180,6 +2284,46 @@
 </div>
 
 <style>
+  /* Incoming patch link (ADR 0039, Tier 1). Modal because accepting replaces
+     the open draft — this must not be something you click past by accident. */
+  .link-offer {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: color-mix(in srgb, #000 62%, transparent);
+    backdrop-filter: blur(3px);
+  }
+
+  .link-offer-body {
+    max-width: 34rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--stroke, rgba(255, 255, 255, 0.16));
+    background: var(--panel, #16181d);
+    color: var(--text, #e8e8ea);
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
+  }
+
+  .link-offer-body p {
+    margin: 0 0 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .link-offer-note {
+    opacity: 0.75;
+    font-size: 0.82rem;
+  }
+
+  .link-offer-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
   /* ── Design tokens ─────────────────────────────────────────────────────────── */
   .studio {
     --bg:     var(--app-bg, #0b0f14);
