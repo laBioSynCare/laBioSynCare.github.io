@@ -47,13 +47,14 @@ const ontologyDir = resolve(here, '../static/ontology')
 // The reusable ontology artifact = the term-space files only. Instances under
 // static/ontology/instances/ are implementation data, not part of the versioned
 // ontology, so they are intentionally not snapshotted here.
-const ONTOLOGY_FILES = [
+export const ONTOLOGY_FILES = [
   'sstim-core.ttl',
   'sstim-vocab.ttl',
   'sstim-shapes.ttl',
   'sstim-alignments.ttl',
   'sstim-patch-studio.ttl',
   'sstim-exposure.ttl',
+  'sstim-stimulus.ttl',
   'sstim-ecosystem.ttl',
 ]
 

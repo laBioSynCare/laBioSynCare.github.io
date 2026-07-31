@@ -3,7 +3,7 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.11.0
+#  Version:    0.12.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -41,7 +41,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.11.0" ;
+    owl:versionInfo "0.12.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -49,8 +49,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:issued "2026-07-24"^^xsd:date ;
-    dct:modified "2026-07-24"^^xsd:date ;
+    dct:issued "2026-07-31"^^xsd:date ;
+    dct:modified "2026-07-31"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 
@@ -2719,6 +2719,103 @@ sstim-sh:ControlTrackShape a sh:NodeShape ;
         sh:maxCount 1 ; sh:datatype xsd:decimal ;
         sh:minExclusive 0 ; sh:maxExclusive 1 ;
         sh:message "Inhale ratio must be strictly between 0 and 1."@en ;
+    ] .
+
+
+###########################################################################
+# Stimulus specification shapes  (ADR 0042)
+###########################################################################
+
+sstim-sh:StimulusSpecificationShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulusSpecification ;
+    sh:name "Stimulus Specification"@en ;
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "StimulusSpecification must have at least one rdfs:label."@en ;
+    ] ;
+
+    # The regime is required, unlike almost everything else here. A reader cannot
+    # interpret the rest without it: the same properties mean "this is the
+    # stimulus", "this is the process generating it", or "this is the control
+    # law" depending on which regime is declared (ADR 0041 §3).
+    sh:property [
+        sh:path sstim:stimulusRegime ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:in ( "determinate" "stochastic" "adaptive" ) ;
+        sh:message "stimulusRegime must be exactly one of: determinate, stochastic, adaptive."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:describesStimulation ;
+        sh:maxCount 1 ; sh:class sstim:Stimulation ;
+        sh:message "describesStimulation, if present, must point at a single sstim:Stimulation."@en ;
+    ] ;
+
+    # A specification is a description, not a configuration or an execution.
+    sh:not [ sh:class sstim:Preset ] ;
+    sh:message "A StimulusSpecification must not also be a Preset: one describes the stimulation, the other configures an engine to produce it (ADR 0041)."@en .
+
+
+sstim-sh:StimulusChannelQuantityShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:soundPressureLevelDb ;
+    sh:targetSubjectsOf sstim:luminanceCdM2 ;
+    sh:targetSubjectsOf sstim:flashRateHz ;
+    sh:targetSubjectsOf sstim:channelFrequencyHz ;
+    sh:targetSubjectsOf sstim:channelDurationSeconds ;
+    sh:name "Stimulus channel quantities"@en ;
+
+    # Physical bounds, not preferences. Negative durations and negative absolute
+    # luminance are not values a measurement can take.
+    sh:property [
+        sh:path sstim:channelFrequencyHz ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "channelFrequencyHz must be a non-negative decimal."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:channelDurationSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "channelDurationSeconds must be a positive decimal."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:luminanceCdM2 ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "luminanceCdM2 must be a non-negative decimal."@en ;
+    ] ;
+
+    # dB SPL may legitimately be negative (below the reference pressure), so only
+    # an upper bound is asserted, well above any deliverable level.
+    sh:property [
+        sh:path sstim:soundPressureLevelDb ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:maxInclusive 194 ;
+        sh:message "soundPressureLevelDb must not exceed 194 dB SPL, the theoretical maximum in air at one atmosphere."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:flashRateHz ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "flashRateHz must be a non-negative decimal."@en ;
+    ] .
+
+
+sstim-sh:SessionLibertiesShape a sh:NodeShape ;
+    sh:targetClass sstim:SessionSpecification ;
+    sh:name "Session liberties"@en ;
+
+    sh:property [
+        sh:path sstim:masterBrightness ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxInclusive 1 ;
+        sh:message "masterBrightness must be a decimal in [0, 1]."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:scheduledStart ;
+        sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "scheduledStart, if present, must be a single xsd:dateTime."@en ;
     ] .
 
 

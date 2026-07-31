@@ -39,13 +39,13 @@
 <https://w3id.org/sstim/void>
     a void:Dataset, dcat:Dataset ;
     dct:title "Sensory Stimulation Ontology (SSTIM) — dataset"@en ;
-    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, and ecosystem modules; version-controlled public BSC Lab instances; and a separately hosted mutable live-only ecosystem projection. Turtle is the editable ontology master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
+    dct:description "FAIR dataset description for SSTIM: an OWL 2 ontology, multilingual SKOS vocabulary, SHACL shapes, external alignments, exposure/experiment, Patch Studio, stimulus-specification, and ecosystem modules; version-controlled public BSC Lab instances; and a separately hosted mutable live-only ecosystem projection. Turtle is the editable ontology master; JSON-LD and RDF/XML module serializations are generated for publication."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-24"^^xsd:date ;
+    dct:modified "2026-07-31"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     # RDF-01 policy resolution (2026-07-24 audit): void.ttl is the designated,
     # non-snapshotted sidecar (see this file's own header), so it is the
@@ -55,12 +55,15 @@
     # mint a DOI for a release that has not been cut yet), and updating the
     # live core.ttl post-freeze would only diverge it from the already-frozen
     # static/ontology/0.11.0/ copy without fixing anything.
+    # Still the 0.11.0 DOI. Zenodo mints a version DOI only once the release
+    # exists, so this is updated after tagging v0.12.0 — the same order the
+    # comment above describes. Update it here, not in sstim-core.ttl.
     dct:hasVersion <https://doi.org/10.5281/zenodo.21536124> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.11.0" ;
+    dcat:version "0.12.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -69,9 +72,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 10253 ;
-    void:classes 139 ;
-    void:properties 232 ;
+    void:triples 10462 ;
+    void:classes 140 ;
+    void:properties 245 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",
@@ -104,6 +107,7 @@
         <https://w3id.org/sstim/void#shapes>,
         <https://w3id.org/sstim/void#alignments>,
         <https://w3id.org/sstim/void#patch-studio>,
+        <https://w3id.org/sstim/void#stimulus>,
         <https://w3id.org/sstim/void#exposure>,
         <https://w3id.org/sstim/void#ecosystem>,
         <https://w3id.org/sstim/void#instances> ;
@@ -163,6 +167,17 @@
         [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/alignments> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.ttl> ] ,
         [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.jsonld> ] ,
         [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-alignments.rdf> ] .
+
+<https://w3id.org/sstim/void#stimulus>
+    a void:Dataset ;
+    dct:title "SSTIM Stimulus Specification Module"@en ;
+    dct:description "Engine-independent description of a sensory stimulation in physical and perceptual units, the stimulation target axis, and session liberties."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-stimulus.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/stimulus> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/stimulus> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-stimulus.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-stimulus.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-stimulus.rdf> ] .
 
 <https://w3id.org/sstim/void#patch-studio>
     a void:Dataset ;

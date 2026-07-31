@@ -3,7 +3,7 @@
 #  SSTIM Parameter Properties  —  sstim-patch-studio.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.11.0
+#  Version:    0.12.0
 #  Date:       2026-07-24
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -34,7 +34,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.11.0" ;
+    owl:versionInfo "0.12.0" ;
     dct:title "SSTIM Patch Studio Parameter Module"@en ;
     dct:description "Datatype properties for reproducibly specifying SSTIM audio voices and Patch Studio session-authoring parameters."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -42,8 +42,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:issued "2026-07-24"^^xsd:date ;
-    dct:modified "2026-07-24"^^xsd:date ;
+    dct:issued "2026-07-31"^^xsd:date ;
+    dct:modified "2026-07-31"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 

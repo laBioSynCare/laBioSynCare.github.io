@@ -23,6 +23,7 @@ VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
 PATCH_STUDIO := static/ontology/sstim-patch-studio.ttl
+STIMULUS   := static/ontology/sstim-stimulus.ttl
 ECOSYSTEM  := static/ontology/sstim-ecosystem.ttl
 PRIVATE_ECOSYSTEM_SHAPES := static/ontology/sstim-ecosystem-private-shapes.ttl
 PRIVATE_ECOSYSTEM_FIXTURE := test/fixtures/rdf/ecosystem-private/synthetic-terminal-ledger.ttl
@@ -32,12 +33,12 @@ PUBLIC_ECOSYSTEM_ARG = $(if $(strip $(PUBLIC_ECOSYSTEM)),--public-candidate "$(P
 PRIVATE_LEDGER_ARG = $(if $(strip $(PRIVATE_LEDGER)),--private-ledger "$(PRIVATE_LEDGER)",)
 SHACL_WORKERS ?=
 SHACL_WORKERS_ARG = $(if $(strip $(SHACL_WORKERS)),--shacl-workers "$(SHACL_WORKERS)",)
-ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(EXPOSURE) $(ECOSYSTEM)
+ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(STIMULUS) $(EXPOSURE) $(ECOSYSTEM)
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
 # (validation constraints, not browsable terms). Core is first so the merged
 # ontology inherits its IRI (https://w3id.org/sstim).
-BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO) $(ECOSYSTEM)
+BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO) $(STIMULUS) $(ECOSYSTEM)
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(sort $(wildcard $(INSTANCE_ROOT)/*/*.ttl) $(wildcard $(INSTANCE_ROOT)/*/*/*.ttl))

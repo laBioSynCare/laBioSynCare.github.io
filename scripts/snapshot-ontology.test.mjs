@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ontologyHeader, releaseProblems, todayIso } from './snapshot-ontology.mjs'
+import { ONTOLOGY_FILES, ontologyHeader, releaseProblems, todayIso } from './snapshot-ontology.mjs'
 
 // Release-readiness dry-run checks (improvement plan 0.3, Gate P0-C; audit
 // finding KR-14): a snapshot must be refused for development versions,
@@ -7,11 +7,12 @@ import { ontologyHeader, releaseProblems, todayIso } from './snapshot-ontology.m
 // dates, which registries (BioPortal "Released", Archivo, OLS) read off
 // dct:issued.
 
-const MODULE_FILES = [
-  'sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-shapes.ttl',
-  'sstim-alignments.ttl', 'sstim-patch-studio.ttl', 'sstim-exposure.ttl',
-  'sstim-ecosystem.ttl',
-]
+// Imported, not restated. A private copy silently diverged when
+// sstim-stimulus.ttl was added (ADR 0042): the fixture stopped building a
+// complete release set, so "accepts a coherent release set" failed for a reason
+// that had nothing to do with coherence. Sharing the list means adding a module
+// updates the fixture automatically.
+const MODULE_FILES = ONTOLOGY_FILES
 
 const RELEASE_DATE = '2026-07-15'
 

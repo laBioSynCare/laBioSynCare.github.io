@@ -28,6 +28,7 @@ MODULES = {
     ONTOLOGY_DIR / "sstim-shapes.ttl": URIRef("https://w3id.org/sstim/shapes"),
     ONTOLOGY_DIR / "sstim-alignments.ttl": URIRef("https://w3id.org/sstim/alignments"),
     ONTOLOGY_DIR / "sstim-patch-studio.ttl": URIRef("https://w3id.org/sstim/patch-studio"),
+    ONTOLOGY_DIR / "sstim-stimulus.ttl": URIRef("https://w3id.org/sstim/stimulus"),
     ONTOLOGY_DIR / "sstim-exposure.ttl": URIRef("https://w3id.org/sstim/exposure"),
     ONTOLOGY_DIR / "sstim-ecosystem.ttl": URIRef("https://w3id.org/sstim/ecosystem"),
 }

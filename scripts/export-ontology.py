@@ -44,6 +44,7 @@ ONTOLOGY_FILES = [
     "sstim-shapes.ttl",
     "sstim-alignments.ttl",
     "sstim-patch-studio.ttl",
+    "sstim-stimulus.ttl",
     "sstim-exposure.ttl",
     "sstim-ecosystem.ttl",
 ]

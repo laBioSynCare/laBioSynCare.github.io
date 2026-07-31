@@ -116,6 +116,7 @@ export const ONTOLOGY_URLS = {
   shapes:     '/ontology/sstim-shapes.ttl',
   alignments: '/ontology/sstim-alignments.ttl',
   patchStudio:'/ontology/sstim-patch-studio.ttl',
+  stimulus:   '/ontology/sstim-stimulus.ttl',
   exposure:   '/ontology/sstim-exposure.ttl',
   ecosystem:  '/ontology/sstim-ecosystem.ttl',
 }

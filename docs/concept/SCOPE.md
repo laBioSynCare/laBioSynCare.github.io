@@ -55,7 +55,30 @@ The group may work on open semantic descriptions for:
 - stimulus parameters;
 - temporal patterns;
 - frequency structures;
-- carrier and modulation structures.
+- carrier and modulation structures;
+- **engine-independent stimulus descriptions** — what reaches the target, in
+  physical or perceptual units, as distinct from the settings that make one
+  engine produce it ([ADR 0042](../decisions/0042-stimulus-specification.md)).
+
+### What is being stimulated
+
+Deliberately broad, and settled by
+[ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md) §5.
+A stimulation may be directed at:
+
+- a person;
+- a non-human animal;
+- a plant;
+- an object or material;
+- **nothing at all** — a stimulation may be characterised as present in an
+  environment, independently of whether anyone is in it.
+
+Restricting this to humans would exclude animal work, plant and material
+studies, and the characterisation of a space on its own terms. The breadth is
+descriptive only: **recording something as a target carries no claim that it
+perceives, responds, or benefits.** Where a target is a person or an animal,
+everything in Part 2 below — consent, non-clinical framing, no health claims —
+applies unchanged.
 
 ### Modalities
 
