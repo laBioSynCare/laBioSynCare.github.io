@@ -450,11 +450,11 @@ code exists.
 | Runtime configuration | **`runtime-config.json`, generated declaratively by the NixOS module and mounted read-only into the container (§1.6d)** | Provider selection for identity seams beyond Firebase, once they exist | ✅ One package byte-for-byte, deployed twice with different configuration, yields two instances differing only as configured; absent or invalid config falls back to local-only |
 | Identity | Firebase Auth only, nine import sites (§1.2) | Identity-provider interface: anonymous, Firebase, Fediverse/Mastodon OAuth, IndieAuth | Signing in through any provider yields an attributable agent identifier; signing in through none leaves the app fully usable |
 | Storage | **Patches, annotations and profile are all local-first by default and Firestore when signed in, behind one shared conformance suite** (§1.6) | Private-sync implementation (see §3.2), gated on the identity seam | ✅ The same conformance suite passes against every storage implementation |
-| Patch data | Portable `patch-studio-model-1` (§1.4), file import/export shipped | Deterministic SSTIM RDF projection (G10) | ✅ A patch exported from instance A imports identically into instance B |
+| Patch data | Portable `patch-studio-model-1` (§1.4), file import/export, URL-fragment sharing, **and a checksummed session package with a deterministic SSTIM projection** ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)) | Patch-studio-native session class in SSTIM (findings S1/S2/V1) | ✅ A patch exported from instance A imports identically into instance B; `make session-conformance` proves Level 1 + Level 2 equivalence across two origins |
 | Local user data | Versioned instance export with SHA-256 integrity, covering patches, annotations, logbook, profile and skin (§1.5) | — | ✅ An export validates and its checksum verifies; export→import→export is a fixed point |
 | Migration | **Two-origin migration test** (`make migrate-test`), 15 assertions across two separate origins | Schema-version migration for future model revisions | ✅ Two independently deployed instances pass a migration test |
 | Deployment truth | `build-info.json` published with every build; CI asserts the deployed commit equals the built commit | — | ✅ The live site reports the commit it was built from, and a mismatch fails CI |
-| Security | Public/private boundaries in the data model (§1.5) | Threat model and safe deployment defaults | `SECURITY.md` published and automated boundary tests pass |
+| Security | Public/private boundaries in the data model (§1.5), **enforced on package build and parse and re-checked cross-origin** | Threat model and safe deployment defaults | Partial — boundary tests pass for session packages; `SECURITY.md` and a full threat model remain |
 
 ---
 

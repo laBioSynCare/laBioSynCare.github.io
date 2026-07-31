@@ -116,13 +116,15 @@ function serve(port, harnessHtml, payloadRef) {
 
 /** Run headless Chrome against a URL and return the rendered DOM. */
 function launch(url, profileDir) {
-  // --dump-dom gives Chrome a task to finish and exit on. Without it headless
-  // Chrome idles with the page open and never terminates. The DOM output is
-  // discarded — results come back over the POST, which is not sensitive to when
-  // Chrome decides the page is "loaded".
+  // Deliberately no --dump-dom. It makes Chrome print the DOM at load and exit,
+  // which races the harness: instance B runs two SubtleCrypto digests *after*
+  // load, and when Chrome wins, its POST never fires and this reads as a
+  // timeout that says nothing about the cause. The race was silently being won
+  // until it wasn't. Results arrive over the POST and Chrome is killed in the
+  // `finally` below, so nothing needs it to exit on its own.
   return spawn(CHROME, [
     '--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
-    `--user-data-dir=${profileDir}`, '--dump-dom', url,
+    `--user-data-dir=${profileDir}`, url,
   ], { stdio: ['ignore', 'ignore', 'ignore'] })
 }
 

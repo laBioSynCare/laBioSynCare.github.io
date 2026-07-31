@@ -47,7 +47,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check migrate-test session-conformance verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
 
 ## Build the production bundle
 build:
@@ -63,6 +63,15 @@ check:
 ## checks the re-export from B matches A byte-for-byte.
 migrate-test:
 	node scripts/migration-two-origin.mjs
+
+## Session-interchange conformance: package a patch as a portable scientific
+## object on one instance, open it on a second (separate origin), and check
+## Level 1 semantic equivalence (identical SSTIM projection and mapping report),
+## Level 2 execution-parameter equivalence (no parameter drift, modulation
+## intact, re-package byte-identical) and the privacy boundary. Level 3
+## (rendered-signal comparison) is declared not attempted.
+session-conformance:
+	node scripts/session-conformance.mjs
 
 ## Assert a deployed instance serves the commit it should. Fetches
 ## build-info.json from DEPLOY_URL and compares against COMMIT (default: local
@@ -266,6 +275,7 @@ help:
 	@echo "Available targets:"
 	@echo "  make build            Build the production bundle"
 	@echo "  make verify-deploy    Assert DEPLOY_URL serves COMMIT (default: git HEAD)"
+	@echo "  make session-conformance Package a session on instance A, verify it on instance B"
 	@echo "  make check            Run SvelteKit sync and static checks"
 	@echo "  make deploy-firestore-rules Deploy firestore.rules to $(FIREBASE_PROJECT)"
 	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"
