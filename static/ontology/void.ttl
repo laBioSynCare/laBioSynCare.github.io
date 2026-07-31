@@ -69,9 +69,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 9929 ;
-    void:classes 134 ;
-    void:properties 231 ;
+    void:triples 10257 ;
+    void:classes 140 ;
+    void:properties 232 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",

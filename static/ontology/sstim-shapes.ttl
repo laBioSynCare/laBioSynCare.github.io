@@ -2547,5 +2547,170 @@ sstim-sh:PublicEcosystemPrivateDataShape a sh:NodeShape ;
 
 
 ###########################################################################
+# Patch Studio shapes  (ADR 0040 — findings S1, S2, V1)
+#
+# Deliberately lighter than the Preset and SessionSpecification shapes. A patch
+# is an authoring object exchanged between instances, not a curated catalog
+# entry: it carries no evidence grounding, no multilingual copy and no safety
+# metadata, and requiring them would make every real patch invalid. What is
+# constrained here is structural integrity — a patch identifies itself, has a
+# duration, and is composed of well-formed tracks.
+###########################################################################
+
+sstim-sh:PatchShape a sh:NodeShape ;
+    sh:targetClass sstim:Patch ;
+    sh:name "Patch"@en ;
+
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Patch must have at least one rdfs:label."@en ;
+    ] ;
+
+    sh:property [
+        sh:path dct:created ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "Patch must have one xsd:dateTime creation timestamp."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:durationSeconds ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:maxInclusive 86400 ;
+        sh:message "Patch durationSeconds must be a positive integer no greater than 86400."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:composedOfTrack ;
+        sh:node sstim-sh:TrackShape ;
+        sh:message "composedOfTrack must point at a well-formed track."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:tempoBpm ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxInclusive 400 ;
+        sh:message "tempoBpm must be a positive decimal no greater than 400."@en ;
+    ] ;
+
+    # A patch is not a session specification. Asserting both would mean the
+    # object both does and does not execute a catalog preset, which is exactly
+    # the confusion ADR 0040 exists to remove.
+    sh:not [ sh:class sstim:SessionSpecification ] ;
+    sh:message "A Patch must not also be typed as a SessionSpecification: a patch references no preset."@en .
+
+
+sstim-sh:TrackShape a sh:NodeShape ;
+    sh:targetClass sstim:Track, sstim:AudioTrack, sstim:VisualTrack,
+                   sstim:HapticTrack, sstim:ControlTrack ;
+    sh:name "Track"@en ;
+
+    # Exactly one kind, mirroring the four-way xone the voice subtypes carry.
+    # pyshacl runs without OWL inference, so the owl:AllDisjointClasses axiom in
+    # sstim-patch-studio.ttl would not be checked on its own.
+    sh:xone (
+        [ sh:class sstim:AudioTrack ]
+        [ sh:class sstim:VisualTrack ]
+        [ sh:class sstim:HapticTrack ]
+        [ sh:class sstim:ControlTrack ]
+    ) ;
+    sh:message "Track must be typed as exactly one of: AudioTrack, VisualTrack, HapticTrack, ControlTrack."@en .
+
+
+sstim-sh:AudioTrackShape a sh:NodeShape ;
+    sh:targetClass sstim:AudioTrack ;
+    sh:name "AudioTrack"@en ;
+
+    sh:property [
+        sh:path sstim:initialVolume ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxInclusive 1 ;
+        sh:message "Audio track gain must be in [0, 1]."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:panPosition ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive -1 ; sh:maxInclusive 1 ;
+        sh:message "Audio track pan must be in [-1, 1]."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:pulseRateHz ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxInclusive 50 ;
+        sh:message "Pulse rate must be positive and at most 50 Hz (CLAUDE.md 4.7)."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:carrierFreqLeft ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxExclusive 1500 ;
+        sh:message "Left carrier must be a positive decimal below 1500 Hz."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:carrierFreqRight ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxExclusive 1500 ;
+        sh:message "Right carrier must be a positive decimal below 1500 Hz."@en ;
+    ] .
+
+
+sstim-sh:VisualTrackShape a sh:NodeShape ;
+    sh:targetClass sstim:VisualTrack ;
+    sh:name "VisualTrack"@en ;
+
+    sh:property [
+        sh:path sstim:visualSideCount ;
+        sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:message "visualSideCount must be a non-negative integer."@en ;
+    ] .
+
+
+sstim-sh:HapticTrackShape a sh:NodeShape ;
+    sh:targetClass sstim:HapticTrack ;
+    sh:name "HapticTrack"@en ;
+
+    sh:property [
+        sh:path sstim:stimulationIntensity ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxInclusive 1 ;
+        sh:message "Haptic intensity must be in [0, 1]."@en ;
+    ] .
+
+
+sstim-sh:ControlTrackShape a sh:NodeShape ;
+    sh:targetClass sstim:ControlTrack ;
+    sh:name "ControlTrack"@en ;
+
+    # Below 3 s a breathing period is tremolo, not breathing guidance
+    # (CLAUDE.md 4.5). Enforced here as it is for catalog Martigli voices.
+    sh:property [
+        sh:path sstim:martigliPeriodInitial ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 3.0 ;
+        sh:message "A breathing control period must be at least 3.0 s; below that it is tremolo, not breathing guidance."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:martigliPeriodFinal ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 3.0 ;
+        sh:message "A breathing control target period must be at least 3.0 s."@en ;
+    ] ;
+
+    sh:property [
+        sh:path sstim:breathingPhaseRatio ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ; sh:maxExclusive 1 ;
+        sh:message "Inhale ratio must be strictly between 0 and 1."@en ;
+    ] .
+
+
+###########################################################################
 # End of sstim-shapes.ttl
 ###########################################################################

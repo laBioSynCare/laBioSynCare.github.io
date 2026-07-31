@@ -18,7 +18,19 @@ const RDFS_DOMAIN = 'http://www.w3.org/2000/01/rdf-schema#domain'
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
 const OWL_DATATYPE_PROPERTY = 'http://www.w3.org/2002/07/owl#DatatypeProperty'
 
-/** Parse an ontology module into { localName: domainLocalName }. */
+const OWL_UNION_OF = 'http://www.w3.org/2002/07/owl#unionOf'
+const RDF_FIRST = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#first'
+const RDF_REST = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#rest'
+const RDF_NIL = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#nil'
+
+/**
+ * Parse ontology modules into { propertyLocalName: [domainLocalName, …] }.
+ *
+ * Domains are a *list* because ADR 0040 widened twenty-three of them into
+ * owl:unionOf, so a property may legitimately apply to a catalog class and its
+ * patch counterpart. A helper that reads only a single named class would return
+ * a blank-node id here and the conformance test would silently compare garbage.
+ */
 function ontologyProperties(...files) {
   const parser = new Parser()
   const quads = files.flatMap((f) => parser.parse(readFileSync(f, 'utf8')))
@@ -29,12 +41,40 @@ function ontologyProperties(...files) {
   const domains = new Map(
     quads.filter((q) => q.predicate.value === RDFS_DOMAIN).map((q) => [q.subject.value, q.object.value]),
   )
+  const unionOf = new Map(
+    quads.filter((q) => q.predicate.value === OWL_UNION_OF).map((q) => [q.subject.value, q.object.value]),
+  )
+  const first = new Map(quads.filter((q) => q.predicate.value === RDF_FIRST).map((q) => [q.subject.value, q.object.value]))
+  const rest = new Map(quads.filter((q) => q.predicate.value === RDF_REST).map((q) => [q.subject.value, q.object.value]))
+
+  const readList = (head) => {
+    const out = []
+    for (let node = head; node && node !== RDF_NIL; node = rest.get(node)) {
+      const item = first.get(node)
+      if (item) out.push(item)
+    }
+    return out
+  }
+
   const out = {}
   for (const iri of isDatatypeProperty) {
     if (!iri.startsWith(SSTIM)) continue
-    out[iri.slice(SSTIM.length)] = (domains.get(iri) ?? '').replace(SSTIM, '')
+    const domain = domains.get(iri)
+    const members = domain && unionOf.has(domain) ? readList(unionOf.get(domain)) : [domain]
+    out[iri.slice(SSTIM.length)] = members.filter(Boolean).map((m) => m.replace(SSTIM, ''))
   }
   return out
+}
+
+/** Every sstim: term the given modules declare — classes and properties alike. */
+function ontologyTerms(...files) {
+  const parser = new Parser()
+  const quads = files.flatMap((f) => parser.parse(readFileSync(f, 'utf8')))
+  return new Set(
+    quads
+      .filter((q) => q.predicate.value === RDF_TYPE && q.subject.value.startsWith(SSTIM))
+      .map((q) => q.subject.value.slice(SSTIM.length)),
+  )
 }
 
 const PATCH_STUDIO_TTL = 'static/ontology/sstim-patch-studio.ttl'
@@ -70,15 +110,36 @@ describe('the mapping table is grounded in the ontology', () => {
       .toEqual([])
   })
 
-  it('records each property with the domain the ontology gives it', () => {
+  it('records a domain the ontology actually admits for that property', () => {
     const wrong = []
     for (const [property, { spec, source }] of claimedProperties()) {
-      const actual = allProps[property]
-      if (actual && actual !== spec.domain) {
-        wrong.push(`${property} (${source}): table says ${spec.domain}, ontology says ${actual}`)
+      const admitted = allProps[property]
+      if (admitted && admitted.length && !admitted.includes(spec.domain)) {
+        wrong.push(`${property} (${source}): table says ${spec.domain}, ontology admits ${admitted.join(' | ')}`)
       }
     }
     expect(wrong, `domain mismatches:\n${wrong.join('\n')}`).toEqual([])
+  })
+
+  it('widened every domain the projection emits on a patch-side class', () => {
+    // ADR 0040 finding V1. Each property the projection puts on a Track or a
+    // Patch must admit that class, or the RDF would entail the node is a
+    // catalog Voice or SessionSpecification — which is what V1 was about.
+    const needed = [
+      ['initialVolume', 'AudioTrack'], ['panPosition', 'AudioTrack'],
+      ['baseFrequency', 'AudioTrack'], ['pulseRateHz', 'AudioTrack'],
+      ['carrierFreqLeft', 'AudioTrack'], ['carrierFreqRight', 'AudioTrack'],
+      ['beatHz', 'AudioTrack'], ['noteDurationFraction', 'AudioTrack'],
+      ['rotationSpeed', 'VisualTrack'], ['visualSideCount', 'VisualTrack'],
+      ['stimulationIntensity', 'HapticTrack'], ['hapticPattern', 'HapticTrack'],
+      ['martigliPeriodInitial', 'ControlTrack'], ['breathingPhaseRatio', 'ControlTrack'],
+      ['noteCount', 'ControlTrack'],
+      ['tempoBpm', 'Patch'], ['beatsPerBar', 'Patch'],
+      ['durationSeconds', 'Patch'], ['masterVolume', 'Patch'],
+    ]
+    const missing = needed.filter(([prop, cls]) => !(allProps[prop] ?? []).includes(cls))
+      .map(([prop, cls]) => `${prop} does not admit sstim:${cls}`)
+    expect(missing, missing.join('\n')).toEqual([])
   })
 
   it('accounts for every patch-studio property — used or deliberately not', () => {
@@ -141,11 +202,35 @@ describe('projection', () => {
     expect(projectPatch(reordered, OPTIONS).turtle).toBe(projectPatch(patch, OPTIONS).turtle)
   })
 
-  it('emits only real SSTIM properties', () => {
+  it('emits only terms the ontology declares', () => {
+    // Classes and object properties as well as datatype properties, now that the
+    // projection types its nodes (ADR 0040).
+    const declared = new Set([
+      ...Object.keys(allProps),
+      ...ontologyTerms(PATCH_STUDIO_TTL, CORE_TTL),
+    ])
     const { turtle } = projectPatch(sample(), OPTIONS)
     const used = [...turtle.matchAll(/sstim:(\w+)/g)].map((m) => m[1])
     expect(used.length).toBeGreaterThan(0)
-    for (const property of new Set(used)) expect(allProps).toHaveProperty(property)
+    const undeclared = [...new Set(used)].filter((t) => !declared.has(t))
+    expect(undeclared, `emitted but not declared in SSTIM: ${undeclared.join(', ')}`).toEqual([])
+  })
+
+  it('types the patch and its tracks', () => {
+    const { turtle } = projectPatch(sample(), OPTIONS)
+    expect(turtle).toMatch(/a sstim:Patch/)
+    expect(turtle).toMatch(/a sstim:AudioTrack/)
+    expect(turtle).toMatch(/a sstim:VisualTrack/)
+    expect(turtle).toMatch(/a sstim:ControlTrack/)
+    expect(turtle).toMatch(/sstim:composedOfTrack/)
+  })
+
+  it('never types a patch as a session specification', () => {
+    // A shape forbids it; emitting it would be an object that both does and does
+    // not execute a catalog preset.
+    const { turtle } = projectPatch(sample(), OPTIONS)
+    expect(turtle).not.toMatch(/sstim:SessionSpecification/)
+    expect(turtle).not.toMatch(/a\s+sstim:Voice/)
   })
 
   it('produces JSON-LD alongside the Turtle', () => {
@@ -183,25 +268,22 @@ describe('the mapping report tells the truth about what did not travel', () => {
     expect(sources).toMatch(/cutoff|resonance|detune|opacity|scale|hue/)
   })
 
-  it('carries the structural findings that block catalog conformance', () => {
+  it('carries the structural findings, now recorded as resolved', () => {
     const { report } = projectPatch(sample(), OPTIONS)
     const ids = report.structuralFindings.map((f) => f.id)
-    expect(ids).toContain('S1')
-    expect(ids).toContain('S2')
-    expect(report.structuralFindings.filter((f) => f.severity === 'blocking')).toHaveLength(2)
+    expect(ids).toEqual(['S1', 'S2', 'V1'])
+    // Kept rather than deleted: packages built before ADR 0040 carry them as
+    // open, and a reader comparing two packages should see what changed.
+    expect(report.structuralFindings.every((f) => f.severity === 'resolved')).toBe(true)
+    expect(report.structuralFindings.every((f) => f.resolvedIn === 'ADR 0040')).toBe(true)
   })
 
-  it('states plainly that this is not catalog-conformant RDF', () => {
+  it('states what the projection is and what it still does not assert', () => {
     const { report } = projectPatch(sample(), OPTIONS)
-    expect(report.conformance).toMatch(/[Nn]ot a sstim:SessionSpecification/)
-    expect(report.conformance).toMatch(/not catalog-conformant/)
-  })
-
-  it('does not claim a SessionSpecification or Voice type in the RDF', () => {
-    // The whole point of S1/S2: emitting these types would fail SHACL.
-    const { turtle } = projectPatch(sample(), OPTIONS)
-    expect(turtle).not.toMatch(/sstim:SessionSpecification/)
-    expect(turtle).not.toMatch(/a\s+sstim:Voice/)
+    expect(report.conformance).toMatch(/SHACL-validated/)
+    expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
+    // The line that must never soften: RDF validity is not scientific warrant.
+    expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
   })
 
   it('keeps the structural findings in sync with the module docs', () => {

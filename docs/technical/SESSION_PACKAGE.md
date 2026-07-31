@@ -36,11 +36,12 @@ checksum meaningful and the conformance test possible.
 
 ---
 
-## 2. The ontology finding
+## 2. The ontology finding — raised, then closed
 
-**SSTIM has no patch-studio-native session class.** This was verified, not
-assumed. Typing a projection as `sstim:SessionSpecification` with `sstim:Voice`
-tracks and running pyshacl against `sstim-shapes.ttl` produces:
+Building this package surfaced a real gap, verified with pyshacl rather than
+assumed: **SSTIM described the catalog and had no vocabulary for the authoring
+model.** Typing a projection as `sstim:SessionSpecification` with `sstim:Voice`
+tracks produced:
 
 ```
 Focus Node: ex:probe
@@ -51,32 +52,38 @@ Message:    Voice must be typed as exactly one of the four subtypes:
             Binaural, Martigli, Martigli-Binaural, or Symmetry.
 ```
 
-Both constraints are correct as ontology. A `sstim:SessionSpecification` is the
-*execution of a catalog preset*; a `sstim:Voice` is one of four catalog voice
-types. A patch is a live authoring object whose tracks — `Carrier`, `Noise`,
-`Drone`, `Sample`, nine visual types, `Vibration` — have no catalog voice at all.
+Both constraints are correct. A `SessionSpecification` executes a catalog preset;
+a patch executes none. The 27 parameter properties in `sstim-patch-studio.ttl`
+had existed since 0.6.0 — the *things that bear them* did not.
 
-Three findings ship inside every package's mapping report:
-
-| id | Severity | Finding |
+| id | Status | Finding |
 |---|---|---|
-| **S1** | blocking | No patch-studio-native session class. The projection is emitted as a `prov:Entity` carrying real SSTIM properties, not as a `SessionSpecification`. |
-| **S2** | blocking | Patch Studio track types have no corresponding `sstim:Voice` subtype. |
-| **V1** | divergence | `rotationSpeed`, `visualSideCount`, `visualDensity`, `stimulationIntensity` and `hapticPattern` have `rdfs:domain sstim:SessionSpecification` — one visual and one haptic configuration per session — while a patch may carry nine visual tracks. |
+| **S1** | ✅ resolved | No patch-studio-native session class → `sstim:Patch`, an information content entity and `prov:Plan`, sibling to `sstim:Preset` |
+| **S2** | ✅ resolved | Track types had no `sstim:Voice` subtype → `sstim:Track` with four disjoint subtypes, parallel to `Voice`, linked by `sstim:composedOfTrack` |
+| **V1** | ✅ resolved | Visual/haptic properties were session-scoped → 23 domains widened to `owl:unionOf`, admitting the patch-side class |
 
-Minting a class here was not available: `CLAUDE.md` §5.1 forbids declaring OWL
-classes under an implementation path, and §3.4 forbids editing the ontology
-without explicit instruction. **Closing S1/S2/V1 is ontology work with a human in
-the loop** — a concrete, bounded research task rather than a coding oversight.
+Closed by [ADR 0040](../decisions/0040-patch-studio-native-session-and-track-classes.md).
+The projection now emits properly typed, SHACL-validated RDF.
 
-Until then the projection claims exactly what it is, in the package itself:
+**The findings are kept in every mapping report rather than deleted**, marked
+`resolved` with `resolvedIn: "ADR 0040"`. Packages built before 2026-07-31 carry
+them as open, and a reader comparing two packages should be able to see what
+changed and when.
 
-> Property-level SSTIM projection over the declared mappable subset. Not a
-> `sstim:SessionSpecification` and not catalog-conformant — see structural
-> findings S1 and S2. The lossless patch in the package remains the executable
-> truth.
+**Backward compatibility.** `rdfs:domain` is an inference rule, not a constraint,
+so widening to a union *weakens* the entailment: every existing catalog assertion
+remains valid, and what stops is only the false entailment that a patch is a
+`SessionSpecification`.
 
----
+**What validation does not confer.** A patch that validates asserts what it *is*,
+never that it does anything. Evidence tier, intended outcome and safety metadata
+are authored by a human through the gated bridge in
+[ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md), never inferred from
+signal parameters. The mapping report says so in every package.
+
+**Still unrepresented:** modulation links, tempo-sync relations, isochronic
+envelope shapes, and the parameters `cutoff`, `resonance`, `detune`, `opacity`,
+`scale`, `hue`.
 
 ## 3. The mapping table cannot drift from the ontology
 

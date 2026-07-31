@@ -264,8 +264,18 @@ const harnessB = `<!doctype html><meta charset="utf-8"><title>B</title><body>
       opened.report.unmapped.length === projB.report.unmapped.length &&
       opened.report.structuralFindings.length > 0,
       opened.report.structuralFindings.map((f) => f.id).join(', '))
-    check('L1', 'the package does not claim catalog conformance',
-      /not catalog-conformant/.test(opened.report.conformance))
+    check('L1', 'the projection is a typed sstim:Patch with typed tracks',
+      /a sstim:Patch/.test(opened.turtle) &&
+      /a sstim:AudioTrack/.test(opened.turtle) &&
+      /sstim:composedOfTrack/.test(opened.turtle),
+      'ADR 0040')
+    check('L1', 'the projection is not a session specification',
+      !/sstim:SessionSpecification/.test(opened.turtle))
+    check('L1', 'the package still asserts no evidence or outcome',
+      /no evidence, outcome or safety metadata/.test(opened.report.conformance))
+    check('L1', 'the structural findings are recorded as resolved',
+      opened.report.structuralFindings.every((f) => f.severity === 'resolved'),
+      opened.report.structuralFindings.map((f) => f.id + ':' + f.severity).join(' '))
 
     // ── re-package: the fixed point ──
     const repacked = await serialiseSessionPackage(opened.patch, ${OPTIONS_JSON})

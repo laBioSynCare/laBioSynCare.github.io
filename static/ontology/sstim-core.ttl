@@ -1362,10 +1362,14 @@ sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
 
 
 sstim:durationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    # Union admits sstim:Patch, which carries its own duration exactly as a
+    # session specification does (ADR 0040, finding V1). Existing session data is
+    # unaffected; the widening only stops a patch from being entailed to be a
+    # SessionSpecification, which ADR 0040 establishes it is not.
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
     rdfs:range  xsd:integer ;
     rdfs:label  "duration (seconds)"@en ;
-    skos:definition "Intended total duration of a session specification in seconds."@en ;
+    skos:definition "Intended total duration of a session specification or patch in seconds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 
@@ -1394,10 +1398,11 @@ sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty
 
 
 sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    # As sstim:durationSeconds above — a patch carries its own master gain.
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "master volume"@en ;
-    skos:definition "Normalized master output gain requested by the session specification, from 0 (silent) to 1 (implementation maximum); not a calibrated sound-pressure level."@en ;
+    skos:definition "Normalized master output gain requested by the session specification or patch, from 0 (silent) to 1 (implementation maximum); not a calibrated sound-pressure level."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 

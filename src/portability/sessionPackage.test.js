@@ -204,8 +204,12 @@ describe('the mapping report travels with the package', () => {
     expect(Array.isArray(report.unmapped)).toBe(true)
   })
 
-  it('does not claim catalog conformance', async () => {
+  it('states what the projection is, and what it still does not assert', async () => {
     const { report } = await parseSessionPackage(await serialiseSessionPackage(sample(), OPTIONS))
-    expect(report.conformance).toMatch(/not catalog-conformant/)
+    expect(report.conformance).toMatch(/SHACL-validated/)
+    // ADR 0040 made the RDF valid. It did not make it a scientific claim, and
+    // this is the sentence that must never soften.
+    expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
+    expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
   })
 })

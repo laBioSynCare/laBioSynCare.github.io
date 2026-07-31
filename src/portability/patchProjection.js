@@ -6,37 +6,38 @@
 // half of that: it never claims more than it can support, and it makes the gap
 // machine-readable instead of leaving it to a footnote.
 //
-// ## Why the projection is not a `sstim:SessionSpecification`
+// ## The projection is a `sstim:Patch`
 //
-// Verified against `sstim-shapes.ttl` with pyshacl on 2026-07-31. Typing a patch
-// as `sstim:SessionSpecification` and its tracks as `sstim:Voice` produces two
-// violations that no amount of care in this file can avoid:
+// It was not always. Until ADR 0040 the only available typing was an untyped
+// `prov:Entity`: a patch typed as `sstim:SessionSpecification` failed SHACL
+// because that class is the *execution of a catalog preset* and a patch executes
+// none, and its layers matched none of the four catalog `sstim:Voice` subtypes.
+// Those were findings S1 and S2, and a third — V1 — recorded that the visual and
+// haptic properties were session-scoped in the ontology but track-scoped in a
+// patch.
 //
-//   Focus ex:probe         "SessionSpecification must reference exactly one Preset."
-//   Focus ex:probe-voice-1 "Voice must be typed as exactly one of the four
-//                           subtypes: Binaural, Martigli, Martigli-Binaural,
-//                           or Symmetry."
+// All three are now closed in the ontology itself. `sstim-patch-studio.ttl`
+// declares `sstim:Patch` and `sstim:Track` with four disjoint subtypes, and the
+// parameter domains admit them; `sstim-shapes.ttl` constrains them. So the
+// projection emits properly typed, SHACL-validated RDF, and a patch is no longer
+// a second-class citizen of its own ontology.
 //
-// Both are correct as ontology. A SessionSpecification is the *execution of a
-// catalog preset*, and a Voice is one of four catalog voice types — while a
-// patch is a live authoring object whose tracks (`Carrier`, `Noise`, `Drone`,
-// `Sample`, nine visual types, `Vibration`) have no catalog voice at all. The
-// honest conclusion is that SSTIM has no patch-studio-native session class yet.
-//
-// Minting one here is not available: `CLAUDE.md` §5.1 forbids declaring OWL
-// classes under an implementation path, and §3.4 forbids editing the ontology
-// without explicit instruction. So the projection emits the real SSTIM
-// *properties* — which do exist, 27 of them in `sstim-patch-studio.ttl` — on a
-// `prov:Entity`, and reports the missing class as a structural finding rather
-// than papering over it. Closing that gap is ontology work with a human in the
-// loop, which is exactly the shape of a funded deliverable.
+// The catalog model is untouched: `Preset`, `SessionSpecification` and `Voice`
+// keep their meanings, and a patch is explicitly *not* a SessionSpecification —
+// a shape enforces that, because asserting both would mean an object that both
+// does and does not execute a preset.
 
 import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
+
+export const TRACK_CLASSES = {
+  audioTracks: 'AudioTrack',
+  visualTracks: 'VisualTrack',
+  hapticTracks: 'HapticTrack',
+}
 
 export const PROJECTION_MODEL = 'bsc-lab-patch-projection-1'
 
 const SSTIM = 'https://w3id.org/sstim#'
-const PROV = 'http://www.w3.org/ns/prov#'
 const DCT = 'http://purl.org/dc/terms/'
 const RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
 const XSD = 'http://www.w3.org/2001/XMLSchema#'
@@ -118,34 +119,44 @@ export const DELIBERATELY_UNUSED = {
   visualDensity: 'No Patch Studio visual parameter corresponds; particle count is not exposed as a density.',
 }
 
-/** Structural divergences between the two models, reported with every package. */
+/**
+ * Structural divergences between the two models, reported with every package.
+ *
+ * All three are **resolved** as of ADR 0040 (2026-07-31). They are kept, rather
+ * than deleted, because packages built before that date carry them as open
+ * findings and a reader comparing two packages should be able to see what
+ * changed and when. A `resolved` entry is not a warning.
+ */
 export const STRUCTURAL_FINDINGS = [
   {
     id: 'S1',
-    severity: 'blocking',
-    finding: 'SSTIM has no patch-studio-native session class.',
+    severity: 'resolved',
+    resolvedIn: 'ADR 0040',
+    finding: 'SSTIM had no patch-studio-native session class.',
     detail:
-      'Typing the projection as sstim:SessionSpecification fails SHACL: the shape requires exactly one sstim:referencesPreset pointing at a sstim:Preset, and a patch executes no catalog preset. Verified with pyshacl against sstim-shapes.ttl.',
+      'Typing the projection as sstim:SessionSpecification failed SHACL: that shape requires exactly one sstim:referencesPreset pointing at a sstim:Preset, and a patch executes no catalog preset.',
     consequence:
-      'The projection is emitted as a prov:Entity carrying SSTIM properties, not as a SessionSpecification. It is machine-readable and property-accurate but not catalog-conformant.',
+      'sstim:Patch now exists in sstim-patch-studio.ttl as an information content entity and prov:Plan, sibling to sstim:Preset. A SHACL shape additionally forbids typing one object as both a Patch and a SessionSpecification.',
   },
   {
     id: 'S2',
-    severity: 'blocking',
-    finding: 'Patch Studio track types have no corresponding sstim:Voice subtype.',
+    severity: 'resolved',
+    resolvedIn: 'ADR 0040',
+    finding: 'Patch Studio track types had no corresponding sstim:Voice subtype.',
     detail:
-      'sstim-sh:VoiceShape requires sh:xone of BinauralVoice, MartigliVoice, MartigliBinauralVoice or SymmetryVoice. Carrier, Noise, Drone, Sample, all nine visual types and Vibration match none of them.',
+      'sstim-sh:VoiceShape requires sh:xone of BinauralVoice, MartigliVoice, MartigliBinauralVoice or SymmetryVoice. Carrier, Noise, Drone, Sample, the nine visual types and Vibration match none of them.',
     consequence:
-      'Track nodes are emitted as prov:Entity with SSTIM datatype properties, and the patch track type is preserved verbatim in the lossless patch alongside.',
+      'sstim:Track now exists with four disjoint subtypes — AudioTrack, VisualTrack, HapticTrack, ControlTrack — parallel to sstim:Voice rather than hierarchically related to it, and sstim:composedOfTrack links a patch to them.',
   },
   {
     id: 'V1',
-    severity: 'divergence',
-    finding: 'Visual and haptic properties are session-scoped in SSTIM but track-scoped in Patch Studio.',
+    severity: 'resolved',
+    resolvedIn: 'ADR 0040',
+    finding: 'Visual and haptic properties were session-scoped in SSTIM but track-scoped in Patch Studio.',
     detail:
-      'rotationSpeed, visualSideCount, visualDensity, stimulationIntensity and hapticPattern all have rdfs:domain sstim:SessionSpecification, implying one visual and one haptic configuration per session. A patch may carry up to nine visual tracks and multiple haptic tracks.',
+      'rotationSpeed, visualSideCount, visualDensity, stimulationIntensity and hapticPattern had rdfs:domain sstim:SessionSpecification, implying one visual and one haptic configuration per session, while a patch may carry nine visual tracks.',
     consequence:
-      'These properties are emitted on the individual track entity rather than the session, which is faithful to the patch but outside the declared domain. Resolving this needs a modelling decision, not a code change.',
+      'Twenty-three property domains were widened to unions admitting the corresponding patch class. Existing catalog data is unaffected: a union domain is a weaker entailment, so every prior assertion remains valid.',
   },
 ]
 
@@ -153,7 +164,6 @@ export const STRUCTURAL_FINDINGS = [
 
 const PREFIXES = [
   ['sstim', SSTIM],
-  ['prov', PROV],
   ['dct', DCT],
   ['rdfs', RDFS],
   ['xsd', XSD],
@@ -218,7 +228,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
   const nodes = []
 
   const sessionStatements = [
-    ['a', 'prov:Entity'],
+    ['a', 'sstim:Patch'],
     ['rdfs:label', `"${escapeLiteral(patchExport.patchName ?? 'Untitled Patch')}"`],
     ['dct:created', `"${created}"^^xsd:dateTime`],
     ['dct:conformsTo', `<https://w3id.org/sstim/patch-studio>`],
@@ -245,8 +255,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     for (const [index, track] of (tracks ?? []).entries()) {
       const iri = `${sessionIri}/track/${group}-${index + 1}`
       const statements = [
-        ['a', 'prov:Entity'],
-        ['prov:wasDerivedFrom', `<${sessionIri}>`],
+        ['a', `sstim:${TRACK_CLASSES[group]}`],
         ['rdfs:label', `"${escapeLiteral(track.trackType ?? 'Track')}"`],
       ]
 
@@ -271,6 +280,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
       }
 
 
+      sessionStatements.push(['sstim:composedOfTrack', `<${iri}>`])
       nodes.push({ iri, statements })
     }
   }
@@ -279,8 +289,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
   for (const [index, control] of (patchExport.controlTracks ?? []).entries()) {
     const iri = `${sessionIri}/control/${index + 1}`
     const statements = [
-      ['a', 'prov:Entity'],
-      ['prov:wasDerivedFrom', `<${sessionIri}>`],
+      ['a', 'sstim:ControlTrack'],
       ['rdfs:label', `"${escapeLiteral(control.type ?? 'Control')}"`],
     ]
     const table = CONTROL_PROPERTIES[control.type] ?? {}
@@ -301,6 +310,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
       statements.push([`sstim:${spec.property}`, literal(value, spec.datatype)])
       mapped.push({ source: `controlTracks[${index}].${name}`, property: `sstim:${spec.property}`, scope: 'control' })
     }
+    sessionStatements.push(['sstim:composedOfTrack', `<${iri}>`])
     nodes.push({ iri, statements })
   }
 
@@ -323,7 +333,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     structuralFindings: STRUCTURAL_FINDINGS,
     // Stated plainly so no downstream reader mistakes this for catalog RDF.
     conformance:
-      'Property-level SSTIM projection over the declared mappable subset. Not a sstim:SessionSpecification and not catalog-conformant — see structuralFindings S1 and S2. The lossless patch in the package remains the executable truth.',
+      'SHACL-validated SSTIM projection: the patch is a sstim:Patch composed of typed sstim:Track instances (ADR 0040). It is deliberately not a sstim:SessionSpecification, which executes a catalog preset, and it asserts no evidence, outcome or safety metadata — those are authored by a human through the gated catalog bridge (ADR 0026). The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
   }
 
   return { turtle, jsonld: toJsonLd(nodes), report }

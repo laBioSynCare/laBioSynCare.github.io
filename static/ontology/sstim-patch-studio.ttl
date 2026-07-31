@@ -26,6 +26,8 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix sstim: <https://w3id.org/sstim#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 
 
 ###########################################################################
@@ -51,63 +53,63 @@
 ###########################################################################
 
 sstim:carrierFreqLeft a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "left carrier frequency"@en ;
     skos:definition "Left-ear carrier frequency for binaural presentation, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:carrierFreqRight a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "right carrier frequency"@en ;
     skos:definition "Right-ear carrier frequency for binaural presentation, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:initialVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "initial volume"@en ;
     skos:definition "Initial output gain or amplitude for a voice."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:panPosition a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "pan position"@en ;
     skos:definition "Stereo position from left to right."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:baseFrequency a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "base frequency"@en ;
     skos:definition "Base, carrier, or center frequency for a voice, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:beatHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "beat frequency"@en ;
     skos:definition "Driven or perceived beat frequency in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:pulseRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "pulse rate"@en ;
     skos:definition "Rhythmic pulse or sequence step rate in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:noteDurationFraction a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "note duration fraction"@en ;
     skos:definition "Fraction of a rhythmic pulse occupied by the active note envelope."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:noteCount a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "note count"@en ;
     skos:definition "Number of notes or sequence positions in a Symmetry cycle."@en ;
@@ -135,14 +137,14 @@ sstim:permutationFunction a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:breathingPhaseRatio a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing phase ratio"@en ;
     skos:definition "Fraction of a breathing cycle assigned to the inhale phase."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:breathingAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing amplitude"@en ;
     skos:definition "Depth or excursion of a breathing-shaped control signal."@en ;
@@ -168,7 +170,7 @@ sstim:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli oscillation amplitude"@en ;
     skos:definition "Frequency-sweep amplitude (ma) of a Martigli oscillation, in Hz; the carrier(s) sweep ± ma around the center."@en ;
@@ -176,7 +178,7 @@ sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli initial period"@en ;
     skos:definition "Initial breathing-cycle duration (mp0) of a Martigli oscillation, in seconds. Must be >= 3 s when the voice is the breathing reference (isOn)."@en ;
@@ -184,7 +186,7 @@ sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:Voice ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "Martigli final period"@en ;
     skos:definition "Final breathing-cycle duration (mp1) of a Martigli oscillation after the transition, in seconds."@en ;
@@ -214,49 +216,49 @@ sstim:isBreathReference a owl:DatatypeProperty, owl:FunctionalProperty ;
 ###########################################################################
 
 sstim:rotationSpeed a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "rotation speed"@en ;
     skos:definition "Visual rotation rate or angular speed."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:visualSideCount a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "visual side count"@en ;
     skos:definition "Number of sides used by a geometric visual form."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:visualDensity a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "visual density"@en ;
     skos:definition "Density of rendered visual elements."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:stimulationIntensity a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:HapticTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "stimulation intensity"@en ;
     skos:definition "Strength of haptic or sensory output."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:hapticPattern a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:HapticTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "haptic pattern"@en ;
     skos:definition "Pattern index or selector for haptic delivery."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:tempoBpm a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "tempo BPM"@en ;
     skos:definition "Optional authoring tempo in beats per minute."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
 
 sstim:beatsPerBar a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Patch ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "beats per bar"@en ;
     skos:definition "Number of beats in one authoring tempo bar."@en ;
@@ -265,3 +267,81 @@ sstim:beatsPerBar a owl:DatatypeProperty, owl:FunctionalProperty ;
 ###########################################################################
 # End of sstim-patch-studio.ttl
 ###########################################################################
+
+
+###########################################################################
+# Patch Studio structural classes
+#
+# Resolves findings S1, S2 and V1 recorded in docs/technical/SESSION_PACKAGE.md
+# and ADR 0040. Before these terms existed, a Patch Studio patch could only be
+# projected into RDF as an untyped prov:Entity: typing it as a
+# sstim:SessionSpecification failed SHACL, because that class is the execution
+# of a catalog preset and a patch executes none, and its layers matched none of
+# the four catalog sstim:Voice subtypes.
+#
+# The catalog model is untouched. sstim:Preset, sstim:SessionSpecification and
+# sstim:Voice keep their meanings exactly; these classes sit beside them as the
+# authoring counterpart, not above or below them.
+###########################################################################
+
+sstim:Patch a owl:Class ;
+    rdfs:subClassOf iao:0000030, prov:Plan ;
+    rdfs:label "Patch"@en ;
+    skos:definition "A directly executable specification of a sensory stimulation arrangement, authored in a patch studio rather than delivered through a catalog. A patch is composed of tracks and carries its own timing; unlike a session specification it references no preset, and unlike a preset it is not a catalog delivery artifact awaiting curation. The unit of exchange between patch-authoring instances."@en ;
+    skos:scopeNote "Sibling of sstim:Preset, not a subclass: a preset is a curated catalog entry carrying evidence grounding, safety metadata and multilingual content, none of which a patch asserts. Converting a patch to a preset is a gated, partial, human-supervised step."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0026-patch-studio-catalog-bridge.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0040-patch-studio-native-session-and-track-classes.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:Track a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Track"@en ;
+    skos:definition "A single layer within a patch, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
+    skos:scopeNote "Parallel to sstim:Voice rather than hierarchically related to it. A voice is an audio layer of a catalog preset, constrained to four technique types; a track is a layer of a patch and may be visual or haptic, or a control signal that modulates other tracks rather than producing output itself."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0040-patch-studio-native-session-and-track-classes.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:AudioTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Audio Track"@en ;
+    skos:definition "A track whose output is audible: an isochronic tone, a binaural carrier pair, a plain carrier, noise, a drone, or a sample."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:VisualTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Visual Track"@en ;
+    skos:definition "A track whose output is visible. Rate-bearing visual tracks are subject to the runtime flash-rate safety limits recorded in the exposure module."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:HapticTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Haptic Track"@en ;
+    skos:definition "A track whose output is delivered as vibration through a device actuator."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:ControlTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Control Track"@en ;
+    skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks. Breathing-guidance (Martigli) and symmetry-derived control signals are the current kinds."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# A track is exactly one kind. Mirrors the disjointness the four voice subtypes
+# already carry, so a projection cannot type a layer as both audible and control.
+[] a owl:AllDisjointClasses ;
+    owl:members ( sstim:AudioTrack sstim:VisualTrack sstim:HapticTrack sstim:ControlTrack ) .
+
+
+sstim:composedOfTrack a owl:ObjectProperty ;
+    rdfs:domain sstim:Patch ;
+    rdfs:range  sstim:Track ;
+    rdfs:label  "composed of track"@en ;
+    skos:definition "Links a patch to the tracks it is composed of. The patch counterpart of sstim:composedOf, which links a catalog preset to its voices."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .

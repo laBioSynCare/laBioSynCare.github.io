@@ -63,6 +63,7 @@ annotations lives here.
 | [0037](0037-self-regulation-genus-and-sensory-neurostimulation-branch.md) | Add DeliberateSelfRegulation as the neutral genus above no-applied-stimulus self-directed practices; assert SensoryNeurostimulation/-Technique below Neurostimulation as an intersection class; keep generic biofeedback neutral; add primaryFrequencyBand (resolves audit RDF-04, RDF-05, and the ordering sub-bug of RDF-08) | Accepted |
 | [0038](0038-identity-providers-and-the-two-seam-adapter.md) | Split the backend adapter into identity and storage seams; local-first storage as the default; Mastodon OAuth as the first identity provider and IndieAuth as the second, with both implemented to prove the seam is an interface rather than a swap | Proposed |
 | [0039](0039-sharing-model-and-the-shared-backend-question.md) | Decline a multi-user hosted backend (the same commitment ADR 0008 declined for federation); share through publication instead — URL fragment, file, static/RDF publication with one-click Zenodo and Mastodon targets, and curated contribution — with WebRTC retained as a synchronous transfer channel for co-located use | Proposed |
+| [0040](0040-patch-studio-native-session-and-track-classes.md) | A patch is a first-class SSTIM object: add `sstim:Patch` and `sstim:Track` with four disjoint subtypes, widen 23 parameter domains to unions, and shape patches as authoring objects rather than catalog entries (resolves session-package findings S1, S2, V1) | Accepted |
 
 ## Adding an ADR
 
