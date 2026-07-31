@@ -1,6 +1,6 @@
 # ADR 0042 — `sstim:StimulusSpecification`: describing the stimulation, not the engine
 
-**Status:** Proposed — 2026-07-31
+**Status:** Accepted — 2026-07-31 · implemented and released in SSTIM 0.12.0
 
 Implements gap **A** from
 [ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md) §3:

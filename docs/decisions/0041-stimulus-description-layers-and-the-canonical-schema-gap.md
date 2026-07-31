@@ -1,8 +1,12 @@
 # ADR 0041 — Four description layers, and the two things SSTIM does not yet have
 
-**Status:** Proposed — 2026-07-31 · **Supersedes [ADR 0040](0040-patch-studio-native-session-and-track-classes.md)**
+**Status:** Accepted — 2026-07-31 · implemented and released in SSTIM 0.12.0 · **Supersedes [ADR 0040](0040-patch-studio-native-session-and-track-classes.md)**
 
-No ontology file is modified by this ADR. It is a proposal for review.
+Written as a proposal; **accepted and implemented in SSTIM 0.12.0** (tag
+`v0.12.0`). The decisions below are in force. Two questions the text left open
+were settled during implementation and are marked inline: `sstim:Track` survives,
+and the layer-1 class is named `sstim:StimulusSpecification`
+([ADR 0042](0042-stimulus-specification.md)).
 
 ## Context
 
@@ -53,8 +57,12 @@ field list. The BSC catalog format and `patch-studio-model-1` become **conforman
 profiles** — documentation plus SHACL shapes — not OWL classes.
 
 `sstim:Patch` is **withdrawn**: it named an engine-specific serialisation in a
-shared term space. `sstim:Track` may survive as a general notion (a layer within
-a configuration); that is decided separately, not inherited from ADR 0040.
+shared term space. **`sstim:Track` survives** — settled during implementation:
+any multi-layer configuration has layers whatever it calls them, and both BSC
+schemas have them. `sstim:Voice` is additionally asserted below
+`sstim:AudioTrack`, which ADR 0040 declined and which became clean once the Patch
+Studio control tracks were renamed (§7), since no single name then covered both
+an audible layer and a silent one.
 
 This satisfies `CLAUDE.md` §5.1 in both directions: no implementation schema
 becomes an OWL class, and no class is declared under an implementation path.
@@ -91,7 +99,7 @@ you cannot ask a WAV file its beat frequency without analysis — and it fails
 outright for both the stochastic and adaptive regimes. Extensional adequacy and
 descriptive adequacy are different properties, and only the second is wanted.
 
-**Proposed name — open for decision.** `sstim:StimulusSpecification`, for the
+**Name — settled as `sstim:StimulusSpecification`** ([ADR 0042](0042-stimulus-specification.md)), for the
 stimulus as delivered, in physical/perceptual units. Alternatives considered:
 `StimulusProfile` (collides with `sstim-ex:ExposureProfile`),
 `StimulationDescription` (vague about *which* layer), `StimulusForm`. Naming

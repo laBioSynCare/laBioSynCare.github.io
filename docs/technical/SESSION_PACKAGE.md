@@ -58,15 +58,21 @@ had existed since 0.6.0 — the *things that bear them* did not.
 
 | id | Status | Finding |
 |---|---|---|
-| **S1** | ✅ resolved | No patch-studio-native session class → `sstim:Patch`, an information content entity and `prov:Plan`, sibling to `sstim:Preset` |
+| **S1** | ✅ resolved | No class a configuration could claim. ADR 0040 answered with `sstim:Patch`; **ADR 0041 withdrew that** as an engine-specific serialisation in shared term space, and the projection is now a `sstim:Preset` — the engine-configuration layer, of which "patch" is a synonym |
 | **S2** | ✅ resolved | Track types had no `sstim:Voice` subtype → `sstim:Track` with four disjoint subtypes, parallel to `Voice`, linked by `sstim:composedOfTrack` |
 | **V1** | ✅ resolved | Visual/haptic properties were session-scoped → 23 domains widened to `owl:unionOf`, admitting the patch-side class |
 
-Closed by [ADR 0040](../decisions/0040-patch-studio-native-session-and-track-classes.md).
-The projection now emits properly typed, SHACL-validated RDF.
+Closed by [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md),
+which supersedes ADR 0040. The projection emits properly typed, SHACL-validated
+RDF: a `sstim:Preset` composed of typed `sstim:Track` instances.
+
+**A preset is still not the stimulation.** It configures an engine; what actually
+reaches the target is `sstim:StimulusSpecification`
+([ADR 0042](../decisions/0042-stimulus-specification.md)) — `65 dB SPL at the ear`
+rather than `gain: 0.5`. The package describes settings, and says so.
 
 **The findings are kept in every mapping report rather than deleted**, marked
-`resolved` with `resolvedIn: "ADR 0040"`. Packages built before 2026-07-31 carry
+`resolved`, naming the ADR that resolved each. Packages built before 2026-07-31 carry
 them as open, and a reader comparing two packages should be able to see what
 changed and when.
 
