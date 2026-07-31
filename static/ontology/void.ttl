@@ -55,10 +55,7 @@
     # mint a DOI for a release that has not been cut yet), and updating the
     # live core.ttl post-freeze would only diverge it from the already-frozen
     # static/ontology/0.11.0/ copy without fixing anything.
-    # Still the 0.11.0 DOI. Zenodo mints a version DOI only once the release
-    # exists, so this is updated after tagging v0.12.0 — the same order the
-    # comment above describes. Update it here, not in sstim-core.ttl.
-    dct:hasVersion <https://doi.org/10.5281/zenodo.21536124> ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21717988> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
