@@ -23,10 +23,10 @@
 //
 // What a preset is *not* is the stimulation itself. The engine-independent
 // description of what reaches the subject is `sstim:StimulusSpecification`,
-// which does not exist yet: `gain: 0.5` is an engine control, `65 dB SPL at the
-// ear` is a stimulus property, and only the second is reproducible on an engine
-// nobody has built yet. That gap is ADR 0041 §3, and it is the reason this
-// projection describes settings rather than stimulation.
+// introduced by ADR 0042: `gain: 0.5` is an engine control, `65 dB SPL at the
+// ear` is a stimulus property, and only the second is reproducible across
+// engines. This projection has no calibrated-output observation from which to
+// build that specification, so it truthfully describes settings only.
 
 import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
 
@@ -111,6 +111,7 @@ export const TIMING_PROPERTIES = {
  * track is not.
  */
 export const DELIBERATELY_UNUSED = {
+  hasBreathGuide: 'This relation identifies a catalog Voice used as the breathing guide; Patch Studio tracks are generic configuration tracks, not catalog voices.',
   martigliCenterFreq: 'A Martigli control track modulates other tracks; it has no carrier of its own.',
   martigliTransitionDuration: 'Patch Studio expresses the transition through control-track automation, not a single scalar.',
   isBreathReference: 'The one-breath-reference rule (CLAUDE.md §4.5) is a catalog preset constraint; Patch Studio does not mark a reference track.',
@@ -337,7 +338,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     structuralFindings: STRUCTURAL_FINDINGS,
     // Stated plainly so no downstream reader mistakes this for catalog RDF.
     conformance:
-      'SHACL-validated SSTIM projection: a sstim:Preset — the engine-configuration layer — composed of typed sstim:Track instances (ADR 0041). It is deliberately not a sstim:SessionSpecification, which is an execution rather than a configuration, and it asserts no evidence, outcome or safety metadata: those are authored by a human through the gated catalog bridge (ADR 0026). It is also not a description of the stimulation itself — that is sstim:StimulusSpecification, which does not exist yet (ADR 0041 §3), so these are engine settings rather than delivered stimulus properties. The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
+      'SHACL-validated SSTIM projection: a sstim:Preset — the engine-configuration layer — composed of typed sstim:Track instances (ADR 0041). It is deliberately not a sstim:SessionSpecification, which is an execution rather than a configuration, and it asserts no evidence, outcome or safety metadata: those are authored by a human through the gated catalog bridge (ADR 0026). It is also not a sstim:StimulusSpecification: that engine-independent description exists (ADR 0042), but producing one requires calibrated delivered-output data that a saved engine configuration does not contain. The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
   }
 
   return { turtle, jsonld: toJsonLd(nodes), report }

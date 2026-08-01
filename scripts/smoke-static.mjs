@@ -92,15 +92,35 @@ async function main() {
       ? ok('GET unknown route 404s', 'server is not blanket-200')
       : bad('GET unknown route', `expected 404, got ${missing.status}`)
 
-    // 3. Ontology is served same-origin as static Turtle (COEP requirement).
-    const ttl = await fetch(`${base}/ontology/sstim-core.ttl`)
-    const ttlBody = ttl.ok ? await ttl.text() : ''
-    // The file opens with a banner comment, so look for the prefix declarations
-    // and a known class rather than requiring @prefix on line one.
-    const looksLikeOntology = /^@prefix\s+sstim:/m.test(ttlBody) && ttlBody.includes('owl:Ontology')
-    ttl.ok && looksLikeOntology
-      ? ok('GET /ontology/sstim-core.ttl', `${ttlBody.length} bytes, prefixes + owl:Ontology present`)
-      : bad('GET /ontology/sstim-core.ttl', ttl.ok ? 'body is not the SSTIM core ontology' : `status ${ttl.status}`)
+    // 3. The manifest and every public ontology/profile distribution are served
+    // same-origin. A single core sentinel missed the 0.12 stimulus-loader gap.
+    const manifestResponse = await fetch(`${base}/ontology/manifest.json`)
+    let ontologyManifest = null
+    try {
+      ontologyManifest = manifestResponse.ok ? await manifestResponse.json() : null
+    } catch {
+      ontologyManifest = null
+    }
+    ontologyManifest
+      ? ok('GET /ontology/manifest.json', `${ontologyManifest.modules.length} modules`)
+      : bad('GET /ontology/manifest.json', `status ${manifestResponse.status} or invalid JSON`)
+
+    const publicSources = ontologyManifest
+      ? [
+          ...ontologyManifest.modules.map(module => [module.id, module.runtime.url]),
+          ...ontologyManifest.profiles
+            .filter(profile => profile.runtime?.url)
+            .map(profile => [`profile:${profile.id}`, profile.runtime.url]),
+        ]
+      : []
+    for (const [id, url] of publicSources) {
+      const response = await fetch(base + url)
+      const body = response.ok ? await response.text() : ''
+      const looksLikeOntology = body.includes('owl:Ontology')
+      response.ok && looksLikeOntology
+        ? ok(`GET ${url}`, `${id}, ${body.length} bytes`)
+        : bad(`GET ${url}`, response.ok ? 'body is not an ontology document' : `status ${response.status}`)
+    }
 
     // 4. PWA assets present.
     for (const asset of ['/service-worker.js', '/manifest.webmanifest']) {

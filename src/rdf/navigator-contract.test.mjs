@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import ontologyManifest from '../../static/ontology/manifest.json' with { type: 'json' }
 import {
   INSTANCE_SOURCES,
   LIVE_ECOSYSTEM_FETCH_OPTIONS,
+  ONTOLOGY_SOURCES,
+  ONTOLOGY_URLS,
   loadLiveEcosystem,
   navigatorSources,
   staticInstanceSources,
@@ -9,6 +12,12 @@ import {
 
 const LIVE_URL = 'https://biosyncare-lab.web.app/current.ttl'
 const LIVE_GRAPH = 'https://w3id.org/sstim/graph/ecosystem-agents'
+const fullProfile = ontologyManifest.profiles.find(profile => profile.id === 'full')
+const fullProfileModuleIds = [...fullProfile.modules, ...fullProfile.shapeModules]
+const fullProfileModules = fullProfileModuleIds.map(id =>
+  ontologyManifest.modules.find(module => module.id === id),
+)
+const sourceKey = id => id.replace(/-([a-z0-9])/g, (_, character) => character.toUpperCase())
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -16,12 +25,40 @@ afterEach(() => {
 })
 
 describe('unified navigator source boundary', () => {
+  it('matches the manifest Full profile and its associated shapes exactly', () => {
+    const expectedKeys = fullProfileModuleIds.map(sourceKey)
+
+    expect(Object.keys(ONTOLOGY_URLS)).toEqual(expectedKeys)
+    expect(Object.keys(ONTOLOGY_SOURCES)).toEqual(expectedKeys)
+    expect(ONTOLOGY_URLS).toEqual(Object.fromEntries(
+      fullProfileModules.map(module => [sourceKey(module.id), module.runtime.url]),
+    ))
+
+    expect(Object.values(ONTOLOGY_SOURCES).map(source => ({
+      id: source.id,
+      title: source.title,
+      roles: source.roles,
+      url: source.url,
+      graph: source.graph,
+      persistentUrl: source.persistentUrl,
+    }))).toEqual(fullProfileModules.map(module => ({
+      id: module.id,
+      title: module.title,
+      roles: module.roles,
+      url: module.runtime.url,
+      graph: module.runtime.graphIri,
+      persistentUrl: module.publication.persistentUrl,
+    })))
+  })
+
   it('loads only terms, catalog, and the current public ecosystem', () => {
     const sources = navigatorSources()
-    expect(sources).toHaveLength(10)
-    expect(sources).toContainEqual(INSTANCE_SOURCES.frameworks[0])
-    expect(sources).toContainEqual(INSTANCE_SOURCES.implementations[0])
-    expect(sources).toContainEqual(INSTANCE_SOURCES.ecosystem[0])
+    expect(sources).toEqual([
+      ...Object.values(ONTOLOGY_SOURCES),
+      INSTANCE_SOURCES.frameworks[0],
+      INSTANCE_SOURCES.implementations[0],
+      INSTANCE_SOURCES.ecosystem[0],
+    ])
 
     const urls = sources.map(source => source.url)
     expect(urls.some(url => url.includes('/sessions/'))).toBe(false)

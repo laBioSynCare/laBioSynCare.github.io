@@ -87,6 +87,7 @@
     "sstim-shapes.ttl": "8001788f8f09d633a7e1dbb4ded776739709b4a1181a93e4635187d75ced79c0",
     "sstim-alignments.ttl": "b3de1b6e9b3c926ef375bd3ed683f2bf7a56923a6e8b6fc441d3d55cc5a1c288",
     "sstim-patch-studio.ttl": "a5ee8d54e55ffa5cf1677d6ad2ae8bde5e14ca0a0c03bb6fb7a50b26b2005274",
+    "sstim-stimulus.ttl": "5b7aed18ecc9562e49be1bdd0c6531dd2b2820e722a4f8eb57361707f87ae2f2",
     "sstim-exposure.ttl": "9a0bcb6ae4d76b58927f1886e88e2da847c1ac46defe1b5c2abffd292d7a5d79",
     "sstim-ecosystem.ttl": "80b7ef9d517decca83cb6ec0d461ecfc07f725e7868f3b91225cf7a08298d330"
   }

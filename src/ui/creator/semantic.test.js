@@ -16,18 +16,18 @@ import { FIELD_SEMANTICS } from '../field/fieldSemantic.js'
 // in the live ontology modules, and unknown inputs must be explicitly
 // unmapped instead of minting an sstim IRI.
 
-const ONTOLOGY_DIR = new URL('../../../static/ontology/', import.meta.url)
-const MODULES = [
-  'sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-exposure.ttl',
-  'sstim-patch-studio.ttl', 'sstim-ecosystem.ttl',
-]
+const REPOSITORY_ROOT = new URL('../../../', import.meta.url)
+const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', REPOSITORY_ROOT), 'utf8'))
+const moduleById = new Map(manifest.modules.map(module => [module.id, module]))
+const fullProfile = manifest.profiles.find(profile => profile.id === 'full')
+const MODULES = fullProfile.modules.map(id => moduleById.get(id).source.path)
 
 let declared
 
 beforeAll(() => {
   declared = new Set()
   for (const file of MODULES) {
-    for (const q of new Parser().parse(readFileSync(new URL(file, ONTOLOGY_DIR), 'utf8'))) {
+    for (const q of new Parser().parse(readFileSync(new URL(file, REPOSITORY_ROOT), 'utf8'))) {
       if (q.subject.termType === 'NamedNode') declared.add(q.subject.value)
     }
   }

@@ -1,5 +1,22 @@
-import { describe, expect, it } from 'vitest'
-import { ONTOLOGY_FILES, ontologyHeader, releaseProblems, todayIso } from './snapshot-ontology.mjs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it } from 'vitest'
+import {
+  ONTOLOGY_FILES,
+  dirtyOntologyFiles,
+  immutableImportProblems,
+  ontologyHeader,
+  releaseProblems,
+  todayIso,
+  writeSnapshotArtifacts,
+} from './snapshot-ontology.mjs'
 
 // Release-readiness dry-run checks (improvement plan 0.3, Gate P0-C; audit
 // finding KR-14): a snapshot must be refused for development versions,
@@ -176,18 +193,210 @@ sstim:Thing a owl:Class ;
 })
 
 describe('the live ontology tree', () => {
-  it('is date-coherent as a whole set: every module agrees with core', async () => {
-    const { readFileSync } = await import('node:fs')
+  it('is release-coherent as a whole set, including manifest-owned imports', () => {
     const files = new Map(MODULE_FILES.map((f) => [f, readFileSync(new URL(`../static/ontology/${f}`, import.meta.url), 'utf8')]))
+    const manifest = JSON.parse(
+      readFileSync(new URL('../static/ontology/manifest.json', import.meta.url), 'utf8'),
+    )
     const core = files.get('sstim-core.ttl')
     const version = core.match(/owl:versionInfo\s+"([^"]+)"/)[1]
     // The tree's own declared release date, not today: a published version
     // keeps its release date as the working tree moves on.
     const releaseDate = ontologyHeader(core).match(/dct:issued\s+"(\d{4}-\d{2}-\d{2})"/)[1]
     if (version.includes('-')) {
-      expect(releaseProblems({ version, files, releaseDate }).length).toBeGreaterThan(0)
+      expect(releaseProblems({ version, files, releaseDate, manifest }).length).toBeGreaterThan(0)
     } else {
-      expect(releaseProblems({ version, files, releaseDate })).toEqual([])
+      expect(releaseProblems({ version, files, releaseDate, manifest })).toEqual([])
     }
+  })
+})
+
+describe('immutable modular profile closures', () => {
+  const version = '0.13.0'
+  const manifest = {
+    modules: [
+      { id: 'core', source: { path: 'static/ontology/sstim-core.ttl' } },
+      { id: 'stimulus', source: { path: 'static/ontology/sstim-stimulus.ttl' } },
+    ],
+    profiles: [
+      {
+        id: 'core',
+        modules: ['core', 'stimulus'],
+        source: { path: 'static/ontology/sstim-core-profile.ttl' },
+        release: { snapshot: true },
+      },
+    ],
+  }
+  const profile = (imports) => `<https://w3id.org/sstim/profile/core> a owl:Ontology ;
+    owl:versionInfo "${version}" ;
+    owl:imports ${imports.map((iri) => `<${iri}>`).join(', ')} ;
+    dct:issued "2026-08-01"^^xsd:date .`
+
+  it('accepts exact versioned sibling imports', () => {
+    const files = new Map([[
+      'sstim-core-profile.ttl',
+      profile([
+        `https://w3id.org/sstim/${version}/sstim-core.ttl`,
+        `https://w3id.org/sstim/${version}/sstim-stimulus.ttl`,
+      ]),
+    ]])
+    expect(immutableImportProblems({ version, files, manifest })).toEqual([])
+  })
+
+  it('accepts a complete release check only with its immutable manifest closure', () => {
+    const files = releaseSet(version, {
+      'sstim-core-profile.ttl': `<https://w3id.org/sstim/profile/core> a owl:Ontology ;
+    owl:versionInfo "${version}" ;
+    owl:imports
+        <https://w3id.org/sstim/${version}/sstim-core.ttl>,
+        <https://w3id.org/sstim/${version}/sstim-stimulus.ttl> ;
+${dates()}
+    dct:isPartOf <https://w3id.org/sstim> .`,
+    })
+    expect(releaseProblems({
+      version,
+      files,
+      releaseDate: RELEASE_DATE,
+      manifest,
+    })).toEqual([])
+  })
+
+  it.each([
+    ['unversioned', ['https://w3id.org/sstim/kernel', 'https://w3id.org/sstim/stimulus']],
+    ['wrong version', ['https://w3id.org/sstim/0.12.0/sstim-core.ttl', `https://w3id.org/sstim/${version}/sstim-stimulus.ttl`]],
+    ['missing', [`https://w3id.org/sstim/${version}/sstim-core.ttl`]],
+    ['extra', [
+      `https://w3id.org/sstim/${version}/sstim-core.ttl`,
+      `https://w3id.org/sstim/${version}/sstim-stimulus.ttl`,
+      `https://w3id.org/sstim/${version}/sstim-common.ttl`,
+    ]],
+  ])('rejects a %s import closure', (_label, imports) => {
+    const files = new Map([['sstim-core-profile.ttl', profile(imports)]])
+    expect(immutableImportProblems({ version, files, manifest })).toHaveLength(1)
+  })
+})
+
+describe('snapshot filesystem and provenance safety', () => {
+  const temporaryDirectories = []
+
+  afterEach(() => {
+    for (const directory of temporaryDirectories.splice(0)) {
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
+
+  function temporaryOntology() {
+    const root = mkdtempSync(join(tmpdir(), 'sstim-snapshot-test-'))
+    temporaryDirectories.push(root)
+    const directory = join(root, 'ontology')
+    mkdirSync(directory)
+    const ontologyFiles = ['sstim-core.ttl', 'sstim-core-profile.ttl']
+    const sidecars = ['manifest.json', 'manifest.schema.json']
+    writeFileSync(join(directory, ontologyFiles[0]), 'core bytes\n')
+    writeFileSync(join(directory, ontologyFiles[1]), 'profile bytes\n')
+    writeFileSync(join(directory, sidecars[0]), '{"suite":{"version":"9.9.9"}}\n')
+    writeFileSync(join(directory, sidecars[1]), '{"$id":"test"}\n')
+    return { directory, ontologyFiles, sidecars }
+  }
+
+  it('copies modules, profiles, and manifest sidecars before recording checksums', () => {
+    const fixture = temporaryOntology()
+    let recorded = null
+    const result = writeSnapshotArtifacts({
+      ontologyDirectory: fixture.directory,
+      version: '9.9.9',
+      ontologyFiles: fixture.ontologyFiles,
+      sidecars: fixture.sidecars,
+      commit: 'abc123',
+      recordChecksums: (version, outDir) => {
+        recorded = { version, outDir }
+        expect(readFileSync(join(outDir, 'manifest.json'), 'utf8'))
+          .toBe('{"suite":{"version":"9.9.9"}}\n')
+        expect(readFileSync(join(outDir, 'sstim-core-profile.ttl'), 'utf8'))
+          .toBe('profile bytes\n')
+      },
+    })
+
+    expect(recorded).toEqual({ version: '9.9.9', outDir: result.outDir })
+    expect(result.written).toEqual([
+      'README.md',
+      'manifest.json',
+      'manifest.schema.json',
+      'sstim-core-profile.ttl',
+      'sstim-core.ttl',
+    ])
+    expect(readFileSync(join(result.outDir, 'README.md'), 'utf8')).toContain('abc123')
+  })
+
+  it('makes checksum-ledger failure fatal after copying the release set', () => {
+    const fixture = temporaryOntology()
+    expect(() => writeSnapshotArtifacts({
+      ontologyDirectory: fixture.directory,
+      version: '9.9.8',
+      ontologyFiles: fixture.ontologyFiles,
+      sidecars: fixture.sidecars,
+      recordChecksums: () => {
+        throw new Error('ledger unavailable')
+      },
+    })).toThrow(/checksum ledger recording failed.*ledger unavailable/)
+  })
+
+  it('allows force-refreshing owned files but rejects unexpected stale artifacts', () => {
+    const fixture = temporaryOntology()
+    const options = {
+      ontologyDirectory: fixture.directory,
+      version: '9.9.7',
+      ontologyFiles: fixture.ontologyFiles,
+      sidecars: fixture.sidecars,
+      recordChecksums: () => {},
+    }
+    const first = writeSnapshotArtifacts(options)
+    writeFileSync(join(fixture.directory, 'sstim-core.ttl'), 'updated core bytes\n')
+    writeSnapshotArtifacts({ ...options, force: true })
+    expect(readFileSync(join(first.outDir, 'sstim-core.ttl'), 'utf8'))
+      .toBe('updated core bytes\n')
+
+    writeFileSync(join(first.outDir, 'sstim-retired.ttl'), 'stale\n')
+    expect(() => writeSnapshotArtifacts({ ...options, force: true }))
+      .toThrow(/unexpected existing artifact\(s\): sstim-retired\.ttl/)
+    expect(readFileSync(join(first.outDir, 'sstim-retired.ttl'), 'utf8')).toBe('stale\n')
+  })
+
+  it('rejects a ledger-registered version before force can overwrite it', () => {
+    const fixture = temporaryOntology()
+    const options = {
+      ontologyDirectory: fixture.directory,
+      version: '9.9.6',
+      ontologyFiles: fixture.ontologyFiles,
+      sidecars: fixture.sidecars,
+      recordChecksums: () => {},
+    }
+    const first = writeSnapshotArtifacts(options)
+    const frozenCore = readFileSync(join(first.outDir, 'sstim-core.ttl'), 'utf8')
+    writeFileSync(join(fixture.directory, 'sstim-core.ttl'), 'must not replace snapshot\n')
+    writeFileSync(
+      join(fixture.directory, 'snapshot-checksums.json'),
+      '{"9.9.6":{"sstim-core.ttl":"recorded"}}\n',
+    )
+    let recorderCalled = false
+
+    expect(() => writeSnapshotArtifacts({
+      ...options,
+      force: true,
+      recordChecksums: () => {
+        recorderCalled = true
+      },
+    })).toThrow(/version 9\.9\.6 is already registered/)
+    expect(recorderCalled).toBe(false)
+    expect(readFileSync(join(first.outDir, 'sstim-core.ttl'), 'utf8')).toBe(frozenCore)
+  })
+
+  it('fails closed when git cannot verify source cleanliness', () => {
+    expect(() => dirtyOntologyFiles({
+      sourcePaths: ['static/ontology/sstim-core.ttl'],
+      runCommand: () => {
+        throw new Error('git status failed')
+      },
+    })).toThrow('git status failed')
   })
 })

@@ -3,14 +3,15 @@
 #  SSTIM Vocabulary  —  sstim-vocab.ttl
 #
 #  Namespace:  https://w3id.org/sstim/vocab#
-#  Version:    0.12.0
-#  Date:       2026-07-24
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
 #  SKOS concept schemes for the Sensory Stimulation controlled vocabulary.
 #  All individuals are dual-typed as both skos:Concept and instances of
-#  the relevant OWL class from sstim-core.ttl (Pattern 2 dual-typing).
+#  the relevant OWL class from the Vocabulary dependency closure (Pattern 2
+#  dual-typing).
 #  See ontology/README.md for the design rationale.
 #
 #  Protected file — do not modify without explicit maintainer instruction.
@@ -33,16 +34,16 @@
 ###########################################################################
 
 <https://w3id.org/sstim/vocab> a owl:Ontology ;
-    owl:versionInfo "0.12.0" ;
+    owl:versionInfo "0.13.0-dev" ;
     dct:title "SSTIM Controlled Vocabulary"@en ;
     dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/technique> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 adds structured caution severity and action metadata, self-report phases, explicit SKOS inverse links, and stronger operational definitions while retaining every 0.5.0 term IRI."@en ;
     skos:historyNote "0.7.0 adds orthogonal evidence-basis, proposition, scope, search, source-governance, review, and ecosystem relationship/purpose/outcome controlled values. Legacy overloaded evidence tags remain deprecated for compatibility."@en .
@@ -1112,7 +1113,7 @@ sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:
 # Part 10 — Stimulus Temporal Structure Scheme
 #
 # Formalizes the value list already stated in the skos:definition of
-# sstim:StimulusTemporalStructure (sstim-core.ttl). Dual-typed so that
+# sstim:StimulusTemporalStructure (sstim-common.ttl). Dual-typed so that
 # sstim:hasStimulusTemporalStructure (range sstim:StimulusTemporalStructure)
 # can be range-validated without RDFS inference.
 ###########################################################################
@@ -2865,8 +2866,8 @@ sstim-v:engagementActiveSelfRegulatory a owl:NamedIndividual, sstim:ParticipantE
 # than left single-valued. None is referenced by any BSC preset, framework,
 # protocol, or implementation, and none is linked by definesTechnique or
 # incorporatesTechnique: inclusion asserts neither BSC Lab capability, nor
-# efficacy, nor safety. Characteristic delivery media are asserted in
-# sstim-exposure.ttl, which already depends on this module.
+# efficacy, nor safety. Characteristic delivery media are asserted in the
+# sstim-technique-exposure.ttl bridge, which depends on both concerns.
 
 sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3033,4 +3034,3 @@ sstim-v:techBiofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, s
     sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory ;
     skos:related sstim-v:techSonification ;
     skos:editorialNote "Added from the 2026-07-22 Theo Marins interview; typed as self-directed neuromodulation by ADR 0036."@en .
-

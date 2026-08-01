@@ -3,8 +3,8 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.12.0
-#  Date:       2026-07-24
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -41,16 +41,16 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.12.0" ;
+    owl:versionInfo "0.13.0-dev" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/ecosystem>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 
@@ -2620,7 +2620,7 @@ sstim-sh:TrackShape a sh:NodeShape ;
 
     # Exactly one kind, mirroring the four-way xone the voice subtypes carry.
     # pyshacl runs without OWL inference, so the owl:AllDisjointClasses axiom in
-    # sstim-patch-studio.ttl would not be checked on its own.
+    # sstim-configuration.ttl would not be checked on its own.
     sh:xone (
         [ sh:class sstim:AudioTrack ]
         [ sh:class sstim:VisualTrack ]
@@ -2753,9 +2753,23 @@ sstim-sh:StimulusSpecificationShape a sh:NodeShape ;
         sh:message "describesStimulation, if present, must point at a single sstim:Stimulation."@en ;
     ] ;
 
+    sh:property
+        sstim-sh:StimulusSpecificationChannelLinkShape,
+        sstim-sh:StimulusSpecificationTargetLinkShape ;
+
     # A specification is a description, not a configuration or an execution.
     sh:not [ sh:class sstim:Preset ] ;
     sh:message "A StimulusSpecification must not also be a Preset: one describes the stimulation, the other configures an engine to produce it (ADR 0041)."@en .
+
+sstim-sh:StimulusSpecificationChannelLinkShape a sh:PropertyShape ;
+    sh:path sstim:hasStimulusChannel ;
+    sh:class sstim-ex:StimulusChannel ;
+    sh:message "hasStimulusChannel, if present, must point at a declared sstim-ex:StimulusChannel."@en .
+
+sstim-sh:StimulusSpecificationTargetLinkShape a sh:PropertyShape ;
+    sh:path sstim:hasStimulationTarget ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:message "hasStimulationTarget, if present, must identify a resource rather than a literal."@en .
 
 
 sstim-sh:StimulusChannelQuantityShape a sh:NodeShape ;

@@ -60,6 +60,10 @@ immediate focus is outreach (Brain Innovation Days application by
 One entrance decision stays open — whether Sensory Field remains a distinct
 on-ramp or folds into Patch Studio — and is an architecture call, not copy.
 Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
+The live ontology has advanced to the manifest-driven `0.13.0-dev` modular
+preview, but `0.12.0` remains the citable release. The new namespace catalogs,
+profile/schema routes, and incomplete per-profile contracts are staged work,
+not a published `0.13.0` claim.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -205,6 +209,18 @@ indexed, examiner-searchable records.
       submit PR. PR #6184 was merged on 2026-06-11; root RDF, module,
       Patch Studio, and versioned `0.1.0/` redirects are live. Keep the
       mirrored copy in `docs/ecosystem/w3id/` synchronized with the registry.*
+- [~] Deploy and register the manifest-driven `0.13` publication routes `P1`
+      *The repository now generates a Full namespace catalog for machine RDF at
+      `/sstim`, exposes the exact two-class Kernel at `/sstim/kernel`, and
+      generates a Stimulus + Exposure namespace catalog at `/sstim/exposure`.
+      The separate `/sstim/module/exposure` route returns only the Exposure
+      semantic module and is the live Full profile's distribution/`owl:imports`
+      endpoint; `/sstim/exposure` must never be used as that import target
+      (although `dct:requires` may use it as the logical ontology identifier).
+      It also defines PROF-enabled profile entry points, `/sstim/manifest`, and
+      the schema PID `/sstim/manifest-schema/1`. The mirrored rules are staged;
+      deploy their Pages targets first, submit the perma-id update, and verify
+      every route × representation before marking this complete.*
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
@@ -248,18 +264,43 @@ Turtle files are listed in section 1. After they exist:
       *`scripts/sstim-quality-audit.py` and
       `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
       safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
-- [?] Accept or revise the SSTIM Core Profile and concern-module architecture in
+- [x] Accept and implement the SSTIM Core Profile and concern-module architecture in
       [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
       `P1`
-      *The 2026-08-01 boundary audit confirms that the present core is too broad
-      as an adoption contract. Do not move protected Turtle blocks while the ADR
-      is Proposed. If accepted, implement the manifest and closure/parity gates
-      before extracting evidence or adding further physical modules.*
-- [x] Generate WIDOCO HTML docs from `sstim-core.ttl` `P1`
+      *Accepted 2026-08-01 and implemented on the live `0.13.0-dev` line as a
+      small Kernel, Core, Core Plus, optional concern/bridge modules, and Full
+      compatibility profile. `static/ontology/manifest.json` is the source of
+      truth for modules and closures; the Core, Core Plus, and Full profile
+      entry points select semantic imports while shapes remain explicit. Frozen
+      `0.12.0` remains the latest immutable release. Normalized Full-union parity
+      preserves its semantics subject only to ADR 0044's channel clarification
+      and expected metadata/ownership changes. Deferred semantic and finer
+      packaging work is listed in ADR 0043 and the module architecture guide.*
+- [x] Harden optional links in the weak Core SHACL contract `P1`
+      *`hasStimulusChannel` and `hasStimulationTarget` remain optional. When
+      asserted, the channel must be typed `sstim-ex:StimulusChannel`, and the
+      target must be an IRI or blank node rather than a literal. Both
+      constraints remain no stronger than the Full contract.*
+- [x] Add immutable modular-release guards `P1`
+      *A released manifest must declare its versioned base, manifest, and schema
+      URLs, use the frozen schema through `$schema`, and give every snapshotted
+      artifact an immutable `publication.versionedUrl`. Released profile entry
+      points must import exact versioned sibling files and expose immutable PROF
+      artifacts. Contract paths must exist; Git and checksum-ledger failures are
+      fail-closed; registered snapshots cannot be force-overwritten.*
+- [ ] Complete the release contract for every SSTIM profile `P1`
+      *Each released profile must have nonempty positive, out-of-scope, and
+      adversarial fixture sets plus at least one competency query. Core has a
+      positive fixture and executable contract; it still lacks the two negative
+      fixture categories. Kernel, Core Plus, and Full still need all three
+      fixture categories and their own competency queries. Until these and the
+      staged route deployment are complete, `0.13.0-dev` is noncitable.*
+- [x] Generate WIDOCO HTML docs from the manifest-defined Full OWL profile `P1`
       *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
-      generates core-module reference docs; gap-filling metadata in
-      `docs/ontology/widoco.properties`. SKOS vocabulary docs done via pyLODE
-      2.13.2 `vocpub` (`make vocab-docs` → `/ontology/docs/vocab/`, ADR 0023).*
+      unions the Full semantic closure before OWL translation and generates its
+      reference docs; gap-filling metadata is in `docs/ontology/widoco.properties`.
+      SKOS vocabulary docs are generated separately via pyLODE 2.13.2 `vocpub`
+      (`make vocab-docs` → `/ontology/docs/vocab/`, ADRs 0023 and 0043).*
 - [x] Deploy WIDOCO output to GitHub Pages `P1`
       *Publication path decided (ADR 0023): `pages.yml` generates into
       `dist/ontology/docs/` — deployed artifact only, never committed to
@@ -271,7 +312,10 @@ Turtle files are listed in section 1. After they exist:
       `/sstim/exposure` and `/sstim/void` routes — verified in
       `docs/ontology/reviews/2026-07-11-dbpedia-archivo-submission.md`. Browser
       HTML target is the knowledge browser (ADR 0023); WIDOCO docs at
-      `/ontology/docs/` cross-link with the graph view.*
+      `/ontology/docs/` cross-link with the graph view. This was the
+      pre-modular route matrix; the staged `0.13` contract redefines
+      `/sstim/exposure` as the two-module namespace catalog and adds
+      `/sstim/module/exposure` for exact module retrieval/import.*
 - [x] Add `owl:versionIRI` pointing to immutable snapshot:
       `https://w3id.org/sstim/0.1.0` `P1`
       *`sstim-core.ttl` declares the version IRI, and
@@ -358,6 +402,41 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
+- [ ] Reviewed `sstim-alignments.ttl` pass — findings from the 2026-08-01 live
+      Wikidata verification `P2`
+      *(1) A candidate target now exists for one of the techniques the file lists
+      as pending alignment (lines 97–99): **`Monaural beats` Q6898437**, verified
+      to exist — 1 statement, no description, 2 sitelinks. `sstim-v:techMonauralBeats`
+      has been defined since 0.3.0, so this closes a known pending item rather
+      than a gap. Given how thin the Wikidata item is, `closeMatch` is the
+      defensible predicate; consider improving Q6898437 first — it is as empty as
+      Q98000061 was.
+      (2) `sstim-v:techBinauralBeats skos:exactMatch wd:Q863539` asserts exact
+      equivalence with an item typed `P31` music genre and `P279` electronic
+      music. Sharper than it first appears: the comment seven lines above
+      (lines 90–92) already states that `voiceBinaural` is "not identical to the
+      perceptual phenomenon or musical genre represented by Wikidata Q863539" and
+      uses `relatedMatch` accordingly — then the next line asserts `exactMatch`
+      against that same item. The five bands were reasoned down from `exactMatch`
+      to `closeMatch` on exactly this ground.
+      All ten existing Q-ID targets re-verified valid — no redirects, merges or
+      deletions. Protected file (CLAUDE.md §3.4): needs explicit instruction.*
+- [ ] Consider `skos:altLabel` coverage in `sstim-vocab.ttl` — currently **zero**
+      `P2`
+      *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
+      Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,
+      and an alias as `skos:altLabel`. SSTIM and Wikidata therefore agree exactly
+      on `skos:prefLabel`, which makes them directly comparable — but
+      `sstim-vocab.ttl` has 239 `skos:notation` values and **no `skos:altLabel`
+      at all**. Reconciliation and entity-linking tools (OpenRefine, Wikidata
+      search, generic matchers) resolve strings against prefLabel *and* altLabel,
+      so today a match succeeds only on the exact prefLabel in one of the four
+      languages. Nothing resolves "isochronic tones" to
+      `techIsochronicTones` ("Isochronic Tone Stimulation"), "monaural beats" to
+      `techMonauralBeats`, "gated pulse train" to either, or "alpha rhythm" /
+      "ritmo alfa" to `sstim-v:alpha`. This is a usability gap for other people's
+      tooling, and it is the cheap half of interoperability. Protected file
+      (CLAUDE.md §3.4): needs explicit instruction and per-term review.*
 - [?] Create items for project-specific techniques only after independent
       published sources establish notability `P2`
 - [?] Edit related Wikipedia articles only after independent sources support
@@ -446,7 +525,10 @@ Do not start these until all Phase 0 documents are committed.
       *Done 2026-07-11 (PR #6337 merged): Turtle/RDF-XML/JSON-LD negotiated per
       `Accept`, browser HTML → knowledge browser (ADR 0023), for every module
       plus `/sstim/exposure` and `/sstim/void`. Matrix in
-      `docs/ontology/reviews/2026-07-11-dbpedia-archivo-submission.md`.*
+      `docs/ontology/reviews/2026-07-11-dbpedia-archivo-submission.md`. This
+      records the pre-modular deployment; the staged `0.13` verification must
+      test the `/sstim/exposure` namespace catalog separately from the exact
+      `/sstim/module/exposure` module endpoint.*
 - [ ] Optional Netlify/custom-domain deployment: `lab.biosyncare.com`
       (CNAME at Keliweb) `P2`
       *Deferred until BSC Lab needs COOP/COEP headers for WASM threading,
@@ -807,6 +889,12 @@ Not project-specific — run on a schedule.
 **Per release:**
 - [ ] Update core `owl:versionIRI`, module `owl:versionInfo`, and all release
       metadata consistently `recurring`
+- [ ] Prepare exact immutable sibling `owl:imports`, manifest
+      `immutableRelease` (base, manifest, and schema), released `$schema`,
+      immutable PROF artifacts, and every snapshotted artifact's versioned URL
+      `recurring`
+- [ ] Confirm every released profile has positive, out-of-scope, and
+      adversarial fixtures plus an executable competency query `recurring`
 - [ ] Run WIDOCO to regenerate docs `recurring`
 - [ ] Run `make validate` and confirm all public instance graphs pass SHACL
       `recurring`

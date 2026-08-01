@@ -24,31 +24,22 @@
 // it and writes to the separate checksums ledger file.
 
 import { createHash } from 'node:crypto'
-import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
+import { readFileSync, writeFileSync, readdirSync, existsSync, realpathSync } from 'node:fs'
 import { dirname, resolve, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const ontologyDir = resolve(here, '../static/ontology')
 const ledgerPath = join(ontologyDir, 'snapshot-checksums.json')
-
-const ONTOLOGY_FILES = [
-  'sstim-core.ttl',
-  'sstim-vocab.ttl',
-  'sstim-shapes.ttl',
-  'sstim-alignments.ttl',
-  'sstim-patch-studio.ttl',
-  'sstim-exposure.ttl',
-  'sstim-ecosystem.ttl',
-]
+const VERSION_RE = /^\d+\.\d+\.\d+$/
 
 function sha256(path) {
   return createHash('sha256').update(readFileSync(path)).digest('hex')
 }
 
-function readLedger() {
-  if (!existsSync(ledgerPath)) return {}
-  return JSON.parse(readFileSync(ledgerPath, 'utf8'))
+export function readLedger(path = ledgerPath) {
+  if (!existsSync(path)) return {}
+  return JSON.parse(readFileSync(path, 'utf8'))
 }
 
 function writeLedger(ledger) {
@@ -58,18 +49,101 @@ function writeLedger(ledger) {
   writeFileSync(ledgerPath, `${JSON.stringify(ordered, null, 2)}\n`)
 }
 
-function hashVersionDir(version) {
-  const dir = join(ontologyDir, version)
+export function hashVersionDir(version, directory = ontologyDir) {
+  const dir = join(directory, version)
   if (!existsSync(dir)) {
     throw new Error(`static/ontology/${version}/ does not exist`)
   }
-  const present = new Set(readdirSync(dir))
+  // Historical snapshots contain different module sets. Hash what the frozen
+  // directory actually publishes instead of comparing every release with a
+  // hard-coded current inventory. This also makes an unrecorded module visible
+  // as drift (0.12.0's stimulus file exposed the old list's blind spot).
+  const present = readdirSync(dir)
+    .filter((file) => file.endsWith('.ttl') || file === 'manifest.json' || file === 'manifest.schema.json')
+    .sort()
   const hashes = {}
-  for (const file of ONTOLOGY_FILES) {
-    if (!present.has(file)) continue
+  for (const file of present) {
     hashes[file] = sha256(join(dir, file))
   }
   return hashes
+}
+
+export function snapshotDirectoryVersions(directory = ontologyDir) {
+  return readdirSync(directory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && VERSION_RE.test(entry.name))
+    .map((entry) => entry.name)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+}
+
+// The ledger is the publication registry, not merely a list of directories to
+// sample. Every semver-shaped snapshot directory must have one ledger entry,
+// and every entry must have a directory. Otherwise an unregistered directory
+// could evade this check and still acquire generated persistent routes.
+export function snapshotVerificationProblems({
+  directory = ontologyDir,
+  ledger = readLedger(join(directory, 'snapshot-checksums.json')),
+} = {}) {
+  const problems = []
+  if (!ledger || typeof ledger !== 'object' || Array.isArray(ledger)) {
+    return ['snapshot checksum ledger root must be a JSON object']
+  }
+
+  const directoryVersions = snapshotDirectoryVersions(directory)
+  const ledgerVersions = Object.keys(ledger)
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  const directorySet = new Set(directoryVersions)
+  const ledgerSet = new Set(ledgerVersions)
+
+  for (const version of directoryVersions) {
+    if (!ledgerSet.has(version)) {
+      problems.push(`${version}: semver snapshot directory is present but unregistered in snapshot-checksums.json`)
+    }
+  }
+  for (const version of ledgerVersions) {
+    if (!VERSION_RE.test(version)) {
+      problems.push(`${version}: checksum-ledger key is not a plain semantic version`)
+    }
+    if (!directorySet.has(version)) {
+      problems.push(`${version}: checksum-ledger entry has no matching snapshot directory`)
+    }
+  }
+
+  for (const version of ledgerVersions) {
+    if (!VERSION_RE.test(version) || !directorySet.has(version)) continue
+    const recorded = ledger[version]
+    if (!recorded || typeof recorded !== 'object' || Array.isArray(recorded)) {
+      problems.push(`${version}: checksum-ledger entry must be a file-to-sha256 object`)
+      continue
+    }
+
+    let current
+    try {
+      current = hashVersionDir(version, directory)
+    } catch (error) {
+      problems.push(`${version}: ${error.message}`)
+      continue
+    }
+    const files = new Set([...Object.keys(recorded), ...Object.keys(current)])
+    for (const file of files) {
+      if (!(file in current)) {
+        problems.push(`${version}/${file}: recorded but now missing`)
+      } else if (!(file in recorded)) {
+        problems.push(`${version}/${file}: present on disk but not recorded`)
+      } else if (current[file] !== recorded[file]) {
+        problems.push(`${version}/${file}: sha256 no longer matches the recorded checksum`)
+      }
+    }
+  }
+
+  return problems
+}
+
+export function assertSnapshotLedger(options = {}) {
+  const problems = snapshotVerificationProblems(options)
+  if (problems.length) {
+    throw new Error(`snapshot checksum ledger rejected the publication inventory:\n- ${problems.join('\n- ')}`)
+  }
+  return options.ledger ?? readLedger(join(options.directory ?? ontologyDir, 'snapshot-checksums.json'))
 }
 
 function record(version) {
@@ -93,51 +167,39 @@ function verify() {
     process.exit(1)
   }
 
-  let problems = 0
-  for (const version of versions) {
-    let current
-    try {
-      current = hashVersionDir(version)
-    } catch (error) {
-      console.error(`verify-snapshot-checksums: DRIFT ${version}: ${error.message}`)
-      problems += 1
-      continue
-    }
-    const recorded = ledger[version]
-    const files = new Set([...Object.keys(recorded), ...Object.keys(current)])
-    for (const file of files) {
-      if (!(file in current)) {
-        console.error(`verify-snapshot-checksums: DRIFT ${version}/${file}: recorded but now missing`)
-        problems += 1
-      } else if (!(file in recorded)) {
-        console.error(`verify-snapshot-checksums: DRIFT ${version}/${file}: present on disk but not recorded (re-run \`record ${version}\`?)`)
-        problems += 1
-      } else if (current[file] !== recorded[file]) {
-        console.error(`verify-snapshot-checksums: DRIFT ${version}/${file}: sha256 no longer matches the recorded checksum`)
-        problems += 1
-      }
-    }
-  }
+  const problems = snapshotVerificationProblems({ directory: ontologyDir, ledger })
 
-  if (problems) {
-    console.error(`verify-snapshot-checksums: ${problems} drift issue(s) across ${versions.length} recorded version(s)`)
+  if (problems.length) {
+    for (const problem of problems) {
+      console.error(`verify-snapshot-checksums: DRIFT ${problem}`)
+    }
+    console.error(`verify-snapshot-checksums: ${problems.length} drift issue(s) across ${versions.length} recorded version(s)`)
     process.exit(1)
   }
   console.log(`verify-snapshot-checksums: passed (${versions.length} recorded versions match their frozen files)`)
 }
 
-const [command, arg] = process.argv.slice(2)
-if (command === 'record') {
-  if (!arg) {
-    console.error('Usage: node scripts/verify-snapshot-checksums.mjs record <version>')
+function main() {
+  const [command, arg] = process.argv.slice(2)
+  if (command === 'record') {
+    if (!arg) {
+      console.error('Usage: node scripts/verify-snapshot-checksums.mjs record <version>')
+      process.exit(1)
+    }
+    record(arg)
+  } else if (!command) {
+    verify()
+  } else {
+    console.error(`Unknown command "${command}". Usage:
+    node scripts/verify-snapshot-checksums.mjs            # verify recorded versions
+    node scripts/verify-snapshot-checksums.mjs record <version>  # record a new version`)
     process.exit(1)
   }
-  record(arg)
-} else if (!command) {
-  verify()
-} else {
-  console.error(`Unknown command "${command}". Usage:
-  node scripts/verify-snapshot-checksums.mjs            # verify recorded versions
-  node scripts/verify-snapshot-checksums.mjs record <version>  # record a new version`)
-  process.exit(1)
+}
+
+if (
+  process.argv[1] &&
+  realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url))
+) {
+  main()
 }

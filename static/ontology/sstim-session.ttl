@@ -1,0 +1,232 @@
+###########################################################################
+#
+#  SSTIM Intervention and Session Module
+#
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/session> a owl:Ontology ;
+    owl:versionInfo "0.13.0-dev" ;
+    dct:title "SSTIM Intervention and Session Module"@en ;
+    dct:description "Planned stimulation interventions, session specifications and executions, configuration overrides, and consent-governed self-reports."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/configuration> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-01"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Interventions, sessions, executions, and self-reports
+###########################################################################
+
+sstim:StimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Stimulation Intervention"@en ;
+    skos:definition "A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer over sensory stimulation and neuromodulation interventions."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SensoryStimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulation ;
+    rdfs:subClassOf sstim:StimulationIntervention ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Sensory Stimulation Intervention"@en,
+               "Intervento di Stimolazione Sensoriale"@it,
+               "Intervenção de Estimulação Sensorial"@pt,
+               "Intervención de Estimulación Sensorial"@es ;
+    skos:definition "A specific, designed execution of Sensory Stimulation with defined parameters, target modalities, intended effect, and delivery mechanism. An intervention can realize a session specification derived from a preset, protocol, or framework."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SessionSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030, prov:Plan ;
+    rdfs:label "Session Specification"@en ;
+    skos:definition "A complete, reproducible description of a specific intended execution of a preset, including user-defined overrides of preset defaults. The unit of scientific reproducibility: given a specification and a conforming engine, the acoustic output is fully determined."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SessionInstance a owl:Class ;
+    rdfs:subClassOf prov:Activity, sstim:SensoryStimulationIntervention ;
+    rdfs:label "Session Instance"@en ;
+    skos:definition "The record of an actual execution of a session specification, including timing, completion status, platform, and optional self-report. Append-only: never modified after creation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SelfReport a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report"@en ;
+    skos:definition "A consent-governed, session-associated self-assessment capturing subjective affect, focus, sleepiness, quality, and optional free text at an explicitly identified collection phase."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SelfReportPhase a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report Phase"@en ;
+    skos:definition "A controlled category identifying when a self-report was collected relative to its associated session, such as before, immediately after, or at follow-up."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasDeliveryModality a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationIntervention ;
+    rdfs:range  sstim:SensoryModality ;
+    rdfs:label  "has delivery modality"@en ;
+    skos:definition "Links an executed sensory stimulation intervention to one or more broad controlled modality categories engaged by its delivery. Use the exposure module for channel-level physical-medium and perceived-modality detail."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:referencesPreset a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:Preset ;
+    rdfs:label  "references preset"@en ;
+    skos:definition "Links a session specification to the preset it executes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:usesSpecification a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SessionSpecification ;
+    rdfs:label  "uses specification"@en ;
+    skos:definition "Links a recorded session execution to the single immutable session specification it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasSelfReport a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SelfReport ;
+    rdfs:label  "has self-report"@en ;
+    skos:definition "Links a session instance to zero or more consent-governed self-reports collected at explicit phases. Multiple reports support pre/post and follow-up observations without overwriting prior data."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasReportPhase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  sstim:SelfReportPhase ;
+    rdfs:label "has report phase"@en ;
+    skos:definition "Identifies the single collection phase of a session-associated self-report."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "initial breathing period (s)"@en ;
+    skos:definition "User override for mp0. Must be >= 3.0 s for breathing guidance. Absent means use preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "final breathing period (s)"@en ;
+    skos:definition "Optional user override for the final guided-breathing cycle period in seconds; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "breathing transition duration (s)"@en ;
+    skos:definition "Optional duration in seconds over which guided breathing changes from its initial to final cycle period; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "actual duration (seconds)"@en ;
+    skos:definition "Observed playback duration of a recorded session instance in whole seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:completionStatus a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "completion status"@en ;
+    skos:definition "Values: 'completed' | 'interrupted' (>30% played) | 'abandoned' (<30% played)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:primaryAffect a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "primary affect"@en ;
+    skos:definition "Affect rating at the report's declared collection phase, from 1 (very negative) to 5 (very positive)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:focusRating a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "focus rating"@en ;
+    skos:definition "Attentional-focus rating at the report's declared collection phase, from 1 (scattered) to 5 (highly focused)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:sleepiness a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "sleepiness"@en ;
+    skos:definition "Sleepiness rating at the report's declared collection phase, from 1 (alert) to 5 (very drowsy)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:subjectiveQuality a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "subjective session quality"@en ;
+    skos:definition "Subjective quality rating for the associated session, normally collected after delivery, from 1 (poor) to 5 (excellent)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:goalAchieved a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "goal achieved"@en ;
+    skos:definition "Self-reported yes/no assessment of whether the participant's stated session goal was met; it is not an objective efficacy measure."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:disablesTrack a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:Track ;
+    rdfs:label  "disables track"@en ;
+    skos:definition "A layer of the configuration that this session turns off — a soundscape left out, an ambience muted. Listing what was disabled keeps the configuration itself unmodified, so the same preset remains comparable across sessions that used it differently."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scheduledStart a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:dateTime ;
+    rdfs:label  "scheduled start"@en ;
+    skos:definition "Intended start time of the session. A property of the plan, not of any execution: sstim:SessionInstance records when a session actually ran."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasStimulationTarget rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulusSpecification sstim:SessionSpecification ) ] .
+
+sstim:durationSeconds rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+sstim:masterVolume rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+sstim:masterBrightness rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+
+###########################################################################
+# End of session
+###########################################################################

@@ -21,7 +21,11 @@ import {
 // relationship bindings using the same N3 representation as the application.
 
 const { defaultGraph, namedNode, quad } = DataFactory
-const ONTOLOGY_DIR = new URL('../../static/ontology/', import.meta.url)
+const REPOSITORY_ROOT = new URL('../../', import.meta.url)
+const ONTOLOGY_DIR = new URL('static/ontology/', REPOSITORY_ROOT)
+const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', REPOSITORY_ROOT), 'utf8'))
+const moduleById = new Map(manifest.modules.map(module => [module.id, module]))
+const fullProfile = manifest.profiles.find(profile => profile.id === 'full')
 const FIXTURE_URL = '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
 const PUBLIC_URL = 'https://biosyncare-lab.web.app/current.ttl'
 const FIXTURE_FILE = 'instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
@@ -127,10 +131,7 @@ describe('synthetic ecosystem loader contract', () => {
 
   it('the isolated named graph conforms to all non-SPARQL SHACL components', () => {
     const data = new Store([
-      ...parseFile('sstim-core.ttl'),
-      ...parseFile('sstim-vocab.ttl'),
-      ...parseFile('sstim-exposure.ttl'),
-      ...parseFile('sstim-ecosystem.ttl'),
+      ...fullProfile.modules.flatMap(id => parseFile(moduleById.get(id).source.path.replace('static/ontology/', ''))),
       ...parseFile('instances/frameworks/bsc.ttl'),
     ])
     for (const q of namedStore.getQuads(null, null, null, namedNode(GRAPH_IRI))) {

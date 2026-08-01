@@ -47,23 +47,23 @@ PRIVATE_LEDGER_FIXTURE = (
     ROOT / "test" / "fixtures" / "rdf" / "ecosystem-private"
     / "synthetic-terminal-ledger.ttl"
 )
-SHAPES = ONTOLOGY_DIR / "sstim-shapes.ttl"
 PRIVATE_SHAPES = ONTOLOGY_DIR / "sstim-ecosystem-private-shapes.ttl"
 PRIVATE_NEGATIVE_DIR = (
     ROOT / "test" / "fixtures" / "rdf" / "ecosystem-private-negative"
 )
 CONTEXT = ONTOLOGY_DIR / "context.jsonld"
+MANIFEST = json.loads((ONTOLOGY_DIR / "manifest.json").read_text(encoding="utf-8"))
+MANIFEST_MODULES = {module["id"]: module for module in MANIFEST["modules"]}
+FULL_PROFILE = next(profile for profile in MANIFEST["profiles"] if profile["id"] == "full")
+SHAPES = ROOT / MANIFEST_MODULES["shapes"]["source"]["path"]
 
 # The BSC framework is the positive fixture's sole instance dependency: the
 # synthetic implementation says it implements this declared framework. No
 # other ecosystem/implementation file is allowed to complete the fixture.
-CONTEXT_FILES = (
-    ONTOLOGY_DIR / "sstim-core.ttl",
-    ONTOLOGY_DIR / "sstim-vocab.ttl",
-    ONTOLOGY_DIR / "sstim-exposure.ttl",
-    ONTOLOGY_DIR / "sstim-ecosystem.ttl",
-    ONTOLOGY_DIR / "instances" / "frameworks" / "bsc.ttl",
-)
+CONTEXT_FILES = tuple(
+    ROOT / MANIFEST_MODULES[module_id]["source"]["path"]
+    for module_id in FULL_PROFILE["modules"]
+) + (ONTOLOGY_DIR / "instances" / "frameworks" / "bsc.ttl",)
 IMPLEMENTATION_CATALOG = (
     ONTOLOGY_DIR / "instances" / "implementations" / "implementations.ttl"
 )
@@ -71,6 +71,20 @@ W3ID_STAGING_FILE = (
     ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
 )
 ECOSYSTEM_PUBLIC_DUMP = "https://biosyncare-lab.web.app/current.ttl"
+_Q_ZERO_GUARD = r"(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$))"
+HTML_ACCEPT = (
+    r"RewriteCond %{HTTP_ACCEPT} "
+    r"(?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)"
+    + _Q_ZERO_GUARD
+    + " [NC]"
+)
+EMPTY_ACCEPT = r"RewriteCond %{HTTP_ACCEPT} ^$ [OR]"
+TURTLE_ACCEPT = (
+    r"RewriteCond %{HTTP_ACCEPT} "
+    r"(?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)"
+    + _Q_ZERO_GUARD
+    + " [NC]"
+)
 
 SSTIM = Namespace("https://w3id.org/sstim#")
 ECO = Namespace("https://w3id.org/sstim/ecosystem#")
@@ -907,16 +921,24 @@ def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
         if line.strip().startswith(("RewriteCond", "RewriteRule"))
     )
     expected_directives = (
-        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        HTML_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
         "https://labiosyncare.github.io/ [R=303,L]",
-        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
         r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        EMPTY_ACCEPT,
+        TURTLE_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
         f"{ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        "- [R=406,L]",
+        EMPTY_ACCEPT,
+        TURTLE_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
         rf"(?!synthetic-)[A-Za-z0-9._~-]+/?$ {ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ - [R=406,L]",
     )
     require(
         directives == expected_directives,

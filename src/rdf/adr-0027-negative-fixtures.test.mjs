@@ -9,9 +9,12 @@ import SHACLValidator from 'rdf-validate-shacl'
 // suite pins the rejections. sh:sparql constraints are stripped (the JS
 // validator has no SPARQLConstraintComponent; pySHACL covers them in CI).
 
-const DIR = new URL('../../static/ontology/', import.meta.url)
+const REPOSITORY_ROOT = new URL('../../', import.meta.url)
+const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', REPOSITORY_ROOT), 'utf8'))
+const moduleById = new Map(manifest.modules.map(module => [module.id, module]))
+const fullProfile = manifest.profiles.find(profile => profile.id === 'full')
 const SH_SPARQL = DataFactory.namedNode('http://www.w3.org/ns/shacl#sparql')
-const parseTtl = (f) => new Parser().parse(readFileSync(new URL(f, DIR), 'utf8'))
+const parseTtl = (f) => new Parser().parse(readFileSync(new URL(f, REPOSITORY_ROOT), 'utf8'))
 
 const PREFIXES = `
 @prefix sstim: <https://w3id.org/sstim#> .
@@ -28,10 +31,12 @@ let validator
 let baseQuads
 
 beforeAll(() => {
-  const shapes = new Store(parseTtl('sstim-shapes.ttl'))
+  const shapes = new Store(parseTtl(moduleById.get('shapes').source.path))
   for (const q of shapes.getQuads(null, SH_SPARQL, null, null)) shapes.delete(q)
   validator = new SHACLValidator(shapes)
-  baseQuads = ['sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-exposure.ttl'].flatMap(parseTtl)
+  baseQuads = fullProfile.modules
+    .map(id => moduleById.get(id).source.path)
+    .flatMap(parseTtl)
 })
 
 function conforms(ttl) {

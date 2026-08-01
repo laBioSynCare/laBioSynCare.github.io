@@ -17,7 +17,7 @@ resolving the two questions ADR 0035 explicitly parked (its notes 4 and 5).
 > semantic self-directed/interventional distinction. It is not a decision to
 > split SSTIM into source modules or conformance profiles. The small-core
 > direction is [ADR 0041 §6](0041-stimulus-description-layers-and-the-canonical-schema-gap.md#6-a-small-core-with-adjunctive-modules),
-> and its proposed module architecture is
+> and its adopted module architecture is
 > [ADR 0043](0043-sstim-core-profile-and-module-boundaries.md). ADR 0037 also
 > corrected two semantic overreaches here: no-applied-stimulus practices belong
 > under `DeliberateSelfRegulation`, and sensory neurostimulation is the

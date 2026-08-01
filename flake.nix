@@ -165,7 +165,7 @@
 
             packages = [
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
-              (py.withPackages (ps: [ ps.rdflib ]))  # python3.12 + rdflib — `make export`, ad-hoc use
+              (py.withPackages (ps: [ ps.rdflib ps.jsonschema ]))  # RDF tooling + manifest JSON Schema validation
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
               pylode              # vendored `pylode` CLI — SKOS vocab HTML docs (`make vocab-docs`)
               robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`
@@ -242,6 +242,8 @@
               || { echo "no index.html in package output"; exit 1; }
             test -f "$out/share/bsc-lab/ontology/sstim-core.ttl" \
               || { echo "ontology assets missing from package output"; exit 1; }
+            test -f "$out/share/bsc-lab/ontology/manifest.json" \
+              || { echo "ontology manifest missing from package output"; exit 1; }
             grep -q 'bsc-lab-build-info-1' "$out/share/bsc-lab/build-info.json" \
               || { echo "package does not declare the commit it was built from"; exit 1; }
             if grep -rEq 'AIza[0-9A-Za-z_-]{20,}' "$out/share/bsc-lab"; then

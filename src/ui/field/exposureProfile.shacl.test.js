@@ -21,18 +21,21 @@ import { fieldStateToQuads } from './exposureProfile.js'
 // public-claim levels, not exposure profiles, and remain covered by pySHACL
 // in `make validate`.
 
-const ONTOLOGY_DIR = new URL('../../../static/ontology/', import.meta.url)
+const REPOSITORY_ROOT = new URL('../../../', import.meta.url)
+const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', REPOSITORY_ROOT), 'utf8'))
+const moduleById = new Map(manifest.modules.map(module => [module.id, module]))
+const fullProfile = manifest.profiles.find(profile => profile.id === 'full')
 const SH_SPARQL = DataFactory.namedNode('http://www.w3.org/ns/shacl#sparql')
 const EXPORT_ID = 'shacl-golden-0001'
 const NOW = '2026-07-13T00:00:00.000Z'
 
-const parseTtl = (file) => new Parser().parse(readFileSync(new URL(file, ONTOLOGY_DIR), 'utf8'))
+const parseTtl = (file) => new Parser().parse(readFileSync(new URL(file, REPOSITORY_ROOT), 'utf8'))
 
 let validator
 let baseQuads
 
 beforeAll(() => {
-  const shapes = new Store(parseTtl('sstim-shapes.ttl'))
+  const shapes = new Store(parseTtl(moduleById.get('shapes').source.path))
   for (const q of shapes.getQuads(null, SH_SPARQL, null, null)) shapes.delete(q)
   validator = new SHACLValidator(shapes)
   // The ontology modules supply the class hierarchy (e.g. ExploratoryProtocol
@@ -41,8 +44,8 @@ beforeAll(() => {
   // target the export references. Mirrors `make shacl-instances` against the
   // authoritative graph the app loads at runtime.
   baseQuads = [
-    'sstim-core.ttl', 'sstim-vocab.ttl', 'sstim-exposure.ttl',
-    'instances/frameworks/bsc.ttl',
+    ...fullProfile.modules.map(id => moduleById.get(id).source.path),
+    'static/ontology/instances/frameworks/bsc.ttl',
   ].flatMap(parseTtl)
 })
 
@@ -104,7 +107,7 @@ describe('exposureProfile SHACL conformance (golden, KR-01)', () => {
 
   it('validator sanity: the curated fixture conforms', () => {
     const data = new Store(baseQuads)
-    for (const q of parseTtl('instances/experiments/sensory-field-example.ttl')) {
+    for (const q of parseTtl('static/ontology/instances/experiments/sensory-field-example.ttl')) {
       data.add(q)
     }
     expect(validator.validate(data).conforms).toBe(true)

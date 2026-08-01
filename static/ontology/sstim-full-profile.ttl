@@ -1,0 +1,91 @@
+###########################################################################
+#
+#  SSTIM Full Profile entrypoint
+#
+#  Version: 0.13.0-dev
+#  Date:    2026-08-01
+#  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Compatibility aggregate over every public semantic, bridge, vocabulary,
+#  alignment, ecosystem, and Patch Studio module. Validation shape graphs are
+#  selected separately and are not part of this OWL import closure.
+#
+###########################################################################
+
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prof: <http://www.w3.org/ns/dx/prof/> .
+@prefix role: <http://www.w3.org/ns/dx/prof/role/> .
+
+<https://w3id.org/sstim/profile/full> a owl:Ontology, prof:Profile ;
+    owl:versionInfo "0.13.0-dev" ;
+    prof:hasToken "full" ;
+    prof:isProfileOf <https://w3id.org/sstim> ;
+    prof:hasResource
+        <https://w3id.org/sstim/profile/full#entrypoint>,
+        <https://w3id.org/sstim/profile/full#constraints>,
+        <https://w3id.org/sstim/profile/full#manifest> ;
+    dct:title "SSTIM Full Profile"@en ;
+    dct:description "Compatibility profile importing every supported public SSTIM semantic module, bridge, controlled vocabulary, alignment, ecosystem module, and Patch Studio implementation profile."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires
+        <https://w3id.org/sstim>,
+        <https://w3id.org/sstim/stimulus>,
+        <https://w3id.org/sstim/common>,
+        <https://w3id.org/sstim/technique>,
+        <https://w3id.org/sstim/neuromodulation>,
+        <https://w3id.org/sstim/evidence>,
+        <https://w3id.org/sstim/configuration>,
+        <https://w3id.org/sstim/session>,
+        <https://w3id.org/sstim/exposure>,
+        <https://w3id.org/sstim/technique-exposure>,
+        <https://w3id.org/sstim/evidence-exposure>,
+        <https://w3id.org/sstim/neuromodulation-evidence>,
+        <https://w3id.org/sstim/vocab>,
+        <https://w3id.org/sstim/alignments>,
+        <https://w3id.org/sstim/ecosystem>,
+        <https://w3id.org/sstim/patch-studio> ;
+    owl:imports
+        <https://w3id.org/sstim/kernel>,
+        <https://w3id.org/sstim/stimulus>,
+        <https://w3id.org/sstim/common>,
+        <https://w3id.org/sstim/technique>,
+        <https://w3id.org/sstim/neuromodulation>,
+        <https://w3id.org/sstim/evidence>,
+        <https://w3id.org/sstim/configuration>,
+        <https://w3id.org/sstim/session>,
+        <https://w3id.org/sstim/module/exposure>,
+        <https://w3id.org/sstim/technique-exposure>,
+        <https://w3id.org/sstim/evidence-exposure>,
+        <https://w3id.org/sstim/neuromodulation-evidence>,
+        <https://w3id.org/sstim/vocab>,
+        <https://w3id.org/sstim/alignments>,
+        <https://w3id.org/sstim/ecosystem>,
+        <https://w3id.org/sstim/patch-studio> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-01"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso
+        <https://w3id.org/sstim/manifest>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md> .
+
+<https://w3id.org/sstim/profile/full#entrypoint> a prof:ResourceDescriptor ;
+    prof:hasRole role:specification ;
+    prof:hasArtifact <https://w3id.org/sstim/profile/full> ;
+    dct:format "text/turtle" .
+
+<https://w3id.org/sstim/profile/full#constraints> a prof:ResourceDescriptor ;
+    prof:hasRole role:constraints ;
+    prof:hasArtifact <https://w3id.org/sstim/shapes> ;
+    dct:conformsTo <http://www.w3.org/ns/shacl#> ;
+    dct:format "text/turtle" .
+
+<https://w3id.org/sstim/profile/full#manifest> a prof:ResourceDescriptor ;
+    prof:hasRole role:schema ;
+    prof:hasArtifact <https://w3id.org/sstim/manifest> ;
+    dct:format "application/json" .

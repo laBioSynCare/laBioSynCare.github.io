@@ -211,6 +211,7 @@ describe('the mapping report travels with the package', () => {
     // this is the sentence that must never soften.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
     expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
-    expect(report.conformance).toMatch(/sstim:StimulusSpecification, which does not exist yet/)
+    expect(report.conformance).toMatch(/not a sstim:StimulusSpecification/)
+    expect(report.conformance).toMatch(/requires calibrated delivered-output data/)
   })
 })

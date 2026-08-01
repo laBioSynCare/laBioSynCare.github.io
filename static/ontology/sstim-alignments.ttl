@@ -3,8 +3,8 @@
 #  SSTIM External Alignments  —  sstim-alignments.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.12.0
-#  Date:       2026-07-24
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -39,16 +39,16 @@
 ###########################################################################
 
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
-    owl:versionInfo "0.12.0" ;
+    owl:versionInfo "0.13.0-dev" ;
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en .
 
@@ -129,7 +129,7 @@ sstim:SensoryStimulationTechnique rdfs:subClassOf iao:0000030 .
 # a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
 sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
 
-# Session instance → PROV Activity (stated in sstim-core.ttl; repeated here
+# Session instance → PROV Activity (stated in sstim-session.ttl; repeated here
 # for cross-reference in alignment context)
 # sstim:SessionInstance rdfs:subClassOf prov:Activity .
 
@@ -160,7 +160,8 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 # External upper-ontology term labels (display stubs)
 #
 # Local rdfs:label assertions for the external BFO/OBI/IAO IRIs referenced
-# above and in sstim-core.ttl, so the knowledge browser renders readable
+# above and across the semantic dependency modules, so the knowledge browser
+# renders readable
 # names instead of opaque numeric IRIs. These are display aids, not
 # authoritative definitions — the canonical labels live in BFO/OBI/IAO.
 ###########################################################################

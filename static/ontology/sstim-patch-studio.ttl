@@ -1,32 +1,37 @@
 ###########################################################################
 #
-#  SSTIM Parameter Properties  —  sstim-patch-studio.ttl
+#  SSTIM BSC Catalog and Patch Studio Profile Module
 #
-#  Namespace:  https://w3id.org/sstim
-#  Version:    0.12.0
-#  Date:       2026-07-24
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
-#  License:    CC BY 4.0
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
-#  Datatype properties that quantify a voice (sstim:Voice) and a session
-#  authoring configuration (sstim:SessionSpecification). These are the
-#  numeric parameter properties shared by the BSC preset catalog model and
-#  the live Patch Studio authoring model; all terms are in the sstim#
-#  namespace and are part of the SSTIM ontology (rdfs:isDefinedBy
-#  <https://w3id.org/sstim>). The SHACL voice shapes in sstim-shapes.ttl
-#  constrain the voice properties below.
-#
-#  Protected file — do not modify without explicit maintainer instruction.
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
 #
 ###########################################################################
 
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix sstim: <https://w3id.org/sstim#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
 
 
 ###########################################################################
@@ -34,131 +39,203 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.12.0" ;
-    dct:title "SSTIM Patch Studio Parameter Module"@en ;
-    dct:description "Datatype properties for reproducibly specifying SSTIM audio voices and Patch Studio session-authoring parameters."@en ;
+    owl:versionInfo "0.13.0-dev" ;
+    dct:title "SSTIM BSC Catalog and Patch Studio Profile Module"@en ;
+    dct:description "BSC-specific voice, grouping, permutation, audio synthesis, visual, haptic, and authoring parameters over the generic configuration and session model."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/session> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-17"^^xsd:date ;
-    dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:issued "2026-06-17"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
 ###########################################################################
-# Voice parameter datatype properties (domain sstim:Voice)
+# BSC catalog and Patch Studio profile terms
 ###########################################################################
+
+sstim:PresetGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Preset Group"@en ;
+    skos:definition "A classification of BSC presets by design character, evidence strength, and use context. Five groups: Heal, Support, Perform, Indulge, Transcend."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:VoiceType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice Type"@en ;
+    skos:definition "A named category of BSC audio voice (Binaural, Martigli, Martigli-Binaural, Symmetry) identifying the synthesis technique a voice realizes. Classification anchor for the SKOS voice-type vocabulary; distinct from the sstim:Voice parameter-bundle classes in Part 6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:PermutationFunction a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Permutation Function"@en ;
+    skos:definition "A named reordering rule applied to a Symmetry voice note sequence at each cycle boundary (identity, rotate forward, rotate backward, reversal, shuffle)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:Voice a owl:Class ;
+    # AudioTrack is owned by Configuration, which this Patch Studio profile
+    # requires. The specialization is asserted once near the end of this module;
+    # Configuration therefore remains independent of the optional BSC profile.
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice"@en ;
+    skos:definition "An audio layer within a BSC catalog preset, identified by its technique type (Binaural, Martigli, Martigli-Binaural, Symmetry) and carrying the parameters that fully specify that voice. A catalog preset contains 1–6 voices."@en ;
+    skos:scopeNote "The catalog-model specialisation of sstim:AudioTrack: every voice is an audio track, while an audio track in another schema need not be one of the four catalog technique types."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0006-one-class-per-technique.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:BinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Binaural Voice"@en ;
+    skos:definition "Two sine tones at slightly different frequencies (fl, fr) presented dichotically to produce a perceived beat at |fr - fl| Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:MartigliVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli Voice"@en ;
+    skos:definition "A single tone whose frequency oscillates sinusoidally with a breathing arc that decelerates linearly from mp0 to mp1 over md seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:MartigliBinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli-Binaural Voice"@en ;
+    skos:definition "Binaural beat combined with Martigli breathing oscillation. Both carriers sweep in parallel, maintaining constant beat frequency while timbral register evolves with breathing."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:SymmetryVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Symmetry Voice"@en ;
+    skos:definition "N notes log-distributed over I octaves, repeated with algebraic group permutation at each cycle boundary, at pulse rate N/d Hz. When I=0, reduces to traditional isochronous tone stimulation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:composedOf a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Voice ;
+    rdfs:label  "composed of"@en ;
+    skos:definition "Links a preset to its 1–6 voice specifications."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:inGroup a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:PresetGroup ;
+    rdfs:label  "in group"@en ;
+    skos:definition "Links a preset to its group classification. Each preset belongs to exactly one group."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "has breath guide"@en ;
+    skos:definition "True iff the preset contains exactly one voice with isOn=true. Governs visual breathing animation and haptic pulse delivery."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
+
+[] a owl:AllDisjointClasses ;
+    owl:members (
+        sstim:BinauralVoice
+        sstim:MartigliVoice
+        sstim:MartigliBinauralVoice
+        sstim:SymmetryVoice
+    ) .
 
 sstim:carrierFreqLeft a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "left carrier frequency"@en ;
     skos:definition "Left-ear carrier frequency for binaural presentation, in Hz."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:carrierFreqRight a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "right carrier frequency"@en ;
     skos:definition "Right-ear carrier frequency for binaural presentation, in Hz."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:initialVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "initial volume"@en ;
     skos:definition "Initial output gain or amplitude for a voice."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:panPosition a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "pan position"@en ;
     skos:definition "Stereo position from left to right."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:baseFrequency a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "base frequency"@en ;
     skos:definition "Base, carrier, or center frequency for a voice, in Hz."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:beatHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "beat frequency"@en ;
     skos:definition "Driven or perceived beat frequency in Hz."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:pulseRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "pulse rate"@en ;
     skos:definition "Rhythmic pulse or sequence step rate in Hz."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:noteDurationFraction a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:AudioTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "note duration fraction"@en ;
     skos:definition "Fraction of a rhythmic pulse occupied by the active note envelope."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:noteCount a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "note count"@en ;
     skos:definition "Number of notes or sequence positions in a Symmetry cycle."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:octaveSpan a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:decimal ;
     rdfs:label "octave span"@en ;
     skos:definition "Pitch span covered by a Symmetry sequence."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:cycleDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:decimal ;
     rdfs:label "cycle duration"@en ;
     skos:definition "Duration of one repeated control or sequence cycle, in seconds."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:permutationFunction a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
     rdfs:range xsd:integer ;
     rdfs:label "permutation function"@en ;
     skos:definition "Permutation function selector for sequence ordering. Values match the skos:notation of sstim-v:PermutationFunctionScheme members (0=shuffle, 1=rotate forward, 2=rotate backward, 3=reverse, 4=identity)."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:breathingPhaseRatio a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing phase ratio"@en ;
     skos:definition "Fraction of a breathing cycle assigned to the inhale phase."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:breathingAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "breathing amplitude"@en ;
     skos:definition "Depth or excursion of a breathing-shaped control signal."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-###########################################################################
-# Martigli voice oscillation parameters (Martigli & Martigli-Binaural voices)
-#
-# Per-voice authored parameters of the Martigli breathing arc, distinct from the
-# session-level sstim:breathingPeriod* override properties (domain
-# SessionSpecification). Domain is the broad sstim:Voice, matching the other voice
-# parameters above; the SHACL Martigli voice shapes enforce which subtype must
-# carry which parameter. See ADR 0012 and docs/technical/BREATHING_MODEL.md.
-###########################################################################
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
@@ -166,7 +243,7 @@ sstim:martigliCenterFreq a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "Martigli center frequency"@en ;
     skos:definition "Center frequency (mf0) of a Martigli voice's oscillating tone, in Hz; the frequency sweeps mf0 ± ma. Martigli voices only — Martigli-Binaural uses the carrier pair."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
@@ -174,7 +251,7 @@ sstim:martigliAmplitude a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "Martigli oscillation amplitude"@en ;
     skos:definition "Frequency-sweep amplitude (ma) of a Martigli oscillation, in Hz; the carrier(s) sweep ± ma around the center."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
@@ -182,7 +259,7 @@ sstim:martigliPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "Martigli initial period"@en ;
     skos:definition "Initial breathing-cycle duration (mp0) of a Martigli oscillation, in seconds. Must be >= 3 s when the voice is the breathing reference (isOn)."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:Voice sstim:ControlTrack ) ] ;
@@ -190,7 +267,7 @@ sstim:martigliPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "Martigli final period"@en ;
     skos:definition "Final breathing-cycle duration (mp1) of a Martigli oscillation after the transition, in seconds."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:martigliTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
@@ -198,7 +275,7 @@ sstim:martigliTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty 
     rdfs:label "Martigli transition duration"@en ;
     skos:definition "Time (md) over which the breathing cycle interpolates linearly from mp0 to mp1, in seconds; mp1 is held afterwards."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:isBreathReference a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:Voice ;
@@ -206,152 +283,60 @@ sstim:isBreathReference a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:label "is breath reference"@en ;
     skos:definition "True iff this voice is the breathing reference (isOn): its oscillation drives the visual breathing animation and haptic pulse. At most one voice per preset may be the breathing reference."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-###########################################################################
-# Session authoring parameter datatype properties
-# (domain sstim:SessionSpecification — visual, haptic, and tempo authoring)
-###########################################################################
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:rotationSpeed a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "rotation speed"@en ;
     skos:definition "Visual rotation rate or angular speed."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:visualSideCount a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "visual side count"@en ;
     skos:definition "Number of sides used by a geometric visual form."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:visualDensity a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:VisualTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "visual density"@en ;
     skos:definition "Density of rendered visual elements."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:stimulationIntensity a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:HapticTrack ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "stimulation intensity"@en ;
     skos:definition "Strength of haptic or sensory output."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:hapticPattern a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:HapticTrack ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "haptic pattern"@en ;
     skos:definition "Pattern index or selector for haptic delivery."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:tempoBpm a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range xsd:decimal ;
     rdfs:label "tempo BPM"@en ;
     skos:definition "Optional authoring tempo in beats per minute."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:beatsPerBar a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
     rdfs:range xsd:integer ;
     rdfs:label "beats per bar"@en ;
     skos:definition "Number of beats in one authoring tempo bar."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
+    rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
-###########################################################################
-# End of sstim-patch-studio.ttl
-###########################################################################
-
-
-###########################################################################
-# Layers within an engine configuration
-#
-# ADR 0041. An earlier version of this block (ADR 0040) also declared
-# sstim:Patch, on the reasoning that a patch and a preset were different kinds
-# of thing. That was wrong and the class is withdrawn: "patch" and "preset" name
-# the same layer — a saved parameter configuration for some engine or design —
-# and the difference between BSC's two serialisations is a fact about BSC, not
-# about sensory stimulation. Engine-specific schemas are conformance profiles of
-# sstim:Preset, not classes in the shared term space (CLAUDE.md 5.1).
-#
-# sstim:Track survives that withdrawal because it is genuinely general: any
-# multi-layer configuration has layers, whatever it calls them, and both the BSC
-# catalog and Patch Studio have them.
-###########################################################################
-
-sstim:Track a owl:Class ;
-    rdfs:subClassOf iao:0000030 ;
-    rdfs:label "Track"@en ;
-    skos:definition "A single layer within an engine configuration, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
-    skos:scopeNote "Currently parallel to sstim:Voice rather than above it. A voice is the audio layer of a BSC catalog preset, constrained to four technique types; whether sstim:Voice should be asserted as a subclass of sstim:AudioTrack is an open question deferred by ADR 0041 — it becomes clean once Patch Studio control tracks are renamed to LFO and Permutation, which removes the case where one name covers both an audible layer and a silent one."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-sstim:AudioTrack a owl:Class ;
-    rdfs:subClassOf sstim:Track ;
-    rdfs:label "Audio Track"@en ;
-    skos:definition "A track whose output is audible: an isochronic tone, a binaural carrier pair, a plain carrier, noise, a drone, or a sample."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-sstim:VisualTrack a owl:Class ;
-    rdfs:subClassOf sstim:Track ;
-    rdfs:label "Visual Track"@en ;
-    skos:definition "A track whose output is visible. Rate-bearing visual tracks are subject to the runtime flash-rate safety limits recorded in the exposure module."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-sstim:HapticTrack a owl:Class ;
-    rdfs:subClassOf sstim:Track ;
-    rdfs:label "Haptic Track"@en ;
-    skos:definition "A track whose output is delivered as vibration through a device actuator."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-sstim:ControlTrack a owl:Class ;
-    rdfs:subClassOf sstim:Track ;
-    rdfs:label "Control Track"@en ;
-    skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks. Breathing-guidance (Martigli) and symmetry-derived control signals are the current kinds."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-# A track is exactly one kind. Mirrors the disjointness the four voice subtypes
-# already carry, so a projection cannot type a layer as both audible and control.
-[] a owl:AllDisjointClasses ;
-    owl:members ( sstim:AudioTrack sstim:VisualTrack sstim:HapticTrack sstim:ControlTrack ) .
-
-
-sstim:composedOfTrack a owl:ObjectProperty ;
-    rdfs:domain sstim:Preset ;
-    rdfs:range  sstim:Track ;
-    rdfs:label  "composed of track"@en ;
-    skos:definition "Links an engine configuration to the layers it is composed of. Distinct from sstim:composedOf, which links a BSC catalog preset to its voices: a configuration whose schema has generic layers uses this, one whose schema has the four catalog voice types uses that."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim> .
-
-
-# A voice is an audible layer, which is exactly what sstim:AudioTrack is.
-#
-# ADR 0040 declined this subsumption on reasoning that did not survive review:
-# that a voice carries catalog-specific semantics (a subclass is *allowed* to be
-# more specific) and that a control track is silent (irrelevant — a voice sits
-# under AudioTrack, not under Track). What genuinely blocked it was that
-# "Martigli" named an audible catalog voice and a silent Patch Studio controller
-# at once. Renaming the controller to LFO (ADR 0041) removed the collision and
-# the subsumption is now simply true.
-#
-# Asserted here rather than beside sstim:Voice in sstim-core.ttl because
-# sstim:AudioTrack is defined in this module, which already dct:requires core.
-# The reverse would invert the module dependency.
-#
-# Backward-compatible: it adds an entailment about existing voices and removes
-# none. pyshacl runs without OWL inference, so no shape targeting AudioTrack
-# begins firing on catalog voices as a side effect.
 sstim:Voice rdfs:subClassOf sstim:AudioTrack .
+
+
+###########################################################################
+# End of patch-studio
+###########################################################################

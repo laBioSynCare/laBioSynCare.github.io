@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import {
+    ONTOLOGY_SOURCES,
     loadLiveEcosystem,
     loadStaticKnowledgeGraph,
     mergeStores,
@@ -34,6 +35,8 @@ ORDER BY ?label`)
   let includeLive = $state(false)
   let loadingLive = $state(false)
   let liveStatus = $state({ state: 'disabled', message: 'Live ecosystem data is not loaded.' })
+
+  const ontologySources = Object.values(ONTOLOGY_SOURCES)
 
   let selectedExample = $derived(EXAMPLE_QUERIES.find(q => q.id === selectedExampleId) ?? null)
 
@@ -206,10 +209,10 @@ ORDER BY ?label`)
           </p>
           <h3>What gets loaded, and from where</h3>
           <ul>
-            <li>The ontology and vocabulary — <code>sstim-core.ttl</code>, <code>sstim-vocab.ttl</code>,
-              <code>sstim-shapes.ttl</code>, <code>sstim-alignments.ttl</code>, the Patch Studio module —
-              served same-origin from <code>/ontology/*.ttl</code> (mirrored at the citable
-              <a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a> namespace).</li>
+            <li>Every ontology module in the manifest's Full profile, plus its associated
+              Full SHACL shapes — served same-origin from <code>/ontology/*.ttl</code>
+              (mirrored at the persistent <a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a>
+              namespace; cite an immutable version such as <a href="https://w3id.org/sstim/0.12.0" rel="external">0.12.0</a>).</li>
             <li>The versioned catalog — frameworks, implementations, presets, protocols,
               evidence, experiments — from <code>/ontology/instances/*</code>.</li>
             <li>The live public ecosystem projection — opt-in via the checkbox — fetched
@@ -236,13 +239,10 @@ ORDER BY ?label`)
             <code>curl</code> into any triple store) and query them there:
           </p>
           <ul class="source-urls">
-            <li><a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a> — citable, content-negotiated entry point</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-core.ttl" rel="external">…/ontology/sstim-core.ttl</a> — OWL core</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-vocab.ttl" rel="external">…/ontology/sstim-vocab.ttl</a> — SKOS vocabulary</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-shapes.ttl" rel="external">…/ontology/sstim-shapes.ttl</a> — SHACL shapes</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-alignments.ttl" rel="external">…/ontology/sstim-alignments.ttl</a> — BFO/OBI/IAO/Wikidata alignments</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-exposure.ttl" rel="external">…/ontology/sstim-exposure.ttl</a> — exposure module</li>
-            <li><a href="https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl" rel="external">…/ontology/sstim-ecosystem.ttl</a> — ecosystem module</li>
+            <li><a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a> — persistent, content-negotiated latest namespace; cite <a href="https://w3id.org/sstim/0.12.0" rel="external">the immutable 0.12.0 release</a></li>
+            {#each ontologySources as source}
+              <li><a href={source.persistentUrl} rel="external">{source.url}</a> — {source.title}</li>
+            {/each}
             <li><a href="https://biosyncare-lab.web.app/current.ttl" rel="external">biosyncare-lab.web.app/current.ttl</a> — live public ecosystem (mutable, not citable)</li>
           </ul>
           <h3>Querying another endpoint</h3>

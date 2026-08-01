@@ -1,0 +1,688 @@
+###########################################################################
+#
+#  SSTIM Evidence and Research Governance Module
+#
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/evidence> a owl:Ontology ;
+    owl:versionInfo "0.13.0-dev" ;
+    dct:title "SSTIM Evidence and Research Governance Module"@en ;
+    dct:description "Evidence assessments, atomic propositions, qualified bases, scope, references, searches, reviews, provenance, and public-claim governance."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/configuration> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-01"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Evidence and research governance terms
+###########################################################################
+
+sstim:EvidenceTierValue a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Tier Value"@en ;
+    skos:definition "A classification of empirical support strength for a specific stimulation claim, accounting for study quality, result consistency, modality match, and population match. Six tiers: speculative(1) through established(6). A tier is meaningful only together with the claim direction and the bounded proposition scope it was assigned to."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceModalityTag a owl:Class ;
+    owl:deprecated true ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Modality Tag (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the tag conflated sensory modality (AUD, AV, VIS, TACTILE, MULTISENSORY), intervention (BREATH), study model (PRECLINICAL), and synthesis type (REVIEW). Authoritative data uses the orthogonal basis axes; the class survives only for the generated non-authoritative 0.7 compatibility view and is removed no earlier than 1.0."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:PublicClaimLevel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Public Claim Level"@en,
+               "Livello di Affermazione Pubblica"@it,
+               "Nível de Alegação Pública"@pt,
+               "Nivel de Afirmación Pública"@es ;
+    skos:definition "A named ceiling on what a sensory-stimulation product may assert about itself on a public-facing surface, ordered from descriptive fact to quantified/superiority claims. Each level carries the minimum evidence-tier rank required to assert at that level publicly, so over-claiming is machine-checkable. A risk-reduction classification, not legal advice."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceClaim a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Claim"@en ;
+    skos:definition "Compatibility superclass of evidence assessments. Direct instantiation is rejected by SHACL: every instance must carry a concrete evidence subtype (sstim:EvidenceAssessmentClaim). Hypotheses, research questions, boundary applicability, requirements, design objectives, planned outcomes, knowledge-status assertions, and session observations are never EvidenceClaims."@en ;
+    skos:historyNote "Narrowed 2026-07-13 (ADR 0027) from a single overloaded claim class to the compatibility superclass of EvidenceAssessmentClaim."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ClaimDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Claim Direction"@en ;
+    skos:definition "Whether a body of evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EffectDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Effect Direction"@en ;
+    skos:definition "The direction of the measured outcome (increase, decrease, or no change). Wellness-neutral; describes what was measured, not a health claim."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ReviewStatus a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Review Status"@en ;
+    skos:definition "The audit status of an evidence claim's tier assignment (provisional, reviewed, or needs update)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:PublicSafeReference a owl:Class ;
+    rdfs:subClassOf sstim:BibliographicReference ;
+    rdfs:label "Public-Safe Reference"@en ;
+    skos:definition "A peer-reviewed publication cleared for citation in BSC user-facing content. Must be cleared in the BSC Reference Agent before use in preset techDesc fields."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasEvidenceTier a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:EvidenceTierValue ;
+    rdfs:label  "has evidence tier"@en ;
+    skos:definition "Links an evidence claim to its strength classification tier, accounting for study quality and modality matching."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasModalityTag a owl:ObjectProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:EvidenceModalityTag ;
+    rdfs:label  "has modality tag (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the tag mixed sensory modality with study model and synthesis type. Authoritative data uses the orthogonal basis axes (basisSensoryModality, basisModalityApplicability, basisStudyModel, basisSynthesisType, basisIntervention). Appears only in the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:supportsRelation a owl:ObjectProperty ;
+    owl:deprecated true ;
+    rdfs:subPropertyOf sstim:evaluatesSubject ;
+    rdfs:range  [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label  "supports relation (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the property name encodes a supporting direction the claim may not have. Use sstim:evaluatesSubject; direction lives exclusively in hasClaimDirection. Retained as a materialized compatibility alias during 0.7.x; removed no earlier than 1.0."@en ;
+    skos:historyNote "Deprecated 2026-07-13 in favour of sstim:evaluatesSubject (ADR 0027); original range decision from ADR 0013 is preserved on the replacement."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0013-evidence-support-relation-range.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:citesReference a owl:ObjectProperty ;
+    rdfs:range  sstim:BibliographicReference ;
+    rdfs:label  "cites reference"@en ;
+    skos:definition "Links an evidence assessment to a bibliographic reference. For every bibliographic basis source the assessment carries a matching citesReference triple (ADR 0027); publication clearance is a separate concern (ADR 0029)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasClaimDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:ClaimDirection ;
+    rdfs:label  "has claim direction"@en ;
+    skos:definition "Whether the cited evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasEffectDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:EffectDirection ;
+    rdfs:label  "has effect direction (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: observed effect direction is source-level metadata; use sstim:basisObservedEffectDirection on the qualified evidence basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:ReviewStatus ;
+    rdfs:label  "has review status (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: review state is derived from immutable EvidenceReviewDecision records, not stored as a mutable status. A non-authoritative 0.7 compatibility view may derive it; it is excluded from validation and authorization."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:evidenceOutcome a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "evidence outcome (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisObservedOutcome concept plus sstim:basisOutcomeNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:studyPopulation a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "study population (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisStudyPopulation descriptor plus sstim:basisPopulationNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:comparator a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "comparator (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisComparator descriptor plus sstim:basisComparatorNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:evidenceDate a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:date ;
+    rdfs:label  "evidence date (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: source publication dates stay as dct:issued on the bibliographic reference; assessment and review dates come from their generating activities. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:reviewedBy a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reviewed by (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: reviewer identity and role live on the review activity's prov:qualifiedAssociation as agent IRIs, not name literals. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasPublicClaimLevel a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:PublicClaimLevel ;
+    rdfs:label  "has public claim level"@en ;
+    skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that supporting evidence meets the level's required tier."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:tierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceTierValue ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "tier rank"@en ;
+    skos:definition "Ordinal rank 1–6 for SPARQL ORDER BY. Speculative=1, Anecdotal=2, Preliminary=3, Moderate=4, Strong=5, Established=6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:claimLevelRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "claim level rank"@en ;
+    skos:definition "Ordinal rank 0–5 of a public claim level. C0 Descriptive=0, C1 Experiential=1, C2 Wellness=2, C3 Structure/Function=3, C4 Medical/Condition=4, C5 Quantified/Superiority=5."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:requiresEvidenceTierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "requires evidence tier rank"@en ;
+    skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition). PROVISIONAL policy mapping — reconcile with the BioSynCare Reference publicClaimLevel/clinicalScope enum and a qualified EU MDR adviser before launch."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:referenceKey a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicSafeReference ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reference key"@en ;
+    skos:definition "Short uppercase key (e.g. 'INGENDOH_2023') matching citation keys in preset techDesc fields."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:evidenceNotes a owl:AnnotationProperty ;
+    rdfs:label "evidence notes"@en ;
+    skos:definition "Internal human-readable note on evidence basis and caveats. Not for user-facing display."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceAssessmentClaim a owl:Class ;
+    rdfs:subClassOf sstim:EvidenceClaim ;
+    rdfs:label "Evidence Assessment Claim"@en ;
+    skos:definition "A versioned, immutable assessment of an identified evidence basis about one atomic bounded proposition. The sole concrete evidence-bearing class: exactly one evidence tier and one claim direction, at least one qualified evidence basis, and exactly one assessed proposition. A correction mints a new revision IRI linked with prov:wasRevisionOf; it never edits a published revision in place."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:BibliographicReference a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Bibliographic Reference"@en ;
+    skos:definition "A bibliographic record of a published source. Being recorded implies neither endorsement nor permission to quote, reproduce, or display the source."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:GovernedResearchOutput a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Governed Research Output"@en ;
+    skos:definition "A versioned study record, dataset revision, or analysis output admitted as an evidence source. Requires exactly one source-governance record; an ungoverned dataset cannot serve as an evidence basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:SourceGovernanceRecord a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Source Governance Record"@en ;
+    skos:definition "An immutable record governing a research output used as evidence: source version and digest, custodian, access classification, consent/ethics basis or an explicit not-applicable determination, and permitted use scope, with generation time and a qualified responsible agent."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceBasis a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Basis"@en ;
+    skos:definition "One qualified contribution of a single source to an evidence assessment, carrying source-level modality, intervention, study design, model/population, synthesis, and observed-result metadata separately from the assessment's own conclusion."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceSearchRecord a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Search Record"@en ;
+    skos:definition "An immutable, reproducible record of a literature/evidence search: sources, exact query, coverage dates, eligibility criteria, result count, and content digest. Supports only scoped 'no eligible evidence found' findings, never universal absence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:AssessmentProposition a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Assessment Proposition"@en ;
+    skos:definition "One immutable, atomic, independently assessable proposition evaluated by an evidence assessment: exactly one subject, one outcome concept, one scope, one proposition form, and exact text or digest."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:AssessmentScope a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Assessment Scope"@en ;
+    skos:definition "The explicit modality, population/model, intervention/context, and comparator scope of an assessment proposition. Every axis carries a named value or an explicit unknown / not-reported / not-applicable marker; omission never means universal applicability."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceOutcomeConcept a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Outcome Concept"@en ;
+    skos:definition "A controlled endpoint, response, or mechanism category used to identify what a proposition or reported source result is about. It is a category, not an observed result or benefit."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:PopulationDescriptor a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Population Descriptor"@en ;
+    skos:definition "An identified description of a study population or participant group referenced by an assessment scope or evidence basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ComparatorDescriptor a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Comparator Descriptor"@en ;
+    skos:definition "An identified description of the comparison condition (for example sham, no-stimulus, baseline, or alternative frequency) referenced by an assessment scope or evidence basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ScopeMarker a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Scope Marker"@en ;
+    skos:definition "A controlled marker stating that a scope axis is unknown, not reported, or not applicable. Mutually exclusive with concrete values on the same axis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ModalityApplicability a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Modality Applicability"@en ;
+    skos:definition "A controlled statement of how sensory modality applies to an evidence source: mixed modalities, unknown/not reported, or not applicable. Distinct states, never a wildcard."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:StudyDesign a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Design"@en ;
+    skos:definition "The design of the underlying studies contributing to an evidence source (for example randomized controlled trial, observational, case report, preclinical experiment, mixed, or unknown)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:StudyModel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Model"@en ;
+    skos:definition "The model or stage in which an evidence source's findings were produced (for example human participants, preclinical animal model, in vitro, computational)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceSynthesisType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Synthesis Type"@en ;
+    skos:definition "The synthesis level of an evidence source: primary study, narrative review, systematic review, meta-analysis, literature review, or tutorial. A narrative review does not acquire systematic-review status merely because it synthesizes literature."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidencePropositionForm a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Proposition Form"@en ;
+    skos:definition "The logical form of an assessment proposition: bounded relation, bounded null result, scoped search finding, or universal absence. Universal-absence propositions never conform; a scoped search finding requires an evidence search record basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ReviewerRelationship a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Reviewer Relationship"@en ;
+    skos:definition "The relationship of a review's agent to the assessed work: self, same organization, external, or unknown. External relationship never implies independence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:IndependenceDetermination a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Independence Determination"@en ;
+    skos:definition "A policy-based determination of reviewer independence: independent, not independent, or undetermined. An independent or not-independent determination requires a named independence policy and conflict disclosure."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ReviewDecisionValue a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Review Decision Value"@en ;
+    skos:definition "The outcome of an evidence review: confirm, request revision, or reject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:ConflictDisclosure a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Conflict Disclosure"@en ;
+    skos:definition "A record of declared conflicts of interest for a review, including the explicit declaration that no conflict was declared."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceAssessmentActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Assessment Activity"@en ;
+    skos:definition "The PROV activity that generates an evidence assessment revision. It used every qualified basis, its sources, and the immutable rubric/method revision actually applied, and carries a qualified association naming the responsible agent and role."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceReviewActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Review Activity"@en ;
+    skos:definition "The PROV activity that reviews exactly one assessment revision under a named rubric/policy revision and generates an immutable evidence review decision."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceSearchActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Search Activity"@en ;
+    skos:definition "The PROV activity that executes an evidence search and generates an immutable evidence search record, with execution times and a qualified responsible agent/role."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:EvidenceReviewDecision a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Review Decision"@en ;
+    skos:definition "An immutable review decision about one assessment revision: reviewer relationship, independence determination, and decision are independent axes. A later decision supersedes or invalidates the earlier one; no mutable effective-review pointer exists."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:evaluatesSubject a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label "evaluates subject"@en ;
+    skos:definition "Links an evidence assessment to the preset or technique it evaluates. Neutral: the assessment's direction lives exclusively in hasClaimDirection. Replaces the directionally misleading supportsRelation."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0013-evidence-support-relation-range.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:assessesProposition a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:AssessmentProposition ;
+    rdfs:label "assesses proposition"@en ;
+    skos:definition "Links an evidence assessment to the single atomic bounded proposition it evaluates."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasEvidenceBasis a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceBasis ;
+    rdfs:label "has evidence basis"@en ;
+    skos:definition "Links an evidence assessment to a qualified basis. Every assessment has at least one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisSource a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:BibliographicReference sstim:GovernedResearchOutput sstim:EvidenceSearchRecord ) ] ;
+    rdfs:label "basis source"@en ;
+    skos:definition "The single source of a qualified evidence basis: a bibliographic reference, a governed research output, or an evidence search record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasSourceGovernanceRecord a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:SourceGovernanceRecord ;
+    rdfs:label "has source governance record"@en ;
+    skos:definition "Links a governed research output to its single immutable source-governance record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:propositionSubject a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label "proposition subject"@en ;
+    skos:definition "The single subject of an assessment proposition; must match the assessment's evaluatesSubject value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:propositionOutcome a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidenceOutcomeConcept ;
+    rdfs:label "proposition outcome"@en ;
+    skos:definition "The single identified outcome concept an assessment proposition is about."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasAssessmentScope a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:AssessmentScope ;
+    rdfs:label "has assessment scope"@en ;
+    skos:definition "The single explicit scope of an assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasPropositionForm a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidencePropositionForm ;
+    rdfs:label "has proposition form"@en ;
+    skos:definition "The single controlled logical form of an assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:scopeSensoryModality a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:SensoryModality sstim:ScopeMarker ) ] ;
+    rdfs:label "scope sensory modality"@en ;
+    skos:definition "A named sensory modality of the proposition scope, or an explicit unknown / not-reported / not-applicable marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:scopePopulationOrModel a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:PopulationDescriptor sstim:StudyModel sstim:ScopeMarker ) ] ;
+    rdfs:label "scope population or model"@en ;
+    skos:definition "A named population descriptor or study model of the proposition scope, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:scopeInterventionOrContext a owl:ObjectProperty ;
+    rdfs:label "scope intervention or context"@en ;
+    skos:definition "The identified intervention, technique, protocol, context, or exposure profile the proposition scope covers, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:scopeComparator a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:ComparatorDescriptor sstim:ScopeMarker ) ] ;
+    rdfs:label "scope comparator"@en ;
+    skos:definition "The identified comparison condition of the proposition scope, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisSensoryModality a owl:ObjectProperty ;
+    rdfs:range sstim:SensoryModality ;
+    rdfs:label "basis sensory modality"@en ;
+    skos:definition "A canonical sensory modality the basis source explicitly supports. Zero modalities requires an explicit modality-applicability value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisModalityApplicability a owl:ObjectProperty ;
+    rdfs:range sstim:ModalityApplicability ;
+    rdfs:label "basis modality applicability"@en ;
+    skos:definition "How sensory modality applies to this basis source: mixed, unknown/not reported, or not applicable."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisIntervention a owl:ObjectProperty ;
+    rdfs:label "basis intervention"@en ;
+    skos:definition "The studied technique, protocol, intervention, or exposure profile this basis source is about (for example paced breathing rather than an auditory cue)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisStudyDesign a owl:ObjectProperty ;
+    rdfs:range sstim:StudyDesign ;
+    rdfs:label "basis study design"@en ;
+    skos:definition "The design of the underlying studies contributing to this basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisStudyModel a owl:ObjectProperty ;
+    rdfs:range sstim:StudyModel ;
+    rdfs:label "basis study model"@en ;
+    skos:definition "The model or stage of this basis source's findings (human, preclinical animal, in vitro, computational)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisStudyPopulation a owl:ObjectProperty ;
+    rdfs:range sstim:PopulationDescriptor ;
+    rdfs:label "basis study population"@en ;
+    skos:definition "The identified population studied by this basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisSynthesisType a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceSynthesisType ;
+    rdfs:label "basis synthesis type"@en ;
+    skos:definition "The synthesis level of this basis source (primary study, narrative review, systematic review, meta-analysis, literature review, tutorial)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisObservedOutcome a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceOutcomeConcept ;
+    rdfs:label "basis observed outcome"@en ;
+    skos:definition "An outcome concept the basis source reports on, as source-level metadata distinct from the assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisComparator a owl:ObjectProperty ;
+    rdfs:range sstim:ComparatorDescriptor ;
+    rdfs:label "basis comparator"@en ;
+    skos:definition "A comparator the basis source used, as source-level metadata."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisObservedEffectDirection a owl:ObjectProperty ;
+    rdfs:range sstim:EffectDirection ;
+    rdfs:label "basis observed effect direction"@en ;
+    skos:definition "The direction of an outcome the basis source reports, as source-level metadata."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:reviewsAssessment a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidenceAssessmentClaim ;
+    rdfs:label "reviews assessment"@en ;
+    skos:definition "The single assessment revision an evidence review decision is about; must equal the revision its generating review activity used."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:reviewRubric a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "review rubric"@en ;
+    skos:definition "The immutable rubric or policy revision a review decision was made under."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasReviewerRelationship a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:ReviewerRelationship ;
+    rdfs:label "has reviewer relationship"@en ;
+    skos:definition "The reviewer's relationship to the assessed work: self, same organization, external, or unknown."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasIndependenceDetermination a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:IndependenceDetermination ;
+    rdfs:label "has independence determination"@en ;
+    skos:definition "The policy-based independence determination of a review decision. External relationship never implies independence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:hasReviewDecision a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:ReviewDecisionValue ;
+    rdfs:label "has review decision"@en ;
+    skos:definition "The outcome of a review decision: confirm, request revision, or reject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:independencePolicy a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "independence policy"@en ;
+    skos:definition "The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:conflictDisclosure a owl:ObjectProperty ;
+    rdfs:range sstim:ConflictDisclosure ;
+    rdfs:label "conflict disclosure"@en ;
+    skos:definition "A conflict-of-interest disclosure record attached to an independence determination, including the explicit no-conflict-declared record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:propositionText a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "proposition text"@en ;
+    skos:definition "The exact language-tagged text of an atomic assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:propositionDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "proposition digest"@en ;
+    skos:definition "An immutable content digest identifying the exact proposition when text alone is insufficient."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisOutcomeNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis outcome note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's reported outcome. Never a substitute for the identified outcome concept."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisPopulationNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis population note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's population. Never a substitute for the identified population descriptor."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:basisComparatorNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis comparator note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's comparator. Never a substitute for the identified comparator descriptor."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchSource a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search source"@en ;
+    skos:definition "A database or source searched, one value per source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchQuery a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search query"@en ;
+    skos:definition "The exact query string executed by an evidence search."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchCoverageStart a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "search coverage start"@en ;
+    skos:definition "The earliest publication date the search covered, when bounded."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchCoverageEnd a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "search coverage end"@en ;
+    skos:definition "The latest date the search covered; the as-of date of a scoped search finding."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchEligibilityCriteria a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "search eligibility criteria"@en ;
+    skos:definition "The eligibility criteria applied to search results."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchResultCount a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "search result count"@en ;
+    skos:definition "The number of results the executed search returned."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:searchDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search digest"@en ;
+    skos:definition "A content digest of the search record's result set or export."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:governedSourceVersion a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "governed source version"@en ;
+    skos:definition "The exact version of the governed research output this governance record covers."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:governedSourceDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "governed source digest"@en ;
+    skos:definition "A content digest of the governed research output version."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:custodian a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range prov:Agent ;
+    rdfs:label "custodian"@en ;
+    skos:definition "The agent that owns or is custodian of a governed research output."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:accessClassification a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "access classification"@en ;
+    skos:definition "The access classification of a governed research output (for example private, shared-research, de-identified, public)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:consentBasisNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "consent basis note"@en ;
+    skos:definition "The applicable consent or ethics basis for a governed research output, or an explicit not-applicable determination."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+sstim:permittedUseScope a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "permitted use scope"@en ;
+    skos:definition "The permitted use and release scope of a governed research output as evidence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
+
+
+###########################################################################
+# End of evidence
+###########################################################################

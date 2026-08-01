@@ -22,8 +22,9 @@ pre-filled values, and a status slot to complete after submitting.
 
 ## 1. Reusable metadata kit
 
-Every field below is copy-paste ready and verified against the released
-ontology (`static/ontology/sstim-core.ttl`, `void.ttl`) on 2026-07-11.
+Every field below is copy-paste ready and verified on 2026-08-01 against the
+latest immutable release (`static/ontology/0.12.0/`) and its publication
+records. Mutable `0.13.0-dev` module files are not release metadata.
 
 | Field | Value |
 |---|---|
@@ -31,20 +32,20 @@ ontology (`static/ontology/sstim-core.ttl`, `void.ttl`) on 2026-07-11.
 | Stable ontology URI | `https://w3id.org/sstim` |
 | Namespace URI | `https://w3id.org/sstim#` |
 | Preferred prefix | `sstim` |
-| Current version | `0.6.0` |
-| Version IRI | `https://w3id.org/sstim/0.6.0` |
+| Current version | `0.12.0` |
+| Version IRI | `https://w3id.org/sstim/0.12.0` |
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
-| Version DOI (0.6.0) | `10.5281/zenodo.21302910` |
+| Version DOI (0.12.0) | `10.5281/zenodo.21717988` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
 | Publisher | `https://github.com/laBioSynCare` |
 | First released | 2026-04-12 |
-| Current release date | 2026-07-11 |
+| Current release date | 2026-07-31 |
 | Source repository | `https://github.com/laBioSynCare/laBioSynCare.github.io` |
 | HTML documentation | `https://labiosyncare.github.io/ontology/docs/` |
-| Turtle (core) | `https://labiosyncare.github.io/ontology/sstim-core.ttl` |
-| JSON-LD (core) | `https://labiosyncare.github.io/ontology/sstim-core.jsonld` |
-| RDF/XML (core) | `https://labiosyncare.github.io/ontology/sstim-core.rdf` |
+| Frozen Turtle entry point (0.12.0) | `https://w3id.org/sstim/0.12.0/sstim-core.ttl` |
+| JSON-LD (content negotiated) | `https://w3id.org/sstim` with `Accept: application/ld+json` |
+| RDF/XML (content negotiated) | `https://w3id.org/sstim` with `Accept: application/rdf+xml` |
 | VoID/DCAT | `https://labiosyncare.github.io/ontology/void.ttl` |
 
 **Short description (≤ 300 chars).**
@@ -65,11 +66,12 @@ breathing, multisensory integration, SKOS vocabulary, SHACL, evidence tiers.
 
 ## 2. Readiness at a glance
 
-The core ontology URI (`https://w3id.org/sstim`) already dereferences through
-w3id to Turtle/JSON-LD/RDF-XML, and the WIDOCO HTML is live — so registries
-that target the core URI can go **now**. The pending perma-id PR #6337 only adds
-the `/sstim/exposure` and `/sstim/void` routes; it does **not** block core-URI
-registration.
+The released `0.12.0` ontology URI already dereferences through w3id to
+Turtle/JSON-LD/RDF-XML, and the WIDOCO HTML is live. Perma-id PR #6337 merged on
+2026-07-11; it is not pending. Existing registry records for the released line
+remain valid. Do not present mutable `0.13.0-dev` as a new release: its generated
+namespace catalogues, exact Kernel/module endpoints, profiles, manifest, and
+schema must be deployed and the staged perma-id matrix verified first.
 
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
@@ -111,8 +113,9 @@ resolve, and returns an automated quality-star rating. No account.
 - **Provide:** ontology URI `https://w3id.org/sstim`
 - **HTTP POST alternative:**
   `curl -X POST https://archivo.tools.dbpedia.org/add --data-urlencode "suggestUrl=https://w3id.org/sstim"`
-- **Acceptance prerequisites — both verified met on 2026-07-11:**
-  (1) the URI content-negotiates to Turtle/RDF-XML/N-Triples ✅ (w3id → Pages);
+- **Acceptance prerequisites — verified met on 2026-07-11:**
+  (1) the URI content-negotiates to Turtle and RDF/XML ✅ (w3id → Pages;
+  N-Triples remains an optional unsupported representation);
   (2) the `owl:Ontology` IRI in the returned document equals the submitted URL —
   SSTIM's ontology subject is `<https://w3id.org/sstim>`, matching exactly ✅.
 - **After:** Archivo crawls every 8 h once accepted; record the Archivo IRI +
@@ -125,8 +128,9 @@ reading Archivo's source (`archivo/crawling/best_effort_crawling.py`,
 `utils/parsing.py`): Archivo fetches the URI three times (rdf+xml, turtle,
 n-triples) and parses each response with **rapper (Raptor)** keyed to the
 **requested** format, not the response Content-Type; it accepts if any format
-yields >0 triples. The live w3id rules ignore `Accept` and always return Turtle,
-so only the Turtle branch can parse. Reproducing Archivo's exact pipeline
+yields >0 triples. Before PR #6337, the then-live w3id rules ignored `Accept`
+and always returned Turtle, so only the Turtle branch could parse. Reproducing
+Archivo's exact pipeline
 (`requests` fetch → `rapper -i <fmt>`) on 2026-07-11 gave: rdf+xml → 0, **turtle
 → 707**, n-triples → 0 — i.e. one parseable format, which is an **accept**. The
 rejection therefore required the Turtle fetch itself to have transiently failed
@@ -468,7 +472,7 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Object types | controlled picker — pick the closest to what SSTIM describes (e.g. **protocol**, **study/experimental process**); ≥1 required. If nothing fits, ask curators |
 | Subjects (SRAO) | **psychology**, **neuroscience** (≥1 required) |
 | Taxonomies | **Not applicable** (species irrelevant) |
-| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download SSTIM (Turtle)** — `…/ontology/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
+| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download citable SSTIM 0.12.0 (Turtle)** — `https://w3id.org/sstim/0.12.0/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download latest released SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. After the modular release, keep the versioned download and treat top-level `sstim-core.ttl` as Kernel only. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
 
 **RECOMMENDED (add for a strong, approvable record):**
 

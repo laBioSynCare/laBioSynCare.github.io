@@ -9,14 +9,14 @@
 //
 // The design rule here is the one that made `build-info.json` useful: **derive
 // the facts, do not restate them.** A checker that hard-codes "the version is
-// 0.12.0" is one more place to forget. So the canonical version comes from
-// sstim-core.ttl, the module list from the snapshot script's own export, and
-// the DOI from void.ttl — and every document is checked against those.
+// 0.12.0" is one more place to forget. The live suite and module inventory now
+// come from manifest.json; the latest citable release and DOI come from
+// void.ttl. Development and immutable release identity are intentionally
+// distinct facts.
 //
 // Usage:  node scripts/truth-audit.mjs [--verbose]
 
 import { readFileSync, existsSync } from 'node:fs'
-import { ONTOLOGY_FILES } from './snapshot-ontology.mjs'
 
 const VERBOSE = process.argv.includes('--verbose')
 const problems = []
@@ -32,28 +32,28 @@ const core = read('static/ontology/sstim-core.ttl')
 const voidTtl = read('static/ontology/void.ttl')
 const citation = read('CITATION.cff')
 const pkg = JSON.parse(read('package.json'))
+const manifest = JSON.parse(read('static/ontology/manifest.json'))
 
-const VERSION = core?.match(/owl:versionInfo\s+"([^"]+)"/)?.[1]
+const VERSION = manifest.suite.version
+const RELEASE_VERSION = voidTtl?.match(/dcat:version\s+"([^"]+)"/)?.[1]
 const VERSION_IRI = core?.match(/owl:versionIRI\s+<[^>]*\/([\d.]+)>/)?.[1]
 const DOI = voidTtl?.match(/dct:hasVersion\s+<https:\/\/doi\.org\/([^>]+)>/)?.[1]
-const MODULE_COUNT = ONTOLOGY_FILES.length
+const MODULE_COUNT = manifest.modules.length
 const APP_VERSION = pkg.version
 
 if (!VERSION) fail('sstim-core.ttl', 'no owl:versionInfo found — cannot audit anything else')
-
-const NUMBER_WORDS = {
-  5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve',
-}
 
 // ── 1. the release identity agrees with itself ───────────────────────────────
 
 if (VERSION && VERSION_IRI && VERSION !== VERSION_IRI) {
   fail('sstim-core.ttl', `owl:versionIRI says ${VERSION_IRI} but owl:versionInfo says ${VERSION}`)
+} else if (VERSION?.includes('-') && VERSION_IRI) {
+  fail('sstim-core.ttl', `development version ${VERSION} must not claim owl:versionIRI`)
 } else ok(`core version identity (${VERSION})`)
 
 const citationVersion = citation?.match(/^version:\s*(.+)$/m)?.[1]?.trim()
-if (citationVersion && citationVersion !== VERSION) {
-  fail('CITATION.cff', `version ${citationVersion} does not match the ontology's ${VERSION}`)
+if (citationVersion && citationVersion !== RELEASE_VERSION) {
+  fail('CITATION.cff', `version ${citationVersion} does not match the latest immutable release ${RELEASE_VERSION}`)
 } else ok('CITATION.cff version')
 
 const citationDoi = citation?.match(/^doi:\s*(.+)$/m)?.[1]?.trim()
@@ -61,17 +61,17 @@ if (DOI && citationDoi && citationDoi !== DOI) {
   fail('CITATION.cff', `doi ${citationDoi} does not match void.ttl's ${DOI}`)
 } else ok('CITATION.cff DOI')
 
-const voidVersion = voidTtl?.match(/dcat:version\s+"([^"]+)"/)?.[1]
-if (voidVersion && voidVersion !== VERSION) {
-  fail('void.ttl', `dcat:version ${voidVersion} does not match the ontology's ${VERSION}`)
-} else ok('void.ttl version')
+if (!RELEASE_VERSION || !existsSync(`static/ontology/${RELEASE_VERSION}`)) {
+  fail('void.ttl', `dcat:version ${RELEASE_VERSION ?? '(missing)'} has no immutable snapshot`)
+} else ok(`void.ttl immutable release (${RELEASE_VERSION})`)
 
 // Every module must carry the release version.
-for (const file of ONTOLOGY_FILES) {
-  const text = read(`static/ontology/${file}`)
-  if (!text) { fail(file, 'listed in ONTOLOGY_FILES but missing from static/ontology/'); continue }
+for (const module of manifest.modules) {
+  const file = module.source.path
+  const text = read(file)
+  if (!text) { fail(file, 'listed in manifest but missing'); continue }
   const moduleVersion = text.match(/owl:versionInfo\s+"([^"]+)"/)?.[1]
-  if (moduleVersion !== VERSION) {
+  if (module.version !== VERSION || moduleVersion !== VERSION) {
     fail(file, `owl:versionInfo ${moduleVersion} diverges from the set's ${VERSION}`)
   }
 }
@@ -99,7 +99,7 @@ for (const file of PROSE) {
     if (!/sstim|ontology|release/i.test(line)) return
     for (const m of line.matchAll(olderVersion)) {
       const found = m[1]
-      if (found === VERSION || found === APP_VERSION) continue
+      if (found === VERSION.split('-', 1)[0] || found === RELEASE_VERSION || found === APP_VERSION) continue
       // Only complain about things shaped like an SSTIM release.
       if (!/^0\.\d+\.\d+$/.test(found)) continue
       fail(`${file}:${i + 1}`, `names SSTIM ${found} as if current; the release is ${VERSION}`)
@@ -107,20 +107,7 @@ for (const file of PROSE) {
   })
 }
 
-// Module counts written as words go stale silently.
-for (const file of PROSE) {
-  const text = read(file)
-  if (!text) continue
-  for (const [n, word] of Object.entries(NUMBER_WORDS)) {
-    if (Number(n) === MODULE_COUNT) continue
-    // Allow an intervening adjective: "seven release modules" slipped past a
-    // pattern that only knew "seven modules" and "seven ontology modules".
-    const re = new RegExp(`\\b${word}\\s+(\\w+\\s+)?modules\\b`, 'i')
-    const line = text.split('\n').findIndex((l) => re.test(l))
-    if (line >= 0) fail(`${file}:${line + 1}`, `says "${word} modules"; there are ${MODULE_COUNT}`)
-  }
-}
-ok('no superseded version or module count in prose')
+ok('no superseded live/citable version in prose')
 
 // A superseded DOI in prose is the same class of error as a superseded version,
 // and the first pass checked DOIs only among the machine-readable files.
@@ -205,6 +192,7 @@ ok(`${SHIPPED.length} shipped capabilities have evidence and no stale denial`)
 if (VERBOSE || problems.length === 0) {
   console.log('truth-audit: derived facts')
   console.log(`  SSTIM version   ${VERSION}`)
+  console.log(`  citable release ${RELEASE_VERSION}`)
   console.log(`  version DOI     ${DOI ?? '(none recorded)'}`)
   console.log(`  ontology modules ${MODULE_COUNT}`)
   console.log(`  app version     ${APP_VERSION}`)

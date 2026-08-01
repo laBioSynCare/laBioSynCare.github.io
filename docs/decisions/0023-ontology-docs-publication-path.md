@@ -1,6 +1,6 @@
 # ADR 0023 — WIDOCO docs: CI-generated Pages subpath; the app keeps the browser-facing IRI
 
-**Status:** Accepted — 2026-07-11
+**Status:** Accepted — 2026-07-11; Full-profile input amended by ADR 0043 on 2026-08-01
 
 ## Context
 
@@ -31,7 +31,7 @@ artifact only.**
 - Output is never committed. `/ontology/docs/` is reserved for generated
   documentation; the app owns the site root and all existing routes. No
   separate docs branch, no second workflow.
-- Gap-filling metadata (the abstract, which the core ontology does not declare)
+- Gap-filling metadata (the abstract, which the ontology does not declare)
   comes from `docs/ontology/widoco.properties`; everything else is extracted
   from the ontology itself (`-getOntologyMetadata`).
 
@@ -56,8 +56,11 @@ required by any current registry. The docs and the app cross-link instead:
 - Revisiting the browser target later is a one-rule `.htaccess` edit in a
   perma-id PR — reversible, and only warranted if a registry review requires
   static documentation at the ontology IRI itself.
-- WIDOCO documents the core module only; the SKOS vocabulary module is served
-  by a SKOS-aware generator. **Done 2026-07-12:** pyLODE 2.13.2 (`vocpub`
+- Beginning with the modular line in ADR 0043, WIDOCO documents the
+  manifest-defined Full semantic profile after its RDF closure is unioned; it
+  must not receive independently translated modules, which can discard
+  cross-module axioms. The SKOS vocabulary module is also served by a SKOS-aware
+  generator. **Done 2026-07-12:** pyLODE 2.13.2 (`vocpub`
   profile, vendored in the flake) generates `/ontology/docs/vocab/` in CI
   alongside WIDOCO; the two cross-link (WIDOCO abstract → vocab page; graph node
   panel → vocab page for SKOS concepts). pyLODE 2.x was chosen over 3.x because

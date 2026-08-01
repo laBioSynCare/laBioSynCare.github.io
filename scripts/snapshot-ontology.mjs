@@ -3,7 +3,7 @@
 //
 //   node scripts/snapshot-ontology.mjs [version] [--force]
 //
-// Copies the live ontology Turtle files from static/ontology/*.ttl verbatim
+// Copies release-prepared ontology modules and profile entrypoints verbatim
 // (byte-identical) into static/ontology/<version>/, so the URL promised by
 // `owl:versionIRI <https://w3id.org/sstim/<version>>` resolves to a frozen copy
 // that never changes even as the top-level files keep evolving.
@@ -16,6 +16,10 @@
 // Existing snapshots are protected by default. Use --force only to correct a
 // snapshot that was never published. Cutting a real new release means bumping
 // owl:versionInfo / owl:versionIRI first, then snapshotting the new number.
+//
+// Released profile entrypoints must already import exact versioned sibling
+// files, and the manifest must advertise those immutable artifact URLs. The
+// snapshot step never rewrites imports after hashing.
 //
 // Release-readiness checks (improvement plan 0.3, audit KR-14): a snapshot is
 // refused unless the version is a plain release (no -dev/prerelease suffix),
@@ -43,20 +47,24 @@ import { execFileSync } from 'node:child_process'
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
 const ontologyDir = resolve(here, '../static/ontology')
+const manifestPath = join(ontologyDir, 'manifest.json')
 
-// The reusable ontology artifact = the term-space files only. Instances under
-// static/ontology/instances/ are implementation data, not part of the versioned
-// ontology, so they are intentionally not snapshotted here.
-export const ONTOLOGY_FILES = [
-  'sstim-core.ttl',
-  'sstim-vocab.ttl',
-  'sstim-shapes.ttl',
-  'sstim-alignments.ttl',
-  'sstim-patch-studio.ttl',
-  'sstim-exposure.ttl',
-  'sstim-stimulus.ttl',
-  'sstim-ecosystem.ttl',
-]
+function snapshotSourcePaths() {
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  return [
+    ...manifest.modules
+      .filter((module) => module.release.snapshot)
+      .map((module) => module.source.path),
+    ...manifest.profiles
+      .filter((profile) => profile.release.snapshot)
+      .map((profile) => profile.source.path),
+  ]
+}
+
+// Instances are implementation data, not part of the versioned ontology.
+// Modules and profile entrypoints are the manifest-declared reusable artifact.
+export const ONTOLOGY_FILES = snapshotSourcePaths().map((path) => path.split('/').pop())
+export const SNAPSHOT_SIDECARS = ['manifest.json', 'manifest.schema.json']
 
 function declaredVersion() {
   const core = readFileSync(join(ontologyDir, 'sstim-core.ttl'), 'utf8')
@@ -114,7 +122,43 @@ export function todayIso(now = new Date()) {
 // file names to their Turtle text; `releaseDate` is the YYYY-MM-DD date the
 // release is issued on (defaults to today). Returns a list of human-readable
 // problems (empty when the set is ready to snapshot as `version`).
-export function releaseProblems({ version, files, releaseDate = todayIso() }) {
+export function immutableImportProblems({ version, files, manifest }) {
+  const problems = []
+  if (!manifest || !Array.isArray(manifest.modules) || !Array.isArray(manifest.profiles)) {
+    return ['manifest: cannot verify immutable profile imports']
+  }
+  const moduleById = new Map(manifest.modules.map((module) => [module.id, module]))
+  const baseUrl = `https://w3id.org/sstim/${version}/`
+
+  for (const profile of manifest.profiles.filter((candidate) => candidate.release?.snapshot)) {
+    const filename = profile.source?.path?.split('/').pop()
+    const text = files.get(filename) ?? ''
+    const header = ontologyHeader(text)
+    const importsObject = header.match(/\bowl:imports\s+([^;]+);/)?.[1] ?? ''
+    const actual = [...importsObject.matchAll(/<([^>]+)>/g)]
+      .map((match) => match[1])
+      .sort()
+    const expected = (profile.modules ?? [])
+      .map((moduleId) => moduleById.get(moduleId)?.source?.path)
+      .filter(Boolean)
+      .map((sourcePath) => `${baseUrl}${sourcePath.split('/').pop()}`)
+      .sort()
+    if (actual.length !== expected.length || actual.some((iri, index) => iri !== expected[index])) {
+      problems.push(
+        `${filename}: owl:imports must be the exact immutable ${version} sibling closure; ` +
+        `expected [${expected.join(', ')}], found [${actual.join(', ')}]`,
+      )
+    }
+  }
+  return problems
+}
+
+export function releaseProblems({
+  version,
+  files,
+  releaseDate = todayIso(),
+  manifest = null,
+}) {
   const problems = []
   if (version.includes('-')) {
     problems.push(`"${version}" is a development/prerelease version; snapshots are cut only from plain release versions`)
@@ -159,6 +203,7 @@ export function releaseProblems({ version, files, releaseDate = todayIso() }) {
   if (!/mod:status\s+"released"/.test(core)) {
     problems.push('sstim-core.ttl: mod:status must be "released" at snapshot time')
   }
+  if (manifest) problems.push(...immutableImportProblems({ version, files, manifest }))
   return problems
 }
 
@@ -184,7 +229,8 @@ function usage() {
 Copies static/ontology/*.ttl into static/ontology/<version>/.
 
 Options:
-  --force   Overwrite an existing snapshot directory. Use only before publish.
+  --force   Refresh an unpublished snapshot's owned files. Unexpected existing
+            artifacts are rejected and never deleted automatically.
   --release-date=YYYY-MM-DD
             The date this version is issued; every module header must declare
             it as dct:issued and dct:modified. Defaults to today.
@@ -221,15 +267,130 @@ function parseArgs(argv) {
   return { version: version ?? declaredVersion(), force, releaseDate }
 }
 
-function dirtyOntologyFiles() {
+export function dirtyOntologyFiles({
+  sourcePaths = null,
+  rootDir = repoRoot,
+  runCommand = execFileSync,
+} = {}) {
+  const checkedPaths = sourcePaths ?? [
+    ...snapshotSourcePaths(),
+    'static/ontology/manifest.json',
+    'static/ontology/manifest.schema.json',
+  ]
+  const out = runCommand(
+    'git',
+    ['status', '--porcelain', '--', ...checkedPaths],
+    { cwd: rootDir },
+  ).toString().trim()
+  return out ? out.split(/\r?\n/) : []
+}
+
+function snapshotReadme({ version, commit, ontologyFiles, sidecars }) {
+  return `# SSTIM ontology — frozen snapshot ${version}
+
+These files are a **byte-identical, immutable copy** of the SSTIM ontology as of
+version \`${version}\`. They exist so that
+\`owl:versionIRI <https://w3id.org/sstim/${version}>\` resolves to a frozen
+artifact that can be cited without ambiguity, even after the top-level
+\`/ontology/*.ttl\` files continue to evolve toward the next version.
+
+Profile entrypoints were release-prepared before this copy: every
+\`owl:imports\` and PROF artifact target is an exact versioned URL.
+\`manifest.json\` advertises the immutable URL of every snapshotted artifact,
+and its \`$schema\` points at the frozen \`manifest.schema.json\` sibling.
+
+- Source commit: \`${commit}\`
+- Generated by: \`scripts/snapshot-ontology.mjs\`
+- Do not hand-edit. To correct an unpublished snapshot, re-run the script with
+  \`--force\`. To cut a new version, bump \`owl:versionInfo\` /
+  \`owl:versionIRI\` in \`sstim-core.ttl\` first, then snapshot the new number.
+
+Files: ${[...ontologyFiles, ...sidecars].map((file) => `\`${file}\``).join(', ')}.
+`
+}
+
+export function snapshotVersionRegistered({
+  ontologyDirectory = ontologyDir,
+  version,
+} = {}) {
+  const ledgerPath = join(ontologyDirectory, 'snapshot-checksums.json')
+  if (!existsSync(ledgerPath)) return false
+  const ledger = JSON.parse(readFileSync(ledgerPath, 'utf8'))
+  return Object.prototype.hasOwnProperty.call(ledger, version)
+}
+
+// Copy the already validated release set and make checksum registration part
+// of the operation's success contract. `--force` may refresh only files that
+// this version of the snapshotter owns; an unexpected file is rejected rather
+// than silently retained or deleted.
+export function writeSnapshotArtifacts({
+  ontologyDirectory = ontologyDir,
+  version,
+  ontologyFiles = ONTOLOGY_FILES,
+  sidecars = SNAPSHOT_SIDECARS,
+  force = false,
+  commit = 'uncommitted',
+  isVersionRegistered = (releaseVersion) => snapshotVersionRegistered({
+    ontologyDirectory,
+    version: releaseVersion,
+  }),
+  recordChecksums = (releaseVersion) => execFileSync(
+    'node',
+    [join(here, 'verify-snapshot-checksums.mjs'), 'record', releaseVersion],
+    { stdio: 'inherit' },
+  ),
+}) {
+  const outDir = join(ontologyDirectory, version)
+  if (isVersionRegistered(version)) {
+    throw new Error(
+      `refusing to modify ${outDir}: version ${version} is already registered ` +
+      'in the immutable snapshot checksum ledger',
+    )
+  }
+  const ownedFiles = new Set([...ontologyFiles, ...sidecars, 'README.md'])
+  const existingFiles = existsSync(outDir)
+    ? readdirSync(outDir).filter((file) => file !== '.DS_Store')
+    : []
+
+  if (existingFiles.length && !force) {
+    throw new Error(
+      `refusing to overwrite existing snapshot ${outDir}; ` +
+      'use --force only if this snapshot has not been published',
+    )
+  }
+  const unexpectedFiles = existingFiles.filter((file) => !ownedFiles.has(file)).sort()
+  if (force && unexpectedFiles.length) {
+    throw new Error(
+      `refusing --force because ${outDir} contains unexpected existing ` +
+      `artifact(s): ${unexpectedFiles.join(', ')}`,
+    )
+  }
+
+  mkdirSync(outDir, { recursive: true })
+  for (const file of ontologyFiles) {
+    copyFileSync(join(ontologyDirectory, file), join(outDir, file))
+  }
+  for (const file of sidecars) {
+    copyFileSync(join(ontologyDirectory, file), join(outDir, file))
+  }
+  writeFileSync(
+    join(outDir, 'README.md'),
+    snapshotReadme({ version, commit, ontologyFiles, sidecars }),
+  )
+
   try {
-    const sourcePaths = ONTOLOGY_FILES.map((file) => join('static/ontology', file))
-    const out = execFileSync('git', ['status', '--porcelain', '--', ...sourcePaths], { cwd: repoRoot })
-      .toString()
-      .trim()
-    return out ? out.split(/\r?\n/) : []
-  } catch {
-    return []
+    recordChecksums(version, outDir)
+  } catch (error) {
+    throw new Error(
+      `checksum ledger recording failed for ${version}; the snapshot is ` +
+      `incomplete and must not be published (${error.message})`,
+      { cause: error },
+    )
+  }
+
+  return {
+    outDir,
+    written: readdirSync(outDir).filter((file) => file !== '.DS_Store').sort(),
   }
 }
 
@@ -249,7 +410,37 @@ function main() {
     process.exit(1)
   }
 
-  const problems = releaseProblems({ version, files: liveModuleFiles(), releaseDate })
+  try {
+    execFileSync('python3', [join(here, 'validate-sstim-manifest-schema.py')], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    })
+    execFileSync('node', [join(here, 'sstim-manifest.mjs'), 'check'], {
+      cwd: repoRoot,
+      stdio: 'inherit',
+    })
+  } catch {
+    console.error(
+      'Refusing to snapshot: static/ontology/manifest.json does not satisfy ' +
+      'its JSON Schema and synchronized semantic contract.',
+    )
+    process.exit(1)
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  if (manifest.suite.version !== version || manifest.suite.status !== 'released') {
+    console.error(
+      `Refusing to snapshot: manifest suite is ${manifest.suite.version} / ${manifest.suite.status}; ` +
+      `expected ${version} / released.`,
+    )
+    process.exit(1)
+  }
+
+  const problems = releaseProblems({
+    version,
+    files: liveModuleFiles(),
+    releaseDate,
+    manifest,
+  })
   if (problems.length) {
     console.error(`Refusing to snapshot: the module set is not release-ready as "${version}" (release date ${releaseDate}):`)
     for (const problem of problems) console.error(`  - ${problem}`)
@@ -259,15 +450,14 @@ function main() {
     process.exit(1)
   }
 
-  const outDir = join(ontologyDir, version)
-  const existingFiles = existsSync(outDir) ? readdirSync(outDir).filter((f) => f !== '.DS_Store') : []
-  if (existingFiles.length && !force) {
-    console.error(`Refusing to overwrite existing snapshot static/ontology/${version}/.`)
-    console.error('Use --force only if this snapshot has not been published.')
+  let dirty
+  try {
+    dirty = dirtyOntologyFiles()
+  } catch (error) {
+    console.error('Refusing to snapshot: could not verify that ontology sources are clean.')
+    console.error(`  ${error.message}`)
     process.exit(1)
   }
-
-  const dirty = dirtyOntologyFiles()
   if (dirty.length) {
     console.error('Refusing to snapshot while source ontology files have uncommitted changes:')
     for (const line of dirty) console.error(`  ${line}`)
@@ -275,46 +465,19 @@ function main() {
     process.exit(1)
   }
 
-  mkdirSync(outDir, { recursive: true })
-
-  for (const file of ONTOLOGY_FILES) {
-    copyFileSync(join(ontologyDir, file), join(outDir, file))
-  }
-
-  const commit = sourceCommit()
-  const readme = `# SSTIM ontology — frozen snapshot ${version}
-
-These files are a **byte-identical, immutable copy** of the SSTIM ontology as of
-version \`${version}\`. They exist so that
-\`owl:versionIRI <https://w3id.org/sstim/${version}>\` resolves to a frozen
-artifact that can be cited without ambiguity, even after the top-level
-\`/ontology/*.ttl\` files continue to evolve toward the next version.
-
-- Source commit: \`${commit}\`
-- Generated by: \`scripts/snapshot-ontology.mjs\`
-- Do not hand-edit. To correct an unpublished snapshot, re-run the script with
-  \`--force\`. To cut a new version, bump \`owl:versionInfo\` /
-  \`owl:versionIRI\` in \`sstim-core.ttl\` first, then snapshot the new number.
-
-Files: ${ONTOLOGY_FILES.map((f) => `\`${f}\``).join(', ')}.
-`
-  writeFileSync(join(outDir, 'README.md'), readme)
-
-  const written = readdirSync(outDir).sort()
-  console.log(`snapshot: wrote static/ontology/${version}/ (${written.length} files)`)
-  for (const f of written) console.log(`  ${f}`)
-
-  // RDF-03/RDF-12 (2026-07-24 audit): every new snapshot gets its checksums
-  // recorded immediately, so `make verify-snapshots` can catch drift in it for
-  // the rest of its life. Skipped under --force re-cuts of an unpublished
-  // snapshot whose checksums are already recorded — record() itself refuses
-  // to silently overwrite a recorded version.
+  let result
   try {
-    execFileSync('node', [join(here, 'verify-snapshot-checksums.mjs'), 'record', version], { stdio: 'inherit' })
-  } catch {
-    console.error(`snapshot: wrote the files but could not record checksums for ${version}.`)
-    console.error(`Run \`node scripts/verify-snapshot-checksums.mjs record ${version}\` by hand once resolved.`)
+    result = writeSnapshotArtifacts({
+      version,
+      force,
+      commit: sourceCommit(),
+    })
+  } catch (error) {
+    console.error(`snapshot: ERROR ${error.message}`)
+    process.exit(1)
   }
+  console.log(`snapshot: wrote static/ontology/${version}/ (${result.written.length} files)`)
+  for (const file of result.written) console.log(`  ${file}`)
 }
 
 // Guarded so unit tests can import releaseProblems without side effects.

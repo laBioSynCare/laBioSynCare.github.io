@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.12.0
-#  Date:       2026-07-24
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -34,20 +34,21 @@
 ###########################################################################
 
 <https://w3id.org/sstim/exposure> a owl:Ontology ;
-    # No owl:versionIRI / owl:priorVersion: SSTIM is versioned as a whole set — the
-    # frozen snapshot at static/ontology/<version>/ (identified by the core
-    # owl:versionIRI) is the citable unit. Modules carry owl:versionInfo only, as a
-    # module-level change counter. See ADR 0020.
-    owl:versionInfo "0.12.0" ;
+    # /sstim/exposure is the combined namespace catalogue.  The version IRI
+    # makes the exact mutable Exposure distribution imported by profiles an
+    # OWL-recognized identifier; release preparation replaces it with this
+    # module's immutable versioned Turtle URL. See ADR 0020 and ADR 0043.
+    owl:versionIRI <https://w3id.org/sstim/module/exposure> ;
+    owl:versionInfo "0.13.0-dev" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-18"^^xsd:date ;
     dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
@@ -67,12 +68,6 @@ sstim-ex:ExposureProfile a owl:Class ;
     skos:definition "Information artifact describing how one exploratory or operational stimulation exposure is delivered, perceived, placed, bounded, and interpreted."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> .
-
-sstim-ex:StimulusChannel a owl:Class ;
-    rdfs:subClassOf iao:0000030 ;
-    rdfs:label "Stimulus Channel"@en ;
-    skos:definition "A channel within an exposure profile, such as an audio, visual, haptic, respiratory, olfactory, gustatory, or electromagnetic exposure path."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:PhysicalDeliveryMedium a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
@@ -228,9 +223,9 @@ sstim-ex:channelRole a owl:ObjectProperty ;
 
 # ADR 0034 §4. Coarse technique-level characteristic for catalog navigation and
 # querying, analogous to the retained coarse sstim:techniqueModality relation.
-# This property and the medium assertions for vocabulary-owned technique
-# subjects live here rather than in sstim-vocab.ttl: the exposure module already
-# depends on the vocabulary, and reversing that would create a module cycle.
+# Exposure owns this delivery-semantics property. Assertions whose subjects are
+# vocabulary-owned techniques live in the Technique–Exposure bridge, so neither
+# concern becomes the authoritative owner of cross-concern instance statements.
 sstim-ex:characteristicDeliveryMedium a owl:ObjectProperty ;
     rdfs:domain sstim:StimulationTechnique ;
     rdfs:range sstim-ex:PhysicalDeliveryMedium ;
@@ -2174,70 +2169,3 @@ sstim-ex:knowledgeScopeNote a owl:DatatypeProperty ;
 ###########################################################################
 # End of sstim-exposure.ttl
 ###########################################################################
-
-
-###########################################################################
-# Characteristic delivery media for vocabulary-owned techniques (ADR 0034)
-#
-# These assertions live here, not in sstim-vocab.ttl. Technique identity and
-# type stay vocabulary-owned; the exposure module already depends on the
-# vocabulary, so asserting an exposure-namespace property about a vocabulary
-# subject keeps the dependency pointing one way. Putting them in the
-# vocabulary would make it depend on exposure and close a module cycle.
-#
-# Consequence for the gates: `make shacl-vocab` can no longer validate
-# sstim-vocab.ttl alone and loads the core+vocabulary+exposure closure
-# instead; `make shacl-exposure` still validates this file alone, which stays
-# meaningful because the technique types it references are absent here, so no
-# technique shape targets them. Assertions are never duplicated to satisfy a
-# file-local command.
-#
-# TMS carries both an applied magnetic field and the electric field it induces
-# in tissue: an established physical transformation, represented as a
-# secondary tissue-field interaction rather than a proposed mechanism.
-###########################################################################
-
-sstim-v:techASMR sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techAcousticStartle sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techAmplitudeModulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techAudioTactile sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumMechanicalVibration .
-sstim-v:techAudiovisualEntrainment sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumVisualLight .
-sstim-v:techAuditoryIllusion sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techBinauralBeats sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techBroadbandNoise sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techClickTrain sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techClosedLoopAuditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techColorFieldStimulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight .
-sstim-v:techDBS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
-sstim-v:techFractalRhythm sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techFrequencyModulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techGamma40Auditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techIntrathecalNeuromodulatoryAgentDelivery sstim-ex:characteristicDeliveryMedium sstim-ex:mediumPharmacologicalAgent .
-sstim-v:techIsochronicTones sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techMonauralBeats sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techMusicStructural sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techNotchedSound sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techPhoticDriving sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight .
-sstim-v:techReferencePitchRetuning sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techRepetitiveTMS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedMagneticField, sstim-ex:mediumAppliedElectricField .
-sstim-v:techRhythmicAuditoryCueing sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techRoughness sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techSolfeggioTuning sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techSonification sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techSpatialAuditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techSubliminalAudio sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-sstim-v:techTACS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
-sstim-v:techTDCS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
-sstim-v:techUltrasoundNeuromod sstim-ex:characteristicDeliveryMedium sstim-ex:mediumFocusedUltrasound .
-sstim-v:techVagusNerveStimulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
-sstim-v:techVibroacoustic sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration .
-sstim-v:techVibrotactileEntrainment sstim-ex:characteristicDeliveryMedium sstim-ex:mediumMechanicalVibration .
-sstim-v:techVoiceMantra sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
-
-# ADR 0035 (2026-07-22 Theo Marins interview). ECT delivers applied electric
-# current; neurofeedback and biofeedback render the measured signal back as
-# visual and/or auditory feedback, so their characteristic media are the
-# perceptual channels through which the feedback is presented.
-sstim-v:techElectroconvulsiveTherapy sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
-sstim-v:techNeurofeedback sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight, sstim-ex:mediumAirConductedSound .
-sstim-v:techBiofeedback sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight, sstim-ex:mediumAirConductedSound .

@@ -50,13 +50,23 @@ function resolveCommit() {
   }
 }
 
-/** The SSTIM release this build publishes, read from the ontology itself. */
-function resolveOntologyVersion() {
+/** The SSTIM suite/profile this build publishes, read from the manifest. */
+function resolveOntologyBuild() {
   try {
-    const ttl = readFileSync('static/ontology/sstim-core.ttl', 'utf8');
-    return ttl.match(/owl:versionInfo\s+"([^"]+)"/)?.[1] ?? 'unknown';
+    const manifest = JSON.parse(readFileSync('static/ontology/manifest.json', 'utf8'));
+    const profileId = manifest.suite.defaultProfile;
+    const profile = manifest.profiles.find(candidate => candidate.id === profileId);
+    return {
+      ontologyVersion: manifest.suite.version ?? 'unknown',
+      ontologyProfile: profileId ?? 'unknown',
+      ontologyClosureSha256: profile?.sha256 ?? 'unknown',
+    };
   } catch {
-    return 'unknown';
+    return {
+      ontologyVersion: 'unknown',
+      ontologyProfile: 'unknown',
+      ontologyClosureSha256: 'unknown',
+    };
   }
 }
 
@@ -76,13 +86,14 @@ function resolveBuiltAt(commitSource) {
 
 const { commit, commitSource } = resolveCommit();
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+const ontology = resolveOntologyBuild();
 
 const info = {
   model: MODEL,
   commit,
   commitSource,
   appVersion: pkg.version ?? 'unknown',
-  ontologyVersion: resolveOntologyVersion(),
+  ...ontology,
   builtAt: resolveBuiltAt(commitSource),
 };
 

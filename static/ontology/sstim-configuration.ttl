@@ -1,0 +1,207 @@
+###########################################################################
+#
+#  SSTIM Engine Configuration Module
+#
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/configuration> a owl:Ontology ;
+    owl:versionInfo "0.13.0-dev" ;
+    dct:title "SSTIM Engine Configuration Module"@en ;
+    dct:description "Generic engine configurations, tracks, defaults, revision links, and configuration-to-stimulus, technique, framework, and caution relations."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/technique> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-01"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Configurations, tracks, and configuration relations
+###########################################################################
+
+sstim:Preset a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Preset"@en,
+               "Preset"@it, "Preset"@pt, "Preset"@es ;
+    skos:altLabel "Patch"@en ;
+    skos:definition "A reusable, versioned parameter configuration that makes a particular engine, instrument or design produce an intended sensory stimulation. A preset follows a protocol or framework but is not itself the protocol, and it is not the stimulation: it is the set of settings from which one engine reproduces it."@en ;
+    skos:scopeNote "Engine-dependent by nature. Two engines that produce identical stimulation may have entirely unrelated presets, and two research groups will have unrelated schemas, so the field list is a property of a schema rather than of this class. The BSC catalog format and Patch Studio's patch-studio-model-1 are two such schemas; they are conformance profiles of this class, not distinct classes. \"Patch\" is a synonym, from modular-synthesis usage. The engine-independent description of what actually reaches the subject is sstim:StimulusSpecification, which is a different layer (ADR 0041)."@en ;
+    skos:historyNote "Until 0.11.x the definition named \"audio architecture\" as a constituent. That described the BSC catalog format, not presets: a sensory stimulation preset may carry visual, haptic, respiratory, olfactory, gustatory or electromagnetic layers, as sstim-ex:StimulusChannel already recognises. Corrected by ADR 0041."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:targetsFrequencyBand a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "targets frequency band"@en ;
+    skos:definition "Links a preset to 1–2 target frequency bands. RDF property values are unordered; use sstim:primaryFrequencyBand to identify which one is primary (RDF-08, 2026-07-24 audit)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:primaryFrequencyBand a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim:targetsFrequencyBand ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "primary frequency band"@en ;
+    skos:definition "The single primary band among a preset's sstim:targetsFrequencyBand values, when more than one is declared. Corrects the former convention of an implicit 'first entry is primary' ordering, which RDF property values do not carry (RDF-08, 2026-07-24 audit)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:forImplementation a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationImplementation ;
+    rdfs:label  "for implementation"@en ;
+    skos:definition "Links a preset to the implementation whose parameter model it configures."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:followsProtocol a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationProtocol ;
+    rdfs:label  "follows protocol"@en ;
+    skos:definition "Links a preset to the sensory stimulation protocol whose rules or constraints it follows."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:hasIntendedEffect a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:IntendedEffect ;
+    rdfs:label  "has intended effect"@en ;
+    skos:definition "Links a preset to one or more controlled design-intent categories. The relation describes purpose and does not assert that the effect occurred."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:hasCautionTag a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:CautionTag ;
+    rdfs:label  "has caution tag"@en ;
+    skos:definition "Links a preset to a safety or usage advisory flag. A preset may carry zero or more caution tags."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:derivedFrom a owl:ObjectProperty, owl:AsymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Preset ;
+    rdfs:label  "derived from"@en ;
+    skos:definition "Links a preset to its immediate predecessor preset version. The relation is directional, asymmetric, and not transitive; use repeated links to traverse a longer revision history."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:presetVersion a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "preset version"@en ;
+    skos:definition "Semantic version string (X.Y.Z) of this preset."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:durationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    # A configuration may carry a default duration, which a session may override;
+    # ADR 0041 §3 treats "changing the default duration, if the preset has one"
+    # as one of the liberties a session takes. The union admits both without
+    # entailing that a preset is a session specification.
+    rdfs:range  xsd:integer ;
+    rdfs:label  "duration (seconds)"@en ;
+    skos:definition "Intended total duration in seconds, either of a session specification or as the default carried by a preset."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
+    # As sstim:durationSeconds above — a configuration may carry a default gain.
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "master volume"@en ;
+    skos:definition "Normalized master output gain, from 0 (silent) to 1 (implementation maximum); an engine control, not a calibrated sound-pressure level. The delivered level belongs to sstim:StimulusSpecification (ADR 0041)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:specifiedBy a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:StimulusSpecification ;
+    rdfs:label  "specified by"@en ;
+    skos:definition "Links an engine configuration to the stimulus specification it realises."@en ;
+    skos:scopeNote "Many presets may realise one specification; that is the point, and it is what makes cross-engine comparison possible. The link is asserted by whoever measured or derived it and is never inferred: what stimulus a preset produces depends on the engine, the transducer and the listening conditions, so entailing it would reintroduce exactly the engine-dependence this layer exists to escape."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:masterBrightness a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "master brightness"@en ;
+    skos:definition "Normalized master visual output level, from 0 (dark) to 1 (implementation maximum); an engine control, not a calibrated luminance. The visual counterpart of sstim:masterVolume, whose absence was the audio-centrism ADR 0041 corrected. The delivered luminance is sstim:luminanceCdM2."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:Track a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Track"@en ;
+    skos:definition "A single layer within an engine configuration, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
+    skos:scopeNote "The generic superclass for audio, visual, haptic, and control layers. The optional Patch Studio profile specializes sstim:Voice under sstim:AudioTrack; other configuration schemas may define their own Track subclasses. ADR 0041 renamed the former Patch Studio control voices to LFO and Permutation before adding that Voice subsumption, removing the earlier audible-versus-control ambiguity."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:AudioTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Audio Track"@en ;
+    skos:definition "A track whose output is audible: an isochronic tone, a binaural carrier pair, a plain carrier, noise, a drone, or a sample."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:VisualTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Visual Track"@en ;
+    skos:definition "A track whose output is visible. Rate-bearing visual tracks are subject to the runtime flash-rate safety limits recorded in the exposure module."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:HapticTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Haptic Track"@en ;
+    skos:definition "A track whose output is delivered as vibration through a device actuator."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:ControlTrack a owl:Class ;
+    rdfs:subClassOf sstim:Track ;
+    rdfs:label "Control Track"@en ;
+    skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks. Breathing-guidance (Martigli) and symmetry-derived control signals are the current kinds."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+sstim:composedOfTrack a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Track ;
+    rdfs:label  "composed of track"@en ;
+    skos:definition "Links an engine configuration to the layers it is composed of. Distinct from sstim:composedOf, which links a BSC catalog preset to its voices: a configuration whose schema has generic layers uses this, one whose schema has the four catalog voice types uses that."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( sstim:AudioTrack sstim:VisualTrack sstim:HapticTrack sstim:ControlTrack ) .
+
+
+###########################################################################
+# End of configuration
+###########################################################################

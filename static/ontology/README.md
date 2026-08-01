@@ -21,11 +21,13 @@ the graph.
   IRI `https://w3id.org/sstim/0.12.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the validated `0.12.0` release sources; core claims the whole-set
-  `owl:versionIRI` and every public module carries synchronized
-  `owl:versionInfo`.
-- Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
-  published in `void.ttl` rather than duplicated here.
+- Live sources: the mutable `0.13.0-dev` modular preview accepted by ADR 0043.
+  Its source inventory and closures are defined by [`manifest.json`](manifest.json),
+  and every module carries synchronized `owl:versionInfo`. This development line
+  is not an immutable release.
+- Immutable-release term-graph counts are checked by
+  `scripts/sstim-quality-audit.py` and published in `void.ttl` rather than
+  duplicated here.
 - Public instance and synthetic-fixture graph counts are published in
   `void.ttl` and verified by the quality audit rather than duplicated here.
 - Persistent namespace: `https://w3id.org/sstim`.
@@ -38,15 +40,16 @@ whole-set release.
 
 ```text
 static/ontology/
-|-- sstim-core.ttl          OWL domain model and core constraints
-|-- sstim-vocab.ttl         Multilingual SKOS controlled values
-|-- sstim-shapes.ttl        SHACL Core and SHACL-SPARQL shapes
+|-- manifest.json           Authoritative live module/profile bill of materials
+|-- manifest.schema.json    Manifest contract at /sstim/manifest-schema/1
+|-- sstim-core.ttl          Dependency-free process Kernel
+|-- sstim-stimulus.ttl      Engine-independent Core stimulus descriptions
+|-- sstim-common.ttl        Optional reusable descriptors and quantities
+|-- sstim-*-profile.ttl     Kernel, Core, Core Plus, and Full OWL import entry points
+|-- sstim-core-shapes.ttl   Weak reusable Core SHACL contract
+|-- sstim-shapes.ttl        Full SHACL Core and SHACL-SPARQL policy
+|-- sstim-*.ttl             Concern, bridge, vocabulary, and alignment modules
 |-- sstim-ecosystem-private-shapes.ttl  Separate access-controlled audit profile (rules only)
-|-- sstim-alignments.ttl    Verified Wikidata and OBO alignments
-|-- sstim-patch-studio.ttl  Voice and authoring parameter properties
-|-- sstim-stimulus.ttl      Engine-independent stimulus description and target axis
-|-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
-|-- sstim-ecosystem.ttl     Ecosystem agents, relationships, and consent lifecycle
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
 |-- 0.1.0/ ... 0.12.0/     Immutable whole-set snapshots
@@ -64,37 +67,87 @@ static/ontology/
         `-- agents/        Reserved contract graph; no committed real data
 ```
 
-All eight term/public-shape modules plus the separate private-audit shape file
-declare an `owl:Ontology` node with title,
-description, creator, creation/modification dates, license, and version
-metadata. Modules carry `owl:versionInfo` only. The core receives a version IRI
-only when the whole set is frozen for release; see
+The live manifest-owned modules, profile entry points, and separate private-audit
+shape file declare an `owl:Ontology` node with title, description, creator,
+creation/modification dates, license, and version metadata. Modules carry
+`owl:versionInfo` only. The root Kernel receives a version IRI only when the
+whole set is frozen for release; see
 [ADR 0020](../../docs/decisions/0020-whole-set-snapshot-versioning.md).
 
 ### Module maturity
 
-These eight files are authoritative source and publication modules, but the
-0.12.0 suite is still versioned and normally validated as one whole set. They do
-not yet form a complete, acyclic, machine-discoverable set of independently
-reusable closures. In particular, the new stimulus source is snapshotted and
-exported but is not yet present in the runtime ontology source set or staged
-persistent-identifier routes.
+The frozen `0.12.0` suite remains an eight-file whole-set release. The live
+`0.13.0-dev` line implements an acyclic Kernel/Core/Core Plus architecture with
+optional concern and bridge modules and an explicit Full compatibility profile.
+[`manifest.json`](manifest.json) is authoritative for direct dependencies,
+transitive profile closures, runtime graphs, publication URLs, and checksums;
+do not reconstruct that inventory from this directory listing.
 
-The [2026-08-01 boundary audit](../../docs/ontology/reviews/2026-08-01-sstim-core-and-module-boundary-audit.md)
-recommends a small logical Core Profile plus optional concern modules. The
-staged proposal is [ADR 0043](../../docs/decisions/0043-sstim-core-profile-and-module-boundaries.md).
-Until it is accepted and implemented, “module” here should be read as a source
-and publication boundary—and, where wired, a runtime named-graph boundary—not
-a claim that every file is a standalone consumer package.
+Read the [module architecture and adoption guide](../../docs/ontology/MODULE_ARCHITECTURE.md)
+for the exact dependency table, profile and SHACL selection, Full-union
+compatibility contract, named-graph ownership rules, and current deferred gaps.
+The evidence is in the
+[2026-08-01 boundary audit](../../docs/ontology/reviews/2026-08-01-sstim-core-and-module-boundary-audit.md),
+and the accepted decisions are
+[ADR 0043](../../docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
+and [ADR 0044](../../docs/decisions/0044-stimulus-channel-core-ownership.md).
+
+### Publication and profile discovery
+
+The live manifest identifies its schema with the persistent IRI
+`https://w3id.org/sstim/manifest-schema/1`. Each Kernel, Core, Core Plus, and
+Full entry point is both an `owl:Ontology` and a `prof:Profile`; its
+`prof:hasResource` descriptors expose the specification, the applicable SHACL
+constraints where one is published, and the manifest. This discovery metadata
+does not make the mutable `0.13.0-dev` sources a citable release.
+
+For a release, `$schema` and `immutableRelease.schemaUrl` identify the frozen
+`<version>/manifest.schema.json` sibling. The entrypoint, constraints, and
+manifest `prof:hasArtifact` values likewise change from mutable discovery IRIs
+to the profile, shape, and manifest immutable URLs before checksums are taken.
+
+The modular publication contract deliberately separates a namespace document
+from the smallest ontology file:
+
+- machine RDF at `https://w3id.org/sstim` is a generated catalog of the Full
+  semantic namespace;
+- `https://w3id.org/sstim/kernel` returns exactly `sstim-core.ttl`, the
+  dependency-free two-class Kernel; and
+- machine RDF at `https://w3id.org/sstim/exposure` is a generated Stimulus +
+  Exposure namespace catalog, because `sstim-ex:StimulusChannel` is owned by
+  the Stimulus module while retaining its stable exposure-namespace IRI; and
+- `https://w3id.org/sstim/module/exposure` returns only
+  `sstim-exposure.ttl` (or its negotiated serialization) and is the exact
+  mutable distribution/import endpoint for the Exposure semantic module.
+
+The two Exposure URLs are not interchangeable. The live Full profile's
+`dct:requires` may identify the logical Exposure ontology as `/sstim/exposure`,
+but its retrieval-bearing `owl:imports` uses `/sstim/module/exposure` so
+importing Exposure does not silently import the Stimulus + Exposure namespace
+catalog. During release preparation that endpoint, like every other mutable
+module endpoint, is replaced by the exact immutable versioned sibling Turtle
+URL.
+
+The source manifest, generators, and mirrored w3id rules encode this behavior,
+but the `0.13.0-dev` catalogs, profile routes, and schema PID remain staged until
+the generated Pages artifacts are deployed and the perma-id update is merged
+and verified.
+
+The Core SHACL contract keeps `hasStimulusChannel` and
+`hasStimulationTarget` optional. If present, however, a channel link must point
+to a resource typed `sstim-ex:StimulusChannel`, and a target link must point to
+an IRI or blank node rather than a literal. This weak-but-typed contract avoids
+silently accepting malformed optional links without importing delivery,
+evidence, safety, configuration, or session policy.
 
 ## Namespaces
 
 | Prefix | IRI | Purpose |
 |---|---|---|
-| `sstim:` | `https://w3id.org/sstim#` | Core classes and properties |
+| `sstim:` | `https://w3id.org/sstim#` | Reusable suite classes and properties owned across semantic modules |
 | `sstim-v:` | `https://w3id.org/sstim/vocab#` | Controlled SKOS values |
 | `sstim-sh:` | `https://w3id.org/sstim/shapes#` | SHACL shapes |
-| `sstim-ex:` | `https://w3id.org/sstim/exposure#` | Exposure and experiment terms |
+| `sstim-ex:` | `https://w3id.org/sstim/exposure#` | Exposure identifiers owned across Stimulus and Exposure modules |
 | `sstim-eco:` | `https://w3id.org/sstim/ecosystem#` | Ecosystem relationship and consent terms |
 | `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework techniques |
 | `bsclab-protocol:` | `https://w3id.org/sstim/implementation/bsclab/protocol/` | Public BSC Lab protocols |
@@ -320,19 +373,25 @@ make validate
 
 That command runs:
 
-1. pySHACL over core, vocabulary, exposure, all seven merged modules, and all
-   public instances;
-2. the isolated ecosystem contract: JSON-LD graph isomorphism, 34 adversarial
+1. the machine-readable manifest and ownership contracts: dependency
+   acyclicity, exact profile closures, one authoritative source for each named
+   OWL term, SKOS value, and SHACL shape, ontology-header parity,
+   runtime/publication mappings, and source checksums;
+2. pySHACL over the Core profile with Core shapes, the Full closure with Full
+   shapes, and all public instances;
+3. the isolated ecosystem contract: JSON-LD graph isomorphism, 34 adversarial
    public SHACL overlays, six file-profile leakage overlays, six private-ledger
    adversarial cases, a self-publication positive scenario, complete-history
    mirroring and private-terminal deletion proofs, exact qualified
    bindings, and runtime named-graph isolation;
-3. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
+4. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
    SKOS integrity, functional values, local IRI resolution, evidence provenance,
    ecosystem namespace ownership, VoID counts, and competency thresholds;
-4. ROBOT with HermiT over the merged OWL module set;
-5. named-graph SPARQL competency queries through Comunica;
-6. graph-isomorphic JSON-LD and RDF/XML export round trips for every module.
+5. normalized Full-union equivalence against the frozen `0.12.0` distribution,
+   plus ROBOT with HermiT over the merged OWL module set;
+6. named-graph SPARQL competency queries through Comunica; and
+7. graph-isomorphic JSON-LD and RDF/XML export round trips for every
+   manifest-owned Turtle source.
 
 Useful narrower targets:
 
@@ -354,16 +413,16 @@ or validation scripts.
 
 ## Named Graphs
 
-The runtime loader assigns these graph families:
+Every live ontology module has a runtime named graph. The exact source-to-graph
+mapping is the module's `runtime.graphIri` in [`manifest.json`](manifest.json),
+including the new Common, Technique, Configuration, Session, Neuromodulation,
+Evidence, and bridge graphs. Named graphs record authoritative source/runtime
+provenance; they are not import closures or term namespaces, and graph ownership
+may differ from the frozen `0.12.0` dataset layout.
+
+Public instance data uses these additional graph families:
 
 ```text
-https://w3id.org/sstim/graph/core
-https://w3id.org/sstim/graph/vocab
-https://w3id.org/sstim/graph/shapes
-https://w3id.org/sstim/graph/alignments
-https://w3id.org/sstim/graph/patch-studio
-https://w3id.org/sstim/graph/exposure
-https://w3id.org/sstim/graph/ecosystem
 https://w3id.org/sstim/graph/frameworks
 https://w3id.org/sstim/graph/implementations
 https://w3id.org/sstim/graph/ecosystem-fixture
@@ -376,8 +435,10 @@ https://w3id.org/sstim/implementation/bsclab/session/
 https://w3id.org/sstim/ref/
 ```
 
-`src/rdf/loader.js` is an explicit browser manifest. Adding an instance file
-without adding it to that manifest fails the quality audit.
+The semantic-module inventory comes from `manifest.json`.
+`src/rdf/loader.js` separately inventories public instance files and assigns
+their graphs; adding an instance without wiring that loader inventory fails the
+quality audit.
 
 ## Query Examples
 
@@ -421,24 +482,45 @@ SELECT ?person ?organization ?role ?source WHERE {
 
 ## Versioning And Publication
 
-SSTIM versions the eight modules as one citable set:
+SSTIM versions the manifest-owned modules as one synchronized citable set:
 
 1. Develop in top-level modules with a `-dev` `owl:versionInfo`, no
    `owl:versionIRI`, and `mod:status "under development"` in the core. The
    quality audit enforces that all modules carry the same version and that a
    `-dev` line never claims released status.
 2. Run the complete validation suite and review semantic diffs.
-3. Set the release version in **every** module, and the `owl:versionIRI` and
-   `mod:status "released"` in the core.
-4. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
-   sources, an existing snapshot, dev/prerelease versions, diverging module
-   versions, and missing release metadata
+3. Set the release version in **every manifest-owned module and profile entry
+   point**, synchronize manifest checksums, and set the `owl:versionIRI` and
+   `mod:status "released"` in the root Kernel. Populate every profile's
+   positive, out-of-scope, and adversarial fixture sets and at least one
+   competency query. Every listed contract path must already name an existing
+   repository file.
+4. Give every snapshotted module and profile its exact immutable
+   `publication.versionedUrl`; add the manifest's immutable base, manifest, and
+   schema URLs; point the released `$schema` at the frozen schema sibling; and
+   change every profile `owl:imports` list to the exact versioned sibling files
+   in its declared closure. Change each profile's specification, constraints,
+   and manifest `prof:hasArtifact` values to those immutable artifacts too.
+   Release preparation must do this before hashing; the snapshot command does
+   not rewrite imports or discovery metadata.
+5. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
+   or unverifiable sources, a checksum-registered snapshot, dev/prerelease
+   versions, diverging module versions, mutable profile imports/discovery
+   artifacts, missing contract files, and missing release metadata. Snapshot
+   creation fails if checksum-ledger registration fails
    (`scripts/snapshot-ontology.test.mjs` covers these refusals).
-5. Audit the entire tagged repository state—not only
+6. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.
-6. Tag and publish the GitHub release so Zenodo archives the same commit.
-7. Add the resulting version DOI without rewriting a published snapshot.
+7. Tag and publish the GitHub release so Zenodo archives the same commit.
+8. Add the resulting version DOI without rewriting a published snapshot.
+
+The current development manifest intentionally has no immutable release URLs.
+Only Core has a positive fixture and an executable contract today; Kernel,
+Core Plus, and Full still need profile-specific fixtures and competency
+queries, and Core still needs its out-of-scope and adversarial fixture sets.
+Consequently `0.13.0-dev` is noncitable even though its module and publication
+mechanics are implemented.
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
 master. `context.jsonld` is a hand-maintained compaction context, not a generated
@@ -464,7 +546,7 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.11.0` for the current immutable citation:
+Use SSTIM `v0.12.0` for the current immutable citation:
 
 ```bibtex
 @misc{fabbri_sstim_2026,
@@ -472,8 +554,8 @@ Use SSTIM `v0.11.0` for the current immutable citation:
   title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
   year      = {2026},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21536124},
-  url       = {https://doi.org/10.5281/zenodo.21536124}
+  doi       = {10.5281/zenodo.21717988},
+  url       = {https://doi.org/10.5281/zenodo.21717988}
 }
 ```
 

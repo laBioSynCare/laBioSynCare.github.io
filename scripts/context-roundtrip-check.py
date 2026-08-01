@@ -7,7 +7,7 @@ every top-level and instance Turtle document without triple loss.
 RDF-02 (2026-07-24 RDF structure and publication audit): compacting a graph
 with static/ontology/context.jsonld and parsing the result back must be
 isomorphic to the source graph. export-ontology.py does not catch this because
-it exports only the seven term-space modules using RDFLib's own generated
+it exports the manifest-selected release sources using RDFLib's own generated
 compact context, not the context.jsonld consumers actually fetch, and it never
 touches void.ttl or the instance documents. This script closes that gap by
 using the published context against every top-level document and every

@@ -9,7 +9,7 @@ live under [`static/ontology/`](../../static/ontology/README.md).
 - Stable namespace: `https://w3id.org/sstim`
 - Prefix: `sstim`
 - Current citable release: `0.12.0`
-- Next development line: not yet opened
+- Live development line: `0.13.0-dev` modular preview; mutable and not citable
 - Ontology license: CC BY 4.0
 - Current release DOI: `10.5281/zenodo.21717988`
 - All-versions concept DOI: `10.5281/zenodo.21286974`
@@ -20,18 +20,25 @@ consent-dependent self-reports, and qualified ecosystem relationships. Its scope
 interoperability, and conservative non-clinical use. Describing a protocol or
 claim does not establish efficacy.
 
-## Live Modules
+## Live Architecture
 
-| Module | Role |
-|---|---|
-| [`sstim-core.ttl`](../../static/ontology/sstim-core.ttl) | Current root model: stimulation plus technique, evidence, catalog, protocol, and session semantics; proposed for extraction in ADR 0043 |
-| [`sstim-vocab.ttl`](../../static/ontology/sstim-vocab.ttl) | Multilingual SKOS controlled vocabularies |
-| [`sstim-stimulus.ttl`](../../static/ontology/sstim-stimulus.ttl) | Engine-independent stimulus specification, target axis, quantities, and current session bridges |
-| [`sstim-exposure.ttl`](../../static/ontology/sstim-exposure.ttl) | Physical delivery, perceived modality, device capability, placement, limits, and experiment context |
-| [`sstim-patch-studio.ttl`](../../static/ontology/sstim-patch-studio.ttl) | Voice and session-authoring parameters |
-| [`sstim-ecosystem.ttl`](../../static/ontology/sstim-ecosystem.ttl) | Ecosystem agents, relationships, and engagement/consent lifecycle terms |
-| [`sstim-shapes.ttl`](../../static/ontology/sstim-shapes.ttl) | SHACL integrity and publication contracts |
-| [`sstim-alignments.ttl`](../../static/ontology/sstim-alignments.ttl) | Verified, conservatively scoped external mappings |
+The `0.13.0-dev` source set is defined by the machine-readable
+[`manifest.json`](../../static/ontology/manifest.json), not by the former
+eight-file list. It records the exact module dependency DAG, runtime graph and
+publication mappings, checksums, and profile closures.
+
+| Profile | Semantic closure | Shapes |
+|---|---|---|
+| [Kernel](../../static/ontology/sstim-kernel-profile.ttl) | Root process anchor only | None published |
+| [Core](../../static/ontology/sstim-core-profile.ttl) | Kernel + stimulus description | [Core shapes](../../static/ontology/sstim-core-shapes.ttl) |
+| [Core Plus](../../static/ontology/sstim-core-plus-profile.ttl) | Core + reusable Common descriptors | Core shapes; Common-specific shapes deferred |
+| [Full](../../static/ontology/sstim-full-profile.ttl) | Every concern, bridge, vocabulary, alignment, ecosystem, and Patch Studio module | [Full shapes](../../static/ontology/sstim-shapes.ttl) |
+
+The exact module table, direct and transitive dependencies, adoption examples,
+shape-selection rules, named-graph behavior, and compatibility contract are in
+the [module architecture guide](MODULE_ARCHITECTURE.md). The immutable
+[`0.12.0`](../../static/ontology/0.12.0/) directory remains the latest released
+eight-file distribution.
 
 Public BSC Lab implementation data is under
 [`static/ontology/instances/`](../../static/ontology/instances/README.md). It
@@ -43,8 +50,8 @@ real participant records are excluded.
 
 - [SSTIM core and module boundary audit — 2026-08-01](reviews/2026-08-01-sstim-core-and-module-boundary-audit.md):
   quantitative growth, actual cross-module dependencies, reuse assessment,
-  candidate Core Profile, and staged extraction gates. Its architecture proposal
-  is [ADR 0043](../decisions/0043-sstim-core-profile-and-module-boundaries.md).
+  candidate Core Profile, and staged extraction gates. Its architecture is
+  accepted in [ADR 0043](../decisions/0043-sstim-core-profile-and-module-boundaries.md).
 - [Ontology Improvement Plan](IMPROVEMENT_PLAN.md): current maturity
   assessment, ordered 0.7 change sets, session/observation work, interoperability
   dependencies, release gates, and deliberate boundaries.
@@ -83,22 +90,24 @@ make build
 make export
 ```
 
-`make validate` runs SHACL against individual and merged modules plus all public
-instances, HermiT consistency reasoning, repository-wide quality checks,
-SPARQL competency queries, and graph-isomorphic JSON-LD/RDF/XML round trips.
+`make validate` runs profile-aware SHACL plus all public instances, HermiT
+consistency reasoning, manifest and repository-wide quality checks, SPARQL
+competency queries, normalized `0.12.0`-to-Full redistribution equivalence, and
+graph-isomorphic JSON-LD/RDF/XML round trips.
 `make export` writes those verified serializations from the Turtle masters.
-The 2026-07-13 audit additionally requires per-runtime-artifact validation;
-that gate is planned and must not be implied by the current static suite.
+Concern-specific SHACL packages beyond Core remain deferred; a green Full
+validation must not be described as independent conformance for those concerns.
 
 ### Release gate (`make snapshot`)
 
 `scripts/snapshot-ontology.mjs` refuses to freeze a snapshot unless the whole
-module set is coherent. Cutting a release therefore means updating, in **every**
-module header, before running `make snapshot`:
+manifest-owned module set is coherent. Cutting a release therefore means
+updating every manifest-owned module and profile entry point, synchronizing
+manifest checksums, and then running `make snapshot`:
 
 | Property | Rule |
 |---|---|
-| `owl:versionInfo` | the new version, identical across all eight modules |
+| `owl:versionInfo` | the new version, identical across all manifest-owned modules and profile entry points |
 | `owl:versionIRI` | `https://w3id.org/sstim/<version>` (core only, ADR 0020) |
 | `mod:status` | `"released"` (core only) |
 | **`dct:issued`** | **the release date — bump it every release** |

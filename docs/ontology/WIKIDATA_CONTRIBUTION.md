@@ -49,22 +49,50 @@ and no property for SSTIM identifiers.
 
 ## 3. Staged plan
 
-### Stage 0 — contribute, build standing · **no gate, start now**
+### Stage 0 — contribute, build standing · **substantially done 2026-08-01**
 
 Domain-expert contributions to items that already exist. Asserts nothing about
 SSTIM.
 
-- [ ] Create or designate a named Wikidata account; edit under it consistently
-- [ ] **Add multilingual labels.** `sstim-vocab.ttl` already carries EN/IT/PT/ES
-      `skos:prefLabel`s. Wikidata is chronically short of non-English labels in
-      this domain. This is the highest-value, least contentious contribution
-      available and it is already written
-- [ ] Add references to unsourced statements on the seven items above
-- [ ] Correct errors and fill obvious gaps found while reading them
+- [x] Named account: `Rfabbri`, registered 2011-08-24, 674 edits across Wikimedia
+      (632 on pt.wikipedia). User page created 2026-08-01 with Babel, ORCID and a
+      conflict-of-interest disclosure
+- [x] **Multilingual labels and descriptions** across the eight aligned items —
+      22 it/pt/es descriptions, 9 labels. Local Wikidata edit count 4 → 53
+- [x] **Errors corrected:** the Spanish description on Q831014 said "las ondas del
+      sueño" (beta characterises wakefulness, not sleep); Q863539 carried
+      `skos:altLabel` "brain waves" and "alpha waves", the latter naming a
+      different item (Q2469782), plus three spellings of the I-Doser software,
+      which has its own item (Q1186015)
+- [x] **Q98000061 typed:** `P279` → sound (Q11461), mirroring `pure tone`
+      (Q1573668), and `P1889 different from` → Monaural beats (Q6898437)
+- [x] Talk-page post on `Talk:Q863539` raising the phenomenon-versus-genre typing
+- [x] Talk-page note on `Talk:Q831014` explaining the overwritten description
+- [ ] Add references to unsourced statements — deferred; `P571` = 1839 on Q863539
+      could not be sourced from the English article and was raised as a question
+      instead
 
-**Why this comes first.** It is the only prerequisite for Wikimedia's Rapid Fund,
-which requires a demonstrated contribution history on the target project — and it
-is good citizenship independent of any funding.
+**Correction to this section's original claim.** It said the labels were "already
+written" in `sstim-vocab.ttl`. Half true, and the wrong half mattered: the band
+concepts carry bare band names (`"Alfa"@it`), which are not usable as labels for
+items titled *alpha wave*, and all 256 `skos:definition` strings are `@en` only,
+so every non-English description had to be written from scratch. What transferred
+cleanly was the technique terminology — `Stimolazione con Toni Isocroni` and its
+siblings gave Q98000061 the three labels it lacked.
+
+**Rapid Fund rationale — verified, with one correction.** This section's claim that
+Stage 0 is a prerequisite for the Rapid Fund is **correct**: `Grants:Project/Rapid`
+(read 2026-08-01) requires applicants to "Have current contribution history and
+experience on the target Wikimedia project(s)", and additionally "organising
+experience or training experience". The only wrong figure was the timeline — the
+programme runs **one round every two months** with a 2-month processing time, not
+~45 days to cash.
+
+Note what the requirement actually demands, because Stage 0 only half satisfies it:
+**53 edits in a single day is a contribution history one day deep on the target
+project**, and Stage 0 produced no organising or training experience at all. The
+fundable list is editathons, workshops, meetups, education and cultural-heritage
+work. See `docs/funding/FUNDING_LANDSCAPE.md` §2.2.
 
 ### Stage 1 — one item for the SSTIM ontology · **gate met**
 

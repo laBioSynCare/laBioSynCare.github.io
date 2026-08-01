@@ -68,8 +68,8 @@ same commit.
 ## `loader.js`
 
 Parses Turtle files into an N3.Store. The current implementation supports
-single-file loading, a fixed canonical ontology merge, and a committed instance
-manifest for browser loading.
+single-file loading, a manifest-derived Full-profile ontology merge, and a
+committed instance inventory for browser loading.
 
 ```javascript
 import {
@@ -81,7 +81,7 @@ import {
   loadMerged,
 } from './loader.js'
 
-// Load the seven canonical ontology files
+// Load every module in manifest.json's Full profile, including its Full shapes
 const ontologyStore = await loadOntology()
 
 // Graph navigator: terms + versioned catalog + mutable public ecosystem
@@ -105,6 +105,15 @@ const combinedStore = await loadMerged([
 
 In the browser, files are fetched via the Fetch API from the Vite static asset
 server. Node.js filesystem loading is deferred to the export/test pipeline.
+
+`ONTOLOGY_URLS` and `ONTOLOGY_SOURCES` are generated from
+`static/ontology/manifest.json`: the Full profile's ordered `modules` plus its
+associated `shapeModules`. Manifest kebab-case ids remain camelCase public keys
+for JavaScript callers (for example, `patch-studio` becomes `patchStudio`). Each
+source descriptor retains the manifest's canonical named-graph IRI, title,
+roles, and persistent URL. Adding a Full-profile module therefore updates all
+browser loaders and the SPARQL source inventory without another hard-coded
+file list.
 
 **Named graphs:** all scoped loaders assign canonical
 graph IRIs at load time. Ontology modules use `https://w3id.org/sstim/graph/*`;

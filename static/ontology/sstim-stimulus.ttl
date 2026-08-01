@@ -1,43 +1,26 @@
 ###########################################################################
 #
-#  SSTIM Stimulus Specification Module  —  sstim-stimulus.ttl
+#  SSTIM Core Stimulus Description Module
 #
-#  Namespace:  https://w3id.org/sstim
-#  Version:    0.12.0
-#  Date:       2026-07-31
+#  Version:    0.13.0-dev
+#  Date:       2026-08-01
 #  Author:     Renato Fabbri <renato@junto.space>
-#  License:    CC BY 4.0
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
-#  Layer 1 of ADR 0041: a description of what actually reaches the subject,
-#  independent of the engine that produces it.
-#
-#  A preset (layer 2) is engine-dependent by nature — `gain: 0.5` means nothing
-#  without knowing the engine, and two implementations producing acoustically
-#  identical stimulation have unrelated presets. That makes a preset unusable as
-#  the unit of scientific comparison. This module supplies the unit that works:
-#  stimulus properties in physical or perceptual units. `65 dB SPL at the ear`
-#  rather than `gain: 0.5`; `sinusoidal` rather than `waveformL: 0`.
-#
-#  Deliberately incomplete on arrival, and visibly so. Choosing the right
-#  physical quantities across seven modalities is scientific modelling that
-#  deserves review (CLAUDE.md §3.4, ADR 0004), so this module ships the class,
-#  the regime distinction, the channel composition and a small set of
-#  unambiguous quantities. The rest waits.
-#
-#  Nothing here asserts effect. A specification says what a stimulation *is* —
-#  frequencies, levels, durations, channels — never that it does anything.
-#
-#  Protected file — do not modify without explicit maintainer instruction.
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
 #
 ###########################################################################
 
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
 @prefix dct:   <http://purl.org/dc/terms/> .
-@prefix sstim: <https://w3id.org/sstim#> .
-@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
 
@@ -47,21 +30,21 @@
 ###########################################################################
 
 <https://w3id.org/sstim/stimulus> a owl:Ontology ;
-    owl:versionInfo "0.12.0" ;
-    dct:title "SSTIM Stimulus Specification Module"@en ;
-    dct:description "Engine-independent description of a sensory stimulation: what reaches the subject, in physical and perceptual units, rather than the settings that make one engine produce it."@en ;
+    owl:versionInfo "0.13.0-dev" ;
+    dct:title "SSTIM Core Stimulus Description Module"@en ;
+    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, and optional stimulation target."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-07-31"^^xsd:date ;
     dct:issued "2026-07-31"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-01"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
 ###########################################################################
-# The specification itself
+# Core stimulus description terms
 ###########################################################################
 
 sstim:StimulusSpecification a owl:Class ;
@@ -73,38 +56,12 @@ sstim:StimulusSpecification a owl:Class ;
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0042-stimulus-specification.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
-
 sstim:describesStimulation a owl:ObjectProperty ;
     rdfs:domain sstim:StimulusSpecification ;
     rdfs:range  sstim:Stimulation ;
     rdfs:label  "describes stimulation"@en ;
     skos:definition "Links a specification, which is an information artifact, to the stimulation process it describes."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-sstim:specifiedBy a owl:ObjectProperty ;
-    rdfs:domain sstim:Preset ;
-    rdfs:range  sstim:StimulusSpecification ;
-    rdfs:label  "specified by"@en ;
-    skos:definition "Links an engine configuration to the stimulus specification it realises."@en ;
-    skos:scopeNote "Many presets may realise one specification; that is the point, and it is what makes cross-engine comparison possible. The link is asserted by whoever measured or derived it and is never inferred: what stimulus a preset produces depends on the engine, the transducer and the listening conditions, so entailing it would reintroduce exactly the engine-dependence this layer exists to escape."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-###########################################################################
-# Regime — which of the three kinds of thing is being described
-#
-# ADR 0041 §3. A determinate stimulus can be stated completely. A stochastic one
-# is described by its generating process, because two renderings of pink noise
-# differ sample by sample and are the same stimulation. An adaptive one has no
-# static description *in principle* — the stimulus depends on the subject's
-# measured state — so what a specification describes there is a control law.
-#
-# Recorded as a constrained string rather than a SKOS concept scheme: promoting
-# these to vocabulary concepts is follow-up work in sstim-vocab.ttl, and a
-# half-formed scheme is worse than an honest enumeration. The permitted values
-# are enforced by sh:in in sstim-shapes.ttl.
-###########################################################################
 
 sstim:stimulusRegime a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:StimulusSpecification ;
@@ -113,16 +70,6 @@ sstim:stimulusRegime a owl:DatatypeProperty, owl:FunctionalProperty ;
     skos:definition "Which kind of description this is: \"determinate\" when the stimulus is fixed in advance, \"stochastic\" when the specification describes a generating process whose realisations differ, or \"adaptive\" when the stimulus depends on the subject's measured state and what is described is a control law rather than a stimulus."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
-
-###########################################################################
-# Channels and their quantities
-#
-# Channels are sstim-ex:StimulusChannel — audio, visual, haptic, respiratory,
-# olfactory, gustatory, electromagnetic — reused rather than reinvented. The
-# audio-centrism ADR 0041 found in sstim:Preset's old definition came precisely
-# from a class inventing its own narrow structure.
-###########################################################################
-
 sstim:hasStimulusChannel a owl:ObjectProperty ;
     rdfs:domain sstim:StimulusSpecification ;
     rdfs:range  sstim-ex:StimulusChannel ;
@@ -130,14 +77,11 @@ sstim:hasStimulusChannel a owl:ObjectProperty ;
     skos:definition "Links a specification to a channel through which stimulation reaches the subject."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
-
-sstim:channelFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim-ex:StimulusChannel ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "channel frequency (Hz)"@en ;
-    skos:definition "Rate at which a channel presents its stimulus, in hertz, as delivered rather than as configured."@en ;
+sstim-ex:StimulusChannel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Channel"@en ;
+    skos:definition "A channel within a stimulus specification or exposure profile, such as an audio, visual, haptic, respiratory, olfactory, gustatory, or electromagnetic exposure path."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
 
 sstim:channelDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
@@ -146,46 +90,7 @@ sstim:channelDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     skos:definition "Duration for which a channel presents its stimulus, in seconds."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
 
-
-sstim:soundPressureLevelDb a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim-ex:StimulusChannel ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "sound pressure level (dB SPL)"@en ;
-    skos:definition "Sound pressure level at the subject's ear, in decibels SPL. This is the quantity sstim:masterVolume is not: a normalized engine gain is not a level, because the same gain produces different levels on different hardware."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-sstim:luminanceCdM2 a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim-ex:StimulusChannel ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "luminance (cd/m²)"@en ;
-    skos:definition "Luminance presented to the subject, in candelas per square metre."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-sstim:flashRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim-ex:StimulusChannel ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "flash rate (Hz)"@en ;
-    skos:definition "Rate of luminance alternation presented to the subject, in hertz. Safety-bearing: rates in the photosensitive range are constrained at runtime rather than merely recorded."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-###########################################################################
-# What is being stimulated
-#
-# SSTIM had no class for this at all — only sstim:ParticipantEngagementMode,
-# which is a facet of an absent thing. ADR 0041 §5 admits humans, non-human
-# animals, plants, objects and materials, and unoccupied space: a stimulation
-# may be characterised as present in an environment with no subject.
-#
-# Hence the range is a union of material entity and site, and the relation is
-# optional. A stimulation with no target is well-formed, not deficient.
-###########################################################################
-
 sstim:hasStimulationTarget a owl:ObjectProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulusSpecification sstim:SessionSpecification ) ] ;
     rdfs:range  [ a owl:Class ; owl:unionOf ( bfo:0000040 bfo:0000029 ) ] ;
     rdfs:label  "has stimulation target"@en ;
     skos:definition "What the stimulation is directed at: a person, a non-human animal, a plant, an object or material, or a place. Absence is meaningful and permitted — a stimulation characterised as present in unoccupied space has no target."@en ;
@@ -195,33 +100,5 @@ sstim:hasStimulationTarget a owl:ObjectProperty ;
 
 
 ###########################################################################
-# Session liberties
-#
-# ADR 0041 §8. A session takes liberties with the configuration it executes, and
-# three of them had nowhere to live. Declared here rather than in core so the
-# deferred core split does not grow; sstim-patch-studio.ttl already sets the
-# precedent of a module adding properties to a class defined elsewhere.
+# End of stimulus
 ###########################################################################
-
-sstim:disablesTrack a owl:ObjectProperty ;
-    rdfs:domain sstim:SessionSpecification ;
-    rdfs:range  sstim:Track ;
-    rdfs:label  "disables track"@en ;
-    skos:definition "A layer of the configuration that this session turns off — a soundscape left out, an ambience muted. Listing what was disabled keeps the configuration itself unmodified, so the same preset remains comparable across sessions that used it differently."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-sstim:masterBrightness a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] ;
-    rdfs:range  xsd:decimal ;
-    rdfs:label  "master brightness"@en ;
-    skos:definition "Normalized master visual output level, from 0 (dark) to 1 (implementation maximum); an engine control, not a calibrated luminance. The visual counterpart of sstim:masterVolume, whose absence was the audio-centrism ADR 0041 corrected. The delivered luminance is sstim:luminanceCdM2."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
-
-
-sstim:scheduledStart a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionSpecification ;
-    rdfs:range  xsd:dateTime ;
-    rdfs:label  "scheduled start"@en ;
-    skos:definition "Intended start time of the session. A property of the plan, not of any execution: sstim:SessionInstance records when a session actually ran."@en ;
-    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .

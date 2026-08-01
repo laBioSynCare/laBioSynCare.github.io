@@ -1,4 +1,5 @@
 import { DataFactory, Parser, Store } from 'n3'
+import ontologyManifest from '../../static/ontology/manifest.json' with { type: 'json' }
 import {
   ECOSYSTEM_AGENTS_GRAPH_IRI,
   ECOSYSTEM_FIXTURE_GRAPH_IRI,
@@ -106,51 +107,58 @@ export function mergeStores(...stores) {
   return merged
 }
 
-/**
- * Standard BSC Lab ontology URLs served from the same runtime origin.
- * These constants mirror the files copied from static/ into dist/ at build time.
- */
-export const ONTOLOGY_URLS = {
-  core:       '/ontology/sstim-core.ttl',
-  vocab:      '/ontology/sstim-vocab.ttl',
-  shapes:     '/ontology/sstim-shapes.ttl',
-  alignments: '/ontology/sstim-alignments.ttl',
-  patchStudio:'/ontology/sstim-patch-studio.ttl',
-  stimulus:   '/ontology/sstim-stimulus.ttl',
-  exposure:   '/ontology/sstim-exposure.ttl',
-  ecosystem:  '/ontology/sstim-ecosystem.ttl',
+/** Convert a manifest kebab-case module id to the loader's public camelCase key. */
+function ontologySourceKey(id) {
+  return id.replace(/-([a-z0-9])/g, (_, character) => character.toUpperCase())
 }
 
-export const ONTOLOGY_SOURCES = {
-  core: {
-    url: ONTOLOGY_URLS.core,
-    graph: 'https://w3id.org/sstim/graph/core',
-  },
-  vocab: {
-    url: ONTOLOGY_URLS.vocab,
-    graph: 'https://w3id.org/sstim/graph/vocab',
-  },
-  shapes: {
-    url: ONTOLOGY_URLS.shapes,
-    graph: 'https://w3id.org/sstim/graph/shapes',
-  },
-  alignments: {
-    url: ONTOLOGY_URLS.alignments,
-    graph: 'https://w3id.org/sstim/graph/alignments',
-  },
-  patchStudio: {
-    url: ONTOLOGY_URLS.patchStudio,
-    graph: 'https://w3id.org/sstim/graph/patch-studio',
-  },
-  exposure: {
-    url: ONTOLOGY_URLS.exposure,
-    graph: 'https://w3id.org/sstim/graph/exposure',
-  },
-  ecosystem: {
-    url: ONTOLOGY_URLS.ecosystem,
-    graph: 'https://w3id.org/sstim/graph/ecosystem',
-  },
+const fullProfile = ontologyManifest.profiles.find(
+  profile => profile.id === ontologyManifest.suite.defaultProfile,
+)
+if (!fullProfile || fullProfile.id !== 'full') {
+  throw new Error('SSTIM manifest must identify the Full profile as its default profile')
 }
+
+const moduleById = new Map(ontologyManifest.modules.map(module => [module.id, module]))
+const fullProfileModuleIds = [...fullProfile.modules, ...fullProfile.shapeModules]
+const fullProfileModules = fullProfileModuleIds.map((id) => {
+  const module = moduleById.get(id)
+  if (!module?.runtime?.url || !module.runtime.graphIri) {
+    throw new Error(`SSTIM Full profile module ${id} has no complete runtime descriptor`)
+  }
+  return module
+})
+
+/**
+ * SSTIM Full-profile URLs served from the same runtime origin.
+ *
+ * The manifest uses stable kebab-case ids; this browser API retains camelCase
+ * keys (`patchStudio`, `evidenceExposure`, and so on) for JavaScript callers.
+ */
+export const ONTOLOGY_URLS = Object.freeze(Object.fromEntries(
+  fullProfileModules.map(module => [
+    ontologySourceKey(module.id),
+    module.runtime.url,
+  ]),
+))
+
+/**
+ * Named-graph source descriptors for every Full-profile module and its
+ * associated Full-profile SHACL shapes. Metadata is retained for runtime UIs.
+ */
+export const ONTOLOGY_SOURCES = Object.freeze(Object.fromEntries(
+  fullProfileModules.map(module => [
+    ontologySourceKey(module.id),
+    Object.freeze({
+      id: module.id,
+      title: module.title,
+      roles: Object.freeze([...module.roles]),
+      url: module.runtime.url,
+      graph: module.runtime.graphIri,
+      persistentUrl: module.publication.persistentUrl,
+    }),
+  ]),
+))
 
 /**
  * RDF instance sources. Browser builds cannot list directories, so this

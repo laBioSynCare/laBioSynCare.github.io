@@ -2,13 +2,13 @@
 
 Status: active publication plan
 
-Current citable release: SSTIM `0.7.0`
+Current citable release: SSTIM `0.12.0`
 
-Next development line: not yet opened
+Next development line: `0.13.0-dev` (mutable modular preview; not citable)
 
 Created: 2026-06-30
 
-Last reviewed: 2026-07-15
+Last reviewed: 2026-08-01
 
 Maintainer: Renato Fabbri
 
@@ -24,9 +24,9 @@ close mapping.
 
 ### Released and citable
 
-- SSTIM `0.7.0` is frozen under `static/ontology/0.7.0/`, identified by
-  `https://w3id.org/sstim/0.7.0`, and tagged `v0.7.0`.
-- Version DOI: [`10.5281/zenodo.21380171`](https://doi.org/10.5281/zenodo.21380171).
+- SSTIM `0.12.0` is frozen under `static/ontology/0.12.0/`, identified by
+  `https://w3id.org/sstim/0.12.0`, and tagged `v0.12.0`.
+- Version DOI: [`10.5281/zenodo.21717988`](https://doi.org/10.5281/zenodo.21717988).
 - All-versions concept DOI:
   [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
 - The GitHub-Zenodo integration is enabled for future GitHub releases.
@@ -35,12 +35,19 @@ close mapping.
 ### Implemented in the repository
 
 - Turtle is the editable source; `make export` generates JSON-LD and RDF/XML
-  for all seven public modules.
+  for manifest-owned modules and profile entry points and generates the
+  manifest-declared namespace catalogs.
 - The Pages build validates RDF before publishing generated serializations.
-- Core and module routing rules for Turtle, JSON-LD, and RDF/XML are staged in
-  `docs/ecosystem/w3id/sstim/.htaccess`.
+- The `0.13.0-dev` module, profile, manifest, schema, and namespace-catalog
+  routing rules are staged in `docs/ecosystem/w3id/sstim/.htaccess`.
+- `static/ontology/manifest.json` is the authoritative module and profile bill
+  of materials. It declares the persistent schema identifier
+  `https://w3id.org/sstim/manifest-schema/1`, dependency and profile closures,
+  checksums, runtime graphs, and publication artifacts.
 - Every module has machine-readable ontology metadata, licensing, dependency,
-  and synchronized release-version information.
+  ownership, and synchronized release-version information. Every profile entry
+  point also uses the W3C Profiles Vocabulary (`prof:Profile`) to advertise its
+  specification, constraints where available, and manifest resources.
 - `static/ontology/void.ttl` describes the module graph and public instance
   data with VoID/DCAT distributions, examples, vocabularies, and checked counts.
 - The core ontology links back to the VoID dataset with `void:inDataset`.
@@ -48,12 +55,15 @@ close mapping.
   surface and is checked against the loader manifest and RDF terms.
 - `make validate` integrates Turtle parsing, SHACL, HermiT reasoning,
   repository quality checks, SPARQL competency queries, and graph-isomorphic
-  JSON-LD/RDF/XML round trips.
+  JSON-LD/RDF/XML round trips. The weak Core SHACL contract keeps channel and
+  target links optional but requires an asserted channel to be typed
+  `sstim-ex:StimulusChannel` and an asserted target to be an IRI or blank node.
 - The post-release canonical FOOPS assessment scores 87.5%. Minimum metadata
   and both version-IRI checks pass; the remaining failures depend on public
   prefix and ontology registry discovery.
-- `make ontology-docs` generates WIDOCO reference documentation for the core
-  module (WIDOCO 1.4.25 pinned in the flake; gap-filling metadata in
+- `make ontology-docs` generates WIDOCO reference documentation for the
+  manifest-defined Full semantic profile (WIDOCO 1.4.25 pinned in the flake;
+  the RDF closure is unioned before OWL translation; gap-filling metadata in
   `docs/ontology/widoco.properties`). `pages.yml` publishes it to
   `/ontology/docs/` in the deployed artifact only — never committed (ADR 0023).
   Verified live at `https://labiosyncare.github.io/ontology/docs/` on
@@ -64,16 +74,26 @@ close mapping.
 
 ### Still external or deployment-dependent
 
-1. ~~Merge the perma-id/w3id.org routing update and test content negotiation~~
-   — **done 2026-07-11** (PR #6337 merged). The `/sstim/exposure` and
-   `/sstim/void` routes and Turtle/RDF-XML/JSON-LD content negotiation are live;
-   the full route × representation matrix is verified in
-   [`reviews/2026-07-11-dbpedia-archivo-submission.md`](reviews/2026-07-11-dbpedia-archivo-submission.md).
-2. Submit the stable release URI to selected ontology registries
+1. The pre-modular route matrix was deployed and verified on 2026-07-11 (PR
+   #6337). Deploy the new generated catalogs and profile/schema artifacts, then
+   merge and verify the staged `0.13` perma-id rules. In the finalized contract,
+   machine RDF at `/sstim` is the generated Full namespace catalog,
+   `/sstim/kernel` is the exact Kernel endpoint, and `/sstim/exposure` is the
+   generated Stimulus + Exposure namespace catalog. `/sstim/module/exposure`
+   is the separate exact Exposure semantic module distribution and live import
+   endpoint. The profile routes, `/sstim/manifest`, and
+   `/sstim/manifest-schema/1` must also dereference in their declared
+   representations.
+2. Complete the profile release contracts. Every released profile requires at
+   least one positive, out-of-scope, and adversarial fixture plus a competency
+   query. Core currently has a positive fixture and executable contract;
+   Kernel, Core Plus, and Full remain incomplete, and Core lacks its two
+   negative fixture categories.
+3. Submit the stable release URI to selected ontology registries
    ([REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md)). DBpedia Archivo already
    validates SSTIM ("accessible in 2 formats"); indexing is blocked only by a
    DBpedia-side Databus outage — retry when their infrastructure recovers.
-3. Create conservative Wikidata links only after the ontology landing page and
+4. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
 
 Browser requests for the ontology IRI keep resolving to the interactive
@@ -81,16 +101,18 @@ knowledge browser, whose hash handling gives every SSTIM term a live graph
 view (ADR 0023). Revisit that routing only if a registry review requires
 static documentation at the IRI itself; the change is one `.htaccess` rule.
 
-The `0.6.0` term-space is released independently of WIDOCO and registry
-submission. Zenodo creates its version DOI from the GitHub release; the DOI is
-then added to live publication metadata without rewriting the frozen snapshot.
+The frozen `0.12.0` term-space remains the current citable release independently
+of the mutable `0.13.0-dev` work. Zenodo creates a version DOI from a published
+GitHub release; that process must never require rewriting an already published
+snapshot.
 
 ### Ontology snapshot versus release archive
 
 These are two different boundaries:
 
-- `make snapshot VERSION=X.Y.Z` creates the curated ontology snapshot under
-  `static/ontology/<version>/` from the seven reusable term modules;
+- `make snapshot VERSION=X.Y.Z` copies the release-prepared, manifest-selected
+  modules, shape graphs, profile entry points, manifest, and schema into
+  `static/ontology/<version>/` as one byte-identical artifact set;
 - publishing the tag as a GitHub release lets the enabled Zenodo integration
   archive the repository state associated with that release and mint its DOI.
 
@@ -116,8 +138,21 @@ use and is the canonical identifier policy.
 
 Releases are versioned as one ontology set:
 
-- the core ontology carries the release `owl:versionIRI`;
+- the root Kernel ontology carries the whole-set release `owl:versionIRI`;
 - module files carry `owl:versionInfo` but no independent release identity;
+- a released manifest carries `immutableRelease` URLs and an exact immutable
+  `publication.versionedUrl` for every snapshotted module and profile;
+- its `$schema` and `immutableRelease.schemaUrl` identify the frozen versioned
+  `manifest.schema.json`, rather than the mutable schema PID;
+- released profile entry points import the exact versioned sibling Turtle files
+  in their declared semantic closure, never mutable latest-module IRIs;
+- their PROF resource descriptors identify the immutable profile entrypoint,
+  selected shape artifact, and frozen manifest rather than mutable discovery
+  endpoints;
+- before release preparation, the live Full profile imports the exact Exposure
+  module at `/sstim/module/exposure`, never the aggregate `/sstim/exposure`
+  namespace document; its `dct:requires` may still name `/sstim/exposure` as
+  the logical ontology identifier;
 - `static/ontology/<version>/` is the immutable, citable whole-set snapshot;
 - generated JSON-LD/RDF/XML files are serializations, not independent sources;
 - the Zenodo version DOI identifies the complete deposited GitHub release
@@ -129,22 +164,36 @@ See [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).
 
 ## Content Negotiation and Documentation
 
-The intended stable behavior is:
+The finalized modular behavior is below. It is implemented in the repository
+but remains staged for `0.13.0-dev` until the generated Pages artifacts and the
+matching perma-id rules are deployed and verified.
 
-| Request | Representation |
-|---|---|
-| `Accept: text/turtle` | Turtle source |
-| `Accept: application/ld+json` | generated JSON-LD |
-| `Accept: application/rdf+xml` | generated RDF/XML |
-| browser / HTML | BSC Lab knowledge browser (interactive; term fragments select graph nodes) |
+| Request | Machine-readable representation | HTML representation |
+|---|---|---|
+| `/sstim` | Generated Full semantic namespace catalog in negotiated Turtle, JSON-LD, or RDF/XML | BSC Lab knowledge browser; term fragments select graph nodes |
+| `/sstim/kernel` | Exact Kernel (`sstim-core`) in the negotiated RDF syntax | WIDOCO documentation |
+| `/sstim/exposure` | Generated Stimulus + Exposure namespace catalog in the negotiated RDF syntax | WIDOCO documentation |
+| `/sstim/module/exposure` | Exact Exposure semantic module (`sstim-exposure`) in the negotiated RDF syntax; mutable distribution/import endpoint | WIDOCO documentation |
+| `/sstim/profile/{kernel,core,core-plus,full}` | PROF-enabled profile entry point in the negotiated RDF syntax | WIDOCO documentation |
+| `/sstim/manifest` | JSON suite manifest | Not a separate HTML contract |
+| `/sstim/manifest-schema/1` | JSON Schema for the manifest | Not a separate HTML contract |
+| Other `/sstim/<module-slug>` routes | Exact concern, bridge, vocabulary, alignment, or shape module in the negotiated RDF syntax | WIDOCO documentation |
+
+`/sstim/exposure` is a namespace document and must not appear as the Exposure
+module's `owl:imports` target. The live Full profile uses
+`/sstim/module/exposure`; a released Full profile uses the corresponding
+immutable versioned sibling Turtle file. A `dct:requires` reference to the
+logical `/sstim/exposure` ontology identifier is not a retrieval import.
 
 WIDOCO reference documentation is published at
 `https://labiosyncare.github.io/ontology/docs/` and cross-linked with the
 knowledge browser rather than being the redirect target (ADR 0023).
 
 The generated RDF targets must be deployed before the external w3id rule is
-merged. After deployment, verify the core IRI, every module IRI, the versioned
-IRI, and `/sstim/void` with explicit `Accept` headers and redirect checks.
+merged. After deployment, verify the namespace catalogs, exact Kernel, every
+exact module distribution endpoint (including `/sstim/module/exposure`), every
+profile IRI, manifest and schema PID, versioned IRI, and `/sstim/void` with
+explicit `Accept` headers and redirect checks.
 
 WIDOCO output must be reproducible in CI and must not be edited manually. The
 documentation should expose:
@@ -232,29 +281,45 @@ notability. Reusable diagrams may be published to Wikimedia Commons under CC BY
 
 ## Rollout
 
-### Phase 1: release 0.6
+### Phase 1: modular publication mechanics — implemented locally
 
-- Complete the modeling, maintainer review, and automated validation recorded
-  in `IMPROVEMENT_PLAN.md` and ADR 0022.
-- Freeze `static/ontology/0.6.0/` from the validated live modules.
-- Update version, citation, VoID, and documentation metadata together.
-- Tag and publish the GitHub release; verify the new Zenodo version record.
+- Maintain the manifest-defined Kernel, Core, Core Plus, and Full closures and
+  separate shape selection accepted by ADR 0043.
+- Generate the Full root namespace catalog and the Stimulus + Exposure
+  namespace catalog from their manifest declarations.
+- Publish PROF discovery metadata from each profile entry point and validate
+  the manifest against the local Draft 2020-12 schema. Mutable manifests use
+  `https://w3id.org/sstim/manifest-schema/1`; released manifests use their
+  frozen versioned schema sibling.
+- Keep `0.13.0-dev` explicitly mutable, staged, and noncitable.
 
-### Phase 2: complete FAIR deployment
+### Phase 2: prepare the next immutable release
 
-- Deploy generated RDF serializations and the checked VoID description.
-- Publish reproducible WIDOCO HTML.
-- Merge and verify the staged w3id routing changes.
+- Add positive, out-of-scope, and adversarial contract fixtures plus at least
+  one competency query for every profile. Core already has its positive fixture
+  and executable contract; the remaining profile-specific coverage is deferred.
+- Change each profile to the exact versioned sibling import closure and add
+  `immutableRelease` (including its schema URL) plus every artifact's
+  `publication.versionedUrl` to the release manifest. Point released `$schema`
+  and PROF resource descriptors at their frozen artifacts.
+- Update synchronized version/date metadata, run `make validate`, freeze the
+  manifest-selected files, and verify all older snapshot checksums.
+- Audit the tagged repository boundary, tag and publish the release, and verify
+  its Zenodo version record without modifying the frozen snapshot.
 
-### Phase 3: registries
+### Phase 3: deploy and verify the modular routes
+
+- Deploy generated RDF serializations, both namespace catalogs, profile entry
+  points, manifest/schema artifacts, checked VoID, and reproducible WIDOCO HTML.
+- Merge the staged perma-id rules only after those targets exist, then run the
+  full route × representation verification matrix.
+
+### Phase 4: registries and knowledge-graph links
 
 - Submit prefix.cc, LOV, BARTOC, BioPortal, OLS, and FAIRsharing records.
 - Submit to DBpedia Archivo and address actionable quality findings.
 - Register with OpenAIRE when an eligible gateway record is accepted.
 - Store submission URLs, dates, record identifiers, and status in the repo.
-
-### Phase 4: knowledge-graph links
-
 - Create the SSTIM ontology item in Wikidata.
 - Add reciprocal mappings only for released terms with verified equivalence.
 - Review candidate biomedical mappings with a domain/ontology expert.
@@ -263,14 +328,23 @@ notability. Reusable diagrams may be published to Wikimedia Commons under CC BY
 
 SSTIM is first-class for public reuse when:
 
-- the ontology and every module dereference through w3id to Turtle, JSON-LD,
-  RDF/XML, and stable HTML as requested;
+- the namespace documents, exact module distribution endpoints, and profiles
+  dereference through w3id to Turtle, JSON-LD, RDF/XML, and stable HTML as
+  requested;
+- `/sstim` serves the generated Full namespace catalog, `/sstim/kernel` serves
+  the exact Kernel, and `/sstim/exposure` serves the generated two-module
+  namespace catalog in machine-readable negotiations, while
+  `/sstim/module/exposure` serves only the exact Exposure semantic module;
 - generated serializations parse and represent the same source graphs;
 - SHACL, OWL reasoning, quality, and competency audits run in CI;
+- every released profile has nonempty positive, out-of-scope, and adversarial
+  fixtures plus at least one executable competency query;
 - machine-readable metadata includes creator, license, namespace, version,
   DOI, provenance, distributions, and checked graph counts;
 - every release has an immutable snapshot, Git tag, changelog entry, and Zenodo
   version DOI under the same concept DOI;
+- every released manifest advertises immutable versioned artifact URLs, and
+  each released profile imports only its exact versioned sibling closure;
 - every release audits the complete tagged repository state and contains no
   private ledger or real ecosystem record from the mutable/live-only tier;
 - WIDOCO documentation and citation instructions identify the current release;

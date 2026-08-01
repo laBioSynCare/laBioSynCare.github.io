@@ -18,7 +18,7 @@ WORKLET_DIR := static/worklets
 WASM_WAT   := $(WORKLET_DIR)/bsc-osc.wat
 WASM_OUT   := $(WORKLET_DIR)/bsc-osc.wasm
 SHAPES     := static/ontology/sstim-shapes.ttl
-ONTOLOGY   := static/ontology/sstim-core.ttl
+CORE_SHAPES := static/ontology/sstim-core-shapes.ttl
 VOCAB      := static/ontology/sstim-vocab.ttl
 ALIGNMENTS := static/ontology/sstim-alignments.ttl
 EXPOSURE   := static/ontology/sstim-exposure.ttl
@@ -33,12 +33,16 @@ PUBLIC_ECOSYSTEM_ARG = $(if $(strip $(PUBLIC_ECOSYSTEM)),--public-candidate "$(P
 PRIVATE_LEDGER_ARG = $(if $(strip $(PRIVATE_LEDGER)),--private-ledger "$(PRIVATE_LEDGER)",)
 SHACL_WORKERS ?=
 SHACL_WORKERS_ARG = $(if $(strip $(SHACL_WORKERS)),--shacl-workers "$(SHACL_WORKERS)",)
-ONTOLOGY_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(SHAPES) $(PATCH_STUDIO) $(STIMULUS) $(EXPOSURE) $(ECOSYSTEM)
+MANIFEST := static/ontology/manifest.json
+MANIFEST_CLI := node scripts/sstim-manifest.mjs
+CORE_PROFILE_MODULES := $(shell $(MANIFEST_CLI) files core)
+FULL_SEMANTIC_MODULES := $(shell $(MANIFEST_CLI) files full)
+ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
-# (validation constraints, not browsable terms). Core is first so the merged
-# ontology inherits its IRI (https://w3id.org/sstim).
-BIOPORTAL_MODULES := $(ONTOLOGY) $(VOCAB) $(ALIGNMENTS) $(EXPOSURE) $(PATCH_STUDIO) $(STIMULUS) $(ECOSYSTEM)
+# (validation constraints, not browsable terms). The RDF closure is unioned
+# before OWL translation, and the bundle is explicitly assigned the root IRI.
+BIOPORTAL_MODULES := $(FULL_SEMANTIC_MODULES)
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(sort $(wildcard $(INSTANCE_ROOT)/*/*.ttl) $(wildcard $(INSTANCE_ROOT)/*/*/*.ttl))
@@ -48,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence
 
 ## Build the production bundle
 build:
@@ -128,23 +132,28 @@ preview: build
 
 ## Validate core ontology against shapes
 shacl-core:
-	$(PYSHACL) -s $(SHAPES) $(ONTOLOGY)
+	@tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	cat $(CORE_PROFILE_MODULES) > "$$tmp"; \
+	$(PYSHACL) -s $(CORE_SHAPES) "$$tmp"
 
 ## Validate the vocabulary against shapes, in its dependency closure.
 ## ADR 0034: technique identity/type is vocabulary-owned while characteristic
-## delivery media are exposure-owned, so the vocabulary can no longer be
-## validated in isolation. Loading core+vocabulary+exposure is the fix;
-## duplicating assertions across files to keep a file-local command working
-## is not. `shacl-modules` remains the whole-set authority.
+## delivery media are exposure-owned, so the vocabulary cannot be validated in
+## isolation. The manifest-defined Full semantic closure supplies every direct
+## and transitive dependency; `shacl-modules` remains the whole-set authority.
 shacl-vocab:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) > "$$tmp"; \
+	cat $(FULL_SEMANTIC_MODULES) > "$$tmp"; \
 	$(PYSHACL) -s $(SHAPES) "$$tmp"
 
-## Validate exposure ontology module against shapes
+## Validate Exposure constraints in the manifest-defined Full closure
 shacl-exposure:
-	$(PYSHACL) -s $(SHAPES) $(EXPOSURE)
+	@tmp="$$(mktemp)"; \
+	trap 'rm -f "$$tmp"' EXIT; \
+	cat $(FULL_SEMANTIC_MODULES) > "$$tmp"; \
+	$(PYSHACL) -s $(SHAPES) "$$tmp"
 
 ## Validate the complete ontology module set, including module metadata
 shacl-modules:
@@ -160,7 +169,7 @@ shacl-instances:
 	else \
 		tmp="$$(mktemp)"; \
 		trap 'rm -f "$$tmp"' EXIT; \
-		cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(ECOSYSTEM) $(INSTANCE_FILES) > "$$tmp"; \
+		cat $(FULL_SEMANTIC_MODULES) $(INSTANCE_FILES) > "$$tmp"; \
 		$(PYSHACL) -s $(SHAPES) "$$tmp"; \
 	fi
 
@@ -168,7 +177,7 @@ shacl-instances:
 shacl-private-ecosystem:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(ONTOLOGY) $(VOCAB) $(EXPOSURE) $(ECOSYSTEM) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
+	cat $(FULL_SEMANTIC_MODULES) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
 	$(PYSHACL) -s $(PRIVATE_ECOSYSTEM_SHAPES) -i rdfs "$$tmp"
 
 ## Run all SHACL validations
@@ -179,9 +188,19 @@ reason:
 	@set -e; \
 	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
-	$(ROBOT) merge $(foreach file,$(ONTOLOGY_MODULES),--input $(file)) \
-		reason --reasoner $(REASONER) --output "$$tmpdir/sstim-reasoned.owl"; \
-	echo "reason: ROBOT $(REASONER) consistency check passed ($(words $(ONTOLOGY_MODULES)) modules)"
+	cat $(FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	if ! $(ROBOT) reason --input "$$tmpdir/sstim-full.ttl" \
+		--reasoner $(REASONER) --output "$$tmpdir/sstim-reasoned.owl" \
+		> "$$tmpdir/robot.log" 2>&1; then \
+		cat "$$tmpdir/robot.log"; \
+		exit 1; \
+	fi; \
+	cat "$$tmpdir/robot.log"; \
+	if grep -Eq 'ERROR org\.obolibrary\.robot\.IOHelper|could not be parsed' "$$tmpdir/robot.log"; then \
+		echo "reason: ROBOT discarded input triples" >&2; \
+		exit 1; \
+	fi; \
+	echo "reason: ROBOT $(REASONER) consistency check passed ($(words $(FULL_SEMANTIC_MODULES)) semantic modules)"
 
 ## Run ontology SPARQL sanity checks
 sparql-sanity:
@@ -237,32 +256,78 @@ context-roundtrip:
 verify-snapshots:
 	node scripts/verify-snapshot-checksums.mjs
 
+## Validate the canonical module/profile bill of materials and source digests
+manifest-check:
+	$(PYTHON) scripts/validate-sstim-manifest-schema.py
+	$(MANIFEST_CLI) check
+	npx vitest run scripts/sstim-manifest.test.mjs
+
+## Prove unique public-resource sources and honest direct dct:requires edges
+module-boundaries:
+	$(PYTHON) scripts/check-sstim-module-boundaries.py
+
+## Execute the weak Core profile SHACL/fixture/competency-query contract
+core-profile-contract:
+	$(PYTHON) scripts/sstim-core-profile-contract.py
+
+## Prove the modular Full union preserves the frozen 0.12 semantics
+full-equivalence:
+	$(PYTHON) scripts/check-sstim-full-equivalence.py
+
 ## Run the current ontology validation suite
-validate: shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
 export:
 	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)
 
-## Merge the browsable term modules (core+vocab+alignments+exposure+patch-studio,
-## excl. SHACL shapes) into one RDF/XML OWL file for BioPortal ingest.
+## Merge the manifest-defined Full semantic profile (excluding SHACL shapes)
+## into one RDF/XML OWL file for BioPortal ingest.
 ## Generated into dist/ (deploy artifact only), never committed; override BIOPORTAL_OUT=.
 bioportal-bundle:
-	@mkdir -p $(dir $(BIOPORTAL_OUT))
-	$(ROBOT) merge $(foreach f,$(BIOPORTAL_MODULES),--input $(f)) \
+	@set -e; \
+	mkdir -p $(dir $(BIOPORTAL_OUT)); \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	cat $(BIOPORTAL_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
 		annotate --ontology-iri https://w3id.org/sstim \
-		--output $(BIOPORTAL_OUT)
-	@echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules"
+		--output $(BIOPORTAL_OUT) > "$$tmpdir/robot.log" 2>&1; then \
+		cat "$$tmpdir/robot.log"; \
+		exit 1; \
+	fi; \
+	cat "$$tmpdir/robot.log"; \
+	if grep -Eq 'ERROR org\.obolibrary\.robot\.IOHelper|could not be parsed' "$$tmpdir/robot.log"; then \
+		echo "bioportal-bundle: ROBOT discarded input triples" >&2; \
+		exit 1; \
+	fi; \
+	test -s $(BIOPORTAL_OUT); \
+	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules"
 
-## Generate WIDOCO HTML reference documentation from the core ontology
+## Generate WIDOCO HTML reference documentation from the Full semantic profile
 ## (default into dist/ontology/docs/ for the Pages artifact; override DOCS_DIR=).
 ## Output is generated, never committed — /ontology/docs/ belongs to the docs,
 ## the app keeps the site root.
 ontology-docs:
-	$(WIDOCO) -ontFile $(ONTOLOGY) -outFolder $(DOCS_DIR) \
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	cat $(FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
+		annotate --ontology-iri https://w3id.org/sstim \
+		--output "$$tmpdir/sstim-full.owl" > "$$tmpdir/robot.log" 2>&1; then \
+		cat "$$tmpdir/robot.log"; \
+		exit 1; \
+	fi; \
+	cat "$$tmpdir/robot.log"; \
+	if grep -Eq 'ERROR org\.obolibrary\.robot\.IOHelper|could not be parsed' "$$tmpdir/robot.log"; then \
+		echo "ontology-docs: ROBOT discarded input triples" >&2; \
+		exit 1; \
+	fi; \
+	$(WIDOCO) -ontFile "$$tmpdir/sstim-full.owl" -outFolder $(DOCS_DIR) \
 		-confFile $(WIDOCO_CONF) -getOntologyMetadata \
-		-rewriteAll -lang en -uniteSections -noPlaceHolderText
+		-rewriteAll -lang en -uniteSections -noPlaceHolderText; \
 	cp $(DOCS_DIR)/index-en.html $(DOCS_DIR)/index.html
 
 ## Generate pyLODE SKOS docs for the vocabulary module (vocpub profile).
@@ -291,6 +356,10 @@ help:
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
 	@echo "  make validate         Run the current ontology validation suite"
+	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"
+	@echo "  make module-boundaries Prove unique resource sources and honest direct dependencies"
+	@echo "  make core-profile-contract Validate Core shapes, fixture, and competency queries"
+	@echo "  make full-equivalence Prove Full preserves the frozen 0.12 semantic union"
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
@@ -301,9 +370,9 @@ help:
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"
-	@echo "  make shacl-core       Validate sstim-core.ttl against shapes"
-	@echo "  make shacl-vocab      Validate sstim-vocab.ttl against shapes"
-	@echo "  make shacl-exposure   Validate sstim-exposure.ttl against shapes"
+	@echo "  make shacl-core       Validate the Core profile closure against Core shapes"
+	@echo "  make shacl-vocab      Validate Vocabulary in the Full semantic closure"
+	@echo "  make shacl-exposure   Validate Exposure constraints in the Full closure"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
 	@echo "  make ecosystem-contract Validate ecosystem fixtures or an external candidate (PUBLIC_ECOSYSTEM=/external/public.ttl, PRIVATE_LEDGER=/external/audit.ttl, SHACL_WORKERS=N)"

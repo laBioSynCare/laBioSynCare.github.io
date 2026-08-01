@@ -21,16 +21,16 @@ ECOSYSTEM_INSTANCE_DIR = INSTANCE_DIR / "ecosystem"
 ECOSYSTEM_REAL_DIR = ECOSYSTEM_INSTANCE_DIR / "agents"
 ECOSYSTEM_FIXTURE_DIR = ECOSYSTEM_INSTANCE_DIR / "fixtures"
 W3ID_STAGING_FILE = ROOT / "docs" / "ecosystem" / "w3id" / "sstim" / ".htaccess"
-
+MANIFEST_PATH = ONTOLOGY_DIR / "manifest.json"
+MANIFEST = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+MANIFEST_MODULES = {module["id"]: module for module in MANIFEST["modules"]}
+FULL_PROFILE = next(profile for profile in MANIFEST["profiles"] if profile["id"] == "full")
+FULL_MODULE_IDS = FULL_PROFILE["modules"] + FULL_PROFILE["shapeModules"]
 MODULES = {
-    ONTOLOGY_DIR / "sstim-core.ttl": URIRef("https://w3id.org/sstim"),
-    ONTOLOGY_DIR / "sstim-vocab.ttl": URIRef("https://w3id.org/sstim/vocab"),
-    ONTOLOGY_DIR / "sstim-shapes.ttl": URIRef("https://w3id.org/sstim/shapes"),
-    ONTOLOGY_DIR / "sstim-alignments.ttl": URIRef("https://w3id.org/sstim/alignments"),
-    ONTOLOGY_DIR / "sstim-patch-studio.ttl": URIRef("https://w3id.org/sstim/patch-studio"),
-    ONTOLOGY_DIR / "sstim-stimulus.ttl": URIRef("https://w3id.org/sstim/stimulus"),
-    ONTOLOGY_DIR / "sstim-exposure.ttl": URIRef("https://w3id.org/sstim/exposure"),
-    ONTOLOGY_DIR / "sstim-ecosystem.ttl": URIRef("https://w3id.org/sstim/ecosystem"),
+    ROOT / MANIFEST_MODULES[module_id]["source"]["path"]: URIRef(
+        MANIFEST_MODULES[module_id]["ontologyIri"]
+    )
+    for module_id in FULL_MODULE_IDS
 }
 
 SSTIM = Namespace("https://w3id.org/sstim#")
@@ -100,6 +100,33 @@ TECHNIQUE_PUBLIC_ROUTES = {
     "framework/bsc/technique/audiovisual-rhythm-coordination": VOCAB_DUMP,
     "framework/bsc/technique/vibrotactile-rhythm-stimulation": VOCAB_DUMP,
 }
+
+# Canonical Accept matching for every staged content-negotiated route. Explicit
+# RDF types win in JSON-LD, RDF/XML order, then HTML, then Turtle/wildcard.
+# Full media ranges are matched case-insensitively and q=0 is never acceptable.
+_Q_ZERO_GUARD = (
+    r"(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$))"
+)
+_JSON_LD_ACCEPT_RE = (
+    r"(?:^|,)\s*application/ld\+json\s*(?=;|,|$)" + _Q_ZERO_GUARD
+)
+_RDF_XML_ACCEPT_RE = (
+    r"(?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)" + _Q_ZERO_GUARD
+)
+_HTML_ACCEPT_RE = (
+    r"(?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)"
+    + _Q_ZERO_GUARD
+)
+_TURTLE_ACCEPT_RE = (
+    r"(?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)"
+    + _Q_ZERO_GUARD
+)
+JSON_LD_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_JSON_LD_ACCEPT_RE} [NC]"
+RDF_XML_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_RDF_XML_ACCEPT_RE} [NC]"
+HTML_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_HTML_ACCEPT_RE} [NC]"
+EMPTY_ACCEPT = r"RewriteCond %{HTTP_ACCEPT} ^$ [OR]"
+TURTLE_ACCEPT = rf"RewriteCond %{{HTTP_ACCEPT}} {_TURTLE_ACCEPT_RE} [NC]"
+
 errors: list[str] = []
 
 
@@ -193,6 +220,34 @@ declared_module_properties = list(void_graph.objects(dataset_iri, VOID.propertie
 declared_instance_triples = list(void_graph.objects(instance_dataset_iri, VOID.triples))
 declared_ecosystem_triples = list(void_graph.objects(ECOSYSTEM_AGENTS_GRAPH, VOID.triples))
 declared_fixture_triples = list(void_graph.objects(ECOSYSTEM_FIXTURE_GRAPH, VOID.triples))
+dataset_versions = list(void_graph.objects(dataset_iri, DCAT.version))
+
+# VoID describes the latest immutable release, while the top-level sources may
+# be a prerelease development line. Count the frozen distribution named by
+# dcat:version instead of making release metadata drift with live development.
+published_modules = Graph()
+published_named_classes: set[URIRef] = set()
+published_declared_properties: set[URIRef] = set()
+if len(dataset_versions) != 1:
+    fail("void.ttl: expected exactly one dcat:version")
+else:
+    published_dir = ONTOLOGY_DIR / str(dataset_versions[0])
+    published_paths = sorted(published_dir.glob("sstim-*.ttl"))
+    if not published_paths:
+        fail(f"void.ttl: dcat:version {dataset_versions[0]} has no frozen module set")
+    else:
+        published_modules = parse_graph(published_paths)
+        published_named_classes = {
+            subject
+            for subject in published_modules.subjects(RDF.type, OWL.Class)
+            if isinstance(subject, URIRef)
+        }
+        published_declared_properties = {
+            subject
+            for property_type in (OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty)
+            for subject in published_modules.subjects(RDF.type, property_type)
+            if isinstance(subject, URIRef)
+        }
 
 
 def published_instance_url(path: Path) -> URIRef:
@@ -211,12 +266,15 @@ expected_fixture_uri_spaces = {
     *expected_ecosystem_uri_spaces,
     Literal("https://w3id.org/sstim/implementation/bsclab/"),
 }
-if declared_module_triples != [Literal(len(modules))]:
-    fail(f"void.ttl: void:triples must be {len(modules)} for the term-module graph")
-if declared_module_classes != [Literal(len(named_classes))]:
-    fail(f"void.ttl: void:classes must be {len(named_classes)} named OWL classes")
-if declared_module_properties != [Literal(len(declared_properties))]:
-    fail(f"void.ttl: void:properties must be {len(declared_properties)} OWL properties")
+if declared_module_triples != [Literal(len(published_modules))]:
+    fail(
+        "void.ttl: void:triples must be "
+        f"{len(published_modules)} for the frozen {dataset_versions[0] if dataset_versions else '?'} graph"
+    )
+if declared_module_classes != [Literal(len(published_named_classes))]:
+    fail(f"void.ttl: void:classes must be {len(published_named_classes)} named OWL classes")
+if declared_module_properties != [Literal(len(published_declared_properties))]:
+    fail(f"void.ttl: void:properties must be {len(published_declared_properties)} OWL properties")
 if declared_instance_triples != [Literal(len(instances))]:
     fail(f"void.ttl: instance void:triples must be {len(instances)}")
 if declared_ecosystem_triples:
@@ -242,9 +300,12 @@ if (instance_dataset_iri, VOID.subset, ECOSYSTEM_FIXTURE_GRAPH) not in void_grap
     fail("void.ttl: public instance dataset must include the ecosystem-fixture graph as a subset")
 
 core_versions = list(modules.objects(URIRef("https://w3id.org/sstim"), OWL.versionInfo))
-dataset_versions = list(void_graph.objects(dataset_iri, DCAT.version))
-if len(core_versions) == 1 and dataset_versions != core_versions:
-    fail("void.ttl: dcat:version must match the live core owl:versionInfo")
+if len(core_versions) == 1:
+    live_version = str(core_versions[0])
+    if "-" not in live_version and dataset_versions != core_versions:
+        fail("void.ttl: a released live core must match dcat:version")
+    if "-" in live_version and dataset_versions and str(dataset_versions[0]) == live_version:
+        fail("void.ttl: dcat:version must identify an immutable release, not a prerelease")
 
 
 def objects(subject: URIRef, predicate: URIRef) -> list:
@@ -902,16 +963,263 @@ check_void_partitions(ECOSYSTEM_FIXTURE_GRAPH, ecosystem_fixture_instances, "eco
 # Patch Studio tool and ontology module) from being conflated by broad routes.
 w3id_text = W3ID_STAGING_FILE.read_text(encoding="utf-8")
 
+# Persistent module/profile routes must cover the manifest exactly. Validate
+# the complete directive matrix, not just route-slug counts: every supported
+# representation must map to its exact artifact, q=0/unsupported requests must
+# reach 406, and no shadow copy may occur elsewhere in the file.
+manifest_route_start = "# BEGIN audited SSTIM manifest routes"
+manifest_route_end = "# END audited SSTIM manifest routes"
+
+
+def directive_lines(block: str) -> tuple[str, ...]:
+    return tuple(
+        line.strip()
+        for line in block.splitlines()
+        if line.strip().startswith(("RewriteCond", "RewriteRule"))
+    )
+
+
+if w3id_text.count(manifest_route_start) != 1 or w3id_text.count(manifest_route_end) != 1:
+    fail("w3id staging: expected one delimited SSTIM manifest route block")
+else:
+    manifest_route_block = w3id_text.split(manifest_route_start, 1)[1].split(
+        manifest_route_end, 1
+    )[0]
+
+    def negotiated_directives(
+        pattern: str,
+        *,
+        json_ld: str,
+        rdf_xml: str,
+        html: str,
+        turtle: str,
+    ) -> tuple[str, ...]:
+        return (
+            JSON_LD_ACCEPT,
+            f"RewriteRule {pattern} {json_ld} [R=303,L]",
+            RDF_XML_ACCEPT,
+            f"RewriteRule {pattern} {rdf_xml} [R=303,L]",
+            HTML_ACCEPT,
+            f"RewriteRule {pattern} {html} [R=303,L]",
+            EMPTY_ACCEPT,
+            TURTLE_ACCEPT,
+            f"RewriteRule {pattern} {turtle} [R=303,L]",
+            f"RewriteRule {pattern} - [R=406,L]",
+        )
+
+    module_slugs = [
+        module["publication"]["persistentUrl"].removeprefix(
+            "https://w3id.org/sstim/"
+        )
+        for module in MANIFEST["modules"]
+    ]
+    profile_slugs = [profile["id"] for profile in MANIFEST["profiles"]]
+    ordinary_module_slugs = [
+        slug for slug in module_slugs if slug not in {"kernel", "module/exposure"}
+    ]
+    profile_pattern = rf"^profile/({'|'.join(profile_slugs)})$"
+    module_pattern = rf"^({'|'.join(ordinary_module_slugs)})$"
+    expected_manifest_directives = (
+        "RewriteRule ^manifest$ https://labiosyncare.github.io/ontology/manifest.json [R=303,L]",
+        "RewriteRule ^manifest-schema/1$ https://labiosyncare.github.io/ontology/manifest.schema.json [R=303,L]",
+        *negotiated_directives(
+            profile_pattern,
+            json_ld="https://labiosyncare.github.io/ontology/sstim-$1-profile.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-$1-profile.rdf",
+            html="https://labiosyncare.github.io/ontology/docs/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-$1-profile.ttl",
+        ),
+        *negotiated_directives(
+            "^kernel$",
+            json_ld="https://labiosyncare.github.io/ontology/sstim-core.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-core.rdf",
+            html="https://labiosyncare.github.io/ontology/docs/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-core.ttl",
+        ),
+        *negotiated_directives(
+            "^exposure$",
+            json_ld="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.rdf",
+            html="https://labiosyncare.github.io/ontology/docs/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.ttl",
+        ),
+        *negotiated_directives(
+            "^module/exposure$",
+            json_ld="https://labiosyncare.github.io/ontology/sstim-exposure.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-exposure.rdf",
+            html="https://labiosyncare.github.io/ontology/docs/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-exposure.ttl",
+        ),
+        *negotiated_directives(
+            module_pattern,
+            json_ld="https://labiosyncare.github.io/ontology/sstim-$1.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-$1.rdf",
+            html="https://labiosyncare.github.io/ontology/docs/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-$1.ttl",
+        ),
+        *negotiated_directives(
+            "^$",
+            json_ld="https://labiosyncare.github.io/ontology/sstim-namespace.jsonld",
+            rdf_xml="https://labiosyncare.github.io/ontology/sstim-namespace.rdf",
+            html="https://labiosyncare.github.io/",
+            turtle="https://labiosyncare.github.io/ontology/sstim-namespace.ttl",
+        ),
+    )
+    if directive_lines(manifest_route_block) != expected_manifest_directives:
+        fail(
+            "w3id staging: manifest-owned route/media matrix does not exactly "
+            "match module, profile, namespace, and artifact targets"
+        )
+
+    # A second rule for any managed path can shadow or silently diverge from the
+    # audited block even when the block itself remains internally complete.
+    outside_manifest_block = w3id_text.split(manifest_route_start, 1)[0] + w3id_text.split(
+        manifest_route_end, 1
+    )[1]
+    managed_paths = {
+        "",
+        "exposure",
+        "manifest",
+        "manifest-schema/1",
+        *module_slugs,
+        *(f"profile/{slug}" for slug in profile_slugs),
+    }
+    for directive in directive_lines(outside_manifest_block):
+        if not directive.startswith("RewriteRule "):
+            continue
+        source_pattern = directive.split(maxsplit=2)[1]
+        try:
+            source_re = re.compile(source_pattern)
+        except re.error:
+            continue
+        if any(source_re.fullmatch(path) for path in managed_paths):
+            fail(
+                "w3id staging: manifest-owned route is duplicated outside its "
+                f"audited block: {source_pattern}"
+            )
+
+
+# Prove that the canonical Accept expressions are case-insensitive, reject
+# explicit q=0, return 406 for unsupported-only requests, and retain a stable
+# precedence when a client lists more than one supported representation.
+def negotiated_kind(header: str) -> str | None:
+    for kind, pattern in (
+        ("jsonld", _JSON_LD_ACCEPT_RE),
+        ("rdfxml", _RDF_XML_ACCEPT_RE),
+        ("html", _HTML_ACCEPT_RE),
+    ):
+        if re.search(pattern, header, flags=re.IGNORECASE):
+            return kind
+    if not header or re.search(_TURTLE_ACCEPT_RE, header, flags=re.IGNORECASE):
+        return "turtle"
+    return None
+
+
+accept_contract = {
+    "": "turtle",
+    "*/*": "turtle",
+    "TEXT/TURTLE": "turtle",
+    "APPLICATION/LD+JSON": "jsonld",
+    "application/rdf+xml": "rdfxml",
+    "text/html": "html",
+    "text/html;q=0, application/ld+json": "jsonld",
+    "application/rdf+xml;q=0, text/html": "html",
+    "application/ld+json;q=0.01": "jsonld",
+    "application/ld+json;q=0": None,
+    "application/ld+json;q=0.000": None,
+    "*/*;q=0": None,
+    "application/json": None,
+    "text/html, application/ld+json": "jsonld",
+}
+for accept_header, expected_kind in accept_contract.items():
+    if negotiated_kind(accept_header) != expected_kind:
+        fail(
+            "w3id staging: canonical Accept matcher failed for "
+            f"{accept_header!r}; expected {expected_kind!r}"
+        )
+
+if w3id_text.count('Header always set Vary "Accept"') != 1:
+    fail("w3id staging: expected exactly one always-on Vary: Accept directive")
+
+
+# The immutable snapshot route region is generated from actual frozen files.
+# Unknown versions/files must remain 404 instead of receiving a redirect to a
+# missing Pages target. Modular snapshots gain manifest and frozen-schema routes
+# only when the corresponding sidecars are present in that exact directory.
+snapshot_route_start = "# BEGIN generated exact SSTIM snapshot routes"
+snapshot_route_end = "# END generated exact SSTIM snapshot routes"
+if w3id_text.count(snapshot_route_start) != 1 or w3id_text.count(snapshot_route_end) != 1:
+    fail("w3id staging: expected one generated exact SSTIM snapshot route region")
+else:
+    snapshot_route_block = w3id_text.split(snapshot_route_start, 1)[1].split(
+        snapshot_route_end, 1
+    )[0]
+    expected_snapshot_directives: list[str] = []
+    snapshot_directories = sorted(
+        (
+            path
+            for path in ONTOLOGY_DIR.iterdir()
+            if path.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", path.name)
+        ),
+        key=lambda path: tuple(int(part) for part in path.name.split(".")),
+    )
+    for directory in snapshot_directories:
+        version = directory.name
+        version_pattern = version.replace(".", r"\.")
+        files = sorted(path.name for path in directory.iterdir() if path.is_file())
+        turtle_files = [file for file in files if file.endswith(".ttl")]
+        if "sstim-core.ttl" not in turtle_files:
+            fail(f"w3id staging: {version} snapshot lacks sstim-core.ttl")
+            continue
+        turtle_pattern = "|".join(file.replace(".", r"\.") for file in turtle_files)
+        expected_snapshot_directives.append(
+            f"RewriteRule ^{version_pattern}/({turtle_pattern})$ "
+            f"https://labiosyncare.github.io/ontology/{version}/$1 [R=302,L]"
+        )
+        if "manifest.json" in files:
+            expected_snapshot_directives.append(
+                f"RewriteRule ^{version_pattern}/manifest$ "
+                f"https://labiosyncare.github.io/ontology/{version}/manifest.json [R=302,L]"
+            )
+        if "manifest.schema.json" in files:
+            expected_snapshot_directives.append(
+                f"RewriteRule ^{version_pattern}/manifest\\.schema\\.json$ "
+                f"https://labiosyncare.github.io/ontology/{version}/manifest.schema.json [R=302,L]"
+            )
+        expected_snapshot_directives.append(
+            f"RewriteRule ^{version_pattern}/?$ "
+            f"https://labiosyncare.github.io/ontology/{version}/sstim-core.ttl [R=302,L]"
+        )
+    if directive_lines(snapshot_route_block) != tuple(expected_snapshot_directives):
+        fail(
+            "w3id staging: frozen snapshot routes do not exactly match the "
+            "repository snapshot artifact inventory"
+        )
+
+void_route_start = "# BEGIN audited SSTIM void routes"
+void_route_end = "# END audited SSTIM void routes"
+if w3id_text.count(void_route_start) != 1 or w3id_text.count(void_route_end) != 1:
+    fail("w3id staging: expected one audited SSTIM void route block")
+else:
+    void_route_block = w3id_text.split(void_route_start, 1)[1].split(
+        void_route_end, 1
+    )[0]
+    expected_void_directives = (
+        HTML_ACCEPT,
+        "RewriteRule ^void$ https://labiosyncare.github.io/ [R=303,L]",
+        EMPTY_ACCEPT,
+        TURTLE_ACCEPT,
+        "RewriteRule ^void$ https://labiosyncare.github.io/ontology/void.ttl [R=303,L]",
+        "RewriteRule ^void$ - [R=406,L]",
+    )
+    if directive_lines(void_route_block) != expected_void_directives:
+        fail("w3id staging: VoID HTML/Turtle/406 route matrix has drifted")
+
 
 def check_exact_w3id_route_block(
     block_name: str, expected_routes: dict[str, str]
 ) -> None:
-    """Assert a delimited .htaccess block maps `expected_routes` exactly.
-
-    Every subject must carry one exact HTML rule and one exact RDF rule to its
-    owning dump, and the block may contain nothing else — a prefix wildcard or
-    an unlisted subject is a failure, not a warning.
-    """
+    """Assert exact HTML/Turtle/406 directives for a delimited route block."""
     start = f"# BEGIN audited {block_name} routes"
     end = f"# END audited {block_name} routes"
     if w3id_text.count(start) != 1 or w3id_text.count(end) != 1:
@@ -919,42 +1227,28 @@ def check_exact_w3id_route_block(
         return
 
     block = w3id_text.split(start, 1)[1].split(end, 1)[0]
-    target_pattern = "|".join(
-        re.escape(target) for target in sorted(set(expected_routes.values()))
-    )
-    exact_rule = re.compile(
-        r"RewriteRule \^\(([^)\n]+)\)/\?\$ "
-        rf"(https://labiosyncare\.github\.io/|{target_pattern}) "
-        r"\[R=303,L\]"
-    )
-    html_routes: set[str] = set()
-    rdf_targets: dict[str, str] = {}
-    for line in block.splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("RewriteRule"):
-            continue
-        match = exact_rule.fullmatch(stripped)
-        if match is None:
-            fail(
-                f"w3id staging: {block_name} block contains a broad or malformed "
-                "RewriteRule"
+    all_routes = "|".join(expected_routes)
+    expected_directives: list[str] = [
+        HTML_ACCEPT,
+        f"RewriteRule ^({all_routes})/?$ https://labiosyncare.github.io/ [R=303,L]",
+    ]
+    routes_by_target: dict[str, list[str]] = {}
+    for route, target in expected_routes.items():
+        routes_by_target.setdefault(target, []).append(route)
+    for target, routes in routes_by_target.items():
+        pattern = f"^({'|'.join(routes)})/?$"
+        expected_directives.extend(
+            (
+                EMPTY_ACCEPT,
+                TURTLE_ACCEPT,
+                f"RewriteRule {pattern} {target} [R=303,L]",
+                f"RewriteRule {pattern} - [R=406,L]",
             )
-            continue
-        target = match.group(2)
-        for route in match.group(1).split("|"):
-            if target == "https://labiosyncare.github.io/":
-                html_routes.add(route)
-            elif route in rdf_targets:
-                fail(f"w3id staging: duplicate {block_name} RDF route {route}")
-            else:
-                rdf_targets[route] = target
-
-    if html_routes != set(expected_routes):
-        fail(f"w3id staging: HTML routes do not exactly cover {block_name} subjects")
-    if rdf_targets != expected_routes:
+        )
+    if directive_lines(block) != tuple(expected_directives):
         fail(
-            f"w3id staging: RDF routes do not exactly map {block_name} subjects "
-            "to owning dumps"
+            f"w3id staging: {block_name} block must exactly map every HTML and "
+            "Turtle request and reject unsupported/q=0 requests"
         )
 
 
@@ -989,21 +1283,29 @@ else:
         if line.strip().startswith(("RewriteCond", "RewriteRule"))
     )
     expected_live_directives = (
-        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        HTML_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
         "https://labiosyncare.github.io/ [R=303,L]",
-        r"RewriteCond %{HTTP_ACCEPT} (text/html|application/xhtml\+xml)",
+        HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
         r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        EMPTY_ACCEPT,
+        TURTLE_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
         f"{ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
+        "- [R=406,L]",
+        EMPTY_ACCEPT,
+        TURTLE_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
         rf"(?!synthetic-)[A-Za-z0-9._~-]+/?$ {ECOSYSTEM_PUBLIC_DUMP} [R=303,L]",
+        r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
+        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ - [R=406,L]",
     )
     if live_directives != expected_live_directives:
         fail(
             "w3id staging: live ecosystem block must contain only the canonical "
-            "namespace-level HTML and RDF routes"
+            "namespace-level HTML, Turtle, and 406 routes"
         )
 
 for agent in ecosystem_agents:

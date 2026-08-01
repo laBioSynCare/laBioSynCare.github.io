@@ -78,10 +78,12 @@ function ontologyTerms(...files) {
 }
 
 const PATCH_STUDIO_TTL = 'static/ontology/sstim-patch-studio.ttl'
-const CORE_TTL = 'static/ontology/sstim-core.ttl'
+const CONFIGURATION_TTL = 'static/ontology/sstim-configuration.ttl'
+const SESSION_TTL = 'static/ontology/sstim-session.ttl'
 
 const patchStudioProps = ontologyProperties(PATCH_STUDIO_TTL)
-const allProps = ontologyProperties(PATCH_STUDIO_TTL, CORE_TTL)
+const projectionClosure = [PATCH_STUDIO_TTL, CONFIGURATION_TTL, SESSION_TTL]
+const allProps = ontologyProperties(...projectionClosure)
 
 /** Every property this module claims to use, flattened. */
 function claimedProperties() {
@@ -207,7 +209,7 @@ describe('projection', () => {
     // projection types its nodes (ADR 0040).
     const declared = new Set([
       ...Object.keys(allProps),
-      ...ontologyTerms(PATCH_STUDIO_TTL, CORE_TTL),
+      ...ontologyTerms(...projectionClosure),
     ])
     const { turtle } = projectPatch(sample(), OPTIONS)
     const used = [...turtle.matchAll(/sstim:(\w+)/g)].map((m) => m[1])
@@ -285,7 +287,8 @@ describe('the mapping report tells the truth about what did not travel', () => {
     // The line that must never soften: RDF validity is not scientific warrant.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)
     // Nor is a configuration a description of the stimulation (ADR 0041 §3).
-    expect(report.conformance).toMatch(/sstim:StimulusSpecification, which does not exist yet/)
+    expect(report.conformance).toMatch(/not a sstim:StimulusSpecification/)
+    expect(report.conformance).toMatch(/requires calibrated delivered-output data/)
   })
 
   it('keeps the structural findings in sync with the module docs', () => {
