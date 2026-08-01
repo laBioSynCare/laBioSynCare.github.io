@@ -249,6 +249,49 @@ else:
             if isinstance(subject, URIRef)
         }
 
+        # The subset inventory must describe the release dcat:version names, the
+        # same frozen set the counts above are taken from. void.ttl is
+        # hand-written and was not updated when ADR 0043 grew the suite from 8
+        # modules to 18, so without this the FAIR description silently stops
+        # covering most of the ontology. Bumping dcat:version to a modular
+        # release now forces the subsets to be completed. `#instances` is the
+        # public-instance dataset, not a module.
+        NON_MODULE_SUBSETS = {"instances"}
+        VOID_BASE = "https://w3id.org/sstim/void#"
+        frozen_module_ids = {path.stem.removeprefix("sstim-") for path in published_paths}
+        declared_subsets = {
+            str(subset)[len(VOID_BASE):]
+            for subset in void_graph.objects(dataset_iri, VOID.subset)
+            if str(subset).startswith(VOID_BASE)
+        }
+        for missing in sorted(frozen_module_ids - declared_subsets):
+            fail(
+                f"void.ttl: frozen {dataset_versions[0]} module sstim-{missing}.ttl has no "
+                f"void:subset <{VOID_BASE}{missing}>"
+            )
+        for extra in sorted(declared_subsets - frozen_module_ids - NON_MODULE_SUBSETS):
+            fail(
+                f"void.ttl: void:subset <{VOID_BASE}{extra}> describes no module in the "
+                f"frozen {dataset_versions[0]} release"
+            )
+        # A subset must distribute the module it is named for; a copied block
+        # that still points at its neighbour is otherwise invisible.
+        for module_id in sorted(frozen_module_ids & declared_subsets):
+            expected = f"/ontology/sstim-{module_id}.ttl"
+            subset_iri = URIRef(f"{VOID_BASE}{module_id}")
+            # Distributions hang off the subset as blank nodes; void:dataDump is
+            # asserted directly.
+            downloads = {
+                str(url)
+                for distribution in void_graph.objects(subset_iri, DCAT.distribution)
+                for url in void_graph.objects(distribution, DCAT.downloadURL)
+            } | {str(url) for url in void_graph.objects(subset_iri, VOID.dataDump)}
+            if not any(url.endswith(expected) for url in downloads):
+                fail(
+                    f"void.ttl: subset <{VOID_BASE}{module_id}> has no dcat:downloadURL "
+                    f"ending in {expected}"
+                )
+
 
 def published_instance_url(path: Path) -> URIRef:
     relative = path.relative_to(ONTOLOGY_DIR).as_posix()

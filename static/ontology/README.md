@@ -510,15 +510,17 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    and manifest `prof:hasArtifact` values to those immutable artifacts too.
    Release preparation must do this before hashing; the snapshot command does
    not rewrite imports or discovery metadata.
-5. Update `void.ttl` to describe the release being cut: set `dcat:version`, and
-   give every manifest module a subset with its own distributions. Keep each
-   module distribution's `dcat:accessURL` on that module's own retrieval
-   endpoint — the Kernel is `/sstim/kernel` and Exposure is
-   `/sstim/module/exposure`, because `/sstim` and `/sstim/exposure` return
-   multi-module namespace catalogues. The quality audit counts `void:triples`,
-   `void:classes`, and `void:properties` against the frozen directory named by
-   `dcat:version`, so this step follows the snapshot for counts but its
-   inventory must be prepared here.
+5. Update `void.ttl` to describe the release being cut. Bumping `dcat:version`
+   is what makes the quality audit demand the rest: it counts `void:triples`,
+   `void:classes`, and `void:properties` against the frozen directory that
+   version names, and requires a `void:subset` per frozen module whose
+   distribution actually names that module's file. Going from the eight-module
+   `0.12.0` to a modular release therefore fails the audit until every new
+   module has a subset. Also move each module distribution's `dcat:accessURL`
+   onto that module's own retrieval endpoint — the Kernel is `/sstim/kernel`
+   and Exposure is `/sstim/module/exposure`, because `/sstim` and
+   `/sstim/exposure` return multi-module namespace catalogues; the audit cannot
+   check this for you while `dcat:version` still names a pre-modular release.
 6. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
    or unverifiable sources, a checksum-registered snapshot, dev/prerelease
    versions, diverging module versions, mutable profile imports/discovery
@@ -547,8 +549,9 @@ The current development manifest intentionally has no immutable release URLs.
 Only Core has a positive fixture and an executable contract today; Kernel,
 Core Plus, and Full still need profile-specific fixtures and competency
 queries, and Core still needs its out-of-scope and adversarial fixture sets.
-Step 5 is likewise unbuilt: `void.ttl` still describes the 0.12.0 module set
-rather than the manifest's. Consequently `0.13.0-dev` is noncitable
+`void.ttl` still describes the eight-module `0.12.0` set, which is correct for
+the release it names; the audit now forces its subset inventory to be completed
+as soon as `dcat:version` moves to a modular release. Consequently `0.13.0-dev` is noncitable
 even though its module and publication mechanics are implemented.
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
