@@ -503,30 +503,48 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    and manifest `prof:hasArtifact` values to those immutable artifacts too.
    Release preparation must do this before hashing; the snapshot command does
    not rewrite imports or discovery metadata.
-5. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
+5. Update `void.ttl` to describe the release being cut: set `dcat:version`, and
+   give every manifest module a subset with its own distributions. Keep each
+   module distribution's `dcat:accessURL` on that module's own retrieval
+   endpoint — the Kernel is `/sstim/kernel` and Exposure is
+   `/sstim/module/exposure`, because `/sstim` and `/sstim/exposure` return
+   multi-module namespace catalogues. The quality audit counts `void:triples`,
+   `void:classes`, and `void:properties` against the frozen directory named by
+   `dcat:version`, so this step follows the snapshot for counts but its
+   inventory must be prepared here.
+6. Commit, then run `make snapshot VERSION=X.Y.Z`; the command refuses dirty
    or unverifiable sources, a checksum-registered snapshot, dev/prerelease
    versions, diverging module versions, mutable profile imports/discovery
    artifacts, missing contract files, and missing release metadata. Snapshot
    creation fails if checksum-ledger registration fails
    (`scripts/snapshot-ontology.test.mjs` covers these refusals).
-6. Regenerate the persistent snapshot routes with
+7. Freeze a whole-ontology artifact beside the modules. `sstim-core.ttl` is the
+   Kernel, not the release, so `https://w3id.org/sstim/X.Y.Z` — the declared
+   `owl:versionIRI` — must not resolve to it. Until the release path generates
+   and freezes `sstim-namespace.ttl` (today `make export` writes the catalogues
+   to `dist/` only), or another whole-ontology artifact is chosen and recorded,
+   `node scripts/sstim-w3id-snapshot-routes.mjs` refuses to emit the
+   bare-version route for a snapshot carrying a manifest.
+8. Regenerate the persistent snapshot routes with
    `node scripts/sstim-w3id-snapshot-routes.mjs --write` and commit the updated
    `docs/ecosystem/w3id/sstim/.htaccess`, then submit it upstream. Without this
    the new version has no w3id routes; `make w3id-routes` (part of
    `make validate`) fails until the committed region matches the frozen
    snapshots on disk.
-7. Audit the entire tagged repository state—not only
+9. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.
-8. Tag and publish the GitHub release so Zenodo archives the same commit.
-9. Add the resulting version DOI without rewriting a published snapshot.
+10. Tag and publish the GitHub release so Zenodo archives the same commit.
+11. Add the resulting version DOI without rewriting a published snapshot.
 
 The current development manifest intentionally has no immutable release URLs.
 Only Core has a positive fixture and an executable contract today; Kernel,
 Core Plus, and Full still need profile-specific fixtures and competency
 queries, and Core still needs its out-of-scope and adversarial fixture sets.
-Consequently `0.13.0-dev` is noncitable even though its module and publication
-mechanics are implemented.
+Steps 5 and 7 are likewise unbuilt: no whole-ontology artifact is frozen for the
+version IRI to resolve to, and `void.ttl` still describes the 0.12.0 module set
+rather than deriving from the manifest. Consequently `0.13.0-dev` is noncitable
+even though its module and publication mechanics are implemented.
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
 master. `context.jsonld` is a hand-maintained compaction context, not a generated

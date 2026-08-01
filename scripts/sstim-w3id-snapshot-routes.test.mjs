@@ -65,14 +65,14 @@ test('future modular snapshots gain exact manifest and schema routes only when p
   const region = generatedRegion([
     {
       version: '1.0.0',
-      turtle: ['sstim-core-profile.ttl', 'sstim-core.ttl'],
+      turtle: ['sstim-core-profile.ttl', 'sstim-core.ttl', 'sstim-namespace.ttl'],
       manifest: true,
       schema: true,
     },
   ])
 
   expect(region).toContain(
-    'RewriteRule ^1\\.0\\.0/(sstim-core-profile\\.ttl|sstim-core\\.ttl)$ https://labiosyncare.github.io/ontology/1.0.0/$1 [R=302,L]',
+    'RewriteRule ^1\\.0\\.0/(sstim-core-profile\\.ttl|sstim-core\\.ttl|sstim-namespace\\.ttl)$ https://labiosyncare.github.io/ontology/1.0.0/$1 [R=302,L]',
   )
   expect(region).toContain(
     'RewriteRule ^1\\.0\\.0/manifest$ https://labiosyncare.github.io/ontology/1.0.0/manifest.json [R=302,L]',
@@ -86,4 +86,43 @@ test('a frozen snapshot without the root artifact is rejected', () => {
   expect(() => generatedRegion([
     { version: '1.0.0', turtle: ['sstim-vocab.ttl'], manifest: false, schema: false },
   ])).toThrow('frozen snapshot lacks sstim-core.ttl')
+})
+
+test('a pre-modular version IRI resolves to sstim-core.ttl, which was the whole ontology', () => {
+  const region = generatedRegion([
+    { version: '0.12.0', turtle: ['sstim-core.ttl'], manifest: false, schema: false },
+  ])
+
+  expect(region).toContain(
+    'RewriteRule ^0\\.12\\.0/?$ https://labiosyncare.github.io/ontology/0.12.0/sstim-core.ttl [R=302,L]',
+  )
+})
+
+test('a modular version IRI resolves to the whole ontology, never to the Kernel module', () => {
+  // After ADR 0043 sstim-core.ttl is the two-class Kernel. Resolving
+  // owl:versionIRI <https://w3id.org/sstim/x.y.z> to it would hand a registry a
+  // fraction of the release, so a modular snapshot must freeze a catalogue.
+  expect(() => generatedRegion([
+    {
+      version: '0.13.0',
+      turtle: ['sstim-core.ttl', 'sstim-stimulus.ttl'],
+      manifest: true,
+      schema: true,
+    },
+  ])).toThrow('would resolve to the Kernel module instead of the released ontology')
+
+  const region = generatedRegion([
+    {
+      version: '0.13.0',
+      turtle: ['sstim-core.ttl', 'sstim-namespace.ttl'],
+      manifest: true,
+      schema: true,
+    },
+  ])
+  expect(region).toContain(
+    'RewriteRule ^0\\.13\\.0/?$ https://labiosyncare.github.io/ontology/0.13.0/sstim-namespace.ttl [R=302,L]',
+  )
+  expect(region).not.toContain(
+    'RewriteRule ^0\\.13\\.0/?$ https://labiosyncare.github.io/ontology/0.13.0/sstim-core.ttl',
+  )
 })

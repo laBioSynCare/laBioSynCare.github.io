@@ -57,6 +57,15 @@ export function snapshotInventory(directory = ontologyDir) {
     .sort((a, b) => compareSemver(a.version, b.version))
 }
 
+// The bare version route resolves `owl:versionIRI <https://w3id.org/sstim/x.y.z>`,
+// so it must serve the whole released ontology. Before the manifest era
+// sstim-core.ttl *was* that ontology. After ADR 0043 it is the two-class Kernel,
+// and pointing a version IRI at it would answer a FAIR/registry client with a
+// fraction of the release — worse than not resolving at all, which is the very
+// failure ADR 0020 set out to avoid. A modular snapshot must therefore freeze a
+// whole-ontology namespace catalogue for its version IRI to resolve to.
+const MODULAR_ROOT_ARTIFACT = 'sstim-namespace.ttl'
+
 export function generatedRegion(inventory = snapshotInventory()) {
   const lines = [START]
   for (const snapshot of inventory) {
@@ -64,6 +73,15 @@ export function generatedRegion(inventory = snapshotInventory()) {
     const filePattern = snapshot.turtle.map(regexLiteral).join('|')
     if (!snapshot.turtle.includes('sstim-core.ttl')) {
       throw new Error(`${snapshot.version}: frozen snapshot lacks sstim-core.ttl`)
+    }
+    const rootArtifact = snapshot.manifest ? MODULAR_ROOT_ARTIFACT : 'sstim-core.ttl'
+    if (!snapshot.turtle.includes(rootArtifact)) {
+      throw new Error(
+        `${snapshot.version}: modular snapshot lacks ${MODULAR_ROOT_ARTIFACT}, so the ` +
+        'version IRI would resolve to the Kernel module instead of the released ' +
+        'ontology. Freeze the generated namespace catalogue into the snapshot, or ' +
+        'decide and record a different whole-ontology release artifact.',
+      )
     }
     if (filePattern) {
       lines.push(
@@ -85,7 +103,7 @@ export function generatedRegion(inventory = snapshotInventory()) {
     }
     lines.push(
       `RewriteRule ^${versionPattern}/?$ ` +
-      `https://labiosyncare.github.io/ontology/${snapshot.version}/sstim-core.ttl [R=302,L]`,
+      `https://labiosyncare.github.io/ontology/${snapshot.version}/${rootArtifact} [R=302,L]`,
     )
   }
   lines.push(END)

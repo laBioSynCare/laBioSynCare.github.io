@@ -386,6 +386,19 @@ queries, and the deployed persistent routes pass HTML/RDF content-negotiation
 tests, including `Vary: Accept`. Repository-local route files are necessary but
 do not demonstrate deployed negotiation.
 
+Two consequences of demoting `sstim-core.ttl` from "the ontology" to "the
+Kernel module" are also release blockers, because artifacts that stood for the
+whole ontology still name that file:
+
+- the bare version route. `owl:versionIRI <https://w3id.org/sstim/<version>>`
+  must resolve to the release, not to two classes, and a frozen snapshot
+  currently holds no whole-ontology document. Rollout step 5 is unmet here
+  until the release path freezes a namespace catalogue or another artifact is
+  chosen; `scripts/sstim-w3id-snapshot-routes.mjs` fails closed meanwhile.
+- the VoID/DCAT record. It must describe the released module set and stop
+  pairing a module `dcat:downloadURL` with a `dcat:accessURL` that now returns
+  a multi-module namespace catalogue.
+
 ## Follow-up decisions kept out of this refactor
 
 The 0.13 redistribution does not decide:

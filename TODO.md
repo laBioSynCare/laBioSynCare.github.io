@@ -295,6 +295,23 @@ Turtle files are listed in section 1. After they exist:
       fixture categories. Kernel, Core Plus, and Full still need all three
       fixture categories and their own competency queries. Until these and the
       staged route deployment are complete, `0.13.0-dev` is noncitable.*
+- [ ] Give the version IRI a whole-ontology artifact to resolve to `P1`
+      *Until 0.12 `sstim-core.ttl` was the whole ontology, so `/sstim/<version>`
+      could serve it; it is now the two-class Kernel, and a frozen snapshot has
+      no single document standing for the release. `sstim-w3id-snapshot-routes`
+      now refuses a bare-version route for a manifest-carrying snapshot that
+      does not freeze `sstim-namespace.ttl`, so this cannot ship silently, but
+      the release path must still generate and freeze that catalogue (today
+      `make export` writes it only to `dist/`) or record a different
+      whole-ontology release artifact.*
+- [ ] Derive the VoID/DCAT record from the manifest `P1`
+      *ADR 0043 rollout step 5, still unmet. `void.ttl` is consistent today —
+      the quality audit counts it against the frozen directory its `dcat:version`
+      names — but it describes 0.12.0's 9 subsets. At 0.13.0 it must describe
+      all 18 modules, and the Kernel and Exposure `dcat:accessURL` values must
+      become `/sstim/kernel` and `/sstim/module/exposure`, since `/sstim` and
+      `/sstim/exposure` now serve namespace catalogues rather than those
+      modules. Nothing yet checks the subset inventory against the manifest.*
 - [x] Generate WIDOCO HTML docs from the manifest-defined Full OWL profile `P1`
       *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
       unions the Full semantic closure before OWL translation and generates its
