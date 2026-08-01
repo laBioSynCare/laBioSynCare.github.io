@@ -6,8 +6,10 @@ All notable changes to the **SSTIM ontology** — the versioned, citable artifac
 [Semantic Versioning](https://semver.org/). Release tags are `vX.Y.Z`; each tagged
 version is frozen byte-identical under `static/ontology/X.Y.Z/`.
 
-**Scope.** This tracks the reusable ontology term-space — core, vocabulary, SHACL
-shapes, external alignments, stimulus, exposure, ecosystem, and Patch Studio modules.
+**Scope.** This tracks the reusable ontology term-space — every module listed in
+[`static/ontology/manifest.json`](static/ontology/manifest.json), which is the
+authoritative bill of materials, together with the profile entry points that
+name their closures.
 BSC Lab application and infrastructure work is tracked in [ROADMAP.md](ROADMAP.md)
 and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
@@ -15,11 +17,55 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-### Documentation
+### Changed
 
-- Audited the 0.12.0 core and physical module boundaries. Proposed a small
-  SSTIM Core Profile, optional concern modules, a Full compatibility profile,
-  and a manifest-first migration in ADR 0043. No ontology term or axiom changed.
+- **The ontology is now a set of modules behind named profiles, not one root
+  file.** `sstim-core.ttl` was a catch-all mixing stimulation, techniques,
+  protocols, neuromodulation, evidence, configuration, sessions, caution
+  metadata, and BSC voice terms. Its 385 declared terms are redistributed across
+  18 manifest-owned modules, each with one authoritative source, one ontology
+  IRI, and a declared direct dependency set. **No term was added, removed, or
+  renamed** — 385 declared terms before and after — and the Full union preserves
+  0.12.0 semantics at 9,977 normalized triples, verified by
+  `make full-equivalence`. `sstim-core.ttl` is now the dependency-free Kernel:
+  `sstim:Stimulation` and `sstim:SensoryStimulation`, and nothing else. See
+  [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
+  and the [module architecture guide](docs/ontology/MODULE_ARCHITECTURE.md).
+- **`sstim-ex:StimulusChannel` keeps its IRI but changes owner and definition.**
+  Its authoritative declaration moves from Exposure to Stimulus so the Core
+  Profile does not depend on the optional Exposure concern, and its definition
+  broadens from "a channel within an exposure profile" to cover a stimulus
+  specification as well. Existing exposure channels retain their meaning; the
+  public IRI is unchanged, and `https://w3id.org/sstim/exposure` now serves a
+  Stimulus + Exposure namespace catalogue so the IRI still dereferences to its
+  declaration. See [ADR 0044](docs/decisions/0044-stimulus-channel-core-ownership.md).
+- **`sstim:hasStimulationTarget` declares no domain in Core.** Its
+  `StimulusSpecification`/`SessionSpecification` union domain moves intact to
+  the Session module, so Core does not depend on Session. Session and Full
+  restore exactly the 0.12.0 inference. The union stays one RDF list: several
+  `rdfs:domain` statements would intersect rather than union.
+
+### Added
+
+- **Four profile entry points** — Kernel, Core, Core Plus, and Full — each a
+  W3C Profiles Vocabulary `prof:Profile` with an exact semantic closure, an
+  explicitly associated SHACL closure, and a declared inference mode. A
+  consumer can now implement a bounded contract instead of the whole graph.
+- **`manifest.json` and `manifest.schema.json`** as the authoritative bill of
+  materials. The Makefile, loader, exporter, snapshotter, and release checks
+  derive their inventories from it rather than repeating hand-maintained lists.
+- **Distinct retrieval endpoints** where a namespace IRI is not a single
+  module: `https://w3id.org/sstim/kernel` for the Kernel and
+  `https://w3id.org/sstim/module/exposure` for Exposure. `/sstim` and
+  `/sstim/exposure` serve generated namespace catalogues for hash-term
+  dereference and are not import endpoints.
+- **A reusable weak Core SHACL package** (`sstim-core-shapes.ttl`) alongside the
+  retained Full aggregate, with a positive fixture and an executable contract
+  proving Core accepts a determinate stimulus without Full delivery, placement,
+  modality, or safety policy leaking into its validation.
+- Two Full property shapes, `sstim-sh:StimulusSpecificationChannelLinkShape` and
+  `sstim-sh:StimulusSpecificationTargetLinkShape`, hardening the optional
+  channel and target links under inference mode `none` (ADR 0044).
 
 ### Fixed
 

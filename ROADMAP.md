@@ -120,6 +120,13 @@ primarily with AI-assisted development.
 - **Ontology:** the eight release modules add qualified evidence governance and
   ecosystem relationships alongside the sensory-domain vocabulary, safety
   metadata, SHACL, OWL reasoning, and executable quality/competency checks.
+- **Development line:** `0.13.0-dev` redistributes those same 385 terms across
+  18 manifest-owned modules behind four profile entry points — Kernel, Core,
+  Core Plus, Full — so an adopter can implement a bounded contract instead of
+  the whole graph. No term was added or removed and the Full union preserves
+  `0.12.0` semantics; it is noncitable until the release blockers in
+  [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
+  are cleared.
 - **Public data:** BSC Lab framework, implementation, protocols, reference
   presets, evidence, references, experiments, one synthetic session, and a
   synthetic ecosystem contract graph are public. Private catalog, real
