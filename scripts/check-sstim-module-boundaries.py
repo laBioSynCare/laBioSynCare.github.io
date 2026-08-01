@@ -72,6 +72,30 @@ def main() -> int:
                 f"{sorted(source_modules)}; expected one authoritative source"
             )
 
+    # ADR 0043 and ADR 0044: a cross-layer union domain or range is one intact
+    # RDF list owned by one module. Several rdfs:domain (or rdfs:range)
+    # statements intersect rather than union, so splitting one silently narrows
+    # a property instead of widening it. Redistribution makes this easy to hit,
+    # because a property's declaration and its domain now live in different
+    # modules by design -- sstim:hasStimulationTarget is declared in Stimulus
+    # and gets its StimulusSpecification/SessionSpecification domain in Session.
+    axis_sources: dict[tuple[URIRef, URIRef], list[str]] = defaultdict(list)
+    for module_id, graph in graphs.items():
+        for predicate in (RDFS.domain, RDFS.range):
+            for subject, _ in graph.subject_objects(predicate):
+                if isinstance(subject, URIRef) and str(subject).startswith(LOCAL_ROOT):
+                    axis_sources[(subject, predicate)].append(module_id)
+    for (subject, predicate), sources in sorted(
+        axis_sources.items(), key=lambda item: (str(item[0][0]), str(item[0][1]))
+    ):
+        if len(sources) > 1:
+            axis = str(predicate).rsplit("#", 1)[-1]
+            errors.append(
+                f"{subject}: {len(sources)} rdfs:{axis} statements from {sorted(sources)}; "
+                "several intersect rather than union — keep one intact owl:unionOf axiom "
+                "in the most-specific dependent module"
+            )
+
     # Typed public resources establish source ownership even when their
     # historical namespace names another concern (notably
     # sstim-ex:StimulusChannel, now stimulus-owned). This also lets a later
@@ -168,7 +192,8 @@ def main() -> int:
     print(
         "module-boundaries: PASS "
         f"({len(modules)} modules, {len(declarations)} uniquely owned OWL terms, "
-        f"{len(resource_declarations)} named public resources with one source)"
+        f"{len(resource_declarations)} named public resources with one source, "
+        f"{len(axis_sources)} undivided domain/range axioms)"
     )
     return 0
 

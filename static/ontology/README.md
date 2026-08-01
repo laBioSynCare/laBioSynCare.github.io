@@ -376,7 +376,10 @@ That command runs:
 1. the machine-readable manifest and ownership contracts: dependency
    acyclicity, exact profile closures, one authoritative source for each named
    OWL term, SKOS value, and SHACL shape, ontology-header parity,
-   runtime/publication mappings, and source checksums;
+   runtime/publication mappings, source checksums, and the rule that no
+   property carries a divided `rdfs:domain` or `rdfs:range` — several such
+   statements intersect rather than union, and redistribution puts a property's
+   declaration and its domain in different modules by design;
 2. pySHACL over the Core profile with Core shapes, the Full closure with Full
    shapes, and all public instances;
 3. the isolated ecosystem contract: JSON-LD graph isomorphism, 34 adversarial
@@ -391,7 +394,11 @@ That command runs:
    plus ROBOT with HermiT over the merged OWL module set;
 6. named-graph SPARQL competency queries through Comunica; and
 7. graph-isomorphic JSON-LD and RDF/XML export round trips for every
-   manifest-owned Turtle source.
+   manifest-owned Turtle source; and
+8. the w3id route contract: the generated snapshot-route region matches the
+   frozen directories on disk, and every `/ontology/` redirect target is an
+   artifact this repository publishes — a committed file, a manifest-declared
+   export serialization, or a namespace document.
 
 Useful narrower targets:
 

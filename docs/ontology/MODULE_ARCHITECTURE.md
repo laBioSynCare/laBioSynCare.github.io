@@ -93,6 +93,15 @@ otherwise optional concerns. This avoids either making the base depend upward
 or weakening an intact `owl:unionOf` into several intersection-producing
 domain or range statements.
 
+`make module-boundaries` enforces that last point directly: no SSTIM property
+may carry more than one `rdfs:domain` or more than one `rdfs:range` statement
+across the whole module set. Redistribution makes the mistake easy to reach,
+because a property's declaration and its domain now sit in different modules by
+design — `sstim:hasStimulationTarget` is declared in Stimulus and receives its
+`StimulusSpecification`/`SessionSpecification` union domain in Session (ADR
+0044 §3). Adding a second domain there would silently narrow the property to the
+intersection instead of widening it, and no reasoner would report an error.
+
 The main vocabulary remains a Full compatibility aggregate in `0.13.0-dev`.
 Loading it is not a shortcut to a small controlled-value package: its own
 dependency closure reaches several optional concerns.
@@ -203,7 +212,12 @@ dereferencing the preserved
 `https://w3id.org/sstim/exposure#StimulusChannel` IRI must still receive its
 definition after Stimulus becomes its authoritative source. These catalogues
 must not be substituted for exact module imports: the Exposure import endpoint
-is `https://w3id.org/sstim/module/exposure`. Every negotiated HTML/RDF namespace
+is `https://w3id.org/sstim/module/exposure`. The reason is concrete rather than
+stylistic — a catalogue is a concatenation of its modules, so it carries one
+`owl:Ontology` header per module (sixteen in the Full catalogue). It is a
+namespace-dereference document, not an ontology document: it has no single OWL
+identity to import, and importing it would also pull in every other module
+sharing that namespace. Every negotiated HTML/RDF namespace
 or profile route must return `Vary: Accept` to keep representation caches
 correct.
 

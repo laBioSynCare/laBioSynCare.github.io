@@ -274,12 +274,16 @@ core-profile-contract:
 full-equivalence:
 	$(PYTHON) scripts/check-sstim-full-equivalence.py
 
-## Prove the committed w3id .htaccess snapshot-route region still matches the
-## frozen snapshots on disk. The unit test only regenerates the region in
-## memory, so without this a release that forgets `--write` would silently ship
-## without persistent routes for the new version.
+## Check the w3id route contract two ways. First, that the committed .htaccess
+## snapshot-route region still matches the frozen snapshots on disk: the unit
+## test only regenerates the region in memory, so without this a release that
+## forgets `--write` would silently ship without persistent routes for the new
+## version. Second, that every /ontology/ redirect target is an artifact this
+## repository actually publishes, so a renamed module or a dropped export flag
+## cannot turn a persistent identifier into a 404.
 w3id-routes:
 	node scripts/sstim-w3id-snapshot-routes.mjs --check
+	node scripts/check-w3id-route-targets.mjs
 
 ## Run the current ontology validation suite
 validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots w3id-routes truth-audit
@@ -371,7 +375,7 @@ help:
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
 	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
-	@echo "  make w3id-routes      Verify the committed w3id .htaccess snapshot routes are current"
+	@echo "  make w3id-routes      Verify w3id snapshot routes are current and every target is published"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"

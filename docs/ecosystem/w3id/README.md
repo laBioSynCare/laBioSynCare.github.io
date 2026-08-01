@@ -64,8 +64,15 @@ Immutable version snapshots are produced by `make snapshot`
 (see [`scripts/snapshot-ontology.mjs`](../../../scripts/snapshot-ontology.mjs)).
 Existing snapshot directories are protected; use `make snapshot FORCE=1` only
 to correct an unpublished snapshot. The version root
-`https://w3id.org/sstim/<version>` is the ontology's `owl:versionIRI` and
-redirects to the frozen `sstim-core.ttl` document for that version. Beginning
+`https://w3id.org/sstim/<version>` is the ontology's `owl:versionIRI`. For
+`0.12.0` and earlier it redirects to the frozen `sstim-core.ttl`, which was then
+the whole ontology. It is now the two-class Kernel, so from the modular release
+line that route must resolve to a frozen whole-ontology artifact instead —
+otherwise the version IRI would answer a registry with a fraction of the
+release. `scripts/sstim-w3id-snapshot-routes.mjs` refuses to emit the
+bare-version route for a snapshot carrying a manifest unless that snapshot also
+freezes `sstim-namespace.ttl`, so the wrong route cannot be generated silently;
+producing that artifact is an open release blocker. Beginning
 with the modular release line, the snapshot inventory comes from
 `static/ontology/manifest.json`, and the manifest and its schema are frozen
 beside the Turtle files. The staged `/sstim/<version>/manifest` rule exposes
@@ -97,8 +104,14 @@ exists.
 2. Create or update the directory `sstim/` at the repository root.
 3. Copy [`sstim/.htaccess`](sstim/.htaccess) from this folder into it, keeping
    any already-live rules that are still valid.
-4. Run `node scripts/sstim-w3id-snapshot-routes.mjs --check`; a new frozen
-   snapshot must update the exact generated route region before publication.
+4. Run `make w3id-routes`. It checks two independent things: that the generated
+   snapshot region matches the frozen directories on disk (a new snapshot must
+   update it before publication), and that every `/ontology/` redirect target
+   is an artifact this repository actually publishes — a committed file, a
+   manifest-declared export serialization, or a namespace document. The second
+   check exists because Apache never validates these rules against the build,
+   so a renamed module or a dropped `release.export` flag would otherwise turn
+   a persistent identifier into a 404.
 5. Open a PR. Keep the change scoped strictly to the new `sstim/` directory —
    the maintainers reject PRs that touch other namespaces.
 6. Write the PR description on top of the upstream template
