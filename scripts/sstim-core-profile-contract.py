@@ -339,11 +339,61 @@ def check_core_fixture(errors: list[str]) -> None:
             )
 
 
+def check_declared_fixture_sets(errors: list[str]) -> None:
+    """Execute every fixture the manifest registers for Core, by category.
+
+    The in-memory mutations above prove the shapes react to a broken field. They
+    cannot prove what the manifest promises a *consumer*, which is that these
+    committed files behave as their category says: out-of-scope data validates,
+    adversarial data does not. A fixture listed but never run is a release
+    contract that nobody checks.
+    """
+    shapes = Graph()
+    for module_id in CORE_PROFILE["shapeModules"]:
+        shapes.parse(MODULE_SOURCE_PATHS[module_id], format="turtle")
+    ontology = core_ontology_graph()
+
+    def validates(path: Path) -> tuple[bool, str]:
+        conforms, _, report = shacl_validate(
+            data_graph=parse(path),
+            shacl_graph=shapes,
+            ont_graph=ontology,
+            inference="none",
+            advanced=False,
+        )
+        return conforms, report
+
+    fixtures = CORE_PROFILE["fixtures"]
+    for category in ("positive", "outOfScope"):
+        for relative in fixtures[category]:
+            conforms, report = validates(ROOT / relative)
+            if not conforms:
+                errors.append(
+                    f"{category} Core fixture {relative} must validate under the "
+                    f"Core closure but did not:\n{report}"
+                )
+    if not fixtures["outOfScope"]:
+        errors.append(
+            "Core profile declares no out-of-scope fixture; ADR 0043 §7 requires one "
+            "per profile to prove omitted concern policy does not leak into validation"
+        )
+    if not fixtures["adversarial"]:
+        errors.append("Core profile declares no adversarial fixture")
+    for relative in fixtures["adversarial"]:
+        conforms, _ = validates(ROOT / relative)
+        if conforms:
+            errors.append(
+                f"adversarial Core fixture {relative} was accepted; it must be "
+                "rejected by the Core closure or it is not adversarial"
+            )
+
+
 def main() -> int:
     errors: list[str] = []
     try:
         check_profiles(errors)
         check_core_fixture(errors)
+        check_declared_fixture_sets(errors)
     except Exception as exc:  # report parse/query/tool failures uniformly
         errors.append(f"unexpected contract-check failure: {type(exc).__name__}: {exc}")
 
@@ -352,10 +402,13 @@ def main() -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
+    fixtures = CORE_PROFILE["fixtures"]
     print(
         f"SSTIM Core profile contract OK: {len(MANIFEST['profiles'])} profile entrypoints, "
-        f"{len(FULL)} Full modules, weak Core SHACL, positive fixture, "
-        "competency query, 9 negative mutations, and 4 optional-field cases."
+        f"{len(FULL)} Full modules, weak Core SHACL, competency query, "
+        "9 negative mutations, 4 optional-field cases, and declared fixtures "
+        f"({len(fixtures['positive'])} positive, {len(fixtures['outOfScope'])} out-of-scope, "
+        f"{len(fixtures['adversarial'])} adversarial)."
     )
     return 0
 

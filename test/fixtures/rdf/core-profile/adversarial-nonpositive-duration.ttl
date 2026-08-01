@@ -1,0 +1,39 @@
+###########################################################################
+# Adversarial Core fixture: an unusable regime and a zero-length channel.
+#
+# Core's whole claim is that it can describe a stimulus determinately enough to
+# reproduce. Two ways that claim fails silently:
+#
+#   * a regime outside ( "determinate" "stochastic" "adaptive" ), which leaves a
+#     consumer with no defined way to interpret the specification; and
+#   * a channel of zero seconds, which delivers nothing while still satisfying a
+#     naive "has a duration" check. ChannelDurationShape uses sh:minExclusive 0
+#     rather than a mere datatype test for exactly this reason.
+###########################################################################
+
+@prefix example: <https://example.org/sstim/core-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification with an unknown regime"@en ;
+    dct:identifier "core-adversarial-nonpositive-duration" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "periodic" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Sensory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Channel that delivers nothing"@en ;
+    sstim:channelDurationSeconds "0.0"^^xsd:decimal .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

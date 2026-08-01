@@ -776,8 +776,14 @@
         "positive": [
           "test/fixtures/rdf/core-profile/positive-minimal-stimulus.ttl"
         ],
-        "outOfScope": [],
-        "adversarial": []
+        "outOfScope": [
+          "test/fixtures/rdf/core-profile/out-of-scope-full-concerns.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/core-profile/adversarial-untyped-channel.ttl",
+          "test/fixtures/rdf/core-profile/adversarial-literal-target.ttl",
+          "test/fixtures/rdf/core-profile/adversarial-nonpositive-duration.ttl"
+        ]
       },
       "competencyQueries": [
         "scripts/sstim-core-profile-contract.py"
