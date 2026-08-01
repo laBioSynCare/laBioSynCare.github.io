@@ -85,7 +85,7 @@
       "source": {
         "path": "static/ontology/sstim-core.ttl",
         "mediaType": "text/turtle",
-        "sha256": "3acec1217eb2c09d5cd22d6555e15c15971a752e429a7dc66786d04ea93d8f2c"
+        "sha256": "f9018abffaa961c253a38927f6c7481091f1c831030a4f2d72943a03828a4ba2"
       },
       "runtime": {
         "url": "/ontology/sstim-core.ttl",
@@ -458,7 +458,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "971e262d407a6809145c22f9fc75c29985c38422fde2838c69375f4f6810e677"
+        "sha256": "6713602a9463338b604c9637ae3092aba9a33cc239a1c1df889d2878880de898"
       },
       "runtime": {
         "url": "/ontology/sstim-exposure.ttl",
@@ -739,7 +739,7 @@
         "adversarial": []
       },
       "competencyQueries": [],
-      "sha256": "2256f9bc6e12324639e7250c1672fb9c19f58b5b01fea5cfacbc01e561fe877d"
+      "sha256": "126aea13aa327fd857aa9349725b2365f22aa464b6d5f67d9a4a5973e6f31dc2"
     },
     {
       "id": "core",
@@ -782,7 +782,7 @@
       "competencyQueries": [
         "scripts/sstim-core-profile-contract.py"
       ],
-      "sha256": "4e0e49ebea17365a5754cb0ae6042ed71388946489142ece200fc6836acfff88"
+      "sha256": "a972501a66306ae84213eea4f502448ab2b08279437d48917f893e957fba0e9b"
     },
     {
       "id": "core-plus",
@@ -822,7 +822,7 @@
         "adversarial": []
       },
       "competencyQueries": [],
-      "sha256": "bd78c69eb554d05aaf4994c0d15de949c10dc97e719e38df58fee57d7dbf6c84"
+      "sha256": "18e525949fabfa14b5c50951960d4ca3650852a2b833fe7e9bfb561dc02c5d36"
     },
     {
       "id": "full",
@@ -875,7 +875,7 @@
         "adversarial": []
       },
       "competencyQueries": [],
-      "sha256": "dc10d3815123048bb99d9504f23d1998e4a48cdc4fba41d4cd9895d538b93ccf"
+      "sha256": "ecd5ecb1fe05721205a514c1834e7eb7a1203d944390c502a2ca5281a3c140ba"
     }
   ]
 }

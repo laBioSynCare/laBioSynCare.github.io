@@ -125,8 +125,54 @@ export function profileDigest(manifest, moduleIds) {
   return createHash('sha256').update(payload, 'utf8').digest('hex')
 }
 
+// A Turtle comment runs from a '#' to end of line, but only when that '#' is
+// outside an IRI reference and outside a string literal. '#' is also the SSTIM
+// namespace separator, so naive stripping would corrupt every term IRI. The
+// metadata below is read with regular expressions, so comments must be removed
+// first: prose mentioning owl:imports, dct:requires, or owl:versionIRI must not
+// be read as an axiom.
+export function stripTurtleComments(text) {
+  let out = ''
+  let index = 0
+  let quote = null
+  let inIri = false
+  while (index < text.length) {
+    const char = text[index]
+    if (quote) {
+      if (char === '\\' && quote.length === 1) {
+        out += char + (text[index + 1] ?? '')
+        index += 2
+        continue
+      }
+      if (text.startsWith(quote, index)) {
+        out += quote
+        index += quote.length
+        quote = null
+        continue
+      }
+    } else if (inIri) {
+      if (char === '>') inIri = false
+    } else if (char === '<') {
+      inIri = true
+    } else if (text.startsWith('"""', index) || text.startsWith("'''", index)) {
+      quote = text.slice(index, index + 3)
+      out += quote
+      index += 3
+      continue
+    } else if (char === '"' || char === "'") {
+      quote = char
+    } else if (char === '#') {
+      while (index < text.length && text[index] !== '\n') index += 1
+      continue
+    }
+    out += char
+    index += 1
+  }
+  return out
+}
+
 export function readOntologyMetadata(path) {
-  const text = readFileSync(path, 'utf8')
+  const text = stripTurtleComments(readFileSync(path, 'utf8'))
   const statementMatch = text.match(
     /<([^>]+)>\s*(?:\r?\n\s*)?a\s+[^;]*\bowl:Ontology\b[^;]*;([\s\S]*?)\s+\.\s*(?=\r?\n|$)/m,
   )
@@ -987,7 +1033,6 @@ function validateProfileContractFiles(manifest, errors, rootDir) {
 
 function validateFilesAndOntology(manifest, moduleById, errors, rootDir, { verifyChecksums }) {
   if (!Array.isArray(manifest.modules)) return
-  const moduleMetadataById = new Map()
   for (const [index, module] of manifest.modules.entries()) {
     if (!isRecord(module) || !isRecord(module.source) || typeof module.source.path !== 'string') continue
     const at = `modules[${index}]`
@@ -1014,7 +1059,6 @@ function validateFilesAndOntology(manifest, moduleById, errors, rootDir, { verif
       errors.push(`${at}.source.path: ${error.message}`)
       continue
     }
-    moduleMetadataById.set(module.id, metadata)
     if (metadata.ontologyIri !== module.ontologyIri) {
       errors.push(`${at}.ontologyIri: Turtle declares ${JSON.stringify(metadata.ontologyIri)}`)
     }
@@ -1024,16 +1068,20 @@ function validateFilesAndOntology(manifest, moduleById, errors, rootDir, { verif
     if (metadata.title !== module.title) {
       errors.push(`${at}.title: Turtle declares ${JSON.stringify(metadata.title)}`)
     }
-    const expectedVersionIris = manifest.suite?.status === 'released' && module.release?.snapshot
-      ? [module.publication?.versionedUrl].filter(Boolean)
-      : module.publication?.persistentUrl !== module.ontologyIri
-        ? [module.publication?.persistentUrl].filter(Boolean)
-        : []
+    // ADR 0020: SSTIM is versioned as one synchronized set. Only the umbrella
+    // module carries owl:versionIRI, and only once released. Concern modules
+    // never declare one, so a module's retrieval endpoint is deliberately not
+    // an OWL identity — profiles import ontology *documents* (OWL 2 Structural
+    // Specification 3.4), which need not be ontology or version IRIs.
+    const isSuiteUmbrella = module.ontologyIri === manifest.suite?.ontologyIri
+    const expectedVersionIris = manifest.suite?.status === 'released' && isSuiteUmbrella
+      ? [`${manifest.suite.ontologyIri}/${manifest.suite.version}`]
+      : []
     if (!sameSet(metadata.versionIris, expectedVersionIris)) {
       errors.push(
         `${at}.publication: Turtle owl:versionIRI declares [${metadata.versionIris.join(', ')}], ` +
-        `expected [${expectedVersionIris.join(', ')}] for the ` +
-        `${manifest.suite?.status === 'released' ? 'immutable release artifact' : 'development retrieval identity'}`,
+        `expected [${expectedVersionIris.join(', ')}] under the ADR 0020 whole-set ` +
+        `versioning policy for a ${manifest.suite?.status === 'released' ? 'released' : 'development'} suite`,
       )
     }
     if (Array.isArray(module.requires)) {
@@ -1118,22 +1166,12 @@ function validateFilesAndOntology(manifest, moduleById, errors, rootDir, { verif
         `${manifest.suite?.status === 'released' ? 'immutable' : 'development'} retrieval closure`,
       )
     }
-    for (const moduleId of profileModuleIds) {
-      const module = moduleById.get(moduleId)
-      const importedIri = manifest.suite?.status === 'released'
-        ? module?.publication?.versionedUrl
-        : module?.publication?.persistentUrl
-      const importedMetadata = moduleMetadataById.get(moduleId)
-      const declaredIdentities = importedMetadata
-        ? [importedMetadata.ontologyIri, ...importedMetadata.versionIris]
-        : []
-      if (importedIri && !declaredIdentities.includes(importedIri)) {
-        errors.push(
-          `${at}.modules: imported ${JSON.stringify(importedIri)} is not the ` +
-          `owl:Ontology IRI or an owl:versionIRI declared by module ${JSON.stringify(moduleId)}`,
-        )
-      }
-    }
+    // Every import is checked above against the manifest retrieval closure, which
+    // is the contract that matters: the URL must be the endpoint this suite
+    // publishes for that module. It is deliberately not compared to the imported
+    // module's owl:Ontology IRI. OWL 2 imports name ontology documents, and two
+    // SSTIM endpoints (/kernel, /module/exposure) exist precisely because their
+    // ontology IRIs are occupied by multi-module namespace catalogues.
 
     for (const problem of profileResourceArtifactProblems({
       manifest,

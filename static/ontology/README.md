@@ -509,11 +509,17 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    artifacts, missing contract files, and missing release metadata. Snapshot
    creation fails if checksum-ledger registration fails
    (`scripts/snapshot-ontology.test.mjs` covers these refusals).
-6. Audit the entire tagged repository state—not only
+6. Regenerate the persistent snapshot routes with
+   `node scripts/sstim-w3id-snapshot-routes.mjs --write` and commit the updated
+   `docs/ecosystem/w3id/sstim/.htaccess`, then submit it upstream. Without this
+   the new version has no w3id routes; `make w3id-routes` (part of
+   `make validate`) fails until the committed region matches the frozen
+   snapshots on disk.
+7. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.
-7. Tag and publish the GitHub release so Zenodo archives the same commit.
-8. Add the resulting version DOI without rewriting a published snapshot.
+8. Tag and publish the GitHub release so Zenodo archives the same commit.
+9. Add the resulting version DOI without rewriting a published snapshot.
 
 The current development manifest intentionally has no immutable release URLs.
 Only Core has a positive fixture and an executable contract today; Kernel,

@@ -146,6 +146,15 @@ dependency as `https://w3id.org/sstim/exposure` in `dct:requires`, but its
 development `owl:imports` target is the exact
 `https://w3id.org/sstim/module/exposure` distribution.
 
+An import target therefore need not be an ontology IRI or a version IRI of the
+module it retrieves, and `/kernel` and `/module/exposure` are neither. This is
+conformant, not a workaround: an OWL 2 import names an *ontology document* —
+the structural specification models `owl:imports` as `directlyImportsDocuments`
+(§3.4) and resolves the retrieved document to an ontology afterwards. Do not
+"repair" the apparent mismatch by giving a module an `owl:versionIRI` pointing
+at its retrieval endpoint. A version IRI must denote a version, ADR 0020 gives
+the whole set exactly one, and only the released umbrella declares it.
+
 ## Semantic compatibility and graph ownership
 
 The `0.13.0-dev` extraction is a redistribution, not a broad redesign. The

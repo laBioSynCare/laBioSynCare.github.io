@@ -40,11 +40,14 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    # /sstim is also the Full namespace catalogue.  The version IRI makes the
-    # exact mutable Kernel distribution imported by profiles an OWL-recognized
-    # identifier; release preparation replaces it with that module's immutable
-    # versioned Turtle URL.
-    owl:versionIRI <https://w3id.org/sstim/kernel> ;
+    # No version IRI while under development: SSTIM is versioned as one
+    # synchronized set, and release preparation adds the whole-set version IRI
+    # https://w3id.org/sstim/<version> here — and only here. See ADR 0020.
+    # /sstim is also the Full namespace catalogue, so profiles import the exact
+    # Kernel retrieval endpoint https://w3id.org/sstim/kernel. That endpoint
+    # need not be an ontology or version IRI of this module: an OWL 2 import
+    # names an ontology *document* (Structural Specification 3.4,
+    # directlyImportsDocuments), not an ontology IRI.
     owl:versionInfo "0.13.0-dev" ;
     owl:priorVersion <https://w3id.org/sstim/0.12.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,

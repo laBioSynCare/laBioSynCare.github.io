@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes
 
 ## Build the production bundle
 build:
@@ -274,8 +274,15 @@ core-profile-contract:
 full-equivalence:
 	$(PYTHON) scripts/check-sstim-full-equivalence.py
 
+## Prove the committed w3id .htaccess snapshot-route region still matches the
+## frozen snapshots on disk. The unit test only regenerates the region in
+## memory, so without this a release that forgets `--write` would silently ship
+## without persistent routes for the new version.
+w3id-routes:
+	node scripts/sstim-w3id-snapshot-routes.mjs --check
+
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots w3id-routes truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -364,6 +371,7 @@ help:
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
 	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
+	@echo "  make w3id-routes      Verify the committed w3id .htaccess snapshot routes are current"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"

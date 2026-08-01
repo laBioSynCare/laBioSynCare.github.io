@@ -44,6 +44,8 @@ import { dirname, resolve, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 
+import { stripTurtleComments } from './sstim-manifest.mjs'
+
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
 const ontologyDir = resolve(here, '../static/ontology')
@@ -207,10 +209,14 @@ export function releaseProblems({
   return problems
 }
 
+// Release readiness is decided by matching Turtle text, so comments are stripped
+// first: prose about owl:versionIRI, dct:issued, or mod:status must not be read
+// as an assertion. These strings are only ever inspected — the snapshot itself
+// copies the untouched files from disk.
 function liveModuleFiles() {
   const files = new Map()
   for (const file of ONTOLOGY_FILES) {
-    files.set(file, readFileSync(join(ontologyDir, file), 'utf8'))
+    files.set(file, stripTurtleComments(readFileSync(join(ontologyDir, file), 'utf8')))
   }
   return files
 }

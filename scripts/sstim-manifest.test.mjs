@@ -9,6 +9,7 @@ import {
   readOntologyMetadata,
   resolveProfileClosure,
   sameSet,
+  stripTurtleComments,
   syncChecksums,
   validateManifest,
 } from './sstim-manifest.mjs'
@@ -70,6 +71,60 @@ test('released manifests require immutable artifacts and complete profile contra
   const errors = validateManifest(manifest, { verifyFiles: false })
   expect(errors.some((error) => error.includes('publication.versionedUrl'))).toBe(true)
   expect(errors.some((error) => error.includes('fixtures.adversarial'))).toBe(true)
+})
+
+test('Turtle prose is never read as an axiom, and # survives in IRIs and literals', () => {
+  const source = [
+    '@prefix sstim: <https://w3id.org/sstim#> .',
+    '# release preparation adds owl:versionIRI <https://w3id.org/decoy/version> here ;',
+    '<https://w3id.org/sstim> a owl:Ontology ;',
+    '    owl:versionInfo "0.13.0-dev" ; # owl:imports <https://w3id.org/decoy/import> ;',
+    '    dct:title "A # hash inside a literal" ;',
+    '    dct:description "an escaped \\" quote and # another hash" ;',
+    '    owl:imports <https://w3id.org/sstim/kernel> .',
+    '',
+  ].join('\n')
+
+  const stripped = stripTurtleComments(source)
+
+  expect(stripped).toContain('<https://w3id.org/sstim#>')
+  expect(stripped).toContain('"A # hash inside a literal"')
+  expect(stripped).toContain('# another hash')
+  expect(stripped).toContain('<https://w3id.org/sstim/kernel>')
+  expect(stripped).not.toContain('decoy')
+})
+
+test('no module claims a version IRI while the suite is under development (ADR 0020)', () => {
+  const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
+  expect(manifest.suite.status).toBe('development')
+
+  for (const module of manifest.modules) {
+    const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, module.source.path))
+    expect(
+      metadata.versionIris,
+      `module ${module.id} must carry owl:versionInfo only; the whole-set release adds the single core version IRI`,
+    ).toEqual([])
+  }
+})
+
+test('profiles import module retrieval endpoints, which need not be ontology IRIs', () => {
+  const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
+  const moduleById = new Map(manifest.modules.map((module) => [module.id, module]))
+
+  // /sstim and /sstim/exposure serve multi-module namespace catalogues, so the
+  // Kernel and Exposure modules publish separate exact retrieval endpoints.
+  expect(moduleById.get('core').publication.persistentUrl).toBe('https://w3id.org/sstim/kernel')
+  expect(moduleById.get('exposure').publication.persistentUrl)
+    .toBe('https://w3id.org/sstim/module/exposure')
+
+  for (const profile of manifest.profiles) {
+    const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, profile.source.path))
+    const expectedImports = profile.modules.map((id) => moduleById.get(id).publication.persistentUrl)
+    const expectedRequires = profile.modules.map((id) => moduleById.get(id).ontologyIri)
+
+    expect(sameSet(metadata.imports, expectedImports)).toBe(true)
+    expect(sameSet(metadata.requires, expectedRequires)).toBe(true)
+  }
 })
 
 test('metadata set comparison rejects duplicate-for-missing declarations', () => {

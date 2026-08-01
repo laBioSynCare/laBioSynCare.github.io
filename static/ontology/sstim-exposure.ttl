@@ -34,11 +34,14 @@
 ###########################################################################
 
 <https://w3id.org/sstim/exposure> a owl:Ontology ;
-    # /sstim/exposure is the combined namespace catalogue.  The version IRI
-    # makes the exact mutable Exposure distribution imported by profiles an
-    # OWL-recognized identifier; release preparation replaces it with this
-    # module's immutable versioned Turtle URL. See ADR 0020 and ADR 0043.
-    owl:versionIRI <https://w3id.org/sstim/module/exposure> ;
+    # No version IRI / prior version: SSTIM is versioned as a whole set — the
+    # frozen snapshot at static/ontology/<version>/ (identified by the core
+    # version IRI) is the citable unit. Modules carry owl:versionInfo only, as a
+    # module-level change counter. See ADR 0020.
+    # /sstim/exposure serves the Stimulus + Exposure namespace catalogue after
+    # ADR 0044, so profiles import the exact module retrieval endpoint
+    # https://w3id.org/sstim/module/exposure. An OWL 2 import names an
+    # ontology *document*, not an ontology IRI, so no version IRI is needed.
     owl:versionInfo "0.13.0-dev" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;

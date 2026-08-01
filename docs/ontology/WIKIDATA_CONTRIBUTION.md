@@ -58,7 +58,8 @@ SSTIM.
       (632 on pt.wikipedia). User page created 2026-08-01 with Babel, ORCID and a
       conflict-of-interest disclosure
 - [x] **Multilingual labels and descriptions** across the eight aligned items —
-      22 it/pt/es descriptions, 9 labels. Local Wikidata edit count 4 → 53
+      22 it/pt/es descriptions, 9 labels. `Special:Contributions` shows **53 edits,
+      all dated 2026-08-01**
 - [x] **Errors corrected:** the Spanish description on Q831014 said "las ondas del
       sueño" (beta characterises wakefulness, not sleep); Q863539 carried
       `skos:altLabel` "brain waves" and "alpha waves", the latter naming a
