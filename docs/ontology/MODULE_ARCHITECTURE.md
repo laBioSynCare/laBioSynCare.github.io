@@ -81,7 +81,7 @@ by the manifest and must not be copied into every header.
 | `evidence-exposure` — [`sstim-evidence-exposure.ttl`](../../static/ontology/sstim-evidence-exposure.ttl) | Evidence scope and basis ranges involving exposures and experiments | `evidence`, `exposure`, `configuration`, `technique`, `session` |
 | `neuromodulation-evidence` — [`sstim-neuromodulation-evidence.ttl`](../../static/ontology/sstim-neuromodulation-evidence.ttl) | Evidence outcome relations involving neural facets | `neuromodulation`, `evidence` |
 | `vocab` — [`sstim-vocab.ttl`](../../static/ontology/sstim-vocab.ttl) | Full-compatibility aggregate of controlled values across concerns | `common`, `technique`, `neuromodulation`, `evidence`, `session`, `patch-studio` |
-| `alignments` — [`sstim-alignments.ttl`](../../static/ontology/sstim-alignments.ttl) | Conservative external mappings and upper-ontology alignments | `common`, `technique`, `session`, `evidence`, `vocab` |
+| `alignments` — [`sstim-alignments.ttl`](../../static/ontology/sstim-alignments.ttl) | Conservative external mappings to other vocabularies, chiefly Wikidata | `common`, `technique`, `session`, `evidence`, `vocab` |
 | `core-shapes` — [`sstim-core-shapes.ttl`](../../static/ontology/sstim-core-shapes.ttl) | Weak reusable Core SHACL contract | `core`, `stimulus` |
 | `shapes` — [`sstim-shapes.ttl`](../../static/ontology/sstim-shapes.ttl) | Full validation-policy compatibility aggregate | Every concern module referenced by its shapes: `core`, `stimulus`, `common`, `technique`, `configuration`, `session`, `neuromodulation`, `evidence`, `exposure`, `ecosystem`, `patch-studio`, `vocab` |
 
@@ -127,6 +127,15 @@ For avoidance of doubt, the exact Full semantic module list is `core`,
 `neuromodulation`, `patch-studio`, `vocab`, `exposure`, `ecosystem`,
 `neuromodulation-evidence`, `evidence-exposure`, `technique-exposure`, and
 `alignments`. `shapes` is associated separately and is not an OWL import.
+
+Upper-ontology alignment is not confined to the `alignments` module and is not
+lost by choosing a smaller profile. BFO, IAO, and OBI subsumption is asserted on
+each term where that term is declared — roughly a hundred such references spread
+over twelve modules — so a Kernel or Core adopter still receives the BFO
+grounding for everything in its closure. The `alignments` module carries the
+mappings that are *not* upper-ontology subsumption, chiefly `skos:*Match` links
+to Wikidata, which is why omitting it costs external cross-references rather
+than formal grounding.
 
 Kernel is the process anchor, not the practical description profile. Core is
 the smallest profile that can describe a determinate or adaptive stimulus with
