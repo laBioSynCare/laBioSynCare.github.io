@@ -141,6 +141,13 @@ def main() -> int:
             source_paths.append(source_path)
             graph.parse(source_path, format="turtle")
 
+        # The Turtle catalogue is the concatenation of the module masters in
+        # manifest order (see source_text below), never a reserialization:
+        # reserializing rewrites decimal lexical forms and would make the
+        # catalogue differ from the modules it is built from.
+        # `namespaceCatalogueTurtle` in scripts/sstim-manifest.mjs implements the
+        # same rule so `make snapshot` can freeze a byte-identical copy without
+        # requiring RDFLib. Keep the two in step.
         runtime = namespace_document["runtime"]
         outputs = (
             (runtime["turtleUrl"], "turtle"),

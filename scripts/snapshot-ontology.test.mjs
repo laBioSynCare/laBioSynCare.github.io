@@ -296,7 +296,17 @@ describe('snapshot filesystem and provenance safety', () => {
     writeFileSync(join(directory, ontologyFiles[1]), 'profile bytes\n')
     writeFileSync(join(directory, sidecars[0]), '{"suite":{"version":"9.9.9"}}\n')
     writeFileSync(join(directory, sidecars[1]), '{"$id":"test"}\n')
-    return { directory, ontologyFiles, sidecars }
+    // A snapshot freezes a namespace catalogue per manifest namespace document,
+    // built from the copied modules rather than from the live sources.
+    const manifest = {
+      modules: [{ id: 'core', source: { path: 'static/ontology/sstim-core.ttl' } }],
+      namespaceDocuments: [{
+        id: 'sstim',
+        modules: ['core'],
+        runtime: { turtleUrl: '/ontology/sstim-namespace.ttl' },
+      }],
+    }
+    return { directory, ontologyFiles, sidecars, manifest }
   }
 
   it('copies modules, profiles, and manifest sidecars before recording checksums', () => {
@@ -307,6 +317,7 @@ describe('snapshot filesystem and provenance safety', () => {
       version: '9.9.9',
       ontologyFiles: fixture.ontologyFiles,
       sidecars: fixture.sidecars,
+      manifest: fixture.manifest,
       commit: 'abc123',
       recordChecksums: (version, outDir) => {
         recorded = { version, outDir }
@@ -324,8 +335,15 @@ describe('snapshot filesystem and provenance safety', () => {
       'manifest.schema.json',
       'sstim-core-profile.ttl',
       'sstim-core.ttl',
+      'sstim-namespace.ttl',
     ])
     expect(readFileSync(join(result.outDir, 'README.md'), 'utf8')).toContain('abc123')
+    // The version IRI resolves to this catalogue, so it must be built from the
+    // frozen modules rather than copied from a build directory or the live tree.
+    expect(readFileSync(join(result.outDir, 'sstim-namespace.ttl'), 'utf8'))
+      .toBe('core bytes\n')
+    expect(readFileSync(join(result.outDir, 'README.md'), 'utf8'))
+      .toContain('sstim-namespace.ttl')
   })
 
   it('makes checksum-ledger failure fatal after copying the release set', () => {
@@ -335,6 +353,7 @@ describe('snapshot filesystem and provenance safety', () => {
       version: '9.9.8',
       ontologyFiles: fixture.ontologyFiles,
       sidecars: fixture.sidecars,
+      manifest: fixture.manifest,
       recordChecksums: () => {
         throw new Error('ledger unavailable')
       },
@@ -348,6 +367,7 @@ describe('snapshot filesystem and provenance safety', () => {
       version: '9.9.7',
       ontologyFiles: fixture.ontologyFiles,
       sidecars: fixture.sidecars,
+      manifest: fixture.manifest,
       recordChecksums: () => {},
     }
     const first = writeSnapshotArtifacts(options)
@@ -369,6 +389,7 @@ describe('snapshot filesystem and provenance safety', () => {
       version: '9.9.6',
       ontologyFiles: fixture.ontologyFiles,
       sidecars: fixture.sidecars,
+      manifest: fixture.manifest,
       recordChecksums: () => {},
     }
     const first = writeSnapshotArtifacts(options)

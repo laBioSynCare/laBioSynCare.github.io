@@ -525,13 +525,12 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    artifacts, missing contract files, and missing release metadata. Snapshot
    creation fails if checksum-ledger registration fails
    (`scripts/snapshot-ontology.test.mjs` covers these refusals).
-7. Freeze a whole-ontology artifact beside the modules. `sstim-core.ttl` is the
-   Kernel, not the release, so `https://w3id.org/sstim/X.Y.Z` — the declared
-   `owl:versionIRI` — must not resolve to it. Until the release path generates
-   and freezes `sstim-namespace.ttl` (today `make export` writes the catalogues
-   to `dist/` only), or another whole-ontology artifact is chosen and recorded,
-   `node scripts/sstim-w3id-snapshot-routes.mjs` refuses to emit the
-   bare-version route for a snapshot carrying a manifest.
+7. `make snapshot` also freezes one namespace catalogue per manifest namespace
+   document, built by concatenating the modules it was just given. This is what
+   `https://w3id.org/sstim/X.Y.Z` — the declared `owl:versionIRI` — resolves to,
+   because `sstim-core.ttl` is the Kernel rather than the release. Nothing to do
+   by hand, but do not delete these files: the route generator refuses to emit
+   the bare-version route for a snapshot that lacks `sstim-namespace.ttl`.
 8. Regenerate the persistent snapshot routes with
    `node scripts/sstim-w3id-snapshot-routes.mjs --write` and commit the updated
    `docs/ecosystem/w3id/sstim/.htaccess`, then submit it upstream. Without this
@@ -548,9 +547,8 @@ The current development manifest intentionally has no immutable release URLs.
 Only Core has a positive fixture and an executable contract today; Kernel,
 Core Plus, and Full still need profile-specific fixtures and competency
 queries, and Core still needs its out-of-scope and adversarial fixture sets.
-Steps 5 and 7 are likewise unbuilt: no whole-ontology artifact is frozen for the
-version IRI to resolve to, and `void.ttl` still describes the 0.12.0 module set
-rather than deriving from the manifest. Consequently `0.13.0-dev` is noncitable
+Step 5 is likewise unbuilt: `void.ttl` still describes the 0.12.0 module set
+rather than the manifest's. Consequently `0.13.0-dev` is noncitable
 even though its module and publication mechanics are implemented.
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable

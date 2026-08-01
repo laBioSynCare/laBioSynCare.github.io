@@ -5,6 +5,8 @@ import {
   DEFAULT_MANIFEST_PATH,
   REPOSITORY_ROOT,
   loadManifest,
+  namespaceCatalogueFilename,
+  namespaceCatalogueTurtle,
   profileResourceArtifactProblems,
   readOntologyMetadata,
   resolveProfileClosure,
@@ -125,6 +127,26 @@ test('profiles import module retrieval endpoints, which need not be ontology IRI
     expect(sameSet(metadata.imports, expectedImports)).toBe(true)
     expect(sameSet(metadata.requires, expectedRequires)).toBe(true)
   }
+})
+
+test('a namespace catalogue is the concatenation of its modules in manifest order', () => {
+  const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
+  const moduleById = new Map(manifest.modules.map((module) => [module.id, module]))
+
+  for (const document of manifest.namespaceDocuments) {
+    const built = namespaceCatalogueTurtle(manifest, document.id, {
+      moduleSources: (module) => `<<${module.id}>>`,
+    })
+    expect(built).toBe(document.modules.map((id) => `<<${id}>>`).join('\n'))
+    // Every module named by the catalogue must exist, or dereference silently
+    // loses the terms that module owns.
+    for (const id of document.modules) expect(moduleById.has(id)).toBe(true)
+  }
+
+  expect(namespaceCatalogueFilename(manifest.namespaceDocuments[0]))
+    .toBe('sstim-namespace.ttl')
+  expect(() => namespaceCatalogueTurtle(manifest, 'no-such-document'))
+    .toThrow('Unknown namespace document')
 })
 
 test('metadata set comparison rejects duplicate-for-missing declarations', () => {

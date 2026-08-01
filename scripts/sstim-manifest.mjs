@@ -243,6 +243,42 @@ export function resolveModuleClosure(manifest, seedIds) {
   return result
 }
 
+// A namespace catalogue is the concatenation of its modules' Turtle masters, in
+// manifest order, joined by a newline. Concatenating rather than reserializing
+// preserves every RDF term exactly as authored -- reserializing rewrites
+// decimal lexical forms ("20" becomes "20.0") and would make the catalogue
+// differ from the modules it is built from.
+//
+// `scripts/export-ontology.py` builds the runtime catalogue by the same rule for
+// `make export`. Keep the two in step: the frozen snapshot copy and the deployed
+// copy of a released catalogue must be byte-identical.
+export function namespaceCatalogueFilename(namespaceDocument) {
+  return namespaceDocument.runtime.turtleUrl.split('/').pop()
+}
+
+export function namespaceCatalogueTurtle(
+  manifest,
+  documentId,
+  { rootDir = REPOSITORY_ROOT, moduleSources } = {},
+) {
+  const document = manifest.namespaceDocuments.find((entry) => entry.id === documentId)
+  if (!document) throw new Error(`Unknown namespace document ${JSON.stringify(documentId)}`)
+  const moduleById = new Map(manifest.modules.map((module) => [module.id, module]))
+  return document.modules
+    .map((moduleId) => {
+      const module = moduleById.get(moduleId)
+      if (!module) {
+        throw new Error(
+          `Namespace document ${JSON.stringify(documentId)} names unknown module ` +
+          JSON.stringify(moduleId),
+        )
+      }
+      if (moduleSources) return moduleSources(module)
+      return readFileSync(resolve(rootDir, module.source.path), 'utf8')
+    })
+    .join('\n')
+}
+
 export function resolveProfileClosure(manifest, profileId, { withShapes = false } = {}) {
   const profile = manifest.profiles.find((candidate) => candidate.id === profileId)
   if (!profile) throw new Error(`Unknown profile ${JSON.stringify(profileId)}`)

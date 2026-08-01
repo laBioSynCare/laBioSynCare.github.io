@@ -44,7 +44,11 @@ import { dirname, resolve, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 
-import { stripTurtleComments } from './sstim-manifest.mjs'
+import {
+  namespaceCatalogueFilename,
+  namespaceCatalogueTurtle,
+  stripTurtleComments,
+} from './sstim-manifest.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
@@ -67,6 +71,18 @@ function snapshotSourcePaths() {
 // Modules and profile entrypoints are the manifest-declared reusable artifact.
 export const ONTOLOGY_FILES = snapshotSourcePaths().map((path) => path.split('/').pop())
 export const SNAPSHOT_SIDECARS = ['manifest.json', 'manifest.schema.json']
+
+// Frozen namespace catalogues. `sstim-core.ttl` stopped being the whole ontology
+// when ADR 0043 reduced it to the Kernel, so the version IRI
+// <https://w3id.org/sstim/{version}> needs a frozen document that still stands
+// for the entire release. These are generated into the snapshot rather than
+// copied, because the live catalogues are build artifacts under dist/.
+export function snapshotNamespaceCatalogues(manifest) {
+  return (manifest.namespaceDocuments ?? []).map((document) => ({
+    id: document.id,
+    filename: namespaceCatalogueFilename(document),
+  }))
+}
 
 function declaredVersion() {
   const core = readFileSync(join(ontologyDir, 'sstim-core.ttl'), 'utf8')
@@ -291,14 +307,25 @@ export function dirtyOntologyFiles({
   return out ? out.split(/\r?\n/) : []
 }
 
-function snapshotReadme({ version, commit, ontologyFiles, sidecars }) {
+function snapshotReadme({ version, commit, ontologyFiles, sidecars, catalogueFiles = [] }) {
+  const catalogueNote = catalogueFiles.length
+    ? `
+
+\`${catalogueFiles.join('`, `')}\` ${catalogueFiles.length === 1 ? 'is a' : 'are'}
+**generated namespace ${catalogueFiles.length === 1 ? 'catalogue' : 'catalogues'}**:
+the concatenation of the frozen modules sharing each hash namespace, in manifest
+order. \`sstim-namespace.ttl\` is what
+\`https://w3id.org/sstim/${version}\` resolves to, because \`sstim-core.ttl\` is
+the two-class Kernel rather than the whole ontology (ADR 0043). Every other file
+here is a byte-identical copy of its top-level source.`
+    : ''
   return `# SSTIM ontology — frozen snapshot ${version}
 
 These files are a **byte-identical, immutable copy** of the SSTIM ontology as of
 version \`${version}\`. They exist so that
 \`owl:versionIRI <https://w3id.org/sstim/${version}>\` resolves to a frozen
 artifact that can be cited without ambiguity, even after the top-level
-\`/ontology/*.ttl\` files continue to evolve toward the next version.
+\`/ontology/*.ttl\` files continue to evolve toward the next version.${catalogueNote}
 
 Profile entrypoints were release-prepared before this copy: every
 \`owl:imports\` and PROF artifact target is an exact versioned URL.
@@ -311,7 +338,7 @@ and its \`$schema\` points at the frozen \`manifest.schema.json\` sibling.
   \`--force\`. To cut a new version, bump \`owl:versionInfo\` /
   \`owl:versionIRI\` in \`sstim-core.ttl\` first, then snapshot the new number.
 
-Files: ${[...ontologyFiles, ...sidecars].map((file) => `\`${file}\``).join(', ')}.
+Files: ${[...ontologyFiles, ...catalogueFiles, ...sidecars].map((file) => `\`${file}\``).join(', ')}.
 `
 }
 
@@ -334,6 +361,7 @@ export function writeSnapshotArtifacts({
   version,
   ontologyFiles = ONTOLOGY_FILES,
   sidecars = SNAPSHOT_SIDECARS,
+  manifest = JSON.parse(readFileSync(manifestPath, 'utf8')),
   force = false,
   commit = 'uncommitted',
   isVersionRegistered = (releaseVersion) => snapshotVersionRegistered({
@@ -353,7 +381,14 @@ export function writeSnapshotArtifacts({
       'in the immutable snapshot checksum ledger',
     )
   }
-  const ownedFiles = new Set([...ontologyFiles, ...sidecars, 'README.md'])
+  const catalogues = snapshotNamespaceCatalogues(manifest)
+  const catalogueFiles = catalogues.map((catalogue) => catalogue.filename)
+  const ownedFiles = new Set([
+    ...ontologyFiles,
+    ...catalogueFiles,
+    ...sidecars,
+    'README.md',
+  ])
   const existingFiles = existsSync(outDir)
     ? readdirSync(outDir).filter((file) => file !== '.DS_Store')
     : []
@@ -379,9 +414,23 @@ export function writeSnapshotArtifacts({
   for (const file of sidecars) {
     copyFileSync(join(ontologyDirectory, file), join(outDir, file))
   }
+  // Built from the files just copied, so the frozen catalogue is exactly the
+  // concatenation of the frozen modules rather than of whatever the live
+  // sources become next.
+  for (const catalogue of catalogues) {
+    writeFileSync(
+      join(outDir, catalogue.filename),
+      namespaceCatalogueTurtle(manifest, catalogue.id, {
+        moduleSources: (module) => readFileSync(
+          join(outDir, module.source.path.split('/').pop()),
+          'utf8',
+        ),
+      }),
+    )
+  }
   writeFileSync(
     join(outDir, 'README.md'),
-    snapshotReadme({ version, commit, ontologyFiles, sidecars }),
+    snapshotReadme({ version, commit, ontologyFiles, sidecars, catalogueFiles }),
   )
 
   try {
