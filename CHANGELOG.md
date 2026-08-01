@@ -7,13 +7,19 @@ All notable changes to the **SSTIM ontology** — the versioned, citable artifac
 version is frozen byte-identical under `static/ontology/X.Y.Z/`.
 
 **Scope.** This tracks the reusable ontology term-space — core, vocabulary, SHACL
-shapes, external alignments, the exposure, ecosystem, and Patch Studio modules.
+shapes, external alignments, stimulus, exposure, ecosystem, and Patch Studio modules.
 BSC Lab application and infrastructure work is tracked in [ROADMAP.md](ROADMAP.md)
 and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
 file is the human-readable summary.
 
 ## [Unreleased]
+
+### Documentation
+
+- Audited the 0.12.0 core and physical module boundaries. Proposed a small
+  SSTIM Core Profile, optional concern modules, a Full compatibility profile,
+  and a manifest-first migration in ADR 0043. No ontology term or axiom changed.
 
 ### Fixed
 
@@ -26,6 +32,37 @@ file is the human-readable summary.
   across all eight SSTIM submissions, corrected there by hand on 2026-07-27.
   Metadata and tooling only; no term changed. See
   [`docs/ontology/README.md`](docs/ontology/README.md#release-gate-make-snapshot).
+
+## [0.12.0] - 2026-07-31
+
+Published under version DOI `10.5281/zenodo.21717988`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
+
+Description-layer release ([ADR 0041](docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md),
+[ADR 0042](docs/decisions/0042-stimulus-specification.md)).
+
+### Added
+
+- Added `sstim-stimulus.ttl`, the eighth release module, with
+  `sstim:StimulusSpecification`, the determinate/stochastic/adaptive regime,
+  engine-independent channel quantities, and the optional stimulation-target
+  axis.
+- Added session-level track disabling, master brightness, and scheduled-start
+  properties pending the broader core/module extraction.
+
+### Changed
+
+- Redefined `sstim:Preset` as an engine-dependent configuration rather than the
+  stimulation itself; stimulus specifications are the cross-engine comparison
+  layer.
+- Retained generic `Track` and its four subtypes, asserted `Voice` below
+  `AudioTrack`, and renamed Patch Studio's control concepts to LFO and
+  Permutation in its persisted model.
+
+### Removed
+
+- Withdrew the three-day-old `sstim:Patch` class before downstream adoption;
+  `Preset` covers the generic engine-configuration role.
 
 ## [0.11.0] - 2026-07-24
 

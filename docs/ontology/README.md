@@ -8,10 +8,10 @@ live under [`static/ontology/`](../../static/ontology/README.md).
 
 - Stable namespace: `https://w3id.org/sstim`
 - Prefix: `sstim`
-- Current citable release: `0.11.0`
+- Current citable release: `0.12.0`
 - Next development line: not yet opened
 - Ontology license: CC BY 4.0
-- Current release DOI: `10.5281/zenodo.21536124`
+- Current release DOI: `10.5281/zenodo.21717988`
 - All-versions concept DOI: `10.5281/zenodo.21286974`
 
 SSTIM is an OWL/SKOS model for sensory-stimulation techniques, delivery and
@@ -24,8 +24,9 @@ claim does not establish efficacy.
 
 | Module | Role |
 |---|---|
-| [`sstim-core.ttl`](../../static/ontology/sstim-core.ttl) | Core classes, properties, evidence, safety, protocol, and session semantics |
+| [`sstim-core.ttl`](../../static/ontology/sstim-core.ttl) | Current root model: stimulation plus technique, evidence, catalog, protocol, and session semantics; proposed for extraction in ADR 0043 |
 | [`sstim-vocab.ttl`](../../static/ontology/sstim-vocab.ttl) | Multilingual SKOS controlled vocabularies |
+| [`sstim-stimulus.ttl`](../../static/ontology/sstim-stimulus.ttl) | Engine-independent stimulus specification, target axis, quantities, and current session bridges |
 | [`sstim-exposure.ttl`](../../static/ontology/sstim-exposure.ttl) | Physical delivery, perceived modality, device capability, placement, limits, and experiment context |
 | [`sstim-patch-studio.ttl`](../../static/ontology/sstim-patch-studio.ttl) | Voice and session-authoring parameters |
 | [`sstim-ecosystem.ttl`](../../static/ontology/sstim-ecosystem.ttl) | Ecosystem agents, relationships, and engagement/consent lifecycle terms |
@@ -40,6 +41,10 @@ real participant records are excluded.
 
 ## Planning Documents
 
+- [SSTIM core and module boundary audit — 2026-08-01](reviews/2026-08-01-sstim-core-and-module-boundary-audit.md):
+  quantitative growth, actual cross-module dependencies, reuse assessment,
+  candidate Core Profile, and staged extraction gates. Its architecture proposal
+  is [ADR 0043](../decisions/0043-sstim-core-profile-and-module-boundaries.md).
 - [Ontology Improvement Plan](IMPROVEMENT_PLAN.md): current maturity
   assessment, ordered 0.7 change sets, session/observation work, interoperability
   dependencies, release gates, and deliberate boundaries.
@@ -93,7 +98,7 @@ module header, before running `make snapshot`:
 
 | Property | Rule |
 |---|---|
-| `owl:versionInfo` | the new version, identical across all seven modules |
+| `owl:versionInfo` | the new version, identical across all eight modules |
 | `owl:versionIRI` | `https://w3id.org/sstim/<version>` (core only, ADR 0020) |
 | `mod:status` | `"released"` (core only) |
 | **`dct:issued`** | **the release date — bump it every release** |

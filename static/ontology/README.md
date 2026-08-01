@@ -16,12 +16,12 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.11.0`, DOI
-  [10.5281/zenodo.21536124](https://doi.org/10.5281/zenodo.21536124), version
-  IRI `https://w3id.org/sstim/0.11.0`.
+- Latest immutable release: `v0.12.0`, DOI
+  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988), version
+  IRI `https://w3id.org/sstim/0.12.0`.
 - All-version DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the validated `0.11.0` release sources; core claims the whole-set
+- Live sources: the validated `0.12.0` release sources; core claims the whole-set
   `owl:versionIRI` and every public module carries synchronized
   `owl:versionInfo`.
 - Current term-graph counts are checked by `scripts/sstim-quality-audit.py` and
@@ -31,7 +31,7 @@ the graph.
 - Persistent namespace: `https://w3id.org/sstim`.
 - License: CC BY 4.0.
 
-The frozen [`0.11.0/`](0.11.0) directory is immutable and is the current citable
+The frozen [`0.12.0/`](0.12.0) directory is immutable and is the current citable
 whole-set release.
 
 ## Files
@@ -44,11 +44,12 @@ static/ontology/
 |-- sstim-ecosystem-private-shapes.ttl  Separate access-controlled audit profile (rules only)
 |-- sstim-alignments.ttl    Verified Wikidata and OBO alignments
 |-- sstim-patch-studio.ttl  Voice and authoring parameter properties
+|-- sstim-stimulus.ttl      Engine-independent stimulus description and target axis
 |-- sstim-exposure.ttl      Delivery, perception, device, safety, and experiment model
 |-- sstim-ecosystem.ttl     Ecosystem agents, relationships, and consent lifecycle
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
-|-- 0.1.0/ ... 0.10.0/     Immutable whole-set snapshots
+|-- 0.1.0/ ... 0.12.0/     Immutable whole-set snapshots
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
     |-- implementations/    BSC Lab and public-safe BioSynCare identities
@@ -63,12 +64,28 @@ static/ontology/
         `-- agents/        Reserved contract graph; no committed real data
 ```
 
-All seven term/public-shape modules plus the separate private-audit shape file
+All eight term/public-shape modules plus the separate private-audit shape file
 declare an `owl:Ontology` node with title,
 description, creator, creation/modification dates, license, and version
 metadata. Modules carry `owl:versionInfo` only. The core receives a version IRI
 only when the whole set is frozen for release; see
 [ADR 0020](../../docs/decisions/0020-whole-set-snapshot-versioning.md).
+
+### Module maturity
+
+These eight files are authoritative source and publication modules, but the
+0.12.0 suite is still versioned and normally validated as one whole set. They do
+not yet form a complete, acyclic, machine-discoverable set of independently
+reusable closures. In particular, the new stimulus source is snapshotted and
+exported but is not yet present in the runtime ontology source set or staged
+persistent-identifier routes.
+
+The [2026-08-01 boundary audit](../../docs/ontology/reviews/2026-08-01-sstim-core-and-module-boundary-audit.md)
+recommends a small logical Core Profile plus optional concern modules. The
+staged proposal is [ADR 0043](../../docs/decisions/0043-sstim-core-profile-and-module-boundaries.md).
+Until it is accepted and implemented, “module” here should be read as a source
+and publication boundary—and, where wired, a runtime named-graph boundary—not
+a claim that every file is a standalone consumer package.
 
 ## Namespaces
 
@@ -404,7 +421,7 @@ SELECT ?person ?organization ?role ?source WHERE {
 
 ## Versioning And Publication
 
-SSTIM versions the seven modules as one citable set:
+SSTIM versions the eight modules as one citable set:
 
 1. Develop in top-level modules with a `-dev` `owl:versionInfo`, no
    `owl:versionIRI`, and `mod:status "under development"` in the core. The

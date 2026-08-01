@@ -154,6 +154,10 @@ asserts that any stimulation does anything.
 **Put it in `sstim-core.ttl`.** Rejected: the core split is deferred and core is
 already too large ([ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md) §6).
 Adding the flagship concept to it would make that split harder, not easier.
+The deferred work is now audited and proposed as a logical Core Profile in
+[ADR 0043](0043-sstim-core-profile-and-module-boundaries.md); that profile may
+span a dependency-free kernel and this focused source file, so it does not
+require growing the old catch-all file again.
 
 **Model the stimulus as a rendered waveform.** Engine-independent and
 descriptively useless — not parametric, not queryable, and inapplicable to the

@@ -248,6 +248,13 @@ Turtle files are listed in section 1. After they exist:
       *`scripts/sstim-quality-audit.py` and
       `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
       safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
+- [?] Accept or revise the SSTIM Core Profile and concern-module architecture in
+      [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
+      `P1`
+      *The 2026-08-01 boundary audit confirms that the present core is too broad
+      as an adoption contract. Do not move protected Turtle blocks while the ADR
+      is Proposed. If accepted, implement the manifest and closure/parity gates
+      before extracting evidence or adding further physical modules.*
 - [x] Generate WIDOCO HTML docs from `sstim-core.ttl` `P1`
       *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
       generates core-module reference docs; gap-filling metadata in

@@ -1,6 +1,8 @@
 # ADR 0036 — Neurostimulation, the two senses of neuromodulation, and the self-directed split
 
-**Status:** Accepted — 2026-07-23 · targets SSTIM 0.10.0
+**Status:** Accepted — 2026-07-23 · released in SSTIM 0.10.0 · amended by
+[ADR 0037](0037-self-regulation-genus-and-sensory-neurostimulation-branch.md)
+in SSTIM 0.11.0
 
 Disambiguates the two senses of "neuromodulation" (intervention vs. effect),
 adds `Neurostimulation` as the stimulation-based branch, splits neuromodulation
@@ -10,6 +12,17 @@ physiological modulation out, and adds `Neuroplasticity` as a disposition. It
 continues the 2026-07-22 Theo Marins interview thread that produced
 [ADR 0035](0035-participant-engagement-mode-and-endogenous-self-regulation.md),
 resolving the two questions ADR 0035 explicitly parked (its notes 4 and 5).
+
+> **Architecture clarification (2026-08-01).** “Split” in this ADR means the
+> semantic self-directed/interventional distinction. It is not a decision to
+> split SSTIM into source modules or conformance profiles. The small-core
+> direction is [ADR 0041 §6](0041-stimulus-description-layers-and-the-canonical-schema-gap.md#6-a-small-core-with-adjunctive-modules),
+> and its proposed module architecture is
+> [ADR 0043](0043-sstim-core-profile-and-module-boundaries.md). ADR 0037 also
+> corrected two semantic overreaches here: no-applied-stimulus practices belong
+> under `DeliberateSelfRegulation`, and sensory neurostimulation is the
+> `Neurostimulation` ∩ `SensoryRouteNeuromodulation` intersection rather than
+> every sensory-route case.
 
 The implementation touches protected term files
 ([ADR 0004](0004-protected-ontology-files.md); `CLAUDE.md` §3.4). Maintainer

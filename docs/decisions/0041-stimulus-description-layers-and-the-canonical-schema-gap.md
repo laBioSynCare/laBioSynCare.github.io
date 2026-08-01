@@ -177,6 +177,14 @@ technique classes, none of which every description needs. Splitting it is
 separate work with real cost (IRIs must not move — [ADR 0020](0020-whole-set-snapshot-versioning.md)),
 recorded here as direction rather than scheduled.
 
+**Follow-up (2026-08-01).** The 0.12.0 graph and its actual dependencies were
+measured in the
+[core and module boundary audit](../ontology/reviews/2026-08-01-sstim-core-and-module-boundary-audit.md).
+The audit confirms this direction and proposes a staged implementation in
+[ADR 0043](0043-sstim-core-profile-and-module-boundaries.md): manifest and
+per-profile contracts first, then term redistribution. The split remains
+unimplemented while ADR 0043 is Proposed.
+
 ### 7. Patch Studio control tracks are renamed to what they are
 
 `Martigli` → **LFO**; `Symmetry` → **Permutation**, in `patch-studio-model-1`

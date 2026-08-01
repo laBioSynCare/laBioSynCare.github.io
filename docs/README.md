@@ -89,6 +89,10 @@ banner pointing to the as-built reference.
 - [`ontology/IMPROVEMENT_PLAN.md`](ontology/IMPROVEMENT_PLAN.md) — implementation
   ledger for the `0.7.0` release and remaining RDF roadmap, driven by the
   [2026-07-13 RDF audit](ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md).
+- [SSTIM core and module boundary audit](ontology/reviews/2026-08-01-sstim-core-and-module-boundary-audit.md) —
+  0.12.0 growth and dependency analysis, candidate Core Profile, concern
+  boundaries, migration order, and acceptance gates; paired with
+  [ADR 0043](decisions/0043-sstim-core-profile-and-module-boundaries.md).
 - [`credentials/firebase.md`](credentials/firebase.md) — optional Firebase setup.
 
 ## `decisions/` — architecture decision records

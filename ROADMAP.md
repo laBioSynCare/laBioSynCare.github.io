@@ -155,8 +155,9 @@ what exists.
 
 ### Ontology modules and quality infrastructure
 
-- Three release modules beyond the original four: `sstim-exposure.ttl`,
-  `sstim-ecosystem.ttl`, `sstim-patch-studio.ttl`, plus
+- Four release modules beyond the original four: `sstim-exposure.ttl`,
+  `sstim-ecosystem.ttl`, `sstim-patch-studio.ttl`, and
+  `sstim-stimulus.ttl`, plus
   `sstim-ecosystem-private-shapes.ttl`, `void.ttl`, and `context.jsonld`.
 - ROBOT/HermiT OWL DL consistency reasoning over the merged term space
   (`make reason`).
@@ -168,7 +169,8 @@ what exists.
   ([ADR 0023](docs/decisions/0023-ontology-docs-publication-path.md)).
 - BioPortal ingest bundle (`make bioportal-bundle`) and submission; FOOPS
   reassessed at 87.5% with only registry-dependent checks outstanding.
-- 37 accepted ADRs (0001–0037). Roughly a handful existed in April 2026.
+- 43 ADRs (0001–0043, with accepted, proposed, and superseded states). Roughly
+  a handful existed in April 2026.
 
 ### Ecosystem and stakeholder layer
 
