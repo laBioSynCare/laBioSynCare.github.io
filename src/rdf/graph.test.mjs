@@ -211,4 +211,33 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
     // Nothing on the canvas may carry a blank-node identifier as its id.
     expect(elements.every(e => /^https?:/.test(e.data.id) || e.data.source)).toBe(true)
   }, PROJECTION_TIMEOUT_MS)
+
+  it('draws property edges from every member of a union domain or range', async () => {
+    // ADR 0043 keeps a cross-layer domain as one intact owl:unionOf, because
+    // several rdfs:domain statements would intersect rather than widen. Read
+    // literally, such a property connects a blank node the canvas does not
+    // know, so nine object properties — hasExposureProfile, hasBodyPlacement,
+    // requiresDeviceCapability and the rest of the exposure cluster — drew no
+    // edge at all. Expanding the list gives one edge per named member.
+    const store = await parseIntoStore(`
+      @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+      @prefix ex:   <https://example.org/t/> .
+
+      ex:Profile a owl:Class ; rdfs:label "Profile"@en .
+      ex:Channel a owl:Class ; rdfs:label "Channel"@en .
+      ex:Placement a owl:Class ; rdfs:label "Placement"@en .
+      ex:hasPlacement a owl:ObjectProperty ;
+          rdfs:label "has placement"@en ;
+          rdfs:domain [ a owl:Class ; owl:unionOf ( ex:Profile ex:Channel ) ] ;
+          rdfs:range ex:Placement .
+    `, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+    const drawn = elements
+      .filter(e => e.data.kind === 'objProp')
+      .map(e => `${e.data.source.split('/').pop()}->${e.data.target.split('/').pop()}`)
+      .sort()
+
+    expect(drawn).toEqual(['Channel->Placement', 'Profile->Placement'])
+  }, PROJECTION_TIMEOUT_MS)
 })

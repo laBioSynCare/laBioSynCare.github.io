@@ -99,6 +99,24 @@ function displayLabel(iri, label) {
   return label
 }
 
+// An rdfs:domain or rdfs:range is often an anonymous union: ADR 0043 keeps
+// cross-layer axioms as one intact owl:unionOf rather than several statements,
+// because several would intersect instead of widening. Reading the blank node
+// literally means the property connects nothing the canvas knows about, so
+// nine object properties — the whole exposure cluster, hasExposureProfile,
+// hasBodyPlacement, requiresDeviceCapability and the rest — silently drew no
+// edge at all. Expanding the list restores one edge per named member.
+// The union and intersection paths are two OPTIONALs rather than one
+// alternation: Comunica returns no rows for `(owl:unionOf|owl:intersectionOf)`
+// followed by a sequence, silently, while each branch works on its own.
+const CLASS_MEMBERS = `
+        OPTIONAL { ?domainNode owl:unionOf/rdf:rest*/rdf:first ?domainUnion . }
+        OPTIONAL { ?domainNode owl:intersectionOf/rdf:rest*/rdf:first ?domainIntersection . }
+        OPTIONAL { ?rangeNode owl:unionOf/rdf:rest*/rdf:first ?rangeUnion . }
+        OPTIONAL { ?rangeNode owl:intersectionOf/rdf:rest*/rdf:first ?rangeIntersection . }
+        BIND(COALESCE(?domainUnion, ?domainIntersection, ?domainNode) AS ?domain)
+        BIND(COALESCE(?rangeUnion, ?rangeIntersection, ?rangeNode) AS ?range)`
+
 export async function buildGraphElements(store) {
   const nodes = new Map()   // id → cy node data
   const edges = []
@@ -174,15 +192,16 @@ export async function buildGraphElements(store) {
   // ── 3. Object properties (domain → range) ──────────────────────────────────
   const objPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
+    PREFIX rdf:  <${RDF}>
     PREFIX rdfs: <${RDFS}>
     PREFIX skos: <${SKOS}>
     SELECT ?prop ?propLabel ?def ?domain ?range WHERE {
       GRAPH ?g {
         ?prop a owl:ObjectProperty .
-        ?prop rdfs:domain ?domain .
-        ?prop rdfs:range  ?range .
+        ?prop rdfs:domain ?domainNode .
+        ?prop rdfs:range  ?rangeNode .
         OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
-        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }
+        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }${CLASS_MEMBERS}
       }
     }`)
 
@@ -207,15 +226,16 @@ export async function buildGraphElements(store) {
   // ── 4. Datatype properties (domain → XSD type) ─────────────────────────────
   const dataPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
+    PREFIX rdf:  <${RDF}>
     PREFIX rdfs: <${RDFS}>
     PREFIX skos: <${SKOS}>
     SELECT ?prop ?propLabel ?def ?domain ?range WHERE {
       GRAPH ?g {
         ?prop a owl:DatatypeProperty .
-        ?prop rdfs:domain ?domain .
-        ?prop rdfs:range  ?range .
+        ?prop rdfs:domain ?domainNode .
+        ?prop rdfs:range  ?rangeNode .
         OPTIONAL { ?prop rdfs:label ?propLabel . FILTER(LANG(?propLabel) = "en") }
-        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }
+        OPTIONAL { ?prop skos:definition ?def . FILTER(LANG(?def) = "en") }${CLASS_MEMBERS}
       }
     }`)
 
