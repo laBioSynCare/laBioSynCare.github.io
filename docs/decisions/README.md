@@ -68,6 +68,7 @@ annotations lives here.
 | [0042](0042-stimulus-specification.md) | `sstim:StimulusSpecification` in a new `sstim-stimulus.ttl` module: engine-independent stimulus description in physical/perceptual units, with a required regime facet (determinate / stochastic / adaptive) because an adaptive stimulus has no static description in principle; reuses `sstim-ex:StimulusChannel`; adds the target axis (people, animals, plants, objects, or nothing) and the session liberties | Accepted |
 | [0043](0043-sstim-core-profile-and-module-boundaries.md) | Define exact Kernel, Core, Core Plus, concern/bridge, and Full Profile closures for SSTIM 0.13; use honest dependency and SHACL closures, one manifest, Full union-graph equivalence, and stable public term IRIs | Accepted |
 | [0044](0044-stimulus-channel-core-ownership.md) | Keep the public `sstim-ex:StimulusChannel` IRI while moving ownership to the Core stimulus module and broadening its definition to specification-or-exposure use; keep the base target property domainless and restore its intact union domain in Session | Accepted |
+| [0045](0045-shapeless-profiles-are-discovery-entry-points.md) | A profile with no shape closure is a discovery entry point, not a conformance target: it owes a positive fixture and a competency query, and must not declare out-of-scope or adversarial fixtures, because both are verdicts of a closure it does not have | Accepted |
 
 ## Adding an ADR
 

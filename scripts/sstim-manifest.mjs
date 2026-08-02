@@ -819,14 +819,34 @@ function validateProfiles(manifest, moduleById, errors, { verifyChecksums }) {
         errors.push(`${at}.competencyQueries: duplicate path ${JSON.stringify(path)}`)
       }
     }
+    // ADR 0045: "out-of-scope" and "adversarial" are verdicts of a profile's
+    // SHACL closure, so they only exist where there is one. A profile with an
+    // empty shapeModules list is a discovery entry point, not a conformance
+    // target: nothing could reject an adversarial graph, and an out-of-scope
+    // graph would validate vacuously. Such a profile still owes a positive
+    // fixture and a competency query, which prove its terms are usable.
+    const validates = Array.isArray(profile.shapeModules) && profile.shapeModules.length > 0
     if (profile.status === 'released') {
-      for (const category of ['positive', 'outOfScope', 'adversarial']) {
+      const required = validates
+        ? ['positive', 'outOfScope', 'adversarial']
+        : ['positive']
+      for (const category of required) {
         if (Array.isArray(profile.fixtures?.[category]) && profile.fixtures[category].length === 0) {
           errors.push(`${at}.fixtures.${category}: a released profile requires at least one contract fixture`)
         }
       }
       if (Array.isArray(profile.competencyQueries) && profile.competencyQueries.length === 0) {
         errors.push(`${at}.competencyQueries: a released profile requires at least one competency query`)
+      }
+    }
+    if (!validates) {
+      for (const category of ['outOfScope', 'adversarial']) {
+        if (Array.isArray(profile.fixtures?.[category]) && profile.fixtures[category].length > 0) {
+          errors.push(
+            `${at}.fixtures.${category}: profile declares no shapeModules, so no ` +
+            'validation verdict exists for this category (ADR 0045)',
+          )
+        }
       }
     }
     if (MODULE_ID_PATTERN.test(profile.id ?? '')) {

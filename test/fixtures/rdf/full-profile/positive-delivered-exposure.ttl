@@ -1,0 +1,65 @@
+###########################################################################
+# Positive fixture for the SSTIM Full Profile.
+#
+# Full's claim is that it joins concerns no smaller profile joins, so this is
+# one connected description crossing four module boundaries:
+#
+#   Kernel/Stimulus  the process, specification, channel, duration, regime
+#   Common           the calibrated channel magnitudes
+#   Exposure         how that same channel is delivered, perceived, and placed
+#   Vocabulary       the controlled caution value
+#
+# Neither Core nor Core Plus can express it: both stop at the channel's
+# duration and magnitudes and have no way to say that the stimulus reaches the
+# subject as air-conducted sound at both ears.
+#
+# Delivery medium, perceived modality, and body placement are referenced from
+# the Exposure module's own controlled individuals rather than declared here,
+# because the Full shapes require those values to be typed members of
+# sstim-ex:PhysicalDeliveryMedium, sstim-ex:PerceivedModality, and
+# sstim-ex:BodyPlacement. Referencing them is also what a real consumer does.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/full-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+#-- Kernel + Stimulus: the engine-independent description ----------------
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Alpha auditory stimulus specification"@en ;
+    dct:identifier "full-positive-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Alpha auditory stimulation process"@en .
+
+#-- Common: what Core Plus adds — calibrated magnitudes ------------------
+#-- Exposure: what only Full adds — how it physically arrives ------------
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Calibrated auditory channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

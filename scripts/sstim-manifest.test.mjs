@@ -57,12 +57,15 @@ test('released manifests require immutable artifacts and complete profile contra
     profile.fixtures.positive = [
       'test/fixtures/rdf/core-profile/positive-minimal-stimulus.ttl',
     ]
-    profile.fixtures.outOfScope = [
-      'test/fixtures/rdf/ecosystem-positive/self-publication.ttl',
-    ]
-    profile.fixtures.adversarial = [
-      'test/fixtures/rdf/ecosystem/flattened-relationship.ttl',
-    ]
+    // ADR 0045: only a profile with a shape closure owes the negative
+    // categories, because both are verdicts of that closure.
+    const conformanceTarget = profile.shapeModules.length > 0
+    profile.fixtures.outOfScope = conformanceTarget
+      ? ['test/fixtures/rdf/ecosystem-positive/self-publication.ttl']
+      : []
+    profile.fixtures.adversarial = conformanceTarget
+      ? ['test/fixtures/rdf/ecosystem/flattened-relationship.ttl']
+      : []
     profile.competencyQueries = ['scripts/sstim-core-profile-contract.py']
   }
 
@@ -73,6 +76,28 @@ test('released manifests require immutable artifacts and complete profile contra
   const errors = validateManifest(manifest, { verifyFiles: false })
   expect(errors.some((error) => error.includes('publication.versionedUrl'))).toBe(true)
   expect(errors.some((error) => error.includes('fixtures.adversarial'))).toBe(true)
+})
+
+test('negative fixture categories exist only where a shape closure does (ADR 0045)', () => {
+  const manifest = structuredClone(loadManifest(DEFAULT_MANIFEST_PATH))
+  const kernel = manifest.profiles.find((profile) => profile.id === 'kernel')
+  expect(kernel.shapeModules).toEqual([])
+
+  // Nothing could reject an adversarial graph under an empty shape closure, so
+  // declaring one would be a contract that always passes.
+  kernel.fixtures.adversarial = ['test/fixtures/rdf/ecosystem/flattened-relationship.ttl']
+  const declared = validateManifest(manifest, { verifyFiles: false })
+  expect(declared.some((error) => (
+    error.includes('profiles[0].fixtures.adversarial') && error.includes('ADR 0045')
+  ))).toBe(true)
+
+  // A released shapeless profile still owes a positive fixture and a query.
+  kernel.fixtures.adversarial = []
+  kernel.status = 'released'
+  kernel.fixtures.positive = []
+  const released = validateManifest(manifest, { verifyFiles: false })
+  expect(released.some((error) => error.includes('profiles[0].fixtures.positive'))).toBe(true)
+  expect(released.some((error) => error.includes('fixtures.outOfScope'))).toBe(false)
 })
 
 test('Turtle prose is never read as an axiom, and # survives in IRIs and literals', () => {

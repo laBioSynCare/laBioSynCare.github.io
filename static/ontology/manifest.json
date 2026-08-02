@@ -734,11 +734,15 @@
       ],
       "shapeModules": [],
       "fixtures": {
-        "positive": [],
+        "positive": [
+          "test/fixtures/rdf/kernel-profile/positive-sensory-stimulation.ttl"
+        ],
         "outOfScope": [],
         "adversarial": []
       },
-      "competencyQueries": [],
+      "competencyQueries": [
+        "test/competency/kernel.rq"
+      ],
       "sha256": "126aea13aa327fd857aa9349725b2365f22aa464b6d5f67d9a4a5973e6f31dc2"
     },
     {
@@ -786,7 +790,7 @@
         ]
       },
       "competencyQueries": [
-        "scripts/sstim-core-profile-contract.py"
+        "test/competency/core.rq"
       ],
       "sha256": "a972501a66306ae84213eea4f502448ab2b08279437d48917f893e957fba0e9b"
     },
@@ -823,11 +827,19 @@
         "core-shapes"
       ],
       "fixtures": {
-        "positive": [],
-        "outOfScope": [],
-        "adversarial": []
+        "positive": [
+          "test/fixtures/rdf/core-plus-profile/positive-calibrated-channel.ttl"
+        ],
+        "outOfScope": [
+          "test/fixtures/rdf/core-plus-profile/out-of-scope-configuration-and-evidence.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/core-plus-profile/adversarial-uncalibrated-channel.ttl"
+        ]
       },
-      "competencyQueries": [],
+      "competencyQueries": [
+        "test/competency/core-plus.rq"
+      ],
       "sha256": "18e525949fabfa14b5c50951960d4ca3650852a2b833fe7e9bfb561dc02c5d36"
     },
     {
@@ -876,11 +888,19 @@
         "shapes"
       ],
       "fixtures": {
-        "positive": [],
-        "outOfScope": [],
-        "adversarial": []
+        "positive": [
+          "test/fixtures/rdf/full-profile/positive-delivered-exposure.ttl"
+        ],
+        "outOfScope": [
+          "test/fixtures/rdf/full-profile/out-of-scope-foreign-vocabulary.ttl"
+        ],
+        "adversarial": [
+          "test/fixtures/rdf/full-profile/adversarial-undelivered-channel.ttl"
+        ]
       },
-      "competencyQueries": [],
+      "competencyQueries": [
+        "test/competency/full.rq"
+      ],
       "sha256": "ecd5ecb1fe05721205a514c1834e7eb7a1203d944390c502a2ca5281a3c140ba"
     }
   ]

@@ -546,10 +546,11 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
 11. Add the resulting version DOI without rewriting a published snapshot.
 
 The current development manifest intentionally has no immutable release URLs.
-Core now has the complete contract: a positive fixture, an out-of-scope fixture
-proving Full-profile policy does not leak into Core validation, three
-adversarial fixtures, and a competency query, all executed by
-`make core-profile-contract`. Kernel, Core Plus, and Full still need theirs.
+All four profiles now carry their conformance contract, executed against their
+own closures by `make core-profile-contract`: a positive fixture and a SPARQL
+competency query each, plus out-of-scope and adversarial fixtures for the three
+profiles that select a shape package. Kernel selects none, so it declares
+neither negative category ([ADR 0045](../../docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)).
 `void.ttl` still describes the eight-module `0.12.0` set, which is correct for
 the release it names; the audit now forces its subset inventory to be completed
 as soon as `dcat:version` moves to a modular release. Consequently `0.13.0-dev` is noncitable

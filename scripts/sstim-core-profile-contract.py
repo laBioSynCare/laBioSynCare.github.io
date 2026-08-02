@@ -339,53 +339,112 @@ def check_core_fixture(errors: list[str]) -> None:
             )
 
 
-def check_declared_fixture_sets(errors: list[str]) -> None:
-    """Execute every fixture the manifest registers for Core, by category.
-
-    The in-memory mutations above prove the shapes react to a broken field. They
-    cannot prove what the manifest promises a *consumer*, which is that these
-    committed files behave as their category says: out-of-scope data validates,
-    adversarial data does not. A fixture listed but never run is a release
-    contract that nobody checks.
-    """
+def profile_graphs(profile: dict) -> tuple[Graph, Graph]:
+    """Return (ontology, shapes) for a profile's declared closure."""
+    ontology = Graph()
+    for module_id in profile["modules"]:
+        ontology.parse(MODULE_SOURCE_PATHS[module_id], format="turtle")
     shapes = Graph()
-    for module_id in CORE_PROFILE["shapeModules"]:
+    for module_id in profile["shapeModules"]:
         shapes.parse(MODULE_SOURCE_PATHS[module_id], format="turtle")
-    ontology = core_ontology_graph()
+    return ontology, shapes
 
-    def validates(path: Path) -> tuple[bool, str]:
-        conforms, _, report = shacl_validate(
-            data_graph=parse(path),
-            shacl_graph=shapes,
-            ont_graph=ontology,
-            inference="none",
-            advanced=False,
-        )
-        return conforms, report
 
-    fixtures = CORE_PROFILE["fixtures"]
-    for category in ("positive", "outOfScope"):
-        for relative in fixtures[category]:
-            conforms, report = validates(ROOT / relative)
-            if not conforms:
-                errors.append(
-                    f"{category} Core fixture {relative} must validate under the "
-                    f"Core closure but did not:\n{report}"
-                )
-    if not fixtures["outOfScope"]:
-        errors.append(
-            "Core profile declares no out-of-scope fixture; ADR 0043 §7 requires one "
-            "per profile to prove omitted concern policy does not leak into validation"
-        )
-    if not fixtures["adversarial"]:
-        errors.append("Core profile declares no adversarial fixture")
-    for relative in fixtures["adversarial"]:
-        conforms, _ = validates(ROOT / relative)
-        if conforms:
-            errors.append(
-                f"adversarial Core fixture {relative} was accepted; it must be "
-                "rejected by the Core closure or it is not adversarial"
+def check_declared_fixture_sets(errors: list[str]) -> None:
+    """Execute every fixture and competency query the manifest registers, for
+    every profile, by category.
+
+    The in-memory mutations above prove the Core shapes react to a broken field.
+    They cannot prove what the manifest promises a *consumer*, which is that
+    these committed files behave as their category says: positive and
+    out-of-scope data validates, adversarial data does not, and each profile can
+    answer its own question. A fixture or query listed but never run is a
+    release contract that nobody checks.
+
+    The ontology is merged into the data graph rather than passed as `ont_graph`
+    -- the same shape `make shacl-instances` uses. Passing the 8,499-triple Full
+    closure as a separate ontology graph makes pySHACL take minutes instead of
+    seconds. Module sources conform on their own (`make shacl-modules`), so any
+    violation reported here comes from the fixture.
+    """
+    for profile_id, profile in PROFILES_BY_ID.items():
+        ontology, shapes = profile_graphs(profile)
+        fixtures = profile["fixtures"]
+        validates_data = len(profile["shapeModules"]) > 0
+
+        def verdict(path: Path) -> tuple[bool, str]:
+            data = Graph()
+            for triple in ontology:
+                data.add(triple)
+            data.parse(path, format="turtle")
+            conforms, _, report = shacl_validate(
+                data_graph=data,
+                shacl_graph=shapes,
+                inference="none",
+                advanced=False,
             )
+            return conforms, report
+
+        if not fixtures["positive"]:
+            errors.append(f"{profile_id} profile declares no positive fixture")
+        if not profile["competencyQueries"]:
+            errors.append(f"{profile_id} profile declares no competency query")
+
+        # ADR 0045: the negative categories are verdicts of a shape closure, so
+        # a profile without one must not declare them, and is not asked to.
+        if validates_data:
+            for category in ("outOfScope", "adversarial"):
+                if not fixtures[category]:
+                    errors.append(
+                        f"{profile_id} profile has a shape closure but declares no "
+                        f"{category} fixture (ADR 0043 §7)"
+                    )
+        else:
+            for category in ("outOfScope", "adversarial"):
+                if fixtures[category]:
+                    errors.append(
+                        f"{profile_id} profile declares a {category} fixture but has no "
+                        "shape closure, so no verdict exists to make it meaningful (ADR 0045)"
+                    )
+
+        if validates_data:
+            for category in ("positive", "outOfScope"):
+                for relative in fixtures[category]:
+                    conforms, report = verdict(ROOT / relative)
+                    if not conforms:
+                        errors.append(
+                            f"{category} {profile_id} fixture {relative} must validate "
+                            f"under its own closure but did not:\n{report}"
+                        )
+            for relative in fixtures["adversarial"]:
+                conforms, _ = verdict(ROOT / relative)
+                if conforms:
+                    errors.append(
+                        f"adversarial {profile_id} fixture {relative} was accepted; it "
+                        "must be rejected by that profile's closure or it is not adversarial"
+                    )
+
+        # A competency query must return at least one row over the profile's own
+        # positive fixtures, using only terms the profile's closure defines.
+        for relative in profile["competencyQueries"]:
+            query_path = ROOT / relative
+            if query_path.suffix != ".rq":
+                continue
+            query = query_path.read_text(encoding="utf-8")
+            answered = False
+            for positive in fixtures["positive"]:
+                data = Graph()
+                for triple in ontology:
+                    data.add(triple)
+                data.parse(ROOT / positive, format="turtle")
+                if list(data.query(query)):
+                    answered = True
+                    break
+            if not answered:
+                errors.append(
+                    f"{profile_id} competency query {relative} returned no rows over "
+                    f"its positive fixture(s); the profile cannot answer its own question"
+                )
 
 
 def main() -> int:
@@ -402,13 +461,18 @@ def main() -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    fixtures = CORE_PROFILE["fixtures"]
+    totals = {category: 0 for category in ("positive", "outOfScope", "adversarial")}
+    queries = 0
+    for profile in MANIFEST["profiles"]:
+        for category in totals:
+            totals[category] += len(profile["fixtures"][category])
+        queries += len(profile["competencyQueries"])
     print(
-        f"SSTIM Core profile contract OK: {len(MANIFEST['profiles'])} profile entrypoints, "
-        f"{len(FULL)} Full modules, weak Core SHACL, competency query, "
-        "9 negative mutations, 4 optional-field cases, and declared fixtures "
-        f"({len(fixtures['positive'])} positive, {len(fixtures['outOfScope'])} out-of-scope, "
-        f"{len(fixtures['adversarial'])} adversarial)."
+        f"SSTIM profile contract OK: {len(MANIFEST['profiles'])} profile entrypoints, "
+        f"{len(FULL)} Full modules, weak Core SHACL, 9 negative mutations, "
+        f"4 optional-field cases, {queries} competency queries, and "
+        f"{totals['positive']} positive / {totals['outOfScope']} out-of-scope / "
+        f"{totals['adversarial']} adversarial fixtures executed against their own closures."
     )
     return 0
 

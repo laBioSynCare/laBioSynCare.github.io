@@ -288,16 +288,15 @@ Turtle files are listed in section 1. After they exist:
       points must import exact versioned sibling files and expose immutable PROF
       artifacts. Contract paths must exist; Git and checksum-ledger failures are
       fail-closed; registered snapshots cannot be force-overwritten.*
-- [ ] Complete the release contract for every SSTIM profile `P1`
-      *Each released profile must have nonempty positive, out-of-scope, and
-      adversarial fixture sets plus at least one competency query. **Core is
-      complete** and its declared fixtures are executed by
-      `make core-profile-contract`. Core Plus and Full still need all three
-      categories and their own competency queries. Kernel needs a decision
-      first: its shape closure is empty, so no fixture can be adversarial
-      against it — either publish minimal Kernel shapes or exempt shapeless
-      profiles from the negative categories. Until these and the staged route
-      deployment are complete, `0.13.0-dev` is noncitable.*
+- [x] Complete the release contract for every SSTIM profile `P1`
+      *Done. Every profile declares a positive fixture and a SPARQL competency
+      query; Core, Core Plus, and Full additionally declare out-of-scope and
+      adversarial fixtures. Kernel has an empty shape closure, so per
+      [ADR 0045](docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)
+      it is a discovery entry point and must not declare the negative
+      categories. All of it is executed against each profile's own closure by
+      `make core-profile-contract`. `0.13.0-dev` remains noncitable until the
+      staged route deployment is verified.*
 - [ ] Give the version IRI a whole-ontology artifact to resolve to `P1`
       *Until 0.12 `sstim-core.ttl` was the whole ontology, so `/sstim/<version>`
       could serve it; it is now the two-class Kernel, and a frozen snapshot has

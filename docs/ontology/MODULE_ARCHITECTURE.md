@@ -117,7 +117,7 @@ present, and authoritative manifest.
 
 | Profile | Profile IRI / entry point | Exact semantic closure | Shape selection |
 |---|---|---|---|
-| Kernel | `https://w3id.org/sstim/profile/kernel`; [`sstim-kernel-profile.ttl`](../../static/ontology/sstim-kernel-profile.ttl) | `core` | None published in `0.13.0-dev` |
+| Kernel | `https://w3id.org/sstim/profile/kernel`; [`sstim-kernel-profile.ttl`](../../static/ontology/sstim-kernel-profile.ttl) | `core` | None published in `0.13.0-dev`; a discovery entry point rather than a conformance target ([ADR 0045](../decisions/0045-shapeless-profiles-are-discovery-entry-points.md)) |
 | Core | `https://w3id.org/sstim/profile/core`; [`sstim-core-profile.ttl`](../../static/ontology/sstim-core-profile.ttl) | `core`, `stimulus` | `core-shapes` |
 | Core Plus | `https://w3id.org/sstim/profile/core-plus`; [`sstim-core-plus-profile.ttl`](../../static/ontology/sstim-core-plus-profile.ttl) | `core`, `stimulus`, `common` | `core-shapes`; no Common-specific shapes yet |
 | Full | `https://w3id.org/sstim/profile/full`; [`sstim-full-profile.ttl`](../../static/ontology/sstim-full-profile.ttl) | All 16 term-space modules above, including bridges, Vocabulary, Alignments, Ecosystem, and Patch Studio | `shapes` |

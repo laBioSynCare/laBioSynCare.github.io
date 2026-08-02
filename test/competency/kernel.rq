@@ -1,0 +1,16 @@
+# Kernel competency question:
+#   "Which processes in this graph are sensory stimulations, and are they
+#    stimulations at all?"
+#
+# This is the whole of what Kernel claims: an anchor that lets a consumer
+# recognise a stimulation process and its sensory specialisation without
+# importing any other SSTIM module. If this query cannot be answered over the
+# Kernel positive fixture, the two-class Kernel has no reason to be published.
+PREFIX sstim: <https://w3id.org/sstim#>
+PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?process ?label WHERE {
+  ?process a sstim:SensoryStimulation ;
+           a sstim:Stimulation ;
+           rdfs:label ?label .
+}
