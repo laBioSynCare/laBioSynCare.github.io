@@ -240,4 +240,42 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
 
     expect(drawn).toEqual(['Channel->Placement', 'Profile->Placement'])
   }, PROJECTION_TIMEOUT_MS)
+
+  it('records upper-ontology parents on the node instead of drawing them', async () => {
+    // Edges to these would collapse the canvas: 83 of the ~100 external parents
+    // in SSTIM are "information content entity" alone. The grounding is real and
+    // is a reason to adopt the ontology, so the inspector lists it. Labels are
+    // read from the store — SSTIM labels the OBO anchors it reuses — so no
+    // hand-maintained IRI-to-name table can go stale.
+    const store = await parseIntoStore(`
+      @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+      @prefix iao:  <http://purl.obolibrary.org/obo/IAO_> .
+      @prefix prov: <http://www.w3.org/ns/prov#> .
+      @prefix ex:   <https://example.org/t/> .
+
+      iao:0000030 rdfs:label "information content entity"@en .
+      ex:Parent a owl:Class ; rdfs:label "Parent"@en .
+      ex:Record a owl:Class ; rdfs:label "Record"@en ;
+          rdfs:subClassOf iao:0000030, ex:Parent .
+      ex:Step a owl:Class ; rdfs:label "Step"@en ;
+          rdfs:subClassOf prov:Activity .
+      ex:Plain a owl:Class ; rdfs:label "Plain"@en ; rdfs:subClassOf ex:Parent .
+    `, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+    const node = iri => elements.find(e => e.data.iri === iri)?.data
+
+    // Labelled from the store, and the internal parent is left to the canvas.
+    expect(node('https://example.org/t/Record').externalParents)
+      .toEqual([{ iri: 'http://purl.obolibrary.org/obo/IAO_0000030', label: 'information content entity' }])
+    // PROV carries no label here; the local name already reads cleanly.
+    expect(node('https://example.org/t/Step').externalParents)
+      .toEqual([{ iri: 'http://www.w3.org/ns/prov#Activity', label: 'Activity' }])
+    // A class with only internal parents gains no row at all.
+    expect(node('https://example.org/t/Plain').externalParents).toBeUndefined()
+
+    // The external parent must still not appear as a node or an edge.
+    expect(elements.some(e => e.data.id === 'http://purl.obolibrary.org/obo/IAO_0000030')).toBe(false)
+    expect(elements.some(e => e.data.target === 'http://purl.obolibrary.org/obo/IAO_0000030')).toBe(false)
+  }, PROJECTION_TIMEOUT_MS)
 })

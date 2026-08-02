@@ -1738,6 +1738,26 @@
                       </div>
                     {/if}
                   {/if}
+                  {#if selected.externalParents?.length}
+                    <!-- Upper-ontology grounding. Not drawn on the canvas: 83 of
+                         the ~100 external parents are "information content
+                         entity" alone, so edges to them would collapse the graph
+                         into one hub. Listing them here keeps the alignment
+                         visible without the clutter. -->
+                    <div class="meta-row">
+                      <dt>Aligned to</dt>
+                      <dd>
+                        {#each selected.externalParents as parent, index}
+                          {#if index > 0}, {/if}<a
+                            href={parent.iri}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={`${parent.iri} — upper-ontology parent, not drawn on the canvas`}
+                          >{parent.label}</a>
+                        {/each}
+                      </dd>
+                    </div>
+                  {/if}
                   {#if selected.notation}
                     <div class="meta-row">
                       <dt>Notation</dt>

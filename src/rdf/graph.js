@@ -117,6 +117,18 @@ const CLASS_MEMBERS = `
         BIND(COALESCE(?domainUnion, ?domainIntersection, ?domainNode) AS ?domain)
         BIND(COALESCE(?rangeUnion, ?rangeIntersection, ?rangeNode) AS ?range)`
 
+// Upper-ontology parents are deliberately not drawn: 83 of the ~100 external
+// subClassOf targets are IAO_0000030 alone, so edges to them would collapse the
+// canvas into one hub. The grounding is still real and is a reason to adopt
+// SSTIM, so the inspector lists it instead. Only nine distinct parents are used
+// and SSTIM already labels five of them; the rest are PROV, whose local names
+// read cleanly, so no hand-maintained label table is needed.
+const EXTERNAL_PARENT_NS = ['http://purl.obolibrary.org', 'http://www.w3.org/ns/prov']
+
+function isExternalParent(iri) {
+  return EXTERNAL_PARENT_NS.some(ns => iri.startsWith(ns))
+}
+
 export async function buildGraphElements(store) {
   const nodes = new Map()   // id → cy node data
   const edges = []
@@ -155,12 +167,22 @@ export async function buildGraphElements(store) {
   for (const r of classRows) {
     const id = r.cls.value
     if (id.startsWith(OWL)) continue   // skip owl:Class itself
+    const externalParents = iriValues(store, id, RDFS + 'subClassOf')
+      .filter(isExternalParent)
+      .map(parent => ({
+        iri: parent,
+        // SSTIM labels the OBO anchors it reuses; PROV's local names are already
+        // readable. Reading the label from the store keeps this from going stale.
+        label: preferredLiteral(terms(store, parent, RDFS + 'label'))?.value ?? localName(parent),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label))
     addNode(id, {
       kind: 'owlClass',
       layer: 'ontology',
       label: r.label?.value ?? localName(id),
       definition: r.def?.value ?? '',
       iri: id,
+      ...(externalParents.length ? { externalParents } : {}),
     })
   }
 
