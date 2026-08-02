@@ -26,11 +26,19 @@ points, all newly extracted modules, `manifest.json`, and
 `manifest.schema.json`, in Turtle, JSON-LD, and RDF/XML. The registry itself
 still carries the pre-modular rules: the root and `exposure` routes resolve to
 single files rather than generated catalogues, and the snapshot rules are
-regex wildcards. A perma-id update submitting this file is open; until it
-merges, the two differ in the registry's direction, not in missing targets.
+regex wildcards. [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480)
+submits this file; until it merges, the two differ in the registry's
+direction, not in missing targets.
 
 `0.12.0` remains the latest immutable release. Top-level sources are the mutable
 `0.13.0-dev` line and must not be confused with a released snapshot.
+
+**Copy `.htaccess` to the registry verbatim; do not copy this README.** The
+registry's `sstim/README.md` is a trimmed version of this file. perma-id asks
+that submissions carry "redirects and basic information" only, so the registry
+copy keeps the maintainer block, route table, and negotiation rules, and drops
+this file's `make` commands, script paths, and registry-state tracking, which
+describe how BSC Lab produces the targets rather than how the redirects behave.
 
 | PID | Content | Registry state |
 |---|---|---|
