@@ -13,7 +13,7 @@ AddType application/rdf+xml   .rdf .owl
 AddType application/ld+json   .jsonld
 AddType application/n-triples .nt
 
-Header set Access-Control-Allow-Origin *
+Header always set Access-Control-Allow-Origin *
 Header always set Vary "Accept"
 
 RewriteEngine On
@@ -110,6 +110,10 @@ RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\
 RewriteRule ^module/exposure$ https://labiosyncare.github.io/ontology/sstim-exposure.ttl [R=303,L]
 RewriteRule ^module/exposure$ - [R=406,L]
 
+# The SKOS vocabulary has its own pyLODE page; every other module is
+# described by the WIDOCO reference index.
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^vocab$ https://labiosyncare.github.io/ontology/docs/vocab/ [R=303,L]
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
 RewriteRule ^(stimulus|core-shapes|common|technique|configuration|session|evidence|neuromodulation|patch-studio|vocab|ecosystem|neuromodulation-evidence|evidence-exposure|technique-exposure|alignments|shapes)$ https://labiosyncare.github.io/ontology/sstim-$1.jsonld [R=303,L]
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]

@@ -439,7 +439,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/vocab",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-vocab.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-vocab.ttl",
+        "documentationUrl": "https://labiosyncare.github.io/ontology/docs/vocab/"
       },
       "release": {
         "snapshot": true,

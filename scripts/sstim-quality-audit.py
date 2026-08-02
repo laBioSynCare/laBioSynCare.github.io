@@ -1062,6 +1062,23 @@ else:
     ]
     profile_pattern = rf"^profile/({'|'.join(profile_slugs)})$"
     module_pattern = rf"^({'|'.join(ordinary_module_slugs)})$"
+
+    # A module may document itself somewhere other than the suite reference
+    # index; the SKOS vocabulary has its own pyLODE page. HTML negotiation for
+    # those routes is overridden immediately before the shared module block, so
+    # the override wins on ordering. Deriving it from the manifest keeps the
+    # whole route table generated rather than hand-patched.
+    documentation_overrides = tuple(
+        directive
+        for module in MANIFEST["modules"]
+        if module["publication"].get("documentationUrl")
+        for directive in (
+            HTML_ACCEPT,
+            "RewriteRule "
+            f"^{module['publication']['persistentUrl'].removeprefix('https://w3id.org/sstim/')}$ "
+            f"{module['publication']['documentationUrl']} [R=303,L]",
+        )
+    )
     expected_manifest_directives = (
         "RewriteRule ^manifest$ https://labiosyncare.github.io/ontology/manifest.json [R=303,L]",
         "RewriteRule ^manifest-schema/1$ https://labiosyncare.github.io/ontology/manifest.schema.json [R=303,L]",
@@ -1093,6 +1110,7 @@ else:
             html="https://labiosyncare.github.io/ontology/docs/",
             turtle="https://labiosyncare.github.io/ontology/sstim-exposure.ttl",
         ),
+        *documentation_overrides,
         *negotiated_directives(
             module_pattern,
             json_ld="https://labiosyncare.github.io/ontology/sstim-$1.jsonld",

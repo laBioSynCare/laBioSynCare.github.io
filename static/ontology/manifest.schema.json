@@ -66,7 +66,9 @@
                 "const": "kernel"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         {
@@ -76,7 +78,9 @@
                 "const": "core"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         {
@@ -86,7 +90,9 @@
                 "const": "core-plus"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         },
         {
@@ -96,7 +102,9 @@
                 "const": "full"
               }
             },
-            "required": ["id"]
+            "required": [
+              "id"
+            ]
           }
         }
       ]
@@ -112,13 +120,19 @@
                 "const": "released"
               }
             },
-            "required": ["status"]
+            "required": [
+              "status"
+            ]
           }
         },
-        "required": ["suite"]
+        "required": [
+          "suite"
+        ]
       },
       "then": {
-        "required": ["immutableRelease"],
+        "required": [
+          "immutableRelease"
+        ],
         "properties": {
           "$schema": {
             "pattern": "^https://w3id\\.org/sstim/[0-9]+\\.[0-9]+\\.[0-9]+/manifest\\.schema\\.json$"
@@ -142,15 +156,21 @@
                         "const": true
                       }
                     },
-                    "required": ["snapshot"]
+                    "required": [
+                      "snapshot"
+                    ]
                   }
                 },
-                "required": ["release"]
+                "required": [
+                  "release"
+                ]
               },
               "then": {
                 "properties": {
                   "publication": {
-                    "required": ["versionedUrl"]
+                    "required": [
+                      "versionedUrl"
+                    ]
                   }
                 }
               }
@@ -168,15 +188,21 @@
                             "const": true
                           }
                         },
-                        "required": ["snapshot"]
+                        "required": [
+                          "snapshot"
+                        ]
                       }
                     },
-                    "required": ["release"]
+                    "required": [
+                      "release"
+                    ]
                   },
                   "then": {
                     "properties": {
                       "publication": {
-                        "required": ["versionedUrl"]
+                        "required": [
+                          "versionedUrl"
+                        ]
                       }
                     }
                   }
@@ -185,9 +211,15 @@
                   "properties": {
                     "fixtures": {
                       "properties": {
-                        "positive": { "minItems": 1 },
-                        "outOfScope": { "minItems": 1 },
-                        "adversarial": { "minItems": 1 }
+                        "positive": {
+                          "minItems": 1
+                        },
+                        "outOfScope": {
+                          "minItems": 1
+                        },
+                        "adversarial": {
+                          "minItems": 1
+                        }
                       }
                     },
                     "competencyQueries": {
@@ -202,7 +234,9 @@
       },
       "else": {
         "not": {
-          "required": ["immutableRelease"]
+          "required": [
+            "immutableRelease"
+          ]
         },
         "properties": {
           "$schema": {
@@ -213,7 +247,9 @@
               "properties": {
                 "publication": {
                   "not": {
-                    "required": ["versionedUrl"]
+                    "required": [
+                      "versionedUrl"
+                    ]
                   }
                 }
               }
@@ -224,7 +260,9 @@
               "properties": {
                 "publication": {
                   "not": {
-                    "required": ["versionedUrl"]
+                    "required": [
+                      "versionedUrl"
+                    ]
                   }
                 }
               }
@@ -274,7 +312,11 @@
           "$ref": "#/$defs/version"
         },
         "status": {
-          "enum": ["development", "released", "deprecated"]
+          "enum": [
+            "development",
+            "released",
+            "deprecated"
+          ]
         },
         "versionPolicy": {
           "const": "synchronized"
@@ -291,7 +333,9 @@
                 "const": "development"
               }
             },
-            "required": ["status"]
+            "required": [
+              "status"
+            ]
           },
           "then": {
             "properties": {
@@ -306,7 +350,10 @@
     "integrity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["algorithm", "profileDigestFormat"],
+      "required": [
+        "algorithm",
+        "profileDigestFormat"
+      ],
       "properties": {
         "algorithm": {
           "const": "sha256"
@@ -319,7 +366,11 @@
     "immutableRelease": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["baseUrl", "manifestUrl", "schemaUrl"],
+      "required": [
+        "baseUrl",
+        "manifestUrl",
+        "schemaUrl"
+      ],
       "properties": {
         "baseUrl": {
           "$ref": "#/$defs/httpsUrl"
@@ -335,7 +386,11 @@
     "inventory": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["directory", "filePattern", "excluded"],
+      "required": [
+        "directory",
+        "filePattern",
+        "excluded"
+      ],
       "properties": {
         "directory": {
           "const": "static/ontology"
@@ -348,7 +403,10 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["path", "reason"],
+            "required": [
+              "path",
+              "reason"
+            ],
             "properties": {
               "path": {
                 "type": "string",
@@ -366,7 +424,11 @@
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["path", "mediaType", "sha256"],
+      "required": [
+        "path",
+        "mediaType",
+        "sha256"
+      ],
       "properties": {
         "path": {
           "type": "string",
@@ -383,7 +445,11 @@
     "publication": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["public", "persistentUrl", "distributionUrl"],
+      "required": [
+        "public",
+        "persistentUrl",
+        "distributionUrl"
+      ],
       "properties": {
         "public": {
           "const": true
@@ -396,6 +462,10 @@
         },
         "versionedUrl": {
           "$ref": "#/$defs/httpsUrl"
+        },
+        "documentationUrl": {
+          "$ref": "#/$defs/httpsUrl",
+          "description": "Human-readable documentation for this module, when it is not the suite reference index. Generated separately from the OWL docs: the SKOS vocabulary has a pyLODE page of its own. w3id HTML negotiation for the module's route resolves here."
         }
       }
     },
@@ -427,7 +497,11 @@
         "runtime": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["turtleUrl", "jsonLdUrl", "rdfXmlUrl"],
+          "required": [
+            "turtleUrl",
+            "jsonLdUrl",
+            "rdfXmlUrl"
+          ],
           "properties": {
             "turtleUrl": {
               "type": "string",
@@ -446,7 +520,9 @@
         "publication": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["persistentUrl"],
+          "required": [
+            "persistentUrl"
+          ],
           "properties": {
             "persistentUrl": {
               "$ref": "#/$defs/httpsUrl"
@@ -458,7 +534,11 @@
     "moduleRelease": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["snapshot", "export", "fullProfile"],
+      "required": [
+        "snapshot",
+        "export",
+        "fullProfile"
+      ],
       "properties": {
         "snapshot": {
           "type": "boolean"
@@ -474,7 +554,10 @@
     "profileRelease": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["snapshot", "export"],
+      "required": [
+        "snapshot",
+        "export"
+      ],
       "properties": {
         "snapshot": {
           "type": "boolean"
@@ -537,7 +620,10 @@
         "runtime": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["url", "graphIri"],
+          "required": [
+            "url",
+            "graphIri"
+          ],
           "properties": {
             "url": {
               "type": "string",
@@ -573,7 +659,11 @@
     "fixtures": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["positive", "outOfScope", "adversarial"],
+      "required": [
+        "positive",
+        "outOfScope",
+        "adversarial"
+      ],
       "properties": {
         "positive": {
           "$ref": "#/$defs/pathList"
@@ -629,10 +719,18 @@
           "$ref": "#/$defs/version"
         },
         "status": {
-          "enum": ["development", "released", "deprecated"]
+          "enum": [
+            "development",
+            "released",
+            "deprecated"
+          ]
         },
         "inferenceMode": {
-          "enum": ["none", "rdfs", "owl-rl"]
+          "enum": [
+            "none",
+            "rdfs",
+            "owl-rl"
+          ]
         },
         "source": {
           "$ref": "#/$defs/source"
@@ -640,7 +738,9 @@
         "runtime": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["url"],
+          "required": [
+            "url"
+          ],
           "properties": {
             "url": {
               "type": "string",
