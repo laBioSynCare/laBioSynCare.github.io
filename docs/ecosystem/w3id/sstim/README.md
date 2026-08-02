@@ -20,30 +20,29 @@ Future PRs touching `sstim/` will be authored or approved by
 
 ## Routes
 
-As of 2026-08-01, the registry and this staging directory differ. The existing
-root, `vocab`, `shapes`, `alignments`, `patch-studio`, `exposure`, `ecosystem`,
-`void`, and semantic-version snapshot routes are live at w3id.org. The manifest,
-manifest schema, profiles, newly extracted modules, Stimulus, and versioned
-manifest rules exist only in the local `.htaccess` staging copy. Their GitHub
-Pages targets are not deployed yet; a perma-id update must be submitted only
-after those targets return successfully. The root and Exposure routes are live
-but still have their pre-modular targets; the staged rules switch them to
-generated namespace catalogues.
+As of 2026-08-02, every GitHub Pages target named by this `.htaccess` is
+deployed and returns `200` — the namespace catalogues, the four profile entry
+points, all newly extracted modules, `manifest.json`, and
+`manifest.schema.json`, in Turtle, JSON-LD, and RDF/XML. The registry itself
+still carries the pre-modular rules: the root and `exposure` routes resolve to
+single files rather than generated catalogues, and the snapshot rules are
+regex wildcards. A perma-id update submitting this file is open; until it
+merges, the two differ in the registry's direction, not in missing targets.
 
 `0.12.0` remains the latest immutable release. Top-level sources are the mutable
 `0.13.0-dev` line and must not be confused with a released snapshot.
 
 | PID | Content | Registry state |
 |---|---|---|
-| `/sstim` | RDF: generated Full namespace catalogue `sstim-namespace.{ttl,jsonld,rdf}` for dereferencing `sstim:` hash terms; HTML: human documentation | Route live with the pre-modular RDF target; catalogue target staged |
-| `/sstim/kernel` | Exact small Kernel distribution `sstim-core.{ttl,jsonld,rdf}` | Staged locally; Pages deploy and perma-id update required |
-| `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Route live with the pre-modular target; catalogue target staged |
-| `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Staged locally; Pages deploy and perma-id update required |
+| `/sstim` | RDF: generated Full namespace catalogue `sstim-namespace.{ttl,jsonld,rdf}` for dereferencing `sstim:` hash terms; HTML: human documentation | Route live with the pre-modular RDF target; catalogue deployed, perma-id update open |
+| `/sstim/kernel` | Exact small Kernel distribution `sstim-core.{ttl,jsonld,rdf}` | Target deployed; perma-id update open |
+| `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Route live with the pre-modular target; catalogue deployed, perma-id update open |
+| `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Target deployed; perma-id update open |
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
-| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned `0.13.0-dev` modules | Staged locally; Pages deploy and perma-id update required |
-| `/sstim/manifest` | Authoritative JSON bill of materials | Staged locally; Pages deploy and perma-id update required |
-| `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Staged locally; Pages deploy and perma-id update required |
-| `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Staged locally; Pages deploy and perma-id update required |
+| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned `0.13.0-dev` modules | Target deployed; perma-id update open |
+| `/sstim/manifest` | Authoritative JSON bill of materials | Target deployed; perma-id update open |
+| `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Target deployed; perma-id update open |
+| `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Target deployed; perma-id update open |
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
@@ -100,6 +99,13 @@ the exact Exposure module formats, other modules, profiles, manifest, and
 schema—must be generated, deployed, and tested before the corresponding
 `.htaccess` update is submitted to perma-id. Verify the complete route ×
 `Accept` matrix and the `Vary: Accept` response header.
+
+This gate was satisfied on 2026-08-02: every target named above was confirmed
+to return `200` from `https://labiosyncare.github.io/ontology/` in Turtle,
+JSON-LD, and RDF/XML before the perma-id update was opened. The negotiation
+matrix and `Vary: Accept` can only be checked once the registry rules are
+merged, since w3id.org performs the negotiation; that verification belongs to
+the merge, not to this repository.
 
 Audited static catalog routes send RDF clients to the owning Turtle instance
 file. General live ecosystem namespace rules send RDF clients to the mutable,
