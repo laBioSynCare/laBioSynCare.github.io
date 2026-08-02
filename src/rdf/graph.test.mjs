@@ -183,4 +183,32 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
 
     expect(modality.facets).toBeUndefined()
   }, PROJECTION_TIMEOUT_MS)
+
+  it('omits anonymous class expressions, which are structure rather than terms', async () => {
+    // A union or intersection reached through rdfs:domain, rdfs:range, or
+    // owl:equivalentClass is a blank node typed owl:Class. SSTIM has 50, and
+    // ADR 0044's intact StimulusSpecification/SessionSpecification domain is
+    // one of them, so they must stay in the ontology. They must not reach the
+    // canvas: every edge query filters blank nodes, so each one arrived as an
+    // orphan labelled with an N3.js blank-node id, which the annotation panel
+    // then refused because it needs an IRI.
+    const store = await parseIntoStore(`
+      @prefix owl:  <http://www.w3.org/2002/07/owl#> .
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+      @prefix ex:   <https://example.org/t/> .
+
+      ex:Named a owl:Class ; rdfs:label "Named"@en .
+      ex:Other a owl:Class ; rdfs:label "Other"@en .
+      ex:link a owl:ObjectProperty ;
+          rdfs:domain [ a owl:Class ; owl:unionOf ( ex:Named ex:Other ) ] ;
+          rdfs:range ex:Other .
+    `, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+    const classes = elements.filter(e => e.data.kind === 'owlClass')
+
+    expect(classes.map(e => e.data.iri).sort())
+      .toEqual(['https://example.org/t/Named', 'https://example.org/t/Other'])
+    // Nothing on the canvas may carry a blank-node identifier as its id.
+    expect(elements.every(e => /^https?:/.test(e.data.id) || e.data.source)).toBe(true)
+  }, PROJECTION_TIMEOUT_MS)
 })

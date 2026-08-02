@@ -113,6 +113,14 @@ export async function buildGraphElements(store) {
   }
 
   // ── 1. OWL Classes ─────────────────────────────────────────────────────────
+  // Named classes only. An `owl:Class` subject is just as often an anonymous
+  // class expression: SSTIM has 50 of them, every one a union or intersection
+  // reached through rdfs:domain, rdfs:range, or owl:equivalentClass. They are
+  // correct and required modelling — ADR 0044's intact union domain is one —
+  // but they are structure, not vocabulary. Rendering them gave the browser 50
+  // orphan nodes labelled with N3.js blank-node ids, unreachable by every edge
+  // query (which already filter them) and rejected by the annotation panel,
+  // which needs an IRI. The subClassOf query below has always filtered them.
   const classRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
@@ -122,6 +130,7 @@ export async function buildGraphElements(store) {
         ?cls a owl:Class .
         OPTIONAL { ?cls rdfs:label ?label . FILTER(LANG(?label) = "en") }
         OPTIONAL { ?cls skos:definition ?def . FILTER(LANG(?def) = "en") }
+        FILTER(!isBlank(?cls))
       }
     }`)
 
