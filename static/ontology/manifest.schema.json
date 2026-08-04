@@ -208,22 +208,54 @@
                   }
                 },
                 {
+                  "description": "A released profile always owes a positive fixture. Out-of-scope and adversarial fixtures are verdicts of a SHACL closure, so they are owed only by a profile that selects one; a shapeless profile is a discovery entry point and must not declare them (ADR 0045).",
                   "properties": {
                     "fixtures": {
                       "properties": {
                         "positive": {
                           "minItems": 1
-                        },
-                        "outOfScope": {
-                          "minItems": 1
-                        },
-                        "adversarial": {
-                          "minItems": 1
                         }
                       }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "shapeModules": {
+                        "minItems": 1
+                      }
                     },
-                    "competencyQueries": {
-                      "minItems": 1
+                    "required": [
+                      "shapeModules"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "fixtures": {
+                        "properties": {
+                          "outOfScope": {
+                            "minItems": 1
+                          },
+                          "adversarial": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "fixtures": {
+                        "properties": {
+                          "outOfScope": {
+                            "maxItems": 0
+                          },
+                          "adversarial": {
+                            "maxItems": 0
+                          }
+                        }
+                      }
                     }
                   }
                 }
