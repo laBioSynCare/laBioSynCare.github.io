@@ -4,7 +4,7 @@
 #
 #  Namespace:  https://w3id.org/sstim/ecosystem#
 #  Module IRI: https://w3id.org/sstim/ecosystem
-#  Version:    0.13.0
+#  Version:    0.14.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -43,7 +43,7 @@
 <https://w3id.org/sstim/ecosystem> a owl:Ontology ;
     # Introduced in the 0.7.0 whole-set release (ADR 0024/0031). Modules carry
     # owl:versionInfo only; the core identifies the citable set (ADR 0020).
-    owl:versionInfo "0.13.0" ;
+    owl:versionInfo "0.14.0-dev" ;
     dct:title "SSTIM Ecosystem Module"@en ;
     dct:description "Reusable SSTIM module for the sensory-stimulation ecosystem: a neutral agent umbrella, qualified relationship and membership records, implementation responsibility, a retractable approved public projection, append-only private operational activities, and controlled relationship, purpose, and outcome vocabularies. Carries no personal data; named agents are curated implementation data."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

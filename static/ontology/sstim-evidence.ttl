@@ -2,7 +2,7 @@
 #
 #  SSTIM Evidence and Research Governance Module
 #
-#  Version:    0.13.0
+#  Version:    0.14.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/evidence> a owl:Ontology ;
-    owl:versionInfo "0.13.0" ;
+    owl:versionInfo "0.14.0-dev" ;
     dct:title "SSTIM Evidence and Research Governance Module"@en ;
     dct:description "Evidence assessments, atomic propositions, qualified bases, scope, references, searches, reviews, provenance, and public-claim governance."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

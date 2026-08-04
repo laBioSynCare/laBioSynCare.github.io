@@ -72,8 +72,12 @@ export function modelSnapshotInventory(manifest, version) {
   return { version, turtle: turtle.sort(), manifest: true, schema: true }
 }
 
-function nextVersion(current) {
-  const [major, minor] = current.replace(/-dev$/, '').split('.').map(Number)
+// A -dev line is already numbered for the release it becomes, so 0.14.0-dev
+// rehearses 0.14.0. Only a released line has to guess, and it guesses the next
+// minor -- the cadence every SSTIM release so far has followed.
+export function nextVersion(current) {
+  if (current.endsWith('-dev')) return current.replace(/-dev$/, '')
+  const [major, minor] = current.split('.').map(Number)
   return `${major}.${minor + 1}.0`
 }
 

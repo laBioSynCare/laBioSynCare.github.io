@@ -2,7 +2,7 @@
 #
 #  SSTIM Engine Configuration Module
 #
-#  Version:    0.13.0
+#  Version:    0.14.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/configuration> a owl:Ontology ;
-    owl:versionInfo "0.13.0" ;
+    owl:versionInfo "0.14.0-dev" ;
     dct:title "SSTIM Engine Configuration Module"@en ;
     dct:description "Generic engine configurations, tracks, defaults, revision links, and configuration-to-stimulus, technique, framework, and caution relations."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

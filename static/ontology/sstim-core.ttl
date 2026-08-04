@@ -3,7 +3,7 @@
 #  SSTIM Core Kernel  —  sstim-core.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.13.0
+#  Version:    0.14.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -40,19 +40,19 @@
 
 <https://w3id.org/sstim>
     a owl:Ontology, voaf:Vocabulary ;
-    # SSTIM is versioned as one synchronized set, so this is the only version
-    # IRI in the suite; concern modules carry owl:versionInfo alone (ADR 0020).
-    # It resolves to the frozen namespace catalogue for this release, not to
-    # this file: sstim-core.ttl is the two-class Kernel after ADR 0043, and a
-    # version IRI must answer with the whole release.
+    # No version IRI while under development: SSTIM is versioned as one
+    # synchronized set, and release preparation adds the whole-set version IRI
+    # https://w3id.org/sstim/<version> here — and only here (ADR 0020). It
+    # resolves to the frozen namespace catalogue, not to this file:
+    # sstim-core.ttl is the two-class Kernel after ADR 0043, and a version IRI
+    # must answer with the whole release.
     # /sstim is likewise the Full namespace catalogue, so profiles import the
     # exact Kernel retrieval endpoint https://w3id.org/sstim/kernel. That
     # endpoint need not be an ontology or version IRI of this module: an OWL 2
     # import names an ontology *document* (Structural Specification 3.4,
     # directlyImportsDocuments), not an ontology IRI.
-    owl:versionIRI <https://w3id.org/sstim/0.13.0> ;
-    owl:versionInfo "0.13.0" ;
-    owl:priorVersion <https://w3id.org/sstim/0.12.0> ;
+    owl:versionInfo "0.14.0-dev" ;
+    owl:priorVersion <https://w3id.org/sstim/0.13.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
@@ -65,17 +65,16 @@
     dct:modified "2026-08-04"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
-    # Recorded after the tag, once Zenodo minted the identifier: the 0.5.0
-    # precedent is to add these rather than guess. The frozen 0.13.0 snapshot
-    # predates the mint and legitimately lacks them; that is why the 0.8.0-0.10.0
-    # snapshots were left alone rather than back-edited when the same gap was
-    # found in the 2026-07-24 audit.
-    dct:hasVersion <https://doi.org/10.5281/zenodo.21792692> ;
-    dct:bibliographicCitation "Fabbri, R. (2026). Sensory Stimulation Ontology (SSTIM) 0.13.0. Zenodo. https://doi.org/10.5281/zenodo.21792692"@en ;
+    # dct:hasVersion / dct:bibliographicCitation intentionally omitted on the
+    # mutable line. A version DOI is minted from the tag, which is cut from the
+    # frozen snapshot, so it can never appear in the artifact it identifies;
+    # void.ttl and CITATION.cff carry it instead. Adding it here would leave the
+    # development line self-citing a release it is no longer identical to — the
+    # 0.8.0-0.10.0 defect found in the 2026-07-24 audit.
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
-    mod:status "released"@en ;
+    mod:status "under development"@en ;
     foaf:logo <https://labiosyncare.github.io/icons/icon.svg> ;
     vann:preferredNamespacePrefix "sstim" ;
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;

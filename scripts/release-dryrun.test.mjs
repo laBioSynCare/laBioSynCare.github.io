@@ -6,7 +6,11 @@ import {
   validateManifest,
 } from './sstim-manifest.mjs'
 import { generatedRegion } from './sstim-w3id-snapshot-routes.mjs'
-import { modelSnapshotInventory, prepareReleaseManifest } from './release-dryrun.mjs'
+import {
+  modelSnapshotInventory,
+  nextVersion,
+  prepareReleaseManifest,
+} from './release-dryrun.mjs'
 
 const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
 const NEXT = '9.9.0'
@@ -56,4 +60,11 @@ test('the rehearsal fails when the snapshot would freeze no whole-ontology artif
 
   expect(() => generatedRegion([inventory]))
     .toThrow('would resolve to the Kernel module instead of the released ontology')
+})
+
+test('a -dev line rehearses the release it is already numbered for', () => {
+  // 0.14.0-dev becomes 0.14.0; rehearsing 0.15.0 would skip the release the
+  // repository is actually working towards.
+  expect(nextVersion('0.14.0-dev')).toBe('0.14.0')
+  expect(nextVersion('0.13.0')).toBe('0.14.0')
 })

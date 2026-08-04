@@ -2,7 +2,7 @@
 #
 #  SSTIM Common Extension Module
 #
-#  Version:    0.13.0
+#  Version:    0.14.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/common> a owl:Ontology ;
-    owl:versionInfo "0.13.0" ;
+    owl:versionInfo "0.14.0-dev" ;
     dct:title "SSTIM Common Extension Module"@en ;
     dct:description "Optional shared descriptors used across SSTIM concerns: bands, modalities, mechanisms, temporal structure, delivery approach, cautions, and calibrated channel quantities."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
