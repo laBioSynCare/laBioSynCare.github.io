@@ -1,0 +1,53 @@
+###########################################################################
+#
+#  SSTIM Kernel Profile entrypoint
+#
+#  Version: 0.13.0
+#  Date:    2026-08-04
+#  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Low-level entrypoint for the dependency-free stimulation process anchor.
+#  Core remains the smallest recommended consumer profile.
+#
+###########################################################################
+
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prof: <http://www.w3.org/ns/dx/prof/> .
+@prefix role: <http://www.w3.org/ns/dx/prof/role/> .
+
+<https://w3id.org/sstim/profile/kernel> a owl:Ontology, prof:Profile ;
+    owl:versionIRI <https://w3id.org/sstim/0.13.0/sstim-kernel-profile.ttl> ;
+    owl:versionInfo "0.13.0" ;
+    prof:hasToken "kernel" ;
+    prof:isProfileOf <https://w3id.org/sstim> ;
+    prof:hasResource
+        <https://w3id.org/sstim/profile/kernel#entrypoint>,
+        <https://w3id.org/sstim/profile/kernel#manifest> ;
+    dct:title "SSTIM Kernel Profile"@en ;
+    dct:description "Low-level SSTIM profile containing only the dependency-free stimulation process kernel. Core is the smallest recommended profile for ordinary consumers."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim> ;
+    owl:imports
+        <https://w3id.org/sstim/0.13.0/sstim-core.ttl> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-04"^^xsd:date ;
+    dct:modified "2026-08-04"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso
+        <https://w3id.org/sstim/manifest>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md> .
+
+<https://w3id.org/sstim/profile/kernel#entrypoint> a prof:ResourceDescriptor ;
+    prof:hasRole role:specification ;
+    prof:hasArtifact <https://w3id.org/sstim/0.13.0/sstim-kernel-profile.ttl> ;
+    dct:format "text/turtle" .
+
+<https://w3id.org/sstim/profile/kernel#manifest> a prof:ResourceDescriptor ;
+    prof:hasRole role:schema ;
+    prof:hasArtifact <https://w3id.org/sstim/0.13.0/manifest> ;
+    dct:format "application/json" .

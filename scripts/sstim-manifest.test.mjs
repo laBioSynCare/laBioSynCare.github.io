@@ -19,11 +19,16 @@ import {
 test('the live SSTIM manifest is complete and internally consistent', () => {
   const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
   expect(validateManifest(manifest)).toEqual([])
-  expect(manifest.suite.version).toBe('0.13.0-dev')
-  expect(manifest.suite.status).toBe('development')
+  // Both lines are legitimate states of this file: the suite alternates
+  // between a mutable -dev line and a frozen release. Assert the invariants
+  // that hold either way rather than pinning one.
+  expect(manifest.suite.version).toMatch(/^0\.\d+\.\d+(-dev)?$/)
+  expect(['development', 'released']).toContain(manifest.suite.status)
   expect(manifest.schemaVersion).toBe('1.2.0')
   expect(manifest.modules).toHaveLength(18)
-  expect(manifest.$schema).toBe('https://w3id.org/sstim/manifest-schema/1')
+  expect(manifest.$schema).toBe(manifest.suite.status === 'released'
+    ? `https://w3id.org/sstim/${manifest.suite.version}/manifest.schema.json`
+    : 'https://w3id.org/sstim/manifest-schema/1')
   expect(manifest.namespaceDocuments.map((document) => document.id)).toEqual([
     'sstim',
     'exposure',
@@ -121,16 +126,19 @@ test('Turtle prose is never read as an axiom, and # survives in IRIs and literal
   expect(stripped).not.toContain('decoy')
 })
 
-test('no module claims a version IRI while the suite is under development (ADR 0020)', () => {
+test('only the umbrella module ever claims a version IRI (ADR 0020)', () => {
   const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
-  expect(manifest.suite.status).toBe('development')
+  const released = manifest.suite.status === 'released'
 
   for (const module of manifest.modules) {
     const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, module.source.path))
-    expect(
-      metadata.versionIris,
-      `module ${module.id} must carry owl:versionInfo only; the whole-set release adds the single core version IRI`,
-    ).toEqual([])
+    // SSTIM is versioned as one synchronized set: concern modules carry
+    // owl:versionInfo alone, and the umbrella gains a version IRI only once
+    // frozen. Neither depends on which line the repository is currently on.
+    const expected = released && module.ontologyIri === manifest.suite.ontologyIri
+      ? [`${manifest.suite.ontologyIri}/${manifest.suite.version}`]
+      : []
+    expect(metadata.versionIris, `module ${module.id}`).toEqual(expected)
   }
 })
 
@@ -146,7 +154,14 @@ test('profiles import module retrieval endpoints, which need not be ontology IRI
 
   for (const profile of manifest.profiles) {
     const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, profile.source.path))
-    const expectedImports = profile.modules.map((id) => moduleById.get(id).publication.persistentUrl)
+    // Development profiles import the mutable retrieval endpoints; a released
+    // profile imports the exact immutable siblings, so a frozen closure cannot
+    // acquire a later module revision.
+    const expectedImports = profile.modules.map((id) => (
+      manifest.suite.status === 'released'
+        ? moduleById.get(id).publication.versionedUrl
+        : moduleById.get(id).publication.persistentUrl
+    ))
     const expectedRequires = profile.modules.map((id) => moduleById.get(id).ontologyIri)
 
     expect(sameSet(metadata.imports, expectedImports)).toBe(true)
@@ -181,38 +196,59 @@ test('metadata set comparison rejects duplicate-for-missing declarations', () =>
   ])).toBe(false)
 })
 
-test('profile resource descriptors point at mutable artifacts during development', () => {
+test('profile resource descriptors track the line the suite is on', () => {
   const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
+  const isReleased = manifest.suite.status === 'released'
   for (const profile of manifest.profiles) {
     const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, profile.source.path))
     expect(metadata.resourceArtifacts.get(`${profile.iri}#entrypoint`)).toEqual([
-      profile.iri,
+      isReleased ? profile.publication.versionedUrl : profile.iri,
     ])
     expect(metadata.resourceArtifacts.get(`${profile.iri}#manifest`)).toEqual([
-      manifest.manifestIri,
+      isReleased ? manifest.immutableRelease.manifestUrl : manifest.manifestIri,
     ])
   }
 
-  const released = structuredClone(manifest)
-  released.suite.status = 'released'
-  released.immutableRelease = {
+  // A released profile whose descriptors still name mutable endpoints must be
+  // caught: that is a frozen artifact pointing at something that can change
+  // under it. Built by rewriting the descriptors rather than by reading a
+  // development manifest, so the check holds whichever line the repository is
+  // on when the suite runs.
+  const releasedManifest = structuredClone(manifest)
+  releasedManifest.suite.status = 'released'
+  releasedManifest.immutableRelease = {
     manifestUrl: 'https://w3id.org/sstim/0.13.0/manifest',
   }
-  for (const module of released.modules) {
+  for (const module of releasedManifest.modules) {
     module.publication.versionedUrl =
       `https://w3id.org/sstim/0.13.0/${module.source.path.split('/').pop()}`
   }
-  const core = released.profiles.find((profile) => profile.id === 'core')
+  const core = releasedManifest.profiles.find((profile) => profile.id === 'core')
   core.publication.versionedUrl =
     'https://w3id.org/sstim/0.13.0/sstim-core-profile.ttl'
-  const metadata = readOntologyMetadata(resolve(REPOSITORY_ROOT, core.source.path))
+  const mutableArtifacts = new Map([
+    [`${core.iri}#entrypoint`, [core.iri]],
+    [`${core.iri}#manifest`, [releasedManifest.manifestIri]],
+    [
+      `${core.iri}#constraints`,
+      core.shapeModules.map((id) => releasedManifest.modules
+        .find((module) => module.id === id).publication.persistentUrl),
+    ],
+  ])
   const problems = profileResourceArtifactProblems({
-    manifest: released,
+    manifest: releasedManifest,
     profile: core,
-    resourceArtifacts: metadata.resourceArtifacts,
+    resourceArtifacts: mutableArtifacts,
   })
   expect(problems).toHaveLength(3)
   expect(problems.every((problem) => problem.includes('immutable release'))).toBe(true)
+
+  // And the descriptors this repository actually ships are accepted.
+  const actual = readOntologyMetadata(resolve(REPOSITORY_ROOT, core.source.path))
+  expect(profileResourceArtifactProblems({
+    manifest, profile: manifest.profiles.find((p) => p.id === 'core'),
+    resourceArtifacts: actual.resourceArtifacts,
+  })).toEqual([])
 })
 
 test('unknown manifest fields and nonexistent contract files are rejected', () => {

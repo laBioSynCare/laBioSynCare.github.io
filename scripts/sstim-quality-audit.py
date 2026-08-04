@@ -232,7 +232,23 @@ if len(dataset_versions) != 1:
     fail("void.ttl: expected exactly one dcat:version")
 else:
     published_dir = ONTOLOGY_DIR / str(dataset_versions[0])
-    published_paths = sorted(published_dir.glob("sstim-*.ttl"))
+    # A modular snapshot freezes more than its modules: four profile entry
+    # points, and the generated namespace catalogues the version IRI resolves
+    # to. Globbing sstim-*.ttl would count a catalogue as a module, demand a
+    # void:subset for it, and inflate every count -- the catalogue repeats its
+    # modules' triples, and re-parsing them mints fresh blank nodes, so the 50
+    # anonymous class expressions get counted twice. VoID describes the term
+    # space, so the frozen manifest's module list is authoritative where it
+    # exists; pre-manifest snapshots keep the glob.
+    frozen_manifest = published_dir / "manifest.json"
+    if frozen_manifest.is_file():
+        frozen = json.loads(frozen_manifest.read_text(encoding="utf-8"))
+        published_paths = sorted(
+            published_dir / Path(module["source"]["path"]).name
+            for module in frozen["modules"]
+        )
+    else:
+        published_paths = sorted(published_dir.glob("sstim-*.ttl"))
     if not published_paths:
         fail(f"void.ttl: dcat:version {dataset_versions[0]} has no frozen module set")
     else:
@@ -1247,9 +1263,16 @@ else:
                 f"RewriteRule ^{version_pattern}/manifest\\.schema\\.json$ "
                 f"https://labiosyncare.github.io/ontology/{version}/manifest.schema.json [R=302,L]"
             )
+        # The bare version route resolves owl:versionIRI, so it must answer with
+        # the whole release. Through 0.12.0 sstim-core.ttl was the whole release;
+        # after ADR 0043 it is the two-class Kernel, and a modular snapshot
+        # freezes a namespace catalogue for this route to point at instead.
+        root_artifact = (
+            "sstim-namespace.ttl" if "manifest.json" in files else "sstim-core.ttl"
+        )
         expected_snapshot_directives.append(
             f"RewriteRule ^{version_pattern}/?$ "
-            f"https://labiosyncare.github.io/ontology/{version}/sstim-core.ttl [R=302,L]"
+            f"https://labiosyncare.github.io/ontology/{version}/{root_artifact} [R=302,L]"
         )
     if directive_lines(snapshot_route_block) != tuple(expected_snapshot_directives):
         fail(

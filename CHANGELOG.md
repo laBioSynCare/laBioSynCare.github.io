@@ -17,6 +17,11 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-08-04
+
+The modular release. Everything below was previously listed as unreleased; the
+architecture is now frozen, citable, and served from the persistent namespace.
+
 ### Changed
 
 - **The ontology is now a set of modules behind named profiles, not one root
@@ -66,6 +71,23 @@ file is the human-readable summary.
 - Two Full property shapes, `sstim-sh:StimulusSpecificationChannelLinkShape` and
   `sstim-sh:StimulusSpecificationTargetLinkShape`, hardening the optional
   channel and target links under inference mode `none` (ADR 0044).
+
+### Release engineering
+
+- **The version IRI resolves to the whole release, not to one file.** `make
+  snapshot` now freezes a namespace catalogue beside the modules, because
+  `sstim-core.ttl` stopped being the whole ontology when it became the Kernel.
+  The route generator refuses to emit a bare-version route for a modular
+  snapshot that lacks one.
+- **Every profile carries an executed conformance contract** — a positive
+  fixture and a SPARQL competency query, plus out-of-scope and adversarial
+  fixtures wherever a SHACL closure exists to give those categories meaning
+  ([ADR 0045](docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)).
+- **`void.ttl` describes the release it names.** The quality audit now derives
+  its module set from the frozen manifest, so a catalogue is never counted as a
+  module, and every frozen module must have a subset that distributes it.
+- **New guards** for divided `rdfs:domain`/`rdfs:range` axioms, unpublishable
+  w3id redirect targets, and Turtle prose being parsed as an axiom.
 
 ### Fixed
 

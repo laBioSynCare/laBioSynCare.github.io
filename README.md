@@ -15,11 +15,16 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-08-01:
+As of 2026-08-04:
 
-- **Latest immutable release:** SSTIM `v0.12.0`, archived at
-  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988) and
-  identified by `https://w3id.org/sstim/0.12.0`. The description-layer release
+- **Latest immutable release:** SSTIM `v0.13.0`, identified by
+  `https://w3id.org/sstim/0.13.0`. The modular release (ADR 0043, ADR 0044,
+  ADR 0045): the former catch-all root file becomes 18 manifest-owned modules
+  behind four conformance profiles — Kernel, Core, Core Plus, Full — with no
+  term added, removed, or renamed and the Full union preserving `0.12.0`
+  semantics exactly. The previous release, `v0.12.0`, is archived at
+  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988). The
+  description-layer release
   (ADR 0041, ADR 0042): separates the stimulation process, an engine-independent
   description of it, the engine configuration that produces it, and the
   execution of that configuration. Adds `sstim:StimulusSpecification` in a new
@@ -33,7 +38,7 @@ As of 2026-08-01:
   the [manifest](static/ontology/manifest.json) and explicit profile entry
   points rather than treating `sstim-core.ttl` as the whole suite.
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **`0.12.0` release graph:** eight Turtle modules, 140 named OWL classes, 50 anonymous
+- **`0.13.0` release graph:** 18 Turtle modules and four profile entry points, 140 named OWL classes, 50 anonymous
   class expressions, 245 properties, and 445 SKOS concepts in 50 concept
   schemes, plus VoID/DCAT and a JSON-LD context. These counts are checked
   against the frozen distribution by `scripts/sstim-quality-audit.py` during
@@ -333,9 +338,9 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.12.0` using
-[10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988). Its stable
-version IRI is `https://w3id.org/sstim/0.12.0`. Use the
+For the released ontology, cite SSTIM `v0.13.0`. Its stable version IRI is
+`https://w3id.org/sstim/0.13.0`; the version DOI is minted by Zenodo when the
+tag is published. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

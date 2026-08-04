@@ -60,7 +60,7 @@
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.12.0" ;
+    dcat:version "0.13.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -69,7 +69,7 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 10462 ;
+    void:triples 10734 ;
     void:classes 140 ;
     void:properties 245 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
@@ -99,22 +99,143 @@
         <https://w3id.org/sstim/vocab#alpha>,
         <https://w3id.org/sstim/exposure#ExposureProfile>,
         <https://w3id.org/sstim/ecosystem#EcosystemAgent> ;
-    void:subset <https://w3id.org/sstim/void#core>,
-        <https://w3id.org/sstim/void#vocab>,
-        <https://w3id.org/sstim/void#shapes>,
+    void:subset
         <https://w3id.org/sstim/void#alignments>,
-        <https://w3id.org/sstim/void#patch-studio>,
-        <https://w3id.org/sstim/void#stimulus>,
-        <https://w3id.org/sstim/void#exposure>,
+        <https://w3id.org/sstim/void#common>,
+        <https://w3id.org/sstim/void#configuration>,
+        <https://w3id.org/sstim/void#core>,
+        <https://w3id.org/sstim/void#core-shapes>,
         <https://w3id.org/sstim/void#ecosystem>,
+        <https://w3id.org/sstim/void#evidence>,
+        <https://w3id.org/sstim/void#evidence-exposure>,
+        <https://w3id.org/sstim/void#exposure>,
+        <https://w3id.org/sstim/void#neuromodulation>,
+        <https://w3id.org/sstim/void#neuromodulation-evidence>,
+        <https://w3id.org/sstim/void#patch-studio>,
+        <https://w3id.org/sstim/void#session>,
+        <https://w3id.org/sstim/void#shapes>,
+        <https://w3id.org/sstim/void#stimulus>,
+        <https://w3id.org/sstim/void#technique>,
+        <https://w3id.org/sstim/void#technique-exposure>,
+        <https://w3id.org/sstim/void#vocab>,
         <https://w3id.org/sstim/void#instances> ;
     # Primary distribution: the core OWL module in Turtle.
     dcat:distribution [
         a dcat:Distribution ;
-        dct:title "SSTIM core ontology (Turtle)"@en ;
+        dct:title "SSTIM namespace catalogue (Turtle)"@en ;
         dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ;
         dcat:accessURL <https://w3id.org/sstim> ;
-        dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.ttl> ] .
+        dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-namespace.ttl> ] .
+
+<https://w3id.org/sstim/void#core-shapes>
+    a void:Dataset ;
+    dct:title "SSTIM Core Profile SHACL Shapes"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-core-shapes.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/core-shapes> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/core-shapes> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core-shapes.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core-shapes.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core-shapes.rdf> ] .
+
+<https://w3id.org/sstim/void#common>
+    a void:Dataset ;
+    dct:title "SSTIM Common Extension Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-common.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/common> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/common> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-common.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-common.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-common.rdf> ] .
+
+<https://w3id.org/sstim/void#technique>
+    a void:Dataset ;
+    dct:title "SSTIM Technique, Framework, and Protocol Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-technique.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/technique> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/technique> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique.rdf> ] .
+
+<https://w3id.org/sstim/void#configuration>
+    a void:Dataset ;
+    dct:title "SSTIM Engine Configuration Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-configuration.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/configuration> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/configuration> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-configuration.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-configuration.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-configuration.rdf> ] .
+
+<https://w3id.org/sstim/void#session>
+    a void:Dataset ;
+    dct:title "SSTIM Intervention and Session Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-session.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/session> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/session> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-session.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-session.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-session.rdf> ] .
+
+<https://w3id.org/sstim/void#evidence>
+    a void:Dataset ;
+    dct:title "SSTIM Evidence and Research Governance Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-evidence.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/evidence> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/evidence> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence.rdf> ] .
+
+<https://w3id.org/sstim/void#neuromodulation>
+    a void:Dataset ;
+    dct:title "SSTIM Neuromodulation Extension Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-neuromodulation.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/neuromodulation> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/neuromodulation> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation.rdf> ] .
+
+<https://w3id.org/sstim/void#neuromodulation-evidence>
+    a void:Dataset ;
+    dct:title "SSTIM Neuromodulation–Evidence Bridge Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/neuromodulation-evidence> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/neuromodulation-evidence> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.rdf> ] .
+
+<https://w3id.org/sstim/void#evidence-exposure>
+    a void:Dataset ;
+    dct:title "SSTIM Evidence–Exposure Bridge Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-evidence-exposure.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/evidence-exposure> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/evidence-exposure> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence-exposure.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence-exposure.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-evidence-exposure.rdf> ] .
+
+<https://w3id.org/sstim/void#technique-exposure>
+    a void:Dataset ;
+    dct:title "SSTIM Technique–Exposure Bridge Module"@en ;
+    dct:description "Manifest-owned SSTIM module. See the module architecture guide for its concern, dependencies, and profile membership."@en ;
+    void:dataDump <https://labiosyncare.github.io/ontology/sstim-technique-exposure.ttl> ;
+    dcat:landingPage <https://w3id.org/sstim/technique-exposure> ;
+    dcat:distribution
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/technique-exposure> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique-exposure.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique-exposure.jsonld> ] ,
+        [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-technique-exposure.rdf> ] .
 
 ###########################################################################
 # Module subsets — one void:Dataset per published module, each with Turtle
@@ -123,12 +244,12 @@
 
 <https://w3id.org/sstim/void#core>
     a void:Dataset ;
-    dct:title "SSTIM Core ontology"@en ;
-    dct:description "OWL 2 classes, object/datatype properties, and annotation properties."@en ;
+    dct:title "SSTIM Kernel"@en ;
+    dct:description "The dependency-free process anchor: sstim:Stimulation and sstim:SensoryStimulation. Retrieved from /sstim/kernel; /sstim itself serves the namespace catalogue."@en ;
     void:dataDump <https://labiosyncare.github.io/ontology/sstim-core.ttl> ;
-    dcat:landingPage <https://w3id.org/sstim> ;
+    dcat:landingPage <https://w3id.org/sstim/kernel> ;
     dcat:distribution
-        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/kernel> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.ttl> ] ,
         [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.jsonld> ] ,
         [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-core.rdf> ] .
 
@@ -192,9 +313,9 @@
     dct:title "SSTIM Exposure & Experiment Module"@en ;
     dct:description "Separates physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     void:dataDump <https://labiosyncare.github.io/ontology/sstim-exposure.ttl> ;
-    dcat:landingPage <https://w3id.org/sstim/exposure> ;
+    dcat:landingPage <https://w3id.org/sstim/module/exposure> ;
     dcat:distribution
-        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/exposure> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.ttl> ] ,
+        [ a dcat:Distribution ; dct:title "Turtle" ; dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> ; dcat:accessURL <https://w3id.org/sstim/module/exposure> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.ttl> ] ,
         [ a dcat:Distribution ; dct:title "JSON-LD" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/ld+json> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.jsonld> ] ,
         [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://labiosyncare.github.io/ontology/sstim-exposure.rdf> ] .
 

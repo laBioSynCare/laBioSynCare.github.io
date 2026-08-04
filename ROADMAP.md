@@ -114,19 +114,17 @@ primarily with AI-assisted development.
 
 ### Repository update (July 2026)
 
-- **SSTIM:** `0.12.0` is the validated, frozen release line, archived under
-  version DOI `10.5281/zenodo.21717988`; the continuing project retains
-  concept DOI `10.5281/zenodo.21286974`.
-- **Ontology:** the eight release modules add qualified evidence governance and
-  ecosystem relationships alongside the sensory-domain vocabulary, safety
-  metadata, SHACL, OWL reasoning, and executable quality/competency checks.
-- **Development line:** `0.13.0-dev` redistributes those same 385 terms across
-  18 manifest-owned modules behind four profile entry points — Kernel, Core,
-  Core Plus, Full — so an adopter can implement a bounded contract instead of
-  the whole graph. No term was added or removed and the Full union preserves
-  `0.12.0` semantics; it is noncitable until the release blockers in
-  [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
-  are cleared.
+- **SSTIM:** `0.13.0` is the validated, frozen release line.
+  The previous release `v0.12.0` remains archived under version DOI
+  `10.5281/zenodo.21717988`, and the continuing project retains concept DOI
+  `10.5281/zenodo.21286974`.
+- **Ontology:** `0.13.0` redistributes the same 385 terms across 18
+  manifest-owned modules behind four profile entry points — Kernel, Core, Core
+  Plus, Full — so an adopter can implement a bounded contract instead of the
+  whole graph. No term was added, removed, or renamed, and the Full union
+  preserves `0.12.0` semantics exactly. Qualified evidence governance, ecosystem
+  relationships, safety metadata, SHACL, OWL reasoning, and the executable
+  quality/competency checks all carry over.
 - **Public data:** BSC Lab framework, implementation, protocols, reference
   presets, evidence, references, experiments, one synthetic session, and a
   synthetic ecosystem contract graph are public. Private catalog, real

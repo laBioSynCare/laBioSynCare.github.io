@@ -43,8 +43,9 @@ Phase tags:
 ## Current Focus (update when focus shifts)
 
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.12.0` is the validated release line (tag `v0.12.0`, version IRI
-`https://w3id.org/sstim/0.12.0`), archived under release DOI
+SSTIM `0.13.0` is the validated release line (tag `v0.13.0`, version IRI
+`https://w3id.org/sstim/0.13.0`), the modular release accepted by ADR 0043.
+The previous release `v0.12.0` remains archived under release DOI
 `10.5281/zenodo.21717988`; cite the concept DOI `10.5281/zenodo.21286974`
 across releases. The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
@@ -60,10 +61,9 @@ immediate focus is outreach (Brain Innovation Days application by
 One entrance decision stays open — whether Sensory Field remains a distinct
 on-ramp or folds into Patch Studio — and is an architecture call, not copy.
 Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
-The live ontology has advanced to the manifest-driven `0.13.0-dev` modular
-preview, but `0.12.0` remains the citable release. The new namespace catalogs,
-profile/schema routes, and incomplete per-profile contracts are staged work,
-not a published `0.13.0` claim.
+The manifest-driven modular architecture shipped as `0.13.0` on 2026-08-04:
+namespace catalogues, profile and schema routes, and a complete conformance
+contract for every profile, with the registry rules merged and verified live.
 
 **Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
 (real-time audiovisual designer, four selectable audio engines, six audio voice
@@ -272,7 +272,7 @@ Turtle files are listed in section 1. After they exist:
       compatibility profile. `static/ontology/manifest.json` is the source of
       truth for modules and closures; the Core, Core Plus, and Full profile
       entry points select semantic imports while shapes remain explicit. Frozen
-      `0.12.0` remains the latest immutable release. Normalized Full-union parity
+      `0.13.0` is the latest immutable release. Normalized Full-union parity
       preserves its semantics subject only to ADR 0044's channel clarification
       and expected metadata/ownership changes. Deferred semantic and finer
       packaging work is listed in ADR 0043 and the module architecture guide.*
