@@ -65,10 +65,13 @@
     dct:modified "2026-08-04"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     bibo:doi "10.5281/zenodo.21286974" ;
-    # dct:hasVersion / dct:bibliographicCitation intentionally omitted until
-    # Zenodo mints the 0.13.0 version DOI, which happens after the tag. The
-    # 0.5.0 precedent is to add them then rather than guess the identifier; the
-    # concept DOI above covers all versions in the meantime.
+    # Recorded after the tag, once Zenodo minted the identifier: the 0.5.0
+    # precedent is to add these rather than guess. The frozen 0.13.0 snapshot
+    # predates the mint and legitimately lacks them; that is why the 0.8.0-0.10.0
+    # snapshots were left alone rather than back-edited when the same gap was
+    # found in the 2026-07-24 audit.
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21792692> ;
+    dct:bibliographicCitation "Fabbri, R. (2026). Sensory Stimulation Ontology (SSTIM) 0.13.0. Zenodo. https://doi.org/10.5281/zenodo.21792692"@en ;
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;

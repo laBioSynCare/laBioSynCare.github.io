@@ -114,10 +114,10 @@ primarily with AI-assisted development.
 
 ### Repository update (July 2026)
 
-- **SSTIM:** `0.13.0` is the validated, frozen release line.
-  The previous release `v0.12.0` remains archived under version DOI
-  `10.5281/zenodo.21717988`, and the continuing project retains concept DOI
-  `10.5281/zenodo.21286974`.
+- **SSTIM:** `0.13.0` is the validated, frozen release line, archived under
+  version DOI `10.5281/zenodo.21792692`.
+  The previous release `v0.12.0` is archived under version DOI `10.5281/zenodo.21717988`,
+  and the continuing project retains concept DOI `10.5281/zenodo.21286974`.
 - **Ontology:** `0.13.0` redistributes the same 385 terms across 18
   manifest-owned modules behind four profile entry points — Kernel, Core, Core
   Plus, Full — so an adopter can implement a bounded contract instead of the

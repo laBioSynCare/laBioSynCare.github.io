@@ -45,9 +45,8 @@ Phase tags:
 **Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
 SSTIM `0.13.0` is the validated release line (tag `v0.13.0`, version IRI
 `https://w3id.org/sstim/0.13.0`), the modular release accepted by ADR 0043.
-The previous release `v0.12.0` remains archived under release DOI
-`10.5281/zenodo.21717988`; cite the concept DOI `10.5281/zenodo.21286974`
-across releases. The external live-only ecosystem store, loader, and
+The previous release `v0.12.0` is archived under release DOI `10.5281/zenodo.21717988`;
+cite the concept DOI `10.5281/zenodo.21286974` across releases. The external live-only ecosystem store, loader, and
 private admission ledger are operational, with Renato as the first admitted
 agent. The unified Graph navigator now exposes the interlinked versioned catalog,
 live ecosystem, and SSTIM terms. The w3id catalog + live ecosystem routes are

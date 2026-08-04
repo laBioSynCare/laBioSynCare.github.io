@@ -22,9 +22,10 @@ As of 2026-08-04:
   ADR 0045): the former catch-all root file becomes 18 manifest-owned modules
   behind four conformance profiles — Kernel, Core, Core Plus, Full — with no
   term added, removed, or renamed and the Full union preserving `0.12.0`
-  semantics exactly. The previous release, `v0.12.0`, is archived at
-  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988). The
-  description-layer release
+  semantics exactly. Archived under version DOI
+  [10.5281/zenodo.21792692](https://doi.org/10.5281/zenodo.21792692).
+- **Previous release:** SSTIM `v0.12.0`, archived at [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988).
+  The description-layer release
   (ADR 0041, ADR 0042): separates the stimulation process, an engine-independent
   description of it, the engine configuration that produces it, and the
   execution of that configuration. Adds `sstim:StimulusSpecification` in a new
@@ -339,8 +340,8 @@ or certify products.
 ## Citation And License
 
 For the released ontology, cite SSTIM `v0.13.0`. Its stable version IRI is
-`https://w3id.org/sstim/0.13.0`; the version DOI is minted by Zenodo when the
-tag is published. Use the
+`https://w3id.org/sstim/0.13.0` and its version DOI is
+[10.5281/zenodo.21792692](https://doi.org/10.5281/zenodo.21792692). Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

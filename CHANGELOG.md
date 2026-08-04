@@ -19,6 +19,9 @@ file is the human-readable summary.
 
 ## [0.13.0] - 2026-08-04
 
+Published under version DOI `10.5281/zenodo.21792692`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
+
 The modular release. Everything below was previously listed as unreleased; the
 architecture is now frozen, citable, and served from the persistent namespace.
 

@@ -55,7 +55,7 @@
     # mint a DOI for a release that has not been cut yet), and updating the
     # live core.ttl post-freeze would only diverge it from the already-frozen
     # static/ontology/0.11.0/ copy without fixing anything.
-    dct:hasVersion <https://doi.org/10.5281/zenodo.21717988> ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21792692> ;
     dct:conformsTo <https://www.w3.org/TR/owl2-overview/>,
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
