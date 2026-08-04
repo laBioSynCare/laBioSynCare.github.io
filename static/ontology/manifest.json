@@ -1,12 +1,12 @@
 {
-  "$schema": "https://w3id.org/sstim/manifest-schema/1",
+  "$schema": "https://w3id.org/sstim/0.13.0/manifest.schema.json",
   "schemaVersion": "1.2.0",
   "manifestIri": "https://w3id.org/sstim/manifest",
   "suite": {
     "id": "sstim",
     "ontologyIri": "https://w3id.org/sstim",
-    "version": "0.13.0-dev",
-    "status": "development",
+    "version": "0.13.0",
+    "status": "released",
     "versionPolicy": "synchronized",
     "defaultProfile": "full"
   },
@@ -81,11 +81,11 @@
         "core"
       ],
       "ontologyIri": "https://w3id.org/sstim",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-core.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f9018abffaa961c253a38927f6c7481091f1c831030a4f2d72943a03828a4ba2"
+        "sha256": "bee0cb92c76281f54e2e7a2f0e284806d705bc9481070257163680625911395e"
       },
       "runtime": {
         "url": "/ontology/sstim-core.ttl",
@@ -96,7 +96,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/kernel",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-core.ttl"
       },
       "release": {
         "snapshot": true,
@@ -112,11 +113,11 @@
         "core"
       ],
       "ontologyIri": "https://w3id.org/sstim/stimulus",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "02feb699a96747579b353adeddddd3c87e3d2a6f02d8f7fe514086936af7d849"
+        "sha256": "d80eaf2cc30d3ac401c10b4e8abccfc169c03922a59bc8f0797f9ba3dd7518ca"
       },
       "runtime": {
         "url": "/ontology/sstim-stimulus.ttl",
@@ -129,7 +130,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/stimulus",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-stimulus.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-stimulus.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-stimulus.ttl"
       },
       "release": {
         "snapshot": true,
@@ -145,11 +147,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/core-shapes",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-core-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "949f4bf8a594cbd8d7778ff0f5c135fb3852642572e98e2378e1735597aa92e7"
+        "sha256": "91f8a73aad3213760da3506d635f40c1be3ba3a96b41745a86772660cd701634"
       },
       "runtime": {
         "url": "/ontology/sstim-core-shapes.ttl",
@@ -163,7 +165,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/core-shapes",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-shapes.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-shapes.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-core-shapes.ttl"
       },
       "release": {
         "snapshot": true,
@@ -179,11 +182,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/common",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "658aab4bf692b1d3eef0ded3101c9fa0548fd9f0bd1576c9b2e11427d20d7ae6"
+        "sha256": "2ddd3cf943b3108334e0013dd489905c507f2d1dd5d7486fe061cfaeec64968a"
       },
       "runtime": {
         "url": "/ontology/sstim-common.ttl",
@@ -196,7 +199,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/common",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-common.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-common.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-common.ttl"
       },
       "release": {
         "snapshot": true,
@@ -211,11 +215,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/technique",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-technique.ttl",
         "mediaType": "text/turtle",
-        "sha256": "2b50a770b35626966e3998a47e4e0d8d85ced4fd5dbc9a38832d3aa16a5ed6c7"
+        "sha256": "ec41f218231bc174fc18b51c04780f6900af129f5bd1d914dfa6b90e4e543a8b"
       },
       "runtime": {
         "url": "/ontology/sstim-technique.ttl",
@@ -228,7 +232,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/technique",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-technique.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-technique.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-technique.ttl"
       },
       "release": {
         "snapshot": true,
@@ -243,11 +248,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/configuration",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d54eed8edf12faeaa555e12a482beac83b7f0139a42debc7daf6947359b8192a"
+        "sha256": "852b580cb8d0ae7d8185d1afe2f8c134d0c91eddf6453da2fab4f17af370aeaf"
       },
       "runtime": {
         "url": "/ontology/sstim-configuration.ttl",
@@ -262,7 +267,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/configuration",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-configuration.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-configuration.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-configuration.ttl"
       },
       "release": {
         "snapshot": true,
@@ -277,11 +283,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/session",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "28c5e3e407e9ad232c2a5e169367dd5d8ee7d2ba3561e1ede42910986f2d067b"
+        "sha256": "75523a393845728700fc848c4e8c5982e5e89b703f33bced34973fddbce67cef"
       },
       "runtime": {
         "url": "/ontology/sstim-session.ttl",
@@ -297,7 +303,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/session",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-session.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-session.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-session.ttl"
       },
       "release": {
         "snapshot": true,
@@ -312,11 +319,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/evidence",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "3be47e9274b350ea6be5ec6719bfcdd8897ad12414395423cc402c9051f251b2"
+        "sha256": "7796db820f17394bc9ff66d1e05674227cfb8467e866f7e4d907ffa6f51bcfdb"
       },
       "runtime": {
         "url": "/ontology/sstim-evidence.ttl",
@@ -331,7 +338,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/evidence",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-evidence.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-evidence.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-evidence.ttl"
       },
       "release": {
         "snapshot": true,
@@ -346,11 +354,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/neuromodulation",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-neuromodulation.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d4f1274954023bf4f8354566ee886a1bcc0c3d95be2a8e1f0f59469bb358f2e9"
+        "sha256": "9d465cdd9ec8ff144d3e9f1a6a85e0fe70b3a6d12125cdd5391b0e85074143e8"
       },
       "runtime": {
         "url": "/ontology/sstim-neuromodulation.ttl",
@@ -366,7 +374,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/neuromodulation",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-neuromodulation.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-neuromodulation.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-neuromodulation.ttl"
       },
       "release": {
         "snapshot": true,
@@ -382,11 +391,11 @@
         "implementation-profile"
       ],
       "ontologyIri": "https://w3id.org/sstim/patch-studio",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-patch-studio.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0019e9c3a5b7b41beee0b2acf2d44c9ddef9e71b4d2c59a548c4b185cafad3c5"
+        "sha256": "745fdeeb474b5bb898ebf665140005e8d3a630fdedded99ffa29fa6a2015c243"
       },
       "runtime": {
         "url": "/ontology/sstim-patch-studio.ttl",
@@ -400,7 +409,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/patch-studio",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-patch-studio.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-patch-studio.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-patch-studio.ttl"
       },
       "release": {
         "snapshot": true,
@@ -417,11 +427,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/vocab",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "fad7759cfb00822e4858c1d25606f9601795e29b7eee7ff66602384375a40d82"
+        "sha256": "a11c00de2e2a4ee8a6bc3e24692d4c9979b3c9161c627454928fb93853f5068c"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -440,7 +450,8 @@
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/vocab",
         "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-vocab.ttl",
-        "documentationUrl": "https://labiosyncare.github.io/ontology/docs/vocab/"
+        "documentationUrl": "https://labiosyncare.github.io/ontology/docs/vocab/",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-vocab.ttl"
       },
       "release": {
         "snapshot": true,
@@ -455,11 +466,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/exposure",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "6713602a9463338b604c9637ae3092aba9a33cc239a1c1df889d2878880de898"
+        "sha256": "2e3bb771956c9a99bd51e7c506d6137dcf703e43757bf5a58fccc8c6a8e78331"
       },
       "runtime": {
         "url": "/ontology/sstim-exposure.ttl",
@@ -477,7 +488,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/module/exposure",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-exposure.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -492,11 +504,11 @@
         "semantic"
       ],
       "ontologyIri": "https://w3id.org/sstim/ecosystem",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0eafa9d294a4b14df82a0a991f067db4d704b20ca809a942b9cb17fd0fec2036"
+        "sha256": "8f246b35291a6218be434c848bd6bbbb9c2a8a93db6d91dfcd22a05c9dfb25a3"
       },
       "runtime": {
         "url": "/ontology/sstim-ecosystem.ttl",
@@ -509,7 +521,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/ecosystem",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-ecosystem.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-ecosystem.ttl"
       },
       "release": {
         "snapshot": true,
@@ -525,11 +538,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/neuromodulation-evidence",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-neuromodulation-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "db592826c3a8a9e491b1029293b8129d46c4d1b4cd0d885b791af75d28c85237"
+        "sha256": "94050cb86cbfa76f0029658c9db249351d4c19fb1b8167081fbe8ffd1769e250"
       },
       "runtime": {
         "url": "/ontology/sstim-neuromodulation-evidence.ttl",
@@ -543,7 +556,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/neuromodulation-evidence",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-neuromodulation-evidence.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-neuromodulation-evidence.ttl"
       },
       "release": {
         "snapshot": true,
@@ -559,11 +573,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/evidence-exposure",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-evidence-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "7c67d388c7ec23a27dd4b999a71109f637cd4f68f5e893c7d1fb6322ac9547d7"
+        "sha256": "a7e0338819857c464b734488e486e4e7f597d0d00361883e3e89fcd847e9d704"
       },
       "runtime": {
         "url": "/ontology/sstim-evidence-exposure.ttl",
@@ -580,7 +594,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/evidence-exposure",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-evidence-exposure.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-evidence-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-evidence-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -596,11 +611,11 @@
         "bridge"
       ],
       "ontologyIri": "https://w3id.org/sstim/technique-exposure",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-technique-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1080a9f51578f5ab6a1bec9e0b1dcfa6328d5d918e06741257f39a1b7e963150"
+        "sha256": "c13f6c7f45168c30f81c6442f0e6aaef7f9f3d958b21b79764ebc1efd101f316"
       },
       "runtime": {
         "url": "/ontology/sstim-technique-exposure.ttl",
@@ -614,7 +629,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/technique-exposure",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-technique-exposure.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-technique-exposure.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-technique-exposure.ttl"
       },
       "release": {
         "snapshot": true,
@@ -631,11 +647,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/alignments",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "4ad1189983f24a9a68ee39b1dae4fe4de2225ff24bb8475c1dd37317fa670d40"
+        "sha256": "01d65c5f30854326f40e05b79e13fc89734752e7ab77393e48fa7e01a54476b6"
       },
       "runtime": {
         "url": "/ontology/sstim-alignments.ttl",
@@ -652,7 +668,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/alignments",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-alignments.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-alignments.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-alignments.ttl"
       },
       "release": {
         "snapshot": true,
@@ -668,11 +685,11 @@
         "support"
       ],
       "ontologyIri": "https://w3id.org/sstim/shapes",
-      "version": "0.13.0-dev",
+      "version": "0.13.0",
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d9660f7f18d27e2e329c9610b3b54056fcb4416d9082ecaf8c6ddbcaff5642fe"
+        "sha256": "5f35d72d9d82c8d3a0b2267d25d610cbb6c9530aacb969be81ae0beac8cadcb6"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -696,7 +713,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/shapes",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-shapes.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-shapes.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-shapes.ttl"
       },
       "release": {
         "snapshot": true,
@@ -710,13 +728,13 @@
       "id": "kernel",
       "title": "SSTIM Kernel Profile",
       "iri": "https://w3id.org/sstim/profile/kernel",
-      "version": "0.13.0-dev",
-      "status": "development",
+      "version": "0.13.0",
+      "status": "released",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-kernel-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "33947df28df01efad50ac37789111d4d104706d0168ded9418d4ce2462f6f6ea"
+        "sha256": "89c4edec0cf2fb8013c654b54e948ebf385d9a10e50447e0f73855fff983da2b"
       },
       "runtime": {
         "url": "/ontology/sstim-kernel-profile.ttl"
@@ -724,7 +742,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/kernel",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-kernel-profile.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-kernel-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-kernel-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -744,19 +763,19 @@
       "competencyQueries": [
         "test/competency/kernel.rq"
       ],
-      "sha256": "126aea13aa327fd857aa9349725b2365f22aa464b6d5f67d9a4a5973e6f31dc2"
+      "sha256": "57c338d7da419273044a9efeec1823c91e985878e11333f7178e5488075559e4"
     },
     {
       "id": "core",
       "title": "SSTIM Core Profile",
       "iri": "https://w3id.org/sstim/profile/core",
-      "version": "0.13.0-dev",
-      "status": "development",
+      "version": "0.13.0",
+      "status": "released",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-core-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "400a119cbfecc9486ccb4b652facbb85d2d13a2ef8a09ffb75dc743bd08a73b5"
+        "sha256": "6645c2ad94c2884d2145ac5918a9ae60ee1785dbc9c19678c9b93ccc0a70756f"
       },
       "runtime": {
         "url": "/ontology/sstim-core-profile.ttl"
@@ -764,7 +783,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/core",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-profile.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-core-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -793,19 +813,19 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "a972501a66306ae84213eea4f502448ab2b08279437d48917f893e957fba0e9b"
+      "sha256": "7c268c469062f6063c5e8638197a5818386fba573c535f1c99f9dbe714921564"
     },
     {
       "id": "core-plus",
       "title": "SSTIM Core Plus Profile",
       "iri": "https://w3id.org/sstim/profile/core-plus",
-      "version": "0.13.0-dev",
-      "status": "development",
+      "version": "0.13.0",
+      "status": "released",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-core-plus-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "4c0d2ce5a4bf9adaefaea79b73a38bc20bd023f3951e424b631ab3c82fc52ef6"
+        "sha256": "6f05901c2d3f6aecb34eb6fad82ea544afdd18cdd9b44ce0f58494e4cbc98022"
       },
       "runtime": {
         "url": "/ontology/sstim-core-plus-profile.ttl"
@@ -813,7 +833,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/core-plus",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-plus-profile.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-core-plus-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-core-plus-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -841,19 +862,19 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "18e525949fabfa14b5c50951960d4ca3650852a2b833fe7e9bfb561dc02c5d36"
+      "sha256": "245375a627e24b93b5b6a5b746fde0075f0b1dd03c9e00db347627ac8aa3ded4"
     },
     {
       "id": "full",
       "title": "SSTIM Full Profile",
       "iri": "https://w3id.org/sstim/profile/full",
-      "version": "0.13.0-dev",
-      "status": "development",
+      "version": "0.13.0",
+      "status": "released",
       "inferenceMode": "none",
       "source": {
         "path": "static/ontology/sstim-full-profile.ttl",
         "mediaType": "text/turtle",
-        "sha256": "7f1a1b8b235e74f7f0b95509eca8a4f8cdd223a36245fb60246fa56e3012693b"
+        "sha256": "6577eaf3e1f7034160e2e75991e26c7d6f5fb54a8fc17ff637c3bca00a304a35"
       },
       "runtime": {
         "url": "/ontology/sstim-full-profile.ttl"
@@ -861,7 +882,8 @@
       "publication": {
         "public": true,
         "persistentUrl": "https://w3id.org/sstim/profile/full",
-        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-full-profile.ttl"
+        "distributionUrl": "https://labiosyncare.github.io/ontology/sstim-full-profile.ttl",
+        "versionedUrl": "https://w3id.org/sstim/0.13.0/sstim-full-profile.ttl"
       },
       "release": {
         "snapshot": true,
@@ -902,7 +924,12 @@
       "competencyQueries": [
         "test/competency/full.rq"
       ],
-      "sha256": "ecd5ecb1fe05721205a514c1834e7eb7a1203d944390c502a2ca5281a3c140ba"
+      "sha256": "010f68d2527b3edcb3a6d1f89acc4d2ffb3bf258427763db10efed165428a925"
     }
-  ]
+  ],
+  "immutableRelease": {
+    "baseUrl": "https://w3id.org/sstim/0.13.0/",
+    "manifestUrl": "https://w3id.org/sstim/0.13.0/manifest",
+    "schemaUrl": "https://w3id.org/sstim/0.13.0/manifest.schema.json"
+  }
 }

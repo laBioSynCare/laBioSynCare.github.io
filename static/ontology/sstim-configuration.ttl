@@ -2,8 +2,8 @@
 #
 #  SSTIM Engine Configuration Module
 #
-#  Version:    0.13.0-dev
-#  Date:       2026-08-01
+#  Version:    0.13.0
+#  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/configuration> a owl:Ontology ;
-    owl:versionInfo "0.13.0-dev" ;
+    owl:versionInfo "0.13.0" ;
     dct:title "SSTIM Engine Configuration Module"@en ;
     dct:description "Generic engine configurations, tracks, defaults, revision links, and configuration-to-stimulus, technique, framework, and caution relations."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-08-01"^^xsd:date ;
-    dct:modified "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-04"^^xsd:date ;
+    dct:modified "2026-08-04"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
