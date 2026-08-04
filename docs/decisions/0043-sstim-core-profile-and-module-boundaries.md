@@ -386,6 +386,19 @@ queries, and the deployed persistent routes pass HTML/RDF content-negotiation
 tests, including `Vary: Accept`. Repository-local route files are necessary but
 do not demonstrate deployed negotiation.
 
+Both were satisfied by 2026-08-04, with one qualification recorded rather than
+waived. Every profile now declares fixtures and a competency query, executed
+against its own closure; ADR 0045 governs the shapeless case. The deployed
+routes were verified against w3id.org after
+[perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480) merged,
+across 19 route/`Accept` combinations, all matching the model. `Vary: Accept` is
+the qualification: no w3id.org `303` emits it, whatever the `.htaccess` asks,
+and it is therefore not achievable at this registry. The requirement existed to
+stop a shared cache serving one representation to a client that asked for
+another; those `303`s carry no cache directives and `303` is not heuristically
+cacheable under RFC 9111, so the hazard does not arise. Should SSTIM ever move
+to a host that emits it, the directive is already in place.
+
 Two consequences of demoting `sstim-core.ttl` from "the ontology" to "the
 Kernel module" are also release blockers, because artifacts that stood for the
 whole ontology still name that file:

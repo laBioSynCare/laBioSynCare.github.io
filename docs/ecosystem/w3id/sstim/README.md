@@ -20,15 +20,26 @@ Future PRs touching `sstim/` will be authored or approved by
 
 ## Routes
 
-As of 2026-08-02, every GitHub Pages target named by this `.htaccess` is
-deployed and returns `200` — the namespace catalogues, the four profile entry
-points, all newly extracted modules, `manifest.json`, and
-`manifest.schema.json`, in Turtle, JSON-LD, and RDF/XML. The registry itself
-still carries the pre-modular rules: the root and `exposure` routes resolve to
-single files rather than generated catalogues, and the snapshot rules are
-regex wildcards. [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480)
-submits this file; until it merges, the two differ in the registry's
-direction, not in missing targets.
+[perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480) merged
+on 2026-08-03, so the registry now serves these rules. Verified live on
+2026-08-04 across 19 route/`Accept` combinations: the namespace catalogues, the
+exact Kernel and Exposure module endpoints, the four profile entry points, the
+extracted modules, `manifest`, `manifest-schema/1`, and the frozen snapshots all
+resolve as modelled, in Turtle, JSON-LD, and RDF/XML. Turtle is the default for
+an absent or wildcard `Accept`; a browser reaches human documentation; `q=0`
+makes a type unacceptable without suppressing the others; and an unknown version
+or filename returns `404` rather than redirecting to a missing target.
+
+**`Vary: Accept` is not emitted, and cannot be from here.** The directive is in
+this file and mod_headers is active — `Access-Control-Allow-Origin` from the
+same block does survive — but no w3id.org `303` carries `Vary`, including
+namespaces that request it with `Header merge`. The one namespace that does emit
+it answers `200` from a different backend, so it is not a counterexample. The
+practical risk is bounded rather than accepted blindly: these `303`s carry no
+`Cache-Control`, `Expires`, `ETag`, or `Last-Modified`, and `303` is not
+heuristically cacheable under RFC 9111, so a conformant shared cache should not
+store them in the first place. The directive stays, correct if the server ever
+permits it.
 
 `0.12.0` remains the latest immutable release. Top-level sources are the mutable
 `0.13.0-dev` line and must not be confused with a released snapshot.
@@ -42,15 +53,15 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 
 | PID | Content | Registry state |
 |---|---|---|
-| `/sstim` | RDF: generated Full namespace catalogue `sstim-namespace.{ttl,jsonld,rdf}` for dereferencing `sstim:` hash terms; HTML: human documentation | Route live with the pre-modular RDF target; catalogue deployed, perma-id update open |
-| `/sstim/kernel` | Exact small Kernel distribution `sstim-core.{ttl,jsonld,rdf}` | Target deployed; perma-id update open |
-| `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Route live with the pre-modular target; catalogue deployed, perma-id update open |
-| `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Target deployed; perma-id update open |
+| `/sstim` | RDF: generated Full namespace catalogue `sstim-namespace.{ttl,jsonld,rdf}` for dereferencing `sstim:` hash terms; HTML: human documentation | Live |
+| `/sstim/kernel` | Exact small Kernel distribution `sstim-core.{ttl,jsonld,rdf}` | Live |
+| `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Live |
+| `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Live |
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
-| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned `0.13.0-dev` modules | Target deployed; perma-id update open |
-| `/sstim/manifest` | Authoritative JSON bill of materials | Target deployed; perma-id update open |
-| `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Target deployed; perma-id update open |
-| `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Target deployed; perma-id update open |
+| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned `0.13.0-dev` modules | Live |
+| `/sstim/manifest` | Authoritative JSON bill of materials | Live |
+| `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
+| `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
@@ -69,10 +80,10 @@ requests with no acceptable supported range receive `406 Not Acceptable`. The
 precedence is deterministic server ordering, not full ranking by positive `q`
 magnitude; clients that require one representation should request that media
 type alone. The manifest and schema are JSON; VoID and frozen Turtle files are
-not multi-format. `Header always set Vary "Accept"` makes every negotiated 303
-response emit `Vary: Accept`, preventing a cache from serving an HTML
-representation to an RDF client or vice versa. HTML requests go to human-facing
-documentation or the application.
+not multi-format. `Header always set Vary "Accept"` is present but does not take
+effect on w3id.org redirects; see the note above for why that is bounded rather
+than ignored. HTML requests go to human-facing documentation or the
+application.
 
 `make export` generates both namespace catalogues from the manifest:
 `sstim-namespace.{ttl,jsonld,rdf}` is the Full semantic union, while

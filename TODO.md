@@ -295,11 +295,15 @@ Turtle files are listed in section 1. After they exist:
       [ADR 0045](docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)
       it is a discovery entry point and must not declare the negative
       categories. All of it is executed against each profile's own closure by
-      `make core-profile-contract`. Pages targets for every modular route were
-      deployed and verified 200 on 2026-08-02; the registry rules are in
-      [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480).
-      `0.13.0-dev` remains noncitable until that merges and the deployed
-      negotiation matrix is checked against w3id.org itself.*
+      `make core-profile-contract`. Pages targets were deployed and verified on
+      2026-08-02;
+      [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480)
+      merged 2026-08-03 and the deployed negotiation matrix was verified against
+      w3id.org on 2026-08-04 — 19 route/`Accept` combinations, all as modelled.
+      `Vary: Accept` is not emitted by any w3id `303` and cannot be set from the
+      `.htaccess`; the responses are not cacheable, so the risk it guarded is
+      moot. Every release blocker is now cleared; `0.13.0` awaits only the
+      mechanical version/date bump, snapshot, and its own snapshot-route PR.*
 - [ ] Give the version IRI a whole-ontology artifact to resolve to `P1`
       *Until 0.12 `sstim-core.ttl` was the whole ontology, so `/sstim/<version>`
       could serve it; it is now the two-class Kernel, and a frozen snapshot has

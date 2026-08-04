@@ -383,9 +383,14 @@ solve every semantic or packaging issue. Follow-up work still includes:
   those modules, so pairing them with a module `dcat:downloadURL` would
   describe one distribution with two different documents. Nothing yet checks
   the subset inventory against the manifest;
-- deployed persistent-route verification for HTML/RDF negotiation, immutable
-  artifact and closure discovery, and the required `Vary: Accept` response for
-  the eventual `0.13.0` release; and
+- ~~deployed persistent-route verification~~ — done on 2026-08-04, after
+  [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480)
+  merged: 19 route/`Accept` combinations resolve exactly as modelled, including
+  Turtle defaulting, browser HTML, `q=0` handling, and `404` for unknown
+  versions. The `Vary: Accept` part of this gate is unobtainable rather than
+  outstanding: no w3id.org `303` emits it, the responses carry no cache
+  directives, and `303` is not heuristically cacheable under RFC 9111, so the
+  cache-poisoning risk it guarded against does not arise; and
 - independent module versions, which are deliberately deferred while SSTIM
   keeps a synchronized suite release train.
 
