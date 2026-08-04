@@ -491,6 +491,13 @@ SELECT ?person ?organization ?role ?source WHERE {
 
 SSTIM versions the manifest-owned modules as one synchronized citable set:
 
+0. Before any of this, run `make release-dryrun` — it is part of `make validate`,
+   so it should already be green. It rehearses the next release against the
+   current sources: prepares the manifest in memory, checks it against its own
+   contract and its published JSON Schema, and generates the snapshot routes the
+   release would need. Cutting `0.13.0` was blocked three times by gates that had
+   been wrong for weeks and could only be found by pretending to release; this is
+   what pretends, continuously.
 1. Develop in top-level modules with a `-dev` `owl:versionInfo`, no
    `owl:versionIRI`, and `mod:status "under development"` in the core. The
    quality audit enforces that all modules carry the same version and that a

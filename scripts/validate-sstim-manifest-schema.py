@@ -18,7 +18,13 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = ROOT / "static" / "ontology" / "manifest.json"
+# An explicit path lets the release dry-run validate a prepared manifest that is
+# not on disk yet, which is how a released-shape schema bug gets caught before a
+# release rather than during one.
+MANIFEST_PATH = (
+    Path(sys.argv[1]) if len(sys.argv) > 1
+    else ROOT / "static" / "ontology" / "manifest.json"
+)
 SCHEMA_PATH = ROOT / "static" / "ontology" / "manifest.schema.json"
 
 

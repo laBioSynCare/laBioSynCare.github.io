@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -285,8 +285,16 @@ w3id-routes:
 	node scripts/sstim-w3id-snapshot-routes.mjs --check
 	node scripts/check-w3id-route-targets.mjs
 
+## Rehearse the next release against the current sources without cutting one.
+## Cutting 0.13.0 was blocked three times by gates that had been wrong for weeks
+## and could only be found by pretending to release; nothing did that between
+## releases. Cheap half only: manifest preparation, its JSON Schema, and the
+## snapshot routes. SHACL and reasoning are covered on the live sources above.
+release-dryrun:
+	node scripts/release-dryrun.mjs
+
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots w3id-routes truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots w3id-routes release-dryrun truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -376,6 +384,7 @@ help:
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
 	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
 	@echo "  make w3id-routes      Verify w3id snapshot routes are current and every target is published"
+	@echo "  make release-dryrun   Rehearse the next release without cutting one"
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"
