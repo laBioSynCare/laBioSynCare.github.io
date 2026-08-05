@@ -161,6 +161,47 @@ export const ONTOLOGY_SOURCES = Object.freeze(Object.fromEntries(
 ))
 
 /**
+ * Module identity for every Full-profile module, in manifest order.
+ *
+ * `requires` carries the ADR 0043 §3 direct dependency edges so a consumer can
+ * expand a module selection to its declared closure. The navigator's module
+ * filter is built from this rather than from a hand-kept list: ADR 0043 §5
+ * makes the manifest the one bill of materials, and a second inventory is the
+ * thing that drifts.
+ */
+export const ONTOLOGY_MODULES = Object.freeze(fullProfileModules.map(module => Object.freeze({
+  id: module.id,
+  title: module.title,
+  roles: Object.freeze([...module.roles]),
+  graph: module.runtime.graphIri,
+  requires: Object.freeze([...module.requires]),
+})))
+
+/**
+ * Named-graph IRI → manifest module id, for attributing a term to its owning
+ * module. Every SSTIM term is declared in exactly one module, so the named
+ * graph of its declaring quad is an unambiguous owner.
+ */
+export const MODULE_ID_BY_GRAPH_IRI = Object.freeze(Object.fromEntries(
+  fullProfileModules.map(module => [module.runtime.graphIri, module.id]),
+))
+
+/**
+ * The published conformance profiles and their exact closures.
+ *
+ * `modules` is the manifest closure verbatim, including modules the navigator
+ * never loads (Core's `core-shapes`, for one). Consumers that need drawable
+ * modules intersect with ONTOLOGY_MODULES rather than expecting this list to
+ * have been pre-filtered — the profile closure is a release contract and is
+ * not the navigator's to narrow.
+ */
+export const ONTOLOGY_PROFILES = Object.freeze(ontologyManifest.profiles.map(profile => Object.freeze({
+  id: profile.id,
+  title: profile.title,
+  modules: Object.freeze([...profile.modules, ...profile.shapeModules]),
+})))
+
+/**
  * RDF instance sources. Browser builds cannot list directories, so this
  * manifest is the source of truth. Real ecosystem data is deliberately served
  * from a mutable external store and never copied into the citable repository.

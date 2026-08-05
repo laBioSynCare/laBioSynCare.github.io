@@ -2,7 +2,7 @@
 
 > Living notes on UX and UI improvements for the BSC Lab knowledge browser
 > (RDF ontology graph viewer, annotation surface, SPARQL interface).
-> Last updated: 2026-07-18. Update when ideas land or get superseded.
+> Last updated: 2026-08-04. Update when ideas land or get superseded.
 
 This is not a hard roadmap. Items are unranked except by category. Each
 entry states the *user-visible value* and a one-line implementation hint.
@@ -14,8 +14,35 @@ page (a dedicated `src/ui/sparql/` component is planned).
 
 ## Currently Implemented
 
-- **Single-row top bar** — scope selector, focus search, Center / Fit / Relayout
+- **Single-row top bar** — scope button, focus search, Center / Fit / Relayout
   actions, help (`?`) and global menu (`+`); aligned controls, ARIA-only labels.
+- **Scope axes.** The picker was one flat list of 18 entries that silently
+  served three different questions, so "Core OWL classes", "Ecosystem focus"
+  and "Frequency bands" read as mutually exclusive alternatives when they are
+  not. It is now a popover with three multi-select axes — **Layer**
+  (provenance: terms / catalog / ecosystem), **Module** (ADR 0043 ownership),
+  **Concern** (concept schemes) — plus a fourth, node type, on the left-rail
+  legend. Selections union within an axis and intersect across axes; the button
+  shows a summary and an active-filter count. All 18 legacy `?view=` tokens
+  still resolve, translated onto the new axes, because w3id.org routes
+  deep-link into this page.
+- **Module axis from the manifest.** The Module axis and its Kernel / Core /
+  Core Plus / Full profile shortcuts are generated from
+  `static/ontology/manifest.json`, never hand-listed — ADR 0043 §5 makes the
+  manifest the one bill of materials, and the picker was the last inventory not
+  derived from it. `src/rdf/navigator-contract.test.mjs` fails if they diverge.
+  "Include required modules" expands a selection to its declared dependency
+  closure. A term is attributed to its owning module by the named graph of its
+  *declaring* quad (`data.module` in `src/rdf/graph.js`); every SSTIM term is
+  declared in exactly one module, so the attribution is unambiguous, and the
+  selection panel shows it. Bridge, alignment and shape modules are dimmed —
+  they own axioms rather than terms, so their only node is the module identity.
+- **Set nodes aside.** A handful of hub nodes dominate a force layout; `x`, the
+  ⊘ button in the selection panel, or a right-click removes one from the canvas
+  without changing the scope. Set-aside nodes are listed in the left rail for
+  individual or bulk restore, and the count sits permanently in the stats panel
+  next to Nodes/Edges so a hand-pruned canvas can never be read as the ontology
+  itself. Session-only, deliberately never written to the URL.
 - **Selection panel layout** — kind tag + close on the header row, selection
   title, annotation form on top, description below the Save button, framed
   metadata block (IRI / Notation / Scheme), Connections list, saved notes.
@@ -37,8 +64,8 @@ page (a dedicated `src/ui/sparql/` component is planned).
   A slider in the left rail lets the user pick anywhere from 0 (instant) to
   800 ms; the value persists to `localStorage`.
 - **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
-  close · `c` center · `f` fit · `r` relayout · `h` / `?` help. Discoverable
-  from the help dialog and tooltips.
+  close · `c` center · `x` set aside · `f` fit · `r` relayout · `h` / `?` help.
+  Discoverable from the help dialog and tooltips.
 - **Connections grouping & filter pills** — neighbors split into Outgoing /
   Incoming subsections; a row of color-coded pills above the list toggles
   visibility per edge kind, and the count in the header reflects the active
@@ -145,7 +172,9 @@ confirmation.
 - **Find by IRI.** Paste an IRI to jump straight to the node.
 - **Layer presets.** Save the current edge/node-toggle combination + scope as a
   named preset (e.g. "Vocabulary only", "Frequency hierarchy"); restore from a
-  menu.
+  menu. The Module axis already ships the published-profile case (Kernel /
+  Core / Core Plus / Full); what is left is *user-defined* presets spanning all
+  four axes plus the edge-layer toggles.
 
 ## Annotation
 
@@ -189,9 +218,11 @@ confirmation.
 
 ## URL & Sharing
 
-- **Reflect scope and edge-layer toggles in the URL.** The selected node's IRI
-  is already in the hash; extending the URL state to include scope and visible
-  edge layers would make filter views shareable too.
+- **Reflect edge-layer toggles in the URL.** The selected node's IRI is in the
+  hash and all four scope axes are now in the query string (`?layer=`,
+  `?module=`, `?view=`, `?hide=`, each omitted at its default). The edge-layer
+  checkboxes are the remaining piece of filter state that a shared link does
+  not carry.
 - **Permalinks per node.** A "share" button next to "Copy IRI" that copies the
   full BSC Lab deep-link (`https://labiosyncare.github.io/#X`; `/graph#X` once
   the entrance ships) rather than the canonical IRI.

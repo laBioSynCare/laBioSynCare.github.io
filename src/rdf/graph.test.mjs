@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildGraphElements } from './graph.js'
-import { parseIntoStore } from './loader.js'
+import { mergeStores, parseIntoStore } from './loader.js'
 
 const GRAPH = 'https://example.org/graph/navigator-test'
 const APP = 'https://w3id.org/sstim/implementation/biosyncare'
@@ -182,6 +182,51 @@ sstim-v:techTACS a skos:Concept, sstim:NeuromodulationTechnique ;
     const modality = elements.find(e => e.data.iri === 'https://w3id.org/sstim/vocab#modalityAuditory')?.data
 
     expect(modality.facets).toBeUndefined()
+  }, PROJECTION_TIMEOUT_MS)
+
+  // ADR 0043: a term's owning module is a published fact in the manifest, and
+  // the named graph of its *declaring* quad is what carries it. The navigator's
+  // module filter reads data.module, so attribution has to come from the
+  // declaration and not from whichever graph happened to mention the term —
+  // annotating a term from a dependent module must not reassign its owner.
+  it('attributes a term to the module whose graph declares it', async () => {
+    const kernelGraph = 'https://w3id.org/sstim/graph/core'
+    const commonGraph = 'https://w3id.org/sstim/graph/common'
+
+    const kernel = await parseIntoStore(`
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim: <https://w3id.org/sstim#> .
+sstim:Stimulation a owl:Class ; rdfs:label "Stimulation"@en .
+`, 'text/turtle', kernelGraph)
+
+    // The dependent module annotates the Kernel's class and declares its own.
+    const common = await parseIntoStore(`
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sstim: <https://w3id.org/sstim#> .
+sstim:Stimulation skos:scopeNote "Annotated from a dependent module."@en .
+sstim:FrequencyBand a owl:Class ; rdfs:label "Frequency band"@en .
+`, 'text/turtle', commonGraph)
+
+    const store = mergeStores(kernel, common)
+    const elements = await buildGraphElements(store)
+
+    expect(byId(elements, 'https://w3id.org/sstim#Stimulation').module).toBe('core')
+    expect(byId(elements, 'https://w3id.org/sstim#FrequencyBand').module).toBe('common')
+  }, PROJECTION_TIMEOUT_MS)
+
+  it('leaves module unset for terms outside the released module graphs', async () => {
+    const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
+    const elements = await buildGraphElements(store)
+
+    // The fixture graph is not a manifest module, so nothing may claim an
+    // owner. Catalog and ecosystem instances never carry one in any case —
+    // they are instance data, governed by the layer axis.
+    expect(byId(elements, APP).module).toBeUndefined()
+    expect(byId(elements, PERSON).module).toBeUndefined()
+    expect(byId(elements, 'https://w3id.org/sstim#SensoryModality').module).toBeUndefined()
   }, PROJECTION_TIMEOUT_MS)
 
   it('omits anonymous class expressions, which are structure rather than terms', async () => {

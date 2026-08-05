@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { replaceState } from '$app/navigation'
   import { buildGraphElements } from '../../rdf/graph.js'
+  import { ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
@@ -18,24 +19,49 @@
   let graphStats = $state(null)
   let allElements = $state([])
 
-  // Each entry is a *perspective* on the one SSTIM knowledge graph — a filter
-  // over the same underlying triples, never a separate dataset. The `about`
-  // text is surfaced in the scope guide (the ⓘ next to the picker) so the
-  // difference between, say, "Catalog focus" and "Ecosystem focus" is
-  // discoverable without reading the ADRs.
-  const GRAPH_SCOPES = [
-    { value: 'all', label: 'Full SSTIM · ontology & vocabulary',
-      about: 'The released term space: every OWL class and SKOS concept of the SSTIM ontology and vocabulary. Catalog and ecosystem instances are excluded here so that published terms — not example data — define the shape of the graph.' },
-    { value: 'catalog-ecosystem', label: 'Catalog + ecosystem',
-      about: 'The instance layers together: versioned public reference records (frameworks, implementations, techniques, presets) alongside the live ecosystem projection of people and organizations, plus the terms they point at.' },
-    { value: 'catalog', label: 'Catalog focus · versioned',
-      about: 'Versioned public reference instances only — frameworks, implementations and their components, techniques, presets, and evidence records. Citable and frozen per release.' },
-    { value: 'ecosystem', label: 'Ecosystem focus · live',
+  // The node-type legend is generated from this list so the swatch, the count,
+  // the visibility checkbox and the spotlight target can never drift apart from
+  // the styles in styleSheet(). Declared here because the scope axes below read
+  // it when parsing filters out of the URL.
+  const NODE_KINDS = [
+    { kind: 'owlClass',              label: 'OWL class' },
+    { kind: 'skosConcept',           label: 'SKOS concept' },
+    { kind: 'xsdType',               label: 'XSD datatype' },
+    { kind: 'ontologyResource',      label: 'Ontology resource' },
+    { kind: 'catalogFramework',      label: 'Catalog framework' },
+    { kind: 'catalogImplementation', label: 'Catalog implementation' },
+    { kind: 'catalogTechnique',      label: 'Catalog technique' },
+    { kind: 'ecosystemPerson',       label: 'Live person' },
+    { kind: 'ecosystemOrganization', label: 'Live organization' },
+    { kind: 'ecosystemTarget',       label: 'Live target' },
+  ]
+
+  // ── Scope axes ─────────────────────────────────────────────────────────────
+  // Every filter below is a perspective on the one SSTIM knowledge graph — a
+  // view over the same underlying triples, never a separate dataset.
+  //
+  // These were one flat list of 18 entries, which silently served three
+  // different questions: which provenance layer, which owning module, which
+  // concern. That made "Core OWL classes", "Ecosystem focus · live" and
+  // "Frequency bands" read as mutually exclusive alternatives when they answer
+  // different things entirely. They are separate axes now. A selection **unions
+  // within an axis and intersects across axes**, so Terms + evidence module +
+  // Cautions concern means "term-layer nodes that the evidence module owns and
+  // that the caution concern covers".
+  //
+  // The `about` text is surfaced in the scope guide (the ⓘ beside the picker)
+  // so each axis is discoverable without reading the ADRs.
+
+  const GRAPH_LAYERS = [
+    { value: 'terms', label: 'Terms', layers: ['ontology', 'vocabulary'],
+      about: 'The released term space: every OWL class and SKOS concept of the SSTIM ontology and vocabulary. This is the default on its own so that published terms — not example data — define the shape of the graph.' },
+    { value: 'catalog', label: 'Catalog · versioned', layers: ['catalog'],
+      about: 'Versioned public reference instances — frameworks, implementations and their components, techniques, presets, and evidence records. Citable and frozen per release.' },
+    { value: 'ecosystem', label: 'Ecosystem · live', layers: ['ecosystem'],
       about: 'The live projection of people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
-    { value: 'core', label: 'Core OWL classes',
-      about: 'The OWL class skeleton and XSD datatypes on their own — the formal backbone of the ontology, without the SKOS vocabulary hanging off it.' },
-    { value: 'vocabulary', label: 'All SKOS vocabulary',
-      about: 'Every skos:Concept across all concept schemes, with their broader/narrower and related links. The controlled terms used to describe stimulation, without the OWL scaffolding.' },
+  ]
+
+  const GRAPH_CONCERNS = [
     { value: 'frequency', label: 'Frequency bands',
       about: 'The frequency band vocabulary — delta through gamma, their sub-bands and single-frequency targets — with the FrequencyBand classes that govern them.' },
     { value: 'modality', label: 'Sensory modalities',
@@ -60,19 +86,107 @@
       about: 'A cross-cutting view (ADR 0034/0036): neuromodulation classes, neural access routes, delivery approaches, target sites, systems and phenomena, plus every concept that asserts one of those facets.' },
   ]
 
-  // A `?view=<scope value>` query param lets a link (e.g. from w3id.org or
-  // another BSC Lab page) land directly on a specific filtered perspective,
-  // not just the default full graph. Takes priority over the saved session
-  // scope; an unrecognized/missing value falls back to the session as before.
-  function readScopeFromUrl() {
-    if (typeof window === 'undefined') return null
-    const value = new URLSearchParams(window.location.search).get('view')
-    return GRAPH_SCOPES.some((s) => s.value === value) ? value : null
+  // The module axis is generated from the ADR 0043 manifest, never hand-listed.
+  // The manifest is the one bill of materials — the loader already derives its
+  // sources from it and navigator-contract.test.mjs holds both to it — so the
+  // picker cannot drift from the modules the app actually loads. The module id
+  // is shown rather than the long title because the id is the stable
+  // identifier profiles use in `dct:requires`.
+  const GRAPH_MODULES = ONTOLOGY_MODULES.map((module) => ({
+    value: module.id,
+    label: module.id,
+    requires: module.requires,
+    roles: module.roles,
+    about: module.title,
+  }))
+  const MODULE_REQUIRES = new Map(ONTOLOGY_MODULES.map((m) => [m.id, m.requires]))
+  const DRAWABLE_MODULES = new Set(ONTOLOGY_MODULES.map((m) => m.id))
+
+  // Profile shortcuts select a whole conformance closure at once. Full is
+  // represented as *no* module constraint rather than as all sixteen ids
+  // selected: the navigator loads exactly the Full profile, so an empty module
+  // axis and a full one are the same graph, and the empty one stays honest if
+  // the profile grows. Closures are intersected with what the navigator draws
+  // — Core's `core-shapes` is a validation artifact with no drawable terms.
+  const GRAPH_PROFILES = ONTOLOGY_PROFILES.map((profile) => ({
+    value: profile.id,
+    label: profile.title.replace(/^SSTIM /, '').replace(/ Profile$/, ''),
+    modules: profile.modules.filter((id) => DRAWABLE_MODULES.has(id)),
+  }))
+
+  // Legacy `?view=` tokens are published deep-link targets (w3id.org routes
+  // resolve into this page), so every one of the original 18 keeps working.
+  // Layer and term-kind scopes translate onto their new axis; the rest are
+  // concern tokens and need no mapping.
+  const LEGACY_VIEW_TOKENS = {
+    all:                 { layers: ['terms'] },
+    'catalog-ecosystem': { layers: ['catalog', 'ecosystem'] },
+    catalog:             { layers: ['catalog'] },
+    ecosystem:           { layers: ['ecosystem'] },
+    core:                { layers: ['terms'], hiddenKinds: ['skosConcept', 'ontologyResource'] },
+    vocabulary:          { layers: ['terms'], hiddenKinds: ['owlClass', 'xsdType', 'ontologyResource'] },
   }
 
-  // 'terms' was folded into 'all' when the full view stopped showing the
-  // catalog/ecosystem instance layers; map stale sessions forward.
-  let graphScope = $state(readScopeFromUrl() ?? (graphSession.graphScope === 'terms' ? 'all' : graphSession.graphScope))
+  function readListParam(params, name, valid) {
+    const raw = params.get(name)
+    if (raw === null) return null
+    const values = raw.split(',').map((v) => v.trim()).filter((v) => valid.has(v))
+    return values.length ? values : null
+  }
+
+  // A `?layer=`/`?module=`/`?view=`/`?hide=` query string lets a link land
+  // directly on a filtered perspective. It takes priority over the saved
+  // session; anything unrecognized is dropped rather than failing the load.
+  function readFiltersFromUrl() {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    const concernValues = new Set(GRAPH_CONCERNS.map((c) => c.value))
+    const kindValues = new Set(NODE_KINDS.map((k) => k.kind))
+    const found = {}
+
+    const rawView = params.get('view')
+    if (rawView) {
+      const tokens = rawView.split(',').map((v) => v.trim()).filter(Boolean)
+      const concerns = tokens.filter((t) => concernValues.has(t))
+      if (concerns.length) found.concernFilters = concerns
+      for (const token of tokens) {
+        const legacy = LEGACY_VIEW_TOKENS[token]
+        if (!legacy) continue
+        found.layerFilters = [...new Set([...(found.layerFilters ?? []), ...legacy.layers])]
+        if (legacy.hiddenKinds) found.hiddenKinds = legacy.hiddenKinds
+      }
+    }
+
+    const layers = readListParam(params, 'layer', new Set(GRAPH_LAYERS.map((l) => l.value)))
+    if (layers) found.layerFilters = layers
+    const modules = readListParam(params, 'module', DRAWABLE_MODULES)
+    if (modules) found.moduleFilters = modules
+    const hidden = readListParam(params, 'hide', kindValues)
+    if (hidden) found.hiddenKinds = hidden
+
+    return Object.keys(found).length ? found : null
+  }
+
+  const urlFilters = readFiltersFromUrl()
+  const initialFilters = urlFilters ?? {}
+
+  // Each axis is a Set. Within an axis the members union; across axes they
+  // intersect. An empty module/concern/hiddenKinds axis imposes no constraint;
+  // the layer axis always constrains, and defaults to the term space alone.
+  let layerFilters = $state(new Set(
+    initialFilters.layerFilters ?? graphSession.layerFilters ?? ['terms']))
+  let moduleFilters = $state(new Set(
+    initialFilters.moduleFilters ?? graphSession.moduleFilters ?? []))
+  let concernFilters = $state(new Set(
+    initialFilters.concernFilters ?? graphSession.concernFilters ?? []))
+  let hiddenKinds = $state(new Set(
+    initialFilters.hiddenKinds ?? graphSession.hiddenKinds ?? []))
+  let includeModuleDependencies = $state(graphSession.includeModuleDependencies ?? true)
+
+  // Nodes the reader has set aside by hand. Session-only and never written to
+  // the URL — see graphSession.js.
+  let hiddenNodes = $state(new Set(graphSession.hiddenNodes ?? []))
+
   let focusNodeQuery = $state(graphSession.focusNodeQuery)
 
   // Layer visibility
@@ -190,30 +304,21 @@
     'https://w3id.org/sstim/vocab#CautionTagScheme':          '#ef9a9a',
   }
 
-  // The node-type legend is generated from this list so the swatch, the count
-  // and the click target can never drift apart from the styles in styleSheet().
-  const NODE_KINDS = [
-    { kind: 'owlClass',              label: 'OWL class' },
-    { kind: 'skosConcept',           label: 'SKOS concept' },
-    { kind: 'xsdType',               label: 'XSD datatype' },
-    { kind: 'ontologyResource',      label: 'Ontology resource' },
-    { kind: 'catalogFramework',      label: 'Catalog framework' },
-    { kind: 'catalogImplementation', label: 'Catalog implementation' },
-    { kind: 'catalogTechnique',      label: 'Catalog technique' },
-    { kind: 'ecosystemPerson',       label: 'Live person' },
-    { kind: 'ecosystemOrganization', label: 'Live organization' },
-    { kind: 'ecosystemTarget',       label: 'Live target' },
-  ]
-
   // Clicking a legend row spotlights that node type (or concept scheme):
   // matching nodes keep full strength, everything else recedes. null = off.
   let typeHighlight = $state(null)   // { mode: 'kind' | 'scheme', value }
   let sourceGuideOpen = $state(false)
 
-  // Thematic scope → the concept schemes it shows. graph.js renders every
+  // Concern → the concept schemes it shows. graph.js renders every
   // skos:Concept in the store (vocab + exposure) tagged with its scheme IRI,
-  // so filtering by scheme gives per-domain views. 'all'/'core'/'vocabulary'
-  // are handled directly in graphScopeNodeVisible.
+  // so filtering by scheme gives per-domain views.
+  //
+  // These stay scheme-based rather than module-based even though the module
+  // axis now exists: `sstim-vocab.ttl` is still the single ADR 0043 §4
+  // compatibility aggregate holding 239 of the 445 concepts, so "module =
+  // common" draws nine classes and no vocabulary at all. Until concern-specific
+  // vocabulary distributions are extracted, scheme membership is the only thing
+  // that can slice the controlled terms.
   const V_SCHEME = 'https://w3id.org/sstim/vocab#'
   const EX_SCHEME = 'https://w3id.org/sstim/exposure#'
   const SCOPE_SCHEMES = {
@@ -521,27 +626,61 @@
     ]
   }
 
-  function graphScopeNodeVisible(data) {
-    if (!data) return false
-    // The full SSTIM view is the released term space only; catalog and
-    // ecosystem instances (a framework, an implementation, a person) would
-    // otherwise gain unearned centrality. They live in the instance scopes.
-    if (graphScope === 'all') return ['ontology', 'vocabulary'].includes(data.layer)
-    if (graphScope === 'catalog-ecosystem') return ['catalog', 'ecosystem'].includes(data.layer)
-    if (graphScope === 'catalog') return data.layer === 'catalog'
-    if (graphScope === 'ecosystem') return data.layer === 'ecosystem'
-    if (graphScope === 'core') return ['owlClass', 'xsdType'].includes(data.kind)
-    if (graphScope === 'vocabulary') return data.kind === 'skosConcept'
-    const schemes = SCOPE_SCHEMES[graphScope]
-    const classes = SCOPE_CLASSES[graphScope]
-    const facets  = SCOPE_FACETS[graphScope]
-    if (!schemes && !classes && !facets) return true
+  // The selected modules plus, when the closure toggle is on, everything they
+  // transitively require. Selecting `evidence` alone draws a graph whose ranges
+  // dangle into modules that are not there; its ADR 0043 closure is the unit
+  // that actually stands up on its own.
+  const activeModuleClosure = $derived.by(() => {
+    if (!moduleFilters.size) return null
+    const closure = new Set(moduleFilters)
+    if (!includeModuleDependencies) return closure
+    const queue = [...moduleFilters]
+    while (queue.length) {
+      for (const required of MODULE_REQUIRES.get(queue.pop()) ?? []) {
+        if (closure.has(required) || !DRAWABLE_MODULES.has(required)) continue
+        closure.add(required)
+        queue.push(required)
+      }
+    }
+    return closure
+  })
+
+  const activeLayers = $derived(new Set(
+    GRAPH_LAYERS.filter((l) => layerFilters.has(l.value)).flatMap((l) => l.layers),
+  ))
+
+  function concernMatches(concern, data) {
+    const schemes = SCOPE_SCHEMES[concern]
+    const classes = SCOPE_CLASSES[concern]
+    const facets  = SCOPE_FACETS[concern]
     if (schemes && data.kind === 'skosConcept' && schemes.includes(data.scheme)) return true
     if (classes && classes.includes(localName(data.iri))) return true
-    // A node qualifies by asserting any of the scope's facet predicates. This
-    // is what lets a perspective span classes, schemes, and tagged concepts.
+    // A node qualifies by asserting any of the concern's facet predicates.
+    // This is what lets a perspective span classes, schemes, and tagged
+    // concepts at once.
     if (facets && data.facets && facets.some((p) => data.facets[p]?.length)) return true
     return false
+  }
+
+  // The module, concern and node-type axes. Split out from the layer axis
+  // because context expansion (below) crosses layers deliberately but must
+  // still respect the axes the reader set.
+  function termAxesVisible(data) {
+    if (hiddenKinds.has(data.kind)) return false
+    // A node with no owning module — an XSD datatype, a catalog record, a live
+    // person — is not something the module axis can speak about, so it passes
+    // through rather than vanishing. Which of those appear is the layer axis's
+    // job.
+    if (activeModuleClosure && data.module && !activeModuleClosure.has(data.module)) return false
+    if (concernFilters.size && ![...concernFilters].some((c) => concernMatches(c, data))) return false
+    return true
+  }
+
+  function graphScopeNodeVisible(data) {
+    if (!data) return false
+    if (hiddenNodes.has(data.id)) return false
+    if (!activeLayers.has(data.layer)) return false
+    return termAxesVisible(data)
   }
 
   function edgeLayerVisible(kind) {
@@ -566,24 +705,32 @@
         .map((element) => element.data.id)
     )
 
-    // A focus layer keeps its immediate semantic targets visible. This is what
-    // lets an ecosystem-only view retain the catalog/ontology nodes each live
-    // relationship points to without recursively pulling in the whole graph.
-    const contextKinds = graphScope === 'ecosystem'
-      ? new Set(['ecosystemRelationship'])
-      : graphScope === 'catalog'
-        ? new Set(['catalogRelation', 'instanceOf'])
-        : graphScope === 'catalog-ecosystem'
-          ? new Set(['ecosystemRelationship', 'catalogRelation', 'instanceOf'])
-          : null
-    if (contextKinds) {
+    // An instance layer keeps its immediate semantic targets visible. This is
+    // what lets an ecosystem-only view retain the catalog/ontology nodes each
+    // live relationship points to without recursively pulling in the whole
+    // graph. The endpoint still has to satisfy the module, concern and
+    // node-type axes — crossing a layer boundary is not licence to ignore the
+    // filters the reader set — and a node set aside by hand stays hidden.
+    const contextKinds = new Set()
+    if (layerFilters.has('ecosystem')) contextKinds.add('ecosystemRelationship')
+    if (layerFilters.has('catalog')) {
+      contextKinds.add('catalogRelation')
+      contextKinds.add('instanceOf')
+    }
+    if (contextKinds.size) {
+      const elementById = new Map(
+        allElements.filter((e) => !e.data?.source).map((e) => [e.data.id, e.data]),
+      )
+      const admits = (id) => {
+        const data = elementById.get(id)
+        return Boolean(data) && !hiddenNodes.has(id) && termAxesVisible(data)
+      }
       for (const element of allElements) {
         const data = element.data
         if (!data?.source || !contextKinds.has(data.kind) || !edgeLayerVisible(data.kind)) continue
-        if (visibleNodeIds.has(data.source) || visibleNodeIds.has(data.target)) {
-          visibleNodeIds.add(data.source)
-          visibleNodeIds.add(data.target)
-        }
+        if (!visibleNodeIds.has(data.source) && !visibleNodeIds.has(data.target)) continue
+        if (admits(data.source)) visibleNodeIds.add(data.source)
+        if (admits(data.target)) visibleNodeIds.add(data.target)
       }
     }
 
@@ -658,6 +805,25 @@
   const visibleKindCounts = $derived(new Map(graphStats?.nodeCounts ?? []))
   const visibleSchemeCounts = $derived(new Map(graphStats?.schemeCounts ?? []))
 
+  // How many nodes each module would contribute under the *other* axes — the
+  // module axis itself is excluded, so the numbers say what picking a module
+  // adds rather than collapsing to the current selection. Modules that own no
+  // drawable term (the bridges, alignments, shapes) sit at 0, which is itself
+  // worth seeing: it is what "axiom-only module" looks like.
+  const visibleModuleCounts = $derived.by(() => {
+    const counts = new Map()
+    for (const element of allElements) {
+      const data = element.data
+      if (!data || data.source || !data.module) continue
+      if (hiddenNodes.has(data.id)) continue
+      if (!activeLayers.has(data.layer)) continue
+      if (hiddenKinds.has(data.kind)) continue
+      if (concernFilters.size && ![...concernFilters].some((c) => concernMatches(c, data))) continue
+      counts.set(data.module, (counts.get(data.module) ?? 0) + 1)
+    }
+    return counts
+  })
+
   const selectedKind = $derived(selected && !selected.source ? selected.kind : null)
   const selectedScheme = $derived(selected && !selected.source ? selected.scheme : null)
 
@@ -726,10 +892,15 @@
     return cy.elements().filter((element) => newIds.has(element.id()))
   }
 
-  // A node is a true singleton when none of its currently-visible edges connect
-  // it to anything — e.g. an XSD datatype once the data-property layer is hidden.
-  function isVisiblyIsolated(node) {
-    return node.connectedEdges().filter((edge) => edge.style('display') !== 'none').length === 0
+  // A node is a true singleton when none of the edges in the set being laid out
+  // connect it to anything — e.g. an XSD datatype once the data-property layer
+  // is hidden. Membership is tested against an explicit id set rather than the
+  // `display` style: a node on its way out is still `display: element` until its
+  // fade-out completes, so reading the style mid-transition sees the previous
+  // view. See relayoutGraph.
+  function isolatedWithin(visibleIds) {
+    return (node) =>
+      node.connectedEdges().filter((edge) => visibleIds.has(edge.id())).length === 0
   }
 
   // Among the visible elements, return the largest connected component (the
@@ -878,10 +1049,17 @@
     padding: 30,
   }
 
-  function relayoutGraph() {
+  // `elements` is the set to lay out. Callers that just changed the scope must
+  // pass the new set: applyGraphDisplay fades elements out over transitionMs and
+  // only sets `display: none` when that animation completes, so reading the
+  // style here would lay out and fit the *previous* view. Going from the full
+  // graph to a small profile closure made that unmissable — the canvas kept the
+  // old bounding box and the surviving handful of nodes were left as specks.
+  function relayoutGraph(elements = null) {
     if (!cy) return
-    const visible = cy.elements().filter((element) => element.style('display') !== 'none')
+    const visible = elements ?? cy.elements().filter((element) => element.style('display') !== 'none')
     if (!visible.nodes().length) return
+    const visibleIds = new Set(visible.map((element) => element.id()))
 
     // Choose what gets gridded vs. kept in the force layout (see strayMode).
     // strayElements carries nodes AND their internal edges (never edges to
@@ -889,7 +1067,7 @@
     // tell islands apart from true singletons.
     let core, strayElements
     if (strayMode === 'singletons') {
-      const strayNodes = visible.nodes().filter(isVisiblyIsolated)
+      const strayNodes = visible.nodes().filter(isolatedWithin(visibleIds))
       strayElements = strayNodes
       core = visible.not(strayNodes)
     } else {
@@ -937,7 +1115,12 @@
 
   function persistGraphSession() {
     saveGraphSession({
-      graphScope,
+      layerFilters: [...layerFilters],
+      moduleFilters: [...moduleFilters],
+      concernFilters: [...concernFilters],
+      hiddenKinds: [...hiddenKinds],
+      includeModuleDependencies,
+      hiddenNodes: [...hiddenNodes],
       focusNodeQuery,
       showSubClassOf,
       showObjProp,
@@ -1115,16 +1298,38 @@
     return candidates[0].data.id
   }
 
-  // A deep link may target a catalog/ecosystem instance that the current
-  // scope hides (selection would land on a display:none node); widen to the
-  // instance scope so the target is actually visible.
+  // A deep link may target a node the current filters hide — selection would
+  // otherwise land on a display:none node and appear to do nothing. w3id.org
+  // routes resolve into this page, so a deep link has to win over the saved
+  // session: widen one axis at a time, least destructive first, and only clear
+  // the reader's filters if the target is still not on screen.
   function widenScopeToShow(id) {
     const element = allElements.find((el) => !el.data?.source && el.data?.id === id)
-    if (!element || graphScopeNodeVisible(element.data)) return
-    if (['catalog', 'ecosystem'].includes(element.data.layer)) {
-      graphScope = 'catalog-ecosystem'
-      applyGraphDisplay({ animate: false })
+    if (!element) return
+    const data = element.data
+    let widened = false
+
+    if (hiddenNodes.has(id)) {
+      hiddenNodes = new Set([...hiddenNodes].filter((hidden) => hidden !== id))
+      widened = true
     }
+    if (!activeLayers.has(data.layer)) {
+      const layer = GRAPH_LAYERS.find((l) => l.layers.includes(data.layer))
+      if (layer) {
+        layerFilters = new Set([...layerFilters, layer.value])
+        widened = true
+      }
+    }
+    if (hiddenKinds.has(data.kind)) {
+      hiddenKinds = new Set([...hiddenKinds].filter((kind) => kind !== data.kind))
+      widened = true
+    }
+    if (!termAxesVisible(data)) {
+      moduleFilters = new Set()
+      concernFilters = new Set()
+      widened = true
+    }
+    if (widened) applyGraphDisplay({ animate: false })
   }
 
   function hashForIri(iri) {
@@ -1164,14 +1369,21 @@
     replaceState(url || window.location.pathname, {})
   }
 
-  // Mirrors writeHashForSelected: keeps the address bar's `view=` param in
-  // sync with the active perspective so the current filtered view — Catalog +
-  // ecosystem, Core OWL classes, Frequency bands, etc. — is itself a
-  // copyable/bookmarkable link, not just the selected node.
+  // Mirrors writeHashForSelected: keeps the address bar in sync with the active
+  // perspective so the current filtered view is itself a copyable/bookmarkable
+  // link, not just the selected node. One param per axis, each omitted at its
+  // default, so an unfiltered graph stays a bare URL. The hand-hidden node set
+  // is deliberately absent — see graphSession.js.
   function writeScopeToUrl() {
     const params = new URLSearchParams(window.location.search)
-    if (graphScope === 'all') params.delete('view')
-    else params.set('view', graphScope)
+    const axis = (name, values, isDefault) => {
+      if (isDefault) params.delete(name)
+      else params.set(name, [...values].join(','))
+    }
+    axis('layer', layerFilters, layerFilters.size === 1 && layerFilters.has('terms'))
+    axis('module', moduleFilters, moduleFilters.size === 0)
+    axis('view', concernFilters, concernFilters.size === 0)
+    axis('hide', hiddenKinds, hiddenKinds.size === 0)
     const query = params.toString()
     const url = window.location.pathname + (query ? '?' + query : '') + window.location.hash
     if (url === window.location.pathname + window.location.search + window.location.hash) return
@@ -1207,14 +1419,98 @@
   function handleScopeChange() {
     clearSelection()
     focusNodeQuery = ''
-    applyGraphDisplay()
-    relayoutGraph()
+    // Lay out and fit the set applyGraphDisplay just computed, not whatever is
+    // still on screen mid-fade.
+    relayoutGraph(applyGraphDisplay())
   }
 
-  function setGraphScope(value) {
-    graphScope = value
+  function toggleInSet(current, value) {
+    const next = new Set(current)
+    if (next.has(value)) next.delete(value)
+    else next.add(value)
+    return next
+  }
+
+  function toggleLayerFilter(value) {
+    // The layer axis is the one axis that always constrains, so emptying it
+    // would blank the canvas with no way back except a reset. Refuse the last
+    // one rather than presenting a dead state.
+    if (layerFilters.size === 1 && layerFilters.has(value)) return
+    layerFilters = toggleInSet(layerFilters, value)
     handleScopeChange()
   }
+
+  function toggleModuleFilter(value) {
+    moduleFilters = toggleInSet(moduleFilters, value)
+    handleScopeChange()
+  }
+
+  function toggleConcernFilter(value) {
+    concernFilters = toggleInSet(concernFilters, value)
+    handleScopeChange()
+  }
+
+  function toggleKindFilter(kind) {
+    hiddenKinds = toggleInSet(hiddenKinds, kind)
+    applyGraphDisplay()
+  }
+
+  function setModuleProfile(profileValue) {
+    const profile = GRAPH_PROFILES.find((p) => p.value === profileValue)
+    if (!profile) return
+    moduleFilters = profile.value === 'full' ? new Set() : new Set(profile.modules)
+    handleScopeChange()
+  }
+
+  function setIncludeModuleDependencies(value) {
+    includeModuleDependencies = value
+    handleScopeChange()
+  }
+
+  function resetScopeFilters() {
+    layerFilters = new Set(['terms'])
+    moduleFilters = new Set()
+    concernFilters = new Set()
+    hiddenKinds = new Set()
+    handleScopeChange()
+  }
+
+  // Which profile the current module selection *is*, for marking the shortcut
+  // as active. Set equality against the drawable closure, so picking the same
+  // modules by hand lights the same chip.
+  const activeProfile = $derived.by(() => {
+    const match = GRAPH_PROFILES.find((profile) => {
+      const expected = profile.value === 'full' ? [] : profile.modules
+      return expected.length === moduleFilters.size &&
+        expected.every((id) => moduleFilters.has(id))
+    })
+    return match?.value ?? null
+  })
+
+  const scopeSummary = $derived.by(() => {
+    const parts = []
+    const layers = GRAPH_LAYERS.filter((l) => layerFilters.has(l.value))
+    parts.push(layers.length === GRAPH_LAYERS.length
+      ? 'All layers'
+      : layers.map((l) => l.label.split(' · ')[0]).join(' + '))
+    if (moduleFilters.size) {
+      const profile = GRAPH_PROFILES.find((p) => p.value === activeProfile && p.value !== 'full')
+      parts.push(profile
+        ? profile.label
+        : `${moduleFilters.size} module${moduleFilters.size === 1 ? '' : 's'}`)
+    }
+    if (concernFilters.size === 1) {
+      parts.push(GRAPH_CONCERNS.find((c) => c.value === [...concernFilters][0]).label)
+    } else if (concernFilters.size > 1) {
+      parts.push(`${concernFilters.size} concerns`)
+    }
+    return parts.join(' · ')
+  })
+
+  const scopeFilterCount = $derived(
+    moduleFilters.size + concernFilters.size + hiddenKinds.size +
+    (layerFilters.size === 1 && layerFilters.has('terms') ? 0 : 1),
+  )
 
   function setFocusNodeQuery(value) {
     focusNodeQuery = value
@@ -1267,12 +1563,54 @@
     }
   }
 
+  // ── Setting nodes aside by hand ────────────────────────────────────────────
+  // A handful of hub nodes dominate a force layout and drown the structure a
+  // reader is trying to see. Hiding is a display act on top of the scope, never
+  // a change to the graph: the count stays on screen in the stats panel and the
+  // set is listed for restore, so a pruned canvas can never be mistaken for the
+  // ontology itself.
+  function hideNode(id) {
+    if (!id || hiddenNodes.has(id)) return
+    hiddenNodes = new Set([...hiddenNodes, id])
+    if (selected?.id === id) clearSelection()
+    applyGraphDisplay()
+  }
+
+  function hideSelectedNode() {
+    if (!selected || selected.source) return
+    hideNode(selected.id)
+  }
+
+  function restoreNode(id) {
+    hiddenNodes = new Set([...hiddenNodes].filter((hidden) => hidden !== id))
+    applyGraphDisplay()
+  }
+
+  function restoreAllNodes() {
+    if (!hiddenNodes.size) return
+    hiddenNodes = new Set()
+    applyGraphDisplay()
+  }
+
+  // Labels for the restore list. Read from allElements rather than stored with
+  // the id so a hidden node keeps its current label across reloads.
+  const hiddenNodeList = $derived.by(() => {
+    if (!hiddenNodes.size) return []
+    const byId = new Map(
+      allElements.filter((e) => !e.data?.source).map((e) => [e.data.id, e.data]),
+    )
+    return [...hiddenNodes]
+      .map((id) => ({ id, label: byId.get(id)?.label ?? localName(id), kind: byId.get(id)?.kind }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+  })
+
   $effect(() => {
     // re-run whenever any toggle changes
     showSubClassOf; showObjProp; showDataProp
     showNarrower; showRelated; showInstanceOf
     showCatalogRelation; showEcosystemRelationship
-    graphScope
+    layerFilters; moduleFilters; concernFilters; hiddenKinds
+    includeModuleDependencies; hiddenNodes
     applyGraphDisplay()
   })
 
@@ -1285,7 +1623,8 @@
     showSubClassOf; showObjProp; showDataProp
     showNarrower; showRelated; showInstanceOf
     showCatalogRelation; showEcosystemRelationship
-    graphScope
+    layerFilters; moduleFilters; concernFilters; hiddenKinds
+    includeModuleDependencies; hiddenNodes
     neighborhoodFocus
     neighbors = computeNeighbors(selected.id)
   })
@@ -1308,13 +1647,28 @@
   $effect(() => {
     graphNavigation.set({
       available: true,
-      scopes: GRAPH_SCOPES,
-      scope: graphScope,
+      layers: GRAPH_LAYERS,
+      modules: GRAPH_MODULES,
+      profiles: GRAPH_PROFILES,
+      concerns: GRAPH_CONCERNS,
+      layerFilters,
+      moduleFilters,
+      concernFilters,
+      includeModuleDependencies,
+      activeProfile,
+      scopeSummary,
+      scopeFilterCount,
+      moduleCounts: visibleModuleCounts,
+      toggleLayer: toggleLayerFilter,
+      toggleModule: toggleModuleFilter,
+      toggleConcern: toggleConcernFilter,
+      setProfile: setModuleProfile,
+      setIncludeModuleDependencies,
+      resetScope: resetScopeFilters,
       focusNodeQuery,
       focusNodeOptions,
       canCenter: Boolean(focusNodeQuery.trim() || selected),
       strayMode,
-      setScope: setGraphScope,
       setFocusNodeQuery,
       setStrayMode,
       center: focusNode,
@@ -1355,6 +1709,14 @@
         if (selected || focusNodeQuery.trim()) {
           event.preventDefault()
           focusNode()
+        }
+        return
+      case 'x':
+      case 'X':
+        // 'h' is the help toggle in the top bar, so hiding takes 'x'.
+        if (selected && !selected.source) {
+          event.preventDefault()
+          hideSelectedNode()
         }
         return
     }
@@ -1399,6 +1761,11 @@
       })
       cy.on('tap', (evt) => {
         if (evt.target === cy) clearSelection()
+      })
+      // Right-click sets a node aside without going through the inspector,
+      // which is how a reader clears three hub nodes in three gestures.
+      cy.on('cxttap', 'node', (evt) => {
+        hideNode(evt.target.id())
       })
 
       // Hover feedback: the element highlights and the cursor signals that it
@@ -1465,7 +1832,7 @@
   })
 
   $effect(() => {
-    graphScope
+    layerFilters; moduleFilters; concernFilters; hiddenKinds
     if (!setupReady) return
     writeScopeToUrl()
   })
@@ -1590,6 +1957,9 @@
       {/each}
     </ul>
 
+    <!-- The checkbox filters the type out of the canvas; the row itself still
+         spotlights it. This is the axis that used to be the "Core OWL classes"
+         and "All SKOS vocabulary" entries in the old flat scope list. -->
     <div class="panel-head spaced">
       <strong>Node types</strong>
       {#if typeHighlight?.mode === 'kind'}
@@ -1599,7 +1969,16 @@
     <ul class="legend-list">
       {#each NODE_KINDS as nk}
         {@const count = visibleKindCounts.get(nk.kind) ?? 0}
-        <li>
+        {@const shown = !hiddenKinds.has(nk.kind)}
+        <li class="legend-row">
+          <input
+            type="checkbox"
+            class="legend-check"
+            checked={shown}
+            aria-label="Show {nk.label} nodes"
+            title={shown ? `Hide all ${nk.label} nodes` : `Show ${nk.label} nodes`}
+            onchange={() => toggleKindFilter(nk.kind)}
+          />
           <button
             type="button"
             class="legend-btn"
@@ -1607,11 +1986,14 @@
             class:on={typeHighlight?.mode === 'kind' && typeHighlight.value === nk.kind}
             class:current={selectedKind === nk.kind}
             class:empty={count === 0}
+            class:filtered={!shown}
             disabled={count === 0}
             aria-pressed={typeHighlight?.mode === 'kind' && typeHighlight.value === nk.kind}
-            title={count === 0
-              ? `${nk.label} — none in this view`
-              : `Spotlight the ${count} ${nk.label} node${count === 1 ? '' : 's'}`}
+            title={!shown
+              ? `${nk.label} — hidden by the type filter`
+              : count === 0
+                ? `${nk.label} — none in this view`
+                : `Spotlight the ${count} ${nk.label} node${count === 1 ? '' : 's'}`}
             onclick={() => toggleTypeHighlight('kind', nk.kind)}
           >
             <span class="swatch" style="background:{COLORS[nk.kind]}"></span>
@@ -1621,6 +2003,29 @@
         </li>
       {/each}
     </ul>
+
+    {#if hiddenNodeList.length}
+      <div class="panel-head spaced">
+        <strong>Set aside</strong>
+        <button type="button" class="clear-highlight" onclick={restoreAllNodes}>restore all</button>
+      </div>
+      <ul class="hidden-list">
+        {#each hiddenNodeList as node (node.id)}
+          <li>
+            <button
+              type="button"
+              class="hidden-btn"
+              title="Restore {node.label}"
+              onclick={() => restoreNode(node.id)}
+            >
+              <span class="swatch" style="background:{COLORS[node.kind] ?? '#888'}"></span>
+              <span class="legend-label">{node.label}</span>
+              <span class="hidden-restore" aria-hidden="true">↩</span>
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
 
     <div class="panel-head spaced">
       <strong>SKOS schemes</strong>
@@ -1672,6 +2077,19 @@
           <section class="selection-panel">
             <header class="selection-header">
               <span class="kind-tag">{KIND_LABELS[selected.kind] ?? EDGE_KIND_LABELS[selected.kind] ?? selected.kind}</span>
+              {#if selected.module}
+                <span class="module-tag" title="Declared by the {selected.module} module (ADR 0043)">{selected.module}</span>
+              {/if}
+              <span class="header-spacer"></span>
+              {#if !selected.source}
+                <button
+                  type="button"
+                  class="close hide-btn"
+                  onclick={hideSelectedNode}
+                  aria-label="Set this node aside"
+                  title="Set aside — remove from the canvas without changing the scope (x)"
+                >⊘</button>
+              {/if}
               <button type="button" class="close" onclick={clearSelection} aria-label="Clear selection" title="Clear selection (Esc)">✕</button>
             </header>
             <h2 class="selection-title">{selected.recordLabel ?? selected.label}</h2>
@@ -1998,6 +2416,19 @@
                 </div>
               </dl>
 
+              <!-- Always rendered, never only when non-zero: a reader looking
+                   at a hand-pruned canvas has to be able to see that it is one. -->
+              <dl>
+                <div class:muted-stat={hiddenNodes.size === 0}>
+                  <dt>Set aside</dt>
+                  <dd>{hiddenNodes.size}</dd>
+                </div>
+                <div class:muted-stat={scopeFilterCount === 0}>
+                  <dt>Filters</dt>
+                  <dd>{scopeFilterCount}</dd>
+                </div>
+              </dl>
+
               <h4>Node types</h4>
               <ul class="stats-list">
                 {#each graphStats.nodeCounts as [kind, count]}
@@ -2298,6 +2729,56 @@
     flex-shrink: 0;
   }
   .legend-btn.empty { opacity: 0.4; cursor: default; }
+  /* Filtered out by the type checkbox — struck through rather than dimmed, so
+     it reads as "excluded by a choice" and not as "absent from the data". */
+  .legend-btn.filtered .legend-label {
+    text-decoration: line-through;
+    opacity: 0.55;
+  }
+
+  .legend-check {
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .hidden-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.35rem 0 0;
+  }
+  .hidden-list li { display: flex; }
+  .hidden-btn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 2px 4px;
+    border: var(--app-border-width) solid transparent;
+    border-radius: var(--app-radius);
+    background: transparent;
+    color: var(--app-muted);
+    font-size: inherit;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+  }
+  .hidden-btn:hover {
+    background: var(--app-surface-2);
+    border-color: var(--app-border);
+    color: var(--app-text-strong);
+  }
+  .hidden-btn .legend-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hidden-restore {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
 
   .legend-count {
     font-size: 0.58rem;
@@ -2410,10 +2891,10 @@
   .selection-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
+    gap: 0.4rem;
     margin: 0;
   }
+  .header-spacer { flex: 1; }
 
   .kind-tag {
     font-size: 0.66rem;
@@ -2421,6 +2902,18 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--pico-muted-color);
+  }
+
+  /* Which ADR 0043 module declares this term. Monospace because it is the
+     manifest id, the same token a profile's dct:requires names. */
+  .module-tag {
+    font-family: var(--app-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 0.62rem;
+    padding: 1px 5px;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    color: var(--app-muted);
+    white-space: nowrap;
   }
 
   .close {
@@ -2813,8 +3306,14 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-    margin: 0;
+    margin: 0 0 0.5rem;
   }
+  .stats dl:last-of-type { margin-bottom: 0; }
+
+  /* A zero here still occupies its tile: the point of the readout is that a
+     non-zero value is impossible to miss, which only works if the row is
+     always in the same place. */
+  .stats dl div.muted-stat { opacity: 0.55; }
 
   .stats dl div {
     padding: 0.45rem 0.5rem;

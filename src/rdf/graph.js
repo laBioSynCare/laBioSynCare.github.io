@@ -24,6 +24,7 @@
  */
 
 import { select } from './query.js'
+import { MODULE_ID_BY_GRAPH_IRI } from './loader.js'
 import { DataFactory } from 'n3'
 
 const { namedNode } = DataFactory
@@ -665,7 +666,47 @@ export async function buildGraphElements(store) {
     })
   }
 
-  // ── 12. Annotation enrichment ───────────────────────────────────────────────
+  // ── 14. Module provenance (ADR 0043) ───────────────────────────────────────
+  // Which module owns a term is a published fact — the manifest's bill of
+  // materials — not something a navigator should re-derive from IRI shape or a
+  // hand-kept list of local names. The named graph of the declaring quad *is*
+  // that owner: the loader tags each module's quads with its manifest
+  // `runtime.graphIri`, and every SSTIM term is declared in exactly one module,
+  // so the attribution is unambiguous.
+  //
+  // Read here rather than by projecting ?g out of each SELECT above: a term's
+  // label or definition may legitimately be asserted from a dependent module,
+  // and binding ?g per query would then return one row per contributing graph
+  // and pick a non-owner arbitrarily. Only the type declaration marks ownership.
+  const DECLARATION_TYPES = [
+    OWL + 'Class', OWL + 'ObjectProperty', OWL + 'DatatypeProperty',
+    OWL + 'Ontology', SKOS + 'Concept',
+  ]
+  function moduleForIri(iri) {
+    for (const type of DECLARATION_TYPES) {
+      const [declaration] = store.getQuads(
+        namedNode(iri), namedNode(RDF + 'type'), namedNode(type), null,
+      )
+      const moduleId = declaration && MODULE_ID_BY_GRAPH_IRI[declaration.graph.value]
+      if (moduleId) return moduleId
+    }
+    return ''
+  }
+  for (const node of nodes.values()) {
+    if (!node.data.iri) continue
+    const moduleId = moduleForIri(node.data.iri)
+    if (moduleId) node.data.module = moduleId
+  }
+  // Property edges carry the module that declares the property, which is not
+  // always the module of either endpoint — that is exactly what an ADR 0043
+  // bridge module is — so the inspector can name it.
+  for (const edge of edges) {
+    if (!edge.data.propIri) continue
+    const moduleId = moduleForIri(edge.data.propIri)
+    if (moduleId) edge.data.module = moduleId
+  }
+
+  // ── 15. Annotation enrichment ───────────────────────────────────────────────
   // Definitions and notes were previously read only where a section's SPARQL
   // happened to ask for them — OWL classes got skos:definition, SKOS concepts
   // got none, and scope/history/editorial notes were dropped everywhere. The

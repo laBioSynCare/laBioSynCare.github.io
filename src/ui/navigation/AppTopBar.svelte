@@ -7,16 +7,27 @@
   let searchInput = $state(null)
   let helpOpen = $state(false)
   let scopeGuideOpen = $state(false)
+  let scopeMenuOpen = $state(false)
+  let scopeGroup = $state(null)
 
   const SHORTCUTS = [
     { keys: ['/'], desc: 'Focus the search field' },
     { keys: ['Enter'], desc: 'Center on matched node (while typing in search)' },
     { keys: ['Esc'], desc: 'Clear selection · blur search · close this dialog' },
     { keys: ['c'], desc: 'Center on the current selection' },
+    { keys: ['x'], desc: 'Set the selected node aside (restore it in the left panel)' },
     { keys: ['f'], desc: 'Fit the visible graph to the viewport' },
     { keys: ['r'], desc: 'Re-run the graph layout' },
     { keys: ['h', '?'], desc: 'Toggle this help' },
   ]
+
+  // The scope panel is a popover, so it closes on an outside click or Escape.
+  // Pointerdown rather than click: a chip inside the panel re-renders the list,
+  // and a click listener would see the reused node as "outside".
+  function handleWindowPointerDown(event) {
+    if (!scopeMenuOpen || !scopeGroup) return
+    if (!scopeGroup.contains(event.target)) scopeMenuOpen = false
+  }
 
   function isTypingTarget(node) {
     if (!node) return false
@@ -39,6 +50,13 @@
       event.preventDefault()
       event.stopImmediatePropagation()
       helpOpen = false
+      return
+    }
+
+    if (event.key === 'Escape' && scopeMenuOpen) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      scopeMenuOpen = false
       return
     }
 
@@ -70,33 +88,145 @@
 
   onMount(() => {
     window.addEventListener('keydown', handleWindowKeydown)
-    return () => window.removeEventListener('keydown', handleWindowKeydown)
+    window.addEventListener('pointerdown', handleWindowPointerDown)
+    return () => {
+      window.removeEventListener('keydown', handleWindowKeydown)
+      window.removeEventListener('pointerdown', handleWindowPointerDown)
+    }
   })
 </script>
 
 <header class="app-topbar">
   <div class="topbar-main">
     {#if $graphNavigation.available}
-      <div class="scope-group">
-        <select
+      <div class="scope-group" bind:this={scopeGroup}>
+        <button
+          type="button"
           class="topbar-control scope-field"
-          aria-label="SSTIM subgraph perspective"
+          aria-label="SSTIM subgraph scope"
+          aria-expanded={scopeMenuOpen}
+          aria-haspopup="dialog"
           title="Choose which part of the SSTIM knowledge graph to show"
-          value={$graphNavigation.scope}
-          onchange={(event) => $graphNavigation.setScope(event.currentTarget.value)}
+          onclick={() => (scopeMenuOpen = !scopeMenuOpen)}
         >
-          {#each $graphNavigation.scopes as scope}
-            <option value={scope.value}>{scope.label}</option>
-          {/each}
-        </select>
+          <span class="scope-summary">{$graphNavigation.scopeSummary}</span>
+          {#if $graphNavigation.scopeFilterCount > 0}
+            <span class="scope-badge" title="{$graphNavigation.scopeFilterCount} filters active">
+              {$graphNavigation.scopeFilterCount}
+            </span>
+          {/if}
+          <span class="scope-caret" aria-hidden="true">▾</span>
+        </button>
         <button
           type="button"
           class="scope-info"
-          aria-label="About SSTIM subgraph perspectives"
+          aria-label="About SSTIM subgraph scope"
           aria-expanded={scopeGuideOpen}
-          title="What is this? — explains each SSTIM subgraph perspective"
+          title="What is this? — explains the scope axes"
           onclick={() => (scopeGuideOpen = true)}
         >ⓘ</button>
+
+        {#if scopeMenuOpen}
+          <!-- Three axes rather than one flat list: a selection unions within
+               an axis and intersects across them. -->
+          <div class="scope-panel" role="dialog" aria-label="Graph scope">
+            <section class="axis">
+              <h4>Layer <small>provenance</small></h4>
+              <div class="chips">
+                {#each $graphNavigation.layers as layer}
+                  <button
+                    type="button"
+                    class="chip"
+                    class:on={$graphNavigation.layerFilters.has(layer.value)}
+                    aria-pressed={$graphNavigation.layerFilters.has(layer.value)}
+                    title={layer.about}
+                    onclick={() => $graphNavigation.toggleLayer(layer.value)}
+                  >{layer.label}</button>
+                {/each}
+              </div>
+            </section>
+
+            <section class="axis">
+              <h4>Module <small>ADR 0043 · from the manifest</small></h4>
+              <div class="chips profiles">
+                {#each $graphNavigation.profiles as profile}
+                  <button
+                    type="button"
+                    class="chip profile"
+                    class:on={$graphNavigation.activeProfile === profile.value}
+                    aria-pressed={$graphNavigation.activeProfile === profile.value}
+                    title={profile.value === 'full'
+                      ? 'Every loaded module — no module constraint'
+                      : `Profile closure: ${profile.modules.join(', ')}`}
+                    onclick={() => $graphNavigation.setProfile(profile.value)}
+                  >{profile.label}</button>
+                {/each}
+              </div>
+              <label class="axis-toggle">
+                <input
+                  type="checkbox"
+                  checked={$graphNavigation.includeModuleDependencies}
+                  onchange={(event) =>
+                    $graphNavigation.setIncludeModuleDependencies(event.currentTarget.checked)}
+                />
+                Include required modules
+              </label>
+              <div class="chips">
+                {#each $graphNavigation.modules as module}
+                  {@const count = $graphNavigation.moduleCounts.get(module.value) ?? 0}
+                  <!-- A bridge, alignment or shape module owns axioms but no
+                       classes or concepts, so its only drawable node is its own
+                       module identity. Marked from the manifest roles rather
+                       than inferred from the count, which is never 0 for
+                       exactly that reason. -->
+                  {@const termFree = module.roles.some(
+                    (role) => ['bridge', 'alignments', 'validation'].includes(role))}
+                  <button
+                    type="button"
+                    class="chip mono"
+                    class:on={$graphNavigation.moduleFilters.has(module.value)}
+                    class:empty={termFree}
+                    aria-pressed={$graphNavigation.moduleFilters.has(module.value)}
+                    title="{module.about}{module.requires.length
+                      ? ` — requires ${module.requires.join(', ')}`
+                      : ' — no local dependencies'}{termFree
+                      ? '. Owns axioms only; its single node is the module identity.'
+                      : ''}"
+                    onclick={() => $graphNavigation.toggleModule(module.value)}
+                  >
+                    {module.label}<span class="chip-count">{count}</span>
+                  </button>
+                {/each}
+              </div>
+            </section>
+
+            <section class="axis">
+              <h4>Concern <small>concept schemes</small></h4>
+              <div class="chips">
+                {#each $graphNavigation.concerns as concern}
+                  <button
+                    type="button"
+                    class="chip"
+                    class:on={$graphNavigation.concernFilters.has(concern.value)}
+                    aria-pressed={$graphNavigation.concernFilters.has(concern.value)}
+                    title={concern.about}
+                    onclick={() => $graphNavigation.toggleConcern(concern.value)}
+                  >{concern.label}</button>
+                {/each}
+              </div>
+            </section>
+
+            <footer class="scope-panel-foot">
+              <span class="foot-hint">Node types are filtered in the left panel.</span>
+              <button
+                type="button"
+                class="chip reset"
+                disabled={$graphNavigation.scopeFilterCount === 0}
+                onclick={() => $graphNavigation.resetScope()}
+              >Reset</button>
+            </footer>
+          </div>
+        {/if}
       </div>
 
       <input
@@ -216,21 +346,63 @@
 {/if}
 
 <InfoModal
-  title="SSTIM subgraph perspectives"
-  subtitle="Every perspective is a filter over one knowledge graph — the same triples, never a separate dataset. Pick one to narrow what the canvas draws."
+  title="SSTIM subgraph scope"
+  subtitle="Every filter is a view over one knowledge graph — the same triples, never a separate dataset. Three axes narrow what the canvas draws: choices union within an axis and intersect across axes."
   open={scopeGuideOpen}
   onClose={() => (scopeGuideOpen = false)}
 >
   <dl class="scope-guide">
-    {#each $graphNavigation.scopes as scope}
-      <div class:current={scope.value === $graphNavigation.scope}>
+    <div class="axis-heading"><dt>Layer — where a node comes from</dt></div>
+    {#each $graphNavigation.layers as layer}
+      <div class:current={$graphNavigation.layerFilters.has(layer.value)}>
         <dt>
-          {scope.label}
-          {#if scope.value === $graphNavigation.scope}<span class="current-tag">showing</span>{/if}
+          {layer.label}
+          {#if $graphNavigation.layerFilters.has(layer.value)}<span class="current-tag">showing</span>{/if}
         </dt>
-        <dd>{scope.about ?? ''}</dd>
+        <dd>{layer.about}</dd>
       </div>
     {/each}
+
+    <div class="axis-heading"><dt>Module — which module declares the term</dt></div>
+    <div>
+      <dd>
+        The SSTIM suite is split into modules with declared dependencies, and
+        four conformance profiles name exact closures over them: Kernel, Core,
+        Core Plus and Full (ADR 0043). This axis is generated from the release
+        manifest, so it lists exactly the modules the app loads. A term is
+        attributed to the module that declares it — a single, unambiguous owner.
+        Nodes with no owning module, such as catalog records and live people,
+        are governed by the Layer axis instead and pass through this one.
+      </dd>
+    </div>
+    <div>
+      <dd>
+        "Include required modules" expands a selection to its declared closure.
+        A module on its own often has ranges pointing into modules that are not
+        drawn; its closure is the unit that stands up. The dimmed modules —
+        bridges, alignments and SHACL shapes — own axioms rather than classes or
+        concepts, so the only node they contribute is their own module identity.
+      </dd>
+    </div>
+
+    <div class="axis-heading"><dt>Concern — which part of the domain</dt></div>
+    {#each $graphNavigation.concerns as concern}
+      <div class:current={$graphNavigation.concernFilters.has(concern.value)}>
+        <dt>
+          {concern.label}
+          {#if $graphNavigation.concernFilters.has(concern.value)}<span class="current-tag">showing</span>{/if}
+        </dt>
+        <dd>{concern.about}</dd>
+      </div>
+    {/each}
+    <div>
+      <dd>
+        Concerns match on concept scheme, governing class and asserted facet
+        rather than on module, because the controlled vocabulary is still one
+        compatibility aggregate spanning every concern. They are the only axis
+        that can slice the SKOS terms.
+      </dd>
+    </div>
   </dl>
 </InfoModal>
 
@@ -289,8 +461,10 @@
     align-items: center;
   }
 
-  /* Scope picker + its "what is this?" affordance travel together. */
+  /* Scope picker + its "what is this?" affordance travel together. The panel
+     is absolutely positioned against this box. */
   .scope-group {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.3rem;
@@ -300,6 +474,159 @@
   .scope-group .scope-field {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: var(--app-border-width) solid var(--app-border);
+    text-align: left;
+    cursor: pointer;
+  }
+  .scope-group .scope-field:hover { border-color: var(--app-accent); }
+  .scope-field[aria-expanded='true'] {
+    border-color: var(--app-accent);
+    background: var(--app-accent-soft);
+  }
+
+  .scope-summary {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .scope-badge {
+    flex-shrink: 0;
+    min-width: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    background: var(--app-accent);
+    color: var(--app-surface);
+    font-size: 0.65rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    line-height: 1.15rem;
+  }
+
+  .scope-caret { flex-shrink: 0; font-size: 0.6rem; opacity: 0.7; }
+
+  .scope-panel {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: 40;
+    width: min(30rem, calc(100vw - 2rem));
+    max-height: min(32rem, calc(100vh - var(--app-header-height, 56px) - 2rem));
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 28%);
+  }
+
+  .axis h4 {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0 0 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-muted);
+  }
+  .axis h4 small {
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    opacity: 0.8;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+  .chips.profiles { margin-bottom: 0.45rem; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    width: auto;
+    margin: 0;
+    padding: 0.22rem 0.55rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: 999px;
+    background: var(--app-surface-2);
+    color: var(--app-text);
+    font-size: 0.72rem;
+    line-height: 1.3;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip:hover:not(:disabled) { border-color: var(--app-accent); color: var(--app-text-strong); }
+  .chip.on {
+    background: var(--app-accent-soft);
+    border-color: var(--app-accent);
+    color: var(--app-text-strong);
+    font-weight: 600;
+  }
+  .chip.mono { font-family: var(--app-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); }
+  /* A module that owns no drawable term stays clickable — the 0 is the point. */
+  .chip.empty { opacity: 0.5; }
+  .chip.profile { font-weight: 600; }
+  .chip.reset:disabled { opacity: 0.4; cursor: default; }
+
+  .chip-count {
+    font-size: 0.62rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+
+  .axis-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0 0 0.5rem;
+    font-size: 0.72rem;
+    color: var(--app-muted);
+    cursor: pointer;
+  }
+  .axis-toggle input { margin: 0; }
+
+  /* Sticky so Reset stays reachable once the axes overflow the panel — with
+     seventeen module chips they do at any realistic window height. */
+  .scope-panel-foot {
+    position: sticky;
+    bottom: -0.75rem;
+    margin: 0 -0.75rem -0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border-top: var(--app-border-width) solid var(--app-border);
+    background: var(--app-surface);
+  }
+  .foot-hint { font-size: 0.68rem; color: var(--app-muted); }
+
+  .scope-guide .axis-heading {
+    border: none;
+    background: transparent;
+    padding: 0.35rem 0 0;
+  }
+  .scope-guide .axis-heading dt {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--app-muted);
   }
 
   .scope-info {
