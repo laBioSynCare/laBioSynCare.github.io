@@ -23,7 +23,7 @@ RDF-03, RDF-12 partially fixed; RDF-04, RDF-05, RDF-17 fixed; RDF-08, RDF-09,
 RDF-13, RDF-15 partially fixed where the remainder is either a maintainer
 policy decision (ADR 0020/RDF-12) or a separate, larger modeling project — the
 full oscillation-band/stimulus-target split of RDF-08 — rather than a
-mechanical fix). See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
+mechanical fix). See [ADR 0037](../../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md),
 the "Status" note under each finding, and the checked-off Gate A/B lists for
 specifics. `make validate` and the full Vitest suite (19 files, 151 tests)
 pass with all of these changes in place. The version bumped to `0.11.0` — a
@@ -69,7 +69,7 @@ represented in the class hierarchy — **fixed** via
 `sstim:SensoryNeurostimulation` / `sstim:SensoryNeurostimulationTechnique`,
 defined as an intersection rather than a blanket subclass axiom so
 self-directed sensory-route cases correctly stay excluded (RDF-05's status).
-See [ADR 0037](../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md).
+See [ADR 0037](../../decisions/0037-self-regulation-genus-and-sensory-neurostimulation-branch.md).
 
 The right conclusion is not that the RDF is broken. It is that the syntactic
 and conformance engineering is ahead of release-integrity checks, semantic

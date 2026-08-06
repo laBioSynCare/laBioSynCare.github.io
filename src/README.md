@@ -1,17 +1,11 @@
 # src — Software Architecture
 
-> **Status.** Two things run today: the **knowledge browser** (RDF loader,
-> Cytoscape ontology graph, SPARQL route, preset browser, node annotations) and
-> the **Patch Studio** (`ui/creator/`) — a real-time audiovisual designer with
-> four selectable audio engines (see [`engines/README.md`](engines/README.md)
-> and [`../docs/technical/PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)).
-> Still planned: the `core/` orchestration layer (clock, scheduler worker,
-> orchestrator), the GPU `visual/`+`haptic/` engines, `rdf/export.js`, and JSON
-> Schemas. A dedicated `tests/` subtree is also planned — note that this does
-> **not** mean the code is untested: vitest suites live beside the source they
-> cover (`ui/creator/*.test.js`, `rdf/*.test.mjs`, `ui/field/*.test.js`) and run
-> in CI. Items below are marked **(planned)** where they do not yet exist. See
-> `ROADMAP.md` for phase definitions and
+> **Status.** Running today: the **knowledge browser** (RDF loader, Cytoscape
+> graph, SPARQL, preset browser, annotations), the **Patch Studio**
+> (`ui/creator/`) with four selectable audio engines, and the **Sensory Field**
+> (`ui/field/`), behind the public entrance at `/`. Still planned: the `core/`
+> orchestration layer, the GPU `visual/` + `haptic/` engines, `rdf/export.js`,
+> and the JSON Schemas. See `ROADMAP.md` for phase definitions and
 > [`../docs/technical/PORTABLE_DEPLOYMENT.md`](../docs/technical/PORTABLE_DEPLOYMENT.md)
 > for the deployment and portability baseline.
 
@@ -27,58 +21,32 @@ in `process()`, namespace imports — govern the entire codebase.
 
 ## Directory map
 
-```
-src/
-├── app.html                      HTML shell (pre-paint skin + a11y meta)
-│
-├── engines/
-│   └── audio/                    IAudioEngine + four implementations + factory
-│       ├── IAudioEngine.js        Interface contract
-│       ├── audioEngines.js        Registry, capability detection, persisted
-│       │                          selection, createAudioEngine() factory
-│       ├── VanillaWebAudioEngine.js   Native Web Audio nodes (default)
-│       ├── WorkletVoiceEngine.js  Shared base for the AudioWorklet engines
-│       ├── AudioWorkletEngine.js  Audio-thread DSP in JS
-│       ├── WasmAudioWorkletEngine.js  Audio-thread DSP in WASM
-│       ├── NullAudioEngine.js     Silent (clock only) — fallback
-│       └── sampleLoader.js        Decode/cache for the Sample voice
-│   ├── visual/                  IVisualEngine + PixiJS/CSS engines (planned)
-│   └── haptic/                  IHapticEngine + Vibration/Null engines (planned)
-│
-├── core/                        Orchestration layer (planned — README only):
-│   │                            MasterClock, StimulationOrchestrator,
-│   │                            SessionScheduler.worker, ProtocolRunner,
-│   │                            SessionRecorder
-│
-├── firebase/                    Optional auth + Firestore profile/annotations/patches
-│   ├── client.js  auth.js  profile.js  patches.js
-│
-├── rdf/
-│   ├── namespaces.js     All IRI prefix declarations (single source of truth)
-│   ├── loader.js         Turtle/TriG → N3.Store
-│   ├── query.js          Comunica SPARQL execution wrapper
-│   ├── graph.js          Ontology → Cytoscape graph model
-│   ├── presets.js        SPARQL-driven preset listing
-│   ├── annotations/AnnotationStore.js   Named-graph annotation CRUD
-│   └── (planned) validate.js, export.js
-│
-├── ui/
-│   ├── creator/          Patch Studio — real-time audiovisual designer
-│   │                     (PresetCreator, presetDraft, controlSignals, tempo,
-│   │                      semantic, Knob)  → docs/technical/PATCH_STUDIO.md
-│   ├── graph/            RDF ontology graph (Cytoscape.js)
-│   ├── annotation/       Annotation panel (named graphs)
-│   ├── navigation/       Top bar, bottom dock, profile control
-│   ├── theme/            Skin/palette system (skins.js)
-│   ├── safety/           Photosensitivity advisory + visual-stim policy
-│   ├── auth/             Sign-in form (Firebase)
-│   └── (planned) player/, browser/, dedicated sparql/ component
-│
-├── routes/              SvelteKit pages: / (graph), /creator, /presets,
-│   │                    /sparql, /logbook, /profile, /settings
-│
-└── data/presets/        Public BSC Lab runtime JSON presets (planned)
-```
+`ls` gives the file listing; this table gives what each directory is *for* and
+the rule it carries. Only non-obvious entries are listed.
+
+| Directory | Role |
+|---|---|
+| `engines/audio/` | `IAudioEngine` + four implementations + `audioEngines.js` (registry, capability detection, persisted selection, factory). See [`engines/README.md`](engines/README.md). |
+| `engines/visual/`, `engines/haptic/` | **Planned.** Empty; the target design is in `docs/technical/VISUAL_ENGINE_ARCHITECTURE.md`. |
+| `core/` | **Planned.** Empty. Orchestration: clock, scheduler worker, orchestrator, protocol runner, session recorder. |
+| `rdf/` | `namespaces.js` is the single source of truth for every IRI prefix — never hardcode one. Plus loader (Turtle/TriG → N3.Store), Comunica query wrapper, Cytoscape graph model, preset listing, and `annotations/` (named-graph CRUD only). |
+| `identity/` | The identity seam ([ADR 0038](../docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)): anonymous and Firebase providers behind `IdentityProvider`, with a conformance suite. |
+| `storage/` | The storage seam: local and Firestore patch stores behind `PatchStore`, likewise conformance-tested. |
+| `config/` | `runtimeConfig.js` — deployment-time `runtime-config.json`, so one built artifact serves many operators. |
+| `portability/` | Instance export/import, patch projection and links, and the session package ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)). |
+| `sync/` | `bsc-lab-private-sync-1` ([`PRIVATE_SYNC.md`](../docs/technical/PRIVATE_SYNC.md)) — reference and in-memory implementations; no networked one yet. |
+| `firebase/` | Optional auth + Firestore. Everything works without it. |
+| `ui/creator/` | Patch Studio — the real-time authoring surface. → [`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md) |
+| `ui/field/` | Sensory Field, incl. the stereoscopic scenes. → [`SENSORY_FIELD.md`](../docs/technical/SENSORY_FIELD.md) |
+| `ui/graph/`, `ui/sparql/`, `ui/annotation/` | Knowledge browser surfaces. |
+| `ui/entrance/` | The public landing: doors, conversion bar, cite/contribute modals. |
+| `ui/safety/` | Photosensitivity advisory + visual-stimulation policy. Gates all flashing output. |
+| `ui/pwa/` | Service-worker registration and the session-safe update banner. |
+| `ui/navigation/`, `ui/theme/`, `ui/auth/` | Chrome, skins, sign-in form. |
+| `routes/` | `/` entrance, `/graph`, `/creator`, `/field` (+ `/tree`, `/abstract`, `/landscape`), `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`. |
+
+Tests live beside the code they cover (`*.test.js`, `*.test.mjs`) and run under
+`make test`.
 
 ---
 
@@ -134,24 +102,25 @@ Pages remains the canonical citable copy.
 ## Shared data contract
 
 The preset JSON format (`docs/technical/PRESET_FORMAT.md`) is the interface
-between the two BSC Lab subsystems and is also coordinated with BioSynCare as a
-format contract. It is not a shared catalog contract. The private BioSynCare/BSC
-catalog stays outside this repository and is not converted to Turtle here. The
-stimulation subsystem reads public BSC Lab presets from `src/data/presets/`
-(JSON, if present) or from an optional BSC Lab RDF export. The knowledge
-subsystem reads from the RDF ontology files and public BSC Lab reference
-instances.
+between the two BSC Lab subsystems and is coordinated with BioSynCare as a
+*format* contract, not a shared catalog. The private BioSynCare/BSC catalog stays
+outside this repository and is not converted to Turtle here. The knowledge
+subsystem reads the RDF ontology files and public BSC Lab reference instances.
 
-The Patch Studio authors its own live model (`model: "patch-studio-model-1"`,
-see [`docs/technical/PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)); a
-bridge from a patch to the catalog preset / RDF instance is future work.
+The Patch Studio authors its own live model (`model: "patch-studio-model-1"`, see
+[`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)).
+`portability/patchProjection.js` projects a patch into SSTIM RDF over the
+declared mappable subset, reporting everything that did not travel rather than
+overclaiming ([ADR 0026](../docs/decisions/0026-patch-studio-catalog-bridge.md),
+[ADR 0041](../docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md));
+`portability/sessionPackage.js` wraps that as a portable session package
+([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)).
 
-Changes to the **preset catalog format** must be coordinated across:
-1. `docs/technical/PRESET_FORMAT.md` (specification)
-2. `schemas/preset.schema.json` (JSON Schema validation) — *planned*
-3. `static/ontology/sstim-shapes.ttl` (SHACL validation)
-4. `src/core/ProtocolRunner.js` (preset → VoiceSpec translation) — *planned*
-5. `src/rdf/export.js` (RDF → JSON export) — *planned*
+Changes to the **preset catalog format** must be coordinated across
+`docs/technical/PRESET_FORMAT.md` (specification),
+`static/ontology/sstim-shapes.ttl` (SHACL), and — once they exist —
+`schemas/preset.schema.json`, `src/core/ProtocolRunner.js`, and
+`src/rdf/export.js`.
 
 ---
 

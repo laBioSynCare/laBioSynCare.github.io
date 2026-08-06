@@ -22,28 +22,35 @@ pre-filled values, and a status slot to complete after submitting.
 
 ## 1. Reusable metadata kit
 
-Every field below is copy-paste ready and verified on 2026-08-01 against the
-latest immutable release (`static/ontology/0.12.0/`) and its publication
-records. Mutable `0.13.0-dev` module files are not release metadata.
+The constant fields are copy-paste ready. **The four version-dependent fields
+are deliberately not written down** — a registry record filled from a stale
+number is worse than one not filled at all. Read them at submission time:
 
-| Field | Value |
+```bash
+node scripts/truth-audit.mjs      # prints citable release, version DOI, module count
+```
+
+| Version-dependent field | Where to read it |
+|---|---|
+| Current version | `void.ttl` → `dcat:version` |
+| Version IRI | `https://w3id.org/sstim/<that version>` |
+| Version DOI | `void.ttl` → `dct:hasVersion` |
+| Current release date | that release's `dct:issued` |
+
+| Constant field | Value |
 |---|---|
 | Title | Sensory Stimulation Ontology (SSTIM) |
 | Stable ontology URI | `https://w3id.org/sstim` |
 | Namespace URI | `https://w3id.org/sstim#` |
 | Preferred prefix | `sstim` |
-| Current version | `0.12.0` |
-| Version IRI | `https://w3id.org/sstim/0.12.0` |
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
-| Version DOI (0.12.0) | `10.5281/zenodo.21717988` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
 | Publisher | `https://github.com/laBioSynCare` |
 | First released | 2026-04-12 |
-| Current release date | 2026-07-31 |
 | Source repository | `https://github.com/laBioSynCare/laBioSynCare.github.io` |
 | HTML documentation | `https://labiosyncare.github.io/ontology/docs/` |
-| Frozen Turtle entry point (0.12.0) | `https://w3id.org/sstim/0.12.0/sstim-core.ttl` |
+| Frozen Turtle entry point | `https://w3id.org/sstim/<version>/sstim-core.ttl` |
 | JSON-LD (content negotiated) | `https://w3id.org/sstim` with `Accept: application/ld+json` |
 | RDF/XML (content negotiated) | `https://w3id.org/sstim` with `Accept: application/rdf+xml` |
 | VoID/DCAT | `https://labiosyncare.github.io/ontology/void.ttl` |
@@ -66,12 +73,12 @@ breathing, multisensory integration, SKOS vocabulary, SHACL, evidence tiers.
 
 ## 2. Readiness at a glance
 
-The released `0.12.0` ontology URI already dereferences through w3id to
-Turtle/JSON-LD/RDF-XML, and the WIDOCO HTML is live. Perma-id PR #6337 merged on
-2026-07-11; it is not pending. Existing registry records for the released line
-remain valid. Do not present mutable `0.13.0-dev` as a new release: its generated
-namespace catalogues, exact Kernel/module endpoints, profiles, manifest, and
-schema must be deployed and the staged perma-id matrix verified first.
+The released ontology URI dereferences through w3id to Turtle/JSON-LD/RDF-XML,
+and the WIDOCO HTML is live. Perma-id PRs #6337 (pre-modular, 2026-07-11) and
+#6480 (modular, 2026-08-04) are both merged. Existing registry records for the
+released line remain valid. **Never present a mutable `-dev` line as a release**:
+its generated namespace catalogues, Kernel/module endpoints, profiles, manifest,
+and schema must be deployed and the perma-id matrix verified first.
 
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
@@ -171,7 +178,7 @@ deployment / canonical host is healthy again.
 Service:            DBpedia Archivo (archivo.tools.dbpedia.org)
 Submitted URL:      https://w3id.org/sstim
 Submitted version:  0.6.0
-Release DOI:        10.5281/zenodo.21302910
+Release DOI submitted: 10.5281/zenodo.21302910
 Date:               2026-07-11
 Account/maintainer: — (anonymous suggestion)
 External record ID or URL:
@@ -219,7 +226,7 @@ Service:            LOV (Linked Open Vocabularies)
 Submitted URL:      https://lov.linkeddata.es/dataset/suggest
 Submitted namespace: https://w3id.org/sstim
 Submitted version:  0.6.0
-Release DOI:        10.5281/zenodo.21302910
+Release DOI submitted: 10.5281/zenodo.21302910
 Date:               2026-07-10 (resubmitted 2026-07-11; both acknowledged)
 Account/maintainer: — (form; confirmation emailed to renato.fabbri@gmail.com)
 External record ID or URL:  (assigned on integration)
@@ -416,11 +423,11 @@ creates a submission carrying whatever `dct:issued` the deployed file declares**
 the `make snapshot` release gate (see
 [`README.md`](README.md#release-gate-make-snapshot)).
 
-Two further observations from the same submission list, neither harmful:
-0.10.0 has **no** submission (it and 0.11.0 both deployed on 2026-07-24 and the
-daily pull sampled once); and 0.7.0 and 0.7.0-dev each produced **two**
-submissions, because the pull creates one whenever the deployed bytes change
-even if `owl:versionInfo` did not move.
+Two further observations from the same historical submission list, neither
+harmful: 0.10.0 has **no** submission (it and 0.11.0 both deployed on 2026-07-24
+and the daily pull sampled once); and 0.7.0 and the dev line prior to it each
+produced **two** submissions, because the pull creates one whenever the deployed
+bytes change even if `owl:versionInfo` did not move.
 
 ### FAIRsharing — ready now (account required)
 
@@ -472,7 +479,7 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Object types | controlled picker — pick the closest to what SSTIM describes (e.g. **protocol**, **study/experimental process**); ≥1 required. If nothing fits, ask curators |
 | Subjects (SRAO) | **psychology**, **neuroscience** (≥1 required) |
 | Taxonomies | **Not applicable** (species irrelevant) |
-| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download citable SSTIM 0.12.0 (Turtle)** — `https://w3id.org/sstim/0.12.0/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download latest released SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. After the modular release, keep the versioned download and treat top-level `sstim-core.ttl` as Kernel only. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
+| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download citable SSTIM `<version>` (Turtle)** — `https://w3id.org/sstim/<version>/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download latest released SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. After the modular release, keep the versioned download and treat top-level `sstim-core.ttl` as Kernel only. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
 
 **RECOMMENDED (add for a strong, approvable record):**
 

@@ -12,22 +12,10 @@ for the runes mandate and the prohibited Svelte 4 patterns.
 
 ---
 
-## Directory structure (as built)
-
-```
-ui/
-├── creator/       Patch Studio — real-time audiovisual designer
-├── graph/         RDF ontology graph (Cytoscape.js)
-├── annotation/    Annotation panel (named-graph CRUD)
-├── navigation/    App top bar, bottom dock, profile control
-├── theme/         Skin / palette system
-├── safety/        Photosensitivity advisory + visual-stimulation policy
-├── auth/          Firebase sign-in form
-└── (planned) player/, browser/, dedicated sparql/ component
-```
-
-Routes that mount these live in `src/routes/`: `/` (graph), `/creator`,
-`/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`.
+The directory-to-role map is in [`../README.md`](../README.md#directory-map).
+This file documents the conventions and the non-obvious parts of each surface.
+The session `player/` and standalone preset `browser/` of the target design are
+still planned.
 
 ---
 

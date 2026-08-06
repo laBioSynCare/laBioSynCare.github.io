@@ -298,20 +298,14 @@ above for why they're no longer also duplicated in a hero/footer bar.
 
 ## Next actions
 
-- [x] Wireframe the four-door grid + conversion bar — see "Wireframe" above.
-- [x] Decide the graph browser's new home — `/graph` (see above).
-- [x] Fold into [`KNOWLEDGE_BROWSER_UX.md`](KNOWLEDGE_BROWSER_UX.md) and open a
-      `src/routes/` implementation task (Phase 2) — TODO.md §5.
-- [x] Confirm hero copy with Renato — shipped, subhead trimmed on review.
-- [x] Build the entrance (`src/routes/+page.svelte`,
-      `src/ui/entrance/ConversionBar.svelte`,
-      `src/ui/entrance/ContributeProtocolModal.svelte`,
-      `src/ui/entrance/CiteSstimModal.svelte`) and move the browser to
-      `/graph` (`src/routes/graph/+page.svelte`).
-- [ ] Optional follow-up, no urgency: retarget the merged w3id HTML branches
-      to `/graph` in a future bundled w3id PR (see "Graph browser home"
-      above).
-- [ ] Optional follow-up: create the `protocol-proposal` GitHub label
-      referenced in `.github/ISSUE_TEMPLATE/protocol-contribution.md`'s
-      frontmatter (same not-yet-created situation as the pre-existing
-      `use-case`/`term-proposal` labels).
+The entrance, the conversion bar, both modals, and the move of the browser to
+`/graph` all shipped on 2026-07-18. Two optional follow-ups remain, neither
+urgent:
+
+- Retarget the merged w3id HTML branches to `/graph` in a future bundled w3id PR
+  (see "Graph browser home" above). They currently 303 to the bare root, which
+  works — a visitor lands on orientation, one click from the browser.
+- Create the `protocol-proposal` GitHub label referenced in
+  `.github/ISSUE_TEMPLATE/protocol-contribution.md`'s frontmatter — the same
+  not-yet-created situation as the pre-existing `use-case` / `term-proposal`
+  labels.

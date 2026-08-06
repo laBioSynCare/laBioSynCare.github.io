@@ -1,16 +1,9 @@
 # SSTIM Publication and External Interlinking Plan
 
-Status: active publication plan
-
-Current citable release: SSTIM `0.12.0`
-
-Next development line: `0.13.0-dev` (mutable modular preview; not citable)
-
-Created: 2026-06-30
-
-Last reviewed: 2026-08-01
-
-Maintainer: Renato Fabbri
+Status: active publication plan. Created 2026-06-30, last reviewed 2026-08-01.
+Maintainer: Renato Fabbri. Version facts are derived from
+[`void.ttl`](../../static/ontology/void.ttl) and
+[`manifest.json`](../../static/ontology/manifest.json), never restated here.
 
 This document owns outward-facing publication, discovery, citation, and
 interlinking work. [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) owns internal
@@ -24,9 +17,9 @@ close mapping.
 
 ### Released and citable
 
-- SSTIM `0.12.0` is frozen under `static/ontology/0.12.0/`, identified by
-  `https://w3id.org/sstim/0.12.0`, and tagged `v0.12.0`.
-- Version DOI: [`10.5281/zenodo.21717988`](https://doi.org/10.5281/zenodo.21717988).
+- Each release is frozen under `static/ontology/<version>/`, identified by
+  `https://w3id.org/sstim/<version>`, and tagged `v<version>`. `void.ttl` names
+  the current one and its version DOI.
 - All-versions concept DOI:
   [`10.5281/zenodo.21286974`](https://doi.org/10.5281/zenodo.21286974).
 - The GitHub-Zenodo integration is enabled for future GitHub releases.
@@ -38,8 +31,9 @@ close mapping.
   for manifest-owned modules and profile entry points and generates the
   manifest-declared namespace catalogs.
 - The Pages build validates RDF before publishing generated serializations.
-- The `0.13.0-dev` module, profile, manifest, schema, and namespace-catalog
-  routing rules are staged in `docs/ecosystem/w3id/sstim/.htaccess`.
+- Module, profile, manifest, schema, and namespace-catalog routing rules are
+  maintained in `docs/ecosystem/w3id/sstim/.htaccess`, regenerated per release
+  by `scripts/sstim-w3id-snapshot-routes.mjs`.
 - `static/ontology/manifest.json` is the authoritative module and profile bill
   of materials. It declares the persistent schema identifier
   `https://w3id.org/sstim/manifest-schema/1`, dependency and profile closures,
@@ -74,9 +68,10 @@ close mapping.
 
 ### Still external or deployment-dependent
 
-1. The pre-modular route matrix was deployed and verified on 2026-07-11 (PR
-   #6337). Deploy the new generated catalogs and profile/schema artifacts, then
-   merge and verify the staged `0.13` perma-id rules. In the finalized contract,
+1. Deploy each release's generated catalogs and profile/schema artifacts, then
+   merge and verify the corresponding perma-id rules. The pre-modular route
+   matrix was deployed and verified on 2026-07-11 (PR #6337) and the modular one
+   on 2026-08-04 (PR #6480). In the finalized contract,
    machine RDF at `/sstim` is the generated Full namespace catalog,
    `/sstim/kernel` is the exact Kernel endpoint, and `/sstim/exposure` is the
    generated Stimulus + Exposure namespace catalog. `/sstim/module/exposure`
@@ -84,16 +79,11 @@ close mapping.
    endpoint. The profile routes, `/sstim/manifest`, and
    `/sstim/manifest-schema/1` must also dereference in their declared
    representations.
-2. Complete the profile release contracts. Every released profile requires at
-   least one positive, out-of-scope, and adversarial fixture plus a competency
-   query. Core currently has a positive fixture and executable contract;
-   Kernel, Core Plus, and Full remain incomplete, and Core lacks its two
-   negative fixture categories.
-3. Submit the stable release URI to selected ontology registries
+2. Submit the stable release URI to selected ontology registries
    ([REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md)). DBpedia Archivo already
    validates SSTIM ("accessible in 2 formats"); indexing is blocked only by a
    DBpedia-side Databus outage — retry when their infrastructure recovers.
-4. Create conservative Wikidata links only after the ontology landing page and
+3. Create conservative Wikidata links only after the ontology landing page and
    registry metadata are stable.
 
 Browser requests for the ontology IRI keep resolving to the interactive
@@ -101,10 +91,9 @@ knowledge browser, whose hash handling gives every SSTIM term a live graph
 view (ADR 0023). Revisit that routing only if a registry review requires
 static documentation at the IRI itself; the change is one `.htaccess` rule.
 
-The frozen `0.12.0` term-space remains the current citable release independently
-of the mutable `0.13.0-dev` work. Zenodo creates a version DOI from a published
-GitHub release; that process must never require rewriting an already published
-snapshot.
+A frozen term-space remains the citable release independently of mutable
+development work. Zenodo creates a version DOI from a published GitHub release;
+that process must never require rewriting an already published snapshot.
 
 ### Ontology snapshot versus release archive
 
@@ -164,9 +153,9 @@ See [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).
 
 ## Content Negotiation and Documentation
 
-The finalized modular behavior is below. It is implemented in the repository
-but remains staged for `0.13.0-dev` until the generated Pages artifacts and the
-matching perma-id rules are deployed and verified.
+The finalized modular behavior is below. A development line's routes stay staged
+until its generated Pages artifacts and matching perma-id rules are deployed and
+verified.
 
 | Request | Machine-readable representation | HTML representation |
 |---|---|---|
@@ -281,38 +270,15 @@ notability. Reusable diagrams may be published to Wikimedia Commons under CC BY
 
 ## Rollout
 
-### Phase 1: modular publication mechanics — implemented locally
+### Phases 1–3: modular mechanics, release, and routes — done
 
-- Maintain the manifest-defined Kernel, Core, Core Plus, and Full closures and
-  separate shape selection accepted by ADR 0043.
-- Generate the Full root namespace catalog and the Stimulus + Exposure
-  namespace catalog from their manifest declarations.
-- Publish PROF discovery metadata from each profile entry point and validate
-  the manifest against the local Draft 2020-12 schema. Mutable manifests use
-  `https://w3id.org/sstim/manifest-schema/1`; released manifests use their
-  frozen versioned schema sibling.
-- Keep `0.13.0-dev` explicitly mutable, staged, and noncitable.
-
-### Phase 2: prepare the next immutable release
-
-- Add positive, out-of-scope, and adversarial contract fixtures plus at least
-  one competency query for every profile. Core already has its positive fixture
-  and executable contract; the remaining profile-specific coverage is deferred.
-- Change each profile to the exact versioned sibling import closure and add
-  `immutableRelease` (including its schema URL) plus every artifact's
-  `publication.versionedUrl` to the release manifest. Point released `$schema`
-  and PROF resource descriptors at their frozen artifacts.
-- Update synchronized version/date metadata, run `make validate`, freeze the
-  manifest-selected files, and verify all older snapshot checksums.
-- Audit the tagged repository boundary, tag and publish the release, and verify
-  its Zenodo version record without modifying the frozen snapshot.
-
-### Phase 3: deploy and verify the modular routes
-
-- Deploy generated RDF serializations, both namespace catalogs, profile entry
-  points, manifest/schema artifacts, checked VoID, and reproducible WIDOCO HTML.
-- Merge the staged perma-id rules only after those targets exist, then run the
-  full route × representation verification matrix.
+The modular publication mechanics, the first modular release, and the deployed
+route matrix all landed by 2026-08-04. `make release-dryrun` (part of
+`make validate`) keeps rehearsing the sequence continuously, which is what
+prevents these steps from silently rotting between releases. The recurring
+per-release procedure is in
+[`static/ontology/README.md`](../../static/ontology/README.md#versioning-and-publication);
+it is not duplicated here.
 
 ### Phase 4: registries and knowledge-graph links
 

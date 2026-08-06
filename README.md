@@ -15,59 +15,46 @@ the [Evidence Framework](docs/concept/EVIDENCE_FRAMEWORK.md).
 
 ## Project Status
 
-As of 2026-08-04:
+Version numbers, DOIs, module and term counts are **derived, not restated
+here** — `make truth-audit` fails when prose disagrees with the sources:
 
-- **Latest immutable release:** SSTIM `v0.13.0`, identified by
-  `https://w3id.org/sstim/0.13.0`. The modular release (ADR 0043, ADR 0044,
-  ADR 0045): the former catch-all root file becomes 18 manifest-owned modules
-  behind four conformance profiles — Kernel, Core, Core Plus, Full — with no
-  term added, removed, or renamed and the Full union preserving `0.12.0`
-  semantics exactly. Archived under version DOI
-  [10.5281/zenodo.21792692](https://doi.org/10.5281/zenodo.21792692).
-- **Previous release:** SSTIM `v0.12.0`, archived at [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988).
-  The description-layer release
-  (ADR 0041, ADR 0042): separates the stimulation process, an engine-independent
-  description of it, the engine configuration that produces it, and the
-  execution of that configuration. Adds `sstim:StimulusSpecification` in a new
-  module, redefines `sstim:Preset` as the engine-configuration layer, and admits
-  non-human, object and unoccupied-space stimulation targets.
-- **All-version DOI:**
-  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Live ontology development:** `0.13.0-dev`, the modular preview accepted in
-  ADR 0043. It has small Kernel, Core, and Core Plus closures plus optional
-  concern and bridge modules. It is mutable and not an immutable release; use
-  the [manifest](static/ontology/manifest.json) and explicit profile entry
-  points rather than treating `sstim-core.ttl` as the whole suite.
+| Fact | Source |
+|---|---|
+| Latest citable release, its version DOI, graph counts | [`void.ttl`](static/ontology/void.ttl) |
+| Live development version, modules, profile closures | [`manifest.json`](static/ontology/manifest.json) |
+| How to cite | [`CITATION.cff`](CITATION.cff) |
+| What changed in each release | [`CHANGELOG.md`](CHANGELOG.md) |
+
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
-- **`0.13.0` release graph:** 18 Turtle modules and four profile entry points, 140 named OWL classes, 50 anonymous
-  class expressions, 245 properties, and 445 SKOS concepts in 50 concept
-  schemes, plus VoID/DCAT and a JSON-LD context. These counts are checked
-  against the frozen distribution by `scripts/sstim-quality-audit.py` during
-  `make validate`, not maintained by hand.
-- **Public example data:** 19 Turtle files containing the BSC framework, nine
-  framework techniques (three originated by BSC, six vendor-neutral techniques
-  it incorporates from the SSTIM vocabulary — ADR 0033), two implementations,
-  nine protocols, two reference presets, eight evidence assessments, three
-  knowledge-status assertions, seven exposure hypotheses, seven DOI-identified
-  references, ten exposure profiles, one explicitly synthetic session with
-  pre/post reports, and one synthetic ecosystem contract graph. No real
-  ecosystem-agent record is included in the release repository.
+  All-version concept DOI:
+  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
+- **Ontology shape:** manifest-owned Turtle modules behind four conformance
+  profiles — Kernel, Core, Core Plus, Full — plus VoID/DCAT and a JSON-LD
+  context. The development line is mutable and not an immutable release; use the
+  manifest and explicit profile entry points rather than treating
+  `sstim-core.ttl` as the whole suite.
+- **Public example data:** the BSC framework, nine framework techniques (three
+  originated by BSC, six vendor-neutral ones it incorporates — ADR 0033), two
+  implementations, protocols, reference presets, evidence assessments,
+  knowledge-status assertions, exposure hypotheses and profiles, DOI-identified
+  references, one explicitly synthetic session with pre/post reports, and one
+  synthetic ecosystem contract graph. No real ecosystem-agent record ships here.
 - **Validation:** SHACL Core and SHACL-SPARQL, HermiT via ROBOT, repository-wide
   semantic integrity checks, and executable SPARQL competency queries run under
   the pinned Nix toolchain.
 - **External review:** the 2026-07-10
   [automated OOPS/FOOPS review](docs/ontology/reviews/2026-07-10-external-automated-review.md)
-  is resolved for release, and the maintainer guided and accepted the ontology
-  changes. The maintainer accepted `0.10.0` after the automated OWL, SHACL,
-  quality, round-trip, runtime, and build gates passed; independent human
-  ontology review is not claimed. The deployed canonical FOOPS score is 87.5%; the
-  remaining failures are registry-dependent.
+  is resolved, and the maintainer guided and accepted the ontology changes.
+  Releases are accepted once the automated OWL, SHACL, quality, round-trip,
+  runtime, and build gates pass; **independent human ontology review is not
+  claimed.** The deployed canonical FOOPS score is 87.5%, with the remaining
+  failures registry-dependent.
 - **Registry discoverability:** the `sstim` prefix resolves at prefix.cc and the
   ontology is parsed and browsable in
   [BioPortal](https://bioportal.bioontology.org/ontologies/SSTIM); LOV,
   [BARTOC](https://github.com/gbv/bartoc.org/issues/319), and FAIRsharing
-  (record 8494) submissions await curator review, and a DBpedia Archivo
-  submission passed RDF validation but is blocked by a Databus outage. Tracked in
+  (record 8494) await curator review, and a DBpedia Archivo submission passed
+  RDF validation but is blocked by a Databus outage. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
   Sensory Field, logbook, profile and settings are implemented as a static
@@ -82,7 +69,7 @@ clinical protocols, and clinical claims are not published here.
 
 ## SSTIM Modules And Profiles
 
-The live `0.13.0-dev` source set is manifest-driven. The
+The live source set is manifest-driven. The
 [`manifest.json`](static/ontology/manifest.json) file is the authoritative list
 of modules, direct dependencies, runtime named graphs, checksums, and profile
 closures. The main adoption choices are:
@@ -94,8 +81,8 @@ closures. The main adoption choices are:
 | [Core Plus](static/ontology/sstim-core-plus-profile.ttl) | Core + reusable common descriptors and calibrated quantities | Core shapes; Common-specific shapes are deferred |
 | [Full](static/ontology/sstim-full-profile.ttl) | All semantic, bridge, vocabulary, alignment, ecosystem, and Patch Studio modules | [`sstim-shapes.ttl`](static/ontology/sstim-shapes.ttl) |
 
-Consumers that previously merged the eight `0.12.0` sources should select the
-Full profile. New reusable integrations should start with Core or Core Plus and
+Consumers that previously merged the eight pre-modular sources should select
+the Full profile. New reusable integrations should start with Core or Core Plus and
 add concern modules through their manifest-resolved dependency closure. Shapes
 are selected separately from OWL imports. Core validation deliberately leaves
 channels and targets optional, but hardens either link when it is present: a
@@ -119,9 +106,9 @@ distribution/import endpoint are instead
 uses that endpoint, never the namespace catalog. Its `dct:requires` may still
 identify the logical Exposure ontology as `https://w3id.org/sstim/exposure`.
 Release preparation replaces the mutable import endpoint with the exact
-immutable versioned sibling file. These `0.13.0-dev` artifacts and routes are
+immutable versioned sibling file. A development line's artifacts and routes stay
 staged until the Pages deployment and corresponding perma-id update; they are
-not citable release endpoints yet.
+never citable release endpoints.
 
 Every module is an `owl:Ontology` with creator, publisher, dates, license,
 description, version metadata, and explicit ownership. Controlled values remain
@@ -252,24 +239,25 @@ make export     # JSON-LD and RDF/XML serializations of manifest-owned sources
    completeness, SKOS integrity, local IRI resolution, evidence provenance, and
    competency thresholds.
 4. ROBOT with HermiT checks OWL DL consistency across the module set, and the
-   normalized Full-union parity gate checks the `0.13.0-dev` redistribution
-   against frozen `0.12.0`.
+   normalized Full-union parity gate checks the live redistribution against the
+   frozen pre-modular baseline.
 5. Comunica runs named-graph competency queries for delivery media, protocol
    chains, evidence trails, actionable cautions, and phase-qualified reports.
 6. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
 
-The immutable [`static/ontology/0.12.0/`](static/ontology/0.12.0) snapshot is not
-edited after publication. Future releases are cut only after validation,
+Each frozen [`static/ontology/<version>/`](static/ontology) snapshot is immutable
+and is not edited after publication. Future releases are cut only after validation,
 version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 The release gate additionally requires every snapshotted artifact to advertise
 its immutable versioned URL, every profile to import the exact versioned sibling
 closure, every PROF descriptor to identify immutable entrypoint, constraint,
 and manifest artifacts, and every profile to have existing nonempty positive,
 out-of-scope, and adversarial fixtures plus a competency query. The released
-manifest and schema are themselves frozen sibling artifacts. Those profile
-contracts and the staged route deployment remain work before `0.13.0-dev` can
-become a release.
+manifest and schema are themselves frozen sibling artifacts. `make release-dryrun`
+rehearses all of this against the current sources on every `make validate`, so a
+gate that has been wrong for weeks surfaces before a release is attempted rather
+than during one.
 
 ## Repository Map
 
@@ -339,9 +327,9 @@ or certify products.
 
 ## Citation And License
 
-For the released ontology, cite SSTIM `v0.13.0`. Its stable version IRI is
-`https://w3id.org/sstim/0.13.0` and its version DOI is
-[10.5281/zenodo.21792692](https://doi.org/10.5281/zenodo.21792692). Use the
+To cite a specific release, use [`CITATION.cff`](CITATION.cff) — it names the
+current immutable version and version DOI, and GitHub renders it as *Cite this
+repository*. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 

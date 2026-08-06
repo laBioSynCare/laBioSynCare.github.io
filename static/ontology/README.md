@@ -16,25 +16,26 @@ the graph.
 
 ## Status
 
-- Latest immutable release: `v0.12.0`, DOI
-  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988), version
-  IRI `https://w3id.org/sstim/0.12.0`.
-- All-version DOI:
-  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- Live sources: the mutable `0.13.0-dev` modular preview accepted by ADR 0043.
-  Its source inventory and closures are defined by [`manifest.json`](manifest.json),
-  and every module carries synchronized `owl:versionInfo`. This development line
-  is not an immutable release.
-- Immutable-release term-graph counts are checked by
-  `scripts/sstim-quality-audit.py` and published in `void.ttl` rather than
-  duplicated here.
-- Public instance and synthetic-fixture graph counts are published in
-  `void.ttl` and verified by the quality audit rather than duplicated here.
-- Persistent namespace: `https://w3id.org/sstim`.
-- License: CC BY 4.0.
+Version facts are derived, never restated here — restating them is what made
+three documents advertise a superseded release at once. Read them from source:
 
-The frozen [`0.12.0/`](0.12.0) directory is immutable and is the current citable
-whole-set release.
+| Fact | Source |
+|---|---|
+| Live development version, module inventory, profile closures | [`manifest.json`](manifest.json) |
+| Latest citable release and its version DOI | [`void.ttl`](void.ttl) (`dcat:version`, `dct:hasVersion`) |
+| Citation metadata | [`CITATION.cff`](../../CITATION.cff) |
+| Term-graph, instance, and fixture counts | `void.ttl`, checked by `scripts/sstim-quality-audit.py` |
+
+`make truth-audit` fails if these disagree with each other or with prose.
+
+- Persistent namespace: `https://w3id.org/sstim`. All-version concept DOI:
+  [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974) — stable
+  across every release. License: CC BY 4.0.
+- Live sources are the mutable modular line accepted by ADR 0043: every module
+  carries a synchronized `-dev` `owl:versionInfo`, and a development line is
+  never an immutable release.
+- Each frozen `<version>/` directory is immutable; the one named by
+  `void.ttl`'s `dcat:version` is the current citable whole-set release.
 
 ## Files
 
@@ -52,7 +53,7 @@ static/ontology/
 |-- sstim-ecosystem-private-shapes.ttl  Separate access-controlled audit profile (rules only)
 |-- context.jsonld          Public JSON-LD compaction context
 |-- void.ttl                VoID/DCAT publication metadata and checked counts
-|-- 0.1.0/ ... 0.12.0/     Immutable whole-set snapshots
+|-- 0.1.0/ ... <version>/  Immutable whole-set snapshots, one per release
 `-- instances/
     |-- frameworks/         BSC framework and framework techniques
     |-- implementations/    BSC Lab and public-safe BioSynCare identities
@@ -76,9 +77,9 @@ whole set is frozen for release; see
 
 ### Module maturity
 
-The frozen `0.12.0` suite remains an eight-file whole-set release. The live
-`0.13.0-dev` line implements an acyclic Kernel/Core/Core Plus architecture with
-optional concern and bridge modules and an explicit Full compatibility profile.
+Releases through `0.12.0` were a flat eight-file whole-set distribution. From
+`0.13.0` the suite is an acyclic Kernel/Core/Core Plus architecture with optional
+concern and bridge modules and an explicit Full compatibility profile.
 [`manifest.json`](manifest.json) is authoritative for direct dependencies,
 transitive profile closures, runtime graphs, publication URLs, and checksums;
 do not reconstruct that inventory from this directory listing.
@@ -99,7 +100,7 @@ The live manifest identifies its schema with the persistent IRI
 Full entry point is both an `owl:Ontology` and a `prof:Profile`; its
 `prof:hasResource` descriptors expose the specification, the applicable SHACL
 constraints where one is published, and the manifest. This discovery metadata
-does not make the mutable `0.13.0-dev` sources a citable release.
+does not make the mutable development sources a citable release.
 
 For a release, `$schema` and `immutableRelease.schemaUrl` identify the frozen
 `<version>/manifest.schema.json` sibling. The entrypoint, constraints, and
@@ -128,10 +129,10 @@ catalog. During release preparation that endpoint, like every other mutable
 module endpoint, is replaced by the exact immutable versioned sibling Turtle
 URL.
 
-The source manifest, generators, and mirrored w3id rules encode this behavior,
-but the `0.13.0-dev` catalogs, profile routes, and schema PID remain staged until
-the generated Pages artifacts are deployed and the perma-id update is merged
-and verified.
+The source manifest, generators, and mirrored w3id rules encode this behavior.
+A development line's catalogs, profile routes, and schema PID stay staged until
+the generated Pages artifacts are deployed and the perma-id update is merged and
+verified.
 
 The Core SHACL contract keeps `hasStimulusChannel` and
 `hasStimulationTarget` optional. If present, however, a channel link must point
@@ -390,8 +391,9 @@ That command runs:
 4. `scripts/sstim-quality-audit.py` for module/context/loader completeness,
    SKOS integrity, functional values, local IRI resolution, evidence provenance,
    ecosystem namespace ownership, VoID counts, and competency thresholds;
-5. normalized Full-union equivalence against the frozen `0.12.0` distribution,
-   plus ROBOT with HermiT over the merged OWL module set;
+5. normalized Full-union equivalence against the frozen pre-modular baseline
+   (`BASELINE` in `scripts/check-sstim-full-equivalence.py`), plus ROBOT with
+   HermiT over the merged OWL module set;
 6. named-graph SPARQL competency queries through Comunica; and
 7. graph-isomorphic JSON-LD and RDF/XML export round trips for every
    manifest-owned Turtle source; and
@@ -508,7 +510,13 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    `mod:status "released"` in the root Kernel. Populate every profile's
    positive, out-of-scope, and adversarial fixture sets and at least one
    competency query. Every listed contract path must already name an existing
-   repository file.
+   repository file. Bump **`dct:issued`** and `dct:modified` to the release
+   date; leave `dct:created` alone. This matters more than it looks: `dct:issued`
+   is what registries read as the version's release date — BioPortal's
+   **Released** column, and the same in Archivo and OLS — so leaving it at the
+   ontology's first issue date makes every version look like it shipped that day.
+   That is exactly what happened to SSTIM submissions 1–8 (all showing
+   `2026-04-12`, corrected by hand on 2026-07-27).
 4. Give every snapshotted module and profile its exact immutable
    `publication.versionedUrl`; add the manifest's immutable base, manifest, and
    schema URLs; point the released `$schema` at the frozen schema sibling; and
@@ -521,9 +529,9 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    is what makes the quality audit demand the rest: it counts `void:triples`,
    `void:classes`, and `void:properties` against the frozen directory that
    version names, and requires a `void:subset` per frozen module whose
-   distribution actually names that module's file. Going from the eight-module
-   `0.12.0` to a modular release therefore fails the audit until every new
-   module has a subset. Also move each module distribution's `dcat:accessURL`
+   distribution actually names that module's file. Moving from a flat
+   distribution to a modular one therefore fails the audit until every new module
+   has a subset. Also move each module distribution's `dcat:accessURL`
    onto that module's own retrieval endpoint — the Kernel is `/sstim/kernel`
    and Exposure is `/sstim/module/exposure`, because `/sstim` and
    `/sstim/exposure` return multi-module namespace catalogues; the audit cannot
@@ -552,16 +560,14 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
 10. Tag and publish the GitHub release so Zenodo archives the same commit.
 11. Add the resulting version DOI without rewriting a published snapshot.
 
-The current development manifest intentionally has no immutable release URLs.
-All four profiles now carry their conformance contract, executed against their
-own closures by `make core-profile-contract`: a positive fixture and a SPARQL
-competency query each, plus out-of-scope and adversarial fixtures for the three
-profiles that select a shape package. Kernel selects none, so it declares
-neither negative category ([ADR 0045](../../docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)).
-`void.ttl` still describes the eight-module `0.12.0` set, which is correct for
-the release it names; the audit now forces its subset inventory to be completed
-as soon as `dcat:version` moves to a modular release. Consequently `0.13.0-dev` is noncitable
-even though its module and publication mechanics are implemented.
+A development manifest intentionally carries no immutable release URLs, which is
+what makes a `-dev` line noncitable even when its module and publication
+mechanics are complete. All four profiles carry a conformance contract executed
+against their own closures by `make core-profile-contract`: a positive fixture
+and a SPARQL competency query each, plus out-of-scope and adversarial fixtures
+for the three profiles that select a shape package. Kernel selects none, so it
+declares neither negative category
+([ADR 0045](../../docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)).
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
 master. `context.jsonld` is a hand-maintained compaction context, not a generated
@@ -587,18 +593,9 @@ private/user data in public instance files, or edit a frozen version directory.
 
 ## Citation
 
-Use SSTIM `v0.12.0` for the current immutable citation:
+To cite a specific release, use [`CITATION.cff`](../../CITATION.cff) — it names
+the current immutable version and its version DOI, GitHub renders it as *Cite
+this repository*, and `make truth-audit` keeps it agreeing with `void.ttl`.
 
-```bibtex
-@misc{fabbri_sstim_2026,
-  author    = {Fabbri, Renato},
-  title     = {BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform},
-  year      = {2026},
-  publisher = {Zenodo},
-  doi       = {10.5281/zenodo.21717988},
-  url       = {https://doi.org/10.5281/zenodo.21717988}
-}
-```
-
-For SSTIM across all releases, use the concept DOI
+To cite SSTIM across all releases, use the concept DOI
 [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).

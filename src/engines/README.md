@@ -101,8 +101,12 @@ against memory it owns; envelope/gain/pan/mix stay in JS.
 Implements the full contract but emits no sound, while still owning a real
 `AudioContext` so the clock, control modulation and visual previews run exactly
 as a sounding engine would. For quiet/shared environments, accessibility, and
-timing/visual debugging — and the guaranteed fallback when AudioWorklet is
-unavailable. Mirrors the `NullHapticEngine` pattern.
+timing/visual debugging. Mirrors the `NullHapticEngine` pattern.
+
+It is a deliberate choice, not the fallback: when a selected engine's `requires`
+capabilities are missing, `createAudioEngine()` returns the default `vanilla`
+engine with `fellBack: true`. `vanilla` requires no capabilities, so it is the
+floor.
 
 **Regenerating the WASM kernel** (after editing `static/worklets/bsc-osc.wat`):
 ```bash

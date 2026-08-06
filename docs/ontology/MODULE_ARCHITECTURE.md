@@ -1,29 +1,21 @@
 # SSTIM module architecture
 
-This document is the consumer guide to the SSTIM `0.13.0-dev` modular line.
-The decision and rationale are in
+This document is the consumer guide to the SSTIM modular line. The decision and
+rationale are in
 [ADR 0043](../decisions/0043-sstim-core-profile-and-module-boundaries.md);
 [ADR 0044](../decisions/0044-stimulus-channel-core-ownership.md) records the
 one intentional term-definition clarification made during redistribution.
 
-## Release status
+Two distributions must not be confused. The **live development line** is
+mutable, is not a released version, and must never be cited as an immutable
+artifact. Each **frozen release** under `static/ontology/<version>/` is
+immutable and citable; `void.ttl` names the current one.
 
-Two distributions must not be confused:
-
-- **`0.12.0` is the latest immutable and citable release.** Its version IRI is
-  `https://w3id.org/sstim/0.12.0`, its DOI is
-  [10.5281/zenodo.21717988](https://doi.org/10.5281/zenodo.21717988), and its
-  frozen eight-file source set remains under
-  [`static/ontology/0.12.0/`](../../static/ontology/0.12.0/).
-- **`0.13.0-dev` is the live modular development line.** It is mutable, is not
-  a released version, and must not be cited as an immutable artifact. Its
-  authoritative bill of materials is
-  [`static/ontology/manifest.json`](../../static/ontology/manifest.json).
-
-The manifest, not a prose file list, defines the live module inventory,
-dependency edges, runtime graph IRIs, profile closures, checksums, and
-publication locations. This document explains that contract; if it and the
-manifest diverge during development, the manifest is authoritative.
+[`static/ontology/manifest.json`](../../static/ontology/manifest.json) — not a
+prose file list — defines the live module inventory, dependency edges, runtime
+graph IRIs, profile closures, checksums, and publication locations. This
+document explains that contract in readable form; where the two disagree, the
+manifest is authoritative.
 
 ## What the split means
 
@@ -60,7 +52,7 @@ The exact Exposure semantic module and OWL import endpoint is
 
 ## Modules and direct dependencies
 
-The following is the implemented `0.13.0-dev` dependency graph. Entries in the
+The following is the implemented dependency graph. Entries in the
 last column are **direct** requirements. Their transitive closures are supplied
 by the manifest and must not be copied into every header.
 
@@ -102,7 +94,7 @@ design — `sstim:hasStimulationTarget` is declared in Stimulus and receives its
 0044 §3). Adding a second domain there would silently narrow the property to the
 intersection instead of widening it, and no reasoner would report an error.
 
-The main vocabulary remains a Full compatibility aggregate in `0.13.0-dev`.
+The main vocabulary remains a Full compatibility aggregate.
 Loading it is not a shortcut to a small controlled-value package: its own
 dependency closure reaches several optional concerns.
 
@@ -117,7 +109,7 @@ present, and authoritative manifest.
 
 | Profile | Profile IRI / entry point | Exact semantic closure | Shape selection |
 |---|---|---|---|
-| Kernel | `https://w3id.org/sstim/profile/kernel`; [`sstim-kernel-profile.ttl`](../../static/ontology/sstim-kernel-profile.ttl) | `core` | None published in `0.13.0-dev`; a discovery entry point rather than a conformance target ([ADR 0045](../decisions/0045-shapeless-profiles-are-discovery-entry-points.md)) |
+| Kernel | `https://w3id.org/sstim/profile/kernel`; [`sstim-kernel-profile.ttl`](../../static/ontology/sstim-kernel-profile.ttl) | `core` | None published; a discovery entry point rather than a conformance target ([ADR 0045](../decisions/0045-shapeless-profiles-are-discovery-entry-points.md)) |
 | Core | `https://w3id.org/sstim/profile/core`; [`sstim-core-profile.ttl`](../../static/ontology/sstim-core-profile.ttl) | `core`, `stimulus` | `core-shapes` |
 | Core Plus | `https://w3id.org/sstim/profile/core-plus`; [`sstim-core-plus-profile.ttl`](../../static/ontology/sstim-core-plus-profile.ttl) | `core`, `stimulus`, `common` | `core-shapes`; no Common-specific shapes yet |
 | Full | `https://w3id.org/sstim/profile/full`; [`sstim-full-profile.ttl`](../../static/ontology/sstim-full-profile.ttl) | All 16 term-space modules above, including bridges, Vocabulary, Alignments, Ecosystem, and Patch Studio | `shapes` |
@@ -175,9 +167,8 @@ the whole set exactly one, and only the released umbrella declares it.
 
 ## Semantic compatibility and graph ownership
 
-The `0.13.0-dev` extraction is a redistribution, not a broad redesign. The
-compatibility gate compares the union of the frozen `0.12.0` eight-file
-distribution with the union of the live Full term space and Full shapes. The
+The extraction is a redistribution, not a broad redesign. The compatibility
+gate compares the union of the frozen pre-modular eight-file distribution with the union of the live Full term space and Full shapes. The
 normalized graphs must be isomorphic after excluding:
 
 - ontology metadata subjects;
@@ -253,7 +244,7 @@ therefore do not import shape graphs.
 - Select [`sstim-shapes.ttl`](../../static/ontology/sstim-shapes.ttl) with Full.
   It retains the existing comprehensive/publication policy and SHACL-SPARQL
   checks.
-- In `0.13.0-dev`, concern-specific profiles and shape packages beyond Core have
+- Concern-specific profiles and shape packages beyond Core have
   not yet been extracted. A consumer selecting one concern may add local shapes,
   or use Full shapes only with the Full semantic closure; Full shapes must not be
   mislabeled as an independently reusable concern contract.
@@ -312,14 +303,14 @@ node scripts/sstim-manifest.mjs files full --with-shapes
 
 Import `https://w3id.org/sstim/profile/full` and select Full shapes. This is the
 compatibility path for the BSC Lab application and for consumers that merged all
-`0.12.0` modules. Loading only the now-small `sstim-core.ttl` no longer loads the
-whole suite.
+pre-modular modules. Loading only the now-small `sstim-core.ttl` no longer loads
+the whole suite.
 
 ### Reproducible released work
 
-Use `https://w3id.org/sstim/0.12.0` or the frozen `0.12.0` distributions until a
-`0.13.0` release exists. Local `0.13.0-dev` manifest paths and profile entry
-points are for evaluation and integration work, not immutable citation.
+Cite the version IRI of a frozen release — `void.ttl` names the current one.
+Local development manifest paths and profile entry points are for evaluation and
+integration work, never immutable citation.
 
 A future snapshot copies the release-prepared artifacts byte-for-byte; the
 snapshotter does not repair imports or rewrite its manifest. Consequently, the
@@ -346,9 +337,6 @@ solve every semantic or packaging issue. Follow-up work still includes:
 - concern-specific controlled-vocabulary distributions instead of the current
   Full-only compatibility aggregate;
 - reusable validation packages beyond Core and Full, including bridge shapes;
-- nonempty positive, out-of-scope, adversarial, and competency-query contracts
-  for every published profile; Kernel, Core Plus, and Full still lack complete
-  manifest-owned fixture/query sets in the current development line;
 - separating delivery/safety semantics from the experiment, hypothesis, and
   knowledge-status parts of Exposure;
 - generalizing evidence subjects before Evidence can become a smaller,
@@ -359,40 +347,28 @@ solve every semantic or packaging issue. Follow-up work still includes:
 - reconciling duplicate stimulus/exposure frequency and flicker quantities;
 - deciding whether frequency bands describe observed oscillation, stimulus
   targets, or distinct concepts;
-- **a whole-ontology artifact for the version IRI to resolve to.** Until 0.12
-  `sstim-core.ttl` *was* the whole ontology, so the bare version route could
-  serve it. It is now the two-class Kernel, and a frozen snapshot contains
-  modules and profile entry points but no single document representing the
-  release. Left alone, `owl:versionIRI <https://w3id.org/sstim/0.13.0>` would
-  resolve to two classes — a mis-resolving version IRI, which is worse than the
-  non-resolving one ADR 0020 set out to prevent.
-  `scripts/sstim-w3id-snapshot-routes.mjs` now refuses to emit a bare-version
-  route for a snapshot carrying a manifest unless that snapshot also freezes
-  `sstim-namespace.ttl`, so this cannot ship silently. Producing it needs a
-  decision: the namespace catalogues are generated by `make export` into
-  `dist/` only, while `snapshot-ontology.mjs` copies manifest-declared sources,
-  so the release path must either generate and freeze the catalogue or record a
-  different whole-ontology release artifact;
-- **a manifest-derived VoID/DCAT record** (ADR 0043 rollout step 5, still
-  unmet). `void.ttl` is internally consistent today because the quality audit
-  counts it against the frozen directory its `dcat:version` names, so it
-  correctly describes the 9 subsets of 0.12.0. At 0.13.0 it must describe all
-  18 modules, and the Kernel and Exposure `dcat:accessURL` values must move to
-  `https://w3id.org/sstim/kernel` and `https://w3id.org/sstim/module/exposure`
-  — `/sstim` and `/sstim/exposure` now serve namespace catalogues rather than
-  those modules, so pairing them with a module `dcat:downloadURL` would
-  describe one distribution with two different documents. Nothing yet checks
-  the subset inventory against the manifest;
-- ~~deployed persistent-route verification~~ — done on 2026-08-04, after
-  [perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480)
-  merged: 19 route/`Accept` combinations resolve exactly as modelled, including
-  Turtle defaulting, browser HTML, `q=0` handling, and `404` for unknown
-  versions. The `Vary: Accept` part of this gate is unobtainable rather than
-  outstanding: no w3id.org `303` emits it, the responses carry no cache
-  directives, and `303` is not heuristically cacheable under RFC 9111, so the
-  cache-poisoning risk it guarded against does not arise; and
+- checking the VoID subset inventory against the manifest. `void.ttl` now
+  carries one subset per published module and routes the Kernel and Exposure
+  `dcat:accessURL` values to `/sstim/kernel` and `/sstim/module/exposure` — the
+  bare `/sstim` and `/sstim/exposure` serve namespace catalogues, so pairing
+  either with a module `dcat:downloadURL` would describe one distribution with
+  two different documents. The quality audit counts the inventory against the
+  frozen directory `dcat:version` names, but nothing yet derives it from the
+  manifest; and
 - independent module versions, which are deliberately deferred while SSTIM
   keeps a synchronized suite release train.
+
+Two gaps recorded here were closed in the first modular release. The version IRI
+now resolves to a frozen `sstim-namespace.ttl` catalogue rather than to the
+two-class Kernel, and `scripts/sstim-w3id-snapshot-routes.mjs` refuses a
+bare-version route for a manifest-bearing snapshot that lacks one. Persistent
+routes were verified against the deployment on 2026-08-04 after
+[perma-id/w3id.org#6480](https://github.com/perma-id/w3id.org/pull/6480) merged:
+19 route/`Accept` combinations resolve as modelled, including Turtle defaulting,
+browser HTML, `q=0`, and `404` for unknown versions. `Vary: Accept` is
+unobtainable rather than outstanding — no w3id.org `303` emits it, the responses
+carry no cache directives, and `303` is not heuristically cacheable under
+RFC 9111, so the cache-poisoning risk it guarded against does not arise.
 
 Those changes need their own semantic decisions and compatibility evidence.
 They are not reasons to keep the old catch-all root source, and they must not be

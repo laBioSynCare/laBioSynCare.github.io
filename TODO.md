@@ -266,9 +266,8 @@ Turtle files are listed in section 1. After they exist:
 - [x] Accept and implement the SSTIM Core Profile and concern-module architecture in
       [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
       `P1`
-      *Accepted 2026-08-01 and implemented on the live `0.13.0-dev` line as a
-      small Kernel, Core, Core Plus, optional concern/bridge modules, and Full
-      compatibility profile. `static/ontology/manifest.json` is the source of
+      *Accepted 2026-08-01 and implemented as a small Kernel, Core, Core Plus,
+      optional concern/bridge modules, and a Full compatibility profile.* `static/ontology/manifest.json` is the source of
       truth for modules and closures; the Core, Core Plus, and Full profile
       entry points select semantic imports while shapes remain explicit. Frozen
       `0.13.0` is the latest immutable release. Normalized Full-union parity

@@ -181,24 +181,28 @@ class BinauralProcessor extends AudioWorkletProcessor {
 
 ### 3.4 Ontology files are not auto-modified
 
-The files below encode scientific decisions, vocabulary definitions, and legal
-prior art records. They are never modified by AI agents without an explicit
-human instruction in the current session that says "modify [filename]":
+These encode scientific decisions, vocabulary definitions, and legal prior-art
+records. They are never modified by an AI agent without an explicit human
+instruction in the current session naming the file: "modify [filename]".
 
 ```
-static/ontology/sstim-core.ttl
-static/ontology/sstim-vocab.ttl
-static/ontology/sstim-shapes.ttl
-static/ontology/sstim-alignments.ttl
-static/ontology/sstim-patch-studio.ttl
+static/ontology/*.ttl              every manifest-owned module, its shapes,
+                                   and its profile entry points
+static/ontology/instances/**/*.ttl public reference data
+static/ontology/<version>/**       frozen releases — immutable, never edited
 docs/technical/BREATHING_MODEL.md
 docs/technical/SYMMETRY_SYSTEM.md
 docs/technical/MARTIGLI_BINAURAL.md
 ```
 
-The three `docs/technical/` files above are defensive publications — timestamped
-prior art records. Modifying them after their first commit date undermines their
-legal function.
+The pattern is deliberate: the modular split (ADR 0043) turned one root file into
+many, and a hand-maintained list would have silently unprotected every module
+added after it was written. `static/ontology/manifest.json` is the authoritative
+inventory. See [ADR 0004](docs/decisions/0004-protected-ontology-files.md).
+
+The three `docs/technical/` files are defensive publications — timestamped prior
+art records. Modifying them after their first commit date undermines their legal
+function.
 
 ### 3.5 No health or medical claims in any user-facing copy
 
@@ -420,18 +424,16 @@ SELECT ?band WHERE {
 
 ### 5.4 SHACL validation before any preset export
 
-Before exporting any preset from the RDF store to JSON, run SHACL validation:
+Never export RDF that has not been validated against the applicable shape
+package. Log the violations and return nothing rather than emitting a
+non-conformant graph.
 
-```javascript
-import { validate } from '../rdf/validate.js';
-
-const report = await validate(dataStore, shapesStore);
-if (!report.conforms) {
-  // Log violations. Do not export.
-  report.results.forEach(r => console.error(r.message, r.focusNode));
-  return null;
-}
-```
+A browser-side `src/rdf/validate.js` (rdf-validate-shacl) is **planned and does
+not exist yet** — do not import it. Today validation runs under `make validate`
+via pySHACL, and the tests that assert conformance of generated graphs live
+beside their producers (for example `src/ui/field/exposureProfile.shacl.test.js`
+and `src/portability/sessionPackage.test.js`). Follow that pattern for any new
+RDF-emitting surface.
 
 ### 5.5 Annotations use named graphs
 
@@ -516,67 +518,31 @@ silently. Never let a missing haptic engine throw or log errors to the user.
 
 ## 7. Project Structure Quick Reference
 
+Directory listings drift; these indexes do not, because each is maintained where
+the thing lives:
+
+| For | Read |
+|---|---|
+| Documentation map | [`docs/README.md`](docs/README.md) |
+| Architecture decisions | [`docs/decisions/README.md`](docs/decisions/README.md) |
+| Application architecture | [`src/README.md`](src/README.md) |
+| Ontology sources and design | [`static/ontology/README.md`](static/ontology/README.md) |
+| Live ontology module inventory | `static/ontology/manifest.json` (machine-readable, authoritative) |
+| Tracked work | [`TODO.md`](TODO.md), [`ROADMAP.md`](ROADMAP.md) |
+
+The paths that carry invariants, and are therefore worth naming here:
+
 ```
-CLAUDE.md                     ← you are here
-README.md                     ← GitHub landing page
-ROADMAP.md                    ← strategic phases
-TODO.md                       ← all tracked work (dev + ecosystem)
-CONTRIBUTING.md               ← governance and contribution guide
-
-docs/
-  README.md                   ← documentation index (start here for docs)
-  concept/                    ← SENSORY_STIMULATION, SCOPE, NON_SCOPE,
-  │                             EVIDENCE_FRAMEWORK, FACILITATING_DEDICATION
-  technical/                  ← PRESET_FORMAT, SESSION_MODEL, PATCH_STUDIO,
-  │                             SENSORY_FIELD, PHOTOSENSITIVITY_SAFETY, KNOWLEDGE_BROWSER_UX,
-  │                             AUDIO_ENGINE_ARCHITECTURE, VISUAL_ENGINE_ARCHITECTURE,
-  │                             BREATHING_MODEL, SYMMETRY_SYSTEM, MARTIGLI_BINAURAL
-  decisions/                  ← ADRs 0001–0023 (+ README index)
-  ecosystem/                  ← IP_STRATEGY, W3C_COMMUNITY_GROUP_PROPOSAL,
-                                INVITATION_TEMPLATE, ADVISORY_BOARD, PARTNERS,
-                                CONSORTIUM_INVITATION
-
-static/
-  _headers                    ← COOP/COEP/CORP headers for future Netlify/custom hosting
-  manifest.webmanifest        ← PWA web app manifest (PWA_SERVICE_WORKER.md)
-  icons/                      ← PWA icons (192/512/maskable PNG + SVG sources)
-  worklets/                   ← AudioWorklet processors (never bundled by Vite)
-    bsc-voice.worklet.js        ← unified voice processor (JS DSP)
-    bsc-voice-wasm.worklet.js   ← unified voice processor (WASM oscillator)
-    bsc-osc.wat / bsc-osc.wasm  ← hand-written WASM sine-LUT kernel + source
-  audio/                      ← ambient Sample clips (rain/ocean/wind, CC0)
-  ontology/                   ← Turtle files served same-origin (copied to dist/)
-    sstim-core.ttl              ← OWL ontology
-    sstim-vocab.ttl             ← SKOS vocabulary (multilingual)
-    sstim-shapes.ttl            ← SHACL validation shapes
-    sstim-alignments.ttl        ← external links (Wikidata, DBpedia, OBO)
-    sstim-patch-studio.ttl      ← Patch Studio model vocabulary
-    0.1.0/                      ← immutable release snapshot
-    instances/                  ← preset and reference instances as RDF
-
-scripts/
-  gen-ambiences.mjs           ← regenerates static/audio/*.wav
-
-schemas/                      ← (planned) preset.schema.json, session.schema.json
-
-src/
-  app.html                    ← HTML shell (pre-paint skin script, manifest link)
-  service-worker.js           ← PWA service worker (PWA_SERVICE_WORKER.md)
-  engines/audio/              ← IAudioEngine + 4 engines + audioEngines factory
-  engines/visual|haptic/      ← (planned) IVisualEngine / IHapticEngine + impls
-  core/                       ← (planned) MasterClock, Orchestrator, Scheduler, Recorder
-  firebase/                   ← optional auth + Firestore (client, auth, profile)
-  rdf/                        ← namespaces, loader, query, graph, presets, annotations/
-  ui/creator/                 ← Patch Studio (PATCH_STUDIO.md)
-  ui/field/                   ← Sensory Field instrument (SENSORY_FIELD.md)
-  ui/graph/                   ← RDF graph visualization (Cytoscape.js)
-  ui/annotation/              ← annotation panel (named graphs)
-  ui/navigation|theme|safety|auth/  ← chrome, skins, photosensitivity + flashSafety, sign-in
-  ui/pwa/                     ← service-worker registration + session-safe update banner
-  routes/                     ← /, /creator, /field, /presets, /sparql, /logbook, /profile, /settings
-
-tests/                        ← (planned) rdf/, engines/, schemas/ suites
-  (current unit tests live beside source, e.g. ui/creator/*.test.js)
+static/worklets/       AudioWorklet processors — NEVER bundled by Vite (§3.2)
+  bsc-voice.worklet.js       unified voice processor (JS DSP)
+  bsc-voice-wasm.worklet.js  unified voice processor (WASM oscillator)
+  bsc-osc.wat / .wasm        hand-written sine-LUT kernel + source
+static/audio/          ambient Sample clips (CC0) — runtime-cached, never precached (§9)
+static/ontology/       Turtle served same-origin (copied to dist/); §3.4 protects it
+static/_headers        COOP/COEP/CORP for a future custom host; GitHub Pages ignores it
+src/rdf/namespaces.js  the only place an ontology IRI may be written (§5.1)
+src/service-worker.js  three binding constraints — see §9 and ADR 0009
+schemas/               (planned) preset.schema.json, session.schema.json
 ```
 
 ---
@@ -679,24 +645,19 @@ for worklet files — that triggers Vite's module bundling.
 
 ## 10. Testing Requirements
 
-> **Phase 1 note.** `make validate`, `make check`, and `make build` are live
-> and mirrored by GitHub Actions. The remaining items in this section —
-> `schemas/preset.schema.json`, the `tests/` subtree, and `hooks/pre-commit` —
-> are planned and do not yet exist in the repo.
+Before any PR or commit touching `static/ontology/`, run `make validate`. It is
+the same gate CI runs, and it covers far more than syntax: SHACL over the
+applicable profile closures and every public instance, the manifest contract,
+the quality audit, HermiT via ROBOT, SPARQL competency queries, export round
+trips, the w3id route contract, `make truth-audit`, and `make release-dryrun`.
 
-Before any PR or commit that modifies `static/ontology/`, run:
-```bash
-make validate
-```
+For application changes, `make test` (Vitest, beside the source) and `make check`
+(SvelteKit sync + svelte-check).
 
-Before any PR or commit that modifies `src/data/presets/`, run:
-```bash
-npx ajv validate -s schemas/preset.schema.json -d 'src/data/presets/*.json'
-```
-
-When the pre-commit hook (`hooks/pre-commit`) lands, it should run the local
-validation mirror automatically. If it fails, fix the violations before
-committing. Do not use `--no-verify` to bypass it.
+**Planned and not yet present:** `schemas/preset.schema.json` with an `ajv` gate
+over catalog presets, a dedicated `tests/` subtree, and `hooks/pre-commit`. When
+the hook lands it should run the local validation mirror automatically — fix
+violations rather than passing `--no-verify`.
 
 ---
 

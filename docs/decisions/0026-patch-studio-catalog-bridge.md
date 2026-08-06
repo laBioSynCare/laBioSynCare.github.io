@@ -7,7 +7,7 @@
 The [Patch Studio](../technical/PATCH_STUDIO.md) builds an in-memory patch draft
 and exports a `patch-studio-model-1` object (`buildPatchExport`, §8). Today that
 object is consumed only by `draftFromPatchExport()` and Firestore
-([`src/firebase/patches.js`](../../src/firebase/patches.js)). There is **no path**
+(`src/firebase/patches.js`, since replaced by the storage seam in [`src/storage/`](../../src/storage/)). There is **no path**
 from a patch to the preset catalog JSON ([`PRESET_FORMAT.md`](../technical/PRESET_FORMAT.md),
 `header` + `voices`) or to an RDF instance under
 `static/ontology/instances/presets/`. Yet the catalog preset is the artifact the

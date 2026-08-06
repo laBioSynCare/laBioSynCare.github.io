@@ -6,121 +6,58 @@
 
 This is not a hard roadmap. Items are unranked except by category. Each
 entry states the *user-visible value* and a one-line implementation hint.
-The browser is implemented in `src/ui/graph/`, `src/ui/annotation/`, and
-`src/ui/navigation/`, with the SPARQL interface in the `src/routes/sparql/`
-page (a dedicated `src/ui/sparql/` component is planned).
+The browser lives at `/graph` — behind the public entrance since 2026-07-18
+([`PUBLIC_ENTRANCE.md`](PUBLIC_ENTRANCE.md)), which keeps Cytoscape and ontology
+parsing off the site's first paint. It is implemented in `src/ui/graph/`,
+`src/ui/annotation/`, `src/ui/navigation/`, and `src/ui/sparql/`.
 
 ---
 
-## Currently Implemented
+## Currently implemented
 
-- **Single-row top bar** — scope button, focus search, Center / Fit / Relayout
-  actions, help (`?`) and global menu (`+`); aligned controls, ARIA-only labels.
-- **Scope axes.** The picker was one flat list of 18 entries that silently
-  served three different questions, so "Core OWL classes", "Ecosystem focus"
-  and "Frequency bands" read as mutually exclusive alternatives when they are
-  not. It is now a popover with three multi-select axes — **Layer**
-  (provenance: terms / catalog / ecosystem), **Module** (ADR 0043 ownership),
-  **Concern** (concept schemes) — plus a fourth, node type, on the left-rail
-  legend. Selections union within an axis and intersect across axes; the button
-  shows a summary and an active-filter count. All 18 legacy `?view=` tokens
-  still resolve, translated onto the new axes, because w3id.org routes
-  deep-link into this page.
-- **Module axis from the manifest.** The Module axis and its Kernel / Core /
-  Core Plus / Full profile shortcuts are generated from
-  `static/ontology/manifest.json`, never hand-listed — ADR 0043 §5 makes the
-  manifest the one bill of materials, and the picker was the last inventory not
-  derived from it. `src/rdf/navigator-contract.test.mjs` fails if they diverge.
-  "Include required modules" expands a selection to its declared dependency
-  closure. A term is attributed to its owning module by the named graph of its
-  *declaring* quad (`data.module` in `src/rdf/graph.js`); every SSTIM term is
-  declared in exactly one module, so the attribution is unambiguous, and the
-  selection panel shows it. Bridge, alignment and shape modules are dimmed —
-  they own axioms rather than terms, so their only node is the module identity.
-- **Set nodes aside.** A handful of hub nodes dominate a force layout; `x`, the
-  ⊘ button in the selection panel, or a right-click removes one from the canvas
-  without changing the scope. Set-aside nodes are listed in the left rail for
-  individual or bulk restore, and the count sits permanently in the stats panel
-  next to Nodes/Edges so a hand-pruned canvas can never be read as the ontology
-  itself. Session-only, deliberately never written to the URL.
-- **Selection panel layout** — kind tag + close on the header row, selection
-  title, annotation form on top, description below the Save button, framed
-  metadata block (IRI / Notation / Scheme), Connections list, saved notes.
-- **Copy IRI** — clipboard action with "Copied" feedback.
-- **Connections list** — neighbors of the selected node, color-coded by edge
-  kind, with a 3 px tinted left bar; ordered top→bottom in triple direction
-  (subject → predicate → object) so an outgoing card reads `predicate →` /
-  `neighbor` and an incoming card reads `neighbor` / `← predicate`.
-- **Focus this neighborhood** — collapses the canvas to the selected node + its
-  1-hop neighbors; updates as you walk to a neighbor; exit restores the full
-  view. Respects scope and edge-layer filters. Entering and exiting focus
-  animate the fit; walking inside focus preserves the current zoom and pans
-  smoothly to the new node instead of re-fitting. Visibility transitions
-  (focus toggle, scope/layer changes, neighborhood walk) cross-fade nodes and
-  edges so nothing pops in or out.
-- **Unified animation duration** — fade-in, fade-out, center-pan, and fit all
-  share a single `transitionMs` setting with `ease-in-out-cubic` easing, so
-  in/out feel symmetric and the camera + visibility changes finish together.
-  A slider in the left rail lets the user pick anywhere from 0 (instant) to
-  800 ms; the value persists to `localStorage`.
-- **Keyboard shortcuts** — `/` focus search · `Enter` center · `Esc` clear /
-  close · `c` center · `x` set aside · `f` fit · `r` relayout · `h` / `?` help.
-  Discoverable from the help dialog and tooltips.
-- **Connections grouping & filter pills** — neighbors split into Outgoing /
-  Incoming subsections; a row of color-coded pills above the list toggles
-  visibility per edge kind, and the count in the header reflects the active
-  filter ("3 of 5"). Filter state persists across selections.
-- **CURIE display** — the IRI row shows the compact `sstim:X` /
-  `sstim-v:X` form; `href`, hover tooltip, and the Copy button still use the
-  full canonical IRI so the citable form never disappears. `toCurie()` lives in
-  `src/rdf/namespaces.js` next to the prefix table.
-- **Hash deep-linking** — `https://labiosyncare.github.io/#highTheta` lands on
-  the graph with the matching node selected; bare local names resolve via
-  lookup (preferring `sstim:` then `sstim-v:` on collision), CURIEs like
-  `#sstim-v:highTheta` are accepted as a fallback. Selection writes back to the
-  URL with `history.replaceState`, so the URL is bidirectionally shareable
-  without polluting the back stack.
-- **Public / private annotations** — notes default to private and fail closed
-  (an unrecognised visibility value is treated as private); creators can mark
-  a note public at write time, edit it in place afterwards, and toggle
-  visibility on edit. Unauthenticated visitors see public notes (read-only);
-  only the creator can edit or delete. Author display name is captured at
-  write time and shown on each note. Public notes serialize into a shared RDF
-  named graph; private notes stay in a per-user graph. RDF serialization uses
-  `oa:bodyValue`, whitelisted OA motivations, and pseudonymous agent IRIs —
-  the Firebase authentication ID never appears in exported RDF (audit KR-12).
-- **Author display name + profile page** — display name on signup is optional
-  and falls back to the email's local-part instead of "Anonymous". A new
-  `/profile/` route lets signed-in users edit their display name, affiliation,
-  and bio; saving syncs the new display name back into Firebase Auth so
-  subsequent annotations attribute correctly. Profile data lives in
-  `users/{uid}` with owner-only Firestore rules.
+The feature list is in [`CHANGELOG.md`](../../CHANGELOG.md) and the code in
+`src/ui/graph/`. What is worth carrying forward is the reasoning, because these
+are the choices a future change could quietly undo:
 
----
+- **The scope picker has axes, not a list.** One flat list of 18 entries silently
+  served three different questions, so "Core OWL classes", "Ecosystem focus" and
+  "Frequency bands" read as mutually exclusive when they are not. It is now three
+  multi-select axes — **Layer** (provenance), **Module** (ADR 0043 ownership),
+  **Concern** (concept schemes) — plus node type on the legend. Selections union
+  within an axis and intersect across axes. All 18 legacy `?view=` tokens still
+  resolve, because w3id.org routes deep-link into this page.
+- **The Module axis is generated from `manifest.json`**, never hand-listed —
+  ADR 0043 §5 makes the manifest the one bill of materials, and this picker was
+  the last inventory not derived from it. `src/rdf/navigator-contract.test.mjs`
+  fails if they diverge. A term is attributed by the named graph of its
+  *declaring* quad, and every SSTIM term is declared in exactly one module, so
+  attribution is unambiguous.
+- **Set-aside is session-only and always visible.** Hub nodes dominate a force
+  layout, so nodes can be removed from the canvas without changing scope — but
+  the count sits permanently beside Nodes/Edges, so a hand-pruned canvas can
+  never be mistaken for the ontology itself. Deliberately never written to the
+  URL.
+- **Annotations fail closed.** Notes default to private, and an unrecognised
+  visibility value is treated as private. Public notes serialize to a shared
+  named graph, private ones to a per-user graph. RDF uses `oa:bodyValue`,
+  whitelisted OA motivations, and pseudonymous agent IRIs — the Firebase auth ID
+  never appears in exported RDF (audit KR-12).
+- **CURIEs display, IRIs persist.** The IRI row shows `sstim:X`, but `href`,
+  tooltip, and Copy all use the full canonical IRI, so the citable form never
+  disappears. `toCurie()` lives beside the prefix table in
+  `src/rdf/namespaces.js`.
+- **Hash deep links are bidirectional.** `/graph#highTheta` selects the node;
+  selection writes back with `history.replaceState`, so a URL is shareable
+  without polluting the back stack. `/#term` still works via a forwarding shim
+  on the entrance.
+- **Animation is one setting.** Fade, pan, and fit share a single
+  `transitionMs` with `ease-in-out-cubic`, so in and out feel symmetric and the
+  camera and visibility changes finish together.
 
-## Decided — graph home moves to `/graph` behind the public entrance
-
-Per [`PUBLIC_ENTRANCE.md`](PUBLIC_ENTRANCE.md) (Workstream 4, decided
-2026-07-18): the audience-first entrance replaces the graph-first `/`, and
-the knowledge browser becomes a dedicated **`/graph`** route — door ②'s
-destination, not the front door. Consequences for this surface:
-
-- **Deep links.** `/#term` remains valid via a hash-forward shim on the
-  entrance (non-entrance hashes forward to `/graph` + hash with
-  `replaceState`); the canonical deep-link form becomes `/graph#term`.
-  The hash-resolution logic itself (bare local names, CURIE fallback,
-  bidirectional URL write-back) is unchanged.
-- **w3id.** The merged HTML conneg branches (routes live 2026-07-17,
-  perma-id/w3id.org#6378) all 303 to the bare root and keep working:
-  HTML-preferring visitors get orientation, one click from the browser.
-  Optionally retarget those branches to `/graph` in a future bundled
-  w3id PR.
-- **Loading.** Cytoscape + ontology parsing move off the site's first
-  paint entirely — the entrance stays featherweight and the heavy load
-  happens only when `/graph` (or a forwarded deep link) is opened.
-
-Build task: TODO.md §5 (Phase 2 UX). Blocked only on hero-copy
-confirmation.
+Also present: single-row top bar, keyboard shortcuts (`/` `Enter` `Esc` `c` `x`
+`f` `r` `h`/`?`), Copy IRI, direction-ordered Connections with per-edge-kind
+filter pills, 1-hop neighborhood focus, and the `/profile/` page that supplies
+annotation author names.
 
 ---
 

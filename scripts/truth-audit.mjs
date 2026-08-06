@@ -80,7 +80,14 @@ ok(`all ${MODULE_COUNT} modules at ${VERSION}`)
 // ── 2. prose does not advertise a superseded release ─────────────────────────
 
 const PROSE = ['README.md', 'SECURITY.md', 'docs/technical/PORTABLE_DEPLOYMENT.md',
-  'ROADMAP.md', 'TODO.md', 'src/routes/+page.svelte']
+  'ROADMAP.md', 'TODO.md', 'src/routes/+page.svelte',
+  // The ontology docs restate release facts more than anything else in the
+  // repository, and were the last place still advertising a superseded line.
+  'static/ontology/README.md', 'docs/ontology/README.md',
+  'docs/ontology/MODULE_ARCHITECTURE.md',
+  'docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md',
+  'docs/ontology/REGISTRY_SUBMISSIONS.md', 'docs/ecosystem/w3id/README.md',
+  'docs/ecosystem/w3id/sstim/README.md']
 
 // Any SSTIM x.y.z that is not the current one, outside a changelog/history line.
 const olderVersion = /\bv?(\d+\.\d+\.\d+)\b/g
@@ -88,14 +95,20 @@ const olderVersion = /\bv?(\d+\.\d+\.\d+)\b/g
 // Text that legitimately names an old version: history, changelogs, ranges
 // ("v0.2.0 through v0.12.0"), and struck-through gap rows recording what a gap
 // *used to say*. Without this the audit flags its own evidence of progress.
-const IS_HISTORY = /histor|changelog|superseded|previous|prior|until 0\.|was |formerly|earlier|released in|through|snapshot|no longer|~~/i
+const IS_HISTORY = /histor|changelog|superseded|previous|prior|until 0\.|was |formerly|earlier|released in|through|snapshot|no longer|submitted|~~/i
+
+// A table row carrying an ISO date is a log entry — a record of what was true
+// on that date — not a claim about now. Registry submission logs and release
+// tables are full of them, and flagging those would make the audit demand that
+// history be rewritten every release.
+const IS_DATED_LOG_ROW = (line) => line.trimStart().startsWith('|') && /\d{4}-\d{2}-\d{2}/.test(line)
 
 for (const file of PROSE) {
   const text = read(file)
   if (!text) continue
   text.split('\n').forEach((line, i) => {
     // History, changelogs and superseded-ADR notes legitimately name old versions.
-    if (IS_HISTORY.test(line)) return
+    if (IS_HISTORY.test(line) || IS_DATED_LOG_ROW(line)) return
     if (!/sstim|ontology|release/i.test(line)) return
     for (const m of line.matchAll(olderVersion)) {
       const found = m[1]
@@ -109,6 +122,24 @@ for (const file of PROSE) {
 
 ok('no superseded live/citable version in prose')
 
+// A superseded *development* line is the error the check above cannot see:
+// "0.13.0-dev" contains "0.13.0", which was a legitimate release number, so it
+// read as current for a whole release cycle while naming a line that had moved
+// on. Any `-dev` string that is not the live one is stale by construction.
+const devPattern = /\b\d+\.\d+\.\d+-dev\b/g
+for (const file of PROSE) {
+  const text = read(file)
+  if (!text) continue
+  text.split('\n').forEach((line, i) => {
+    if (IS_HISTORY.test(line) || IS_DATED_LOG_ROW(line)) return
+    for (const m of line.matchAll(devPattern)) {
+      if (m[0] === VERSION) continue
+      fail(`${file}:${i + 1}`, `names ${m[0]} as the development line; it is ${VERSION}`)
+    }
+  })
+}
+ok('no superseded development line in prose')
+
 // A superseded DOI in prose is the same class of error as a superseded version,
 // and the first pass checked DOIs only among the machine-readable files.
 if (DOI) {
@@ -118,7 +149,7 @@ if (DOI) {
     const text = read(file)
     if (!text) continue
     text.split('\n').forEach((line, i) => {
-      if (IS_HISTORY.test(line)) return
+      if (IS_HISTORY.test(line) || IS_DATED_LOG_ROW(line)) return
       for (const m of line.matchAll(doiPattern)) {
         // The concept DOI names every version and is correct anywhere.
         if (m[0] === DOI || m[0] === conceptDoi) continue

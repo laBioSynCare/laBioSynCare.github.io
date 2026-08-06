@@ -41,8 +41,8 @@ heuristically cacheable under RFC 9111, so a conformant shared cache should not
 store them in the first place. The directive stays, correct if the server ever
 permits it.
 
-`0.12.0` remains the latest immutable release. Top-level sources are the mutable
-`0.13.0-dev` line and must not be confused with a released snapshot.
+Top-level sources are the mutable development line and must never be confused
+with a released snapshot; `void.ttl` names the latest immutable release.
 
 **Copy `.htaccess` to the registry verbatim; do not copy this README.** The
 registry's `sstim/README.md` is a trimmed version of this file. perma-id asks
@@ -58,7 +58,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Live |
 | `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Live |
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
-| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned `0.13.0-dev` modules | Live |
+| `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned modules | Live |
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
 | `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
