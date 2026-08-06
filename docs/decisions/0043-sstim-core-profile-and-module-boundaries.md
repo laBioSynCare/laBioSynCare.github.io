@@ -1,6 +1,6 @@
 # ADR 0043 — SSTIM Kernel, Core, Core Plus, concern modules, and Full Profile
 
-**Status:** Accepted — 2026-08-01 · implementation target SSTIM 0.13.0
+**Status:** Accepted — 2026-08-01 · implemented and released in SSTIM 0.13.0
 
 Implements the architectural direction recorded in
 [ADR 0041 §6](0041-stimulus-description-layers-and-the-canonical-schema-gap.md#6-a-small-core-with-adjunctive-modules).
@@ -338,23 +338,16 @@ several files is not evidence that independent release cadence is safe.
 
 ## 0.13 rollout and release gates
 
-1. Accept ADR 0044 and move the channel declaration while preserving its IRI.
-2. Redistribute terms and cross-axioms into the accepted modules and bridges;
-   assign one authoritative owner to each.
-3. Add the authoritative manifest and make every inventory consumer check it.
-4. Prove normalized 0.12-to-0.13 Full union-graph equivalence.
-5. Wire every source, graph, route, export, snapshot, context, VoID record, and
-   generated documentation page through the manifest.
-6. Publish the weak Core SHACL closure while retaining the Full aggregate;
-   extract concern-specific and bridge shapes later, together with the named
-   conformance profiles they validate.
-7. Add per-profile positive, out-of-scope, and adversarial fixtures plus
-   competency queries. In particular, Core must describe a determinate stimulus,
-   channel, duration, regime, and optional target without loading Common or any
-   larger concern.
-8. Run parse, local-IRI-closure, reasoning, SHACL, competency-query, round-trip,
-   snapshot-integrity, and route-parity gates for each published profile and for
-   Full.
+**All eight rollout steps completed in SSTIM 0.13.0**: ADR 0044 accepted and the
+channel declaration moved with its IRI preserved; terms and cross-axioms
+redistributed with one authoritative owner each; the manifest added and every
+inventory consumer wired through it; normalized 0.12-to-0.13 Full union-graph
+equivalence proved; the weak Core SHACL closure published alongside the Full
+aggregate; per-profile fixtures and competency queries added; and the full gate
+suite run for each profile. The recurring per-release procedure now lives in
+[`static/ontology/README.md`](../../static/ontology/README.md#versioning-and-publication).
+
+The rules below outlived the rollout and bind every future release.
 
 For OWLAPI-based reasoning, a profile's RDF closure is unioned before RDF-to-OWL
 translation. Loading every physical module as an independent OWL ontology and
@@ -380,11 +373,19 @@ cannot be proved clean by Git, if the version is already present in the immutabl
 checksum ledger, or if checksum registration fails. The copied files and their
 checksums must then remain immutable.
 
-The modular implementation is accepted, but publication remains blocked until
-every published profile has nonempty profile-owned fixtures and competency
-queries, and the deployed persistent routes pass HTML/RDF content-negotiation
-tests, including `Vary: Accept`. Repository-local route files are necessary but
-do not demonstrate deployed negotiation.
+This ADR originally blocked publication on three conditions. Two were met:
+every published profile now carries nonempty profile-owned fixtures and a
+competency query, and the deployed persistent routes passed content-negotiation
+testing on 2026-08-04 across 19 route/`Accept` combinations — repository-local
+route files were necessary but never sufficient, and that distinction held.
+
+The third, `Vary: Accept`, **was unsatisfiable and is withdrawn as a gate.** No
+w3id.org `303` emits the header, including namespaces that request it explicitly;
+the directive is present and correct if the server ever permits it. The risk it
+guarded against does not arise regardless: these `303`s carry no cache directives
+and `303` is not heuristically cacheable under RFC 9111, so a conformant shared
+cache should not store them at all. Reasoning in
+[`../ecosystem/w3id/sstim/README.md`](../ecosystem/w3id/sstim/README.md).
 
 Both were satisfied by 2026-08-04, with one qualification recorded rather than
 waived. Every profile now declares fixtures and a competency query, executed

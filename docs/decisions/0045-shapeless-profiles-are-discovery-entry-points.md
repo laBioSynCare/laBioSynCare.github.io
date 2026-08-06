@@ -1,6 +1,6 @@
 # ADR 0045 — A profile with no shape closure is a discovery entry point, not a conformance target
 
-**Status:** Accepted — 2026-08-02 · implementation target SSTIM 0.13.0
+**Status:** Accepted — 2026-08-02 · implemented and released in SSTIM 0.13.0
 
 Refines the per-profile conformance contract in
 [ADR 0043 §5 and §7](0043-sstim-core-profile-and-module-boundaries.md), which

@@ -30,6 +30,7 @@
 [ ]  Not started
 [!]  Blocked — see note
 [?]  Decision pending — see note
+[–]  Abandoned or superseded — kept with the reason, so it is not re-proposed
 ```
 
 Phase tags:
@@ -42,52 +43,43 @@ Phase tags:
 
 ## Current Focus (update when focus shifts)
 
-**Update (Jul 2026):** Phase 0 is complete and the repository is in Phase 1.
-SSTIM `0.13.0` is the validated release line (tag `v0.13.0`, version IRI
-`https://w3id.org/sstim/0.13.0`), the modular release accepted by ADR 0043.
-The previous release `v0.12.0` is archived under release DOI `10.5281/zenodo.21717988`;
-cite the concept DOI `10.5281/zenodo.21286974` across releases. The external live-only ecosystem store, loader, and
-private admission ledger are operational, with Renato as the first admitted
-agent. The unified Graph navigator now exposes the interlinked versioned catalog,
-live ecosystem, and SSTIM terms. The w3id catalog + live ecosystem routes are
-merged and verified (2026-07-17, perma-id/w3id.org#6378), and the live
-aggregate carries the W3C CG and Æterni Anima records — persistent
-identifiers may now be promoted in human-facing discovery. The Phase-2 public
-entrance shipped 2026-07-18 (four doors on `/`, browser moved to `/graph` —
-see §5 and [`PUBLIC_ENTRANCE.md`](docs/technical/PUBLIC_ENTRANCE.md)). The
-immediate focus is outreach (Brain Innovation Days application by
-1 Sept 2026); registry review and future independent human review continue.
-One entrance decision stays open — whether Sensory Field remains a distinct
-on-ramp or folds into Patch Studio — and is an architecture call, not copy.
-Public BSC Lab data remains separate from the private BioSynCare/BSC catalog.
-The manifest-driven modular architecture shipped as `0.13.0` on 2026-08-04:
-namespace catalogues, profile and schema routes, and a complete conformance
-contract for every profile, with the registry rules merged and verified live.
+Phase 0 is complete; the repository is in Phase 1 with substantial Phase-2 work
+already shipped. Release facts are derived from
+[`void.ttl`](static/ontology/void.ttl) and
+[`manifest.json`](static/ontology/manifest.json); what each release changed is in
+[`CHANGELOG.md`](CHANGELOG.md). Cite the concept DOI
+`10.5281/zenodo.21286974` across releases.
 
-**Update (May 2026):** an early Phase-2 prototype — the **Patch Studio**
-(real-time audiovisual designer, four selectable audio engines, six audio voice
-types + universal tremolo, nine visual track types with blend/fullscreen mixing,
-and a photosensitivity safety layer) — now exists ahead of schedule. It is
-documented in [`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)
-and [`docs/technical/PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+**Immediate:** outreach — Brain Innovation Days application by **1 Sept 2026**.
+Registry curation and independent human ontology review continue in parallel.
 
-**Update (Jun 2026):** the **Sensory Field** (`/field/`) ships Steps 1–2 — a
-static colour field + per-ear tone/noise, blink and monaural/binaural beat, a
-runtime flash-rate cap ([`src/ui/safety/flashSafety.js`](src/ui/safety/flashSafety.js)),
-and per-configuration `sstim-ex:ExposureProfile` export. Exposure ontology bumped
-to 0.4.0 (laterality, quantitative properties, `ExposureLimit` safety boundaries).
-See [`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md) and
-[ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md). Next: Step 3
-(stereoscopic depth / dichoptic eye-laterality).
-The `core/` orchestration layer and the GPU visual/haptic engines remain Phase 2
-work; Phase 3 infrastructure still must not be built during Phase 1.
+**Standing state.** The modular ontology architecture shipped, with namespace
+catalogues, profile and schema routes, and a conformance contract for every
+profile; the registry rules are merged and verified against the deployment. The
+external live-only ecosystem store, loader, and private admission ledger are
+operational, and the live aggregate carries the W3C CG and Æterni Anima records,
+so persistent identifiers may be promoted in human-facing discovery. The unified
+Graph navigator exposes the interlinked versioned catalog, live ecosystem, and
+SSTIM terms. The public entrance shipped 2026-07-18 (four doors on `/`, browser
+at `/graph`). Public BSC Lab data remains separate from the private
+BioSynCare/BSC catalog.
 
-### Known issues (Phase 0)
-- [x] ~~`static/ontology/sstim-vocab.ttl` SHACL non-conformance on
-      `sstim-v:allFrequencyBands`~~ — resolved 2026-04-22. Introduced
-      `sstim:FrequencyBandGroup` in `sstim-core.ttl`; retyped
-      `allFrequencyBands` away from `sstim:FrequencyBand`. Both files
-      now fully conform against `sstim-shapes.ttl`.
+**Ahead of schedule, from Phase 2.** The **Patch Studio** (real-time audiovisual
+designer, four selectable audio engines, six audio voice types plus universal
+tremolo, nine visual track types with blend/fullscreen mixing) and the **Sensory
+Field** (`/field/`, Steps 1–2: static colour field, per-ear tone/noise, blink,
+monaural/binaural beat, runtime flash-rate cap, per-configuration
+`ExposureProfile` export). Both sit behind the photosensitivity safety layer. See
+[`PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md),
+[`SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md), and
+[`PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+
+**Open decisions.** Whether Sensory Field stays a distinct on-ramp or folds into
+Patch Studio — an architecture call, not copy. Sensory Field Step 3 (stereoscopic
+depth / dichoptic eye-laterality) is outlined but unbuilt.
+
+**Still Phase 2, not to be built during Phase 1:** the `core/` orchestration
+layer and the GPU visual/haptic engines. Phase 3 infrastructure likewise waits.
 
 ---
 
@@ -496,7 +488,9 @@ Do not start these until all Phase 0 documents are committed.
 - [x] `src/rdf/loader.js` — fetch + parse TTL files from URLs (N3.js) `P1`
       *Loads: sstim-core.ttl, sstim-vocab.ttl, sstim-alignments.ttl,
       sstim-shapes.ttl, and committed preset/reference instance TTL files.*
-- [ ] `src/rdf/store.js` — N3.Store management, merge multiple graphs `P1`
+- [–] `src/rdf/store.js` — **absorbed into `loader.js`**, which already exports
+      `parseIntoStore`, `loadMerged` and `mergeStores`. A separate module would
+      add an indirection with no second caller.
 - [x] `src/rdf/query.js` — Comunica SPARQL engine, lazy-loaded `P1`
       *Dynamic import: only load Comunica when SPARQL interface opens*
 - [ ] `src/rdf/validate.js` — rdf-validate-shacl in browser `P1`
@@ -596,9 +590,13 @@ Do not start these until all Phase 0 documents are committed.
       referenced in the new issue template's frontmatter `P3`
 
 ### Engine interfaces and implementations
-- [ ] `src/engines/audio/IAudioEngine.js` `P2`
-- [ ] `src/engines/audio/VanillaWebAudioEngine.js` `P2`
-- [ ] `src/engines/audio/ToneJsEngine.js` `P2`
+- [x] ~~`src/engines/audio/IAudioEngine.js`~~ — shipped, with four
+      implementations: Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, and
+      Null. See [`src/engines/README.md`](src/engines/README.md).
+- [x] ~~`src/engines/audio/VanillaWebAudioEngine.js`~~ — shipped; the default.
+- [–] `src/engines/audio/ToneJsEngine.js` — **abandoned.** Four engines already
+      exercise the interface; a Tone.js wrapper adds a dependency without
+      proving anything the WASM engine does not.
 - [ ] `src/engines/visual/IVisualEngine.js` `P2`
 - [ ] `src/engines/visual/PixiJSEngine.js` — PixiJS v8, WebGPU/WebGL `P2`
 - [ ] `src/engines/visual/CSSEngine.js` — CSS animations fallback `P2`
@@ -607,12 +605,11 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] `src/engines/haptic/NullHapticEngine.js` — silent fallback `P2`
 
 ### AudioWorklet processors (in static/worklets/, never bundled)
-- [ ] `static/worklets/binaural.worklet.js` — stereo oscillators, beat
-      frequency, panning modes `P2`
-- [ ] `static/worklets/martigli.worklet.js` — sinusoidal frequency sweep,
-      breathing arc interpolation `P2`
-- [ ] `static/worklets/symmetry.worklet.js` — permuted note sequence
-      scheduling, isochronic mode `P2`
+- [x] ~~Per-technique `binaural` / `martigli` / `symmetry` worklets~~ —
+      **superseded by one unified processor.** `bsc-voice.worklet.js` covers
+      every voice type, with `bsc-voice-wasm.worklet.js` + `bsc-osc.wasm` as the
+      WASM oscillator variant. Recorded in
+      [`AUDIO_ENGINE_ARCHITECTURE.md`](docs/technical/AUDIO_ENGINE_ARCHITECTURE.md).
 
 ### Core orchestration
 - [ ] `src/core/MasterClock.js` — wraps AudioContext.currentTime,
@@ -667,9 +664,12 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       + `isoEnvSpec`.
 - [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
       preserving the `AudioContext.currentTime` clock authority) `P2`
-- [ ] Extract a cloud-patches store over `src/firebase/patches.js`; split out
-      subcomponents (cloud menu, help overlay, semantic-info panel, mix stage,
-      track card) `P2`
+- [x] ~~Extract a cloud-patches store~~ — shipped as the storage seam
+      ([ADR 0038](docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)):
+      `src/storage/` holds `PatchStore` with local and Firestore implementations
+      and a conformance suite; `src/firebase/patches.js` is gone.
+- [ ] Split out Patch Studio subcomponents (cloud menu, help overlay,
+      semantic-info panel, mix stage, track card) `P2`
 
 **Tests (PATCH_STUDIO.md §10.3)**
 - [x] ~~Unit tests for `modulation.js` + `waveformPaths.js`~~ —
@@ -908,23 +908,14 @@ Not project-specific — run on a schedule.
 - [ ] Review npm audit output and update dependencies `recurring`
 - [ ] Check pySHACL for new releases; update CI if needed `recurring`
 - [ ] Review BioSynCare user feedback and extract actionable items `recurring`
-- [ ] Update `docs/ecosystem/TRADEMARK_STATUS.md` with filing progress `recurring`
+- [ ] Record trademark filing progress in `TODO.md` §2 and `IP_STRATEGY.md` `recurring`
 
-**Per release:**
-- [ ] Update core `owl:versionIRI`, module `owl:versionInfo`, and all release
-      metadata consistently `recurring`
-- [ ] Prepare exact immutable sibling `owl:imports`, manifest
-      `immutableRelease` (base, manifest, and schema), released `$schema`,
-      immutable PROF artifacts, and every snapshotted artifact's versioned URL
-      `recurring`
-- [ ] Confirm every released profile has positive, out-of-scope, and
-      adversarial fixtures plus an executable competency query `recurring`
-- [ ] Run WIDOCO to regenerate docs `recurring`
-- [ ] Run `make validate` and confirm all public instance graphs pass SHACL
-      `recurring`
-- [ ] Regenerate the public BSC Lab preset JSON bundle if the player uses it `recurring`
-- [ ] Confirm all earlier frozen ontology snapshots are byte-unchanged `recurring`
-- [ ] Tag release in git with semver `recurring`
+**Per release:** follow the eleven-step procedure in
+[`static/ontology/README.md`](static/ontology/README.md#versioning-and-publication),
+which is authoritative and enforced by `make snapshot` and `make release-dryrun`.
+Not duplicated here — a second copy of a release checklist is a second thing to
+forget. The one item outside it: regenerate the public BSC Lab preset JSON bundle
+if the player uses it `recurring`.
 
 **Per new public BSC Lab reference preset added:**
 - [ ] Validate JSON against `schemas/preset.schema.json` `recurring`
@@ -934,5 +925,5 @@ Not project-specific — run on a schedule.
 
 ---
 
-*Last updated: 2026-07-11 - WIDOCO publication path implemented (ADR 0023)*
-*Next update due: after the WIDOCO Pages deploy is verified live or perma-id PR #6337 merges*
+*This file tracks work. Dated status belongs in [`CHANGELOG.md`](CHANGELOG.md);
+current state is derived by `make truth-audit`.*

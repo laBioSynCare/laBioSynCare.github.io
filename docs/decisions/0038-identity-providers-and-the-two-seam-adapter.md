@@ -1,12 +1,15 @@
 # ADR 0038 — Identity providers: Fediverse-first, behind a two-seam adapter
 
-**Status:** Proposed — 2026-07-30
-
-Records an architectural direction for replacing the single hardcoded identity
-and storage backend, and the ordering between candidate identity providers. No
-implementation exists yet; the work is tracked in
+**Status:** Accepted — 2026-07-30 · **both seams implemented; neither Fediverse
+identity provider is.** `src/storage/` and `src/identity/` exist with conformance
+suites, and the anonymous and Firebase identity providers ship. Mastodon OAuth
+and IndieAuth — the part of §3 that demonstrates the seam is an interface rather
+than a swap — remain outstanding. Tracked in
 [`../technical/PORTABLE_DEPLOYMENT.md`](../technical/PORTABLE_DEPLOYMENT.md) §3.2
 and in `ROADMAP.md` under "Software: portable deployment and migration".
+
+Records an architectural direction for replacing the single hardcoded identity
+and storage backend, and the ordering between candidate identity providers.
 
 ## Context
 

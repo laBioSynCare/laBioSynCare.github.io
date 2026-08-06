@@ -112,19 +112,22 @@ primarily with AI-assisted development.
 - **IP:** No trademarks filed yet. No patents. Defensive publication
   strategy chosen over patent filing.
 
-### Repository update (July 2026)
+### Repository update (since April 2026)
 
-- **SSTIM:** `0.13.0` is the validated, frozen release line, archived under
-  version DOI `10.5281/zenodo.21792692`.
-  The previous release `v0.12.0` is archived under version DOI `10.5281/zenodo.21717988`,
-  and the continuing project retains concept DOI `10.5281/zenodo.21286974`.
-- **Ontology:** `0.13.0` redistributes the same 385 terms across 18
+Version numbers, DOIs, and term counts are derived from
+[`void.ttl`](static/ontology/void.ttl) and
+[`manifest.json`](static/ontology/manifest.json), not restated here;
+[`CHANGELOG.md`](CHANGELOG.md) records what each release changed.
+
+- **SSTIM** has a validated, frozen, DOI-archived release line, plus a concept
+  DOI (`10.5281/zenodo.21286974`) that names the continuing project.
+- **Ontology:** the modular redistribution moved the same term set across
   manifest-owned modules behind four profile entry points — Kernel, Core, Core
   Plus, Full — so an adopter can implement a bounded contract instead of the
   whole graph. No term was added, removed, or renamed, and the Full union
-  preserves `0.12.0` semantics exactly. Qualified evidence governance, ecosystem
-  relationships, safety metadata, SHACL, OWL reasoning, and the executable
-  quality/competency checks all carry over.
+  preserves pre-modular semantics exactly. Qualified evidence governance,
+  ecosystem relationships, safety metadata, SHACL, OWL reasoning, and the
+  executable quality/competency checks all carry over.
 - **Public data:** BSC Lab framework, implementation, protocols, reference
   presets, evidence, references, experiments, one synthetic session, and a
   synthetic ecosystem contract graph are public. Private catalog, real
@@ -137,91 +140,42 @@ primarily with AI-assisted development.
 
 ## Delivered Outside the Original Plan
 
-This roadmap was written in April 2026, when the ontology had no tagged
-releases and the repository had no release engineering. The work below was
-delivered since and appears nowhere in the phase deliverables above. It is
-recorded here so that the phase lists are not mistaken for the full scope of
-what exists.
+This roadmap was written in April 2026, when the ontology had no tagged releases
+and the repository had no release engineering. Substantial work has landed since
+that appears nowhere in the phase deliverables below — recorded here so the phase
+lists are not mistaken for the full scope of what exists.
+[`CHANGELOG.md`](CHANGELOG.md) is the release history of record; the per-item
+inventory that used to sit here duplicated it and went stale after every release.
 
-### Release engineering and citability
+Five themes, none of them in the original phases:
 
-- Ten tagged releases, `v0.2.0` (2026-06-12) through `v0.12.0` (2026-07-31).
-  No release tag existed when the phases below were written.
-- Zenodo archiving enabled at `v0.5.0`: an all-versions concept DOI plus a
-  distinct version DOI per release, carried into the ontology metadata,
-  VoID/DCAT, citation guidance, and the JSON-LD context.
-- Immutable whole-set snapshots under `static/ontology/0.1.0/` … `0.12.0/`
-  ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)), with a
-  `make verify-snapshots` checksum gate against silent edits.
-- `CHANGELOG.md` as the release history of record.
-- `make validate` as a single composite gate: six SHACL suites, ecosystem
-  contract, quality audit, OWL DL reasoning, SPARQL sanity, export check,
-  JSON-LD context round-trip, and snapshot verification — all mirrored in CI.
-
-### Ontology modules and quality infrastructure
-
-- Four release modules beyond the original four: `sstim-exposure.ttl`,
-  `sstim-ecosystem.ttl`, `sstim-patch-studio.ttl`, and
-  `sstim-stimulus.ttl`, plus
-  `sstim-ecosystem-private-shapes.ttl`, `void.ttl`, and `context.jsonld`.
-- ROBOT/HermiT OWL DL consistency reasoning over the merged term space
-  (`make reason`).
-- Executable competency and quality checks (`make sparql-sanity`,
-  `make quality-audit`) rather than prose competency questions.
-- Multi-format serialization export (`make export` → JSON-LD and RDF/XML) and a
-  JSON-LD context round-trip test.
-- pyLODE `vocpub` SKOS documentation alongside WIDOCO's OWL reference docs
-  ([ADR 0023](docs/decisions/0023-ontology-docs-publication-path.md)).
-- BioPortal ingest bundle (`make bioportal-bundle`) and submission; FOOPS
-  reassessed at 87.5% with only registry-dependent checks outstanding.
-- 43 ADRs (0001–0043, with accepted, proposed, and superseded states). Roughly
-  a handful existed in April 2026.
-
-### Ecosystem and stakeholder layer
-
-Not in any phase list. Introduced by
-[ADR 0024](docs/decisions/0024-stakeholder-ecosystem-modeling.md) and hardened
-by [ADR 0031](docs/decisions/0031-qualified-ecosystem-records.md) and
-[ADR 0032](docs/decisions/0032-visible-pending-status-ecosystem-records.md).
-
-- Qualified ecosystem records for people and organizations with a visible
-  consent lifecycle (notified → approved), a private ledger, a
-  retention/removal runbook, and a private-first admission job.
-- A live, mutable public projection (`current.ttl`) kept outside the citable
-  releases and opt-in in the app, with source and provenance disclosure.
-- `make ecosystem-contract` and `make ecosystem-publish` operational tooling.
-- Supporting documents: `ECOSYSTEM_INTEGRATION.md`, `ECOSYSTEM_OPERATIONS.md`,
-  `OUTREACH_TARGETS.md`, `HED_BIDS_INTEROP.md`, `SSTIM_LLM_MESSAGING.md`,
-  `DEFENSIVE_PUBLICATIONS.md`.
-
-### Application surfaces
-
-- **Sensory Field** (`/field/`) with three scenes, `ExposureProfile` emission,
-  and a runtime flash-rate cap ([ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)).
-- **Logbook**, **Profile**, **Settings**, and **About** routes.
-- **Entrance/conversion layer**: citation modal, protocol-contribution modal,
-  and conversion bar for the four-door entrance.
-- **Graph navigator** far beyond "class hierarchy + SKOS scheme": legend
-  spotlighting, subgraph guides, facet-based navigation across stimulation and
-  neuromodulation, live-ecosystem overlay, provenance disclosure, and
-  deep-linkable IRI targets.
-- **PWA layer**: manifest, service worker, offline runtime caching, and a
-  session-safe update banner ([ADR 0009](docs/decisions/0009-pwa.md)).
-- Photosensitivity safety layer, theme/skin system, generated CC0 ambient
-  samples (`scripts/gen-ambiences.mjs`) with a `Sample` track type, and vitest
-  unit suites beside the source they cover.
-
-### Toolchain and publication path
-
-- A Nix flake pinning Node, Python + pySHACL, ROBOT/HermiT, WIDOCO, pyLODE,
-  WABT, and Firebase tooling across Linux and macOS. CI runs every command
-  inside it, so contributor and CI toolchains match exactly.
-- GitHub Actions for build, check, validate, and Pages deploy.
-- w3id.org routing merged upstream three times: PR #6337 (2026-07-11, full
-  route × representation matrix), PR #6378 (2026-07-17, catalog and live
-  ecosystem routes), and PR #6393 (2026-07-21, HTML-accept deep links into the
-  graph browser). One identifier now serves both audiences: a browser hitting
-  `w3id.org/sstim` lands in the live graph navigator, a machine gets Turtle.
+- **Release engineering and citability.** Tagged releases, Zenodo concept and
+  version DOIs carried into ontology metadata and VoID/DCAT, immutable
+  whole-set snapshots with a checksum gate
+  ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md)), and
+  `make validate` as one composite CI-mirrored gate.
+- **Ontology modularity and quality infrastructure.** The Kernel/Core/Core
+  Plus/Full split ([ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)),
+  ROBOT/HermiT OWL DL reasoning, executable competency and quality checks
+  instead of prose competency questions, multi-format export with round-trip
+  tests, WIDOCO plus pyLODE documentation, and BioPortal ingest. The ADR series
+  itself grew from a handful to dozens.
+- **An ecosystem and stakeholder layer.** Qualified records for people and
+  organizations with a visible consent lifecycle, a private ledger, a
+  retention/removal runbook, and a live mutable public projection kept outside
+  the citable releases ([ADR 0024](docs/decisions/0024-stakeholder-ecosystem-modeling.md),
+  [0031](docs/decisions/0031-qualified-ecosystem-records.md),
+  [0032](docs/decisions/0032-visible-pending-status-ecosystem-records.md)).
+- **Application surfaces.** Sensory Field
+  ([ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)), the
+  four-door entrance and conversion layer, a graph navigator far beyond "class
+  hierarchy + SKOS scheme", the PWA layer
+  ([ADR 0009](docs/decisions/0009-pwa.md)), the photosensitivity safety layer,
+  and unit suites beside the source they cover.
+- **Toolchain and publication path.** A Nix flake pinning the entire toolchain,
+  with CI running every command inside it so contributor and CI environments
+  match exactly; GitHub Actions for build, check, validate and deploy; and the
+  w3id.org route matrix merged upstream and verified against the deployment.
 
 ---
 
@@ -322,11 +276,13 @@ the knowledge navigation layer.
       implementation instances under `/framework/bsc`, `/implementation/bsclab`,
       and public-safe `/implementation/biosyncare` metadata if needed (PR to
       perma-id/w3id.org). Do not publish the private BioSynCare/BSC catalog
-      through BSC Lab. *(three upstream merges into perma-id/w3id.org: #6337
+      through BSC Lab. *(upstream merges into perma-id/w3id.org: #6337
       2026-07-11 route × representation matrix, #6378 2026-07-17 catalog and live
-      ecosystem routes, #6393 2026-07-21 HTML-accept deep links into the graph
-      browser. Verified live: `Accept: text/html` on `w3id.org/sstim` resolves to
-      `/graph/`, `Accept: text/turtle` to `sstim-core.ttl`)*
+      ecosystem routes, #6480 2026-08-03 the modular module/profile/manifest
+      routes, verified live 2026-08-04 across 19 route/`Accept` combinations.
+      `Accept: text/html` on `w3id.org/sstim` resolves to the entrance at `/`,
+      not `/graph` — retargeting the HTML branches is an open follow-up in
+      `PUBLIC_ENTRANCE.md`)*
 - [ ] Submit defensive publications for Martigli, Symmetry, and
       Martigli-Binaural to IP.com and arXiv (cs.SD)
       *(submission material prepared in `docs/ecosystem/DEFENSIVE_PUBLICATIONS.md`;

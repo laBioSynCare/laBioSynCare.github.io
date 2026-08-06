@@ -1,6 +1,6 @@
 # ADR 0035 — Participant engagement mode, ECT, and endogenous self-regulation
 
-**Status:** Accepted — 2026-07-23 · targets SSTIM 0.10.0
+**Status:** Accepted — 2026-07-23 · released in SSTIM 0.10.0
 
 Adds a sixth facet axis — how much active participation a method demands of the
 individual — catalogues electroconvulsive therapy and the closed-loop

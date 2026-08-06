@@ -149,154 +149,52 @@ SSTIM models deliberately applied interventions, not endogenous physiological
 neuromodulation. Within that operational scope, neuromodulation is a kind of
 stimulation, but it does not require *sensory* stimulation.
 
-The Turtle blocks in this ADR are abbreviated semantic signatures, not
-copy-ready term records. Implementation adds the repository-required labels,
-multilingual annotations where applicable, definitions, `rdfs:isDefinedBy`, and
-an `rdfs:seeAlso` link to this ADR for every new or semantically revised local
-term.
+The shipped terms are authoritative and carry `rdfs:seeAlso` back to this ADR;
+the abbreviated Turtle sketches that were here have been removed rather than left
+to drift from them. `sstim:Stimulation` lives in `sstim-core.ttl`, the technique
+and protocol parents in `sstim-technique.ttl`, `sstim:StimulationIntervention` in
+`sstim-session.ttl`, and everything neuromodulation-specific in
+`sstim-neuromodulation.ttl`.
 
-```turtle
-sstim:Stimulation a owl:Class ;
-    rdfs:subClassOf bfo:0000015 ;
-    skos:definition """A deliberately parameterized process in which structured
-      physical energy, mechanical input, a chemical agent, or another controlled
-      input is applied as a stimulus with a declared design intent to elicit,
-      perturb, regulate, or probe an identified biological, sensory, or neural
-      process. Mere exposure, administration, or energy transfer without that
-      stimulation intent is insufficient. Classification does not assert
-      excitation, conscious perception, response, benefit, or safety."""@en .
+**`sstim:Stimulation`** is the neutral umbrella: a deliberately parameterized
+process applying structured energy, mechanical input, a chemical agent, or
+another controlled input, with a declared design intent to elicit, perturb,
+regulate, or probe an identified biological, sensory, or neural process. Mere
+exposure or energy transfer without that intent is insufficient, and membership
+asserts nothing about excitation, perception, response, benefit, or safety.
+`SensoryStimulation` and `Neuromodulation` are both its children.
 
-sstim:SensoryStimulation rdfs:subClassOf sstim:Stimulation .
+**`sstim:Neuromodulation`** is the intervention-side class: stimulation whose
+declared objective is to alter activity or function at an identified neural
+target. It excludes endogenous physiological neuromodulation and probe-only
+stimulation, and it does not mean treatment or successful modulation.
 
-sstim:Neuromodulation a owl:Class ;
-    rdfs:subClassOf sstim:Stimulation ;
-    skos:definition """In SSTIM, a deliberately applied stimulation process whose
-      declared intervention objective is to alter activity or function at an
-      identified neural target. Anatomical site and distributed neural system
-      are recorded on separate facets. Membership records target and design
-      intent; whether modulation occurred is represented separately through
-      observations and evidence."""@en ;
-    skos:scopeNote """This intervention-side class excludes endogenous
-      physiological neuromodulation and stimulation performed solely to probe or
-      measure a response without a neural-modulation objective. It does not mean
-      treatment or successful modulation."""@en .
+**One overlap pattern, applied at four layers.** At each of process,
+intervention, technique, and protocol, the sensory-route class is the
+intersection of the sensory and neuromodulation siblings with
+`neuralAccessRoute some CanonicalSensoryTransductionAccessRoute` — so
+`SensoryRouteNeuromodulationTechnique ≡ SensoryStimulationTechnique ⊓
+NeuromodulationTechnique ⊓ ∃neuralAccessRoute.CanonicalSensoryTransduction…`, and
+likewise for the other three. Each also carries explicit `rdfs:subClassOf` axioms
+to both parents. Those are redundant for a reasoner and deliberate: the graph
+navigator renders named subclass edges and does not project `owl:intersectionOf`
+expressions.
 
-sstim:SensoryRouteNeuromodulation a owl:Class ;
-    rdfs:subClassOf sstim:SensoryStimulation, sstim:Neuromodulation ;
-    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
-        ( sstim:SensoryStimulation
-          sstim:Neuromodulation
-          [ a owl:Restriction ;
-            owl:onProperty sstim:neuralAccessRoute ;
-            owl:someValuesFrom
-                sstim:CanonicalSensoryTransductionAccessRoute ]
-        ) ] .
-```
+`SensoryStimulation`'s definition is revised in the same change so its defining
+intervention route engages canonical sensory transduction and afferent processing
+with structured input. Conscious perception is not required, and an incidental
+sensation arising from some other primary route is insufficient.
 
-Revise `SensoryStimulation`’s definition/scope note in the same change: its
-defining intervention route engages canonical sensory transduction and afferent
-processing with structured input. Conscious perception is not required, and a
-mere incidental sensation from another primary route is insufficient.
+`SensoryStimulation` and `Neuromodulation` overlap; neither subsumes the other,
+and **no disjointness is asserted** between the sensory and neuromodulation
+parents at any layer — hybrid and multi-channel plans and techniques are
+legitimate. `EntrainmentBasedTechnique` and `NonEntrainmentTechnique` remain
+sensory-specific and inherit the neutral parent indirectly.
 
-`SensoryStimulation` and `Neuromodulation` overlap; neither subsumes the other.
-The explicit `rdfs:subClassOf` axioms on the defined intersection are redundant
-for an OWL reasoner but deliberate: the current graph navigator renders named
-subclass edges and does not project `owl:intersectionOf` expressions.
-
-The existing planned-process layer receives the same neutral parent:
-
-```turtle
-sstim:StimulationIntervention a owl:Class ;
-    rdfs:subClassOf sstim:Stimulation, cob:0000082 .
-
-sstim:SensoryStimulationIntervention
-    rdfs:subClassOf sstim:StimulationIntervention, cob:0000082 .
-
-sstim:NeuromodulationIntervention a owl:Class ;
-    rdfs:subClassOf sstim:StimulationIntervention, sstim:Neuromodulation .
-
-sstim:SensoryRouteNeuromodulationIntervention a owl:Class ;
-    rdfs:subClassOf sstim:SensoryStimulationIntervention,
-        sstim:NeuromodulationIntervention ;
-    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
-        ( sstim:SensoryStimulationIntervention
-          sstim:NeuromodulationIntervention
-          [ a owl:Restriction ;
-            owl:onProperty sstim:neuralAccessRoute ;
-            owl:someValuesFrom
-                sstim:CanonicalSensoryTransductionAccessRoute ]
-        ) ] .
-```
-
-The same structure applies to reusable technique information artifacts:
-
-```turtle
-sstim:StimulationTechnique a owl:Class ;
-    rdfs:subClassOf iao:0000030 ;
-    skos:definition """A reusable information-content category for a
-      parameterizable stimulation method. Classification records the method's
-      declared design intent and characteristic delivery, not that any response
-      occurred."""@en .
-
-sstim:SensoryStimulationTechnique
-    rdfs:subClassOf sstim:StimulationTechnique, iao:0000030 .
-
-sstim:NeuromodulationTechnique a owl:Class ;
-    rdfs:subClassOf sstim:StimulationTechnique ;
-    skos:definition """A stimulation technique whose defining intervention
-      objective is to alter activity or function at an identified neural target,
-      with anatomical site and distributed neural system recorded separately.
-      Membership does not assert successful modulation, benefit, or safety."""@en .
-
-sstim:SensoryRouteNeuromodulationTechnique a owl:Class ;
-    rdfs:subClassOf sstim:SensoryStimulationTechnique,
-        sstim:NeuromodulationTechnique ;
-    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
-        ( sstim:SensoryStimulationTechnique
-          sstim:NeuromodulationTechnique
-          [ a owl:Restriction ;
-            owl:onProperty sstim:neuralAccessRoute ;
-            owl:someValuesFrom
-                sstim:CanonicalSensoryTransductionAccessRoute ]
-        ) ] .
-```
-
-Protocol intent remains an information-artifact classification rather than a
-process type:
-
-```turtle
-sstim:StimulationProtocol a owl:Class ;
-    rdfs:subClassOf iao:0000030, obi:0000272 .
-
-sstim:SensoryStimulationProtocol
-    rdfs:subClassOf sstim:StimulationProtocol, iao:0000030, obi:0000272 .
-
-sstim:NeuromodulationProtocol a owl:Class ;
-    rdfs:subClassOf sstim:StimulationProtocol .
-
-sstim:SensoryRouteNeuromodulationProtocol a owl:Class ;
-    rdfs:subClassOf sstim:SensoryStimulationProtocol,
-        sstim:NeuromodulationProtocol ;
-    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
-        ( sstim:SensoryStimulationProtocol
-          sstim:NeuromodulationProtocol
-          [ a owl:Restriction ;
-            owl:onProperty sstim:neuralAccessRoute ;
-            owl:someValuesFrom
-                sstim:CanonicalSensoryTransductionAccessRoute ]
-        ) ] .
-```
-
-No disjointness is asserted between the sensory and neuromodulation parents at
-any layer. Hybrid and multi-channel plans and techniques are legitimate.
-`EntrainmentBasedTechnique` and `NonEntrainmentTechnique` remain sensory-specific
-subclasses and therefore inherit the new neutral parent indirectly.
-
-These parent additions are additive. Existing direct upper-ontology axioms—most
-notably `SensoryStimulationTechnique → iao:0000030` and
-`SensoryStimulationProtocol → obi:0000272`—remain materialized because the
-repository quality contract tests those direct triples rather than inferred
-closure.
+The parent additions are additive. Existing direct upper-ontology axioms — notably
+`SensoryStimulationTechnique → iao:0000030` and `SensoryStimulationProtocol →
+obi:0000272` — stay materialized, because the repository quality contract tests
+those direct triples rather than inferred closure.
 
 ### 2. Separate three meanings of “sensory”
 
@@ -497,52 +395,20 @@ SHACL; route is additionally allowed on stimulus channels. They intentionally
 carry no OWL domain: one cross-layer property must not infer that a protocol
 information artifact is a technique or process.
 
-```turtle
-sstim:NeuralAccessRoute a owl:Class ; rdfs:subClassOf iao:0000030 .
-sstim:CanonicalSensoryTransductionAccessRoute a owl:Class ;
-    rdfs:subClassOf sstim:NeuralAccessRoute .
-sstim:SensoryTransductionBypassingAccessRoute a owl:Class ;
-    rdfs:subClassOf sstim:NeuralAccessRoute .
-sstim:StimulationDeliveryApproach a owl:Class ; rdfs:subClassOf iao:0000030 .
-sstim:NeuralTargetSite a owl:Class ; rdfs:subClassOf iao:0000030 .
-sstim:NeuralSystem a owl:Class ; rdfs:subClassOf iao:0000030 .
-sstim:NeuralPhenomenon a owl:Class ; rdfs:subClassOf iao:0000030 .
+Seven facet classes are added under `iao:0000030` — `NeuralAccessRoute` with its
+`CanonicalSensoryTransduction…` and `SensoryTransductionBypassing…` children,
+plus `StimulationDeliveryApproach`, `NeuralTargetSite`, `NeuralSystem`, and
+`NeuralPhenomenon` — and three parallel property families range over them:
+`neuralAccessRoute` / `stimulationDeliveryApproach` / `intendedNeuralTargetSite`
+/ `intendedNeuralSystem` / `intendedNeuralPhenomenon` for the design intent, a
+`mechanism*` family domained on `StimulationMechanism` for the hypothesis, and an
+`outcome*` family domained on `EvidenceOutcomeConcept` for the finding. Only the
+last two take a domain; the intent properties deliberately take none. All live in
+`sstim-neuromodulation.ttl`, except the `outcome*` family in
+`sstim-neuromodulation-evidence.ttl`.
 
-sstim:neuralAccessRoute a owl:ObjectProperty ;
-    rdfs:range sstim:NeuralAccessRoute .
-sstim:stimulationDeliveryApproach a owl:ObjectProperty ;
-    rdfs:range sstim:StimulationDeliveryApproach .
-sstim:intendedNeuralTargetSite a owl:ObjectProperty ;
-    rdfs:range sstim:NeuralTargetSite .
-sstim:intendedNeuralSystem a owl:ObjectProperty ;
-    rdfs:range sstim:NeuralSystem .
-sstim:intendedNeuralPhenomenon a owl:ObjectProperty ;
-    rdfs:range sstim:NeuralPhenomenon .
-sstim:mechanismNeuralAccessRoute a owl:ObjectProperty ;
-    rdfs:domain sstim:StimulationMechanism ;
-    rdfs:range sstim:NeuralAccessRoute .
-sstim:mechanismNeuralTargetSite a owl:ObjectProperty ;
-    rdfs:domain sstim:StimulationMechanism ;
-    rdfs:range sstim:NeuralTargetSite .
-sstim:mechanismNeuralSystem a owl:ObjectProperty ;
-    rdfs:domain sstim:StimulationMechanism ;
-    rdfs:range sstim:NeuralSystem .
-sstim:mechanismNeuralPhenomenon a owl:ObjectProperty ;
-    rdfs:domain sstim:StimulationMechanism ;
-    rdfs:range sstim:NeuralPhenomenon .
-sstim:outcomeNeuralAccessRoute a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceOutcomeConcept ;
-    rdfs:range sstim:NeuralAccessRoute .
-sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceOutcomeConcept ;
-    rdfs:range sstim:NeuralTargetSite .
-sstim:outcomeNeuralSystem a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceOutcomeConcept ;
-    rdfs:range sstim:NeuralSystem .
-sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceOutcomeConcept ;
-    rdfs:range sstim:NeuralPhenomenon .
-```
+Keeping intent, mechanism, and outcome as three separate property families is
+the point: it is what stops a proposed route from reading as an observed one.
 
 `sstim-v:NeuralAccessRouteScheme` contains causal-route categories only. “Receptor” in
 this axis means a canonical sensory receptor, not a molecular drug receptor. Its
@@ -1067,45 +933,20 @@ used for any field-wide coverage statement.
 
 ## Consequences and migration
 
-- **Core ontology:** add neutral process, intervention, protocol, and technique
-  parents; neuromodulation and route-qualified overlap classes; route, approach,
-  target-site, neural-system, and phenomenon value classes/properties; and the
-  coordinated domain/range/definition migration. Revise the
-  `SensoryStimulation` definition/scope note so canonical sensory transduction
-  and afferent processing—not conscious perception—is the route criterion.
-- **Exposure module:** add the coarse characteristic-medium property, extend the
-  delivery-medium hierarchy, add channel-role support for intended versus
-  concomitant/control paths and two-way route consistency, widen
-  `hasExposureProfile`, and store all vocabulary-technique medium assertions
-  here. Existing sound, vibration,
-  visible/IR/UV, and olfactory/gustatory values that become narrower concepts
-  lose their old `skos:topConceptOf` and scheme `skos:hasTopConcept` assertions;
-  materialized `skos:broader`/`skos:narrower` inverses are updated together.
-- **Vocabulary:** relabel `TechniqueScheme`, retype and reword focused
-  ultrasound and the auditory-gamma overlap seed, populate the exact contrast
-  set, expand temporal structures, and add route, approach, target, system, and
-  phenomenon concepts. Replace legacy SSVEP, SSSEP, ASSR, FFR, and acoustic
-  startle response-as-mechanism placements with correctly typed
-  phenomenon/outcome concepts and explicit replacement history; remove the old
-  mechanism typing and scheme topology, and audit every remaining mechanism
-  entry by the same criterion. Rewrite `mechUltrasonic` as an uncertain proposed
-  mechanism family without a no-percept criterion. Every active value follows
-  the complete repository SKOS contract: OWL named-individual + value-class +
-  `skos:Concept` typing, four-language preferred labels, notation, English
-  definition/scope note, scheme membership, top/broader placement, and
-  materialized inverse topology.
-- **Shapes:** retain and generalize `TechniqueShape`; add process, sensory,
-  neuromodulation, overlap, protocol, intervention, facet-subject, and
-  route/channel-consistency shapes; remove the editorial-note branch; widen the
-  evidence constraints; and make the vocabulary SHACL gate load its
-  core/vocabulary/exposure dependency closure.
-- **Existing-data migration:** all 30 technique concepts in
-  `static/ontology/sstim-vocab.ttl` and the three framework-owned techniques in
-  `static/ontology/instances/frameworks/bsc.ttl` receive characteristic-medium
-  assertions. Assertions about the 30 vocabulary subjects are exposure-owned;
-  assertions about the three `bsc-fw-tech:` instance subjects remain in their
-  instance file. Sensory/neuromodulation entries receive valid temporal values;
-  no generic placeholder is fabricated.
+Shipped in SSTIM 0.9.0. The per-module edit list that stood here has been removed:
+it described work now verifiable in the ontology itself, and a checklist of
+completed edits is not a record of a decision. In outline, Core gained the neutral
+parents, the overlap classes, and the facet classes and properties; Exposure
+gained the coarse characteristic-medium property, a deepened delivery-medium
+hierarchy, channel roles for intended versus concomitant paths, and every
+vocabulary-technique medium assertion; Vocabulary gained the route, approach,
+target, system, and phenomenon concepts and lost the legacy `mech*`
+response-as-mechanism placements; Shapes gained the process, overlap, facet-subject
+and route-consistency constraints and lost the editorial-note branch.
+
+Two consequences are worth keeping, because they record reasoning rather than
+work:
+
 - **`ExploratoryProtocol` reparenting is a ten-file instance migration, decided
   per file, not a single core edit.** Reparenting the class (§7) silently removes
   `SensoryStimulationProtocol` from every current instance, so each is retyped
@@ -1139,49 +980,21 @@ used for any field-wide coverage statement.
   carries name subjects whose `rdf:type` is absent from that file, so no
   technique shape targets them there. `make shacl-modules` remains the whole-set
   authority. Neither gate is satisfied by duplicating assertions across files.
-- **Concept documentation:** revise the direct-neural-stimulation section to
-  distinguish sensory route, sensory-system target, and incidental perception.
-- **Queries and graph UI:** add executable queries to
-  `scripts/sstim-exposure-sanity.mjs`; implement scopes/facet edges in
-  `src/ui/graph/OntologyGraph.svelte` and `src/rdf/graph.js`; extend
-  `src/rdf/graph.test.mjs` and the inference/quality regression script.
-- **Context and release metadata:** add every new local class/property to
-  `context.jsonld`; recalculate and revise the hand-maintained `void.ttl`; update
-  module metadata, ontology READMEs, `CHANGELOG.md`, `CITATION.cff`, and the
-  WIDOCO scope text in `docs/ontology/widoco.properties`.
-- **Versioning:** the semantic migration and new terms require a 0.9.0 whole-set
-  release. Before semantic edits, all seven live modules move together to
-  `0.9.0-dev`; the core drops `owl:versionIRI` and uses
-  `mod:status "under development"`. After the complete validation suite and
-  semantic-diff review, every live module moves to `0.9.0`, and the core restores
-  its release `owl:versionIRI` and `mod:status "released"`. Frozen 0.3.0–0.8.0
-  snapshots remain untouched. A snapshot is made only after the release commit
-  is clean.
-
-  The seven are exactly `ONTOLOGY_MODULES` in the `Makefile` — core, vocabulary,
-  alignments, shapes, patch-studio, exposure, ecosystem — which is also the
-  0.8.0 snapshot's file set. `sstim-ecosystem-private-shapes.ttl` is an eighth
-  versioned file at `0.7.0`; it is neither snapshotted nor part of the whole-set
-  release, and it is deliberately left at `0.7.0` unless this migration changes
-  the private ledger profile. Its exclusion is not an oversight.
-- **DOI is recorded after the release, never in it.** Zenodo mints the version
-  DOI from the GitHub release archived off the tag, so the release commit leaves
-  the DOI pending in `CITATION.cff`, `CHANGELOG.md`, `README.md`, and the
-  ontology READMEs, and a separate follow-up commit fills it in once minted —
-  the shape used for 0.6.0, 0.7.0, and 0.8.0. The concept DOI is stable across
-  versions; only the version DOI is new.
-- **w3id routes need no change.** Every term added here is a fragment on the
-  already-routed `sstim#`, `sstim/vocab#`, and `sstim/exposure#` roots. No new
-  path is minted, so no `perma-id/w3id.org` PR is required by this ADR. This is
-  independent of the separately pending route work in PR #6393.
-- **Alignments:** external alignments for neuromodulation and named techniques
-  are reviewed separately against live authoritative identifiers. No mapping is
-  inferred from a label.
-- **No capability or health claim:** catalog inclusion changes no BSC preset,
-  framework, implementation, or public copy. It asserts neither efficacy nor
-  safety.
+The remaining consequences — concept-doc wording, executable queries and graph
+facets, `context.jsonld` and `void.ttl` entries, module metadata and changelog —
+all landed with the release. Two boundaries held and still hold: external
+alignments for neuromodulation and named techniques are reviewed separately
+against live authoritative identifiers and never inferred from a label, and
+catalog inclusion asserts neither efficacy nor safety and changes no BSC preset,
+framework, implementation, or public copy.
 
 ### Required regression tests
+
+The SHACL side of this list is enforced by `sstim-shapes.ttl` (the route and
+channel-consistency constraints of items 4–8) and runs under `make validate`.
+The negative fixtures items 7 and 8 call for have **no counterpart** under
+`test/fixtures/rdf/`, unlike the profile and ecosystem contracts — so treat the
+list below as an open acceptance spec, not a description of existing coverage.
 
 1. Focused ultrasound is not inferred to be a
    `SensoryStimulationTechnique` under RDFS closure despite retaining temporal
@@ -1239,20 +1052,9 @@ fixtures.
 
 ### Implementation order
 
-1. Put all seven live modules in the synchronized `0.9.0-dev` state, remove the
-   core `owl:versionIRI`, and mark the core under development.
-2. Add neutral classes and widen shared domains/ranges.
-3. Retype focused ultrasound and migrate existing technique metadata.
-4. Add controlled facets, representative techniques, and exposure profiles.
-5. Apply the composable shapes and evidence constraint changes.
-6. Add executable competency queries and graph facets.
-7. Run the complete validation, test, check, and build suite; review semantic
-   diffs; set synchronized 0.9.0 release metadata; generate final exports; and
-   rerun the applicable gates.
-8. Commit the release, then create the immutable snapshot from the clean commit.
-
-The order is normative: retyping focused ultrasound before widening the shared
-property domains recreates the sensory inference this ADR is intended to remove.
+One ordering constraint is normative and outlived the 0.9.0 build: **widen the
+shared property domains before retyping focused ultrasound.** Doing it the other
+way recreates the sensory inference this ADR exists to remove.
 
 ---
 

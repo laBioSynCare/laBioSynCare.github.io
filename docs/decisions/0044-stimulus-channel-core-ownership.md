@@ -1,6 +1,6 @@
 # ADR 0044 — `StimulusChannel` ownership and profile-sensitive target domain
 
-**Status:** Accepted — 2026-08-01 · implementation target SSTIM 0.13.0
+**Status:** Accepted — 2026-08-01 · implemented and released in SSTIM 0.13.0
 
 Clarifies the one semantic boundary that cannot be handled as a purely
 mechanical redistribution under

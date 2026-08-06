@@ -1,6 +1,9 @@
 # ADR 0039 — How data is shared, and why there is no shared backend
 
-**Status:** Proposed — 2026-07-31
+**Status:** Accepted — 2026-07-31 · **Tiers 1 and 2 shipped** (`patchLink.js`,
+Patch Studio download/import, `instanceExport.js`, `sessionPackage.js`). Tiers 3
+and 4 and the WebRTC channel of §5 are outstanding; per-tier status is recorded
+inline below.
 
 Records one decision seen from two sides: what "self-hosted storage" should and
 should not include (gap G5 in

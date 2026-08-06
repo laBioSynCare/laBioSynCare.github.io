@@ -78,7 +78,12 @@ schemas exist.
 - AudioWorklet processors: pre-allocate all state in `constructor()`, zero
   allocation in `process()`, return `true`
 - Namespaces: never hardcode IRI strings; import from `src/rdf/namespaces.js`
-- Tests: new engine implementations must pass `tests/engines/IAudioEngineCompliance.test.js`
+- Tests: a new audio engine must render correctly under the deterministic
+  `OfflineAudioContext` harnesses (sine accuracy, binaural separation, noise
+  tilt, tremolo depth/rate, sample playback) and be registered in
+  `src/engines/audio/audioEngines.js` with its required capability flags. A
+  committed `tests/engines/` compliance suite is planned but does not exist yet —
+  do not block on it
 - PixiJS: use v8 API only — `app.canvas`, `graphics.circle()`, async `app.init()`
 
 ### Setup

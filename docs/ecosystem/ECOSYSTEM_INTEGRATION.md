@@ -69,61 +69,16 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 
 ## Workstream 1 — Reconcile "proposed" vs. "launched" group status
 
-**`[x] Done — 2026-07-12. Status confirmed; all status/governance wording and the pre-submission artifacts reconciled to launched-group framing.**
+**`[x] Done — 2026-07-12.`** The W3C Sensory Stimulation Community Group is
+**launched**, with Juliana Andrade and Renato Fabbri as chairs. All status and
+governance wording and the pre-submission artifacts were reconciled to
+launched-group framing; the list of contradictions this workstream existed to
+find has been removed now that none of them survive.
 
-The docs contradict each other and reality on whether the W3C Sensory Stimulation
-Community Group is *proposed* or *launched*. The source conversation says it is
-launched with four participants and Juliana Andrade + Renato Fabbri as chairs.
-
-**Verified contradictions:**
-
-| File / line | Current wording | Problem |
-|---|---|---|
-| [`ROADMAP.md`](../../ROADMAP.md) :257 | "The W3C Community Group is launched." | Present-tense claim (Phase 2 goal framing) |
-| [`CONTRIBUTING.md`](../../CONTRIBUTING.md) :324 | "W3C CG charter \| CG chair + CG participants" | Assumes chair/participants **exist** |
-| [`CONTRIBUTING.md`](../../CONTRIBUTING.md) :325 | "SSTIM namespace governance \| W3C CG (when constituted)" | Assumes **not yet** constituted — self-contradiction |
-| [`CONTRIBUTING.md`](../../CONTRIBUTING.md) :330 | "governed … once constituted … Until the CG is constituted, Renato Fabbri maintains editorial control." | Treats group as future |
-| [`SCOPE.md`](../concept/SCOPE.md) :36, :149 | "the proposed group" | Treats group as proposed |
-| [`NON_SCOPE.md`](../concept/NON_SCOPE.md) | "the proposed W3C Community Group" | Treats group as proposed |
-| [`INVITATION_TEMPLATE.md`](INVITATION_TEMPLATE.md) :11, :17 | "the proposed group" | Treats group as proposed |
-| [`CHARTER.md`](../../CHARTER.md) | "draft charter for the proposed …" | Treats charter as draft |
-| [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](W3C_COMMUNITY_GROUP_PROPOSAL.md) | framed as a proposal | May need a status banner |
-
-**Resolved status (2026-07-12, confirmed by Renato):** option (b). The **W3C
-Sensory Stimulation Vocabulary Community Group is launched** (chairs: Juliana
-Braga de Salles Andrade + Renato Fabbri; four participants), but its **charter is
-not yet ratified**. Until ratification, **Renato Fabbri retains editorial control**
-of the SSTIM namespace; governance transfers to the CG on ratification.
-
-**Canonical phrasing to reuse:** *"The W3C Sensory Stimulation Vocabulary
-Community Group is launched; its charter is not yet ratified, and editorial
-control of the SSTIM namespace remains with Renato Fabbri until ratification."*
-
-**Done — clean status/governance fixes (2026-07-12):**
-- [x] `CONTRIBUTING.md` — namespace governance now tied to charter ratification
-      (fixes the self-contradiction); editorial control stated as Renato's until then.
-- [x] `SCOPE.md` (×4) + `NON_SCOPE.md` — dropped the "proposed" qualifier; the
-      group's scope is unchanged by launch.
-- [x] `docs/README.md` (×2) — dropped "proposed"; CHARTER described as
-      "launched; charter not yet ratified".
-
-**Done — pre-submission artifacts converted to launched-group framing (Renato approved 2026-07-12):**
-- [x] `CHARTER.md` — status line → "launched; charter not yet ratified"; "Proposers
-      and Initial Contacts" → "Chairs and Participants" (roster deferred to the W3C
-      page); "Next Steps Before W3C Submission" → post-launch next steps (submission
-      marked done, charter ratification pending).
-- [x] `INVITATION_TEMPLATE.md` — "support the *proposal*" → "join the launched group".
-- [x] `CONSORTIUM_INVITATION.md` — "*proposed* … *founding* participation" → launched-group participation.
-- [x] `TODO.md` W3C section — submission/account/launch tasks marked done; charter-ratification task added.
-- [x] `ROADMAP.md`, `PARTNERS.md`, `TODO.md` (CG-name decision) — the residual
-      "≥5 founding members" launch gate reconciled to launched + the growth KPI.
-- [x] **Tension resolved:** the "don't launch below 5" gate is overtaken; participant
-      growth folds into the W3C-growth KPI (4 → ≥12) in Workstream 3.
-
-**Note on names:** the charter now defers the chair/participant roster to the
-group's W3C page (the authoritative record) rather than hardcoding individuals,
-consistent with the [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)
-consent posture.
+The rule it leaves behind: `CHARTER.md` and
+[`W3C_COMMUNITY_GROUP_PROPOSAL.md`](W3C_COMMUNITY_GROUP_PROPOSAL.md) describe a
+launched group whose **charter is not yet ratified**. Those are two different
+facts, and copy that collapses them is wrong in one direction or the other.
 
 ---
 
@@ -245,85 +200,22 @@ and Patch Studio exports are inputs, not a finished bridge.
 
 ## Workstream 4 — The public entrance (audience model, deepened)
 
-**`[x] Shipped 2026-07-18 — [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md)
-(IA, per-door copy, wireframe, route map). Door order decided (Understand
-leads); graph home decided (`/` → entrance, browser → `/graph` with
-hash-forward shim); folded into `KNOWLEDGE_BROWSER_UX.md`. Built and deployed
-the same day — see TODO.md §5 for the per-item record. Hero copy is confirmed
-(headline as-is, subhead trimmed on review), so no wording question remains.
-One open item, deliberately not decided here: whether Sensory Field stays a
-distinct low-commitment on-ramp or folds into Patch Studio — an architecture
-call (engine sharing, route consolidation, UX model), not entrance copy.**
+**`[x] Shipped 2026-07-18.`** Graduated, per this file's own rule, into
+[`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md) — which is the source of
+record for the persona catalog, the seven-personas-to-four-doors mapping, the
+per-door copy and route map, the two conversion actions, the wireframe, and the
+safety routing. The design notes that were duplicated here have been removed.
 
-**Problem the source named:** the live root drops an unfamiliar visitor straight
-into an ontology graph + a photosensitivity notice. It signals technical
-seriousness but does not say *"here is the shared problem; here is the community;
-bring us one protocol."* The starting idea was a three-door entrance
-(Researcher / Implementer / Institution). That is too narrow — it ignores the
-people who arrive **before** they are any of those.
+What this workstream contributed, and what still holds: seven flat doors is bad
+IA, so group by *intent* into **① Experience · ② Understand & reproduce ·
+③ Build on it · ④ Join & partner**, and surface the two social-conversion levers
+— *Join the W3C group* and *Contribute a protocol* — from every door rather than
+burying them in one. Entrance copy uses permitted wellness verbs only
+(`CLAUDE.md` §3.5).
 
-> **Personas ≠ stakeholders.** These personas are *anonymous audience archetypes*
-> for entrance UX. They are distinct from the *real, named* people/organizations
-> modeled per [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md)
-> (Workstream 5). The two connect: the ADR's `relationshipType` scheme
-> (research-collaborator, scientific-advisor, standards-body, funder,
-> institutional-host, community-member, …) is the formal RDF vocabulary that
-> parallels these roles, and the graph-browser "Stakeholders" scope is content that
-> serves the Researcher and Standards-peer personas (3, 5). Keep persona labels and
-> `relationshipType` values aligned where they overlap.
-
-### Persona catalog (expanded)
-
-| # | Persona | Mindset | Wants | Primary action(s) |
-|---|---|---|---|---|
-| 1 | **Curious newcomer / general public** | "What even is this?" | Plain-language orientation + a safe taste | *See what this is* → 60-sec explainer; *Try a safe demo* |
-| 2 | **Appreciator / user / self-experimenter** | "Let me feel/use it" | Sessions, presets, instruments | *Start a session* / *Browse presets* / *Open the studio* |
-| 3 | **Researcher** (sensory / neuro / psychophysics) | "Can I reproduce or encode a protocol?" | Ontology, evidence tiers, SPARQL, citation | *Encode a protocol* / *Explore the ontology* / *Cite SSTIM* |
-| 4 | **Implementer / developer** | "Can I build on this?" | Architecture, run-local, engines, license | *Read the architecture* / *Run it locally* / *Build an engine* |
-| 5 | **Standards / ontology peer** (W3C, HED/BIDS, OBO) | "Is the vocabulary sound? Can I align terms?" | The TTL, alignments, review path, crosswalk | *Join the W3C group* / *Review the ontology* / *Propose a crosswalk* |
-| 6 | **Institution / partner / funder / policy** | "Is this credible and safe to associate with?" | Governance, IP, responsible-neurotech alignment | *Partner with us* / *Read governance* / *Join the consortium* |
-| 7 | **Contributor / community member** | "How do I help?" | Translation, annotation, docs, protocols, issues | *Contribute a protocol* / *See open work* / *Join the group* |
-
-### From 7 personas to 4 doors (seven flat doors is bad IA)
-
-Group by *intent*; each door fans out. Personas can appear under more than one door.
-
-- **① Experience it** — personas 1, 2 → *"See what this is"* · *"Try a safe session"*
-- **② Understand & reproduce** — personas 3, 5 → *"Explore the ontology"* · *"Encode / reproduce a protocol"* · *"Query with SPARQL"*
-- **③ Build on it** — persona 4 → *"Run it locally"* · *"Read the architecture"* · *"Extend an engine"*
-- **④ Join & partner** — personas 5, 6, 7 → *"Join the W3C group"* · *"Contribute a protocol"* · *"Partner / consortium"*
-
-### The two conversion actions (surface everywhere)
-
-Regardless of door, the two actions that turn a visitor into a participant are:
-
-- **"Join the W3C group"**
-- **"Contribute a protocol"**
-
-These are the social-conversion levers the ecosystem needs; they should be
-reachable from every door, not buried in one.
-
-### Constraints on entrance copy
-
-- **No medical claims.** All entrance strings use the permitted wellness verbs
-  (support, facilitate, encourage, guide, invite) — `CLAUDE.md` §3.5,
-  [`SCOPE.md`](../concept/SCOPE.md). No "treat/cure/proven."
-- **Safety without a wall.** Personas 1–2 must pass through the photosensitivity
-  safety layer ([`PHOTOSENSITIVITY_SAFETY.md`](../technical/PHOTOSENSITIVITY_SAFETY.md)),
-  but it should route them into a *safe* demo, not block the front door with a warning.
-- **One-liner (positioning):** *"Open standards and reference infrastructure for
-  responsible sensory stimulation and sensory neurotechnology, with BioSynCare as
-  one separate commercial implementation."* — candidate for README / landing;
-  refine before shipping.
-
-**Next actions:**
-- [x] Draft entrance copy per door (§3.5-compliant) — done in [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md).
-- [x] Wireframe the four-door grid + conversion bar — done 2026-07-18 (in the spec).
-- [x] Graph browser's new home decided 2026-07-18: `/graph` route + hash-forward shim on `/` (not a section).
-- [x] Fold into [`KNOWLEDGE_BROWSER_UX.md`](../technical/KNOWLEDGE_BROWSER_UX.md) and open a `src/routes/` build task — done 2026-07-18 (TODO.md §5).
-- [x] Door order decided (**Understand leads**, 2026-07-13); hero headline/subhead confirmed 2026-07-18 (subhead trimmed on review).
-- [x] Build the entrance and move the browser to `/graph` — shipped 2026-07-18 (TODO.md §5).
-- [ ] Open, not entrance scope: Sensory Field × Patch Studio — keep as two surfaces or merge? Architecture decision; see [`PUBLIC_ENTRANCE.md`](../technical/PUBLIC_ENTRANCE.md) "Decisions & open questions".
+One item was deliberately not decided here and remains open: whether Sensory
+Field stays a distinct on-ramp or folds into Patch Studio. It is an architecture
+call, not a copy question.
 
 ---
 

@@ -1,6 +1,15 @@
 # ADR 0026 — Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not a native catalog authoring model
 
-**Status:** Proposed — 2026-07-12 *(awaiting review; drafted from the Patch Studio improvement analysis, see [`../technical/PATCH_STUDIO.md`](../technical/PATCH_STUDIO.md) §10.1)*
+**Status:** Accepted — 2026-07-12 · **RDF half implemented, catalog-JSON half not.**
+`src/portability/patchProjection.js` is the gated one-way converter to SSTIM RDF
+over the declared mappable subset, with a machine-readable report of what did not
+travel. It projects a `sstim:Preset`, not the `sstim:Patch` this ADR's successor
+[ADR 0040](0040-patch-studio-native-session-and-track-classes.md) minted and
+[ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md)
+withdrew. No converter to the `header` + `voices` catalog JSON exists.
+
+Drafted from the Patch Studio improvement analysis, see
+[`../technical/PATCH_STUDIO.md`](../technical/PATCH_STUDIO.md) §10.1.
 
 ## Context
 

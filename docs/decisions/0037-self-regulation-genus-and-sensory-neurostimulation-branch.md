@@ -1,6 +1,6 @@
 # ADR 0037 — Self-regulation genus, the sensory-neurostimulation branch, and the primary-band property
 
-**Status:** Accepted — 2026-07-24 · targets SSTIM 0.11.0
+**Status:** Accepted — 2026-07-24 · released in SSTIM 0.11.0
 
 Resolves RDF-04, RDF-05, and the concrete sub-bug of RDF-08 from the
 [2026-07-24 RDF structure and publication audit](../ontology/reviews/2026-07-24-rdf-structure-and-publication-audit.md).
