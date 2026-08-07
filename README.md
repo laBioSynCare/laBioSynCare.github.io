@@ -245,6 +245,11 @@ make export     # JSON-LD and RDF/XML serializations of manifest-owned sources
    chains, evidence trails, actionable cautions, and phase-qualified reports.
 6. Generated JSON-LD and RDF/XML are parsed back and checked for graph
    isomorphism with each Turtle source module.
+7. `make truth-audit` checks the prose: no superseded version, development line
+   or DOI advertised as current, no shipped capability described as future work,
+   and every relative link in every tracked document resolves.
+8. `make release-dryrun` rehearses the next release against the current sources,
+   so a gate that has been wrong for weeks surfaces before a release, not during.
 
 Each frozen [`static/ontology/<version>/`](static/ontology) snapshot is immutable
 and is not edited after publication. Future releases are cut only after validation,

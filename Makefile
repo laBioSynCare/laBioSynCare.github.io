@@ -79,9 +79,10 @@ session-conformance:
 	node scripts/session-conformance.mjs
 
 ## Assert the repository's prose matches the repository. Derives the release
-## version, DOI and module list from the ontology and the snapshot script, then
-## checks README/SECURITY/PORTABLE_DEPLOYMENT/ROADMAP/TODO/homepage against them
-## — including claims that a shipped capability is still future work.
+## version, DOI and module list from manifest.json and void.ttl, then checks the
+## release-bearing prose against them: no superseded version, development line
+## or DOI advertised as current, and no shipped capability described as future
+## work. Also checks that every relative link in every tracked .md resolves.
 truth-audit:
 	node scripts/truth-audit.mjs
 

@@ -17,6 +17,8 @@
 // Usage:  node scripts/truth-audit.mjs [--verbose]
 
 import { readFileSync, existsSync } from 'node:fs'
+import { execSync } from 'node:child_process'
+import { dirname, resolve } from 'node:path'
 
 const VERBOSE = process.argv.includes('--verbose')
 const problems = []
@@ -217,6 +219,34 @@ for (const { capability, evidence, stale } of SHIPPED) {
   }
 }
 ok(`${SHIPPED.length} shipped capabilities have evidence and no stale denial`)
+
+// ── 4. every relative link in the docs resolves ──────────────────────────────
+//
+// A dead link is the one documentation defect with no judgement call attached:
+// it is always wrong, and it is invisible until someone clicks. Three had been
+// sitting in the tree — a file deleted by a refactor, and a review that moved a
+// directory deeper without updating its own ADR links. Reorganising docs is
+// exactly when these appear, which is exactly when nobody is checking.
+
+const MD_LINK = /\[[^\]]*\]\(([^)\s]+)\)/g
+const tracked = execSync('git ls-files "*.md"', { encoding: 'utf8' }).trim().split('\n')
+let links = 0
+
+for (const file of tracked) {
+  const text = read(file)
+  if (!text) continue
+  text.split('\n').forEach((line, i) => {
+    for (const m of line.matchAll(MD_LINK)) {
+      const [target] = m[1].split('#')
+      if (!target || /^(https?:|mailto:|\/\/)/.test(target)) continue
+      links++
+      if (!existsSync(resolve(dirname(file), target))) {
+        fail(`${file}:${i + 1}`, `link target does not exist: ${target}`)
+      }
+    }
+  })
+}
+ok(`${links} relative doc links resolve`)
 
 // ── report ───────────────────────────────────────────────────────────────────
 
