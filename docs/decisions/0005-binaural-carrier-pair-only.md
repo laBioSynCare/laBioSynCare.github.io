@@ -1,6 +1,11 @@
 # ADR 0005 — Binaural beat parameterized as carrier pair only
 
-**Status:** Accepted — 2026-04
+**Status:** Accepted — 2026-04 (implemented under different local names: the
+pair is `sstim:carrierFreqLeft` / `sstim:carrierFreqRight` in
+[`sstim-patch-studio.ttl`](../../static/ontology/sstim-patch-studio.ttl), borne by
+`sstim:BinauralVoice`; the controlled technique concept is
+`sstim-v:techBinauralBeats`. The decision below — pair form only, normalize
+center+beat on ingest — is what shipped)
 
 ## Context
 

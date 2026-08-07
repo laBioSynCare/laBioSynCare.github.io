@@ -364,56 +364,62 @@ Each session specification and session instance has a corresponding
 RDF individual. The session ontology is minimal in Phase 1 and will
 be extended in Phase 3 as the evidence infrastructure matures.
 
+The class definitions are in
+[`sstim-session.ttl`](../../static/ontology/sstim-session.ttl) and are not
+reproduced here — the copy that was drifted, losing `SessionSpecification`'s
+`iao:0000030, prov:Plan` parents and `SessionInstance`'s
+`SensoryStimulationIntervention` parent. In outline, a `SessionSpecification` is
+the reproducible description of one intended execution, and a `SessionInstance`
+(a `prov:Activity`) is the append-only record of an actual one.
+
+One wording issue is known and open: the shipped `SessionSpecification`
+definition promises a fully determined *acoustic* output, which is audio-shaped
+language in a modality-neutral model. Tracked as a deferred gap in
+[`../ontology/MODULE_ARCHITECTURE.md`](../ontology/MODULE_ARCHITECTURE.md).
+
+An instance looks like this. The shape is taken from the validated fixture
+[`instances/sessions/synthetic-reference-session.ttl`](../../static/ontology/instances/sessions/synthetic-reference-session.ttl),
+which `make validate` checks — the hand-written example that stood here used
+three terms the ontology does not define (`sstim:headphoneMode`,
+`sstim-v:headphones`, `sstim-v:completed`), so it could never have validated.
+
 ```turtle
-@prefix sstim:              <https://w3id.org/sstim#> .
-@prefix sstim-v:            <https://w3id.org/sstim/vocab#> .
-@prefix bsclab-session:     <https://w3id.org/sstim/implementation/bsclab/session/> .
-@prefix owl:                <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs:               <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix skos:               <http://www.w3.org/2004/02/skos/core#> .
-@prefix xsd:                <http://www.w3.org/2001/XMLSchema#> .
-@prefix prov:               <http://www.w3.org/ns/prov#> .
+@prefix sstim:          <https://w3id.org/sstim#> .
+@prefix sstim-v:        <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-preset:  <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-session: <https://w3id.org/sstim/implementation/bsclab/session/> .
+@prefix prov:           <http://www.w3.org/ns/prov#> .
+@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
 
-# Session Specification class
-sstim:SessionSpecification a owl:Class ;
-    rdfs:label "Session Specification"@en ;
-    skos:definition
-        """A complete, reproducible description of a specific intended
-        execution of a BSC preset, including user-defined overrides
-        of preset defaults."""@en .
+bsclab-session:example-001-spec a sstim:SessionSpecification, prov:Plan ;
+    sstim:referencesPreset bsclab-preset:perform-alpha-10-seed ;
+    sstim:durationSeconds 1800 ;
+    sstim:masterVolume 0.20 .
 
-# Session Instance class
-sstim:SessionInstance a owl:Class ;
-    rdfs:subClassOf prov:Activity ;
-    rdfs:label "Session Instance"@en ;
-    skos:definition
-        """The record of an actual execution of a session specification,
-        including timing, completion status, and optional self-report
-        data."""@en .
-
-# Example session instance
-bsclab-session:550e8400-e29b-41d4-a716-446655440000
-    a sstim:SessionInstance, prov:Activity ;
-    sstim:usesSpecification [
-        a sstim:SessionSpecification ;
-        sstim:referencesPreset <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed> ;
-        sstim:presetVersion "0.9.1" ;
-        sstim:durationSeconds 1800 ;
-        sstim:headphoneMode sstim-v:headphones ;
-    ] ;
-    prov:startedAtTime "2026-04-12T09:15:00+02:00"^^xsd:dateTimeStamp ;
-    prov:endedAtTime   "2026-04-12T09:45:01+02:00"^^xsd:dateTimeStamp ;
+bsclab-session:example-001 a sstim:SessionInstance ;
+    sstim:usesSpecification bsclab-session:example-001-spec ;
     sstim:actualDurationSeconds 1801 ;
-    sstim:completionStatus sstim-v:completed .
+    sstim:completionStatus "completed" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory ;
+    prov:startedAtTime "2026-04-12T09:15:00+02:00"^^xsd:dateTime ;
+    prov:endedAtTime   "2026-04-12T09:45:01+02:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://w3id.org/sstim/implementation/bsclab> .
 ```
+
+`sstim:completionStatus` is a plain string — `"completed"`, `"interrupted"`
+(>30% played), or `"abandoned"` (<30%) — not a controlled concept.
 
 Key design decisions for the RDF model:
 
 - `SessionInstance` extends `prov:Activity` to leverage the PROV-O
   provenance vocabulary for timing and attribution.
-- `SessionSpecification` is an anonymous blank node embedded in the
-  session instance, not a separate named individual. A specification
-  that was never executed does not need its own IRI.
+- `SessionSpecification` gets its **own IRI**, as in the committed fixture. An
+  earlier draft of this document proposed embedding it as a blank node on the
+  grounds that an unexecuted specification needs no identifier; that was wrong in
+  both directions. A specification is the unit of reproducibility, so it must be
+  citable and comparable across the instances that realize it — and a blank node
+  cannot be either. `usesSpecification` is functional: one instance, one
+  specification.
 - Session instances referencing the same preset do so by IRI, not
   by embedding the preset. This ensures a single source of truth
   for preset definitions.

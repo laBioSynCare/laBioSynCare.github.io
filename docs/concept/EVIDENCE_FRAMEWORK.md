@@ -16,9 +16,9 @@
 > question, boundary applicability, requirement, design objective, planned
 > outcome, knowledge-status assertion). `supportsRelation` → `evaluatesSubject`;
 > the overloaded modality tag split into orthogonal basis axes; review is a PROV
-> activity. Turtle blocks in the "How it's encoded" section below still show the
-> pre-0027 shapes and are pending a rewrite; treat the `.ttl` masters and ADR
-> 0027 as authoritative.
+> activity. The `.ttl` masters and ADR 0027 are authoritative for encoding; this
+> document is authoritative for what the tiers *mean* and what language each
+> permits.
 
 ---
 
@@ -483,168 +483,33 @@ peer-reviewed evidence or documented methodological critique.
 
 ---
 
-## Formal ontology seed
+## How the six tiers are encoded
 
-The following declarations implement the six-tier vocabulary.
-Full class definitions and property assignments are in
-`static/ontology/sstim-core.ttl` and `static/ontology/sstim-vocab.ttl`.
+The `.ttl` masters are authoritative:
+[`sstim-evidence.ttl`](../../static/ontology/sstim-evidence.ttl) owns the
+classes and properties,
+[`sstim-vocab.ttl`](../../static/ontology/sstim-vocab.ttl) the tier concepts.
 
-```turtle
-@prefix sstim:   <https://w3id.org/sstim#> .
-@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
-@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
-@prefix owl:      <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix eco:      <http://purl.obolibrary.org/obo/ECO_> .
+- `sstim:EvidenceTierValue` classifies the strength and quality of empirical
+  support for one claim, accounting for study quality, consistency, and modality
+  and population match.
+- The six tiers are dual-typed individuals — `skos:Concept` **and**
+  `sstim:EvidenceTierValue` — in `sstim-v:EvidenceTierScheme`, ordered by
+  `skos:notation`, and mapped to ECO where an honest mapping exists
+  ([ADR 0002](../decisions/0002-dual-typing-owl-skos.md)).
+- `sstim:hasEvidenceTier` links a claim to its tier.
 
-# ── Evidence tier class ─────────────────────────────────────────────────
-
-sstim:EvidenceTierValue a owl:Class ;
-    rdfs:label "Evidence Tier Value"@en ;
-    skos:definition
-        """A classification of the strength and quality of empirical
-        support for a specific Sensory Stimulation claim, taking into
-        account study quality, consistency, modality match, and
-        population match."""@en .
-
-# ── Tier concept scheme ──────────────────────────────────────────────────
-
-sstim-v:EvidenceTierScheme a skos:ConceptScheme ;
-    skos:prefLabel "BSC Evidence Tier Vocabulary"@en ;
-    skos:hasTopConcept sstim-v:speculative,
-                       sstim-v:anecdotal,
-                       sstim-v:preliminary,
-                       sstim-v:moderate,
-                       sstim-v:strong,
-                       sstim-v:established .
-
-# ── Individual tier concepts (dual-typed as OWL individuals) ─────────────
-
-sstim-v:speculative a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Speculative"@en, "Speculativo"@it,
-                   "Especulativo"@pt, "Especulativo"@es ;
-    skos:definition
-        """Design intent is based on theoretical reasoning or mechanistic
-        plausibility. No empirical data exists for this specific claim
-        or closely related claims in any modality."""@en ;
-    sstim:tierRank 1 .
-
-sstim-v:anecdotal a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Anecdotal"@en, "Aneddotico"@it,
-                   "Anedótico"@pt, "Anecdótico"@es ;
-    skos:definition
-        """Consistent informal reports from practitioners or users suggest
-        an effect, but no controlled or systematically collected data
-        exists. Reports are internally coherent with the proposed
-        mechanism."""@en ;
-    sstim:tierRank 2 .
-
-sstim-v:preliminary a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Preliminary"@en, "Preliminare"@it,
-                   "Preliminar"@pt, "Preliminar"@es ;
-    skos:definition
-        """At least one published study exists, but with significant
-        limitations: no control group, very small sample, single site,
-        or evidence from a non-matching modality or population.
-        Preclinical evidence qualifies at most this tier for human
-        wellness claims."""@en ;
-    sstim:tierRank 3 .
-
-sstim-v:moderate a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Moderate"@en, "Moderato"@it,
-                   "Moderado"@pt, "Moderado"@es ;
-    skos:definition
-        """Multiple published studies with consistent effect direction,
-        at least one using a controlled design; or a single well-designed
-        RCT in a closely related context. Some methodological limitations
-        remain. Modality and population are reasonably matched."""@en ;
-    sstim:tierRank 4 .
-
-sstim-v:strong a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Strong"@en, "Robusto"@it,
-                   "Robusto"@pt, "Robusto"@es ;
-    skos:definition
-        """Multiple well-designed controlled studies from independent
-        research groups, or a systematic review of several controlled
-        studies, showing consistent effects in a well-matched population
-        and modality."""@en ;
-    sstim:tierRank 5 .
-
-sstim-v:established a skos:Concept, sstim:EvidenceTierValue ;
-    skos:inScheme sstim-v:EvidenceTierScheme ;
-    skos:prefLabel "Established"@en, "Consolidato"@it,
-                   "Consolidado"@pt, "Consolidado"@es ;
-    skos:definition
-        """Multiple high-quality systematic reviews or meta-analyses
-        with consistent findings, independent replication, direct modality
-        and population match, and no substantial contradicting evidence
-        from equivalent-quality studies."""@en ;
-    sstim:tierRank 6 .
-
-# ── Evidence claim class ─────────────────────────────────────────────────
-
-sstim:EvidenceClaim a owl:Class ;
-    rdfs:label "Evidence Claim"@en ;
-    skos:definition
-        """A specific assertion about the effect of a Sensory Stimulation
-        intervention, together with its supporting evidence, tier
-        assignment, modality tags, and citation list."""@en .
-
-# ── Evidence modality tag class ──────────────────────────────────────────
-
-sstim:EvidenceModalityTag a owl:Class ;
-    rdfs:label "Evidence Modality Tag"@en ;
-    skos:definition
-        """A classification of the stimulus modality and population
-        in which supporting evidence was gathered, used to apply the
-        modality-matching discount when assigning evidence tiers."""@en .
-
-sstim-v:evidenceAuditory a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Auditory-Only Human Evidence"@en ;
-    skos:notation "AUD" .
-
-sstim-v:evidenceAudiovisual a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Audio-Visual / Multisensory Human Evidence"@en ;
-    skos:notation "AV" .
-
-sstim-v:evidenceBreath a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Breathing / HRV / Respiratory Evidence"@en ;
-    skos:notation "BREATH" .
-
-sstim-v:evidenceGeneral a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Mixed-Modality or Modality-Ambiguous Evidence"@en ;
-    skos:notation "GENERAL" .
-
-sstim-v:evidencePreclinical a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Preclinical / Animal / Mechanistic Evidence"@en ;
-    skos:notation "PRECLINICAL" .
-
-sstim-v:evidenceReview a skos:Concept, sstim:EvidenceModalityTag ;
-    skos:prefLabel "Systematic Review or Meta-Analysis"@en ;
-    skos:notation "REVIEW" .
-
-# ── Key property ─────────────────────────────────────────────────────────
-
-sstim:hasEvidenceTier a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceClaim ;
-    rdfs:range  sstim:EvidenceTierValue ;
-    rdfs:label  "has evidence tier"@en ;
-    skos:definition
-        """Links an evidence claim to its strength classification.
-        Assignment must account for both study quality (OCEBM-style)
-        and modality/population match (BSC modality-matching
-        principle)."""@en .
-
-sstim:hasModalityTag a owl:ObjectProperty ;
-    rdfs:domain sstim:EvidenceClaim ;
-    rdfs:range  sstim:EvidenceModalityTag ;
-    rdfs:label  "has modality tag"@en .
-```
+The Turtle that used to be reproduced here has been removed rather than updated.
+It had drifted into teaching a **deprecated** model: it showed
+`sstim:hasModalityTag` as a live property with an `EvidenceClaim` domain, when
+[ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md)
+deprecated it precisely because one tag mixed sensory modality with study model
+and synthesis type. Authoritative data uses five orthogonal basis axes instead —
+`basisSensoryModality`, `basisModalityApplicability`, `basisStudyModel`,
+`basisSynthesisType`, `basisIntervention` — and tiers hang off
+`sstim:EvidenceAssessmentClaim`, linked to its subject by
+`sstim:evaluatesSubject`. A copy in prose is a second source that cannot be
+validated; the module can.
 
 ---
 
