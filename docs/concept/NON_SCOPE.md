@@ -51,22 +51,11 @@ However, the group does not:
 
 ## Status Discipline
 
-Community Group work must not be described as a W3C Standard unless it separately enters and completes an appropriate W3C standards-track process.
+Community Group work must not be described as a W3C Standard unless it separately
+enters and completes an appropriate W3C standards-track process. Never write
+"W3C standard", "official standard", "certified by W3C", "therapeutic standard",
+or "medical standard".
 
-Use:
-
-- Community Group proposal
-- Community Group work
-- draft vocabulary
-- open vocabulary
-- shared terminology
-- implementation guidance
-- Community Group report
-
-Avoid:
-
-- W3C standard
-- official standard
-- certified by W3C
-- therapeutic standard
-- medical standard
+The permitted wording is in [`CHARTER.md`](../../CHARTER.md#status-discipline)
+and is not duplicated here — the copy that was here drifted, still recommending
+"Community Group proposal" after the group had launched.

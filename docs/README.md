@@ -92,12 +92,15 @@ Ontology design itself is documented at
 - [`w3id/README.md`](ecosystem/w3id/README.md) — how the persistent-namespace
   targets are generated and guarded; the route contract itself is in
   [`w3id/sstim/README.md`](ecosystem/w3id/sstim/README.md).
-- W3C Community Group: [`CHARTER.md`](../CHARTER.md),
-  [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md),
-  [`INVITATION_TEMPLATE.md`](ecosystem/INVITATION_TEMPLATE.md),
-  [`CONSORTIUM_INVITATION.md`](ecosystem/CONSORTIUM_INVITATION.md),
-  [`ADVISORY_BOARD.md`](ecosystem/ADVISORY_BOARD.md),
-  [`PARTNERS.md`](ecosystem/PARTNERS.md).
+- W3C Community Group — **launched, charter not yet ratified**.
+  [`CHARTER.md`](../CHARTER.md) is the live instrument and owns the
+  status-discipline wording;
+  [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
+  is the submitted proposal, kept as a record and not updated.
+  Outreach: [`INVITATION_TEMPLATE.md`](ecosystem/INVITATION_TEMPLATE.md),
+  [`CONSORTIUM_INVITATION.md`](ecosystem/CONSORTIUM_INVITATION.md).
+  People: [`ADVISORY_BOARD.md`](ecosystem/ADVISORY_BOARD.md) (**the source of
+  truth for advisory consent state**), [`PARTNERS.md`](ecosystem/PARTNERS.md).
 
 ## Alongside the code
 

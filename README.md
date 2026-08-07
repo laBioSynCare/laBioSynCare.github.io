@@ -319,16 +319,19 @@ preset format and SSTIM vocabulary, but neither repository imports the other's
 private data. BSC is a framework; BSC Lab and BioSynCare are implementations;
 protocols, presets, and session executions are separate modeled levels.
 
-## W3C Community Group Proposal
+## W3C Community Group
 
-This repository is the technical anchor for a proposed vendor-neutral Sensory
-Stimulation Vocabulary Community Group. The proposal covers shared terms,
-semantic models, JSON-LD contexts, SHACL profiles, safety metadata, evidence
-annotations, and implementation guidance. It does not define clinical practice
-or certify products.
+This repository is the technical anchor for the vendor-neutral Sensory
+Stimulation Vocabulary Community Group. The group is **launched**; its charter is
+not yet ratified, and until it is, editorial control of the SSTIM namespace stays
+with the maintainer. Its work covers shared terms, semantic models, JSON-LD
+contexts, SHACL profiles, safety metadata, evidence annotations, and
+implementation guidance. It does not define clinical practice or certify
+products, and Community Group work is not a W3C Standard.
 
-- [Charter](CHARTER.md)
-- [Community Group Proposal](docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
+- [Charter](CHARTER.md) — the live instrument
+- [Original proposal](docs/ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md) — the
+  submitted text, kept as a record
 - [Ontology publication plan](docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
 - [Contributing](CONTRIBUTING.md)
 

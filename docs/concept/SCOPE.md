@@ -2,8 +2,10 @@
 
 This document covers two related but distinct scopes:
 
-1. The **Sensory Stimulation Vocabulary Community Group** scope (the
-   W3C Community Group proposal anchored in this repository).
+1. The **Sensory Stimulation Vocabulary Community Group** scope — the W3C
+   Community Group anchored in this repository. It is **launched**; its charter
+   is not yet ratified. [`../../CHARTER.md`](../../CHARTER.md) is the normative
+   instrument, and this part is the working elaboration of its Scope section.
 2. The **BSC Lab** scope — what BSC Lab itself does and explicitly does not
    claim, with regulatory and language guidance for contributors.
 
@@ -12,10 +14,10 @@ fall outside the Community Group's remit.
 
 ---
 
-# Part 1 — Proposed W3C Community Group Scope
+# Part 1 — W3C Community Group Scope
 
-This part defines the intended scope of the proposed Sensory Stimulation
-Vocabulary Community Group.
+This part defines the intended scope of the Sensory Stimulation Vocabulary
+Community Group.
 
 ## Core Intent
 

@@ -152,9 +152,10 @@ BSC Lab may serve as a reference implementation environment and as a vocabulary 
 
 Community Group work must not be represented as a W3C Standard unless and until it separately enters and completes an appropriate W3C standards-track process.
 
-Preferred wording:
+Preferred wording — the group is launched, so "proposal" now understates it just
+as "standard" overstates it:
 
-- "W3C Community Group proposal"
+- "W3C Community Group" (add "launched, charter not yet ratified" where precision matters)
 - "Community Group report"
 - "community-led vocabulary"
 - "open interoperability work"

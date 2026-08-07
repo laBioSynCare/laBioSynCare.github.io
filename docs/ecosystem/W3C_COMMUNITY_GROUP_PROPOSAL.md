@@ -1,5 +1,11 @@
 # W3C Community Group Proposal
 
+> **Historical record: this is the submission, and the group was accepted.** The
+> Sensory Stimulation Vocabulary Community Group is **launched**; its charter is
+> not yet ratified. [`../../CHARTER.md`](../../CHARTER.md) is the live instrument
+> and the W3C group page is the authoritative roster. Keep this file as the text
+> that was submitted — do not update it to describe the group as it is now.
+
 Proposed group name:
 
 ```text
