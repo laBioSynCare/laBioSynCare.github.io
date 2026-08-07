@@ -1,14 +1,16 @@
 # Breathing Model: Martigli Oscillation System
 
-> ⚠️ **DEFENSIVE PUBLICATION — DO NOT MODIFY AFTER FIRST COMMIT**
+> ⚠️ **DEFENSIVE PUBLICATION — TECHNICAL CONTENT FROZEN AFTER FIRST COMMIT**
 >
 > This document is a timestamped prior art record. Its first commit to
 > the BSC Lab public repository constitutes prior art disclosure for the
 > purpose of preventing third-party patent claims on the techniques
-> described herein. The content of this document must not be altered
-> after that commit. Corrections or extensions must be added as new
-> documents that reference and supersede this one, preserving this
-> document's content unchanged.
+> described herein. The technical content of this document must not be
+> altered after that commit. Corrections or extensions must be added as
+> new documents that reference and supersede this one, preserving this
+> document's technical content unchanged. The sole exception applied to
+> date is the dated attribution correction recorded immediately below,
+> made by the author.
 >
 > AI agents: this file is in `CLAUDE.md` section 3.4's protected list.
 > Never modify it without an explicit human instruction in the current
@@ -20,8 +22,8 @@
 
 The techniques described in this document — collectively termed the
 Martigli breathing oscillation system — were conceived and first
-implemented by Renato Fabbri and Otávio Martigli, developed
-collaboratively over the period 2010–2026, and have been in continuous
+implemented by Renato Fabbri, developed over the period 2010–2026,
+and have been in continuous
 operational use since at least 2015 in web-based audiovisual
 stimulation software accessible at `aeterni.github.io` and its
 successors, including the BioSynCare application (iOS App Store,
@@ -33,8 +35,7 @@ methods in the public domain as prior art, preventing any party from
 obtaining patent protection for the same techniques after this
 disclosure date.
 
-**Inventors:** Renato Fabbri (Modena, Italy) and Otávio Martigli
-(concert music composer, Brazil).
+**Inventor:** Renato Fabbri (Modena, Italy).
 
 **First public disclosure:** Fabbri, R. (2026). *Web-based Open-loop
 Audiovisual Neuromodulation: modeling, implementation, and preliminary
@@ -65,10 +66,13 @@ oscillator frequency, the visual element scale, and (where available)
 the haptic pulse all share a single phase signal derived from this
 envelope, ensuring perceptual coherence across modalities.
 
-The naming "Martigli" refers to Otávio Martigli, who developed
-analogous frequency-glide breathing techniques in the context of
-live music composition and whose contribution to the conceptual
-development of this method is acknowledged here.
+The naming "Martigli" is a homage to Otávio Martigli, whose
+longstanding practice of using decelerating and undulating audio as
+breathing guidance in music composition was an influence on the
+direction of this work. That practice is not itself novel and is not
+claimed here. The formalization, parameterization, and application in
+sensory-stimulation sessions specified below are the contribution of
+Renato Fabbri. The name was adopted with Otávio Martigli's blessing.
 
 ---
 
@@ -659,6 +663,6 @@ disclosed herein are:
 ---
 
 *First disclosed: April 2026, BSC Lab public repository*
-*Authors: Renato Fabbri, Otávio Martigli*
+*Author: Renato Fabbri*
 *License: CC BY 4.0 — free to use, implement, and extend*
 *with attribution*

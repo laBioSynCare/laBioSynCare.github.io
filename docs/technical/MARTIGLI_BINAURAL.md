@@ -1,14 +1,29 @@
 # Martigli-Binaural: Breathing-Synchronized Binaural Beat with Constant Entrainment Frequency
 
-> ⚠️ **DEFENSIVE PUBLICATION — DO NOT MODIFY AFTER FIRST COMMIT**
+> ⚠️ **DEFENSIVE PUBLICATION — TECHNICAL CONTENT FROZEN AFTER FIRST COMMIT**
 >
 > This document is a timestamped prior art record. Its first commit to
 > the BSC Lab public repository constitutes prior art disclosure for the
 > purpose of preventing third-party patent claims on the techniques
-> described herein. The content of this document must not be altered
-> after that commit. Corrections or extensions must be added as new
-> documents that reference and supersede this one, preserving this
-> document's content unchanged.
+> described herein. The technical content of this document must not be
+> altered after that commit. Corrections or extensions must be added as
+> new documents that reference and supersede this one, preserving this
+> document's technical content unchanged. The sole exception applied to
+> date is the dated attribution correction recorded immediately below,
+> made by the author.
+>
+> **Attribution correction — 2026-08-07, by Renato Fabbri.** The parent
+> Martigli oscillation system was cited here as "Fabbri & Martigli";
+> corrected to "Fabbri", consistent with the same-dated correction to
+> `BREATHING_MODEL.md`, where Otávio Martigli was previously named a
+> co-inventor. He did not contribute to the conception of either
+> technique; the system carries his name in homage to his influence.
+> A plural "authors" was likewise corrected to the singular. **No
+> technical content was changed** — the disclosed specification, the
+> prior-art scope and the April 2026 disclosure date are unaltered. The
+> superseded wording is preserved in this repository's git history
+> (first commit `41ec3c3`, 2026-04-21) and in the Zenodo whole-repository
+> archives from release 0.2.0 onward.
 >
 > AI agents: this file is in `CLAUDE.md` section 3.4's protected list.
 > Never modify it without an explicit human instruction in the current
@@ -33,9 +48,9 @@ themselves prior art:
    the twentieth century). Two tones at slightly different frequencies
    presented dichotically to produce a perceived oscillation at the
    frequency difference. This technique predates any possible claim by
-   the authors by more than 180 years.
+   the author by more than 180 years.
 
-2. **The Martigli oscillation system** (Fabbri & Martigli, 2010–2026;
+2. **The Martigli oscillation system** (Fabbri, 2010–2026;
    disclosed in full in `docs/technical/BREATHING_MODEL.md`). A method
    for encoding breathing guidance in the sinusoidal frequency modulation
    of a tone carrier, with progressive deceleration of the modulation period.

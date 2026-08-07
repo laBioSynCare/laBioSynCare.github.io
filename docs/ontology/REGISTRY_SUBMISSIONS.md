@@ -87,7 +87,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
 | BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
-| FAIRsharing | 🕓 **record 8494 complete, awaiting curator review** (DOI pending) | yes | — |
+| FAIRsharing | 🕓 **record 8494 under curator review** — curator edited it 2026-08-07 (DOI pending) | yes | — |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -490,9 +490,9 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Domains (DRAO) | **sensory perception** (+ auditory/visual perception if offered) |
 | Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
 | Record associations | **Done 2026-07-12:** added **BFO, IAO, OBI** with relationship **extends**. **COB is not registered in FAIRsharing** (small/newer OBO layer) — skipped, no gap. |
-| Citation / Publications | **Skip** — recommended-only, and only for a journal paper describing the resource (none exists). The DOI-import hangs on Zenodo DOIs (FAIRsharing import is CrossRef/PubMed; Zenodo is DataCite) — reload to clear the spinner. If a citation is wanted, use "CREATE NEW PUBLICATION" manually. |
+| Citation / Publications | **Skip** — recommended-only, and only for a journal paper describing the resource (none exists). The DOI-import hangs on Zenodo DOIs (FAIRsharing import is CrossRef/PubMed; Zenodo is DataCite) — reload to clear the spinner. If a citation is wanted, use "CREATE NEW PUBLICATION" manually. Re-listed as missing by the automated completeness mail on 2026-08-07; decision unchanged until a paper exists. |
 | Cross references / identifiers | Additional Information tab. Portal dropdown lists BioPortal/OLS/OBO Foundry/AgroPortal/re3data/SciCrunch/Other — for a Zenodo DOI use **portal = Other**. Real value: add **BioPortal**/**OLS**/**OBO Foundry** cross-refs once SSTIM is listed there. Optional. |
-| Associated tools | **Skip** (optional). The interactive browser is an integrated site feature → belongs under **Data processes** as "Browse", not as a standalone tool. |
+| Associated tools | **Skip** (optional). The interactive browser is an integrated site feature → belongs under **Data processes** as "Browse", not as a standalone tool — which is exactly the distinction the 2026-08-07 completeness mail draws when it re-lists this field. Decision unchanged. |
 
 ```text
 Service:            FAIRsharing
@@ -504,16 +504,32 @@ Concept DOI:        10.5281/zenodo.21286974
 Date:               2026-07-12 (skeleton record created)
 Account/maintainer: @renato.fabbri (FAIRsharing account)
 External record ID or URL:  https://fairsharing.org/8494 (hidden until approved)
-Status:             COMPLETE + AWAITING CURATOR REVIEW (2026-07-12). Taxonomies
-                    set to "Not Applicable" → record left "incomplete" and now
-                    reads "awaiting review by FAIRsharing curators". All required
-                    fields done; rich metadata (object types, subjects, domains
-                    incl. sensory-perception terms, 3 data processes, CC BY 4.0,
-                    BSC Lab maintainer, IAO/BFO/OBI extends, Zenodo cross-ref).
-                    Recommended-missing (funding org, publications, citations)
-                    intentionally skipped — do not block review/DOI.
+Status:             UNDER CURATOR REVIEW (curator edit 2026-08-07). Completed
+                    2026-07-12: taxonomies set to "Not Applicable" → record left
+                    "incomplete" and read "awaiting review by FAIRsharing
+                    curators". All required fields done; rich metadata (object
+                    types, subjects, domains incl. sensory-perception terms, 3
+                    data processes, CC BY 4.0, BSC Lab maintainer, IAO/BFO/OBI
+                    extends, Zenodo cross-ref). Recommended-missing (funding org,
+                    publications, citations) intentionally skipped — do not block
+                    review/DOI. On 2026-08-07 FAIRsharing curator Lea.Girard
+                    (10801) modified the record, so review has begun; the
+                    notification asserted neither approval nor a DOI, and the
+                    edits themselves are unread (see the two checks below).
 Required follow-up: Wait for curator approval → FAIRsharing DOI issued (currently
-                    "Awaiting DOI"). Record the DOI when it lands.
+                    "Awaiting DOI"). Record the DOI when it lands. Two things to
+                    check at the next login — neither is scriptable, because
+                    `/8494` serves an empty app shell while logged out and
+                    api.fairsharing.org needs a JWT: (1) diff the curator's
+                    2026-08-07 edits at `https://fairsharing.org/8494?history=show`
+                    against the intended values above; (2) the record was
+                    submitted at 0.6.0 and the current release is 0.13.0 —
+                    confirm no data-process URL pins a stale version. Also note
+                    the same-day automated completeness mail listed
+                    "Organisation links" as not yet present, which contradicts
+                    the BSC Lab maintaining-org entry recorded here; it is more
+                    likely counting the deliberately absent funder/collaborator
+                    roles, but verify the maintainer link actually saved.
 ```
 
 ### OLS (Ontology Lookup Service) — only if accepted
