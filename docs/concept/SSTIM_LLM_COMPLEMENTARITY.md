@@ -13,9 +13,6 @@ model; an LLM supplies a natural-language interface and flexible reasoning over
 that model. Used together, the LLM proposes and explains while SSTIM and human
 review decide what is correct and canonical.
 
-> For guidance on how to *describe* this externally (recommended terms and
-> wording), see [`ecosystem/SSTIM_LLM_MESSAGING.md`](../ecosystem/SSTIM_LLM_MESSAGING.md).
-
 ---
 
 ## How they complement each other
@@ -56,3 +53,36 @@ retrieval, validation, and tool execution, the combined system can support
 grounded "expert agent" workflows. The agentic behaviour belongs to that combined
 system, never to the ontology file alone. Human review remains the authority for
 scientific, regulatory, and governance decisions.
+
+---
+
+## How to say this externally
+
+Describe SSTIM as **symbolic** AI infrastructure — ontology, knowledge graph,
+validation — that can *ground* LLMs and agents. Never as an LLM, as machine
+learning, or as an autonomous AI in itself.
+
+| Term | Use | Notes |
+|---|---|---|
+| Symbolic AI | Recommended | Accurately describes ontologies, knowledge graphs, rules, and formal reasoning. |
+| Expert symbolic reasoning | Recommended | Emphasises that the knowledge is expert-authored and machine-actionable. |
+| Automated reasoning | Recommended | For OWL/RDFS inference, SPARQL query expansion, SHACL validation, and rule-like checks. |
+| Expert automated reasoning | Acceptable | Less standard, but defensible for automated reasoning over an expert-authored model. |
+| Expert AI agents | Conditional | Only when an actual agentic system uses SSTIM to retrieve, reason, validate, and act. |
+| Expert LLM agents | Conditional | Only when the agent contains an LLM and uses SSTIM as a grounding/validation layer. |
+| Expert automated agents | Avoid | Less idiomatic and less precise than "AI agents" or "LLM-grounded agent workflows". |
+
+**General:** SSTIM is a semantic ontology and knowledge graph that enables expert
+symbolic reasoning, automated validation, and LLM-grounded AI workflows for
+sensory stimulation data.
+
+**Technical audience:** SSTIM provides the symbolic knowledge layer for hybrid AI
+systems — OWL/SKOS semantics, SHACL constraints, SPARQL-queryable relations,
+evidence tiers, and provenance metadata that can ground LLMs and AI agents.
+
+**Non-technical audience:** SSTIM turns expert knowledge about sensory
+stimulation into a structured, machine-readable form that AI systems can search,
+check, explain, and use more reliably.
+
+Keep all health and wellness phrasing inside [`SCOPE.md`](SCOPE.md)
+(`CLAUDE.md` §3.5).

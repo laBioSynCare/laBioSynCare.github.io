@@ -3,12 +3,14 @@
 This document records the composition, roles, and engagement model for the
 BSC Lab Scientific Advisory Board.
 
-> **Status:** The advisory board is in formation. No formal advisory
-> agreements are in place as of April 2026. Entries marked [*pending*]
-> indicate individuals who have been identified as candidates but whose
-> participation has not been formally confirmed or publicly announced.
-> Do not use this document as a public roster without confirming current
-> status with Renato Fabbri.
+> **Status: the board is in formation and no formal advisory agreement is in
+> place.** Entries marked [*pending*] name candidates whose participation has
+> not been confirmed. This is not a public roster; confirm with Renato Fabbri
+> before treating it as one.
+>
+> **This file is the single source of truth for advisory consent state**, and it
+> currently disagrees with other files in this repository — see the note under
+> Members. Resolve here first, then propagate.
 
 ---
 
@@ -48,7 +50,32 @@ advisor; proposed as a member of the W3C Sensory Stimulation Vocabulary
 Community Group itself, alongside the advisory board role.  
 **Status:** Role and public naming pending her formal confirmation. Notified
 2026-07-18 with a request to review the knowledge graph entry before it is
-marked approved.
+marked approved. The open decision is `TODO.md` §10 ("does she want a named
+public role"); the open task is §7 ("ask formally about scientific advisory
+role — named on website").
+
+> **Unresolved, and it needs Renato's decision.** While that confirmation is
+> pending, several public files in this repository already state the role as
+> fact: `CLAUDE.md` and `ROADMAP.md` ("Scientific advisor"),
+> `CONTRIBUTING.md` (governance authority over Tier 4+ evidence changes),
+> `EVIDENCE_FRAMEWORK.md` ("Scientific advisory"),
+> [ADR 0032](../decisions/0032-visible-pending-status-ecosystem-records.md)
+> ("advisory board, W3C Community Group"), and
+> [`FACILITATING_DEDICATION.md`](../concept/FACILITATING_DEDICATION.md), which
+> additionally attributes personal observations and a clinical-research
+> background to her by name.
+>
+> This is the situation the project's own rules exist to prevent:
+> [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md) and
+> [ADR 0031](../decisions/0031-qualified-ecosystem-records.md) require a named
+> person to self-publish or give authenticated consent **for the exact
+> relationship and purpose**, and state that notification alone is insufficient.
+> `CHARTER.md` says the same for participants.
+>
+> Two ways to close it, both Renato's call: obtain and record the confirmation
+> here, or soften those assertions to match this file. Do not leave them
+> disagreeing — the repository is public, and right now it both claims the
+> relationship and records that the claim is unconfirmed.
 
 ---
 

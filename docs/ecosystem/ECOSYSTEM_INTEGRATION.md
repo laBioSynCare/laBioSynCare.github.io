@@ -70,10 +70,14 @@ open-BSC-Lab / closed-BioSynCare separation ([ADR 0007](../decisions/0007-framew
 ## Workstream 1 — Reconcile "proposed" vs. "launched" group status
 
 **`[x] Done — 2026-07-12.`** The W3C Sensory Stimulation Community Group is
-**launched**, with Juliana Andrade and Renato Fabbri as chairs. All status and
-governance wording and the pre-submission artifacts were reconciled to
-launched-group framing; the list of contradictions this workstream existed to
-find has been removed now that none of them survive.
+**launched**. All status and governance wording and the pre-submission artifacts
+were reconciled to launched-group framing; the list of contradictions this
+workstream existed to find has been removed now that none of them survive.
+
+Chairs and the roster are deliberately **not** listed here. `CHARTER.md` names
+the group's W3C page as the authoritative record and adds that named
+participants are added only after explicit consent — so a second, in-repo roster
+would be both redundant and a place to publish a name ahead of its consent.
 
 The rule it leaves behind: `CHARTER.md` and
 [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](W3C_COMMUNITY_GROUP_PROPOSAL.md) describe a

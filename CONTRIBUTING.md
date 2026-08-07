@@ -322,7 +322,7 @@ security surface is the preset catalog export pipeline.
 |---|---|
 | Bug fixes and minor features | Renato Fabbri (sole maintainer) |
 | Ontology class additions | Renato Fabbri + advisory board input |
-| Evidence tier changes (Tier 4+) | Renato Fabbri + Juliana Braga de Salles Andrade |
+| Evidence tier changes (Tier 4+) | Renato Fabbri + scientific advisor (advisory role [pending confirmation](docs/ecosystem/ADVISORY_BOARD.md)) |
 | Vocabulary term additions | Renato Fabbri |
 | Defensive publication modifications | Cannot be modified after first commit |
 | Preset catalog additions | Renato Fabbri |

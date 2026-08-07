@@ -1,8 +1,12 @@
 # CLAUDE.md — BSC Lab AI Agent Directive
 
 > **Read this file completely before touching any other file in this repository.**
-> This directive applies to Claude Code, GitHub Copilot, Cursor, and all AI coding agents.
-> Last updated: 2026-07-11. Maintained by Renato Fabbri.
+> It is the directive for every AI coding agent working here. Only Claude Code
+> loads it automatically — `AGENTS.md`, `GEMINI.md` and
+> `.github/copilot-instructions.md` are planned (`TODO.md` §1) and do not exist,
+> so an agent on another tool must be pointed here explicitly.
+> Maintained by Renato Fabbri; update it in the same commit that changes what it
+> describes (§12).
 
 ---
 
@@ -39,7 +43,8 @@ BioSynCare. Do not conflate them.
 ## 2. Technology Stack
 
 These decisions are final unless `src/README.md` documents a change. Do not
-substitute alternatives without explicit instruction.
+substitute alternatives without explicit instruction. Rows marked **(planned)**
+are chosen but not yet installed — do not describe them as how the app works.
 
 | Layer | Technology | Version | Rationale |
 |---|---|---|---|
@@ -47,11 +52,11 @@ substitute alternatives without explicit instruction.
 | UI framework | Svelte 5 | 5.x | Compiler-based, near-vanilla bundle, reactive stores fit SPARQL result rendering |
 | RDF parsing/store | N3.js | 1.17+ | Parses Turtle/TriG/N-Quads, in-memory triple store |
 | SPARQL engine | Comunica | `@comunica/query-sparql-rdfjs` 3.x | SPARQL 1.1 in browser against N3 store |
-| RDF validation | rdf-validate-shacl | 0.5+ | SHACL in browser, Zazuko-maintained |
+| RDF validation | rdf-validate-shacl | 0.5+ | Installed, but used only by tests today (`*.shacl.test.js`, `adr-0027-negative-fixtures.test.mjs`). Browser-side validation is **(planned)** — see §5.4. `make validate` uses pySHACL |
 | Graph visualization | Cytoscape.js | 3.28+ | RDF ontology/evidence graph navigation |
-| Visual engine (default) | PixiJS | v8.x | Auto WebGPU/WebGL, unified renderer API |
+| Visual engine (default) | PixiJS | v8.x | **(planned — not installed.)** Auto WebGPU/WebGL, unified renderer API. Visuals today are CSS/DOM in the Patch Studio |
 | Audio engine (default) | Vanilla Web Audio API | browser native | Direct AudioContext control, no abstraction overhead |
-| Haptic engine (default) | Web Vibration API | browser native | NullHapticEngine fallback for unsupported platforms |
+| Haptic engine (default) | Web Vibration API | browser native | **(planned.)** NullHapticEngine fallback for unsupported platforms; the studio shows a haptic preview only |
 | App hosting | GitHub Pages | current | Client-only static app and `/ontology/*.ttl` artifacts; custom hosting deferred until headers or backend services are needed |
 | Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
 | Ontology docs | WIDOCO + pyLODE | 1.4.25 / 2.13.2 (flake-pinned) | HTML reference docs generated in `pages.yml`, artifact only, never committed (ADR 0023): WIDOCO (`make ontology-docs` → `/ontology/docs/`) for the OWL core; pyLODE `vocpub` (`make vocab-docs` → `/ontology/docs/vocab/`) for the SKOS vocabulary. Browser target at w3id stays the knowledge browser |
@@ -70,9 +75,10 @@ configuration. Always use:
 npx @sveltejs/mcp
 ```
 
-And ensure `.cursor/rules/rdf.mdc` and `.cursor/rules/audio-engine.mdc` are loaded.
-If an AI agent generates Svelte 4 syntax (`export let`, `$:`, `on:click`, `<slot />`),
-reject it and regenerate with explicit runes instruction.
+If an AI agent generates Svelte 4 syntax (`export let`, `$:`, `on:click`,
+`<slot />`), reject it and regenerate with an explicit runes instruction. The
+`.cursor/rules/*.mdc` files this section used to require are planned and do not
+exist (`TODO.md` §1); this file is the rule source until they do.
 
 ### Local dev server
 

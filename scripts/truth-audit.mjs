@@ -193,6 +193,15 @@ const SHIPPED = [
   { capability: 'Boundary enforcement', evidence: ['src/portability/sessionPackage.js'],
     command: 'session-conformance privacy assertions',
     stale: [/[Nn]o automated public\/private boundary tests/i] },
+  // Both seams of ADR 0038 exist. What is missing is a second real identity
+  // *provider*, which is a different claim — "the seam is untouched" was still
+  // being asserted in PORTABLE_DEPLOYMENT after nine consumers had migrated to
+  // it, and in the ADR's own status line while its successor described it as done.
+  { capability: 'Identity seam', evidence: ['src/identity/IdentityProvider.js',
+      'src/identity/identityProvider.conformance.test.js', 'src/storage/PatchStore.js'],
+    command: 'identityProvider.conformance.test.js',
+    stale: [/identity seam is untouched/i, /no implementation exists yet/i,
+            /gated on the identity seam/i, /identity seam.{0,20}(is )?(still )?(planned|absent|missing)/i] },
 ]
 
 const auditable = PROSE.concat(['docs/technical/SESSION_PACKAGE.md'])

@@ -176,8 +176,10 @@ Every build publishes **`build-info.json`** naming the commit it came from, and 
 fetches it back from the deployed URL after publishing — so "the live site is the
 commit we built" is checked rather than assumed.
 
-What remains open is a private cross-device sync service and the identity seam
-that must precede it
+The identity and storage seams both exist, with conformance suites
+([ADR 0038](docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)).
+What remains open is a private cross-device sync service, and a second real
+identity provider to prove the seam is an interface rather than a swap
 ([ADR 0039](docs/decisions/0039-sharing-model-and-the-shared-backend-question.md)).
 
 Every commit is also verified as a **credential-free static deployment**:

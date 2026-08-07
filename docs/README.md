@@ -21,8 +21,8 @@ the two disagree, the code and the as-built docs win.
 - [`FACILITATING_DEDICATION.md`](concept/FACILITATING_DEDICATION.md) — the
   primary validated use case.
 - [`SSTIM_LLM_COMPLEMENTARITY.md`](concept/SSTIM_LLM_COMPLEMENTARITY.md) — how
-  symbolic SSTIM and LLMs complement each other. Public wording lives in
-  [`ecosystem/SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md).
+  symbolic SSTIM and LLMs complement each other, and the recommended public
+  wording for saying so without overclaiming.
 
 ## `technical/` — specifications
 
@@ -50,8 +50,9 @@ instance. Both are the source for their planned JSON Schemas.
 [`../src/engines/README.md`](../src/engines/README.md)) and
 [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md)
 (PixiJS v8 design; as-built visuals in `PATCH_STUDIO.md` §5).
-[`OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md`](technical/OPENCLAW_AGENT_AUTOMATION_PROPOSAL.md)
-is an exploratory Phase-3 proposal assuming a server backend BSC Lab does not run.
+[`AGENT_AUTOMATION_BOUNDARY.md`](technical/AGENT_AUTOMATION_BOUNDARY.md) records
+what a conversational agent-automation layer would have to respect if one were
+ever added — nothing in it is built or on the roadmap.
 
 **Defensive publications — do not modify** after first commit (`CLAUDE.md` §3.4):
 [`BREATHING_MODEL.md`](technical/BREATHING_MODEL.md),
@@ -88,8 +89,6 @@ Ontology design itself is documented at
 - [`IP_STRATEGY.md`](ecosystem/IP_STRATEGY.md) and
   [`DEFENSIVE_PUBLICATIONS.md`](ecosystem/DEFENSIVE_PUBLICATIONS.md) —
   publication-first over patents, plus the filing tracker.
-- [`SSTIM_LLM_MESSAGING.md`](ecosystem/SSTIM_LLM_MESSAGING.md) — public wording
-  for SSTIM's relationship to AI, avoiding overclaim.
 - [`w3id/README.md`](ecosystem/w3id/README.md) — how the persistent-namespace
   targets are generated and guarded; the route contract itself is in
   [`w3id/sstim/README.md`](ecosystem/w3id/sstim/README.md).
