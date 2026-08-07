@@ -216,10 +216,13 @@ preset or an RDF instance is intentionally deferred — when added, the mapping
 belongs alongside the preset-format change checklist in
 [`../../src/README.md`](../../src/README.md).
 
-Signed-in users can also save this same export object to Firestore via
-`src/firebase/patches.js`. Patch documents live in `patchStudioPatches`, are
-owner-scoped by `firestore.rules`, and load through `draftFromPatchExport()`,
-which normalizes older or partial JSON back into the live draft shape.
+Patches are saved through the storage seam in
+[`../../src/storage/`](../../src/storage/): `PatchStore` has a local and a
+Firestore implementation behind one contract, both exercised by the same
+conformance suite, so saving works with or without an account. Firestore
+documents live in `patchStudioPatches`, are owner-scoped by `firestore.rules`,
+and load through `draftFromPatchExport()`, which normalizes older or partial JSON
+back into the live draft shape.
 
 ---
 
@@ -244,20 +247,25 @@ Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
 > the work can proceed against repo truth. Tracked as checkboxes in
 > [`../../TODO.md`](../../TODO.md) ("Software — Phase 2 → UI — Patch Studio").
 
-### 10.1 The export is a dead-end (highest priority)
+### 10.1 The export reaches RDF, but not the catalog
 
-`buildPatchExport()` produces a `patch-studio-model-1` object (§8) that only
-`draftFromPatchExport()` and Firestore (`src/firebase/patches.js`) consume. There
-is **no bridge to the preset catalog JSON** ([`PRESET_FORMAT.md`](PRESET_FORMAT.md),
-`header` + `voices`) or to an RDF instance under
-`static/ontology/instances/presets/`. So a patch can be designed, played, and
-cloud-saved, but it cannot become a catalog preset — which is the artifact the
-BSC Lab → BioSynCare pipeline (`CLAUDE.md` §11) and the knowledge browser
-(`src/rdf/presets.js`) actually consume. The studio is a design surface wired to
-nothing downstream.
+`buildPatchExport()` produces a `patch-studio-model-1` object (§8). Two of the
+three downstream paths now exist:
 
-The two models are **structurally divergent**, so this is a lossy, partial
-mapping — not a re-serialisation:
+- **SSTIM RDF — built.** `src/portability/patchProjection.js` projects a patch
+  into a `sstim:Preset` over the declared mappable subset and emits a
+  machine-readable report of everything that did not travel;
+  `src/portability/sessionPackage.js` wraps that as a checksummed portable
+  package, and `make session-conformance` proves Level 1 and Level 2 equivalence
+  across two origins ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)).
+- **Catalog preset JSON — still open.** There is no converter to
+  [`PRESET_FORMAT.md`](PRESET_FORMAT.md)'s `header` + `voices`, which is the
+  artifact the BSC Lab → BioSynCare pipeline (`CLAUDE.md` §11) and the knowledge
+  browser (`src/rdf/presets.js`) consume. This is the remaining half of
+  [ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md).
+
+The two models are **structurally divergent**, so any catalog conversion is a
+lossy, partial mapping — not a re-serialisation:
 
 | | Patch Studio (`patch-studio-model-1`) | Catalog preset (`PRESET_FORMAT.md`) |
 |---|---|---|
@@ -267,8 +275,7 @@ mapping — not a re-serialisation:
 | Metadata | `patchName` only | `group`, `targetBand`, `evidenceTier`, `cautionTags`, multilingual `desc*`/`med2*`/`uses*`/`techDesc*`, `headphonesMode`, … |
 | Breathing | Martigli **control track** modulating other tracks | Martigli / Martigli-Binaural **audible voice** |
 
-Consequences that must be decided before implementing (see
-[ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md)):
+Consequences that must be decided before implementing the catalog half:
 
 - Only a **mappable subset** round-trips: `BinauralBeat → Binaural`; a `Symmetry`
   control + `IsochronicTone` → `Symmetry` voice (isochronic, `noctaves: 0`); a
@@ -276,16 +283,15 @@ Consequences that must be decided before implementing (see
   `Martigli-Binaural`. `Carrier`/`Noise`/`Drone`/`Sample`, all visual, and all
   haptic tracks have **no catalog voice** and are dropped or blocked.
 - The catalog `header` carries scientific/human metadata that **cannot be derived**
-  from a patch. A conversion needs a **metadata-authoring step** (the panel the
-  stale TODO called "set group/targetBand/evidence tier").
+  from a patch. A conversion needs a **metadata-authoring step**.
 - The public target is a **BSC Lab reference preset** (bsclab IRI +
-  `static/ontology/instances/presets/`), SHACL-validated per §5.4 before it is
-  emitted. The private BioSynCare/BSC catalog stays out of this repo.
+  `static/ontology/instances/presets/`), SHACL-validated per `CLAUDE.md` §5.4
+  before it is emitted. The private BioSynCare/BSC catalog stays out of this repo.
 
 ### 10.2 `PresetCreator.svelte` is a monolith
 
-The component is **~4,365 lines** (`<script>` 1–1282, markup ~985, `<style>`
-~2,100) with **~91 functions** in one file, mixing transport, engine lifecycle,
+The component is **well over four thousand lines** — check with `wc -l`, since a
+number written here drifts with every commit — mixing transport, engine lifecycle,
 modulation math, tempo sync, Firestore CRUD, keyboard + fullscreen handling, SVG
 waveform-path generation, validation display, and the help overlay. It works and
 respects the invariants, but the size is a growing maintenance and test liability.
@@ -306,8 +312,8 @@ Decomposition (extract, do not rewrite behaviour):
   `trackToVoiceSpec`, `startVoiceFor`, `stopVoiceFor`, `stopAllVoices`,
   `restartVoice`, `restartSystem`, and the `rafTick` loop. Keeps the
   `AudioContext.currentTime` clock authority (`CLAUDE.md` §3.1) in one place.
-- **Cloud store:** the `refreshCloudPatches`/`saveCloudPatch`/`loadCloudPatch`/
-  `renameCloudPatch`/`removeCloudPatch` glue over `src/firebase/patches.js`.
+- **Cloud store:** ✅ **done** — extracted to
+  [`../../src/storage/`](../../src/storage/) as the `PatchStore` seam.
 - **Subcomponents:** cloud-patches menu, help overlay, semantic-info panel,
   mix/fullscreen stage, per-track card.
 

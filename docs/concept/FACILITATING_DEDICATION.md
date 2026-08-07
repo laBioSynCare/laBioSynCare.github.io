@@ -47,6 +47,18 @@ rather than treating it as an experiment.
 
 ## The observation: a preliminary personal case series
 
+> **Consent check needed before this section is treated as publishable.** It
+> names a second person and attributes to her a professional specialization, an
+> employer, a usage pattern, and behavioural self-reports. That is a far broader
+> purpose than "advisory board member" — and
+> [`../ecosystem/ADVISORY_BOARD.md`](../ecosystem/ADVISORY_BOARD.md) records even
+> that narrower role as **pending her confirmation**.
+> [ADR 0024](../decisions/0024-stakeholder-ecosystem-modeling.md) and
+> [ADR 0031](../decisions/0031-qualified-ecosystem-records.md) require
+> authenticated consent for the *exact* relationship and purpose, and this
+> repository is public. Renato: either record the consent covering this scope, or
+> reduce the attribution to what is covered.
+
 **Observers:** Two individuals, both scientifically trained skeptics
 with professional expertise in research methodology.
 

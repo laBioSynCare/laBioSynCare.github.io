@@ -140,9 +140,9 @@ someone who wants the actual namespace resource, a different need from
 
 ### Contribute a protocol — modal, not a raw file link
 
-Linking straight to `CONTRIBUTING.md` (373 lines, mostly the software/
-ontology contributor path) was the wrong front door for a newcomer with a
-protocol idea — flagged on review 2026-07-18. **`Contribute a protocol` now
+Linking straight to `CONTRIBUTING.md` — hundreds of lines, mostly the software
+and ontology contributor path — was the wrong front door for a newcomer with a
+protocol idea, flagged on review 2026-07-18. **`Contribute a protocol` now
 opens `src/ui/entrance/ContributeProtocolModal.svelte`:** one short paragraph
 of instructions, three fields (protocol name, plain-language description,
 optional contact), and a submit action that opens a **prefilled GitHub Issues

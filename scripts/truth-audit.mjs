@@ -204,7 +204,13 @@ const SHIPPED = [
             /gated on the identity seam/i, /identity seam.{0,20}(is )?(still )?(planned|absent|missing)/i] },
 ]
 
-const auditable = PROSE.concat(['docs/technical/SESSION_PACKAGE.md'])
+// PATCH_STUDIO carried the exact sentence this table already listed as stale
+// ("the studio is a design surface wired to nothing downstream") for as long as
+// the table existed, because the scan never looked at it. A claim table is only
+// as good as the set of files it reads.
+const auditable = PROSE.concat(['docs/technical/SESSION_PACKAGE.md',
+  'docs/technical/PATCH_STUDIO.md', 'docs/technical/PRIVATE_SYNC.md',
+  'src/README.md', 'src/engines/README.md', 'CONTRIBUTING.md'])
 for (const { capability, evidence, stale } of SHIPPED) {
   const missing = evidence.filter((f) => !existsSync(f))
   if (missing.length) {
