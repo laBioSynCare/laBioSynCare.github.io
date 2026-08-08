@@ -55,8 +55,10 @@ plain static asset (served same-origin, like the ontology Turtle). Key fields:
 
 The PNG icons live in [`../../static/icons/`](../../static/icons/) and are
 rasterised from two source SVGs in that directory (`icon.svg`, the brand mark on
-a transparent field for `purpose: any`; `icon-maskable.svg`, full-bleed dark
-field with the mark inside the safe zone for `purpose: maskable`). Regenerate
+a transparent field for `purpose: any`; `icon-maskable.svg`, a full-bleed
+Petroleum `#00424E` field with the mark scaled into the safe zone for
+`purpose: maskable`). Both are copies of a generated file — regenerate from
+[`../brand/gen.py`](../brand/gen.py) rather than editing them by hand. Regenerate
 them with `rsvg-convert` (see the comment block at the top of `icon.svg`).
 
 `app.html` carries the three head tags the manifest cannot supply itself:

@@ -1,9 +1,11 @@
 # Brand marks — the BSC Lab isotype, and how it was derived
 
-> **Status: candidate under review, nothing adopted.** `static/favicon.svg` and
-> `static/icons/*` are unchanged. This directory holds the exploration, the
-> generator that produced it, and the reasoning — so the next person does not
-> re-derive it from scratch or re-make the mistakes recorded here.
+> **Status: adopted 2026-08-08 — `marks/merge-d.svg`.** It is now
+> `static/favicon.svg`, `static/icons/icon.svg` and, scaled into the safe zone,
+> `static/icons/icon-maskable.svg`; the four PNGs are rasterised from those two.
+> This directory holds the exploration that produced it, the generator, and the
+> reasoning — so the next person does not re-derive it or re-make the mistakes
+> recorded here.
 
 ## The development history
 
@@ -11,7 +13,7 @@
 
 Nine sections: the parent mark measured off its artwork, every candidate at four
 sizes on both grounds, the colour matrix with computed contrast ratios, the
-merge that produced the current front-runner, notes on the BSC colour system,
+merge that produced the adopted mark, notes on the BSC colour system,
 and the forms that were tried and cut with the reason each failed.
 
 **That page is private to its owner.** Artifacts are not public unless shared
@@ -50,14 +52,22 @@ rather than redraws: the wave's four critical points — the two crossings where
 the curves superpose, the peak, the trough — become the subject. Those points
 were already in the parent figure, unmarked.
 
-**Current front-runner: `merge-e.svg`.** A Petroleum 500 disc, the wave in Warm
-Ivory, the two side lenses filled in Mint, and Mint nodes on the peak and
-trough. The lenses mark the crossings and the nodes mark the apexes, so each
-structural feature is stated once — the four rejected merges each state one
-twice. Every colour pair in it is one the BSC colour manual approves: Warm Ivory
-on Petroleum 9.90:1, Mint on Petroleum 6.16:1. The nodes are held off the ivory
-wave by a ring of the petroleum field, because Mint on Warm Ivory is 1.61:1 and
-the manual lists that pair as not recommended.
+**Adopted: `merge-d.svg`.** A Petroleum 500 disc, the wave in Warm Ivory, the
+two side lenses filled in Mint, and Mint nodes on the peak and trough. The
+lenses mark the crossings and the nodes mark the apexes, so each structural
+feature is stated once — the three rejected merges each state one twice. Its
+colour pairs are ones the BSC manual approves: Warm Ivory on Petroleum 9.90:1,
+Mint on Petroleum 6.16:1.
+
+**Known trade-off, accepted deliberately.** The mint nodes sit directly on the
+ivory wave, and Mint on Warm Ivory is 1.61:1 — a pair the manual lists as not
+recommended. At 16 px each node fuses into the stroke it sits on and reads as a
+thickening rather than a node. `merge-e.svg` is the same mark with a ring of the
+petroleum field holding the nodes off the wave, which fixes both; it was offered
+and `merge-d` was chosen for its cleaner, less engineered look at display sizes.
+If the tab icon ever needs to be crisper, `merge-e` is a drop-in replacement for
+the favicon alone, and `bsclab-isotype-small.svg` (the kite) is the more radical
+reduction.
 
 ## Files
 
@@ -95,10 +105,22 @@ recorded here only because the isotype work depends on them.
    secondary action. One generated token source would make the drift impossible
    rather than merely discouraged.
 
-## If a mark is adopted
+## Changing the mark again
 
-Replace `static/favicon.svg` and `static/icons/icon.svg`, regenerate
-`icon-192.png`, `icon-512.png` and `apple-touch-icon-180.png` with
-`rsvg-convert`, and revisit `theme-color` in `src/app.html` — the current icon
-is a light-blue ring on a `#1a1a2e` disc, and these candidates are built on the
-BSC palette instead.
+The three SVGs under `static/` are copies of a generated file — do not hand-edit
+them. Regenerate with `python3 gen.py`, copy the chosen `marks/*.svg` over
+`static/favicon.svg` and `static/icons/icon.svg`, rebuild the maskable variant
+(the mark scaled to a content radius of 184 on a full-bleed Petroleum field),
+then rasterise:
+
+```sh
+cd static/icons
+rsvg-convert -w 192 -h 192 icon.svg          -o icon-192.png
+rsvg-convert -w 512 -h 512 icon.svg          -o icon-512.png
+rsvg-convert -w 512 -h 512 icon-maskable.svg -o icon-maskable-512.png
+rsvg-convert -w 180 -h 180 icon-maskable.svg -o apple-touch-icon-180.png
+```
+
+`theme-color` in `src/app.html` and the manifest stays `#f7f3ea`: it is the
+paper skin's background applied pre-paint, not an icon colour, and the icon
+change does not bear on it.

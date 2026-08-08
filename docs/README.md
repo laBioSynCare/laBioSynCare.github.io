@@ -91,8 +91,8 @@ gallery rather than entering the PWA's precached `static/` asset set.
 [`brand/README.md`](brand/README.md) holds the BSC Lab isotype exploration: the
 parent mark measured off its artwork, the generator that builds every candidate
 from those constants, a WCAG audit of the BSC colour system, and a link to the
-full development history. Nothing is adopted — `static/favicon.svg` and
-`static/icons/` are unchanged.
+full development history. The adopted mark (`marks/merge-d.svg`) is the source
+of `static/favicon.svg` and `static/icons/`.
 
 ## `ecosystem/` — IP, governance, outreach
 
