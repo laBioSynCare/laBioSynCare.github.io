@@ -166,17 +166,13 @@ this": it is the identifier, not a destination — see the footer note under
 - **Primary CTA:** **Join the W3C group** (external W3C page) · **Contribute a
   protocol** → opens `ContributeProtocolModal` (see below), *not* a direct
   link to `CONTRIBUTING.md`.
-- **Secondary:** *Partner / consortium* → [`../ecosystem/CONSORTIUM_INVITATION.md`](../ecosystem/CONSORTIUM_INVITATION.md)
-  · *Ecosystem working plan* → [`../ecosystem/ECOSYSTEM_INTEGRATION.md`](../ecosystem/ECOSYSTEM_INTEGRATION.md).
+- **Secondary:** *Partner / consortium* → [`../ecosystem/CONSORTIUM_INVITATION.md`](../ecosystem/CONSORTIUM_INVITATION.md).
   (Still cut 2026-07-18: the Governance & charter link — charter is reachable
   from the modal's "read the full contribution guide" and from `/about`.)
-  (**Added 2026-08-08:** the integration plan. The invitation is the ask; the
-  plan is the working state behind it — five open workstreams, named outreach
-  targets, and the single milestone they serve — which is the honest answer to
-  "what would I be joining?" for the institution/funder persona. It is a
-  living tracker, so the label says **working plan**: nobody should read its
-  outreach notes as commitments. It is also linked from About's
-  Links & licensing list, next to the other ecosystem documents.)
+  (**2026-08-08:** back to one secondary link. Two candidates were tried in the
+  second slot and both belong elsewhere — the ecosystem brief moved up to the
+  hero, and [`../ecosystem/ECOSYSTEM_INTEGRATION.md`](../ecosystem/ECOSYSTEM_INTEGRATION.md)
+  to About. See the hero orientation note under "Decisions & open questions".)
 
 ### Contribute a protocol — modal, not a raw file link
 
@@ -215,6 +211,8 @@ Pico.css `<article>` elements in a two-column CSS grid.
 │    An open knowledge graph, an executable lab, and a community     │ ← subhead
 │    for designing and describing auditory, visual, and              │
 │    cross-modal stimulation.                                        │
+│    New here? One-page ecosystem brief — how the knowledge graph,   │ ← orientation
+│    this platform, and the applications fit together.               │
 │                                                                    │
 ├────────────────────────────────────────────────────────────────────┤
 │ ┌──────────────────────────────┐ ┌──────────────────────────────┐  │
@@ -231,7 +229,7 @@ Pico.css `<article>` elements in a two-column CSS grid.
 │ │ platform. (subcopy)          │ │ (subcopy)                    │  │
 │ │ [Deployment and portability] │ │ [Join the W3C group]         │  │
 │ │ [Run it locally]             │ │ [Contribute a protocol]      │  │ ← opens modal
-│ │ Architecture · Audio engines │ │ Consortium · Ecosystem plan  │  │
+│ │ Architecture · Audio engines │ │ Consortium                   │  │
 │ └──────────────────────────────┘ └──────────────────────────────┘  │
 ├────────────────────────────────────────────────────────────────────┤
 │ footer: one-liner · Namespace + DOI · GitHub · BioSynCare · About  │
@@ -324,6 +322,27 @@ above for why they're no longer also duplicated in a hero/footer bar.
   clause; About covers it (see "Hero" above).
 - **Door ① primary CTA — REVISED 2026-07-18:** Patch Studio, not Sensory
   Field (see door ① above).
+- **Hero orientation line — ADDED 2026-08-08.** One plain line under the
+  subhead: *"New here? One-page ecosystem brief — how the knowledge graph, this
+  platform, and the applications fit together."* → `/docs/BioSynCare_Ecosystem_Brief_EN.pdf`.
+  This is the one thing four doors cannot do. Each door answers "what can I do
+  here"; none places SSTIM against BSC Lab against BioSynCare, and a visitor who
+  cannot make that distinction cannot tell which door is theirs — the most
+  common report about this project is that it is hard to grasp as a whole. The
+  brief was first placed in door ④ and moved: a reader who is still orienting
+  does not scroll to the fourth card to find the overview. It is a line of text,
+  not a button, so the hero keeps its no-CTA shape (see "Wireframe"). Also
+  linked first in About's Links & licensing list.
+  - **The PDF is served from `static/docs/`, and its authoring copy lives in the
+    gitignored `docs/funding/documents/` tree.** Two copies, so a revision has
+    to be copied forward or the published brief silently goes stale — the same
+    failure mode as the release identifiers, without a derived-facts fix
+    available (a PDF has nothing to derive from). `src/ui/externalLinks.js`
+    holds the URL and says so.
+  - **What replacing the tracker fixed:** the 2026-08-07 pass had put
+    `ECOSYSTEM_INTEGRATION.md` in door ④. Wrong artifact for a visitor — 500
+    lines of open workstreams, KPIs and outreach notes answer "how is this
+    project being run", not "what is this project". It stays linked from About.
 - **Door ② subcopy — CORRECTED 2026-08-07:** dropped the BIDS/HED encoding
   claim, which described an unbuilt exporter; added the generated reference
   docs as door ②'s second secondary link (see door ② above).

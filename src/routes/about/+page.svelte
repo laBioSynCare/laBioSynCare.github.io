@@ -4,6 +4,7 @@
   import { CONCEPT_DOI, doiUrl } from '../../ui/entrance/releaseMetadata.js'
   import {
     BIOSYNCARE_URL,
+    ECOSYSTEM_BRIEF_URL,
     GITHUB_URL,
     ONTOLOGY_DOCS_URL,
     VOCAB_DOCS_URL,
@@ -198,6 +199,10 @@
   ]
 
   const links = [
+    // First, deliberately: it is the only artifact that shows all four layers
+    // of the page above on one page, which is what a reader arriving confused
+    // actually needs.
+    { label: 'Ecosystem brief (one page, PDF)', href: ECOSYSTEM_BRIEF_URL },
     { label: 'Source repository', href: GITHUB_URL, external: true },
     { label: 'Ontology reference docs', href: ONTOLOGY_DOCS_URL, external: true },
     { label: 'Vocabulary docs', href: VOCAB_DOCS_URL, external: true },

@@ -30,3 +30,11 @@ export const BIOSYNCARE_URL = 'https://biosyncare.com/'
 // a stub for local development, which CI overwrites.
 export const ONTOLOGY_DOCS_URL = '/ontology/docs/'
 export const VOCAB_DOCS_URL = '/ontology/docs/vocab/'
+
+// One-page overview of the whole ecosystem — SSTIM, BSC Lab, BioSynCare, the
+// W3C group, and how they connect. It is here because the three-layer structure
+// is the hardest thing about this project to grasp from any single surface, and
+// a reader who has not grasped it cannot tell which door is theirs. Served from
+// `static/docs/`; the authoring copy lives in the gitignored `docs/funding/`
+// tree, so update both together or the published version silently goes stale.
+export const ECOSYSTEM_BRIEF_URL = '/docs/BioSynCare_Ecosystem_Brief_EN.pdf'

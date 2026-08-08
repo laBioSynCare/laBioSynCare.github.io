@@ -9,6 +9,7 @@
   import { CONCEPT_DOI, doiUrl } from '../ui/entrance/releaseMetadata.js'
   import {
     BIOSYNCARE_URL,
+    ECOSYSTEM_BRIEF_URL,
     GITHUB_URL,
     ONTOLOGY_DOCS_URL,
     W3C_GROUP_URL,
@@ -85,14 +86,14 @@
         { label: 'Join the W3C group', href: W3C_GROUP_URL, external: true },
         { label: 'Contribute a protocol', action: 'contribute' },
       ],
-      // The consortium invitation is the ask; the integration plan is the
-      // working state behind it — five open workstreams, named targets, and
-      // the milestone they serve, which is the honest answer to "what would I
-      // be joining?". It is a living tracker, not a brochure: labelled
-      // "working plan" so nobody reads its outreach notes as commitments.
+      // Back to one secondary link. The ecosystem brief was tried here and
+      // moved to the hero: a reader who cannot yet place SSTIM against BSC Lab
+      // against BioSynCare will not scroll to the fourth card to find that
+      // out. The internal integration tracker was tried here too and is the
+      // wrong artifact for a visitor — 500 lines of open workstreams and
+      // outreach notes; it stays linked from About.
       secondary: [
         { label: 'Partner / consortium', href: ghBlob('docs/ecosystem/CONSORTIUM_INVITATION.md'), external: true },
-        { label: 'Ecosystem working plan', href: ghBlob('docs/ecosystem/ECOSYSTEM_INTEGRATION.md'), external: true },
       ],
     },
   ]
@@ -151,6 +152,15 @@
          sentence, the <title> and og:title as labels. -->
     <h1>{SHARE_TITLE}.</h1>
     <p class="subhead">{SHARE_DESCRIPTION}</p>
+    <!-- The one thing the four doors cannot do: place the three layers against
+         each other. A visitor who does not yet know how SSTIM, BSC Lab and
+         BioSynCare relate cannot tell which door is theirs, so the overview
+         sits above them rather than behind door ④. One line, no button — the
+         hero stays a hero. -->
+    <p class="hero-orientation">
+      New here? <a href={ECOSYSTEM_BRIEF_URL}>One-page ecosystem brief</a> — how
+      the knowledge graph, this platform, and the applications fit together.
+    </p>
   </header>
 
   <section class="doors" aria-label="Choose your path">
@@ -248,6 +258,14 @@
   .subhead {
     font-size: 1.02rem;
     line-height: 1.6;
+    max-width: 68ch;
+    color: var(--app-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .hero-orientation {
+    font-size: 0.88rem;
+    line-height: 1.55;
     max-width: 68ch;
     color: var(--app-muted);
     margin: 0 0 1.35rem;
