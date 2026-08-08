@@ -109,10 +109,12 @@ between the two BSC Lab subsystems and is coordinated with BioSynCare as a
 outside this repository and is not converted to Turtle here. The knowledge
 subsystem reads the RDF ontology files and public BSC Lab reference instances.
 
-The Patch Studio authors its own live model (`model: "patch-studio-model-2"`, see
-[`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)); genuine model-1 documents
-remain readable through an explicit importer. Its normalizer carries 14 visual
-track types and one serialized stage-presentation contract;
+The Patch Studio authors its own live model (`model: "patch-studio-model-3"`, see
+[`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)); genuine model-1 and
+model-2 documents remain readable through explicit migration. Model 2 is the
+historical first spatial schema; model 3 adds the spatial track's explicit
+optional depth-to-size cue. Its normalizer carries 14 visual track types and one
+serialized stage-presentation contract;
 Field starters and pure adapters produce the same canonical draft.
 `portability/patchProjection.js` projects a patch into SSTIM RDF over the
 declared mappable subset, recursively reporting nested and discrete state that

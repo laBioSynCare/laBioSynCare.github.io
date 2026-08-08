@@ -18,10 +18,11 @@ Deferral does not block the mandatory Field/Studio integration in
 [ADR 0046](0046-one-studio-two-authoring-modes.md).
 
 **Model-version amendment — 2026-08-08.** The architectural separation below is
-unchanged, but `patch-studio-model-2` is now the live authoring/export model.
-Genuine model-1 documents remain readable through an explicit importer; model-2
-fields are rejected under the model-1 tag rather than exposed to silent downgrade
-by an older reader.
+unchanged. `patch-studio-model-2` became the first spatial authoring schema;
+`patch-studio-model-3` is now the live authoring/export model and makes the
+optional spatial depth-to-size cue explicit. Genuine model-1 and model-2
+documents remain readable through explicit migration. Newer fields are rejected
+under an older tag rather than exposed to silent downgrade by an older reader.
 
 Drafted from the Patch Studio improvement analysis, see
 [`../technical/PATCH_STUDIO.md`](../technical/PATCH_STUDIO.md) §10.1.

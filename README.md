@@ -197,7 +197,8 @@ Existing portability foundations:
 - versioned, checksum-verified ontology releases ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md));
 - JSON-LD and RDF/XML ontology export via `make export`;
 - RDF serialization of annotations with authentication identifiers excluded;
-- the portable `patch-studio-model-2` representation with explicit model-1 import;
+- the portable `patch-studio-model-3` representation, with explicit import of
+  genuine model-1 and model-2 documents;
 - separation of public reference data, per-user annotation graphs and private records.
 
 The next portability layer — reproducible institutional deployment, explicit

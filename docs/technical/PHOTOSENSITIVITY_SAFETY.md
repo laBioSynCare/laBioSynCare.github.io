@@ -54,7 +54,7 @@ also sets `documentElement.dataset.visualStim` for CSS hooks.
 | Surface | Behaviour when policy is off |
 |---|---|
 | Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder; the `Blink` track flicker is also rate-capped (see §4) ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
-| **Mix** / fullscreen visual stage | Disabled (the button is inert when off or when there are no visual tracks) |
+| **Mix** modal / optional fullscreen visual stage | Disabled (the button is inert when off or when there are no visual tracks) |
 | Sensory Field (`/field/`) | The colour field shows a placeholder when off; the blink rate is additionally capped by `flashSafety.js` (see §4) — [`FieldStage.svelte`](../../src/ui/field/FieldStage.svelte), [`SensoryField.svelte`](../../src/ui/field/SensoryField.svelte) |
 | Future PixiJS visual engine | Must read `isVisualStimulationOn()` and render nothing when off |
 

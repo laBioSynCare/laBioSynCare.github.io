@@ -56,18 +56,19 @@ founder's commercial interest does not exist.
 Patch Studio is **partly SSTIM-integrated**, but does not yet produce the full
 set of validated and loss-accounted artifacts defined below:
 
-- `patch-studio-model-2` exports and reconstructs losslessly, while genuine
-  model-1 documents remain readable through an explicit migration;
+- current `patch-studio-model-3` exports reconstruct losslessly, while genuine
+  model-1 and model-2 documents remain readable through explicit migration;
 - session packages carry Patch JSON, Turtle, JSON-LD, checksums, and a mapping
   report, and cross-origin tests establish semantic and parameter equivalence;
 - the RDF projection creates an SSTIM `Preset` composed of typed tracks;
 - the projection still cannot express all modulation, tempo-sync, envelope,
   synthesis, and visual semantics;
-- its report currently calls output “SHACL-validated,” but the producer path
-  does not invoke SHACL. Parsing and ontology-term accounting are useful but are
-  not a substitute for validating the emitted graph;
-- the mapping report is not exhaustive for discrete and nested values, so some
-  semantic loss can escape the `unmapped` count;
+- its report explicitly says that the producer path does not invoke SHACL.
+  Parsing and ontology-term accounting are useful but are not a substitute for
+  validating the emitted graph;
+- the mapping report recursively accounts for nested, discrete, modulation,
+  tempo-sync, configuration, and visual-stage leaves as mapped, unmapped with a
+  reason, or non-semantic authoring metadata;
 - no JSON Schema currently validates the native patch format.
 
 Sensory Field is stronger on one narrower claim: its `ExposureProfile` emitter

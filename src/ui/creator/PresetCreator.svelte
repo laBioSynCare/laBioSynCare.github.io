@@ -1,6 +1,6 @@
 <script>
-  import { onDestroy, onMount } from 'svelte'
-  import { afterNavigate } from '$app/navigation'
+  import { onDestroy, onMount, tick } from 'svelte'
+  import { afterNavigate, replaceState } from '$app/navigation'
   import Knob from './Knob.svelte'
   import SpatialTrackInspector from './SpatialTrackInspector.svelte'
   import StudioVisualStage from './StudioVisualStage.svelte'
@@ -215,19 +215,60 @@
   let lastVisualTick = null
   let controllerTime = $state(0)
 
-  // Visual mix / fullscreen stage.
+  // Visual mix window. It opens at a cross-eye-friendly size and only enters
+  // true fullscreen after an explicit action inside the window.
   let mixOpen = $state(false)
+  let mixFullscreen = $state(false)
+  let mixDialogEl = $state(null)
+  let mixTriggerEl = $state(null)
   let stageEl = $state(null)
 
-  function openMix() {
+  async function openMix() {
     mixOpen = true
-    // Try true fullscreen; fall back to the fixed overlay if unavailable.
-    queueMicrotask(() => { try { stageEl?.requestFullscreen?.() } catch (_) {} })
+    await tick()
+    try {
+      if (mixDialogEl?.showModal && !mixDialogEl.open) mixDialogEl.showModal()
+      else if (mixDialogEl && !mixDialogEl.open) mixDialogEl.setAttribute('open', '')
+    } catch (_) {
+      mixDialogEl?.setAttribute('open', '')
+    }
+    mixDialogEl?.focus()
   }
 
   function closeMix() {
+    try {
+      if (document.fullscreenElement === stageEl) document.exitFullscreen?.()
+      if (mixDialogEl?.open) mixDialogEl.close()
+    } catch (_) {}
+    mixFullscreen = false
     mixOpen = false
-    try { if (document.fullscreenElement) document.exitFullscreen?.() } catch (_) {}
+    queueMicrotask(() => mixTriggerEl?.focus())
+  }
+
+  async function toggleMixFullscreen() {
+    try {
+      if (document.fullscreenElement === stageEl) await document.exitFullscreen?.()
+      else await stageEl?.requestFullscreen?.()
+    } catch (_) {}
+  }
+
+  function handleMixCancel(event) {
+    event.preventDefault()
+    if (document.fullscreenElement === stageEl) {
+      try { document.exitFullscreen?.() } catch (_) {}
+      return
+    }
+    closeMix()
+  }
+
+  function handleMixBackdropClick(event) {
+    if (event.target !== event.currentTarget) return
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const insideDialog = event.clientX >= bounds.left
+      && event.clientX <= bounds.right
+      && event.clientY >= bounds.top
+      && event.clientY <= bounds.bottom
+    if (!insideDialog) closeMix()
   }
 
   const summary = $derived(patchSummary(draft))
@@ -389,7 +430,7 @@
   function clearStarterQuery() {
     const url = new URL(window.location.href)
     url.searchParams.delete('starter')
-    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`)
+    replaceState(`${url.pathname}${url.search}${url.hash}`, {})
   }
 
   function starterActionAllowed() {
@@ -933,7 +974,11 @@
 
     if (event.key === 'Escape' && mixOpen) {
       event.preventDefault()
-      closeMix()
+      if (document.fullscreenElement === stageEl) {
+        try { document.exitFullscreen?.() } catch (_) {}
+      } else {
+        closeMix()
+      }
       return
     }
 
@@ -956,8 +1001,9 @@
   }
 
   function handleFullscreenChange() {
-    // If the user leaves true fullscreen (e.g. via Esc), drop the overlay too.
-    if (mixOpen && !document.fullscreenElement) mixOpen = false
+    // Exiting fullscreen returns to the resizable mix window; it does not
+    // discard the mix or close the dialog.
+    mixFullscreen = document.fullscreenElement === stageEl
   }
 
   onMount(() => {
@@ -1672,7 +1718,7 @@
   {/snippet}
 
   <!-- Per-type visual preview content (no outer box) — reused by track cards
-       and the fullscreen mix stage. -->
+       and the resizable mix stage. -->
   {#snippet visualLayer(track)}
     {#if track.trackType === 'Blink'}
       <span class="visual-aura"></span>
@@ -2415,10 +2461,11 @@
           {/each}
           <button
             class="add-btn mix-btn"
+            bind:this={mixTriggerEl}
             onclick={openMix}
             disabled={!$visualStimulationOn || !draft.visualTracks.length}
-            title="Mix all visual tracks fullscreen"
-          >⛶ Mix</button>
+            title="Open the resizable visual mix"
+          >Mix</button>
         </div>
       </div>
       <div class="col-body">
@@ -2607,34 +2654,48 @@
   {/if}
 
   {#if mixOpen}
-    <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-    <div
-      class="visual-stage"
-      bind:this={stageEl}
-      style={`background:${draft.visualStage?.backgroundColor || '#04060a'}`}
+    <dialog
+      class="mix-dialog"
+      bind:this={mixDialogEl}
+      aria-label="Patch Studio visual mix"
+      oncancel={handleMixCancel}
+      onclick={handleMixBackdropClick}
+      tabindex="-1"
     >
-      {#each draft.visualTracks as track (track.id)}
-        {#if track.id === firstStudioStageTrackId}
-          <StudioVisualStage
-            tracks={studioStageTracks}
-            {liveValues}
-            stage={draft.visualStage}
-            {controllerTime}
-            transparentBackground={true}
-            active={$visualStimulationOn}
-            label="Patch Studio visual mix"
-          />
-        {:else if !isStudioStageTrack(track) && track.enabled !== false}
-          <div class="stage-layer" style={`${visualStyle(track)};mix-blend-mode:${track.blend || 'screen'}`}>
-            <div class="stage-scale">{@render visualLayer(track)}</div>
-          </div>
+      <div
+        class="visual-stage"
+        bind:this={stageEl}
+        style={`background:${draft.visualStage?.backgroundColor || '#04060a'}`}
+      >
+        {#each draft.visualTracks as track (track.id)}
+          {#if track.id === firstStudioStageTrackId}
+            <StudioVisualStage
+              tracks={studioStageTracks}
+              {liveValues}
+              stage={draft.visualStage}
+              {controllerTime}
+              transparentBackground={true}
+              active={$visualStimulationOn}
+              label="Patch Studio visual mix"
+            />
+          {:else if !isStudioStageTrack(track) && track.enabled !== false}
+            <div class="stage-layer" style={`${visualStyle(track)};mix-blend-mode:${track.blend || 'screen'}`}>
+              <div class="stage-scale">{@render visualLayer(track)}</div>
+            </div>
+          {/if}
+        {/each}
+        {#if !draft.visualTracks.length}
+          <p class="stage-empty">Add visual tracks to mix.</p>
         {/if}
-      {/each}
-      {#if !draft.visualTracks.length}
-        <p class="stage-empty">Add visual tracks to mix.</p>
-      {/if}
-      <button type="button" class="stage-close" onclick={closeMix} aria-label="Close mix">✕ Close</button>
-    </div>
+        <div class="stage-actions" role="toolbar" aria-label="Visual mix actions">
+          <span class="stage-resize-hint">Resize from the lower-right corner</span>
+          <button type="button" class="stage-action" onclick={toggleMixFullscreen}>
+            {mixFullscreen ? 'Exit full screen' : 'Full screen'}
+          </button>
+          <button type="button" class="stage-action" onclick={closeMix} aria-label="Close visual mix">✕ Close</button>
+        </div>
+      </div>
+    </dialog>
   {/if}
 
 </div>
@@ -4435,18 +4496,46 @@
   }
   .mandala-shape-2 { transform: rotate(30deg); opacity: 0.7; }
 
-  /* ── Visual mix / fullscreen stage ──────────────────────────────────────── */
+  /* ── Resizable visual mix window / optional fullscreen stage ───────────── */
   .mix-btn { margin-left: auto; }
   .mix-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  .mix-dialog {
+    width: min(52rem, calc(100vw - 3rem));
+    height: min(32rem, calc(100vh - 3rem));
+    min-width: min(22rem, calc(100vw - 1rem));
+    min-height: min(16rem, calc(100vh - 1rem));
+    max-width: calc(100vw - 1.5rem);
+    max-height: calc(100vh - 1.5rem);
+    box-sizing: border-box;
+    margin: auto;
+    padding: 0;
+    overflow: hidden;
+    resize: both;
+    color: #fff;
+    background: #04060a;
+    border: 1px solid #ffffff40;
+    border-radius: 10px;
+    box-shadow: 0 24px 80px #000c;
+  }
+
+  .mix-dialog::backdrop {
+    background: #000a;
+    backdrop-filter: blur(3px);
+  }
+
   .visual-stage {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
+    position: relative;
+    width: 100%;
+    height: 100%;
     background: #04060a;
     overflow: hidden;
   }
-  .visual-stage:fullscreen { width: 100vw; height: 100vh; }
+  .visual-stage:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
 
   .stage-layer {
     position: absolute;
@@ -4470,11 +4559,26 @@
     font-size: 1rem;
   }
 
-  .stage-close {
+  .stage-actions {
     position: absolute;
     top: 16px;
     right: 16px;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stage-resize-hint {
+    padding: 6px 8px;
+    color: #ffffffb8;
+    font-size: 11px;
+    background: #0008;
+    border-radius: 5px;
+    backdrop-filter: blur(4px);
+  }
+
+  .stage-action {
     margin: 0;
     padding: 8px 14px;
     width: auto;
@@ -4487,7 +4591,10 @@
     cursor: pointer;
     backdrop-filter: blur(4px);
   }
-  .stage-close:hover { background: #ffffff30; }
+  .stage-action:hover { background: #ffffff30; }
+  .stage-action:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .visual-stage:fullscreen .stage-resize-hint { display: none; }
 
   .haptic-preview {
     background:

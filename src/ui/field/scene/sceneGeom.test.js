@@ -29,6 +29,34 @@ describe('projection', () => {
     expect(disparity(0.4, 50)).toBeCloseTo(20)
     expect(disparity(-0.4, 50)).toBeCloseTo(-20)
   })
+
+  it('keeps view-plane x and camera-space z independent after yaw', () => {
+    const options = { cx: 100, cy: 80, scale: 20, theta: 0.73 }
+    const depthScale = 50
+    const base = project({ x: 0.2, y: -0.1, z: 0.3 }, options)
+    const movedX = project({
+      x: 0.2, y: -0.1, z: 0.3, viewOffsetX: 0.4,
+    }, options)
+    const movedZ = project({
+      x: 0.2, y: -0.1, z: 0.3, depthOffset: 0.4,
+    }, options)
+    const eyes = (point) => ({
+      left: point.sx - disparity(point.z, depthScale) / 2,
+      right: point.sx + disparity(point.z, depthScale) / 2,
+    })
+    const midpoint = (pair) => (pair.left + pair.right) / 2
+    const separation = (pair) => pair.right - pair.left
+
+    expect(movedX.sx - base.sx).toBeCloseTo(8)
+    expect(movedX.z).toBeCloseTo(base.z)
+    expect(midpoint(eyes(movedX)) - midpoint(eyes(base))).toBeCloseTo(8)
+    expect(separation(eyes(movedX))).toBeCloseTo(separation(eyes(base)))
+
+    expect(movedZ.sx).toBeCloseTo(base.sx)
+    expect(movedZ.z - base.z).toBeCloseTo(0.4)
+    expect(midpoint(eyes(movedZ))).toBeCloseTo(midpoint(eyes(base)))
+    expect(separation(eyes(movedZ)) - separation(eyes(base))).toBeCloseTo(20)
+  })
 })
 
 describe('scene helpers', () => {
@@ -40,6 +68,20 @@ describe('scene helpers', () => {
     const b = rotatedSceneBounds(scene, 0)
     expect(b.minZ).toBeLessThan(0)
     expect(b.maxZ).toBeGreaterThan(0)
+  })
+
+  it('includes camera-space track depth offsets in delivered depth bounds', () => {
+    const shifted = {
+      segments: [],
+      dots: [{ x: 0, y: 0, z: 0, depthOffset: 0.75 }],
+      polys: [],
+    }
+    const bounds = rotatedSceneBounds(shifted, 1.2)
+    // Degenerate bounds deliberately expand to the generic fallback; use two
+    // offsets so the exact delivered camera-space values remain observable.
+    shifted.dots.push({ x: 0, y: 0, z: 0, depthOffset: -0.25 })
+    expect(rotatedSceneBounds(shifted, 1.2)).toEqual({ minZ: -0.25, maxZ: 0.75 })
+    expect(bounds).toEqual({ minZ: -1, maxZ: 1 })
   })
 
   it('sceneExtent gives a positive horizontal radius and a height range', () => {

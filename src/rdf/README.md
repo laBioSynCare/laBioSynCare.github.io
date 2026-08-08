@@ -221,7 +221,8 @@ preset that fails validation is included in runtime JSON.
 
 > Not yet implemented. The API and pipeline below are the target. Note this is
 > the **catalog** export path; the live Patch Studio uses its own
-> `patch-studio-model-2` export, with model-1 import compatibility (see
+> `patch-studio-model-3` export, with model-1 and model-2 import compatibility
+> (model 2 is the historical first spatial schema; see
 > `docs/technical/PATCH_STUDIO.md`).
 
 Optionally generates runtime JSON for public BSC Lab reference presets. This is

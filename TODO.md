@@ -653,7 +653,8 @@ The improvement backlog below is grounded in that spec's §10 and gated by
 
 - [x] ~~`PresetCreator.svelte` — add/remove control/audio/visual/haptic
       tracks, per-param knobs, modulation links, tempo sync, live engine
-      preview, cloud save~~ — shipped (currently `patch-studio-model-2`; model 1 imports).
+      preview, cloud save~~ — shipped (currently `patch-studio-model-3`; genuine
+      model 1 and model 2 documents import).
 
 **Mandatory Sensory Field integration (highest priority — ADR 0046)**
 - [x] Decide the product boundary: one canonical Studio model/runtime with
@@ -661,9 +662,10 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       templates/routes, and a shared visual projection stage —
       [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
       `P2`
-- [x] Add first-class colour-field and four spatial-scene track contracts to the
-      `patch-studio-model-2` normalizer, including visual enabled state and an
-      explicit model-1 importer,
+- [x] Add first-class colour-field and four spatial-scene track contracts in
+      model 2, followed by the current `patch-studio-model-3` boundary for the
+      explicit optional depth-to-size cue; retain explicit model-1 and model-2
+      import,
       shared spatial parameters, a general-rate `Sinusoid` control, and
       fixed-point coverage `P2`
 - [x] Add ordinary Studio inspectors, four Field starter bundles, and shared

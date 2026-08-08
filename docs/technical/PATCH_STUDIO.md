@@ -14,10 +14,12 @@
 > The Patch Studio is an interactive *design surface*: it builds an in-memory
 > **patch draft** and renders it live through the selected audio engine (see
 > [`../../src/engines/README.md`](../../src/engines/README.md)). Its export
-> object is tagged `model: "patch-studio-model-2"` and is its own thing. Model-1
-> files remain importable through an explicit migration, but new exports are
-> always model 2 so older readers cannot silently downgrade spatial data. Its
-> lossless session package and partial SSTIM RDF projection are implemented;
+> object is tagged `model: "patch-studio-model-3"` and is its own thing. Genuine
+> model-1 and model-2 files remain importable through explicit migration, but
+> new exports are always model 3 so older readers cannot silently downgrade the
+> optional depth-to-size state. Model 2 remains the historical first spatial
+> schema. The lossless session package and partial SSTIM RDF projection are
+> implemented;
 > the one-way catalog JSON adapter is still future work. The adopted plan to
 > absorb Sensory Field is partially implemented: ordinary first-class
 > colour-field and spatial visual tracks, Field starters/routes, and one shared
@@ -65,9 +67,10 @@ Four track families. Control tracks are **modulation sources**; the other three
 are **sensory tracks** whose parameters can be modulated by control tracks.
 
 `buildPatchExport(draft)` serialises a draft to a portable object tagged
-`model: "patch-studio-model-2"`. `draftFromPatchExport()` also accepts genuine
-`patch-studio-model-1` documents, supplies the model-2 stage default, and rebuilds
-them into the current draft shape; their next export is model 2.
+`model: "patch-studio-model-3"`. `draftFromPatchExport()` also accepts genuine
+`patch-studio-model-1` and `patch-studio-model-2` documents and rebuilds them
+into the current draft shape. Model 1 receives the shared-stage default; model-2
+spatial tracks receive `depthAffectsScale: false`. Their next export is model 3.
 
 ---
 
@@ -200,9 +203,30 @@ result can be re-enabled without reconstructing discarded settings.
 
 `ColorField` owns `{ color, offColor, blinkEnabled }`. Each spatial type owns a
 normalized, content-specific `config`; it does not share one optional-field bag.
-Spatial transforms live in `params`, while presentation lives once in
-`visualStage`: mono/stereo-pair/anaglyph/autostereogram, parallel/cross viewing,
-background, depth scale/colour, zoom, stroke width, and camera yaw/auto-rotation.
+Spatial transforms live in `params`, and each spatial track has the discrete
+`depthAffectsScale` flag. Presentation lives once in `visualStage`:
+mono/stereo-pair/anaglyph/autostereogram, parallel/cross viewing, background,
+depth scale/colour, zoom, stroke width, and camera yaw/auto-rotation.
+
+### 5.1 Spatial coordinates and the optional perspective cue
+
+The track controls are three distinct camera-space translations applied after
+stage camera yaw:
+
+- **X** moves the source horizontally on the view plane.
+- **Y** moves it vertically on the view plane.
+- **Z** changes depth relative to the focal plane. Positive values are nearer;
+  negative values are farther. Z feeds binocular horizontal disparity in a
+  stereo pair or anaglyph, and the depth buffer in an autostereogram. It does
+  not reuse X or move the source's common, pre-disparity screen position.
+
+The shared stage's `depthScalePx` controls how much disparity a given Z produces.
+The projection is orthographic by default, so changing Z does not otherwise
+change apparent size. A track may opt into the explicit
+`depthAffectsScale: true` perspective cue: positive Z then enlarges the complete
+source and negative Z shrinks it. The multiplier is `2^(z/2)`, bounded to
+`0.5..2`; it composes with the independent `spatialScale` control. Model-1 and
+model-2 imports default this flag to `false`, preserving constant-size behavior.
 
 > **Implementation note.** The original nine flat types still render as live
 > **CSS/DOM previews** and mix-stage overlays. `ColorField` and the four spatial
@@ -215,14 +239,16 @@ background, depth scale/colour, zoom, stroke width, and camera yaw/auto-rotation
 > shipped shared-stage path, not the still-planned PixiJS engine in
 > [`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md).
 
-### 5.1 Mixing and fullscreen
+### 5.2 Mixing, resizing, and fullscreen
 
 Each visual track has a `blend` mode (`BLEND_MODES = ['screen', 'lighten',
 'normal', 'multiply', 'overlay', 'difference']`). The **Mix** control composites
-every visual track into one full-viewport stage and requests true fullscreen via
-the Fullscreen API (Esc closes). CSS blend applies to the nine flat overlays and
-to individual `ColorField` layers. Spatial sources compose as primitives before
-the single projection. Their opacity and blend execute in vector mono,
+every visual track in a resizable modal whose default width keeps each stereo
+pane practical for cross-eyed viewing. **Full screen** is a separate, explicit
+action. Esc leaves true fullscreen and returns to the same modal; Esc again (or
+**Close**) closes it. CSS blend applies to the nine flat overlays and to
+individual `ColorField` layers. Spatial sources compose as primitives before the
+single projection. Their opacity and blend execute in vector mono,
 stereo-pair, and anaglyph output. Autostereogram is generated from one depth
 buffer, so per-primitive blend is not applicable; the spatial inspector states
 that and hides the irrelevant selector in that mode.
@@ -232,13 +258,13 @@ therefore represents them as one group at the first enabled spatial position in
 the visual-track array, preserving spatial source order inside the group;
 `ColorField` layers retain their authored order around that topology boundary.
 
-### 5.2 Photosensitivity gating
+### 5.3 Photosensitivity gating
 
 Flickering/moving visuals are gated by the global visual-stimulation setting.
 When it is off, previews and the mix stage are suppressed. See
 [`PHOTOSENSITIVITY_SAFETY.md`](PHOTOSENSITIVITY_SAFETY.md).
 
-### 5.3 Field starters and legacy conversion
+### 5.4 Field starters and legacy conversion
 
 The four `/field/*` compatibility intents open a Studio dialog, never another
 runtime. Its expanded report displays mapped, dormant, warning, behavior
@@ -285,7 +311,7 @@ params on a track are tempo-syncable and as what kind (`duration`, `rate`,
 
 ```js
 {
-  model: 'patch-studio-model-2',
+  model: 'patch-studio-model-3',
   patchName,
   timing: { bpmEnabled, bpm, bpmMods, beatsPerBar, lengthSec },
   visualStage,
@@ -307,9 +333,18 @@ Firestore implementation behind one contract, both exercised by the same
 conformance suite, so saving works with or without an account. Firestore
 documents live in `patchStudioPatches`, are owner-scoped by `firestore.rules`,
 and load through `draftFromPatchExport()`, which explicitly migrates model 1 and
-normalizes older or partial JSON back into the live draft shape. Storage, links,
-packages, and projection accept both supported identifiers but reject model-2
-fields mislabeled as model 1.
+model 2 and normalizes older or partial JSON back into the live draft shape.
+Storage, links, packages, and projection accept all three supported identifiers.
+They reject model-2 spatial fields mislabeled as model 1, and reject the
+model-3-only `depthAffectsScale` field under either older tag.
+
+The native-model history is deliberately small:
+
+| Model | Meaning | Import behavior |
+|---|---|---|
+| `patch-studio-model-1` | Pre-spatial Studio schema | Supplies the shared-stage and later track defaults, then re-exports as model 3 |
+| `patch-studio-model-2` | Historical first spatial schema: shared stage, `Sinusoid`, `ColorField`, and spatial scene tracks | Supplies `depthAffectsScale: false`, then re-exports as model 3 |
+| `patch-studio-model-3` | Current schema; makes optional depth-to-size coupling explicit per spatial track | Normalizes and round-trips as the current model |
 
 ---
 
@@ -327,9 +362,10 @@ Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
 [`controlSignals.test.js`](../../src/ui/creator/controlSignals.test.js), and
 [`visualTrackModel.test.js`](../../src/ui/creator/visualTrackModel.test.js). The
 control-rename defect formerly described here is fixed: tempo sync, validation,
-and the no-control warning use `LFO`, `Permutation`, and `Sinusoid`. Model-2
-current-version/import/rejection behavior is covered across the draft,
-portability, storage, package, link, and projection boundaries.
+and the no-control warning use `LFO`, `Permutation`, and `Sinusoid`. Current
+model-3 export, genuine model-1/model-2 migration, and older-tag rejection are
+covered across the draft, portability, storage, package, link, and projection
+boundaries.
 
 ---
 
@@ -343,7 +379,7 @@ portability, storage, package, link, and projection boundaries.
 
 ### 10.1 The export reaches RDF, but not the catalog
 
-`buildPatchExport()` produces a `patch-studio-model-2` object (§8). The lossless
+`buildPatchExport()` produces a `patch-studio-model-3` object (§8). The lossless
 native/package path exists, the semantic projection is partial, and the catalog
 delivery path remains open:
 
@@ -367,7 +403,7 @@ delivery path remains open:
 The two models are **structurally divergent**, so any catalog conversion is a
 lossy, partial mapping — not a re-serialisation:
 
-| | Patch Studio (`patch-studio-model-2`; model 1 remains importable) | Catalog preset (`PRESET_FORMAT.md`) |
+| | Patch Studio (`patch-studio-model-3`; models 1 and 2 remain importable) | Catalog preset (`PRESET_FORMAT.md`) |
 |---|---|---|
 | Shape | control tracks *modulate* sensory-track params (`{value, mods, tempoSync}`) | static `header` + parametric `voices[]` |
 | Audio types | `IsochronicTone`, `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample` | `Binaural`, `Martigli`, `Martigli-Binaural`, `Symmetry` only |

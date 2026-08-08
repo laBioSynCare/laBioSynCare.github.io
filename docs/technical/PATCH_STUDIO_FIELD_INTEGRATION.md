@@ -56,7 +56,7 @@ gate in the final column has passed.
 | Concern | Patch Studio at decision time | Sensory Field at decision time | Current checkpoint | Required completion |
 |---|---|---|---|---|
 | Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | Every `/field/*` page is a thin redirect to `/creator/?starter=…`; visible navigation uses those canonical starter URLs | Static/offline and browser acceptance for every alias |
-| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | `patch-studio-model-2` owns `visualStage`, `Sinusoid`, `ColorField`, and four spatial types; model 1 imports explicitly, and pure adapters retain disabled tone/noise/depth as inactive ordinary tracks | Close the remaining fidelity and lifecycle gaps |
+| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | Current `patch-studio-model-3` owns the model-2 spatial foundation plus an explicit optional depth-to-size cue; genuine models 1 and 2 import, and pure adapters retain disabled tone/noise/depth as inactive ordinary tracks | Close the remaining fidelity and lifecycle gaps |
 | Persistence | Local or Firestore `PatchStore` | Four `bsclab.field*` local-storage keys | `PatchStore` remains canonical; Studio reads all four legacy keys in memory and leaves them untouched | Complete the deprecation window before removing legacy readers/data |
 | Playback | Engine, voice handles, transport, rAF loop in `PresetCreator.svelte` | Separate engine, handles, transport, and rAF loop in `SensoryField.svelte` | Public entry points use Studio's one routed runtime; the old standalone runtime code remains, and Studio lifecycle/frame evaluation is still monolithic | One extracted controller, audio-clock authority, and delivered-state snapshot; remove duplicate legacy ownership |
 | Visuals | Nine composited CSS/DOM track types | Fixed colour, marker depth, and three stereoscopic scenes | Fourteen ordinary types exist. Spatial sources group at the first spatial position and compose before one projection; vector blend executes, while autostereogram blend is explicitly not applicable. Static SIRDS is clock-gated and dynamic refresh is capped at 8 fps | Descriptor registry plus lifecycle/browser gates |
@@ -179,7 +179,7 @@ Field template.
 | Left/right noise | Two hard-panned `Noise` tracks | Preserve noise colour, filter, gain, and channel role |
 | Monaural beat | Existing tremolo contract on every enabled tone **and noise** voice | Preserve rate, depth, and mode; rate changes must update every tremolo-bearing voice |
 | Binaural beat | Frequencies on the two delivered ear tracks | A derived center/beat UI is allowed; left/right remain executable truth |
-| Marker depth | First-class spatial visual track plus shared-stage presentation settings | Store disparity/depth, grid, and motion on the track; store technique, canonical eye order, and camera/view settings once on the stage |
+| Marker depth | First-class spatial visual track plus shared-stage presentation settings | Store camera-space X/Y placement and independent Z depth/disparity on the track. Store the optional per-track depth-to-size cue explicitly; store technique, canonical eye order, and disparity scale once on the stage |
 | Tree, abstraction, landscape | Content-specific spatial sources behind the common spatial-track contract | Convert Tree to the shared scene representation first; compose sources before the shared stage projects them |
 | Beat-driven depth | Explicit link to a general-rate sinusoidal control covering the Field's 0–40 Hz range | Existing breathing LFO (3–60 s) and stepped Permutation cannot reproduce it |
 | Breath-driven depth | Explicit fixed-rate `Sinusoid` at `1 / breathPeriodSec` | The legacy “breath” signal is sinusoidal; do not substitute the session-ramping breathing LFO or hide a renderer-owned loop |
@@ -194,6 +194,13 @@ stereo pair, anaglyph, autostereogram, or another reviewed presentation. This is
 a shared geometric projection, not the SSTIM RDF projection. It must not become
 one untyped bag of every scene family's optional fields, and the merge does not
 require artificial depth fields on the nine existing 2D track types.
+
+For a spatial track, X and Y are camera-space view-plane offsets applied after
+camera yaw, while Z is a separate depth offset used for binocular disparity or
+the autostereogram depth buffer. The orthographic default keeps size independent
+of Z. Model 3's optional `depthAffectsScale` flag adds a bounded perspective cue
+when requested—nearer sources grow and farther sources shrink—without conflating
+X movement, Z disparity, and the independent authored `spatialScale`.
 
 Multiple spatial tracks may coexist and share one camera, eye order, and output
 topology. They cannot occupy independently projected layers: the track-array
@@ -224,10 +231,12 @@ does not make the resulting RDF SHACL-validated.
 ### Milestone 0 — pin the contracts and fixtures
 
 **Status: partial.** ADR 0046 is pinned and the model-version decision is now
-explicit: genuine `patch-studio-model-1` documents import, while all new exports
-use `patch-studio-model-2`. The stale control-name validation, tempo-sync keys, and warning are fixed;
+explicit: genuine `patch-studio-model-1` and `patch-studio-model-2` documents
+import, while all new exports use `patch-studio-model-3`. Model 2 remains the
+historical first spatial schema; model 3 records the optional depth-to-size cue.
+The stale control-name validation, tempo-sync keys, and warning are fixed;
 the new adapter gives monaural tremolo to both tone and noise and reports the
-legacy live-update correction. Model-2 import/rejection coverage and pure model,
+legacy live-update correction. Version import/rejection coverage and pure model,
 adapter, starter stage-policy, control, scene, and round-trip cases exist.
 Disabled tone/noise retention is covered across linked/unlinked and global-audio
 states. The full beat-mode, persisted-state, delivered-voice, and browser fixture
@@ -257,8 +266,9 @@ matrix and old standalone runtime correction are not complete.
 - Fix and pin the current live-update inconsistency in which monaural tremolo is
   constructed on noise voices but later rate changes update tone voices only.
 - Keep the shipped model boundary pinned: model-2 features are rejected under a
-  model-1 tag, while genuine model-1 files, links, stored records, packages, and
-  projections remain readable through the explicit importer.
+  model-1 tag, and model-3 `depthAffectsScale` state is rejected under either
+  older tag. Genuine model-1 and model-2 files, links, stored records, packages,
+  and projections remain readable through explicit migration.
 
 Exit gate: fixtures describe the current delivered behavior, not merely UI
 defaults, and the intended model-version rule is recorded.
@@ -291,8 +301,10 @@ can be mounted by a small harness without mounting the full editor.
 
 **Status: partial.** `ColorField`, `DepthMarkers`, `TreeScene`, `AbstractScene`,
 `LandscapeScene`, shared `visualStage`, spatial transforms, and the fixed-rate
-phase-addressable `Sinusoid` are `patch-studio-model-2` contracts. Genuine
-model-1 documents remain readable through an explicit migration. Pure
+phase-addressable `Sinusoid` originated in `patch-studio-model-2`, the historical
+first spatial schema. Current `patch-studio-model-3` adds the explicit per-track
+`depthAffectsScale` flag. Genuine model-1 and model-2 documents remain readable
+through explicit migration, with the new flag defaulted off. Pure
 adapters, normalizers, deterministic cache/composition tests, export/import
 fixed-point cases, disabled-source retention, vector blend, explicit SIRDS blend
 non-applicability, clock-gated static rendering, 8-fps dynamic SIRDS cadence, and

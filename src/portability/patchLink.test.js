@@ -11,6 +11,7 @@ import {
 import {
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   buildPatchExport,
   createDraft,
   draftFromPatchExport,
@@ -70,7 +71,7 @@ describe('round-trip', () => {
     const received = await decodePatchLink((await encodePatchLink(legacy)).value)
 
     expect(received).toEqual(legacy)
-    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V3)
   })
 })
 
@@ -184,6 +185,17 @@ describe('input from outside is treated as hostile', () => {
       visualStage: { presentationMode: 'mono' },
     })).rejects.toThrow(/model-2 features.*model-1/)
   })
+
+  it('refuses a model-3 flag carried under the model-2 tag', async () => {
+    await expect(encodePatchLink({
+      model: PATCH_STUDIO_MODEL_V2,
+      visualTracks: [{
+        id: 'visual-tree',
+        trackType: 'TreeScene',
+        depthAffectsScale: true,
+      }],
+    })).rejects.toThrow(/model-3 features.*model-2/)
+  })
 })
 
 describe('reading a link out of what someone pasted', () => {
@@ -191,7 +203,7 @@ describe('reading a link out of what someone pasted', () => {
     const { url } = await buildPatchLink(samplePatch(), 'https://example.org/creator/')
     const value = readPatchLinkFrom(url)
     expect(value).not.toBeNull()
-    expect((await decodePatchLink(value)).model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect((await decodePatchLink(value)).model).toBe(PATCH_STUDIO_MODEL_V3)
   })
 
   it('reads a bare location.hash', async () => {

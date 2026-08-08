@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   AUTOSTEREOGRAM_MAX_FPS,
+  DEPTH_SIZE_SCALE_MAX,
+  DEPTH_SIZE_SCALE_MIN,
   SPATIAL_ROTATION_SPEED_UNIT,
   SPATIAL_SOURCE_CACHE_LIMIT,
   clearSpatialSourceSceneCache,
   composeSpatialTrackScenes,
   createDepthMarkersScene,
+  depthSizeScale,
   spatialRenderTime,
   spatialSourceToScene,
   spatialSourceSceneCacheSize,
@@ -32,6 +35,7 @@ function spatialTrack(id, trackType, config = {}, values = {}) {
       spatialScale: param(values.spatialScale ?? 1),
       rotationSpeed: param(values.rotationSpeed ?? 0),
     },
+    depthAffectsScale: values.depthAffectsScale === true,
   }
 }
 
@@ -134,7 +138,7 @@ describe('spatial scene transform and composition', () => {
     )
   })
 
-  it('transforms points and sizes, multiplies opacity, and does not mutate its source', () => {
+  it('keeps x/y/z as camera-space offsets, transforms sizes, and does not mutate its source', () => {
     const source = {
       background: null,
       segments: [{
@@ -164,21 +168,49 @@ describe('spatial scene transform and composition', () => {
 
     expect(source).toEqual(before)
     expect(transformed.segments[0]).toMatchObject({
-      a: { x: 10, y: 0, z: 8 },
-      b: { x: 12, y: 2, z: 10 },
+      a: { x: 0, y: 2, z: 4, viewOffsetX: 10, viewOffsetY: -2, depthOffset: 4 },
+      b: { x: 2, y: 4, z: 6, viewOffsetX: 10, viewOffsetY: -2, depthOffset: 4 },
       width: 0.2,
       opacity: 0.2,
     })
     expect(transformed.dots[0]).toMatchObject({
-      x: 12,
-      y: -2,
-      z: 2,
+      x: 2,
+      y: 0,
+      z: -2,
+      viewOffsetX: 10,
+      viewOffsetY: -2,
+      depthOffset: 4,
       r: 0.4,
       rx: 0.6,
       ry: 0.2,
       opacity: 0.4,
     })
     expect(transformed.polys[0]).toMatchObject({ strokeWidth: 0.4, opacity: 0.1 })
+  })
+
+  it('optionally couples +z/-z to bounded apparent size', () => {
+    expect(depthSizeScale(0, true)).toBe(1)
+    expect(depthSizeScale(2, true)).toBe(DEPTH_SIZE_SCALE_MAX)
+    expect(depthSizeScale(-2, true)).toBe(DEPTH_SIZE_SCALE_MIN)
+    expect(depthSizeScale(200, true)).toBe(DEPTH_SIZE_SCALE_MAX)
+    expect(depthSizeScale(-200, true)).toBe(DEPTH_SIZE_SCALE_MIN)
+    expect(depthSizeScale(2, false)).toBe(1)
+
+    const source = {
+      background: null,
+      segments: [],
+      dots: [{ x: 0, y: 0, z: 0, r: 0.2, fill: '#ffffff' }],
+      polys: [],
+    }
+    const fixed = transformSpatialScene(source, { z: 2, spatialScale: 1 })
+    const perspective = transformSpatialScene(source, {
+      z: 2,
+      spatialScale: 1,
+      depthAffectsScale: true,
+    })
+
+    expect(fixed.dots[0]).toMatchObject({ r: 0.2, depthOffset: 2 })
+    expect(perspective.dots[0]).toMatchObject({ r: 0.4, depthOffset: 2 })
   })
 
   it('pins local rotation to controller time in turns per second', () => {
@@ -212,7 +244,15 @@ describe('spatial scene transform and composition', () => {
     })
 
     const centralDot = scene.dots.at(-1)
-    expect(centralDot).toMatchObject({ x: 0.75, y: -0.5, z: 0, opacity: 0.25 })
+    expect(centralDot).toMatchObject({
+      x: 0,
+      y: 0,
+      z: 0,
+      viewOffsetX: 0.75,
+      viewOffsetY: -0.5,
+      depthOffset: 0,
+      opacity: 0.25,
+    })
     expect(track.params.x.value).toBe(-1)
     expect(track.params.opacity.value).toBe(0.8)
   })

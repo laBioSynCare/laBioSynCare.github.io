@@ -229,6 +229,13 @@ generator depth knob — at `spread = 0` a scene is planar (z = 0), toward
 `TreeStereo`, and `TreeStage` own legacy clocks/shells only and are not mounted by
 the canonical routes.
 
+Canonical Studio track translation is camera-space and deliberately separates
+the axes: X/Y move the source on the view plane after camera yaw, while Z changes
+stereoscopic disparity/depth without changing that common screen position.
+Current patch model 3 adds the explicit, default-off `depthAffectsScale` flag for
+authors who also want positive/near Z to enlarge the source and negative/far Z
+to shrink it. The independent `spatialScale` remains the authored base size.
+
 One model, four presentations (orthographic, so disparity is a pure function of z
 with the focal plane at z = 0 — matching the field's `--offset` cue):
 

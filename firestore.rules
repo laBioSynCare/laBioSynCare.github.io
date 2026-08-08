@@ -110,7 +110,8 @@ service cloud.firestore {
     && request.resource.data.patchName.size() <= 200
     && request.resource.data.model in [
       'patch-studio-model-1',
-      'patch-studio-model-2'
+      'patch-studio-model-2',
+      'patch-studio-model-3'
     ]
     && request.resource.data.patch is map
     && request.resource.data.patch.model == request.resource.data.model

@@ -241,10 +241,10 @@ reads, writes, validates, or generates presets.
 > catalog JSON** (`header` + `voices`, voice types `Binaural` / `Martigli` /
 > `Martigli-Binaural` / `Symmetry`) shared with BioSynCare. The **Patch Studio**
 > (`src/ui/creator/`) is a separate, live authoring model tagged
-> `model: "patch-studio-model-2"` with its own track types (`IsochronicTone`,
+> `model: "patch-studio-model-3"` with its own track types (`IsochronicTone`,
 > `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample`, …). Genuine model-1
-> documents remain importable, but new exports must never carry model-2 fields
-> under the model-1 tag — see
+> and model-2 documents remain importable. New exports must never carry newer
+> fields under an older model tag — see
 > `docs/technical/PATCH_STUDIO.md`. The rules in §4 do not apply to patch drafts.
 
 ### 4.1 Voice type names

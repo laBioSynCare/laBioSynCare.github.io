@@ -4,6 +4,7 @@ import {
   PATCH_STUDIO_MODEL,
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   SPATIAL_VISUAL_TRACK_TYPES,
   VISUAL_PARAM_RANGE,
   VISUAL_TRACK_TYPES,
@@ -199,6 +200,7 @@ describe('ADR 0046 visual model foundation', () => {
       expect(track.params.z).toMatchObject({ value: 0, mods: [] })
       expect(track.params.spatialScale).toMatchObject({ value: 1, mods: [] })
       expect(track.params.rotationSpeed.tempoSync).toBeDefined()
+      expect(track.depthAffectsScale).toBe(false)
       expect(track.config).toBeDefined()
     }
 
@@ -226,7 +228,7 @@ describe('ADR 0046 visual model foundation', () => {
     expect(track.config).not.toHaveProperty('backgroundColor')
   })
 
-  it('migrates model 1 to model 2 without mutating the legacy patch', () => {
+  it('migrates model 1 to model 3 without mutating the legacy patch', () => {
     const legacy = {
       model: PATCH_STUDIO_MODEL_V1,
       patchName: 'Legacy visual patch',
@@ -241,25 +243,53 @@ describe('ADR 0046 visual model foundation', () => {
     const imported = draftFromPatchExport(legacy)
 
     expect(legacy).toEqual(before)
-    expect(migrated.model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(migrated.model).toBe(PATCH_STUDIO_MODEL_V3)
     expect(migrated.visualStage).toEqual(createVisualStagePresentation())
     expect(imported.visualStage).toEqual(createVisualStagePresentation())
     expect(imported.controlTracks[0]).toMatchObject({ id: 'ctl-old', type: 'Permutation', nnotes: 5 })
     expect(imported.audioTracks[0]).toMatchObject({ id: 'audio-old', trackType: 'Carrier' })
     expect(imported.visualTracks[0].enabled).toBe(true)
     expect(imported.visualTracks[0]).not.toHaveProperty('config')
-    expect(buildPatchExport(imported).model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(buildPatchExport(imported).model).toBe(PATCH_STUDIO_MODEL_V3)
   })
 
-  it('never emits model-2 fields under the model-1 identifier', () => {
+  it('imports model 2 with constant-size depth and re-exports model 3', () => {
+    const legacy = {
+      model: PATCH_STUDIO_MODEL_V2,
+      patchName: 'Model 2 spatial patch',
+      timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+      visualStage: createVisualStagePresentation({ presentationMode: 'stereo-pair' }),
+      controlTracks: [],
+      audioTracks: [],
+      visualTracks: [{
+        id: 'visual-tree-v2',
+        trackType: 'TreeScene',
+        name: 'Tree',
+        enabled: true,
+        blend: 'normal',
+        params: {},
+        config: { seed: 17 },
+      }],
+      hapticTracks: [],
+    }
+    const before = structuredClone(legacy)
+    const imported = draftFromPatchExport(legacy)
+
+    expect(legacy).toEqual(before)
+    expect(imported.visualTracks[0].depthAffectsScale).toBe(false)
+    expect(buildPatchExport(imported).model).toBe(PATCH_STUDIO_MODEL_V3)
+  })
+
+  it('never emits newer fields under an older identifier', () => {
     const draft = createEmptyDraft()
     draft.controlTracks = [createControlTrack('Sinusoid')]
     draft.visualTracks = [createVisualTrack('ColorField')]
 
     const exported = buildPatchExport(draft)
 
-    expect(exported.model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(exported.model).toBe(PATCH_STUDIO_MODEL_V3)
     expect(exported.model).not.toBe(PATCH_STUDIO_MODEL_V1)
+    expect(exported.model).not.toBe(PATCH_STUDIO_MODEL_V2)
     expect(exported.visualStage).toBeDefined()
   })
 
@@ -281,6 +311,7 @@ describe('ADR 0046 visual model foundation', () => {
       }),
       createVisualTrack('DepthMarkers', {
         id: 'visual-markers',
+        depthAffectsScale: true,
         config: { gridSize: 5, gridDepthAxis: 'both', trajectoryEnabled: true },
       }),
       createVisualTrack('TreeScene', {
@@ -316,6 +347,7 @@ describe('ADR 0046 visual model foundation', () => {
         mods: [expect.objectContaining({ controlId: 'ctl-spatial', amount: 0.3 })],
       },
     })
+    expect(imported.visualTracks[1].depthAffectsScale).toBe(true)
     expect(imported.visualStage.presentationMode).toBe('stereo-pair')
   })
 })

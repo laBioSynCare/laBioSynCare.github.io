@@ -390,7 +390,8 @@ concrete rather than abstract.
       selectable in Settings with capability gating, but the choice applies on
       next playback, not mid-session; there is no visual engine to select)*
 - [x] Real-time designer with live audio preview — the **Patch Studio**
-      (`patch-studio-model-2`, with model-1 import); shipped ahead of schedule
+      (`patch-studio-model-3`, with model-1 and model-2 import); shipped ahead
+      of schedule
 - [~] Merge Sensory Field into Patch Studio as ordinary first-class colour-field
       and spatial visual tracks *(the additive canonical model, 14-type visual
       registry, shared presentation stage, starters, report-producing adapters,

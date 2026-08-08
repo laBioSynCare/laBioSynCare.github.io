@@ -17,6 +17,11 @@ export const TWO_PI = Math.PI * 2
 export const DEG = Math.PI / 180
 export const WORLD_Z = { x: 0, y: 0, z: 1 }
 
+const finiteOffset = (value) => {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : 0
+}
+
 // ── Seeded PRNG ───────────────────────────────────────────────────────────────
 // mulberry32: tiny, fast, deterministic for a given seed (reproducible scenes).
 export function mulberry32(seed) {
@@ -73,7 +78,11 @@ export function rotateY(p, theta) {
  */
 export function project(p, { cx = 0, cy = 0, scale = 1, theta = 0 } = {}) {
   const r = rotateY(p, theta)
-  return { sx: cx + scale * r.x, sy: cy - scale * r.y, z: r.z }
+  return {
+    sx: cx + scale * (r.x + finiteOffset(p?.viewOffsetX)),
+    sy: cy - scale * (r.y + finiteOffset(p?.viewOffsetY)),
+    z: r.z + finiteOffset(p?.depthOffset),
+  }
 }
 
 /** Horizontal disparity (px) for a rotated depth `z`; odd in z, zero at z = 0. */
@@ -103,7 +112,7 @@ export function rotatedSceneBounds(scene, theta) {
   let minZ = Infinity
   let maxZ = -Infinity
   for (const p of scenePoints(scene)) {
-    const z = rotateY(p, theta).z
+    const z = rotateY(p, theta).z + finiteOffset(p?.depthOffset)
     if (z < minZ) minZ = z
     if (z > maxZ) maxZ = z
   }

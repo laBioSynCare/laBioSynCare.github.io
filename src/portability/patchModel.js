@@ -2,17 +2,20 @@
 //
 // Version 1 is the pre-spatial authoring schema. Version 2 adds the shared
 // visual stage, fixed-rate Sinusoid controls, ColorField, and first-class
-// spatial visual tracks. Keep these identifiers at the portability boundary so
-// storage, links, packages, projection, and the editor cannot disagree about
-// which documents they accept.
+// spatial visual tracks. Version 3 makes each spatial track's optional
+// depth-to-size perspective coupling explicit. Keep these identifiers at the
+// portability boundary so storage, links, packages, projection, and the editor
+// cannot disagree about which documents they accept.
 
 export const PATCH_STUDIO_MODEL_V1 = 'patch-studio-model-1'
 export const PATCH_STUDIO_MODEL_V2 = 'patch-studio-model-2'
-export const PATCH_STUDIO_MODEL = PATCH_STUDIO_MODEL_V2
+export const PATCH_STUDIO_MODEL_V3 = 'patch-studio-model-3'
+export const PATCH_STUDIO_MODEL = PATCH_STUDIO_MODEL_V3
 
 export const SUPPORTED_PATCH_STUDIO_MODELS = Object.freeze([
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
 ])
 
 const MODEL_2_VISUAL_TYPES = new Set([
@@ -52,10 +55,17 @@ export function patchUsesModel2Features(patch) {
   ))
 }
 
+/** Model-3 state that a model-2 normalizer would silently discard. */
+export function patchUsesModel3Features(patch) {
+  if (!patch || typeof patch !== 'object' || Array.isArray(patch)) return false
+  const visualTracks = Array.isArray(patch.visualTracks) ? patch.visualTracks : []
+  return visualTracks.some((track) => hasOwn(track, 'depthAffectsScale'))
+}
+
 /**
  * Validate both the identifier and the identifier/schema pairing. In
- * particular, a model-2 feature may never be emitted under the model-1 tag:
- * old readers accept that tag and otherwise downgrade the feature silently.
+ * particular, a newer feature may never be emitted under an older tag: old
+ * readers accept those tags and would otherwise downgrade the feature silently.
  */
 export function assertPatchStudioPatch(
   patch,
@@ -63,6 +73,12 @@ export function assertPatchStudioPatch(
 ) {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error(message)
   assertSupportedPatchStudioModel(patch.model, message)
+  if (
+    patch.model !== PATCH_STUDIO_MODEL_V3
+    && patchUsesModel3Features(patch)
+  ) {
+    throw new Error(`A patch using model-3 features cannot declare ${patch.model}.`)
+  }
   if (patch.model === PATCH_STUDIO_MODEL_V1 && patchUsesModel2Features(patch)) {
     throw new Error('A patch using model-2 features cannot declare patch-studio-model-1.')
   }

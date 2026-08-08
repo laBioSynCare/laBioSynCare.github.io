@@ -15,6 +15,7 @@ import {
   CONFIGURED_VISUAL_TRACK_TYPES,
   createVisualStagePresentation,
   createVisualTrackConfig,
+  isSpatialVisualTrackType,
   normalizeVisualStagePresentation,
   normalizeVisualTrackConfig,
 } from './visualTrackModel.js'
@@ -22,11 +23,13 @@ import {
   PATCH_STUDIO_MODEL,
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   SUPPORTED_PATCH_STUDIO_MODELS,
   assertPatchStudioPatch,
   assertSupportedPatchStudioModel,
   isSupportedPatchStudioModel,
   patchUsesModel2Features,
+  patchUsesModel3Features,
 } from '../../portability/patchModel.js'
 
 export {
@@ -59,11 +62,13 @@ export {
   PATCH_STUDIO_MODEL,
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   SUPPORTED_PATCH_STUDIO_MODELS,
   assertPatchStudioPatch,
   assertSupportedPatchStudioModel,
   isSupportedPatchStudioModel,
   patchUsesModel2Features,
+  patchUsesModel3Features,
 }
 
 // Control track types
@@ -563,6 +568,9 @@ function normalizeVisualTrack(source) {
   }
   const config = normalizeVisualTrackConfig(trackType, stored.config)
   if (config) track.config = config
+  if (isSpatialVisualTrackType(trackType)) {
+    track.depthAffectsScale = stored.depthAffectsScale === true
+  }
   return track
 }
 
@@ -738,6 +746,7 @@ function visualParams(trackType = 'Geometry', defaults = {}) {
 export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
   const {
     config: configOverrides,
+    depthAffectsScale,
     trackType: _ignoredTrackTypeOverride,
     ...trackOverrides
   } = plainObject(overrides)
@@ -754,6 +763,9 @@ export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
   }
   const config = createVisualTrackConfig(trackType, configOverrides)
   if (config) track.config = config
+  if (isSpatialVisualTrackType(trackType)) {
+    track.depthAffectsScale = depthAffectsScale === true
+  }
   return track
 }
 
@@ -817,7 +829,9 @@ export function createEmptyDraft() {
 /**
  * Upgrade a portable patch to the current exchange model before rebuilding the
  * live draft. Model 1 had no shared visual stage; its deterministic migration
- * supplies the model-2 default. Track normalization below performs the older
+ * supplies that default. Model 2 spatial tracks get the model-3 orthographic
+ * default (`depthAffectsScale=false`) during track normalization below. The
+ * same normalization performs the older
  * Martigli/Symmetry name migration and fills all other live defaults.
  *
  * Missing model identifiers remain an in-memory compatibility case only. File,

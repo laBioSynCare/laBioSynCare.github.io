@@ -15,6 +15,7 @@ import {
   PATCH_STUDIO_MODEL,
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   cleanPatchExport,
   sortNewestFirst,
 } from './PatchStore.js'
@@ -195,6 +196,17 @@ for (const impl of implementations()) {
       }))).rejects.toThrow(/model-2 features.*model-1/i)
     })
 
+    it('refuses model-3 data mislabeled as model 2', async () => {
+      await expect(store.save(patch('Mislabeled perspective', {
+        model: PATCH_STUDIO_MODEL_V2,
+        visualTracks: [{
+          id: 'visual-tree',
+          trackType: 'TreeScene',
+          depthAffectsScale: true,
+        }],
+      }))).rejects.toThrow(/model-3 features.*model-2/i)
+    })
+
     it('gives an unnamed patch a default name', async () => {
       await store.save(patch(''))
       expect((await store.list())[0].patchName).toBe('Untitled Patch')
@@ -216,9 +228,10 @@ for (const impl of implementations()) {
 }
 
 describe('PatchStore shared helpers', () => {
-  it('uses model 2 for new saves while retaining model 1 as a readable format', () => {
-    expect(PATCH_STUDIO_MODEL).toBe(PATCH_STUDIO_MODEL_V2)
+  it('uses model 3 for new saves while retaining models 1 and 2 as readable formats', () => {
+    expect(PATCH_STUDIO_MODEL).toBe(PATCH_STUDIO_MODEL_V3)
     expect(PATCH_STUDIO_MODEL_V1).toBe('patch-studio-model-1')
+    expect(PATCH_STUDIO_MODEL_V2).toBe('patch-studio-model-2')
   })
 
   it('sorts newest first, falling back to createdAt', () => {

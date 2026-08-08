@@ -19,6 +19,8 @@ export const DEFAULT_SPATIAL_SCENE_BACKGROUND = '#07090c'
 export const SPATIAL_ROTATION_SPEED_UNIT = 'turns-per-second'
 export const SPATIAL_SOURCE_CACHE_LIMIT = 32
 export const AUTOSTEREOGRAM_MAX_FPS = 8
+export const DEPTH_SIZE_SCALE_MIN = 0.5
+export const DEPTH_SIZE_SCALE_MAX = 2
 
 const MARKER_COLOR = '#ffffff'
 const PLANE_COLOR = '#8a94a3'
@@ -218,9 +220,15 @@ function transformPoint(point, transform) {
   }, transform.rotationRad)
   return {
     ...point,
-    x: rotated.x + transform.x,
-    y: rotated.y + transform.y,
-    z: rotated.z + transform.z,
+    x: rotated.x,
+    y: rotated.y,
+    z: rotated.z,
+    // Ordinary track x/y/z are camera-space offsets. The shared projector
+    // applies them after camera yaw, keeping planar placement and binocular
+    // disparity independent from one another.
+    viewOffsetX: finiteNumber(point?.viewOffsetX, 0) + transform.x,
+    viewOffsetY: finiteNumber(point?.viewOffsetY, 0) + transform.y,
+    depthOffset: finiteNumber(point?.depthOffset, 0) + transform.z,
   }
 }
 
@@ -228,16 +236,29 @@ function transformedOpacity(primitive, opacity) {
   return clamp01(clamp01(primitive?.opacity) * opacity)
 }
 
+/**
+ * Optional perspective cue for a whole track. +z is nearer and grows; -z is
+ * farther and shrinks. The exponential mapping is symmetric around z=0 and
+ * remains bounded even when a caller bypasses the normal parameter clamp.
+ */
+export function depthSizeScale(z, enabled = false) {
+  if (enabled !== true) return 1
+  const factor = 2 ** (finiteNumber(z, 0) / 2)
+  return Math.min(DEPTH_SIZE_SCALE_MAX, Math.max(DEPTH_SIZE_SCALE_MIN, factor))
+}
+
 /** Apply one ordinary spatial track's transform without mutating its source. */
 export function transformSpatialScene(scene, values = {}) {
   const requestedScale = finiteNumber(values.spatialScale, 1)
   const rotationSpeed = finiteNumber(values.rotationSpeed, 0)
   const timeSec = finiteNumber(values.timeSec, 0)
+  const z = finiteNumber(values.z, 0)
+  const authoredScale = requestedScale > 0 ? requestedScale : 1
   const transform = {
     x: finiteNumber(values.x, 0),
     y: finiteNumber(values.y, 0),
-    z: finiteNumber(values.z, 0),
-    spatialScale: requestedScale > 0 ? requestedScale : 1,
+    z,
+    spatialScale: authoredScale * depthSizeScale(z, values.depthAffectsScale),
     opacity: clamp01(values.opacity),
     // Match the existing Studio visual contract: 1 means one full turn/sec.
     rotationRad: rotationSpeed * timeSec * TWO_PI,
@@ -302,6 +323,7 @@ export function spatialTrackToScene(track, { liveValues = {}, timeSec = 0 } = {}
     x: parameterValue(track, liveValues, 'x', 0),
     y: parameterValue(track, liveValues, 'y', 0),
     z: parameterValue(track, liveValues, 'z', 0),
+    depthAffectsScale: track?.depthAffectsScale === true,
     spatialScale: parameterValue(track, liveValues, 'spatialScale', 1),
     opacity: parameterValue(track, liveValues, 'opacity', 1),
     rotationSpeed: parameterValue(track, liveValues, 'rotationSpeed', 0),

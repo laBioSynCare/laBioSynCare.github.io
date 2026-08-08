@@ -357,6 +357,14 @@ export function isSpatialVisualTrackType(trackType) {
 }
 
 /**
+ * Whether +z/-z also scales a whole spatial source like a simple perspective
+ * cue. False preserves the orthographic free-view behaviour of model 2.
+ */
+export function normalizeDepthAffectsScale(value) {
+  return value === true
+}
+
+/**
  * Plan the shared-stage topology without pretending independent 3-D sources
  * can be projected separately. Color fields retain their authored order around
  * one spatial-composition boundary, placed at the first enabled spatial track.

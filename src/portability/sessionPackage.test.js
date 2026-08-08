@@ -11,6 +11,7 @@ import {
 import {
   PATCH_STUDIO_MODEL_V1,
   PATCH_STUDIO_MODEL_V2,
+  PATCH_STUDIO_MODEL_V3,
   buildPatchExport,
   createAudioTrack,
   createControlTrack,
@@ -53,7 +54,7 @@ describe('package structure', () => {
     expect(manifest.model).toBe(SESSION_PACKAGE_MODEL)
     expect(manifest.bscLabCommit).toBe('6dfc79a')
     expect(manifest.sstimRelease).toBe('0.11.0')
-    expect(manifest.patchModel).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(manifest.patchModel).toBe(PATCH_STUDIO_MODEL_V3)
   })
 
   it('checksums every file individually', async () => {
@@ -142,7 +143,7 @@ describe('round-trip: the patch survives exactly', () => {
 
     expect(received).toEqual(legacy)
     expect(manifest.patchModel).toBe(PATCH_STUDIO_MODEL_V1)
-    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V3)
   })
 })
 
@@ -194,6 +195,17 @@ describe('a malformed package fails before anything is applied', () => {
       model: PATCH_STUDIO_MODEL_V1,
       visualStage: { presentationMode: 'mono' },
     }, OPTIONS)).rejects.toThrow(/model-2 features.*model-1/)
+  })
+
+  it('refuses model-3 data mislabeled as model 2', async () => {
+    await expect(buildSessionPackage({
+      model: PATCH_STUDIO_MODEL_V2,
+      visualTracks: [{
+        id: 'visual-tree',
+        trackType: 'TreeScene',
+        depthAffectsScale: false,
+      }],
+    }, OPTIONS)).rejects.toThrow(/model-3 features.*model-2/)
   })
 
   it('requires an explicit timestamp so packages are reproducible', async () => {

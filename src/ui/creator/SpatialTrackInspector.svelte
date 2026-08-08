@@ -1,6 +1,7 @@
 <script>
   import {
     createVisualTrackConfig,
+    isSpatialVisualTrackType,
     normalizeVisualTrackConfig,
   } from './visualTrackModel.js'
 
@@ -109,6 +110,11 @@
     emit({ ...track, config: nextConfig ?? { ...config, [key]: value } })
   }
 
+  function updateDepthAffectsScale(value) {
+    if (!track || !isSpatialVisualTrackType(track.trackType)) return
+    emit({ ...track, depthAffectsScale: value === true })
+  }
+
   function numberValue(event) {
     return Number(event.currentTarget.value)
   }
@@ -122,6 +128,27 @@
 
 {#if track && CONTENT_LABELS[track.trackType]}
   <section class="inspector" aria-label={`${CONTENT_LABELS[track.trackType]} settings`}>
+    {#if isSpatialVisualTrackType(track.trackType)}
+      <fieldset>
+        <legend>Spatial coordinates</legend>
+        <p class="coordinate-note">
+          X and Y place the source on the view plane. Z changes only binocular
+          depth/disparity: positive is nearer and negative is farther.
+        </p>
+        <label class="check-row">
+          <input
+            type="checkbox"
+            checked={track.depthAffectsScale === true}
+            onchange={(event) => updateDepthAffectsScale(event.currentTarget.checked)}
+          />
+          <span>Z also changes apparent size (perspective)</span>
+        </label>
+        <p class="coordinate-note secondary">
+          When enabled, nearer sources grow and farther sources shrink. The
+          effect is bounded; leave it off for constant-size stereoscopy.
+        </p>
+      </fieldset>
+    {/if}
     <fieldset>
       <legend>{CONTENT_LABELS[track.trackType]} recipe</legend>
       {#if config.generatorVersion}
@@ -216,6 +243,13 @@
   input, select { margin: 0; }
   input[type='color'] { width: 100%; min-height: 2.1rem; }
   .version { margin: 0 0 0.55rem; color: var(--app-muted, #627181); font-size: 0.85rem; }
+  .coordinate-note {
+    margin: 0 0 0.65rem;
+    color: var(--app-muted, #627181);
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .coordinate-note.secondary { margin: 0.5rem 0 0; }
   @media (max-width: 540px) {
     .range-row { grid-template-columns: 1fr 3rem; }
     .range-row > span { grid-column: 1 / -1; }

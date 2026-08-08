@@ -99,10 +99,16 @@ The implementation sequence and acceptance gates are in
 
 The first cutover is shipped:
 
-- `patch-studio-model-2` has a shared `visualStage`, a fixed-rate phase-addressable
-  `Sinusoid` control, `ColorField`, and four first-class spatial visual-track
-  types. Genuine model-1 documents remain readable through an explicit importer;
-  new exports and saved edits use model 2.
+- `patch-studio-model-2` introduced the shared `visualStage`, fixed-rate
+  phase-addressable `Sinusoid` control, `ColorField`, and four first-class
+  spatial visual-track types. It remains the historical first spatial schema.
+  Current `patch-studio-model-3` adds an explicit optional per-track
+  `depthAffectsScale` cue. Genuine model-1 and model-2 documents remain readable
+  through explicit migration; new exports and saved edits use model 3.
+- Spatial track X/Y are camera-space view-plane offsets and Z independently
+  controls depth/disparity. Orthographic constant size is the default; the
+  model-3 flag may additionally make positive/near Z enlarge a source and
+  negative/far Z shrink it, without turning Z into horizontal placement.
 - Pure Field/scene adapters and starters create ordinary Studio tracks. Studio
   detects all four legacy local-storage records without deleting or uploading
   them. Disabled tone, noise, and depth sources survive as muted/disabled tracks

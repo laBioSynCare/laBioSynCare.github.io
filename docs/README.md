@@ -27,7 +27,7 @@ the two disagree, the code and the as-built docs win.
 ## `technical/` — specifications
 
 **As-built.** [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) (the live authoring
-model, `patch-studio-model-2`, with model-1 import) · [`SENSORY_FIELD.md`](technical/SENSORY_FIELD.md)
+model, `patch-studio-model-3`, with model-1 and model-2 import) · [`SENSORY_FIELD.md`](technical/SENSORY_FIELD.md)
 (the `/field/` instrument) ·
 [`PHOTOSENSITIVITY_SAFETY.md`](technical/PHOTOSENSITIVITY_SAFETY.md) (advisory,
 policy, flash-rate cap) · [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md)
@@ -79,6 +79,12 @@ indexes the module architecture, improvement and publication plans, registry
 submissions, and the dated audits.
 Ontology design itself is documented at
 [`../static/ontology/README.md`](../static/ontology/README.md).
+
+## `gallery/` — selected captures
+
+[`gallery/README.md`](gallery/README.md) collects original captures of BSC Lab
+instruments and authored patches. Images stay beside their captions in the
+gallery rather than entering the PWA's precached `static/` asset set.
 
 ## `ecosystem/` — IP, governance, outreach
 

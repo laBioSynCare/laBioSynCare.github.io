@@ -30,6 +30,7 @@ import {
 import {
   createVisualStagePresentation,
   createVisualTrackConfig,
+  isSpatialVisualTrackType,
 } from './visualTrackModel.js'
 
 export const FIELD_TRACK_BUNDLE_MODEL = 'patch-studio-track-bundle-1'
@@ -157,7 +158,7 @@ function visualTrack(id, trackType, {
   params,
   config,
 } = {}) {
-  return {
+  const track = {
     id,
     trackType,
     name,
@@ -166,6 +167,8 @@ function visualTrack(id, trackType, {
     params,
     config: createVisualTrackConfig(trackType, config),
   }
+  if (isSpatialVisualTrackType(trackType)) track.depthAffectsScale = false
+  return track
 }
 
 function spatialParams(overrides = {}) {

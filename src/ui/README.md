@@ -33,15 +33,20 @@ presentation stage. Knob/parameter changes are applied without a restart via
 count, tremolo enable) rebuild the affected voice.
 
 - `PresetCreator.svelte` — the studio shell, transport, rAF live-evaluation loop,
-  scopes/previews, and the fullscreen visual **mix** stage.
+  scopes/previews, and the resizable, optionally fullscreen visual **mix** stage.
 - `presetDraft.js` + `visualTrackModel.js` — the additive data model (track
   types, stage presentation, parameter ranges, factories, normalization and
-  validation). **Authoritative model spec:**
+  validation). New exports use `patch-studio-model-3`; genuine model-1 and
+  model-2 documents migrate to it. Model 2 is the historical first spatial
+  schema, while model 3 makes the optional per-track depth-to-size cue explicit.
+  **Authoritative model spec:**
   [`../../docs/technical/PATCH_STUDIO.md`](../../docs/technical/PATCH_STUDIO.md).
 - `controlSignals.js` — LFO / Permutation / general-rate Sinusoid evaluation.
 - `StudioVisualStage.svelte` — shared composition/presentation for ordinary
   visual tracks; `SpatialTrackInspector.svelte` and `VisualStageControls.svelte`
-  expose track-local and stage-global settings.
+  expose track-local and stage-global settings. Spatial X/Y are camera-space
+  view-plane offsets; Z independently drives disparity/depth, with an opt-in
+  `depthAffectsScale` perspective cue.
 - `fieldStarters.js` + `fieldTrackAdapter.js` — pure Field starter bundles and
   deterministic legacy-state conversion reports; they do not rewrite legacy
   records automatically.

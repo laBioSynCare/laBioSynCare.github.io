@@ -12,6 +12,7 @@ import {
 } from './patchProjection.js'
 import {
   PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
   buildPatchExport,
   createAudioTrack,
   createControlTrack,
@@ -271,6 +272,17 @@ describe('projection', () => {
       model: PATCH_STUDIO_MODEL_V1,
       visualStage: { presentationMode: 'mono' },
     }, OPTIONS)).toThrow(/model-2 features.*model-1/)
+  })
+
+  it('refuses model-3 projection data mislabeled as model 2', () => {
+    expect(() => projectPatch({
+      model: PATCH_STUDIO_MODEL_V2,
+      visualTracks: [{
+        id: 'visual-tree',
+        trackType: 'TreeScene',
+        depthAffectsScale: true,
+      }],
+    }, OPTIONS)).toThrow(/model-3 features.*model-2/)
   })
 
   it('requires an explicit timestamp, so output cannot depend on the clock', () => {
