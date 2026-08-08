@@ -270,16 +270,21 @@ corpus-scoped knowledge-status assertions) are deliberately **not**
 `EvidenceClaim`s and never carry a tier — see
 [ADR 0027](../../docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md).
 
-Every claim requires a tier, modality tag, direction, review status, review
-date, modification date, accountable agent, and explicit subject. Claims at
-`tierRank >= 3` must cite a declared public-safe reference. Exploratory exposure
-claims remain speculative, inconclusive, and provisional unless audited
-evidence supports promotion.
+Every `EvidenceAssessmentClaim` requires a label and description, exactly one
+subject, tier, direction, proposition and modification date, at least one
+qualified basis, and an accountable IRI-valued agent. Each basis records its
+sensory modality, modality applicability, study model, synthesis type,
+intervention and observed result on separate axes. A bibliographic basis is
+mirrored by `citesReference`; review state comes from immutable
+`EvidenceReviewDecision` records rather than the deprecated mutable status and
+modality-tag fields.
 
-Public preset copy uses the C0-C5 claim-level scheme. SHACL rejects a public
-claim level above its evidence ceiling and always rejects medical/condition
-claims under the current policy. This is risk-reduction metadata, not legal
-advice; see [ADR 0018](../../docs/decisions/0018-evidence-integrity-and-public-claim-governance.md).
+Public preset copy still uses the legacy C0-C5 claim-level scheme as a
+provisional reject-only compatibility control. SHACL can reject an excessive or
+medical/condition level, but passing that check does not authorize publication.
+Exact-expression authorization and a BSC Lab surface policy remain proposed in
+[ADR 0028](../../docs/decisions/0028-atomic-claim-propositions-and-public-expressions.md)
+and [ADR 0029](../../docs/decisions/0029-bsc-lab-public-claim-publication-profile.md).
 
 ## Safety Metadata
 

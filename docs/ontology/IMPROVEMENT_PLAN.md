@@ -8,6 +8,11 @@ and phase numbering below is dependency order, not a version.
 
 **Primary audit:** [RDF knowledge-representation audit, 2026-07-13](reviews/2026-07-13-rdf-knowledge-representation-audit.md)
 
+For the implemented baseline and the ordered work that remains after the
+modular `0.13.0` release, start with the maintained
+[current-state summary](CURRENT_STATE.md). This plan preserves the dependency
+logic and acceptance gates; it is not a claim that every bullet is still open.
+
 ## Objective
 
 Make SSTIM's OWL, SKOS, SHACL, JSON-LD, instance data, application serializers,
@@ -16,11 +21,13 @@ the largest possible vocabulary. It is a trustworthy path from an executable
 stimulus specification to an actual session, an event timeline, qualified user
 observations, and optional standards-based research exports.
 
-The current graph has a sound base: stable IRIs, seven live modules, immutable
-release snapshots, claim-scoped evidence, conservative safety language, useful
-modeling levels, and substantial automated validation. The audit found that
-runtime serializers and documentation do not yet obey all of those contracts.
-Contract repair therefore precedes term growth.
+The graph audited on 2026-07-13 had a sound base: stable IRIs, seven live files,
+immutable release snapshots, claim-scoped evidence, conservative safety
+language, useful modeling levels, and substantial automated validation. The
+current suite has since become the manifest-owned modular architecture
+summarized in `CURRENT_STATE.md`. The audit found that runtime serializers and
+documentation did not yet obey all of those contracts; the unresolved contract
+repairs still precede term growth.
 
 ## Planning principles
 
@@ -81,9 +88,9 @@ approved. It makes existing claims testable and stops non-conformant output.
 - Run SSTIM SHACL and unresolved-local-IRI checks on generated graphs in CI.
 - Cover a state matrix: visual only, audio only, depth, blinking, monaural,
   binaural, and mixed fields.
-- Reconcile the Sensory Field generator with its committed fixture. Until then,
-  mark the download as a lossy exposure summary or disable it as a conformant
-  SSTIM export.
+- Keep the now-conformant Sensory Field generator and its committed fixture in
+  lockstep. Extend its state matrix without weakening the applicable SHACL or
+  unresolved-local-IRI checks.
 - Never add placeholder `EvidenceClaim` metadata simply to make validation
   green. A delivery record with no hypothesis should have no effect claim.
 

@@ -50,7 +50,8 @@ node scripts/truth-audit.mjs      # prints citable release, version DOI, module 
 | First released | 2026-04-12 |
 | Source repository | `https://github.com/laBioSynCare/laBioSynCare.github.io` |
 | HTML documentation | `https://labiosyncare.github.io/ontology/docs/` |
-| Frozen Turtle entry point | `https://w3id.org/sstim/<version>/sstim-core.ttl` |
+| Frozen whole-set entry point | `https://w3id.org/sstim/<version>` (namespace catalogue) |
+| Frozen Kernel Turtle | `https://w3id.org/sstim/<version>/sstim-core.ttl` |
 | JSON-LD (content negotiated) | `https://w3id.org/sstim` with `Accept: application/ld+json` |
 | RDF/XML (content negotiated) | `https://w3id.org/sstim` with `Accept: application/rdf+xml` |
 | VoID/DCAT | `https://labiosyncare.github.io/ontology/void.ttl` |
@@ -421,7 +422,7 @@ Patched submissions keep their corrected date, but **each new nightly pull
 creates a submission carrying whatever `dct:issued` the deployed file declares**
 — so the durable fix is bumping `dct:issued` at release time, now enforced by
 the `make snapshot` release gate (see
-[`README.md`](README.md#release-gate-make-snapshot)).
+[`static/ontology/README.md`](../../static/ontology/README.md#versioning-and-publication)).
 
 Two further observations from the same historical submission list, neither
 harmful: 0.10.0 has **no** submission (it and 0.11.0 both deployed on 2026-07-24

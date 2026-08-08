@@ -76,9 +76,12 @@ implementation by `schema:sameAs` or `owl:sameAs`.
   is a baseline or capability-boundary protocol.
 - A preset names its implementation, protocol, public claim level, and caution
   metadata.
-- Every evidence claim has a tier, modality, direction, review state/date,
-  responsible agent, and modification date.
-- Claims at preliminary tier or stronger cite a declared public-safe reference.
+- Every evidence assessment has one subject, tier, direction and bounded
+  proposition, at least one qualified evidence basis, a responsible agent, and
+  a modification date. Basis-level modality, model, design and synthesis axes
+  remain separate; review state comes from immutable review decisions.
+- Every bibliographic evidence basis is mirrored by a `citesReference` link to
+  the declared reference. Publication clearance is a separate policy concern.
 - A session specification is an immutable plan; a session instance records one
   execution.
 - Multiple phase-qualified self-reports are separate nodes. They are not

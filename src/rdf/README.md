@@ -8,8 +8,10 @@
 
 The RDF subsystem loads the SSTIM ontology, versioned public catalog, approved
 live ecosystem projection, and public BSC Lab reference instances into scoped
-in-browser N3.js stores; executes SPARQL via Comunica; and validates data with
-SHACL. It must not import, convert, or export the private BioSynCare/BSC catalog.
+in-browser N3.js stores and executes SPARQL via Comunica. Applicable SHACL runs
+in repository and producer tests today; browser-side validation remains
+planned. It must not import, convert, or export the private BioSynCare/BSC
+catalog.
 
 ---
 
@@ -144,14 +146,21 @@ import { select, construct } from './query.js'
 const results = await select(store, `
   PREFIX sstim: <https://w3id.org/sstim#>
   PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+  PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
   SELECT ?preset ?label ?tier WHERE {
-    ?preset a sstim:Preset ;
-            rdfs:label ?label ;
-            sstim:hasEvidenceTier [ sstim:tierRank ?tier ] .
-    FILTER(LANG(?label) = "en")
+    GRAPH ?presetGraph {
+      ?preset a sstim:Preset ; rdfs:label ?label .
+    }
+    OPTIONAL {
+      GRAPH ?claimGraph {
+        ?claim a sstim:EvidenceAssessmentClaim ;
+               sstim:evaluatesSubject ?preset ;
+               sstim:hasEvidenceTier ?tier .
+      }
+    }
   }
-  ORDER BY DESC(?tier)
+  ORDER BY ?label
 `)
 // results: [{ preset: NamedNode, label: Literal, tier: Literal }, ...]
 

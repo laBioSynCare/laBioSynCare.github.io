@@ -225,9 +225,10 @@ New SHACL shapes that add constraints must be accompanied by:
 
 ### Adding a new public-safe reference
 
-Public-safe references (citable in user-facing `techDesc` fields) are managed
-in the BSC Reference Agent document (`referenceDocuments/BSC_Reference_Agent_*.md`)
-and in `static/ontology/instances/references/references.ttl`.
+Public-safe references (eligible for citation in user-facing `techDesc` fields)
+are represented in
+`static/ontology/instances/references/references.ttl`. Recording a reference
+does not by itself authorize a public expression; see ADRs 0027–0029.
 
 To add a reference:
 
@@ -236,8 +237,10 @@ To add a reference:
 2. Open a PR adding the reference to `static/ontology/instances/references/references.ttl`
    using the `sstim:PublicSafeReference` class with `sstim:referenceKey`,
    `dct:title`, `dct:creator`, `dct:date`, `dct:identifier` (DOI)
-3. Note which modality tags apply (AUD, AV, BREATH, GENERAL, PRECLINICAL, REVIEW)
-   using `sstim:hasModalityTag`
+3. When the reference supports an assessment, add a qualified
+   `sstim:EvidenceBasis` carrying the separate sensory-modality, applicability,
+   intervention, study-model, study-design, synthesis and observed-result axes;
+   mirror that bibliographic source with `sstim:citesReference`
 4. Do not add references that are: preprints without peer review, self-published
    studies, studies where the lead author has a commercial conflict of interest
    not disclosed in the paper, or studies with fewer than 20 participants
@@ -262,7 +265,9 @@ first-commit hash as the prior disclosure date.
 
 Every PR must:
 
-1. Pass all pre-commit hook checks (SHACL, JSON Schema, Turtle syntax)
+1. Pass the applicable checked-in validation commands (`make validate`,
+   `make test`, `make check`, and `make build`); the planned pre-commit wrapper
+   and preset/session JSON Schemas are not present yet
 2. Include a summary of what changed and why
 3. Reference the Issue it addresses (or explain why no Issue exists)
 4. Not modify protected files without explicit maintainer approval in the Issue

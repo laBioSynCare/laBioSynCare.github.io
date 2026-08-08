@@ -1,0 +1,333 @@
+# SSTIM Current State and Next Steps
+
+**Status:** maintained current-state summary, reviewed 2026-08-08. This is the
+starting point for ontology work. Dated audits remain evidence for individual
+decisions, but they describe the repository state on their stated dates rather
+than the state summarized here.
+
+## Authoritative facts
+
+SSTIM separates its mutable development sources from its immutable citable
+releases. Do not infer one from the other.
+
+| Question | Current answer | Authority |
+|---|---|---|
+| What is being edited? | `0.14.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.13.0`, released 2026-08-04 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| Which DOI identifies that release? | `10.5281/zenodo.21792692` | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
+| What changed? | No semantic change is yet recorded for `0.14.0-dev` | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
+
+The live line is mutable, carries no `owl:versionIRI`, and is not a citable
+release. The frozen [`0.13.0/`](../../static/ontology/0.13.0/) directory is the
+latest immutable whole-set snapshot. Its version IRI resolves to the frozen
+namespace catalogue rather than to `sstim-core.ttl`, which is now only the
+two-class Kernel.
+
+## Architecture as built
+
+The manifest owns 16 semantic modules and two validation modules. Their direct
+dependencies form an acyclic graph, every public term has one authoritative
+source, and all modules advance on one synchronized version line. The readable
+dependency table is in the [module architecture guide](MODULE_ARCHITECTURE.md);
+the manifest remains normative.
+
+The four profile entry points serve different adoption needs:
+
+| Profile | Semantic closure | Validation meaning |
+|---|---|---|
+| Kernel | `Stimulation` and `SensoryStimulation` | Discovery entry point only; intentionally no SHACL package |
+| Core | Kernel plus engine-independent stimulus descriptions | Weak reusable Core SHACL contract |
+| Core Plus | Core plus shared quantities and descriptors | Reuses the Core shape package; no separate Common package yet |
+| Full | All 16 semantic modules | Full SHACL and SHACL-SPARQL contract |
+
+Kernel is therefore a profile, but not a conformance target. Core, Core Plus,
+and Full have executable positive, out-of-scope, adversarial, and competency
+contracts appropriate to their declared shape closures. A consumer should
+select the smallest profile that answers its use case and should select SHACL
+explicitly; OWL imports do not silently import validation policy.
+
+The persistent publication routes preserve the distinction between namespace
+catalogues and exact modules:
+
+- `https://w3id.org/sstim` identifies the suite and negotiates the generated
+  Full namespace catalogue;
+- `https://w3id.org/sstim/kernel` retrieves the exact Kernel;
+- `https://w3id.org/sstim/exposure` negotiates the Stimulus + Exposure
+  namespace catalogue; and
+- `https://w3id.org/sstim/module/exposure` retrieves the exact Exposure module
+  and is the mutable import endpoint.
+
+## Semantic coverage
+
+SSTIM currently distinguishes four description layers:
+
+1. the stimulation process;
+2. an engine-independent `StimulusSpecification` describing what reaches a
+   target;
+3. an engine-dependent `Preset` configuration; and
+4. a `SessionSpecification` plan plus the executed `SessionInstance` activity.
+
+The Full profile also represents techniques, frameworks, protocols,
+implementations, delivery and perception, calibrated descriptors, safety
+advisories, evidence assessments, research hypotheses, neuromodulation,
+Patch Studio parameters, sessions and self-reports, and qualified ecosystem
+relationships.
+
+Evidence is scoped and revisioned. An `EvidenceAssessmentClaim` evaluates one
+subject, assesses one bounded proposition, has one or more qualified evidence
+bases, and records direction, tier, provenance, and review state. Hypotheses,
+requirements, observations, design objectives, planned outcomes, and
+knowledge-status assertions are separate types and do not become evidence
+claims merely because they are useful or adjacent. The deprecated scalar
+modality and assessment-summary fields are compatibility terms, not the current
+authoring contract.
+
+The public C0-C5 claim-level check is a provisional reject-only compatibility
+control. It reduces risk but does not authorize copy. Exact expression-level
+authorization and the BSC Lab publication profile remain proposed in
+[ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md)
+and [ADR 0029](../decisions/0029-bsc-lab-public-claim-publication-profile.md).
+
+## Data and privacy boundaries
+
+Committed instance RDF is public reference data, not ontology term space and
+not part of the immutable ontology snapshots. It currently includes the BSC
+framework and implementations, two reference protocols, two reference presets,
+seven DOI-identified references, ten exploratory exposure examples, evidence
+assessments, and one explicitly synthetic session with phased self-reports.
+
+The committed ecosystem graph is synthetic contract data. Real ecosystem
+records live in a separately hosted mutable projection and pass a private-first
+admission process. Private BioSynCare catalog data, authentication identifiers,
+contact channels, raw consent evidence, private audit history, and real
+participant observations are not committed to this repository.
+
+The browser loads ontology modules from the manifest into canonical named
+graphs. Its static instance inventory is still explicit in `src/rdf/loader.js`;
+there is no generated instance manifest yet. Annotations and the optional live
+ecosystem projection use separate graph and storage boundaries.
+
+## Validation and publication state
+
+The complete pinned gate passed on 2026-08-08:
+
+```bash
+nix develop --command make validate
+nix develop --command make test
+```
+
+The gate covers manifest schema and checksums, module ownership and direct
+dependencies, all profile contracts, Full-union compatibility, SHACL over
+modules and public instances, ecosystem admission fixtures, repository-wide
+quality and competency checks, HermiT consistency over the 16 local semantic
+modules, Turtle/JSON-LD/RDF/XML round trips, the public JSON-LD context, frozen
+snapshot checksums, w3id route targets, release rehearsal, and documentation
+truth checks. The application suite also passes.
+
+This is strong evidence that the graph satisfies its declared local contracts.
+It is not an independent ontology review, a validation of every external upper
+ontology, proof of a scientific effect, or evidence that proposed privacy and
+publication models are implemented.
+
+## Assessment and practical usefulness
+
+### Bottom line: great
+
+On the scale **bad → good → great → excellent → exceptional**, SSTIM is
+**great overall in its current state**.
+
+That rating is deliberately split from enthusiasm about individual parts:
+
+| Dimension | Assessment | Reason |
+|---|---|---|
+| Repository and release engineering | Excellent | Immutable snapshots, persistent identifiers, manifest-driven modules, profile contracts, SHACL, reasoning, round-trip checks, release rehearsal, and truth audits form an unusually strong gate |
+| Knowledge representation | Great | The process/stimulus/configuration/execution layers, scoped evidence model, controlled values, privacy boundaries, and explicit optional concerns are coherent and useful |
+| Documentation and epistemic discipline | Great | Decisions and limitations are unusually explicit, effect language is conservative, and historical audits are preserved; active guidance has nevertheless drifted and still needs consolidation |
+| Interoperability readiness | Great for bounded SSTIM exchange; good beyond it | Stable IRIs, profiles, RDF serializations, SHACL and SPARQL support reuse, but HED/BIDS/NWB adapters, concern-specific packages, mapping provenance and some semantic splits remain unfinished |
+| Community maturity | Good | The W3C Community Group and publication infrastructure exist, but independent review, third-party implementations, external citations and shared maintainership are not yet demonstrated at the level expected of a mature standard |
+
+It is more than **good** because it is not merely a plausible vocabulary: it has
+implemented semantic boundaries, executable consumer profiles, public examples,
+stable publication, migration history, and regression gates that catch changes
+across OWL, SKOS, SHACL, JSON-LD, instances, documentation and release artifacts.
+
+It is not yet **excellent overall** because several important contracts remain
+incomplete: executed sessions, qualified participant observations,
+expression-level public-claim governance, browser-side validation, frequency
+semantics, concern-specific vocabulary and shape packages, and independent
+review. It is not **exceptional** because that label should require demonstrated
+external adoption and durable multi-party stewardship, not only strong work by
+its originating project.
+
+### Is SSTIM useful now?
+
+**Yes, within its stated scope.** SSTIM is useful when two systems or people need
+to exchange, validate, query, compare, or publish structured knowledge about
+sensory stimulation without collapsing the stimulation itself, an engine's
+settings, an intended session, an executed session, and an evidence claim into
+one object.
+
+Its most practical uses today are:
+
+1. **Portable stimulus descriptions.** A researcher or developer can use Core
+   to describe a determinate, stochastic or adaptive stimulus and its channels
+   independently of the engine that produced it. This makes cross-tool
+   comparison more defensible than exchanging opaque gain and waveform fields.
+2. **Validated knowledge graphs.** A project can use Core, Core Plus or Full as
+   an explicit contract, validate instance RDF with the associated SHACL
+   package, and use the competency queries as executable examples of what the
+   selected profile promises.
+3. **Protocols, configurations and provenance.** Full can connect techniques,
+   protocols, implementations, presets, stimulus specifications, exposures and
+   session plans while preserving their different roles. This is useful for
+   catalogues, reproducible examples and research metadata.
+4. **Evidence curation without global efficacy claims.** Curators can attach an
+   immutable, scoped assessment to one preset or technique, keep proposition,
+   direction, tier, source-level basis and review provenance separate, and
+   represent mixed or refuting evidence without changing the subject's identity.
+5. **Conservative safety and hypothesis metadata.** Projects can describe
+   cautions, exposure hypotheses, requirements and knowledge-status assertions
+   without promoting them to observed effects or evidence claims.
+6. **Citable linked data.** Stable w3id routes, frozen version IRIs, a concept
+   DOI, version DOIs, VoID/DCAT metadata and generated serializations make SSTIM
+   suitable for a paper supplement, public dataset or reusable semantic layer.
+7. **Ontology-aware applications.** The BSC Lab graph browser and SPARQL surface
+   demonstrate how a client can derive module inventory from the manifest,
+   load named graphs, navigate SKOS/OWL terms and query evidence trails.
+
+### How to use it
+
+1. **Choose the smallest profile.** Use Kernel only for discovery, Core for an
+   engine-independent stimulus description, Core Plus when shared calibrated
+   descriptors are needed, and Full for techniques, configurations, sessions,
+   evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
+   entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
+   `/sstim/profile/core-plus`, and `/sstim/profile/full`.
+2. **Pin a release for published work.** Use the immutable `0.13.0` profile and
+   module URLs for a paper or dataset. Use `0.14.0-dev` only when intentionally
+   testing mutable development sources.
+3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and
+   controlled concepts, but mint protocols, presets, sessions, assessments and
+   other records under the adopter's own stable namespace.
+4. **Load the declared closure.** Read modules, direct dependencies, graph IRIs,
+   profile membership and applicable shape modules from `manifest.json`; do not
+   reconstruct them from a directory listing or assume `sstim-core.ttl` is the
+   whole ontology.
+5. **Validate and query.** Run the selected SHACL contract with its declared
+   inference mode, exercise the corresponding competency query, and keep
+   ontology conformance distinct from scientific validation of the represented
+   protocol or claim.
+6. **Record version and provenance.** Publish the profile/version IRI, source
+   and generated-artifact hashes, creation and modification dates, responsible
+   agents, and any local mapping or policy version needed to reproduce the
+   graph.
+
+For a local SSTIM checkout, the quickest complete verification is:
+
+```bash
+nix develop --command make validate
+nix develop --command make test
+```
+
+An adopter who only needs a small private audio preset object, has no RDF
+consumers, and does not need cross-engine meaning may find SSTIM unnecessary.
+SSTIM should also not yet be used as a clinical decision system, proof that a
+stimulation has an effect, a production schema for identifiable participant
+observations, or a claim of turnkey HED/BIDS/NWB interoperability.
+
+## Known limitations
+
+The main gaps are design and coverage gaps, not current parser failures:
+
+- `SessionSpecification` and `masterVolume` remain audio-shaped, while the
+  native executed-session schema, event timeline, and declared reproducibility
+  level are incomplete. The portable Patch Studio package solves object
+  interchange, not executed-session recording.
+- Qualified participant observations, structured unwanted experiences,
+  missing/declined states, and their privacy/provenance profile are not ready
+  for real participant data.
+- Browser-side SHACL validation and the public preset-to-runtime export path are
+  planned; repository and runtime-generator tests are the present validation
+  surfaces.
+- Core Plus has no distinct Common validation distribution, and optional
+  concern and bridge modules do not yet have reusable shape packages.
+- The controlled vocabulary remains coupled to the Full compatibility closure;
+  concern-specific vocabulary distributions do not exist.
+- Exposure still combines delivery/safety with experiment, hypothesis, and
+  knowledge-status concerns. Evidence subjects also need generalization before
+  Evidence can become a smaller Core-oriented extension.
+- Stimulus and Exposure expose overlapping frequency/flicker quantities, and
+  frequency-band concepts still conflate observed neural oscillations with
+  stimulus targets.
+- External mappings need per-mapping provenance and continued conservative
+  review. Multilingual preferred labels are substantial, but alias coverage and
+  measured per-scheme language coverage remain weak.
+- VoID subsets are checked against the frozen release manifest but are not
+  generated from the live manifest, leaving an avoidable maintenance seam.
+- Independent ontology, domain, privacy, and linked-data review remains
+  desirable.
+
+## Recommended next steps
+
+### 1. Bound the `0.14` change set
+
+Record one coherent objective under `CHANGELOG.md`'s Unreleased heading before
+adding terms. Do not combine session redesign, participant observations,
+frequency semantics, and vocabulary packaging in one unreviewable release.
+Each semantic change needs its own ADR or accepted plan, migration note, SHACL
+changes, fixtures, competency query, context/application review, and explicit
+authorization for protected files.
+
+### 2. Establish the native session contract
+
+Reconcile `SESSION_MODEL.md`, the RDF session model, the Patch Studio package,
+and the future recorder around one versioned native schema. Define stable IDs,
+engine/application versions, configuration and asset hashes, monotonic events,
+interruptions, actual execution outcome, and a defensible reproducibility
+level. Preserve the current distinction between an engine configuration, a
+stimulus description, an intended execution, and an executed activity.
+
+### 3. Add qualified observations and privacy policy
+
+Model prompts, observation items, helpfulness, unwanted experiences,
+participant-perceived relatedness, explicit missingness states, visibility,
+consent, retention, withdrawal, and de-identification. Begin with synthetic
+golden cases. No real participant data should enter a public graph before this
+profile, its threat model, and its negative fixtures are accepted.
+
+### 4. Resolve public-expression governance
+
+Review ADRs 0028 and 0029. If accepted, implement exact proposition and
+expression revisions, a versioned BSC Lab policy, trusted-input and surface
+inventories outside RDF, and fail-closed adversarial tests. Until then, retain
+the existing reject-only posture and do not describe it as authorization.
+
+### 5. Repair semantic seams in bounded follow-ups
+
+Prioritize the observed-oscillation versus stimulus-target frequency split,
+then reconcile duplicate channel quantities and make sessions
+modality-neutral. Separately define concern-specific vocabulary and validation
+packages, and only then consider deeper Exposure/Evidence decomposition. Keep
+stable public term IRIs and provide explicit compatibility mappings where a
+meaning changes.
+
+### 6. Close runtime and maturity gaps
+
+Add browser-side SHACL for downloadable/public graphs, generate the instance
+inventory, complete the Patch Studio/catalog bridge without inferring evidence
+or intent, measure language coverage, attach mapping provenance, publish the
+remaining registry records, and obtain independent review. HED/BIDS/NWB work
+should follow a validated native session demonstrator rather than become its
+storage authority.
+
+## Release acceptance
+
+The next release is ready only when its selected change set passes
+`nix develop --command make validate` and `make test`, the protected sources and
+manifest are synchronized, generated serializations are graph-isomorphic,
+runtime-produced graphs in scope pass their applicable profile, public/private
+fixtures remain separated, documentation and the changelog describe the same
+model, and the immutable snapshot, routes, tag, citation metadata, and Zenodo
+record agree.

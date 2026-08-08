@@ -194,8 +194,9 @@ when that loss is explicit and tested.
   datatypes and properties.
 - The current self-report model lacks direct helpfulness, repeatable structured
   unwanted experiences, missingness states, and enforceable privacy provenance.
-- The live Sensory Field exporter fails current EvidenceClaim and Protocol SHACL
-  requirements and omits configuration details needed for reproduction.
+- The Sensory Field exposure export now passes its applicable SSTIM SHACL
+  contract, but it remains an exposure/configuration summary rather than the
+  native executed-session and event contract required by this profile.
 - Browser-side RDF validation and HED/BIDS/NWB adapters do not exist.
 
 These are tracked in the

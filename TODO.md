@@ -200,7 +200,7 @@ indexed, examiner-searchable records.
       submit PR. PR #6184 was merged on 2026-06-11; root RDF, module,
       Patch Studio, and versioned `0.1.0/` redirects are live. Keep the
       mirrored copy in `docs/ecosystem/w3id/` synchronized with the registry.*
-- [~] Deploy and register the manifest-driven `0.13` publication routes `P1`
+- [x] Deploy and register the manifest-driven `0.13` publication routes `P1`
       *The repository now generates a Full namespace catalog for machine RDF at
       `/sstim`, exposes the exact two-class Kernel at `/sstim/kernel`, and
       generates a Stimulus + Exposure namespace catalog at `/sstim/exposure`.
@@ -209,9 +209,9 @@ indexed, examiner-searchable records.
       endpoint; `/sstim/exposure` must never be used as that import target
       (although `dct:requires` may use it as the logical ontology identifier).
       It also defines PROF-enabled profile entry points, `/sstim/manifest`, and
-      the schema PID `/sstim/manifest-schema/1`. The mirrored rules are staged;
-      deploy their Pages targets first, submit the perma-id update, and verify
-      every route × representation before marking this complete.*
+      the schema PID `/sstim/manifest-schema/1`. Pages targets were deployed,
+      perma-id PR #6480 merged on 2026-08-03, and the 19-case negotiation matrix
+      was verified on 2026-08-04.*
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
@@ -292,25 +292,20 @@ Turtle files are listed in section 1. After they exist:
       w3id.org on 2026-08-04 — 19 route/`Accept` combinations, all as modelled.
       `Vary: Accept` is not emitted by any w3id `303` and cannot be set from the
       `.htaccess`; the responses are not cacheable, so the risk it guarded is
-      moot. Every release blocker is now cleared; `0.13.0` awaits only the
-      mechanical version/date bump, snapshot, and its own snapshot-route PR.*
-- [ ] Give the version IRI a whole-ontology artifact to resolve to `P1`
+      moot. `0.13.0` was released on 2026-08-04.*
+- [x] Give the version IRI a whole-ontology artifact to resolve to `P1`
       *Until 0.12 `sstim-core.ttl` was the whole ontology, so `/sstim/<version>`
       could serve it; it is now the two-class Kernel, and a frozen snapshot has
-      no single document standing for the release. `sstim-w3id-snapshot-routes`
-      now refuses a bare-version route for a manifest-carrying snapshot that
-      does not freeze `sstim-namespace.ttl`, so this cannot ship silently, but
-      the release path must still generate and freeze that catalogue (today
-      `make export` writes it only to `dist/`) or record a different
-      whole-ontology release artifact.*
-- [ ] Derive the VoID/DCAT record from the manifest `P1`
-      *ADR 0043 rollout step 5, still unmet. `void.ttl` is consistent today —
-      the quality audit counts it against the frozen directory its `dcat:version`
-      names — but it describes 0.12.0's 9 subsets. At 0.13.0 it must describe
-      all 18 modules, and the Kernel and Exposure `dcat:accessURL` values must
-      become `/sstim/kernel` and `/sstim/module/exposure`, since `/sstim` and
-      `/sstim/exposure` now serve namespace catalogues rather than those
-      modules. Nothing yet checks the subset inventory against the manifest.*
+      no single document standing for the release. Since `0.13.0`, snapshotting
+      freezes `sstim-namespace.ttl`, the route generator refuses an incomplete
+      modular snapshot, and the version IRI resolves to that whole-set
+      catalogue.*
+- [~] Derive the VoID/DCAT record from the manifest `P1`
+      *The release-critical half shipped in `0.13.0`: `void.ttl` now carries one
+      subset per frozen module, uses the correct Kernel and Exposure access
+      endpoints, and the quality audit checks it against the frozen manifest.
+      Generation from the live manifest is still open, so metadata maintenance
+      is checked but not yet single-source.*
 - [x] Generate WIDOCO HTML docs from the manifest-defined Full OWL profile `P1`
       *`make ontology-docs` (WIDOCO 1.4.25, pinned in the flake beside ROBOT)
       unions the Full semantic closure before OWL translation and generates its
@@ -356,7 +351,9 @@ Turtle files are listed in section 1. After they exist:
 ### Phase 2 ontology extensions
 - [x] Model session specifications, executed session activities, phased
       self-reports, and a non-personal synthetic example `P2`
-- [ ] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
+- [x] Add `sstim:derivedFrom` property for preset lineage tracking `P2`
+      *Implemented as an asymmetric, irreflexive immediate-predecessor relation
+      in the Configuration module; longer histories use repeated links.*
 - [ ] Record recognized **named methods / schools** (Snoezelen / MSE, Tomatis,
       Bérard AIT, Ayres Sensory Integration, vibroacoustic therapy, sound baths,
       …) as a neutral, evidence-scoped catalogue `P2`

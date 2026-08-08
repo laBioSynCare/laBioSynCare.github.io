@@ -362,17 +362,14 @@ through alpha frequency targeting" — is supported by Tier 3–4
 evidence (binaural beat literature, mixed but positive direction,
 some modality mismatch with AVE studies).
 
-When assigning a single `evidenceTier` value to the preset as
-a whole, the convention is: **use the lowest (most conservative)
-tier across all active claims.** This is conservative by design
-— the preset is not better than its weakest claim.
-
-The ontology supports more granular representation: each
-`sstim:EvidenceClaim` instance attached to a protocol can carry
-its own tier, reference list, modality tags, and notes. For
-research purposes, this granularity is available. For user-facing
-content, the single preset-level tier is what governs the
-language.
+The private catalog may retain one conservative display value as an adapter
+field, but SSTIM does not assert a tier on the preset itself. Each immutable
+`sstim:EvidenceAssessmentClaim` evaluates one preset or technique, assesses one
+bounded proposition, and carries its own tier, direction, qualified evidence
+bases and provenance. The basis axes keep sensory modality, applicability,
+intervention, study model/design, synthesis and observed result distinct. A
+surface policy must evaluate the exact claims it publishes; a lowest-tier
+catalog summary is not publication authorization.
 
 ---
 
@@ -408,17 +405,12 @@ approach*, not by strength: experimental evidence, computational
 evidence, author statement, curator inference, and so on.
 The BSC tier system is orthogonal to ECO.
 
-In the BSC ontology:
-- `sstim:EvidenceTierValue` captures strength (the six tiers above)
-- `eco:ECO_0000000` (ECO terms) capture type
-- A single `sstim:EvidenceClaim` instance carries both
-
-For example, a claim supported by two RCTs would carry
-`sstim:hasEvidenceTier sstim-v:tierModerate` AND
-`eco:ECO_0001384` (randomized controlled trial evidence
-used in manual assertion). A claim supported only by mechanism-
-based reasoning would carry `sstim:hasEvidenceTier sstim-v:tierSpeculative`
-AND `eco:ECO_0000007` (author inference).
+In SSTIM, `sstim:EvidenceTierValue` captures assessed strength. Evidence type
+belongs to each qualified `sstim:EvidenceBasis`, using identified source and
+study-design concepts plus the separate basis axes. SSTIM does not currently
+assert direct ECO types on an `EvidenceAssessmentClaim`; an ECO alignment
+should be added only for a verified source-level concept, never used as a
+substitute for tier or scope.
 
 ---
 
@@ -426,8 +418,9 @@ AND `eco:ECO_0000007` (author inference).
 
 The private BioSynCare/BSC preset catalog uses a simplified three-value system:
 `speculative`, `moderate`, `established`. This was the working
-system during initial catalog development. The six-tier system
-described in this document is the target formalization.
+system during initial catalog development. SSTIM's six-tier system is the
+formal RDF model; the three-value catalog field is a private adapter that must
+not be mistaken for the ontology contract.
 
 Approximate mapping from the catalog's current values:
 

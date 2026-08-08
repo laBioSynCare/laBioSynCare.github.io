@@ -68,8 +68,10 @@ ADR 0011 while the series ran past 0045.
 
 ## `ontology/` — plans and reviews
 
-[`ontology/README.md`](ontology/README.md) indexes the module architecture,
-improvement and publication plans, registry submissions, and the dated audits.
+[`ontology/CURRENT_STATE.md`](ontology/CURRENT_STATE.md) is the maintained
+current-state and next-steps summary. [`ontology/README.md`](ontology/README.md)
+indexes the module architecture, improvement and publication plans, registry
+submissions, and the dated audits.
 Ontology design itself is documented at
 [`../static/ontology/README.md`](../static/ontology/README.md).
 

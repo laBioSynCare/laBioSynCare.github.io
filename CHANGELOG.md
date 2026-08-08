@@ -102,7 +102,7 @@ architecture is now frozen, citable, and served from the persistent namespace.
   version as released on 2026-04-12 — visible as BioPortal's **Released** column
   across all eight SSTIM submissions, corrected there by hand on 2026-07-27.
   Metadata and tooling only; no term changed. See
-  [`docs/ontology/README.md`](docs/ontology/README.md#release-gate-make-snapshot).
+  [`static/ontology/README.md`](static/ontology/README.md#versioning-and-publication).
 
 ## [0.12.0] - 2026-07-31
 

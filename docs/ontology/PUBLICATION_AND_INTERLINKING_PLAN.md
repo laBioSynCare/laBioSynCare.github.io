@@ -303,8 +303,9 @@ SSTIM is first-class for public reuse when:
   `/sstim/module/exposure` serves only the exact Exposure semantic module;
 - generated serializations parse and represent the same source graphs;
 - SHACL, OWL reasoning, quality, and competency audits run in CI;
-- every released profile has nonempty positive, out-of-scope, and adversarial
-  fixtures plus at least one executable competency query;
+- every released profile has a nonempty positive fixture and at least one
+  executable competency query; each profile with a nonempty SHACL closure also
+  has nonempty out-of-scope and adversarial fixtures;
 - machine-readable metadata includes creator, license, namespace, version,
   DOI, provenance, distributions, and checked graph counts;
 - every release has an immutable snapshot, Git tag, changelog entry, and Zenodo

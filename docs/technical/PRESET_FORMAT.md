@@ -805,9 +805,11 @@ presets carry their own `version` field which should match the catalog
 version at time of creation. When a preset is revised, its `version`
 is incremented independently of the catalog version.
 
-The `derivedFrom` field (pending, see Known Gaps above) will capture
-revision lineage when implemented. Until then, catalog notes in the
-backend tool track revisions manually.
+The catalog JSON `derivedFrom` field is pending, so catalog notes in the backend
+tool still track revisions manually. The RDF property already exists as
+`sstim:derivedFrom`, an asymmetric, irreflexive link to the immediate
+predecessor `sstim:Preset`; the missing work is the catalog adapter field, not
+the ontology term.
 
 ---
 
@@ -822,7 +824,10 @@ reference presets are:
 - Source application / catalog → `sstim:forImplementation` → `https://w3id.org/sstim/implementation/bsclab`
 - `header.group` → `sstim:inGroup` → group individual in `sstim-vocab.ttl`
 - `header.targetBand` → `sstim:targetsFrequencyBand` → band concepts
-- `header.evidenceTier` → a `sstim:EvidenceClaim` carrying `sstim:hasEvidenceTier` → tier individual
+- `header.evidenceTier` → a separately identified
+  `sstim:EvidenceAssessmentClaim` that evaluates the preset and carries the
+  tier, direction, bounded proposition, qualified basis, provenance and review
+  decision required by ADR 0027; the tier is not asserted on the preset itself
 - `header.cautionTags` → `sstim:hasCautionTag` → caution tag individuals
 - Voice array → `sstim:composedOf` → voice component individuals
 

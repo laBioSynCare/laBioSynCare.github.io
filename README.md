@@ -28,11 +28,12 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
 - **Persistent namespace:** `https://w3id.org/sstim` is registered and live.
   All-version concept DOI:
   [10.5281/zenodo.21286974](https://doi.org/10.5281/zenodo.21286974).
-- **Ontology shape:** manifest-owned Turtle modules behind four conformance
-  profiles — Kernel, Core, Core Plus, Full — plus VoID/DCAT and a JSON-LD
-  context. The development line is mutable and not an immutable release; use the
-  manifest and explicit profile entry points rather than treating
-  `sstim-core.ttl` as the whole suite.
+- **Ontology shape:** manifest-owned Turtle modules behind four profile entry
+  points — Kernel, Core, Core Plus, Full — plus VoID/DCAT and a JSON-LD context.
+  Kernel is a shapeless discovery profile; Core, Core Plus, and Full are the
+  conformance targets. The development line is mutable and not an immutable
+  release; use the manifest and explicit profile entry points rather than
+  treating `sstim-core.ttl` as the whole suite.
 - **Public example data:** the BSC framework, nine framework techniques (three
   originated by BSC, six vendor-neutral ones it incorporates — ADR 0033), two
   implementations, protocols, reference presets, evidence assessments,
@@ -259,9 +260,10 @@ version metadata, snapshot generation, tag creation, and Zenodo archival agree.
 The release gate additionally requires every snapshotted artifact to advertise
 its immutable versioned URL, every profile to import the exact versioned sibling
 closure, every PROF descriptor to identify immutable entrypoint, constraint,
-and manifest artifacts, and every profile to have existing nonempty positive,
-out-of-scope, and adversarial fixtures plus a competency query. The released
-manifest and schema are themselves frozen sibling artifacts. `make release-dryrun`
+and manifest artifacts. Every profile has a positive fixture and competency
+query; profiles with a nonempty SHACL closure additionally have nonempty
+out-of-scope and adversarial fixtures. The released manifest and schema are
+themselves frozen sibling artifacts. `make release-dryrun`
 rehearses all of this against the current sources on every `make validate`, so a
 gate that has been wrong for weeks surfaces before a release is attempted rather
 than during one.

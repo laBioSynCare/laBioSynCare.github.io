@@ -18,6 +18,9 @@ Describing a protocol or claim does not establish efficacy.
 
 ## Plans
 
+- [Current state and next steps](CURRENT_STATE.md) — maintained starting point:
+  released versus development state, implemented profiles and semantic scope,
+  validation evidence, known limits, and the recommended work sequence.
 - [Module architecture](MODULE_ARCHITECTURE.md) — the consumer guide to the
   modular line: dependency table, profile and SHACL selection, Full-union
   compatibility contract, named-graph ownership, deferred gaps. Accepted in
@@ -36,7 +39,8 @@ Describing a protocol or claim does not establish efficacy.
 ## Reviews
 
 Dated, point-in-time records. They are evidence for the plans above, not current
-guidance — read the plan or ADR that cites one before acting on its findings.
+guidance — read the current-state summary, plan, or ADR that cites one before
+acting on its findings.
 
 - [Core and module boundary audit, 2026-08-01](reviews/2026-08-01-sstim-core-and-module-boundary-audit.md)
   — growth, dependency topology, candidate Core Profile, extraction gates.
