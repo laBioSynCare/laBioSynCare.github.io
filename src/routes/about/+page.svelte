@@ -2,6 +2,14 @@
   // Static content page — no runes needed. The bottom-dock screens, described
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
   import { CONCEPT_DOI, doiUrl } from '../../ui/entrance/releaseMetadata.js'
+  import {
+    BIOSYNCARE_URL,
+    GITHUB_URL,
+    ONTOLOGY_DOCS_URL,
+    VOCAB_DOCS_URL,
+    W3C_GROUP_URL,
+    ghBlob,
+  } from '../../ui/externalLinks.js'
 
   const screens = [
     {
@@ -190,13 +198,17 @@
   ]
 
   const links = [
-    { label: 'Source repository', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io', external: true },
-    { label: 'Ontology reference docs', href: '/ontology/docs/', external: true },
-    { label: 'Vocabulary docs', href: '/ontology/docs/vocab/', external: true },
+    { label: 'Source repository', href: GITHUB_URL, external: true },
+    { label: 'Ontology reference docs', href: ONTOLOGY_DOCS_URL, external: true },
+    { label: 'Vocabulary docs', href: VOCAB_DOCS_URL, external: true },
     { label: 'Ontology DOI (all versions)', href: doiUrl(CONCEPT_DOI), external: true },
-    { label: 'W3C Community Group', href: 'https://www.w3.org/community/sstim/', external: true },
-    { label: 'Governance & charter', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CONTRIBUTING.md#8-governance', external: true },
-    { label: 'HED / BIDS interoperability', href: 'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ecosystem/HED_BIDS_INTEROP.md', external: true },
+    { label: 'W3C Community Group', href: W3C_GROUP_URL, external: true },
+    { label: 'Governance & charter', href: ghBlob('CONTRIBUTING.md#8-governance'), external: true },
+    { label: 'HED / BIDS interoperability', href: ghBlob('docs/ecosystem/HED_BIDS_INTEROP.md'), external: true },
+    { label: 'Ecosystem working plan', href: ghBlob('docs/ecosystem/ECOSYSTEM_INTEGRATION.md'), external: true },
+    // The page above describes BioSynCare in a card of its own; until now it
+    // was the only one of the four layers a reader could not go and look at.
+    { label: 'BioSynCare (commercial app)', href: BIOSYNCARE_URL, external: true },
   ]
 </script>
 
@@ -221,7 +233,7 @@
     <p class="scope-note">
       The work is non-clinical. It supports exploration and authoring of sensory experiences;
       it does not diagnose, treat, cure, or prevent any condition, and it makes no claim of
-      clinical efficacy. See <a href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SCOPE.md" rel="external">Scope</a>.
+      clinical efficacy. See <a href={ghBlob('docs/concept/SCOPE.md')} rel="external">Scope</a>.
     </p>
   </header>
 
@@ -285,8 +297,8 @@
     <p class="more-screens">
       Two more reference surfaces open from the <strong>+</strong> menu in the top bar: your
       optional account <strong>Profile</strong> (private, sign-in based), and the generated
-      <a href="/ontology/docs/" rel="external">Ontology docs</a> and
-      <a href="/ontology/docs/vocab/" rel="external">Vocabulary docs</a>.
+      <a href={ONTOLOGY_DOCS_URL} rel="external">Ontology docs</a> and
+      <a href={VOCAB_DOCS_URL} rel="external">Vocabulary docs</a>.
     </p>
   </section>
 
@@ -312,7 +324,7 @@
     </p>
     <p class="section-intro">
       Community coordination happens in the
-      <a href="https://www.w3.org/community/sstim/" rel="external">Sensory Stimulation
+      <a href={W3C_GROUP_URL} rel="external">Sensory Stimulation
       Vocabulary Community Group</a> at the W3C — an open group, proposed and chaired by
       Renato Fabbri, for aligning sensory-stimulation vocabulary and interoperability work
       across projects. Anyone can join and participate.

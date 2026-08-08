@@ -1,8 +1,35 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
 
+// GitHub Pages resolves `/dir/` to `/dir/index.html`; the dev server does not,
+// so a static directory index is reachable in production and 404s locally. That
+// is how `/ontology/docs/` — the WIDOCO reference, linked from the entrance, the
+// About page and the top-bar menu — stayed broken under `make dev` even after a
+// placeholder was added for exactly this reason. Dev only: the production build
+// is served by the real host and never sees this.
+const staticDirectoryIndex = {
+  name: 'bsc-static-directory-index',
+  apply: 'serve',
+  // `pre`, and first in the array: plugin middlewares are installed in plugin
+  // order, and SvelteKit's own 404 answers the request before any middleware
+  // registered after it can rewrite the URL.
+  enforce: 'pre',
+  configureServer(server) {
+    server.middlewares.use((req, _res, next) => {
+      const [path, query = ''] = (req.url ?? '').split('?')
+      if (path.endsWith('/') && existsSync(join('static', path, 'index.html'))) {
+        req.url = `${path}index.html${query && `?${query}`}`
+      }
+      next()
+    })
+  },
+}
+
 export default defineConfig({
-  plugins: [sveltekit()],
+  plugins: [staticDirectoryIndex, sveltekit()],
 
   // Vite loads `.env` from the project root in every mode, so unsetting
   // VITE_FIREBASE_* in the shell is not enough to produce a genuinely

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>SSTIM vocabulary documentation — generated at deploy time</title>
+    <style>
+      body {
+        max-width: 44rem;
+        margin: 4rem auto;
+        padding: 0 1.25rem;
+        font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: #24211c;
+        background: #f7f3ea;
+      }
+      h1 { font-size: 1.4rem; line-height: 1.25; }
+      code { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.92em; }
+      pre { overflow-x: auto; }
+      a { color: #0a5c8a; }
+      @media (prefers-color-scheme: dark) {
+        body { color: #e8e3d8; background: #16150f; }
+        a { color: #7cc0e8; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SSTIM vocabulary documentation is generated at deploy time</h1>
+    <p>
+      The SKOS concept schemes are documented by pyLODE (<code>vocpub</code> profile) in the
+      Pages workflow, into the deployed artifact only — WIDOCO, which produces
+      <a href="/ontology/docs/">the OWL reference</a>, is OWL-centric and does not cover
+      them. Neither is committed (ADR 0023), so this placeholder stands in during local
+      development and deployment overwrites it.
+    </p>
+    <pre><code>npm run build
+make vocab-docs VOCAB_DOCS_DIR=dist/ontology/docs/vocab
+npm run preview -- --host 127.0.0.1 --port 4174</code></pre>
+    <p>
+      Published at
+      <a href="https://labiosyncare.github.io/ontology/docs/vocab/"
+        >labiosyncare.github.io/ontology/docs/vocab/</a
+      >. The vocabulary Turtle is served here as a static asset, and every concept is
+      browsable in the <a href="/graph/">knowledge browser</a>.
+    </p>
+  </body>
+</html>

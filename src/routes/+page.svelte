@@ -7,10 +7,20 @@
   // General homepage citation points at the concept DOI (all versions), not a
   // pinned release — see src/ui/entrance/releaseMetadata.js.
   import { CONCEPT_DOI, doiUrl } from '../ui/entrance/releaseMetadata.js'
+  import {
+    BIOSYNCARE_URL,
+    GITHUB_URL,
+    ONTOLOGY_DOCS_URL,
+    W3C_GROUP_URL,
+    ghBlob,
+  } from '../ui/externalLinks.js'
 
-  const GH = 'https://github.com/laBioSynCare/laBioSynCare.github.io'
-  const GH_BLOB = GH + '/blob/main/'
-  const W3C_GROUP_URL = 'https://www.w3.org/community/sstim/'
+  // The hero copy is also the share copy — one string, so a reworded headline
+  // cannot leave the social preview quoting the old one.
+  const SHARE_TITLE = 'Sensory stimulation, made open and reproducible'
+  const SHARE_DESCRIPTION =
+    'An open knowledge graph, an executable lab, and a community for designing ' +
+    'and describing auditory, visual, and cross-modal stimulation.'
 
   // Display order decided 2026-07-13: Understand leads (PUBLIC_ENTRANCE.md).
   // Join/Contribute live once, inline in door ④ — not repeated in a hero or
@@ -21,12 +31,20 @@
       id: 'door-understand',
       eyebrow: 'Understand',
       title: 'Explore and reproduce the science.',
-      copy: 'Browse the SSTIM ontology, query it with SPARQL, and encode a protocol across BIDS/HED.',
+      // No BIDS/HED clause: that profile is a design target, not an exporter
+      // anyone can run here (HED_BIDS_INTEROP.md says so in its own status
+      // line), and this door was the one place promising it as a capability.
+      copy: 'Browse the SSTIM ontology, follow the evidence behind a claim, and query it all with SPARQL.',
       primary: [
         { label: 'Explore the ontology', href: '/graph/' },
         { label: 'Query with SPARQL', href: '/sparql/' },
       ],
+      // The generated OWL/SKOS reference is what a standards or ontology peer
+      // reads before the graph, and it was reachable only from the top-bar
+      // "+" menu and About. It exists in the deployed artifact only, so it
+      // needs rel="external" to stay out of the prerender crawler's way.
       secondary: [
+        { label: 'Read the reference docs', href: ONTOLOGY_DOCS_URL, external: true },
         { label: 'Cite SSTIM', action: 'cite' },
       ],
     },
@@ -45,14 +63,17 @@
       id: 'door-build',
       eyebrow: 'Build',
       title: 'Deploy and extend the open platform.',
-      copy: 'Run BSC Lab locally today, or host it yourself: one bit-reproducible package deploys as a NixOS service, a container, or plain static files, and is configured at deployment rather than at build. Your data exports and migrates between instances with no account.',
+      // One sentence, like the other three: the paragraph this replaced was
+      // three times the length of its neighbours and broke the grid's rhythm.
+      // The configured-at-deployment detail is the linked document's job.
+      copy: 'One bit-reproducible package runs as a NixOS service, a container, or plain static files — and your data migrates between instances with no account.',
       primary: [
-        { label: 'Deployment and portability', href: GH_BLOB + 'docs/technical/PORTABLE_DEPLOYMENT.md', external: true },
-        { label: 'Run it locally', href: GH + '#readme', external: true },
+        { label: 'Deployment and portability', href: ghBlob('docs/technical/PORTABLE_DEPLOYMENT.md'), external: true },
+        { label: 'Run it locally', href: GITHUB_URL + '#readme', external: true },
       ],
       secondary: [
-        { label: 'Read the architecture', href: GH_BLOB + 'src/README.md', external: true },
-        { label: 'The four audio engines', href: GH_BLOB + 'src/engines/README.md', external: true },
+        { label: 'Read the architecture', href: ghBlob('src/README.md'), external: true },
+        { label: 'The four audio engines', href: ghBlob('src/engines/README.md'), external: true },
       ],
     },
     {
@@ -64,8 +85,14 @@
         { label: 'Join the W3C group', href: W3C_GROUP_URL, external: true },
         { label: 'Contribute a protocol', action: 'contribute' },
       ],
+      // The consortium invitation is the ask; the integration plan is the
+      // working state behind it — five open workstreams, named targets, and
+      // the milestone they serve, which is the honest answer to "what would I
+      // be joining?". It is a living tracker, not a brochure: labelled
+      // "working plan" so nobody reads its outreach notes as commitments.
       secondary: [
-        { label: 'Partner / consortium', href: GH_BLOB + 'docs/ecosystem/CONSORTIUM_INVITATION.md', external: true },
+        { label: 'Partner / consortium', href: ghBlob('docs/ecosystem/CONSORTIUM_INVITATION.md'), external: true },
+        { label: 'Ecosystem working plan', href: ghBlob('docs/ecosystem/ECOSYSTEM_INTEGRATION.md'), external: true },
       ],
     },
   ]
@@ -97,19 +124,33 @@
 
 <svelte:head>
   <title>BSC Lab · Sensory stimulation, made open and reproducible</title>
-  <meta
-    name="description"
-    content="An open knowledge graph, an executable lab, and a community for designing and describing auditory, visual, and cross-modal stimulation."
-  />
+  <!-- No `name="description"` here: svelte:head appends rather than replaces,
+       so this page used to emit two conflicting description tags with the
+       shell's weaker one first. app.html now carries SHARE_DESCRIPTION as the
+       site-wide fallback and this page inherits it — keep the two in sync.
+
+       A shared link previewed off that shell text, which is the one place it
+       costs us the visitor. No og:url and no og:image: both must be absolute,
+       and this artifact is deployed by other operators under their own origin
+       (PORTABLE_DEPLOYMENT §1.6d), so a hardcoded labiosyncare.github.io would
+       be wrong on every self-hosted instance, and a crawler never runs the
+       script that could read the origin back. Title and description are
+       origin-independent and carry the summary card on their own. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="BSC Lab" />
+  <meta property="og:title" content={SHARE_TITLE} />
+  <meta property="og:description" content={SHARE_DESCRIPTION} />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content={SHARE_TITLE} />
+  <meta name="twitter:description" content={SHARE_DESCRIPTION} />
 </svelte:head>
 
 <main class="entrance">
   <header class="hero" id="hero" bind:this={heroEl}>
-    <h1>Sensory stimulation, made open and reproducible.</h1>
-    <p class="subhead">
-      An open knowledge graph, an executable lab, and a community for designing
-      and describing auditory, visual, and cross-modal stimulation.
-    </p>
+    <!-- The full stop lives here, not in SHARE_TITLE: the hero reads as a
+         sentence, the <title> and og:title as labels. -->
+    <h1>{SHARE_TITLE}.</h1>
+    <p class="subhead">{SHARE_DESCRIPTION}</p>
   </header>
 
   <section class="doors" aria-label="Choose your path">
@@ -129,7 +170,11 @@
         </p>
         <p class="door-secondary">
           {#each door.secondary as action, i}
-            {#if i > 0}<span aria-hidden="true"> · </span>{/if}
+            <!-- The separator's own spaces cannot be trusted: Svelte trims the
+                 whitespace inside this span, so the middot rendered flush
+                 against the preceding link ("Browse presets· Cite SSTIM") on
+                 every door with two secondary links. The gap is CSS. -->
+            {#if i > 0}<span class="sep" aria-hidden="true">·</span>{/if}
             {#if action.action === 'cite'}
               <button type="button" class="link-like" onclick={() => citeOpen = true}>{action.label}</button>
             {:else}
@@ -147,11 +192,23 @@
       stimulation and sensory neurotechnology.
     </p>
     <p class="footer-links">
-      <a href="https://w3id.org/sstim" rel="external">w3id.org/sstim</a>
+      <!-- Qualified like its DOI neighbour, because it is an identifier rather
+           than a destination: w3id.org/sstim answers a browser with this very
+           page by design (pinned in scripts/w3id-negotiation.test.mjs — someone
+           typing the namespace IRI cold wants the project), so the label has to
+           say what the reader is being handed. Door ② carries the human
+           destination for the namespace, the generated reference docs. -->
+      <a href="https://w3id.org/sstim" rel="external">Namespace w3id.org/sstim</a>
       <span aria-hidden="true"> · </span>
       <a href={doiUrl(CONCEPT_DOI)} rel="external">DOI {CONCEPT_DOI}</a>
       <span aria-hidden="true"> · </span>
-      <a href={GH} rel="external">GitHub</a>
+      <a href={GITHUB_URL} rel="external">GitHub</a>
+      <span aria-hidden="true"> · </span>
+      <!-- The separate commercial application, named as such: an unqualified
+           "BioSynCare" in the footer of the open platform is exactly the
+           conflation CLAUDE.md §11 exists to prevent. About explains the
+           relationship in full, one link along. -->
+      <a href={BIOSYNCARE_URL} rel="external">BioSynCare (commercial app)</a>
       <span aria-hidden="true"> · </span>
       <a href="/about/">About</a>
     </p>
@@ -253,6 +310,10 @@
     line-height: 1.5;
     margin: 0;
     color: var(--app-muted);
+  }
+
+  .door-secondary .sep {
+    margin: 0 0.15rem 0 0.3rem;
   }
 
   .door-secondary .link-like {

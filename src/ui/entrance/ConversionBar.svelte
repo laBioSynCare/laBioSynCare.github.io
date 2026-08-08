@@ -1,11 +1,14 @@
 <script>
-  // The two social-conversion actions. Live inline in door ④ ("Join &
-  // partner") as their canonical spot; this component is otherwise only
-  // used as the mobile sticky bar once the hero has scrolled away — see
+  // The two social-conversion actions. Their canonical spot is door ④ ("Join
+  // & partner"), which renders them itself from the entrance's own door data —
+  // this component is *only* the mobile sticky bar shown once the hero has
+  // scrolled away, and `variant="sticky"` is its single call site. (The
+  // comment here used to say it was the door's implementation too, which it
+  // stopped being when the duplicated hero/footer bars were cut.) See
   // PUBLIC_ENTRANCE.md.
-  const { variant = 'sticky', onContribute } = $props()
+  import { W3C_GROUP_URL } from '../externalLinks.js'
 
-  const W3C_GROUP_URL = 'https://www.w3.org/community/sstim/'
+  const { variant = 'sticky', onContribute } = $props()
 </script>
 
 <div class="conversion-bar {variant}">

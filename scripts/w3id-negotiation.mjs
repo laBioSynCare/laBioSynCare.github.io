@@ -71,7 +71,11 @@ export function resolveRoute(path, accept, rules) {
     if (target === '-') return { status: Number(status ?? 200), location: null }
     return {
       status: Number(status ?? 200),
-      location: target.replace(/\$1/g, match[1] ?? ''),
+      // $1..$9, not $1 alone: the ecosystem deep links carry both the record
+      // kind and its local name into a graph-browser hash, and a model that
+      // silently left `$2` literal would have "passed" while every person and
+      // organization IRI resolved to a broken fragment.
+      location: target.replace(/\$([1-9])/g, (_, n) => match[Number(n)] ?? ''),
     }
   }
   return { status: 404, location: null }

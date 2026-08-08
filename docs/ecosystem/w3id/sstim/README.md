@@ -130,9 +130,18 @@ Audited static catalog routes send RDF clients to the owning Turtle instance
 file. General live ecosystem namespace rules send RDF clients to the mutable,
 live-only `current.ttl` projection. Current synthetic contract subjects reserve
 a `synthetic-*` slug rejected by those rules and are available only through the
-direct fixture artifact; there are no fixture-specific routes. HTML requests
-reach the project landing page for static catalog and live ecosystem
-identifiers. The frozen SSTIM `0.12.0` snapshot remains unchanged.
+direct fixture artifact; there are no fixture-specific routes. HTML requests for
+a static catalog or live ecosystem identifier reach **that entity's node in the
+knowledge browser** — `/graph/#{prefix}:{local}` — not the project landing page:
+an identifier that answers a browser with a landing page tells the reader
+nothing about the thing they asked for. Module and profile identifiers instead
+reach their generated reference documentation, and the bare namespace reaches
+the project entrance, which is what someone typing `w3id.org/sstim` cold is
+asking for. All three behaviours are pinned in
+[`scripts/w3id-negotiation.test.mjs`](../../../../scripts/w3id-negotiation.test.mjs),
+which models the rules the way Apache resolves them — the deep links were merged
+once (upstream #6393) and lost to a later full-file rewrite because nothing
+asserted them. The frozen SSTIM `0.12.0` snapshot remains unchanged.
 
 Dataset membership belongs to the live RDF projection, not the registry
 configuration. Adding, correcting, or retracting a record therefore does not

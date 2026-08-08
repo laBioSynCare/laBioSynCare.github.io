@@ -92,14 +92,28 @@ place. The eyebrow labels were also cut to a single word each (`UNDERSTAND`,
 ### ② Understand & reproduce it
 - **For:** researchers and standards/ontology peers.
 - **Headline:** *Explore and reproduce the science.*
-- **Subcopy:** *Browse the SSTIM ontology, query it with SPARQL, and encode a
-  protocol across BIDS/HED.*
+- **Subcopy:** *Browse the SSTIM ontology, follow the evidence behind a claim,
+  and query it all with SPARQL.*
+  (**Revised 2026-08-07:** the earlier subcopy ended "…and encode a protocol
+  across BIDS/HED", which promised a capability that does not exist.
+  [`../ecosystem/HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) opens
+  with *"revised design target, not as-built … no current BSC Lab exporter
+  should be described as implementing this profile"* — and this door was the
+  only place in the repository describing it as one. The replacement clause
+  names something a visitor can actually do: **Evidence & claims** is a
+  browsable scope in `/graph`, with assessment claims, tiers and modality
+  tags. The About page still links the interoperability document as the
+  design record it is.)
 - **Primary CTA:** **Explore the ontology** → `/graph` · **Query with SPARQL** → `/sparql`
-- **Secondary:** *Cite SSTIM* → opens `CiteSstimModal` (see below), not a
-  direct link to the namespace IRI. (Cut 2026-07-18: the HED/BIDS
-  interoperability profile link — already named in the subcopy, and
-  reachable from `/graph` and the About page; keeping one secondary link per
-  door instead of two was the point.)
+- **Secondary:** *Read the reference docs* → `/ontology/docs/` · *Cite SSTIM* →
+  opens `CiteSstimModal` (see below), not a direct link to the namespace IRI.
+  (**Revised 2026-08-07:** the generated WIDOCO/pyLODE reference was reachable
+  only from the top bar's `+` menu and from About, yet it is the first thing
+  this door's own audience — standards and ontology peers — goes looking for.
+  It earns the second slot the 2026-07-18 pass reserved. It exists in the
+  deployed artifact only, never in the tree, so the link carries
+  `rel="external"` to keep the prerender crawler off it, exactly as
+  `AppTopBar` does. Still cut: a HED/BIDS link, for the reason above.)
 
 ### Cite SSTIM — modal, not a bare namespace link
 
@@ -107,23 +121,42 @@ place. The eyebrow labels were also cut to a single word each (`UNDERSTAND`,
 machine-facing namespace IRI, useless to a human trying to write a
 bibliography entry. Flagged on review 2026-07-18. It now opens
 `src/ui/entrance/CiteSstimModal.svelte`: the plain citation and BibTeX form
-(from `CITATION.cff`, each with a one-click copy), the version DOI
-(`10.5281/zenodo.21380171`, v0.7.0 — the one to actually cite) versus the
-concept DOI (`10.5281/zenodo.21286974`, for referring to SSTIM across
-releases — README's "Citation And License" section explains the
-distinction), the stable namespace IRI, and a link to that same README
-section for the Apache-2.0 (software) / CC BY 4.0 (ontology) license split.
-The footer's separate `w3id.org/sstim` link is unchanged — that one's for
-someone who wants the actual namespace resource, a different need from
-"how do I cite this."
+(from `CITATION.cff`, each with a one-click copy), the **version DOI** — the one
+to actually cite — versus the **concept DOI**, for referring to SSTIM across
+releases (README's "Citation And License" section explains the distinction),
+the stable namespace IRI, and a link to that same README section for the
+Apache-2.0 (software) / CC BY 4.0 (ontology) license split.
+
+Every identifier in that modal comes from `src/ui/entrance/releaseMetadata.js`
+and **none is written here**. This paragraph used to name the version DOI and
+release inline, and went two releases stale doing it — the same drift, in the
+same words, that the module was created to end. `make truth-audit` now audits
+this file too.
+
+The footer's separate namespace link is a different need from "how do I cite
+this": it is the identifier, not a destination — see the footer note under
+"Decisions & open questions".
 
 ### ③ Build on it
 - **For:** implementers / developers.
-- **Headline:** *Build on the open platform.*
-- **Subcopy:** *Run BSC Lab locally and extend the audio engines or RDF
-  pipeline.*
-- **Primary CTA:** **Read the architecture** → [`../../src/README.md`](../../src/README.md) · **Run it locally** → repo README
-- **Secondary:** *The four audio engines* → [`../../src/engines/README.md`](../../src/engines/README.md)
+- **Headline:** *Deploy and extend the open platform.*
+- **Subcopy:** *One bit-reproducible package runs as a NixOS service, a
+  container, or plain static files — and your data migrates between instances
+  with no account.*
+- **Primary CTA:** **Deployment and portability** →
+  [`PORTABLE_DEPLOYMENT.md`](PORTABLE_DEPLOYMENT.md) · **Run it locally** → repo README
+- **Secondary:** *Read the architecture* → [`../../src/README.md`](../../src/README.md) ·
+  *The four audio engines* → [`../../src/engines/README.md`](../../src/engines/README.md)
+
+  (**Revised 2026-07-31**, recorded here 2026-08-07: the door was rewritten
+  when G1–G3, G6 and G9 closed — self-hosting became the interesting claim, so
+  the headline gained *deploy* and the architecture link moved down to make
+  room for the portability document. Every clause is backed by a command in
+  `PORTABLE_DEPLOYMENT.md` §0: `nix build --rebuild`, `nix flake check`,
+  `nix build .#oci`, `make migrate-test`. **Shortened 2026-08-07:** the
+  rewrite had grown to three sentences, roughly triple its neighbours, which
+  broke the four-card rhythm the 2026-07-18 pass had established. The
+  configured-at-deployment detail it carried is the linked document's job.)
 
 ### ④ Join & partner
 - **For:** standards peers, institutions/funders/policy, and contributors.
@@ -133,10 +166,17 @@ someone who wants the actual namespace resource, a different need from
 - **Primary CTA:** **Join the W3C group** (external W3C page) · **Contribute a
   protocol** → opens `ContributeProtocolModal` (see below), *not* a direct
   link to `CONTRIBUTING.md`.
-- **Secondary:** *Partner / consortium* → [`../ecosystem/CONSORTIUM_INVITATION.md`](../ecosystem/CONSORTIUM_INVITATION.md).
-  (Cut 2026-07-18: the Governance & charter link — one secondary link per
-  door; charter is reachable from the modal's "read the full contribution
-  guide" and from `/about`.)
+- **Secondary:** *Partner / consortium* → [`../ecosystem/CONSORTIUM_INVITATION.md`](../ecosystem/CONSORTIUM_INVITATION.md)
+  · *Ecosystem working plan* → [`../ecosystem/ECOSYSTEM_INTEGRATION.md`](../ecosystem/ECOSYSTEM_INTEGRATION.md).
+  (Still cut 2026-07-18: the Governance & charter link — charter is reachable
+  from the modal's "read the full contribution guide" and from `/about`.)
+  (**Added 2026-08-08:** the integration plan. The invitation is the ask; the
+  plan is the working state behind it — five open workstreams, named outreach
+  targets, and the single milestone they serve — which is the honest answer to
+  "what would I be joining?" for the institution/funder persona. It is a
+  living tracker, so the label says **working plan**: nobody should read its
+  outreach notes as commitments. It is also linked from About's
+  Links & licensing list, next to the other ecosystem documents.)
 
 ### Contribute a protocol — modal, not a raw file link
 
@@ -181,20 +221,20 @@ Pico.css `<article>` elements in a two-column CSS grid.
 │ │ ② Understand                 │ │ ① Experience                 │  │
 │ │ Explore and reproduce the    │ │ Try a session.               │  │
 │ │ science. (subcopy)           │ │ (subcopy)                    │  │
-│ │ [Explore the ontology]       │ │ [Try the Sensory Field]      │  │
-│ │ [Query with SPARQL]          │ │ Browse presets · Studio      │  │
-│ │ Cite SSTIM                   │ │                              │  │
+│ │ [Explore the ontology]       │ │ [Open Patch Studio]          │  │
+│ │ [Query with SPARQL]          │ │ Sensory Field · Presets      │  │
+│ │ Reference docs · Cite SSTIM  │ │                              │  │
 │ └──────────────────────────────┘ └──────────────────────────────┘  │
 │ ┌──────────────────────────────┐ ┌──────────────────────────────┐  │
 │ │ ③ Build                      │ │ ④ Join                       │  │
-│ │ Build on the open platform.  │ │ Join the community.          │  │
-│ │ (subcopy)                    │ │ (subcopy)                    │  │
-│ │ [Read the architecture]      │ │ [Join the W3C group]         │  │
+│ │ Deploy and extend the open   │ │ Join the community.          │  │
+│ │ platform. (subcopy)          │ │ (subcopy)                    │  │
+│ │ [Deployment and portability] │ │ [Join the W3C group]         │  │
 │ │ [Run it locally]             │ │ [Contribute a protocol]      │  │ ← opens modal
-│ │ Four audio engines           │ │ Consortium                   │  │
+│ │ Architecture · Audio engines │ │ Consortium · Ecosystem plan  │  │
 │ └──────────────────────────────┘ └──────────────────────────────┘  │
 ├────────────────────────────────────────────────────────────────────┤
-│ footer: institutional one-liner · w3id + DOI · GitHub · About      │
+│ footer: one-liner · Namespace + DOI · GitHub · BioSynCare · About  │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -284,6 +324,62 @@ above for why they're no longer also duplicated in a hero/footer bar.
   clause; About covers it (see "Hero" above).
 - **Door ① primary CTA — REVISED 2026-07-18:** Patch Studio, not Sensory
   Field (see door ① above).
+- **Door ② subcopy — CORRECTED 2026-08-07:** dropped the BIDS/HED encoding
+  claim, which described an unbuilt exporter; added the generated reference
+  docs as door ②'s second secondary link (see door ② above).
+- **Door ③ — SHORTENED 2026-08-07:** back to one sentence, like its three
+  neighbours (see door ③ above).
+- **Share preview — ADDED 2026-08-07:** the entrance emits its own
+  `og:`/`twitter:` title and description, built from the same two strings as
+  the hero, so a shared link stops previewing with `app.html`'s generic
+  shell description. **Deliberately no `og:image` or `og:url`:** both must be
+  absolute, and other operators deploy this same artifact under their own
+  origin ([`PORTABLE_DEPLOYMENT.md`](PORTABLE_DEPLOYMENT.md) §1.6d) — a
+  hardcoded `labiosyncare.github.io` would be wrong on every self-hosted
+  instance, and the origin cannot be recovered at runtime because crawlers do
+  not run the script that reads `runtime-config.json`. A `summary` card
+  carries title and description without an image.
+- **Footer — EXTENDED 2026-08-08:** the row is now *Namespace w3id.org/sstim ·
+  DOI … · GitHub · BioSynCare (commercial app) · About*.
+  - **BioSynCare** was the one layer of the four-layer model a reader could not
+    go and look at; About describes it and now links it too. The label says
+    *commercial app* because an unqualified "BioSynCare" in the open platform's
+    footer is precisely the conflation `CLAUDE.md` §11 exists to prevent. This
+    does **not** reinstate the institutional one-liner's cut BioSynCare clause
+    (see "Hero" above) — a labelled link is not a dangling subordinate clause.
+  - **Namespace** now qualifies the IRI, matching its DOI neighbour, because it
+    is an identifier and not a destination: `w3id.org/sstim` answers a browser
+    with the entrance itself, by design and by test (see below). The reader
+    who wants something to read gets door ②'s reference-docs link.
+- **The w3id round-trip — RESOLVED 2026-08-08, and it was not a page defect.**
+  The 2026-08-07 pass recorded the footer IRI as a dead end to be fixed by
+  retargeting the w3id HTML branch. It is a deliberate decision, asserted in
+  `scripts/w3id-negotiation.test.mjs`: *"a person typing w3id.org/sstim wants
+  the project, not a generated reference page."* Changing it would serve the
+  entrance's own footer at the cost of everyone arriving cold. What the audit
+  did uncover in that area was real and is fixed: **every catalog and ecosystem
+  entity IRI was answering browsers with this entrance** — `framework/bsc`, the
+  two implementations, the Patch Studio component, all seven BSC techniques, and
+  every `specialist/`, `organization/` and `ecosystem-record/` identifier.
+  Upstream #6393 had deep-linked them into `/graph/#…`; #6480 rewrote the file
+  from an older base and reverted all of it, unnoticed, because the rules were
+  never mirrored into this repository and nothing asserted them. They are
+  restored in `docs/ecosystem/w3id/sstim/.htaccess` and pinned by test; the
+  registry still serves the reverted rules until a perma-id PR syncs it.
+- **Shared link constants — 2026-08-08:** `src/ui/externalLinks.js` now owns the
+  repository URL, the W3C group URL, BioSynCare, and the two generated-doc
+  paths. The W3C URL had been typed into three files, the repository URL into
+  six. `/ontology/docs/` also gained a tracked placeholder under
+  `static/ontology/docs/` so those links explain themselves under `make dev`
+  instead of 404ing; deployment overwrites it with the generated index.
+- **Release metadata — GUARDED 2026-08-07:** the entrance footer's DOI and
+  `CiteSstimModal`'s whole citation come from
+  `src/ui/entrance/releaseMetadata.js`, which had gone two releases stale and
+  was handing visitors a superseded version DOI. `make truth-audit` now
+  derives the release identity from `void.ttl`/`sstim-core.ttl`/`CITATION.cff`
+  and compares it against that module. Its prose scan already covered
+  `+page.svelte` and always had — the numbers had simply moved somewhere it
+  did not look.
 - [ ] **Open — Sensory Field × Patch Studio relationship.** Raised on the
   2026-07-18 review: should Sensory Field be developed further as a
   standalone, simpler on-ramp instrument, or folded into Patch Studio as a

@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest'
 
 import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
+// The deep-link targets are graph-browser hashes, so the prefixes they use have
+// to be the ones the browser resolves against — assert against the real table
+// rather than restating it.
+import { PREFIXES } from '../src/rdf/namespaces.js'
 
 const rules = loadRules()
 const ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
@@ -62,6 +66,55 @@ test('the SKOS vocabulary has its own documentation page', () => {
   expect(go('vocab', 'text/turtle').doc).toBe('sstim-vocab.ttl')
   expect(go('vocab', 'application/ld+json').doc).toBe('sstim-vocab.jsonld')
   expect(go('shapes', 'text/html').doc).toBe('docs/')
+})
+
+test('an entity IRI deep-links to that entity, never to the entrance', () => {
+  // This is the test whose absence cost the work twice. perma-id/w3id.org#6393
+  // replaced these targets with per-entity graph deep links; #6480 rewrote the
+  // file from an older base and reverted every one of them, unnoticed, because
+  // nothing here described the intent. An entity IRI answering a browser with a
+  // landing page is the classic linked-data failure: the reader learns that the
+  // project exists and nothing about the thing they asked for.
+  const APP = 'https://labiosyncare.github.io/'
+  const graph = (path) => go(path, BROWSER).doc?.replace(APP + 'graph/', '')
+
+  expect(graph('framework/bsc')).toBe('#bsc-fw:')
+  expect(graph('implementation/bsclab')).toBe('#bsclab:')
+  expect(graph('implementation/biosyncare')).toBe('#biosyncare:')
+  expect(graph('implementation/bsclab/component/patch-studio'))
+    .toBe('#bsclab:component/patch-studio')
+
+  // Originated techniques → their framework node.
+  expect(graph('framework/bsc/technique/martigli-breathing-oscillation'))
+    .toBe('#bsc-fw-tech:martigli-breathing-oscillation')
+  expect(graph('framework/bsc/technique/symmetry-permutation-entrainment'))
+    .toBe('#bsc-fw-tech:symmetry-permutation-entrainment')
+  // Retired in ADR 0033 → the vendor-neutral concept that replaced each.
+  expect(graph('framework/bsc/technique/binaural-beat-stimulation')).toBe('#techBinauralBeats')
+  expect(graph('framework/bsc/technique/vibrotactile-rhythm-stimulation'))
+    .toBe('#techVibrotactileEntrainment')
+
+  // Both capture groups reach the hash: kind and local name.
+  expect(graph('specialist/renato-fabbri')).toBe('#sstim-specialist:renato-fabbri')
+  expect(graph('organization/ifsc-usp')).toBe('#sstim-organization:ifsc-usp')
+  expect(graph('ecosystem-record/role/curator-2026'))
+    .toBe('#sstim-ecosystem-record:role/curator-2026')
+
+  // Every hash prefix above must be one the browser can actually resolve.
+  for (const prefix of ['bsc-fw', 'bsc-fw-tech', 'bsclab', 'biosyncare',
+    'sstim-specialist', 'sstim-organization', 'sstim-ecosystem-record']) {
+    expect(PREFIXES, `${prefix}: is not a registered prefix`).toHaveProperty(prefix)
+  }
+
+  // RDF representations are untouched by the deep links.
+  expect(go('framework/bsc', 'text/turtle').doc).toBe('instances/frameworks/bsc.ttl')
+  expect(go('specialist/renato-fabbri', '*/*').doc)
+    .toBe('https://biosyncare-lab.web.app/current.ttl')
+
+  // The reserved fixture prefix stays outside the live routes, in both
+  // representations — a synthetic record must not resolve at all.
+  expect(go('specialist/synthetic-someone', BROWSER).status).toBe(404)
+  expect(go('specialist/synthetic-someone', 'text/turtle').status).toBe(404)
 })
 
 test('snapshot routes are exact, so unknown versions and files 404', () => {

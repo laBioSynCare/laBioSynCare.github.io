@@ -12,11 +12,11 @@
     VERSION_DOI,
     VERSION_IRI,
   } from './releaseMetadata.js'
+  import { GITHUB_URL } from '../externalLinks.js'
 
   const { open = false, onClose } = $props()
 
-  const README_CITATION_URL =
-    'https://github.com/laBioSynCare/laBioSynCare.github.io#citation-and-license'
+  const README_CITATION_URL = `${GITHUB_URL}#citation-and-license`
 
   const PLAIN_CITATION =
     `Fabbri, R. (2026). BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology ` +

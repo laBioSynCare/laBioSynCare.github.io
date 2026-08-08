@@ -4,13 +4,13 @@
   // layers). Collects a plain-language protocol idea and hands it to
   // GitHub Issues as a prefilled draft the visitor reviews before posting —
   // no backend, consistent with the static-hosting constraint (CLAUDE.md §2).
+  import { GITHUB_URL, ghBlob } from '../externalLinks.js'
+
   const { open = false, onClose } = $props()
 
-  const ISSUE_BASE = 'https://github.com/laBioSynCare/laBioSynCare.github.io/issues/new'
-  const TEMPLATE_CHOOSER =
-    'https://github.com/laBioSynCare/laBioSynCare.github.io/issues/new/choose'
-  const CONTRIBUTING_URL =
-    'https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/CONTRIBUTING.md'
+  const ISSUE_BASE = `${GITHUB_URL}/issues/new`
+  const TEMPLATE_CHOOSER = `${ISSUE_BASE}/choose`
+  const CONTRIBUTING_URL = ghBlob('CONTRIBUTING.md')
 
   let name = $state('')
   let description = $state('')

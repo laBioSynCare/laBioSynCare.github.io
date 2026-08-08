@@ -3,6 +3,7 @@
   import ProfileControl from './ProfileControl.svelte'
   import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
+  import { ONTOLOGY_DOCS_URL, VOCAB_DOCS_URL } from '../externalLinks.js'
 
   let searchInput = $state(null)
   let helpOpen = $state(false)
@@ -299,8 +300,8 @@
       <!-- Generated docs (WIDOCO for OWL core, pyLODE for the SKOS vocabulary)
            exist only in the deployed artifact; rel="external" keeps the
            prerender crawler and router away from them -->
-      <a href="/ontology/docs/" rel="external">Ontology docs</a>
-      <a href="/ontology/docs/vocab/" rel="external">Vocabulary docs</a>
+      <a href={ONTOLOGY_DOCS_URL} rel="external">Ontology docs</a>
+      <a href={VOCAB_DOCS_URL} rel="external">Vocabulary docs</a>
       <ProfileControl />
     </div>
   </details>

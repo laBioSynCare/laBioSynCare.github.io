@@ -67,6 +67,35 @@ if (!RELEASE_VERSION || !existsSync(`static/ontology/${RELEASE_VERSION}`)) {
   fail('void.ttl', `dcat:version ${RELEASE_VERSION ?? '(missing)'} has no immutable snapshot`)
 } else ok(`void.ttl immutable release (${RELEASE_VERSION})`)
 
+// The entrance and the citation modal do not read CITATION.cff at runtime —
+// they read `releaseMetadata.js`, which is where the numbers moved after the
+// footer and the modal drifted apart. The prose scan below never saw them
+// again, because it scans `+page.svelte` and the module is not prose: the file
+// written to stop the drift went two releases stale, unguarded, and handed
+// visitors a citation for a superseded version. Compare it to the derived
+// facts rather than adding it to a regex sweep.
+const releaseMeta = read('src/ui/entrance/releaseMetadata.js')
+if (releaseMeta) {
+  const field = (name) => releaseMeta.match(new RegExp(`^export const ${name} = '([^']+)'`, 'm'))?.[1]
+  const conceptDoi = core?.match(/dct:identifier\s+"([^"]+)"/)?.[1]
+  const citationDate = citation?.match(/^date-released:\s*(.+)$/m)?.[1]?.trim()
+  const expected = [
+    ['RELEASE_VERSION', field('RELEASE_VERSION'), RELEASE_VERSION, 'void.ttl'],
+    ['VERSION_DOI', field('VERSION_DOI'), DOI, 'void.ttl'],
+    ['CONCEPT_DOI', field('CONCEPT_DOI'), conceptDoi, 'sstim-core.ttl'],
+    ['RELEASE_DATE', field('RELEASE_DATE'), citationDate, 'CITATION.cff'],
+  ]
+  for (const [name, actual, want, source] of expected) {
+    if (!want) continue
+    if (actual !== want) {
+      fail('src/ui/entrance/releaseMetadata.js', `${name} is ${actual ?? '(missing)'}; ${source} says ${want}`)
+    }
+  }
+  ok('entrance release metadata matches the citable release')
+} else {
+  fail('truth-audit', 'src/ui/entrance/releaseMetadata.js is missing — the entrance citation check is stale, not the docs')
+}
+
 // Every module must carry the release version.
 for (const module of manifest.modules) {
   const file = module.source.path
@@ -83,6 +112,11 @@ ok(`all ${MODULE_COUNT} modules at ${VERSION}`)
 
 const PROSE = ['README.md', 'SECURITY.md', 'docs/technical/PORTABLE_DEPLOYMENT.md',
   'ROADMAP.md', 'TODO.md', 'src/routes/+page.svelte',
+  // The entrance's copy source of record. It described the citation modal by
+  // naming the version DOI and release inline, and was two releases stale —
+  // unwatched, because the scan covered the page it specifies but not the
+  // specification. Those identifiers now live only in releaseMetadata.js.
+  'docs/technical/PUBLIC_ENTRANCE.md',
   // The ontology docs restate release facts more than anything else in the
   // repository, and were the last place still advertising a superseded line.
   'static/ontology/README.md', 'docs/ontology/README.md',
