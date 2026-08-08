@@ -86,6 +86,14 @@ Ontology design itself is documented at
 instruments and authored patches. Images stay beside their captions in the
 gallery rather than entering the PWA's precached `static/` asset set.
 
+## `brand/` — the isotype, and how it was derived
+
+[`brand/README.md`](brand/README.md) holds the BSC Lab isotype exploration: the
+parent mark measured off its artwork, the generator that builds every candidate
+from those constants, a WCAG audit of the BSC colour system, and a link to the
+full development history. Nothing is adopted — `static/favicon.svg` and
+`static/icons/` are unchanged.
+
 ## `ecosystem/` — IP, governance, outreach
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
