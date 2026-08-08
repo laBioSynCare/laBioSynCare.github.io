@@ -4,10 +4,12 @@
   import ConversionBar from '../ui/entrance/ConversionBar.svelte'
   import ContributeProtocolModal from '../ui/entrance/ContributeProtocolModal.svelte'
   import CiteSstimModal from '../ui/entrance/CiteSstimModal.svelte'
+  import Isotype from '../ui/brand/Isotype.svelte'
   // General homepage citation points at the concept DOI (all versions), not a
   // pinned release — see src/ui/entrance/releaseMetadata.js.
   import { CONCEPT_DOI, doiUrl } from '../ui/entrance/releaseMetadata.js'
   import {
+    AETERNI_URL,
     BIOSYNCARE_URL,
     ECOSYSTEM_BRIEF_URL,
     GITHUB_URL,
@@ -56,7 +58,7 @@
       copy: 'Audio-visual sessions in your browser — no install, start gently.',
       primary: [{ label: 'Open Patch Studio', href: '/creator/' }],
       secondary: [
-        { label: 'Try the Sensory Field', href: '/creator/?starter=field' },
+        { label: 'Start from a sensory template', href: '/creator/?starter=field' },
         { label: 'Browse presets', href: '/presets/' },
       ],
     },
@@ -148,6 +150,9 @@
 
 <main class="entrance">
   <header class="hero" id="hero" bind:this={heroEl}>
+    <!-- The site's own mark, at the one place a visitor arrives. Everywhere
+         else BSC Lab is a text brand in the top bar. -->
+    <Isotype name="bsclab" size={56} title="BSC Lab" />
     <!-- The full stop lives here, not in SHARE_TITLE: the hero reads as a
          sentence, the <title> and og:title as labels. -->
     <h1>{SHARE_TITLE}.</h1>
@@ -198,8 +203,12 @@
 
   <footer class="entrance-footer">
     <p class="one-liner">
-      Open standards and reference infrastructure for responsible sensory
-      stimulation and sensory neurotechnology.
+      <Isotype name="aeterni-anima" size={21} title="Æterni Anima" />
+      <span
+        >Open standards and reference infrastructure for responsible sensory
+        stimulation and sensory neurotechnology — an
+        <a href={AETERNI_URL} rel="external">Æterni Anima</a> initiative.</span
+      >
     </p>
     <p class="footer-links">
       <!-- Qualified like its DOI neighbour, because it is an identifier rather
@@ -218,7 +227,9 @@
            "BioSynCare" in the footer of the open platform is exactly the
            conflation CLAUDE.md §11 exists to prevent. About explains the
            relationship in full, one link along. -->
-      <a href={BIOSYNCARE_URL} rel="external">BioSynCare (commercial app)</a>
+      <a class="with-mark" href={BIOSYNCARE_URL} rel="external"
+        ><Isotype name="biosyncare" size={17} />BioSynCare (commercial app)</a
+      >
       <span aria-hidden="true"> · </span>
       <a href="/about/">About</a>
     </p>
@@ -245,6 +256,10 @@
 
   .hero {
     margin-bottom: 2.25rem;
+  }
+
+  .hero :global(.isotype) {
+    margin: 0 0 0.9rem;
   }
 
   .hero h1 {
@@ -352,7 +367,16 @@
     border-top: var(--app-border-width) solid var(--app-border);
   }
 
+  /* Optical alignment: the glyph's cap sits above the first line's x-height,
+     so nudge it down rather than aligning the boxes. */
+  .one-liner :global(.isotype) {
+    margin-top: 0.12rem;
+  }
+
   .one-liner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
     font-size: 0.88rem;
     line-height: 1.6;
     max-width: 70ch;
@@ -363,6 +387,13 @@
   .footer-links {
     font-size: 0.82rem;
     margin: 0;
+  }
+
+  /* The mark rides with the link text and wraps with it. */
+  .footer-links .with-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .sticky-conversion {

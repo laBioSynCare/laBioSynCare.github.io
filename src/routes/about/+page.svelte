@@ -2,6 +2,7 @@
   // Static content page — no runes needed. The bottom-dock screens, described
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
   import { CONCEPT_DOI, doiUrl } from '../../ui/entrance/releaseMetadata.js'
+  import Isotype from '../../ui/brand/Isotype.svelte'
   import {
     BIOSYNCARE_URL,
     ECOSYSTEM_BRIEF_URL,
@@ -46,33 +47,17 @@
       what:
         'A live surface for authoring multi-sensory patches. Layer audio tracks ' +
         '(Isochronic Tone, Binaural Beat, Carrier, Noise, Drone, ambient Sample), visual ' +
-        'tracks (geometry, particles, gradients, pacers, ripples, spirals, mandalas…), and ' +
-        'a haptic Vibration track — with per-parameter modulation and photosensitivity ' +
-        'safeguards.',
+        'tracks (geometry, particles, colour fields, depth markers, stereoscopic trees, ' +
+        'abstractions, landscapes…), and a haptic Vibration track — with per-parameter ' +
+        'modulation and photosensitivity safeguards.',
       how:
-        'Add tracks from the palette and shape each parameter; many can be tempo-synced or ' +
-        'modulated. Press play to preview audio and visuals together in real time. The audio ' +
-        'engine — Vanilla Web Audio, AudioWorklet, AudioWorklet + WASM, or the sound-free ' +
-        'Silent engine — is chosen in Settings and applied on the next playback. Playback ' +
-        'always starts from a tap or click, per browser autoplay rules.',
-    },
-    {
-      href: '/field/',
-      label: 'Field',
-      role: 'Sensory Field instrument',
-      emoji: '🌗',
-      color: 'var(--app-haptic)',
-      what:
-        'A bounded visual/audio exposure instrument for prototyping sensory fields. Each ' +
-        'control is mapped to the exposure-ontology term it emits — full-screen light ' +
-        'fields, free-view stereoscopy, blink patterns — so what you shape here is ' +
-        'expressible directly in SSTIM.',
-      how:
-        'Open the Field and adjust the exposure controls; inline links show what each ' +
-        'setting means in the ontology. Alternate scenes are reachable from the + menu: ' +
-        'Stereoscopic Tree, Abstraction, and 3D Landscape. Blink rates are bounded by the ' +
-        'photosensitivity flash-rate limit, and visual stimulation honours the safety ' +
-        'toggle in Settings.',
+        'Add tracks from the palette, or open Sensory Field starters inside Studio for a ' +
+        'colour/audio field, depth markers, a tree, an abstraction, or a landscape. Shape ' +
+        'each parameter; many can be tempo-synced or modulated. Press play to preview audio ' +
+        'and visuals together. The audio engine — Vanilla Web Audio, AudioWorklet, ' +
+        'AudioWorklet + WASM, or the sound-free Silent engine — is chosen in Settings and ' +
+        'applied on the next playback. Playback always starts from a tap or click, per ' +
+        'browser autoplay rules.',
     },
     {
       href: '/presets/',
@@ -134,7 +119,7 @@
         'safety behaviour.',
       how:
         'Pick a skin (Paper, Midnight, Aurora, Ember, Daylight), select the audio engine ' +
-        'used by Patch Studio and the Field, and set the visual-stimulation safety toggle. ' +
+        'used by Patch Studio, and set the visual-stimulation safety toggle. ' +
         'Unsupported engines fall back automatically.',
     },
   ]
@@ -147,6 +132,7 @@
       name: 'Æterni Anima',
       tag: 'The organization',
       color: 'var(--app-control)',
+      mark: 'aeterni-anima',
       body:
         'The organization behind all of this — BSC Lab, the SSTIM knowledge graph it ' +
         'publishes, Patch Studio, and BioSynCare are all its responsibility. It is an ' +
@@ -168,10 +154,11 @@
       name: 'BSC Lab',
       tag: 'Open platform',
       color: 'var(--app-accent)',
+      mark: 'bsclab',
       body:
         'The open-source research and engineering platform you are using now. It holds the ' +
         'SSTIM knowledge graph and its Turtle sources, Patch Studio, and the surfaces built ' +
-        'around them — Graph, Field, Presets, SPARQL, and Logbook. Software is Apache-2.0; ' +
+        'around them — Graph, Presets, SPARQL, and Logbook. Software is Apache-2.0; ' +
         'the ontology, vocabulary, and public reference data are CC BY 4.0.',
     },
     {
@@ -191,6 +178,7 @@
       name: 'BioSynCare',
       tag: 'Commercial application',
       color: 'var(--app-haptic)',
+      mark: 'biosyncare',
       body:
         'A separate, closed-source commercial application in its own repository. It shares ' +
         'the preset JSON format and the SSTIM vocabulary with BSC Lab, but neither project ' +
@@ -254,7 +242,12 @@
       {#each layers as layer}
         <article class="layer-card" style="--card-color: {layer.color}">
           <span class="layer-tag">{layer.tag}</span>
-          <h3>{layer.name}</h3>
+          <div class="layer-head">
+            {#if layer.mark}
+              <Isotype name={layer.mark} size={38} title="{layer.name} isotype" />
+            {/if}
+            <h3>{layer.name}</h3>
+          </div>
           <p>{layer.body}</p>
         </article>
       {/each}
@@ -486,11 +479,25 @@
     margin-bottom: 0.35rem;
   }
 
+  /* The mark sits on the heading baseline row, not above it: two of the five
+     layers are products with an isotype and three are not, so the cards have to
+     stay level with or without one. */
+  .layer-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    /* Reserve the mark's height on every card, marked or not, so the five
+       headings sit on one line across the grid. Without this the two product
+       cards push their titles ~15px lower than the three that carry no mark. */
+    min-height: 38px;
+  }
+
   .layer-card h3 {
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--app-text-strong);
-    margin: 0 0 0.5rem;
+    margin: 0;
   }
 
   .layer-card p {
