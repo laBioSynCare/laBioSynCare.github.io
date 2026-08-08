@@ -28,9 +28,10 @@
 > [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
 > for everything shipped that this roadmap never listed.
 >
-> **Direction adopted 2026-08-08:** Sensory Field will become a Guided Field
-> workspace inside Patch Studio over one document and runtime, while its simple
-> identity and `/field/*` entry points remain. See
+> **Direction adopted 2026-08-08:** Sensory Field capabilities will become
+> ordinary first-class colour-field and spatial visual tracks inside Patch
+> Studio over one document, runtime, and shared visual projection stage, while
+> Field templates and `/field/*` entry points remain. See
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
 > and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md).
 
@@ -382,9 +383,10 @@ concrete rather than abstract.
       next playback, not mid-session; there is no visual engine to select)*
 - [x] Real-time designer with live audio preview — the **Patch Studio**
       (`patch-studio-model-1`); shipped ahead of schedule
-- [ ] Merge Sensory Field into Patch Studio as Guided Field over one canonical
-      model, engine, transport, clock, store, safety gate, and export boundary;
-      retain compatibility routes — see
+- [ ] Merge Sensory Field into Patch Studio as ordinary first-class colour-field
+      and spatial visual tracks over one canonical model, engine, transport,
+      clock, store, safety gate, shared visual projection stage, and export
+      boundary; retain Field templates and compatibility routes — see
       [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
 - [~] Bridge Patch Studio to semantic/delivery formats: the lossless session
       package and partial SSTIM `Preset` projection exist; real producer-adjacent
@@ -632,7 +634,7 @@ until BioSynCare reaches acquisition-relevant scale.
 | PWA / service worker | 2 | Shipped — see ADR 0009 before touching |
 | AudioWorklet stimulation engine | 2 | Shipped for patch track types; Martigli/Symmetry ports: yes |
 | Patch Studio (real-time designer) | 2 | Shipped — extend, don't rebuild |
-| Sensory Field → Guided Field merge | 2 | Build now — mandatory; follow ADR 0046 milestones |
+| Sensory Field → first-class Studio tracks/templates | 2 | Build now — mandatory; follow ADR 0046 milestones |
 | PixiJS visual engine + `IVisualEngine` | 2 | Not yet |
 | Haptic engine (`IHapticEngine`, vibrate path) | 2 | Not yet |
 | Three-clock architecture / Worker scheduler | 2 | Not yet |

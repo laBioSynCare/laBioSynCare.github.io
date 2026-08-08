@@ -76,9 +76,10 @@ behind the photosensitivity safety layer. See
 [`SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md), and
 [`PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
 
-**Integration decision made 2026-08-08.** Sensory Field becomes a Guided Field
-workspace inside Patch Studio over one model/runtime, while `/field/*` stays as
-a compatibility on-ramp. Implementation is pending; see
+**Integration decision made 2026-08-08.** Sensory Field capabilities become
+ordinary first-class colour-field and spatial visual tracks inside Patch Studio
+over one model/runtime and shared visual projection stage, while `/field/*`
+stays as a template and compatibility on-ramp. Implementation is pending; see
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
 and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md). Free-view
 depth and three richer scenes are already shipped; headset/VR and independent
@@ -647,8 +648,8 @@ The improvement backlog below is grounded in that spec's §10 and gated by
 
 **Mandatory Sensory Field integration (highest priority — ADR 0046)**
 - [x] Decide the product boundary: one canonical Studio model/runtime with
-      Guided Field and Advanced authoring views; retain `/field/*` compatibility
-      entry points —
+      ordinary first-class colour-field and spatial visual tracks, Field
+      templates/routes, and a shared visual projection stage —
       [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
       `P2`
 - [ ] Pin legacy Field fixtures and finish the `LFO`/`Permutation` rename:
@@ -658,14 +659,17 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       add enabled/inactive semantics and a general-rate sinusoidal depth control;
       implement pure, report-producing adapters for the main Field and all three
       scene families; extend fixed-point and cross-origin tests `P2`
-- [ ] Componentize Guided Field inside Studio over the same draft, engine,
-      audio clock, transport, store, and session-only safety acknowledgement `P2`
+- [ ] Add ordinary Studio inspectors and templates for the Field-derived tracks
+      over the same draft, engine, audio clock, transport, store, session-only
+      safety acknowledgement, and shared visual projection stage; do not retain
+      a parallel Field workspace or execution state `P2`
 - [ ] Derive both configuration and exposure exports from the unified delivered
       state; run real producer-adjacent SHACL validation and exhaustive loss
       accounting `P2`
 - [ ] Offer non-destructive conversion of the four `bsclab.field*` storage
-      families; cut old routes over to guided workspaces; remove duplicate Field
-      runtime/persistence only after a deprecation window `P2`
+      families; cut old routes over to Field templates or migrated patches
+      inside Studio; remove duplicate Field runtime/persistence only after a
+      deprecation window `P2`
 
 **Optional catalog compatibility (after the merge and neutrality decision gate —
 PATCH_STUDIO.md §10.1, ADR 0026)**

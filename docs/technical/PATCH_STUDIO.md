@@ -17,7 +17,8 @@
 > object is tagged `model: "patch-studio-model-1"` and is its own thing. Its
 > lossless session package and partial SSTIM RDF projection are implemented;
 > the one-way catalog JSON adapter is still future work. The adopted plan to
-> merge Sensory Field as a guided workspace is
+> absorb Sensory Field as ordinary first-class colour-field and spatial visual
+> tracks, with Field templates/routes over a shared visual projection stage, is
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 The canonical implementation is [`src/ui/creator/presetDraft.js`](../../src/ui/creator/presetDraft.js)

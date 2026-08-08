@@ -118,8 +118,11 @@ overclaiming ([ADR 0026](../docs/decisions/0026-patch-studio-catalog-bridge.md),
 
 Sensory Field currently owns a separate runtime and emits an SSTIM
 `ExposureProfile`. [ADR 0046](../docs/decisions/0046-one-studio-two-authoring-modes.md)
-adopts one Studio runtime with Guided Field and Advanced views while retaining
-configuration, exposure, and calibrated-stimulus semantics as separate products.
+adopts one Studio runtime in which Field capabilities become ordinary
+first-class colour-field and spatial visual tracks. Field templates and routes
+open the canonical patch graph and shared visual projection stage while
+configuration, exposure, and calibrated-stimulus semantics remain separate
+products.
 Implementation order is in
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
 SSTIM conformance and optional BSC catalog compatibility are deliberately split

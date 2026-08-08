@@ -51,8 +51,9 @@ instance. Both are the source for their planned JSON Schemas.
 [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md)
 (PixiJS v8 design; as-built visuals in `PATCH_STUDIO.md` §5).
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
-is the adopted plan for making Sensory Field a guided Studio workspace over one
-model and runtime.
+is the adopted plan for absorbing Sensory Field into one Studio model/runtime
+as ordinary first-class colour-field and spatial visual tracks, with Field
+templates and routes using a shared visual projection stage.
 [`AGENT_AUTOMATION_BOUNDARY.md`](technical/AGENT_AUTOMATION_BOUNDARY.md) records
 what a conversational agent-automation layer would have to respect if one were
 ever added — nothing in it is built or on the roadmap.

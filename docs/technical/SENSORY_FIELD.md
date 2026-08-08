@@ -10,8 +10,9 @@
 > (CLAUDE.md §3.5), and the photosensitivity layer in
 > [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md). That is the as-built
 > state, not the target: [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
-> adopts Guided Field as a Studio workspace over one model/runtime; the phased
-> migration is in
+> adopts its capabilities as ordinary first-class Studio tracks over one
+> model/runtime and shared visual projection stage; `/field/*` becomes a family
+> of template and compatibility entry points. The phased migration is in
 > [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 Route: `/field/` ([src/routes/field/+page.svelte](../../src/routes/field/+page.svelte)).

@@ -219,9 +219,10 @@ burying them in one. Entrance copy uses permitted wellness verbs only
 
 That architecture question is now resolved by
 [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md): Sensory Field
-becomes a named guided workspace over Patch Studio's canonical model/runtime,
-while retaining its approachable identity and `/field/*` compatibility entry
-points. Implementation remains open under
+becomes ordinary first-class colour-field and spatial visual tracks in Patch
+Studio's canonical model/runtime and shared visual projection stage, while Field
+templates and `/field/*` routes retain an approachable compatibility entrance.
+Implementation remains open under
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
 it is still an architecture task, not entrance copy work.
 

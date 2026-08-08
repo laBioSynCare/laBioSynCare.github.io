@@ -399,12 +399,14 @@ above for why they're no longer also duplicated in a hero/footer bar.
   and compares it against that module. Its prose scan already covered
   `+page.svelte` and always had — the numbers had simply moved somewhere it
   did not look.
-- [x] **Decision resolved 2026-08-08 — merge the runtime, retain the guided
-  on-ramp.** Sensory Field will become a named Guided Field workspace inside
-  Patch Studio, editing the same document and using the same engine, transport,
-  clock, store, and safety gate. The `/field/*` URLs remain compatibility entry
+- [x] **Decision resolved 2026-08-08 — merge the runtime, retain the template
+  on-ramp.** Sensory Field capabilities will become ordinary first-class
+  colour-field and spatial visual tracks inside Patch Studio, using the same
+  document, engine, transport, clock, store, safety gate, and shared visual
+  projection stage. The `/field/*` URLs remain template and compatibility entry
   points, so door ① can keep its low-commitment “start gently” path. This is not
-  yet implemented: [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
+  yet implemented:
+  [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
   owns the decision and
   [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md) owns the
   phased work.

@@ -264,8 +264,9 @@ block the Field merge or artifact-level SSTIM conformance.
    fixtures.
 2. **Stabilize the current Studio:** fix control validation/tempo sync, extract
    the runtime, and add real projection validation/loss accounting.
-3. **Merge Field into the neutral core:** one document/runtime with Guided and
-   Advanced views; preserve Field's exposure SHACL gate.
+3. **Merge Field into the neutral core:** one document/runtime with ordinary
+   first-class colour-field and spatial visual tracks, Field templates/routes,
+   and a shared visual projection stage; preserve Field's exposure SHACL gate.
 4. **Finish P1, R1, R2, and X1 on the merged model:** schemas, exhaustive
    mapping, exact profile validation, and cross-instance tests.
 5. **Run the coalition/consumer decision gate.** Gather concrete review rather

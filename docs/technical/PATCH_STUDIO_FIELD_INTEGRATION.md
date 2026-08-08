@@ -8,45 +8,49 @@
 
 ## 1. Outcome
 
-Sensory Field becomes a **guided workspace inside Patch Studio**, not a deleted
-experience and not a component embedded with its old runtime intact. Users keep
-the simple “start gently” path and the named Field scenes; the application gains
-one document, one persistence seam, one transport, one audio engine, one clock,
-one safety gate, and one export boundary.
+Sensory Field becomes a **starter-template and compatibility-entry family inside
+Patch Studio**, not a deleted experience and not a component embedded with its
+old runtime intact. Users keep the simple “start gently” path and the named Field
+scenes, but each chosen experience expands to ordinary Studio tracks. The
+application gains one document, one persistence seam, one transport, one audio
+engine, one clock, one safety gate, and one export boundary.
 
 The completed architecture is:
 
 ```text
 /creator/ ───────────────┐
 /field/* compatibility ─┴─> Studio shell
-                              ├─ Guided Field workspace
-                              └─ Advanced track workspace
-                                      │
-                                one live patch graph
-                                      │
-                   one transport + one AudioContext clock
-                                      │
-                  audio + visual renderers; haptic preview
-                                      │
-                              delivered-state snapshot
-                       ┌──────────────┼───────────────┐
-                  lossless patch   SSTIM Preset   ExposureProfile
-                  and package      projection     when applicable
+                              │
+                     template/import intent
+                              │
+                   ordinary live patch tracks
+                              │
+               one transport + one AudioContext clock
+                              │
+                  renderer/stage registry
+                              │
+       spatial sources -> shared composition/projection
+                              │
+                    delivered-state snapshot
+             ┌────────────────┼─────────────────┐
+        lossless patch     SSTIM Preset    ExposureProfile
+        and package        projection      when applicable
 ```
 
-This is a product merge only when Guided and Advanced views edit the same live
-graph and playback through the same runtime. A shared navigation bar, iframe,
-tab, or wrapper around two autonomous components does not meet the requirement.
+This is a product merge only when Field templates and legacy imports create
+normal tracks that play through the Studio runtime. A shared navigation bar,
+iframe, tab, or wrapper around two autonomous components does not meet the
+requirement.
 
 ## 2. As-built baseline
 
 | Concern | Patch Studio today | Sensory Field today | Required convergence |
 |---|---|---|---|
-| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | `/creator/` canonical; old routes deep-link to guided workspaces |
-| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | One canonical patch graph; guided metadata cannot carry execution state |
+| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | `/creator/` canonical; old routes request the corresponding starter or legacy import |
+| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | One canonical patch graph; template metadata cannot carry execution state |
 | Persistence | Local or Firestore `PatchStore` | Four `bsclab.field*` local-storage keys | One `PatchStore`; explicit, recoverable legacy conversion |
 | Playback | Engine, voice handles, transport, rAF loop in `PresetCreator.svelte` | Separate engine, handles, transport, and rAF loop in `SensoryField.svelte` | One extracted controller and one audio-clock authority |
-| Visuals | Nine composited CSS/DOM track types | Fixed colour, marker depth, and three stereoscopic scenes | First-class colour/stereo scene tracks behind a renderer registry |
+| Visuals | Nine composited CSS/DOM track types | Fixed colour, marker depth, and three stereoscopic scenes | First-class colour and spatial visual tracks; content-specific sources feed one shared Studio composition/projection stage behind a renderer registry |
 | Safety | Shared flash helpers; session-only Studio acknowledgement | Shared helpers; acknowledgement in live state but excluded from persistence | One session-only acknowledgement, never serialized or migrated |
 | Export | Lossless patch and package; partial SSTIM `Preset` projection | SHACL-tested SSTIM `ExposureProfile` | Preserve both semantic views and derive them from one delivered snapshot |
 
@@ -59,23 +63,23 @@ people to add those old oscillator types; and the Patch RDF report says
 
 ## 3. Boundary rules
 
-### 3.1 One model, two views
+### 3.1 One model, ordinary tracks
 
-Guided Field is a projection/editor of a managed track group. Advanced Studio
-can display and edit those same tracks. All values that affect execution—voice
-type, frequency, gain, visual colour, blink, stereo technique, depth, motion,
-and modulation—belong to the tracks.
+A Field starter is a pure constructor for normal Studio tracks. The basic
+starter creates a colour-field visual plus the applicable left/right audio and
+control tracks; marker, tree, abstraction, and landscape starters create
+ordinary spatial visual tracks. After insertion, there is no managed Field group
+and no separate editing contract: tracks may be renamed, duplicated, reordered,
+layered, modulated, or removed like any others.
 
-View-only metadata may contain:
-
-- the IDs that constitute the guided group;
-- conveniences such as “link ears”;
-- the selected control panel or scene template.
-
-It must not contain a second frequency, gain, colour, clock, or consent value.
-If advanced edits can no longer be represented by the guided controls, the
-guided view displays **partial/detached** and offers a deliberate repair action.
-It never rewrites the patch merely because the view opened.
+Optional origin metadata may remember which starter created a track. It is
+provenance only and must not determine playback, export eligibility, or validity.
+Conveniences such as “link ears” are explicit edit operations or template
+inputs, never a second stored frequency or gain. Merely opening a template menu
+or compatibility route must not mutate an existing patch. A starter may request
+a presentation technique, but if the current patch already has a different
+stage setting the user must explicitly keep the current presentation or apply
+the starter's setting; a track-local projector is not created as a workaround.
 
 ### 3.2 One runtime
 
@@ -85,9 +89,11 @@ features. Renderers receive time from that controller. `performance.now()` may
 remain a non-playing preview clock, but sounding or session playback uses
 `AudioContext.currentTime`.
 
-Opening Guided Field must not call `createAudioEngine()`, create an autonomous
-animation loop, or retain another set of voice handles. Switching between
-Guided and Advanced while playing must not restart or audibly alter playback.
+Loading a Field starter or legacy import must not call `createAudioEngine()`,
+create an autonomous animation loop, or retain another set of voice handles.
+Adding ordinary Field-derived tracks follows the same lifecycle as adding any
+other track; the completed merge has no special mode switch that can restart or
+reinterpret playback.
 
 Haptic tracks remain authoring/preview-only until the separately roadmapped
 `IHapticEngine` and delivery path ship. The Field merge does not silently add
@@ -101,13 +107,14 @@ The merge produces several honest views of one activity; they are not synonyms:
 |---|---|---|
 | Patch JSON / session package | Exact executable authoring state | Canonical, lossless payload |
 | SSTIM `Preset` projection | Engine configuration that the public ontology can represent | Partial until every source path is mapped or reported |
-| SSTIM `ExposureProfile` | Delivered Field-oriented media, channels, rates, capabilities, and boundaries | Derived from delivered/clamped runtime state |
+| SSTIM `ExposureProfile` | Delivered media, channels, rates, capabilities, and boundaries for the reviewed applicable track subset | Derived from delivered/clamped runtime state |
 | SSTIM `StimulusSpecification` | Engine-independent physical/perceptual output | Emit only with sufficient calibration; not implied by a gain slider |
 | Catalog-compatible JSON | Optional delivery artifact for a declared adapter and subset | Never the canonical Studio model |
 
 The existing Field exposure export is retained as a golden behavior. It must
 continue exporting the **delivered** flash rate after the safety clamp, not the
-raw authored value.
+raw authored value. Eligibility is determined from track content and delivery
+policy, never from Field-template provenance.
 
 ### 3.4 A delivered configuration, not an animation-frame sample
 
@@ -122,9 +129,10 @@ of current animation phase.
 ## 4. Field-to-patch mapping contract
 
 The adapter is directional and pure: a normalized legacy Field state becomes a
-canonical patch plus a structured mapping report. Reverse editing is a guided
-view over recognized tracks, not an assumption that every arbitrary patch can
-be squeezed into Field controls.
+canonical patch plus a structured mapping report. After conversion, the result
+is ordinary Studio content; there is no reverse synchronization with the legacy
+Field object or an assumption that every arbitrary patch can be squeezed into a
+Field template.
 
 | Field concept | Canonical representation | Important rule |
 |---|---|---|
@@ -136,17 +144,32 @@ be squeezed into Field controls.
 | Left/right noise | Two hard-panned `Noise` tracks | Preserve noise colour, filter, gain, and channel role |
 | Monaural beat | Existing tremolo contract on every enabled tone **and noise** voice | Preserve rate, depth, and mode; rate changes must update every tremolo-bearing voice |
 | Binaural beat | Frequencies on the two delivered ear tracks | A derived center/beat UI is allowed; left/right remain executable truth |
-| Marker depth | First-class stereoscopic scene track | Store view method, canonical eye pair, disparity/depth, grid, and motion |
-| Tree, abstraction, landscape | The same scene-track contract with a typed scene kind | Reuse one renderer registry; convert Tree to the shared scene renderer first |
+| Marker depth | First-class spatial visual track plus shared-stage presentation settings | Store disparity/depth, grid, and motion on the track; store technique, canonical eye order, and camera/view settings once on the stage |
+| Tree, abstraction, landscape | Content-specific spatial sources behind the common spatial-track contract | Convert Tree to the shared scene representation first; compose sources before the shared stage projects them |
 | Beat-driven depth | Explicit link to a general-rate sinusoidal control covering the Field's 0–40 Hz range | Existing breathing LFO (3–60 s) and stepped Permutation cannot reproduce it |
 | Breath-driven depth | Explicit link to the breathing-shaped LFO | No Field-only time loop or hidden driver |
-| “Link ears” and selected panel | Guided-view metadata | Convenience only; never changes output without an explicit edit |
+| “Link ears” | Template input or explicit multi-track edit operation | Convenience only; never becomes a second executable value |
+| Selected starter | Optional origin/provenance metadata | Playback and semantic export must not depend on it |
 | Flash acknowledgement | No serialized mapping | Must be renewed per session |
 
-Every nested or discrete field introduced by the scene contract must be handled
-by the portable-package accounting: mapped to SSTIM, listed as unmapped with a
-reason, or classified as non-semantic authoring metadata. Numeric-only scanning
-is insufficient.
+Spatial source configuration belongs to each track; presentation configuration
+belongs once to the shared Studio visual stage. Sources produce the neutral
+scene model, compatible layers are composed, and the stage then applies mono,
+stereo pair, anaglyph, autostereogram, or another reviewed presentation. This is
+a shared geometric projection, not the SSTIM RDF projection. It must not become
+one untyped bag of every scene family's optional fields, and the merge does not
+require artificial depth fields on the nine existing 2D track types.
+
+Multiple spatial tracks may coexist and share one camera, eye order, and output
+topology. Compatible geometry follows the normal track order, opacity, and
+blend contracts before projection; inherently full-frame presentation such as
+an autostereogram must declare and test its composition constraints rather than
+silently hiding or excluding tracks.
+
+Every nested or discrete field introduced by the spatial contract must be
+handled by portable-package accounting: mapped to SSTIM, listed as unmapped with
+a reason, or classified as non-semantic authoring metadata. Numeric-only
+scanning is insufficient.
 
 ## 5. Implementation sequence
 
@@ -160,12 +183,17 @@ is insufficient.
 - Keep capped/acknowledged blink in runtime safety fixtures, not persisted
   migration fixtures: both produce the same patch, while session consent changes
   only the delivered configuration snapshot.
-- Pin partial/detached cases: missing managed track, unsupported track inside the
-  group, broken role ID, an asymmetric edit while `linkEars` is true, and an
-  advanced modulation the guided controls cannot express. Opening Guided Field
-  must make zero mutations; repair is a separate confirmed action.
+- Pin starter-expansion cases: insertion into an empty patch, addition to an
+  existing patch, repeated insertion, independent removal/duplication/reordering
+  of generated tracks, and asymmetric edits after a linked-ear starter. Template
+  origin must have no effect on subsequent execution or export.
+- Pin a starter whose requested presentation conflicts with the patch's current
+  stage setting: Keep preserves the current stage, Apply changes it explicitly,
+  and dismissing the prompt changes nothing.
+- Pin compatibility-route behavior with an open draft: opening a route makes no
+  mutation until the user chooses Add, Replace, or Keep current patch.
 - Pin current voice specifications, exports, routes, local-storage keys, safety
-  behavior, and Guided Field copy in tests before moving code.
+  behavior, and Field starter copy in tests before moving code.
 - Fix the `LFO`/`Permutation` validation/tempo-sync keys and stale oscillator
   warning copy.
 - Fix and pin the current live-update inconsistency in which monaural tremolo is
@@ -184,17 +212,28 @@ defaults, and the intended model-version rule is recorded.
 - Extract the Studio visual conditional into a renderer/stage registry.
 - Move the Stereoscopic Tree onto the already shared `SceneStage` contract used
   by abstraction and landscape.
+- Separate content-specific spatial source generation from the shared geometric
+  view/projection stage, and give marker depth an adapter to that contract.
 - Give every playing visual renderer controller time; retain
   `performance.now()` only for explicitly non-playing previews.
-- Add controller tests before binding the Field UI.
+- Add controller tests before adding the Field starter flows.
 
 Exit gate: current Patch Studio behavior and exports are stable, and the runtime
 can be mounted by a small harness without mounting the full editor.
 
 ### Milestone 2 — extend the canonical patch graph
 
-- Add explicit colour-field and stereoscopic-scene track contracts, including
-  all discrete renderer/view configuration and modulatable numeric parameters.
+- Add explicit colour-field and first-class spatial visual-track contracts,
+  including content-specific source configuration and modulatable numeric
+  parameters, plus a separate shared stage-presentation contract.
+- Register spatial source types through the normal visual-track descriptor path;
+  they must support ordinary track creation, rename, enable, duplicate, removal,
+  ordering, blend, persistence, package, and share operations.
+- Define compatible-layer composition before projection and the constraints of
+  full-frame stage techniques, including multiple spatial tracks and
+  autostereogram output.
+- Cache deterministic scene generation by normalized source configuration; only
+  cheap view properties may be evaluated on every animation frame.
 - Add a general-rate sinusoidal control contract covering 0–40 Hz, with phase,
   waveform, and Field-equivalence tests. Do not widen/redefine the existing
   breathing LFO silently; any such change needs explicit model migration.
@@ -210,26 +249,33 @@ can be mounted by a small harness without mounting the full editor.
 Exit gate: every legacy fixture becomes a lossless executable patch for all
 behavior the old implementation actually delivered.
 
-### Milestone 3 — put Guided Field inside Studio
+### Milestone 3 — ship Field starters as ordinary Studio tracks
 
-- Componentize Field controls and scene renderers without bringing their engine
-  or persistence ownership with them.
-- Add a Studio workspace selector: **Guided Field** and **Advanced** edit the
-  identical draft.
+- Add Field starter actions to Studio's normal add flow. The basic starter
+  inserts its colour, audio, and control tracks; marker, tree, abstraction, and
+  landscape starters insert their corresponding spatial visual tracks.
+- Reuse Field control components only where they edit the same canonical track
+  fields as ordinary Studio controls; do not bring over Field engine,
+  persistence, transport, or shadow state.
 - Keep the low-commitment entrance, conservative defaults, fullscreen behavior,
   reduced-motion behavior, and photosensitivity explanation.
-- Display partial/detached state when advanced edits leave the guided subset.
-- Test every pinned partial/detached case: merely opening Guided Field is
-  read-only, and repair requires an explicit confirmation.
+- Allow every inserted track to participate independently in ordinary Studio
+  editing and mixing. Removing origin metadata or changing a source type must
+  not detach, invalidate, or silently repair other tracks.
+- Treat a starter's preferred stage presentation as an explicit suggested edit,
+  never as a hidden per-track view or an automatic override of an open patch.
+- Test starter expansion and normal lifecycle operations, including multiple
+  spatial tracks and a mixture of Field-derived and manually created tracks.
 
-Exit gate: one draft, engine, transport, audio clock, frame loop, and safety
-acknowledgement exist regardless of the active view; switching views during
-playback is behaviorally inert.
+Exit gate: starter output is indistinguishable in lifecycle and execution from
+equivalent manually created tracks, and only one draft, engine, transport, audio
+clock, frame loop, and safety acknowledgement exist.
 
 ### Milestone 4 — preserve semantic truth at cutover
 
-- Derive `ExposureProfile` from the managed Field track group and the delivered
-  snapshot; keep the existing SHACL state matrix green.
+- Derive `ExposureProfile` from the applicable ordinary tracks and the delivered
+  snapshot; keep the existing SHACL state matrix green. Template provenance must
+  neither grant nor remove export eligibility.
 - Preserve the current scope honestly: the main Field has an exposure exporter;
   tree, abstraction, and landscape currently do not. The mandatory merge does
   not fabricate profiles for them. Either label those scenes non-exportable or
@@ -254,7 +300,7 @@ passes the exact profile it declares.
 - Preserve the original records until the user confirms the converted patch;
   never auto-upload, auto-delete, overwrite an open patch, or migrate consent.
 - Make `/field/*` thin compatibility entry points that select the appropriate
-  Guided Field template or migrated draft inside Studio.
+  Field starter or migrated draft inside Studio.
 - On navigation with an open/unsaved Studio draft, preview and confirm before a
   compatibility entry point loads a template or converted state. Direct cold
   loads may select the requested template immediately.
@@ -262,7 +308,7 @@ passes the exact profile it declares.
   announce any later redirect-removal window before it starts.
 
 Exit gate: all four historic URLs work in static/offline builds, bookmarks open
-the intended guided mode, and migration is recoverable.
+the intended starter/import intent, and migration is recoverable.
 
 ### Milestone 6 — remove duplicate ownership
 
@@ -272,8 +318,8 @@ the intended guided mode, and migration is recoverable.
   neutral reusable modules.
 - Run the deprecation window before removing any legacy-state reader.
 
-The mandatory merge is complete only at this milestone—not when the workspace
-first becomes visible in Studio.
+The mandatory merge is complete only at this milestone—not when the first Field
+starter becomes visible in Studio.
 
 ## 6. Mandatory merge versus companion conformance work
 
@@ -301,8 +347,8 @@ The dependency spine is **M0 → M1 → M2 → M3 → M4/M5 → M6**. Within it:
   in parallel;
 - semantic mapping design should review M2 while the track contract is still
   cheap to change;
-- the migration UI and route wrappers can be developed against fixtures while
-  Guided Field is being componentized;
+- the migration UI, starter expansion, and route wrappers can be developed
+  against fixtures while spatial track renderers are being integrated;
 - BioSynCare catalog conversion must wait for the canonical merged model, but a
   generic adapter interface and neutral naming can be agreed earlier.
 
@@ -313,13 +359,16 @@ surface.
 ## 8. Acceptance matrix
 
 - **Runtime:** one engine, transport, audio clock, frame loop, and live draft;
-  Guided↔Advanced switching does not restart or change output.
+  loading a starter or compatibility intent creates no autonomous runtime.
 - **Audio:** migrated voice specs match type, pan, frequency, gain, noise
   colour/filter, enabled state, and tremolo across the full tone/noise and beat
   matrix. Add deterministic offline-render comparison when an engine supports
   it, without claiming cross-hardware bit identity.
 - **Visual:** colour, blink, duty, eye ordering, technique, depth, motion, and
-  every scene kind survive export/import; sounding visuals use the audio clock.
+  every spatial source survive export/import; sounding visuals use the audio
+  clock. Spatial tracks pass normal lifecycle and layering tests, including
+  multiple tracks, one shared stage authority, presentation-conflict prompts,
+  and full-frame projection modes.
 - **Safety:** the shared clamp and gate are exercised; above-threshold consent
   is per-session and absent from patch, package, migration, and cloud storage;
   consent changes the delivery snapshot, never the saved patch.
@@ -334,7 +383,7 @@ surface.
 - **Compatibility:** `/field/*` works online, offline, and in a static build;
   entering from an open draft never replaces it without confirmation.
 - **Accessibility:** keyboard controls, focus, reduced motion, visual gate, and
-  fullscreen exit remain operable in both workspaces.
+  fullscreen exit remain operable in Studio and every `/field/*` entry flow.
 
 Relevant verification commands at completion are `make test`, `make check`,
 `make session-conformance`, `make build`, `make smoke-static`, and—when
@@ -348,9 +397,10 @@ UI looks integrated.
 | Risk | Control |
 |---|---|
 | Cosmetic merge leaves two runtimes | Definition of done requires one model/transport/store |
-| Beginner experience is lost | Retain Guided Field name, defaults, controls, and route aliases |
+| Beginner experience is lost | Retain Field starters, names, conservative defaults, explanations, and route aliases |
 | Scene data vanishes from packages | Exhaustive path accounting plus fixed-point fixtures |
-| Advanced edits are silently coerced | Partial/detached guided state and deliberate repair |
+| Template identity becomes hidden execution state | Expand once to ordinary tracks; treat origin only as optional provenance |
+| Opaque spatial output hides other visual tracks | Specify and test composition for every projection mode |
 | Audio/visual timing regresses | Controller-supplied audio time for every playing renderer |
 | Consent becomes durable | Keep acknowledgement outside all serializable models |
 | Monolith grows during merge | Extract controller and renderer registry before features |

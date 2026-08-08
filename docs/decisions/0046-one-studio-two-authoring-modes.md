@@ -1,107 +1,131 @@
-# ADR 0046 — One Studio, two authoring modes, and separate semantic products
+# ADR 0046 — One Studio, first-class spatial visual tracks, and separate semantic products
 
-**Status:** Accepted — 2026-08-08 · implementation pending
+**Status:** Accepted — 2026-08-08 · revised before implementation 2026-08-08 · implementation pending
+
+> **Revision — 2026-08-08, before implementation.** The initially accepted
+> design described “Guided Field” and “Advanced Studio” as two views over a
+> managed Field track group. Before implementation began, that choice was
+> replaced by ordinary first-class spatial visual tracks, Field starter
+> templates, and one shared visual projection stage. No runtime, schema,
+> ontology release, or external conformance claim implemented the former
+> choice. Git commit `52c98d6` preserves it. The filename is retained so
+> published links stay stable.
 
 ## Context
 
 BSC Lab currently has two stimulation surfaces:
 
-- Patch Studio (`/creator/`) is the advanced, multi-track authoring surface. It
-  owns a `patch-studio-model-1` draft, a `PatchStore`, an audio engine, a
-  transport, and an animation-frame loop.
-- Sensory Field (`/field/` and its scene routes) is the guided on-ramp. It owns a
-  separate `sensory-field-model-1` state, four local-storage families, another
-  audio engine, another transport/loop, and an `ExposureProfile` exporter.
+- Patch Studio (`/creator/`) owns a `patch-studio-model-1` draft, `PatchStore`,
+  audio engine, transport, and animation loop.
+- Sensory Field (`/field/` and its scene routes) owns a separate
+  `sensory-field-model-1` state, four local-storage families, another runtime,
+  and an `ExposureProfile` exporter.
 
 [ADR 0011](0011-sensory-field-and-flash-safety.md) deliberately introduced the
-Field separately because embedding a beginner experience in the then-complex
-Studio would have compromised that on-ramp. The Field has since grown from a
-single colour-and-sound instrument into stereoscopic marker, tree, abstraction,
-and landscape scenes. Maintaining two execution stacks is now the larger risk:
-an apparent merge made only from tabs or component embedding would still leave
-two clocks, two stores, two safety acknowledgements, and divergent exports.
+Field separately to protect an approachable on-ramp. The Field has since grown
+from a colour-and-sound instrument into stereoscopic marker, tree, abstraction,
+and landscape scenes. Maintaining two stores, clocks, safety acknowledgements,
+and export paths is now the larger risk.
 
-The product decision is now to merge them. The requirement is architectural,
-not merely navigational, while the Field's approachable interaction remains
-valuable.
+The required merge is architectural, not merely navigational. Field defaults,
+scene families, branding, and compatibility routes remain valuable, but its
+stereoscopic content should behave like ordinary Studio visual tracks rather
+than belonging to a privileged workspace.
 
 ## Decision
 
-1. **Patch Studio becomes the one canonical product and execution boundary.**
-   It owns the live document, persistence seam, engine, transport, audio-clock
-   authority, frame evaluation, and session-only safety acknowledgement.
+1. **Patch Studio is the one product and execution boundary.** It owns the live
+   document, persistence, engine, transport, audio-clock authority, frame
+   evaluation, visual stage, and session-only safety acknowledgement. A route,
+   tab, or embedded component retaining a second runtime does not satisfy the
+   merge.
 
-2. **Sensory Field remains a named guided authoring mode.** “Guided Field” and
-   “Advanced Studio” edit the same live document. The guided mode manages a
-   recognizable group of tracks and exposes only the controls needed for its
-   instrument. Switching views must not copy, restart, or reinterpret the
-   stimulus.
+2. **Sensory Field becomes a starter-template and compatibility-entry family,
+   not an authoring mode.** A Field starter creates ordinary control, audio, and
+   visual tracks. Those tracks then have the same lifecycle as tracks created
+   directly in Studio. Template-origin metadata is optional provenance only and
+   cannot affect playback, export, or validity. There is no Guided/Advanced
+   switch, managed Field execution group, or partial/detached state.
 
-3. **Execution data lives in the canonical track graph.** Field colour, blink,
-   source/channel enabled state, stereo scenes, view technique, and modulation
-   need explicit track contracts; they must not be hidden in a parallel `field`
-   object. Optional
-   view metadata may remember conveniences such as linked-ear controls and the
-   IDs managed by Guided Field, but it must not change what plays. If an
-   Advanced edit breaks a guided invariant, Guided Field reports a partial or
-   detached state rather than coercing it silently.
+3. **Spatial visuals are first-class visual tracks.** Colour fields, depth
+   markers, trees, abstractions, and landscapes enter the ordinary registry as
+   explicit, content-appropriate track types. A spatial track owns its source
+   recipe and live horizontal, vertical, and depth state, including applicable
+   transforms, enabled state, motion, modulation, and content configuration.
+   Execution data may not hide in a parallel Field object or template record.
 
-4. **Migration is explicit and recoverable.** Existing Patch Studio files keep
-   importing. Existing Field local-storage records are offered for one-time
-   conversion, never uploaded or deleted automatically, and never overwrite an
-   open patch. A photosensitivity acknowledgement is not migrated or persisted.
-   The `/field/*` URLs remain compatibility entry points into the corresponding
-   guided modes for at least one deprecation window; `/creator/` is canonical.
+   Content-specific normalizers share a spatial-scene and rendering contract;
+   they do not become one untyped union of every scene family's optional fields.
+   Existing flat visuals may initially participate as overlays or zero-depth
+   planes. Converting every current visual into native 3D geometry is not a
+   prerequisite.
 
-5. **The semantic products remain distinct.** The lossless patch/session
-   package is executable truth. SSTIM `Preset` RDF describes engine
-   configuration. An `ExposureProfile` describes the delivered Field-oriented
-   exposure summary. A `StimulusSpecification` is used only when calibrated,
-   engine-independent output is actually known. The merge must not collapse
-   these layers into one misleading document.
+4. **Depth and stereoscopic presentation are separate concerns.** Tracks
+   describe what exists and where. The shared Studio stage composes compatible
+   layers and applies the selected presentation—such as mono, stereo pair,
+   anaglyph, or autostereogram—once. Eye order, camera/view parameters, and
+   output topology have one stage authority, not conflicting per-track
+   projectors. One scene track normally generates both eye views; separate
+   per-eye tracks are for genuinely independent dichoptic stimuli. Rendering
+   backends are implementation details.
 
-6. **BioSynCare compatibility is not part of the native model.** A later,
-   optional, one-way catalog adapter may target a version-pinned supported
-   subset. It is governed by
-   [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](../ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
-   and may not make BioSynCare fields or concepts requirements of Patch Studio
-   or SSTIM.
+5. **Migration is explicit and recoverable.** Legacy Field records are offered
+   for previewed, opt-in conversion to ordinary tracks. They are never uploaded,
+   deleted, or used to replace an open patch automatically. Photosensitivity
+   acknowledgement is neither serialized nor migrated. `/field/*` remains a
+   template/import entry family for at least one deprecation window;
+   `/creator/` is canonical.
+
+6. **Semantic products remain distinct.** Patch JSON and session packages are
+   lossless executable truth. SSTIM `Preset` RDF is an engine-configuration
+   projection. `ExposureProfile` is derived only for reviewed delivered-exposure
+   mappings, regardless of template provenance. `StimulusSpecification` is
+   emitted only when calibrated, engine-independent output is known. Export
+   describes deterministic delivered configuration and control laws, not the
+   animation phase at click time.
+
+7. **BioSynCare compatibility is not native-model conformance.** A later,
+   optional, version-pinned one-way catalog adapter may support a declared
+   subset under
+   [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](../ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md).
+   BioSynCare concepts do not become Patch Studio or SSTIM requirements, and an
+   adapter must reject or report unsupported spatial content rather than
+   discard it.
 
 The implementation sequence and acceptance gates are in
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 ## Alternatives considered
 
-- **Keep two products and only share visual components.** Rejected. It leaves
-  duplicate state, transport, persistence, and safety ownership, so it does not
-  satisfy the mandatory merge.
-- **Embed the current Field component inside Patch Studio.** Rejected. Both
-  components would instantiate an engine and animation loop; one visible shell
-  would conceal two runtimes.
-- **Delete the Field and expose only advanced tracks.** Rejected. The guided,
-  low-commitment on-ramp serves a different user task and can remain simple
-  without remaining a separate application.
-- **Make Field state the canonical model.** Rejected. It cannot express the
-  Studio's arbitrary track graph, modulation, tempo sync, visual mixing, or
-  haptic authoring.
-- **Shape the unified model around the BioSynCare catalog.** Rejected. That
-  audio-only delivery contract cannot represent the multimodal Studio and would
-  couple an open reference implementation to one closed product.
+- **Keep two products or embed the current Field component.** Rejected because
+  one shell would still conceal duplicate state, runtime, persistence, safety,
+  and export ownership.
+- **Maintain Guided Field as a managed-group workspace.** Rejected because it
+  adds special ownership, invariants, and repair states for ordinary tracks.
+- **Use one monolithic `StereoScene` union.** Rejected because unrelated source
+  schemas become a conditional data bag and kind changes risk data loss.
+- **Give every track its own stereoscopic projector.** Rejected because tracks
+  could disagree about eye order, camera, and depth scale, while full-frame
+  techniques require composition before projection.
+- **Retrofit every 2D track with complete 3D geometry first.** Rejected because
+  the spatial capability can be adopted incrementally.
+- **Make Field or the BioSynCare catalog the canonical model.** Rejected because
+  neither represents Studio's arbitrary multimodal track graph without loss or
+  inappropriate product coupling.
 
 ## Consequences
 
-- The merge is larger than route consolidation: shared runtime extraction and a
-  visual-track extension precede the final UI cutover.
-- Patch Studio keeps one advanced surface while gaining a reusable guided-mode
-  pattern for future instruments.
-- Field bookmarks and familiar branding can survive even after the standalone
-  runtime is removed.
-- New nested or discrete scene data expands portability tests: every serialized
-  field must be mapped to RDF, reported as unmapped, or classified explicitly as
-  non-semantic view metadata.
+- Studio remains one authoring surface; Field remains recognizable through
+  templates, defaults, names, and route aliases rather than execution ownership.
+- A descriptor-driven visual registry, normalized spatial contract, and shared
+  scene compositor/projector must precede route cutover.
+- Multiple spatial tracks may coexist. Composition rules must distinguish
+  transparent geometry, flat overlays, and opaque full-frame techniques.
+- Package and RDF mapping reports must account for every nested or discrete
+  spatial field as mapped, explicitly unmapped, or non-semantic metadata.
 - [ADR 0011](0011-sensory-field-and-flash-safety.md) is superseded only in its
-  decision to keep a separate interface/runtime. Its flash-rate gate, per-session
-  acknowledgement, exposure semantics, and conservative framing remain binding.
+  separate-interface/runtime choice. Its flash gate, per-session
+  acknowledgement, exposure semantics, and conservative framing remain active.
 
 ## See also
 
@@ -109,7 +133,6 @@ The implementation sequence and acceptance gates are in
   Studio implementation.
 - [`../technical/SENSORY_FIELD.md`](../technical/SENSORY_FIELD.md) — current
   Field and scene implementation.
-- [ADR 0026](0026-patch-studio-catalog-bridge.md) — partial, gated catalog/RDF
-  conversion.
+- [ADR 0026](0026-patch-studio-catalog-bridge.md) — gated catalog/RDF conversion.
 - [ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md)
   and [ADR 0042](0042-stimulus-specification.md) — semantic-layer boundaries.

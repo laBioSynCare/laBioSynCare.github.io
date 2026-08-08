@@ -69,20 +69,45 @@ annotations lives here.
 | [0043](0043-sstim-core-profile-and-module-boundaries.md) | SSTIM Kernel, Core, Core Plus, concern modules, and Full Profile | Accepted |
 | [0044](0044-stimulus-channel-core-ownership.md) | `StimulusChannel` ownership and profile-sensitive target domain | Accepted |
 | [0045](0045-shapeless-profiles-are-discovery-entry-points.md) | A profile with no shape closure is a discovery entry point, not a conformance target | Accepted |
-| [0046](0046-one-studio-two-authoring-modes.md) | One Studio, two authoring modes, and separate semantic products | Accepted · implementation pending |
+| [0046](0046-one-studio-two-authoring-modes.md) | One Studio, first-class spatial visual tracks, and separate semantic products | Accepted · revised before implementation 2026-08-08 |
+
+## ADR lifecycle and revision policy
+
+Git preserves earlier text; ADRs preserve decisions that affected reality. An
+ADR becomes historically fixed when its decision is implemented, released, or
+externally relied upon—not merely when its status first changes to `Accepted`.
+The aim is to keep the current decision clear without silently rewriting the
+architecture that software, RDF, releases, or collaborators already used.
+
+| Lifecycle | Revision rule |
+|---|---|
+| **Proposed** | Freely edit, rename, split, replace, or consolidate it. Keep the index and direct links current. |
+| **Accepted · implementation pending** | The maintainer may revise it in place while no code, RDF/schema contract, release, or external citation relies on the accepted choice. Keep the original acceptance date, add `revised before implementation YYYY-MM-DD`, and add a short revision note naming the former choice and why it changed. Update direct cross-links and implementation plans in the same change. If the replacement is not yet accepted, return the ADR to `Proposed`. |
+| **Implemented, released, or cited** | The decision and its rationale are historical. They may be edited for clarity, brevity, typos, links, and accurate implementation status, but an edit must not silently change the architectural choice. Add a dated note when condensation could obscure history. Record a substantive change in a new ADR, and mark the earlier record `Amended by NNNN` or `Superseded by NNNN`. |
+| **Consolidation** | Proposed or accepted-but-unimplemented records may be consolidated when the result remains one coherent decision. Keep one canonical number. A record already committed or linked becomes a short `Consolidated into NNNN` tombstone; an unpublished draft may be removed. Never reuse ADR numbers or rewrite shared Git history. Implemented, released, or cited ADRs may be summarized by later current guidance but are not consolidated away. |
+
+Status is one of `Proposed`, `Accepted`, `Deprecated`, `Consolidated into NNNN`,
+or `Superseded by NNNN`. An accepted ADR may add lifecycle detail such as
+`implementation pending`, `revised before implementation YYYY-MM-DD`,
+`implemented`, or `released in X.Y.Z`. Use `Amended by NNNN` when the original
+decision remains partly active; use `Superseded by NNNN` when it no longer does.
+
+The filename and ADR number should remain stable once another document, RDF
+resource, release, or external reader links to them. Editing an ADR never means
+amending or rebasing already shared Git commits: the new commit records the
+revision.
 
 ## Adding an ADR
 
 1. Copy the structure of an existing file.
 2. Give it the next sequential number and a short descriptive slug.
-3. Status is one of: `Proposed`, `Accepted`, `Superseded by NNNN`, `Deprecated`.
-   **Update it when reality moves.** An ADR marked `Proposed` while the code
-   ships it is worse than no record — ADR 0038 said "no implementation exists
-   yet" for seams that had shipped, and its own successor contradicted it. Where
-   implementation is partial, say which part.
-4. If an ADR supersedes a prior one, edit the prior one's status line and link
-   to the new one — never delete or rewrite past decisions.
-5. Add a row to the index. The Decision cell is the file's own H1, minus the
+3. Set and maintain status under the lifecycle policy above. Status must
+   describe reality precisely, including partial implementation. An ADR marked
+   `Proposed` while the code ships it is worse than no record.
+4. Add or update the index row. If another ADR amends, supersedes, or
+   consolidates this one, update both records and their index rows. Preserve a
+   historical row when the record has already been committed or linked.
+5. The Decision cell is the file's own H1, minus the
    `ADR NNNN —` prefix. Keep it a title: the cells here once grew to 450
    characters, which is an abstract, and an index of abstracts is not an index.
 6. If the decision affects `.ttl` classes or properties, add

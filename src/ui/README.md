@@ -3,8 +3,9 @@
 > **Status.** The shipped UI is the **knowledge browser** (graph, SPARQL,
 > annotations, presets), **Patch Studio** (`creator/`), and the currently
 > standalone **Sensory Field** (`field/`), wrapped in shared navigation, theming,
-> and the photosensitivity safety layer. Field is planned to become a guided
-> Studio workspace under
+> and the photosensitivity safety layer. Field capabilities are planned to become
+> ordinary first-class Studio tracks, starter templates, and compatibility entry
+> points over a shared visual projection stage under
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
 > The standalone
 > session `player/` and preset `browser/` components in the target design are
@@ -57,10 +58,12 @@ Studio. The as-built contract is
 [`SENSORY_FIELD.md`](../../docs/technical/SENSORY_FIELD.md).
 
 [ADR 0046](../../docs/decisions/0046-one-studio-two-authoring-modes.md) changes
-that target: retain Guided Field's controls and identity, but move them over the
-same patch graph, engine, transport, clock, store, and safety acknowledgement as
-Advanced Studio. Do not embed the current autonomous component in Studio; follow
-the extraction, adapter, migration, and route gates in the integration plan.
+that target: retain the Field scene generators, templates, and route identity,
+but represent their execution as ordinary first-class colour-field and spatial
+visual tracks in the same patch graph, engine, transport, clock, store, safety
+acknowledgement, and shared visual projection stage. Do not embed the current
+autonomous component in Studio; follow the extraction, adapter, migration, and
+route gates in the integration plan.
 
 ---
 
