@@ -426,7 +426,17 @@ MERGES['merge-e'] = merge_e
 
 
 def write_all(out):
-    named = {'parent-on-grid': parent(), 'candidate-a': candidate_a(),
+    named = {'parent-on-grid': parent(),
+             # BioSynCare's mark, redrawn on its own measured constants and set
+             # in the official Petroleum 500 rather than the #1A4E66 its raster
+             # artwork actually contains. Used on the About page and the
+             # entrance footer until an official SVG exists to replace it.
+             'biosyncare-isotype': parent(PETROL_500),
+             # aeterni-anima-isotype.svg is NOT generated here: it is the Æ
+             # ligature of Cormorant Garamond Medium (the face aeterni.github.io
+             # loads) in that site's --accent #8a6d1d, converted to an outline
+             # with fontTools so it needs no font at runtime and cannot reflow
+             # per platform. Re-extract only if the source mark changes. 'candidate-a': candidate_a(),
              'candidate-b': candidate_b(), 'candidate-c': candidate_c(),
              'candidate-a-small': candidate_a_small(),
              'bsclab-isotype': candidate_a(BLUE),

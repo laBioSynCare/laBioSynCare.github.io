@@ -69,12 +69,26 @@ If the tab icon ever needs to be crisper, `merge-e` is a drop-in replacement for
 the favicon alone, and `bsclab-isotype-small.svg` (the kite) is the more radical
 reduction.
 
+## The other two marks in the ecosystem
+
+`src/ui/brand/Isotype.svelte` renders three marks inline, for the entrance hero
+and footer and the About page's layer cards:
+
+| Mark | Source |
+|---|---|
+| `bsclab` | `marks/merge-d.svg` — the adopted isotype above |
+| `biosyncare` | `marks/biosyncare-isotype.svg` — the parent redrawn on its measured constants, in the official Petroleum 500 rather than the `#1A4E66` its raster artwork contains. **Replace with an official SVG when one is exported.** |
+| `aeterni-anima` | `marks/aeterni-anima-isotype.svg` — the Æ ligature of Cormorant Garamond Medium, the face `aeterni.github.io` loads, in that site's own `--accent` `#8a6d1d`. Converted to an outline with fontTools so it needs no webfont and cannot reflow per platform; Cormorant Garamond is OFL. |
+
+The Æ is a letterform where the other two are geometric, so the component scales
+it 1.3× to match their optical presence rather than their bounding box.
+
 ## Files
 
 ```
-gen.py         every mark, from one set of measured constants
+gen.py         every generated mark, from one set of measured constants
 contrast.py    WCAG audit of the BSC colour system as specified
-marks/         the generated SVGs
+marks/         the SVGs (aeterni-anima-isotype.svg is extracted, not generated)
 ```
 
 Regenerate with `python3 gen.py` (no dependencies). `contrast.py` prints a

@@ -23,6 +23,10 @@ export const W3C_GROUP_URL = 'https://www.w3.org/community/sstim/'
 // the institutional footer rather than inside a door.
 export const BIOSYNCARE_URL = 'https://biosyncare.com/'
 
+// The organisation responsible for BSC Lab, SSTIM, Patch Studio and BioSynCare
+// (implementations.ttl records it as the dct:contributor of all of them).
+export const AETERNI_URL = 'https://aeterni.github.io/'
+
 // Generated reference documentation — WIDOCO for the OWL core, pyLODE for the
 // SKOS vocabulary. Same-origin paths, but they exist only in the deployed
 // artifact (ADR 0023), so every link to them carries rel="external" to keep the
