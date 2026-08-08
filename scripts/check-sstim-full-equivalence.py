@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify that the modular SSTIM Full union preserves the 0.12 semantics."""
+"""Verify Full compatibility with 0.12 outside explicitly recorded migrations."""
 
 import json
 from pathlib import Path
@@ -26,8 +26,10 @@ BASELINE_FILES = (
 )
 
 SSTIM = Namespace("https://w3id.org/sstim#")
+SSTIM_V = Namespace("https://w3id.org/sstim/vocab#")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 SSTIM_EX = Namespace("https://w3id.org/sstim/exposure#")
+WD = Namespace("http://www.wikidata.org/entity/")
 OLD_CHANNEL_DEFINITION = Literal(
     "A channel within an exposure profile, such as an audio, visual, haptic, "
     "respiratory, olfactory, gustatory, or electromagnetic exposure path.",
@@ -60,6 +62,11 @@ NEW_TRACK_SCOPE_NOTE = Literal(
 VALIDATION_HARDENING_NODES = {
     Namespace("https://w3id.org/sstim/shapes#").StimulusSpecificationChannelLinkShape,
     Namespace("https://w3id.org/sstim/shapes#").StimulusSpecificationTargetLinkShape,
+}
+DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES = {
+    (SSTIM_V.techBinauralBeats, SKOS.exactMatch, WD.Q863539),
+    (SSTIM_V.techBinauralBeats, SKOS.relatedMatch, WD.Q863539),
+    (SSTIM_V.techMonauralBeats, SKOS.closeMatch, WD.Q6898437),
 }
 
 
@@ -115,6 +122,8 @@ def normalized(
             continue
         if subject in VALIDATION_HARDENING_NODES or obj in VALIDATION_HARDENING_NODES:
             continue
+        if triple in DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES:
+            continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue
         if triple == (SSTIM.Track, SKOS.scopeNote, track_scope_note):
@@ -140,7 +149,7 @@ def main() -> int:
             "Full-union equivalence: PASS "
             f"({len(old)} normalized triples; ownership, ontology metadata, and "
             "the documented ADR 0043/0044 annotation, definition, and SHACL "
-            "exceptions excluded)"
+            "exceptions plus the named 0.14 alignment migration excluded)"
         )
         return 0
 

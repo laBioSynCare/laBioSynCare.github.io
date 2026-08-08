@@ -4,7 +4,7 @@
 #
 #  Namespace:  https://w3id.org/sstim
 #  Version:    0.14.0-dev
-#  Date:       2026-08-04
+#  Date:       2026-08-08
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -48,9 +48,10 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-08-04"^^xsd:date ;
-    dct:modified "2026-08-04"^^xsd:date ;
+    dct:modified "2026-08-08"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en .
+    skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
+    skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
 
 
 ###########################################################################
@@ -94,11 +95,15 @@ sstim-v:voiceBinaural skos:relatedMatch wd:Q863539 .
 # isochronic tones: https://www.wikidata.org/wiki/Q98000061
 sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
 
-# Technique vocabulary alignments (QIDs verified against live Wikidata, 2026-06).
-# Other techniques (monaural beats, RAS, ASSR, vibroacoustic, ultrasound
-# neuromodulation, etc.) are pending Wikidata alignment — tracked in TODO.md.
+# Technique vocabulary alignments. Q863539 and Q6898437 were re-verified against
+# live Wikidata on 2026-08-08. Q6898437 is a thin item, so closeMatch is the
+# strongest defensible assertion. Q863539 also represents a perceptual phenomenon
+# and music genre, so the SSTIM stimulation technique is only related to it.
+# Other techniques (RAS, ASSR, vibroacoustic, ultrasound neuromodulation, etc.)
+# are pending Wikidata alignment — tracked in TODO.md.
 sstim-v:techIsochronicTones skos:closeMatch wd:Q98000061 .
-sstim-v:techBinauralBeats skos:exactMatch wd:Q863539 .
+sstim-v:techMonauralBeats skos:closeMatch wd:Q6898437 .
+sstim-v:techBinauralBeats skos:relatedMatch wd:Q863539 .
 
 # Multisensory integration: verified Wikidata concept Q17166073. SSTIM's term
 # is a proposed-mechanism category, so relatedMatch is intentionally weaker

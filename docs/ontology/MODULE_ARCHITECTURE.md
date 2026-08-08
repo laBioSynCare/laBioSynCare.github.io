@@ -176,13 +176,24 @@ normalized graphs must be isomorphic after excluding:
 - the `StimulusChannel` definition clarification and named optional-link SHACL
   hardening authorized by ADR 0044; and
 - the exact old and new `sstim:Track` scope-note literals for the annotation
-  erratum recorded by ADR 0043.
+  erratum recorded by ADR 0043; and
+- the three exact old/new mapping triples in the 0.14 development-line
+  Wikidata correction: the former and current Q863539 assertions for
+  `techBinauralBeats`, and the new Q6898437 assertion for
+  `techMonauralBeats`.
 
 That erratum fixes inherited prose which called `sstim:Voice` parallel to Track
 and its `sstim:AudioTrack` subsumption unresolved even though the 0.12 graph
 already asserted the subsumption and its history note recorded the decision.
 No class axiom changes: the equivalence gate excludes only those two exact
 annotation literals, not annotation properties generally.
+
+The last exclusion is not part of the 0.13 redistribution. The mutable 0.14
+line intentionally replaces one overstrong external match and adds one
+conservative match. The gate names those three triples individually and still
+requires every other normalized triple to be graph-isomorphic with the frozen
+baseline; it therefore proves compatibility outside the recorded mapping
+migration, not literal whole-graph identity for 0.14.
 
 This is **RDF graph-union compatibility**, not RDF Dataset compatibility.
 Public class, property, concept, scheme, and existing Full shape IRIs remain

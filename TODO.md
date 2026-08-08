@@ -415,7 +415,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
-- [ ] Reviewed `sstim-alignments.ttl` pass — findings from the 2026-08-01 live
+- [x] Reviewed `sstim-alignments.ttl` pass — findings from the 2026-08-01 live
       Wikidata verification `P2`
       *(1) A candidate target now exists for one of the techniques the file lists
       as pending alignment (lines 97–99): **`Monaural beats` Q6898437**, verified
@@ -433,7 +433,9 @@ publishing SSTIM into Wikidata, not contributing to it.*
       against that same item. The five bands were reasoned down from `exactMatch`
       to `closeMatch` on exactly this ground.
       All ten existing Q-ID targets re-verified valid — no redirects, merges or
-      deletions. Protected file (CLAUDE.md §3.4): needs explicit instruction.*
+      deletions. Resolved 2026-08-08 with explicit maintainer authorization:
+      Q6898437 was added via `closeMatch` and Q863539 was weakened to
+      `relatedMatch`; frozen release copies remain unchanged.*
 - [ ] Consider `skos:altLabel` coverage in `sstim-vocab.ttl` — currently **zero**
       `P2`
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.

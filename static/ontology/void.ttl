@@ -3,7 +3,7 @@
 #  SSTIM — VoID + DCAT dataset description  —  void.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Date:       2026-07-24
+#  Date:       2026-08-08
 #  License:    CC BY 4.0
 #
 #  Machine-readable dataset metadata (VoID + DCAT) for the published SSTIM
@@ -45,7 +45,7 @@
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
     dct:issued "2026-04-12"^^xsd:date ;
-    dct:modified "2026-07-31"^^xsd:date ;
+    dct:modified "2026-08-08"^^xsd:date ;
     dct:identifier "10.5281/zenodo.21286974" ;
     # RDF-01 policy resolution (2026-07-24 audit): void.ttl is the designated,
     # non-snapshotted sidecar (see this file's own header), so it is the
@@ -119,7 +119,7 @@
         <https://w3id.org/sstim/void#technique-exposure>,
         <https://w3id.org/sstim/void#vocab>,
         <https://w3id.org/sstim/void#instances> ;
-    # Primary distribution: the core OWL module in Turtle.
+    # Primary distribution: the Full namespace catalogue in Turtle.
     dcat:distribution [
         a dcat:Distribution ;
         dct:title "SSTIM namespace catalogue (Turtle)"@en ;

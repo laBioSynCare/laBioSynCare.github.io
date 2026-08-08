@@ -17,6 +17,15 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Changed
+
+- Re-audited the live Wikidata technique mappings: added a conservative
+  `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened
+  `sstim-v:techBinauralBeats` from `skos:exactMatch` to `skos:relatedMatch`
+  because Q863539 also represents a perceptual phenomenon and music genre.
+- Corrected the VoID sidecar's modification date and its description of the
+  primary Turtle distribution. No released `0.13.0` artifact was changed.
+
 ## [0.13.0] - 2026-08-04
 
 Published under version DOI `10.5281/zenodo.21792692`, with

@@ -271,7 +271,7 @@ module-boundaries:
 core-profile-contract:
 	$(PYTHON) scripts/sstim-core-profile-contract.py
 
-## Prove the modular Full union preserves the frozen 0.12 semantics
+## Prove Full preserves frozen 0.12 semantics outside recorded migrations
 full-equivalence:
 	$(PYTHON) scripts/check-sstim-full-equivalence.py
 
@@ -379,7 +379,7 @@ help:
 	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"
 	@echo "  make module-boundaries Prove unique resource sources and honest direct dependencies"
 	@echo "  make core-profile-contract Validate Core shapes, fixture, and competency queries"
-	@echo "  make full-equivalence Prove Full preserves the frozen 0.12 semantic union"
+	@echo "  make full-equivalence Prove Full compatibility outside recorded migrations"
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"

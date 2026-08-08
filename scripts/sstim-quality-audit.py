@@ -82,6 +82,14 @@ CATALOG_PUBLIC_ROUTES = {
         "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
     ),
 }
+CATALOG_HTML_ROUTES = {
+    "framework/bsc": "https://labiosyncare.github.io/graph/#bsc-fw:",
+    "implementation/bsclab": "https://labiosyncare.github.io/graph/#bsclab:",
+    "implementation/biosyncare": "https://labiosyncare.github.io/graph/#biosyncare:",
+    "implementation/bsclab/component/patch-studio": (
+        "https://labiosyncare.github.io/graph/#bsclab:component/patch-studio"
+    ),
+}
 # BSC framework technique identities (ADR 0033). The three BSC originated
 # resolve to the framework document that defines them; the four retired ones
 # resolve to the SKOS vocabulary now carrying their replacements. Audited
@@ -99,6 +107,31 @@ TECHNIQUE_PUBLIC_ROUTES = {
     "framework/bsc/technique/photic-rhythm-stimulation": VOCAB_DUMP,
     "framework/bsc/technique/audiovisual-rhythm-coordination": VOCAB_DUMP,
     "framework/bsc/technique/vibrotactile-rhythm-stimulation": VOCAB_DUMP,
+}
+TECHNIQUE_HTML_ROUTES = {
+    "framework/bsc/technique/martigli-breathing-oscillation": (
+        "https://labiosyncare.github.io/graph/"
+        "#bsc-fw-tech:martigli-breathing-oscillation"
+    ),
+    "framework/bsc/technique/martigli-binaural-hybrid": (
+        "https://labiosyncare.github.io/graph/#bsc-fw-tech:martigli-binaural-hybrid"
+    ),
+    "framework/bsc/technique/symmetry-permutation-entrainment": (
+        "https://labiosyncare.github.io/graph/"
+        "#bsc-fw-tech:symmetry-permutation-entrainment"
+    ),
+    "framework/bsc/technique/binaural-beat-stimulation": (
+        "https://labiosyncare.github.io/graph/#techBinauralBeats"
+    ),
+    "framework/bsc/technique/photic-rhythm-stimulation": (
+        "https://labiosyncare.github.io/graph/#techPhoticDriving"
+    ),
+    "framework/bsc/technique/audiovisual-rhythm-coordination": (
+        "https://labiosyncare.github.io/graph/#techAudiovisualEntrainment"
+    ),
+    "framework/bsc/technique/vibrotactile-rhythm-stimulation": (
+        "https://labiosyncare.github.io/graph/#techVibrotactileEntrainment"
+    ),
 }
 
 # Canonical Accept matching for every staged content-negotiated route. Explicit
@@ -1301,7 +1334,9 @@ else:
 
 
 def check_exact_w3id_route_block(
-    block_name: str, expected_routes: dict[str, str]
+    block_name: str,
+    expected_routes: dict[str, str],
+    expected_html_routes: dict[str, str],
 ) -> None:
     """Assert exact HTML/Turtle/406 directives for a delimited route block."""
     start = f"# BEGIN audited {block_name} routes"
@@ -1310,12 +1345,19 @@ def check_exact_w3id_route_block(
         fail(f"w3id staging: expected one delimited {block_name} route block")
         return
 
+    if tuple(expected_html_routes) != tuple(expected_routes):
+        fail(f"w3id staging: {block_name} HTML and RDF route inventories differ")
+        return
+
     block = w3id_text.split(start, 1)[1].split(end, 1)[0]
-    all_routes = "|".join(expected_routes)
-    expected_directives: list[str] = [
-        HTML_ACCEPT,
-        f"RewriteRule ^({all_routes})/?$ https://labiosyncare.github.io/ [R=303,L]",
-    ]
+    expected_directives: list[str] = []
+    for route, target in expected_html_routes.items():
+        expected_directives.extend(
+            (
+                HTML_ACCEPT,
+                f"RewriteRule ^{route}/?$ {target} [R=303,L,NE]",
+            )
+        )
     routes_by_target: dict[str, list[str]] = {}
     for route, target in expected_routes.items():
         routes_by_target.setdefault(target, []).append(route)
@@ -1336,8 +1378,12 @@ def check_exact_w3id_route_block(
         )
 
 
-check_exact_w3id_route_block("BSC catalog", CATALOG_PUBLIC_ROUTES)
-check_exact_w3id_route_block("BSC technique", TECHNIQUE_PUBLIC_ROUTES)
+check_exact_w3id_route_block(
+    "BSC catalog", CATALOG_PUBLIC_ROUTES, CATALOG_HTML_ROUTES
+)
+check_exact_w3id_route_block(
+    "BSC technique", TECHNIQUE_PUBLIC_ROUTES, TECHNIQUE_HTML_ROUTES
+)
 
 # Fixture identities deliberately use the production IRI grammar required by
 # the released SHACL contract, but synthetic-* is a reserved, non-routed slug.
@@ -1368,11 +1414,13 @@ else:
     )
     expected_live_directives = (
         HTML_ACCEPT,
-        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
-        "https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/((?!synthetic-)"
+        r"[A-Za-z0-9._~-]+)/?$ https://labiosyncare.github.io/graph/"
+        r"#sstim-$1:$2 [R=303,L,NE]",
         HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
-        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        r"((?!synthetic-)[A-Za-z0-9._~-]+)/?$ https://labiosyncare.github.io/"
+        r"graph/#sstim-ecosystem-record:$1/$2 [R=303,L,NE]",
         EMPTY_ACCEPT,
         TURTLE_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
