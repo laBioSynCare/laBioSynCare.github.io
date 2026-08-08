@@ -55,7 +55,7 @@ gate in the final column has passed.
 
 | Concern | Patch Studio at decision time | Sensory Field at decision time | Current checkpoint | Required completion |
 |---|---|---|---|---|
-| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | Every `/field/*` page is a thin redirect to `/creator/?starter=…`; visible navigation uses those canonical starter URLs | Static/offline and browser acceptance for every alias |
+| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | Studio is the only visible authoring surface; every `/field/*` page is a prerendered compatibility page that replace-navigates to `/creator/?starter=…`, and starters remain inside Studio | Static/offline and browser acceptance for every alias |
 | State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | Current `patch-studio-model-3` owns the model-2 spatial foundation plus an explicit optional depth-to-size cue; genuine models 1 and 2 import, and pure adapters retain disabled tone/noise/depth as inactive ordinary tracks | Close the remaining fidelity and lifecycle gaps |
 | Persistence | Local or Firestore `PatchStore` | Four `bsclab.field*` local-storage keys | `PatchStore` remains canonical; Studio reads all four legacy keys in memory and leaves them untouched | Complete the deprecation window before removing legacy readers/data |
 | Playback | Engine, voice handles, transport, rAF loop in `PresetCreator.svelte` | Separate engine, handles, transport, and rAF loop in `SensoryField.svelte` | Public entry points use Studio's one routed runtime; the old standalone runtime code remains, and Studio lifecycle/frame evaluation is still monolithic | One extracted controller, audio-clock authority, and delivered-state snapshot; remove duplicate legacy ownership |
@@ -403,9 +403,10 @@ passes the exact profile it declares.
 in memory, leaves originals intact, exposes the complete conversion report, and
 gates review-sensitive Add/Replace actions on acknowledgement. Add has explicit
 keep/apply-stage variants and appends live; Replace and Cancel remain distinct.
-`/field/*` routes and visible navigation now select the corresponding Studio
-starter. Production/static/offline browser coverage, all open-draft and
-accessibility cases, About/offline-cache review, and a deprecation announcement
+`/field/*` routes are prerendered compatibility pages that replace-navigate to
+the corresponding Studio starter. Field has been removed from the bottom dock and global menu;
+starters remain discoverable inside Studio. Production/static/offline browser
+coverage, all open-draft and accessibility cases, and a deprecation announcement
 remain open.
 
 - Detect `bsclab.field`, `bsclab.field.tree`, `bsclab.field.abstract`, and
@@ -417,7 +418,8 @@ remain open.
 - On navigation with an open/unsaved Studio draft, preview and confirm before a
   compatibility entry point loads a template or converted state. Direct cold
   loads may select the requested template immediately.
-- Update the entrance, navigation, About copy, offline cache/routes, and docs;
+- Keep the entrance, navigation, About copy, offline cache/routes, and docs
+  aligned around one visible Studio surface;
   announce any later redirect-removal window before it starts.
 
 Exit gate: all four historic URLs work in static/offline builds, bookmarks open

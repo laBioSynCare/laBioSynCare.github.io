@@ -288,10 +288,6 @@
       <a href="/">Home</a>
       <a href="/graph/">Graph</a>
       <a href="/creator/">Patch Studio</a>
-      <a href="/creator/?starter=field">Sensory Field</a>
-      <a href="/creator/?starter=tree">Stereoscopic Tree</a>
-      <a href="/creator/?starter=abstract">Abstraction</a>
-      <a href="/creator/?starter=landscape">3D Landscape</a>
       <a href="/presets/">Presets</a>
       <a href="/sparql/">SPARQL</a>
       <a href="/logbook/">Logbook</a>

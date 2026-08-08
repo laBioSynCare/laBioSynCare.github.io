@@ -43,10 +43,11 @@ Everything in this section was checked against the working tree on 2026-07-30.
 
 ### 1.1 The application is static and runs client-side
 
-The build uses `@sveltejs/adapter-static`. The knowledge browser, SPARQL workbench,
-Patch Studio, Sensory Field, preset browser and all reference data operate in the
-browser. Ontology Turtle is served as same-origin static assets from
-`static/ontology/`.
+The build uses `@sveltejs/adapter-static`. The knowledge browser, SPARQL
+workbench, Patch Studio (including Sensory Field starters), preset browser and
+all reference data operate in the browser. The legacy `/field/*` aliases are
+prerendered compatibility pages that replace-navigate after hydration. Ontology Turtle is served as same-origin static
+assets from `static/ontology/`.
 
 Consequence: **the core application is already hostable on any static file server**,
 with no application server, database or runtime dependency.
@@ -68,12 +69,13 @@ annotations, patches and profile are kept on the device instead of an account
 
 **This is verified on every commit, not asserted.** `make smoke-static` rebuilds
 with no configuration, serves `dist-smoke/` over plain HTTP from a dependency-free
-Node server, and checks that all nine primary routes return their own prerendered
-HTML, that an unknown path returns 404 (so a fallback-everything host cannot make
-the other assertions vacuous), that the ontology Turtle is served same-origin, that
-the service worker and manifest are present, that **no Firebase API key is inlined
-in any bundle file**, and that the unconfigured-Firebase guard shipped. It runs in
-CI after the build.
+Node server, and checks that all eight primary routes return their own prerendered
+HTML, that all four legacy `/field/*` artifacts point at their exact Studio
+starter intents, that an unknown path returns 404 (so a fallback-everything host
+cannot make the other assertions vacuous), that the ontology Turtle is served
+same-origin, that the service worker and manifest are present, that **no Firebase
+API key is inlined in any bundle file**, and that the unconfigured-Firebase guard
+shipped. It runs in CI after the build.
 
 > **A trap worth knowing about.** Vite loads the project-root `.env` in *every*
 > mode, so unsetting `VITE_FIREBASE_*` in the shell is **not** enough — a
@@ -206,10 +208,11 @@ never rebuilt for a different path, so they cannot drift:
 **`scripts/smoke-http.sh` is the single definition of a correct deployment**, run
 against both the VM and the container. Two hand-written approximations would
 diverge, and the point of supporting more than one path is that they behave
-identically. It asserts the application is served, all eight prerendered routes
-return their own page, Turtle and JSON-LD carry the media types RDF clients
-need, the manifest does too, COOP/COEP/CORP are applied, and an unknown path is a
-real 404 rather than a soft homepage.
+identically. It asserts the application is served, all seven primary
+prerendered routes return their own page, all four `/field/*` compatibility
+artifacts point at their exact Studio starter intents, Turtle and JSON-LD carry
+the media types RDF clients need, the manifest does too, COOP/COEP/CORP are
+applied, and an unknown path is a real 404 rather than a soft homepage.
 
 The script is confirmed to discriminate: run against the dev server it fails the
 three cross-origin assertions, and passes only where the headers are genuinely

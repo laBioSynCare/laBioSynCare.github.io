@@ -19,9 +19,10 @@
 > selectable audio engines, 14 registered visual track types, one shared visual
 > composition/presentation stage, and a photosensitivity safety layer
 > ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)) — the
-> **Sensory Field** starter family, now reached through Studio from `/field/*`
-> compatibility entry points, with pure legacy-state adapters and explicit
-> conversion reports shown in Studio ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
+> **Sensory Field** starter family, now reached inside Studio while `/field/*`
+> remains as redirect-only bookmark compatibility, with pure legacy-state
+> adapters and explicit conversion reports shown in Studio
+> ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
 > [ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)) — the
 > installable **PWA** layer, and a Phase-3 **WASM** audio path. The `core/`
 > orchestration layer (three-clock scheduler, `StimulationOrchestrator`,
@@ -32,9 +33,9 @@
 > **Integration status 2026-08-08:** Sensory Field capabilities are now ordinary
 > first-class colour-field and spatial visual tracks in the canonical Studio
 > document. The shared composition stage, Field starters, report-producing
-> adapters, non-destructive migration offer, and `/field/*` route cutover have
-> shipped. Disabled sources are retained inactive; Add appends live with explicit
-> keep/apply-stage choices; the full report and review acknowledgement are in the
+> adapters, non-destructive migration offer, `/field/*` redirects, and global
+> navigation consolidation have shipped. Disabled sources are retained inactive;
+> Add appends live with explicit keep/apply-stage choices; the full report and review acknowledgement are in the
 > conversion flow; and vector spatial blend plus bounded SIRDS refresh execute.
 > Runtime/controller extraction, exact trajectory/clamp fidelity and lifecycle
 > proof, a unified delivered-state `ExposureProfile` with producer-adjacent SHACL,
@@ -180,7 +181,7 @@ Five themes, none of them in the original phases:
   the citable releases ([ADR 0024](docs/decisions/0024-stakeholder-ecosystem-modeling.md),
   [0031](docs/decisions/0031-qualified-ecosystem-records.md),
   [0032](docs/decisions/0032-visible-pending-status-ecosystem-records.md)).
-- **Application surfaces.** Sensory Field
+- **Application surfaces.** Sensory Field, now absorbed into Patch Studio
   ([ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)), the
   four-door entrance and conversion layer, a graph navigator far beyond "class
   hierarchy + SKOS scheme", the PWA layer

@@ -28,7 +28,7 @@ the two disagree, the code and the as-built docs win.
 
 **As-built.** [`PATCH_STUDIO.md`](technical/PATCH_STUDIO.md) (the live authoring
 model, `patch-studio-model-3`, with model-1 and model-2 import) · [`SENSORY_FIELD.md`](technical/SENSORY_FIELD.md)
-(the `/field/` instrument) ·
+(legacy Field contracts, adapters, starters, and `/field/*` redirects) ·
 [`PHOTOSENSITIVITY_SAFETY.md`](technical/PHOTOSENSITIVITY_SAFETY.md) (advisory,
 policy, flash-rate cap) · [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md)
 (caching, the three traps, compliance matrix) ·

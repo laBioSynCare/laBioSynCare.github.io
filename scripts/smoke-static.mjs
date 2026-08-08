@@ -70,7 +70,6 @@ async function main() {
       ['/', 'BSC Lab'],
       ['/graph/', 'Graph'],
       ['/creator/', 'Patch Studio'],
-      ['/field/', 'Field'],
       ['/sparql/', 'SPARQL'],
       ['/presets/', 'Presets'],
       ['/logbook/', 'Logbook'],
@@ -83,6 +82,23 @@ async function main() {
       if (!r.ok) bad(`GET ${route}`, `status ${r.status}`)
       else if (!body.includes(marker)) bad(`GET ${route}`, `missing marker "${marker}"`)
       else ok(`GET ${route}`, `${r.status}, ${body.length} bytes`)
+    }
+
+    // Former Field screens are compatibility aliases, not primary application
+    // surfaces. Each prerendered page exposes its exact fallback/replace target;
+    // browser acceptance separately proves the hydrated replace-navigation.
+    const compatibilityRoutes = [
+      ['/field/', '/creator/?starter=field'],
+      ['/field/tree/', '/creator/?starter=tree'],
+      ['/field/abstract/', '/creator/?starter=abstract'],
+      ['/field/landscape/', '/creator/?starter=landscape'],
+    ]
+    for (const [route, target] of compatibilityRoutes) {
+      const r = await fetch(base + route)
+      const body = r.ok ? await r.text() : ''
+      if (!r.ok) bad(`GET ${route}`, `status ${r.status}`)
+      else if (!body.includes(target)) bad(`GET ${route}`, `missing redirect target "${target}"`)
+      else ok(`GET ${route}`, `compatibility redirect to ${target}`)
     }
 
     // 2. The server is honest: an unknown path must not return 200. Without this

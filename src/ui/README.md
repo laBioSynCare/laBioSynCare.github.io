@@ -4,7 +4,7 @@
 > annotations, presets) and **Patch Studio** (`creator/`), wrapped in shared
 > navigation, theming, and the photosensitivity safety layer. Studio now owns 14
 > visual track types, shared visual composition, Field starters, and legacy-state
-> adapters; public `/field/*` routes enter those starters under
+> adapters; public `/field/*` aliases replace-navigate to those starters under
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
 > Legacy `field/` components remain during compatibility/deprecation. The
 > standalone session `player/` and preset `browser/` components in the target
@@ -65,8 +65,9 @@ on mount (browser autoplay policy). The engine is built by
 
 The original guided colour, per-ear audio, blink, free-view depth, and
 stereoscopic-scene components remain here as legacy compatibility source and
-reusable scene-generation code. The public `/field/*` routes no longer mount an
-autonomous Field workspace; they open corresponding starter intents in Studio.
+reusable scene-generation code. The public `/field/*` aliases no longer mount an
+autonomous Field workspace; prerendered compatibility pages open corresponding starter
+intents in Studio. Field is not a global-navigation tab.
 The as-built legacy contract is
 [`SENSORY_FIELD.md`](../../docs/technical/SENSORY_FIELD.md).
 
@@ -117,7 +118,9 @@ optional Firebase sign-in.
 
 - **navigation/** — `AppTopBar.svelte` (graph scope/search/fit + keyboard help +
   the global `+` menu), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
-  SPARQL · Logbook · Settings), `ProfileControl.svelte`, `graphNavigation.js`.
+  SPARQL · Logbook · Settings · About), `ProfileControl.svelte`,
+  `graphNavigation.js`. Sensory Field is discoverable through Studio's starter
+  palette rather than represented as another application screen.
 - **theme/** — `skins.js`: five palettes (default `paper`) applied via a
   `data-skin` attribute, persisted to `localStorage`, pre-applied before first
   paint by an inline script in `app.html` to avoid a flash of the wrong theme.

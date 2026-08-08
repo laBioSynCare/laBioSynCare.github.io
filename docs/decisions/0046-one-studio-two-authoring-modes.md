@@ -124,8 +124,10 @@ The first cutover is shipped:
   time. Vector modes execute each spatial track's blend; blend is explicitly not
   applicable to autostereogram depth-buffer output. Static SIRDS scenes stay off
   the clock invalidation path and dynamic full-frame refresh is capped at 8 fps.
-- `/field/*` routes and visible navigation now enter the corresponding Studio
-  starter. The old standalone shells no longer own a publicly routed runtime.
+- `/field/*` routes are prerendered compatibility pages that replace-navigate to
+  the corresponding Studio starter without adding a Back-button history trap.
+  Field has no global-navigation tab; its starters live inside Studio. The old
+  standalone shells no longer own a publicly routed runtime.
 - The stale control-name validation and warning defects are fixed. Patch RDF
   projection now reports nested and discrete unmapped leaves and explicitly says
   that producer-side SHACL validation has not run.

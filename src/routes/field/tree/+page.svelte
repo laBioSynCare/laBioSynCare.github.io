@@ -10,9 +10,9 @@
 </script>
 
 <svelte:head>
-  <title>Stereoscopic Tree | BSC Lab</title>
+  <title>Stereoscopic Tree compatibility link | BSC Lab</title>
 </svelte:head>
 
 <main>
-  <p>Opening the Stereoscopic Tree starter in <a href={studioHref}>Patch Studio</a>.</p>
+  <p>This address is retained for old bookmarks. Opening the Stereoscopic Tree starter in <a href={studioHref}>Patch Studio</a>.</p>
 </main>

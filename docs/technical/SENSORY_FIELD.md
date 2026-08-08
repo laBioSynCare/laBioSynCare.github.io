@@ -1,8 +1,9 @@
 # Sensory Field
 
 > **For AI agents:** Sensory Field is now a **starter-template and compatibility
-> entry family inside Patch Studio**. `/field/*` redirects to ordinary Studio
-> tracks and no longer mounts the standalone Field runtime. The retained
+> entry family inside Patch Studio**. `/field/*` uses prerendered compatibility
+> pages that replace-navigate to ordinary Studio starters and no longer mounts the standalone Field runtime or
+> appears as a global-navigation tab. The retained
 > `src/ui/field/` components, state models, persistence keys, and exposure
 > exporter are legacy conversion/golden-behavior code pending deprecation; they
 > are not the canonical public authoring path. Sensory Field began as the first
@@ -168,7 +169,7 @@ ontology" mapping links each active concept to the graph view via
 ## 7. File map
 
 ```
-src/routes/field*/+page.svelte              thin redirects to /creator/?starter=…
+src/routes/field*/+page.svelte              replace-state redirects + fallback links
 src/ui/creator/PresetCreator.svelte         canonical Studio UI/runtime + starter flow
 src/ui/creator/visualTrackModel.js          visual types, configs, shared-stage contract
 src/ui/creator/fieldTrackAdapter.js         pure legacy state → ordinary track bundles

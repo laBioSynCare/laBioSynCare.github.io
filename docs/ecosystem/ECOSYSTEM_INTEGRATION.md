@@ -19,7 +19,7 @@
 We are **not looking for a circle to join — we have started building one.** The
 three-layer model (knowledge / platform / community) already exists in
 [`ROADMAP.md`](../../ROADMAP.md); the W3C group is launched; the ontology, engines,
-Patch Studio, and Sensory Field are live. The bottleneck is therefore **social
+and Patch Studio with its Field-derived tracks are live. The bottleneck is therefore **social
 conversion, not more construction:**
 
 > The room exists, but it is not yet populated enough.
@@ -220,8 +220,9 @@ burying them in one. Entrance copy uses permitted wellness verbs only
 That architecture question is now resolved by
 [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md): Sensory Field
 becomes ordinary first-class colour-field and spatial visual tracks in Patch
-Studio's canonical model/runtime and shared visual projection stage, while Field
-templates and `/field/*` routes retain an approachable compatibility entrance.
+Studio's canonical model/runtime and shared visual projection stage. Field
+templates remain inside Studio, while `/field/*` survives only as redirect-only
+bookmark compatibility rather than a separate navigation destination.
 The additive 14-type visual model, shared composition stage, Field starters,
 report-producing legacy adapters, recursive projection-loss accounting, and
 public-route cutover are shipped. The integration remains partial under

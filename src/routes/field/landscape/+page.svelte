@@ -10,9 +10,9 @@
 </script>
 
 <svelte:head>
-  <title>3D Landscape | BSC Lab</title>
+  <title>3D Landscape compatibility link | BSC Lab</title>
 </svelte:head>
 
 <main>
-  <p>Opening the 3D Landscape starter in <a href={studioHref}>Patch Studio</a>.</p>
+  <p>This address is retained for old bookmarks. Opening the 3D Landscape starter in <a href={studioHref}>Patch Studio</a>.</p>
 </main>

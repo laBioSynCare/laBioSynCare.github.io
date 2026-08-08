@@ -3,8 +3,9 @@
 > **Status.** Running today: the **knowledge browser** (RDF loader, Cytoscape
 > graph, SPARQL, preset browser, annotations), the **Patch Studio**
 > (`ui/creator/`) with four selectable audio engines, 14 visual track types, and
-> one shared visual composition stage. `/field/*` now opens Field starters in
-> Studio; legacy Field modules remain for adapters and deprecation. Still planned:
+> one shared visual composition stage. The only public authoring screen is
+> Studio; `/field/*` replace-navigates to its starters, while legacy Field
+> modules remain for adapters and deprecation. Still planned:
 > the `core/`
 > orchestration layer, the GPU `visual/` + `haptic/` engines, `rdf/export.js`,
 > and the JSON Schemas. See `ROADMAP.md` for phase definitions and
@@ -39,13 +40,13 @@ the rule it carries. Only non-obvious entries are listed.
 | `sync/` | `bsc-lab-private-sync-1` ([`PRIVATE_SYNC.md`](../docs/technical/PRIVATE_SYNC.md)) — reference and in-memory implementations; no networked one yet. |
 | `firebase/` | Optional auth + Firestore. Everything works without it. |
 | `ui/creator/` | Patch Studio — the real-time authoring surface, including Field starters/adapters and the shared 14-type visual stage. → [`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md) |
-| `ui/field/` | Legacy Sensory Field implementation and reusable scene generators retained during compatibility/deprecation; public `/field/*` routes now enter Studio. → [`SENSORY_FIELD.md`](../docs/technical/SENSORY_FIELD.md) |
+| `ui/field/` | Legacy Sensory Field implementation and reusable scene generators retained during compatibility/deprecation; public `/field/*` aliases redirect to Studio. → [`SENSORY_FIELD.md`](../docs/technical/SENSORY_FIELD.md) |
 | `ui/graph/`, `ui/sparql/`, `ui/annotation/` | Knowledge browser surfaces. |
 | `ui/entrance/` | The public landing: doors, conversion bar, cite/contribute modals. |
 | `ui/safety/` | Photosensitivity advisory + visual-stimulation policy. Gates all flashing output. |
 | `ui/pwa/` | Service-worker registration and the session-safe update banner. |
 | `ui/navigation/`, `ui/theme/`, `ui/auth/` | Chrome, skins, sign-in form. |
-| `routes/` | `/` entrance, `/graph`, `/creator`, `/field` (+ `/tree`, `/abstract`, `/landscape` compatibility starters into Studio), `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`. |
+| `routes/` | `/` entrance, `/graph`, `/creator`, `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`, plus four `/field/*` compatibility redirects into Studio starters. |
 
 Tests live beside the code they cover (`*.test.js`, `*.test.mjs`) and run under
 `make test`.
@@ -123,9 +124,10 @@ did not travel rather than overclaiming ([ADR 0026](../docs/decisions/0026-patch
 `portability/sessionPackage.js` wraps that as a portable session package
 ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)).
 
-Public `/field/*` routes now open starter intents in Studio, where colour-field
-and four spatial scene families are ordinary first-class tracks composed by the
-shared visual stage. Legacy local state is detected but not silently rewritten:
+Public `/field/*` aliases now replace-navigate to starter intents in Studio,
+where colour-field and four spatial scene families are ordinary first-class
+tracks composed by the shared visual stage. Legacy local state is detected but
+not silently rewritten:
 pure adapters offer add/replace/keep choices and return structured mapping,
 correction, unsupported-state, and warning reports. The old autonomous Field
 components and per-configuration `ExposureProfile` exporter remain in source

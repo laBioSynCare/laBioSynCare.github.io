@@ -10,9 +10,9 @@
 </script>
 
 <svelte:head>
-  <title>Sensory Field | BSC Lab</title>
+  <title>Sensory Field compatibility link | BSC Lab</title>
 </svelte:head>
 
 <main>
-  <p>Opening the Sensory Field starter in <a href={studioHref}>Patch Studio</a>.</p>
+  <p>This address is retained for old bookmarks. Opening the Sensory Field starter in <a href={studioHref}>Patch Studio</a>.</p>
 </main>

@@ -58,7 +58,7 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   RDF validation but is blocked by a Databus outage. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio
-  with Sensory Field starter routes, logbook, profile and settings are
+  with built-in Sensory Field starters, logbook, profile and settings are
   implemented as a static SvelteKit application, usable with no account;
   Firebase-backed sync is optional.
 
@@ -129,11 +129,12 @@ surfaces are:
 - **Presets:** public BSC Lab reference presets and their evidence links.
 - **Patch Studio:** real-time audio/visual authoring with Web Audio,
   AudioWorklet/WASM options, modulation, photosensitivity safeguards, and
-  first-class colour-field and stereoscopic scene tracks.
-- **Sensory Field starters:** the former Field URLs now offer ordinary Studio
-  tracks for colour/audio, depth markers, trees, abstractions, and landscapes.
-  Its SHACL-tested exposure mapper remains a legacy golden path while unified
-  Studio exposure export is completed.
+  first-class colour-field and stereoscopic scene tracks. Its built-in Sensory
+  Field starters create ordinary Studio tracks for colour/audio, depth markers,
+  trees, abstractions, and landscapes; the former `/field/*` URLs are
+  history-replacing compatibility redirects, not another application screen. The SHACL-tested
+  legacy exposure mapper remains a golden path while unified Studio exposure
+  export is completed.
 - **Logbook, annotations, patches and profile:** kept in your browser by
   default, with no account required. Signing in (when Firebase is configured)
   keeps them with your account instead so they follow you between devices.
@@ -145,8 +146,8 @@ Architecture details are in [src/README.md](src/README.md),
 ## Deployment And Portability
 
 BSC Lab builds as a static SvelteKit application. The knowledge browser, SPARQL
-workbench, Patch Studio, Sensory Field starter routes and reference data all operate client-side,
-so the core application is hostable on any static file server. Firebase is
+workbench, Patch Studio, legacy Field redirects and reference data all operate
+client-side, so the core application is hostable on any static file server. Firebase is
 optional: configuration comes from build-time `VITE_FIREBASE_*` variables, and a
 build without them produces a working instance with no embedded credentials. Only
 **sign-in** becomes unavailable — annotations, saved patches, the logbook and the

@@ -43,9 +43,24 @@ else
 fi
 
 # 2. Every prerendered route returns its own page, not a fallback.
-for route in graph creator field sparql presets logbook settings about; do
+for route in graph creator sparql presets logbook settings about; do
   if fetch "/$route/"; then ok "GET /$route/"; else bad "GET /$route/" "not served"; fi
 done
+
+# Former Field screens remain static compatibility artifacts whose SvelteKit
+# redirect pages point at ordinary Patch Studio starter intents.
+while read -r route starter; do
+  if fetch "$route" && grep -Fq "/creator/?starter=$starter" "$TMP/body"; then
+    ok "GET $route redirects to Patch Studio starter=$starter"
+  else
+    bad "GET $route" "missing Patch Studio starter redirect"
+  fi
+done <<'EOF'
+/field/ field
+/field/tree/ tree
+/field/abstract/ abstract
+/field/landscape/ landscape
+EOF
 
 # 3. Ontology publication, with media types RDF clients actually need.
 if fetch "/ontology/sstim-core.ttl" && grep -q '@prefix sstim:' "$TMP/body"; then

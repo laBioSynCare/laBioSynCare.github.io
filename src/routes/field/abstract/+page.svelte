@@ -10,9 +10,9 @@
 </script>
 
 <svelte:head>
-  <title>Abstraction | BSC Lab</title>
+  <title>Abstraction compatibility link | BSC Lab</title>
 </svelte:head>
 
 <main>
-  <p>Opening the Abstraction starter in <a href={studioHref}>Patch Studio</a>.</p>
+  <p>This address is retained for old bookmarks. Opening the Abstraction starter in <a href={studioHref}>Patch Studio</a>.</p>
 </main>

@@ -68,23 +68,24 @@ BioSynCare/BSC catalog.
 **Ahead of schedule, from Phase 2.** The **Patch Studio** (real-time audiovisual
 designer, four selectable audio engines, six audio voice types plus universal
 tremolo, and 14 visual track types composed through one shared presentation
-stage) now receives the **Sensory Field** starter family through `/field/*`
-compatibility entry points. Field-derived colour, depth, tree, abstraction, and
-landscape tracks use the canonical patch model; pure adapters offer
-non-destructive conversion with complete reports shown in Studio and review
-acknowledgement when needed. Disabled sources remain inactive tracks, and Add
-appends live with explicit keep/apply-stage choices. The legacy Field
+stage) now contains the **Sensory Field** starter family; `/field/*` remains only
+as redirect compatibility for old bookmarks. Field-derived colour, depth, tree,
+abstraction, and landscape tracks use the canonical patch model; pure adapters
+offer non-destructive conversion with complete reports shown in Studio and
+review acknowledgement when needed. Disabled sources remain inactive tracks,
+and Add appends live with explicit keep/apply-stage choices. The legacy Field
 implementation and its per-configuration `ExposureProfile` exporter remain in
-source during the deprecation window. Both paths sit behind the photosensitivity
-safety layer. See
+source during the deprecation window. Canonical delivery sits behind the
+photosensitivity safety layer. See
 [`PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md),
 [`SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md), and
 [`PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
 
 **Integration status 2026-08-08.** First-class colour-field and spatial visual
 tracks, the shared composition stage, Field starters, report-producing adapters,
-recursive projection-loss accounting, and the `/field/*` public-route cutover
-are shipped. Inactive-source retention, in-place Add/playback behavior, report
+recursive projection-loss accounting, `/field/*` history-replacing redirects, and the
+removal of Field from global navigation are shipped. Inactive-source retention,
+in-place Add/playback behavior, report
 acknowledgement, explicit stage choice, vector spatial blend/topology, and static
 versus dynamic SIRDS cadence are also shipped. Runtime/controller extraction,
 exact trajectory/clamp fidelity and lifecycle proof, unified delivered-state
@@ -683,9 +684,9 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       not applicable to autostereogram depth-buffer output; group all spatial
       sources at the first spatial array position before projection; keep static
       SIRDS off clock invalidation and cap dynamic full-frame refresh at 8 fps `P2`
-- [x] Cut `/field/`, `/field/tree/`, `/field/abstract/`, and `/field/landscape/`
-      over to Studio starter intents; retain their route identity as
-      compatibility entrances `P2`
+- [x] Remove Field from global navigation; cut `/field/`, `/field/tree/`,
+      `/field/abstract/`, and `/field/landscape/` over to prerendered
+      compatibility pages that replace-navigate to their Studio starter intents `P2`
 - [x] Recursively account for currently unmapped nested, discrete, modulation,
       tempo-sync, and visual-stage state in the partial SSTIM projection; keep
       the lossless session package as executable truth `P2`

@@ -77,13 +77,10 @@ place. The eyebrow labels were also cut to a single word each (`UNDERSTAND`,
 - **Headline:** *Try a session.*
 - **Subcopy:** *Audio-visual sessions in your browser — no install, start gently.*
 - **Primary CTA:** **Open Patch Studio** → `/creator`
-- **Secondary:** *Try the Sensory Field* → [`/field`](../../src/routes) · *Browse presets* → `/presets`
-  (**Revised 2026-07-18:** Patch Studio promoted to primary, Sensory Field
-  demoted to secondary — flagged on review. Sensory Field's own "start
-  gently" framing sits a little oddly against Patch Studio as the door's
-  headline action now; left as-is pending the open question below about
-  whether Field and Studio should be reworked together rather than just
-  reordered.)
+- **Secondary:** *Start from a sensory template* → `/creator/?starter=field` ·
+  *Browse presets* → `/presets`
+  (**Revised 2026-08-09:** Patch Studio is the only visible authoring surface.
+  The secondary action opens its starter flow; it is not a Field screen.)
 - **Safety:** these personas pass through the photosensitivity layer
   ([`PHOTOSENSITIVITY_SAFETY.md`](PHOTOSENSITIVITY_SAFETY.md)); the runtime
   flash-rate cap is on by default. The notice **routes into a safe demo**, it is
@@ -204,7 +201,7 @@ Pico.css `<article>` elements in a two-column CSS grid.
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│ BSC Lab   Graph · Presets · Field · Studio · SPARQL · …        ◐   │ ← existing nav
+│ BSC Lab   Graph · Patch Studio · Presets · SPARQL · …          ◐   │ ← existing nav
 ├────────────────────────────────────────────────────────────────────┤
 │                                                                    │
 │        Sensory stimulation, made open and reproducible.            │ ← hero H1
@@ -220,7 +217,7 @@ Pico.css `<article>` elements in a two-column CSS grid.
 │ │ Explore and reproduce the    │ │ Try a session.               │  │
 │ │ science. (subcopy)           │ │ (subcopy)                    │  │
 │ │ [Explore the ontology]       │ │ [Open Patch Studio]          │  │
-│ │ [Query with SPARQL]          │ │ Sensory Field · Presets      │  │
+│ │ [Query with SPARQL]          │ │ Sensory template · Presets   │  │
 │ │ Reference docs · Cite SSTIM  │ │                              │  │
 │ └──────────────────────────────┘ └──────────────────────────────┘  │
 │ ┌──────────────────────────────┐ ┌──────────────────────────────┐  │
@@ -399,17 +396,17 @@ above for why they're no longer also duplicated in a hero/footer bar.
   and compares it against that module. Its prose scan already covered
   `+page.svelte` and always had — the numbers had simply moved somewhere it
   did not look.
-- [x] **Decision resolved 2026-08-08 — merge the runtime, retain the template
-  on-ramp.** Sensory Field capabilities will become ordinary first-class
+- [x] **Decision resolved 2026-08-08; navigation consolidated 2026-08-09 —
+  merge the runtime, retain the template on-ramp.** Sensory Field capabilities
+  are ordinary first-class
   colour-field and spatial visual tracks inside Patch Studio, using the same
   document, engine, transport, clock, store, safety gate, and shared visual
-  projection stage. The `/field/*` URLs remain template and compatibility entry
-  points, so door ① can keep its low-commitment “start gently” path. This is not
-  yet implemented:
-  [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
-  owns the decision and
-  [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md) owns the
-  phased work.
+  projection stage. Field is absent from global navigation; the `/field/*` URLs
+  are history-replacing compatibility redirects and door ① links directly to a Studio
+  starter, preserving the low-commitment “start gently” path. The model, route,
+  and navigation cutover is implemented; remaining work is tracked by
+  [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md) and
+  [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 ## Next actions
 

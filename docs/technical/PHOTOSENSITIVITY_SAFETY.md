@@ -53,13 +53,14 @@ also sets `documentElement.dataset.visualStim` for CSS hooks.
 
 | Surface | Behaviour when policy is off |
 |---|---|
-| Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder; the `Blink` track flicker is also rate-capped (see §4) ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
+| Patch Studio visual track previews | Replaced by a static "Visual stimulation is off" placeholder; `Blink` and blinking `ColorField` tracks are also rate-capped (see §4) ([`PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)) |
 | **Mix** modal / optional fullscreen visual stage | Disabled (the button is inert when off or when there are no visual tracks) |
-| Sensory Field (`/field/`) | The colour field shows a placeholder when off; the blink rate is additionally capped by `flashSafety.js` (see §4) — [`FieldStage.svelte`](../../src/ui/field/FieldStage.svelte), [`SensoryField.svelte`](../../src/ui/field/SensoryField.svelte) |
 | Future PixiJS visual engine | Must read `isVisualStimulationOn()` and render nothing when off |
 
 Audio and editing are unaffected by the policy — only visual stimulation is
-gated.
+gated. The former `/field/*` screens now redirect into Patch Studio; retained
+standalone Field components are legacy golden/adapter code, not another public
+enforcement surface.
 
 ---
 
@@ -69,8 +70,8 @@ gated.
   caution once and can disable visuals at any time.
 - `prefers-reduced-motion` is honored as a safe default, consistent with the
   accessibility conventions in [`../../src/ui/README.md`](../../src/ui/README.md).
-- The global on/off policy is the first line. A **flash-rate cap** is now
-  implemented for the Sensory Field in
+- The global on/off policy is the first line. A **flash-rate cap** shared by
+  Patch Studio's Field-derived tracks and retained legacy Field code lives in
   [`src/ui/safety/flashSafety.js`](../../src/ui/safety/flashSafety.js): the
   general-safe ceiling is **3 Hz** (WCAG 2.3.1; Harding / ITU-R BT.1702), with
   the ~15–25 Hz peak band flagged highest-risk. Flashing above 3 Hz is clamped
@@ -78,14 +79,14 @@ gated.
   persisted — re-confirmed each session by design, [ADR 0011](../decisions/0011-sensory-field-and-flash-safety.md)).
   The same 3 Hz threshold is modelled in the ontology as
   `sstim-ex:limitFlickerWcag`, so the gate and the vocabulary cannot diverge.
-- The **Patch Studio `Blink` track** uses the same cap. Because the Patch Studio
+- The **Patch Studio `Blink` and blinking `ColorField` tracks** use the same cap. Because Patch Studio
   is an authoring tool where alpha (10 Hz) and gamma (40 Hz) flicker entrainment
   are legitimate targets, the cap there is opt-through, not a hard ceiling: rates
   above 3 Hz are capped until the author makes an explicit **per-session**
   acknowledgement (never persisted, never saved into the patch — so a shared
   patch can't flash a recipient who never consented), with the live risk level
-  shown on each affected `Blink` card.
-- The Sensory Field Step 3a free-view depth renderer does **not** implement
+  shown on each affected track card.
+- The stereoscopic depth tracks do **not** implement
   independent per-eye flicker. If dichoptic frequency tagging or any other
   per-eye flicker is added later, it must use the same 3 Hz cap at minimum and
   may require stricter gating because per-eye asymmetry compounds visual risk.
