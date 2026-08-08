@@ -63,8 +63,12 @@ had existed since 0.6.0 — the *things that bear them* did not.
 | **V1** | ✅ resolved | Visual/haptic properties were session-scoped → 23 domains widened to `owl:unionOf`, admitting the patch-side class |
 
 Closed by [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md),
-which supersedes ADR 0040. The projection emits properly typed, SHACL-validated
-RDF: a `sstim:Preset` composed of typed `sstim:Track` instances.
+which supersedes ADR 0040. The projection emits properly typed RDF: an
+`sstim:Preset` composed of typed `sstim:Track` instances. Its tests parse the
+graph and account for ontology terms, but the producer path does **not yet run
+SHACL**; the generated report's current “SHACL-validated” phrase is premature.
+Actual producer-adjacent validation is a gate in
+[`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](../ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md).
 
 **A preset is still not the stimulation.** It configures an engine; what actually
 reaches the target is `sstim:StimulusSpecification`

@@ -1,13 +1,18 @@
 # Sensory Field
 
-> **For AI agents:** The Sensory Field is a minimal stimulation *instrument*,
-> separate from the Patch Studio. It is the first deliverable rung of the
+> **For AI agents:** The Sensory Field is currently a guided stimulation
+> *instrument family* with a runtime separate from Patch Studio. It began as the
+> first deliverable rung of the
 > sensory-stimulation interface and the reference consumer of the `sstim-ex:`
 > exposure ontology. Decision record: [ADR 0011](../decisions/0011-sensory-field-and-flash-safety.md).
 > It is bound by the same invariants as the rest of the app — `AudioContext.currentTime`
 > is the only AV-sync clock (CLAUDE.md §3.1), conservative wellness framing only
 > (CLAUDE.md §3.5), and the photosensitivity layer in
-> [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md).
+> [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md). That is the as-built
+> state, not the target: [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
+> adopts Guided Field as a Studio workspace over one model/runtime; the phased
+> migration is in
+> [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 Route: `/field/` ([src/routes/field/+page.svelte](../../src/routes/field/+page.svelte)).
 Module: [src/ui/field/](../../src/ui/field/).

@@ -27,6 +27,12 @@
 > `SessionRecorder`) and the GPU visual and haptic engines remain unbuilt. See
 > [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
 > for everything shipped that this roadmap never listed.
+>
+> **Direction adopted 2026-08-08:** Sensory Field will become a Guided Field
+> workspace inside Patch Studio over one document and runtime, while its simple
+> identity and `/field/*` entry points remain. See
+> [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+> and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md).
 
 ---
 
@@ -376,9 +382,17 @@ concrete rather than abstract.
       next playback, not mid-session; there is no visual engine to select)*
 - [x] Real-time designer with live audio preview — the **Patch Studio**
       (`patch-studio-model-1`); shipped ahead of schedule
-- [ ] Bridge the Patch Studio to the catalog preset / RDF instance formats
-      (mappable subset + metadata authoring, SHACL-gated) — see
-      [ADR 0026](docs/decisions/0026-patch-studio-catalog-bridge.md)
+- [ ] Merge Sensory Field into Patch Studio as Guided Field over one canonical
+      model, engine, transport, clock, store, safety gate, and export boundary;
+      retain compatibility routes — see
+      [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+- [~] Bridge Patch Studio to semantic/delivery formats: the lossless session
+      package and partial SSTIM `Preset` projection exist; real producer-adjacent
+      SHACL validation and exhaustive loss accounting remain. The catalog JSON
+      adapter is optional, version-pinned, and follows the coalition-neutrality
+      gate in
+      [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
+      and [ADR 0026](docs/decisions/0026-patch-studio-catalog-bridge.md)
 - [ ] SessionRecorder: records preset + user-defined params → complete
       reproducible session specification
 - [x] PWA: offline support for cached presets, service worker *(manifest,
@@ -618,12 +632,14 @@ until BioSynCare reaches acquisition-relevant scale.
 | PWA / service worker | 2 | Shipped — see ADR 0009 before touching |
 | AudioWorklet stimulation engine | 2 | Shipped for patch track types; Martigli/Symmetry ports: yes |
 | Patch Studio (real-time designer) | 2 | Shipped — extend, don't rebuild |
+| Sensory Field → Guided Field merge | 2 | Build now — mandatory; follow ADR 0046 milestones |
 | PixiJS visual engine + `IVisualEngine` | 2 | Not yet |
 | Haptic engine (`IHapticEngine`, vibrate path) | 2 | Not yet |
 | Three-clock architecture / Worker scheduler | 2 | Not yet |
 | StimulationOrchestrator | 2 | Not yet |
 | Catalog preset session player | 2 | Not yet |
-| Patch Studio → catalog/RDF bridge | 2 | Not yet |
+| Patch Studio → SSTIM projection | 2 | Partial — package/projection built; validation and exhaustive accounting open |
+| Optional BSC catalog adapter | 2 | After merged model and coalition/consumer gate |
 | Session recorder | 2 | Not yet |
 | WASM audio processors | 3 | Shipped early (WAT kernel); further DSP ports: yes |
 | User feedback / self-report collection | 3 | Not yet |

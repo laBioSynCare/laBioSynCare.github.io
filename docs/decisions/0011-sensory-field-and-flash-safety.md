@@ -1,6 +1,8 @@
 # ADR 0011 — Sensory Field interface, runtime flash-rate safety, and exposure ontology 0.4.0
 
-**Status:** Accepted — 2026-06-18
+**Status:** Accepted — 2026-06-18 · the separate-interface/runtime choice is
+superseded by [ADR 0046](0046-one-studio-two-authoring-modes.md); the safety and
+exposure decisions remain accepted
 
 ## Context
 

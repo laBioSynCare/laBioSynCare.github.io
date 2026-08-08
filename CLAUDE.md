@@ -24,8 +24,11 @@
 
 BSC Lab is the open scientific and technical infrastructure. The related commercial
 application is **BioSynCare** (separate repository, React Native, closed source).
-BSC Lab feeds BioSynCare's preset catalog via a JSON export pipeline but is not
-BioSynCare. Do not conflate them.
+BSC Lab does **not currently feed** BioSynCare: the documented preset JSON format
+is the intended narrow interface, but no Patch Studio→catalog converter or
+`dist/presets.json` pipeline exists. A future adapter is optional,
+version-pinned, and must not make BioSynCare requirements part of SSTIM or the
+native Studio model. Do not conflate the projects.
 
 **Maintained by:** Renato Fabbri (PhD physics, musical composition, creator of the
 `music` Python package on PyPI). Scientific advisor: Juliana Braga de Salles Andrade
@@ -672,15 +675,21 @@ violations rather than passing `--no-verify`.
 BioSynCare is the commercial application (React Native, separate repository).
 BSC Lab is the open-source research and development platform.
 
-The shared interface between them is the preset JSON format. BSC Lab's RDF pipeline
-exports `dist/presets.json` which BioSynCare consumes. Changes to the preset schema
-must be coordinated with the BioSynCare repository.
+The intended interface between them is the documented preset JSON format. The
+converter, JSON Schema, `dist/presets.json` export, and consumer contract are
+planned and **not present**. If the optional adapter is built, it must target a
+named catalog version, report unsupported/lossy mappings, validate before
+exchange, and coordinate schema changes with the BioSynCare repository. See
+`docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`.
 
 BSC Lab code does not import from BioSynCare. BioSynCare code does not import from
-BSC Lab. The only data exchange is the exported `dist/presets.json` file.
+BSC Lab. Any future exchange is validated preset JSON through the explicit
+adapter—not code, RDF dependencies, private catalog data, or backend logic.
 
-Do not add BioSynCare-specific logic to BSC Lab. Do not add BSC Lab RDF dependencies
-to BioSynCare.
+Do not add BioSynCare-specific logic to BSC Lab's native model, runtime, SSTIM
+terms, or generic UI. If approved, product-specific conversion is confined to
+the optional adapter boundary; private acceptance/publication logic remains in
+BioSynCare. Do not add BSC Lab RDF dependencies to BioSynCare.
 
 ---
 

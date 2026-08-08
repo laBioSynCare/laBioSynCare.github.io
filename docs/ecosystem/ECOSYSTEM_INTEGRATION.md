@@ -217,9 +217,13 @@ IA, so group by *intent* into **① Experience · ② Understand & reproduce ·
 burying them in one. Entrance copy uses permitted wellness verbs only
 (`CLAUDE.md` §3.5).
 
-One item was deliberately not decided here and remains open: whether Sensory
-Field stays a distinct on-ramp or folds into Patch Studio. It is an architecture
-call, not a copy question.
+That architecture question is now resolved by
+[ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md): Sensory Field
+becomes a named guided workspace over Patch Studio's canonical model/runtime,
+while retaining its approachable identity and `/field/*` compatibility entry
+points. Implementation remains open under
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
+it is still an architecture task, not entrance copy work.
 
 ---
 

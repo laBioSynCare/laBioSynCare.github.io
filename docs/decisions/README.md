@@ -34,7 +34,7 @@ annotations lives here.
 | [0008](0008-activitypub.md) | ActivityPub federation | Accepted |
 | [0009](0009-pwa.md) | Progressive Web App (installable, offline-capable) | Accepted |
 | [0010](0010-exposure-delivery-modality.md) | Exposure delivery, perceived modality, and evidence status | Accepted |
-| [0011](0011-sensory-field-and-flash-safety.md) | Sensory Field interface, runtime flash-rate safety, and exposure ontology 0.4.0 | Accepted |
+| [0011](0011-sensory-field-and-flash-safety.md) | Sensory Field interface, runtime flash-rate safety, and exposure ontology 0.4.0 | Accepted · interface separation superseded by 0046 |
 | [0012](0012-martigli-voice-parameters.md) | Where Martigli voice parameters live in RDF | Accepted |
 | [0013](0013-evidence-support-relation-range.md) | Evidence `supportsRelation` range | Accepted · property renamed by 0027 |
 | [0014](0014-preset-is-not-a-protocol.md) | A Preset is an information content entity, not a protocol | Accepted |
@@ -49,7 +49,7 @@ annotations lives here.
 | [0023](0023-ontology-docs-publication-path.md) | WIDOCO docs: CI-generated Pages subpath; the app keeps the browser-facing IRI | Accepted · amended by 0043 |
 | [0024](0024-stakeholder-ecosystem-modeling.md) | Modeling the sensory-stimulation ecosystem (agents) | Accepted |
 | [0025](0025-hed-bids-interoperability-crosswalk.md) | SSTIM ↔ HED event semantics with optional BIDS research bindings | Proposed |
-| [0026](0026-patch-studio-catalog-bridge.md) | Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not a native catalog authoring model | Accepted · RDF half built |
+| [0026](0026-patch-studio-catalog-bridge.md) | Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not a native catalog authoring model | Accepted · RDF half built; catalog half conditional |
 | [0027](0027-evidence-claim-family-and-public-claim-gate.md) | Separate evidence assessments from non-evidence statements | Accepted |
 | [0028](0028-atomic-claim-propositions-and-public-expressions.md) | Atomic claim propositions and public expressions | Proposed |
 | [0029](0029-bsc-lab-public-claim-publication-profile.md) | BSC Lab public-claim publication and authorization profile | Proposed |
@@ -69,6 +69,7 @@ annotations lives here.
 | [0043](0043-sstim-core-profile-and-module-boundaries.md) | SSTIM Kernel, Core, Core Plus, concern modules, and Full Profile | Accepted |
 | [0044](0044-stimulus-channel-core-ownership.md) | `StimulusChannel` ownership and profile-sensitive target domain | Accepted |
 | [0045](0045-shapeless-profiles-are-discovery-entry-points.md) | A profile with no shape closure is a discovery entry point, not a conformance target | Accepted |
+| [0046](0046-one-studio-two-authoring-modes.md) | One Studio, two authoring modes, and separate semantic products | Accepted · implementation pending |
 
 ## Adding an ADR
 

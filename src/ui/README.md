@@ -1,8 +1,12 @@
 # src/ui — User Interface Layer
 
 > **Status.** The shipped UI is the **knowledge browser** (graph, SPARQL,
-> annotations, presets) and the **Patch Studio** (`creator/`), wrapped in shared
-> navigation, theming, and the photosensitivity safety layer. The standalone
+> annotations, presets), **Patch Studio** (`creator/`), and the currently
+> standalone **Sensory Field** (`field/`), wrapped in shared navigation, theming,
+> and the photosensitivity safety layer. Field is planned to become a guided
+> Studio workspace under
+> [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
+> The standalone
 > session `player/` and preset `browser/` components in the target design are
 > still planned.
 
@@ -32,7 +36,7 @@ drone voice count, tremolo enable) rebuild the affected voice.
 - `presetDraft.js` — the data model (track types, parameter ranges, factories,
   validation). **Authoritative model spec:**
   [`../../docs/technical/PATCH_STUDIO.md`](../../docs/technical/PATCH_STUDIO.md).
-- `controlSignals.js` — Martigli / Symmetry control-signal evaluation.
+- `controlSignals.js` — LFO / Permutation control-signal evaluation.
 - `tempo.js` — BPM / tempo-sync math. `semantic.js` — track/param → SSTIM terms.
 - `creatorSession.js` — cross-navigation session persistence.
 - `Knob.svelte` — the reusable rotary control (base value + live/modulated dot).
@@ -41,6 +45,22 @@ drone voice count, tremolo enable) rebuild the affected voice.
 `AudioContext.resume()` is called inside the play button's gesture handler, never
 on mount (browser autoplay policy). The engine is built by
 `createAudioEngine()` from [`../engines/audio/audioEngines.js`](../engines/audio/audioEngines.js).
+
+---
+
+## `field/` — Sensory Field (current standalone implementation)
+
+The guided colour, per-ear audio, blink, free-view depth, and stereoscopic-scene
+surface. `SensoryField.svelte` and the scene shells currently own state,
+persistence, playback/frame loops, and exposure export independently of Patch
+Studio. The as-built contract is
+[`SENSORY_FIELD.md`](../../docs/technical/SENSORY_FIELD.md).
+
+[ADR 0046](../../docs/decisions/0046-one-studio-two-authoring-modes.md) changes
+that target: retain Guided Field's controls and identity, but move them over the
+same patch graph, engine, transport, clock, store, and safety acknowledgement as
+Advanced Studio. Do not embed the current autonomous component in Studio; follow
+the extraction, adapter, migration, and route gates in the integration plan.
 
 ---
 

@@ -116,6 +116,16 @@ overclaiming ([ADR 0026](../docs/decisions/0026-patch-studio-catalog-bridge.md),
 `portability/sessionPackage.js` wraps that as a portable session package
 ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)).
 
+Sensory Field currently owns a separate runtime and emits an SSTIM
+`ExposureProfile`. [ADR 0046](../docs/decisions/0046-one-studio-two-authoring-modes.md)
+adopts one Studio runtime with Guided Field and Advanced views while retaining
+configuration, exposure, and calibrated-stimulus semantics as separate products.
+Implementation order is in
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
+SSTIM conformance and optional BSC catalog compatibility are deliberately split
+in
+[`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](../docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md).
+
 Changes to the **preset catalog format** must be coordinated across
 `docs/technical/PRESET_FORMAT.md` (specification),
 `static/ontology/sstim-shapes.ttl` (SHACL), and — once they exist —

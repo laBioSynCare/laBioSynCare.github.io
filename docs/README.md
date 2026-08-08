@@ -50,6 +50,9 @@ instance. Both are the source for their planned JSON Schemas.
 [`../src/engines/README.md`](../src/engines/README.md)) and
 [`VISUAL_ENGINE_ARCHITECTURE.md`](technical/VISUAL_ENGINE_ARCHITECTURE.md)
 (PixiJS v8 design; as-built visuals in `PATCH_STUDIO.md` §5).
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+is the adopted plan for making Sensory Field a guided Studio workspace over one
+model and runtime.
 [`AGENT_AUTOMATION_BOUNDARY.md`](technical/AGENT_AUTOMATION_BOUNDARY.md) records
 what a conversational agent-automation layer would have to respect if one were
 ever added — nothing in it is built or on the roadmap.
@@ -64,7 +67,7 @@ ever added — nothing in it is built or on the roadmap.
 Lightweight ADRs (Context, Decision, Alternatives, Consequences) capturing
 non-obvious choices. **[`decisions/README.md`](decisions/README.md) holds the
 index** — it is not duplicated here, because the copy that was went stale at
-ADR 0011 while the series ran past 0045.
+ADR 0011 while the series continued to grow.
 
 ## `ontology/` — plans and reviews
 
@@ -85,6 +88,9 @@ Ontology design itself is documented at
   ([ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md)).
 - [`ECOSYSTEM_OPERATIONS.md`](ecosystem/ECOSYSTEM_OPERATIONS.md) — running the
   consent-gated publication pipeline.
+- [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
+  — separates public SSTIM conformance from optional, version-pinned BSC catalog
+  compatibility and gives the coalition decision gates.
 - [`HED_BIDS_INTEROP.md`](ecosystem/HED_BIDS_INTEROP.md) — SSTIM ↔ HED event
   profile and optional BIDS/NWB bindings
   ([ADR 0025](decisions/0025-hed-bids-interoperability-crosswalk.md)).

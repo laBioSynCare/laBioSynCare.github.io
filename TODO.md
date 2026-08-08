@@ -54,8 +54,9 @@ already shipped. Release facts are derived from
 Registry curation and independent human ontology review continue in parallel.
 
 **Standing state.** The modular ontology architecture shipped, with namespace
-catalogues, profile and schema routes, and a conformance contract for every
-profile; the registry rules are merged and verified against the deployment. The
+catalogues, profile and schema routes, conformance contracts for Core, Core Plus,
+and Full, and a separate Kernel discovery contract (ADR 0045); the registry
+rules are merged and verified against the deployment. The
 external live-only ecosystem store, loader, and private admission ledger are
 operational, and the live aggregate carries the W3C CG and Æterni Anima records,
 so persistent identifiers may be promoted in human-facing discovery. The unified
@@ -67,16 +68,21 @@ BioSynCare/BSC catalog.
 **Ahead of schedule, from Phase 2.** The **Patch Studio** (real-time audiovisual
 designer, four selectable audio engines, six audio voice types plus universal
 tremolo, nine visual track types with blend/fullscreen mixing) and the **Sensory
-Field** (`/field/`, Steps 1–2: static colour field, per-ear tone/noise, blink,
-monaural/binaural beat, runtime flash-rate cap, per-configuration
-`ExposureProfile` export). Both sit behind the photosensitivity safety layer. See
+Field** (`/field/`: static colour, per-ear tone/noise, blink,
+monaural/binaural beat, free-view depth, and tree/abstraction/landscape scenes;
+runtime flash-rate cap and per-configuration `ExposureProfile` export). Both sit
+behind the photosensitivity safety layer. See
 [`PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md),
 [`SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md), and
 [`PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
 
-**Open decisions.** Whether Sensory Field stays a distinct on-ramp or folds into
-Patch Studio — an architecture call, not copy. Sensory Field Step 3 (stereoscopic
-depth / dichoptic eye-laterality) is outlined but unbuilt.
+**Integration decision made 2026-08-08.** Sensory Field becomes a Guided Field
+workspace inside Patch Studio over one model/runtime, while `/field/*` stays as
+a compatibility on-ramp. Implementation is pending; see
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md). Free-view
+depth and three richer scenes are already shipped; headset/VR and independent
+per-eye flicker remain future work.
 
 **Still Phase 2, not to be built during Phase 1:** the `core/` orchestration
 layer and the GPU visual/haptic engines. Phase 3 infrastructure likewise waits.
@@ -85,8 +91,8 @@ layer and the GPU visual/haptic engines. Phase 3 infrastructure likewise waits.
 
 ## 1. Reference Documents
 
-All 31 files to be written by Claude (this conversation) before any
-software is built. Written in the order specified in `ROADMAP.md`.
+Historical Phase-0 bootstrap inventory: these 31 reference files were planned
+before software construction and are retained here as the original checklist.
 
 ### Already complete
 - [x] `CLAUDE.md` — AI agent directive `P0`
@@ -639,19 +645,47 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       tracks, per-param knobs, modulation links, tempo sync, live engine
       preview, cloud save~~ — shipped (`patch-studio-model-1`).
 
-**Bridge to the catalog / RDF (highest priority — PATCH_STUDIO.md §10.1, ADR 0026)**
-- [ ] `src/ui/creator/patchToPreset.js` — convert the mappable subset of a patch
-      (`BinauralBeat→Binaural`, `Symmetry`+`IsochronicTone→Symmetry`,
-      `Martigli`-modulated carrier→`Martigli`/`Martigli-Binaural`) to catalog
-      `header`+`voices`; report blocked/dropped tracks, never silently drop `P2`
+**Mandatory Sensory Field integration (highest priority — ADR 0046)**
+- [x] Decide the product boundary: one canonical Studio model/runtime with
+      Guided Field and Advanced authoring views; retain `/field/*` compatibility
+      entry points —
+      [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+      `P2`
+- [ ] Pin legacy Field fixtures and finish the `LFO`/`Permutation` rename:
+      correct validation and tempo-sync keys plus the stale “add a Martigli or
+      Symmetry oscillator” user warning before adapting either model `P2`
+- [ ] Add first-class colour-field and stereoscopic-scene track contracts;
+      add enabled/inactive semantics and a general-rate sinusoidal depth control;
+      implement pure, report-producing adapters for the main Field and all three
+      scene families; extend fixed-point and cross-origin tests `P2`
+- [ ] Componentize Guided Field inside Studio over the same draft, engine,
+      audio clock, transport, store, and session-only safety acknowledgement `P2`
+- [ ] Derive both configuration and exposure exports from the unified delivered
+      state; run real producer-adjacent SHACL validation and exhaustive loss
+      accounting `P2`
+- [ ] Offer non-destructive conversion of the four `bsclab.field*` storage
+      families; cut old routes over to guided workspaces; remove duplicate Field
+      runtime/persistence only after a deprecation window `P2`
+
+**Optional catalog compatibility (after the merge and neutrality decision gate —
+PATCH_STUDIO.md §10.1, ADR 0026)**
+- [ ] Define the generic export-adapter result and reconcile a version-pinned BSC
+      catalog contract; proceed only under
+      [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
+      `P2`
+- [ ] `src/ui/creator/patchToBscCatalogPreset.js` — convert the declared mappable
+      subset of a patch (`BinauralBeat→Binaural`,
+      `Permutation`+`IsochronicTone→Symmetry`, breathing `LFO`-modulated
+      carrier→`Martigli`/`Martigli-Binaural`) to catalog `header`+`voices`;
+      report blocked/transformed/unsupported tracks, never silently drop `P2`
 - [ ] Metadata-authoring panel for the required `header` fields
       (`group`, `targetBand`, `evidenceTier`, `cautionTags`, multilingual
       `desc*`/`med2*`/`techDesc*`, `headphonesMode`, …); no auto-derived
       evidence/claims (`CLAUDE.md` §3.5) `P2`
-- [ ] Validate output against `schemas/preset.schema.json`, then emit a BSC Lab
-      reference preset + (second) its RDF instance under
-      `static/ontology/instances/presets/`, SHACL-gated (`CLAUDE.md` §5.4).
-      Pairs with the `src/rdf/export.js` RDF-pipeline task below `P2`
+- [ ] Add the currently missing `schemas/preset.schema.json`, validate locally,
+      obtain version-pinned BioSynCare consumer-contract acceptance, then—under
+      separate public-data approval—emit any BSC Lab reference preset/RDF
+      instance; private catalog data stays outside this repository `P2`
 
 **Decompose the monolith (PATCH_STUDIO.md §10.2)**
 - [x] ~~Extract pure `src/ui/creator/modulation.js`~~ — `evalParamValue`,
@@ -662,7 +696,11 @@ The improvement backlog below is grounded in that spec's §10 and gated by
 - [x] ~~Extract pure `src/ui/creator/waveformPaths.js`~~ — SVG scope geometry
       + `isoEnvSpec`.
 - [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
-      preserving the `AudioContext.currentTime` clock authority) `P2`
+      preserving the `AudioContext.currentTime` clock authority); required by
+      integration Milestone 1 `P2`
+- [ ] Extract a visual renderer/stage registry and move the Stereoscopic Tree to
+      the shared `SceneStage` contract before adding Field track types; required
+      by integration Milestone 1 `P2`
 - [x] ~~Extract a cloud-patches store~~ — shipped as the storage seam
       ([ADR 0038](docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)):
       `src/storage/` holds `PatchStore` with local and Firestore implementations

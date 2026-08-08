@@ -1,12 +1,21 @@
 # ADR 0026 — Patch Studio → catalog/RDF: a gated one-way converter over a mappable subset, not a native catalog authoring model
 
-**Status:** Accepted — 2026-07-12 · **RDF half implemented, catalog-JSON half not.**
+**Status:** Accepted — 2026-07-12 · **RDF half implemented, catalog-JSON half
+not; catalog implementation is now conditional.**
 `src/portability/patchProjection.js` is the gated one-way converter to SSTIM RDF
 over the declared mappable subset, with a machine-readable report of what did not
 travel. It projects a `sstim:Preset`, not the `sstim:Patch` this ADR's successor
 [ADR 0040](0040-patch-studio-native-session-and-track-classes.md) minted and
 [ADR 0041](0041-stimulus-description-layers-and-the-canonical-schema-gap.md)
 withdrew. No converter to the `header` + `voices` catalog JSON exists.
+
+**Planning amendment — 2026-08-08.** The mapping, no-silent-loss,
+human-metadata, and private-catalog boundaries below remain binding if the JSON
+adapter is built. Its implementation is no longer assumed: it follows the
+merged-model, coalition-review, and consumer-contract gate in
+[`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](../ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md).
+Deferral does not block the mandatory Field/Studio integration in
+[ADR 0046](0046-one-studio-two-authoring-modes.md).
 
 Drafted from the Patch Studio improvement analysis, see
 [`../technical/PATCH_STUDIO.md`](../technical/PATCH_STUDIO.md) §10.1.
@@ -19,10 +28,11 @@ object is consumed only by `draftFromPatchExport()` and Firestore
 (`src/firebase/patches.js`, since replaced by the storage seam in [`src/storage/`](../../src/storage/)). There is **no path**
 from a patch to the preset catalog JSON ([`PRESET_FORMAT.md`](../technical/PRESET_FORMAT.md),
 `header` + `voices`) or to an RDF instance under
-`static/ontology/instances/presets/`. Yet the catalog preset is the artifact the
-BSC Lab → BioSynCare pipeline (`CLAUDE.md` §11) and the knowledge browser
-([`src/rdf/presets.js`](../../src/rdf/presets.js)) actually consume. The studio is
-a design surface wired to nothing downstream.
+`static/ontology/instances/presets/`. The catalog JSON is the artifact the
+planned adapter would target; the knowledge browser separately consumes approved
+public RDF instances through
+[`src/rdf/presets.js`](../../src/rdf/presets.js). The studio has no downstream
+catalog path.
 
 The obstacle is that the two models are **structurally divergent**, not two
 encodings of one thing (full table in [PATCH_STUDIO.md](../technical/PATCH_STUDIO.md) §10.1):

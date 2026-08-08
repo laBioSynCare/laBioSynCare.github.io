@@ -399,17 +399,15 @@ above for why they're no longer also duplicated in a hero/footer bar.
   and compares it against that module. Its prose scan already covered
   `+page.svelte` and always had — the numbers had simply moved somewhere it
   did not look.
-- [ ] **Open — Sensory Field × Patch Studio relationship.** Raised on the
-  2026-07-18 review: should Sensory Field be developed further as a
-  standalone, simpler on-ramp instrument, or folded into Patch Studio as a
-  single surface? They're currently documented as deliberately distinct
-  (`SENSORY_FIELD.md` — a guided instrument with its own Step 1–3 roadmap,
-  currently at Step 2; `PATCH_STUDIO.md` — the full multi-track designer),
-  and Sensory Field's role as door ①'s low-commitment "start gently" path
-  is part of why it existed as a separate surface at all. A merge is an
-  architecture decision (engine sharing, route consolidation, UX model), not
-  an entrance copy tweak — needs a real answer before touching engine code,
-  not a guess baked into a landing page.
+- [x] **Decision resolved 2026-08-08 — merge the runtime, retain the guided
+  on-ramp.** Sensory Field will become a named Guided Field workspace inside
+  Patch Studio, editing the same document and using the same engine, transport,
+  clock, store, and safety gate. The `/field/*` URLs remain compatibility entry
+  points, so door ① can keep its low-commitment “start gently” path. This is not
+  yet implemented: [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
+  owns the decision and
+  [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md) owns the
+  phased work.
 
 ## Next actions
 

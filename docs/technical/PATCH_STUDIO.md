@@ -14,8 +14,11 @@
 > The Patch Studio is an interactive *design surface*: it builds an in-memory
 > **patch draft** and renders it live through the selected audio engine (see
 > [`../../src/engines/README.md`](../../src/engines/README.md)). Its export
-> object is tagged `model: "patch-studio-model-1"` and is its own thing — a
-> bridge to the catalog/ontology formats is future work.
+> object is tagged `model: "patch-studio-model-1"` and is its own thing. Its
+> lossless session package and partial SSTIM RDF projection are implemented;
+> the one-way catalog JSON adapter is still future work. The adopted plan to
+> merge Sensory Field as a guided workspace is
+> [`PATCH_STUDIO_FIELD_INTEGRATION.md`](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 The canonical implementation is [`src/ui/creator/presetDraft.js`](../../src/ui/creator/presetDraft.js)
 (data model) and [`src/ui/creator/PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)
@@ -33,7 +36,7 @@ A patch draft is a plain object held in Svelte `$state`:
   patchName: string,
   timing: { lengthSec, bpmEnabled, beatsPerBar, bpm: { value, mods } },
   playing: boolean,
-  controlTracks: [ ... ],   // Martigli / Symmetry — modulation sources
+  controlTracks: [ ... ],   // LFO / Permutation — modulation sources
   audioTracks:   [ ... ],   // the audible voices
   visualTracks:  [ ... ],   // visual stimuli (CSS/DOM previews today)
   hapticTracks:  [ ... ],   // Vibration
@@ -62,7 +65,8 @@ Every modulatable parameter is an object `{ value, mods, tempoSync? }`:
 
 Parameter knob ranges are `[min, max, step]` tables: `AUDIO_PARAM_RANGE`,
 `VISUAL_PARAM_RANGE`, `HAPTIC_PARAM_RANGE`, `MARTIGLI_PARAM_RANGE`,
-`SYMMETRY_PARAM_RANGE`, `TREMOLO_PARAM_RANGE`.
+`SYMMETRY_PARAM_RANGE`, `TREMOLO_PARAM_RANGE`. The two legacy constant names
+remain in code after the control-type rename described below.
 
 The live evaluation runs in `PresetCreator`'s `requestAnimationFrame` loop, which
 reads `engine.getAudioContext().currentTime` as its clock (per `CLAUDE.md` §3.1)
@@ -72,15 +76,21 @@ and writes changes to live voices via `engine.setVoiceParameter()`.
 
 ## 3. Control tracks (modulation sources)
 
-`CONTROL_TYPES = ['Martigli', 'Symmetry']`
+`CONTROL_TYPES = ['LFO', 'Permutation']`
 
-- **Martigli** — a breathing-shaped oscillation that ramps its period from
+- **LFO** — a breathing-shaped oscillator that ramps its period from
   `periodSec` toward `targetPeriodSec` across the session. Params: `periodSec`,
   `targetPeriodSec`, `inhaleRatio`, `amplitude`; `waveform ∈ {sine, triangle,
-  square}`. Full model: [`BREATHING_MODEL.md`](BREATHING_MODEL.md).
-- **Symmetry** — a change-ringing-style stepped LFO (plain-hunt permutations).
+  square}`. Full mechanism: [`BREATHING_MODEL.md`](BREATHING_MODEL.md).
+- **Permutation** — a change-ringing-style stepped control (plain-hunt
+  permutations).
   Params: `nnotes`, `rateHz`, `amplitude`; `family = 'plain-hunt'`. Full model:
   [`SYMMETRY_SYSTEM.md`](SYMMETRY_SYSTEM.md).
+
+Before [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md),
+these controls were named `Martigli` and `Symmetry`. `LEGACY_CONTROL_TYPES`
+migrates stored patches; those technique names remain appropriate for catalog
+voices, not for generic control mechanisms.
 
 A control track's live value is what every linked sensory-parameter `mod`
 multiplies by its `amount`.
@@ -176,9 +186,9 @@ When it is off, previews and the mix stage are suppressed. See
 ## 6. Haptic tracks
 
 `HAPTIC_TRACK_TYPES = ['Vibration']` with params `intensity`, `frequency`,
-`pulseRate`, `pattern`. Rendered through the Web Vibration API where available;
-silently inert elsewhere (iOS Safari). Today the studio shows a haptic
-*preview*; delivery follows the haptic engine interface described in
+`pulseRate`, `pattern`. Today the studio shows a haptic *preview* but does not
+call `navigator.vibrate`; delivery through the Web Vibration API remains target
+work behind the haptic engine interface described in
 [`../../src/engines/README.md`](../../src/engines/README.md).
 
 ---
@@ -211,10 +221,11 @@ params on a track are tempo-syncable and as what kind (`duration`, `rate`,
 
 This is **not** the preset catalog JSON in [`PRESET_FORMAT.md`](PRESET_FORMAT.md)
 and **not** a session instance in [`SESSION_MODEL.md`](SESSION_MODEL.md). It is
-the studio's own portable representation. Converting a patch into a catalog
-preset or an RDF instance is intentionally deferred — when added, the mapping
-belongs alongside the preset-format change checklist in
-[`../../src/README.md`](../../src/README.md).
+the studio's own portable representation. A partial SSTIM `Preset` projection
+and lossless session package now exist in
+[`../../src/portability/`](../../src/portability/) and are documented in
+[`SESSION_PACKAGE.md`](SESSION_PACKAGE.md). The catalog JSON converter remains
+open under [ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md).
 
 Patches are saved through the storage seam in
 [`../../src/storage/`](../../src/storage/): `PatchStore` has a local and a
@@ -231,11 +242,18 @@ back into the live draft shape.
 `validateDraft(draft)` returns `{ level: 'error' | 'warning', message }[]`,
 surfaced in the studio footer. It checks: a patch name is set; BPM / beats-per-bar
 are in range when enabled; session length > 0; at least one control and one
-sensory track exist; Martigli period ≥ 3 s (breathing minimum); Symmetry rate in
-`(0, 50]` Hz; every `mod.controlId` and tempo-sync target still resolves.
+sensory track exist; and every `mod.controlId` still resolves. It also intends to
+enforce the breathing LFO's ≥ 3 s period, the Permutation control's `(0, 50]` Hz
+rate, and valid tempo-sync targets, subject to the rename defect below.
 
 Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
-[`tempo.test.js`](../../src/ui/creator/tempo.test.js).
+[`tempo.test.js`](../../src/ui/creator/tempo.test.js). The control rename left a
+known defect: the tempo-sync registry and two control-specific validation
+branches still key the old `Martigli`/`Symmetry` names, so the live
+`LFO`/`Permutation` checks do not currently execute; the no-control warning also
+uses those legacy labels. Fixing and pinning them is
+Milestone 0 of
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
 ---
 
@@ -249,19 +267,23 @@ Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
 
 ### 10.1 The export reaches RDF, but not the catalog
 
-`buildPatchExport()` produces a `patch-studio-model-1` object (§8). Two of the
-three downstream paths now exist:
+`buildPatchExport()` produces a `patch-studio-model-1` object (§8). The lossless
+native/package path exists, the semantic projection is partial, and the catalog
+delivery path remains open:
 
-- **SSTIM RDF — built.** `src/portability/patchProjection.js` projects a patch
-  into a `sstim:Preset` over the declared mappable subset and emits a
-  machine-readable report of everything that did not travel;
+- **SSTIM RDF — partial mapping built; producer validation still open.**
+  `src/portability/patchProjection.js` projects a patch into a `sstim:Preset`
+  over the declared mappable subset and emits a machine-readable report of
+  numeric parameters that did not travel. Its report is not yet exhaustive for
+  nested/discrete values, and the producer does not yet invoke SHACL;
   `src/portability/sessionPackage.js` wraps that as a checksummed portable
   package, and `make session-conformance` proves Level 1 and Level 2 equivalence
   across two origins ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)).
 - **Catalog preset JSON — still open.** There is no converter to
-  [`PRESET_FORMAT.md`](PRESET_FORMAT.md)'s `header` + `voices`, which is the
-  artifact the BSC Lab → BioSynCare pipeline (`CLAUDE.md` §11) and the knowledge
-  browser (`src/rdf/presets.js`) consume. This is the remaining half of
+  [`PRESET_FORMAT.md`](PRESET_FORMAT.md)'s `header` + `voices`. That would be the
+  optional version-pinned BSC catalog-adapter output; the knowledge browser
+  instead reads separately approved public RDF instances through
+  `src/rdf/presets.js`. This is the remaining half of
   [ADR 0026](../decisions/0026-patch-studio-catalog-bridge.md).
 
 The two models are **structurally divergent**, so any catalog conversion is a
@@ -273,13 +295,14 @@ lossy, partial mapping — not a re-serialisation:
 | Audio types | `IsochronicTone`, `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample` | `Binaural`, `Martigli`, `Martigli-Binaural`, `Symmetry` only |
 | Non-audio | visual + haptic tracks | none (audio only) |
 | Metadata | `patchName` only | `group`, `targetBand`, `evidenceTier`, `cautionTags`, multilingual `desc*`/`med2*`/`uses*`/`techDesc*`, `headphonesMode`, … |
-| Breathing | Martigli **control track** modulating other tracks | Martigli / Martigli-Binaural **audible voice** |
+| Breathing | breathing-shaped `LFO` **control track** modulating other tracks | Martigli / Martigli-Binaural **audible voice** |
 
 Consequences that must be decided before implementing the catalog half:
 
-- Only a **mappable subset** round-trips: `BinauralBeat → Binaural`; a `Symmetry`
-  control + `IsochronicTone` → `Symmetry` voice (isochronic, `noctaves: 0`); a
-  `Martigli` control modulating a carrier/binaural → `Martigli` /
+- Only a **mappable subset** round-trips: `BinauralBeat → Binaural`; a
+  `Permutation` control (legacy `Symmetry`) + `IsochronicTone` → `Symmetry`
+  voice (isochronic, `noctaves: 0`); a breathing-shaped `LFO` (legacy
+  `Martigli`) modulating a carrier/binaural → `Martigli` /
   `Martigli-Binaural`. `Carrier`/`Noise`/`Drone`/`Sample`, all visual, and all
   haptic tracks have **no catalog voice** and are dropped or blocked.
 - The catalog `header` carries scientific/human metadata that **cannot be derived**
