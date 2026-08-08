@@ -1,18 +1,26 @@
 import { describe, expect, it } from 'vitest'
 import {
   PATCH_FILE_MAX_BYTES,
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  SPATIAL_VISUAL_TRACK_TYPES,
+  VISUAL_PARAM_RANGE,
+  VISUAL_TRACK_TYPES,
   buildPatchExport,
   createAudioTrack,
   createDraft,
   createEmptyDraft,
   createMod,
   createTempoSyncConfig,
+  createVisualStagePresentation,
   createVisualTrack,
   CONTROL_TYPES,
   LEGACY_CONTROL_TYPES,
   createControlTrack,
   draftFromPatchExport,
   draftFromPatchFileText,
+  migratePatchExportToCurrent,
   validateDraft,
 } from './presetDraft.js'
 
@@ -120,7 +128,7 @@ describe('preset draft tempo model', () => {
 
   it('advances generated IDs after loading saved patches', () => {
     draftFromPatchExport({
-      model: 'patch-studio-model-1',
+      model: PATCH_STUDIO_MODEL_V1,
       patchName: 'Stored',
       timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
       controlTracks: [{ id: 'ctl-900', type: 'LFO', name: 'Ctl' }],
@@ -141,6 +149,174 @@ describe('preset draft tempo model', () => {
     expect(draft.audioTracks).toEqual([])
     expect(draft.visualTracks).toEqual([])
     expect(draft.hapticTracks).toEqual([])
+  })
+})
+
+describe('ADR 0046 visual model foundation', () => {
+  it('serializes one shared visual-stage presentation on every draft', () => {
+    const draft = createEmptyDraft()
+
+    expect(draft.visualStage).toMatchObject({
+      presentationMode: 'mono',
+      viewingMode: 'parallel',
+      backgroundColor: '#07090c',
+      camera: { yawDeg: 20, autoRotate: false },
+    })
+    expect(buildPatchExport(draft).visualStage).toEqual(draft.visualStage)
+  })
+
+  it('registers ordinary color-field and content-specific spatial tracks', () => {
+    expect(VISUAL_TRACK_TYPES).toEqual(expect.arrayContaining([
+      'ColorField',
+      'DepthMarkers',
+      'TreeScene',
+      'AbstractScene',
+      'LandscapeScene',
+    ]))
+
+    const colorField = createVisualTrack('ColorField')
+    expect(colorField.enabled).toBe(true)
+    expect(Object.keys(colorField.params)).toEqual(['opacity', 'blinkRate', 'duty'])
+    expect(colorField.config).toEqual({
+      color: '#3355ff',
+      offColor: '#000000',
+      blinkEnabled: false,
+    })
+
+    for (const trackType of SPATIAL_VISUAL_TRACK_TYPES) {
+      const track = createVisualTrack(trackType)
+      expect(track.enabled).toBe(true)
+      expect(Object.keys(track.params)).toEqual([
+        'opacity',
+        'x',
+        'y',
+        'z',
+        'spatialScale',
+        'rotationSpeed',
+      ])
+      expect(track.params.x).toMatchObject({ value: 0, mods: [] })
+      expect(track.params.y).toMatchObject({ value: 0, mods: [] })
+      expect(track.params.z).toMatchObject({ value: 0, mods: [] })
+      expect(track.params.spatialScale).toMatchObject({ value: 1, mods: [] })
+      expect(track.params.rotationSpeed.tempoSync).toBeDefined()
+      expect(track.config).toBeDefined()
+    }
+
+    expect(VISUAL_PARAM_RANGE.x).toEqual([-2, 2, 0.01])
+    expect(VISUAL_PARAM_RANGE.y).toEqual([-2, 2, 0.01])
+    expect(VISUAL_PARAM_RANGE.z).toEqual([-2, 2, 0.01])
+    expect(VISUAL_PARAM_RANGE.spatialScale).toEqual([0.1, 4, 0.01])
+  })
+
+  it('accepts deterministic IDs and keeps presentation out of track config', () => {
+    const track = createVisualTrack('TreeScene', {
+      id: 'visual-template-tree',
+      enabled: false,
+      config: {
+        seed: 42,
+        presentationMode: 'stereo-pair',
+        backgroundColor: '#ffffff',
+      },
+    })
+
+    expect(track.id).toBe('visual-template-tree')
+    expect(track.enabled).toBe(false)
+    expect(track.config.seed).toBe(42)
+    expect(track.config).not.toHaveProperty('presentationMode')
+    expect(track.config).not.toHaveProperty('backgroundColor')
+  })
+
+  it('migrates model 1 to model 2 without mutating the legacy patch', () => {
+    const legacy = {
+      model: PATCH_STUDIO_MODEL_V1,
+      patchName: 'Legacy visual patch',
+      timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+      controlTracks: [{ id: 'ctl-old', type: 'Permutation', name: 'Legacy control', nnotes: 5 }],
+      audioTracks: [{ id: 'audio-old', trackType: 'Carrier', name: 'Legacy carrier' }],
+      visualTracks: [{ id: 'visual-old', trackType: 'Geometry', name: 'Old geometry' }],
+      hapticTracks: [],
+    }
+    const before = structuredClone(legacy)
+    const migrated = migratePatchExportToCurrent(legacy)
+    const imported = draftFromPatchExport(legacy)
+
+    expect(legacy).toEqual(before)
+    expect(migrated.model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(migrated.visualStage).toEqual(createVisualStagePresentation())
+    expect(imported.visualStage).toEqual(createVisualStagePresentation())
+    expect(imported.controlTracks[0]).toMatchObject({ id: 'ctl-old', type: 'Permutation', nnotes: 5 })
+    expect(imported.audioTracks[0]).toMatchObject({ id: 'audio-old', trackType: 'Carrier' })
+    expect(imported.visualTracks[0].enabled).toBe(true)
+    expect(imported.visualTracks[0]).not.toHaveProperty('config')
+    expect(buildPatchExport(imported).model).toBe(PATCH_STUDIO_MODEL_V2)
+  })
+
+  it('never emits model-2 fields under the model-1 identifier', () => {
+    const draft = createEmptyDraft()
+    draft.controlTracks = [createControlTrack('Sinusoid')]
+    draft.visualTracks = [createVisualTrack('ColorField')]
+
+    const exported = buildPatchExport(draft)
+
+    expect(exported.model).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(exported.model).not.toBe(PATCH_STUDIO_MODEL_V1)
+    expect(exported.visualStage).toBeDefined()
+  })
+
+  it('is a fixed point with every new track type, disabled state, and stage config', () => {
+    const draft = createEmptyDraft()
+    draft.patchName = 'Spatial fixed point'
+    draft.visualStage = createVisualStagePresentation({
+      presentationMode: 'stereo-pair',
+      viewingMode: 'cross',
+      backgroundColor: '#102030',
+      depthScalePx: 72,
+      camera: { yawDeg: 45, autoRotate: true, autoRotateSec: 30 },
+    })
+    draft.visualTracks = [
+      createVisualTrack('ColorField', {
+        id: 'visual-color',
+        enabled: false,
+        config: { color: '#224466', offColor: '#010203', blinkEnabled: true },
+      }),
+      createVisualTrack('DepthMarkers', {
+        id: 'visual-markers',
+        config: { gridSize: 5, gridDepthAxis: 'both', trajectoryEnabled: true },
+      }),
+      createVisualTrack('TreeScene', {
+        id: 'visual-tree',
+        config: { seed: 41, levels: 8, showRoots: false },
+      }),
+      createVisualTrack('AbstractScene', {
+        id: 'visual-abstract',
+        config: { seed: 42, style: 'kandinsky', objectCount: 72 },
+      }),
+      createVisualTrack('LandscapeScene', {
+        id: 'visual-landscape',
+        config: { seed: 43, palette: 'dusk', houses: 9 },
+      }),
+    ]
+    draft.visualTracks[1].params.x.value = 0.25
+    draft.visualTracks[1].params.y.value = -0.5
+    draft.visualTracks[1].params.z.value = 0.8
+    draft.controlTracks = [createControlTrack('LFO', { id: 'ctl-spatial' })]
+    draft.visualTracks[1].params.z.mods.push(createMod('ctl-spatial', 0.3))
+
+    const first = buildPatchExport(draft)
+    const imported = draftFromPatchExport(first)
+    const second = buildPatchExport(imported)
+
+    expect(second).toEqual(first)
+    expect(imported.visualTracks[0].enabled).toBe(false)
+    expect(imported.visualTracks[1].params).toMatchObject({
+      x: { value: 0.25 },
+      y: { value: -0.5 },
+      z: {
+        value: 0.8,
+        mods: [expect.objectContaining({ controlId: 'ctl-spatial', amount: 0.3 })],
+      },
+    })
+    expect(imported.visualStage.presentationMode).toBe('stereo-pair')
   })
 })
 
@@ -239,7 +415,7 @@ describe('patch file import', () => {
   })
 
   it('rejects a file larger than the size ceiling', () => {
-    const huge = `{"model":"patch-studio-model-1","pad":"${'x'.repeat(PATCH_FILE_MAX_BYTES)}"}`
+    const huge = `{"model":"${PATCH_STUDIO_MODEL_V1}","pad":"${'x'.repeat(PATCH_FILE_MAX_BYTES)}"}`
     expect(() => draftFromPatchFileText(huge)).toThrow(/too large/i)
   })
 
@@ -251,7 +427,7 @@ describe('patch file import', () => {
 
   it('tolerates missing track arrays without inventing tracks', () => {
     const sparse = JSON.stringify({
-      model: 'patch-studio-model-1',
+      model: PATCH_STUDIO_MODEL_V1,
       patchName: 'Sparse',
       timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
     })
@@ -325,5 +501,31 @@ describe('control-track rename migration (ADR 0041)', () => {
   it('creates current types by default', () => {
     expect(createControlTrack().type).toBe('LFO')
     expect(createControlTrack('Permutation').type).toBe('Permutation')
+    expect(createControlTrack('Sinusoid', { rateHz: 40, phaseRad: Math.PI / 2 })).toMatchObject({
+      type: 'Sinusoid',
+      rateHz: 40,
+      phaseRad: Math.PI / 2,
+    })
+  })
+
+  it('round-trips and clamps the general sinusoid control', () => {
+    const patch = patchWith([{
+      id: 'ctl-sine',
+      type: 'Sinusoid',
+      name: 'Depth rate',
+      rateHz: 80,
+      phaseRad: -2,
+      amplitude: 4,
+      tempoSync: { rateHz: { enabled: true, mode: 'division', division: '1/8' } },
+    }])
+    const first = draftFromPatchExport(patch)
+    expect(first.controlTracks[0]).toMatchObject({
+      type: 'Sinusoid',
+      rateHz: 40,
+      phaseRad: 0,
+      amplitude: 2,
+    })
+    expect(buildPatchExport(draftFromPatchExport(buildPatchExport(first))))
+      .toEqual(buildPatchExport(first))
   })
 })

@@ -1,29 +1,37 @@
 # Sensory Field
 
-> **For AI agents:** The Sensory Field is currently a guided stimulation
-> *instrument family* with a runtime separate from Patch Studio. It began as the
-> first deliverable rung of the
+> **For AI agents:** Sensory Field is now a **starter-template and compatibility
+> entry family inside Patch Studio**. `/field/*` redirects to ordinary Studio
+> tracks and no longer mounts the standalone Field runtime. The retained
+> `src/ui/field/` components, state models, persistence keys, and exposure
+> exporter are legacy conversion/golden-behavior code pending deprecation; they
+> are not the canonical public authoring path. Sensory Field began as the first
+> deliverable rung of the
 > sensory-stimulation interface and the reference consumer of the `sstim-ex:`
 > exposure ontology. Decision record: [ADR 0011](../decisions/0011-sensory-field-and-flash-safety.md).
 > It is bound by the same invariants as the rest of the app — `AudioContext.currentTime`
 > is the only AV-sync clock (CLAUDE.md §3.1), conservative wellness framing only
 > (CLAUDE.md §3.5), and the photosensitivity layer in
-> [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md). That is the as-built
-> state, not the target: [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
-> adopts its capabilities as ordinary first-class Studio tracks over one
-> model/runtime and shared visual projection stage; `/field/*` becomes a family
-> of template and compatibility entry points. The phased migration is in
+> [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md).
+> [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md) adopts its
+> capabilities as ordinary first-class Studio tracks over one model/runtime and
+> shared visual projection stage. That cutover is partial: controller extraction,
+> unified exposure export, acceptance gates, and legacy removal remain open. The
+> phased status is in
 > [PATCH_STUDIO_FIELD_INTEGRATION.md](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
-Route: `/field/` ([src/routes/field/+page.svelte](../../src/routes/field/+page.svelte)).
-Module: [src/ui/field/](../../src/ui/field/).
+Compatibility route: `/field/` → `/creator/?starter=field`
+([src/routes/field/+page.svelte](../../src/routes/field/+page.svelte)). Canonical
+module: [src/ui/creator/](../../src/ui/creator/). Retained legacy module:
+[src/ui/field/](../../src/ui/field/).
 
 ---
 
-## 1. What it is
+## 1. What the starter provides
 
-A user picks a full-screen colour and an independent per-ear sound, and presses
-Play. That alone is sensory stimulation — the resting, zero-frequency (DC) case.
+A user starts with a full-screen colour and independent per-ear sound as ordinary
+Studio tracks, then presses Play. That alone is sensory stimulation — the
+resting, zero-frequency (DC) case.
 Turning on **blink** (visual) or a **beat** (audio) adds the time dimension. The
 distinctive power is the *contrast across channels*: a static field in one ear
 while the other entrains, a binaural beat, a gently blinking colour.
@@ -35,29 +43,33 @@ ear, right ear, tactile — each cell either static (0 Hz) or modulated at a
 frequency. Steps 1–3a deliver the **physically honest subset** on commodity
 hardware:
 
-| Channel | Delivered now | Laterality |
+| Channel | Delivered through Studio now | Laterality |
 |---|---|---|
 | Visual field | one full-screen field (both eyes) | No — single field |
-| Free-view depth pair | two side-by-side eye images for parallel or cross-eye viewing | **Yes**, via free-view stereoscopy |
+| Shared spatial stage | mono, two-panel stereo pair, anaglyph, or autostereogram | **Yes** in the stereoscopic presentation modes |
 | Left ear / Right ear | true independent L/R (panned Carrier voices) | **Yes** |
 | Tactile | (planned) Web Vibration pulse | No (single actuator) |
 
-Eye-laterality is now delivered only through the free-view depth pair. It is not
-yet delivered through VR, AR glasses, eye-tracked displays, or independent
-per-eye flicker.
+Eye-laterality is delivered through the shared stage's stereoscopic presentation
+modes. It is not delivered through VR, AR glasses, eye-tracked displays, or
+independent per-eye flicker.
 
 ## 3. Steps
 
 - **Step 1 — static field.** Colour + intensity; per-ear tone (frequency, level)
   and/or noise (white/pink/brown). No time variation. Trivially safe.
-- **Step 2 — modulation.** Visual **blink** (colour ↔ black at a chosen rate and
-  duty) and audio **beat**: *monaural* (one tone, amplitude-modulated, via the
-  engine's tremolo) or *binaural* (a small frequency difference between the ears).
+- **Step 2 — modulation.** Visual **blink** (authored on/off colours, with black
+  as the default off colour, at a chosen rate and
+  duty) and audio **beat**: *monaural* (same-rate amplitude modulation on enabled
+  tone/noise sources via engine tremolo) or *binaural* (a small tone-frequency
+  difference between the ears).
   This is where the flash-rate and sound-level safety becomes load-bearing.
-- **Step 3a — free-view depth.** Stereoscopic depth from two simple point/stick
-  markers whose separation is static or driven by the beat or breath wave. The
-  renderer is CSS/SVG-like DOM, not PixiJS. It supports **parallel** and
-  **cross-eye** viewing by swapping the left/right image order.
+- **Step 3a — marker depth.** A first-class `DepthMarkers` track supplies simple
+  point/stick/grid geometry whose depth and motion can be static or driven by
+  explicit beat/breath `Sinusoid` controls. `SceneStage` renders SVG for mono,
+  stereo-pair, and anaglyph output and canvas for autostereograms; it is not
+  PixiJS. Stereo-pair output supports **parallel** and **cross-eye** viewing by
+  swapping the left/right image order.
   - **Free-view parallel (wall-eyed)** assigns left image → left eye, the same as
     a **VR headset**. **Cross-eyed** free-viewing assigns left image → right eye —
     the *mirror* of parallel. A cross-eye pair fed to VR/parallel without swapping
@@ -69,27 +81,35 @@ per-eye flicker.
   - Per-eye flicker asymmetry (dichoptic frequency tagging) is a known paradigm
     but compounds photosensitivity risk. It is not implemented in Step 3a and
     must be gated at least as strictly as Step 2 if added later.
-- **Step 3b — richer depth scenes.** The **Stereoscopic Tree** (`/field/tree/`,
-  [src/ui/field/tree/](../../src/ui/field/tree/)) is the first delivered Step 3b
-  scene: a procedural tree whose leaves, branches, and roots each carry an
-  (x, y, z) position, so the scene has real depth rather than two markers. One
-  shared 3D model is viewed through three user-selectable stereoscopic techniques
-  (see §8). More shapes, colour distributions, and future headset/VR paths remain
-  planned.
+- **Step 3b — richer depth scenes.** **Stereoscopic Tree**, **Abstraction**, and
+  **3D Landscape** are ordinary `TreeScene`, `AbstractScene`, and
+  `LandscapeScene` tracks. Their historic `/field/*` URLs are compatibility
+  aliases. The tree is procedural: its leaves, branches, and roots each carry an
+  (x, y, z) position, so the scene has real depth rather than two markers. Each
+  shared-stage 3D model is viewed through mono or three user-selectable
+  stereoscopic techniques (see §8). More shapes, colour distributions, and
+  future headset/VR paths remain planned.
 
 ## 4. Audio
 
-Built on the existing `IAudioEngine` ([audioEngines.js](../../src/engines/audio/audioEngines.js)).
+Canonical delivery uses Patch Studio's existing `IAudioEngine`
+([audioEngines.js](../../src/engines/audio/audioEngines.js)).
 Per-ear delivery uses two `Carrier` voices hard-panned −1 / +1 (and `Noise`
-voices likewise); a binaural beat is just a frequency difference between them; a
-monaural beat is the engine's `tremolo` on equal-frequency tones. The clock is
+voices likewise); a binaural beat is just a frequency difference between tones;
+a monaural beat is the engine's `tremolo` on every enabled tone and noise voice.
+The clock is
 `AudioContext.currentTime`; `engine.resume()` is called inside the Play gesture
 (autoplay policy). Sound level is **advisory only** — BSC Lab cannot measure
 delivered SPL — with conservative defaults and a NIOSH 85 dBA / 8 h note.
 
+The old `SensoryField.svelte` engine, handles, and rAF loop remain in source but
+are no longer mounted by the public `/field/*` routes. Studio's lifecycle and
+frame loop are still inside `PresetCreator.svelte`; extracting them into the
+planned controller remains open.
+
 ## 5. Safety
 
-- **Global gate.** The field renders only when `isVisualStimulationOn()` is true
+- **Global gate.** The Studio stage renders only when `isVisualStimulationOn()` is true
   (see [PHOTOSENSITIVITY_SAFETY.md](PHOTOSENSITIVITY_SAFETY.md)); otherwise a
   placeholder shows.
 - **Flash-rate cap.** [flashSafety.js](../../src/ui/safety/flashSafety.js) caps the
@@ -98,21 +118,22 @@ delivered SPL — with conservative defaults and a NIOSH 85 dBA / 8 h note.
   ≈ 15–25 Hz peak band are flagged highest-risk. The acknowledgement is never
   persisted — it is re-confirmed each session by design (ADR 0011).
 - **Depth safety.** Step 3a does not add independent per-eye flicker. It can add
-  eye strain through free-view convergence/divergence, so exported profiles add
-  `boundaryEyeStrain` and `lossHorizontalField`.
+  eye strain through free-view convergence/divergence, so the legacy exposure
+  profile adds `boundaryEyeStrain` and `lossHorizontalField`.
 - The same 3 Hz threshold is modelled as `sstim-ex:limitFlickerWcag`, so the gate
   and the ontology cannot silently diverge.
 
-## 6. Exposure-profile emission
+## 6. Legacy exposure-profile emission
 
-Every configuration serialises to an `sstim-ex:ExposureProfile`
-([exposureProfile.js](../../src/ui/field/exposureProfile.js)), modelled on the
-committed reference instance
+The retained standalone Field state serialises to an `sstim-ex:ExposureProfile`
+through [exposureProfile.js](../../src/ui/field/exposureProfile.js), modelled on
+the committed reference instance
 [`sensory-field-example.ttl`](../../static/ontology/instances/experiments/sensory-field-example.ttl).
 
-The runtime export is **SHACL-conformant** (ADR 0027 closed audit finding
-KR-01). It carries a defining framework, a technique or editorial-note baseline,
-and — instead of manufactured evidence claims — role-specific statements:
+That legacy mapper is **SHACL-conformant** in its golden state matrix (ADR 0027
+closed audit finding KR-01). It carries a defining framework, a technique or
+editorial-note baseline, and — instead of manufactured evidence claims —
+role-specific statements:
 `sstim-ex:ExposureHypothesis` (stereo depth), `sstim-ex:ResearchQuestion`
 (calm/arousal self-observation), and `sstim-ex:BoundaryApplicabilityStatement`
 (photosensitivity). A delivery description asserts no efficacy. The golden
@@ -121,6 +142,12 @@ conformance suite
 validates every field state against the SSTIM shapes and fails on any drift.
 Some visual detail (colours, depth grid) is still summarised rather than fully
 captured.
+
+The canonical Studio starter/track path does **not** yet derive or offer this
+profile. A unified delivered-state snapshot, eligibility from ordinary track
+content, and producer-adjacent SHACL must ship before Studio can claim equivalent
+exposure export. The legacy mapper and tests are the behavior to preserve, not
+evidence that the new route already exports an `ExposureProfile`.
 
 Mapping:
 
@@ -133,45 +160,42 @@ Mapping:
 | Noise | `patternNoise` + an `audioNoise…` colour concept |
 | Beat | `hasBeatFrequencyHz` |
 
-The exported flash rate is the **delivered** (clamped) rate, not the raw slider
-value, so the profile reflects what actually played. The "In the ontology" panel
-links each active concept to the graph view via
+The legacy exported flash rate is the **delivered** (clamped) rate, not the raw
+slider value, so its profile reflects what actually played. The retained "In the
+ontology" mapping links each active concept to the graph view via
 [fieldSemantic.js](../../src/ui/field/fieldSemantic.js).
 
 ## 7. File map
 
 ```
-src/routes/field/+page.svelte               route (thin)
-src/routes/field/{tree,abstract,landscape}/+page.svelte   scene routes (thin)
-src/ui/field/SensoryField.svelte            main UI: session, clock loop, controls, export
-src/ui/field/FieldStage.svelte              render surface (colour fill / fullscreen)
-src/ui/field/fieldState.js                  channel state model + persistence (bsclab.field)
-src/ui/field/exposureProfile.js             state → sstim-ex:ExposureProfile (N3 Writer)
-src/ui/field/fieldSemantic.js               UI concept → ontology IRI (graph links)
+src/routes/field*/+page.svelte              thin redirects to /creator/?starter=…
+src/ui/creator/PresetCreator.svelte         canonical Studio UI/runtime + starter flow
+src/ui/creator/visualTrackModel.js          visual types, configs, shared-stage contract
+src/ui/creator/fieldTrackAdapter.js         pure legacy state → ordinary track bundles
+src/ui/creator/fieldStarters.js             four starter constructors/insertion policy
+src/ui/creator/spatialScene.js              cached source conversion + scene composition
+src/ui/creator/StudioVisualStage.svelte     ColorField layers + one spatial SceneStage
+src/ui/creator/VisualStageControls.svelte   shared presentation controls
+src/ui/creator/SpatialTrackInspector.svelte content-specific visual-track inspector
 
 src/ui/field/scene/sceneGeom.js             shared: projection, disparity, depth tint, autostereogram
 src/ui/field/scene/sceneView.js             shared technique/rotation/depth state + resolveYaw
-src/ui/field/scene/SceneStage.svelte        shared renderer (segments/dots/polys × 3 techniques)
-src/ui/field/scene/SceneStereo.svelte       shared shell (selector, clock, fullscreen, gate, controls slot)
+src/ui/field/scene/SceneStage.svelte        reused renderer (primitives × mono + 3 depth modes)
 
-src/ui/field/tree/treeModel.js              3D tree generator (re-exports shared geom)
-src/ui/field/tree/treeState.js              tree state model + persistence (bsclab.field.tree)
-src/ui/field/tree/TreeStereo.svelte         tree UI (own stage, predates the shared framework)
-src/ui/field/tree/TreeStage.svelte          tree render surface
+src/ui/field/{...}                          retained standalone shells/state/persistence
+src/ui/field/exposureProfile.js             legacy state → sstim-ex:ExposureProfile
+src/ui/field/fieldSemantic.js               legacy UI concept → ontology IRI
+src/ui/field/tree/treeModel.js              reused deterministic 3D tree generator
 src/ui/field/abstract/abstractScene.js      Miró/Kandinsky/Klee scene generator
-src/ui/field/abstract/abstractState.js      abstract state (bsclab.field.abstract)
-src/ui/field/abstract/AbstractField.svelte  abstract page (uses SceneStereo)
 src/ui/field/landscape/landscapeScene.js    hills/river/houses/trees/flowers generator
-src/ui/field/landscape/landscapeState.js    landscape state (bsclab.field.landscape)
-src/ui/field/landscape/LandscapeField.svelte landscape page (uses SceneStereo)
 src/ui/safety/flashSafety.js                flash-rate cap + risk classification
 ```
 
-## 8. Stereoscopic scenes (`/field/tree`, `/field/abstract`, `/field/landscape`)
+## 8. Spatial scenes (ordinary Studio tracks)
 
-Step 3b instruments that extend the field's free-view depth from two markers to
-full 3D scenes. Three scenes share one renderer and differ only in their
-generator:
+The Step 3b sources extend marker depth to full 3D scenes. They are now ordinary
+Studio tracks that share one renderer and differ by deterministic generator;
+the historic URLs below are compatibility aliases:
 
 - **Stereoscopic Tree** (`/field/tree/`) — a procedural tree; leaves, branches,
   and roots each have an (x, y, z) position.
@@ -183,34 +207,34 @@ generator:
 ### Shared scene framework (`src/ui/field/scene/`)
 
 A scene is a flat bag of primitives in normalized 3D space (+y up, +z toward the
-viewer), each carrying its own colour:
+viewer), each carrying its own colour and optional opacity:
 
 ```
-{ background, segments:[{a,b,width,color}], dots:[{x,y,z,r,fill,stroke?}],
-  polys:[{pts:[{x,y,z}…], fill, stroke?, closed}] }
+{ background, segments:[{a,b,width,color,opacity?}],
+  dots:[{x,y,z,r,rx?,ry?,fill,stroke?,opacity?}],
+  polys:[{pts:[{x,y,z}…],fill,stroke?,closed,opacity?}] }
 ```
 
 [sceneGeom.js](../../src/ui/field/scene/sceneGeom.js) holds the scene-agnostic
 math (projection, disparity, `depthTint`, the SIRDS kernel);
 [SceneStage.svelte](../../src/ui/field/scene/SceneStage.svelte) is the one
-renderer (segments → lines, dots → circles, polys → paths, depth-sorted);
-[SceneStereo.svelte](../../src/ui/field/scene/SceneStereo.svelte) is the shared
-shell (technique selector, depth + rotation controls, the `performance.now()` yaw
-clock, fullscreen, the global visual gate, and the ontology panel) with a snippet
-slot for each scene's own controls. Each scene generator
-(`abstractScene.js`, `landscapeScene.js`, `treeModel.js`) is pure and
-deterministic per seed. `spread` is the common depth knob — at `spread = 0` a
-scene is planar (z = 0), toward `spread = 1` it is fully three-dimensional. Yaw is
-driven by the free-running visual clock (no audio on these pages, so the
-AudioContext-only clock rule, CLAUDE.md §3.1, does not apply). The tree predates
-the framework and keeps its own `TreeStage`/`TreeStereo`; `treeModel.js`
-re-exports the shared geometry and `treeToScene()` can adapt it to `SceneStage`.
+renderer (segments → lines, dots → ellipses, polys → paths, depth-sorted).
+[`spatialScene.js`](../../src/ui/creator/spatialScene.js) normalizes and caches
+each marker/tree/abstract/landscape source, applies the track's x/y/z, scale,
+rotation, and opacity without mutation, and composes all enabled sources before
+projection. `StudioVisualStage` supplies controller time and the one shared stage
+camera; global yaw and per-track rotation remain separate. `spread` is the common
+generator depth knob — at `spread = 0` a scene is planar (z = 0), toward
+`spread = 1` it is fully three-dimensional. The retained `SceneStereo`,
+`TreeStereo`, and `TreeStage` own legacy clocks/shells only and are not mounted by
+the canonical routes.
 
-One model, three projections (orthographic, so disparity is a pure function of z
+One model, four presentations (orthographic, so disparity is a pure function of z
 with the focal plane at z = 0 — matching the field's `--offset` cue):
 
 | Technique | Term | How it renders |
 |---|---|---|
+| **Mono** | non-stereoscopic preview | one SVG with no eye disparity; depth tint remains optional |
 | **Free-view stereo pair** | the codebase's free-view stereoscopy | two SVG panels; each vertex shifted ± `disparity(z)/2`; parallel or cross-eye (panels swap); depth-cued colour optional |
 | **Autostereogram** | single-image random-dot stereogram | the scene is rasterised to a per-pixel depth buffer (depth-sorted), then the classic constraint-propagation SIRDS algorithm builds one dot image |
 | **Anaglyph** | red/cyan | one SVG, the scene drawn twice (left eye red, right eye cyan) with `mix-blend-mode: screen`; dots filled, everything else outlined; needs red/cyan glasses |
@@ -220,9 +244,10 @@ with the focal plane at z = 0 — matching the field's `--offset` cue):
 supported; the codebase term for the two-panel method is **free-view
 stereoscopy** (`capabilityFreeViewStereoscopy`).
 
-Safety and framing match the rest of the field: the scene renders only when the
-global visual-stimulation gate is on (placeholder otherwise), the auto-rotate
-default honours `prefers-reduced-motion`, the motion is gentle and non-flashing
-(so the flash-rate cap is not engaged), and all copy is conservative wellness
-framing (CLAUDE.md §3.5). The instrument reuses existing stereoscopy exposure
-terms for its "In the ontology" panel and does not introduce new ontology IRIs.
+Safety and framing match the rest of Studio: the scene renders only when the
+global visual-stimulation gate is on (placeholder otherwise), auto-rotation
+honours `prefers-reduced-motion`, motion is gentle and non-flashing (so the
+flash-rate cap is not engaged), and copy uses conservative wellness framing
+(CLAUDE.md §3.5). The legacy ontology panel reuses existing stereoscopy exposure
+terms and introduces no new ontology IRIs; canonical Studio exposure emission is
+still open as described in §6.

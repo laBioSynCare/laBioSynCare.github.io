@@ -16,11 +16,12 @@
 >
 > **Implementation note (ahead of schedule).** Several Phase-2 artifacts already
 > exist: the **Patch Studio** — a real-time audiovisual designer with four
-> selectable audio engines and a photosensitivity safety layer
+> selectable audio engines, 14 registered visual track types, one shared visual
+> composition/presentation stage, and a photosensitivity safety layer
 > ([`docs/technical/PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md)) — the
-> **Sensory Field** (`/field/`), a minimal stimulation instrument that emits an
-> `sstim-ex:ExposureProfile` and adds a runtime flash-rate safety cap
-> ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
+> **Sensory Field** starter family, now reached through Studio from `/field/*`
+> compatibility entry points, with pure legacy-state adapters and explicit
+> conversion reports shown in Studio ([`docs/technical/SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md),
 > [ADR 0011](docs/decisions/0011-sensory-field-and-flash-safety.md)) — the
 > installable **PWA** layer, and a Phase-3 **WASM** audio path. The `core/`
 > orchestration layer (three-clock scheduler, `StimulationOrchestrator`,
@@ -28,10 +29,16 @@
 > [Delivered Outside the Original Plan](#delivered-outside-the-original-plan)
 > for everything shipped that this roadmap never listed.
 >
-> **Direction adopted 2026-08-08:** Sensory Field capabilities will become
-> ordinary first-class colour-field and spatial visual tracks inside Patch
-> Studio over one document, runtime, and shared visual projection stage, while
-> Field templates and `/field/*` entry points remain. See
+> **Integration status 2026-08-08:** Sensory Field capabilities are now ordinary
+> first-class colour-field and spatial visual tracks in the canonical Studio
+> document. The shared composition stage, Field starters, report-producing
+> adapters, non-destructive migration offer, and `/field/*` route cutover have
+> shipped. Disabled sources are retained inactive; Add appends live with explicit
+> keep/apply-stage choices; the full report and review acknowledgement are in the
+> conversion flow; and vector spatial blend plus bounded SIRDS refresh execute.
+> Runtime/controller extraction, exact trajectory/clamp fidelity and lifecycle
+> proof, a unified delivered-state `ExposureProfile` with producer-adjacent SHACL,
+> the full acceptance matrix, and legacy deprecation/removal remain open. See
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
 > and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md).
 
@@ -365,10 +372,11 @@ concrete rather than abstract.
 - [ ] Three-clock architecture: AudioContext master, Worker scheduler,
       rAF renderer *(`src/core/` is still README-only; no Worker scheduler)*
 - [~] PixiJS v8 visual engine: breathing animation, entrainment visuals
-      synchronized to AudioContext.currentTime *(nine Patch Studio visual track
-      types with blend modes and a fullscreen stage, plus 2D-canvas Sensory
-      Field scenes, are shipped. `IVisualEngine` and the PixiJS/WebGPU renderer
-      are not built)*
+      synchronized to AudioContext.currentTime *(14 Patch Studio visual track
+      types, including colour-field and four spatial scene families, now compose
+      through one shared DOM/SVG/canvas presentation stage. Spatial blend executes
+      in vector modes; static SIRDS is clock-gated and dynamic full-frame updates
+      are capped at 8 fps. `IVisualEngine` and the PixiJS/WebGPU renderer are not built)*
 - [~] Haptic engine: VibrationApi + NullHapticEngine fallback *(the `Vibration`
       track type, its parameters, and modulation routing exist in the patch
       model; no `IHapticEngine` and no `navigator.vibrate` code path yet, so
@@ -382,15 +390,21 @@ concrete rather than abstract.
       selectable in Settings with capability gating, but the choice applies on
       next playback, not mid-session; there is no visual engine to select)*
 - [x] Real-time designer with live audio preview — the **Patch Studio**
-      (`patch-studio-model-1`); shipped ahead of schedule
-- [ ] Merge Sensory Field into Patch Studio as ordinary first-class colour-field
-      and spatial visual tracks over one canonical model, engine, transport,
-      clock, store, safety gate, shared visual projection stage, and export
-      boundary; retain Field templates and compatibility routes — see
+      (`patch-studio-model-2`, with model-1 import); shipped ahead of schedule
+- [~] Merge Sensory Field into Patch Studio as ordinary first-class colour-field
+      and spatial visual tracks *(the additive canonical model, 14-type visual
+      registry, shared presentation stage, starters, report-producing adapters,
+      non-destructive migration offer, and public compatibility-route cutover
+      are shipped. Inactive-source retention, live Add with explicit stage
+      choice, report acknowledgement, vector blend (not applicable to SIRDS), and
+      bounded SIRDS rendering are also shipped. Runtime extraction, exact
+      trajectory/clamp and lifecycle proof, unified exposure/SHACL export,
+      acceptance gates, and legacy retirement remain)* — see
       [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
 - [~] Bridge Patch Studio to semantic/delivery formats: the lossless session
-      package and partial SSTIM `Preset` projection exist; real producer-adjacent
-      SHACL validation and exhaustive loss accounting remain. The catalog JSON
+      package, partial SSTIM `Preset` projection, and recursive property-level
+      loss accounting exist; a unified delivered-state `ExposureProfile` and
+      real producer-adjacent SHACL validation remain. The catalog JSON
       adapter is optional, version-pinned, and follows the coalition-neutrality
       gate in
       [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
@@ -634,13 +648,13 @@ until BioSynCare reaches acquisition-relevant scale.
 | PWA / service worker | 2 | Shipped — see ADR 0009 before touching |
 | AudioWorklet stimulation engine | 2 | Shipped for patch track types; Martigli/Symmetry ports: yes |
 | Patch Studio (real-time designer) | 2 | Shipped — extend, don't rebuild |
-| Sensory Field → first-class Studio tracks/templates | 2 | Build now — mandatory; follow ADR 0046 milestones |
+| Sensory Field → first-class Studio tracks/templates | 2 | Partial — public/model/starter cutover and blocker fixes shipped; runtime, exact trajectory/clamp fidelity, exposure/SHACL, browser acceptance, and retirement gates open |
 | PixiJS visual engine + `IVisualEngine` | 2 | Not yet |
 | Haptic engine (`IHapticEngine`, vibrate path) | 2 | Not yet |
 | Three-clock architecture / Worker scheduler | 2 | Not yet |
 | StimulationOrchestrator | 2 | Not yet |
 | Catalog preset session player | 2 | Not yet |
-| Patch Studio → SSTIM projection | 2 | Partial — package/projection built; validation and exhaustive accounting open |
+| Patch Studio → SSTIM projection | 2 | Partial — package/projection and recursive loss accounting built; unified exposure and producer-adjacent SHACL open |
 | Optional BSC catalog adapter | 2 | After merged model and coalition/consumer gate |
 | Session recorder | 2 | Not yet |
 | WASM audio processors | 3 | Shipped early (WAT kernel); further DSP ports: yes |

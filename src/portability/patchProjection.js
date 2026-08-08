@@ -1,7 +1,7 @@
 // Project a Patch Studio patch into SSTIM RDF — the declared mappable subset,
 // with an explicit report of everything that did not travel.
 //
-// ADR 0026 established that `patch-studio-model-1` and the catalog model are
+// ADR 0026 established that Patch Studio's versioned model and the catalog model are
 // structurally different and that conversion is partial. This module is the RDF
 // half of that: it never claims more than it can support, and it makes the gap
 // machine-readable instead of leaving it to a footnote.
@@ -28,7 +28,7 @@
 // engines. This projection has no calibrated-output observation from which to
 // build that specification, so it truthfully describes settings only.
 
-import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
+import { assertPatchStudioPatch } from './patchModel.js'
 
 export const TRACK_CLASSES = {
   audioTracks: 'AudioTrack',
@@ -211,19 +211,35 @@ function paramValue(track, name) {
   return Number.isFinite(Number(value)) ? Number(value) : undefined
 }
 
+function reportUnmappedLeaves(unmapped, source, value, reason) {
+  if (value === undefined || value === null) return
+  if (Array.isArray(value)) {
+    if (value.length === 0) return
+    value.forEach((item, index) => reportUnmappedLeaves(unmapped, `${source}[${index}]`, item, reason))
+    return
+  }
+  if (typeof value === 'object') {
+    const keys = Object.keys(value).sort()
+    if (keys.length === 0) return
+    for (const key of keys) {
+      reportUnmappedLeaves(unmapped, `${source}.${key}`, value[key], reason)
+    }
+    return
+  }
+  unmapped.push({ source, reason })
+}
+
 /**
  * Project a patch, returning RDF and a mapping report.
  *
- * @param {object} patchExport a `patch-studio-model-1` document
+ * @param {object} patchExport a supported Patch Studio document
  * @param {{ sessionIri: string, created: string }} options
  *        `created` is supplied rather than read from the clock so the same patch
  *        always yields the same bytes.
  * @returns {{ turtle: string, jsonld: object, report: object }}
  */
 export function projectPatch(patchExport, { sessionIri, created }) {
-  if (patchExport?.model !== PATCH_STUDIO_MODEL) {
-    throw new Error('Only Patch Studio patches can be projected into SSTIM.')
-  }
+  assertPatchStudioPatch(patchExport, 'Only Patch Studio patches can be projected into SSTIM.')
   if (!sessionIri) throw new Error('projectPatch needs a sessionIri.')
   if (!created) throw new Error('projectPatch needs a created timestamp.')
 
@@ -247,6 +263,21 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     sessionStatements.push([`sstim:${spec.property}`, literal(raw, spec.datatype)])
     mapped.push({ source: `timing.${field}`, property: `sstim:${spec.property}`, scope: 'session' })
   }
+  for (const field of ['bpmEnabled', 'bpmMods']) {
+    reportUnmappedLeaves(
+      unmapped,
+      `timing.${field}`,
+      timing[field],
+      'Patch timing/control-link state has no direct SSTIM projection property.',
+    )
+  }
+
+  reportUnmappedLeaves(
+    unmapped,
+    'visualStage',
+    patchExport.visualStage,
+    'Shared visual presentation state has no SSTIM projection property.',
+  )
 
   nodes.push({ iri: sessionIri, statements: sessionStatements })
 
@@ -269,6 +300,19 @@ export function projectPatch(patchExport, { sessionIri, created }) {
         const value = paramValue(track, name)
         if (value === undefined) continue
 
+        reportUnmappedLeaves(
+          unmapped,
+          `${group}[${index}].${name}.mods`,
+          track.params?.[name]?.mods,
+          'Modulation links are preserved only in the lossless patch.',
+        )
+        reportUnmappedLeaves(
+          unmapped,
+          `${group}[${index}].${name}.tempoSync`,
+          track.params?.[name]?.tempoSync,
+          'Tempo-sync configuration is preserved only in the lossless patch.',
+        )
+
         if (!spec) {
           unmapped.push({
             source: `${group}[${index}].${name}`,
@@ -282,6 +326,19 @@ export function projectPatch(patchExport, { sessionIri, created }) {
           property: `sstim:${spec.property}`,
           scope: spec.domain === 'SessionSpecification' ? 'track (domain divergence V1)' : 'track',
         })
+      }
+
+
+      for (const field of Object.keys(track).sort()) {
+        if (['id', 'trackType', 'name', 'params'].includes(field)) continue
+        reportUnmappedLeaves(
+          unmapped,
+          `${group}[${index}].${field}`,
+          track[field],
+          field === 'config'
+            ? 'Track recipe/configuration has no SSTIM projection property.'
+            : 'Discrete track state has no SSTIM projection property.',
+        )
       }
 
 
@@ -302,7 +359,17 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     for (const name of Object.keys(control).sort()) {
       if (['id', 'type', 'name'].includes(name)) continue
       const value = Number(control[name])
-      if (!Number.isFinite(value)) continue
+      if (!Number.isFinite(value)) {
+        if (!['id', 'type', 'name'].includes(name)) {
+          reportUnmappedLeaves(
+            unmapped,
+            `controlTracks[${index}].${name}`,
+            control[name],
+            'Discrete control state has no SSTIM projection property.',
+          )
+        }
+        continue
+      }
 
       const spec = table[name]
       if (!spec) {
@@ -338,7 +405,7 @@ export function projectPatch(patchExport, { sessionIri, created }) {
     structuralFindings: STRUCTURAL_FINDINGS,
     // Stated plainly so no downstream reader mistakes this for catalog RDF.
     conformance:
-      'SHACL-validated SSTIM projection: a sstim:Preset — the engine-configuration layer — composed of typed sstim:Track instances (ADR 0041). It is deliberately not a sstim:SessionSpecification, which is an execution rather than a configuration, and it asserts no evidence, outcome or safety metadata: those are authored by a human through the gated catalog bridge (ADR 0026). It is also not a sstim:StimulusSpecification: that engine-independent description exists (ADR 0042), but producing one requires calibrated delivered-output data that a saved engine configuration does not contain. The lossless patch in the package remains the executable truth; see unmapped for parameters with no SSTIM property.',
+      'SSTIM projection requiring producer-side SHACL validation: a sstim:Preset — the engine-configuration layer — composed of typed sstim:Track instances (ADR 0041). This generator does not itself run a SHACL engine and therefore does not claim that an individual export was validated. It is deliberately not a sstim:SessionSpecification, which is an execution rather than a configuration, and it asserts no evidence, outcome or safety metadata: those are authored by a human through the gated catalog bridge (ADR 0026). It is also not a sstim:StimulusSpecification: that engine-independent description exists (ADR 0042), but producing one requires calibrated delivered-output data that a saved engine configuration does not contain. The lossless patch in the package remains the executable truth; see unmapped for parameters and nested/discrete state with no SSTIM property.',
   }
 
   return { turtle, jsonld: toJsonLd(nodes), report }

@@ -11,7 +11,13 @@
 // substitute for exercising the real backend.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { PATCH_STUDIO_MODEL, cleanPatchExport, sortNewestFirst } from './PatchStore.js'
+import {
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  cleanPatchExport,
+  sortNewestFirst,
+} from './PatchStore.js'
 import { LOCAL_PATCH_KEY, createLocalPatchStore } from './localPatchStore.js'
 import { createFirestorePatchStore } from './firestorePatchStore.js'
 import { availablePatchStores, defaultPatchStore } from './patchStores.js'
@@ -139,6 +145,15 @@ for (const impl of implementations()) {
       expect(record.patch.audioTracks).toEqual([{ id: 'a-1', trackType: 'Carrier' }])
     })
 
+    it('retains a genuine model-1 patch so existing saved work remains readable', async () => {
+      const legacy = patch('Legacy', { model: PATCH_STUDIO_MODEL_V1 })
+      await store.save(legacy)
+
+      const [record] = await store.list()
+      expect(record.model).toBe(PATCH_STUDIO_MODEL_V1)
+      expect(record.patch).toEqual(legacy)
+    })
+
     it('updates in place when given an id, without creating a second record', async () => {
       const id = await store.save(patch('Before'))
       const same = await store.save(patch('After'), id)
@@ -173,6 +188,13 @@ for (const impl of implementations()) {
       await expect(store.save({})).rejects.toThrow(/Only Patch Studio patches/i)
     })
 
+    it('refuses model-2 data mislabeled as model 1', async () => {
+      await expect(store.save(patch('Mislabeled', {
+        model: PATCH_STUDIO_MODEL_V1,
+        visualStage: { presentationMode: 'mono' },
+      }))).rejects.toThrow(/model-2 features.*model-1/i)
+    })
+
     it('gives an unnamed patch a default name', async () => {
       await store.save(patch(''))
       expect((await store.list())[0].patchName).toBe('Untitled Patch')
@@ -194,6 +216,11 @@ for (const impl of implementations()) {
 }
 
 describe('PatchStore shared helpers', () => {
+  it('uses model 2 for new saves while retaining model 1 as a readable format', () => {
+    expect(PATCH_STUDIO_MODEL).toBe(PATCH_STUDIO_MODEL_V2)
+    expect(PATCH_STUDIO_MODEL_V1).toBe('patch-studio-model-1')
+  })
+
   it('sorts newest first, falling back to createdAt', () => {
     const sorted = sortNewestFirst([
       { id: 'a', createdAt: '2026-01-01T00:00:00Z', updatedAt: '' },

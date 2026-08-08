@@ -23,7 +23,7 @@
 //    fixed-point property the instance export and the two-origin migration test
 //    already hold to.
 
-import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
+import { assertPatchStudioPatch } from './patchModel.js'
 
 /** Fragment key: `#patch=…`. */
 export const PATCH_LINK_PARAM = 'patch'
@@ -157,14 +157,12 @@ async function inflateBounded(bytes, limit) {
  * too big, because that is an ordinary outcome the UI must handle by offering
  * file export — not an error condition.
  *
- * @param {object} patchExport a `patch-studio-model-1` document
+ * @param {object} patchExport a supported Patch Studio document
  * @returns {Promise<{ ok: true, value: string, chars: number }
  *                  | { ok: false, reason: 'too-large', chars: number, limit: number }>}
  */
 export async function encodePatchLink(patchExport) {
-  if (patchExport?.model !== PATCH_STUDIO_MODEL) {
-    throw new Error('Only Patch Studio patches can be shared as a link.')
-  }
+  assertPatchStudioPatch(patchExport, 'Only Patch Studio patches can be shared as a link.')
 
   const patch = JSON.parse(JSON.stringify(patchExport))
   const envelope = { v: PATCH_LINK_VERSION, sum: await shortSum(patch), patch }
@@ -219,9 +217,7 @@ export async function decodePatchLink(value) {
   }
 
   const patch = envelope.patch
-  if (patch?.model !== PATCH_STUDIO_MODEL) {
-    throw new Error('This link does not contain a Patch Studio patch.')
-  }
+  assertPatchStudioPatch(patch, 'This link does not contain a Patch Studio patch.')
   if (await shortSum(patch) !== envelope.sum) {
     throw new Error('This patch link was altered or truncated in transit.')
   }

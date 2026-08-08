@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   project, disparity, rotateY, normalizeDepth, lerpHexColor, parseHexColor,
-  scenePoints, rotatedSceneBounds, sceneExtent, depthTint, buildAutostereogram,
+  scenePoints, rotatedSceneBounds, sceneExtent, sceneFitScale, depthTint, buildAutostereogram,
 } from './sceneGeom.js'
 
 const scene = {
@@ -46,6 +46,13 @@ describe('scene helpers', () => {
     const e = sceneExtent(scene)
     expect(e.maxR).toBeGreaterThan(0)
     expect(e.maxY).toBeGreaterThan(e.minY)
+  })
+
+  it('applies the same shared zoom to every projection backend', () => {
+    const extent = { maxR: 1, minY: -1, maxY: 1 }
+    const fitted = sceneFitScale(400, 200, extent, 1)
+    expect(sceneFitScale(400, 200, extent, 0.5)).toBeCloseTo(fitted * 0.5)
+    expect(sceneFitScale(400, 200, extent, 1.5)).toBeCloseTo(fitted * 1.5)
   })
 })
 

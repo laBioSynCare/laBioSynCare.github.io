@@ -222,9 +222,13 @@ That architecture question is now resolved by
 becomes ordinary first-class colour-field and spatial visual tracks in Patch
 Studio's canonical model/runtime and shared visual projection stage, while Field
 templates and `/field/*` routes retain an approachable compatibility entrance.
-Implementation remains open under
-[`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
-it is still an architecture task, not entrance copy work.
+The additive 14-type visual model, shared composition stage, Field starters,
+report-producing legacy adapters, recursive projection-loss accounting, and
+public-route cutover are shipped. The integration remains partial under
+[`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md):
+runtime extraction, exact fidelity/lifecycle proof, unified delivered-state
+`ExposureProfile` plus producer-adjacent SHACL, acceptance gates, and legacy
+deprecation/removal are still architecture work, not entrance copy work.
 
 ---
 

@@ -10,7 +10,14 @@ import {
   TIMING_PROPERTIES,
   projectPatch,
 } from './patchProjection.js'
-import { buildPatchExport, createAudioTrack, createControlTrack, createDraft, createVisualTrack }
+import {
+  PATCH_STUDIO_MODEL_V1,
+  buildPatchExport,
+  createAudioTrack,
+  createControlTrack,
+  createDraft,
+  createVisualTrack,
+}
   from '../ui/creator/presetDraft.js'
 
 const SSTIM = 'https://w3id.org/sstim#'
@@ -246,6 +253,26 @@ describe('projection', () => {
     expect(() => projectPatch({ model: 'other' }, OPTIONS)).toThrow(/Only Patch Studio patches/)
   })
 
+  it('continues to project genuine model-1 patches', () => {
+    const legacy = {
+      model: PATCH_STUDIO_MODEL_V1,
+      patchName: 'Legacy projection',
+      timing: { bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+      controlTracks: [],
+      audioTracks: [],
+      visualTracks: [],
+      hapticTracks: [],
+    }
+    expect(projectPatch(legacy, OPTIONS).turtle).toMatch(/Legacy projection/)
+  })
+
+  it('refuses model-2 projection data mislabeled as model 1', () => {
+    expect(() => projectPatch({
+      model: PATCH_STUDIO_MODEL_V1,
+      visualStage: { presentationMode: 'mono' },
+    }, OPTIONS)).toThrow(/model-2 features.*model-1/)
+  })
+
   it('requires an explicit timestamp, so output cannot depend on the clock', () => {
     expect(() => projectPatch(sample(), { sessionIri: OPTIONS.sessionIri })).toThrow(/created/)
   })
@@ -270,6 +297,39 @@ describe('the mapping report tells the truth about what did not travel', () => {
     expect(sources).toMatch(/cutoff|resonance|detune|opacity|scale|hue/)
   })
 
+  it('accounts for spatial recipes, stage presentation, and discrete state', () => {
+    const draft = createDraft()
+    draft.visualStage.presentationMode = 'stereo-pair'
+    draft.visualTracks = [createVisualTrack('TreeScene', {
+      enabled: false,
+      blend: 'normal',
+      config: { seed: 42, levels: 9 },
+    })]
+    const { report } = projectPatch(buildPatchExport(draft), OPTIONS)
+    const sources = report.unmapped.map((item) => item.source)
+
+    expect(sources).toContain('visualStage.presentationMode')
+    expect(sources).toContain('visualTracks[0].enabled')
+    expect(sources).toContain('visualTracks[0].blend')
+    expect(sources).toContain('visualTracks[0].config.seed')
+    expect(sources).toContain('visualTracks[0].config.generatorVersion')
+  })
+
+  it('accounts for links nested under parameters SSTIM cannot map', () => {
+    const patch = sample()
+    patch.visualTracks[0].params.experimentalDepth = {
+      value: 0.5,
+      mods: [{ controlId: 'control-1', amount: 0.25 }],
+      tempoSync: { enabled: true, subdivision: '1/4' },
+    }
+    const { report } = projectPatch(patch, OPTIONS)
+    const sources = report.unmapped.map((item) => item.source)
+
+    expect(sources).toContain('visualTracks[0].experimentalDepth')
+    expect(sources).toContain('visualTracks[0].experimentalDepth.mods[0].controlId')
+    expect(sources).toContain('visualTracks[0].experimentalDepth.tempoSync.enabled')
+  })
+
   it('carries the structural findings, now recorded as resolved', () => {
     const { report } = projectPatch(sample(), OPTIONS)
     const ids = report.structuralFindings.map((f) => f.id)
@@ -282,7 +342,8 @@ describe('the mapping report tells the truth about what did not travel', () => {
 
   it('states what the projection is and what it still does not assert', () => {
     const { report } = projectPatch(sample(), OPTIONS)
-    expect(report.conformance).toMatch(/SHACL-validated/)
+    expect(report.conformance).toMatch(/requiring producer-side SHACL validation/)
+    expect(report.conformance).toMatch(/does not itself run a SHACL engine/)
     expect(report.conformance).toMatch(/not a sstim:SessionSpecification/)
     // The line that must never soften: RDF validity is not scientific warrant.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)

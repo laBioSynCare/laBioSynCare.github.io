@@ -14,17 +14,32 @@
 > The Patch Studio is an interactive *design surface*: it builds an in-memory
 > **patch draft** and renders it live through the selected audio engine (see
 > [`../../src/engines/README.md`](../../src/engines/README.md)). Its export
-> object is tagged `model: "patch-studio-model-1"` and is its own thing. Its
+> object is tagged `model: "patch-studio-model-2"` and is its own thing. Model-1
+> files remain importable through an explicit migration, but new exports are
+> always model 2 so older readers cannot silently downgrade spatial data. Its
 > lossless session package and partial SSTIM RDF projection are implemented;
 > the one-way catalog JSON adapter is still future work. The adopted plan to
-> absorb Sensory Field as ordinary first-class colour-field and spatial visual
-> tracks, with Field templates/routes over a shared visual projection stage, is
+> absorb Sensory Field is partially implemented: ordinary first-class
+> colour-field and spatial visual tracks, Field starters/routes, and one shared
+> visual projection stage have shipped. Disabled sources remain inactive tracks,
+> Add appends live with an explicit stage choice, and conversion reports are
+> visible and acknowledgement-gated when needed. Runtime extraction, unified
+> exposure export, browser acceptance gates, and legacy removal remain open. See
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](PATCH_STUDIO_FIELD_INTEGRATION.md).
 
-The canonical implementation is [`src/ui/creator/presetDraft.js`](../../src/ui/creator/presetDraft.js)
-(data model) and [`src/ui/creator/PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)
-(UI + transport). This document mirrors that code; if they disagree, the code wins
-and this document should be corrected.
+The canonical draft/runtime implementation is
+[`src/ui/creator/presetDraft.js`](../../src/ui/creator/presetDraft.js) (data model)
+and [`src/ui/creator/PresetCreator.svelte`](../../src/ui/creator/PresetCreator.svelte)
+(UI + transport). Spatial contracts, conversion, and rendering are split across
+[`visualTrackModel.js`](../../src/ui/creator/visualTrackModel.js),
+[`fieldTrackAdapter.js`](../../src/ui/creator/fieldTrackAdapter.js),
+[`fieldStarters.js`](../../src/ui/creator/fieldStarters.js),
+[`spatialScene.js`](../../src/ui/creator/spatialScene.js), and the
+[`StudioVisualStage.svelte`](../../src/ui/creator/StudioVisualStage.svelte),
+[`VisualStageControls.svelte`](../../src/ui/creator/VisualStageControls.svelte),
+and [`SpatialTrackInspector.svelte`](../../src/ui/creator/SpatialTrackInspector.svelte)
+components. This document mirrors that code; if they disagree, the code wins and
+this document should be corrected.
 
 ---
 
@@ -36,10 +51,12 @@ A patch draft is a plain object held in Svelte `$state`:
 {
   patchName: string,
   timing: { lengthSec, bpmEnabled, beatsPerBar, bpm: { value, mods } },
+  visualStage: { presentationMode, viewingMode, backgroundColor, depthScalePx,
+                 zoom, strokeWidth, depthColor, camera },
   playing: boolean,
-  controlTracks: [ ... ],   // LFO / Permutation — modulation sources
+  controlTracks: [ ... ],   // LFO / Permutation / Sinusoid — modulation sources
   audioTracks:   [ ... ],   // the audible voices
-  visualTracks:  [ ... ],   // visual stimuli (CSS/DOM previews today)
+  visualTracks:  [ ... ],   // flat, colour-field, and spatial visual stimuli
   hapticTracks:  [ ... ],   // Vibration
 }
 ```
@@ -48,7 +65,9 @@ Four track families. Control tracks are **modulation sources**; the other three
 are **sensory tracks** whose parameters can be modulated by control tracks.
 
 `buildPatchExport(draft)` serialises a draft to a portable object tagged
-`model: "patch-studio-model-1"`.
+`model: "patch-studio-model-2"`. `draftFromPatchExport()` also accepts genuine
+`patch-studio-model-1` documents, supplies the model-2 stage default, and rebuilds
+them into the current draft shape; their next export is model 2.
 
 ---
 
@@ -66,8 +85,9 @@ Every modulatable parameter is an object `{ value, mods, tempoSync? }`:
 
 Parameter knob ranges are `[min, max, step]` tables: `AUDIO_PARAM_RANGE`,
 `VISUAL_PARAM_RANGE`, `HAPTIC_PARAM_RANGE`, `MARTIGLI_PARAM_RANGE`,
-`SYMMETRY_PARAM_RANGE`, `TREMOLO_PARAM_RANGE`. The two legacy constant names
-remain in code after the control-type rename described below.
+`SYMMETRY_PARAM_RANGE`, `SINUSOID_PARAM_RANGE`, `TREMOLO_PARAM_RANGE`. The two
+legacy constant names remain in code after the control-type rename described
+below.
 
 The live evaluation runs in `PresetCreator`'s `requestAnimationFrame` loop, which
 reads `engine.getAudioContext().currentTime` as its clock (per `CLAUDE.md` §3.1)
@@ -77,7 +97,7 @@ and writes changes to live voices via `engine.setVoiceParameter()`.
 
 ## 3. Control tracks (modulation sources)
 
-`CONTROL_TYPES = ['LFO', 'Permutation']`
+`CONTROL_TYPES = ['LFO', 'Permutation', 'Sinusoid']`
 
 - **LFO** — a breathing-shaped oscillator that ramps its period from
   `periodSec` toward `targetPeriodSec` across the session. Params: `periodSec`,
@@ -87,6 +107,10 @@ and writes changes to live voices via `engine.setVoiceParameter()`.
   permutations).
   Params: `nnotes`, `rateHz`, `amplitude`; `family = 'plain-hunt'`. Full model:
   [`SYMMETRY_SYSTEM.md`](SYMMETRY_SYSTEM.md).
+- **Sinusoid** — a fixed-rate, phase-addressable periodic control for general
+  modulation, including Field depth and phase-locked x/y motion. Params:
+  `rateHz` (0–40 Hz), `phaseRad` (0–2π), and `amplitude`; `rateHz` can be tempo
+  synced. Unlike the breathing LFO, its frequency does not ramp across a session.
 
 Before [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md),
 these controls were named `Martigli` and `Symmetry`. `LEGACY_CONTROL_TYPES`
@@ -143,15 +167,23 @@ tremolo: { enabled, rate, depth, mode }   // mode ∈ {'exponential', 'linear'}
 The tremolo runs at the engine output stage and works on all six voice types
 across all four audio engines.
 
+`muted` is the ordinary inactive state for audio tracks: voice construction keeps
+the authored frequency, gain, channel, colour/filter, and tremolo but delivers
+zero gain. Field conversion therefore emits both `Carrier` and `Noise` tracks for
+each effective ear even when a legacy source or global audio switch is off; the
+result can be re-enabled without reconstructing discarded settings.
+
 ---
 
 ## 5. Visual tracks
 
-`VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate', 'Pacer', 'Ripple', 'Spiral', 'Mandala']`
+`VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate',
+'Pacer', 'Ripple', 'Spiral', 'Mandala', 'ColorField', 'DepthMarkers',
+'TreeScene', 'AbstractScene', 'LandscapeScene']`
 
-`VISUAL_VOICE_PARAMS` lists the modulatable params per type (shared registry:
+`VISUAL_VOICE_PARAMS` lists the modulatable params per type (full registry:
 `opacity`, `scale`, `rotationSpeed`, `sides`, `hue`, `blinkRate`, `duty`,
-`oscRate`):
+`oscRate`, `x`, `y`, `z`, `spatialScale`):
 
 | Type | Params | Character |
 |---|---|---|
@@ -162,25 +194,65 @@ across all four audio engines.
 | `Ripple` | `opacity`, `scale`, `oscRate`, `hue` | concentric expanding rings |
 | `Spiral` | `opacity`, `scale`, `rotationSpeed`, `hue` | rotating radial sweep |
 | `Mandala` | `opacity`, `scale`, `rotationSpeed`, `sides`, `hue` | symmetric rotating polygons |
+| `ColorField` | `opacity`, `blinkRate`, `duty` | full-stage authored on/off colours; optional safety-clamped blink |
+| `DepthMarkers` | `opacity`, `x`, `y`, `z`, `spatialScale`, `rotationSpeed` | marker/grid recipe in neutral 3D scene space |
+| `TreeScene` / `AbstractScene` / `LandscapeScene` | `opacity`, `x`, `y`, `z`, `spatialScale`, `rotationSpeed` | content-specific deterministic recipe feeding the shared scene contract |
 
-> **Implementation note.** Visual tracks currently render as live **CSS/DOM
-> previews** inside the studio cards and in the mix stage. The GPU visual
-> engine (PixiJS) in [`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md)
-> is the target renderer; the track types and parameters defined here are the
-> contract it will consume.
+`ColorField` owns `{ color, offColor, blinkEnabled }`. Each spatial type owns a
+normalized, content-specific `config`; it does not share one optional-field bag.
+Spatial transforms live in `params`, while presentation lives once in
+`visualStage`: mono/stereo-pair/anaglyph/autostereogram, parallel/cross viewing,
+background, depth scale/colour, zoom, stroke width, and camera yaw/auto-rotation.
+
+> **Implementation note.** The original nine flat types still render as live
+> **CSS/DOM previews** and mix-stage overlays. `ColorField` and the four spatial
+> types render through `StudioVisualStage`: deterministic source geometry is
+> cached, enabled spatial tracks are transformed and merged into one neutral
+> scene at the first enabled spatial track position, and one `SceneStage` applies
+> the selected presentation. Static sources do not subscribe to controller-time
+> invalidation. Dynamic autostereogram/SIRDS output is quantized to at most eight
+> full-frame refreshes per second. This is a
+> shipped shared-stage path, not the still-planned PixiJS engine in
+> [`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md).
 
 ### 5.1 Mixing and fullscreen
 
 Each visual track has a `blend` mode (`BLEND_MODES = ['screen', 'lighten',
 'normal', 'multiply', 'overlay', 'difference']`). The **Mix** control composites
-every visual track into one full-viewport stage (CSS `mix-blend-mode`) and
-requests true fullscreen via the Fullscreen API (Esc closes).
+every visual track into one full-viewport stage and requests true fullscreen via
+the Fullscreen API (Esc closes). CSS blend applies to the nine flat overlays and
+to individual `ColorField` layers. Spatial sources compose as primitives before
+the single projection. Their opacity and blend execute in vector mono,
+stereo-pair, and anaglyph output. Autostereogram is generated from one depth
+buffer, so per-primitive blend is not applicable; the spatial inspector states
+that and hides the irrelevant selector in that mode.
+
+All enabled spatial sources must compose before projection. The layer plan
+therefore represents them as one group at the first enabled spatial position in
+the visual-track array, preserving spatial source order inside the group;
+`ColorField` layers retain their authored order around that topology boundary.
 
 ### 5.2 Photosensitivity gating
 
 Flickering/moving visuals are gated by the global visual-stimulation setting.
 When it is off, previews and the mix stage are suppressed. See
 [`PHOTOSENSITIVITY_SAFETY.md`](PHOTOSENSITIVITY_SAFETY.md).
+
+### 5.3 Field starters and legacy conversion
+
+The four `/field/*` compatibility intents open a Studio dialog, never another
+runtime. Its expanded report displays mapped, dormant, warning, behavior
+correction, unsupported, and ignored entries. A warning, correction, or
+unsupported entry requires explicit review acknowledgement before Add or
+Replace.
+
+**Add + keep stage** and **Add + apply suggested stage** append ordinary tracks
+directly to the live arrays; they do not reset transport/controller state or
+infer stage ownership from an “empty” patch. During playback, newly appended
+audio tracks receive the same live voice-handle treatment as manually added
+tracks. **Replace patch** and **Cancel** are separate choices. Conversion retains
+switched-off tone/noise as `muted` audio tracks and switched-off depth as an
+`enabled=false` `DepthMarkers` recipe.
 
 ---
 
@@ -213,9 +285,10 @@ params on a track are tempo-syncable and as what kind (`duration`, `rate`,
 
 ```js
 {
-  model: 'patch-studio-model-1',
+  model: 'patch-studio-model-2',
   patchName,
   timing: { bpmEnabled, bpm, bpmMods, beatsPerBar, lengthSec },
+  visualStage,
   controlTracks, audioTracks, visualTracks, hapticTracks,
 }
 ```
@@ -233,8 +306,10 @@ Patches are saved through the storage seam in
 Firestore implementation behind one contract, both exercised by the same
 conformance suite, so saving works with or without an account. Firestore
 documents live in `patchStudioPatches`, are owner-scoped by `firestore.rules`,
-and load through `draftFromPatchExport()`, which normalizes older or partial JSON
-back into the live draft shape.
+and load through `draftFromPatchExport()`, which explicitly migrates model 1 and
+normalizes older or partial JSON back into the live draft shape. Storage, links,
+packages, and projection accept both supported identifiers but reject model-2
+fields mislabeled as model 1.
 
 ---
 
@@ -243,18 +318,18 @@ back into the live draft shape.
 `validateDraft(draft)` returns `{ level: 'error' | 'warning', message }[]`,
 surfaced in the studio footer. It checks: a patch name is set; BPM / beats-per-bar
 are in range when enabled; session length > 0; at least one control and one
-sensory track exist; and every `mod.controlId` still resolves. It also intends to
-enforce the breathing LFO's ≥ 3 s period, the Permutation control's `(0, 50]` Hz
-rate, and valid tempo-sync targets, subject to the rename defect below.
+sensory track exist; and every `mod.controlId` still resolves. It enforces the
+breathing LFO's ≥ 3 s period, the Permutation control's `(0, 50]` Hz rate, the
+Sinusoid control's `[0, 40]` Hz rate, and valid tempo-sync targets.
 
 Unit tests: [`presetDraft.test.js`](../../src/ui/creator/presetDraft.test.js),
-[`tempo.test.js`](../../src/ui/creator/tempo.test.js). The control rename left a
-known defect: the tempo-sync registry and two control-specific validation
-branches still key the old `Martigli`/`Symmetry` names, so the live
-`LFO`/`Permutation` checks do not currently execute; the no-control warning also
-uses those legacy labels. Fixing and pinning them is
-Milestone 0 of
-[`PATCH_STUDIO_FIELD_INTEGRATION.md`](PATCH_STUDIO_FIELD_INTEGRATION.md).
+[`tempo.test.js`](../../src/ui/creator/tempo.test.js),
+[`controlSignals.test.js`](../../src/ui/creator/controlSignals.test.js), and
+[`visualTrackModel.test.js`](../../src/ui/creator/visualTrackModel.test.js). The
+control-rename defect formerly described here is fixed: tempo sync, validation,
+and the no-control warning use `LFO`, `Permutation`, and `Sinusoid`. Model-2
+current-version/import/rejection behavior is covered across the draft,
+portability, storage, package, link, and projection boundaries.
 
 ---
 
@@ -268,15 +343,17 @@ Milestone 0 of
 
 ### 10.1 The export reaches RDF, but not the catalog
 
-`buildPatchExport()` produces a `patch-studio-model-1` object (§8). The lossless
+`buildPatchExport()` produces a `patch-studio-model-2` object (§8). The lossless
 native/package path exists, the semantic projection is partial, and the catalog
 delivery path remains open:
 
 - **SSTIM RDF — partial mapping built; producer validation still open.**
   `src/portability/patchProjection.js` projects a patch into a `sstim:Preset`
-  over the declared mappable subset and emits a machine-readable report of
-  numeric parameters that did not travel. Its report is not yet exhaustive for
-  nested/discrete values, and the producer does not yet invoke SHACL;
+  over the declared mappable subset and emits a machine-readable report of every
+  recursively visited unmapped leaf in stage state, track configuration,
+  modulation/tempo state, and discrete control/track fields. The report clearly
+  says that the producer does not invoke SHACL and does not claim that an
+  individual export was validated;
   `src/portability/sessionPackage.js` wraps that as a checksummed portable
   package, and `make session-conformance` proves Level 1 and Level 2 equivalence
   across two origins ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)).
@@ -290,7 +367,7 @@ delivery path remains open:
 The two models are **structurally divergent**, so any catalog conversion is a
 lossy, partial mapping — not a re-serialisation:
 
-| | Patch Studio (`patch-studio-model-1`) | Catalog preset (`PRESET_FORMAT.md`) |
+| | Patch Studio (`patch-studio-model-2`; model 1 remains importable) | Catalog preset (`PRESET_FORMAT.md`) |
 |---|---|---|
 | Shape | control tracks *modulate* sensory-track params (`{value, mods, tempoSync}`) | static `header` + parametric `voices[]` |
 | Audio types | `IsochronicTone`, `BinauralBeat`, `Carrier`, `Noise`, `Drone`, `Sample` | `Binaural`, `Martigli`, `Martigli-Binaural`, `Symmetry` only |
@@ -338,26 +415,40 @@ Decomposition (extract, do not rewrite behaviour):
   `AudioContext.currentTime` clock authority (`CLAUDE.md` §3.1) in one place.
 - **Cloud store:** ✅ **done** — extracted to
   [`../../src/storage/`](../../src/storage/) as the `PatchStore` seam.
-- **Subcomponents:** cloud-patches menu, help overlay, semantic-info panel,
-  mix/fullscreen stage, per-track card.
+- **Subcomponents:** `StudioVisualStage`, `VisualStageControls`, and
+  `SpatialTrackInspector` are extracted. The fullscreen lifecycle, flat visual
+  overlays, cloud-patches menu, help overlay, semantic-info panel, and general
+  per-track cards remain in `PresetCreator.svelte`.
 
-### 10.3 The hard logic is untested
+### 10.3 Hard-logic coverage is partial
 
 ✅ **Addressed for the §10.2 extractions.** The modulation formula, tempo-sync
 resolution, binaural center/beat split, and scope geometry now have unit
 coverage in `src/ui/creator/modulation.test.js` and `waveformPaths.test.js`
-(creator suite 12 → 44 cases): base + Σ amount·control, clamp, mute→gain 0,
-tempo-sync duration/rate, the L/R carrier split, and path-string invariants.
-Remaining untested logic still lives in the component `<script>` (transport,
-`rafTick` orchestration, cloud CRUD) and becomes testable as §10.2 continues.
+(creator suite): base + Σ amount·control, clamp, mute→gain 0, tempo-sync
+duration/rate, the L/R carrier split, and path-string invariants. The additive
+Field work also has pure coverage in `controlSignals.test.js`,
+`visualTrackModel.test.js`, `fieldTrackAdapter.test.js`, `fieldStarters.test.js`,
+and `spatialScene.test.js`, including deterministic cache/composition and patch
+export/import fixed points, disabled-source retention, stage policies, vector
+spatial blend, static clock gating, and the 8-fps SIRDS cadence. Remaining
+untested orchestration still lives in the component `<script>`: transport,
+`rafTick`, full starter/report lifecycle, fullscreen, and cloud UI behavior.
+Production browser/offline route coverage is also still open.
 
-### 10.4 Visual and haptic are previews, not engines
+### 10.4 Visual rendering is split; haptic remains a preview
 
-Per §5 and §6, visual tracks render as CSS/DOM previews (target: the PixiJS
-engine in [`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md)) and
-haptics are preview-only. This is honest, roadmapped Phase-2 work
-([`ROADMAP.md`](../../ROADMAP.md)), not a defect — listed here so the improvement
-plan sees the whole surface. Lower priority than §10.1–§10.3.
+Per §5 and §6, the nine flat visual types still render as CSS/DOM previews,
+while `ColorField` and the four spatial types now use the shared
+`StudioVisualStage`/`SceneStage` path. This is real mono and stereoscopic
+rendering, but it is not an `IVisualEngine` implementation and does not use the
+planned PixiJS backend in
+[`VISUAL_ENGINE_ARCHITECTURE.md`](VISUAL_ENGINE_ARCHITECTURE.md). Haptics remain
+preview-only. Vector spatial blend is implemented; blend is deliberately not
+applicable to SIRDS depth-buffer output. Descriptor-driven renderer registration,
+production-browser regression, and the general visual engine boundary are still
+roadmapped Phase-2 work
+([`ROADMAP.md`](../../ROADMAP.md)).
 
 ### 10.5 Minor
 

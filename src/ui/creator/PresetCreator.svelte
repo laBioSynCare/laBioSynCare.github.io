@@ -1,6 +1,10 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
+  import { afterNavigate } from '$app/navigation'
   import Knob from './Knob.svelte'
+  import SpatialTrackInspector from './SpatialTrackInspector.svelte'
+  import StudioVisualStage from './StudioVisualStage.svelte'
+  import VisualStageControls from './VisualStageControls.svelte'
   import { createAudioEngine, audioEngines, getActiveAudioEngineId } from '../../engines/audio/audioEngines.js'
   import { identityState } from '../../identity/identityState.js'
   import { pendingState } from '../../identity/IdentityProvider.js'
@@ -16,8 +20,28 @@
   } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
   import {
+    FIELD_REPORT_SECTIONS,
+    FIELD_STARTERS,
+    appendFieldTrackBundleInPlace,
+    createFieldStarterBundle,
+    fieldReportRequiresAcknowledgement,
+    getFieldStarter,
+    insertFieldTrackBundle,
+  } from './fieldStarters.js'
+  import {
+    adaptAbstractState,
+    adaptLandscapeState,
+    adaptSensoryFieldState,
+    adaptTreeState,
+  } from './fieldTrackAdapter.js'
+  import { FIELD_STORAGE_KEY } from '../field/fieldState.js'
+  import { TREE_STORAGE_KEY } from '../field/tree/treeState.js'
+  import { ABSTRACT_STORAGE_KEY } from '../field/abstract/abstractState.js'
+  import { LANDSCAPE_STORAGE_KEY } from '../field/landscape/landscapeState.js'
+  import {
     computeMartigliState,
     computeMartigliStateFree,
+    computeSinusoidState,
     computeSymmetryState,
     martigliPathD,
   } from './controlSignals.js'
@@ -40,6 +64,8 @@
     NOISE_COLORS,
     NOISE_FILTERS,
     SAMPLE_CLIPS,
+    SINUSOID_PARAM_RANGE,
+    SINUSOID_PARAMS,
     SYMMETRY_PARAM_RANGE,
     TREMOLO_MODES,
     TREMOLO_PARAM_RANGE,
@@ -50,6 +76,7 @@
     VISUAL_PARAM_RANGE,
     VISUAL_PARAMS,
     VISUAL_TRACK_TYPES,
+    SPATIAL_VISUAL_TRACK_TYPES,
     PATCH_FILE_MAX_BYTES,
     TIMING_PARAM_RANGE,
     buildPatchExport,
@@ -68,6 +95,7 @@
     visualParamNames,
     voiceParamNames,
   } from './presetDraft.js'
+  import { firstEnabledVisualStageTrackId } from './visualTrackModel.js'
   import {
     buildPatchLink,
     decodePatchLink,
@@ -122,6 +150,31 @@
   let currentPatchName = $state(null)
   let busyPatchId = $state(null)
   let lastPatchUid = null
+  let starterOffer = $state(null)
+  let starterSequence = 0
+
+  const STARTER_REQUESTS = {
+    field: {
+      starterId: 'sensory-field',
+      storageKey: FIELD_STORAGE_KEY,
+      adapt: adaptSensoryFieldState,
+    },
+    tree: {
+      starterId: 'stereoscopic-tree',
+      storageKey: TREE_STORAGE_KEY,
+      adapt: adaptTreeState,
+    },
+    abstract: {
+      starterId: 'stereoscopic-abstraction',
+      storageKey: ABSTRACT_STORAGE_KEY,
+      adapt: adaptAbstractState,
+    },
+    landscape: {
+      starterId: 'stereoscopic-landscape',
+      storageKey: LANDSCAPE_STORAGE_KEY,
+      adapt: adaptLandscapeState,
+    },
+  }
 
   // Local storage when signed out or unconfigured; the account when both are
   // available, so a signed-in user's patches follow them between devices.
@@ -160,6 +213,7 @@
   // recipient who never consented (ADR 0011).
   let flashAccepted = $state(false)
   let lastVisualTick = null
+  let controllerTime = $state(0)
 
   // Visual mix / fullscreen stage.
   let mixOpen = $state(false)
@@ -264,6 +318,135 @@
     tip('Removed.')
   }
   function removeVisual(id) { draft.visualTracks = draft.visualTracks.filter(t => t.id !== id); tip('Removed.') }
+  function updateVisualTrack(next) {
+    draft.visualTracks = draft.visualTracks.map((track) => track.id === next.id ? next : track)
+  }
+  function isStudioStageTrack(track) {
+    return track?.trackType === 'ColorField' || SPATIAL_VISUAL_TRACK_TYPES.includes(track?.trackType)
+  }
+  const studioStageTracks = $derived(draft.visualTracks.filter(isStudioStageTrack))
+  const firstStudioStageTrackId = $derived(firstEnabledVisualStageTrackId(draft.visualTracks))
+
+  function starterIdFactory(starterId) {
+    const batch = ++starterSequence
+    const used = new Set([
+      ...draft.controlTracks,
+      ...draft.audioTracks,
+      ...draft.visualTracks,
+      ...draft.hapticTracks,
+    ].map((track) => track.id))
+    let ordinal = 0
+    return (role) => {
+      let candidate
+      do {
+        ordinal += 1
+        candidate = `starter-${starterId}-${batch}-${ordinal}-${role}`.slice(0, 120)
+      } while (used.has(candidate))
+      used.add(candidate)
+      return candidate
+    }
+  }
+
+  function readLegacyStarter(request, idFor) {
+    const raw = localStorage.getItem(request.storageKey)
+    if (!raw) return null
+    return request.adapt(JSON.parse(raw), { idFor })
+  }
+
+  function offerStarter(token) {
+    const request = STARTER_REQUESTS[token]
+    if (!request) {
+      tip(`Unknown Field starter: ${token}.`)
+      clearStarterQuery()
+      return
+    }
+    const starter = getFieldStarter(request.starterId)
+    const idFor = starterIdFactory(request.starterId)
+    let bundle
+    let legacy = false
+    try {
+      bundle = readLegacyStarter(request, idFor)
+      legacy = !!bundle
+    } catch (error) {
+      tip(`Stored ${starter.label} settings could not be converted; offering defaults instead.`)
+    }
+    bundle ??= createFieldStarterBundle(request.starterId, { idFor })
+    starterOffer = {
+      token,
+      starter,
+      bundle,
+      legacy,
+      requiresAcknowledgement: fieldReportRequiresAcknowledgement(bundle.report),
+      acknowledged: false,
+    }
+  }
+
+  function tokenForStarter(starterId) {
+    return Object.entries(STARTER_REQUESTS)
+      .find(([, request]) => request.starterId === starterId)?.[0]
+  }
+
+  function clearStarterQuery() {
+    const url = new URL(window.location.href)
+    url.searchParams.delete('starter')
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`)
+  }
+
+  function starterActionAllowed() {
+    if (!starterOffer?.requiresAcknowledgement || starterOffer.acknowledged) return true
+    tip('Review and acknowledge the conversion notes before applying this starter.')
+    return false
+  }
+
+  function reportItemText(item) {
+    const code = item?.code ? `[${item.code}] ` : ''
+    const source = item?.source ?? 'Unspecified source'
+    const target = item?.target ? ` → ${item.target}` : ''
+    const detail = item?.detail ?? item?.reason
+    return `${code}${source}${target}${detail ? ` — ${detail}` : ''}`
+  }
+
+  function addStarter(stagePolicy) {
+    if (!starterActionAllowed()) return
+    const offer = starterOffer
+    const result = appendFieldTrackBundleInPlace(draft, offer.bundle, { stagePolicy })
+    if (draft.playing && engine) {
+      // Match normal Play: muted tracks still need a zero-gain handle so they
+      // can be unmuted without restarting the transport.
+      for (const track of result.addedTracks.audioTracks) startVoiceFor(track)
+    }
+    syncCreatorSession()
+    const withNotes = offer.requiresAcknowledgement
+    const stageNote = result.stage.applied ? ' and applied its suggested stage' : ' and kept the current stage'
+    tip(`${offer.starter.label} tracks added${stageNote}${withNotes ? ' after review' : ''}.`)
+    starterOffer = null
+    clearStarterQuery()
+  }
+
+  function replaceWithStarter() {
+    if (!starterActionAllowed()) return
+    const offer = starterOffer
+    const base = createEmptyDraft()
+    base.patchName = `${offer.starter.label} starter`
+    const result = insertFieldTrackBundle(base, offer.bundle, { stagePolicy: 'replace' })
+    resetLiveDraftState({ ...result.draft, playing: false })
+    currentPatchId = null
+    currentPatchName = null
+    tip(`Opened ${offer.starter.label} starter.`)
+    starterOffer = null
+    clearStarterQuery()
+  }
+
+  function keepCurrentDraft() {
+    starterOffer = null
+    clearStarterQuery()
+    tip('Kept the current patch unchanged.')
+  }
+
+  afterNavigate(({ to }) => {
+    const token = to?.url.searchParams.get('starter')
+    if (token && starterOffer?.token !== token) offerStarter(token)
+  })
   function removeHaptic(id) { draft.hapticTracks = draft.hapticTracks.filter(t => t.id !== id); tip('Removed.') }
 
   // ── Mod slots ─────────────────────────────────────────────────────────────────
@@ -488,6 +671,16 @@
         ),
       }
     }
+    if (track.type === 'Sinusoid') {
+      return {
+        ...track,
+        rateHz: clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, num(track.rateHz, 1), 'rate', tempoContext),
+          SINUSOID_PARAM_RANGE,
+          'rateHz'
+        ),
+      }
+    }
     return track
   }
 
@@ -509,14 +702,17 @@
         bpmEnabled: bpmEnabled(),
         muted: track.muted,
       })
+      const changed = prev == null || !Number.isFinite(prev) || Math.abs(prev - v) > 1e-6
+      if (!changed) continue
       base[name] = v
-      if (writeAudio && (prev == null || Math.abs(prev - v) > 1e-6)) writeAudio(name, v)
+      if (writeAudio) writeAudio(name, v)
     }
   }
 
   function rafTick() {
     const ctx = engine?.getAudioContext()
     const tNow = ctx ? ctx.currentTime : performance.now() / 1000
+    controllerTime = tNow
     const playing = draft.playing
     const timing = getTiming()
     const sessionLength = getLengthSec()
@@ -536,6 +732,9 @@
         } else if (c.type === 'Permutation') {
           const ts = sessionElapsed != null ? sessionElapsed : tNow
           st = computeSymmetryState(effectiveTrack, ts)
+        } else if (c.type === 'Sinusoid') {
+          const ts = sessionElapsed != null ? sessionElapsed : tNow
+          st = computeSinusoidState(effectiveTrack, ts)
         } else {
           st = { value: 0 }
         }
@@ -611,9 +810,10 @@
     lastVisualTick = tNow
     for (const track of draft.visualTracks) {
       const tt = track.trackType
-      if (tt !== 'Blink' && tt !== 'Oscillate' && tt !== 'Pacer') continue
+      const colorBlink = tt === 'ColorField' && track.config?.blinkEnabled === true
+      if (tt !== 'Blink' && tt !== 'Oscillate' && tt !== 'Pacer' && !colorBlink) continue
       const lv = liveValues[track.id] ?? (liveValues[track.id] = {})
-      if (tt === 'Blink') {
+      if (tt === 'Blink' || colorBlink) {
         const rawRate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
         // Photosensitivity gate: capped at the general-safe ceiling unless the
         // author has accepted the risk for this session.
@@ -648,6 +848,12 @@
         liveValues[track.id].rateHz = clampRange(
           effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, track.rateHz, 'rate', liveTempo),
           SYMMETRY_PARAM_RANGE,
+          'rateHz'
+        )
+      } else if (track.type === 'Sinusoid') {
+        liveValues[track.id].rateHz = clampRange(
+          effectiveTempoValue({ tempoSync: track.tempoSync?.rateHz }, track.rateHz, 'rate', liveTempo),
+          SINUSOID_PARAM_RANGE,
           'rateHz'
         )
       }
@@ -1291,6 +1497,67 @@
     </div>
   {/if}
 
+  {#if starterOffer}
+    <div class="link-offer" role="alertdialog" aria-labelledby="starter-offer-heading">
+      <div class="link-offer-body">
+        <p id="starter-offer-heading"><strong>Use the {starterOffer.starter.label} starter?</strong></p>
+        <p>{starterOffer.starter.description}</p>
+        <p class="link-offer-note">
+          {#if starterOffer.legacy}
+            Your stored Field settings were converted in memory. The original browser data remains untouched.
+          {:else}
+            This creates ordinary Patch Studio tracks; it does not open another workspace or runtime.
+          {/if}
+          Nothing is saved or uploaded until you explicitly choose Save.
+        </p>
+        <details class="starter-report" open>
+          <summary>Conversion report</summary>
+          <div class="starter-report-sections">
+            {#each FIELD_REPORT_SECTIONS as section (section.key)}
+              {@const entries = starterOffer.bundle.report?.[section.key] ?? []}
+              <section class:needs-review={section.requiresAcknowledgement && entries.length > 0}>
+                <h3>{section.label} <span>({entries.length})</span></h3>
+                {#if entries.length}
+                  <ul>
+                    {#each entries as item}
+                      <li>{reportItemText(item)}</li>
+                    {/each}
+                  </ul>
+                {:else}
+                  <p>None.</p>
+                {/if}
+              </section>
+            {/each}
+          </div>
+        </details>
+        {#if starterOffer.requiresAcknowledgement}
+          <label class="starter-ack">
+            <input type="checkbox" bind:checked={starterOffer.acknowledged} />
+            <span>I reviewed the warnings, behavior corrections, and unsupported items.</span>
+          </label>
+        {/if}
+        <div class="link-offer-actions">
+          <button
+            class="act-btn"
+            onclick={() => addStarter('preserve')}
+            disabled={starterOffer.requiresAcknowledgement && !starterOffer.acknowledged}
+          >Add + keep stage</button>
+          <button
+            class="act-btn"
+            onclick={() => addStarter('replace')}
+            disabled={starterOffer.requiresAcknowledgement && !starterOffer.acknowledged}
+          >Add + apply suggested stage</button>
+          <button
+            class="act-btn"
+            onclick={replaceWithStarter}
+            disabled={starterOffer.requiresAcknowledgement && !starterOffer.acknowledged}
+          >Replace patch</button>
+          <button class="act-btn" onclick={keepCurrentDraft}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   {#snippet paramRow(param, pname, pmin, pmax, pstep, rowKey, trackId, customOnchange, tempoKind, allowMods = true)}
     {@const isOpen = expandedMod === rowKey}
     {@const hasLinkedMods = allowMods && param.mods.length > 0}
@@ -1427,6 +1694,16 @@
         <polygon points={polygonPoints(getLive(track, 'sides'))} />
         <polygon class="mandala-shape-2" points={polygonPoints(getLive(track, 'sides'))} />
       </svg>
+    {:else if isStudioStageTrack(track)}
+      <StudioVisualStage
+        tracks={[track]}
+        {liveValues}
+        stage={draft.visualStage}
+        {controllerTime}
+        preview={true}
+        active={$visualStimulationOn}
+        label={`${track.name} preview`}
+      />
     {:else}
       <span class="visual-aura"></span>
       <svg class="visual-shape" viewBox="0 0 80 50">
@@ -1752,7 +2029,7 @@
                   {/each}
                 </div>
                 <div class="card-meta">{Math.round(track.inhaleRatio * 100)}% inhale</div>
-              {:else}
+              {:else if track.type === 'Permutation'}
                 {@const symSt = controlStates[track.id] ?? {}}
                 {@const symN = clamp(Math.round(num(symSt.nnotes, num(track.nnotes, 4))), 2, 8)}
                 {@const symRow = Array.isArray(symSt.row) ? symSt.row : Array.from({length: symN}, (_, i) => i + 1)}
@@ -1801,12 +2078,36 @@
                   {/each}
                 </div>
                 <div class="card-meta">{track.family ?? 'plain-hunt'} · row {symRowIdx + 1}/{symTotalRows} · step {symStep + 1}/{symN}</div>
+              {:else}
+                {@const sineState = controlStates[track.id] ?? {}}
+                {@const sinePhase = clamp(num(sineState.phase, 0), 0, 1)}
+                {@const sineAmp = Math.max(0.0001, num(sineState.amp, track.amplitude))}
+                {@const sineX = (4 + 112 * sinePhase).toFixed(2)}
+                {@const sineY = (22 - clamp(num(sineState.value, 0) / sineAmp, -1, 1) * 14).toFixed(2)}
+                <div class="phase-widget" aria-hidden="true">
+                  <svg viewBox="0 0 120 44" preserveAspectRatio="none">
+                    <line class="phase-baseline" x1="4" y1="22" x2="116" y2="22" />
+                    <path class="phase-curve" d="M4 22 C18 4 32 4 46 22 S74 40 88 22 S102 4 116 22" />
+                    <circle class="phase-ball" cx={sineX} cy={sineY} r="3.2" />
+                  </svg>
+                </div>
+                <div class="knob-grid">
+                  {#each SINUSOID_PARAMS as pname}
+                    {@const [pmin, pmax, pstep] = SINUSOID_PARAM_RANGE[pname]}
+                    {@const param = controlParam(track, pname)}
+                    {@render paramRow(param, pname, pmin, pmax, pstep, modKey(track.id, pname), track.id,
+                      (v) => { track[pname] = v },
+                      tempoSyncKindForTrackParam(track, pname),
+                      false)}
+                  {/each}
+                </div>
+                <div class="card-meta">{fmtHz(liveControlValue(track, 'rateHz'))} · phase {num(track.phaseRad, 0).toFixed(2)} rad</div>
               {/if}
             </div>
           </article>
         {/each}
         {#if draft.controlTracks.length === 0}
-          <p class="empty">Add a Martigli or Symmetry oscillator.</p>
+          <p class="empty">Add an LFO, Permutation, or Sinusoid control.</p>
         {/if}
       </div>
     </div>
@@ -2121,8 +2422,28 @@
         </div>
       </div>
       <div class="col-body">
+        <details class="starter-menu">
+          <summary>Sensory Field starters</summary>
+          <p>Insert seamless ordinary audio, colour, and stereoscopic tracks.</p>
+          <div class="col-adds">
+            {#each FIELD_STARTERS as starter (starter.id)}
+              <button class="add-btn" onclick={() => offerStarter(tokenForStarter(starter.id))}>
+                +{starter.label}
+              </button>
+            {/each}
+          </div>
+        </details>
+        {#if draft.visualTracks.some(isStudioStageTrack)}
+          <details class="stage-settings">
+            <summary>Shared visual stage</summary>
+            <VisualStageControls
+              stage={draft.visualStage}
+              onchange={(next) => { draft.visualStage = next }}
+            />
+          </details>
+        {/if}
         {#each draft.visualTracks as track (track.id)}
-          <article class="card">
+          <article class="card" class:muted={track.enabled === false}>
             <div class="card-head">
               <div class="card-title-line">
                 <input class="card-name" bind:value={track.name} />
@@ -2131,6 +2452,12 @@
               <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
             </div>
             <div class="card-body">
+              {#if isStudioStageTrack(track)}
+                <label class="mod-enable track-enabled">
+                  <input type="checkbox" bind:checked={track.enabled} />
+                  <span>Enabled</span>
+                </label>
+              {/if}
               {#if !$visualStimulationOn}
                 <div class="track-preview visual-off" aria-hidden="true">
                   <span>Visual stimulation is off (Settings)</span>
@@ -2140,7 +2467,7 @@
                   {@render visualLayer(track)}
                 </div>
               {/if}
-              {#if $visualStimulationOn && track.trackType === 'Blink'}
+              {#if $visualStimulationOn && (track.trackType === 'Blink' || (track.trackType === 'ColorField' && track.config?.blinkEnabled))}
                 {@const br = num(track.params.blinkRate?.value, 10)}
                 {#if requiresFlashAcknowledgement(br)}
                   <div class="flash-warn flash-{flashAccepted ? flashRiskLevel(br) : 'capped'}">
@@ -2155,15 +2482,25 @@
                   </div>
                 {/if}
               {/if}
+              {#if isStudioStageTrack(track)}
+                <SpatialTrackInspector
+                  {track}
+                  onchange={updateVisualTrack}
+                />
+              {/if}
               {#if $visualStimulationOn}
-                <div class="voice-extras">
-                  <label class="voice-select">
-                    <span>blend</span>
-                    <select bind:value={track.blend}>
-                      {#each BLEND_MODES as b}<option value={b}>{b}</option>{/each}
-                    </select>
-                  </label>
-                </div>
+                {#if SPATIAL_VISUAL_TRACK_TYPES.includes(track.trackType) && draft.visualStage?.presentationMode === 'autostereogram'}
+                  <p class="spatial-blend-note">Blend is not applicable to autostereogram depth-buffer output.</p>
+                {:else}
+                  <div class="voice-extras">
+                    <label class="voice-select">
+                      <span>blend</span>
+                      <select bind:value={track.blend}>
+                        {#each BLEND_MODES as b}<option value={b}>{b}</option>{/each}
+                      </select>
+                    </label>
+                  </div>
+                {/if}
               {/if}
               <div class="knob-grid">
                 {#each visualParamNames(track.trackType) as pname}
@@ -2271,11 +2608,27 @@
 
   {#if mixOpen}
     <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-    <div class="visual-stage" bind:this={stageEl}>
+    <div
+      class="visual-stage"
+      bind:this={stageEl}
+      style={`background:${draft.visualStage?.backgroundColor || '#04060a'}`}
+    >
       {#each draft.visualTracks as track (track.id)}
-        <div class="stage-layer" style={`${visualStyle(track)};mix-blend-mode:${track.blend || 'screen'}`}>
-          <div class="stage-scale">{@render visualLayer(track)}</div>
-        </div>
+        {#if track.id === firstStudioStageTrackId}
+          <StudioVisualStage
+            tracks={studioStageTracks}
+            {liveValues}
+            stage={draft.visualStage}
+            {controllerTime}
+            transparentBackground={true}
+            active={$visualStimulationOn}
+            label="Patch Studio visual mix"
+          />
+        {:else if !isStudioStageTrack(track) && track.enabled !== false}
+          <div class="stage-layer" style={`${visualStyle(track)};mix-blend-mode:${track.blend || 'screen'}`}>
+            <div class="stage-scale">{@render visualLayer(track)}</div>
+          </div>
+        {/if}
       {/each}
       {#if !draft.visualTracks.length}
         <p class="stage-empty">Add visual tracks to mix.</p>
@@ -2302,6 +2655,8 @@
 
   .link-offer-body {
     max-width: 34rem;
+    max-height: min(48rem, calc(100vh - 2rem));
+    overflow: auto;
     padding: 1.25rem 1.5rem;
     border-radius: 0.75rem;
     border: 1px solid var(--stroke, rgba(255, 255, 255, 0.16));
@@ -2323,8 +2678,71 @@
 
   .link-offer-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     margin-top: 1rem;
+  }
+
+  .starter-report {
+    margin-top: 0.8rem;
+    border: 1px solid var(--stroke, rgba(255, 255, 255, 0.16));
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--panel, #16181d) 82%, #000 18%);
+  }
+
+  .starter-report > summary {
+    padding: 0.65rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .starter-report-sections {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .starter-report section {
+    padding: 0.55rem 0.65rem;
+    border-radius: 0.35rem;
+    background: color-mix(in srgb, var(--panel, #16181d) 90%, #fff 10%);
+  }
+
+  .starter-report section.needs-review {
+    border-left: 3px solid var(--warn, #e67e22);
+  }
+
+  .starter-report h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.76rem;
+  }
+
+  .starter-report h3 span,
+  .starter-report section > p {
+    opacity: 0.7;
+  }
+
+  .starter-report ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  .starter-report li,
+  .starter-report section > p {
+    margin: 0.2rem 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .starter-ack {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
   }
 
   /* ── Design tokens ─────────────────────────────────────────────────────────── */
@@ -3790,6 +4208,14 @@
     padding: 0 6px;
     font-size: 11px;
     color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+  }
+
+  .spatial-blend-note {
+    margin: 0;
+    padding: 0 6px;
+    color: color-mix(in srgb, var(--txt) 42%, var(--mut));
+    font-size: 10px;
+    line-height: 1.35;
   }
 
   .voice-select {

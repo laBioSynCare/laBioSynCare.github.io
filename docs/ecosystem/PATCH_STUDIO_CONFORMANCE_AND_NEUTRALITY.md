@@ -56,7 +56,8 @@ founder's commercial interest does not exist.
 Patch Studio is **partly SSTIM-integrated**, but does not yet produce the full
 set of validated and loss-accounted artifacts defined below:
 
-- `patch-studio-model-1` exports and reconstructs losslessly;
+- `patch-studio-model-2` exports and reconstructs losslessly, while genuine
+  model-1 documents remain readable through an explicit migration;
 - session packages carry Patch JSON, Turtle, JSON-LD, checksums, and a mapping
   report, and cross-origin tests establish semantic and parameter equivalence;
 - the RDF projection creates an SSTIM `Preset` composed of typed tracks;

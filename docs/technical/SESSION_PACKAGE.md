@@ -19,7 +19,7 @@ moving *an instance*; this one is about moving *an object*.
 | File | Role |
 |---|---|
 | `manifest.json` | What this is, which build produced it, which SSTIM release it was projected against, and per-file checksums |
-| `session.patch.json` | **The executable truth.** The complete `patch-studio-model-1` document, lossless |
+| `session.patch.json` | **The executable truth.** The complete versioned Patch Studio document, lossless (`patch-studio-model-2` for new exports; genuine model 1 remains readable) |
 | `session.ttl` | Property-level SSTIM projection of the declared mappable subset |
 | `session.jsonld` | The same statements as JSON-LD |
 | `mapping-report.json` | Everything the projection could not carry, and why |

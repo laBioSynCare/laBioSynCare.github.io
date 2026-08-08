@@ -67,23 +67,32 @@ BioSynCare/BSC catalog.
 
 **Ahead of schedule, from Phase 2.** The **Patch Studio** (real-time audiovisual
 designer, four selectable audio engines, six audio voice types plus universal
-tremolo, nine visual track types with blend/fullscreen mixing) and the **Sensory
-Field** (`/field/`: static colour, per-ear tone/noise, blink,
-monaural/binaural beat, free-view depth, and tree/abstraction/landscape scenes;
-runtime flash-rate cap and per-configuration `ExposureProfile` export). Both sit
-behind the photosensitivity safety layer. See
+tremolo, and 14 visual track types composed through one shared presentation
+stage) now receives the **Sensory Field** starter family through `/field/*`
+compatibility entry points. Field-derived colour, depth, tree, abstraction, and
+landscape tracks use the canonical patch model; pure adapters offer
+non-destructive conversion with complete reports shown in Studio and review
+acknowledgement when needed. Disabled sources remain inactive tracks, and Add
+appends live with explicit keep/apply-stage choices. The legacy Field
+implementation and its per-configuration `ExposureProfile` exporter remain in
+source during the deprecation window. Both paths sit behind the photosensitivity
+safety layer. See
 [`PATCH_STUDIO.md`](docs/technical/PATCH_STUDIO.md),
 [`SENSORY_FIELD.md`](docs/technical/SENSORY_FIELD.md), and
 [`PHOTOSENSITIVITY_SAFETY.md`](docs/technical/PHOTOSENSITIVITY_SAFETY.md).
 
-**Integration decision made 2026-08-08.** Sensory Field capabilities become
-ordinary first-class colour-field and spatial visual tracks inside Patch Studio
-over one model/runtime and shared visual projection stage, while `/field/*`
-stays as a template and compatibility on-ramp. Implementation is pending; see
+**Integration status 2026-08-08.** First-class colour-field and spatial visual
+tracks, the shared composition stage, Field starters, report-producing adapters,
+recursive projection-loss accounting, and the `/field/*` public-route cutover
+are shipped. Inactive-source retention, in-place Add/playback behavior, report
+acknowledgement, explicit stage choice, vector spatial blend/topology, and static
+versus dynamic SIRDS cadence are also shipped. Runtime/controller extraction,
+exact trajectory/clamp fidelity and lifecycle proof, unified delivered-state
+exposure export with producer-adjacent SHACL, the
+full acceptance matrix, and legacy deprecation/removal remain open; see
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
-and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md). Free-view
-depth and three richer scenes are already shipped; headset/VR and independent
-per-eye flicker remain future work.
+and [ADR 0046](docs/decisions/0046-one-studio-two-authoring-modes.md). Headset/VR
+and independent per-eye flicker remain future work.
 
 **Still Phase 2, not to be built during Phase 1:** the `core/` orchestration
 layer and the GPU visual/haptic engines. Phase 3 infrastructure likewise waits.
@@ -644,7 +653,7 @@ The improvement backlog below is grounded in that spec's §10 and gated by
 
 - [x] ~~`PresetCreator.svelte` — add/remove control/audio/visual/haptic
       tracks, per-param knobs, modulation links, tempo sync, live engine
-      preview, cloud save~~ — shipped (`patch-studio-model-1`).
+      preview, cloud save~~ — shipped (currently `patch-studio-model-2`; model 1 imports).
 
 **Mandatory Sensory Field integration (highest priority — ADR 0046)**
 - [x] Decide the product boundary: one canonical Studio model/runtime with
@@ -652,24 +661,45 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       templates/routes, and a shared visual projection stage —
       [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
       `P2`
-- [ ] Pin legacy Field fixtures and finish the `LFO`/`Permutation` rename:
-      correct validation and tempo-sync keys plus the stale “add a Martigli or
-      Symmetry oscillator” user warning before adapting either model `P2`
-- [ ] Add first-class colour-field and stereoscopic-scene track contracts;
-      add enabled/inactive semantics and a general-rate sinusoidal depth control;
-      implement pure, report-producing adapters for the main Field and all three
-      scene families; extend fixed-point and cross-origin tests `P2`
-- [ ] Add ordinary Studio inspectors and templates for the Field-derived tracks
-      over the same draft, engine, audio clock, transport, store, session-only
-      safety acknowledgement, and shared visual projection stage; do not retain
-      a parallel Field workspace or execution state `P2`
-- [ ] Derive both configuration and exposure exports from the unified delivered
-      state; run real producer-adjacent SHACL validation and exhaustive loss
-      accounting `P2`
-- [ ] Offer non-destructive conversion of the four `bsclab.field*` storage
-      families; cut old routes over to Field templates or migrated patches
-      inside Studio; remove duplicate Field runtime/persistence only after a
-      deprecation window `P2`
+- [x] Add first-class colour-field and four spatial-scene track contracts to the
+      `patch-studio-model-2` normalizer, including visual enabled state and an
+      explicit model-1 importer,
+      shared spatial parameters, a general-rate `Sinusoid` control, and
+      fixed-point coverage `P2`
+- [x] Add ordinary Studio inspectors, four Field starter bundles, and shared
+      visual composition/presentation over the canonical draft and Studio
+      transport/safety path `P2`
+- [x] Implement pure, deterministic, report-producing adapters for the main
+      Field and all three legacy scene storage families; offer non-destructive
+      conversion without rewriting legacy records; retain disabled tone/noise as
+      muted tracks and disabled depth as an inactive visual recipe `P2`
+- [x] Show the complete adapter report in the starter flow and require explicit
+      acknowledgement for warnings, behavior corrections, or unsupported items;
+      append Add actions to the live draft/playback with explicit keep/apply-stage
+      choices rather than resetting or inferring stage ownership `P2`
+- [x] Apply spatial track blend in vector projection modes; state that blend is
+      not applicable to autostereogram depth-buffer output; group all spatial
+      sources at the first spatial array position before projection; keep static
+      SIRDS off clock invalidation and cap dynamic full-frame refresh at 8 fps `P2`
+- [x] Cut `/field/`, `/field/tree/`, `/field/abstract/`, and `/field/landscape/`
+      over to Studio starter intents; retain their route identity as
+      compatibility entrances `P2`
+- [x] Recursively account for currently unmapped nested, discrete, modulation,
+      tempo-sync, and visual-stage state in the partial SSTIM projection; keep
+      the lossless session package as executable truth `P2`
+- [ ] Extract the Studio runtime/controller lifecycle from `PresetCreator.svelte`
+      without creating a second clock, transport, store, or safety authority `P2`
+- [ ] Prove exact legacy behavior and saved-state lifecycle parity across all four
+      adapters, especially marker trajectory and one-sided depth clamping,
+      offline/static routing, and repeated import/acknowledge/accept/decline flows `P2`
+- [ ] Derive configuration and one unified delivered-state `ExposureProfile`
+      from canonical tracks, then run real producer-adjacent SHACL validation;
+      do not treat loss reporting as conformance `P2`
+- [ ] Pass the integration acceptance matrix (build/check/tests, focused model,
+      adapter and projection suites, keyboard/accessibility, safety, visual/audio
+      fidelity, direct-route/static-host, persistence and lifecycle gates) `P2`
+- [ ] Deprecate and remove the duplicate Field runtime/persistence only after the
+      compatibility window and the preceding fidelity/lifecycle gates pass `P2`
 
 **Optional catalog compatibility (after the merge and neutrality decision gate —
 PATCH_STUDIO.md §10.1, ADR 0026)**
@@ -702,9 +732,10 @@ PATCH_STUDIO.md §10.1, ADR 0026)**
 - [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
       preserving the `AudioContext.currentTime` clock authority); required by
       integration Milestone 1 `P2`
-- [ ] Extract a visual renderer/stage registry and move the Stereoscopic Tree to
-      the shared `SceneStage` contract before adding Field track types; required
-      by integration Milestone 1 `P2`
+- [~] Shared visual composition and the reusable `SceneStage` path now render the
+      Field-derived track types with vector blend, first-spatial-position
+      topology, and clock-gated/8-fps SIRDS behavior; a renderer registry and the
+      remaining runtime extraction are still open `P2`
 - [x] ~~Extract a cloud-patches store~~ — shipped as the storage seam
       ([ADR 0038](docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)):
       `src/storage/` holds `PatchStore` with local and Firestore implementations
@@ -715,8 +746,11 @@ PATCH_STUDIO.md §10.1, ADR 0026)**
 **Tests (PATCH_STUDIO.md §10.3)**
 - [x] ~~Unit tests for `modulation.js` + `waveformPaths.js`~~ —
       `src/ui/creator/{modulation,waveformPaths}.test.js` (base + Σ amount·control,
-      clamp, mute→gain 0, tempo-sync resolution, binaural split, scope geometry);
-      creator suite 12 → 44 cases.
+      clamp, mute→gain 0, tempo-sync resolution, binaural split, scope geometry).
+- [x] Model-2 current/import/rejection tests across drafts, links, stores,
+      packages, projection, and conformance; focused adapter/starter/spatial tests
+      cover disabled-source fixed points, stage policy, report acknowledgement
+      predicates, vector blend/topology, and static/dynamic SIRDS timing `P2`
 
 ### RDF pipeline
 - [ ] `src/rdf/export.js` — optionally generate a public BSC Lab preset JSON

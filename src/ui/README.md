@@ -1,15 +1,14 @@
 # src/ui — User Interface Layer
 
 > **Status.** The shipped UI is the **knowledge browser** (graph, SPARQL,
-> annotations, presets), **Patch Studio** (`creator/`), and the currently
-> standalone **Sensory Field** (`field/`), wrapped in shared navigation, theming,
-> and the photosensitivity safety layer. Field capabilities are planned to become
-> ordinary first-class Studio tracks, starter templates, and compatibility entry
-> points over a shared visual projection stage under
+> annotations, presets) and **Patch Studio** (`creator/`), wrapped in shared
+> navigation, theming, and the photosensitivity safety layer. Studio now owns 14
+> visual track types, shared visual composition, Field starters, and legacy-state
+> adapters; public `/field/*` routes enter those starters under
 > [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
-> The standalone
-> session `player/` and preset `browser/` components in the target design are
-> still planned.
+> Legacy `field/` components remain during compatibility/deprecation. The
+> standalone session `player/` and preset `browser/` components in the target
+> design are still planned.
 
 All UI components use Svelte 5 with **runes** syntax exclusively (`$state`,
 `$derived`, `$effect`, `$props`, `onclick`, `{@render ...}`). See `CLAUDE.md` §2
@@ -27,21 +26,29 @@ still planned.
 ## `creator/` — Patch Studio
 
 The primary authoring surface. A four-quadrant designer (controls, audio,
-visual, haptic) that builds an in-memory **patch draft** and renders it live
-through the selected audio engine. Knob/parameter changes are applied without a
-restart via `engine.setVoiceParameter()`; structural changes (e.g. noise colour,
-drone voice count, tremolo enable) rebuild the affected voice.
+visual, haptic) that builds an in-memory **patch draft**, renders audio through
+the selected engine, and composes 14 visual track types through one shared
+presentation stage. Knob/parameter changes are applied without a restart via
+`engine.setVoiceParameter()`; structural changes (e.g. noise colour, drone voice
+count, tremolo enable) rebuild the affected voice.
 
 - `PresetCreator.svelte` — the studio shell, transport, rAF live-evaluation loop,
   scopes/previews, and the fullscreen visual **mix** stage.
-- `presetDraft.js` — the data model (track types, parameter ranges, factories,
+- `presetDraft.js` + `visualTrackModel.js` — the additive data model (track
+  types, stage presentation, parameter ranges, factories, normalization and
   validation). **Authoritative model spec:**
   [`../../docs/technical/PATCH_STUDIO.md`](../../docs/technical/PATCH_STUDIO.md).
-- `controlSignals.js` — LFO / Permutation control-signal evaluation.
+- `controlSignals.js` — LFO / Permutation / general-rate Sinusoid evaluation.
+- `StudioVisualStage.svelte` — shared composition/presentation for ordinary
+  visual tracks; `SpatialTrackInspector.svelte` and `VisualStageControls.svelte`
+  expose track-local and stage-global settings.
+- `fieldStarters.js` + `fieldTrackAdapter.js` — pure Field starter bundles and
+  deterministic legacy-state conversion reports; they do not rewrite legacy
+  records automatically.
 - `tempo.js` — BPM / tempo-sync math. `semantic.js` — track/param → SSTIM terms.
 - `creatorSession.js` — cross-navigation session persistence.
 - `Knob.svelte` — the reusable rotary control (base value + live/modulated dot).
-- Tests: `presetDraft.test.js`, `tempo.test.js`.
+- Tests sit beside each model, signal, starter, adapter, and scene helper.
 
 `AudioContext.resume()` is called inside the play button's gesture handler, never
 on mount (browser autoplay policy). The engine is built by
@@ -49,21 +56,23 @@ on mount (browser autoplay policy). The engine is built by
 
 ---
 
-## `field/` — Sensory Field (current standalone implementation)
+## `field/` — Sensory Field compatibility source
 
-The guided colour, per-ear audio, blink, free-view depth, and stereoscopic-scene
-surface. `SensoryField.svelte` and the scene shells currently own state,
-persistence, playback/frame loops, and exposure export independently of Patch
-Studio. The as-built contract is
+The original guided colour, per-ear audio, blink, free-view depth, and
+stereoscopic-scene components remain here as legacy compatibility source and
+reusable scene-generation code. The public `/field/*` routes no longer mount an
+autonomous Field workspace; they open corresponding starter intents in Studio.
+The as-built legacy contract is
 [`SENSORY_FIELD.md`](../../docs/technical/SENSORY_FIELD.md).
 
-[ADR 0046](../../docs/decisions/0046-one-studio-two-authoring-modes.md) changes
-that target: retain the Field scene generators, templates, and route identity,
-but represent their execution as ordinary first-class colour-field and spatial
-visual tracks in the same patch graph, engine, transport, clock, store, safety
-acknowledgement, and shared visual projection stage. Do not embed the current
-autonomous component in Studio; follow the extraction, adapter, migration, and
-route gates in the integration plan.
+[ADR 0046](../../docs/decisions/0046-one-studio-two-authoring-modes.md) requires
+ordinary first-class colour-field and spatial visual tracks in the same patch
+graph and shared stage, and the model/UI/route portion of that decision has
+shipped. Do not reintroduce the autonomous component as a second workspace or
+execution state. Runtime extraction, exact legacy fidelity and saved-state
+lifecycle proof, unified `ExposureProfile`/SHACL export, acceptance gates, and
+eventual duplicate runtime/persistence removal remain open in the integration
+plan.
 
 ---
 

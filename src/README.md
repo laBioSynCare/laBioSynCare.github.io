@@ -2,8 +2,10 @@
 
 > **Status.** Running today: the **knowledge browser** (RDF loader, Cytoscape
 > graph, SPARQL, preset browser, annotations), the **Patch Studio**
-> (`ui/creator/`) with four selectable audio engines, and the **Sensory Field**
-> (`ui/field/`), behind the public entrance at `/`. Still planned: the `core/`
+> (`ui/creator/`) with four selectable audio engines, 14 visual track types, and
+> one shared visual composition stage. `/field/*` now opens Field starters in
+> Studio; legacy Field modules remain for adapters and deprecation. Still planned:
+> the `core/`
 > orchestration layer, the GPU `visual/` + `haptic/` engines, `rdf/export.js`,
 > and the JSON Schemas. See `ROADMAP.md` for phase definitions and
 > [`../docs/technical/PORTABLE_DEPLOYMENT.md`](../docs/technical/PORTABLE_DEPLOYMENT.md)
@@ -36,14 +38,14 @@ the rule it carries. Only non-obvious entries are listed.
 | `portability/` | Instance export/import, patch projection and links, and the session package ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)). |
 | `sync/` | `bsc-lab-private-sync-1` ([`PRIVATE_SYNC.md`](../docs/technical/PRIVATE_SYNC.md)) — reference and in-memory implementations; no networked one yet. |
 | `firebase/` | Optional auth + Firestore. Everything works without it. |
-| `ui/creator/` | Patch Studio — the real-time authoring surface. → [`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md) |
-| `ui/field/` | Sensory Field, incl. the stereoscopic scenes. → [`SENSORY_FIELD.md`](../docs/technical/SENSORY_FIELD.md) |
+| `ui/creator/` | Patch Studio — the real-time authoring surface, including Field starters/adapters and the shared 14-type visual stage. → [`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md) |
+| `ui/field/` | Legacy Sensory Field implementation and reusable scene generators retained during compatibility/deprecation; public `/field/*` routes now enter Studio. → [`SENSORY_FIELD.md`](../docs/technical/SENSORY_FIELD.md) |
 | `ui/graph/`, `ui/sparql/`, `ui/annotation/` | Knowledge browser surfaces. |
 | `ui/entrance/` | The public landing: doors, conversion bar, cite/contribute modals. |
 | `ui/safety/` | Photosensitivity advisory + visual-stimulation policy. Gates all flashing output. |
 | `ui/pwa/` | Service-worker registration and the session-safe update banner. |
 | `ui/navigation/`, `ui/theme/`, `ui/auth/` | Chrome, skins, sign-in form. |
-| `routes/` | `/` entrance, `/graph`, `/creator`, `/field` (+ `/tree`, `/abstract`, `/landscape`), `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`. |
+| `routes/` | `/` entrance, `/graph`, `/creator`, `/field` (+ `/tree`, `/abstract`, `/landscape` compatibility starters into Studio), `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`. |
 
 Tests live beside the code they cover (`*.test.js`, `*.test.mjs`) and run under
 `make test`.
@@ -107,23 +109,31 @@ between the two BSC Lab subsystems and is coordinated with BioSynCare as a
 outside this repository and is not converted to Turtle here. The knowledge
 subsystem reads the RDF ontology files and public BSC Lab reference instances.
 
-The Patch Studio authors its own live model (`model: "patch-studio-model-1"`, see
-[`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)).
+The Patch Studio authors its own live model (`model: "patch-studio-model-2"`, see
+[`PATCH_STUDIO.md`](../docs/technical/PATCH_STUDIO.md)); genuine model-1 documents
+remain readable through an explicit importer. Its normalizer carries 14 visual
+track types and one serialized stage-presentation contract;
+Field starters and pure adapters produce the same canonical draft.
 `portability/patchProjection.js` projects a patch into SSTIM RDF over the
-declared mappable subset, reporting everything that did not travel rather than
-overclaiming ([ADR 0026](../docs/decisions/0026-patch-studio-catalog-bridge.md),
+declared mappable subset, recursively reporting nested and discrete state that
+did not travel rather than overclaiming ([ADR 0026](../docs/decisions/0026-patch-studio-catalog-bridge.md),
 [ADR 0041](../docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md));
 `portability/sessionPackage.js` wraps that as a portable session package
 ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)).
 
-Sensory Field currently owns a separate runtime and emits an SSTIM
-`ExposureProfile`. [ADR 0046](../docs/decisions/0046-one-studio-two-authoring-modes.md)
-adopts one Studio runtime in which Field capabilities become ordinary
-first-class colour-field and spatial visual tracks. Field templates and routes
-open the canonical patch graph and shared visual projection stage while
-configuration, exposure, and calibrated-stimulus semantics remain separate
-products.
-Implementation order is in
+Public `/field/*` routes now open starter intents in Studio, where colour-field
+and four spatial scene families are ordinary first-class tracks composed by the
+shared visual stage. Legacy local state is detected but not silently rewritten:
+pure adapters offer add/replace/keep choices and return structured mapping,
+correction, unsupported-state, and warning reports. The old autonomous Field
+components and per-configuration `ExposureProfile` exporter remain in source
+during the deprecation window.
+
+The merge is not complete merely because the route and model cutover shipped.
+Runtime/controller extraction, exact legacy rendering/audio and saved-state
+lifecycle proof, one unified delivered-state `ExposureProfile`, producer-adjacent
+SHACL validation, the full acceptance matrix, and duplicate-runtime/persistence
+removal remain open. Implementation order is in
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md);
 SSTIM conformance and optional BSC catalog compatibility are deliberately split
 in

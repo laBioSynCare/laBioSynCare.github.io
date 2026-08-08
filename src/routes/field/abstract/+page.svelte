@@ -1,5 +1,18 @@
 <script>
-  import AbstractField from '../../../ui/field/abstract/AbstractField.svelte'
+  import { goto } from '$app/navigation'
+  import { onMount } from 'svelte'
+
+  const studioHref = '/creator/?starter=abstract'
+
+  onMount(() => {
+    goto(studioHref, { replaceState: true })
+  })
 </script>
 
-<AbstractField />
+<svelte:head>
+  <title>Abstraction | BSC Lab</title>
+</svelte:head>
+
+<main>
+  <p>Opening the Abstraction starter in <a href={studioHref}>Patch Studio</a>.</p>
+</main>

@@ -1,10 +1,15 @@
 # Patch Studio × Sensory Field integration plan
 
-> **Status:** Target design — adopted 2026-08-08; implementation has not begun.
-> [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md) makes the
-> integration mandatory. The current implementations remain described by
-> [PATCH_STUDIO.md](PATCH_STUDIO.md) and [SENSORY_FIELD.md](SENSORY_FIELD.md)
-> until each milestone below ships.
+> **Status:** Accepted target design — adopted 2026-08-08; partially implemented
+> 2026-08-08. Public route cutover, the additive track/stage model, pure
+> Field-to-track adapters, inactive-source retention, live starter append with
+> explicit stage choice, visible conversion reports/acknowledgement, and shared
+> visual composition have shipped.
+> Runtime extraction, complete conversion fidelity and lifecycle behavior,
+> unified exposure export and producer-adjacent SHACL, browser/offline gates, and legacy
+> removal remain open. [ADR 0046](../decisions/0046-one-studio-two-authoring-modes.md)
+> makes the completed integration mandatory; [PATCH_STUDIO.md](PATCH_STUDIO.md)
+> and [SENSORY_FIELD.md](SENSORY_FIELD.md) describe the current checkpoint.
 
 ## 1. Outcome
 
@@ -42,24 +47,28 @@ normal tracks that play through the Studio runtime. A shared navigation bar,
 iframe, tab, or wrapper around two autonomous components does not meet the
 requirement.
 
-## 2. As-built baseline
+## 2. Decision-time baseline and current checkpoint
 
-| Concern | Patch Studio today | Sensory Field today | Required convergence |
-|---|---|---|---|
-| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | `/creator/` canonical; old routes request the corresponding starter or legacy import |
-| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | One canonical patch graph; template metadata cannot carry execution state |
-| Persistence | Local or Firestore `PatchStore` | Four `bsclab.field*` local-storage keys | One `PatchStore`; explicit, recoverable legacy conversion |
-| Playback | Engine, voice handles, transport, rAF loop in `PresetCreator.svelte` | Separate engine, handles, transport, and rAF loop in `SensoryField.svelte` | One extracted controller and one audio-clock authority |
-| Visuals | Nine composited CSS/DOM track types | Fixed colour, marker depth, and three stereoscopic scenes | First-class colour and spatial visual tracks; content-specific sources feed one shared Studio composition/projection stage behind a renderer registry |
-| Safety | Shared flash helpers; session-only Studio acknowledgement | Shared helpers; acknowledgement in live state but excluded from persistence | One session-only acknowledgement, never serialized or migrated |
-| Export | Lossless patch and package; partial SSTIM `Preset` projection | SHACL-tested SSTIM `ExposureProfile` | Preserve both semantic views and derive them from one delivered snapshot |
+The first two columns record the baseline that motivated ADR 0046. The current
+column is the as-built state on 2026-08-08; it does not imply that the completion
+gate in the final column has passed.
 
-Two current defects belong in the stabilization milestone, because adding an
-adapter on top would make them harder to diagnose: the model renamed its control
-types to `LFO` and `Permutation`, but tempo-sync and validation tables still
-test the old `Martigli` and `Symmetry` names and one user warning still tells
-people to add those old oscillator types; and the Patch RDF report says
-“SHACL-validated” although the producer path does not run SHACL.
+| Concern | Patch Studio at decision time | Sensory Field at decision time | Current checkpoint | Required completion |
+|---|---|---|---|---|
+| Routes | `/creator/` | `/field/`, `/field/tree/`, `/field/abstract/`, `/field/landscape/` | Every `/field/*` page is a thin redirect to `/creator/?starter=…`; visible navigation uses those canonical starter URLs | Static/offline and browser acceptance for every alias |
+| State | `patch-studio-model-1`, arbitrary control/audio/visual/haptic tracks | `sensory-field-model-1` plus three scene-state formats | `patch-studio-model-2` owns `visualStage`, `Sinusoid`, `ColorField`, and four spatial types; model 1 imports explicitly, and pure adapters retain disabled tone/noise/depth as inactive ordinary tracks | Close the remaining fidelity and lifecycle gaps |
+| Persistence | Local or Firestore `PatchStore` | Four `bsclab.field*` local-storage keys | `PatchStore` remains canonical; Studio reads all four legacy keys in memory and leaves them untouched | Complete the deprecation window before removing legacy readers/data |
+| Playback | Engine, voice handles, transport, rAF loop in `PresetCreator.svelte` | Separate engine, handles, transport, and rAF loop in `SensoryField.svelte` | Public entry points use Studio's one routed runtime; the old standalone runtime code remains, and Studio lifecycle/frame evaluation is still monolithic | One extracted controller, audio-clock authority, and delivered-state snapshot; remove duplicate legacy ownership |
+| Visuals | Nine composited CSS/DOM track types | Fixed colour, marker depth, and three stereoscopic scenes | Fourteen ordinary types exist. Spatial sources group at the first spatial position and compose before one projection; vector blend executes, while autostereogram blend is explicitly not applicable. Static SIRDS is clock-gated and dynamic refresh is capped at 8 fps | Descriptor registry plus lifecycle/browser gates |
+| Safety | Shared flash helpers; session-only Studio acknowledgement | Shared helpers; acknowledgement in live state but excluded from persistence | Studio applies the shared visual gate and session-only flash acknowledgement to the new tracks | Derive and test one delivered-state snapshot without serializing consent |
+| Export | Lossless patch and package; partial SSTIM `Preset` projection | SHACL-tested SSTIM `ExposureProfile` | Patch projection recursively reports unmapped nested/discrete leaves and no longer claims validation; the Field exporter remains a legacy golden mapper | Unified Studio exposure derivation plus real producer-adjacent SHACL |
+
+The two decision-time correctness defects are fixed: tempo sync, validation, and
+warning copy now use `LFO`, `Permutation`, and the new `Sinusoid` type; the Patch
+RDF report now states that its producer does **not** run SHACL. Recursive
+unmapped-leaf accounting also covers nested and discrete stage, track, config,
+modulation, and control state. This is loss reporting, not conformance: actual
+producer-side SHACL validation remains open.
 
 ## 3. Boundary rules
 
@@ -81,6 +90,16 @@ a presentation technique, but if the current patch already has a different
 stage setting the user must explicitly keep the current presentation or apply
 the starter's setting; a track-local projector is not created as a workaround.
 
+**Current checkpoint.** The starter dialog shows the full structured conversion
+report. Warnings, behavior corrections, or unsupported items require an explicit
+review acknowledgement before mutation. **Add + keep stage** and **Add + apply
+suggested stage** both append directly to the live draft; neither rebuilds the
+draft nor infers stage ownership from whether visual tracks happen to exist. If
+playback is active, newly added audio tracks receive ordinary live voice handles.
+**Replace patch** remains a separate destructive choice, and **Cancel** changes
+nothing. Rename, enable, modulation, and removal use ordinary Studio cards;
+duplicate and reorder operations are not yet available in the Studio UI.
+
 ### 3.2 One runtime
 
 Extract engine lifecycle, voice handles, play/stop, frame evaluation,
@@ -88,6 +107,13 @@ and delivered-state calculation from the Studio monolith before importing Field
 features. Renderers receive time from that controller. `performance.now()` may
 remain a non-playing preview clock, but sounding or session playback uses
 `AudioContext.currentTime`.
+
+**Current checkpoint.** The first route/UI cutover reused the sole publicly
+routed Studio runtime before this extraction. `PresetCreator.svelte` still owns
+engine lifecycle, voice handles, play/stop, and the rAF loop. Its controller time
+comes from `AudioContext.currentTime` when an engine exists and otherwise from
+`performance.now()`, and the shared stage consumes that value. No extracted
+`patchTransport` or independently mountable controller harness exists yet.
 
 Loading a Field starter or legacy import must not call `createAudioEngine()`,
 create an autonomous animation loop, or retain another set of voice handles.
@@ -116,6 +142,11 @@ continue exporting the **delivered** flash rate after the safety clamp, not the
 raw authored value. Eligibility is determined from track content and delivery
 policy, never from Field-template provenance.
 
+**Current checkpoint.** The legacy exporter and its SHACL matrix remain in the
+repository as the golden mapper. The canonical Studio route does not yet derive
+or offer an `ExposureProfile` from ordinary tracks, and no unified delivered
+snapshot exists.
+
 ### 3.4 A delivered configuration, not an animation-frame sample
 
 The delivered-state snapshot is a deterministic description of the delivered
@@ -125,6 +156,10 @@ not the instantaneous opacity, disparity, or oscillator value on the rAF frame
 when Export is clicked. Given the same patch, delivery policy/consent, and fixed
 identifier/timestamp inputs, semantic export must be byte-equivalent regardless
 of current animation phase.
+
+This remains a completion contract. Current Patch export serializes authored
+state and the current RDF projector operates on that export; neither is the
+delivered-state snapshot described here.
 
 ## 4. Field-to-patch mapping contract
 
@@ -137,9 +172,9 @@ Field template.
 | Field concept | Canonical representation | Important rule |
 |---|---|---|
 | Fixed colour and intensity | New first-class colour-field visual track | Preserve the actual on-colour; do not approximate with hue alone |
-| Legacy `offColor` | Explicitly dormant migration data or a separately approved new behavior | Current Field always blinks to black; do not count `offColor` as delivered equivalence |
+| Legacy `offColor` | `ColorField.config.offColor` | The adapter deliberately activates the authored value and reports this as a behavior correction because the standalone Field persisted it but blinked to hard-coded black |
 | Blink and duty cycle | Colour-field/Blink parameters using the shared safety clamp | Consent remains runtime-only; expose authored and delivered values separately |
-| Field/source switches | First-class track/channel enabled or inactive state | Disabled sources retain settings for later re-enable; do not hide them in view metadata or drop them |
+| Field/source switches | First-class track/channel enabled or inactive state | Switched-off tone/noise sources remain authored `muted` tracks; switched-off depth remains an `enabled=false` `DepthMarkers` recipe. Global switches preserve delivered silence/inactivity without discarding settings |
 | Left/right tone | Two hard-panned `Carrier` tracks | Preserve unequal ear gains; do not always collapse to one `BinauralBeat` |
 | Left/right noise | Two hard-panned `Noise` tracks | Preserve noise colour, filter, gain, and channel role |
 | Monaural beat | Existing tremolo contract on every enabled tone **and noise** voice | Preserve rate, depth, and mode; rate changes must update every tremolo-bearing voice |
@@ -147,7 +182,7 @@ Field template.
 | Marker depth | First-class spatial visual track plus shared-stage presentation settings | Store disparity/depth, grid, and motion on the track; store technique, canonical eye order, and camera/view settings once on the stage |
 | Tree, abstraction, landscape | Content-specific spatial sources behind the common spatial-track contract | Convert Tree to the shared scene representation first; compose sources before the shared stage projects them |
 | Beat-driven depth | Explicit link to a general-rate sinusoidal control covering the Field's 0–40 Hz range | Existing breathing LFO (3–60 s) and stepped Permutation cannot reproduce it |
-| Breath-driven depth | Explicit link to the breathing-shaped LFO | No Field-only time loop or hidden driver |
+| Breath-driven depth | Explicit fixed-rate `Sinusoid` at `1 / breathPeriodSec` | The legacy “breath” signal is sinusoidal; do not substitute the session-ramping breathing LFO or hide a renderer-owned loop |
 | “Link ears” | Template input or explicit multi-track edit operation | Convenience only; never becomes a second executable value |
 | Selected starter | Optional origin/provenance metadata | Playback and semantic export must not depend on it |
 | Flash acknowledgement | No serialized mapping | Must be renewed per session |
@@ -161,19 +196,42 @@ one untyped bag of every scene family's optional fields, and the merge does not
 require artificial depth fields on the nine existing 2D track types.
 
 Multiple spatial tracks may coexist and share one camera, eye order, and output
-topology. Compatible geometry follows the normal track order, opacity, and
-blend contracts before projection; inherently full-frame presentation such as
-an autostereogram must declare and test its composition constraints rather than
-silently hiding or excluding tracks.
+topology. They cannot occupy independently projected layers: the track-array
+topology groups every enabled spatial source into one composition boundary at
+the first enabled spatial position, retaining source order inside the group,
+because composition must precede projection. Colour fields retain their authored
+order around that boundary.
+
+**Current checkpoint.** Primitive/track opacity and each spatial track's blend
+execute in the vector mono, stereo-pair, and anaglyph renderers. Autostereogram is
+a SIRDS depth-buffer output, so primitive blend is explicitly not applicable and
+the inspector says so rather than presenting an inert control. Static spatial
+sources stay off the controller-clock invalidation path; time-varying
+autostereogram/camera output is quantized to at most 8 full-frame updates per
+second. Production-browser regression coverage remains open.
 
 Every nested or discrete field introduced by the spatial contract must be
 handled by portable-package accounting: mapped to SSTIM, listed as unmapped with
 a reason, or classified as non-semantic authoring metadata. Numeric-only
 scanning is insufficient.
 
+This recursive accounting now ships in the Patch projector for stage, nested
+configuration, modulation/tempo state, and discrete track/control leaves. It
+does not make the resulting RDF SHACL-validated.
+
 ## 5. Implementation sequence
 
 ### Milestone 0 — pin the contracts and fixtures
+
+**Status: partial.** ADR 0046 is pinned and the model-version decision is now
+explicit: genuine `patch-studio-model-1` documents import, while all new exports
+use `patch-studio-model-2`. The stale control-name validation, tempo-sync keys, and warning are fixed;
+the new adapter gives monaural tremolo to both tone and noise and reports the
+legacy live-update correction. Model-2 import/rejection coverage and pure model,
+adapter, starter stage-policy, control, scene, and round-trip cases exist.
+Disabled tone/noise retention is covered across linked/unlinked and global-audio
+states. The full beat-mode, persisted-state, delivered-voice, and browser fixture
+matrix and old standalone runtime correction are not complete.
 
 - Apply ADR 0046 as the implementation boundary and pin this plan.
 - Capture persisted/migration fixtures for default, visual-only, audio-only,
@@ -198,13 +256,21 @@ scanning is insufficient.
   warning copy.
 - Fix and pin the current live-update inconsistency in which monaural tremolo is
   constructed on noise voices but later rate changes update tone voices only.
-- Decide whether the additive scene-track shape is safely readable as
-  `patch-studio-model-1`; otherwise introduce a new model tag with a v1 importer.
+- Keep the shipped model boundary pinned: model-2 features are rejected under a
+  model-1 tag, while genuine model-1 files, links, stored records, packages, and
+  projections remain readable through the explicit importer.
 
 Exit gate: fixtures describe the current delivered behavior, not merely UI
 defaults, and the intended model-version rule is recorded.
 
 ### Milestone 1 — extract shared runtime and rendering primitives
+
+**Status: partial.** Neutral scene generation/composition, `treeToScene`, marker
+generation, a mono-capable shared `SceneStage`, `StudioVisualStage`, and
+controller-time input for the new stage have shipped. Deterministic source scenes
+are cached by normalized type/configuration. `patchTransport`, an independently
+mountable controller harness, and a descriptor-driven renderer registry have not
+shipped; legacy Tree/Field shells remain in the repository.
 
 - Extract the planned `src/ui/creator/patchTransport.js` (or a neutral successor)
   from `PresetCreator.svelte`: engine lifecycle, voice creation, transport,
@@ -222,6 +288,17 @@ Exit gate: current Patch Studio behavior and exports are stable, and the runtime
 can be mounted by a small harness without mounting the full editor.
 
 ### Milestone 2 — extend the canonical patch graph
+
+**Status: partial.** `ColorField`, `DepthMarkers`, `TreeScene`, `AbstractScene`,
+`LandscapeScene`, shared `visualStage`, spatial transforms, and the fixed-rate
+phase-addressable `Sinusoid` are `patch-studio-model-2` contracts. Genuine
+model-1 documents remain readable through an explicit migration. Pure
+adapters, normalizers, deterministic cache/composition tests, export/import
+fixed-point cases, disabled-source retention, vector blend, explicit SIRDS blend
+non-applicability, clock-gated static rendering, 8-fps dynamic SIRDS cadence, and
+recursive nested/discrete loss accounting have shipped. Exact legacy trajectory
+and one-sided clamp fidelity, ordinary duplicate/reorder UI, and complete
+equivalence/cross-origin and browser gates remain open.
 
 - Add explicit colour-field and first-class spatial visual-track contracts,
   including content-specific source configuration and modulatable numeric
@@ -251,6 +328,15 @@ behavior the old implementation actually delivered.
 
 ### Milestone 3 — ship Field starters as ordinary Studio tracks
 
+**Status: partial.** All four starters are available in Studio and through
+compatibility URLs. Add appends to the live draft and offers explicit keep/apply
+stage choices; the full report is visible and requires acknowledgement when it
+contains review-sensitive entries. Starter output uses ordinary track cards,
+modulation, enable, rename, inspect, remove, save, and shared-stage paths; no
+Field engine or store is mounted. Duplicate/reorder UI, complete lifecycle/
+component tests, and browser acceptance with mixed manual and Field-derived
+tracks remain open.
+
 - Add Field starter actions to Studio's normal add flow. The basic starter
   inserts its colour, audio, and control tracks; marker, tree, abstraction, and
   landscape starters insert their corresponding spatial visual tracks.
@@ -272,6 +358,12 @@ equivalent manually created tracks, and only one draft, engine, transport, audio
 clock, frame loop, and safety acknowledgement exist.
 
 ### Milestone 4 — preserve semantic truth at cutover
+
+**Status: partial.** Patch RDF now recursively accounts for nested/discrete
+unmapped state and explicitly disclaims producer validation. Unified delivered
+state, ordinary-track `ExposureProfile` derivation, producer-adjacent SHACL, and
+any reviewed rich-scene exposure mappings have not shipped. The legacy Field
+exposure exporter and its SHACL suite remain only as golden behavior.
 
 - Derive `ExposureProfile` from the applicable ordinary tracks and the delivered
   snapshot; keep the existing SHACL state matrix green. Template provenance must
@@ -295,6 +387,15 @@ passes the exact profile it declares.
 
 ### Milestone 5 — migrate routes and local state
 
+**Status: partial.** Studio detects all four legacy keys, converts records only
+in memory, leaves originals intact, exposes the complete conversion report, and
+gates review-sensitive Add/Replace actions on acknowledgement. Add has explicit
+keep/apply-stage variants and appends live; Replace and Cancel remain distinct.
+`/field/*` routes and visible navigation now select the corresponding Studio
+starter. Production/static/offline browser coverage, all open-draft and
+accessibility cases, About/offline-cache review, and a deprecation announcement
+remain open.
+
 - Detect `bsclab.field`, `bsclab.field.tree`, `bsclab.field.abstract`, and
   `bsclab.field.landscape`, then offer a previewed one-time conversion.
 - Preserve the original records until the user confirms the converted patch;
@@ -311,6 +412,10 @@ Exit gate: all four historic URLs work in static/offline builds, bookmarks open
 the intended starter/import intent, and migration is recoverable.
 
 ### Milestone 6 — remove duplicate ownership
+
+**Status: not started.** The standalone Field engine, transport, state/persistence
+models, shells, and scene pages remain in source as legacy code. No deprecation
+window or removal gate has completed.
 
 - Remove standalone Field engine, transport, persistence, and shell code only
   after fixture, migration, and route gates pass.
@@ -341,7 +446,11 @@ stable.
 
 ## 7. Ordering and parallel work
 
-The dependency spine is **M0 → M1 → M2 → M3 → M4/M5 → M6**. Within it:
+The intended dependency spine was **M0 → M1 → M2 → M3 → M4/M5 → M6**.
+The first implementation slice advanced model, renderer, starter, and route work
+in parallel and cut public routes over before extracting the controller/registry.
+Those skipped prerequisites remain open work, not waived requirements. Within
+the remaining work:
 
 - fixture capture, current correctness fixes, and renderer extraction can run
   in parallel;
@@ -358,6 +467,9 @@ surface.
 
 ## 8. Acceptance matrix
 
+These are completion gates. The partial implementation described above has not
+yet passed the matrix as a whole.
+
 - **Runtime:** one engine, transport, audio clock, frame loop, and live draft;
   loading a starter or compatibility intent creates no autonomous runtime.
 - **Audio:** migrated voice specs match type, pan, frequency, gain, noise
@@ -366,9 +478,10 @@ surface.
   it, without claiming cross-hardware bit identity.
 - **Visual:** colour, blink, duty, eye ordering, technique, depth, motion, and
   every spatial source survive export/import; sounding visuals use the audio
-  clock. Spatial tracks pass normal lifecycle and layering tests, including
-  multiple tracks, one shared stage authority, presentation-conflict prompts,
-  and full-frame projection modes.
+  clock. Verify the first-spatial-position composition boundary, vector blend,
+  explicit blend non-applicability for autostereogram, static SIRDS clock gating,
+  and the 8-fps cap for time-varying full-frame output in production browsers.
+  Spatial tracks still must pass normal lifecycle and layering tests.
 - **Safety:** the shared clamp and gate are exercised; above-threshold consent
   is per-session and absent from patch, package, migration, and cloud storage;
   consent changes the delivery snapshot, never the saved patch.
@@ -379,7 +492,8 @@ surface.
 - **Portability:** patch export→import is a fixed point, and cross-origin Level 1
   and Level 2 checks include visual modulation and nested/discrete scene state.
 - **Migration:** conversion is previewed, opt-in, local, non-destructive, and
-  never writes Firestore without a later explicit Save.
+  never writes Firestore without a later explicit Save; the complete report and
+  required acknowledgement remain accessible by keyboard and assistive technology.
 - **Compatibility:** `/field/*` works online, offline, and in a static build;
   entering from an open draft never replaces it without confirmation.
 - **Accessibility:** keyboard controls, focus, reduced motion, visual gate, and

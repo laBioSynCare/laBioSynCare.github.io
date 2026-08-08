@@ -1,6 +1,6 @@
 # ADR 0046 — One Studio, first-class spatial visual tracks, and separate semantic products
 
-**Status:** Accepted — 2026-08-08 · revised before implementation 2026-08-08 · implementation pending
+**Status:** Accepted — 2026-08-08 · revised before implementation 2026-08-08 · partially implemented 2026-08-08
 
 > **Revision — 2026-08-08, before implementation.** The initially accepted
 > design described “Guided Field” and “Advanced Studio” as two views over a
@@ -13,7 +13,7 @@
 
 ## Context
 
-BSC Lab currently has two stimulation surfaces:
+At the time of this decision, BSC Lab had two stimulation surfaces:
 
 - Patch Studio (`/creator/`) owns a `patch-studio-model-1` draft, `PatchStore`,
   audio engine, transport, and animation loop.
@@ -95,6 +95,43 @@ than belonging to a privileged workspace.
 The implementation sequence and acceptance gates are in
 [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
 
+## Implementation status — 2026-08-08
+
+The first cutover is shipped:
+
+- `patch-studio-model-2` has a shared `visualStage`, a fixed-rate phase-addressable
+  `Sinusoid` control, `ColorField`, and four first-class spatial visual-track
+  types. Genuine model-1 documents remain readable through an explicit importer;
+  new exports and saved edits use model 2.
+- Pure Field/scene adapters and starters create ordinary Studio tracks. Studio
+  detects all four legacy local-storage records without deleting or uploading
+  them. Disabled tone, noise, and depth sources survive as muted/disabled tracks
+  with their authored settings. The open conversion report shows every mapped,
+  dormant, corrected, unsupported, ignored, and warning entry; corrections,
+  warnings, or unsupported items require acknowledgement before Add or Replace.
+  Add appends to the live draft (and starts new zero-gain or audible voice handles
+  during playback), with explicit keep-stage and apply-suggested-stage actions.
+- `ColorField` and enabled spatial tracks render through one shared Studio stage.
+  Spatial source generation is deterministic and cached, multiple scene sources
+  compose at the first spatial track-array position before mono, stereo-pair,
+  anaglyph, or autostereogram projection, and the stage receives Studio controller
+  time. Vector modes execute each spatial track's blend; blend is explicitly not
+  applicable to autostereogram depth-buffer output. Static SIRDS scenes stay off
+  the clock invalidation path and dynamic full-frame refresh is capped at 8 fps.
+- `/field/*` routes and visible navigation now enter the corresponding Studio
+  starter. The old standalone shells no longer own a publicly routed runtime.
+- The stale control-name validation and warning defects are fixed. Patch RDF
+  projection now reports nested and discrete unmapped leaves and explicitly says
+  that producer-side SHACL validation has not run.
+
+The mandatory merge is not complete. Engine lifecycle, frame evaluation, and a
+delivered-state snapshot still live in `PresetCreator.svelte`; no extracted
+`patchTransport` or descriptor-driven renderer registry exists. Exact legacy
+trajectory and one-sided clamp behavior are reported rather than reproduced.
+Unified Studio `ExposureProfile` derivation, producer-adjacent SHACL,
+production-browser/offline regression gates, and the deprecation/removal of
+legacy Field runtime and persistence code remain open.
+
 ## Alternatives considered
 
 - **Keep two products or embed the current Field component.** Rejected because
@@ -117,10 +154,13 @@ The implementation sequence and acceptance gates are in
 
 - Studio remains one authoring surface; Field remains recognizable through
   templates, defaults, names, and route aliases rather than execution ownership.
-- A descriptor-driven visual registry, normalized spatial contract, and shared
-  scene compositor/projector must precede route cutover.
-- Multiple spatial tracks may coexist. Composition rules must distinguish
-  transparent geometry, flat overlays, and opaque full-frame techniques.
+- A normalized spatial contract and shared scene compositor/projector shipped
+  with the first route cutover. The descriptor-driven renderer registry and
+  extracted runtime remain required completion work.
+- Multiple spatial tracks may coexist. Because they must compose before a single
+  projection, the track-array topology groups them at the first enabled spatial
+  position while retaining source order inside that group. Vector blend executes;
+  SIRDS is a depth-buffer technique to which primitive blend does not apply.
 - Package and RDF mapping reports must account for every nested or discrete
   spatial field as mapped, explicitly unmapped, or non-semantic metadata.
 - [ADR 0011](0011-sensory-field-and-flash-safety.md) is superseded only in its

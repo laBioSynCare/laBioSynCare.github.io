@@ -1,5 +1,5 @@
-// Real-time scalar evaluation and visualization state for control tracks
-// (Martigli / Symmetry). All time inputs MUST come from
+// Real-time scalar evaluation and visualization state for LFO, Permutation,
+// and phase-addressable Sinusoid control tracks. All playback time inputs MUST come from
 // AudioContext.currentTime (CLAUDE.md §3.1).
 
 const TWO_PI = Math.PI * 2
@@ -144,6 +144,25 @@ export function evaluateSymmetry(track, t) {
   return computeSymmetryState(track, t).value
 }
 
+// Fixed-rate, phase-addressable sine. This deliberately does not reuse the
+// breathing LFO: Field motion needs frequencies up to 40 Hz and paired phases
+// for x/y circular trajectories. Time must be AudioContext.currentTime during
+// playback; the caller may provide its preview clock while stopped.
+export function computeSinusoidState(track, t) {
+  const rateHz = clamp(num(track.rateHz, 1), 0, 40)
+  const phaseRad = clamp(num(track.phaseRad, 0), 0, TWO_PI)
+  const amp = clamp(num(track.amplitude, 1), 0, 2)
+  const cycles = Math.max(0, num(t, 0)) * rateHz + phaseRad / TWO_PI
+  const phase = ((cycles % 1) + 1) % 1
+  return {
+    value: amp * Math.sin(TWO_PI * phase),
+    phase,
+    phaseRad,
+    rateHz,
+    amp,
+  }
+}
+
 export function evaluateControl(track, t, sessionElapsed, sessionLength) {
   if (!track) return 0
   if (track.type === 'LFO') {
@@ -155,6 +174,10 @@ export function evaluateControl(track, t, sessionElapsed, sessionLength) {
   if (track.type === 'Permutation') {
     const ts = Number.isFinite(sessionElapsed) ? sessionElapsed : t
     return computeSymmetryState(track, ts).value
+  }
+  if (track.type === 'Sinusoid') {
+    const ts = Number.isFinite(sessionElapsed) ? sessionElapsed : t
+    return computeSinusoidState(track, ts).value
   }
   return 0
 }

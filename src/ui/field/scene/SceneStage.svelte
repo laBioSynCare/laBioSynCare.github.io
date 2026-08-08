@@ -1,11 +1,11 @@
 <script>
-  // Generic stereoscopic render surface. Draws any scene (segments / dots / polys
-  // in 3D — see sceneGeom.js) through three techniques: a free-view stereo pair,
-  // an anaglyph, and a random-dot autostereogram. Each primitive carries its own
+  // Generic spatial render surface. Draws any scene (segments / dots / polys in
+  // 3D — see sceneGeom.js) in mono or through three depth techniques: a free-view
+  // stereo pair, an anaglyph, and a random-dot autostereogram. Each primitive carries its own
   // colour; when depth shading is on, every colour is tinted toward a near/far
   // gradient by its rotated z. Gated by the parent via `active`.
   import {
-    project, disparity, sceneExtent, rotatedSceneBounds, depthTint,
+    project, disparity, sceneExtent, sceneFitScale, rotatedSceneBounds, depthTint,
     normalizeDepth, buildAutostereogram,
   } from './sceneGeom.js'
 
@@ -34,13 +34,12 @@
 
   // Yaw-invariant orthographic fit: scale so the scene never clips at any yaw.
   const extent = $derived(sceneExtent(scene))
-  const scale = $derived(
-    Math.min((paneW / 2) / (extent.maxR * 1.1), paneH / ((extent.maxY - extent.minY) * 1.18)) * zoom,
-  )
+  const scale = $derived(sceneFitScale(paneW, paneH, extent, zoom))
   const cx = $derived(paneW / 2)
   const cy = $derived(paneH / 2 + scale * ((extent.minY + extent.maxY) / 2))
 
   const eyeX = (x, z, sign) => x + (sign * disparity(z, depthScalePx)) / 2
+  const primitiveOpacity = (value) => Math.min(1, Math.max(0, Number.isFinite(Number(value)) ? Number(value) : 1))
 
   // Depth bounds at the current yaw (only when shading is on); turns with the scene.
   const depthBounds = $derived(depthColor?.enabled ? rotatedSceneBounds(scene, theta) : null)
@@ -59,13 +58,17 @@
       items.push({
         kind: 'seg', ax: a.sx, ay: a.sy, az: a.z, bx: b.sx, by: b.sy, bz: b.z,
         z: (a.z + b.z) / 2, color: s.color, width: Math.max(0.6, (s.width ?? 0.01) * scale * strokeWidth),
+        opacity: primitiveOpacity(s.opacity), blend: s.blend ?? 'normal',
       })
     }
     for (const d of sc.dots ?? []) {
       const p = project(d, opts)
       items.push({
-        kind: 'dot', x: p.sx, y: p.sy, z: p.z, r: Math.max(1, (d.r ?? 0.01) * scale),
+        kind: 'dot', x: p.sx, y: p.sy, z: p.z,
+        rx: Math.max(1, (d.rx ?? d.r ?? 0.01) * scale),
+        ry: Math.max(1, (d.ry ?? d.r ?? 0.01) * scale),
         fill: d.fill, stroke: d.stroke, strokeWidth: d.strokeWidth ? Math.max(0.5, d.strokeWidth * scale * strokeWidth) : 0,
+        opacity: primitiveOpacity(d.opacity), blend: d.blend ?? 'normal',
       })
     }
     for (const poly of sc.polys ?? []) {
@@ -79,7 +82,7 @@
       items.push({
         kind: 'poly', pts, z: zc, fill: poly.fill, stroke: poly.stroke,
         strokeWidth: poly.strokeWidth ? Math.max(0.5, poly.strokeWidth * scale * strokeWidth) : 0,
-        closed: poly.closed !== false,
+        closed: poly.closed !== false, opacity: primitiveOpacity(poly.opacity), blend: poly.blend ?? 'normal',
       })
     }
     items.sort((p, q) => p.z - q.z)
@@ -111,7 +114,7 @@
 
     const rb = rotatedSceneBounds(scene, theta)
     const ext = sceneExtent(scene)
-    const dScale = Math.min((w / 2) / (ext.maxR * 1.1), h / ((ext.maxY - ext.minY) * 1.18))
+    const dScale = sceneFitScale(w, h, ext, zoom)
     const dcx = w / 2
     const dcy = h / 2 + dScale * ((ext.minY + ext.maxY) / 2)
     const o = { cx: dcx, cy: dcy, scale: dScale, theta }
@@ -128,6 +131,7 @@
       const proj = poly.pts.map((pt) => project(pt, o))
       const zc = proj.reduce((sum, p) => sum + p.z, 0) / (proj.length || 1)
       drawers.push({ z: zc, fn: () => {
+        ctx.globalAlpha = primitiveOpacity(poly.opacity)
         ctx.beginPath()
         proj.forEach((p, i) => (i === 0 ? ctx.moveTo(p.sx, p.sy) : ctx.lineTo(p.sx, p.sy)))
         if (poly.closed !== false) ctx.closePath()
@@ -140,6 +144,7 @@
       const b = project(s.b, o)
       const zc = (a.z + b.z) / 2
       drawers.push({ z: zc, fn: () => {
+        ctx.globalAlpha = primitiveOpacity(s.opacity)
         ctx.strokeStyle = gray(zc)
         ctx.lineWidth = Math.max(1.5, (s.width ?? 0.01) * dScale)
         ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke()
@@ -148,12 +153,24 @@
     for (const d of scene.dots ?? []) {
       const p = project(d, o)
       drawers.push({ z: p.z, fn: () => {
+        ctx.globalAlpha = primitiveOpacity(d.opacity)
         ctx.fillStyle = gray(p.z)
-        ctx.beginPath(); ctx.arc(p.sx, p.sy, Math.max(1.5, (d.r ?? 0.01) * dScale), 0, Math.PI * 2); ctx.fill()
+        ctx.beginPath()
+        ctx.ellipse(
+          p.sx,
+          p.sy,
+          Math.max(1.5, (d.rx ?? d.r ?? 0.01) * dScale),
+          Math.max(1.5, (d.ry ?? d.r ?? 0.01) * dScale),
+          0,
+          0,
+          Math.PI * 2,
+        )
+        ctx.fill()
       } })
     }
     drawers.sort((p, q) => p.z - q.z)
     for (const dr of drawers) dr.fn()
+    ctx.globalAlpha = 1
 
     const img = ctx.getImageData(0, 0, w, h)
     const depth = new Float32Array(w * h)
@@ -181,14 +198,26 @@
           <g style="mix-blend-mode: screen">
             {#each drawList as it}
               {#if it.kind === 'seg'}
-                <line x1={eyeX(it.ax, it.az, ch.sign)} y1={it.ay} x2={eyeX(it.bx, it.bz, ch.sign)} y2={it.by} stroke={ch.color} stroke-width={it.width} stroke-linecap="round" />
+                <line x1={eyeX(it.ax, it.az, ch.sign)} y1={it.ay} x2={eyeX(it.bx, it.bz, ch.sign)} y2={it.by} stroke={ch.color} stroke-width={it.width} stroke-linecap="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {:else if it.kind === 'poly'}
-                <path d={polyPath(it.pts, ch.sign, it.closed)} fill="none" stroke={ch.color} stroke-width={Math.max(1, it.strokeWidth || 1.4)} stroke-linejoin="round" />
+                <path d={polyPath(it.pts, ch.sign, it.closed)} fill="none" stroke={ch.color} stroke-width={Math.max(1, it.strokeWidth || 1.4)} stroke-linejoin="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {:else}
-                <circle cx={eyeX(it.x, it.z, ch.sign)} cy={it.y} r={it.r} fill={ch.color} />
+                <ellipse cx={eyeX(it.x, it.z, ch.sign)} cy={it.y} rx={it.rx} ry={it.ry} fill={ch.color} opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {/if}
             {/each}
           </g>
+        {/each}
+      </svg>
+    {:else if mode === 'mono'}
+      <svg class="pane mono" viewBox={`0 0 ${paneW} ${paneH}`} preserveAspectRatio="none" aria-hidden="true">
+        {#each drawList as it}
+          {#if it.kind === 'seg'}
+            <line x1={it.ax} y1={it.ay} x2={it.bx} y2={it.by} stroke={tint(it.z, it.color)} stroke-width={it.width} stroke-linecap="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
+          {:else if it.kind === 'poly'}
+            <path d={polyPath(it.pts, 0, it.closed)} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 1} stroke-linejoin="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
+          {:else}
+            <ellipse cx={it.x} cy={it.y} rx={it.rx} ry={it.ry} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 0} opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
+          {/if}
         {/each}
       </svg>
     {:else}
@@ -197,11 +226,11 @@
           <svg class="pane eye-pane" data-eye={pane.key} viewBox={`0 0 ${paneW} ${paneH}`} preserveAspectRatio="none">
             {#each drawList as it}
               {#if it.kind === 'seg'}
-                <line x1={eyeX(it.ax, it.az, pane.sign)} y1={it.ay} x2={eyeX(it.bx, it.bz, pane.sign)} y2={it.by} stroke={tint(it.z, it.color)} stroke-width={it.width} stroke-linecap="round" />
+                <line x1={eyeX(it.ax, it.az, pane.sign)} y1={it.ay} x2={eyeX(it.bx, it.bz, pane.sign)} y2={it.by} stroke={tint(it.z, it.color)} stroke-width={it.width} stroke-linecap="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {:else if it.kind === 'poly'}
-                <path d={polyPath(it.pts, pane.sign, it.closed)} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 1} stroke-linejoin="round" />
+                <path d={polyPath(it.pts, pane.sign, it.closed)} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 1} stroke-linejoin="round" opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {:else}
-                <circle cx={eyeX(it.x, it.z, pane.sign)} cy={it.y} r={it.r} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 0} />
+                <ellipse cx={eyeX(it.x, it.z, pane.sign)} cy={it.y} rx={it.rx} ry={it.ry} fill={hasFill(it.fill) ? tint(it.z, it.fill) : 'none'} stroke={hasFill(it.stroke) ? tint(it.z, it.stroke) : 'none'} stroke-width={it.strokeWidth || 0} opacity={it.opacity} style={`mix-blend-mode:${it.blend}`} />
               {/if}
             {/each}
           </svg>

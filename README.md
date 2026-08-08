@@ -57,9 +57,10 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   (record 8494) await curator review, and a DBpedia Archivo submission passed
   RDF validation but is blocked by a Databus outage. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
-- **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio,
-  Sensory Field, logbook, profile and settings are implemented as a static
-  SvelteKit application, usable with no account; Firebase-backed sync is optional.
+- **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio
+  with Sensory Field starter routes, logbook, profile and settings are
+  implemented as a static SvelteKit application, usable with no account;
+  Firebase-backed sync is optional.
 
 Browsers at the ontology IRI get the interactive application; reference
 documentation is regenerated on every deploy (ADRs 0023 and 0043) —
@@ -127,9 +128,12 @@ surfaces are:
 - **SPARQL workbench:** Comunica queries over ontology and public instance data.
 - **Presets:** public BSC Lab reference presets and their evidence links.
 - **Patch Studio:** real-time audio/visual authoring with Web Audio,
-  AudioWorklet/WASM options, modulation, and photosensitivity safeguards.
-- **Sensory Field:** bounded visual/audio exposure prototyping that emits the
-  exposure vocabulary used by the knowledge graph.
+  AudioWorklet/WASM options, modulation, photosensitivity safeguards, and
+  first-class colour-field and stereoscopic scene tracks.
+- **Sensory Field starters:** the former Field URLs now offer ordinary Studio
+  tracks for colour/audio, depth markers, trees, abstractions, and landscapes.
+  Its SHACL-tested exposure mapper remains a legacy golden path while unified
+  Studio exposure export is completed.
 - **Logbook, annotations, patches and profile:** kept in your browser by
   default, with no account required. Signing in (when Firebase is configured)
   keeps them with your account instead so they follow you between devices.
@@ -141,7 +145,7 @@ Architecture details are in [src/README.md](src/README.md),
 ## Deployment And Portability
 
 BSC Lab builds as a static SvelteKit application. The knowledge browser, SPARQL
-workbench, Patch Studio, Sensory Field and reference data all operate client-side,
+workbench, Patch Studio, Sensory Field starter routes and reference data all operate client-side,
 so the core application is hostable on any static file server. Firebase is
 optional: configuration comes from build-time `VITE_FIREBASE_*` variables, and a
 build without them produces a working instance with no embedded credentials. Only
@@ -193,7 +197,7 @@ Existing portability foundations:
 - versioned, checksum-verified ontology releases ([ADR 0020](docs/decisions/0020-whole-set-snapshot-versioning.md));
 - JSON-LD and RDF/XML ontology export via `make export`;
 - RDF serialization of annotations with authentication identifiers excluded;
-- the portable `patch-studio-model-1` representation;
+- the portable `patch-studio-model-2` representation with explicit model-1 import;
 - separation of public reference data, per-user annotation graphs and private records.
 
 The next portability layer — reproducible institutional deployment, explicit

@@ -8,7 +8,13 @@ import {
   encodePatchLink,
   readPatchLinkFrom,
 } from './patchLink.js'
-import { buildPatchExport, createDraft, draftFromPatchExport } from '../ui/creator/presetDraft.js'
+import {
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  buildPatchExport,
+  createDraft,
+  draftFromPatchExport,
+} from '../ui/creator/presetDraft.js'
 
 const samplePatch = () => buildPatchExport(createDraft())
 
@@ -48,6 +54,23 @@ describe('round-trip', () => {
     const received = await decodePatchLink((await encodePatchLink(patch)).value)
     expect(received.patchName).toBe('Evening Descent — 6.5 s')
     expect(canonical(received.audioTracks)).toBe(canonical(patch.audioTracks))
+  })
+
+  it('reads a genuine model-1 link and upgrades it only when the editor rebuilds it', async () => {
+    const legacy = {
+      model: PATCH_STUDIO_MODEL_V1,
+      patchName: 'Legacy shared patch',
+      timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+      controlTracks: [],
+      audioTracks: [],
+      visualTracks: [{ id: 'v-old', trackType: 'Geometry', name: 'Geometry', params: {} }],
+      hapticTracks: [],
+    }
+
+    const received = await decodePatchLink((await encodePatchLink(legacy)).value)
+
+    expect(received).toEqual(legacy)
+    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V2)
   })
 })
 
@@ -154,6 +177,13 @@ describe('input from outside is treated as hostile', () => {
     )
     await expect(encodePatchLink(null)).rejects.toThrow(/Only Patch Studio patches/)
   })
+
+  it('refuses model-2 fields carried under the model-1 tag', async () => {
+    await expect(encodePatchLink({
+      model: PATCH_STUDIO_MODEL_V1,
+      visualStage: { presentationMode: 'mono' },
+    })).rejects.toThrow(/model-2 features.*model-1/)
+  })
 })
 
 describe('reading a link out of what someone pasted', () => {
@@ -161,7 +191,7 @@ describe('reading a link out of what someone pasted', () => {
     const { url } = await buildPatchLink(samplePatch(), 'https://example.org/creator/')
     const value = readPatchLinkFrom(url)
     expect(value).not.toBeNull()
-    expect((await decodePatchLink(value)).model).toBe('patch-studio-model-1')
+    expect((await decodePatchLink(value)).model).toBe(PATCH_STUDIO_MODEL_V2)
   })
 
   it('reads a bare location.hash', async () => {

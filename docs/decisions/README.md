@@ -69,7 +69,7 @@ annotations lives here.
 | [0043](0043-sstim-core-profile-and-module-boundaries.md) | SSTIM Kernel, Core, Core Plus, concern modules, and Full Profile | Accepted |
 | [0044](0044-stimulus-channel-core-ownership.md) | `StimulusChannel` ownership and profile-sensitive target domain | Accepted |
 | [0045](0045-shapeless-profiles-are-discovery-entry-points.md) | A profile with no shape closure is a discovery entry point, not a conformance target | Accepted |
-| [0046](0046-one-studio-two-authoring-modes.md) | One Studio, first-class spatial visual tracks, and separate semantic products | Accepted · revised before implementation 2026-08-08 |
+| [0046](0046-one-studio-two-authoring-modes.md) | One Studio, first-class spatial visual tracks, and separate semantic products | Accepted · revised before implementation; partially implemented 2026-08-08 |
 
 ## ADR lifecycle and revision policy
 

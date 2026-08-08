@@ -15,6 +15,15 @@
 // patches — because a wide interface is a wide surface for implementations to
 // disagree on.
 
+import {
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  SUPPORTED_PATCH_STUDIO_MODELS,
+  assertPatchStudioPatch,
+  isSupportedPatchStudioModel,
+} from '../portability/patchModel.js'
+
 /**
  * A stored patch record, identical in shape from every implementation.
  *
@@ -38,7 +47,13 @@
  * @property {(patchId: string) => Promise<void>} remove
  */
 
-export const PATCH_STUDIO_MODEL = 'patch-studio-model-1'
+export {
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  SUPPORTED_PATCH_STUDIO_MODELS,
+  isSupportedPatchStudioModel,
+}
 
 /** Longest accepted patch name; longer names are truncated, not rejected. */
 const MAX_NAME = 200
@@ -54,9 +69,7 @@ const MAX_NAME = 200
  */
 export function cleanPatchExport(patchExport) {
   const patch = JSON.parse(JSON.stringify(patchExport ?? {}))
-  if (patch.model !== PATCH_STUDIO_MODEL) {
-    throw new Error('Only Patch Studio patches can be saved.')
-  }
+  assertPatchStudioPatch(patch, 'Only Patch Studio patches can be saved.')
   patch.patchName = (patch.patchName ?? '').toString().trim().slice(0, MAX_NAME) || 'Untitled Patch'
   return patch
 }

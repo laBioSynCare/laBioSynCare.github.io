@@ -8,7 +8,16 @@ import {
   parseSessionPackage,
   serialiseSessionPackage,
 } from './sessionPackage.js'
-import { buildPatchExport, createAudioTrack, createControlTrack, createDraft, createVisualTrack, draftFromPatchExport }
+import {
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  buildPatchExport,
+  createAudioTrack,
+  createControlTrack,
+  createDraft,
+  createVisualTrack,
+  draftFromPatchExport,
+}
   from '../ui/creator/presetDraft.js'
 
 const OPTIONS = {
@@ -44,7 +53,7 @@ describe('package structure', () => {
     expect(manifest.model).toBe(SESSION_PACKAGE_MODEL)
     expect(manifest.bscLabCommit).toBe('6dfc79a')
     expect(manifest.sstimRelease).toBe('0.11.0')
-    expect(manifest.patchModel).toBe('patch-studio-model-1')
+    expect(manifest.patchModel).toBe(PATCH_STUDIO_MODEL_V2)
   })
 
   it('checksums every file individually', async () => {
@@ -115,6 +124,26 @@ describe('round-trip: the patch survives exactly', () => {
     const { patch: received } = await parseSessionPackage(first)
     expect(await serialiseSessionPackage(received, OPTIONS)).toBe(first)
   })
+
+  it('opens a model-1 package losslessly and upgrades only at the editor boundary', async () => {
+    const legacy = {
+      model: PATCH_STUDIO_MODEL_V1,
+      patchName: 'Legacy package',
+      timing: { bpmEnabled: false, bpm: 60, beatsPerBar: 4, lengthSec: 900 },
+      controlTracks: [],
+      audioTracks: [],
+      visualTracks: [{ id: 'v-old', trackType: 'Geometry', name: 'Geometry', params: {} }],
+      hapticTracks: [],
+    }
+
+    const { patch: received, manifest } = await parseSessionPackage(
+      await serialiseSessionPackage(legacy, OPTIONS),
+    )
+
+    expect(received).toEqual(legacy)
+    expect(manifest.patchModel).toBe(PATCH_STUDIO_MODEL_V1)
+    expect(buildPatchExport(draftFromPatchExport(received)).model).toBe(PATCH_STUDIO_MODEL_V2)
+  })
 })
 
 describe('a malformed package fails before anything is applied', () => {
@@ -158,6 +187,13 @@ describe('a malformed package fails before anything is applied', () => {
 
   it('refuses to package anything that is not a Patch Studio patch', async () => {
     await expect(buildSessionPackage({ model: 'other' }, OPTIONS)).rejects.toThrow(/Only Patch Studio patches/)
+  })
+
+  it('refuses model-2 data mislabeled as model 1', async () => {
+    await expect(buildSessionPackage({
+      model: PATCH_STUDIO_MODEL_V1,
+      visualStage: { presentationMode: 'mono' },
+    }, OPTIONS)).rejects.toThrow(/model-2 features.*model-1/)
   })
 
   it('requires an explicit timestamp so packages are reproducible', async () => {
@@ -206,7 +242,7 @@ describe('the mapping report travels with the package', () => {
 
   it('states what the projection is, and what it still does not assert', async () => {
     const { report } = await parseSessionPackage(await serialiseSessionPackage(sample(), OPTIONS))
-    expect(report.conformance).toMatch(/SHACL-validated/)
+    expect(report.conformance).toMatch(/requiring producer-side SHACL validation/)
     // ADR 0040 made the RDF valid. It did not make it a scientific claim, and
     // this is the sentence that must never soften.
     expect(report.conformance).toMatch(/no evidence, outcome or safety metadata/)

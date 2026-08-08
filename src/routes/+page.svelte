@@ -56,7 +56,7 @@
       copy: 'Audio-visual sessions in your browser — no install, start gently.',
       primary: [{ label: 'Open Patch Studio', href: '/creator/' }],
       secondary: [
-        { label: 'Try the Sensory Field', href: '/field/' },
+        { label: 'Try the Sensory Field', href: '/creator/?starter=field' },
         { label: 'Browse presets', href: '/presets/' },
       ],
     },

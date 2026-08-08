@@ -9,9 +9,9 @@
 //
 // Scene shape:
 //   { background: '#hex',
-//     segments: [{ a:{x,y,z}, b:{x,y,z}, width, color }],
-//     dots:     [{ x,y,z, r, fill, stroke?, strokeWidth? }],
-//     polys:    [{ pts:[{x,y,z}...], fill, stroke?, strokeWidth?, closed }] }
+//     segments: [{ a:{x,y,z}, b:{x,y,z}, width, color, opacity?, blend? }],
+//     dots:     [{ x,y,z, r, rx?, ry?, fill, stroke?, strokeWidth?, opacity?, blend? }],
+//     polys:    [{ pts:[{x,y,z}...], fill, stroke?, strokeWidth?, closed, opacity?, blend? }] }
 
 export const TWO_PI = Math.PI * 2
 export const DEG = Math.PI / 180
@@ -129,6 +129,17 @@ export function sceneExtent(scene) {
   if (!(maxY > minY)) { minY = -1; maxY = 1 }
   if (maxR <= 0) maxR = 1
   return { maxR, minY, maxY }
+}
+
+/** Fit a yaw-invariant extent into a viewport and apply the shared-stage zoom. */
+export function sceneFitScale(width, height, extent, zoom = 1) {
+  const safeWidth = Math.max(1, Number(width) || 1)
+  const safeHeight = Math.max(1, Number(height) || 1)
+  const safeZoom = Math.max(0, Number(zoom) || 0)
+  return Math.min(
+    (safeWidth / 2) / (extent.maxR * 1.1),
+    safeHeight / ((extent.maxY - extent.minY) * 1.18),
+  ) * safeZoom
 }
 
 // ── Colour helpers (depth-cued shading) ─────────────────────────────────────────

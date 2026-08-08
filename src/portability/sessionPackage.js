@@ -21,7 +21,7 @@
 // Nothing here reads storage or identity. A package carries a patch and the
 // facts about its own construction — never a user, an account, or a device.
 
-import { PATCH_STUDIO_MODEL } from '../ui/creator/presetDraft.js'
+import { assertPatchStudioPatch } from './patchModel.js'
 import { PROJECTION_MODEL, projectPatch } from './patchProjection.js'
 
 export const SESSION_PACKAGE_MODEL = 'bsc-lab-session-package-1'
@@ -78,7 +78,7 @@ export function findForbiddenIdentifiers(text) {
 /**
  * Build a package around a patch.
  *
- * @param {object} patchExport a `patch-studio-model-1` document
+ * @param {object} patchExport a supported Patch Studio document
  * @param {{ sessionIri: string, created: string, bscLabCommit?: string,
  *           sstimRelease?: string, title?: string }} options
  *        `created` is supplied rather than read from the clock, so the same
@@ -89,9 +89,7 @@ export function findForbiddenIdentifiers(text) {
 export async function buildSessionPackage(patchExport, options) {
   const { sessionIri, created, bscLabCommit = 'unknown', sstimRelease = 'unknown', title } = options ?? {}
 
-  if (patchExport?.model !== PATCH_STUDIO_MODEL) {
-    throw new Error('Only Patch Studio patches can be packaged.')
-  }
+  assertPatchStudioPatch(patchExport, 'Only Patch Studio patches can be packaged.')
   if (!sessionIri) throw new Error('buildSessionPackage needs a sessionIri.')
   if (!created) throw new Error('buildSessionPackage needs a created timestamp.')
 
@@ -195,7 +193,10 @@ export async function parseSessionPackage(text) {
   }
 
   if (manifest?.model !== SESSION_PACKAGE_MODEL) throw new Error('This package has an invalid manifest.')
-  if (patch?.model !== PATCH_STUDIO_MODEL) throw new Error('This package does not contain a Patch Studio patch.')
+  assertPatchStudioPatch(patch, 'This package does not contain a Patch Studio patch.')
+  if (manifest.patchModel !== patch.model) {
+    throw new Error('This package manifest does not match its Patch Studio model.')
+  }
 
   // Per-file checksums, so a reader can tell *which* part was damaged.
   for (const [name, expected] of Object.entries(manifest.checksums ?? {})) {

@@ -4,7 +4,7 @@
   const items = [
     { href: '/graph/', label: 'Graph' },
     { href: '/creator/', label: 'Patch Studio' },
-    { href: '/field/', label: 'Field' },
+    { href: '/creator/?starter=field', label: 'Field' },
     { href: '/presets/', label: 'Presets' },
     { href: '/sparql/', label: 'SPARQL' },
     { href: '/logbook/', label: 'Logbook' },

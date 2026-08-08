@@ -38,13 +38,15 @@ const PORT_A = 4183
 const PORT_B = 4184
 
 // Served to the harness so both origins run the *shipped* modules, not a copy.
-// This must be the whole import closure: presetDraft.js pulls in tempo.js, and a
-// missing entry surfaces only as a silent 404 and a harness that never reports.
+// This must be the whole import closure: a missing entry surfaces only as a
+// silent 404 and a harness that never reports.
 const MODULES = {
   '/sessionPackage.js': resolve('src/portability/sessionPackage.js'),
   '/patchProjection.js': resolve('src/portability/patchProjection.js'),
+  '/patchModel.js': resolve('src/portability/patchModel.js'),
   '/presetDraft.js': resolve('src/ui/creator/presetDraft.js'),
   '/tempo.js': resolve('src/ui/creator/tempo.js'),
+  '/visualTrackModel.js': resolve('src/ui/creator/visualTrackModel.js'),
 }
 
 const TYPES = {
@@ -85,6 +87,7 @@ function serve(port, harnessHtml, payloadRef) {
         // flat paths this server exposes.
         const source = (await readFile(MODULES[url.pathname], 'utf8'))
           .replace(/from '\.\.\/ui\/creator\/presetDraft\.js'/g, "from '/presetDraft.js'")
+          .replace(/from '\.\.\/\.\.\/portability\/patchModel\.js'/g, "from '/patchModel.js'")
           .replace(/from '\.\/patchProjection\.js'/g, "from '/patchProjection.js'")
         return send(200, 'text/javascript', source)
       }

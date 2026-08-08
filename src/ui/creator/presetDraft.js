@@ -11,11 +11,63 @@ import {
   createTempoSyncConfig,
   validateTempoSyncConfig,
 } from './tempo.js'
+import {
+  CONFIGURED_VISUAL_TRACK_TYPES,
+  createVisualStagePresentation,
+  createVisualTrackConfig,
+  normalizeVisualStagePresentation,
+  normalizeVisualTrackConfig,
+} from './visualTrackModel.js'
+import {
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  SUPPORTED_PATCH_STUDIO_MODELS,
+  assertPatchStudioPatch,
+  assertSupportedPatchStudioModel,
+  isSupportedPatchStudioModel,
+  patchUsesModel2Features,
+} from '../../portability/patchModel.js'
 
-export const PATCH_STUDIO_MODEL = 'patch-studio-model-1'
+export {
+  ABSTRACT_SCENE_STYLES,
+  COLOR_FIELD_TRACK_TYPE,
+  CONFIGURED_VISUAL_TRACK_TYPES,
+  DEPTH_MARKER_GRID_AXES,
+  LANDSCAPE_SCENE_PALETTES,
+  SPATIAL_VISUAL_TRACK_TYPES,
+  VISUAL_STAGE_PRESENTATION_MODES,
+  VISUAL_STAGE_VIEWING_MODES,
+  createAbstractSceneConfig,
+  createColorFieldConfig,
+  createDepthMarkersConfig,
+  createLandscapeSceneConfig,
+  createTreeSceneConfig,
+  createVisualStagePresentation,
+  createVisualTrackConfig,
+  isSpatialVisualTrackType,
+  normalizeAbstractSceneConfig,
+  normalizeColorFieldConfig,
+  normalizeDepthMarkersConfig,
+  normalizeLandscapeSceneConfig,
+  normalizeTreeSceneConfig,
+  normalizeVisualStagePresentation,
+  normalizeVisualTrackConfig,
+} from './visualTrackModel.js'
+
+export {
+  PATCH_STUDIO_MODEL,
+  PATCH_STUDIO_MODEL_V1,
+  PATCH_STUDIO_MODEL_V2,
+  SUPPORTED_PATCH_STUDIO_MODELS,
+  assertPatchStudioPatch,
+  assertSupportedPatchStudioModel,
+  isSupportedPatchStudioModel,
+  patchUsesModel2Features,
+}
 
 // Control track types
-export const CONTROL_TYPES = ['LFO', 'Permutation']
+export const CONTROL_TYPES = ['LFO', 'Permutation', 'Sinusoid']
 
 /**
  * Stored control-track types from before ADR 0041, and what they became.
@@ -58,6 +110,18 @@ export const SYMMETRY_PARAM_RANGE = {
 export const SYMMETRY_PARAMS = ['nnotes', 'rateHz', 'amplitude']
 
 export const SYMMETRY_FAMILIES = ['plain-hunt']
+
+// General periodic control used by spatial tracks. Unlike the breathing LFO,
+// this signal has a fixed frequency and explicit phase, so two controls can
+// describe circular x/y motion and Field depth motion up to 40 Hz without a
+// hidden renderer-owned clock.
+export const SINUSOID_PARAM_RANGE = {
+  rateHz:    [0,           40,          0.05],
+  phaseRad:  [0,           Math.PI * 2, 0.01],
+  amplitude: [0,           2,           0.05],
+}
+
+export const SINUSOID_PARAMS = ['rateHz', 'phaseRad', 'amplitude']
 
 // Audio track types
 export const AUDIO_TRACK_TYPES = ['IsochronicTone', 'BinauralBeat', 'Carrier', 'Noise', 'Drone', 'Sample']
@@ -141,11 +205,48 @@ export function createTremolo(overrides = {}) {
   return { enabled: false, rate: 4, depth: 0.5, mode: 'exponential', ...overrides }
 }
 
-// Visual track types
-export const VISUAL_TRACK_TYPES = ['Geometry', 'Particles', 'Gradient', 'Blink', 'Oscillate', 'Pacer', 'Ripple', 'Spiral', 'Mandala']
+// Visual track types. ADR 0046 sources are ordinary tracks in the same registry;
+// only their spatial rendering capability differs from the existing flat types.
+export const VISUAL_TRACK_TYPES = [
+  'Geometry',
+  'Particles',
+  'Gradient',
+  'Blink',
+  'Oscillate',
+  'Pacer',
+  'Ripple',
+  'Spiral',
+  'Mandala',
+  ...CONFIGURED_VISUAL_TRACK_TYPES,
+]
+
+// Shared live transform contract for every first-class spatial source. Source
+// recipes remain content-specific; renderers apply these values before the
+// visual stage composes and projects the scene.
+export const SPATIAL_VISUAL_PARAMS = [
+  'opacity',
+  'x',
+  'y',
+  'z',
+  'spatialScale',
+  'rotationSpeed',
+]
 
 // Visual parameters that can accept modulation (full registry across all types)
-export const VISUAL_PARAMS = ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue', 'blinkRate', 'duty', 'oscRate']
+export const VISUAL_PARAMS = [
+  'opacity',
+  'scale',
+  'rotationSpeed',
+  'sides',
+  'hue',
+  'blinkRate',
+  'duty',
+  'oscRate',
+  'x',
+  'y',
+  'z',
+  'spatialScale',
+]
 
 // Knob ranges for visual params [min, max, step]
 export const VISUAL_PARAM_RANGE = {
@@ -157,6 +258,10 @@ export const VISUAL_PARAM_RANGE = {
   blinkRate:     [0.5,  40,   0.5],   // Hz — photic flicker rate
   duty:          [0.05, 0.95, 0.01],  // on-fraction of each blink cycle
   oscRate:       [0.05, 10,   0.05],  // Hz — sinusoidal oscillation rate
+  x:             [-2,   2,    0.01],  // normalized source-space translation
+  y:             [-2,   2,    0.01],
+  z:             [-2,   2,    0.01],
+  spatialScale:  [0.1,  4,    0.01],
 }
 
 // Modulatable params per visual track type. The three legacy types keep the
@@ -171,6 +276,11 @@ export const VISUAL_VOICE_PARAMS = {
   Ripple:    ['opacity', 'scale', 'oscRate', 'hue'],
   Spiral:    ['opacity', 'scale', 'rotationSpeed', 'hue'],
   Mandala:   ['opacity', 'scale', 'rotationSpeed', 'sides', 'hue'],
+  ColorField: ['opacity', 'blinkRate', 'duty'],
+  DepthMarkers: SPATIAL_VISUAL_PARAMS,
+  TreeScene: SPATIAL_VISUAL_PARAMS,
+  AbstractScene: SPATIAL_VISUAL_PARAMS,
+  LandscapeScene: SPATIAL_VISUAL_PARAMS,
 }
 
 // Blend modes for layering visual tracks in the mixed/fullscreen view.
@@ -182,6 +292,11 @@ export const VISUAL_DEFAULTS = {
   Ripple:  { oscRate: 0.6 },
   Spiral:  { rotationSpeed: 0.4 },
   Mandala: { sides: 6, rotationSpeed: 0.15 },
+  ColorField: { opacity: 0.6, blinkRate: 1, duty: 0.5 },
+  DepthMarkers: { rotationSpeed: 0 },
+  TreeScene: { rotationSpeed: 0 },
+  AbstractScene: { rotationSpeed: 0 },
+  LandscapeScene: { rotationSpeed: 0 },
 }
 
 export function visualParamNames(trackType) {
@@ -209,8 +324,9 @@ export const TIMING_PARAM_RANGE = {
 }
 
 export const TEMPO_SYNC_TARGETS = {
-  Martigli: { periodSec: 'duration', targetPeriodSec: 'duration' },
-  Symmetry: { rateHz: 'rate' },
+  LFO: { periodSec: 'duration', targetPeriodSec: 'duration' },
+  Permutation: { rateHz: 'rate' },
+  Sinusoid: { rateHz: 'rate' },
   IsochronicTone: { pulseRate: 'rate' },
   BinauralBeat: { beatFreq: 'rate' },
   Geometry: { rotationSpeed: 'signedRate' },
@@ -222,6 +338,11 @@ export const TEMPO_SYNC_TARGETS = {
   Ripple: { oscRate: 'rate' },
   Spiral: { rotationSpeed: 'signedRate' },
   Mandala: { rotationSpeed: 'signedRate' },
+  ColorField: { blinkRate: 'rate' },
+  DepthMarkers: { rotationSpeed: 'signedRate' },
+  TreeScene: { rotationSpeed: 'signedRate' },
+  AbstractScene: { rotationSpeed: 'signedRate' },
+  LandscapeScene: { rotationSpeed: 'signedRate' },
   Vibration: { pulseRate: 'rate' },
 }
 
@@ -360,11 +481,18 @@ function normalizeControlTrack(source) {
       periodSec: normalizeTempoSync(stored.tempoSync?.periodSec ?? base.tempoSync.periodSec),
       targetPeriodSec: normalizeTempoSync(stored.tempoSync?.targetPeriodSec ?? base.tempoSync.targetPeriodSec),
     }
-  } else {
+  } else if (type === 'Permutation') {
     track.nnotes = Math.round(rangedNumber(stored.nnotes, SYMMETRY_PARAM_RANGE.nnotes, base.nnotes))
     track.rateHz = rangedNumber(stored.rateHz, SYMMETRY_PARAM_RANGE.rateHz, base.rateHz)
     track.amplitude = rangedNumber(stored.amplitude, SYMMETRY_PARAM_RANGE.amplitude, base.amplitude)
     track.family = choice(stored.family, SYMMETRY_FAMILIES, base.family)
+    track.tempoSync = {
+      rateHz: normalizeTempoSync(stored.tempoSync?.rateHz ?? base.tempoSync.rateHz),
+    }
+  } else {
+    track.rateHz = rangedNumber(stored.rateHz, SINUSOID_PARAM_RANGE.rateHz, base.rateHz)
+    track.phaseRad = rangedNumber(stored.phaseRad, SINUSOID_PARAM_RANGE.phaseRad, base.phaseRad)
+    track.amplitude = rangedNumber(stored.amplitude, SINUSOID_PARAM_RANGE.amplitude, base.amplitude)
     track.tempoSync = {
       rateHz: normalizeTempoSync(stored.tempoSync?.rateHz ?? base.tempoSync.rateHz),
     }
@@ -424,14 +552,18 @@ function normalizeVisualTrack(source) {
   const stored = plainObject(source)
   const trackType = choice(stored.trackType, VISUAL_TRACK_TYPES, 'Geometry')
   const base = createVisualTrack(trackType)
-  return {
+  const track = {
     ...base,
     id: safeId(stored.id, base.id),
     trackType,
     name: safeText(stored.name, base.name),
+    enabled: stored.enabled !== false,
     blend: choice(stored.blend, BLEND_MODES, base.blend),
     params: normalizeParams(stored.params, base.params),
   }
+  const config = normalizeVisualTrackConfig(trackType, stored.config)
+  if (config) track.config = config
+  return track
 }
 
 function normalizeHapticTrack(source) {
@@ -507,10 +639,25 @@ export function createPermutationTrack(overrides = {}) {
   }
 }
 
+export function createSinusoidTrack(overrides = {}) {
+  return {
+    id: uid('ctl'),
+    type: 'Sinusoid',
+    name: 'Sinusoid',
+    rateHz: 1,
+    phaseRad: 0,
+    amplitude: 1,
+    tempoSync: {
+      rateHz: createTempoSyncConfig(),
+    },
+    ...overrides,
+  }
+}
+
 export function createControlTrack(type = 'LFO', overrides = {}) {
-  return type === 'Permutation'
-    ? createPermutationTrack(overrides)
-    : createLfoTrack(overrides)
+  if (type === 'Permutation') return createPermutationTrack(overrides)
+  if (type === 'Sinusoid') return createSinusoidTrack(overrides)
+  return createLfoTrack(overrides)
 }
 
 // ── Mod slot (per-parameter modulation link) ────────────────────────────────
@@ -578,6 +725,7 @@ function visualParams(trackType = 'Geometry', defaults = {}) {
   const base = {
     opacity: 1, scale: 1, rotationSpeed: 0.1, sides: 3, hue: 200,
     blinkRate: 10, duty: 0.5, oscRate: 1,
+    x: 0, y: 0, z: 0, spatialScale: 1,
   }
   const merged = { ...base, ...defaults }
   const params = {}
@@ -588,14 +736,25 @@ function visualParams(trackType = 'Geometry', defaults = {}) {
 }
 
 export function createVisualTrack(trackType = 'Geometry', overrides = {}) {
-  return {
+  const {
+    config: configOverrides,
+    trackType: _ignoredTrackTypeOverride,
+    ...trackOverrides
+  } = plainObject(overrides)
+  const track = {
     id: uid('visual'),
     trackType,
     name: trackType,
-    blend: overrides.blend ?? 'screen',
+    enabled: true,
+    blend: trackOverrides.blend ?? 'screen',
     params: visualParams(trackType, VISUAL_DEFAULTS[trackType]),
-    ...overrides,
+    ...trackOverrides,
+    trackType,
+    enabled: trackOverrides.enabled !== false,
   }
+  const config = createVisualTrackConfig(trackType, configOverrides)
+  if (config) track.config = config
+  return track
 }
 
 // ── Haptic tracks ─────────────────────────────────────────────────────────────
@@ -633,6 +792,7 @@ export function createDraft() {
   return {
     patchName: 'New Patch',
     timing: createTiming(),
+    visualStage: createVisualStagePresentation(),
     playing: false,
     controlTracks: [ctrl],
     audioTracks: [audio],
@@ -645,6 +805,7 @@ export function createEmptyDraft() {
   return {
     patchName: 'Untitled Patch',
     timing: createTiming(),
+    visualStage: createVisualStagePresentation(),
     playing: false,
     controlTracks: [],
     audioTracks: [],
@@ -653,11 +814,36 @@ export function createEmptyDraft() {
   }
 }
 
-export function draftFromPatchExport(exported) {
+/**
+ * Upgrade a portable patch to the current exchange model before rebuilding the
+ * live draft. Model 1 had no shared visual stage; its deterministic migration
+ * supplies the model-2 default. Track normalization below performs the older
+ * Martigli/Symmetry name migration and fills all other live defaults.
+ *
+ * Missing model identifiers remain an in-memory compatibility case only. File,
+ * link, package, and store boundaries require an explicit supported model.
+ */
+export function migratePatchExportToCurrent(exported) {
   const source = plainObject(exported)
-  if (source.model && source.model !== PATCH_STUDIO_MODEL) {
-    throw new Error(`Unsupported patch model: ${source.model}`)
+  const sourceModel = source.model || PATCH_STUDIO_MODEL_V1
+  assertSupportedPatchStudioModel(sourceModel, `Unsupported patch model: ${sourceModel}`)
+  assertPatchStudioPatch(
+    { ...source, model: sourceModel },
+    `Unsupported patch model: ${sourceModel}`,
+  )
+
+  if (sourceModel === PATCH_STUDIO_MODEL_V1) {
+    return {
+      ...source,
+      model: PATCH_STUDIO_MODEL,
+      visualStage: createVisualStagePresentation(),
+    }
   }
+  return { ...source, model: PATCH_STUDIO_MODEL }
+}
+
+export function draftFromPatchExport(exported) {
+  const source = migratePatchExportToCurrent(exported)
 
   const controlTracks = Array.isArray(source.controlTracks)
     ? source.controlTracks.map(normalizeControlTrack)
@@ -675,6 +861,7 @@ export function draftFromPatchExport(exported) {
   const draft = {
     patchName: safeText(source.patchName, 'Imported Patch'),
     timing: normalizeTiming(source.timing),
+    visualStage: normalizeVisualStagePresentation(source.visualStage),
     playing: false,
     controlTracks,
     audioTracks,
@@ -776,6 +963,7 @@ export function buildPatchExport(draft) {
       beatsPerBar: clampBeatsPerBar(timing.beatsPerBar ?? 4),
       lengthSec: timing.lengthSec ?? 900,
     },
+    visualStage: normalizeVisualStagePresentation(draft.visualStage),
     controlTracks: draft.controlTracks,
     audioTracks: draft.audioTracks,
     visualTracks: draft.visualTracks,
@@ -803,7 +991,7 @@ export function validateDraft(draft) {
     }
   }
   if ((timing.lengthSec ?? 0) <= 0) issues.push(err('Length must be > 0 sec.'))
-  if (draft.controlTracks.length === 0) issues.push(warn('No control tracks — add a Martigli or Symmetry oscillator.'))
+  if (draft.controlTracks.length === 0) issues.push(warn('No control tracks — add an LFO, Permutation, or Sinusoid.'))
 
   if (bpmEnabled) {
     for (const mod of timing.bpm?.mods ?? []) {
@@ -812,12 +1000,16 @@ export function validateDraft(draft) {
   }
 
   for (const track of draft.controlTracks) {
-    if (track.type === 'Martigli') {
+    if (track.type === 'LFO') {
       if ((track.periodSec ?? 0) < 3) issues.push(err(`${track.name}: period must be ≥ 3s (breathing minimum).`))
     }
-    if (track.type === 'Symmetry') {
+    if (track.type === 'Permutation') {
       if ((track.rateHz ?? 0) <= 0) issues.push(err(`${track.name}: rate must be > 0 Hz.`))
       if ((track.rateHz ?? 0) > 50) issues.push(err(`${track.name}: rate exceeds 50 Hz maximum.`))
+    }
+    if (track.type === 'Sinusoid') {
+      if ((track.rateHz ?? -1) < 0) issues.push(err(`${track.name}: rate must be ≥ 0 Hz.`))
+      if ((track.rateHz ?? 0) > 40) issues.push(err(`${track.name}: rate exceeds 40 Hz maximum.`))
     }
     if (bpmEnabled) validateTempoSyncMap(issues, track, track.tempoSync ?? {})
   }
