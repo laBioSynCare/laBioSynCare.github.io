@@ -528,13 +528,14 @@
 
   // ── Transport / IO ────────────────────────────────────────────────────────────
 
-  // Build and initialise the audio engine chosen in Settings, falling back to
-  // Vanilla Web Audio when the selected engine isn't supported here.
+  // Build and initialise the audio engine chosen in Settings, resolving to the
+  // compatible default or the capability-free Silent engine when necessary.
   async function createEngine() {
     const { engine: created, id, fellBack } = createAudioEngine()
     if (fellBack) {
       const wanted = audioEngines.find((e) => e.id === getActiveAudioEngineId())
-      tip(`${wanted?.name ?? 'Selected engine'} unavailable here — using Vanilla Web Audio.`)
+      const resolved = audioEngines.find((e) => e.id === id)
+      tip(`${wanted?.name ?? 'Selected engine'} unavailable here — using ${resolved?.name ?? id}.`)
     } else {
       const desc = audioEngines.find((e) => e.id === id)
       if (desc && desc.id !== 'vanilla') tip(`Audio engine: ${desc.name}.`)

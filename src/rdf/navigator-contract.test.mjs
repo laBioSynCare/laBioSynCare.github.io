@@ -54,19 +54,22 @@ describe('unified navigator source boundary', () => {
     })))
   })
 
-  it('loads only terms, catalog, and the current public ecosystem', () => {
+  it('loads terms, browser-addressable catalog records, and the current public ecosystem', () => {
     const sources = navigatorSources()
     expect(sources).toEqual([
       ...Object.values(ONTOLOGY_SOURCES),
       INSTANCE_SOURCES.frameworks[0],
       INSTANCE_SOURCES.implementations[0],
+      ...INSTANCE_SOURCES.presets,
+      INSTANCE_SOURCES.references[0],
       INSTANCE_SOURCES.ecosystem[0],
     ])
 
     const urls = sources.map(source => source.url)
     expect(urls.some(url => url.includes('/sessions/'))).toBe(false)
     expect(urls.some(url => url.includes('/experiments/'))).toBe(false)
-    expect(urls.some(url => url.includes('/presets/'))).toBe(false)
+    expect(urls.filter(url => url.includes('/presets/'))).toHaveLength(2)
+    expect(urls.filter(url => url.includes('/references/'))).toHaveLength(1)
     expect(urls.some(url => url.includes('/fixtures/'))).toBe(false)
   })
 

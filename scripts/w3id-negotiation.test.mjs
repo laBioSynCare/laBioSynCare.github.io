@@ -1,18 +1,92 @@
 import { expect, test } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { Parser } from 'n3'
 
+import { expandRule } from './check-w3id-route-targets.mjs'
 import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
 // The deep-link targets are graph-browser hashes, so the prefixes they use have
 // to be the ones the browser resolves against — assert against the real table
 // rather than restating it.
-import { PREFIXES } from '../src/rdf/namespaces.js'
+import { PREFIXES, toCurie } from '../src/rdf/namespaces.js'
+import { buildGraphElements } from '../src/rdf/graph.js'
+import {
+  INSTANCE_URLS,
+  mergeStores,
+  navigatorSources,
+  parseIntoStore,
+} from '../src/rdf/loader.js'
 
 const rules = loadRules()
 const ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 const BROWSER = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+const SSTIM = 'https://w3id.org/sstim#'
 
 function go(path, accept) {
   const { status, location } = resolveRoute(path, accept, rules)
   return { status, doc: location?.replace(ONTOLOGY, '') ?? null }
+}
+
+function typedSubjects(sourceUrls, typeIri) {
+  const records = []
+  for (const sourceUrl of sourceUrls) {
+    const sourcePath = join(repoRoot, 'static', sourceUrl.replace(/^\//, ''))
+    const quads = new Parser().parse(readFileSync(sourcePath, 'utf8'))
+    const subjects = new Set(quads
+      .filter((quad) => quad.predicate.value === RDF_TYPE && quad.object.value === typeIri)
+      .map((quad) => quad.subject.value))
+    for (const iri of subjects) records.push({ iri, sourceUrl })
+  }
+  return records.sort((a, b) => a.iri.localeCompare(b.iri))
+}
+
+function sstimPath(iri) {
+  const base = 'https://w3id.org/sstim/'
+  expect(iri.startsWith(base), `${iri} is outside the SSTIM route base`).toBe(true)
+  return iri.slice(base.length)
+}
+
+function graphEntityIri(target) {
+  const curie = decodeURIComponent(new URL(target).hash.slice(1))
+  const colon = curie.indexOf(':')
+  if (colon < 1) throw new Error(`Graph entity target is not a CURIE: ${target}`)
+  const prefix = curie.slice(0, colon)
+  const base = PREFIXES[prefix]
+  if (!base) throw new Error(`Graph entity target uses an unknown prefix: ${target}`)
+  return base + curie.slice(colon + 1)
+}
+
+function routedCatalogEntityIris() {
+  return rules
+    .filter(({ target }) => /\/graph\/#(?:bsclab-preset|sstim-ref):/.test(target))
+    .flatMap(({ pattern, target }) => expandRule(pattern, target))
+    .map(graphEntityIri)
+    .sort()
+}
+
+async function buildLocalCatalogGraph(sourceUrls) {
+  const wanted = new Set(sourceUrls)
+  const sources = navigatorSources({ includeLive: false })
+    .filter(({ url }) => wanted.has(url))
+
+  // This equality is intentional: loading whichever subset happens to remain
+  // would let a dropped navigator source turn the projection assertion into a
+  // partial check. The route contract and the Graph source boundary must move
+  // together.
+  expect(sources.map(({ url }) => url).sort()).toEqual([...wanted].sort())
+
+  const stores = await Promise.all(sources.map((source) => {
+    const sourcePath = join(repoRoot, 'static', source.url.replace(/^\//, ''))
+    return parseIntoStore(
+      readFileSync(sourcePath, 'utf8'),
+      source.format ?? 'text/turtle',
+      source.graph,
+    )
+  }))
+  return buildGraphElements(mergeStores(...stores))
 }
 
 test('each namespace and module route serves the document it advertises', () => {
@@ -116,6 +190,84 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   expect(go('specialist/synthetic-someone', BROWSER).status).toBe(404)
   expect(go('specialist/synthetic-someone', 'text/turtle').status).toBe(404)
 })
+
+test('every committed public preset and reference has an exact entity route', () => {
+  // Derive the inventory from the same committed source map the app loads.
+  // Adding a public Preset or PublicSafeReference without adding an audited
+  // w3id route therefore fails here instead of shipping a copied IRI that 404s.
+  const presets = typedSubjects(INSTANCE_URLS.presets, SSTIM + 'Preset')
+  const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
+
+  expect(presets).toHaveLength(2)
+  expect(references).toHaveLength(7)
+
+  for (const { iri, sourceUrl } of [...presets, ...references]) {
+    const path = sstimPath(iri)
+    const sourceDoc = sourceUrl.replace(/^\/ontology\//, '')
+    const html = go(path, BROWSER)
+
+    expect(html.status, `${iri} has no browser route`).toBe(303)
+    expect(html.doc, `${iri} does not deep-link to its graph node`)
+      .toBe(`https://labiosyncare.github.io/graph/#${toCurie(iri)}`)
+    expect(go(path, 'text/turtle').doc, `${iri} does not return its owning Turtle`)
+      .toBe(sourceDoc)
+    expect(go(path, '').doc, `${iri} does not default to its owning Turtle`)
+      .toBe(sourceDoc)
+    expect(go(path, 'application/ld+json').status).toBe(406)
+  }
+
+  // These static namespaces are deliberately fail-closed. An aggregate Turtle
+  // file must never make an uncommitted identifier appear to be a public record.
+  for (const path of [
+    'implementation/bsclab/preset/not-a-public-preset',
+    'implementation/bsclab/preset/heal-theta-breathing-seed/voice',
+    'ref/NOT_A_COMMITTED_REFERENCE',
+    'ref/ingendoh_2023',
+  ]) {
+    expect(go(path, BROWSER).status, `${path} acquired a broad HTML route`).toBe(404)
+    expect(go(path, 'text/turtle').status, `${path} acquired a broad RDF route`).toBe(404)
+  }
+
+  expect(PREFIXES).toHaveProperty('bsclab-preset')
+  expect(PREFIXES).toHaveProperty('sstim-ref')
+
+  const entityHashRules = rules.filter(({ target }) =>
+    target.includes('/graph/#bsclab-preset:') || target.includes('/graph/#sstim-ref:'),
+  )
+  expect(entityHashRules).toHaveLength(2)
+  for (const rule of entityHashRules) {
+    expect(rule.flags, `${rule.pattern} must preserve its literal # fragment`).toContain('NE')
+  }
+})
+
+test('every routed public preset and reference is materialized as a Graph node', async () => {
+  // Start from the actual browser-route targets, expand their audited
+  // alternations, and resolve the same CURIEs the Graph receives. Starting
+  // from the RDF inventory alone would miss a stale extra route and could pass
+  // vacuously if the route block disappeared.
+  const routedIris = routedCatalogEntityIris()
+  const presets = typedSubjects(INSTANCE_URLS.presets, SSTIM + 'Preset')
+  const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
+  const committed = [...presets, ...references].map(({ iri }) => iri).sort()
+
+  expect(routedIris).not.toEqual([])
+  expect(routedIris).toEqual(committed)
+
+  const elements = await buildLocalCatalogGraph([
+    ...INSTANCE_URLS.presets,
+    ...INSTANCE_URLS.references,
+  ])
+  const nodes = new Map(
+    elements
+      .filter(({ data }) => !data.source && data.iri)
+      .map(({ data }) => [data.iri, data]),
+  )
+
+  const missing = routedIris.filter((iri) => !nodes.has(iri))
+  expect(missing, `routed Graph entities without nodes: ${missing.join(', ')}`).toEqual([])
+  for (const { iri } of presets) expect(nodes.get(iri)?.kind).toBe('catalogPreset')
+  for (const { iri } of references) expect(nodes.get(iri)?.kind).toBe('catalogReference')
+}, 30_000)
 
 test('snapshot routes are exact, so unknown versions and files 404', () => {
   expect(go('0.12.0', 'text/turtle').doc).toBe('0.12.0/sstim-core.ttl')

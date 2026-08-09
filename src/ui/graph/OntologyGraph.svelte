@@ -31,6 +31,8 @@
     { kind: 'catalogFramework',      label: 'Catalog framework' },
     { kind: 'catalogImplementation', label: 'Catalog implementation' },
     { kind: 'catalogTechnique',      label: 'Catalog technique' },
+    { kind: 'catalogPreset',         label: 'Catalog preset' },
+    { kind: 'catalogReference',      label: 'Catalog reference' },
     { kind: 'ecosystemPerson',       label: 'Live person' },
     { kind: 'ecosystemOrganization', label: 'Live organization' },
     { kind: 'ecosystemTarget',       label: 'Live target' },
@@ -242,6 +244,8 @@
     catalogFramework: 'Framework · versioned catalog',
     catalogImplementation: 'Implementation · versioned catalog',
     catalogTechnique: 'Technique · versioned catalog',
+    catalogPreset: 'Preset · versioned catalog',
+    catalogReference: 'Reference · versioned catalog',
     ecosystemPerson: 'Person · live ecosystem',
     ecosystemOrganization: 'Organization · live ecosystem',
     ecosystemTarget: 'Target · live ecosystem',
@@ -285,6 +289,8 @@
     catalogFramework: '#ffd54f',
     catalogImplementation: '#ffb74d',
     catalogTechnique: '#ffe082',
+    catalogPreset: '#ff8a65',
+    catalogReference: '#b39ddb',
     ecosystemPerson: '#80cbc4',
     ecosystemOrganization: '#4db6ac',
     ecosystemTarget: '#90a4ae',
@@ -509,6 +515,14 @@
       {
         selector: 'node[kind="catalogTechnique"]',
         style: { shape: 'round-hexagon' }
+      },
+      {
+        selector: 'node[kind="catalogPreset"]',
+        style: { shape: 'round-tag', 'font-weight': 700 }
+      },
+      {
+        selector: 'node[kind="catalogReference"]',
+        style: { shape: 'round-diamond' }
       },
       {
         selector: 'node[kind="ecosystemPerson"]',

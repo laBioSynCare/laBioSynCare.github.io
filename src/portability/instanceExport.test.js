@@ -95,6 +95,7 @@ describe('instance export — envelope and integrity', () => {
     expect(envelope.checksum).toMatch(/^[0-9a-f]{64}$/)
     expect(Date.parse(envelope.exportedAt)).not.toBeNaN()
     expect(await payloadChecksum(envelope.payload)).toBe(envelope.checksum)
+    expect((await parseInstanceExport(JSON.stringify(envelope))).checksumVerified).toBe(true)
   })
 
   it('produces the same checksum regardless of key order', async () => {
@@ -115,6 +116,18 @@ describe('instance export — envelope and integrity', () => {
 })
 
 describe('instance export — parsing rejects bad input', () => {
+  const knownAnnotation = (id, timestamps = {}) => ({
+    id,
+    targetIri: 'https://w3id.org/sstim#Preset',
+    annotationText: 'known note',
+    ...timestamps,
+  })
+  const knownPatch = (id, timestamps = {}) => ({
+    id,
+    patch: { model: 'patch-studio-model-1' },
+    ...timestamps,
+  })
+
   const cases = [
     ['an empty file', '', /empty/i],
     ['whitespace only', '   ', /empty/i],
@@ -139,8 +152,107 @@ describe('instance export — parsing rejects bad input', () => {
   })
 
   it('accepts an envelope with no checksum, for hand-written imports', async () => {
-    const text = `{"model":"${INSTANCE_EXPORT_MODEL}","payload":{"logbooks":[]}}`
-    await expect(parseInstanceExport(text)).resolves.toMatchObject({ model: INSTANCE_EXPORT_MODEL })
+    // A file cannot promote itself to "verified" without carrying a matching
+    // checksum; parseInstanceExport owns this status field.
+    const text = `{"model":"${INSTANCE_EXPORT_MODEL}","checksumVerified":true,"payload":{"logbooks":[]}}`
+    await expect(parseInstanceExport(text)).resolves.toMatchObject({
+      model: INSTANCE_EXPORT_MODEL,
+      checksumVerified: false,
+    })
+  })
+
+  it('rejects an explicitly malformed checksum instead of treating it as absent', async () => {
+    const text = `{"model":"${INSTANCE_EXPORT_MODEL}","checksum":null,"payload":{"logbooks":[]}}`
+    await expect(parseInstanceExport(text)).rejects.toThrow(/invalid checksum/i)
+  })
+
+  it.each([
+    ['unknown logbook scopes', {
+      logbooks: [{ scope: 'remote', data: JSON.parse(bookState('Nope', 1)) }],
+    }, /unknown logbook scope/i],
+    ['non-v2 logbook data', {
+      logbooks: [{ scope: 'anonymous', data: { version: 1, logbooks: [], entries: [], activeBook: null } }],
+    }, /version 2/i],
+    ['broken entry references', {
+      logbooks: [{
+        scope: 'anonymous',
+        data: {
+          version: 2,
+          logbooks: [{ id: 'known', name: 'Known' }],
+          entries: [{ id: 'entry', logbookId: 'missing', tags: [] }],
+          activeBook: 'known',
+        },
+      }],
+    }, /unknown logbook/i],
+    ['non-array annotations', { logbooks: [], annotations: {} }, /annotations section/i],
+    ['non-object annotation records', { logbooks: [], annotations: ['text'] }, /non-object record/i],
+    ['annotations without a target', {
+      logbooks: [], annotations: [{ id: 'a1', annotationText: 'note' }],
+    }, /annotation 1 target/i],
+    ['duplicate annotation IDs', {
+      logbooks: [], annotations: [knownAnnotation('a1'), knownAnnotation('a1')],
+    }, /repeats annotation ID "a1"/i],
+    ['annotations with an invalid createdAt timestamp', {
+      logbooks: [], annotations: [knownAnnotation('a1', { createdAt: 'not-a-date' })],
+    }, /annotation 1 has an invalid createdAt value/i],
+    ['annotations with an invalid updatedAt timestamp', {
+      logbooks: [], annotations: [knownAnnotation('a1', { updatedAt: '2026-02-30T10:00:00.000Z' })],
+    }, /annotation 1 has an invalid updatedAt value/i],
+    ['patch records without a patch body', {
+      logbooks: [], patches: [{ id: 'p1' }],
+    }, /no patch object/i],
+    ['duplicate patch IDs', {
+      logbooks: [], patches: [knownPatch('p1'), knownPatch('p1')],
+    }, /repeats patch ID "p1"/i],
+    ['patches with an invalid createdAt timestamp', {
+      logbooks: [], patches: [knownPatch('p1', { createdAt: 'not-a-date' })],
+    }, /patch 1 has an invalid createdAt value/i],
+    ['patches with an invalid updatedAt timestamp', {
+      logbooks: [], patches: [knownPatch('p1', { updatedAt: '2026-02-30T10:00:00.000Z' })],
+    }, /patch 1 has an invalid updatedAt value/i],
+    ['an array profile', { logbooks: [], profile: [] }, /profile section/i],
+    ['a private identity field in a profile', {
+      logbooks: [], profile: { displayName: 'Ada', contact: { email: 'ada@example.org' } },
+    }, /private identity field "email"/i],
+    ['unknown preferences', {
+      logbooks: [], preferences: { skin: 'paper', audioEngine: 'worklet' },
+    }, /unsupported preference/i],
+    ['a non-string skin', { logbooks: [], preferences: { skin: 4 } }, /skin preference/i],
+    ['unknown payload sections', { logbooks: [], secrets: [] }, /unsupported payload section/i],
+  ])('rejects structurally unsafe payloads: %s', async (_name, payload, pattern) => {
+    // Deliberately checksum-less: structural validation must protect the
+    // compatibility import path before the records can reach localStorage.
+    const text = JSON.stringify({ model: INSTANCE_EXPORT_MODEL, payload })
+    await expect(parseInstanceExport(text)).rejects.toThrow(pattern)
+  })
+
+  it('accepts checksum-less known records with valid, absent or unknown timestamps', async () => {
+    const createdAt = '2026-07-31T10:00:00.000Z'
+    const updatedAt = '2026-08-01T12:30:00+02:00'
+    const payload = {
+      logbooks: [],
+      annotations: [
+        knownAnnotation('a-dated', { createdAt, updatedAt }),
+        knownAnnotation('a-undated'),
+      ],
+      patches: [
+        knownPatch('p-dated', { createdAt, updatedAt }),
+        // PatchStore uses an empty string for a timestamp that is unknown; the
+        // destination formatter treats that as unsynchronised rather than a date.
+        knownPatch('p-unsynced', { createdAt: '', updatedAt: '' }),
+      ],
+    }
+
+    await expect(parseInstanceExport(JSON.stringify({
+      model: INSTANCE_EXPORT_MODEL,
+      payload,
+    }))).resolves.toMatchObject({ payload, checksumVerified: false })
+  })
+
+  it('rejects prototype-pollution keys before checksum or confirmation', async () => {
+    const text = `{"model":"${INSTANCE_EXPORT_MODEL}","payload":{"logbooks":[],"profile":{"__proto__":{"polluted":true}}}}`
+    await expect(parseInstanceExport(text)).rejects.toThrow(/unsafe key/i)
+    expect({}.polluted).toBeUndefined()
   })
 })
 
@@ -204,6 +316,160 @@ describe('instance export — cross-instance round trip', () => {
 
     // A Firebase-free instance must still be able to receive the data.
     expect(JSON.parse(target.getItem('bsclab_logbook_v2')).entries).toHaveLength(3)
+  })
+
+  it('losslessly combines anonymous and account scopes when restoring signed out', async () => {
+    const envelope = await buildInstanceExport(source, { uid: UID })
+    const target = memoryStorage()
+
+    const result = applyInstanceExport(
+      target,
+      await parseInstanceExport(JSON.stringify(envelope)),
+      { uid: null },
+    )
+    const restored = JSON.parse(target.getItem('bsclab_logbook_v2'))
+
+    expect(result.restoredLogbooks).toBe(1)
+    expect(result.combinedLogbookSections).toBe(2)
+    expect(restored.logbooks).toEqual([
+      expect.objectContaining({ id: 'lb-1', name: 'Anon' }),
+      expect.objectContaining({ id: 'lb-1--account', name: 'Mine' }),
+    ])
+    expect(restored.entries).toHaveLength(6)
+    expect(new Set(restored.entries.map((entry) => entry.id)).size).toBe(6)
+    expect(restored.entries.slice(0, 2).every((entry) => entry.logbookId === 'lb-1')).toBe(true)
+    expect(restored.entries.slice(2).every((entry) => entry.logbookId === 'lb-1--account')).toBe(true)
+    expect(restored.activeBook).toBe('lb-1')
+  })
+
+  it('produces the same merged v2 state for the same signed-out import', async () => {
+    const envelope = await buildInstanceExport(source, { uid: UID })
+    const parsed = await parseInstanceExport(JSON.stringify(envelope))
+    const first = memoryStorage()
+    const second = memoryStorage()
+
+    applyInstanceExport(first, parsed, { uid: null })
+    applyInstanceExport(second, parsed, { uid: null })
+
+    expect(first.getItem('bsclab_logbook_v2')).toBe(second.getItem('bsclab_logbook_v2'))
+  })
+
+  it('fails before writing when colliding logbook sections cannot be merged safely', () => {
+    const target = memoryStorage({
+      'bsclab_logbook_v2': bookState('Keep me', 1),
+    })
+    const before = target.getItem('bsclab_logbook_v2')
+    const parsed = {
+      payload: {
+        logbooks: [
+          { scope: 'anonymous', data: JSON.parse(bookState('Valid', 1)) },
+          { scope: 'account', data: { version: 1, logbooks: [], entries: [] } },
+        ],
+        legacyLogbookEntries: [{ id: 'must-not-land' }],
+      },
+    }
+
+    expect(() => applyInstanceExport(target, parsed, { uid: null })).toThrow(/Nothing was restored/i)
+    expect(target.getItem('bsclab_logbook_v2')).toBe(before)
+    expect(target.getItem('bsclab_logbook_v1')).toBeNull()
+  })
+})
+
+describe('instance export — atomic storage application', () => {
+  function storageFailingOnce(seed, { setAt = null, removeAt = null } = {}) {
+    const base = memoryStorage(seed)
+    let setCalls = 0
+    let removeCalls = 0
+    return {
+      ...base,
+      setItem(key, value) {
+        setCalls++
+        if (setCalls === setAt) throw new Error('simulated set refusal')
+        base.setItem(key, value)
+      },
+      removeItem(key) {
+        removeCalls++
+        if (removeCalls === removeAt) throw new Error('simulated remove refusal')
+        base.removeItem(key)
+      },
+    }
+  }
+
+  it('restores every prior value when a later setItem fails', () => {
+    const oldLogbook = bookState('Old', 1)
+    const oldAnnotations = JSON.stringify([{
+      id: 'old', targetIri: 'https://example.org/old', annotationText: 'old',
+    }])
+    const storage = storageFailingOnce({
+      bsclab_logbook_v2: oldLogbook,
+      'bsclab.annotations.v1': oldAnnotations,
+    }, { setAt: 2 })
+    const parsed = {
+      payload: {
+        logbooks: [{ scope: 'anonymous', data: JSON.parse(bookState('New', 2)) }],
+        annotations: [{
+          id: 'new', targetIri: 'https://example.org/new', annotationText: 'new',
+        }],
+      },
+    }
+
+    expect(() => applyInstanceExport(storage, parsed)).toThrow(/Prior browser data was restored/i)
+    expect(storage.getItem('bsclab_logbook_v2')).toBe(oldLogbook)
+    expect(storage.getItem('bsclab.annotations.v1')).toBe(oldAnnotations)
+  })
+
+  it('removes newly created keys while rolling back a partial write', () => {
+    const storage = storageFailingOnce({}, { setAt: 2 })
+    const parsed = {
+      payload: {
+        logbooks: [{ scope: 'anonymous', data: JSON.parse(bookState('New', 1)) }],
+        annotations: [{
+          id: 'new', targetIri: 'https://example.org/new', annotationText: 'new',
+        }],
+      },
+    }
+
+    expect(() => applyInstanceExport(storage, parsed)).toThrow(/nothing from the file was kept/i)
+    expect(storage.getItem('bsclab_logbook_v2')).toBeNull()
+    expect(storage.getItem('bsclab.annotations.v1')).toBeNull()
+  })
+
+  it('rolls back when a planned removeItem fails', () => {
+    const storage = storageFailingOnce({ 'bsclab.skin': 'dusk' }, { removeAt: 1 })
+
+    expect(() => applyInstanceExport(storage, {
+      payload: { logbooks: [], preferences: {} },
+    })).toThrow(/Prior browser data was restored/i)
+    expect(storage.getItem('bsclab.skin')).toBe('dusk')
+  })
+
+  it('overwrites explicitly present empty portable sections and clears an explicit empty preference', () => {
+    const storage = memoryStorage({
+      'bsclab.annotations.v1': JSON.stringify([{
+        id: 'old', targetIri: 'https://example.org/old', annotationText: 'old',
+      }]),
+      'bsclab.patchStudio.patches.v1': JSON.stringify([{
+        id: 'old', patch: { model: 'patch-studio-model-1' },
+      }]),
+      'bsclab.skin': 'dusk',
+    })
+
+    applyInstanceExport(storage, {
+      payload: { logbooks: [], annotations: [], patches: [], preferences: {} },
+    })
+
+    expect(storage.getItem('bsclab.annotations.v1')).toBe('[]')
+    expect(storage.getItem('bsclab.patchStudio.patches.v1')).toBe('[]')
+    expect(storage.getItem('bsclab.skin')).toBeNull()
+  })
+
+  it('validates direct callers before making the first storage write', () => {
+    const storage = memoryStorage({ 'bsclab.skin': 'paper' })
+
+    expect(() => applyInstanceExport(storage, {
+      payload: { logbooks: [], preferences: { skin: 'midnight', unexpected: true } },
+    })).toThrow(/Nothing was restored/i)
+    expect(storage.getItem('bsclab.skin')).toBe('paper')
   })
 })
 

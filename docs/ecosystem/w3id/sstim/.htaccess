@@ -186,6 +186,32 @@ RewriteRule ^(implementation/bsclab|implementation/biosyncare|implementation/bsc
 # END audited BSC catalog routes
 
 # -------------------------------------------------------------------------
+# Public BSC Lab preset and reference identities. These are committed static
+# records, so routes are an exact audited inventory rather than a namespace
+# wildcard: adding or retiring a public record requires an intentional registry
+# update. Browsers deep-link to the requested graph node; RDF clients receive
+# the Turtle file that owns that subject. NE preserves the literal hash in each
+# browser target.
+# -------------------------------------------------------------------------
+# BEGIN audited BSC preset and reference routes
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^implementation/bsclab/preset/(heal-theta-breathing-seed|perform-alpha-10-seed)/?$ https://labiosyncare.github.io/graph/#bsclab-preset:$1 [R=303,L,NE]
+
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ https://labiosyncare.github.io/graph/#sstim-ref:$1 [R=303,L,NE]
+
+RewriteCond %{HTTP_ACCEPT} ^$ [OR]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^implementation/bsclab/preset/(heal-theta-breathing-seed|perform-alpha-10-seed)/?$ https://labiosyncare.github.io/ontology/instances/presets/$1.ttl [R=303,L]
+RewriteRule ^implementation/bsclab/preset/(heal-theta-breathing-seed|perform-alpha-10-seed)/?$ - [R=406,L]
+
+RewriteCond %{HTTP_ACCEPT} ^$ [OR]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ https://labiosyncare.github.io/ontology/instances/references/references.ttl [R=303,L]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ - [R=406,L]
+# END audited BSC preset and reference routes
+
+# -------------------------------------------------------------------------
 # BSC framework technique identities. Every rule is exact — no prefix wildcard
 # — so a retired slug can never fall through to the framework document and
 # appear current. The three techniques BSC originated resolve to the framework

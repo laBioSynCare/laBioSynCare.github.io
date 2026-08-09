@@ -18,6 +18,20 @@ test('every committed w3id ontology redirect target is publishable', () => {
   expect(unpublishableTargets({ htaccess, manifest })).toEqual([])
 })
 
+test('audited public preset and reference routes target their owning Turtle files', () => {
+  const targets = new Set(routeTargets(htaccess))
+
+  expect(targets).toContain(
+    'https://labiosyncare.github.io/ontology/instances/presets/heal-theta-breathing-seed.ttl',
+  )
+  expect(targets).toContain(
+    'https://labiosyncare.github.io/ontology/instances/presets/perform-alpha-10-seed.ttl',
+  )
+  expect(targets).toContain(
+    'https://labiosyncare.github.io/ontology/instances/references/references.ttl',
+  )
+})
+
 test('a rule target expands against its own alternation, unescaping the pattern', () => {
   expect(
     expandRule('(kernel|core|core-plus|full)', 'https://example.test/sstim-$1-profile.ttl'),

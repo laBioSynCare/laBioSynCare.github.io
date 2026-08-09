@@ -42,8 +42,9 @@
  * Implementations: VanillaWebAudioEngine, AudioWorkletEngine,
  * WasmAudioWorkletEngine, NullAudioEngine — registered in `audioEngines.js`.
  *
- * Invariant: the AudioContext created by this engine is the timing
- * authority for all visual and haptic synchronization.
+ * Invariant: the AudioContext — or, for the capability-free Silent engine, an
+ * AudioContext-compatible monotonic clock — is the timing authority for all
+ * visual and haptic synchronization.
  */
 export class IAudioEngine {
   async initialize() { throw new Error('not implemented') }
@@ -53,12 +54,12 @@ export class IAudioEngine {
   /** @returns {AudioEngineCapabilities} */
   getCapabilities() { throw new Error('not implemented') }
 
-  /** @returns {AudioContext} */
+  /** @returns {AudioContext|{currentTime:number, state:string}} */
   getAudioContext() { throw new Error('not implemented') }
 
   /**
    * @param {VoiceSpec} spec
-   * @param {number}    startTime AudioContext.currentTime value
+   * @param {number}    startTime Engine timing-context currentTime value
    * @returns {VoiceHandle}
    */
   scheduleVoice(spec, startTime) { throw new Error('not implemented') }

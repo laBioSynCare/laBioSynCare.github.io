@@ -1,7 +1,12 @@
 <script>
   // Static content page — no runes needed. The bottom-dock screens, described
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
-  import { CONCEPT_DOI, doiUrl } from '../../ui/entrance/releaseMetadata.js'
+  import {
+    CONCEPT_DOI,
+    RELEASE_DATE,
+    RELEASE_VERSION,
+    doiUrl,
+  } from '../../ui/entrance/releaseMetadata.js'
   import Isotype from '../../ui/brand/Isotype.svelte'
   import {
     BIOSYNCARE_URL,
@@ -20,23 +25,14 @@
       role: 'Knowledge browser',
       emoji: '🕸️',
       color: 'var(--app-accent)',
+      action: 'Explore the graph',
       what:
-        'An interactive Cytoscape view of the SSTIM knowledge graph — OWL classes, ' +
-        'multilingual SKOS concepts, object/data properties, and the links between them, ' +
-        'drawn straight from the Turtle sources. It is also where you annotate the ontology.',
+        'Browse SSTIM as a connected knowledge graph: ontology terms, controlled vocabulary, ' +
+        'public reference records, and the relationships between them.',
       how:
-        'Pick a scope: Full SSTIM shows the released ontology and vocabulary; Catalog + ' +
-        'ecosystem switches to the versioned catalog and live people/organizations (the ' +
-        'left rail explains what each data source is); or narrow to one thematic slice — ' +
-        'Core OWL classes, All SKOS vocabulary, Frequency bands, Modalities, Mechanisms, ' +
-        'Techniques, Voice types, Preset groups, Evidence, Cautions, Exposure, and more. ' +
-        'Toggle the edge layers — subClassOf, object/data property, narrower, related, ' +
-        'instanceOf, catalog relation, ecosystem relation. Press / to search, Enter to ' +
-        'centre, and c / f / r to centre, fit, or relayout (? lists every shortcut). Select ' +
-        'any node to open its detail panel: definition, a copyable IRI, a link to its ' +
-        'generated reference entry, and its incoming/outgoing connections — which you can ' +
-        'filter by edge kind or isolate with Focus neighborhood — plus a notes area for ' +
-        'annotation.',
+        'Choose a scope, search with /, and select a node for its definition, stable IRI, ' +
+        'source, and connections. Focus its neighbourhood when the whole graph is too dense. ' +
+        'Public and private annotations remain separate from authoritative SSTIM terms.',
     },
     {
       href: '/creator/',
@@ -44,20 +40,14 @@
       role: 'Real-time authoring',
       emoji: '🎛️',
       color: 'var(--app-visual)',
+      action: 'Open Patch Studio',
       what:
-        'A live surface for authoring multi-sensory patches. Layer audio tracks ' +
-        '(Isochronic Tone, Binaural Beat, Carrier, Noise, Drone, ambient Sample), visual ' +
-        'tracks (geometry, particles, colour fields, depth markers, stereoscopic trees, ' +
-        'abstractions, landscapes…), and a haptic Vibration track — with per-parameter ' +
-        'modulation and photosensitivity safeguards.',
+        'Build and preview layered audio-visual patches, including first-class stereoscopic ' +
+        'scenes, modulation, a resizable Mix view, and photosensitivity safeguards.',
       how:
-        'Add tracks from the palette, or open Sensory Field starters inside Studio for a ' +
-        'colour/audio field, depth markers, a tree, an abstraction, or a landscape. Shape ' +
-        'each parameter; many can be tempo-synced or modulated. Press play to preview audio ' +
-        'and visuals together. The audio engine — Vanilla Web Audio, AudioWorklet, ' +
-        'AudioWorklet + WASM, or the sound-free Silent engine — is chosen in Settings and ' +
-        'applied on the next playback. Playback always starts from a tap or click, per ' +
-        'browser autoplay rules.',
+        'Start empty or use a Field starter, then add ordinary audio and visual tracks. ' +
+        'Preview, save, import, and export the patch from one workspace. Haptic tracks are ' +
+        'authoring metadata for now; this browser build does not provide a haptic delivery engine.',
     },
     {
       href: '/presets/',
@@ -65,14 +55,14 @@
       role: 'Reference catalog',
       emoji: '🎚️',
       color: 'var(--app-control)',
+      action: 'Browse public presets',
       what:
-        'The public BSC Lab reference presets — the catalog objects shared with ' +
-        'BioSynCare — read live from the RDF knowledge graph, with their group, target ' +
-        'frequency band, and linked evidence claims.',
+        'A public reference catalog read from SSTIM RDF, with frequency targets, groups, ' +
+        'provenance, and evidence assessments kept visible rather than flattened into a score.',
       how:
-        'Filter the catalog by group (Heal, Support, Perform, Indulge, Transcend), by ' +
-        'target band (delta, theta, alpha, smr, beta, gamma and sub-bands), or by evidence ' +
-        'tier, and open a preset to see its parameters and the evidence behind it.',
+        'Search and filter the catalog, inspect how each record is described, then follow its ' +
+        'source and evidence links. These are BSC Lab reference records, not the private ' +
+        'BioSynCare catalog and not recommendations for treatment.',
     },
     {
       href: '/sparql/',
@@ -80,17 +70,14 @@
       role: 'Query workbench',
       emoji: '🔎',
       color: 'var(--app-ok)',
+      action: 'Open the workbench',
       what:
         'A SPARQL 1.1 workbench that runs entirely in your browser (Comunica over an ' +
         'N3 store), querying the ontology and the public instance data together.',
       how:
-        'Pick one of eight example queries — vocabulary, ontology structure, catalog, ' +
-        'ecosystem, evidence, exposure, and external alignments to BFO/OBI/IAO and Wikidata ' +
-        '— or edit the starter query and write your own, then press Run and read the results ' +
-        'table. Named graphs keep ontology terms, public reference data, and annotations ' +
-        'separate, so cross-source queries need one GRAPH block per source; the "About this ' +
-        'endpoint" panel on the page explains why, and lists the raw Turtle URLs if you want ' +
-        'to query the same data from your own tooling instead.',
+        'Begin with a documented example or write your own query. The workbench explains ' +
+        'which named graphs are loaded, shows execution status and result counts, and lets ' +
+        'you copy tabular results without sending the query to a remote endpoint.',
     },
     {
       href: '/logbook/',
@@ -98,15 +85,16 @@
       role: 'Personal record',
       emoji: '📓',
       color: 'var(--app-warn)',
+      action: 'Open your logbook',
       what:
         'A private, long-term record of your sensory-stimulation work — sessions, ' +
         'observations, ideas, activities, initiatives, notes, and achievements, across ' +
         'multiple named logbooks.',
       how:
         'Add entries, tag them, and filter by tag. Entries are stored locally in your ' +
-        'browser by default; when a deployment is configured with sign-in, they become a ' +
-        'private per-account record. Your data stays yours and is never committed to the ' +
-        'repository.',
+        'browser. When sign-in is configured, the current account selects a separate local ' +
+        'scope; that does not by itself sync logbooks to a server. Your data is never ' +
+        'committed to the repository.',
     },
     {
       href: '/settings/',
@@ -114,13 +102,13 @@
       role: 'Appearance, engine, safety',
       emoji: '⚙️',
       color: 'var(--app-muted)',
+      action: 'Review settings',
       what:
         'Where you choose the visual skin, the audio engine, and the photosensitivity ' +
         'safety behaviour.',
       how:
-        'Pick a skin (Paper, Midnight, Aurora, Ember, Daylight), select the audio engine ' +
-        'used by Patch Studio, and set the visual-stimulation safety toggle. ' +
-        'Unsupported engines fall back automatically.',
+        'Preview a skin, choose the Patch Studio audio engine, and review visual-safety and ' +
+        'storage behaviour. Capability checks explain unavailable choices and safe fallbacks.',
     },
   ]
 
@@ -180,9 +168,29 @@
       color: 'var(--app-haptic)',
       mark: 'biosyncare',
       body:
-        'A separate, closed-source commercial application in its own repository. It shares ' +
-        'the preset JSON format and the SSTIM vocabulary with BSC Lab, but neither project ' +
-        'imports the other’s code or private data.',
+        'A separate, closed-source commercial application in its own repository. Versioned ' +
+        'exports and SSTIM mappings are the intended interoperability boundary; BSC Lab does ' +
+        'not currently feed or publish BioSynCare’s private catalog, and the projects do not ' +
+        'share application code or private data.',
+    },
+  ]
+
+  const trustSignals = [
+    {
+      label: 'Open implementation',
+      value: 'BSC Lab source is Apache-2.0 and inspectable on GitHub.',
+    },
+    {
+      label: 'Citable knowledge',
+      value: `SSTIM ${RELEASE_VERSION} (${RELEASE_DATE}) uses stable w3id.org IRIs, CC BY 4.0, and a DOI.`,
+    },
+    {
+      label: 'Private by default',
+      value: 'Personal work stays in this browser; any account-backed annotation or patch storage is deployment-specific.',
+    },
+    {
+      label: 'Bounded claims',
+      value: 'Non-clinical; evidence tiers are structured assessments, not independent certification.',
     },
   ]
 
@@ -214,23 +222,53 @@
 </svelte:head>
 
 <main class="about-page">
-  <header class="hero">
-    <p class="eyebrow">About</p>
-    <h1>BSC Lab</h1>
-    <p class="lede">
-      BSC Lab is an open sensory-stimulation research and engineering platform. It pairs a
-      precision audio-visual stimulation application with <strong>SSTIM</strong>, a public
-      RDF knowledge graph for describing techniques, parameters, exposure conditions, safety
-      metadata, and evidence — so what you build, browse, and annotate all live in one place.
-    </p>
-    <p class="scope-note">
-      The work is non-clinical. It supports exploration and authoring of sensory experiences;
-      it does not diagnose, treat, cure, or prevent any condition, and it makes no claim of
-      clinical efficacy. See <a href={ghBlob('docs/concept/SCOPE.md')} rel="external">Scope</a>.
-    </p>
+  <header class="hero" id="overview">
+    <div class="hero-copy">
+      <div class="brand-lockup">
+        <Isotype name="bsclab" size={52} title="BSC Lab isotype" />
+        <div>
+          <p class="eyebrow">Open research &amp; engineering platform</p>
+          <h1>BSC Lab</h1>
+        </div>
+      </div>
+      <p class="lede">
+        Build sensory-stimulation patches and examine the knowledge behind them. BSC Lab
+        brings <strong>Patch Studio</strong> together with <strong>SSTIM</strong>, a public RDF
+        knowledge graph for techniques, parameters, exposure, safety metadata, and evidence.
+      </p>
+      <div class="hero-actions" aria-label="Start using BSC Lab">
+        <a class="primary-action" href="/creator/">Open Patch Studio</a>
+        <a class="secondary-action" href="/graph/">Explore SSTIM</a>
+      </div>
+      <p class="scope-note">
+        <strong>Non-clinical scope.</strong> BSC Lab supports exploration and authoring. It
+        does not diagnose, treat, cure, or prevent any condition, and makes no claim of
+        clinical efficacy. <a href={ghBlob('docs/concept/SCOPE.md')} rel="external">Read the scope</a>.
+      </p>
+    </div>
+
+    <aside class="trust-panel" aria-labelledby="trust-title">
+      <p class="trust-kicker">Trust at a glance</p>
+      <h2 id="trust-title">Know what you are using</h2>
+      <dl>
+        {#each trustSignals as signal}
+          <div>
+            <dt>{signal.label}</dt>
+            <dd>{signal.value}</dd>
+          </div>
+        {/each}
+      </dl>
+    </aside>
   </header>
 
-  <section class="block">
+  <nav class="section-nav" aria-label="About this page">
+    <a href="#ecosystem">Ecosystem</a>
+    <a href="#surfaces">What you can do</a>
+    <a href="#sstim">SSTIM &amp; data</a>
+    <a href="#links">Sources &amp; licensing</a>
+  </nav>
+
+  <section class="block" id="ecosystem">
     <h2>How the pieces fit</h2>
     <p class="section-intro">
       Æterni Anima is the organization responsible for everything here. BSC Lab and
@@ -238,6 +276,25 @@
       BSC is the framework both platforms build on. Knowing which is which makes the rest
       of the app easier to read.
     </p>
+    <div class="ecosystem-map" aria-label="Relationship between Æterni Anima, BSC, BSC Lab, SSTIM, Patch Studio, and BioSynCare">
+      <div class="map-owner">
+        <Isotype name="aeterni-anima" size={34} title="Æterni Anima isotype" />
+        <div><strong>Æterni Anima</strong><span>Organization responsible for both platforms</span></div>
+      </div>
+      <div class="map-branches">
+        <article>
+          <span class="map-label">Open platform</span>
+          <strong>BSC Lab</strong>
+          <span>Contains SSTIM, Patch Studio, and this application</span>
+        </article>
+        <article>
+          <span class="map-label">Separate application</span>
+          <strong>BioSynCare</strong>
+          <span>Closed-source product; no shared private catalog or application code</span>
+        </article>
+      </div>
+      <p class="map-foundation"><strong>BSC framework</strong> informs both platforms; it is not a data store or a third application.</p>
+    </div>
     <div class="layer-grid">
       {#each layers as layer}
         <article class="layer-card" style="--card-color: {layer.color}">
@@ -254,7 +311,7 @@
     </div>
   </section>
 
-  <section class="block">
+  <section class="block" id="surfaces">
     <h2>What you can do here</h2>
     <p class="section-intro">
       Every screen below is reachable from the dock at the bottom of the window. This is a
@@ -272,6 +329,7 @@
           </div>
           <p class="screen-what">{s.what}</p>
           <p class="screen-how"><span class="how-label">How to use</span>{s.how}</p>
+          <a class="card-action" href={s.href}>{s.action}<span aria-hidden="true"> →</span></a>
         </article>
       {/each}
     </div>
@@ -281,13 +339,13 @@
       <div class="callout-body">
         <h3>Annotate the ontology</h3>
         <p>
-          Every term in SSTIM can carry notes, and the <a href="/graph/">Graph knowledge browser</a>
-          is where you add them. Select a node and, in its detail panel, write a
-          <strong>public</strong> note (readable by everyone) or a <strong>private</strong>
-          one (only you). Notes are modeled as W3C Web Annotations and stored in named graphs
-          kept separate from the authoritative ontology data — so annotating never alters the
-          source terms. Reading public notes is open to anyone; adding and editing your own
-          needs sign-in on a deployment configured with accounts.
+          SSTIM terms can carry notes in the <a href="/graph/">Graph knowledge browser</a>.
+          Notes use W3C Web Annotation records in named graphs kept separate from the
+          authoritative ontology, so annotating never alters a source term. On a local-only
+          deployment, notes stay in this browser; the public/private choice records sharing
+          intent for export but does not publish anything. A deployment configured with
+          accounts and shared annotations can let signed-in authors publish public notes or
+          keep private ones, while signed-out readers can read public notes.
         </p>
       </div>
     </aside>
@@ -300,25 +358,34 @@
     </p>
   </section>
 
-  <section class="block">
-    <h2>SSTIM, in a little more depth</h2>
+  <section class="block" id="sstim">
+    <h2>SSTIM and its data boundaries</h2>
     <p class="section-intro">
-      The knowledge graph is organised as a small set of Turtle modules, each an
-      <code>owl:Ontology</code> with its own metadata:
+      SSTIM is a modular ontology suite rather than one opaque data file. Its manifest defines
+      dependency closures and adoption profiles; SHACL, OWL reasoning, link checks, snapshots,
+      and release rehearsal are automated repository gates.
     </p>
+    <aside class="release-note">
+      <span aria-hidden="true">✓</span>
+      <p>
+        <strong>For citation, use released SSTIM.</strong> The DOI resolves to the latest
+        immutable release. This running application can also expose newer development work,
+        which should not be cited as though it were released.
+        <a href={doiUrl(CONCEPT_DOI)} rel="external">Open the release record</a>.
+      </p>
+    </aside>
     <ul class="module-list">
-      <li><strong>Core</strong> — OWL classes, properties, axioms, evidence governance, and the session model.</li>
-      <li><strong>Vocabulary</strong> — multilingual SKOS values for bands, modalities, mechanisms, techniques, evidence, and cautions.</li>
-      <li><strong>Shapes</strong> — SHACL constraints validating modules, evidence, protocols, presets, safety, and sessions.</li>
-      <li><strong>Alignments</strong> — conservative, verified links to Wikidata and OBO Foundry.</li>
-      <li><strong>Exposure</strong> — delivery media, perceived modalities, devices, placement, stimulus patterns, and limits.</li>
-      <li><strong>Patch Studio</strong> — reproducible voice and authoring parameter properties.</li>
-      <li><strong>Ecosystem</strong> — neutral agent relationships, engagement provenance, and consent lifecycle metadata.</li>
+      <li><strong>Foundations</strong> — stimulation, stimulus specifications, shared quantities, techniques, and configurations.</li>
+      <li><strong>Sessions &amp; exposure</strong> — plans, executions, overrides, delivery, perception, devices, placement, and limits.</li>
+      <li><strong>Evidence</strong> — immutable assessment claims with an explicit proposition, qualified basis, direction, tier, agent, and date.</li>
+      <li><strong>Controlled vocabulary</strong> — multilingual SKOS values for bands, modalities, mechanisms, techniques, evidence, and cautions.</li>
+      <li><strong>Application &amp; ecosystem</strong> — Patch Studio parameter mappings plus neutral, consent-aware agent relationships.</li>
+      <li><strong>Validation &amp; alignment</strong> — reusable SHACL contracts and conservative external links.</li>
     </ul>
     <p class="section-intro">
-      Controlled values are dual-typed as both OWL individuals and SKOS concepts. The ontology
-      is validated with SHACL and an OWL reasoner, is published under
-      <code>https://w3id.org/sstim</code>, and carries a citable DOI.
+      Controlled values are dual-typed as OWL individuals and SKOS concepts. Stable namespace
+      documents live under <code>https://w3id.org/sstim</code>. Automated conformance is useful
+      evidence about the files; it is not a substitute for independent scientific or human review.
     </p>
     <p class="section-intro">
       Community coordination happens in the
@@ -329,38 +396,42 @@
     </p>
   </section>
 
-  <section class="block">
-    <h2>Reading the data sources</h2>
+  <section class="block data-block">
+    <h2>Read every source in context</h2>
     <p class="section-intro">
       The Graph's <strong>Data sources</strong> panel lists what is loaded and where it
       comes from. The four words mean different things:
     </p>
-    <ul class="module-list">
-      <li><strong>Ontology</strong> — the versioned OWL term modules: classes, properties, and axioms, released and citable under <code>w3id.org/sstim</code>.</li>
-      <li><strong>Vocabulary</strong> — the multilingual SKOS concept values (frequency bands, modalities, mechanisms, techniques…), dual-typed with the OWL classes.</li>
-      <li><strong>Catalog</strong> — versioned public reference instances of frameworks, implementations and their components, presets, and evidence records.</li>
-      <li><strong>Ecosystem</strong> — a live projection of people, organizations, and reviewed relationships in the field. It is fetched at runtime, each record is separately approved and sourced, and it is retractable: it is deliberately excluded from citable releases and archives.</li>
-    </ul>
+    <div class="data-grid">
+      <article>
+        <span class="data-kind released">Versioned</span>
+        <h3>Ontology &amp; vocabulary</h3>
+        <p>OWL terms, axioms, and multilingual SKOS values. Cite an immutable release; the running site can contain later development work.</p>
+      </article>
+      <article>
+        <span class="data-kind released">Versioned</span>
+        <h3>Public catalog</h3>
+        <p>Reference frameworks, implementations, presets, and evidence records. Pin a release for reuse; public data is not a clinical recommendation.</p>
+      </article>
+      <article>
+        <span class="data-kind live">Live &amp; retractable</span>
+        <h3>Ecosystem projection</h3>
+        <p>Reviewed relationships among people and organizations, fetched at runtime and deliberately excluded from citable archives.</p>
+      </article>
+      <article>
+        <span class="data-kind personal">Personal</span>
+        <h3>Notes &amp; logbooks</h3>
+        <p>Local to this browser by default. Sign-in separates local logbook scopes; shared annotations and account-backed patch storage are separate deployment choices.</p>
+      </article>
+    </div>
+    <p class="boundary-note">
+      <strong>Outside this repository:</strong> real participant session data, clinical
+      material, and the private BioSynCare catalog. Annotations use separate named graphs;
+      private notes and logbooks remain owned by their author.
+    </p>
   </section>
 
-  <section class="block">
-    <h2>Where your data lives</h2>
-    <p class="section-intro">
-      BSC Lab keeps different kinds of data deliberately separate, in different named graphs
-      and stores:
-    </p>
-    <ul class="module-list">
-      <li><strong>Authoritative ontology &amp; public reference data</strong> — the shared, citable SSTIM sources, the same for everyone.</li>
-      <li><strong>Annotations</strong> — public notes in a shared annotation graph; your private notes in your own, visible only to you.</li>
-      <li><strong>Your Logbook</strong> — local to your browser, or private to your account when sign-in is configured.</li>
-    </ul>
-    <p class="section-intro">
-      Real participant session data, the private BioSynCare catalog, and any clinical
-      material are not part of this repository. Your private notes and logbook stay yours.
-    </p>
-  </section>
-
-  <footer class="about-footer">
+  <footer class="about-footer" id="links">
     <h2>Links &amp; licensing</h2>
     <ul class="link-list">
       {#each links as l}
@@ -379,16 +450,35 @@
 
 <style>
   .about-page {
-    max-width: 960px;
+    max-width: 1120px;
     margin: 0 auto;
-    padding: 2rem 1.15rem 6rem;
+    padding: 1.5rem 1.15rem 6rem;
     color: var(--app-text);
     font-family: var(--app-font-ui);
   }
 
   /* ── Hero ─────────────────────────────────────────────────────────────── */
   .hero {
-    margin-bottom: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.8fr);
+    gap: clamp(1.5rem, 4vw, 3.25rem);
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    overflow: hidden;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: calc(var(--app-radius) * 1.6);
+    background:
+      radial-gradient(circle at 8% 0%, color-mix(in srgb, var(--app-accent) 18%, transparent), transparent 34rem),
+      linear-gradient(145deg, var(--app-surface), var(--app-surface-2));
+    box-shadow: 0 1.1rem 3rem color-mix(in srgb, var(--app-text) 7%, transparent);
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 0.9rem;
   }
 
   .eyebrow {
@@ -397,7 +487,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--app-accent);
-    margin: 0 0 0.35rem;
+    margin: 0 0 0.2rem;
   }
 
   .hero h1 {
@@ -405,15 +495,52 @@
     line-height: 1.05;
     font-weight: 800;
     color: var(--app-text-strong);
-    margin: 0 0 0.85rem;
+    margin: 0;
   }
 
   .lede {
     font-size: 1.02rem;
     line-height: 1.6;
     color: var(--app-text);
-    margin: 0 0 1rem;
+    margin: 0 0 1.15rem;
     max-width: 68ch;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .hero-actions a,
+  .card-action {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--app-radius);
+    font-size: 0.86rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+
+  .hero-actions a:hover,
+  .card-action:hover { transform: translateY(-1px); }
+
+  .primary-action {
+    padding: 0.58rem 0.95rem;
+    color: var(--app-on-accent);
+    background: var(--app-accent);
+    border: 1px solid var(--app-accent);
+  }
+
+  .secondary-action {
+    padding: 0.58rem 0.95rem;
+    color: var(--app-text-strong);
+    background: var(--app-surface);
+    border: var(--app-border-width) solid var(--app-border);
   }
 
   .scope-note {
@@ -429,9 +556,73 @@
     max-width: 68ch;
   }
 
+  .trust-panel {
+    padding: 1.05rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: color-mix(in srgb, var(--app-surface) 86%, transparent);
+  }
+
+  .trust-kicker {
+    margin: 0 0 0.2rem;
+    color: var(--app-ok);
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .trust-panel h2 {
+    margin: 0 0 0.8rem;
+    color: var(--app-text-strong);
+    font-size: 1rem;
+  }
+
+  .trust-panel dl { margin: 0; }
+  .trust-panel dl > div {
+    padding: 0.65rem 0;
+    border-top: var(--app-border-width) solid var(--app-border);
+  }
+  .trust-panel dt {
+    color: var(--app-text-strong);
+    font-size: 0.76rem;
+    font-weight: 750;
+  }
+  .trust-panel dd {
+    margin: 0.15rem 0 0;
+    color: var(--app-muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+
+  .section-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin: 0 0 2.5rem;
+    padding: 0.45rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+  }
+
+  .section-nav a {
+    padding: 0.42rem 0.7rem;
+    border-radius: calc(var(--app-radius) * 0.75);
+    color: var(--app-muted);
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .section-nav a:hover {
+    color: var(--app-text-strong);
+    background: var(--app-surface-2);
+  }
+
   /* ── Section scaffolding ──────────────────────────────────────────────── */
   .block {
     margin-bottom: 2.75rem;
+    scroll-margin-top: 5rem;
   }
 
   .block h2,
@@ -448,6 +639,60 @@
     color: var(--app-muted);
     margin: 0 0 1.25rem;
     max-width: 70ch;
+  }
+
+  .ecosystem-map {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface-2);
+  }
+
+  .map-owner {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0 auto 0.8rem;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--app-control) 45%, var(--app-border));
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+  }
+  .map-owner div { display: grid; gap: 0.1rem; }
+  .map-owner strong { color: var(--app-text-strong); font-size: 0.88rem; }
+  .map-owner span { color: var(--app-muted); font-size: 0.7rem; }
+
+  .map-branches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    position: relative;
+  }
+
+  .map-branches article {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.8rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+  }
+  .map-branches strong { color: var(--app-text-strong); font-size: 0.9rem; }
+  .map-branches span:not(.map-label) { color: var(--app-muted); font-size: 0.74rem; line-height: 1.45; }
+  .map-label {
+    color: var(--app-accent);
+    font-size: 0.62rem;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .map-foundation {
+    margin: 0.75rem 0 0;
+    color: var(--app-text);
+    font-size: 0.73rem;
+    text-align: center;
   }
 
   /* ── Three-layer cards ────────────────────────────────────────────────── */
@@ -467,7 +712,9 @@
     border-top: 3px solid var(--card-color);
     border-radius: var(--app-radius);
     padding: 1rem 1.05rem 1.15rem;
+    transition: transform 140ms ease, border-color 140ms ease;
   }
+  .layer-card:hover { transform: translateY(-2px); border-color: var(--card-color); }
 
   .layer-tag {
     display: inline-block;
@@ -523,6 +770,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--app-text) 5%, transparent);
   }
 
   .screen-head {
@@ -573,13 +821,24 @@
     margin: 0;
   }
 
+  .card-action {
+    align-self: flex-start;
+    min-height: 36px;
+    margin-top: auto;
+    padding: 0.35rem 0.65rem;
+    color: var(--app-text-strong);
+    border: var(--app-border-width) solid var(--app-border);
+    background: var(--app-surface-2);
+  }
+  .card-action:hover { border-color: var(--card-color); color: var(--card-color); }
+
   .how-label {
     display: block;
     font-size: 0.64rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--app-muted-2);
+    color: var(--app-text);
     margin-bottom: 0.2rem;
   }
 
@@ -652,6 +911,56 @@
     background: var(--app-accent);
   }
 
+  .release-note {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    margin: 0 0 1rem;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid color-mix(in srgb, var(--app-ok) 38%, var(--app-border));
+    border-radius: var(--app-radius);
+    background: color-mix(in srgb, var(--app-ok) 8%, var(--app-surface));
+  }
+  .release-note > span { color: var(--app-ok); font-weight: 900; }
+  .release-note p { margin: 0; color: var(--app-text); font-size: 0.82rem; line-height: 1.55; }
+  .release-note a { color: var(--app-accent); }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  .data-grid article {
+    padding: 0.9rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface);
+  }
+  .data-grid h3 { margin: 0.35rem 0; color: var(--app-text-strong); font-size: 0.92rem; }
+  .data-grid p { margin: 0; color: var(--app-muted); font-size: 0.8rem; line-height: 1.5; }
+  .data-kind {
+    display: inline-flex;
+    padding: 0.16rem 0.42rem;
+    border-radius: 999px;
+    font-size: 0.61rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--app-text-strong);
+  }
+  .data-kind.released { background: color-mix(in srgb, var(--app-ok) 12%, transparent); border: 1px solid color-mix(in srgb, var(--app-ok) 38%, var(--app-border)); }
+  .data-kind.live { background: color-mix(in srgb, var(--app-warn) 12%, transparent); border: 1px solid color-mix(in srgb, var(--app-warn) 38%, var(--app-border)); }
+  .data-kind.personal { background: var(--app-accent-soft); border: 1px solid color-mix(in srgb, var(--app-accent) 38%, var(--app-border)); }
+  .boundary-note {
+    margin: 0.85rem 0 0;
+    padding: 0.8rem 0.9rem;
+    color: var(--app-text);
+    font-size: 0.8rem;
+    line-height: 1.55;
+    border-left: 3px solid var(--app-muted-2);
+    background: var(--app-surface-2);
+  }
+
   /* ── Footer ───────────────────────────────────────────────────────────── */
   .about-footer {
     border-top: var(--app-border-width) solid var(--app-border);
@@ -689,6 +998,7 @@
   }
 
   code {
+    color: var(--app-text);
     font-family: var(--app-font-mono);
     font-size: 0.82em;
     background: var(--app-surface-2);
@@ -696,10 +1006,31 @@
     border-radius: 3px;
   }
 
+  @media (max-width: 780px) {
+    .hero { grid-template-columns: 1fr; }
+    .trust-panel { max-width: none; }
+  }
+
   @media (max-width: 520px) {
     .about-page { padding: 1.5rem 1rem 6rem; }
     .screen-grid,
-    .layer-grid { grid-template-columns: 1fr; }
+    .layer-grid,
+    .map-branches,
+    .data-grid { grid-template-columns: 1fr; }
+    .hero { padding: 1.05rem; }
+    .brand-lockup { align-items: flex-start; }
+    .hero-actions a { width: 100%; }
+    .section-nav { overflow-x: auto; flex-wrap: nowrap; }
+    .section-nav a { flex: 0 0 auto; }
     .callout { flex-direction: column; gap: 0.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-actions a,
+    .card-action,
+    .layer-card { transition: none; }
+    .hero-actions a:hover,
+    .card-action:hover,
+    .layer-card:hover { transform: none; }
   }
 </style>

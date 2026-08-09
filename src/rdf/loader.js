@@ -317,15 +317,18 @@ export function staticInstanceSources() {
 
 /**
  * The deliberately small manifest used by the unified Graph navigator.
- * It contains the citable term set, versioned catalog records, and optionally
- * the mutable public ecosystem projection. Sessions, experiments, presets,
- * evidence, references, and synthetic fixtures are outside this view.
+ * It contains the citable term set, versioned catalog records (including the
+ * exact public presets and references reached by w3id browser routes), and
+ * optionally the mutable public ecosystem projection. Sessions, experiments,
+ * standalone evidence sources, and synthetic fixtures are outside this view.
  */
 export function navigatorSources(options = {}) {
   const sources = [
     ...Object.values(ONTOLOGY_SOURCES),
     ...INSTANCE_SOURCES.frameworks,
     ...INSTANCE_SOURCES.implementations,
+    ...INSTANCE_SOURCES.presets,
+    ...INSTANCE_SOURCES.references,
   ]
   if (options.includeLive !== false) sources.push(...INSTANCE_SOURCES.ecosystem)
   return sources

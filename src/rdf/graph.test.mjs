@@ -5,6 +5,8 @@ import { mergeStores, parseIntoStore } from './loader.js'
 const GRAPH = 'https://example.org/graph/navigator-test'
 const APP = 'https://w3id.org/sstim/implementation/biosyncare'
 const ORG = 'https://w3id.org/sstim/organization/biosyncare'
+const PRESET = 'https://w3id.org/sstim/implementation/bsclab/preset/example'
+const REFERENCE = 'https://w3id.org/sstim/ref/EXAMPLE_2026'
 const PERSON = 'https://example.org/specialist/alex'
 const RECORD = 'https://example.org/ecosystem-record/alex-develops-app'
 
@@ -22,6 +24,8 @@ const fixture = `
 <https://w3id.org/sstim> a owl:Ontology ; dct:title "SSTIM"@en .
 sstim:SensoryStimulationFramework a owl:Class ; rdfs:label "Sensory stimulation framework"@en .
 sstim:SensoryStimulationImplementation a owl:Class ; rdfs:label "Sensory stimulation implementation"@en .
+sstim:Preset a owl:Class ; rdfs:label "Preset"@en .
+sstim:PublicSafeReference a owl:Class ; rdfs:label "Public-safe reference"@en .
 sstim:SensoryStimulation a owl:Class ; rdfs:label "Sensory stimulation"@en .
 sstim:SensoryModality a owl:Class ; rdfs:label "Sensory modality"@en .
 eco:EcosystemAgent a owl:Class ; rdfs:label "Ecosystem agent"@en .
@@ -46,6 +50,18 @@ eco:EcosystemRelationship a owl:Class ; rdfs:label "Ecosystem relationship"@en .
   rdfs:label "BioSynCare"@en ;
   dct:description "A versioned application record."@en ;
   sstim:implementsFramework <https://w3id.org/sstim/framework/bsc> .
+
+<${PRESET}>
+  a sstim:Preset ;
+  rdfs:label "Example preset"@en ;
+  dct:description "A versioned public preset record."@en ;
+  dct:created "2026-07-01" ;
+  dct:modified "2026-07-02" .
+
+<${REFERENCE}>
+  a sstim:PublicSafeReference ;
+  dct:title "Example public-safe reference"@en ;
+  dct:source <https://doi.org/10.0000/example> .
 
 <${ORG}>
   a eco:EcosystemAgent, schema:Organization ;
@@ -94,6 +110,19 @@ describe('unified navigator projection', () => {
       kind: 'catalogImplementation',
       layer: 'catalog',
       label: 'BioSynCare — application',
+    })
+    expect(byId(elements, PRESET)).toMatchObject({
+      kind: 'catalogPreset',
+      layer: 'catalog',
+      label: 'Example preset',
+      created: '2026-07-01',
+      modified: '2026-07-02',
+    })
+    expect(byId(elements, REFERENCE)).toMatchObject({
+      kind: 'catalogReference',
+      layer: 'catalog',
+      label: 'Example public-safe reference',
+      sourceLinks: ['https://doi.org/10.0000/example'],
     })
     expect(byId(elements, ORG)).toMatchObject({
       kind: 'ecosystemOrganization',

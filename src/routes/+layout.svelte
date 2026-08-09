@@ -66,10 +66,12 @@
     --app-border-subtle: #e1d6c4;
     --app-text: #2f2a21;
     --app-text-strong: #17130d;
-    --app-muted: #746a5b;
+    --app-muted: #6f6557;
     --app-muted-2: #8a806f;
     --app-accent: #3366a3;
     --app-accent-soft: #dce8f3;
+    --app-on-accent: #ffffff;
+    --app-dock-active: var(--app-accent);
     --app-control: #8a5a00;
     --app-audio: #3366a3;
     --app-visual: #7c5cc4;
@@ -94,6 +96,8 @@
     --app-muted-2: #53687a;
     --app-accent: #3b9eff;
     --app-accent-soft: #0c2440;
+    --app-on-accent: #080d12;
+    --app-dock-active: var(--app-accent);
     --app-control: #e67e22;
     --app-audio: #3b9eff;
     --app-visual: #9b5fd3;
@@ -118,6 +122,8 @@
     --app-muted-2: #5c7f88;
     --app-accent: #42d3c8;
     --app-accent-soft: #0b3637;
+    --app-on-accent: #071013;
+    --app-dock-active: var(--app-accent);
     --app-control: #ffb15c;
     --app-audio: #4aa8ff;
     --app-visual: #b882ff;
@@ -142,6 +148,8 @@
     --app-muted-2: #765f48;
     --app-accent: #ffad3b;
     --app-accent-soft: #3a250b;
+    --app-on-accent: #100d0a;
+    --app-dock-active: var(--app-accent);
     --app-control: #ff8c3b;
     --app-audio: #55c7d6;
     --app-visual: #c98cff;
@@ -167,6 +175,8 @@
     --app-muted-2: #758897;
     --app-accent: #0b72c9;
     --app-accent-soft: #d7ebfb;
+    --app-on-accent: #ffffff;
+    --app-dock-active: #07558f;
     --app-control: #c46a00;
     --app-audio: #0b72c9;
     --app-visual: #745bd3;

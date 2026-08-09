@@ -22,6 +22,7 @@ import { extname, join, normalize, resolve } from 'node:path'
 
 const DIST = resolve(process.argv[2] ?? 'dist')
 const EXPORT_MODULE = resolve('src/portability/instanceExport.js')
+const IDENTITY_MODULE = resolve('src/identity/IdentityProvider.js')
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const PORT_A = 4181
 const PORT_B = 4182
@@ -97,6 +98,13 @@ function serve(port, harnessHtml, payloadRef) {
       if (url.pathname === '/harness.html') return send(200, 'text/html', harnessHtml)
       if (url.pathname === '/instanceExport.js') {
         return send(200, 'text/javascript', await readFile(EXPORT_MODULE))
+      }
+      // instanceExport shares the authoritative private-identity field list
+      // with the application identity seam. Serve that source dependency too
+      // so this browser harness exercises the real module graph rather than a
+      // copied or rewritten export implementation.
+      if (url.pathname === '/identity/IdentityProvider.js') {
+        return send(200, 'text/javascript', await readFile(IDENTITY_MODULE))
       }
       if (url.pathname === '/payload.json') {
         return send(200, 'application/json', payloadRef.value ?? 'null')

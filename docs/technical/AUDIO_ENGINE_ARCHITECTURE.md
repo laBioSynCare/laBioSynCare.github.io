@@ -155,16 +155,18 @@ unavailable until runtime hosting moves.
 As built, `createAudioEngine()` in
 [`../../src/engines/audio/audioEngines.js`](../../src/engines/audio/audioEngines.js)
 owns this. Each engine declares the capability flags it `requires`; if the
-selected one's are not all present, the factory returns the default `vanilla`
-engine and reports `fellBack: true`. `vanilla` requires nothing, so a missing
-AudioWorklet degrades the session to native Web Audio rather than blocking it.
-There is no `ScriptProcessorNode` path — deprecated, main-thread, and not precise
-enough.
+selected one's are not all present, the factory prefers the compatible default
+`vanilla` engine and reports `fellBack: true`. A missing AudioWorklet therefore
+degrades to native Web Audio rather than blocking. If Web Audio itself is
+absent, the factory resolves to `silent`, the capability-free floor. There is no
+`ScriptProcessorNode` path — deprecated, main-thread, and not precise enough.
 
-`NullAudioEngine` (`silent`) also requires nothing, but it is a user choice
-rather than a fallback: it implements the full contract with no sound while
-owning a real `AudioContext`, so the clock, control modulation, and visual
-previews behave exactly as with a sounding engine.
+`NullAudioEngine` (`silent`) implements the full contract with no sound and
+constructs no `AudioContext`. It supplies the timing subset the studio uses — a
+monotonic `currentTime` plus `state`, `resume()`, `suspend()`, and `close()` — so
+control modulation and visual previews continue without Web Audio. Its clock
+stops while suspended. Silent can therefore be selected deliberately and also
+serves as the truthful fallback when sounding engines cannot run.
 
 `outputLatency` is also the haptic offset: haptics and audio share no clock, so
 haptic events are delayed by `outputLatency` to line up (`CLAUDE.md` §6.4).

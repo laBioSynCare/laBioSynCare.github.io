@@ -29,7 +29,7 @@ engines/
 │   ├── WorkletVoiceEngine.js        Shared base for the AudioWorklet engines
 │   ├── AudioWorkletEngine.js        Audio-thread DSP in JS (bsc-voice processor)
 │   ├── WasmAudioWorkletEngine.js    Audio-thread DSP in WASM (bsc-voice-wasm)
-│   ├── NullAudioEngine.js           Silent: real clock, no sound (fallback)
+│   ├── NullAudioEngine.js           Silent: monotonic clock, no Web Audio
 │   └── audioEngines.js              Registry + persisted selection + factory
 │
 ├── visual/   (planned — none of these files exist yet)
@@ -63,8 +63,9 @@ capability detection, the Svelte store, and the factory (which falls back to the
 default when a selected engine's capabilities are unavailable).
 
 **Key constraints from `CLAUDE.md` (apply to every engine):**
-- `AudioContext.currentTime` is the only timing authority — engines drive all
-  parameters through timed `AudioParam` automation, never a wall clock
+- The engine timing context's `currentTime` is the only timing authority. For
+  sounding engines that is `AudioContext.currentTime`; Silent supplies the same
+  monotonic timing surface without constructing Web Audio.
 - AudioWorklet files in `static/worklets/` are never bundled
 - No allocation inside `AudioWorkletProcessor.process()`
 - `AudioContext.resume()` must be called inside a user gesture handler
@@ -98,15 +99,17 @@ against memory it owns; envelope/gain/pan/mix stay in JS.
 
 ### `NullAudioEngine` (`silent`)
 
-Implements the full contract but emits no sound, while still owning a real
-`AudioContext` so the clock, control modulation and visual previews run exactly
-as a sounding engine would. For quiet/shared environments, accessibility, and
-timing/visual debugging. Mirrors the `NullHapticEngine` pattern.
+Implements the full contract but emits no sound. Its internal monotonic clock
+has the `currentTime`, `state`, `resume()`, `suspend()`, and `close()` surface
+used by the studio, so control modulation and visual previews keep running
+without constructing an `AudioContext`. It works without browser Web Audio and
+pauses its time while suspended. For quiet/shared environments, accessibility,
+and timing/visual debugging. Mirrors the `NullHapticEngine` pattern.
 
-It is a deliberate choice, not the fallback: when a selected engine's `requires`
-capabilities are missing, `createAudioEngine()` returns the default `vanilla`
-engine with `fellBack: true`. `vanilla` requires no capabilities, so it is the
-floor.
+It is both a deliberate choice and the capability-free floor. When a selected
+engine is unavailable, `createAudioEngine()` first uses `vanilla` if Web Audio
+exists; when Web Audio itself is absent, it resolves to `silent` and reports
+`fellBack: true`.
 
 **Regenerating the WASM kernel** (after editing `static/worklets/bsc-osc.wat`):
 ```bash

@@ -121,15 +121,19 @@ or ontology-only edits, a dev server is not required.
 
 **These rules are never violated under any circumstances. No exception, no workaround.**
 
-### 3.1 AudioContext is the only clock
+### 3.1 The engine timing context is the only clock
 
-`AudioContext.currentTime` is the sole timing authority for all audio-visual
-synchronization. It runs on the audio hardware thread and provides sub-millisecond
-precision (~0.02ms at 48kHz).
+`engine.getAudioContext().currentTime` is the sole timing authority for all
+audio-visual synchronization. Sounding engines return a real `AudioContext`,
+whose hardware clock provides sub-millisecond precision (~0.02ms at 48kHz).
+The capability-free Silent engine returns the documented monotonic timing
+surface instead; it has no audio hardware to synchronize. No caller may create
+or mix in a separate wall clock.
 
 ```javascript
 // CORRECT — always
-const t = audioContext.currentTime;
+const timingContext = engine.getAudioContext();
+const t = timingContext.currentTime;
 oscillatorNode.frequency.setValueAtTime(value, t + 0.1);
 
 // WRONG — never use for AV sync
@@ -140,9 +144,10 @@ setInterval()
 new Date()
 ```
 
-Visual engine frames must read `audioContext.currentTime` at the start of each
-`requestAnimationFrame` callback and compute all positions from it. Never accumulate
-deltas. Always compute absolute position from the audio clock.
+Visual engine frames must read the active engine timing context's `currentTime`
+at the start of each `requestAnimationFrame` callback and compute all positions
+from it. Never accumulate deltas. Always compute absolute position from that
+clock.
 
 ### 3.2 AudioWorklet files are never bundled
 
@@ -478,14 +483,16 @@ touching the engine:
 The system uses three synchronized clocks with distinct roles:
 
 ```
-Audio hardware clock    AudioContext.currentTime  — master authority, sub-ms precision
+Engine timing authority AudioContext.currentTime  — sounding engines, sub-ms precision
+                        Silent monotonic context   — visual/timing-only sessions
 Scheduling clock        Web Worker + setInterval  — 25ms ticks, immune to main-thread jank
-Rendering clock         requestAnimationFrame     — visual updates, reads audio clock
+Rendering clock         requestAnimationFrame     — visual updates, reads engine clock
 ```
 
-The Worker scheduler reads `AudioContext.currentTime`, schedules events 100ms ahead,
-and posts timing state to the main thread. The rAF loop reads current audio time and
-renders. Never merge these clocks. Never schedule audio events from rAF.
+For sounding engines, the Worker scheduler reads `AudioContext.currentTime`,
+schedules events 100ms ahead, and posts timing state to the main thread. The rAF
+loop always reads the active engine's timing context and renders. Never merge
+these clocks. Never schedule audio events from rAF.
 
 ### 6.2 Engine interface contract
 
@@ -567,7 +574,7 @@ legal, regulatory, or architectural requirements.
 |---|---|
 | Modify BSC instance TTL under `static/ontology/instances/` without explicit instruction | Vocabulary changes require scientific review |
 | Modify the three defensive publication files | They are timestamped prior art records |
-| Use `Date.now()` or `setTimeout()` for AV sync | Only `AudioContext.currentTime` is authoritative |
+| Use `Date.now()` or `setTimeout()` for AV sync outside the Silent engine's encapsulated clock | Only the active engine timing context is authoritative |
 | Bundle files in `static/worklets/` | AudioWorklets must load as plain static scripts |
 | Allocate inside `AudioWorkletProcessor.process()` | GC in the audio thread causes glitches |
 | Write health, medical, or treatment claims | Regulatory compliance; see `docs/concept/SCOPE.md` |

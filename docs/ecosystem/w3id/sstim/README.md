@@ -65,6 +65,8 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
+| `/sstim/implementation/bsclab/preset/{heal-theta-breathing-seed,perform-alpha-10-seed}` | Exact public BSC Lab preset records; HTML deep-links to the requested graph node and RDF returns its owning preset Turtle file | Staged locally |
+| `/sstim/ref/{INGENDOH_2023,PICTON_2003,SKOE_KRAUS_2010,ZACCARO_2018,VIALATTE_2010,PETIT_2021,STEIN_STANFORD_2008}` | Exact public-safe reference records; HTML deep-links to the requested graph node and RDF returns the audited reference catalogue | Staged locally |
 | `/sstim/specialist/{id}` and `/sstim/organization/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/ecosystem-record/{relationship,activity,role}/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/void` | VoID + DCAT dataset description (Turtle only) | Live |
@@ -127,8 +129,13 @@ merged, since w3id.org performs the negotiation; that verification belongs to
 the merge, not to this repository.
 
 Audited static catalog routes send RDF clients to the owning Turtle instance
-file. General live ecosystem namespace rules send RDF clients to the mutable,
-live-only `current.ttl` projection. Current synthetic contract subjects reserve
+file. Public preset and reference routes are an exact inventory, not namespace
+wildcards: adding, renaming, or retiring one of these committed records requires
+an intentional route update and a matching negotiation-test update. This keeps
+an unknown identifier at `404` instead of making an aggregate file appear to
+describe a record it does not contain. General live ecosystem namespace rules
+send RDF clients to the mutable, live-only `current.ttl` projection. Current
+synthetic contract subjects reserve
 a `synthetic-*` slug rejected by those rules and are available only through the
 direct fixture artifact; there are no fixture-specific routes. HTML requests for
 a static catalog or live ecosystem identifier reach **that entity's node in the

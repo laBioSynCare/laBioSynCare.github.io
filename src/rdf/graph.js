@@ -9,6 +9,8 @@
  *   'catalogFramework' — versioned framework catalog record
  *   'catalogImplementation' — versioned implementation/component record
  *   'catalogTechnique' — versioned framework technique record
+ *   'catalogPreset' — versioned public preset record
+ *   'catalogReference' — versioned public-safe reference record
  *   'ecosystemPerson' / 'ecosystemOrganization' — live public agents
  *   'scheme'      — skos:ConceptScheme (used as group anchor, not rendered)
  *
@@ -464,6 +466,8 @@ export async function buildGraphElements(store) {
   }
   addTypedCatalogResources(SSTIM_NS + 'SensoryStimulationFramework', 'catalogFramework')
   addTypedCatalogResources(SSTIM_NS + 'SensoryStimulationImplementation', 'catalogImplementation')
+  addTypedCatalogResources(SSTIM_NS + 'Preset', 'catalogPreset')
+  addTypedCatalogResources(SSTIM_NS + 'PublicSafeReference', 'catalogReference')
   for (const subject of store.getSubjects(null, null, null)) {
     if (subject.termType === 'NamedNode' && subject.value.startsWith(BSC_TECHNIQUE_NS)) {
       catalogResources.set(subject.value, 'catalogTechnique')

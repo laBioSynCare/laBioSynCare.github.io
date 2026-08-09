@@ -11,6 +11,8 @@ export const SSTIM_SH = ns('https://w3id.org/sstim/shapes#')
 export const SSTIM_EX = ns('https://w3id.org/sstim/exposure#')
 export const SSTIM_ECO = ns('https://w3id.org/sstim/ecosystem#')
 export const SSTIM_I  = ns('https://w3id.org/sstim/inst/')
+// Public members of sstim-ref: have exact per-entity browser and Turtle routes
+// in the audited preset/reference block of the external w3id.org registry.
 export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
 export const SSTIM_ORGANIZATION = ns('https://w3id.org/sstim/organization/')
 export const SSTIM_SPECIALIST = ns('https://w3id.org/sstim/specialist/')
@@ -32,6 +34,8 @@ export const BIOSYNCARE_EVIDENCE = ns('https://w3id.org/sstim/implementation/bio
 export const BIOSYNCARE_SESSION = ns('https://w3id.org/sstim/implementation/biosyncare/session/')
 export const BIOSYNCARE_ANNOTATION = ns('https://w3id.org/sstim/implementation/biosyncare/annotation/')
 export const BSCLAB = ns('https://w3id.org/sstim/implementation/bsclab/')
+// Public members of bsclab-preset: use the same exact audited route inventory;
+// do not replace it with a namespace wildcard when adding local/private data.
 export const BSCLAB_PRESET = ns('https://w3id.org/sstim/implementation/bsclab/preset/')
 export const BSCLAB_EXPERIMENT = ns('https://w3id.org/sstim/implementation/bsclab/experiment/')
 export const BSCLAB_EVIDENCE = ns('https://w3id.org/sstim/implementation/bsclab/evidence/')

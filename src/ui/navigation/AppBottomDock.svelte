@@ -48,7 +48,7 @@
     display: grid;
     place-items: center;
     padding: 0 0.55rem;
-    color: var(--app-muted);
+    color: var(--app-text);
     text-decoration: none;
     font-size: 0.74rem;
     font-weight: 700;
@@ -62,12 +62,16 @@
 
   .app-bottom-dock a:hover,
   .app-bottom-dock a[aria-current='page'] {
-    color: var(--app-accent);
+    color: var(--app-dock-active, var(--app-accent));
     background: var(--app-accent-soft);
   }
 
   .app-bottom-dock span {
+    display: block;
+    width: 100%;
+    min-width: 0;
     overflow: hidden;
+    text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -76,6 +80,12 @@
     .app-bottom-dock a {
       font-size: 0.66rem;
       padding: 0 0.25rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .app-bottom-dock a {
+      padding-inline: 0.125rem;
     }
   }
 </style>
