@@ -58,6 +58,7 @@ describe('unified navigator source boundary', () => {
     const sources = navigatorSources()
     expect(sources).toEqual([
       ...Object.values(ONTOLOGY_SOURCES),
+      INSTANCE_SOURCES.programmes[0],
       INSTANCE_SOURCES.frameworks[0],
       INSTANCE_SOURCES.implementations[0],
       ...INSTANCE_SOURCES.presets,

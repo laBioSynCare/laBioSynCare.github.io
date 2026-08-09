@@ -69,6 +69,9 @@ ECOSYSTEM_PUBLIC_DUMP = URIRef(
     "https://biosyncare-lab.web.app/current.ttl"
 )
 CATALOG_PUBLIC_ROUTES = {
+    "ecosystem/biosyncare": (
+        "https://labiosyncare.github.io/ontology/instances/programmes/biosyncare-ecosystem.ttl"
+    ),
     "framework/bsc": (
         "https://labiosyncare.github.io/ontology/instances/frameworks/bsc.ttl"
     ),
@@ -83,6 +86,7 @@ CATALOG_PUBLIC_ROUTES = {
     ),
 }
 CATALOG_HTML_ROUTES = {
+    "ecosystem/biosyncare": "https://labiosyncare.github.io/graph/#sstim-ecosystem:biosyncare",
     "framework/bsc": "https://labiosyncare.github.io/graph/#bsc-fw:",
     "implementation/bsclab": "https://labiosyncare.github.io/graph/#bsclab:",
     "implementation/biosyncare": "https://labiosyncare.github.io/graph/#biosyncare:",

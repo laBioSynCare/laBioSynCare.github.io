@@ -1,0 +1,51 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <https://schema.org/> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+
+# The BioSynCare Ecosystem — the programme identity under which SSTIM, the BSC
+# framework, BSC Lab (with its Patch Studio component) and the BioSynCare
+# application are produced. Published name and structure come from the
+# ecosystem brief cited as dct:source.
+#
+# Three things this file deliberately does NOT say.
+#
+# 1. It is not the application. <https://w3id.org/sstim/implementation/biosyncare>
+#    is the commercial app of the same name. A third BioSynCare-named node, the
+#    startup-identity organization, was retired from the live projection on
+#    2026-07-20 (BioSynCare is a product of the Æterni Anima initiative, not a
+#    distinct organization). Keep the two survivors distinguishable.
+#
+# 2. dct:hasPart states production membership only — these artifacts are built
+#    and maintained within this programme. It says nothing about term scope.
+#    SSTIM's vocabulary is deliberately broader than BSC and stays
+#    vendor-neutral; BSC is one framework inside SSTIM, not the reverse
+#    (ADR 0033). Nothing here is asserted in the other direction: no component
+#    carries a dct:isPartOf back-link, so the ontology header stays clean.
+#
+# 3. The W3C Sensory Stimulation Vocabulary Community Group is not a part. It is
+#    an independent W3C forum with its own participants and IPR terms. Its
+#    relationship to SSTIM is carried by the live ecosystem record
+#    ecosystem-record:relationship/sstim-cg-develops-shared-terminology (type
+#    standardsBody), which already disclaims W3C endorsement. Do not add it here.
+#
+# See ADR 0047 for the path decision and ADR 0007 for the layer model.
+<https://w3id.org/sstim/ecosystem/biosyncare> a schema:Project, prov:Collection ;
+    rdfs:label "The BioSynCare Ecosystem"@en ;
+    dct:description "Programme identity for the connected pathway from open formalized knowledge (SSTIM) through open research and technology (BSC Lab, including the Patch Studio authoring component) to everyday delivery (the BioSynCare application), with the BSC framework as the doctrine both platforms build on. Distinct from <https://w3id.org/sstim/implementation/biosyncare>, the commercial application of the same name. This record asserts programme membership of artifacts, not a legal form, corporate group, or ownership of any external organization."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:contributor <https://w3id.org/sstim/organization/aeterni-anima> ;
+    dct:created "2026-08-10"^^xsd:date ;
+    dct:modified "2026-08-10"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dct:source <https://labiosyncare.github.io/docs/BioSynCare_Ecosystem_Brief_EN.pdf> ;
+    schema:url <https://labiosyncare.github.io/docs/BioSynCare_Ecosystem_Brief_EN.pdf> ;
+    dct:hasPart <https://w3id.org/sstim>,
+        <https://w3id.org/sstim/framework/bsc>,
+        <https://w3id.org/sstim/implementation/bsclab>,
+        <https://w3id.org/sstim/implementation/bsclab/component/patch-studio>,
+        <https://w3id.org/sstim/implementation/biosyncare> ;
+    skos:note "Membership is production membership, not term scope: SSTIM remains the broader vendor-neutral ontology within which BSC is one framework."@en ;
+    skos:scopeNote "The W3C Sensory Stimulation Vocabulary Community Group collaborates with this programme but is not part of it; see the standardsBody relationship record in the live ecosystem projection."@en .

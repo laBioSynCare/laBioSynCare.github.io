@@ -17,6 +17,13 @@ export const SSTIM_REF = ns('https://w3id.org/sstim/ref/')
 export const SSTIM_ORGANIZATION = ns('https://w3id.org/sstim/organization/')
 export const SSTIM_SPECIALIST = ns('https://w3id.org/sstim/specialist/')
 export const SSTIM_ECOSYSTEM_RECORD = ns('https://w3id.org/sstim/ecosystem-record/')
+// Three different resources share the word "ecosystem"; keep them apart.
+// SSTIM_ECO (hash)     — the OWL module's terms.
+// SSTIM_ECOSYSTEM      — programme identities in the static catalog (ADR 0047).
+// SSTIM_ECOSYSTEM_RECORD — relationship/activity/role records in the live
+//                          projection, which is mutable and never committed.
+export const SSTIM_ECOSYSTEM = ns('https://w3id.org/sstim/ecosystem/')
+export const BIOSYNCARE_ECOSYSTEM_IRI = namedNode('https://w3id.org/sstim/ecosystem/biosyncare')
 // These three bare-root IRIs (no sub-path) each have a matching per-entity
 // browser redirect in the external w3id.org registry — sstim/.htaccess's
 // "BEGIN audited BSC catalog routes" block (local clone: ~/rep/w3id.org).
@@ -91,6 +98,7 @@ export const PREFIXES = {
   'sstim-organization': 'https://w3id.org/sstim/organization/',
   'sstim-specialist': 'https://w3id.org/sstim/specialist/',
   'sstim-ecosystem-record': 'https://w3id.org/sstim/ecosystem-record/',
+  'sstim-ecosystem': 'https://w3id.org/sstim/ecosystem/',
   'bsc-fw': 'https://w3id.org/sstim/framework/bsc/',
   'bsc-fw-tech': 'https://w3id.org/sstim/framework/bsc/technique/',
   'biosyncare': 'https://w3id.org/sstim/implementation/biosyncare/',

@@ -112,9 +112,14 @@
     },
   ]
 
-  // Who is responsible for what. Æterni Anima is the organization; BSC Lab and
-  // BioSynCare are the two platforms it is responsible for, and SSTIM and Patch
-  // Studio live inside BSC Lab rather than beside it.
+  // Who is responsible for what. Æterni Anima is the organization; the
+  // BioSynCare Ecosystem is the programme it runs, and SSTIM, BSC Lab and the
+  // BioSynCare application are peer components of that programme — SSTIM is
+  // published from BSC Lab's repository but is not a part of it. Keep this in
+  // step with the ecosystem brief and with
+  // static/ontology/instances/programmes/biosyncare-ecosystem.ttl (ADR 0047);
+  // calling the ontology a component of one implementation is the framing the
+  // Community Group work cannot afford.
   const layers = [
     {
       name: 'Æterni Anima',
@@ -144,23 +149,23 @@
       color: 'var(--app-accent)',
       mark: 'bsclab',
       body:
-        'The open-source research and engineering platform you are using now. It holds the ' +
-        'SSTIM knowledge graph and its Turtle sources, Patch Studio, and the surfaces built ' +
+        'The open-source research and engineering platform you are using now. It hosts and ' +
+        'publishes the SSTIM Turtle sources, and it holds Patch Studio and the surfaces built ' +
         'around them — Graph, Presets, SPARQL, and Logbook. Software is Apache-2.0; ' +
         'the ontology, vocabulary, and public reference data are CC BY 4.0.',
     },
     {
       name: 'SSTIM',
-      tag: 'Knowledge graph · in BSC Lab',
+      tag: 'Knowledge graph · vendor-neutral',
       color: 'var(--app-visual)',
       body:
         'The Sensory Stimulation Ontology — a public RDF knowledge graph of techniques, ' +
         'modalities, parameters, exposure conditions, safety metadata, evidence-qualified ' +
         'claims, protocols, presets, and sessions. OWL classes, a multilingual SKOS ' +
-        'vocabulary, and SHACL shapes under the stable namespace w3id.org/sstim. Developed ' +
-        'and published within BSC Lab, it is the reusable, citable scientific artifact — and ' +
-        'namespace governance is set to pass to the W3C Community Group once its charter is ' +
-        'ratified.',
+        'vocabulary, and SHACL shapes under the stable namespace w3id.org/sstim. BSC Lab ' +
+        'hosts and publishes it, but it is deliberately broader than BSC — BSC is one ' +
+        'framework inside it — and namespace governance is set to pass to the W3C Community ' +
+        'Group once its charter is ratified.',
     },
     {
       name: 'BioSynCare',
@@ -271,21 +276,22 @@
   <section class="block" id="ecosystem">
     <h2>How the pieces fit</h2>
     <p class="section-intro">
-      Æterni Anima is the organization responsible for everything here. BSC Lab and
-      BioSynCare are its two platforms — SSTIM and Patch Studio live inside BSC Lab — and
-      BSC is the framework both platforms build on. Knowing which is which makes the rest
-      of the app easier to read.
+      Æterni Anima is the organization responsible for everything here. It runs the
+      BioSynCare Ecosystem, a programme whose components are SSTIM, BSC Lab (which hosts and
+      publishes SSTIM, and holds Patch Studio) and the BioSynCare application, with BSC as
+      the framework both platforms build on. Knowing which is which makes the rest of the
+      app easier to read.
     </p>
     <div class="ecosystem-map" aria-label="Relationship between Æterni Anima, BSC, BSC Lab, SSTIM, Patch Studio, and BioSynCare">
       <div class="map-owner">
         <Isotype name="aeterni-anima" size={34} title="Æterni Anima isotype" />
-        <div><strong>Æterni Anima</strong><span>Organization responsible for both platforms</span></div>
+        <div><strong>Æterni Anima</strong><span>Organization behind the BioSynCare Ecosystem</span></div>
       </div>
       <div class="map-branches">
         <article>
           <span class="map-label">Open platform</span>
           <strong>BSC Lab</strong>
-          <span>Contains SSTIM, Patch Studio, and this application</span>
+          <span>Publishes SSTIM; holds Patch Studio and this application</span>
         </article>
         <article>
           <span class="map-label">Separate application</span>

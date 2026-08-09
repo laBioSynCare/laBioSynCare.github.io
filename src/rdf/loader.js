@@ -207,6 +207,11 @@ export const ONTOLOGY_PROFILES = Object.freeze(ontologyManifest.profiles.map(pro
  * from a mutable external store and never copied into the citable repository.
  */
 export const INSTANCE_URLS = {
+  // Programme identity. Committed and citable, unlike the `ecosystem` group
+  // below, which is the mutable live relationship projection.
+  programmes: [
+    '/ontology/instances/programmes/biosyncare-ecosystem.ttl',
+  ],
   frameworks: [
     '/ontology/instances/frameworks/bsc.ttl',
   ],
@@ -250,6 +255,10 @@ export const INSTANCE_URLS = {
 }
 
 export const INSTANCE_SOURCES = {
+  programmes: INSTANCE_URLS.programmes.map(url => ({
+    url,
+    graph: 'https://w3id.org/sstim/graph/programmes',
+  })),
   frameworks: INSTANCE_URLS.frameworks.map(url => ({
     url,
     graph: 'https://w3id.org/sstim/graph/frameworks',
@@ -325,6 +334,7 @@ export function staticInstanceSources() {
 export function navigatorSources(options = {}) {
   const sources = [
     ...Object.values(ONTOLOGY_SOURCES),
+    ...INSTANCE_SOURCES.programmes,
     ...INSTANCE_SOURCES.frameworks,
     ...INSTANCE_SOURCES.implementations,
     ...INSTANCE_SOURCES.presets,

@@ -306,6 +306,9 @@ W3C Web Annotation vocabulary. The default graph is never modified.
 | `sstim-sh:` | `https://w3id.org/sstim/shapes#` | SHACL shapes |
 | `sstim-i:` | `https://w3id.org/sstim/inst/` | Generic SSTIM instances |
 | `sstim-ref:` | `https://w3id.org/sstim/ref/` | Public-safe references |
+| `sstim-eco:` | `https://w3id.org/sstim/ecosystem#` | Ecosystem-record OWL module terms |
+| `sstim-ecosystem:` | `https://w3id.org/sstim/ecosystem/` | Programme identities in the static catalog ([ADR 0047](../../docs/decisions/0047-programme-identity-path.md)) |
+| `sstim-ecosystem-record:` | `https://w3id.org/sstim/ecosystem-record/` | Relationship, activity and role records in the mutable live projection |
 | `bsc-fw:` | `https://w3id.org/sstim/framework/bsc/` | BSC framework |
 | `bsc-fw-tech:` | `https://w3id.org/sstim/framework/bsc/technique/` | BSC framework technique instances |
 | `bsclab:` | `https://w3id.org/sstim/implementation/bsclab/` | BSC Lab implementation scope |

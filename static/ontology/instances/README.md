@@ -16,7 +16,8 @@ real instance triples, but its historical identifier traces are not erasable.
 Public BSC Lab resources use
 `https://w3id.org/sstim/implementation/bsclab/...`. Reusable references use
 `https://w3id.org/sstim/ref/...`; BSC framework resources use
-`https://w3id.org/sstim/framework/...`. Ecosystem organizations use
+`https://w3id.org/sstim/framework/...`; the programme that produces all of them
+uses `https://w3id.org/sstim/ecosystem/...`. Ecosystem organizations use
 `https://w3id.org/sstim/organization/...`, people use
 `https://w3id.org/sstim/specialist/...`; qualified relationships use
 `https://w3id.org/sstim/ecosystem-record/relationship/...`, and engagement
@@ -27,6 +28,7 @@ BioSynCare catalog and real participant records are not present.
 
 | Directory | Contents |
 |---|---|
+| `programmes/` | The BioSynCare Ecosystem programme identity and its `dct:hasPart` membership ([ADR 0047](../../../docs/decisions/0047-programme-identity-path.md)). Kept out of `ecosystem/`, whose subdirectories are a reserved contract path for agent records |
 | `frameworks/` | BSC framework identity and the three techniques it originated (generic techniques it applies are incorporated from the vocabulary — [ADR 0033](../../../docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md)) |
 | `implementations/` | Public identity records for BSC Lab, the BioSynCare application, and the Patch Studio component |
 | `protocols/` | Two narrow, non-clinical BSC Lab reference protocols |

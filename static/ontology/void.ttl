@@ -333,11 +333,12 @@
 <https://w3id.org/sstim/void#instances>
     a void:Dataset ;
     dct:title "BSC Lab public SSTIM instance data"@en ;
-    dct:description "Public, non-clinical BSC Lab framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
+    dct:description "Public, non-clinical BSC Lab programme, framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 1787 ;
+    void:triples 1805 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
+        "https://w3id.org/sstim/ecosystem/",
         "https://w3id.org/sstim/ref/",
         "https://w3id.org/sstim/organization/",
         "https://w3id.org/sstim/specialist/",
@@ -346,7 +347,8 @@
         <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/ecosystem>,
         <http://www.w3.org/ns/prov#>, <https://schema.org/>,
         <http://www.w3.org/ns/org#>, <http://xmlns.com/foaf/0.1/> ;
-    void:exampleResource <https://w3id.org/sstim/framework/bsc>,
+    void:exampleResource <https://w3id.org/sstim/ecosystem/biosyncare>,
+        <https://w3id.org/sstim/framework/bsc>,
         <https://w3id.org/sstim/implementation/bsclab>,
         <https://w3id.org/sstim/implementation/biosyncare>,
         <https://w3id.org/sstim/implementation/bsclab/component/patch-studio>,

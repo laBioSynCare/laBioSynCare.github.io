@@ -152,6 +152,7 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   const APP = 'https://labiosyncare.github.io/'
   const graph = (path) => go(path, BROWSER).doc?.replace(APP + 'graph/', '')
 
+  expect(graph('ecosystem/biosyncare')).toBe('#sstim-ecosystem:biosyncare')
   expect(graph('framework/bsc')).toBe('#bsc-fw:')
   expect(graph('implementation/bsclab')).toBe('#bsclab:')
   expect(graph('implementation/biosyncare')).toBe('#biosyncare:')
@@ -176,9 +177,17 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
 
   // Every hash prefix above must be one the browser can actually resolve.
   for (const prefix of ['bsc-fw', 'bsc-fw-tech', 'bsclab', 'biosyncare',
-    'sstim-specialist', 'sstim-organization', 'sstim-ecosystem-record']) {
+    'sstim-specialist', 'sstim-organization', 'sstim-ecosystem-record',
+    'sstim-ecosystem']) {
     expect(PREFIXES, `${prefix}: is not a registered prefix`).toHaveProperty(prefix)
   }
+
+  // The programme instance path and the OWL module that shares its first
+  // segment are different resources; `ecosystem` is matched exactly, so the
+  // module rule must never swallow /ecosystem/{id}.
+  expect(go('ecosystem', 'text/turtle').doc).toBe('sstim-ecosystem.ttl')
+  expect(go('ecosystem/biosyncare', 'text/turtle').doc)
+    .toBe('instances/programmes/biosyncare-ecosystem.ttl')
 
   // RDF representations are untouched by the deep links.
   expect(go('framework/bsc', 'text/turtle').doc).toBe('instances/frameworks/bsc.ttl')

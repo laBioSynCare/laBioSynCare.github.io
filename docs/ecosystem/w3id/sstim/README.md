@@ -62,6 +62,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
 | `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
+| `/sstim/ecosystem/biosyncare` | The BioSynCare Ecosystem programme catalog record. Distinct from `/sstim/ecosystem` (the OWL module, matched exactly) and `/sstim/ecosystem-record/...` (live records) | Staged locally |
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
