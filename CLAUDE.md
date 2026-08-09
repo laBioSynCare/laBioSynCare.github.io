@@ -650,6 +650,16 @@ a click/touch event handler, not at module load time.
 Do not load them at startup. Load Cytoscape when the graph view is first opened;
 load Comunica when the SPARQL interface is first opened.
 
+**`await` does not let the browser paint.** Awaiting a promise drains the
+microtask queue and resumes on the *same* task, so a fully `async` pipeline can
+hold the main thread for seconds while every spinner on the page sits frozen —
+which is exactly what the graph loader did. A loading indicator that must stay
+alive needs two things: real yields between the phases
+(`src/ui/loading/renderYield.js`, or `await` a callback the caller supplies, as
+`buildGraphElements` does), and animation of **transform/opacity only** so the
+compositor keeps it moving through whatever block remains. Never assume an
+`async` function is non-blocking.
+
 **Turtle serialization in N3.js.** `N3.Writer` requires explicit prefix registration
 before writing. Prefixes not registered in the writer produce full IRIs in output.
 Always initialize the writer with the full prefix map from `src/rdf/namespaces.js`.

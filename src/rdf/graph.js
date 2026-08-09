@@ -132,10 +132,56 @@ function isExternalParent(iri) {
   return EXTERNAL_PARENT_NS.some(ns => iri.startsWith(ns))
 }
 
-export async function buildGraphElements(store) {
+// The stages below, in order, for the progress reporter. Kept as one list so a
+// caller can size its progress bar before the first stage runs, and so
+// buildGraphElements cannot silently report more steps than it declares —
+// `stage()` throws on an unknown label.
+export const BUILD_STAGES = [
+  'OWL classes',
+  'Class hierarchy',
+  'Object properties',
+  'Datatype properties',
+  'Vocabulary concepts',
+  'Stimulation facets',
+  'Concept hierarchy',
+  'Related concepts',
+  'Class membership',
+  'Ontology modules',
+  'Catalog records',
+  'Ecosystem agents',
+  'Catalog relations',
+  'Ecosystem relationships',
+  'Module provenance',
+  'Annotations',
+]
+
+/**
+ * Project the merged store into Cytoscape elements.
+ *
+ * @param {import('n3').Store} store
+ * @param {{ onProgress?: (p: { step: number, total: number, label: string }) =>
+ *   (void | Promise<void>) }} [options]
+ *   Called before each stage. **Awaited** — that is the point: the projection
+ *   is a second of solid main-thread work, and `await` on a resolved promise
+ *   only drains microtasks, so an all-async build still never lets the browser
+ *   paint. A caller that wants a live loader returns a real yield from here
+ *   (see `src/ui/loading/renderYield.js`). Passing nothing changes nothing.
+ * @returns {Promise<Array>} Cytoscape elements
+ */
+export async function buildGraphElements(store, { onProgress = null } = {}) {
   const nodes = new Map()   // id → cy node data
   const edges = []
   let projectedEdgeId = 0
+
+  let stageIndex = 0
+  async function stage(label) {
+    const expected = BUILD_STAGES[stageIndex]
+    if (expected !== label) {
+      throw new Error(`buildGraphElements stage ${stageIndex} is "${label}", BUILD_STAGES says "${expected}"`)
+    }
+    stageIndex += 1
+    if (onProgress) await onProgress({ step: stageIndex, total: BUILD_STAGES.length, label })
+  }
 
   function addNode(id, data) {
     if (!nodes.has(id)) nodes.set(id, { data: { id, ...data } })
@@ -146,6 +192,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 1. OWL Classes ─────────────────────────────────────────────────────────
+  await stage('OWL classes')
   // Named classes only. An `owl:Class` subject is just as often an anonymous
   // class expression: SSTIM has 50 of them, every one a union or intersection
   // reached through rdfs:domain, rdfs:range, or owl:equivalentClass. They are
@@ -190,6 +237,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 2. rdfs:subClassOf between OWL classes ─────────────────────────────────
+  await stage('Class hierarchy')
   const subRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdfs: <${RDFS}>
@@ -215,6 +263,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 3. Object properties (domain → range) ──────────────────────────────────
+  await stage('Object properties')
   const objPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdf:  <${RDF}>
@@ -249,6 +298,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 4. Datatype properties (domain → XSD type) ─────────────────────────────
+  await stage('Datatype properties')
   const dataPropRows = await select(store, `
     PREFIX owl:  <${OWL}>
     PREFIX rdf:  <${RDF}>
@@ -287,6 +337,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 5. SKOS concepts ────────────────────────────────────────────────────────
+  await stage('Vocabulary concepts')
   const conceptRows = await select(store, `
     PREFIX skos: <${SKOS}>
     PREFIX rdfs: <${RDFS}>
@@ -312,6 +363,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 5b. Stimulation facets (ADR 0034) ───────────────────────────────────────
+  await stage('Stimulation facets')
   // A neuromodulation perspective is cross-cutting: it needs the new OWL
   // classes, the route/approach/target schemes, AND the subset of concepts
   // carrying a given facet value. Scheme membership and class local name cannot
@@ -360,6 +412,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 6. skos:narrower edges ──────────────────────────────────────────────────
+  await stage('Concept hierarchy')
   const narrowerRows = await select(store, `
     PREFIX skos: <${SKOS}>
     SELECT ?broader ?narrower WHERE {
@@ -380,6 +433,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 7. skos:related / skos:broadMatch ──────────────────────────────────────
+  await stage('Related concepts')
   const relatedRows = await select(store, `
     PREFIX skos: <${SKOS}>
     SELECT ?a ?b ?rel WHERE {
@@ -402,6 +456,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 8. instanceOf bridge: SKOS concept → OWL class ─────────────────────────
+  await stage('Class membership')
   const typeRows = await select(store, `
     PREFIX rdf:  <${RDF}>
     PREFIX skos: <${SKOS}>
@@ -430,6 +485,7 @@ export async function buildGraphElements(store) {
 
 
   // ── 9. Ontology/module identities ─────────────────────────────────────────
+  await stage('Ontology modules')
   // These make resource-level attributions (for example, “created SSTIM”) land
   // on a visible node rather than stopping at an unrendered target IRI.
   const ontologyResources = store.getSubjects(
@@ -458,6 +514,7 @@ export async function buildGraphElements(store) {
 
 
   // ── 10. Versioned framework / implementation catalog ──────────────────────
+  await stage('Catalog records')
   const catalogResources = new Map()
   const addTypedCatalogResources = (type, kind) => {
     for (const subject of store.getSubjects(namedNode(RDF + 'type'), namedNode(type), null)) {
@@ -499,6 +556,7 @@ export async function buildGraphElements(store) {
 
 
   // ── 11. Current public ecosystem agents ───────────────────────────────────
+  await stage('Ecosystem agents')
   const agentType = SSTIM_ECO + 'EcosystemAgent'
   const agentResources = new Set()
   for (const subject of store.getSubjects(namedNode(RDF + 'type'), namedNode(agentType), null)) {
@@ -535,6 +593,7 @@ export async function buildGraphElements(store) {
 
 
   // ── 12. Resource type and catalog relation bridges ─────────────────────────
+  await stage('Catalog relations')
   for (const id of [...catalogResources.keys(), ...agentResources]) {
     for (const type of iriValues(store, id, RDF + 'type')) {
       if (!nodes.has(type)) continue
@@ -586,6 +645,7 @@ export async function buildGraphElements(store) {
 
 
   // ── 13. Qualified ecosystem records projected as inspectable edges ─────────
+  await stage('Ecosystem relationships')
   // The relationship record remains the edge IRI and carries its type, purpose,
   // sources, roles, dates, and prose. We do not flatten lifecycle activities or
   // infer stronger claims than the approved current-state publication asserts.
@@ -671,6 +731,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 14. Module provenance (ADR 0043) ───────────────────────────────────────
+  await stage('Module provenance')
   // Which module owns a term is a published fact — the manifest's bill of
   // materials — not something a navigator should re-derive from IRI shape or a
   // hand-kept list of local names. The named graph of the declaring quad *is*
@@ -711,6 +772,7 @@ export async function buildGraphElements(store) {
   }
 
   // ── 15. Annotation enrichment ───────────────────────────────────────────────
+  await stage('Annotations')
   // Definitions and notes were previously read only where a section's SPARQL
   // happened to ask for them — OWL classes got skos:definition, SKOS concepts
   // got none, and scope/history/editorial notes were dropped everywhere. The

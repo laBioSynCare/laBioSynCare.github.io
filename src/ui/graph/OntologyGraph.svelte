@@ -11,6 +11,8 @@
     MIN_ZOOM, MAX_ZOOM, FOCUS_PARAM_VALUE,
   } from './deepLink.js'
   import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
+  import LoadingPanel from '../loading/LoadingPanel.svelte'
+  import { yieldToScheduler, yieldToPaint } from '../loading/renderYield.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
   import InfoModal from '../navigation/InfoModal.svelte'
   import { activeSkin } from '../theme/skins.js'
@@ -21,8 +23,29 @@
   let cy = $state(null)
   let error = $state(null)
   let loading = $state(true)
+
+  // What the loader says while the main thread is busy. `loadStep` is null
+  // whenever the current phase is one atomic block with no honest fraction to
+  // report — the loader shows perpetual motion then rather than a stalled bar.
+  let loadPhase = $state('project')   // 'project' | 'layout'
+  let loadStep = $state(null)         // { label, step, total } | null
   let graphStats = $state(null)
   let allElements = $state([])
+
+  const loadDetail = $derived.by(() => {
+    if (loadPhase === 'layout') {
+      const nodes = allElements.filter((element) => !element.data?.source).length
+      return nodes
+        ? `${nodes.toLocaleString()} nodes · one force layout, and it cannot be interrupted`
+        : 'One force layout, and it cannot be interrupted'
+    }
+    if (!loadStep) return `${store.size.toLocaleString()} quads`
+    return `${loadStep.label} · ${loadStep.step} of ${loadStep.total}`
+  })
+
+  // Completed stages, not the one in flight — a bar that jumps to full while the
+  // last stage is still running is the same lie as one parked at 100%.
+  const loadProgress = $derived(loadStep ? (loadStep.step - 1) / loadStep.total : null)
 
   // The node-type legend is generated from this list so the swatch, the count,
   // the visibility checkbox and the spotlight target can never drift apart from
@@ -1097,6 +1120,11 @@
   const COSE_OPTIONS = {
     name: 'cose',
     animate: false,
+    // Scatter before settling. The graph reaches cose from a grid seed now (the
+    // constructor no longer burns a whole cose pass to produce one), and cose
+    // from a regular lattice with randomize off converges into a stretched
+    // ribbon instead of a cluster.
+    randomize: true,
     nodeRepulsion: () => 8000,
     idealEdgeLength: () => 80,
     edgeElasticity: () => 100,
@@ -1919,26 +1947,35 @@
     window.addEventListener('keydown', handleGraphKeydown)
     window.addEventListener('hashchange', handleHashChange)
     try {
-      const elements = await buildGraphElements(store)
+      const elements = await buildGraphElements(store, {
+        // Awaited by the builder, which is what turns sixteen microtask-only
+        // `await`s into sixteen chances for the browser to paint the loader.
+        onProgress: async ({ step, total, label }) => {
+          loadStep = { label, step, total }
+          await yieldToScheduler()
+        },
+      })
       allElements = elements
 
       const cytoscape = (await import('cytoscape')).default
+
+      loadPhase = 'layout'
+      loadStep = null
+      // The cose run below is a single multi-second synchronous block. Get the
+      // label for it on screen *before* the thread locks, or the loader spends
+      // that whole time describing the step that already finished.
+      await yieldToPaint()
 
       cy = cytoscape({
         container,
         elements,
         style: styleSheet(),
-        layout: {
-          name: 'cose',
-          animate: false,
-          nodeRepulsion: () => 8000,
-          idealEdgeLength: () => 80,
-          edgeElasticity: () => 100,
-          gravity: 0.4,
-          numIter: 1000,
-          fit: false,
-          padding: 30,
-        },
+        // Cheap seed only. This used to run the full cose, and relayoutGraph()
+        // below immediately re-ran cose over the same nodes — two four-second
+        // layouts where one was thrown away. `randomize` in COSE_OPTIONS is
+        // what lets the surviving run start from a grid without settling into a
+        // stretched local minimum.
+        layout: { name: 'grid', fit: false },
         minZoom: MIN_ZOOM,
         maxZoom: MAX_ZOOM,
       })
@@ -2281,7 +2318,14 @@
       <!-- Graph canvas -->
       <div class="canvas" bind:this={container}>
         {#if loading}
-          <p class="overlay" aria-busy="true">Building graph…</p>
+          <div class="overlay">
+            <LoadingPanel
+              title="Building the knowledge graph"
+              phase={loadPhase === 'layout' ? 'Laying out the graph' : 'Projecting terms and relations'}
+              detail={loadDetail}
+              progress={loadProgress}
+            />
+          </div>
         {:else if error}
           <p class="overlay error">{error}</p>
         {/if}
@@ -3081,7 +3125,9 @@
     position: absolute;
     top: 50%;
     left: 50%;
+    width: min(24rem, 80%);
     transform: translate(-50%, -50%);
+    text-align: center;
     color: var(--app-muted);
   }
   .overlay.error { color: var(--app-error); }

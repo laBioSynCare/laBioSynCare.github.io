@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildGraphElements } from './graph.js'
+import { buildGraphElements, BUILD_STAGES } from './graph.js'
 import { mergeStores, parseIntoStore } from './loader.js'
 
 const GRAPH = 'https://example.org/graph/navigator-test'
@@ -352,4 +352,42 @@ sstim:FrequencyBand a owl:Class ; rdfs:label "Frequency band"@en .
     expect(elements.some(e => e.data.id === 'http://purl.obolibrary.org/obo/IAO_0000030')).toBe(false)
     expect(elements.some(e => e.data.target === 'http://purl.obolibrary.org/obo/IAO_0000030')).toBe(false)
   }, PROJECTION_TIMEOUT_MS)
+
+  // The loader is only honest if these hold: every stage reports, in order, and
+  // the callback is *awaited* — that await is the sole reason the browser gets
+  // to paint during a projection that otherwise holds the main thread for a
+  // second straight.
+  describe('progress reporting', () => {
+    it('reports every declared stage once, in order', async () => {
+      const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
+      const seen = []
+      await buildGraphElements(store, { onProgress: (p) => seen.push(p) })
+
+      expect(seen.map((p) => p.label)).toEqual(BUILD_STAGES)
+      expect(seen.map((p) => p.step)).toEqual(BUILD_STAGES.map((_, i) => i + 1))
+      expect(new Set(seen.map((p) => p.total))).toEqual(new Set([BUILD_STAGES.length]))
+    }, PROJECTION_TIMEOUT_MS)
+
+    it('awaits the callback, so a yielding caller really interleaves', async () => {
+      const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
+      let pending = 0
+      let overlapped = false
+      await buildGraphElements(store, {
+        onProgress: async () => {
+          if (pending > 0) overlapped = true
+          pending += 1
+          await new Promise((resolve) => setTimeout(resolve, 0))
+          pending -= 1
+        },
+      })
+      expect(overlapped).toBe(false)
+    }, PROJECTION_TIMEOUT_MS)
+
+    it('builds the same projection with and without a reporter', async () => {
+      const store = await parseIntoStore(fixture, 'text/turtle', GRAPH)
+      const plain = await buildGraphElements(store)
+      const reported = await buildGraphElements(store, { onProgress: () => {} })
+      expect(reported).toEqual(plain)
+    }, PROJECTION_TIMEOUT_MS)
+  })
 })

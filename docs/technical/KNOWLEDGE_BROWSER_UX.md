@@ -75,6 +75,29 @@ are the choices a future change could quietly undo:
 - **Animation is one setting.** Fade, pan, and fit share a single
   `transitionMs` with `ease-in-out-cubic`, so in and out feel symmetric and the
   camera and visibility changes finish together.
+- **The loader is built for a blocked main thread.** Opening the graph is a few
+  seconds of solid synchronous JavaScript, and the Pico `aria-busy` spinner
+  froze mid-spin through all of it — a stopped spinner reads as a crashed page.
+  Three things fix that, and each is load-bearing:
+  1. **The constructor no longer runs a layout.** It ran a full cose that
+     `relayoutGraph()` then immediately re-ran over the same nodes — two
+     four-second layouts, one of them discarded. It seeds with `grid` now, and
+     `COSE_OPTIONS.randomize` is what stops the surviving run from settling into
+     a stretched ribbon from a regular lattice. Mount work went 9.9 s → 5.2 s.
+  2. **`buildGraphElements` takes an awaited `onProgress`.** `await` on its own
+     never yields to the renderer — it drains microtasks and returns on the same
+     task — so an entirely `async` projection still painted nothing for a
+     second. The builder awaits the callback and the caller returns a real yield
+     (`src/ui/loading/renderYield.js`), which is what makes sixteen stages
+     sixteen chances to paint.
+  3. **Everything that moves in `LoadingPanel` animates transform or opacity
+     only.** Those run on the compositor, which keeps ticking while the main
+     thread is locked — verified by capturing frames 150 ms apart during the
+     cose block. Anything animating width, top or background-position freezes
+     exactly when the loader is most needed.
+  The progress bar is deliberately nullable: the layout is one atomic block with
+  no honest fraction, so it shows perpetual motion rather than a bar parked at
+  100% while the page is still stuck.
 
 Also present: single-row top bar, keyboard shortcuts (`/` `Enter` `Esc` `c` `x`
 `f` `r` `h`/`?`), Copy IRI, direction-ordered Connections with per-edge-kind
@@ -212,6 +235,13 @@ annotation author names.
   SPARQL panel opens.
 - **Position cache.** Avoid re-running the cose layout on every toggle. Cache
   positions and only relayout when topology genuinely changes.
+- **Incremental layout, so the page stays responsive.** The remaining freeze is
+  one cose run. `core.layout({ ...COSE_OPTIONS, animate: true, refresh: 30 })`
+  plus `promiseOn('layoutstop')` spreads the same iterations across animation
+  frames, so nothing blocks and the graph visibly settles into place. Measured
+  at 4.9 s against 3.8 s blocking — ~27% more wall-clock for a live page — and
+  it makes `relayoutGraph()` async, which the mount sequence, the scope-change
+  path and `setStrayMode` all have to await. Worth doing; not free.
 - **Off-main-thread RDF parsing.** Move N3.js parsing into a Web Worker for
   the initial load so the UI doesn't block on multi-MB ontologies.
 - **Incremental ontology load.** Stream concepts and SHACL shapes as they
