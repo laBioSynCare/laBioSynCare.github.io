@@ -2,7 +2,7 @@
 
 > Living notes on UX and UI improvements for the BSC Lab knowledge browser
 > (RDF ontology graph viewer, annotation surface, SPARQL interface).
-> Last updated: 2026-08-04. Update when ideas land or get superseded.
+> Last updated: 2026-08-09. Update when ideas land or get superseded.
 
 This is not a hard roadmap. Items are unranked except by category. Each
 entry states the *user-visible value* and a one-line implementation hint.
@@ -50,6 +50,28 @@ are the choices a future change could quietly undo:
   selection writes back with `history.replaceState`, so a URL is shareable
   without polluting the back stack. `/#term` still works via a forwarding shim
   on the entrance.
+- **A deep link carries its framing, and says where it landed.** The hash names
+  the node; `?zoom=` says how closely it is framed and `?focus=neighborhood`
+  whether the graph is folded to its 1-hop neighborhood. On arrival the node is
+  centred and blinks a halo four times, because in a canvas of hundreds a static
+  selection ring reads as "something is selected", not "this one". Three
+  constraints hold this together, in `src/ui/graph/deepLink.js`:
+  **pan is deliberately not in the URL** — the cose layout is re-run unseeded on
+  every load, so a captured pan coordinate would frame empty canvas on the
+  recipient's screen; the node hash is the anchor and zoom is the only camera
+  value that survives a relayout. The blink runs at 2.08 Hz, under the
+  three-per-second ceiling `flashSafety.js` models from WCAG 2.3.1 — a flashing
+  affordance in a sensory-stimulation app is a safety surface, so the rate is
+  asserted against `FLASH_SAFE_MAX_HZ` in a test, and reduced motion or visual
+  stimulation switched off holds one steady halo instead. And `?focus=` is
+  dropped when its node does not resolve, so focus can never be armed with no
+  selection and no button to turn it off.
+- **The opening camera is decided in exactly one place.** Selection, focus and
+  relayout all end in a fit, and Svelte gives no ordering guarantee between an
+  effect flush and the mount continuation — a link's zoom was set and then
+  silently overwritten a frame later. `restoreInitialCamera()` now runs last and
+  cancels the in-flight fit, and the focus effect primes on its first run
+  instead of fitting. Do not "simplify" that priming away.
 - **Animation is one setting.** Fade, pan, and fit share a single
   `transitionMs` with `ease-in-out-cubic`, so in and out feel symmetric and the
   camera and visibility changes finish together.
@@ -156,10 +178,10 @@ annotation author names.
 ## URL & Sharing
 
 - **Reflect edge-layer toggles in the URL.** The selected node's IRI is in the
-  hash and all four scope axes are now in the query string (`?layer=`,
-  `?module=`, `?view=`, `?hide=`, each omitted at its default). The edge-layer
-  checkboxes are the remaining piece of filter state that a shared link does
-  not carry.
+  hash, all four scope axes are in the query string (`?layer=`, `?module=`,
+  `?view=`, `?hide=`, each omitted at its default), and the framing follows in
+  `?zoom=` / `?focus=`. The edge-layer checkboxes are the remaining piece of
+  filter state that a shared link does not carry.
 - **Permalinks per node.** A "share" button next to "Copy IRI" that copies the
   full BSC Lab deep-link (`https://labiosyncare.github.io/#X`; `/graph#X` once
   the entrance ships) rather than the canonical IRI.

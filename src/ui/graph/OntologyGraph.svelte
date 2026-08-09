@@ -1,11 +1,16 @@
 <script>
-  import { onMount, onDestroy } from 'svelte'
+  import { onMount, onDestroy, tick } from 'svelte'
   import { replaceState } from '$app/navigation'
   import { buildGraphElements } from '../../rdf/graph.js'
   import { ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
+  import {
+    parseViewParams, formatZoomParam, pulseSchedule,
+    MIN_ZOOM, MAX_ZOOM, FOCUS_PARAM_VALUE,
+  } from './deepLink.js'
+  import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
   import InfoModal from '../navigation/InfoModal.svelte'
   import { activeSkin } from '../theme/skins.js'
@@ -172,6 +177,11 @@
   const urlFilters = readFiltersFromUrl()
   const initialFilters = urlFilters ?? {}
 
+  // The framing half of the deep link — `?zoom=` and `?focus=neighborhood` —
+  // parsed by deepLink.js, which owns that contract and its tests.
+  const urlView = parseViewParams(typeof window === 'undefined' ? '' : window.location.search)
+  const initialUrlHash = typeof window === 'undefined' ? '' : window.location.hash
+
   // Each axis is a Set. Within an axis the members union; across axes they
   // intersect. An empty module/concern/hiddenKinds axis imposes no constraint;
   // the layer axis always constrains, and defaults to the term space alone.
@@ -206,7 +216,11 @@
   let neighbors = $state([])
   let iriCopied = $state(false)
   let iriCopyTimer = null
-  let neighborhoodFocus = $state(graphSession.neighborhoodFocus)
+  // A deep link is authoritative about its own framing: arriving on `#node`
+  // without `?focus=` must show the whole graph even if this session had left
+  // focus on, or a shared link would open into a view its sender never saw.
+  let neighborhoodFocus = $state(
+    urlView.neighborhoodFocus || (!initialUrlHash && graphSession.neighborhoodFocus))
   let connectionFilters = $state(new Set(graphSession.connectionFilters))
 
   // How to place nodes disconnected from the main cluster:
@@ -484,7 +498,7 @@
           'border-color': theme.dark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(23, 19, 13, 0.22)',
           'color': '#111',
           'font-weight': 500,
-          'transition-property': 'border-color, border-width, opacity',
+          'transition-property': 'border-color, border-width, opacity, overlay-opacity, overlay-padding',
           'transition-duration': '120ms',
         }
       },
@@ -540,6 +554,33 @@
           'z-index': 999,
         }
       },
+      // Arrival beacon for a deep link. A selection ring alone is easy to miss
+      // in a few hundred nodes, so the node the link names blinks a halo a few
+      // times on landing (see pulseElement). The halo grows *outside* the node
+      // rather than only thickening its border, which is what makes it findable
+      // without knowing where to look.
+      {
+        selector: 'node.link-pulse',
+        style: {
+          'border-width': 6,
+          'border-color': theme.accent,
+          'overlay-color': theme.accent,
+          'overlay-opacity': 0.38,
+          'overlay-padding': 16,
+          'z-index': 1000,
+        }
+      },
+      {
+        selector: 'edge.link-pulse',
+        style: {
+          'width': 6,
+          'opacity': 1,
+          'overlay-color': theme.accent,
+          'overlay-opacity': 0.3,
+          'overlay-padding': 8,
+          'z-index': 1000,
+        }
+      },
       // Hover affordance — cytoscape has no :hover selector, so the class is
       // toggled from mouseover/mouseout handlers in onMount.
       {
@@ -592,6 +633,8 @@
           'text-rotation': 'autorotate',
           'text-margin-y': -8,
           'opacity': 0.8,
+          'transition-property': 'width, opacity, overlay-opacity, overlay-padding',
+          'transition-duration': '120ms',
         }
       },
       {
@@ -1109,12 +1152,15 @@
     persistGraphSession()
   }
 
-  function fitGraph(elements = null) {
+  // `animate: false` is for the opening frame, which has nothing to animate
+  // from and must not leave a running animation to land after the deep-link
+  // camera has been applied.
+  function fitGraph(elements = null, { animate = true } = {}) {
     if (!cy) return
     const eles = elements ?? cy.elements().filter((element) => element.style('display') !== 'none')
     const target = eles.length ? eles : cy.elements()
     cy.stop(true)
-    if (transitionMs <= 0) {
+    if (!animate || transitionMs <= 0) {
       cy.fit(target, 30)
       return
     }
@@ -1206,13 +1252,17 @@
     }, { duration: transitionMs, easing: TRANSITION_EASING })
   }
 
-  function selectElementById(id) {
+  // `camera: false` selects without moving the viewport — the deep-link path
+  // needs the selection in place first, then frames it once with the link's own
+  // zoom instead of centring twice.
+  function selectElementById(id, { camera = true } = {}) {
     if (!cy || !id) return
     const element = cy.getElementById(id)
     if (!element.length) return
     cy.elements().unselect()
     element.select()
     selected = element.data()
+    if (!camera) return
     cy.stop(true)
     if (transitionMs <= 0) {
       cy.center(element)
@@ -1221,6 +1271,91 @@
     cy.animate({
       center: { eles: element },
     }, { duration: transitionMs, easing: TRANSITION_EASING })
+  }
+
+  // ── Deep-link arrival beacon ───────────────────────────────────────────────
+  // Blink the element a link landed on, on the schedule deepLink.js defines
+  // (which is where the flash-rate reasoning lives). Wall-clock timers are
+  // correct here: this is canvas UI with no relationship to the stimulation
+  // engine's timing authority (CLAUDE.md §3.1), which governs audio-visual
+  // synchronization only.
+  let pulseTimers = []
+
+  function clearPulse() {
+    for (const timer of pulseTimers) clearTimeout(timer)
+    pulseTimers = []
+    cy?.elements().removeClass('link-pulse')
+  }
+
+  function pulseElement(element) {
+    if (!element?.length) return
+    clearPulse()
+    // Reduced motion, or visual stimulation switched off in Settings: the cue
+    // still has to *locate* the node, so it holds one steady halo instead of
+    // being dropped.
+    const steady = prefersReducedMotion() || !isVisualStimulationOn()
+    for (const { at, on } of pulseSchedule({ steady })) {
+      pulseTimers.push(setTimeout(
+        () => (on ? element.addClass('link-pulse') : element.removeClass('link-pulse')),
+        at,
+      ))
+    }
+  }
+
+  function pulseNodeById(id) {
+    if (!cy || !id) return
+    pulseElement(cy.getElementById(id))
+  }
+
+  // cy.zoom(level) keeps `pan` fixed, which pivots the view on the canvas
+  // origin rather than on what the reader is looking at. Anchor it to the
+  // viewport centre unless a node is about to be centred anyway.
+  function setZoomAboutCenter(level) {
+    cy.zoom({ level, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } })
+  }
+
+  // The one place the opening camera is decided.
+  //
+  // Priority: the link's node (with its `?zoom=`, or the focused neighborhood's
+  // own fit), then a bare `?zoom=`, then the camera this session left behind.
+  function restoreInitialCamera({ id = null, deepLink = false } = {}) {
+    if (!cy) return
+    // The opening fit from relayoutGraph is mid-animation and would land a
+    // frame after this returns, undoing everything below. Cancel it where it
+    // stands — every branch here sets the camera outright.
+    cy.stop(true, false)
+    const element = id ? cy.getElementById(id) : null
+    const hasElement = Boolean(element?.length) && element.style('display') !== 'none'
+
+    if (hasElement && deepLink) {
+      if (urlView.zoom != null) {
+        cy.zoom(urlView.zoom)
+        cy.center(element)
+      } else if (neighborhoodFocus) {
+        // No zoom in the link, but the graph is folded to the neighborhood:
+        // frame that whole set, exactly as the focus button does.
+        fitGraph(null, { animate: false })
+      } else {
+        // A deep link has to arrive close enough to actually read the node.
+        cy.zoom(Math.max(cy.zoom(), 1))
+        cy.center(element)
+      }
+      pulseElement(element)
+      return
+    }
+
+    if (urlView.zoom != null) {
+      // Re-establish the fit this function just cancelled, so the link's scale
+      // is applied around a sane pan rather than a half-finished one.
+      fitGraph(null, { animate: false })
+      setZoomAboutCenter(urlView.zoom)
+    } else if (graphSession.camera) {
+      cy.zoom(graphSession.camera.zoom)
+      cy.pan(graphSession.camera.pan)
+    } else {
+      fitGraph(null, { animate: false })
+    }
+    if (hasElement) cy.center(element)
   }
 
   function computeNeighbors(id) {
@@ -1269,7 +1404,6 @@
   const HASH_PREFER_BASES = [SSTIM_BASE, SSTIM_V_BASE]
 
   let setupReady = false
-  let initialHash = ''
   let unsubscribeSkin = null
 
   function resolveHashToNodeId(rawHash) {
@@ -1383,25 +1517,56 @@
     replaceState(url || window.location.pathname, {})
   }
 
+  // Scope and framing are written by separate callers on separate triggers, so
+  // each one edits the live query string rather than rebuilding it — otherwise
+  // whichever wrote last would drop the other's params.
+  function updateSearchParams(mutate) {
+    const params = new URLSearchParams(window.location.search)
+    mutate(params)
+    const query = params.toString()
+    const url = window.location.pathname + (query ? '?' + query : '') + window.location.hash
+    if (url === window.location.pathname + window.location.search + window.location.hash) return
+    replaceState(url, {})
+  }
+
   // Mirrors writeHashForSelected: keeps the address bar in sync with the active
   // perspective so the current filtered view is itself a copyable/bookmarkable
   // link, not just the selected node. One param per axis, each omitted at its
   // default, so an unfiltered graph stays a bare URL. The hand-hidden node set
   // is deliberately absent — see graphSession.js.
   function writeScopeToUrl() {
-    const params = new URLSearchParams(window.location.search)
-    const axis = (name, values, isDefault) => {
-      if (isDefault) params.delete(name)
-      else params.set(name, [...values].join(','))
-    }
-    axis('layer', layerFilters, layerFilters.size === 1 && layerFilters.has('terms'))
-    axis('module', moduleFilters, moduleFilters.size === 0)
-    axis('view', concernFilters, concernFilters.size === 0)
-    axis('hide', hiddenKinds, hiddenKinds.size === 0)
-    const query = params.toString()
-    const url = window.location.pathname + (query ? '?' + query : '') + window.location.hash
-    if (url === window.location.pathname + window.location.search + window.location.hash) return
-    replaceState(url, {})
+    updateSearchParams((params) => {
+      const axis = (name, values, isDefault) => {
+        if (isDefault) params.delete(name)
+        else params.set(name, [...values].join(','))
+      }
+      axis('layer', layerFilters, layerFilters.size === 1 && layerFilters.has('terms'))
+      axis('module', moduleFilters, moduleFilters.size === 0)
+      axis('view', concernFilters, concernFilters.size === 0)
+      axis('hide', hiddenKinds, hiddenKinds.size === 0)
+    })
+  }
+
+  // The camera counterpart of writeScopeToUrl: the zoom the reader is actually
+  // looking at, and whether the neighborhood is folded down to the selection.
+  // Focus is written only while it is in effect — it needs a selected node to
+  // mean anything, and `?focus=` on a link with no node hash would be inert.
+  function writeViewToUrl() {
+    if (!cy) return
+    updateSearchParams((params) => {
+      params.set('zoom', formatZoomParam(cy.zoom()))
+      if (neighborhoodFocus && selected && !selected.source) params.set('focus', FOCUS_PARAM_VALUE)
+      else params.delete('focus')
+    })
+  }
+
+  // Zoom fires continuously through a wheel gesture or a fit animation; the
+  // address bar only needs where it came to rest.
+  let zoomUrlTimer = null
+  function scheduleViewUrlWrite() {
+    if (!setupReady) return
+    clearTimeout(zoomUrlTimer)
+    zoomUrlTimer = setTimeout(writeViewToUrl, 400)
   }
 
   function handleHashChange() {
@@ -1415,6 +1580,9 @@
     if (id && id !== selected?.id) {
       widenScopeToShow(id)
       selectElementById(id)
+      // Same arrival as a fresh load — the reader followed a link and needs to
+      // be told where it landed.
+      pulseNodeById(id)
     }
   }
 
@@ -1643,11 +1811,22 @@
     neighbors = computeNeighbors(selected.id)
   })
 
+  // Entering or leaving focus re-frames the graph. Its *first* run is not a
+  // toggle, though — it is the effect catching up with the graph that mount
+  // just built, and restoreInitialCamera owns the camera then. Priming on that
+  // run rather than checking a "setup finished" flag is what makes this
+  // ordering-proof: Svelte does not promise whether the effect flushes before
+  // or after the mount continuation resumes, and either way it must not fit.
+  let focusFitPrimed = false
   $effect(() => {
     if (!cy) return
     neighborhoodFocus
     if (!setupReady) return
     const targets = applyGraphDisplay()
+    if (!focusFitPrimed) {
+      focusFitPrimed = true
+      return
+    }
     fitGraph(targets)
   })
 
@@ -1737,7 +1916,6 @@
   }
 
   onMount(async () => {
-    initialHash = window.location.hash
     window.addEventListener('keydown', handleGraphKeydown)
     window.addEventListener('hashchange', handleHashChange)
     try {
@@ -1761,17 +1939,21 @@
           fit: false,
           padding: 30,
         },
-        minZoom: 0.1,
-        maxZoom: 4,
+        minZoom: MIN_ZOOM,
+        maxZoom: MAX_ZOOM,
       })
+
+      cy.on('zoom', scheduleViewUrlWrite)
 
       cy.on('tap', 'node', (evt) => {
         const d = evt.target.data()
         selected = d
+        clearPulse()
       })
       cy.on('tap', 'edge', (evt) => {
         const d = evt.target.data()
         selected = d
+        clearPulse()
       })
       cy.on('tap', (evt) => {
         if (evt.target === cy) clearSelection()
@@ -1806,21 +1988,30 @@
       // the core a first pass and would otherwise tile islands into a strip).
       relayoutGraph()
 
-      if (initialHash) {
-        const id = resolveHashToNodeId(initialHash)
-        if (id) {
-          widenScopeToShow(id)
-          selectElementById(id)
-        }
+      const deepLinkId = initialUrlHash ? resolveHashToNodeId(initialUrlHash) : null
+      // `?focus=` is meaningless without a node to fold the graph around. A hash
+      // that resolves to nothing would otherwise leave focus armed but invisible
+      // — with no selection there is no button to turn it off — and it would
+      // then fire on the reader's first click.
+      if (!deepLinkId && urlView.neighborhoodFocus) neighborhoodFocus = false
+      if (deepLinkId) {
+        widenScopeToShow(deepLinkId)
+        selectElementById(deepLinkId, { camera: false })
+        if (neighborhoodFocus) applyGraphDisplay({ animate: false })
       } else if (graphSession.selectedIri) {
         const id = resolveHashToNodeId('#' + graphSession.selectedIri.split(/[#/]/).pop())
-        if (id) selectElementById(id)
-      }
-      if (!initialHash && graphSession.camera) {
-        cy.zoom(graphSession.camera.zoom)
-        cy.pan(graphSession.camera.pan)
+        if (id) selectElementById(id, { camera: false })
       }
       setupReady = true
+
+      // Camera last, and only after the pending effects have run: selecting a
+      // node and entering focus both schedule a re-fit, and the link's own
+      // framing has to be what survives.
+      await tick()
+      restoreInitialCamera({
+        id: deepLinkId ?? (selected && !selected.source ? selected.id : null),
+        deepLink: Boolean(deepLinkId),
+      })
     } catch (e) {
       error = e.message
       console.error(e)
@@ -1834,6 +2025,8 @@
     window.removeEventListener('keydown', handleGraphKeydown)
     window.removeEventListener('hashchange', handleHashChange)
     clearTimeout(iriCopyTimer)
+    clearTimeout(zoomUrlTimer)
+    for (const timer of pulseTimers) clearTimeout(timer)
     unsubscribeSkin?.()
     resetGraphNavigation()
     cy?.destroy()
@@ -1849,6 +2042,15 @@
     layerFilters; moduleFilters; concernFilters; hiddenKinds
     if (!setupReady) return
     writeScopeToUrl()
+  })
+
+  // Focus is a discrete act, so it goes to the URL immediately rather than on
+  // the zoom debounce — but it also moves the camera, so the debounced write
+  // that follows will pick the zoom up on its own.
+  $effect(() => {
+    neighborhoodFocus; selected
+    if (!setupReady) return
+    writeViewToUrl()
   })
 
   const EDGE_KINDS = [
