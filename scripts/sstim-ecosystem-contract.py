@@ -63,7 +63,12 @@ SHAPES = ROOT / MANIFEST_MODULES["shapes"]["source"]["path"]
 CONTEXT_FILES = tuple(
     ROOT / MANIFEST_MODULES[module_id]["source"]["path"]
     for module_id in FULL_PROFILE["modules"]
-) + (ONTOLOGY_DIR / "instances" / "frameworks" / "bsc.ttl",)
+) + (
+    ONTOLOGY_DIR / "instances" / "frameworks" / "bsc.ttl",
+    # The programme node is a relationship target (ADR 0047); include it so a
+    # ledger record pointing at a programme that does not exist is dangling.
+    ONTOLOGY_DIR / "instances" / "programmes" / "biosyncare-ecosystem.ttl",
+)
 IMPLEMENTATION_CATALOG = (
     ONTOLOGY_DIR / "instances" / "implementations" / "implementations.ttl"
 )
@@ -138,6 +143,7 @@ LOCAL_PREFIXES = (
     "https://w3id.org/sstim/exposure#",
     "https://w3id.org/sstim/ecosystem#",
     "https://w3id.org/sstim/framework/",
+    "https://w3id.org/sstim/ecosystem/",
     "https://w3id.org/sstim/implementation/",
     "https://w3id.org/sstim/ref/",
     "https://w3id.org/sstim/specialist/",
@@ -920,13 +926,19 @@ def check_real_w3id_routes(artifact: Graph, label: str) -> list[str]:
         for line in block.splitlines()
         if line.strip().startswith(("RewriteCond", "RewriteRule"))
     )
+    # The two HTML rules deep-link to the record's own graph node. They were
+    # restored upstream on 2026-08-08 (perma-id/w3id.org#6517) after a file
+    # rewrite reverted them; this expectation was not updated with them, which
+    # made every subsequent ledger publish fail closed. Keep the local name as
+    # $2 so the rule set stays fixed while the record set varies.
     expected_directives = (
         HTML_ACCEPT,
-        r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
-        "https://labiosyncare.github.io/ [R=303,L]",
+        r"RewriteRule ^(specialist|organization)/((?!synthetic-)[A-Za-z0-9._~-]+)/?$ "
+        "https://labiosyncare.github.io/graph/#sstim-$1:$2 [R=303,L,NE]",
         HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
-        r"(?!synthetic-)[A-Za-z0-9._~-]+/?$ https://labiosyncare.github.io/ [R=303,L]",
+        r"((?!synthetic-)[A-Za-z0-9._~-]+)/?$ "
+        r"https://labiosyncare.github.io/graph/#sstim-ecosystem-record:$1/$2 [R=303,L,NE]",
         EMPTY_ACCEPT,
         TURTLE_ACCEPT,
         r"RewriteRule ^(specialist|organization)/(?!synthetic-)[A-Za-z0-9._~-]+/?$ "
