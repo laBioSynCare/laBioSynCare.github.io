@@ -33,7 +33,9 @@ model, `patch-studio-model-3`, with model-1 and model-2 import) · [`SENSORY_FIE
 policy, flash-rate cap) · [`PWA_SERVICE_WORKER.md`](technical/PWA_SERVICE_WORKER.md)
 (caching, the three traps, compliance matrix) ·
 [`SESSION_PACKAGE.md`](technical/SESSION_PACKAGE.md) (a patch as a portable
-scientific object) · [`PRIVATE_SYNC.md`](technical/PRIVATE_SYNC.md)
+scientific object) · [`EQUIPMENT_CHECK.md`](technical/EQUIPMENT_CHECK.md)
+(design: what the delivery chain can reproduce, asserted as
+`sstim-ex:DeviceCapability`) · [`PRIVATE_SYNC.md`](technical/PRIVATE_SYNC.md)
 (`bsc-lab-private-sync-1`) · [`PORTABLE_DEPLOYMENT.md`](technical/PORTABLE_DEPLOYMENT.md)
 (deployment, migration, and the remaining gaps) ·
 [`PUBLIC_ENTRANCE.md`](technical/PUBLIC_ENTRANCE.md) (the landing IA, shipped

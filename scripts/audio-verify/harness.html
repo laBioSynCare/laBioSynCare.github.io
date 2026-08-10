@@ -1,0 +1,357 @@
+<!--
+  Audio engine verification harness. Served by scripts/audio-verify/run.mjs
+  through a Vite dev server, so it imports the real engine sources rather than
+  re-implementing the node graph: every case goes through createAudioEngine()
+  and IAudioEngine.scheduleVoice(), which is the code that actually ships.
+
+  Results are POSTed as JSON to /__audio-verify/results; the runner prints them.
+  This page is never part of a build — it lives outside static/ deliberately.
+-->
+<meta charset="utf-8">
+<title>BSC audio engine verification</title>
+<body>
+<pre id="log">starting…</pre>
+<script type="module">
+import { createAudioEngine } from '/src/engines/audio/audioEngines.js'
+
+const log = (m) => { document.getElementById('log').textContent += '\n' + m }
+const SOUNDING = ['vanilla', 'worklet', 'worklet-wasm']
+
+// Recorder tap. The engines own their AudioContext and connect _masterGain to
+// destination, so the harness re-routes that one edge through a capture
+// processor. It reports the frame of its first render quantum, which makes the
+// mapping from AudioContext time to buffer index exact.
+const RECORDER = `
+class Rec extends AudioWorkletProcessor {
+  constructor(o){ super(); this._n=o.processorOptions.frames;
+    this._L=new Float32Array(this._n); this._R=new Float32Array(this._n);
+    this._i=0; this._sent=false; this._first=-1; }
+  process(inputs){
+    if(this._sent) return true;
+    if(this._first<0){ this._first=currentFrame; this.port.postMessage({type:'start',frame:currentFrame}); }
+    const I=inputs[0]; const L=I&&I[0]?I[0]:null; const R=I&&I[1]?I[1]:L;
+    for(let k=0;k<128&&this._i<this._n;k++,this._i++){
+      this._L[this._i]=L?L[k]:0; this._R[this._i]=R?R[k]:0; }
+    if(this._i>=this._n){ this._sent=true;
+      this.port.postMessage({type:'data',L:this._L,R:this._R},[this._L.buffer,this._R.buffer]); }
+    return true; }
+}
+registerProcessor('bsc-verify-rec', Rec);`
+const recUrl = URL.createObjectURL(new Blob([RECORDER], { type: 'application/javascript' }))
+
+/**
+ * Run one case against a real engine.
+ * `build(ctx, engine, t0)` schedules voices and returns handles.
+ */
+async function run(engineId, seconds, build, { capacity = false } = {}) {
+  const { engine, id, fellBack } = createAudioEngine(engineId)
+  if (fellBack) throw new Error(`${engineId} unavailable here (fell back to ${id})`)
+  await engine.initialize()
+  await engine.resume()
+  const ctx = engine.getAudioContext()
+  await ctx.audioWorklet.addModule(recUrl)
+
+  // Lead-in covers the gap between the recorder's first quantum and t0, so an
+  // analysis window of `seconds` measured from t0 always fits in the buffer.
+  const frames = Math.round((seconds + 0.5) * ctx.sampleRate)
+  const rec = new AudioWorkletNode(ctx, 'bsc-verify-rec', {
+    numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2],
+    processorOptions: { frames },
+  })
+  // Private field by necessity: IAudioEngine exposes no output tap.
+  engine._masterGain.disconnect()
+  engine._masterGain.connect(rec)
+  const mute = ctx.createGain(); mute.gain.value = 0
+  rec.connect(mute).connect(ctx.destination)
+
+  // AudioContext.renderCapacity is Chromium-only; elsewhere the report says so
+  // rather than silently reading as a null measurement.
+  let capReport = capacity ? { supported: !!ctx.renderCapacity, samples: [] } : null
+  if (capReport?.supported) {
+    ctx.renderCapacity.addEventListener('update', (e) => capReport.samples.push({
+      avg: e.averageLoad, peak: e.peakLoad, under: e.underrunRatio,
+    }))
+    ctx.renderCapacity.start({ updateInterval: 0.1 })
+  }
+
+  let firstFrame = -1
+  const started = new Promise((res) => {
+    rec.port.onmessage = (e) => {
+      if (e.data.type === 'start') { firstFrame = e.data.frame; res() }
+    }
+  })
+  await started
+
+  const t0 = ctx.currentTime + 0.20
+  const handles = build(ctx, engine, t0)
+
+  const data = await new Promise((res, rej) => {
+    const timer = setTimeout(() => rej(new Error('capture timeout')), (seconds + 12) * 1000)
+    rec.port.onmessage = (e) => { if (e.data.type === 'data') { clearTimeout(timer); res(e.data) } }
+  })
+
+  if (capReport?.supported) { try { ctx.renderCapacity.stop() } catch { /* ignore */ } }
+  const sampleRate = ctx.sampleRate
+  // Buffer index of AudioContext time t.
+  const at = (t) => Math.round(t * sampleRate) - firstFrame
+  for (const h of handles || []) { try { engine.stopVoice(h, ctx.currentTime, 0.01) } catch { /* ignore */ } }
+  await engine.dispose()
+  return { L: data.L, R: data.R, sampleRate, t0, at, capacity: capReport }
+}
+
+// ---- analysis -------------------------------------------------------------
+function fft(re, im) {
+  const n = re.length
+  for (let i = 1, j = 0; i < n; i++) { let b = n >> 1
+    for (; j & b; b >>= 1) j ^= b; j ^= b
+    if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]] } }
+  for (let len = 2; len <= n; len <<= 1) {
+    const a = -2 * Math.PI / len, wr = Math.cos(a), wi = Math.sin(a)
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0
+      for (let k = 0; k < len / 2; k++) {
+        const ur = re[i + k], ui = im[i + k]
+        const vr = re[i + k + len / 2] * cr - im[i + k + len / 2] * ci
+        const vi = re[i + k + len / 2] * ci + im[i + k + len / 2] * cr
+        re[i + k] = ur + vr; im[i + k] = ui + vi
+        re[i + k + len / 2] = ur - vr; im[i + k + len / 2] = ui - vi
+        const nc = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = nc } } }
+}
+
+/**
+ * Magnitude spectrum with NO window. Valid only under coherent sampling — the
+ * tone must complete an integer number of cycles in the N-sample window, i.e.
+ * f = bin * sampleRate / N. Then there is no spectral leakage at all and the
+ * measured noise/distortion floor is the engine's, not the window's. A Hann
+ * window caps SFDR near -52 dB and a Blackman-Harris near -107 dB; both hide
+ * what a 4096-point sine LUT actually does.
+ */
+function coherentSpectrum(x, off, N) {
+  const re = new Float64Array(N), im = new Float64Array(N)
+  for (let i = 0; i < N; i++) re[i] = x[off + i]
+  fft(re, im)
+  const mag = new Float64Array(N / 2)
+  for (let i = 0; i < N / 2; i++) mag[i] = Math.hypot(re[i], im[i])
+  return mag
+}
+const db = (v) => 20 * Math.log10(Math.max(v, 1e-300))
+
+/** Nearest bin index whose frequency is closest to `target`, plus that frequency. */
+function coherentBin(target, sampleRate, N) {
+  const bin = Math.max(1, Math.round(target * N / sampleRate))
+  return { bin, freq: bin * sampleRate / N }
+}
+
+function purity(x, off, N, bin) {
+  const mag = coherentSpectrum(x, off, N)
+  const fund = mag[bin]
+  let spur = 0, spurBin = 0
+  for (let i = 1; i < N / 2; i++) {
+    if (i === bin) continue
+    if (mag[i] > spur) { spur = mag[i]; spurBin = i }
+  }
+  let harm = 0
+  for (let k = 2; k <= 20; k++) { const h = bin * k; if (h >= N / 2) break; harm += mag[h] * mag[h] }
+  return { sfdr: db(spur / fund), spurBin, thd: db(Math.sqrt(harm) / fund), fund }
+}
+
+function levels(x, from, to) {
+  from = Math.max(0, from); to = Math.min(x.length, to)
+  let pk = 0, s = 0, dc = 0, clip = 0
+  for (let i = from; i < to; i++) { const v = x[i]; const a = Math.abs(v)
+    if (a > pk) pk = a; s += v * v; dc += v; if (a >= 0.999) clip++ }
+  const n = to - from
+  return { peak: pk, rms: Math.sqrt(s / n), dc: dc / n, clipped: clip }
+}
+
+/** Positive-going zero crossings in [from, to) — an exact cycle count. */
+function countCycles(x, from, to) {
+  from = Math.max(0, from); to = Math.min(x.length, to)
+  let n = 0, prev = x[from]
+  for (let i = from + 1; i < to; i++) { const v = x[i]; if (prev < 0 && v >= 0) n++; prev = v }
+  return n
+}
+
+function pulseStats(x, from, to, sampleRate) {
+  const w = Math.max(1, Math.round(sampleRate * 0.001))
+  const env = []
+  for (let i = from; i + w < to; i += w) { let m = 0
+    for (let j = 0; j < w; j++) { const a = Math.abs(x[i + j]); if (a > m) m = a }
+    env.push(m) }
+  let mx = 0; for (const v of env) if (v > mx) mx = v
+  const th = mx * 0.35, onsets = []
+  for (let i = 1; i < env.length; i++) if (env[i - 1] < th && env[i] >= th) onsets.push(i * w / sampleRate)
+  const per = []
+  for (let i = 1; i < onsets.length; i++) per.push(onsets[i] - onsets[i - 1])
+  const mean = per.reduce((a, b) => a + b, 0) / Math.max(1, per.length)
+  const sd = Math.sqrt(per.reduce((a, b) => a + (b - mean) ** 2, 0) / Math.max(1, per.length))
+  return { count: onsets.length, rate: 1 / mean, jitterMs: sd * 1000 }
+}
+
+function firstNonZeroAfter(x, from) {
+  for (let i = Math.max(0, from); i < x.length; i++) if (x[i] !== 0) return i
+  return -1
+}
+
+// ---- cases ----------------------------------------------------------------
+function capSummary(cap) {
+  if (!cap.capacity) return { renderLoadPeak: null, renderLoadAvg: null, underrunRatio: null }
+  if (!cap.capacity.supported) return { renderLoadPeak: 'n/a', renderLoadAvg: 'n/a', underrunRatio: 'n/a' }
+  const s = cap.capacity.samples
+  if (!s.length) return { renderLoadPeak: 'no data', renderLoadAvg: 'no data', underrunRatio: 'no data' }
+  return {
+    renderLoadPeak: +Math.max(...s.map((c) => c.peak)).toFixed(4),
+    renderLoadAvg: +(s.reduce((a, c) => a + c.avg, 0) / s.length).toFixed(4),
+    underrunRatio: +Math.max(...s.map((c) => c.under)).toFixed(4),
+  }
+}
+
+const results = { started: new Date().toISOString(), ua: navigator.userAgent, cases: {} }
+const N = 32768
+const SETTLE = 0.25   // seconds after t0 to skip: engines ramp attack over 50 ms
+
+async function guard(name, fn) {
+  try { results.cases[name] = await fn(); log(`ok   ${name}`) }
+  catch (e) { results.cases[name] = { error: String(e && e.message || e) }; log(`FAIL ${name}: ${e && e.message}`) }
+}
+
+await guard('purity', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    // Frequency is chosen per engine because sampleRate is device-dependent.
+    let bin = 0, freq = 0
+    const cap = await run(id, 2.2, (ctx, engine, t0) => {
+      const c = coherentBin(440, ctx.sampleRate, N); bin = c.bin; freq = c.freq
+      return [engine.scheduleVoice({ type: 'Carrier', params: { gain: 0.5, frequency: freq, pan: 0 } }, t0)]
+    }, { capacity: true })
+    const off = cap.at(cap.t0 + SETTLE)
+    const p = purity(cap.L, off, N, bin)
+    const lv = levels(cap.L, off, off + N)
+    const cycles = countCycles(cap.L, off, off + N)
+    rows.push({ engine: id, sampleRate: cap.sampleRate, freq: +freq.toFixed(4),
+      cyclesMeasured: cycles, cyclesExpected: bin,
+      sfdr: +p.sfdr.toFixed(1), thd: +p.thd.toFixed(1),
+      peak: +lv.peak.toFixed(5), rms: +lv.rms.toFixed(5), dc: lv.dc.toExponential(2),
+      clipped: lv.clipped, ...capSummary(cap) })
+  }
+  return rows
+})
+
+await guard('onset', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const ms = []
+    for (let trial = 0; trial < 4; trial++) {
+      const cap = await run(id, 1.0, (ctx, engine, t0) => [
+        engine.scheduleVoice({ type: 'Carrier', params: { gain: 0.5, frequency: 440, pan: 0 } }, t0)])
+      const start = cap.at(cap.t0)
+      const idx = firstNonZeroAfter(cap.L, start)
+      ms.push(idx < 0 ? NaN : +((idx - start) / cap.sampleRate * 1000).toFixed(3))
+    }
+    rows.push({ engine: id, trialsMs: ms, maxMs: Math.max(...ms) })
+  }
+  return rows
+})
+
+await guard('binaural', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    let binL = 0, binR = 0, fL = 0, fR = 0
+    const cap = await run(id, 2.2, (ctx, engine, t0) => {
+      const a = coherentBin(200, ctx.sampleRate, N); const b = coherentBin(210, ctx.sampleRate, N)
+      binL = a.bin; fL = a.freq; binR = b.bin; fR = b.freq
+      return [engine.scheduleVoice({ type: 'BinauralBeat',
+        params: { gain: 0.5, leftFreq: fL, rightFreq: fR } }, t0)]
+    })
+    const off = cap.at(cap.t0 + SETTLE)
+    const magL = coherentSpectrum(cap.L, off, N)
+    const magR = coherentSpectrum(cap.R, off, N)
+    rows.push({ engine: id,
+      leftHz: +fL.toFixed(4), rightHz: +fR.toFixed(4), beatHz: +(fR - fL).toFixed(4),
+      cyclesLeft: countCycles(cap.L, off, off + N), cyclesLeftExpected: binL,
+      cyclesRight: countCycles(cap.R, off, off + N), cyclesRightExpected: binR,
+      // Channel isolation: the right-ear tone must not appear in the left channel.
+      isolationLdB: +db(magL[binR] / magL[binL]).toFixed(1),
+      isolationRdB: +db(magR[binL] / magR[binR]).toFixed(1),
+      peakL: +levels(cap.L, off, off + N).peak.toFixed(5) })
+  }
+  return rows
+})
+
+await guard('isochronic', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const cap = await run(id, 2.6, (ctx, engine, t0) => [
+      engine.scheduleVoice({ type: 'IsochronicTone',
+        envelope: { type: 'AR', attackFrac: 0.1, releaseFrac: 0.15, noteDurationFrac: 0.5 },
+        params: { gain: 0.5, frequency: 300, pulseRate: 10, pan: 0 } }, t0)])
+    const from = cap.at(cap.t0 + 0.4), to = cap.at(cap.t0 + 2.4)
+    const p = pulseStats(cap.L, from, to, cap.sampleRate)
+    rows.push({ engine: id, pulses: p.count, rateHz: +p.rate.toFixed(4), jitterMs: +p.jitterMs.toFixed(3) })
+  }
+  return rows
+})
+
+await guard('sample', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const cap = await run(id, 2.0, (ctx, engine, t0) => [
+      engine.scheduleVoice({ type: 'Sample', sampleId: 'rain', params: { gain: 0.4, pan: 0 } }, t0)])
+    const from = cap.at(cap.t0 + 0.6), to = cap.at(cap.t0 + 1.8)
+    const lv = levels(cap.L, from, to)
+    rows.push({ engine: id, peak: +lv.peak.toFixed(5), rms: +lv.rms.toFixed(5), clipped: lv.clipped })
+  }
+  return rows
+})
+
+await guard('headroom', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const cap = await run(id, 2.0, (ctx, engine, t0) =>
+      [220, 247, 262, 294, 330, 392].map((f, i) => engine.scheduleVoice({ type: 'Carrier',
+        params: { gain: 0.25, frequency: f, pan: (i % 3 - 1) * 0.6 } }, t0)), { capacity: true })
+    const from = cap.at(cap.t0 + 0.5), to = cap.at(cap.t0 + 1.8)
+    const l = levels(cap.L, from, to), r = levels(cap.R, from, to)
+    rows.push({ engine: id, peakL: +l.peak.toFixed(4), peakR: +r.peak.toFixed(4),
+      rmsL: +l.rms.toFixed(4), dbfs: +db(l.peak).toFixed(2), clipped: l.clipped + r.clipped,
+      ...capSummary(cap) })
+  }
+  return rows
+})
+
+// The WASM processor reads oscillator frequency once per 128-sample block where
+// the JS processor reads it a-rate. Both advance phase by a left Riemann sum, so
+// during a constant slew r the WASM path accumulates a cycle deficit of
+// r*T/2 per second (T = 128/sampleRate) and the JS path r/(2*sampleRate).
+// Counting zero crossings over the sweep measures that deficit directly, which
+// is far more robust than estimating instantaneous frequency.
+await guard('glide', async () => {
+  const rows = []
+  for (const id of ['worklet', 'worklet-wasm']) {
+    const f0 = 100, f1 = 4900, dur = 1.0
+    const cap = await run(id, 2.2, (ctx, engine, t0) => {
+      const h = engine.scheduleVoice({ type: 'Carrier', params: { gain: 0.5, frequency: f0, pan: 0 } }, t0)
+      const p = h._node.parameters.get('frequency')
+      p.setValueAtTime(f0, t0 + SETTLE)
+      p.linearRampToValueAtTime(f1, t0 + SETTLE + dur)
+      return [h]
+    })
+    const from = cap.at(cap.t0 + SETTLE), to = cap.at(cap.t0 + SETTLE + dur)
+    const measured = countCycles(cap.L, from, to)
+    const ideal = (f0 + f1) / 2 * dur
+    const quantum = 128 / cap.sampleRate
+    rows.push({ engine: id, idealCycles: ideal, measuredCycles: measured,
+      deficitCycles: +(ideal - measured).toFixed(2),
+      predictedDeficit: +((f1 - f0) / dur * (id === 'worklet-wasm' ? quantum : 1 / cap.sampleRate) / 2 * dur).toFixed(2),
+      equivalentHzOffset: +((ideal - measured) / dur).toFixed(3) })
+  }
+  return rows
+})
+
+log('posting results…')
+await fetch('/__audio-verify/results', {
+  method: 'POST', headers: { 'content-type': 'application/json' },
+  body: JSON.stringify(results),
+})
+log('done')
+document.body.setAttribute('data-done', '1')
+</script>

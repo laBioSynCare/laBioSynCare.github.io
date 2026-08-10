@@ -239,6 +239,10 @@ snapshot:
 test:
 	npm test
 
+## Measure the audio engines in a real browser (BROWSER=chrome|firefox|all, JSON=path)
+audio-verify:
+	node scripts/audio-verify/run.mjs --browser $(or $(BROWSER),chrome) $(if $(JSON),--json $(JSON),)
+
 ## Verify generated JSON-LD and RDF/XML round-trip to the source graphs
 export-check:
 	@tmpdir="$$(mktemp -d)"; \
@@ -375,6 +379,7 @@ help:
 	@echo "  make dev              Start the local Vite dev server on $(DEV_HOST):$(DEV_PORT)"
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
+	@echo "  make audio-verify     Measure the audio engines in a browser (BROWSER=chrome|firefox|all)"
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"
 	@echo "  make module-boundaries Prove unique resource sources and honest direct dependencies"

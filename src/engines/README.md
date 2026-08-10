@@ -83,6 +83,14 @@ Signal built from native Web Audio nodes (oscillators, gains, stereo panners,
 a `PeriodicWave` envelope for `IsochronicTone`). Broadest compatibility; no
 worklet required.
 
+> **Measuring these claims.** `make audio-verify` drives the engines in a real
+> browser and asserts frequency accuracy, spectral purity, onset, binaural
+> channel isolation, pulse jitter, headroom and the glide behaviour described
+> below. See [`scripts/audio-verify/README.md`](../../scripts/audio-verify/README.md)
+> for the method and the recorded results — including the finding that the two
+> worklet engines measure identically across browsers while `vanilla` varies by
+> 64 dB, because it delegates to the browser's own oscillator.
+
 ### `AudioWorkletEngine` (`worklet`)
 
 Each voice is one `AudioWorkletNode` running `bsc-voice.worklet.js` on the audio
