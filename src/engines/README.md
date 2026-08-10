@@ -93,9 +93,24 @@ are a-rate `AudioParam`s set from the main thread.
 
 Same audio-thread voice model, but the per-sample sine oscillator runs as a
 hand-written WebAssembly kernel (`bsc-osc.wat` → `bsc-osc.wasm`, a 4096-point
-sine LUT with linear interpolation). The host fetches the `.wasm` on the main
-thread and posts the bytes into each node, which compiles + instantiates them
-against memory it owns; envelope/gain/pan/mix stay in JS.
+sine LUT with linear interpolation). The host fetches and compiles the `.wasm`
+once during `initialize()`, then hands the finished `WebAssembly.Module` to each
+voice through `processorOptions`; the processor instantiates it synchronously in
+its constructor against memory it owns, so it is ready before its first render
+quantum. Envelope/gain/pan/mix stay in JS, as do the Noise, Drone and Sample
+voices — the kernel renders only the tonal sine oscillator, so this engine
+differs from `worklet` for `Carrier` / `IsochronicTone` / `BinauralBeat` only.
+
+Two consequences worth knowing when comparing it to `worklet`:
+
+- Oscillator frequency is read once per 128-sample block, where the JS processor
+  reads it a-rate per sample. Worst-case pitch error is slew × 2.67 ms —
+  measured at ~0.9 Hz on a 660 Hz/s sweep, and ~0.03 Hz for Martigli-rate
+  modulation. It only matters for fast sweeps.
+- Browsers that refuse to structured-clone a `WebAssembly.Module` into the
+  worklet agent fall back permanently to posting the raw bytes over the node
+  port. That path compiles on the audio thread, so those voices render silence
+  for the first render quanta (measured 0 or 2 quanta, ≤5.35 ms).
 
 ### `NullAudioEngine` (`silent`)
 

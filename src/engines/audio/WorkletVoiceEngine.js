@@ -56,6 +56,31 @@ export class WorkletVoiceEngine extends IAudioEngine {
   /** Hook: called after each voice node is created (subclass setup). */
   _onVoiceCreated(_node, _spec) {}
 
+  /**
+   * processorOptions for one voice. Subclasses extend it to hand the processor
+   * setup it must have before its first render quantum.
+   */
+  _voiceProcessorOptions(spec) {
+    return {
+      voiceType: spec.type,
+      envelope: spec.envelope || null,
+      noiseColor: spec.noiseColor || null,
+      noiseFilter: spec.noiseFilter || null,
+      droneVoices: spec.droneVoices || null,
+      tremolo: spec.tremolo || null,
+    }
+  }
+
+  /** Construct one voice node. Subclasses override to handle clone fallbacks. */
+  _createVoiceNode(spec) {
+    return new AudioWorkletNode(this._ctx, this._processorName, {
+      numberOfInputs: 0,
+      numberOfOutputs: 1,
+      outputChannelCount: [2],
+      processorOptions: this._voiceProcessorOptions(spec),
+    })
+  }
+
   async resume() {
     if (this._ctx && this._ctx.state !== 'running') await this._ctx.resume()
   }
@@ -83,19 +108,7 @@ export class WorkletVoiceEngine extends IAudioEngine {
     const params = spec.params || {}
     const userGain = Number.isFinite(params.gain) ? params.gain : (spec.volume ?? 0.5)
 
-    const node = new AudioWorkletNode(ctx, this._processorName, {
-      numberOfInputs: 0,
-      numberOfOutputs: 1,
-      outputChannelCount: [2],
-      processorOptions: {
-        voiceType: spec.type,
-        envelope: spec.envelope || null,
-        noiseColor: spec.noiseColor || null,
-        noiseFilter: spec.noiseFilter || null,
-        droneVoices: spec.droneVoices || null,
-        tremolo: spec.tremolo || null,
-      },
-    })
+    const node = this._createVoiceNode(spec)
     this._onVoiceCreated(node, spec)
 
     // Initial AudioParam values.

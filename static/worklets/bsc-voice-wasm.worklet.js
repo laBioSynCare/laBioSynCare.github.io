@@ -6,10 +6,14 @@
 // bsc-osc.wasm advances phase and writes a block via 4096-point sine-LUT
 // interpolation. Envelope shaping, gain, panning and stereo mixing stay in JS.
 //
-// The host engine fetches bsc-osc.wasm on the main thread and posts the bytes
-// in; the processor compiles and instantiates them against memory it owns. As
-// with every BSC worklet: plain static script (never bundled), no allocation in
-// process(), and AudioContext.currentTime remains the only clock.
+// The host engine fetches and compiles bsc-osc.wasm once on the main thread and
+// hands the finished WebAssembly.Module over in processorOptions; this processor
+// instantiates it synchronously here in its constructor, against memory it owns,
+// so it is ready before its first render quantum. Older/limited browsers that
+// cannot clone a Module into the worklet agent get the bytes over the port
+// instead and compile asynchronously (silent until ready). As with every BSC
+// worklet: plain static script (never bundled), no allocation in process(), and
+// AudioContext.currentTime remains the only clock.
 
 'use strict'
 
@@ -116,6 +120,10 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
     this._render = null // set once WASM is instantiated
     this._ready = false
 
+    // Preferred path: the engine already compiled the module, so instantiating
+    // it is synchronous and this voice never renders a silent block.
+    if (opts.wasmModule) this._instantiate(opts.wasmModule)
+
     // Tremolo / AM (applies to every voice type at the output stage).
     const trem = opts.tremolo || {}
     this._tremEnabled = !!trem.enabled
@@ -140,7 +148,10 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
         this._sampleLen = data.left.length
         this._samplePos = 0
         this._sampleStep = (data.sampleRate || sampleRate) / sampleRate
+      } else if (data.type === 'wasm' && data.module) {
+        this._instantiate(data.module)
       } else if (data.type === 'wasm' && data.bytes) {
+        // Fallback path: compile on the audio thread; silent until it resolves.
         WebAssembly.instantiate(data.bytes, { env: { memory: this._memory } })
           .then((result) => {
             this._render = result.instance.exports.render_osc
@@ -151,6 +162,19 @@ class BSCVoiceWasmProcessor extends AudioWorkletProcessor {
             this.port.postMessage({ type: 'error', message: String(err) })
           })
       }
+    }
+  }
+
+  // Synchronous instantiation of an already-compiled module. Only ever called
+  // from the constructor or a port message — never from process().
+  _instantiate(module) {
+    try {
+      const instance = new WebAssembly.Instance(module, { env: { memory: this._memory } })
+      this._render = instance.exports.render_osc
+      this._ready = true
+      this.port.postMessage({ type: 'ready' })
+    } catch (err) {
+      this.port.postMessage({ type: 'error', message: String(err) })
     }
   }
 
