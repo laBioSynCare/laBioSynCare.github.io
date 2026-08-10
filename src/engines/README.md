@@ -45,9 +45,10 @@ engines/
 ```
 
 > Today, visual stimuli are authored and previewed as CSS/DOM elements in the
-> Patch Studio (see `docs/technical/PATCH_STUDIO.md` §5), and the audio engines
-> are verified with `OfflineAudioContext` harnesses rather than a committed
-> `tests/engines/` compliance suite.
+> Patch Studio (see `docs/technical/PATCH_STUDIO.md` §5). The audio engines have
+> a committed browser compliance suite — `make audio-verify`, in
+> [`scripts/audio-verify/`](../../scripts/audio-verify/README.md) — alongside the
+> Vitest units beside each source file.
 
 ---
 
@@ -119,6 +120,34 @@ Two consequences worth knowing when comparing it to `worklet`:
   worklet agent fall back permanently to posting the raw bytes over the node
   port. That path compiles on the audio thread, so those voices render silence
   for the first render quanta (measured 0 or 2 quanta, ≤5.35 ms).
+
+### Cross-engine parity
+
+Settings offers these as interchangeable implementations of one voice model, so
+a stimulus that depends on which one is selected is a defect in that promise.
+`make audio-verify` asserts parity directly. Measured: `Carrier` pan law, noise
+colour slopes, drone level, tremolo depth and rate, pulse rate, headroom and
+onset all agree across the three engines, in both Chrome and Firefox.
+
+One divergence is open, and it is the `Sample` voice's pan law:
+
+| pan | vanilla L / R | worklet L / R |
+|---|---|---|
+| −1 | 0.1189 / 0 | 0.0780 / 0 |
+| 0 | 0.0781 / 0.0562 | 0.0780 / 0.0560 |
+| +1 | 0 / 0.1189 | 0 / 0.0560 |
+
+`Sample` is a *stereo* source. The vanilla engine routes it through
+`StereoPannerNode`, whose stereo law folds the far channel into the near one and
+so preserves energy; the worklet processors attenuate the far channel linearly
+and lose it. The two agree at centre and diverge with |pan|, reaching ~3.7 dB at
+hard pan. Reproduced identically in Chrome and Firefox, so it is ours, not the
+browser's.
+
+Which law is correct is a product decision — matching `StereoPannerNode` would
+change how existing patches sound — so `make audio-verify` reports it as a known
+divergence rather than failing. Settle it and delete the entry from
+`KNOWN_DIVERGENCES` in `scripts/audio-verify/run.mjs`.
 
 ### `NullAudioEngine` (`silent`)
 

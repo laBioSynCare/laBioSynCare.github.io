@@ -43,6 +43,14 @@ confined to this harness.
 | `sample` | That the ambient `Sample` clips decode and render |
 | `headroom` | Peak/clipping with six concurrent voices through the 0.8 master gain |
 | `glide` | Accumulated cycle deficit over a fast sweep — quantifies block-rate vs a-rate frequency reading |
+| `panLaw` | Channel RMS at pan −1 … +1, for a mono (`Carrier`) and a stereo (`Sample`) source, compared across engines |
+| `noiseColour` | Spectral slope of white / pink / brown noise against the expected 0 / −3 / −6 dB per octave |
+| `drone` | Level of the detuned stack, compared across engines |
+| `tremolo` | Modulation depth ratio and rate |
+| `continuity` | Silence before the scheduled start, and step size at start, at a mid-voice gain change, and through the release ramp |
+
+Parity assertions compare every engine against the others on the same measure,
+because Settings presents them as interchangeable.
 
 ### Coherent sampling
 
@@ -102,6 +110,29 @@ The `glide` deficit is the one real behavioural difference: over a
 100→4900 Hz/1 s sweep the WASM path loses 6–7 cycles against a predicted 6.4,
 the JS path loses none. At Martigli modulation rates the same mechanism is worth
 about 0.03 Hz.
+
+## Defects this suite found
+
+Adding the cases above immediately produced three, all now fixed except the last:
+
+1. **Teardown was scheduled from the wrong clock.** `stopVoice()` set its
+   release ramp on the audio clock but its cleanup `setTimeout` from *call
+   time*, at a fixed `(release + 0.05) s`. Stopping a voice more than ~100 ms
+   ahead — what any lookahead scheduler does, and what the planned Worker
+   scheduler will do at 100 ms — disconnected it before the ramp began. Both
+   engines had it; both now share `voiceRelease.js`.
+2. **The worklet engines sounded before their scheduled start.** An
+   `AudioWorkletNode` renders from construction, and the per-voice fade
+   `GainNode` defaults to 1, so a voice emitted a 200 Hz tone at gain 0.5 for the
+   whole lookahead interval and then stepped to silence at `t0`. Measured as a
+   10.6x discontinuity against 1.3x on vanilla; now 1.3x on all three. `vanilla`
+   was immune because an `OscillatorNode` emits nothing before `start(t0)`.
+3. **The `Sample` pan law differs between engines** — see
+   `src/engines/README.md`. Reported as a known divergence pending a product
+   decision, not failed.
+
+The first two are exactly the class of defect a spectrum cannot show and a unit
+test cannot reach.
 
 ## Known limits
 

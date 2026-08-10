@@ -1,5 +1,6 @@
 import { IAudioEngine } from './IAudioEngine.js'
 import { loadSample, sampleUrl } from './sampleLoader.js'
+import { holdThenRelease, teardownDelayMs } from './voiceRelease.js'
 
 const DEFAULT_RELEASE = 0.05
 const PARAM_RAMP = 0.02
@@ -203,9 +204,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
     const tEnd = t + releaseSeconds
     const v = handle._voice
     v._stopped = true
-    v.outGain.gain.cancelScheduledValues(t)
-    v.outGain.gain.setValueAtTime(v.outGain.gain.value, t)
-    v.outGain.gain.linearRampToValueAtTime(0.0001, tEnd)
+    holdThenRelease(v.outGain.gain, t, tEnd)
     for (const node of v.sources) {
       try { node.stop(tEnd + 0.01) } catch (_) {}
     }
@@ -215,7 +214,7 @@ export class VanillaWebAudioEngine extends IAudioEngine {
       for (const node of (v._extraNodes || [])) { try { node.disconnect() } catch (_) {} }
       try { v.outGain.disconnect() } catch (_) {}
       this._voices.delete(handle.id)
-    }, (releaseSeconds + 0.05) * 1000)
+    }, teardownDelayMs(this._ctx, tEnd))
   }
 
   setVoiceParameter(handle, paramName, value, atTime, curve = 'step') {

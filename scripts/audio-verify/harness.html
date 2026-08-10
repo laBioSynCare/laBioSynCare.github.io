@@ -187,6 +187,40 @@ function pulseStats(x, from, to, sampleRate) {
   return { count: onsets.length, rate: 1 / mean, jitterMs: sd * 1000 }
 }
 
+/** Largest sample-to-sample step in [from,to). A click reads far above the
+ *  steady-state step of a sine, which is 2*pi*f*A/sampleRate. */
+function maxStep(x, from, to) {
+  from = Math.max(1, from); to = Math.min(x.length, to)
+  let m = 0
+  for (let i = from; i < to; i++) { const d = Math.abs(x[i] - x[i - 1]); if (d > m) m = d }
+  return m
+}
+
+/** Mean power in [lo,hi) Hz from a magnitude spectrum, in dB. */
+function bandPowerDb(mag, lo, hi, sampleRate, N) {
+  const a = Math.max(1, Math.floor(lo * N / sampleRate))
+  const b = Math.min(mag.length, Math.ceil(hi * N / sampleRate))
+  let p = 0
+  for (let i = a; i < b; i++) p += mag[i] * mag[i]
+  return 10 * Math.log10(Math.max(p / Math.max(1, b - a), 1e-300))
+}
+
+/** Least-squares slope in dB per octave across consecutive octave bands. */
+function spectralSlope(x, off, N, sampleRate) {
+  const mag = coherentSpectrum(x, off, N)
+  const edges = [250, 500, 1000, 2000, 4000]
+  const pts = []
+  for (let i = 0; i < edges.length - 1; i++) {
+    pts.push([i, bandPowerDb(mag, edges[i], edges[i + 1], sampleRate, N)])
+  }
+  const n = pts.length
+  const mx = pts.reduce((a, p) => a + p[0], 0) / n
+  const my = pts.reduce((a, p) => a + p[1], 0) / n
+  let num = 0, den = 0
+  for (const [px, py] of pts) { num += (px - mx) * (py - my); den += (px - mx) ** 2 }
+  return num / den
+}
+
 function firstNonZeroAfter(x, from) {
   for (let i = Math.max(0, from); i < x.length; i++) if (x[i] !== 0) return i
   return -1
@@ -343,6 +377,119 @@ await guard('glide', async () => {
       deficitCycles: +(ideal - measured).toFixed(2),
       predictedDeficit: +((f1 - f0) / dur * (id === 'worklet-wasm' ? quantum : 1 / cap.sampleRate) / 2 * dur).toFixed(2),
       equivalentHzOffset: +((ideal - measured) / dur).toFixed(3) })
+  }
+  return rows
+})
+
+// Pan law. The worklets apply equal-power cos/sin for tonal voices, and the
+// vanilla engine uses StereoPannerNode. Those agree for a mono source, but the
+// Sample voice is a *stereo* source: StereoPannerNode folds the far channel into
+// the near one, while the worklets simply attenuate it. Same patch, different
+// engine, different stereo image and level — measured here rather than argued.
+await guard('panLaw', async () => {
+  const rows = []
+  for (const type of ['Carrier', 'Sample']) {
+    for (const id of SOUNDING) {
+      const row = { voice: type, engine: id }
+      for (const pan of [-1, -0.5, 0, 0.5, 1]) {
+        const spec = type === 'Carrier'
+          ? { type: 'Carrier', params: { gain: 0.5, frequency: 440, pan } }
+          : { type: 'Sample', sampleId: 'rain', params: { gain: 0.5, pan } }
+        const cap = await run(id, 1.6, (ctx, engine, t0) => [engine.scheduleVoice(spec, t0)])
+        const from = cap.at(cap.t0 + 0.6), to = cap.at(cap.t0 + 1.5)
+        const l = levels(cap.L, from, to).rms, r = levels(cap.R, from, to).rms
+        row[`L${pan}`] = +l.toFixed(4)
+        row[`R${pan}`] = +r.toFixed(4)
+      }
+      rows.push(row)
+    }
+  }
+  return rows
+})
+
+// Nothing anywhere asserts that "pink" is pink. White is flat, pink falls
+// 3 dB/octave, brown 6 dB/octave; the filter is opened near Nyquist so the
+// colour, not the cutoff, sets the slope.
+await guard('noiseColour', async () => {
+  const rows = []
+  for (const colour of ['white', 'pink', 'brown']) {
+    for (const id of SOUNDING) {
+      const cap = await run(id, 2.2, (ctx, engine, t0) => [engine.scheduleVoice({
+        type: 'Noise', noiseColor: colour, noiseFilter: 'lowpass',
+        params: { gain: 0.4, pan: 0, cutoff: 20000, resonance: 0.707 } }, t0)])
+      const off = cap.at(cap.t0 + SETTLE)
+      const lv = levels(cap.L, off, off + N)
+      rows.push({ colour, engine: id,
+        slopeDbPerOct: +spectralSlope(cap.L, off, N, cap.sampleRate).toFixed(2),
+        expected: colour === 'white' ? 0 : (colour === 'pink' ? -3 : -6),
+        rms: +lv.rms.toFixed(4), peak: +lv.peak.toFixed(4), clipped: lv.clipped })
+    }
+  }
+  return rows
+})
+
+await guard('drone', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const cap = await run(id, 2.0, (ctx, engine, t0) => [engine.scheduleVoice({
+      type: 'Drone', droneVoices: 5,
+      params: { gain: 0.4, frequency: 110, detune: 100, pan: 0 } }, t0)])
+    const off = cap.at(cap.t0 + SETTLE)
+    const lv = levels(cap.L, off, off + N)
+    rows.push({ engine: id, rms: +lv.rms.toFixed(4), peak: +lv.peak.toFixed(4), clipped: lv.clipped })
+  }
+  return rows
+})
+
+await guard('tremolo', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    const cap = await run(id, 2.2, (ctx, engine, t0) => [engine.scheduleVoice({
+      type: 'Carrier', tremolo: { enabled: true, rate: 4, depth: 0.6, mode: 'exp' },
+      params: { gain: 0.5, frequency: 440, pan: 0 } }, t0)])
+    const from = cap.at(cap.t0 + 0.5), to = cap.at(cap.t0 + 2.1)
+    const w = Math.round(cap.sampleRate * 0.005)
+    const env = []
+    for (let i = from; i + w < to; i += w) {
+      let m = 0; for (let j = 0; j < w; j++) { const a = Math.abs(cap.L[i + j]); if (a > m) m = a }
+      env.push(m)
+    }
+    const mn = Math.min(...env), mx = Math.max(...env), mid = (mn + mx) / 2
+    let cross = 0
+    for (let i = 1; i < env.length; i++) if (env[i - 1] < mid && env[i] >= mid) cross++
+    rows.push({ engine: id, depthRatio: +(mn / mx).toFixed(4),
+      rateHz: +(cross / ((env.length * w) / cap.sampleRate)).toFixed(3) })
+  }
+  return rows
+})
+
+// Clicks are the defect a spectrum will not show. Start, a mid-voice gain
+// change and the release ramp are each compared against the steady-state step
+// size of the same tone; a discontinuity reads as a large multiple of it.
+await guard('continuity', async () => {
+  const rows = []
+  for (const id of SOUNDING) {
+    let handle = null
+    const cap = await run(id, 2.4, (ctx, engine, t0) => {
+      handle = engine.scheduleVoice({ type: 'Carrier',
+        params: { gain: 0.5, frequency: 220, pan: 0 } }, t0)
+      engine.setVoiceParameter(handle, 'gain', 0.15, t0 + 0.9, 'linear')
+      engine.stopVoice(handle, t0 + 1.5, 0.05)
+      return []   // already stopped inside the case
+    })
+    const steady = maxStep(cap.L, cap.at(cap.t0 + 0.4), cap.at(cap.t0 + 0.8))
+    const atStart = maxStep(cap.L, cap.at(cap.t0 - 0.02), cap.at(cap.t0 + 0.08))
+    const atChange = maxStep(cap.L, cap.at(cap.t0 + 0.88), cap.at(cap.t0 + 0.96))
+    const atStop = maxStep(cap.L, cap.at(cap.t0 + 1.48), cap.at(cap.t0 + 1.62))
+    const tail = levels(cap.L, cap.at(cap.t0 + 1.7), cap.at(cap.t0 + 1.9))
+    // Nothing may sound before the scheduled start. An AudioWorkletNode renders
+    // from construction, so this is the direct guard on that.
+    const pre = levels(cap.L, cap.at(cap.t0 - 0.15), cap.at(cap.t0 - 0.01))
+    rows.push({ engine: id, preStartRms: +pre.rms.toFixed(6), steadyStep: +steady.toFixed(5),
+      startRatio: +(atStart / steady).toFixed(2),
+      changeRatio: +(atChange / steady).toFixed(2),
+      stopRatio: +(atStop / steady).toFixed(2),
+      tailRms: +tail.rms.toFixed(6) })
   }
   return rows
 })

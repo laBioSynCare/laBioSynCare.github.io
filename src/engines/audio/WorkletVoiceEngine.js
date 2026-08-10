@@ -1,5 +1,6 @@
 import { IAudioEngine } from './IAudioEngine.js'
 import { loadSample, sampleUrl } from './sampleLoader.js'
+import { holdThenRelease, teardownDelayMs } from './voiceRelease.js'
 
 const PARAM_RAMP = 0.02
 const ATTACK = 0.05
@@ -150,7 +151,16 @@ export class WorkletVoiceEngine extends IAudioEngine {
     }
 
     // Per-voice fade gain for attack/release.
+    //
+    // The initial value must be 0, not the GainNode default of 1: an
+    // AudioWorkletNode renders from the moment it is constructed, at its
+    // parameter *defaults*, while `setValueAtTime(0, t0)` only takes effect at
+    // t0. Without this the voice sounds at 200 Hz / gain 0.5 for the whole
+    // lookahead interval and then steps to silence at t0 — measured as a 10x
+    // discontinuity by `make audio-verify`. Vanilla is immune because an
+    // OscillatorNode emits nothing before start(t0).
     const outGain = ctx.createGain()
+    outGain.gain.value = 0
     outGain.gain.setValueAtTime(0, t0)
     outGain.gain.linearRampToValueAtTime(1, t0 + ATTACK)
     node.connect(outGain).connect(this._masterGain)
@@ -171,17 +181,14 @@ export class WorkletVoiceEngine extends IAudioEngine {
     if (!handle || !handle._node) return
     const t = Math.max(stopTime, this._ctx.currentTime)
     const tEnd = t + releaseSeconds
-    const g = handle._outGain.gain
-    g.cancelScheduledValues(t)
-    g.setValueAtTime(g.value, t)
-    g.linearRampToValueAtTime(0.0001, tEnd)
+    holdThenRelease(handle._outGain.gain, t, tEnd)
     handle.isActive = false
     setTimeout(() => {
       try { handle._node.disconnect() } catch (_) {}
       try { handle._outGain.disconnect() } catch (_) {}
       try { handle._node.port.close?.() } catch (_) {}
       this._voices.delete(handle.id)
-    }, (releaseSeconds + 0.05) * 1000)
+    }, teardownDelayMs(this._ctx, tEnd))
   }
 
   setVoiceParameter(handle, paramName, value, atTime, curve = 'step') {
