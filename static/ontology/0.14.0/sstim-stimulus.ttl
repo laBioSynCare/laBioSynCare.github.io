@@ -1,0 +1,104 @@
+###########################################################################
+#
+#  SSTIM Core Stimulus Description Module
+#
+#  Version:    0.14.0
+#  Date:       2026-08-04
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/stimulus> a owl:Ontology ;
+    owl:versionInfo "0.14.0" ;
+    dct:title "SSTIM Core Stimulus Description Module"@en ;
+    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, and optional stimulation target."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-07-31"^^xsd:date ;
+    dct:issued "2026-08-13"^^xsd:date ;
+    dct:modified "2026-08-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Core stimulus description terms
+###########################################################################
+
+sstim:StimulusSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Specification"@en ;
+    skos:definition "An engine-independent description of a sensory stimulation, stating what reaches the subject in physical or perceptual units rather than the settings that make a particular engine produce it. Two implementations whose output matches realise the same stimulus specification, which is what makes them comparable."@en ;
+    skos:scopeNote "Not a sstim:Preset, which is engine-dependent by nature, and not a prov:Plan: a plan is something to be carried out, while this states what is or would be the case. It asserts nothing about effect — evidence, intended outcome and safety metadata are authored by a human through the gated catalog bridge and are never inferred from parameters."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0042-stimulus-specification.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:describesStimulation a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim:Stimulation ;
+    rdfs:label  "describes stimulation"@en ;
+    skos:definition "Links a specification, which is an information artifact, to the stimulation process it describes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:stimulusRegime a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "stimulus regime"@en ;
+    skos:definition "Which kind of description this is: \"determinate\" when the stimulus is fixed in advance, \"stochastic\" when the specification describes a generating process whose realisations differ, or \"adaptive\" when the stimulus depends on the subject's measured state and what is described is a control law rather than a stimulus."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasStimulusChannel a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim-ex:StimulusChannel ;
+    rdfs:label  "has stimulus channel"@en ;
+    skos:definition "Links a specification to a channel through which stimulation reaches the subject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim-ex:StimulusChannel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Channel"@en ;
+    skos:definition "A channel within a stimulus specification or exposure profile, such as an audio, visual, haptic, respiratory, olfactory, gustatory, or electromagnetic exposure path."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:channelDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "channel duration (s)"@en ;
+    skos:definition "Duration for which a channel presents its stimulus, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasStimulationTarget a owl:ObjectProperty ;
+    rdfs:range  [ a owl:Class ; owl:unionOf ( bfo:0000040 bfo:0000029 ) ] ;
+    rdfs:label  "has stimulation target"@en ;
+    skos:definition "What the stimulation is directed at: a person, a non-human animal, a plant, an object or material, or a place. Absence is meaningful and permitted — a stimulation characterised as present in unoccupied space has no target."@en ;
+    skos:scopeNote "Deliberately broad. SSTIM describes sensory stimulation wherever it is applied, and restricting the target to humans would exclude animal work, plant and material studies, and the characterisation of an environment independently of who is in it. Being a target carries no claim that the target perceives, responds, or benefits."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+
+###########################################################################
+# End of stimulus
+###########################################################################

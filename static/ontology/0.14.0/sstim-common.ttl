@@ -1,0 +1,247 @@
+###########################################################################
+#
+#  SSTIM Common Extension Module
+#
+#  Version:    0.14.0
+#  Date:       2026-08-04
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/common> a owl:Ontology ;
+    owl:versionInfo "0.14.0" ;
+    dct:title "SSTIM Common Extension Module"@en ;
+    dct:description "Optional shared descriptors used across SSTIM concerns: bands, modalities, mechanisms, temporal structure, delivery approach, cautions, and calibrated channel quantities."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/stimulus> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-13"^^xsd:date ;
+    dct:modified "2026-08-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Shared optional descriptors
+###########################################################################
+
+sstim:FrequencyBand a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Frequency Band"@en,
+               "Banda di Frequenza"@it,
+               "Banda de Frequência"@pt,
+               "Banda de Frecuencia"@es ;
+    skos:definition "An information entity describing a named Hz range used in BSC protocol design for targeting and evidence classification. BSC operational design category — not a medical diagnostic taxonomy or universal EEG ontology."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:FrequencyBandGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Frequency Band Group"@en,
+               "Gruppo di Bande di Frequenza"@it,
+               "Grupo de Bandas de Frequência"@pt,
+               "Grupo de Bandas de Frecuencia"@es ;
+    skos:definition "A named collection of frequency bands used as a SKOS scheme root or aggregate grouping concept. Not a band with a specific Hz range; used for SKOS hierarchy navigation (skos:narrower* traversal) rather than for range arithmetic."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:SensoryModality a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Modality"@en,
+               "Modalità Sensoriale"@it,
+               "Modalidade Sensorial"@pt,
+               "Modalidad Sensorial"@es ;
+    skos:definition "A controlled information category identifying a channel of sensory perception through which stimulation is delivered or perceived. Values include auditory, visual, somatosensory, interoceptive, vestibular, and olfactory."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:StimulationMechanism a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Mechanism"@en,
+               "Meccanismo di Stimolazione"@it,
+               "Mecanismo de Estimulação"@pt,
+               "Mecanismo de Estimulación"@es ;
+    skos:definition "A controlled information category identifying a proposed neurobiological or psychophysiological pathway through which a stimulus may produce a measured response or intended effect. Mechanism assignments require separate evidence assessment."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:IntendedEffect a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Intended Effect"@en ;
+    skos:definition "A controlled information category identifying a target change in physiological, psychological, or cognitive state that a sensory stimulation intervention is designed to facilitate. It records design intent, not a guaranteed outcome."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:StimulusTemporalStructure a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Temporal Structure"@en ;
+    skos:definition "The temporal organization of an applied stimulus or agent. Values cover carrier periodicity (periodic, quasi-periodic, aperiodic), closed-loop adaptation, discrete event and pulse-train patterns, and administration schedules. Values are non-disjoint and may be combined, because carrier periodicity, pulse pattern, and administration schedule are different temporal features. Detailed executed timing remains in the exposure profile."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:StimulationDeliveryApproach a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Delivery Approach"@en ;
+    skos:definition "A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external, transcutaneous, transcranial, implanted, or systemic. Detailed device, body placement, administration, and dose remain in the exposure profile."@en ;
+    skos:scopeNote "Values are deliberately non-exclusive: a method may be external, transcutaneous, and transcranial at once. No approach tag is inferred from any other facet."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:stimulationDeliveryApproach a owl:ObjectProperty ;
+    rdfs:range sstim:StimulationDeliveryApproach ;
+    rdfs:label "stimulation delivery approach"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, or intervention to a coarse operational description of how the input is introduced or the interface positioned. Values are non-exclusive and may be combined."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:CautionTag a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Caution Tag"@en,
+               "Etichetta di Cautela"@it,
+               "Etiqueta de Cautela"@pt,
+               "Etiqueta de Precaución"@es ;
+    skos:definition "A safety or usage advisory flag attached to a preset, signalling conditions under which the preset may be unsuitable (e.g. photosensitivity risk, drowsiness, high sensory intensity). Advisory wellness metadata, not a medical contraindication."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:CautionSeverity a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Caution Severity"@en ;
+    skos:definition "A controlled ordinal category for prioritizing a caution tag in user interfaces and validation. Severity describes the response required by the application; it is not a clinical diagnosis or risk probability."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hasCautionSeverity a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range  sstim:CautionSeverity ;
+    rdfs:label "has caution severity"@en ;
+    skos:definition "Assigns exactly one interface-priority severity category to a caution tag."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:FrequencyBand ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz minimum"@en ;
+    skos:definition "Lower bound (inclusive) of the frequency band in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:FrequencyBand ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz maximum"@en ;
+    skos:definition "Upper bound (inclusive) of the frequency band in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:cautionSeverityRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionSeverity ;
+    rdfs:range xsd:integer ;
+    rdfs:label "caution severity rank"@en ;
+    skos:definition "Ordinal rank used to sort caution severities from informational (1) through high-priority stop or avoid guidance (4)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:triggerCondition a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "trigger condition"@en ;
+    skos:definition "Machine-readable-content companion text describing the stimulus feature, context, or user state that activates a caution."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:affectedPopulation a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "affected population"@en ;
+    skos:definition "Conservative plain-language description of the users or contexts to which a caution is especially relevant; not a diagnostic classification."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:recommendedAction a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "recommended action"@en ;
+    skos:definition "Plain-language action an interface should present when a caution applies, such as reduce intensity, disable a channel, stop, or avoid the context."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:displayPriority a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:integer ;
+    rdfs:label "display priority"@en ;
+    skos:definition "Positive integer used to order caution messages within the same severity; lower numbers display first."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:platformDeliverable a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SensoryModality ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "platform deliverable"@en ;
+    skos:definition "Whether this modality is deliverable via standard consumer digital platforms without dedicated hardware."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:modifiedAt a owl:AnnotationProperty ;
+    rdfs:label "modified at"@en ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "Timestamp attached to a mutable annotation record when it was last edited. Ontology and evidence resources should use dct:modified and PROV-O for publication provenance."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:modifiedBy a owl:AnnotationProperty ;
+    rdfs:label "modified by"@en ;
+    skos:definition "Identifier attached to a mutable annotation record for the actor that last edited it. Published RDF should use prov:wasAttributedTo for agent provenance."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:channelFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "channel frequency (Hz)"@en ;
+    skos:definition "Rate at which a channel presents its stimulus, in hertz, as delivered rather than as configured."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:soundPressureLevelDb a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "sound pressure level (dB SPL)"@en ;
+    skos:definition "Sound pressure level at the subject's ear, in decibels SPL. This is the quantity sstim:masterVolume is not: a normalized engine gain is not a level, because the same gain produces different levels on different hardware."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:luminanceCdM2 a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "luminance (cd/m²)"@en ;
+    skos:definition "Luminance presented to the subject, in candelas per square metre."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:flashRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "flash rate (Hz)"@en ;
+    skos:definition "Rate of luminance alternation presented to the subject, in hertz. Safety-bearing: rates in the photosensitive range are constrained at runtime rather than merely recorded."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+
+###########################################################################
+# End of common
+###########################################################################
