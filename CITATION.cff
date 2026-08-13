@@ -14,7 +14,7 @@ abstract: >-
 type: software
 version: 0.14.0
 date-released: 2026-08-13
-doi: 10.5281/zenodo.21792692
+doi: 10.5281/zenodo.21923315
 authors:
   - family-names: Fabbri
     given-names: Renato

@@ -17,6 +17,9 @@ file is the human-readable summary.
 
 ## [0.14.0] - 2026-08-13
 
+Published under version DOI `10.5281/zenodo.21923315`, with
+`10.5281/zenodo.21286974` retained as the all-versions concept DOI.
+
 The session-record release. SSTIM can now say what happened during a session,
 in what order, on which clock — and what a participant said about it, including
 what they were never asked. Closes audit findings KR-02 and KR-03.

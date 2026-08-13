@@ -21,7 +21,7 @@
 
 export const RELEASE_VERSION = '0.14.0'
 export const RELEASE_DATE = '2026-08-13'
-export const VERSION_DOI = '10.5281/zenodo.21792692'
+export const VERSION_DOI = '10.5281/zenodo.21923315'
 export const CONCEPT_DOI = '10.5281/zenodo.21286974'
 
 export const NAMESPACE_IRI = 'https://w3id.org/sstim'
