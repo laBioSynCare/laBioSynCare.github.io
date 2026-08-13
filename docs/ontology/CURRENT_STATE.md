@@ -241,22 +241,26 @@ observations, or a claim of turnkey HED/BIDS/NWB interoperability.
 
 The main gaps are design and coverage gaps, not current parser failures:
 
-- `SessionSpecification` and `masterVolume` remain audio-shaped. The native
-  executed-session schema, event timeline, and declared reproducibility level
-  **exist as of 2026-08-13**
+- `SessionSpecification` and `masterVolume` remain audio-shaped, but the
+  executed-session gap closed on 2026-08-13. The native contract
   ([`session.schema.json`](../../static/schemas/session.schema.json),
-  `src/session/`) — but as a native contract, not as SSTIM terms. The RDF
-  projection carries the specification, the execution, and a five-scalar summary
-  per report, and withholds the rest with the term each field would need. The
-  portable Patch Studio package solves object interchange; this solves
-  executed-session recording.
-- Qualified participant observations, structured unwanted experiences,
-  missing/declined states, and their privacy/provenance profile are modelled and
-  gated **natively**, and are still **not representable in RDF**: SSTIM declares
-  no observation class, no response-state scheme, no unwanted-experience class,
-  and no privacy profile. Run `make session-contract` for the generated list of
-  what is missing. Real participant data therefore remains out of scope for the
-  graph, though the native record is now safe enough to hold it.
+  `src/session/`) and its SSTIM terms
+  ([ADR 0048](../decisions/0048-session-events-and-qualified-observations.md))
+  landed together: event timeline on the engine clock, clock origin and timing
+  authority, delivered versus elapsed duration, declared reproducibility level,
+  and a configuration digest. The portable Patch Studio package solves object
+  interchange; this solves executed-session recording.
+- Qualified participant observations, structured unwanted experiences and
+  missing/declined states are now representable in both forms —
+  `sstim:ParticipantObservation` with a required six-value response state,
+  `sstim:UnwantedExperienceObservation`, and `sstim:ObservationInstrument`.
+  Their **privacy and provenance profile is native-only by choice**: it is
+  required on every bundle and lint-enforced, but no SSTIM terms were minted for
+  consent, because that is entangled with ADR 0031's public/private split and
+  needs its own decision. Real participant data therefore still does not enter
+  the committed graph, though the record is now structured enough to hold it
+  safely elsewhere. Run `make session-contract` for what the projection
+  withholds and why.
 - Browser-side SHACL validation and the public preset-to-runtime export path are
   planned; repository and runtime-generator tests are the present validation
   surfaces.

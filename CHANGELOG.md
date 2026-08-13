@@ -17,7 +17,46 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Added
+
+- **Session events and the clock that orders them**
+  ([ADR 0048](docs/decisions/0048-session-events-and-qualified-observations.md)):
+  `sstim:SessionEvent` with a ten-member type scheme, `sstim:eventOffsetSeconds`,
+  `sstim:clockOriginSeconds` and `sstim:hasTimingAuthority`. Ordering lives in
+  the offset, never in statement order. This is the term set the HED event
+  profile needs — before it, SSTIM could not say that anything occurred during a
+  session.
+- **Delivered versus elapsed duration**: `sstim:deliveredDurationSeconds`, with
+  a SHACL-SPARQL constraint holding delivered ≤ elapsed. A session paused for ten
+  minutes and one that ran ten minutes shorter are no longer indistinguishable.
+- **Reproducibility and integrity metadata**:
+  `sstim:hasReproducibilityLevel` over identical-rendering /
+  equivalent-signal / equivalent-presentation, plus
+  `sstim:configurationDigest` and `sstim:digestAlgorithm`, which SHACL-SPARQL
+  requires together.
+- **Qualified participant observations** (closes KR-03):
+  `sstim:ParticipantObservation` with a required six-value response state, so
+  "none reported", "not asked" and "declined" stop collapsing into one silence;
+  `sstim:UnwantedExperienceObservation` with category, participant-reported
+  severity, onset, persistence, action, resolution and participant-perceived
+  relatedness; `sstim:ObservationInstrument` with `sstim:instrumentVersion`;
+  scale bounds, anchor labels, prompt identity and reported confidence. Nine new
+  controlled schemes, 57 concepts, all four languages.
+- `sstim-v:reportDuringSession` — the fourth self-report phase. A during-session
+  report previously had no phase and could not be represented at all.
+
 ### Changed
+
+- `sstim:SelfReport`'s definition and `sstim-sh:SelfReportShape`'s message: a
+  report is a collection event whose content is qualified observations, and the
+  shape now accepts either those or the five legacy scalars. The scalars remain
+  valid as documented simple projections, so no existing report became
+  non-conformant.
+- `make full-equivalence` now asserts 0.12 **compatibility** rather than
+  isomorphism: every baseline triple must survive, deliberate changes must be
+  recorded as exceptions, and additions are counted rather than rejected. The
+  old test conflated "identical" with "compatible", which held only while the
+  ontology was forbidden to grow.
 
 - Re-audited the live Wikidata technique mappings: added a conservative
   `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened

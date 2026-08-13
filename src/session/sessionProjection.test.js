@@ -49,10 +49,16 @@ describe('loss accounting', () => {
     expect(() => projectSession(orphan)).toThrow(/did not account for/)
   })
 
-  it('names the term each withheld field would need', () => {
+  it('names the term each remaining gap would need', () => {
     const { report } = projectSession(helpful)
-    expect(report.requiredTerms.length).toBeGreaterThan(5)
     for (const term of report.requiredTerms) expect(term).toBeTruthy()
+  })
+
+  it('projects the great majority of the record, now that the terms exist', () => {
+    // Before ADR 0048 this ratio was inverted: the event timeline, every
+    // qualified observation and every unwanted experience were withheld.
+    const { report } = projectSession(helpful)
+    expect(report.projected.length).toBeGreaterThan(report.withheld.length)
   })
 })
 
@@ -100,52 +106,167 @@ describe('what the graph carries', () => {
   })
 })
 
-describe('what the graph refuses to carry', () => {
-  it('withholds the whole event timeline, naming the missing class', () => {
-    const { report } = projectSession(helpful)
-    const events = report.withheld.filter((w) => w.pointer.startsWith('/events/'))
-    expect(events.length).toBeGreaterThan(0)
-    expect(events[0].requiredTerm).toMatch(/session-event class/)
+describe('the execution timeline (ADR 0048)', () => {
+  it('projects every event, typed and placed on the engine clock', () => {
+    const { quads } = projectSession(helpful)
+    const store = new Store(quads)
+    const inst = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful'
+
+    const events = objects(store, inst, `${SSTIM}hasSessionEvent`)
+    expect(events).toHaveLength(helpful.events.length)
+
+    const first = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-event-0000'
+    expect(objects(store, first, `${SSTIM}hasEventType`)[0].value).toBe(`${SSTIM_V}eventSessionOpen`)
+    expect(objects(store, first, `${SSTIM}eventOffsetSeconds`)[0].value).toBe('0')
   })
 
-  it('withholds a during-session report entirely rather than mis-phasing it', () => {
-    // SSTIM declares three phases and this is not one of them. Projecting it
-    // under the nearest neighbour would silently move when the answer was given.
-    const { quads, report } = projectSession(during)
+  it('keeps ordering in the offsets, not in statement order', () => {
+    // An RDF graph is a set. A consumer reading the timeline off statement
+    // order would get a different answer each time, so the offset is the only
+    // ordering authority — and every event must carry one.
+    const { quads } = projectSession(helpful)
+    const store = new Store(quads)
+    const inst = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful'
+
+    for (const event of objects(store, inst, `${SSTIM}hasSessionEvent`)) {
+      expect(objects(store, event.value, `${SSTIM}eventOffsetSeconds`)).toHaveLength(1)
+    }
+  })
+
+  it('projects the clock origin, its authority, and delivered time', () => {
+    const bundle = GOLDEN_SESSIONS['unhelpful, interrupted, one experience, follow-up']
+    const { quads } = projectSession(bundle)
+    const store = new Store(quads)
+    const inst = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-interrupted'
+
+    expect(objects(store, inst, `${SSTIM}clockOriginSeconds`)[0].value).toBe('3.25')
+    expect(objects(store, inst, `${SSTIM}hasTimingAuthority`)[0].value).toBe(`${SSTIM_V}timingAudioHardwareClock`)
+    // 400 s elapsed, 340 s delivered: the pause is visible in the graph.
+    expect(objects(store, inst, `${SSTIM}actualDurationSeconds`)[0].value).toBe('400')
+    expect(objects(store, inst, `${SSTIM}deliveredDurationSeconds`)[0].value).toBe('340')
+  })
+
+  it('projects the configuration digest with the algorithm that made it', () => {
+    const { quads } = projectSession(helpful)
+    const store = new Store(quads)
+    const spec = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-spec'
+
+    expect(objects(store, spec, `${SSTIM}configurationDigest`)[0].value)
+      .toBe(helpful.specification.source.contentHash)
+    expect(objects(store, spec, `${SSTIM}digestAlgorithm`)[0].value).toBe('sha256-canonical-json')
+    expect(objects(store, spec, `${SSTIM}hasReproducibilityLevel`)[0].value)
+      .toBe(`${SSTIM_V}reproEquivalentPresentation`)
+  })
+})
+
+describe('qualified observations (ADR 0048)', () => {
+  it('projects a during-session report under its own phase', () => {
+    const { quads } = projectSession(during)
     const store = new Store(quads)
     const iri = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-multiple-report-during-session'
 
-    expect(store.getQuads(iri, null, null, null)).toHaveLength(0)
-    const withheld = report.withheld.filter((w) => w.pointer.startsWith('/reports/0/'))
-    expect(withheld[0].requiredTerm).toMatch(/during-session/)
+    expect(objects(store, iri, `${SSTIM}hasReportPhase`)[0].value).toBe(`${SSTIM_V}reportDuringSession`)
   })
 
-  it('withholds perceived helpfulness, the item KR-03 found missing', () => {
-    const { report } = projectSession(helpful)
-    const helpfulness = report.withheld.filter((w) => /Perceived helpfulness/.test(w.reason))
-    // The whole item — value, scale, prompt, response state — with the term it needs.
-    expect(helpfulness.length).toBeGreaterThan(3)
-    expect(helpfulness[0].requiredTerm).toMatch(/perceived-helpfulness observation/)
-  })
-
-  it('withholds a report whose every answer was declined or not asked', () => {
-    // Four items, no supplied scalar: SelfReportShape requires at least one
-    // value, so emitting the node would produce a graph that fails its own
-    // contract. The record still exists in the bundle.
-    const { quads, report } = projectSession(declined)
+  it('projects perceived helpfulness with its scale and prompt', () => {
+    const { quads } = projectSession(helpful)
     const store = new Store(quads)
-    const iri = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-abandoned-report-immediate-post'
+    const item = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post-item-perceived-helpfulness'
 
-    expect(store.getQuads(iri, null, null, null)).toHaveLength(0)
-    expect(report.withheld.some((w) => w.reason.includes('at least one report value'))).toBe(true)
+    expect(objects(store, item, `${SSTIM}hasObservationRole`)[0].value).toBe(`${SSTIM_V}rolePerceivedHelpfulness`)
+    expect(objects(store, item, `${SSTIM}observedOrdinalValue`)[0].value).toBe('4')
+    expect(objects(store, item, `${SSTIM}scaleMinimum`)[0].value).toBe('1')
+    expect(objects(store, item, `${SSTIM}scaleMaximum`)[0].value).toBe('5')
+    expect(objects(store, item, `${SSTIM}scaleMaximumLabel`)[0].value).toBe('a great deal')
+    expect(objects(store, item, `${SSTIM}promptIdentifier`)[0].value).toBe('helpfulness')
   })
 
-  it('withholds the response state, because RDF can only omit the triple', () => {
-    const { report } = projectSession(during)
-    const notAsked = report.withheld.find(
-      (w) => w.pointer === '/reports/1/items/1/responseState',
-    )
-    expect(notAsked.reason).toMatch(/collapses/)
+  it('states why an answer is absent instead of omitting the triple', () => {
+    const { quads } = projectSession(declined)
+    const store = new Store(quads)
+    const base = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-abandoned-report-immediate-post'
+
+    const states = {
+      'item-primary-affect': 'responseDeclined',
+      'item-focus': 'responseNotAsked',
+      'item-subjective-quality': 'responseNotApplicable',
+    }
+    for (const [suffix, concept] of Object.entries(states)) {
+      expect(objects(store, `${base}-${suffix}`, `${SSTIM}hasResponseState`)[0].value)
+        .toBe(`${SSTIM_V}${concept}`)
+    }
+
+    // …and no value anywhere on those observations, which the SHACL-SPARQL
+    // constraint also enforces.
+    for (const suffix of Object.keys(states)) {
+      expect(objects(store, `${base}-${suffix}`, `${SSTIM}observedOrdinalValue`)).toHaveLength(0)
+    }
+  })
+
+  it('distinguishes "none reported" from "not asked" on unwanted experiences', () => {
+    const store = new Store(projectSession(helpful).quads)
+    const pre = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-pre-session-item-unwanted-experience-report'
+    const post = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post-item-unwanted-experience-report'
+
+    expect(objects(store, pre, `${SSTIM}hasResponseState`)[0].value).toBe(`${SSTIM_V}responseNotAsked`)
+    expect(objects(store, post, `${SSTIM}hasResponseState`)[0].value).toBe(`${SSTIM_V}responseNoneReported`)
+  })
+
+  it('projects each unwanted experience with everything that qualifies it', () => {
+    const bundle = GOLDEN_SESSIONS['unhelpful, interrupted, one experience, follow-up']
+    const store = new Store(projectSession(bundle).quads)
+    const ue = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-interrupted-report-immediate-post-ue-00'
+
+    expect(objects(store, ue, `${SSTIM}hasExperienceCategory`)[0].value).toBe(`${SSTIM_V}experienceEyeStrain`)
+    expect(objects(store, ue, `${SSTIM}hasReportedSeverity`)[0].value).toBe(`${SSTIM_V}severityMild`)
+    expect(objects(store, ue, `${SSTIM}hasOnsetPhase`)[0].value).toBe(`${SSTIM_V}onsetDuringSession`)
+    expect(objects(store, ue, `${SSTIM}onsetOffsetSeconds`)[0].value).toBe('180')
+    expect(objects(store, ue, `${SSTIM}hasResponseAction`)[0].value).toBe(`${SSTIM_V}actionPausedSession`)
+    expect(objects(store, ue, `${SSTIM}hasPerceivedRelatedness`)[0].value)
+      .toBe(`${SSTIM_V}relatednessPossiblyRelated`)
+  })
+
+  it('keeps the five legacy scalars alongside the observations', () => {
+    // Additive, not a replacement: an existing consumer reading primaryAffect
+    // keeps working, and the observation beside it carries what it cannot.
+    const store = new Store(projectSession(helpful).quads)
+    const post = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post'
+
+    expect(objects(store, post, `${SSTIM}primaryAffect`)[0].value).toBe('4')
+    expect(objects(store, post, `${SSTIM}goalAchieved`)[0].value).toBe('true')
+    expect(objects(store, post, `${SSTIM}hasObservation`).length).toBeGreaterThan(5)
+  })
+
+  it('records the instrument version answers are not comparable across', () => {
+    const store = new Store(projectSession(helpful).quads)
+    const instrument = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post-instrument'
+
+    expect(objects(store, instrument, `${SSTIM}instrumentVersion`)[0].value).toBe('1.0.0')
+  })
+})
+
+describe('what the graph still refuses to carry', () => {
+  it('withholds free text by default, even though the term exists', () => {
+    const { quads, report } = projectSession(helpful)
+    const withheld = report.withheld.find((w) => w.pointer === '/reports/0/statedGoal/text')
+    expect(withheld.reason).toMatch(/identifying information/)
+    expect(quads.some((q) => q.predicate.value === `${SSTIM}observedTextValue`)).toBe(false)
+  })
+
+  it('carries free text only when the caller asks for it', () => {
+    const { quads } = projectSession(helpful, { includeFreeText: true })
+    const store = new Store(quads)
+    const goal = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-pre-session-item-stated-goal'
+    expect(objects(store, goal, `${SSTIM}observedTextValue`)[0].value)
+      .toBe('Settle before a long stretch of writing.')
+  })
+
+  it('withholds event detail, naming what it would need', () => {
+    const bundle = GOLDEN_SESSIONS['during-session report, multiple experiences']
+    const { report } = projectSession(bundle)
+    const detail = report.withheld.filter((w) => w.pointer.includes('/detail/'))
+    expect(detail.length).toBeGreaterThan(0)
+    expect(detail[0].requiredTerm).toMatch(/event-detail properties/)
   })
 
   it('withholds the privacy profile in full, by design', () => {

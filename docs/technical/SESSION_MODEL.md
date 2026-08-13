@@ -33,13 +33,14 @@ profile that governs all of them. The model tag is
 `bsc-lab-session-bundle-1`; a bundle carrying newer fields must never claim an
 older tag.
 
-**The RDF is a projection, not the record.** SSTIM has no term today for an
-event, for instrument provenance, for the six response states, for a qualified
-unwanted experience, or for a privacy profile, so the projection withholds those
-fields and names the term each one needs, rather than minting undeclared IRIs
-(the KR-17 failure). `make session-contract` prints that list. What survives
-projection is: the specification, the execution, and a five-scalar summary of
-each report. See §"RDF representation" below.
+**The RDF is a projection, not the record.** As of
+[ADR 0048](../decisions/0048-session-events-and-qualified-observations.md) it
+carries the event timeline, the clock that orders it, qualified observations
+with their six response states, unwanted-experience records, and instrument
+provenance. What it still withholds — free text, the privacy profile, event
+detail, the execution environment — it withholds on purpose and says so, rather
+than minting undeclared IRIs (the KR-17 failure). `make session-contract` prints
+the current list. See §"RDF representation" below.
 
 ---
 
@@ -570,33 +571,49 @@ Key design decisions for the RDF model:
   to a user IRI, which is stored only in the user's local named graph
   and never included in anonymized research exports.
 
-### What the projection cannot carry
+### What the projection carries
 
-Run `make session-contract` for the current, generated list. As of this writing
-it is 18 terms, and the large ones are:
+Since [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md),
+most of the record travels:
 
-| Withheld | Term SSTIM would need |
+| Carried | Terms |
 |---|---|
-| The entire event timeline | a session-event class with an engine-clock offset, a controlled event-type scheme, and a link from `sstim:SessionInstance` |
-| Every qualified observation | an observation class where each answer is an addressable record with its prompt, scale and state |
-| The six response states | a response-state scheme, so absence carries its reason |
-| Every unwanted experience | a qualified unwanted-experience class with a controlled category scheme |
-| Perceived helpfulness | a helpfulness observation with a declared scale |
-| Instrument and prompt provenance | instrument id, version, language |
-| `during-session` reports (whole report) | a `during-session` `SelfReportPhase` concept |
-| Clock origin, clock source, delivered time | properties on `sstim:SessionInstance` |
-| Source content hash, environment, output guarantee | content-integrity, execution-environment and reproducibility-level properties |
-| The privacy profile | by design — it governs whether the graph may be published, and belongs in a separate access-controlled graph (CLAUDE.md §5.5) |
+| The execution timeline | `sstim:SessionEvent`, `hasEventType`, `eventOffsetSeconds` — ordering lives in the offset, never in statement order |
+| The clock that orders it | `clockOriginSeconds`, `hasTimingAuthority` |
+| Delivered vs elapsed time | `deliveredDurationSeconds`, with SHACL-SPARQL holding delivered ≤ elapsed |
+| What the record can promise | `hasReproducibilityLevel`, `configurationDigest` + `digestAlgorithm` |
+| Every qualified answer | `sstim:ParticipantObservation` — role, response state, value, scale bounds and anchors, prompt |
+| Why an answer is absent | `hasResponseState` over six concepts, enforced by SHACL-SPARQL against a value being present |
+| Perceived helpfulness and the stated goal | `rolePerceivedHelpfulness`, `roleStatedGoal` |
+| Instrument provenance | `sstim:ObservationInstrument` with `instrumentVersion` |
+| Unwanted experiences | `sstim:UnwantedExperienceObservation` with category, severity, onset, persistence, action, resolution, perceived relatedness |
+| `during-session` reports | `sstim-v:reportDuringSession` |
 
-Adding these means editing protected ontology sources (CLAUDE.md §3.4) and needs
-an explicit instruction naming each file. Until then the projection withholds
-rather than mints: a graph that looks authoritative and validates against
-nothing is worse than a smaller graph that is true.
+The five legacy scalars are emitted **alongside** the observations, not instead
+of them, so existing consumers keep working.
 
-**What survives** is worth stating plainly, because it is what a third party
-querying the RDF sees: this session ran, against this configuration, for this
-long, ending this way, with a five-scalar summary per report. Not what happened
-during it, not how the answers were elicited, and not what was never asked.
+### What it still withholds, and why
+
+Run `make session-contract` for the current, generated list — it shrinks by
+itself as terms land, so it cannot claim a gap that has closed. What remains is
+withheld on purpose rather than for want of a term:
+
+- **Free text.** `sstim:observedTextValue` exists, and the projection withholds
+  it unless the caller passes `includeFreeText`. Free text can carry identifiers
+  no schema anticipates.
+- **The privacy profile.** It governs whether the graph may be published at all,
+  so it travels beside the graph rather than inside it, and consent decisions
+  belong in a separate access-controlled named graph (CLAUDE.md §5.5). Terms for
+  it are deliberately not minted yet — see ADR 0048's consequences.
+- **Event detail.** Which engine replaced which, which parameter a safety limit
+  constrained. The event is recorded; its particulars are not.
+- **The execution environment.** Engine identity and build, output route, sample
+  rate, latency. That is equipment, and equipment is
+  [`EQUIPMENT_CHECK.md`](EQUIPMENT_CHECK.md)'s concern.
+
+The rule that produced this list has not changed: where there is no term, the
+projection emits no triple and says so. A graph that looks authoritative and
+validates against nothing is worse than a smaller graph that is true.
 
 ---
 

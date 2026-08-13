@@ -116,10 +116,12 @@ if (failures.length > 0) {
 
 console.log(`  checks         schema, loss accounting, public-repo lint, round trip — all passed`)
 
-console.log(`\nsession-contract: ${requiredTerms.size} SSTIM terms the projection needs and does not have.`)
-console.log('  These are the protected-file additions that would close the rest of')
-console.log('  KR-02/KR-03. Until they exist the projection withholds the fields rather')
-console.log('  than minting undeclared IRIs (KR-17).\n')
+console.log(`\nsession-contract: ${requiredTerms.size} field group(s) the projection does not carry.`)
+console.log('  ADR 0048 closed the KR-02/KR-03 term gap; what is left is a mix of')
+console.log('  deliberate policy (the privacy profile travels beside the graph, not in')
+console.log('  it) and genuinely unminted terms. Either way the projection withholds')
+console.log('  rather than minting undeclared IRIs (KR-17), and this list is generated')
+console.log('  from what it withheld, so it cannot claim a gap that has closed.\n')
 
 for (const term of [...requiredTerms.keys()].sort()) {
   console.log(`  • ${term}`)

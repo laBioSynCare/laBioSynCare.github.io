@@ -587,8 +587,8 @@ sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concep
 sstim-v:SelfReportPhaseScheme a skos:ConceptScheme ;
     skos:prefLabel "SSTIM Self-Report Phase Vocabulary"@en ;
     skos:definition "Controlled phases for locating a consent-governed self-report relative to its associated session."@en ;
-    skos:hasTopConcept sstim-v:reportPreSession, sstim-v:reportImmediatePost,
-        sstim-v:reportFollowUp .
+    skos:hasTopConcept sstim-v:reportPreSession, sstim-v:reportDuringSession,
+        sstim-v:reportImmediatePost, sstim-v:reportFollowUp .
 
 sstim-v:reportPreSession a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
     skos:inScheme sstim-v:SelfReportPhaseScheme ;
@@ -606,6 +606,15 @@ sstim-v:reportImmediatePost a owl:NamedIndividual, sstim:SelfReportPhase, skos:C
     skos:notation "post" ;
     skos:definition "Self-report collected shortly after stimulus delivery ends."@en .
 
+sstim-v:reportDuringSession a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
+    skos:inScheme sstim-v:SelfReportPhaseScheme ;
+    skos:topConceptOf sstim-v:SelfReportPhaseScheme ;
+    skos:prefLabel "During session"@en, "Durante la sessione"@it,
+        "Durante a sessão"@pt, "Durante la sesión"@es ;
+    skos:notation "during" ;
+    skos:definition "Self-report collected while stimulus delivery is in progress. Its placement on the session's own timing context is what makes it interpretable, since a wall-clock timestamp cannot say how far into the session it was given."@en ;
+    skos:historyNote "Added 2026-08-13 (ADR 0048). Until then a during-session report had no phase and could not be represented at all, so a whole class of collected observation was unprojectable."@en .
+
 sstim-v:reportFollowUp a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concept ;
     skos:inScheme sstim-v:SelfReportPhaseScheme ;
     skos:topConceptOf sstim-v:SelfReportPhaseScheme ;
@@ -613,6 +622,170 @@ sstim-v:reportFollowUp a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concep
         "Acompanhamento"@pt, "Seguimiento"@es ;
     skos:notation "follow-up" ;
     skos:definition "Self-report collected after a declared delay from session completion; the timestamp is required to make the delay interpretable."@en .
+
+
+###########################################################################
+# Session event type scheme
+#
+# What a delivering system can observe about its own execution. Added
+# 2026-08-13 (ADR 0048). Kept to occurrences a recorder actually witnesses:
+# a category that no runtime can emit is a category that will be guessed at.
+###########################################################################
+
+sstim-v:SessionEventTypeScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Session Event Type Vocabulary"@en ;
+    skos:definition "Controlled categories of occurrence during a session execution, as observed by the delivering system."@en ;
+    skos:hasTopConcept sstim-v:eventSessionOpen, sstim-v:eventPlaybackStart,
+        sstim-v:eventPlaybackPause, sstim-v:eventPlaybackResume,
+        sstim-v:eventPlaybackStop, sstim-v:eventSessionComplete,
+        sstim-v:eventSessionInterrupt, sstim-v:eventEngineFallback,
+        sstim-v:eventSafetyLimitApplied, sstim-v:eventObservationCollected .
+
+sstim-v:eventSessionOpen a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Session opened"@en, "Sessione aperta"@it,
+        "Sessão aberta"@pt, "Sesión abierta"@es ;
+    skos:notation "session-open" ;
+    skos:definition "The session instance was opened and its clock origin captured. Always the first event, at offset zero."@en .
+
+sstim-v:eventPlaybackStart a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Playback started"@en, "Riproduzione avviata"@it,
+        "Reprodução iniciada"@pt, "Reproducción iniciada"@es ;
+    skos:notation "playback-start" ;
+    skos:definition "Stimulus delivery began."@en .
+
+sstim-v:eventPlaybackPause a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Playback paused"@en, "Riproduzione in pausa"@it,
+        "Reprodução pausada"@pt, "Reproducción pausada"@es ;
+    skos:notation "playback-pause" ;
+    skos:definition "Stimulus delivery stopped without ending the session. Elapsed time continues; delivered duration does not."@en .
+
+sstim-v:eventPlaybackResume a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Playback resumed"@en, "Riproduzione ripresa"@it,
+        "Reprodução retomada"@pt, "Reproducción reanudada"@es ;
+    skos:notation "playback-resume" ;
+    skos:definition "Stimulus delivery restarted after a pause."@en .
+
+sstim-v:eventPlaybackStop a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Playback stopped"@en, "Riproduzione interrotta"@it,
+        "Reprodução parada"@pt, "Reproducción detenida"@es ;
+    skos:notation "playback-stop" ;
+    skos:definition "Stimulus delivery ended before the intended duration elapsed."@en .
+
+sstim-v:eventSessionComplete a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Session completed"@en, "Sessione completata"@it,
+        "Sessão concluída"@pt, "Sesión completada"@es ;
+    skos:notation "session-complete" ;
+    skos:definition "The session delivered its intended duration and closed normally."@en .
+
+sstim-v:eventSessionInterrupt a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Session interrupted"@en, "Sessione interrotta"@it,
+        "Sessão interrompida"@pt, "Sesión interrumpida"@es ;
+    skos:notation "session-interrupt" ;
+    skos:definition "The session closed without delivering its intended duration. Records that the execution ended early; it carries no judgement about why."@en .
+
+sstim-v:eventEngineFallback a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Engine fallback"@en, "Ripiego del motore"@it,
+        "Substituição de motor"@pt, "Repliegue del motor"@es ;
+    skos:notation "engine-fallback" ;
+    skos:definition "Delivery moved to a different engine implementation mid-session, for example because a required capability was unavailable. Material to reproducibility: the stimulus after the fallback was generated by different code."@en .
+
+sstim-v:eventSafetyLimitApplied a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Safety limit applied"@en, "Limite di sicurezza applicato"@it,
+        "Limite de segurança aplicado"@pt, "Límite de seguridad aplicado"@es ;
+    skos:notation "safety-limit-applied" ;
+    skos:definition "A delivery parameter was constrained by a safety limit, so the delivered value differs from the configured one. Without this event the record would describe a stimulus that was never delivered."@en .
+
+sstim-v:eventObservationCollected a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Observation collected"@en, "Osservazione raccolta"@it,
+        "Observação coletada"@pt, "Observación recogida"@es ;
+    skos:notation "observation-collected" ;
+    skos:definition "A report was collected at this point on the session timeline. Places the act of asking, which is separate from what was answered."@en .
+
+
+###########################################################################
+# Timing authority scheme
+###########################################################################
+
+sstim-v:TimingAuthorityScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Timing Authority Vocabulary"@en ;
+    skos:definition "Controlled categories identifying which timing surface produced a session's clock origin and event offsets."@en ;
+    skos:hasTopConcept sstim-v:timingAudioHardwareClock, sstim-v:timingMonotonicSubstitute .
+
+sstim-v:timingAudioHardwareClock a owl:NamedIndividual, sstim:TimingAuthority, skos:Concept ;
+    skos:inScheme sstim-v:TimingAuthorityScheme ;
+    skos:topConceptOf sstim-v:TimingAuthorityScheme ;
+    skos:prefLabel "Audio hardware clock"@en, "Orologio hardware audio"@it,
+        "Relógio de hardware de áudio"@pt, "Reloj de hardware de audio"@es ;
+    skos:notation "audio-hardware" ;
+    skos:definition "Offsets came from the clock of the audio device that rendered the stimulus, which is the same clock the stimulus was generated against."@en .
+
+sstim-v:timingMonotonicSubstitute a owl:NamedIndividual, sstim:TimingAuthority, skos:Concept ;
+    skos:inScheme sstim-v:TimingAuthorityScheme ;
+    skos:topConceptOf sstim-v:TimingAuthorityScheme ;
+    skos:prefLabel "Monotonic substitute clock"@en, "Orologio monotono sostitutivo"@it,
+        "Relógio monotónico substituto"@pt, "Reloj monótono sustituto"@es ;
+    skos:notation "monotonic-substitute" ;
+    skos:definition "Offsets came from a monotonic clock standing in for audio hardware, as in a silent or visual-only session. Ordering is sound; alignment to rendered audio is not claimed, because no audio was rendered."@en .
+
+
+###########################################################################
+# Reproducibility level scheme
+#
+# Which reproduction claim a record supports. Three levels rather than a
+# boolean, because "reproducible" hides the difference between an identical
+# rendering and the same intent realised by different code.
+###########################################################################
+
+sstim-v:ReproducibilityLevelScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Reproducibility Level Vocabulary"@en ;
+    skos:definition "Controlled categories stating how exactly a session specification's output can be reproduced."@en ;
+    skos:hasTopConcept sstim-v:reproIdenticalRendering, sstim-v:reproEquivalentSignal,
+        sstim-v:reproEquivalentPresentation .
+
+sstim-v:reproIdenticalRendering a owl:NamedIndividual, sstim:ReproducibilityLevel, skos:Concept ;
+    skos:inScheme sstim-v:ReproducibilityLevelScheme ;
+    skos:topConceptOf sstim-v:ReproducibilityLevelScheme ;
+    skos:prefLabel "Identical rendering"@en, "Rendering identico"@it,
+        "Renderização idêntica"@pt, "Renderizado idéntico"@es ;
+    skos:notation "identical-rendering" ;
+    skos:definition "Re-execution produces sample-identical output. Requires a deterministic offline render and a pinned engine build; it is not satisfied by a live audio pipeline."@en .
+
+sstim-v:reproEquivalentSignal a owl:NamedIndividual, sstim:ReproducibilityLevel, skos:Concept ;
+    skos:inScheme sstim-v:ReproducibilityLevelScheme ;
+    skos:topConceptOf sstim-v:ReproducibilityLevelScheme ;
+    skos:prefLabel "Equivalent signal"@en, "Segnale equivalente"@it,
+        "Sinal equivalente"@pt, "Señal equivalente"@es ;
+    skos:notation "equivalent-signal" ;
+    skos:definition "Re-execution produces the same generated signal within a declared numerical tolerance, allowing for floating-point differences between implementations."@en .
+
+sstim-v:reproEquivalentPresentation a owl:NamedIndividual, sstim:ReproducibilityLevel, skos:Concept ;
+    skos:inScheme sstim-v:ReproducibilityLevelScheme ;
+    skos:topConceptOf sstim-v:ReproducibilityLevelScheme ;
+    skos:prefLabel "Equivalent presentation"@en, "Presentazione equivalente"@it,
+        "Apresentação equivalente"@pt, "Presentación equivalente"@es ;
+    skos:notation "equivalent-presentation" ;
+    skos:definition "Re-execution produces the same target frequencies, arc, layer architecture and duration, without any claim about the rendered signal. The honest default for a browser audio pipeline."@en ;
+    skos:editorialNote "Declaring a level above what the delivering system can demonstrate is a reproducibility claim the record cannot support; prefer this level unless a deterministic render proves otherwise."@en .
 
 
 ###########################################################################
@@ -3034,3 +3207,607 @@ sstim-v:techBiofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, s
     sstim:participantEngagementMode sstim-v:engagementActiveSelfRegulatory ;
     skos:related sstim-v:techSonification ;
     skos:editorialNote "Added from the 2026-07-22 Theo Marins interview; typed as self-directed neuromodulation by ADR 0036."@en .
+
+
+###########################################################################
+# Observation role scheme
+#
+# What a participant observation observes. Added 2026-08-13 (ADR 0048).
+# Every role here is answerable by a participant about their own experience;
+# none is an outcome measurement, and none belongs to a clinician.
+###########################################################################
+
+sstim-v:ObservationRoleScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Observation Role Vocabulary"@en ;
+    skos:definition "Controlled categories of what a qualified participant observation observes."@en ;
+    skos:hasTopConcept sstim-v:roleStatedGoal, sstim-v:rolePerceivedHelpfulness,
+        sstim-v:rolePrimaryAffect, sstim-v:roleFocus, sstim-v:roleSleepiness,
+        sstim-v:roleSubjectiveQuality, sstim-v:roleGoalAchieved,
+        sstim-v:roleUnwantedExperienceReport .
+
+sstim-v:roleStatedGoal a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Stated goal"@en, "Obiettivo dichiarato"@it,
+        "Objetivo declarado"@pt, "Objetivo declarado"@es ;
+    skos:notation "stated-goal" ;
+    skos:definition "What the participant said they wanted from the session, in their own words."@en ;
+    skos:editorialNote "A participant's intention, not a clinical target, and it establishes no expected outcome. Recording it is what makes a later helpfulness or goal-achieved answer interpretable at all."@en .
+
+sstim-v:rolePerceivedHelpfulness a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Perceived helpfulness"@en, "Utilità percepita"@it,
+        "Utilidade percebida"@pt, "Utilidad percibida"@es ;
+    skos:notation "perceived-helpfulness" ;
+    skos:definition "How much the participant felt the session helped with what they wanted from it, on a declared scale."@en ;
+    skos:scopeNote "A magnitude, unlike the yes/no goal-achieved item, and about the participant's own stated goal rather than the session's designed effect."@en .
+
+sstim-v:rolePrimaryAffect a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Primary affect"@en, "Affetto primario"@it,
+        "Afeto primário"@pt, "Afecto primario"@es ;
+    skos:notation "primary-affect" ;
+    skos:definition "How the participant felt at the report's collection phase, on a declared scale."@en .
+
+sstim-v:roleFocus a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Focus"@en, "Concentrazione"@it,
+        "Foco"@pt, "Foco"@es ;
+    skos:notation "focus" ;
+    skos:definition "How the participant described their attention at the report's collection phase."@en .
+
+sstim-v:roleSleepiness a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Sleepiness"@en, "Sonnolenza"@it,
+        "Sonolência"@pt, "Somnolencia"@es ;
+    skos:notation "sleepiness" ;
+    skos:definition "How alert or drowsy the participant felt at the report's collection phase."@en .
+
+sstim-v:roleSubjectiveQuality a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Subjective quality"@en, "Qualità soggettiva"@it,
+        "Qualidade subjetiva"@pt, "Calidad subjetiva"@es ;
+    skos:notation "subjective-quality" ;
+    skos:definition "How the participant rated the session itself."@en .
+
+sstim-v:roleGoalAchieved a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Goal achieved"@en, "Obiettivo raggiunto"@it,
+        "Objetivo alcançado"@pt, "Objetivo alcanzado"@es ;
+    skos:notation "goal-achieved" ;
+    skos:definition "Whether the participant judged that the session did what they wanted from it."@en ;
+    skos:editorialNote "A self-assessment against the participant's own stated goal. It is not an efficacy measure and does not become one by aggregation."@en .
+
+sstim-v:roleUnwantedExperienceReport a owl:NamedIndividual, sstim:ObservationRole, skos:Concept ;
+    skos:inScheme sstim-v:ObservationRoleScheme ;
+    skos:topConceptOf sstim-v:ObservationRoleScheme ;
+    skos:prefLabel "Unwanted experience report"@en, "Segnalazione di esperienze indesiderate"@it,
+        "Relato de experiências indesejadas"@pt, "Informe de experiencias no deseadas"@es ;
+    skos:notation "unwanted-experience-report" ;
+    skos:definition "The act of asking whether the participant had any unwanted experience, carrying its own response state and linking to whatever they described."@en ;
+    skos:scopeNote "Modelling the asking as an observation is what keeps 'asked, none reported' distinct from 'never asked' and from 'declined to answer'. An empty list of experiences cannot express that difference."@en .
+
+
+###########################################################################
+# Response state scheme
+#
+# Why a value is or is not present. Six states rather than presence and
+# absence, because a missing triple says only that a triple is missing.
+###########################################################################
+
+sstim-v:ResponseStateScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Response State Vocabulary"@en ;
+    skos:definition "Controlled categories stating why a participant observation does or does not carry a value."@en ;
+    skos:hasTopConcept sstim-v:responseSupplied, sstim-v:responseNoneReported,
+        sstim-v:responseNotAsked, sstim-v:responseDeclined,
+        sstim-v:responseUnknown, sstim-v:responseNotApplicable .
+
+sstim-v:responseSupplied a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "Supplied"@en, "Fornita"@it,
+        "Fornecida"@pt, "Proporcionada"@es ;
+    skos:notation "supplied" ;
+    skos:definition "The participant gave an answer, which is recorded as this observation's value."@en .
+
+sstim-v:responseNoneReported a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "None reported"@en, "Nessuna segnalata"@it,
+        "Nenhuma relatada"@pt, "Ninguna informada"@es ;
+    skos:notation "none-reported" ;
+    skos:definition "The participant was asked and reported nothing to record. A positive finding of absence, not a gap."@en .
+
+sstim-v:responseNotAsked a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "Not asked"@en, "Non richiesta"@it,
+        "Não perguntada"@pt, "No preguntada"@es ;
+    skos:notation "not-asked" ;
+    skos:definition "The instrument did not put this question, so nothing about the participant follows from the absence."@en .
+
+sstim-v:responseDeclined a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "Declined"@en, "Rifiutata"@it,
+        "Recusada"@pt, "Rechazada"@es ;
+    skos:notation "declined" ;
+    skos:definition "The participant was asked and chose not to answer. Declining is always available and is never treated as a missing value to be imputed."@en .
+
+sstim-v:responseUnknown a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "Unknown"@en, "Sconosciuta"@it,
+        "Desconhecida"@pt, "Desconocida"@es ;
+    skos:notation "unknown" ;
+    skos:definition "Whether the question was put, or what was answered, is not recoverable from the record."@en .
+
+sstim-v:responseNotApplicable a owl:NamedIndividual, sstim:ResponseState, skos:Concept ;
+    skos:inScheme sstim-v:ResponseStateScheme ;
+    skos:topConceptOf sstim-v:ResponseStateScheme ;
+    skos:prefLabel "Not applicable"@en, "Non applicabile"@it,
+        "Não aplicável"@pt, "No aplicable"@es ;
+    skos:notation "not-applicable" ;
+    skos:definition "The question does not apply to this session, as when a session ended too early for an item about how it went."@en .
+
+
+###########################################################################
+# Unwanted experience category scheme
+#
+# Everyday descriptions of unwanted experience, in the participant's terms.
+# None of these is a diagnosis, a symptom classification, or a clinical
+# adverse-event category, and none may be read as one. "Other" plus free
+# text is preferred over forcing a poor fit.
+###########################################################################
+
+sstim-v:UnwantedExperienceCategoryScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Unwanted Experience Category Vocabulary"@en ;
+    skos:definition "Controlled, non-diagnostic categories for describing an unwanted experience a participant reported around a session."@en ;
+    skos:editorialNote "Descriptive rather than clinical by design. These categories support noticing patterns and responding conservatively; they do not support classifying harm, and no mapping to a clinical adverse-event terminology is provided or implied."@en ;
+    skos:hasTopConcept sstim-v:experienceAuditoryDiscomfort, sstim-v:experienceVisualDiscomfort,
+        sstim-v:experienceEyeStrain, sstim-v:experienceHeadSensation,
+        sstim-v:experienceDizziness, sstim-v:experienceNausea,
+        sstim-v:experienceRestlessness, sstim-v:experienceLowMood,
+        sstim-v:experienceSleepDisruption, sstim-v:experienceOther .
+
+sstim-v:experienceAuditoryDiscomfort a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Auditory discomfort"@en, "Disagio uditivo"@it,
+        "Desconforto auditivo"@pt, "Molestia auditiva"@es ;
+    skos:notation "auditory-discomfort" ;
+    skos:definition "Sound that the participant found uncomfortable, harsh, or too loud."@en .
+
+sstim-v:experienceVisualDiscomfort a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Visual discomfort"@en, "Disagio visivo"@it,
+        "Desconforto visual"@pt, "Molestia visual"@es ;
+    skos:notation "visual-discomfort" ;
+    skos:definition "Light or visual pattern that the participant found uncomfortable, too bright, or unpleasant to look at."@en .
+
+sstim-v:experienceEyeStrain a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Eye strain"@en, "Affaticamento visivo"@it,
+        "Fadiga ocular"@pt, "Fatiga visual"@es ;
+    skos:notation "eye-strain" ;
+    skos:definition "Tired, aching, or effortful eyes reported around the session."@en ;
+    skos:scopeNote "Common with free-viewing techniques that ask the eyes to hold an unusual convergence, and worth recording separately from general visual discomfort for that reason."@en .
+
+sstim-v:experienceHeadSensation a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Head sensation"@en, "Sensazione alla testa"@it,
+        "Sensação na cabeça"@pt, "Sensación en la cabeza"@es ;
+    skos:notation "head-sensation" ;
+    skos:definition "Pressure, heaviness, aching, or other sensation in the head that the participant described."@en ;
+    skos:editorialNote "Deliberately broad and non-diagnostic. Recording a participant's description of a head sensation is not recording a headache as a clinical finding."@en .
+
+sstim-v:experienceDizziness a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Dizziness"@en, "Vertigine"@it,
+        "Tontura"@pt, "Mareo"@es ;
+    skos:notation "dizziness" ;
+    skos:definition "Light-headedness or unsteadiness the participant described."@en .
+
+sstim-v:experienceNausea a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Nausea"@en, "Nausea"@it,
+        "Náusea"@pt, "Náusea"@es ;
+    skos:notation "nausea" ;
+    skos:definition "Queasiness the participant described."@en .
+
+sstim-v:experienceRestlessness a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Restlessness"@en, "Irrequietezza"@it,
+        "Inquietação"@pt, "Inquietud"@es ;
+    skos:notation "restlessness" ;
+    skos:definition "Agitation or difficulty settling that the participant described."@en .
+
+sstim-v:experienceLowMood a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Low mood"@en, "Umore basso"@it,
+        "Humor baixo"@pt, "Ánimo bajo"@es ;
+    skos:notation "low-mood" ;
+    skos:definition "A downward shift in mood the participant described around the session."@en ;
+    skos:editorialNote "A mood report, never a mood disorder. Nothing in this vocabulary supports a psychiatric inference."@en .
+
+sstim-v:experienceSleepDisruption a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Sleep disruption"@en, "Disturbo del sonno"@it,
+        "Perturbação do sono"@pt, "Alteración del sueño"@es ;
+    skos:notation "sleep-disruption" ;
+    skos:definition "Difficulty sleeping, or disturbed sleep, that the participant reported after a session."@en ;
+    skos:scopeNote "Typically a follow-up rather than an immediate-post observation, which is why onset phase and report phase are recorded separately."@en .
+
+sstim-v:experienceOther a owl:NamedIndividual, sstim:UnwantedExperienceCategory, skos:Concept ;
+    skos:inScheme sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:topConceptOf sstim-v:UnwantedExperienceCategoryScheme ;
+    skos:prefLabel "Other"@en, "Altro"@it,
+        "Outro"@pt, "Otro"@es ;
+    skos:notation "other" ;
+    skos:definition "An unwanted experience that none of the listed categories describes."@en ;
+    skos:editorialNote "Preferred over forcing a poor fit. A rising count here is a signal that the scheme needs a category, not that participants are describing things badly."@en .
+
+
+###########################################################################
+# Reported severity scheme
+#
+# How severe the participant said it was. Three magnitudes plus two states
+# for the absence of a magnitude — no clinical grading scale is implied,
+# and none of these values may be mapped onto one.
+###########################################################################
+
+sstim-v:ReportedSeverityScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Reported Severity Vocabulary"@en ;
+    skos:definition "Controlled categories recording how severe a participant said an unwanted experience was."@en ;
+    skos:editorialNote "Participant-reported throughout. These are not clinical severity grades and carry no threshold for action, reporting, or classification."@en ;
+    skos:hasTopConcept sstim-v:severityMild, sstim-v:severityModerate,
+        sstim-v:severitySevere, sstim-v:severityDeclined, sstim-v:severityUnknown .
+
+sstim-v:severityMild a owl:NamedIndividual, sstim:ReportedSeverity, skos:Concept ;
+    skos:inScheme sstim-v:ReportedSeverityScheme ;
+    skos:topConceptOf sstim-v:ReportedSeverityScheme ;
+    skos:prefLabel "Mild"@en, "Lieve"@it, "Leve"@pt, "Leve"@es ;
+    skos:notation "mild" ;
+    skos:definition "The participant described the experience as slight or easily tolerated."@en .
+
+sstim-v:severityModerate a owl:NamedIndividual, sstim:ReportedSeverity, skos:Concept ;
+    skos:inScheme sstim-v:ReportedSeverityScheme ;
+    skos:topConceptOf sstim-v:ReportedSeverityScheme ;
+    skos:prefLabel "Moderate"@en, "Moderata"@it, "Moderada"@pt, "Moderada"@es ;
+    skos:notation "moderate" ;
+    skos:definition "The participant described the experience as noticeable and bothersome."@en .
+
+sstim-v:severitySevere a owl:NamedIndividual, sstim:ReportedSeverity, skos:Concept ;
+    skos:inScheme sstim-v:ReportedSeverityScheme ;
+    skos:topConceptOf sstim-v:ReportedSeverityScheme ;
+    skos:prefLabel "Severe"@en, "Grave"@it, "Grave"@pt, "Grave"@es ;
+    skos:notation "severe" ;
+    skos:definition "The participant described the experience as strong or hard to tolerate."@en .
+
+sstim-v:severityDeclined a owl:NamedIndividual, sstim:ReportedSeverity, skos:Concept ;
+    skos:inScheme sstim-v:ReportedSeverityScheme ;
+    skos:topConceptOf sstim-v:ReportedSeverityScheme ;
+    skos:prefLabel "Severity declined"@en, "Gravità non dichiarata"@it,
+        "Gravidade recusada"@pt, "Gravedad no declarada"@es ;
+    skos:notation "severity-declined" ;
+    skos:definition "The participant described the experience but chose not to rate its severity."@en .
+
+sstim-v:severityUnknown a owl:NamedIndividual, sstim:ReportedSeverity, skos:Concept ;
+    skos:inScheme sstim-v:ReportedSeverityScheme ;
+    skos:topConceptOf sstim-v:ReportedSeverityScheme ;
+    skos:prefLabel "Severity unknown"@en, "Gravità sconosciuta"@it,
+        "Gravidade desconhecida"@pt, "Gravedad desconocida"@es ;
+    skos:notation "severity-unknown" ;
+    skos:definition "No severity is recoverable from the record."@en .
+
+
+###########################################################################
+# Experience onset phase scheme
+###########################################################################
+
+sstim-v:ExperienceOnsetPhaseScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Experience Onset Phase Vocabulary"@en ;
+    skos:definition "Controlled categories locating when an unwanted experience began, relative to the session."@en ;
+    skos:scopeNote "Separate from the self-report phase scheme: when an experience began and when it was reported are different facts, and an experience is often described later than it started."@en ;
+    skos:hasTopConcept sstim-v:onsetBeforeSession, sstim-v:onsetDuringSession,
+        sstim-v:onsetImmediatelyAfter, sstim-v:onsetLaterSameDay,
+        sstim-v:onsetNextDay, sstim-v:onsetUnknown .
+
+sstim-v:onsetBeforeSession a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "Before session"@en, "Prima della sessione"@it,
+        "Antes da sessão"@pt, "Antes de la sesión"@es ;
+    skos:notation "onset-before" ;
+    skos:definition "The experience was already present before delivery began."@en ;
+    skos:scopeNote "Worth recording rather than discarding: an experience present beforehand is the clearest case in which the session cannot be its origin."@en .
+
+sstim-v:onsetDuringSession a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "During session"@en, "Durante la sessione"@it,
+        "Durante a sessão"@pt, "Durante la sesión"@es ;
+    skos:notation "onset-during" ;
+    skos:definition "The experience began while delivery was in progress; an onset offset locates it on the session's timing context where the participant could place it."@en .
+
+sstim-v:onsetImmediatelyAfter a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "Immediately after"@en, "Subito dopo"@it,
+        "Imediatamente depois"@pt, "Inmediatamente después"@es ;
+    skos:notation "onset-immediately-after" ;
+    skos:definition "The experience began shortly after delivery ended."@en .
+
+sstim-v:onsetLaterSameDay a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "Later the same day"@en, "Più tardi lo stesso giorno"@it,
+        "Mais tarde no mesmo dia"@pt, "Más tarde el mismo día"@es ;
+    skos:notation "onset-later-same-day" ;
+    skos:definition "The experience began later on the day of the session."@en .
+
+sstim-v:onsetNextDay a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "Next day"@en, "Il giorno dopo"@it,
+        "No dia seguinte"@pt, "Al día siguiente"@es ;
+    skos:notation "onset-next-day" ;
+    skos:definition "The experience began on the day after the session."@en .
+
+sstim-v:onsetUnknown a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:topConceptOf sstim-v:ExperienceOnsetPhaseScheme ;
+    skos:prefLabel "Onset unknown"@en, "Insorgenza sconosciuta"@it,
+        "Início desconhecido"@pt, "Inicio desconocido"@es ;
+    skos:notation "onset-unknown" ;
+    skos:definition "When the experience began is not recoverable from the record."@en .
+
+
+###########################################################################
+# Experience persistence scheme
+###########################################################################
+
+sstim-v:ExperiencePersistenceScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Experience Persistence Vocabulary"@en ;
+    skos:definition "Controlled categories recording how long an unwanted experience lasted, as the participant described it."@en ;
+    skos:hasTopConcept sstim-v:persistenceResolvedDuringSession,
+        sstim-v:persistenceResolvedSameDay, sstim-v:persistenceResolvedLater,
+        sstim-v:persistenceOngoing, sstim-v:persistenceUnknown .
+
+sstim-v:persistenceResolvedDuringSession a owl:NamedIndividual, sstim:ExperiencePersistence, skos:Concept ;
+    skos:inScheme sstim-v:ExperiencePersistenceScheme ;
+    skos:topConceptOf sstim-v:ExperiencePersistenceScheme ;
+    skos:prefLabel "Resolved during session"@en, "Risolta durante la sessione"@it,
+        "Resolvida durante a sessão"@pt, "Resuelta durante la sesión"@es ;
+    skos:notation "resolved-during-session" ;
+    skos:definition "The experience passed before delivery ended."@en .
+
+sstim-v:persistenceResolvedSameDay a owl:NamedIndividual, sstim:ExperiencePersistence, skos:Concept ;
+    skos:inScheme sstim-v:ExperiencePersistenceScheme ;
+    skos:topConceptOf sstim-v:ExperiencePersistenceScheme ;
+    skos:prefLabel "Resolved the same day"@en, "Risolta lo stesso giorno"@it,
+        "Resolvida no mesmo dia"@pt, "Resuelta el mismo día"@es ;
+    skos:notation "resolved-same-day" ;
+    skos:definition "The experience passed on the day of the session."@en .
+
+sstim-v:persistenceResolvedLater a owl:NamedIndividual, sstim:ExperiencePersistence, skos:Concept ;
+    skos:inScheme sstim-v:ExperiencePersistenceScheme ;
+    skos:topConceptOf sstim-v:ExperiencePersistenceScheme ;
+    skos:prefLabel "Resolved later"@en, "Risolta più tardi"@it,
+        "Resolvida mais tarde"@pt, "Resuelta más tarde"@es ;
+    skos:notation "resolved-later" ;
+    skos:definition "The experience passed after the day of the session."@en .
+
+sstim-v:persistenceOngoing a owl:NamedIndividual, sstim:ExperiencePersistence, skos:Concept ;
+    skos:inScheme sstim-v:ExperiencePersistenceScheme ;
+    skos:topConceptOf sstim-v:ExperiencePersistenceScheme ;
+    skos:prefLabel "Ongoing"@en, "In corso"@it,
+        "Em curso"@pt, "En curso"@es ;
+    skos:notation "ongoing" ;
+    skos:definition "The experience had not passed when the participant reported it."@en .
+
+sstim-v:persistenceUnknown a owl:NamedIndividual, sstim:ExperiencePersistence, skos:Concept ;
+    skos:inScheme sstim-v:ExperiencePersistenceScheme ;
+    skos:topConceptOf sstim-v:ExperiencePersistenceScheme ;
+    skos:prefLabel "Persistence unknown"@en, "Durata sconosciuta"@it,
+        "Persistência desconhecida"@pt, "Persistencia desconocida"@es ;
+    skos:notation "persistence-unknown" ;
+    skos:definition "How long the experience lasted is not recoverable from the record."@en .
+
+
+###########################################################################
+# Experience response action scheme
+###########################################################################
+
+sstim-v:ExperienceResponseActionScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Experience Response Action Vocabulary"@en ;
+    skos:definition "Controlled categories recording what a participant did in response to an unwanted experience."@en ;
+    skos:scopeNote "What the participant did, not what they were advised to do. Recording the action makes a later resolution interpretable."@en ;
+    skos:hasTopConcept sstim-v:actionNone, sstim-v:actionReducedIntensity,
+        sstim-v:actionPausedSession, sstim-v:actionStoppedSession,
+        sstim-v:actionChangedDelivery, sstim-v:actionOther,
+        sstim-v:actionDeclined, sstim-v:actionUnknown .
+
+sstim-v:actionNone a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "No action"@en, "Nessuna azione"@it,
+        "Nenhuma ação"@pt, "Ninguna acción"@es ;
+    skos:notation "action-none" ;
+    skos:definition "The participant continued without changing anything."@en .
+
+sstim-v:actionReducedIntensity a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Reduced intensity"@en, "Intensità ridotta"@it,
+        "Intensidade reduzida"@pt, "Intensidad reducida"@es ;
+    skos:notation "action-reduced-intensity" ;
+    skos:definition "The participant lowered volume, brightness, or another delivery level."@en .
+
+sstim-v:actionPausedSession a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Paused the session"@en, "Sessione messa in pausa"@it,
+        "Sessão pausada"@pt, "Sesión pausada"@es ;
+    skos:notation "action-paused-session" ;
+    skos:definition "The participant paused delivery and later resumed."@en .
+
+sstim-v:actionStoppedSession a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Stopped the session"@en, "Sessione interrotta"@it,
+        "Sessão interrompida"@pt, "Sesión detenida"@es ;
+    skos:notation "action-stopped-session" ;
+    skos:definition "The participant ended delivery."@en .
+
+sstim-v:actionChangedDelivery a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Changed the delivery"@en, "Modalità di erogazione cambiata"@it,
+        "Entrega alterada"@pt, "Entrega modificada"@es ;
+    skos:notation "action-changed-delivery" ;
+    skos:definition "The participant changed how the stimulus reached them, such as removing headphones or looking away."@en .
+
+sstim-v:actionOther a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Other action"@en, "Altra azione"@it,
+        "Outra ação"@pt, "Otra acción"@es ;
+    skos:notation "action-other" ;
+    skos:definition "An action none of the listed categories describes."@en .
+
+sstim-v:actionDeclined a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Action declined"@en, "Azione non dichiarata"@it,
+        "Ação recusada"@pt, "Acción no declarada"@es ;
+    skos:notation "action-declined" ;
+    skos:definition "The participant chose not to say what they did."@en .
+
+sstim-v:actionUnknown a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResponseActionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
+    skos:prefLabel "Action unknown"@en, "Azione sconosciuta"@it,
+        "Ação desconhecida"@pt, "Acción desconocida"@es ;
+    skos:notation "action-unknown" ;
+    skos:definition "What the participant did is not recoverable from the record."@en .
+
+
+###########################################################################
+# Experience resolution scheme
+###########################################################################
+
+sstim-v:ExperienceResolutionScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Experience Resolution Vocabulary"@en ;
+    skos:definition "Controlled categories recording the state an unwanted experience reached."@en ;
+    skos:hasTopConcept sstim-v:resolutionResolved, sstim-v:resolutionImproved,
+        sstim-v:resolutionUnchanged, sstim-v:resolutionWorsened,
+        sstim-v:resolutionUnknown .
+
+sstim-v:resolutionResolved a owl:NamedIndividual, sstim:ExperienceResolution, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResolutionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResolutionScheme ;
+    skos:prefLabel "Resolved"@en, "Risolta"@it, "Resolvida"@pt, "Resuelta"@es ;
+    skos:notation "resolution-resolved" ;
+    skos:definition "The experience passed completely."@en .
+
+sstim-v:resolutionImproved a owl:NamedIndividual, sstim:ExperienceResolution, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResolutionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResolutionScheme ;
+    skos:prefLabel "Improved"@en, "Migliorata"@it, "Melhorada"@pt, "Mejorada"@es ;
+    skos:notation "resolution-improved" ;
+    skos:definition "The experience lessened without passing entirely."@en .
+
+sstim-v:resolutionUnchanged a owl:NamedIndividual, sstim:ExperienceResolution, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResolutionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResolutionScheme ;
+    skos:prefLabel "Unchanged"@en, "Invariata"@it, "Inalterada"@pt, "Sin cambios"@es ;
+    skos:notation "resolution-unchanged" ;
+    skos:definition "The experience stayed as it was."@en .
+
+sstim-v:resolutionWorsened a owl:NamedIndividual, sstim:ExperienceResolution, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResolutionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResolutionScheme ;
+    skos:prefLabel "Worsened"@en, "Peggiorata"@it, "Piorada"@pt, "Empeorada"@es ;
+    skos:notation "resolution-worsened" ;
+    skos:definition "The experience became stronger or more troublesome."@en ;
+    skos:editorialNote "Recording a worsening is a description of what the participant reported. It is not a safety determination, and acting on a pattern of them is a human decision made outside this vocabulary."@en .
+
+sstim-v:resolutionUnknown a owl:NamedIndividual, sstim:ExperienceResolution, skos:Concept ;
+    skos:inScheme sstim-v:ExperienceResolutionScheme ;
+    skos:topConceptOf sstim-v:ExperienceResolutionScheme ;
+    skos:prefLabel "Resolution unknown"@en, "Esito sconosciuto"@it,
+        "Resolução desconhecida"@pt, "Resolución desconocida"@es ;
+    skos:notation "resolution-unknown" ;
+    skos:definition "What became of the experience is not recoverable from the record."@en .
+
+
+###########################################################################
+# Perceived relatedness scheme
+#
+# The participant's own view of whether the session was involved. It is a
+# perception and is never promoted to an attribution by any query, export,
+# or aggregation.
+###########################################################################
+
+sstim-v:PerceivedRelatednessScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Perceived Relatedness Vocabulary"@en ;
+    skos:definition "Controlled categories recording whether a participant perceived an experience as connected to the session."@en ;
+    skos:editorialNote "Records a perception only. Temporal association is not causation, and neither is a participant's belief about it; establishing any causal relation requires the separate governed assessment process, not this property."@en ;
+    skos:hasTopConcept sstim-v:relatednessRelated, sstim-v:relatednessPossiblyRelated,
+        sstim-v:relatednessUnrelated, sstim-v:relatednessUnknown,
+        sstim-v:relatednessDeclined .
+
+sstim-v:relatednessRelated a owl:NamedIndividual, sstim:PerceivedRelatedness, skos:Concept ;
+    skos:inScheme sstim-v:PerceivedRelatednessScheme ;
+    skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
+    skos:prefLabel "Perceived as related"@en, "Percepita come correlata"@it,
+        "Percebida como relacionada"@pt, "Percibida como relacionada"@es ;
+    skos:notation "relatedness-related" ;
+    skos:definition "The participant thought the session was involved."@en .
+
+sstim-v:relatednessPossiblyRelated a owl:NamedIndividual, sstim:PerceivedRelatedness, skos:Concept ;
+    skos:inScheme sstim-v:PerceivedRelatednessScheme ;
+    skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
+    skos:prefLabel "Perceived as possibly related"@en, "Percepita come forse correlata"@it,
+        "Percebida como possivelmente relacionada"@pt, "Percibida como posiblemente relacionada"@es ;
+    skos:notation "relatedness-possibly-related" ;
+    skos:definition "The participant was unsure whether the session was involved."@en .
+
+sstim-v:relatednessUnrelated a owl:NamedIndividual, sstim:PerceivedRelatedness, skos:Concept ;
+    skos:inScheme sstim-v:PerceivedRelatednessScheme ;
+    skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
+    skos:prefLabel "Perceived as unrelated"@en, "Percepita come non correlata"@it,
+        "Percebida como não relacionada"@pt, "Percibida como no relacionada"@es ;
+    skos:notation "relatedness-unrelated" ;
+    skos:definition "The participant thought the session was not involved."@en .
+
+sstim-v:relatednessUnknown a owl:NamedIndividual, sstim:PerceivedRelatedness, skos:Concept ;
+    skos:inScheme sstim-v:PerceivedRelatednessScheme ;
+    skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
+    skos:prefLabel "Relatedness unknown"@en, "Correlazione sconosciuta"@it,
+        "Relação desconhecida"@pt, "Relación desconocida"@es ;
+    skos:notation "relatedness-unknown" ;
+    skos:definition "The participant's view is not recoverable from the record."@en .
+
+sstim-v:relatednessDeclined a owl:NamedIndividual, sstim:PerceivedRelatedness, skos:Concept ;
+    skos:inScheme sstim-v:PerceivedRelatednessScheme ;
+    skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
+    skos:prefLabel "Relatedness declined"@en, "Correlazione non dichiarata"@it,
+        "Relação recusada"@pt, "Relación no declarada"@es ;
+    skos:notation "relatedness-declined" ;
+    skos:definition "The participant chose not to say whether they thought the session was involved."@en .

@@ -774,6 +774,37 @@ sstim-sh:SessionSpecShape a sh:NodeShape ;
         sh:minInclusive 0 ;
         sh:maxInclusive 1 ;
         sh:message "masterVolume must be a decimal in [0, 1]."@en ;
+    ] ;
+
+    # Reproducibility metadata (ADR 0048), optional so that existing
+    # specifications stay conformant. A digest without its algorithm cannot be
+    # recomputed, so the two travel together or not at all.
+    sh:property [
+        sh:path sstim:hasReproducibilityLevel ;
+        sh:maxCount 1 ; sh:class sstim:ReproducibilityLevel ;
+        sh:message "hasReproducibilityLevel must identify a single sstim:ReproducibilityLevel."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:configurationDigest ;
+        sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:pattern "^[0-9a-f]{32,128}$" ;
+        sh:message "configurationDigest must be a single lowercase hexadecimal digest."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:digestAlgorithm ;
+        sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:message "digestAlgorithm must be a single string."@en ;
+    ] ;
+
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A configuration digest must name the algorithm that produced it, or it cannot be recomputed."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#configurationDigest> ?digest .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#digestAlgorithm> ?algorithm }
+            }
+        """ ;
     ] .
 
 
@@ -833,6 +864,45 @@ sstim-sh:SessionInstanceShape a sh:NodeShape ;
         sh:path sstim:hasSelfReport ;
         sh:class sstim:SelfReport ;
         sh:message "Each hasSelfReport value must be a sstim:SelfReport."@en ;
+    ] ;
+
+    # The execution timeline and its clock (ADR 0048). All optional: sessions
+    # recorded before these terms existed remain conformant, and a record that
+    # kept no timeline is incomplete rather than invalid. Bounded when present.
+    sh:property [
+        sh:path sstim:hasSessionEvent ;
+        sh:class sstim:SessionEvent ;
+        sh:message "Each hasSessionEvent value must be a sstim:SessionEvent."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:clockOriginSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "clockOriginSeconds must be a single non-negative decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasTimingAuthority ;
+        sh:maxCount 1 ; sh:class sstim:TimingAuthority ;
+        sh:message "hasTimingAuthority must identify a single sstim:TimingAuthority."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:deliveredDurationSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "deliveredDurationSeconds must be a single non-negative decimal."@en ;
+    ] ;
+
+    # Delivered time cannot exceed elapsed time. The two are recorded separately
+    # so that a paused session is not mistaken for a short one, which only works
+    # if their relationship holds.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "deliveredDurationSeconds must not exceed actualDurationSeconds: a session cannot deliver more stimulus than it ran."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#deliveredDurationSeconds> ?delivered .
+                $this <https://w3id.org/sstim#actualDurationSeconds> ?elapsed .
+                FILTER ( ?delivered > ?elapsed )
+            }
+        """ ;
     ] .
 
 
@@ -930,14 +1000,31 @@ sstim-sh:SelfReportShape a sh:NodeShape ;
         sh:message "SelfReport must record one xsd:dateTime collection timestamp."@en ;
     ] ;
 
+    # A report must carry content, in either representation. The qualified
+    # observation is listed first because it is the current authoring contract;
+    # the five scalars remain valid as documented simple projections (ADR 0048),
+    # so existing reports stay conformant and neither form is forced on the other.
     sh:or (
+        [ sh:path sstim:hasObservation ; sh:minCount 1 ]
         [ sh:path sstim:primaryAffect ; sh:minCount 1 ]
         [ sh:path sstim:focusRating ; sh:minCount 1 ]
         [ sh:path sstim:sleepiness ; sh:minCount 1 ]
         [ sh:path sstim:subjectiveQuality ; sh:minCount 1 ]
         [ sh:path sstim:goalAchieved ; sh:minCount 1 ]
     ) ;
-    sh:message "SelfReport must contain at least one report value."@en ;
+    sh:message "SelfReport must contain at least one observation or report value."@en ;
+
+    sh:property [
+        sh:path sstim:hasObservation ;
+        sh:class sstim:ParticipantObservation ;
+        sh:message "Each hasObservation value must be a sstim:ParticipantObservation."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasInstrument ;
+        sh:maxCount 1 ;
+        sh:class sstim:ObservationInstrument ;
+        sh:message "hasInstrument must point at one sstim:ObservationInstrument."@en ;
+    ] ;
 
     sh:property [
         sh:path sstim:primaryAffect ;
@@ -972,6 +1059,205 @@ sstim-sh:SelfReportShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:datatype xsd:boolean ;
         sh:message "goalAchieved must be a boolean."@en ;
+    ] .
+
+
+###########################################################################
+# Session Event Shape
+#
+# An event without a type or an offset is not an event, it is a hint. Both
+# are therefore required: the type says what happened and the offset says
+# when, on the timing context the session declared.
+###########################################################################
+
+sstim-sh:SessionEventShape a sh:NodeShape ;
+    sh:targetClass sstim:SessionEvent ;
+    sh:name "SessionEvent"@en ;
+
+    sh:property [
+        sh:path sstim:hasEventType ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:SessionEventType ;
+        sh:message "SessionEvent must identify exactly one event type."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:eventOffsetSeconds ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "SessionEvent must carry one non-negative offset on the session timing context."@en ;
+    ] .
+
+
+###########################################################################
+# Participant Observation Shapes
+#
+# The response state is required on every observation, which is the whole
+# point of the model: an absent value whose reason is unrecorded cannot be
+# aggregated safely, because "nothing to report", "not asked" and "declined"
+# would all read as the same silence.
+#
+# The value/state agreement rule needs SPARQL — it relates a value's presence
+# to another property's value — so it runs under pySHACL in `make validate`.
+# The rdf-validate-shacl harness beside the producers strips sh:sparql, and
+# the native JSON Schema enforces the same rule at authoring time.
+###########################################################################
+
+sstim-sh:ParticipantObservationShape a sh:NodeShape ;
+    sh:targetClass sstim:ParticipantObservation ;
+    sh:name "ParticipantObservation"@en ;
+
+    sh:property [
+        sh:path sstim:hasObservationRole ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:ObservationRole ;
+        sh:message "ParticipantObservation must identify exactly one observation role."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasResponseState ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:ResponseState ;
+        sh:message "ParticipantObservation must state exactly one response state, so that an absent value carries its reason."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:observedOrdinalValue ;
+        sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:message "observedOrdinalValue must be a single integer."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:observedBooleanValue ;
+        sh:maxCount 1 ; sh:datatype xsd:boolean ;
+        sh:message "observedBooleanValue must be a single boolean."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:observedTextValue ;
+        sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:message "observedTextValue must be a single string."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:reportedConfidence ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxInclusive 1 ;
+        sh:message "reportedConfidence must be a decimal in [0, 1]."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:scaleMinimum ;
+        sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:lessThan sstim:scaleMaximum ;
+        sh:message "scaleMinimum must be a single integer below scaleMaximum."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:scaleMaximum ;
+        sh:maxCount 1 ; sh:datatype xsd:integer ;
+        sh:message "scaleMaximum must be a single integer."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:reportsUnwantedExperience ;
+        sh:class sstim:UnwantedExperienceObservation ;
+        sh:message "Each reportsUnwantedExperience value must be a sstim:UnwantedExperienceObservation."@en ;
+    ] ;
+
+    # A value and its state must agree. Without this an observation could be
+    # marked "declined" and still carry an answer, which is the contradiction
+    # the six states exist to prevent.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "An observation carries a value if and only if its response state is 'supplied'."@en ;
+        sh:select """
+            SELECT $this WHERE {
+              {
+                $this <https://w3id.org/sstim#hasResponseState> <https://w3id.org/sstim/vocab#responseSupplied> .
+                FILTER NOT EXISTS {
+                  { $this <https://w3id.org/sstim#observedOrdinalValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#observedBooleanValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#observedTextValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#reportsUnwantedExperience> ?v }
+                }
+              } UNION {
+                $this <https://w3id.org/sstim#hasResponseState> ?state .
+                FILTER ( ?state != <https://w3id.org/sstim/vocab#responseSupplied> )
+                {
+                  { $this <https://w3id.org/sstim#observedOrdinalValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#observedBooleanValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#observedTextValue> ?v } UNION
+                  { $this <https://w3id.org/sstim#reportsUnwantedExperience> ?v }
+                }
+              }
+            }
+        """ ;
+    ] .
+
+sstim-sh:UnwantedExperienceObservationShape a sh:NodeShape ;
+    sh:targetClass sstim:UnwantedExperienceObservation ;
+    sh:name "UnwantedExperienceObservation"@en ;
+
+    sh:property [
+        sh:path sstim:hasExperienceCategory ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:UnwantedExperienceCategory ;
+        sh:message "UnwantedExperienceObservation must identify exactly one category."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasReportedSeverity ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:ReportedSeverity ;
+        sh:message "UnwantedExperienceObservation must record exactly one participant-reported severity, which may itself be 'declined' or 'unknown'."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasOnsetPhase ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:ExperienceOnsetPhase ;
+        sh:message "UnwantedExperienceObservation must locate exactly one onset phase."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasPerceivedRelatedness ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim:PerceivedRelatedness ;
+        sh:message "UnwantedExperienceObservation must record exactly one participant-perceived relatedness, so that an unrecorded view is never read as an implied one."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasPersistence ;
+        sh:maxCount 1 ; sh:class sstim:ExperiencePersistence ;
+        sh:message "hasPersistence must be a single sstim:ExperiencePersistence."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasResponseAction ;
+        sh:maxCount 1 ; sh:class sstim:ExperienceResponseAction ;
+        sh:message "hasResponseAction must be a single sstim:ExperienceResponseAction."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasResolutionState ;
+        sh:maxCount 1 ; sh:class sstim:ExperienceResolution ;
+        sh:message "hasResolutionState must be a single sstim:ExperienceResolution."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:onsetOffsetSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "onsetOffsetSeconds must be a single non-negative decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:experienceDurationSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "experienceDurationSeconds must be a single non-negative decimal."@en ;
+    ] .
+
+sstim-sh:ObservationInstrumentShape a sh:NodeShape ;
+    sh:targetClass sstim:ObservationInstrument ;
+    sh:name "ObservationInstrument"@en ;
+
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "ObservationInstrument must have a human-readable rdfs:label."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:instrumentVersion ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ;
+        sh:message "ObservationInstrument must state one version: answers are not comparable across instrument versions."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:language ;
+        sh:maxCount 1 ;
+        sh:message "dct:language must be a single value."@en ;
     ] .
 
 

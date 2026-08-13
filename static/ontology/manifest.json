@@ -281,7 +281,7 @@
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "4de9ee719d39e45f3ddc686a5dd2da3133dda47653f432d9b2e4c0d534af5b2c"
+        "sha256": "48e3b7e9209f9a96e82f7dff51ea0e1223eef76b7f09dd88945a5c0428a7b053"
       },
       "runtime": {
         "url": "/ontology/sstim-session.ttl",
@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "a53788764b89fbf3ce2fbdcdac35369c5b3caea9bb8b561a66481422f4b86836"
+        "sha256": "a466a0bdeb65a9fc00cad0b1506cace0ac5b9a7a9d17e2d51c28aa5f2a9feee9"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -672,7 +672,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e14880bc4a00c65f2aaeaa05d5335be5682d1b39c8a5ad1d86e4574da854e873"
+        "sha256": "e8afe57aa143dac9d6b6332925305c499db431629e51b5bdf8da4d91cb7af50b"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -902,7 +902,7 @@
       "competencyQueries": [
         "test/competency/full.rq"
       ],
-      "sha256": "b2cd17dba8b9eba89490eb6d28b7ecd67c5777887ce05c8a32cb66bdcecbeff0"
+      "sha256": "a5aeafd266943f6ce8299f9dfd055119c9acd99ed204a22bb18d60d3fd4c4e33"
     }
   ]
 }

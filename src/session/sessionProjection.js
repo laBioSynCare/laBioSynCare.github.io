@@ -1,14 +1,16 @@
 // Project a native session bundle into SSTIM RDF — the declared subset — and
 // name everything that did not travel.
 //
-// The native bundle is the record. This is a projection over it, and it is a
-// partial one: SSTIM today has classes for a specification, an execution and a
-// self-report, and has no term at all for an event timeline, for instrument
-// provenance, for the six response states, for a qualified unwanted experience,
-// or for a privacy profile. Those are not oversights in this file — they are the
-// terms KR-02 and KR-03 asked for and that the ontology has not yet declared.
+// The native bundle is the record; this is a projection over it. As of ADR 0048
+// most of it travels: SSTIM now declares the event timeline, the clock that
+// orders it, qualified participant observations with their six response states,
+// unwanted-experience records, instrument provenance, and the reproducibility
+// and integrity metadata that make a specification more than a name. What
+// remains withheld is withheld on purpose rather than for want of a term — see
+// the tail of this file.
 //
-// Two rules follow, and they are the reason this module is worth having:
+// Two rules survive that change, and they are the reason this module is worth
+// having:
 //
 //   1. **Never mint an undeclared IRI.** KR-17 was exactly this failure in the
 //      Patch Studio runtime: a serialiser inventing sstim: IRIs for things the
@@ -21,9 +23,8 @@
 //      neither. A field added to the schema and forgotten here cannot slip out
 //      silently; it stops CI instead.
 //
-// The withheld list doubles as the work order: each entry names the term SSTIM
-// would need. That list is the input to the protected-file change that closes
-// the rest of KR-02/KR-03, and it is generated rather than maintained by hand.
+// The withheld list is still generated rather than maintained by hand, so it
+// shrinks by itself as terms land and cannot claim a gap that has closed.
 
 import { DataFactory, Writer } from 'n3'
 import {
@@ -42,9 +43,10 @@ const dt = (s) => literal(s, XSD('dateTime'))
 const bool = (b) => literal(String(b), XSD('boolean'))
 const en = (s) => literal(s, 'en')
 
-/** The three phases SSTIM declares. `during-session` is not one of them. */
+/** All four phases, since ADR 0048 added the during-session concept. */
 const PHASE_CONCEPTS = {
   'pre-session': 'reportPreSession',
+  'during-session': 'reportDuringSession',
   'immediate-post': 'reportImmediatePost',
   'follow-up': 'reportFollowUp',
 }
@@ -55,14 +57,121 @@ const MODALITY_CONCEPTS = {
   somatosensory: 'modalitySomatosensory',
 }
 
+const EVENT_TYPE_CONCEPTS = {
+  'session-open': 'eventSessionOpen',
+  'playback-start': 'eventPlaybackStart',
+  'playback-pause': 'eventPlaybackPause',
+  'playback-resume': 'eventPlaybackResume',
+  'playback-stop': 'eventPlaybackStop',
+  'session-complete': 'eventSessionComplete',
+  'session-interrupt': 'eventSessionInterrupt',
+  'engine-fallback': 'eventEngineFallback',
+  'safety-clamp-applied': 'eventSafetyLimitApplied',
+  'report-collected': 'eventObservationCollected',
+}
+
+const TIMING_AUTHORITY_CONCEPTS = {
+  'audio-context': 'timingAudioHardwareClock',
+  'silent-monotonic': 'timingMonotonicSubstitute',
+}
+
+const REPRODUCIBILITY_CONCEPTS = {
+  'bit-exact': 'reproIdenticalRendering',
+  'signal-equivalent': 'reproEquivalentSignal',
+  'perceptually-equivalent': 'reproEquivalentPresentation',
+}
+
+const RESPONSE_STATE_CONCEPTS = {
+  supplied: 'responseSupplied',
+  'none-reported': 'responseNoneReported',
+  'not-asked': 'responseNotAsked',
+  declined: 'responseDeclined',
+  unknown: 'responseUnknown',
+  'not-applicable': 'responseNotApplicable',
+}
+
+const OBSERVATION_ROLE_CONCEPTS = {
+  'perceived-helpfulness': 'rolePerceivedHelpfulness',
+  'primary-affect': 'rolePrimaryAffect',
+  focus: 'roleFocus',
+  sleepiness: 'roleSleepiness',
+  'subjective-quality': 'roleSubjectiveQuality',
+  'goal-achieved': 'roleGoalAchieved',
+}
+
+const EXPERIENCE_CATEGORY_CONCEPTS = {
+  'auditory-discomfort': 'experienceAuditoryDiscomfort',
+  'visual-discomfort': 'experienceVisualDiscomfort',
+  'eye-strain': 'experienceEyeStrain',
+  'head-sensation': 'experienceHeadSensation',
+  dizziness: 'experienceDizziness',
+  nausea: 'experienceNausea',
+  restlessness: 'experienceRestlessness',
+  'low-mood': 'experienceLowMood',
+  'sleep-disruption': 'experienceSleepDisruption',
+  other: 'experienceOther',
+}
+
+const SEVERITY_CONCEPTS = {
+  mild: 'severityMild',
+  moderate: 'severityModerate',
+  severe: 'severitySevere',
+  declined: 'severityDeclined',
+  unknown: 'severityUnknown',
+}
+
+const ONSET_PHASE_CONCEPTS = {
+  'before-session': 'onsetBeforeSession',
+  'during-session': 'onsetDuringSession',
+  'immediately-after': 'onsetImmediatelyAfter',
+  'later-same-day': 'onsetLaterSameDay',
+  'next-day': 'onsetNextDay',
+  unknown: 'onsetUnknown',
+}
+
+const PERSISTENCE_CONCEPTS = {
+  'resolved-during-session': 'persistenceResolvedDuringSession',
+  'resolved-same-day': 'persistenceResolvedSameDay',
+  'resolved-later': 'persistenceResolvedLater',
+  ongoing: 'persistenceOngoing',
+  unknown: 'persistenceUnknown',
+}
+
+const ACTION_CONCEPTS = {
+  none: 'actionNone',
+  'reduced-intensity': 'actionReducedIntensity',
+  'paused-session': 'actionPausedSession',
+  'stopped-session': 'actionStoppedSession',
+  'removed-headphones': 'actionChangedDelivery',
+  other: 'actionOther',
+  declined: 'actionDeclined',
+  unknown: 'actionUnknown',
+}
+
+const RESOLUTION_CONCEPTS = {
+  resolved: 'resolutionResolved',
+  improved: 'resolutionImproved',
+  unchanged: 'resolutionUnchanged',
+  worsened: 'resolutionWorsened',
+  unknown: 'resolutionUnknown',
+}
+
+const RELATEDNESS_CONCEPTS = {
+  related: 'relatednessRelated',
+  'possibly-related': 'relatednessPossiblyRelated',
+  unrelated: 'relatednessUnrelated',
+  unknown: 'relatednessUnknown',
+  declined: 'relatednessDeclined',
+}
+
 /**
- * Observation roles that have a declared scalar property.
+ * Observation roles that also have a legacy scalar property.
  *
- * Improvement plan 2.1 permits the legacy scalars as "documented simple
- * projections" of the qualified model, which is what this table is. It carries
- * the answer and drops everything that made the answer interpretable — the
- * prompt, the scale, the instrument version, the response state. That loss is
- * reported per field rather than absorbed.
+ * Improvement plan 2.1 keeps the five scalars as "documented simple
+ * projections" of the qualified model. They are emitted *in addition to* the
+ * qualified observation, not instead of it: existing consumers keep working,
+ * and nothing is lost, because the observation beside them carries the prompt,
+ * the scale and the response state the scalar cannot.
  */
 const SCALAR_PROPERTIES = {
   'primary-affect': { property: 'primaryAffect', kind: 'integer' },
@@ -123,12 +232,12 @@ export function projectSession(bundle, options = {}) {
   keep('/specification/source/label', 'rdfs:label (on the referenced preset)')
   drop('/specification/source/kind',
     'ADR 0041: "patch" and "preset" name the same layer, and the difference between BSC\'s two serialisations is a fact about BSC rather than about sensory stimulation. Both project as sstim:Preset.')
-  drop('/specification/source/contentHash',
-    'No property records the content hash of the configuration a session executed, so the RDF cannot show that the source has not moved since.',
-    'a content-integrity property (hash + algorithm) on sstim:Preset or sstim:SessionSpecification')
+  add(specNode, SSTIM('configurationDigest'), literal(spec.source.contentHash, XSD('string')))
+  add(specNode, SSTIM('digestAlgorithm'),
+    literal(spec.source.contentHashAlgorithm ?? 'sha256-canonical-json', XSD('string')))
+  keep('/specification/source/contentHash', 'sstim:configurationDigest')
   if (spec.source.contentHashAlgorithm !== undefined) {
-    drop('/specification/source/contentHashAlgorithm', 'Carried with the hash it qualifies.',
-      'a content-integrity property (hash + algorithm) on sstim:Preset or sstim:SessionSpecification')
+    keep('/specification/source/contentHashAlgorithm', 'sstim:digestAlgorithm')
   }
   if (spec.source.catalogVersion !== undefined) {
     drop('/specification/source/catalogVersion', 'No property records which catalog version supplied the configuration.',
@@ -199,9 +308,13 @@ export function projectSession(bundle, options = {}) {
       'an execution-environment description (engine identity/build, declared output route, sample rate, output latency, platform, app version)')
   }
 
-  drop('/specification/outputGuarantee',
-    'Which reproduction claim the record supports cannot be stated in RDF, while sstim:SessionSpecification\'s own definition asserts fully determined output. The graph therefore claims more than the record does.',
-    'a reproducibility-level property with values bit-exact / signal-equivalent / perceptually-equivalent')
+  const reproConcept = REPRODUCIBILITY_CONCEPTS[spec.outputGuarantee]
+  if (reproConcept) {
+    add(specNode, SSTIM('hasReproducibilityLevel'), SSTIM_V(reproConcept))
+    keep('/specification/outputGuarantee', 'sstim:hasReproducibilityLevel')
+  } else {
+    drop('/specification/outputGuarantee', `No declared sstim:ReproducibilityLevel concept for "${spec.outputGuarantee}".`)
+  }
 
   // ── Instance ───────────────────────────────────────────────────────────────
   add(instNode, a, SSTIM('SessionInstance'))
@@ -220,16 +333,21 @@ export function projectSession(bundle, options = {}) {
   keep('/instance/actualDurationSeconds', 'sstim:actualDurationSeconds (narrowed to xsd:integer)')
   if (inst.label !== undefined) keep('/instance/label', 'rdfs:label')
 
-  drop('/instance/clockOriginSeconds',
-    'The engine-clock origin every offset is measured from has no property, so a projected session cannot be re-aligned to its own timeline.',
-    'a clock-origin property on sstim:SessionInstance')
+  add(instNode, SSTIM('clockOriginSeconds'), dec(inst.clockOriginSeconds))
+  keep('/instance/clockOriginSeconds', 'sstim:clockOriginSeconds')
+
   if (inst.clockSource !== undefined) {
-    drop('/instance/clockSource', 'Which timing authority produced the offsets cannot be stated.',
-      'a timing-authority property (audio-context / silent-monotonic)')
+    const authority = TIMING_AUTHORITY_CONCEPTS[inst.clockSource]
+    if (authority) {
+      add(instNode, SSTIM('hasTimingAuthority'), SSTIM_V(authority))
+      keep('/instance/clockSource', 'sstim:hasTimingAuthority')
+    } else {
+      drop('/instance/clockSource', `No declared sstim:TimingAuthority concept for "${inst.clockSource}".`)
+    }
   }
-  drop('/instance/deliveredSeconds',
-    'Only total elapsed time has a property. A session paused for ten minutes and one that ran ten minutes shorter project identically.',
-    'a delivered-duration property distinct from actualDurationSeconds')
+
+  add(instNode, SSTIM('deliveredDurationSeconds'), dec(inst.deliveredSeconds))
+  keep('/instance/deliveredSeconds', 'sstim:deliveredDurationSeconds')
 
   for (const [index, modality] of (inst.deliveryModalities ?? []).entries()) {
     const pointer = `/instance/deliveryModalities/${index}`
@@ -246,15 +364,40 @@ export function projectSession(bundle, options = {}) {
   }
 
   // ── Events ─────────────────────────────────────────────────────────────────
-  // The whole timeline. This is the largest single gap and the one that blocks
-  // the HED event profile: HED describes what occurred and when, and SSTIM
-  // currently cannot say that anything occurred at all.
-  if (bundle.events?.length) {
-    dropTree('/events', bundle.events,
-      'SSTIM declares no event class. The execution timeline — open, start, pause, resume, stop, complete, interrupt, engine fallback, safety clamp, report collected — has no representation, so a projected session records that it ran but not what happened during it.',
-      'a session-event class with an engine-clock offset, a controlled event-type scheme, and a link from sstim:SessionInstance')
-  } else {
-    drop('/events', 'No events recorded.')
+  // The execution timeline. Ordering lives in each event's offset, not in the
+  // order of the statements: an RDF graph is a set, so a consumer that read the
+  // timeline off statement order would get a different answer each time.
+  for (const [index, event] of (bundle.events ?? []).entries()) {
+    projectEvent(event, `/events/${index}`)
+  }
+  if (!bundle.events?.length) drop('/events', 'No events recorded.')
+
+  function projectEvent(event, base) {
+    const concept = EVENT_TYPE_CONCEPTS[event.type]
+    if (!concept) {
+      dropTree(base, event, `No declared sstim:SessionEventType concept for "${event.type}".`,
+        'a session-event type concept for every event the recorder can emit')
+      return
+    }
+
+    const node = BSCLAB_SESSION(event.id)
+    add(node, a, SSTIM('SessionEvent'))
+    add(node, SSTIM('hasEventType'), SSTIM_V(concept))
+    add(node, SSTIM('eventOffsetSeconds'), dec(event.offsetSeconds))
+    add(instNode, SSTIM('hasSessionEvent'), node)
+    keep(`${base}/id`, 'IRI identity')
+    keep(`${base}/type`, 'sstim:hasEventType')
+    keep(`${base}/offsetSeconds`, 'sstim:eventOffsetSeconds')
+
+    if (event.wallClock !== undefined) {
+      add(node, PROV('atTime'), dt(event.wallClock))
+      keep(`${base}/wallClock`, 'prov:atTime')
+    }
+    if (event.detail) {
+      dropTree(`${base}/detail`, event.detail,
+        'Type-specific event detail — which engine replaced which, which parameter a safety limit constrained and to what value — has no representation. The event is recorded; its particulars are not.',
+        'event-detail properties, at minimum the engine pair for a fallback and the parameter/requested/delivered triple for a safety limit')
+    }
   }
 
   // ── Reports ────────────────────────────────────────────────────────────────
@@ -265,31 +408,17 @@ export function projectSession(bundle, options = {}) {
 
   function projectReport(report, base) {
     const concept = PHASE_CONCEPTS[report.phase]
-    const scalars = (report.items ?? []).filter(
-      (item) => item.responseState === 'supplied' && SCALAR_PROPERTIES[item.role],
-    )
 
-    // Two reasons a report cannot be projected at all, both structural rather
-    // than incidental: SelfReportShape requires exactly one declared phase and
-    // at least one scalar value, so emitting a node without them would produce
-    // a graph that fails its own contract.
-    let blocked = null
+    // One structural reason a report still cannot be projected: SelfReportShape
+    // requires a collection timestamp, and a report without one would produce a
+    // graph that fails its own contract.
     if (!concept) {
-      blocked = {
-        reason: `No sstim:SelfReportPhase concept exists for "${report.phase}"; SSTIM declares only pre-session, immediate-post and follow-up. The whole report is withheld because sstim-sh:SelfReportShape requires exactly one phase.`,
-        requiredTerm: 'a during-session SelfReportPhase concept',
-      }
-    } else if (!report.collectedAt) {
-      blocked = { reason: 'SelfReportShape requires one xsd:dateTime collection timestamp, and this report has no wall-clock collectedAt.' }
-    } else if (scalars.length === 0) {
-      blocked = {
-        reason: 'No item has both a supplied response and a declared scalar property, and SelfReportShape requires at least one report value. A report whose only content is perceived helpfulness, or whose every answer was declined, cannot be projected.',
-        requiredTerm: 'a qualified observation class that does not depend on the five legacy scalars',
-      }
+      dropTree(base, report, `No declared sstim:SelfReportPhase concept for "${report.phase}".`)
+      return
     }
-
-    if (blocked) {
-      dropTree(base, report, blocked.reason, blocked.requiredTerm)
+    if (!report.collectedAt) {
+      dropTree(base, report,
+        'sstim-sh:SelfReportShape requires one xsd:dateTime collection timestamp, and this report has no wall-clock collectedAt.')
       return
     }
 
@@ -305,18 +434,45 @@ export function projectSession(bundle, options = {}) {
 
     if (report.collectedAtOffsetSeconds !== undefined) {
       drop(`${base}/collectedAtOffsetSeconds`,
-        'Placement on the engine clock has no property; only the wall clock survives.',
-        'an engine-clock offset property for observations collected during a session')
+        'Where on the session clock the report was collected has no property on sstim:SelfReport. The report-collected event carries the same instant, so the fact survives on the timeline; it is not recoverable from the report node itself.',
+        'an engine-clock offset property on sstim:SelfReport')
     }
 
-    dropTree(`${base}/instrument`, report.instrument,
-      'Instrument identity, version and language have no representation, and reports are not comparable across instrument versions. A projected report therefore cannot be analysed responsibly.',
-      'instrument and prompt provenance (instrument id, version, language)')
+    // ── Instrument ──
+    const instrumentNode = BSCLAB_SESSION(`${report.id}-instrument`)
+    add(instrumentNode, a, SSTIM('ObservationInstrument'))
+    add(instrumentNode, RDFS('label'), en(`${report.instrument.id} ${report.instrument.version}`))
+    add(instrumentNode, DCT('identifier'), literal(report.instrument.id, XSD('string')))
+    add(instrumentNode, SSTIM('instrumentVersion'), literal(report.instrument.version, XSD('string')))
+    add(instrumentNode, DCT('language'), literal(report.instrument.language, XSD('string')))
+    add(reportNode, SSTIM('hasInstrument'), instrumentNode)
+    keep(`${base}/instrument/id`, 'dct:identifier')
+    keep(`${base}/instrument/version`, 'sstim:instrumentVersion')
+    keep(`${base}/instrument/language`, 'dct:language')
 
+    // ── Stated goal ──
+    // Modelled as an observation with its own role and response state, so a
+    // goal that was never asked for stays distinct from one that was declined.
     if (report.statedGoal) {
-      dropTree(`${base}/statedGoal`, report.statedGoal,
-        'The participant\'s own stated goal has no property. sstim:goalAchieved asserts a goal was met while the goal itself is unrepresentable.',
-        'a participant-stated-goal property, kept distinct from any clinical target')
+      const goalNode = BSCLAB_SESSION(`${report.id}-item-stated-goal`)
+      add(goalNode, a, SSTIM('ParticipantObservation'))
+      add(goalNode, SSTIM('hasObservationRole'), SSTIM_V('roleStatedGoal'))
+      add(goalNode, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[report.statedGoal.responseState]))
+      add(reportNode, SSTIM('hasObservation'), goalNode)
+      keep(`${base}/statedGoal/responseState`, 'sstim:hasResponseState')
+
+      if (report.statedGoal.text !== undefined) {
+        if (options.includeFreeText === true) {
+          add(goalNode, SSTIM('observedTextValue'), literal(report.statedGoal.text, XSD('string')))
+          keep(`${base}/statedGoal/text`, 'sstim:observedTextValue')
+        } else {
+          // Improvement plan 2.2: free text stays out of exports by default,
+          // because it can carry identifiers no schema can anticipate. The term
+          // exists; withholding it here is a policy decision, not a gap.
+          drop(`${base}/statedGoal/text`,
+            'Free text is withheld by default: it can carry identifying information. sstim:observedTextValue exists and carries it when the caller passes includeFreeText and the governing privacy profile permits it.')
+        }
+      }
     }
 
     for (const [i, item] of (report.items ?? []).entries()) {
@@ -324,46 +480,153 @@ export function projectSession(bundle, options = {}) {
     }
     if (!report.items?.length) drop(`${base}/items`, 'No items in this report.')
 
-    dropTree(`${base}/unwantedExperiences`, report.unwantedExperiences,
-      'Unwanted experiences have no representation at any level: not the response state that distinguishes "none reported" from "not asked" and "declined", and not the qualified record — category, participant-reported severity, onset, persistence, action taken, resolution, participant-perceived relatedness.',
-      'a qualified unwanted-experience observation class with a controlled category scheme, plus the six-value response-state scheme')
+    projectUnwantedExperiences(report, `${base}/unwantedExperiences`, reportNode)
   }
 
   function projectItem(item, base, reportNode) {
-    const scalar = SCALAR_PROPERTIES[item.role]
-
-    if (!scalar) {
-      dropTree(base, item,
-        `No declared property observes "${item.role}". Perceived helpfulness is the direct magnitude item KR-03 found missing; the five legacy scalars do not cover it.`,
-        'a perceived-helpfulness observation with a declared scale')
-      return
-    }
-    if (item.responseState !== 'supplied') {
-      dropTree(base, item,
-        `Response state "${item.responseState}" has no representation: RDF can only omit the triple, which collapses "none reported", "not asked", "declined", "unknown" and "not applicable" into one silence.`,
-        'a six-value response-state scheme so absence carries its reason')
+    const role = OBSERVATION_ROLE_CONCEPTS[item.role]
+    if (!role) {
+      dropTree(base, item, `No declared sstim:ObservationRole concept for "${item.role}".`)
       return
     }
 
-    add(reportNode, SSTIM(scalar.property), scalar.kind === 'boolean' ? bool(item.value) : int(item.value))
-    keep(`${base}/value`, `sstim:${scalar.property}`)
-    drop(`${base}/id`, 'The answer projects as a literal on the report, so the item itself has no node and no identity.',
-      'a qualified observation class, so each answer is an addressable record')
-    drop(`${base}/role`, 'Carried implicitly by which scalar property was used; it is not stated.')
-    drop(`${base}/responseState`, 'Only "supplied" is projectable, so the state itself is never asserted.',
-      'a six-value response-state scheme so absence carries its reason')
+    const node = BSCLAB_SESSION(item.id)
+    add(node, a, SSTIM('ParticipantObservation'))
+    add(node, SSTIM('hasObservationRole'), SSTIM_V(role))
+    add(node, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[item.responseState]))
+    add(reportNode, SSTIM('hasObservation'), node)
+    keep(`${base}/id`, 'IRI identity')
+    keep(`${base}/role`, 'sstim:hasObservationRole')
+    keep(`${base}/responseState`, 'sstim:hasResponseState')
+
+    if (item.responseState === 'supplied') {
+      if (typeof item.value === 'boolean') {
+        add(node, SSTIM('observedBooleanValue'), bool(item.value))
+        keep(`${base}/value`, 'sstim:observedBooleanValue')
+      } else {
+        add(node, SSTIM('observedOrdinalValue'), int(item.value))
+        keep(`${base}/value`, 'sstim:observedOrdinalValue')
+      }
+
+      // The legacy scalar, in addition to the observation rather than instead
+      // of it: existing consumers keep reading what they always read, and the
+      // qualified record beside it carries what the scalar cannot.
+      const scalar = SCALAR_PROPERTIES[item.role]
+      if (scalar) {
+        add(reportNode, SSTIM(scalar.property), scalar.kind === 'boolean' ? bool(item.value) : int(item.value))
+      }
+    } else if (item.value !== undefined) {
+      // Schema-guaranteed null. Recorded as projected because the response
+      // state already carries the fact the null was standing in for.
+      keep(`${base}/value`, 'sstim:hasResponseState (the absence is stated, not the null)')
+    }
+
     if (item.scale) {
-      dropTree(`${base}/scale`, item.scale,
-        'The scale as presented is dropped, leaving a bare integer whose range and anchors are not recoverable from the graph.',
-        'a declared scale (kind, bounds, anchor labels) on an observation')
+      if (item.scale.min !== undefined) {
+        add(node, SSTIM('scaleMinimum'), int(item.scale.min))
+        keep(`${base}/scale/min`, 'sstim:scaleMinimum')
+      }
+      if (item.scale.max !== undefined) {
+        add(node, SSTIM('scaleMaximum'), int(item.scale.max))
+        keep(`${base}/scale/max`, 'sstim:scaleMaximum')
+      }
+      if (item.scale.minLabel !== undefined) {
+        add(node, SSTIM('scaleMinimumLabel'), literal(item.scale.minLabel, XSD('string')))
+        keep(`${base}/scale/minLabel`, 'sstim:scaleMinimumLabel')
+      }
+      if (item.scale.maxLabel !== undefined) {
+        add(node, SSTIM('scaleMaximumLabel'), literal(item.scale.maxLabel, XSD('string')))
+        keep(`${base}/scale/maxLabel`, 'sstim:scaleMaximumLabel')
+      }
+      drop(`${base}/scale/kind`,
+        'Recoverable from which value property carries the answer — an ordinal value or a boolean one — so stating it again would be a second, desynchronisable source.')
     }
+
     if (item.prompt) {
-      dropTree(`${base}/prompt`, item.prompt, 'The exact question shown is dropped.',
-        'instrument and prompt provenance (instrument id, version, language)')
+      add(node, SSTIM('promptIdentifier'), literal(item.prompt.id, XSD('string')))
+      keep(`${base}/prompt/id`, 'sstim:promptIdentifier')
+      if (item.prompt.text !== undefined) {
+        add(node, SSTIM('promptText'), literal(item.prompt.text, XSD('string')))
+        keep(`${base}/prompt/text`, 'sstim:promptText')
+      }
     }
-    if (item.confidence !== undefined) {
-      drop(`${base}/confidence`, 'Participant-declared confidence has no property.',
-        'a confidence property on an observation')
+
+    if (item.confidence !== undefined && item.confidence !== null) {
+      add(node, SSTIM('reportedConfidence'), dec(item.confidence))
+      keep(`${base}/confidence`, 'sstim:reportedConfidence')
+    } else if (item.confidence === null) {
+      drop(`${base}/confidence`, 'Explicit null; no confidence was collected.')
+    }
+  }
+
+  function projectUnwantedExperiences(report, base, reportNode) {
+    const block = report.unwantedExperiences
+    const node = BSCLAB_SESSION(`${report.id}-item-unwanted-experience-report`)
+
+    // The asking is itself an observation. That is what keeps "asked, none
+    // reported" distinct from "never asked" and from "declined" — an empty
+    // list of experiences expresses none of those three.
+    add(node, a, SSTIM('ParticipantObservation'))
+    add(node, SSTIM('hasObservationRole'), SSTIM_V('roleUnwantedExperienceReport'))
+    add(node, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[block.responseState]))
+    add(reportNode, SSTIM('hasObservation'), node)
+    keep(`${base}/responseState`, 'sstim:hasResponseState')
+
+    for (const [index, record] of (block.records ?? []).entries()) {
+      projectExperience(record, `${base}/records/${index}`, node)
+    }
+    if (block.records && block.records.length === 0) {
+      drop(`${base}/records`, 'Empty list; the response state carries why.')
+    }
+  }
+
+  function projectExperience(record, base, blockNode) {
+    const category = EXPERIENCE_CATEGORY_CONCEPTS[record.category]
+    if (!category) {
+      dropTree(base, record, `No declared sstim:UnwantedExperienceCategory concept for "${record.category}".`)
+      return
+    }
+
+    const node = BSCLAB_SESSION(record.id)
+    add(node, a, SSTIM('UnwantedExperienceObservation'))
+    add(node, SSTIM('hasExperienceCategory'), SSTIM_V(category))
+    add(node, SSTIM('hasReportedSeverity'), SSTIM_V(SEVERITY_CONCEPTS[record.participantReportedSeverity]))
+    add(node, SSTIM('hasOnsetPhase'), SSTIM_V(ONSET_PHASE_CONCEPTS[record.onsetPhase]))
+    add(node, SSTIM('hasPerceivedRelatedness'), SSTIM_V(RELATEDNESS_CONCEPTS[record.participantPerceivedRelatedness]))
+    add(blockNode, SSTIM('reportsUnwantedExperience'), node)
+    keep(`${base}/id`, 'IRI identity')
+    keep(`${base}/category`, 'sstim:hasExperienceCategory')
+    keep(`${base}/participantReportedSeverity`, 'sstim:hasReportedSeverity')
+    keep(`${base}/onsetPhase`, 'sstim:hasOnsetPhase')
+    keep(`${base}/participantPerceivedRelatedness`, 'sstim:hasPerceivedRelatedness')
+
+    const optional = [
+      ['persistence', PERSISTENCE_CONCEPTS, 'hasPersistence'],
+      ['actionTaken', ACTION_CONCEPTS, 'hasResponseAction'],
+      ['resolution', RESOLUTION_CONCEPTS, 'hasResolutionState'],
+    ]
+    for (const [field, concepts, property] of optional) {
+      if (record[field] === undefined) continue
+      const concept = concepts[record[field]]
+      if (concept) {
+        add(node, SSTIM(property), SSTIM_V(concept))
+        keep(`${base}/${field}`, `sstim:${property}`)
+      } else {
+        drop(`${base}/${field}`, `No declared concept for "${record[field]}".`)
+      }
+    }
+
+    if (record.onsetOffsetSeconds !== undefined) {
+      add(node, SSTIM('onsetOffsetSeconds'), dec(record.onsetOffsetSeconds))
+      keep(`${base}/onsetOffsetSeconds`, 'sstim:onsetOffsetSeconds')
+    }
+    if (record.durationSeconds !== undefined) {
+      add(node, SSTIM('experienceDurationSeconds'), dec(record.durationSeconds))
+      keep(`${base}/durationSeconds`, 'sstim:experienceDurationSeconds')
+    }
+    if (record.text !== undefined) {
+      drop(`${base}/text`,
+        'Free text is withheld by default: it can carry identifying information, and an unwanted-experience description is the most likely place for it.')
     }
   }
 

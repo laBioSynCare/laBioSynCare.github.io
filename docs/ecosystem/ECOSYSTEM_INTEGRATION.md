@@ -105,8 +105,8 @@ governing home.
 | Function | Representation | Current state |
 |---|---|---|
 | IDs, onset/duration, execution state | Native session/event bundle | **Shipped 2026-08-13** — versioned schema, recorder, engine-clock event timeline, gated by `make session-contract` |
-| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented — but its input now exists |
-| Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Native side complete (qualified observations, response states, privacy profile); the RDF side withholds them pending protected-file term additions |
+| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented — but its input now exists, natively and in RDF |
+| Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Complete in both forms as of ADR 0048, except the privacy profile, which is native-only by choice |
 | Executable stimulus | BSC Lab patch/configuration + hashes | Patch export exists; the session bundle now records the configuration IRI and its content hash, so provenance closes from the session side |
 | Optional research packaging | Complete BIDS Behavioral binding | Not implemented |
 
@@ -125,8 +125,10 @@ projection.
 - [x] Audit the RDF and write the ordered remediation plan.
 - [x] Implement and validate the native session/event/report contract.
       *2026-08-13. `static/schemas/session.schema.json`, `src/session/`,
-      `make session-contract`. The RDF projection is deliberately partial and
-      reports what it withholds; see improvement plan 0.2.*
+      `make session-contract`. Its SSTIM terms landed the same day under
+      [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md),
+      so the event timeline exists in RDF as well as natively — which is what the
+      HED mapping needs. The projection still reports what it withholds.*
 - [ ] Generate a version-pinned HED mapping and synthetic core bundle.
 - [ ] Add and validate the optional complete BIDS Behavioral binding.
 - [ ] Request HED Working Group review.

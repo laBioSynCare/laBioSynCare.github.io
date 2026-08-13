@@ -132,15 +132,14 @@ ids, event order and declared hashes.
 `src/session/sessionProjection.shacl.test.js` validates every projected graph
 against the Full shape closure under `make test`.
 
-**What this did not do, and why.** The projection is partial by construction:
-SSTIM declares no term for an event, for instrument provenance, for the six
-response states, for a qualified unwanted experience, or for a privacy profile.
-Rather than mint undeclared IRIs — the KR-17 failure — the projection withholds
-those fields and names the term each one needs. `make session-contract` prints
-the generated list (18 terms as of 2026-08-13). Closing it means editing
-protected ontology sources and requires an explicit instruction naming each file
-(CLAUDE.md §3.4). Phases 2.1–2.3 below are that work; the native contract no
-longer blocks them, and no longer blocks the HED path's *input* side.
+**The term gap this opened is now closed.** The projection was partial by
+construction — SSTIM declared no term for an event, instrument provenance, the
+six response states, a qualified unwanted experience, or a privacy profile — and
+rather than mint undeclared IRIs (the KR-17 failure) it withheld those fields and
+named the term each needed. `make session-contract` printed 18. ADR 0048 added
+them the same day, taking the generated list from 18 to 5, and what remains is
+mostly deliberate: the privacy profile travels beside the graph rather than in
+it, and free text stays out of exports by default.
 
 #### 0.3 Repair contexts, namespaces, and release controls
 
@@ -300,16 +299,24 @@ serialization is valid and private by default.
 This phase implements the ordinary BSC Lab history use case that motivated the
 ADR 0025 review.
 
-> **Status 2026-08-13.** The *native* half of 2.1 and 2.2 shipped with 0.2: the
-> qualified observation pattern, the six response states, the unwanted-experience
-> record, and the privacy profile all exist in
-> [`session.schema.json`](../../static/schemas/session.schema.json), are exercised
-> by the golden fixtures 2.3 asks for, and are gated by `make session-contract`.
-> What remains is the **ontology** half — the SSTIM terms that would let any of
-> it be projected to RDF. `make session-contract` prints exactly which terms,
-> derived from what the projection had to withhold. Those files are protected
-> (CLAUDE.md §3.4), so this phase now begins with a naming instruction rather
-> than a design question.
+> **Status 2026-08-13 — 2.1 and 2.3 are done; 2.2 is half done.**
+> The qualified observation pattern, the six response states, the
+> unwanted-experience record and the instrument provenance exist in both
+> representations: natively in
+> [`session.schema.json`](../../static/schemas/session.schema.json), and in RDF
+> under [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md)
+> (`sstim:ParticipantObservation`, `sstim:UnwantedExperienceObservation`,
+> `sstim:ObservationInstrument`, and their controlled schemes). The golden
+> fixtures 2.3 asks for exist and are gated by `make session-contract`;
+> `make shacl-session-negative` proves the contradiction guards actually reject.
+>
+> **2.2's privacy profile is native-only, deliberately.** The classification,
+> consent basis, visibility, retention, de-identification and withdrawal states
+> are required on every bundle and machine-checked by the public-repository lint,
+> but no SSTIM terms were minted for them: how consent is represented is
+> entangled with [ADR 0031](../decisions/0031-qualified-ecosystem-records.md)'s
+> public/private split and deserves its own ADR rather than a side effect of the
+> session work. The projection withholds the profile in full and says why.
 
 #### 2.1 Qualified observation pattern
 

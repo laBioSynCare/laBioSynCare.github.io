@@ -1,12 +1,28 @@
 #!/usr/bin/env python3
-"""Verify Full compatibility with 0.12 outside explicitly recorded migrations."""
+"""Verify Full compatibility with 0.12 outside explicitly recorded migrations.
+
+Compatibility, not identity. Until ADR 0048 this asserted isomorphism, because
+the only change it had to police was the modular redistribution (ADR 0043),
+which moved terms between files and was required to add nothing. That made
+"identical" and "compatible" the same test, and identical was the stricter one.
+
+They stop being the same test the moment the ontology grows. A consumer pinned
+to 0.12 is broken by a term that disappears or changes meaning, and is not
+broken by a term that appears — so the guarantee is that the baseline *survives*
+in the live union, not that the live union is exhausted by the baseline.
+
+The strictness that mattered is kept: every removal and every altered triple
+still fails, and a deliberate change must be written into the exception lists
+below to pass. Additions are counted and reported rather than accepted silently,
+so growth stays visible in CI output.
+"""
 
 import json
 from pathlib import Path
 import sys
 
-from rdflib import Graph, Literal, Namespace, RDF, RDFS, OWL
-from rdflib.compare import isomorphic, to_canonical_graph
+from rdflib import BNode, Graph, Literal, Namespace, RDF, RDFS, OWL
+from rdflib.compare import to_canonical_graph
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,6 +85,70 @@ DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES = {
     (SSTIM_V.techMonauralBeats, SKOS.closeMatch, WD.Q6898437),
 }
 
+SH = Namespace("http://www.w3.org/ns/shacl#")
+SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
+
+# ADR 0048 rewrote two SelfReport statements rather than adding beside them.
+#
+# The definition named five fixed values as the report's content and promised
+# optional free text that no property supported; the shape message named "report
+# value" when a report may now carry qualified observations instead. Both are
+# replacements of a baseline triple, so both are recorded here — an unrecorded
+# rewrite still fails.
+DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES = {
+    (
+        SSTIM.SelfReport,
+        SKOS.definition,
+        Literal(
+            "A consent-governed, session-associated self-assessment capturing "
+            "subjective affect, focus, sleepiness, quality, and optional free text "
+            "at an explicitly identified collection phase.",
+            lang="en",
+        ),
+    ),
+    (
+        SSTIM_SH.SelfReportShape,
+        SH.message,
+        Literal("SelfReport must contain at least one report value.", lang="en"),
+    ),
+    (
+        SSTIM_SH.SelfReportShape,
+        SH.message,
+        Literal(
+            "SelfReport must contain at least one observation or report value.",
+            lang="en",
+        ),
+    ),
+}
+
+# ADR 0048 added sstim:hasObservation to SelfReportShape's sh:or alternatives, so
+# every blank node in that RDF list is restructured. The list is excluded from
+# both graphs by reachability rather than by hand, since its members are
+# anonymous and their canonical labels move when any one of them changes. The
+# alternatives themselves stay covered by the SHACL suites, which execute the
+# shape against real data instead of comparing its serialisation.
+SELF_REPORT_OR_LIST_ROOTS = ((SSTIM_SH.SelfReportShape, SH["or"]),)
+
+
+def bnode_closure(graph: Graph, roots: tuple[tuple, ...]) -> set:
+    """Blank nodes reachable from the given (subject, predicate) starting points."""
+    reachable: set[BNode] = set()
+    frontier = [
+        obj
+        for subject, predicate in roots
+        for obj in graph.objects(subject, predicate)
+        if isinstance(obj, BNode)
+    ]
+    while frontier:
+        node = frontier.pop()
+        if node in reachable:
+            continue
+        reachable.add(node)
+        for _, obj in graph.predicate_objects(node):
+            if isinstance(obj, BNode) and obj not in reachable:
+                frontier.append(obj)
+    return reachable
+
 
 def load(directory: Path, filenames: tuple[str, ...]) -> Graph:
     graph = Graph()
@@ -116,13 +196,18 @@ def normalized(
 ) -> Graph:
     result = Graph()
     ontology_subjects = set(graph.subjects(RDF.type, OWL.Ontology))
+    excluded_bnodes = bnode_closure(graph, SELF_REPORT_OR_LIST_ROOTS)
     for triple in graph:
         subject, predicate, obj = triple
         if subject in ontology_subjects or predicate == RDFS.isDefinedBy:
             continue
         if subject in VALIDATION_HARDENING_NODES or obj in VALIDATION_HARDENING_NODES:
             continue
+        if subject in excluded_bnodes or obj in excluded_bnodes:
+            continue
         if triple in DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES:
+            continue
+        if triple in DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue
@@ -144,27 +229,32 @@ def main() -> int:
         NEW_CHANNEL_DEFINITION,
         NEW_TRACK_SCOPE_NOTE,
     )
-    if isomorphic(old, new):
+    old_canonical = set(to_canonical_graph(old))
+    new_canonical = set(to_canonical_graph(new))
+    lost = sorted(old_canonical - new_canonical, key=str)
+    added = len(new_canonical) - len(old_canonical & new_canonical)
+
+    if not lost:
         print(
-            "Full-union equivalence: PASS "
-            f"({len(old)} normalized triples; ownership, ontology metadata, and "
-            "the documented ADR 0043/0044 annotation, definition, and SHACL "
-            "exceptions plus the named 0.14 alignment migration excluded)"
+            "Full-union compatibility: PASS "
+            f"({len(old)} baseline triples all survive; {added} added since 0.12; "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048 "
+            "annotation, definition, and SHACL exceptions plus the named 0.14 "
+            "alignment migration excluded)"
         )
         return 0
 
-    old_canonical = set(to_canonical_graph(old))
-    new_canonical = set(to_canonical_graph(new))
-    print("Full-union equivalence: FAIL", file=sys.stderr)
+    print("Full-union compatibility: FAIL", file=sys.stderr)
     print(f"  normalized baseline triples: {len(old)}", file=sys.stderr)
     print(f"  normalized modular triples:  {len(new)}", file=sys.stderr)
-    for label, triples in (
-        ("missing from modular union", sorted(old_canonical - new_canonical, key=str)),
-        ("unexpected in modular union", sorted(new_canonical - old_canonical, key=str)),
-    ):
-        print(f"  {label}: {len(triples)}", file=sys.stderr)
-        for triple in triples[:20]:
-            print(f"    {triple!r}", file=sys.stderr)
+    print(
+        f"  lost or altered since 0.12: {len(lost)} — a consumer pinned to the "
+        "baseline would break. Record the change in this script's exception "
+        "lists if it is deliberate.",
+        file=sys.stderr,
+    )
+    for triple in lost[:20]:
+        print(f"    {triple!r}", file=sys.stderr)
     return 1
 
 

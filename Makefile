@@ -181,8 +181,14 @@ shacl-private-ecosystem:
 	cat $(FULL_SEMANTIC_MODULES) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
 	$(PYSHACL) -s $(PRIVATE_ECOSYSTEM_SHAPES) -i rdfs "$$tmp"
 
+## Assert the session SHACL-SPARQL constraints reject what they claim to. The
+## positive suites only prove conforming data conforms, and rdf-validate-shacl
+## strips sh:sparql — so without this a broken constraint would pass everything.
+shacl-session-negative:
+	$(PYTHON) scripts/session-shapes-negative.py
+
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:

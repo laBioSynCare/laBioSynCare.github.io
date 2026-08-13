@@ -71,6 +71,7 @@ annotations lives here.
 | [0045](0045-shapeless-profiles-are-discovery-entry-points.md) | A profile with no shape closure is a discovery entry point, not a conformance target | Accepted |
 | [0046](0046-one-studio-two-authoring-modes.md) | One Studio, first-class spatial visual tracks, and separate semantic products | Accepted · revised before implementation; partially implemented 2026-08-08 |
 | [0047](0047-programme-identity-path.md) | Programme identity: `/sstim/ecosystem/{id}`, adding a seventh canonical path to ADR 0007 | Accepted |
+| [0048](0048-session-events-and-qualified-observations.md) | Session events on the engine clock, and qualified participant observations where absence carries its reason — closes KR-02/KR-03 | Accepted |
 
 ## ADR lifecycle and revision policy
 
