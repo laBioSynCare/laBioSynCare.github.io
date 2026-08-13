@@ -1,12 +1,45 @@
 # Session Model
 
-> **For AI agents:** This document defines the distinction between
-> a preset (reusable parameter configuration), a session specification
-> (a preset plus user-chosen parameters for one intended execution), and a
-> session instance (the record of an actual completed execution). Before
-> building any session recording, playback, history, or data export
-> feature, read this document. The JSON schema source is
-> `schemas/session.schema.json`, generated from this document.
+> **For AI agents:** This document explains the session model. It is **not** the
+> contract. The contract is
+> [`static/schemas/session.schema.json`](../../static/schemas/session.schema.json),
+> and where this document and the schema disagree, the schema is right and this
+> document is a bug. That inversion is deliberate: KR-02 found three
+> incompatible session contracts — the ontology, this file's prose, and a
+> JSON-LD coercion — with nothing executable to say which was authoritative, so
+> the prose stopped being a source. `make session-contract` executes the schema
+> against golden fixtures; `make test` validates their RDF projection against
+> SHACL.
+>
+> Before building any session recording, playback, history, or data export
+> feature, read the schema, then `src/session/`.
+
+---
+
+## The one contract
+
+| Concern | Where it lives |
+|---|---|
+| Field-level contract | [`static/schemas/session.schema.json`](../../static/schemas/session.schema.json), `$id` served at `/schemas/session.schema.json` |
+| Controlled values, ids, hashing | [`src/session/sessionContract.js`](../../src/session/sessionContract.js) — derived from the schema, never restated |
+| Recording | [`src/session/sessionRecorder.js`](../../src/session/sessionRecorder.js) |
+| RDF projection + loss report | [`src/session/sessionProjection.js`](../../src/session/sessionProjection.js) |
+| Golden cases | [`src/session/fixtures/goldenSessions.js`](../../src/session/fixtures/goldenSessions.js) |
+| Gates | `make session-contract`, `make test` |
+
+A **session bundle** is one document with five parts: the `specification`, the
+`instance`, an `events` timeline, zero or more `reports`, and a `privacy`
+profile that governs all of them. The model tag is
+`bsc-lab-session-bundle-1`; a bundle carrying newer fields must never claim an
+older tag.
+
+**The RDF is a projection, not the record.** SSTIM has no term today for an
+event, for instrument provenance, for the six response states, for a qualified
+unwanted experience, or for a privacy profile, so the projection withholds those
+fields and names the term each one needs, rather than minting undeclared IRIs
+(the KR-17 failure). `make session-contract` prints that list. What survives
+projection is: the specification, the execution, and a five-scalar summary of
+each report. See §"RDF representation" below.
 
 ---
 
@@ -108,14 +141,21 @@ For presets that include a breathing-guided voice (`hasBreathGuide:
 true`), three parameters govern the breathing arc. The preset stores
 designer defaults for all three. The user may override any of them.
 
-**`userMp0`** — Initial breathing cycle duration in seconds.  
-**`userMp1`** — Final breathing cycle duration in seconds.  
-**`userMd`** — Transition duration in seconds (how long to reach `mp1`
-from `mp0`).
+**`breathingPeriodInitial`** — Initial breathing cycle duration in seconds
+(overrides `mp0`; must be ≥ 3.0, below which it is tremolo rather than
+breathing guidance).  
+**`breathingPeriodFinal`** — Final breathing cycle duration in seconds
+(overrides `mp1`).  
+**`breathingTransitionDuration`** — Transition duration in seconds, how long to
+reach the final period from the initial one (overrides `md`).
 
-When these fields are present in the session specification, they
-override the corresponding `mp0`, `mp1`, `md` values in the preset's
-breathing-reference voice. When absent, the preset's values are used.
+The names are the ontology's — `sstim:breathingPeriodInitial` and its two
+siblings — not a second set of JSON-only names. The earlier `userMp0` /
+`userMp1` / `userMd` spelling existed nowhere but this document.
+
+When these fields carry a value, they override the corresponding `mp0`, `mp1`,
+`md` values in the preset's breathing-reference voice. When they are `null`, the
+preset's own values were used.
 
 The breathing model for all three is: sinusoidal oscillation with
 50/50 inhale/exhale split, linearly interpolating from `mp0` to
@@ -131,165 +171,267 @@ explicitly noted that "although parametrizable by the user for each
 session, the typical setting is [the designer's default]." This
 parameterizability is a core design principle.
 
-**How to record correctly:** The session specification records the
-parameters *as run*, not as designed. If the user does not change the
-breathing parameters, the session specification records `userMp0: null`,
-`userMp1: null`, `userMd: null` (meaning "use preset defaults"). The
-audio engine reads these as `mp0`, `mp1`, `md` from the active preset.
-This preserves the ability to know, from the session record alone,
-whether the user modified the breathing arc.
+**How to record correctly:** The session specification records the parameters
+*as run*, not as designed. If the participant does not change the breathing
+parameters, the specification records an explicit `null` for each, meaning "the
+source's own value was used"; the engine then reads `mp0`, `mp1`, `md` from the
+active preset. The explicit null is what preserves the ability to know, from the
+record alone, whether the arc was modified — and it is one of the things the RDF
+projection cannot carry, since an omitted triple and a deliberate non-override
+look identical.
 
 ### Master volume
 
 **Field:** `masterVolume`  
-**Type:** float  
-**Range:** 0.0–1.0  
-**Default:** 1.0 (preset `iniVolume` values applied at full scale)
+**Type:** number, required  
+**Range:** 0.0–1.0
 
-A scalar applied to all voice volumes uniformly. The session
-specification records the volume level set at session start. If the
-user adjusts volume mid-session on the device level (OS volume), this
-is not captured; only application-level master volume is recorded.
+A scalar applied to all voice volumes uniformly, recorded as set at session
+start. Device-level (OS) volume changes are not captured; only the
+application-level master volume is. Required rather than optional because
+`sstim-sh:SessionSpecShape` requires it, and the schema follows the shape.
 
-### Headphone mode
+### Output route
 
-**Field:** `headphoneMode`  
-**Type:** string enum: `"headphones"` | `"speakers"`  
-**Default:** `"headphones"`
+**Field:** `specification.environment.outputRoute`  
+**Type:** string enum: `"headphones"` | `"speakers"` | `"unknown"` | `"not-asked"`
 
-When `"speakers"`, the binaural beat component is disabled or
-degraded (monaural beat may still be audible). The session specification
-records what the user reported using. This is important for research
-data: binaural beat evidence only applies to headphone sessions.
+What the participant declared they were listening through. Binaural beat
+evidence applies only to headphone delivery, so an undeclared route is recorded
+as `unknown` rather than assumed to be headphones.
+
+This field used to be called `headphoneMode`, and this document used to show a
+`sstim:headphoneMode` triple beside it. **That term has never existed in the
+ontology**, which is one of the concrete divergences KR-02 caught. It now lives
+in `environment` with the rest of the reproduction chain, and the projection
+reports it as withheld until SSTIM declares a term for it.
 
 ---
 
-## Session specification: complete field list
+## Session specification
+
+The complete field list is the schema; it is not restated here, because a second
+copy is a second thing to forget. What follows is what the fields *mean*.
 
 ```json
 {
-  "specVersion": "1.0",
-  "presetId": "Perform - Deep Focus",
-  "presetVersion": "0.9.1",
+  "id": "morning-focus-0912-spec",
+  "label": "Perform — Alpha 10 seed",
+  "created": "2026-08-13T09:00:00Z",
+  "source": {
+    "kind": "preset",
+    "ref": "https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed",
+    "label": "Perform — Alpha 10 seed",
+    "contentHash": "32e114…",
+    "contentHashAlgorithm": "sha256-canonical-json"
+  },
   "durationSeconds": 1800,
-  "userMp0": null,
-  "userMp1": null,
-  "userMd": null,
-  "masterVolume": 1.0,
-  "headphoneMode": "headphones"
+  "masterVolume": 0.2,
+  "breathingPeriodInitial": null,
+  "breathingPeriodFinal": null,
+  "breathingTransitionDuration": null,
+  "environment": { "audioEngine": "audio-worklet", "outputRoute": "headphones", "…": "…" },
+  "outputGuarantee": "perceptually-equivalent"
 }
 ```
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `specVersion` | string | yes | Session spec schema version. Currently `"1.0"` |
-| `presetId` | string | yes | Matches `_id` of the preset |
-| `presetVersion` | string | yes | Matches `header.version` of the preset |
-| `durationSeconds` | integer | yes | Intended session length |
-| `userMp0` | number or null | yes | null = use preset default |
-| `userMp1` | number or null | yes | null = use preset default |
-| `userMd` | number or null | yes | null = use preset default |
-| `masterVolume` | float | yes | 0.0–1.0 |
-| `headphoneMode` | string enum | yes | `"headphones"` or `"speakers"` |
+Three things here did not exist before and are the substance of the KR-02
+repair:
 
-**Future fields (not yet implemented):**
-- `engineAudio` — which audio engine implementation was used
-  (`"VanillaWebAudio"`, `"ToneJs"`, `"WasmMartigli"`)
-- `engineVisual` — which visual engine was used
-- `engineHaptic` — which haptic engine was used
-- These become important for reproducibility once multiple engine
-  implementations exist and their acoustic outputs may differ
+**`source.contentHash`.** The preset id and version told you which preset was
+*named*, not whether it still says what it said. A specification that cannot
+show its source is unchanged is suggestive rather than reproducible. The hash is
+over canonical JSON, so it does not depend on key order or formatting.
+
+**`environment`.** Which engine, which build, which output route, which sample
+rate, which app and ontology version. Reproducibility across four selectable
+audio engines is not a future concern — the engines already exist and their
+outputs already differ.
+
+**`outputGuarantee`.** Which reproduction claim the record actually supports:
+`bit-exact`, `signal-equivalent`, or `perceptually-equivalent`. Web Audio
+sessions are `perceptually-equivalent` unless a deterministic offline render
+proves otherwise; never declare upward. This field exists because
+`sstim:SessionSpecification`'s own definition promises fully determined output,
+which is a stronger claim than any current engine can honour, and the record
+should be able to say so.
 
 ---
 
-## Session instance: complete field list
+## Session instance
 
-A session instance wraps a session specification and adds execution
-data. It is a top-level JSON object and a top-level RDF individual.
+The append-only record of one execution. Never modified after close; a
+correction attaches as another record.
 
 ```json
 {
-  "instanceVersion": "1.0",
-  "uuid": "550e8400-e29b-41d4-a716-446655440000",
-  "specification": { ... session specification ... },
-  "startedAt": "2026-04-12T09:15:00+02:00",
-  "endedAt": "2026-04-12T09:45:01+02:00",
-  "actualDurationSeconds": 1801,
+  "id": "morning-focus-0912",
+  "specificationId": "morning-focus-0912-spec",
+  "startedAt": "2026-08-13T09:01:00Z",
+  "endedAt": "2026-08-13T09:31:02Z",
+  "clockOriginSeconds": 931.25,
+  "clockSource": "audio-context",
+  "actualDurationSeconds": 1802,
+  "deliveredSeconds": 1742,
   "completionStatus": "completed",
-  "platform": "web",
-  "userAgent": "Mozilla/5.0 ...",
-  "selfReport": { ... optional ... },
-  "notes": "Tried with speakers today, much less effective"
+  "deliveryModalities": ["auditory"]
 }
 ```
 
-### Execution metadata fields
+**`clockOriginSeconds` and `clockSource`.** The engine timing context's
+`currentTime` at open, and which timing surface produced it. Every event offset
+is measured from this origin, so the pair `(clockOriginSeconds, offsetSeconds)`
+reconstructs the exact engine time of anything that happened, with no wall clock
+involved. `startedAt` and `endedAt` place the session in the calendar and order
+nothing.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `instanceVersion` | string | yes | Schema version. Currently `"1.0"` |
-| `uuid` | string (UUID v4) | yes | Stable identifier for this instance |
-| `specification` | object | yes | Embedded session specification |
-| `startedAt` | ISO 8601 datetime | yes | When the user pressed play |
-| `endedAt` | ISO 8601 datetime | yes (if ended) | When session ended or was stopped |
-| `actualDurationSeconds` | integer | yes | Actual playback time. May differ from `durationSeconds` if session was interrupted |
-| `completionStatus` | string enum | yes | `"completed"` / `"interrupted"` / `"abandoned"` |
-| `platform` | string | yes | `"web"` / `"ios"` / `"android"` |
-| `userAgent` | string | no | Browser/device user agent string |
-| `notes` | string | no | Free-text user note entered after the session |
+**`actualDurationSeconds` vs `deliveredSeconds`.** Elapsed engine time, and
+elapsed time minus paused intervals. They are different questions — a session
+paused for ten minutes and a session that ran ten minutes shorter are not the
+same session — and only the second is the exposure. Completion status is derived
+from delivered time.
 
 **Completion status semantics:**
-- `"completed"` — session ran for the full `durationSeconds` and ended normally
-- `"interrupted"` — session ran for a meaningful portion of `durationSeconds`
-  but was stopped early (threshold: > 30% of intended duration)
-- `"abandoned"` — session stopped in the first 30% of intended duration
+- `"completed"` — delivered the intended duration (within clock jitter) and ended normally
+- `"interrupted"` — stopped early, past 30% of the intended duration
+- `"abandoned"` — stopped within the first 30%
+- `"in-progress"` — still open; not yet a record of anything, and refused by the
+  RDF projection
 
-For research purposes, only `"completed"` and `"interrupted"` sessions
-with `actualDurationSeconds ≥ 300` (5 minutes) are eligible for
-self-report data. Abandoned sessions are recorded but excluded from
-evidence analysis.
+For research purposes, only `"completed"` and `"interrupted"` sessions with
+`deliveredSeconds ≥ 300` are eligible for self-report analysis. Abandoned
+sessions are recorded but excluded.
 
-### Self-report fields (Phase 3, optional)
+---
 
-The self-report block captures post-session subjective data. It is
-never required and must never be solicited in a way that suggests
-a specific expected outcome. All scales are presented without
-anchoring the user to the preset's intended target.
+## Event timeline
+
+`events` is the ordered list of what the runtime did: `session-open`,
+`playback-start`, `playback-pause`, `playback-resume`, `playback-stop`,
+`session-complete`, `session-interrupt`, `engine-fallback`,
+`safety-clamp-applied`, `report-collected`.
+
+Every event carries an `offsetSeconds` on the engine clock. **Never a wall
+clock**: `Date.now()` and `performance.now()` drift against the audio hardware,
+and a timeline built from them cannot be aligned to the stimulus it describes
+(CLAUDE.md §3.1). `sessionRecorder.test.js` spies on both and fails if either is
+called.
+
+Events record what the runtime did, not what the participant felt. A recorder
+that observes something outside the controlled list extends the vocabulary
+rather than overloading a neighbouring term.
+
+## Reports and observations
+
+A `report` is one **collection event**, and each answer inside it is a
+**qualified observation item** that carries its own provenance. The flat
+five-field block this document used to describe could not represent the ordinary
+BSC Lab history use case, which is what KR-03 found.
 
 ```json
-"selfReport": {
-  "capturedAt": "2026-04-12T09:46:00+02:00",
-  "promptVersion": "1.0",
-  "primaryAffect": 4,
-  "focus": 4,
-  "sleepiness": 2,
-  "subjectiveQuality": 4,
-  "goalAchieved": true,
-  "freeText": "Good session, felt able to concentrate well"
+{
+  "id": "morning-focus-0912-report-immediate-post",
+  "phase": "immediate-post",
+  "collectedAt": "2026-08-13T09:32:05Z",
+  "instrument": { "id": "bsc-lab-core-report", "version": "1.0.0", "language": "en" },
+  "statedGoal": { "responseState": "supplied", "text": "Settle before a long stretch of writing." },
+  "items": [
+    {
+      "id": "…-item-perceived-helpfulness",
+      "role": "perceived-helpfulness",
+      "responseState": "supplied",
+      "value": 4,
+      "scale": { "kind": "ordinal", "min": 1, "max": 5, "minLabel": "not at all", "maxLabel": "a great deal" },
+      "prompt": { "id": "helpfulness", "text": "How much did this session help with what you wanted from it?" }
+    },
+    { "id": "…-item-focus", "role": "focus", "responseState": "declined", "value": null }
+  ],
+  "unwantedExperiences": { "responseState": "none-reported" }
 }
 ```
 
-| Field | Type | Scale | Notes |
-|---|---|---|---|
-| `capturedAt` | ISO 8601 datetime | — | When self-report was submitted |
-| `promptVersion` | string | — | Version of the self-report prompt shown. Important: self-report data is not comparable across prompt versions |
-| `primaryAffect` | integer 1–5 | 1=very negative, 5=very positive | How the user feels now |
-| `focus` | integer 1–5 | 1=scattered, 5=highly focused | Current attentional state |
-| `sleepiness` | integer 1–5 | 1=alert, 5=very drowsy | Arousal level |
-| `subjectiveQuality` | integer 1–5 | 1=poor, 5=excellent | How the user rates this session |
-| `goalAchieved` | boolean | — | Did the session accomplish what the user intended? |
-| `freeText` | string | — | Optional free-text. Max 500 characters |
+**Four phases:** `pre-session`, `during-session`, `immediate-post`,
+`follow-up`. SSTIM declares concepts for three of them; a `during-session`
+report is withheld from the RDF projection entirely rather than filed under the
+nearest neighbour, which would misstate when the answer was given.
 
-**Design principles for self-report:**
-1. All scales are presented unlabeled with respect to the session's
-   target. Never say "did this session help you relax?" for a Heal
-   preset. Use neutral questions: "How do you feel right now?"
-2. The prompt is shown after a short cooldown (minimum 60 seconds
-   after session end) to allow the acute session effect to stabilize.
-3. Self-report is opt-in per session, not per account. A user may
-   choose to report on some sessions and not others.
-4. Self-report data is stored only for sessions where the user has
-   given explicit research consent (separate from app usage consent).
+**Six response states**, and they are six different facts:
+`supplied`, `none-reported`, `not-asked`, `declined`, `unknown`,
+`not-applicable`. A missing key collapses all six into one silence, which
+destroys the difference between "nothing happened", "we never asked", and "they
+chose not to say". A schema rule enforces the pairing: a value is present if and
+only if the state is `supplied`.
+
+**Perceived helpfulness** is a first-class item with a declared scale. KR-03
+found no direct magnitude item — `goalAchieved` is a yes/no against the
+participant's own stated goal and is not one — and no way to record the goal
+itself. Both exist now.
+
+**Instrument provenance is required.** Reports are not comparable across
+instrument versions, so a report without instrument id, version and language is
+not analysable and the schema refuses it.
+
+### Unwanted experiences
+
+```json
+"unwantedExperiences": {
+  "responseState": "supplied",
+  "records": [{
+    "id": "…-ue-00",
+    "category": "eye-strain",
+    "participantReportedSeverity": "mild",
+    "onsetPhase": "during-session",
+    "onsetOffsetSeconds": 180,
+    "persistence": "resolved-same-day",
+    "actionTaken": "paused-session",
+    "resolution": "improved",
+    "participantPerceivedRelatedness": "possibly-related"
+  }]
+}
+```
+
+The block is **deliberately not called `sideEffect`**. That word asserts a causal
+medical conclusion a participant report cannot establish, and KR-03 says so
+explicitly. Nothing here classifies a clinical adverse event, applies a clinical
+grading scale, or infers causation: severity is what the participant said, and
+relatedness is what the participant thought. A test asserts no field name or
+enum value anywhere in the schema matches `side-effect` or `adverse`.
+
+The response state on the block is load-bearing. An empty `records` array cannot
+distinguish "asked, none reported" from "never asked" from "declined to say",
+and a safety history that cannot make that distinction is worse than absent,
+because a downstream consumer would trust it.
+
+### Privacy profile
+
+Every bundle carries one, and it is **required**, not optional — a session record
+without a stated classification cannot be safely stored, exported or committed.
+It records classification (`synthetic`, `public-safe`, `de-identified`,
+`shared-research`, `private`), reporting role, consent basis, policy version,
+visibility, retention, de-identification transform, and withdrawal state. This
+replaces the prose claim that reports are "consent-governed", which was not
+checkable by anything.
+
+Two consequences that are enforced rather than described:
+
+- **`withdrawn: true` overrides everything.** The projection refuses outright.
+- **Only `synthetic` and `public-safe` bundles may be committed to this public
+  repository.** `make session-contract` fails otherwise, so the marking is
+  machine-testable rather than a comment.
+
+Free text stays out of research exports by default: it can carry identifiers.
+The `freeTextIncluded` flag lets an export decide what to strip without walking
+every nested item.
+
+**Design principles for reports** (unchanged, and now supported by the model):
+1. Every scale is presented unlabelled with respect to the session's target.
+   Never "did this session help you relax?" for a Heal preset; use "How do you
+   feel right now?"
+2. The prompt appears after a cooldown of at least 60 seconds after session end,
+   so the acute effect can stabilise.
+3. Reporting is opt-in per session, not per account.
+4. Reports are stored for research only under explicit research consent,
+   separate from app-usage consent — recorded as `consentBasis`.
 
 ---
 
@@ -360,9 +502,10 @@ rounded to the nearest hour) before transmission.
 
 ## RDF representation
 
-Each session specification and session instance has a corresponding
-RDF individual. The session ontology is minimal in Phase 1 and will
-be extended in Phase 3 as the evidence infrastructure matures.
+The RDF is a **projection over the bundle**, produced by
+[`src/session/sessionProjection.js`](../../src/session/sessionProjection.js). It
+is partial, it says which parts it dropped, and it never invents a term to avoid
+dropping one.
 
 The class definitions are in
 [`sstim-session.ttl`](../../static/ontology/sstim-session.ttl) and are not
@@ -427,6 +570,34 @@ Key design decisions for the RDF model:
   to a user IRI, which is stored only in the user's local named graph
   and never included in anonymized research exports.
 
+### What the projection cannot carry
+
+Run `make session-contract` for the current, generated list. As of this writing
+it is 18 terms, and the large ones are:
+
+| Withheld | Term SSTIM would need |
+|---|---|
+| The entire event timeline | a session-event class with an engine-clock offset, a controlled event-type scheme, and a link from `sstim:SessionInstance` |
+| Every qualified observation | an observation class where each answer is an addressable record with its prompt, scale and state |
+| The six response states | a response-state scheme, so absence carries its reason |
+| Every unwanted experience | a qualified unwanted-experience class with a controlled category scheme |
+| Perceived helpfulness | a helpfulness observation with a declared scale |
+| Instrument and prompt provenance | instrument id, version, language |
+| `during-session` reports (whole report) | a `during-session` `SelfReportPhase` concept |
+| Clock origin, clock source, delivered time | properties on `sstim:SessionInstance` |
+| Source content hash, environment, output guarantee | content-integrity, execution-environment and reproducibility-level properties |
+| The privacy profile | by design — it governs whether the graph may be published, and belongs in a separate access-controlled graph (CLAUDE.md §5.5) |
+
+Adding these means editing protected ontology sources (CLAUDE.md §3.4) and needs
+an explicit instruction naming each file. Until then the projection withholds
+rather than mints: a graph that looks authoritative and validates against
+nothing is worse than a smaller graph that is true.
+
+**What survives** is worth stating plainly, because it is what a third party
+querying the RDF sees: this session ran, against this configuration, for this
+long, ending this way, with a five-scalar summary per report. Not what happened
+during it, not how the answers were elicited, and not what was never asked.
+
 ---
 
 ## Relationship to the breathing model
@@ -457,41 +628,52 @@ the user's choice nor the preset's design.
 
 ## Implementation guidance
 
-The `SessionRecorder` class in `src/core/SessionRecorder.js` is
-responsible for creating, holding, and persisting session instances.
-Its interface:
+[`src/session/sessionRecorder.js`](../../src/session/sessionRecorder.js) records
+a session. It is a function, not a class, and it holds no storage: it produces a
+bundle, and persistence is the caller's business.
 
 ```javascript
-// Create specification at session start
-const spec = SessionRecorder.createSpecification({
-  presetId: preset._id,
-  presetVersion: preset.header.version,
-  durationSeconds: 1800,
-  userMp0: null,       // null = use preset default
-  userMp1: null,
-  userMd: null,
-  masterVolume: 1.0,
-  headphoneMode: 'headphones'
-});
+import { openSession } from '../session/sessionRecorder.js'
 
-// Open instance when play begins
-const instance = SessionRecorder.open(spec);
+// The engine's timing context is passed in — it is the only clock (§3.1).
+const recorder = openSession({
+  specification,                       // conforming to session.schema.json
+  timingContext: engine.getAudioContext(),
+  instanceId: 'morning-focus-0912',    // every other id derives from this
+  startedAt: new Date().toISOString(), // calendar placement only; orders nothing
+  deliveryModalities: ['auditory'],
+})
 
-// Attach self-report after session ends
-SessionRecorder.attachSelfReport(instance.uuid, {
-  primaryAffect: 4,
-  focus: 4,
-  sleepiness: 2,
-  subjectiveQuality: 4,
-  goalAchieved: true
-});
+recorder.mark('playback-start')
+recorder.pause()                       // delivered time stops accruing
+recorder.resume()
+recorder.attachReport(report)          // stamps the engine offset if during-session
 
-// Finalize and persist to IndexedDB
-await SessionRecorder.finalize(instance.uuid, 'completed');
+const bundle = recorder.close({
+  endedAt: new Date().toISOString(),
+  privacy,                             // required: no profile, no record
+})
 ```
 
-The `SessionRecorder` never writes to the preset store. It reads
-preset data by reference but never modifies it.
+Four things the recorder guarantees, each with a test that fails if it stops
+being true:
+
+1. **It reads only the engine timing context.** A test spies on `Date.now` and
+   `performance.now` and fails if either is called during a recording.
+2. **Offsets are relative to the origin captured at open**, so a context that has
+   been alive for 931 seconds still yields a timeline starting at zero.
+3. **Delivered time excludes pauses**, and an open pause is closed on `close()`
+   rather than silently lost.
+4. **A closed instance is closed.** Further marks throw; the record is
+   append-only because a session record is evidence of nothing except itself,
+   and it is only that much if it was not edited afterwards.
+
+The recorder never writes to the preset store. It reads the configuration by
+reference and hashes it; it never modifies it.
+
+`specification.id` must be `${instanceId}-spec` — the recorder rejects anything
+else. Derivable ids are what let a report link to the answer inside it without a
+lookup table, which the old model could not do.
 
 ---
 
@@ -503,16 +685,19 @@ preset data by reference but never modifies it.
    more inclusive but noisier. This decision affects the schema for
    self-report aggregation queries.
 
-2. **Session interruption semantics:** If a user pauses a session and
-   resumes it later (same day, different day), is this one session
-   instance or two? Current position: one instance with pause events
-   recorded as a `pauseEvents` array. This is a schema extension to
-   add in Phase 3.
+2. **Session interruption semantics:** ~~If a user pauses and resumes later, is
+   this one session instance or two?~~ **Resolved.** One instance. Pauses are
+   ordinary `playback-pause` / `playback-resume` events on the timeline, and
+   `deliveredSeconds` excludes the paused intervals — so the record answers
+   "how long was it" and "how much was delivered" separately, without a special
+   `pauseEvents` array. What remains open is a policy question rather than a
+   modelling one: how long a pause may run before the session is better recorded
+   as two.
 
 3. **Multi-device synchronization:** If a user runs the same preset on
    a phone and then on a computer on the same day, are these two
    session instances or one? Always two. The device is part of the
-   context captured in `platform` and `userAgent`.
+   context captured in `specification.environment`.
 
 4. **Rooms sessions:** The BioSynCare Rooms feature enables shared
    synchronous sessions. A Rooms session involves multiple users running
@@ -523,9 +708,9 @@ preset data by reference but never modifies it.
 
 ---
 
-*Document version: April 2026*
-*Source for: `schemas/session.schema.json` (generated by Claude Code)*
+*Document version: August 2026 — rewritten to describe the executable contract*
+*Contract: [`static/schemas/session.schema.json`](../../static/schemas/session.schema.json). This document explains it; it does not define it.*
 *Maintained by: Renato Fabbri*
-*Review required when: breathing model changes, Phase 3 self-report
-infrastructure is built, Rooms session data model is finalized, or
-export format for research contributions is specified.*
+*Review required when: the schema changes, SSTIM declares any of the withheld
+terms, the breathing model changes, or the Rooms session data model is
+finalized.*

@@ -24,6 +24,8 @@
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "svelte": "^5.0.0",
     "svelte-check": "^4.4.6",
     "vite": "^6.0.0",

@@ -241,13 +241,22 @@ observations, or a claim of turnkey HED/BIDS/NWB interoperability.
 
 The main gaps are design and coverage gaps, not current parser failures:
 
-- `SessionSpecification` and `masterVolume` remain audio-shaped, while the
-  native executed-session schema, event timeline, and declared reproducibility
-  level are incomplete. The portable Patch Studio package solves object
-  interchange, not executed-session recording.
+- `SessionSpecification` and `masterVolume` remain audio-shaped. The native
+  executed-session schema, event timeline, and declared reproducibility level
+  **exist as of 2026-08-13**
+  ([`session.schema.json`](../../static/schemas/session.schema.json),
+  `src/session/`) — but as a native contract, not as SSTIM terms. The RDF
+  projection carries the specification, the execution, and a five-scalar summary
+  per report, and withholds the rest with the term each field would need. The
+  portable Patch Studio package solves object interchange; this solves
+  executed-session recording.
 - Qualified participant observations, structured unwanted experiences,
-  missing/declined states, and their privacy/provenance profile are not ready
-  for real participant data.
+  missing/declined states, and their privacy/provenance profile are modelled and
+  gated **natively**, and are still **not representable in RDF**: SSTIM declares
+  no observation class, no response-state scheme, no unwanted-experience class,
+  and no privacy profile. Run `make session-contract` for the generated list of
+  what is missing. Real participant data therefore remains out of scope for the
+  graph, though the native record is now safe enough to hold it.
 - Browser-side SHACL validation and the public preset-to-runtime export path are
   planned; repository and runtime-generator tests are the present validation
   surfaces.

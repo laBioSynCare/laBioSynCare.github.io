@@ -243,6 +243,14 @@ test:
 audio-verify:
 	node scripts/audio-verify/run.mjs --browser $(or $(BROWSER),chrome) $(if $(JSON),--json $(JSON),)
 
+## Gate P0-B: the native session bundle validates, its RDF projection accounts
+## for every field, only synthetic/public-safe bundles are committed, and the
+## round trip preserves ids, event order and hashes. Prints the SSTIM terms the
+## projection still needs (`--terms` for the fields wanting each one). SHACL
+## conformance of the projected graphs runs beside its producer, under `make test`.
+session-contract:
+	node scripts/session-contract.mjs
+
 ## Verify generated JSON-LD and RDF/XML round-trip to the source graphs
 export-check:
 	@tmpdir="$$(mktemp -d)"; \
@@ -299,7 +307,7 @@ release-dryrun:
 	node scripts/release-dryrun.mjs
 
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots w3id-routes release-dryrun truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract w3id-routes release-dryrun truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)

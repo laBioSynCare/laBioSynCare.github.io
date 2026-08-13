@@ -88,7 +88,7 @@ facts, and copy that collapses them is wrong in one direction or the other.
 
 ## Workstream 2 — SSTIM ↔ HED event profile and research bindings
 
-**`[~] Revised 2026-07-13 — Proposed ADR + RDF plan written; implementation prerequisites and worked example remain.**
+**`[~] Revised 2026-08-13 — the native session/event/report contract is implemented and gated; the HED mapping, the worked example, and the BIDS binding remain.**
 
 **Artifacts:** [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md) (event profile and
 binding contract), [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)
@@ -104,21 +104,29 @@ governing home.
 
 | Function | Representation | Current state |
 |---|---|---|
-| IDs, onset/duration, execution state | Native session/event bundle | Recorder/schema not implemented |
-| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented |
-| Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Model exists but audit repairs are required |
-| Executable stimulus | BSC Lab patch/configuration + hashes | Patch export exists; bridge/provenance incomplete |
+| IDs, onset/duration, execution state | Native session/event bundle | **Shipped 2026-08-13** — versioned schema, recorder, engine-clock event timeline, gated by `make session-contract` |
+| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented — but its input now exists |
+| Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Native side complete (qualified observations, response states, privacy profile); the RDF side withholds them pending protected-file term additions |
+| Executable stimulus | BSC Lab patch/configuration + hashes | Patch export exists; the session bundle now records the configuration IRI and its content hash, so provenance closes from the session side |
 | Optional research packaging | Complete BIDS Behavioral binding | Not implemented |
 
 The [2026-07-13 RDF audit](../ontology/reviews/2026-07-13-rdf-knowledge-representation-audit.md)
-shows that this requires a native recorder/schema, report/privacy semantics, and
-runtime RDF conformance before the HED and BIDS adapters. Existing Sensory Field
-and Patch Studio exports are inputs, not a finished bridge.
+required a native recorder/schema, report/privacy semantics, and runtime RDF
+conformance before the HED and BIDS adapters. **The first of those is done.**
+HED describes what occurred and when; until 2026-08-13 SSTIM could not say that
+anything occurred at all, and now the native bundle carries an ordered,
+engine-clock event timeline that a HED mapping can be generated from. The
+mapping itself is the next piece of work, and it does not need the ontology
+terms — HED annotations are generated from the native bundle, not from the RDF
+projection.
 
 **Next actions:**
 - [x] Revise the event/binding profile and Proposed ADR.
 - [x] Audit the RDF and write the ordered remediation plan.
-- [ ] Implement and validate the native session/event/report contract.
+- [x] Implement and validate the native session/event/report contract.
+      *2026-08-13. `static/schemas/session.schema.json`, `src/session/`,
+      `make session-contract`. The RDF projection is deliberately partial and
+      reports what it withholds; see improvement plan 0.2.*
 - [ ] Generate a version-pinned HED mapping and synthetic core bundle.
 - [ ] Add and validate the optional complete BIDS Behavioral binding.
 - [ ] Request HED Working Group review.

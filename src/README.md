@@ -31,7 +31,8 @@ the rule it carries. Only non-obvious entries are listed.
 |---|---|
 | `engines/audio/` | `IAudioEngine` + four implementations + `audioEngines.js` (registry, capability detection, persisted selection, factory). See [`engines/README.md`](engines/README.md). |
 | `engines/visual/`, `engines/haptic/` | **Planned.** Empty; the target design is in `docs/technical/VISUAL_ENGINE_ARCHITECTURE.md`. |
-| `core/` | **Planned.** Empty. Orchestration: clock, scheduler worker, orchestrator, protocol runner, session recorder. |
+| `core/` | **Planned.** Empty. Orchestration: clock, scheduler worker, orchestrator, protocol runner. |
+| `session/` | The native session contract ([`SESSION_MODEL.md`](../docs/technical/SESSION_MODEL.md)): schema-derived controlled values, the recorder, and the RDF projection with its generated loss report. Records against the engine timing context only; holds no storage. Gated by `make session-contract`. |
 | `rdf/` | `namespaces.js` is the single source of truth for every IRI prefix — never hardcode one. Plus loader (Turtle/TriG → N3.Store), Comunica query wrapper, Cytoscape graph model, preset listing, and `annotations/` (named-graph CRUD only). |
 | `identity/` | The identity seam ([ADR 0038](../docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)): anonymous and Firebase providers behind `IdentityProvider`, with a conformance suite. |
 | `storage/` | The storage seam: local and Firestore patch stores behind `PatchStore`, likewise conformance-tested. |
@@ -123,6 +124,14 @@ did not travel rather than overclaiming ([ADR 0026](../docs/decisions/0026-patch
 [ADR 0041](../docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md));
 `portability/sessionPackage.js` wraps that as a portable session package
 ([`SESSION_PACKAGE.md`](../docs/technical/SESSION_PACKAGE.md)).
+
+**Two things are called "session" and they are not the same object.**
+`portability/sessionPackage.js` packages a *patch* — a configuration, portable
+between instances. `session/` records an *execution* — what actually ran, when,
+on which clock, and what the participant said afterwards. The first is a
+scientific object you can send someone; the second is a record of one event. The
+session bundle references the configuration by IRI and content hash rather than
+embedding it, which is what keeps them separable.
 
 Public `/field/*` aliases now replace-navigate to starter intents in Studio,
 where colour-field and four spatial scene families are ordinary first-class

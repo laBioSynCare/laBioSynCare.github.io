@@ -149,7 +149,13 @@ before software construction and are retained here as the original checklist.
 - [ ] `.cursor/rules/rdf.mdc` — from `static/ontology/README.md` + `CLAUDE.md` `P1`
 - [ ] `.cursor/rules/audio-engine.mdc` — from `src/core/README.md` `P1`
 - [ ] `schemas/preset.schema.json` — from `docs/technical/PRESET_FORMAT.md` `P1`
-- [ ] `schemas/session.schema.json` — from `docs/technical/SESSION_MODEL.md` `P1`
+- [x] `static/schemas/session.schema.json` — the native session bundle contract `P1`
+      *Shipped 2026-08-13. Under `static/` rather than a root `schemas/`, so the
+      `$id` dereferences at `/schemas/session.schema.json` — the same treatment
+      `manifest.schema.json` gets. It is the contract; `SESSION_MODEL.md` now
+      documents it rather than defining it (KR-02). Gated by
+      `make session-contract`. The preset schema above should follow the same
+      placement when it lands.*
 - [x] `CHANGELOG.md` — started at the first tagged release (v0.5.0); Keep a Changelog format, 0.1.0–0.5.0 `P1`
 
 ---
@@ -635,8 +641,13 @@ Do not start these until all Phase 0 documents are committed.
 - [ ] `src/core/StimulationOrchestrator.js` — wires audio + visual +
       haptic engines via interfaces only `P2`
 - [ ] `src/core/ProtocolRunner.js` — maps preset JSON to engine calls `P2`
-- [ ] `src/core/SessionRecorder.js` — captures preset + user params +
-      timestamps → complete reproducible session spec `P2`
+- [~] Session recording — the **contract and recorder shipped 2026-08-13** as
+      `src/session/` (schema, `openSession()`, RDF projection with generated loss
+      accounting, four golden cases, `make session-contract`). It records against
+      the engine timing context and produces a validated bundle. What is still
+      missing is the *caller*: nothing in the app opens a session yet, because
+      that needs the preset player below. Not `src/core/SessionRecorder.js` — the
+      recorder holds no storage and is not part of the orchestrator. `P2`
 
 ### UI — Player
 - [ ] `src/ui/player/SessionPlayer.js` — play/pause/stop/seek,

@@ -99,21 +99,48 @@ SHACL profile, local-IRI resolution, and graph-specific golden assertions.
 
 #### 0.2 Establish one native session contract
 
-- Create a versioned JSON Schema for the native BSC session bundle.
-- Define stable IDs for the session specification, session instance, event,
-  report, and observation item.
-- Record the exact source preset/patch/configuration and content hashes, engine
-  and application versions, clock origin, monotonic event offsets, wall-clock
-  timestamps where appropriate, interruption/resume events, and actual outcome
-  of execution.
-- Decide and document which output guarantee is supported: bit-exact,
-  signal-equivalent, or perceptually equivalent.
-- Correct `SESSION_MODEL.md`, JSON examples, RDF examples, JSON-LD projection,
-  and SHACL to the same contract. Use named immutable specifications when they
-  are referenced, hashed, shared, or exported.
+**`[x]` Done 2026-08-13, with the ontology half of KR-03 explicitly deferred —
+see below.**
 
-**Gate P0-B:** native JSON validates; its RDF projection validates; a round trip
-preserves IDs, datatypes, values, event order, and declared hashes.
+- `[x]` Create a versioned JSON Schema for the native BSC session bundle.
+  [`static/schemas/session.schema.json`](../../static/schemas/session.schema.json),
+  model tag `bsc-lab-session-bundle-1`. It lives under `static/` so its `$id`
+  dereferences, as `manifest.schema.json` does.
+- `[x]` Define stable IDs for the session specification, session instance, event,
+  report, and observation item. All derived from the instance id by
+  `sessionIds()`; the recorder rejects a specification whose id is not derivable.
+- `[x]` Record the exact source preset/patch/configuration and content hashes,
+  engine and application versions, clock origin, monotonic event offsets,
+  wall-clock timestamps where appropriate, interruption/resume events, and actual
+  outcome of execution. Offsets come from the engine timing context only; a test
+  spies on `Date.now`/`performance.now` and fails if either is consulted.
+  `deliveredSeconds` is separated from `actualDurationSeconds`, so a paused
+  session is not recorded as a short one.
+- `[x]` Decide and document which output guarantee is supported: `outputGuarantee`
+  is a required enum of `bit-exact` / `signal-equivalent` /
+  `perceptually-equivalent`. Web Audio sessions declare the third unless a
+  deterministic offline render proves otherwise.
+- `[x]` Correct `SESSION_MODEL.md` to the same contract. The document now states
+  that it is not the contract and that the schema wins where they disagree.
+  `userMp0`/`userMp1`/`userMd` and `headphoneMode` — names that existed nowhere
+  but that document — are gone.
+
+**Gate P0-B: passing.** `make session-contract` checks that every golden bundle
+validates, that the projection accounts for every leaf field, that only
+synthetic/public-safe bundles are committed, and that the round trip preserves
+ids, event order and declared hashes.
+`src/session/sessionProjection.shacl.test.js` validates every projected graph
+against the Full shape closure under `make test`.
+
+**What this did not do, and why.** The projection is partial by construction:
+SSTIM declares no term for an event, for instrument provenance, for the six
+response states, for a qualified unwanted experience, or for a privacy profile.
+Rather than mint undeclared IRIs — the KR-17 failure — the projection withholds
+those fields and names the term each one needs. `make session-contract` prints
+the generated list (18 terms as of 2026-08-13). Closing it means editing
+protected ontology sources and requires an explicit instruction naming each file
+(CLAUDE.md §3.4). Phases 2.1–2.3 below are that work; the native contract no
+longer blocks them, and no longer blocks the HED path's *input* side.
 
 #### 0.3 Repair contexts, namespaces, and release controls
 
@@ -273,6 +300,17 @@ serialization is valid and private by default.
 This phase implements the ordinary BSC Lab history use case that motivated the
 ADR 0025 review.
 
+> **Status 2026-08-13.** The *native* half of 2.1 and 2.2 shipped with 0.2: the
+> qualified observation pattern, the six response states, the unwanted-experience
+> record, and the privacy profile all exist in
+> [`session.schema.json`](../../static/schemas/session.schema.json), are exercised
+> by the golden fixtures 2.3 asks for, and are gated by `make session-contract`.
+> What remains is the **ontology** half — the SSTIM terms that would let any of
+> it be projected to RDF. `make session-contract` prints exactly which terms,
+> derived from what the projection had to withhold. Those files are protected
+> (CLAUDE.md §3.4), so this phase now begins with a naming instruction rather
+> than a design question.
+
 #### 2.1 Qualified observation pattern
 
 Model a report as a collection event and each answer/experience as a qualified
@@ -326,6 +364,14 @@ The model is not accepted until it answers and tests at least:
 Golden synthetic cases must cover: helpful/no unwanted experience; unhelpful
 with one experience; multiple experiences; declined/not asked; pre/during/post
 reports; follow-up; and an interrupted session.
+
+**`[x]` The cases exist** in
+[`src/session/fixtures/goldenSessions.js`](../../src/session/fixtures/goldenSessions.js)
+— four bundles covering all eight requirements — and answer competency questions
+1, 2, 4, 5 and 6 natively. Question 3 (goal and helpfulness with prompt version)
+is answered natively and unanswerable in RDF until the terms exist. Question 6 is
+answered structurally rather than by convention: an observation has no path to
+`EvidenceClaim` in either the schema or the projection.
 
 **Phase 2 gate:** JSON Schema, RDF/JSON-LD, SHACL, privacy profile, user-facing
 wording, and all golden cases agree. A self-report cannot satisfy an

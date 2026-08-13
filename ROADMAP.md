@@ -411,8 +411,15 @@ concrete rather than abstract.
       gate in
       [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
       and [ADR 0026](docs/decisions/0026-patch-studio-catalog-bridge.md)
-- [ ] SessionRecorder: records preset + user-defined params → complete
-      reproducible session specification
+- [~] SessionRecorder: the native session contract and recorder shipped
+      2026-08-13 — one versioned schema, stable ids, an engine-clock event
+      timeline, qualified observations with six response states, unwanted-experience
+      records, a required privacy profile, and an RDF projection that reports
+      every field it cannot carry
+      ([`SESSION_MODEL.md`](docs/technical/SESSION_MODEL.md), `src/session/`,
+      `make session-contract`). No caller yet: opening a session needs the preset
+      player above. The RDF half of the observation model waits on protected-file
+      term additions
 - [x] PWA: offline support for cached presets, service worker *(manifest,
       service worker, runtime caching of heavy ontology/audio assets, and a
       session-safe update banner — [ADR 0009](docs/decisions/0009-pwa.md),
@@ -523,9 +530,11 @@ generated only for BSC Lab if the player needs it.
 **Status (updated 2026-07-27): partially met, out of the planned order.** Four
 swappable audio engines work end-to-end inside the Patch Studio, and public
 reference presets are published as RDF. But the swappable engines drive
-*patches*, not catalog presets: there is no preset player, no orchestrator, no
-session recorder, and no preset→runtime JSON path. The CG is launched with 4
-participants against a ≥ 5 target. BioSynCare revenue remains negligible.
+*patches*, not catalog presets: there is no preset player, no orchestrator, and
+no preset→runtime JSON path. Session recording has a contract, a recorder and a
+validated RDF projection as of 2026-08-13, but nothing calls it yet — that waits
+on the player. The CG is launched with 4 participants against a ≥ 5 target.
+BioSynCare revenue remains negligible.
 
 ---
 
