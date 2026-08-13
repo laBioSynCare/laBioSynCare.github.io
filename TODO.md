@@ -285,7 +285,7 @@ Turtle files are listed in section 1. After they exist:
       optional concern/bridge modules, and a Full compatibility profile.* `static/ontology/manifest.json` is the source of
       truth for modules and closures; the Core, Core Plus, and Full profile
       entry points select semantic imports while shapes remain explicit. Frozen
-      `0.13.0` is the latest immutable release. Normalized Full-union parity
+      `0.14.0` is the latest immutable release. Normalized Full-union parity
       preserves its semantics subject only to ADR 0044's channel clarification
       and expected metadata/ownership changes. Deferred semantic and finer
       packaging work is listed in ADR 0043 and the module architecture guide.*
@@ -324,7 +324,8 @@ Turtle files are listed in section 1. After they exist:
       modular snapshot, and the version IRI resolves to that whole-set
       catalogue.*
 - [~] Derive the VoID/DCAT record from the manifest `P1`
-      *The release-critical half shipped in `0.13.0`: `void.ttl` now carries one
+      *The release-critical half shipped in the modular release and holds in
+      every release since: `void.ttl` carries one
       subset per frozen module, uses the correct Kernel and Exposure access
       endpoints, and the quality audit checks it against the frozen manifest.
       Generation from the live manifest is still open, so metadata maintenance

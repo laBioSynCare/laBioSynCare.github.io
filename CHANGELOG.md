@@ -15,7 +15,11 @@ and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
 file is the human-readable summary.
 
-## [Unreleased]
+## [0.14.0] - 2026-08-13
+
+The session-record release. SSTIM can now say what happened during a session,
+in what order, on which clock — and what a participant said about it, including
+what they were never asked. Closes audit findings KR-02 and KR-03.
 
 ### Added
 
