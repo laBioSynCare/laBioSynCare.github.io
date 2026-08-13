@@ -58,6 +58,24 @@ file is the human-readable summary.
   old test conflated "identical" with "compatible", which held only while the
   ontology was forbidden to grow.
 
+### Fixed
+
+- The session projection rounded elapsed time to nearest, which could place
+  `sstim:actualDurationSeconds` below `sstim:deliveredDurationSeconds` and
+  violate the delivered ≤ elapsed constraint on correct data. Elapsed is now
+  rounded up.
+- A `supplied` stated goal whose free text was withheld projected as an
+  observation carrying no value — an answer claiming the participant said
+  nothing. It is now withheld whole.
+- The projection refuses to resolve a controlled value the vocabulary does not
+  declare, instead of minting `sstim-v:undefined` from an unguarded lookup.
+- Event wall clocks use `prov:startedAtTime` rather than `prov:atTime`, whose
+  domain is `prov:InstantaneousEvent` and not `prov:Activity`.
+- `make shacl-session-projection` validates the RDF the projection actually
+  emits, with SHACL-SPARQL active — the blind spot the first two defects hid in,
+  since `rdf-validate-shacl` strips `sh:sparql` and `shacl-instances` only
+  covers committed files.
+
 - Re-audited the live Wikidata technique mappings: added a conservative
   `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened
   `sstim-v:techBinauralBeats` from `skos:exactMatch` to `skos:relatedMatch`

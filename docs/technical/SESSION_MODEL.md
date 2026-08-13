@@ -451,23 +451,21 @@ This guarantee requires:
    must never modify a preset in place — only add new versions.
 
 2. The session specification must record all parameters that affect
-   the audio output, including user overrides. If `userMp0` is null
-   (preset default used), the reproducibility contract requires
-   that the preset's value for `mp0` in the breathing-reference voice
-   was used. The engine implementation must use `userMp0` if non-null,
-   else fall back to the preset's `mp0`.
+   the output, including overrides. When `breathingPeriodInitial` is `null`
+   (the source's own value was used), the contract requires that the preset's
+   `mp0` from the breathing-reference voice was applied. The engine must use the
+   override if non-null, else fall back to the preset's value.
 
-3. The audio engine implementation matters for bit-exact reproducibility
-   but not for perceptual reproducibility. The invariant is that any
-   compliant implementation must produce a session with the same target
-   frequencies, breathing arc, voice architecture, and duration. Minor
-   floating-point differences between Web Audio implementations are
-   acceptable.
+3. The engine implementation matters for identical rendering but not for
+   equivalent presentation. Which of the three the record supports is no longer
+   left to the reader: `outputGuarantee` states it, and projects to
+   `sstim:hasReproducibilityLevel`.
 
-**Reproducibility fields to add in future versions:**
-- `audioEngineVersion` — the specific engine build used
-- `wasmChecksum` — if WASM processors are used, the checksum
-  of the WASM binary (Phase 3)
+`specification.environment` records `audioEngine`, `audioEngineVersion` and
+`wasmChecksum` — the fields this section once listed as future work. They exist
+in the native contract now; what remains withheld from the RDF projection is the
+*execution environment as a whole*, because that is equipment and
+[`EQUIPMENT_CHECK.md`](EQUIPMENT_CHECK.md) owns that concern.
 
 ---
 
@@ -478,9 +476,10 @@ stored locally and optionally synchronized to the cloud. The data model
 must support:
 
 **Local storage (Phase 1–2):** IndexedDB in the browser (BSC Lab web),
-or AsyncStorage / SQLite on mobile (BioSynCare). Session instances are
-stored as JSON. The schema version field (`instanceVersion`) enables
-migration when the schema changes.
+or AsyncStorage / SQLite on mobile (BioSynCare). Bundles are stored as JSON, and
+the `model` tag (`bsc-lab-session-bundle-1`) is what a migration reads to know
+which shape it is looking at — the same convention Patch Studio documents use.
+A bundle carrying newer fields must never claim an older tag.
 
 **Privacy-first design:** Session data is local by default. Cloud sync
 is opt-in and requires explicit user consent. Even with cloud sync
@@ -493,11 +492,13 @@ formats must be complete — receiving the export must be sufficient
 to reproduce the user's history in a fresh installation.
 
 **Anonymized research contribution (Phase 3):** With explicit research
-consent (separate consent, separate opt-in, explicitly revocable),
-session instances with self-report data may be contributed to an
-anonymized aggregate dataset. The contribution strips identifiers
-(`uuid` replaced with a salted hash, `userAgent` removed, timestamps
-rounded to the nearest hour) before transmission.
+consent (separate consent, separate opt-in, explicitly revocable), bundles may
+be contributed to an aggregate dataset. The contribution replaces the instance
+id with a salted hash, drops `specification.environment.platform`, rounds
+timestamps, and sets `privacy.deidentification` to record which transform was
+actually applied — not the one intended. Free text is excluded by default. A
+bundle with `privacy.withdrawn: true` is never contributed, and the RDF
+projection refuses it outright.
 
 ---
 

@@ -2,7 +2,7 @@ import { globSync, readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { DataFactory, Parser, Store } from 'n3'
 import SHACLValidator from 'rdf-validate-shacl'
-import { projectSession } from './sessionProjection.js'
+import { CONCEPT_TABLES, projectSession } from './sessionProjection.js'
 import { GOLDEN_SESSIONS } from './fixtures/goldenSessions.js'
 
 // Gate P0-B, second half: the RDF projection of every golden session validates.
@@ -22,6 +22,7 @@ const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json'
 const moduleById = new Map(manifest.modules.map((module) => [module.id, module]))
 const fullProfile = manifest.profiles.find((profile) => profile.id === 'full')
 const SH_SPARQL = DataFactory.namedNode('http://www.w3.org/ns/shacl#sparql')
+const SSTIM_V = 'https://w3id.org/sstim/vocab#'
 
 const parseTtl = (file) => new Parser().parse(readFileSync(new URL(file, REPOSITORY_ROOT), 'utf8'))
 
@@ -84,6 +85,26 @@ describe('session projection SHACL conformance (golden, KR-02)', () => {
       for (const q of parseTtl(`static/ontology/instances/${file}`)) data.add(q)
     }
     expect(validator.validate(data).conforms).toBe(true)
+  })
+
+  it('every concept the projection can emit is declared in the vocabulary', () => {
+    // Stronger than the schema-alignment test, which only proves the projection
+    // knows every enum value. A mapping to a misspelled concept name produces a
+    // perfectly well-formed sstim-v: IRI that nothing declares, and SHACL would
+    // catch it only on a fixture that happened to use that value.
+    const declared = new Set(
+      new Store(baseQuads)
+        .getSubjects(null, null, null)
+        .map((s) => s.value)
+        .filter((iri) => iri.startsWith(SSTIM_V)),
+    )
+    expect(declared.size).toBeGreaterThan(100)
+
+    for (const [path, table] of Object.entries(CONCEPT_TABLES)) {
+      for (const [value, local] of Object.entries(table)) {
+        expect(declared, `${path} → ${value} → sstim-v:${local}`).toContain(`${SSTIM_V}${local}`)
+      }
+    }
   })
 
   it('a graph missing the source type would not conform, so the stub is load-bearing', () => {

@@ -158,12 +158,42 @@ closed. What remains withheld is now withheld on purpose:
   `sstim-ex:capabilityHeadphones` badly, and reaching into the exposure module
   from the session module would add a dependency edge for a cross-reference.
 
-**Validation.** Three of the new constraints relate one value to another and
-need SHACL-SPARQL. `rdf-validate-shacl`, which runs the projection conformance
-tests beside their producer, has no SPARQLConstraintComponent validator and
-strips `sh:sparql` — so a broken constraint would have passed every positive
-suite. `make shacl-session-negative` asserts the negative: six contradictions,
-each rejected by its own constraint's message.
+**Validation, and a gap the first pass left.** Three of the new constraints
+relate one value to another and need SHACL-SPARQL. `rdf-validate-shacl`, which
+runs the projection conformance tests beside their producer, has no
+SPARQLConstraintComponent validator and strips `sh:sparql`; `make
+shacl-instances` covers committed files, and a projection is not one. So the
+constraints that police cross-field contradictions were the only constraints
+nothing ran against projected output.
+
+Two real defects were hiding in exactly that blind spot, both found on review:
+
+1. `sstim:actualDurationSeconds` is `xsd:integer` and
+   `sstim:deliveredDurationSeconds` is decimal. Rounding elapsed time *to
+   nearest* could put it below delivered time — a 602.4 s session that delivered
+   all of it projected as 602 elapsed and 602.4 delivered, violating the
+   delivered ≤ elapsed constraint on data that was entirely correct. Elapsed is
+   now rounded up, which can only overstate by under a second and never breaks
+   the invariant.
+2. A *supplied* stated goal whose free text was withheld projected as an
+   observation with `responseSupplied` and no value — an answer claiming the
+   participant said nothing. Such a goal is now withheld whole; the states that
+   carry no text anyway (declined, not-asked) still project, and those are the
+   ones that record the question was put.
+
+Both are closed, and so is the blind spot: `make shacl-session-projection` emits
+every golden projection plus two edge cases and validates them under pySHACL
+with SPARQL active. `make shacl-session-negative` asserts the other direction —
+six contradictions, each rejected by its own constraint's message — because a
+constraint that never fires passes every positive suite.
+
+Three further guards came out of the same review, each verified by breaking it
+first: the projection refuses to resolve a controlled value the vocabulary does
+not declare rather than minting `sstim-v:undefined`; a test asserts the
+projection's concept tables and the schema's enums cover each other exactly; and
+another asserts every concept name those tables can emit exists in the
+vocabulary, which a misspelling would otherwise reveal only on a recording that
+happened to use that value.
 
 ## Alternatives considered
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { Parser, Store } from 'n3'
-import { projectSession, sessionToTurtle } from './sessionProjection.js'
-import { canonicalJson, leafPointers } from './sessionContract.js'
+import { CONCEPT_TABLES, projectSession, sessionToTurtle } from './sessionProjection.js'
+import { SESSION_SCHEMA, canonicalJson, leafPointers } from './sessionContract.js'
 import { GOLDEN_SESSIONS } from './fixtures/goldenSessions.js'
 
 const SSTIM = 'https://w3id.org/sstim#'
@@ -91,10 +91,10 @@ describe('what the graph carries', () => {
 
     expect(objects(store, inst, `${SSTIM}actualDurationSeconds`)[0].value).toBe('603')
     expect(report.projected.find((p) => p.pointer === '/instance/actualDurationSeconds').property)
-      .toMatch(/narrowed to xsd:integer/)
+      .toMatch(/rounded up to xsd:integer/)
   })
 
-  it('projects the five legacy scalars and nothing else from a report', () => {
+  it('projects the five legacy scalars alongside the report', () => {
     const { quads } = projectSession(helpful)
     const store = new Store(quads)
     const post = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post'
@@ -308,7 +308,90 @@ describe('what the graph still refuses to carry', () => {
   })
 })
 
+describe('drift between the schema and the vocabulary', () => {
+  // Both directions. A value the schema gained and the projection never learned
+  // would otherwise surface at runtime, on whichever recording first used it.
+  it.each(Object.entries(CONCEPT_TABLES))('%s maps every enum value', (path, table) => {
+    const node = path.split('/').reduce((acc, key) => acc[key], SESSION_SCHEMA)
+    expect(node.enum, path).toBeDefined()
+    for (const value of node.enum) {
+      expect(Object.keys(table), `${path} → ${value}`).toContain(value)
+    }
+  })
+
+  it('maps nothing the schema does not declare', () => {
+    for (const [path, table] of Object.entries(CONCEPT_TABLES)) {
+      const node = path.split('/').reduce((acc, key) => acc[key], SESSION_SCHEMA)
+      for (const value of Object.keys(table)) {
+        expect(node.enum, `${path} → ${value}`).toContain(value)
+      }
+    }
+  })
+})
+
+describe('numeric fidelity', () => {
+  it('rounds elapsed time up, so it never falls below delivered time', () => {
+    // Rounding to nearest put a 602.4 s session that delivered all of it at 602
+    // elapsed and 602.4 delivered, breaking the delivered ≤ elapsed constraint
+    // on data that was entirely correct. Nothing caught it: the vitest SHACL
+    // harness strips sh:sparql. `make shacl-session-projection` does now.
+    const bundle = structuredClone(helpful)
+    bundle.instance.actualDurationSeconds = 602.4
+    bundle.instance.deliveredSeconds = 602.4
+
+    const store = new Store(projectSession(bundle).quads)
+    const inst = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful'
+    const elapsed = Number(objects(store, inst, `${SSTIM}actualDurationSeconds`)[0].value)
+    const delivered = Number(objects(store, inst, `${SSTIM}deliveredDurationSeconds`)[0].value)
+
+    expect(elapsed).toBe(603)
+    expect(delivered).toBeLessThanOrEqual(elapsed)
+  })
+
+  it('withholds a non-integer answer rather than rounding it', () => {
+    // sstim:observedOrdinalValue is xsd:integer. Rounding 4.5 to 4 would record
+    // an answer the participant did not give.
+    const bundle = structuredClone(helpful)
+    bundle.reports[1].items[0].value = 4.5
+
+    const { quads, report } = projectSession(bundle)
+    const store = new Store(quads)
+    const item = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post-item-primary-affect'
+
+    expect(store.getQuads(item, null, null, null)).toHaveLength(0)
+    const withheld = report.withheld.find((w) => /non-integer answer/.test(w.reason))
+    expect(withheld.requiredTerm).toMatch(/continuous observation value/)
+
+    // …and the legacy scalar is not emitted either, so the two cannot disagree.
+    const post = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post'
+    expect(objects(store, post, `${SSTIM}primaryAffect`)).toHaveLength(0)
+  })
+
+  it('places an event wall clock on a property an Activity may carry', () => {
+    // prov:atTime has domain prov:InstantaneousEvent; sstim:SessionEvent is a
+    // prov:Activity. No local check polices external predicates, so the wrong
+    // one would have typed every event as something it is not.
+    const bundle = structuredClone(helpful)
+    bundle.events[0].wallClock = '2026-08-13T09:01:00Z'
+
+    const store = new Store(projectSession(bundle).quads)
+    const event = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-event-0000'
+    expect(objects(store, event, 'http://www.w3.org/ns/prov#startedAtTime')[0].value)
+      .toBe('2026-08-13T09:01:00Z')
+    expect(objects(store, event, 'http://www.w3.org/ns/prov#atTime')).toHaveLength(0)
+  })
+})
+
 describe('refusals', () => {
+  it('refuses to mint an IRI for a value the vocabulary does not declare', () => {
+    // The schema makes this impossible, but projectSession does not validate its
+    // input, so rule 1 has to hold on its own rather than by trusting a check
+    // that may not have run.
+    const bundle = structuredClone(helpful)
+    bundle.reports[1].items[0].responseState = 'sort-of'
+    expect(() => projectSession(bundle)).toThrow(/refusing to mint one/)
+  })
+
   it('refuses a withdrawn bundle outright', () => {
     const bundle = structuredClone(helpful)
     bundle.privacy.withdrawn = true

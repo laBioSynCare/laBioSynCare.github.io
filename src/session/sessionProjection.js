@@ -43,6 +43,24 @@ const dt = (s) => literal(s, XSD('dateTime'))
 const bool = (b) => literal(String(b), XSD('boolean'))
 const en = (s) => literal(s, 'en')
 
+/**
+ * Resolve a bundle value to a declared vocabulary concept, or refuse.
+ *
+ * Rule 1 of this module is "never mint an undeclared IRI", and an unguarded
+ * table lookup breaks it silently: `SSTIM_V(undefined)` is a perfectly
+ * well-formed IRI ending in `#undefined` that no ontology declares and no
+ * shape rejects. The JSON Schema makes an unmapped value impossible, but
+ * `projectSession` does not validate its input, so the rule has to hold on its
+ * own rather than by trusting a check that may not have run.
+ */
+function declaredConcept(table, value, what) {
+  const local = table[value]
+  if (!local) {
+    throw new Error(`No declared vocabulary concept for ${what} "${value}"; refusing to mint one.`)
+  }
+  return SSTIM_V(local)
+}
+
 /** All four phases, since ADR 0048 added the during-session concept. */
 const PHASE_CONCEPTS = {
   'pre-session': 'reportPreSession',
@@ -163,6 +181,33 @@ const RELATEDNESS_CONCEPTS = {
   unknown: 'relatednessUnknown',
   declined: 'relatednessDeclined',
 }
+
+/**
+ * Every controlled value the projection must resolve, keyed by where the schema
+ * declares it.
+ *
+ * Exported so a test can assert the two stay aligned in both directions: an
+ * enum value the schema gained and this file never learned would otherwise
+ * surface only at runtime, on the one recording that happened to use it, and a
+ * mapping to a concept name that does not exist in the vocabulary would produce
+ * a well-formed IRI that nothing declares.
+ */
+export const CONCEPT_TABLES = Object.freeze({
+  '$defs/event/properties/type': EVENT_TYPE_CONCEPTS,
+  '$defs/report/properties/phase': PHASE_CONCEPTS,
+  '$defs/observationItem/properties/role': OBSERVATION_ROLE_CONCEPTS,
+  '$defs/responseState': RESPONSE_STATE_CONCEPTS,
+  '$defs/unwantedExperience/properties/category': EXPERIENCE_CATEGORY_CONCEPTS,
+  '$defs/unwantedExperience/properties/participantReportedSeverity': SEVERITY_CONCEPTS,
+  '$defs/unwantedExperience/properties/onsetPhase': ONSET_PHASE_CONCEPTS,
+  '$defs/unwantedExperience/properties/persistence': PERSISTENCE_CONCEPTS,
+  '$defs/unwantedExperience/properties/actionTaken': ACTION_CONCEPTS,
+  '$defs/unwantedExperience/properties/resolution': RESOLUTION_CONCEPTS,
+  '$defs/unwantedExperience/properties/participantPerceivedRelatedness': RELATEDNESS_CONCEPTS,
+  '$defs/instance/properties/deliveryModalities/items': MODALITY_CONCEPTS,
+  '$defs/instance/properties/clockSource': TIMING_AUTHORITY_CONCEPTS,
+  '$defs/specification/properties/outputGuarantee': REPRODUCIBILITY_CONCEPTS,
+})
 
 /**
  * Observation roles that also have a legacy scalar property.
@@ -320,7 +365,14 @@ export function projectSession(bundle, options = {}) {
   add(instNode, a, SSTIM('SessionInstance'))
   add(instNode, RDFS('label'), en(inst.label ?? `Session ${inst.id}`))
   add(instNode, SSTIM('usesSpecification'), specNode)
-  add(instNode, SSTIM('actualDurationSeconds'), int(inst.actualDurationSeconds))
+  // Rounded *up*, not to nearest. sstim:actualDurationSeconds is xsd:integer
+  // while deliveredDurationSeconds is decimal, and rounding to nearest can put
+  // elapsed below delivered — a 602.4 s session delivering all of it projects as
+  // 602 elapsed and 602.4 delivered, which violates the delivered ≤ elapsed
+  // constraint on data that is perfectly correct. Ceiling can only overstate
+  // elapsed by under a second, and never breaks the invariant.
+  add(instNode, SSTIM('actualDurationSeconds'),
+    literal(String(Math.ceil(inst.actualDurationSeconds)), XSD('integer')))
   add(instNode, SSTIM('completionStatus'), literal(inst.completionStatus, XSD('string')))
   add(instNode, PROV('startedAtTime'), dt(inst.startedAt))
   add(instNode, PROV('endedAtTime'), dt(inst.endedAt))
@@ -330,7 +382,7 @@ export function projectSession(bundle, options = {}) {
   keep('/instance/startedAt', 'prov:startedAtTime')
   keep('/instance/endedAt', 'prov:endedAtTime')
   keep('/instance/completionStatus', 'sstim:completionStatus')
-  keep('/instance/actualDurationSeconds', 'sstim:actualDurationSeconds (narrowed to xsd:integer)')
+  keep('/instance/actualDurationSeconds', 'sstim:actualDurationSeconds (rounded up to xsd:integer)')
   if (inst.label !== undefined) keep('/instance/label', 'rdfs:label')
 
   add(instNode, SSTIM('clockOriginSeconds'), dec(inst.clockOriginSeconds))
@@ -390,8 +442,13 @@ export function projectSession(bundle, options = {}) {
     keep(`${base}/offsetSeconds`, 'sstim:eventOffsetSeconds')
 
     if (event.wallClock !== undefined) {
-      add(node, PROV('atTime'), dt(event.wallClock))
-      keep(`${base}/wallClock`, 'prov:atTime')
+      // prov:startedAtTime, not prov:atTime: the latter has domain
+      // prov:InstantaneousEvent, and sstim:SessionEvent is a prov:Activity. The
+      // wrong one would have typed every event as something it is not, and no
+      // local check would have caught it — the quality audit only polices
+      // sstim: predicates.
+      add(node, PROV('startedAtTime'), dt(event.wallClock))
+      keep(`${base}/wallClock`, 'prov:startedAtTime')
     }
     if (event.detail) {
       dropTree(`${base}/detail`, event.detail,
@@ -454,23 +511,35 @@ export function projectSession(bundle, options = {}) {
     // Modelled as an observation with its own role and response state, so a
     // goal that was never asked for stays distinct from one that was declined.
     if (report.statedGoal) {
-      const goalNode = BSCLAB_SESSION(`${report.id}-item-stated-goal`)
-      add(goalNode, a, SSTIM('ParticipantObservation'))
-      add(goalNode, SSTIM('hasObservationRole'), SSTIM_V('roleStatedGoal'))
-      add(goalNode, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[report.statedGoal.responseState]))
-      add(reportNode, SSTIM('hasObservation'), goalNode)
-      keep(`${base}/statedGoal/responseState`, 'sstim:hasResponseState')
+      // Improvement plan 2.2: free text stays out of exports by default, because
+      // it can carry identifiers no schema can anticipate.
+      //
+      // Which means a *supplied* goal cannot be projected at all while its text
+      // is withheld. Emitting the observation with a `supplied` state and no
+      // value would say "they answered, and here is the answer: nothing" — a
+      // claim the value/state constraint rightly rejects. The states that carry
+      // no text in the first place — declined, not-asked — project normally,
+      // and those are the ones worth having anyway, since they record that the
+      // question was put.
+      const carriesText = report.statedGoal.text !== undefined
+      const textTravels = carriesText && options.includeFreeText === true
 
-      if (report.statedGoal.text !== undefined) {
-        if (options.includeFreeText === true) {
+      if (report.statedGoal.responseState === 'supplied' && !textTravels) {
+        dropTree(`${base}/statedGoal`, report.statedGoal,
+          'A supplied goal is withheld with its text: free text stays out of exports by default because it can carry identifying information, and an answer projected without its answer would claim the participant said nothing. sstim:observedTextValue carries it when the caller passes includeFreeText and the governing privacy profile permits it.')
+      } else {
+        const goalNode = BSCLAB_SESSION(`${report.id}-item-stated-goal`)
+        add(goalNode, a, SSTIM('ParticipantObservation'))
+        add(goalNode, SSTIM('hasObservationRole'), SSTIM_V('roleStatedGoal'))
+        add(goalNode, SSTIM('hasResponseState'), declaredConcept(RESPONSE_STATE_CONCEPTS, report.statedGoal.responseState, 'response state'))
+        add(reportNode, SSTIM('hasObservation'), goalNode)
+        keep(`${base}/statedGoal/responseState`, 'sstim:hasResponseState')
+
+        if (textTravels) {
           add(goalNode, SSTIM('observedTextValue'), literal(report.statedGoal.text, XSD('string')))
           keep(`${base}/statedGoal/text`, 'sstim:observedTextValue')
-        } else {
-          // Improvement plan 2.2: free text stays out of exports by default,
-          // because it can carry identifiers no schema can anticipate. The term
-          // exists; withholding it here is a policy decision, not a gap.
-          drop(`${base}/statedGoal/text`,
-            'Free text is withheld by default: it can carry identifying information. sstim:observedTextValue exists and carries it when the caller passes includeFreeText and the governing privacy profile permits it.')
+        } else if (carriesText) {
+          drop(`${base}/statedGoal/text`, 'Free text is withheld by default: it can carry identifying information.')
         }
       }
     }
@@ -490,10 +559,27 @@ export function projectSession(bundle, options = {}) {
       return
     }
 
+    // A supplied answer must reach a declared value property, or the whole
+    // observation is withheld. Emitting the node without its value would leave
+    // a `responseSupplied` observation carrying nothing, which the SHACL-SPARQL
+    // value/state constraint rejects — a projection that produces graphs
+    // failing its own contract is worse than one that declines to project.
+    const projectableValue =
+      item.responseState !== 'supplied' ||
+      typeof item.value === 'boolean' ||
+      Number.isInteger(item.value)
+
+    if (!projectableValue) {
+      dropTree(base, item,
+        `A non-integer answer (${item.value}) has no declared property: sstim:observedOrdinalValue is xsd:integer, and rounding it would record an answer the participant did not give.`,
+        'a continuous observation value, distinct from the ordinal one')
+      return
+    }
+
     const node = BSCLAB_SESSION(item.id)
     add(node, a, SSTIM('ParticipantObservation'))
     add(node, SSTIM('hasObservationRole'), SSTIM_V(role))
-    add(node, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[item.responseState]))
+    add(node, SSTIM('hasResponseState'), declaredConcept(RESPONSE_STATE_CONCEPTS, item.responseState, 'response state'))
     add(reportNode, SSTIM('hasObservation'), node)
     keep(`${base}/id`, 'IRI identity')
     keep(`${base}/role`, 'sstim:hasObservationRole')
@@ -568,7 +654,7 @@ export function projectSession(bundle, options = {}) {
     // list of experiences expresses none of those three.
     add(node, a, SSTIM('ParticipantObservation'))
     add(node, SSTIM('hasObservationRole'), SSTIM_V('roleUnwantedExperienceReport'))
-    add(node, SSTIM('hasResponseState'), SSTIM_V(RESPONSE_STATE_CONCEPTS[block.responseState]))
+    add(node, SSTIM('hasResponseState'), declaredConcept(RESPONSE_STATE_CONCEPTS, block.responseState, 'response state'))
     add(reportNode, SSTIM('hasObservation'), node)
     keep(`${base}/responseState`, 'sstim:hasResponseState')
 
@@ -590,9 +676,9 @@ export function projectSession(bundle, options = {}) {
     const node = BSCLAB_SESSION(record.id)
     add(node, a, SSTIM('UnwantedExperienceObservation'))
     add(node, SSTIM('hasExperienceCategory'), SSTIM_V(category))
-    add(node, SSTIM('hasReportedSeverity'), SSTIM_V(SEVERITY_CONCEPTS[record.participantReportedSeverity]))
-    add(node, SSTIM('hasOnsetPhase'), SSTIM_V(ONSET_PHASE_CONCEPTS[record.onsetPhase]))
-    add(node, SSTIM('hasPerceivedRelatedness'), SSTIM_V(RELATEDNESS_CONCEPTS[record.participantPerceivedRelatedness]))
+    add(node, SSTIM('hasReportedSeverity'), declaredConcept(SEVERITY_CONCEPTS, record.participantReportedSeverity, 'reported severity'))
+    add(node, SSTIM('hasOnsetPhase'), declaredConcept(ONSET_PHASE_CONCEPTS, record.onsetPhase, 'onset phase'))
+    add(node, SSTIM('hasPerceivedRelatedness'), declaredConcept(RELATEDNESS_CONCEPTS, record.participantPerceivedRelatedness, 'perceived relatedness'))
     add(blockNode, SSTIM('reportsUnwantedExperience'), node)
     keep(`${base}/id`, 'IRI identity')
     keep(`${base}/category`, 'sstim:hasExperienceCategory')

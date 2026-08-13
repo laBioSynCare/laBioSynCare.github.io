@@ -187,8 +187,32 @@ shacl-private-ecosystem:
 shacl-session-negative:
 	$(PYTHON) scripts/session-shapes-negative.py
 
+## Validate the RDF the session projection actually emits, with SHACL-SPARQL
+## active. The vitest harness beside the producer strips sh:sparql and
+## shacl-instances only covers committed files, so without this the projection's
+## output is never checked against the cross-field constraints — which is how a
+## rounding bug put delivered duration above elapsed duration and passed.
+shacl-session-projection:
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	node scripts/session-projection-emit.mjs "$$tmpdir/graphs"; \
+	count=0; \
+	for graph in "$$tmpdir"/graphs/*.ttl; do \
+		[ -f "$$graph" ] || continue; \
+		cat $(FULL_SEMANTIC_MODULES) "$$graph" > "$$tmpdir/merged.ttl"; \
+		$(PYSHACL) -s $(SHAPES) "$$tmpdir/merged.ttl" | grep -q "Conforms: True" \
+			|| { echo "FAILED: $$(basename "$$graph")"; $(PYSHACL) -s $(SHAPES) "$$tmpdir/merged.ttl"; exit 1; }; \
+		count=$$((count + 1)); \
+	done; \
+	if [ "$$count" -eq 0 ]; then \
+		echo "shacl-session-projection: FAILED — no projected graphs to validate"; \
+		exit 1; \
+	fi; \
+	echo "shacl-session-projection: passed ($$count projected graphs conform)"
+
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
