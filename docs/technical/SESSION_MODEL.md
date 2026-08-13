@@ -25,7 +25,7 @@
 | Recording | [`src/session/sessionRecorder.js`](../../src/session/sessionRecorder.js) |
 | RDF projection + loss report | [`src/session/sessionProjection.js`](../../src/session/sessionProjection.js) |
 | Golden cases | [`src/session/fixtures/goldenSessions.js`](../../src/session/fixtures/goldenSessions.js) |
-| Gates | `make session-contract`, `make test` |
+| Gates | `make session-contract` (schema, loss accounting, public-repo lint, round trip) · `make shacl-session-projection` (the emitted RDF, with SHACL-SPARQL active) · `make shacl-session-negative` (the contradictions those constraints must reject) · `make test` |
 
 A **session bundle** is one document with five parts: the `specification`, the
 `instance`, an `events` timeline, zero or more `reports`, and a `privacy`

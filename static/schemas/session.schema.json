@@ -272,7 +272,7 @@
         "collectedAt": { "$ref": "#/$defs/dateTime" },
         "collectedAtOffsetSeconds": {
           "$ref": "#/$defs/offsetSeconds",
-          "description": "Required in practice for during-session reports, where the engine clock is the only meaningful placement."
+          "description": "Where on the engine clock the report was collected. Required for during-session reports and refused for the others: only a during-session report happens on that clock, and a wall-clock timestamp cannot say how far into the session an answer was given."
         },
 
         "instrument": {
@@ -305,7 +305,20 @@
         },
 
         "unwantedExperiences": { "$ref": "#/$defs/unwantedExperienceBlock" }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "phase": { "const": "during-session" } },
+            "required": ["phase"]
+          },
+          "then": { "required": ["collectedAtOffsetSeconds"] },
+          "else": {
+            "not": { "required": ["collectedAtOffsetSeconds"] },
+            "description": "A pre-session, post-session or follow-up report does not happen on the session clock, so an offset for it would be a fabricated placement."
+          }
+        }
+      ]
     },
 
     "observationItem": {

@@ -95,6 +95,19 @@ describe('session schema', () => {
     expect(validate(bundle)).toBe(false)
   })
 
+  it('places a during-session report on the engine clock, and only that one', () => {
+    // Only a during-session report happens on the session clock. Requiring the
+    // offset there, and refusing it elsewhere, keeps a fabricated placement out
+    // of reports that were collected before or after the session ran.
+    const bundle = structuredClone(GOLDEN_SESSIONS['during-session report, multiple experiences'])
+    delete bundle.reports[0].collectedAtOffsetSeconds
+    expect(validate(bundle)).toBe(false)
+
+    const post = structuredClone(GOLDEN_SESSIONS['helpful, no unwanted experience'])
+    post.reports[1].collectedAtOffsetSeconds = 300
+    expect(validate(post)).toBe(false)
+  })
+
   it('requires a privacy profile', () => {
     const bundle = structuredClone(GOLDEN_SESSIONS['helpful, no unwanted experience'])
     delete bundle.privacy

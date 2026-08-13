@@ -75,6 +75,19 @@ file is the human-readable summary.
   emits, with SHACL-SPARQL active — the blind spot the first two defects hid in,
   since `rdf-validate-shacl` strips `sh:sparql` and `shacl-instances` only
   covers committed files.
+- The recorder no longer invents a `playback-resume` when a session is closed
+  while paused. It settled the accounting by emitting an event that never
+  happened, into a timeline whose purpose is recording what did.
+- The closing event is placed at the duration `close()` records, rather than at
+  a clock re-read a moment later, which left a timeline running past its own
+  session.
+- The projection refuses a bundle whose records share an identifier. RDF has no
+  duplicate subjects: two records sharing an id merge into one node holding both
+  records' facts, which SHACL then reports as a cardinality violation pointing
+  nowhere near the cause.
+- A report's engine-clock offset is required for during-session reports and
+  refused for the others, so a report collected before or after the session
+  cannot carry a fabricated placement on a clock it never ran on.
 
 - Re-audited the live Wikidata technique mappings: added a conservative
   `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened

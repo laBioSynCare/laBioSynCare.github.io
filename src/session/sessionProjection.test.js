@@ -383,6 +383,23 @@ describe('numeric fidelity', () => {
 })
 
 describe('refusals', () => {
+  it('refuses a bundle whose records share an identifier', () => {
+    // RDF has no duplicate subjects: two records sharing an id merge into one
+    // node holding both records' facts, and nothing downstream can tell that
+    // apart from a single record that genuinely had two of everything. Two
+    // during-session reports are the easy way to produce it, since ids are
+    // derived from the phase.
+    const bundle = structuredClone(during)
+    bundle.reports.push(structuredClone(bundle.reports[0]))
+    expect(() => projectSession(bundle)).toThrow(/Duplicate identifier/)
+  })
+
+  it('refuses duplicate ids nested inside a report', () => {
+    const bundle = structuredClone(helpful)
+    bundle.reports[1].items[1].id = bundle.reports[1].items[0].id
+    expect(() => projectSession(bundle)).toThrow(/Duplicate identifier/)
+  })
+
   it('refuses to mint an IRI for a value the vocabulary does not declare', () => {
     // The schema makes this impossible, but projectSession does not validate its
     // input, so rule 1 has to hold on its own rather than by trusting a check

@@ -129,7 +129,10 @@ describe('pause accounting', () => {
     expect(recorder.pause()).toBeNull()
   })
 
-  it('closes an open pause rather than losing the interval', () => {
+  it('settles an open pause without inventing a resume', () => {
+    // Closing while paused must account for the interval and nothing more. An
+    // earlier version emitted a `playback-resume` so the pause had a partner,
+    // which put an event that never happened into a record of what did.
     const clock = fakeTimingContext()
     const recorder = open(clock)
     clock.advance(200)
@@ -139,7 +142,24 @@ describe('pause accounting', () => {
     const bundle = recorder.close({ endedAt: '2026-08-13T09:06:00Z', privacy: PRIVACY })
     expect(bundle.instance.actualDurationSeconds).toBe(300)
     expect(bundle.instance.deliveredSeconds).toBe(200)
-    expect(bundle.events.at(-2).type).toBe('playback-resume')
+    expect(bundle.events.map((e) => e.type)).toEqual([
+      'session-open', 'playback-pause', 'session-interrupt',
+    ])
+  })
+
+  it('closes at the duration it records, not a moment later', () => {
+    // mark() reads the clock, so re-reading it for the closing event put that
+    // event a few microseconds past the duration close() had just computed —
+    // a timeline running beyond its own session.
+    const clock = fakeTimingContext()
+    const recorder = open(clock)
+    clock.advance(600)
+
+    const bundle = recorder.close({ endedAt: '2026-08-13T09:11:00Z', privacy: PRIVACY })
+    for (const event of bundle.events) {
+      expect(event.offsetSeconds).toBeLessThanOrEqual(bundle.instance.actualDurationSeconds)
+    }
+    expect(bundle.events.at(-1).offsetSeconds).toBe(bundle.instance.actualDurationSeconds)
   })
 })
 

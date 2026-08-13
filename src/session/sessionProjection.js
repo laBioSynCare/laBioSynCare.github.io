@@ -247,6 +247,8 @@ export function projectSession(bundle, options = {}) {
     throw new Error('Refusing to project an open session: an in-progress instance is not yet a record of anything.')
   }
 
+  assertDistinctIds(bundle)
+
   const quads = []
   const projected = []
   const withheld = []
@@ -739,6 +741,47 @@ export function projectSession(bundle, options = {}) {
 
 function byPointer(x, y) {
   return x.pointer < y.pointer ? -1 : x.pointer > y.pointer ? 1 : 0
+}
+
+/**
+ * Every identifier in a bundle names one thing.
+ *
+ * RDF has no notion of a duplicate subject: two records sharing an id do not
+ * collide, they *merge*, and the graph then describes one node holding both
+ * records' facts. Nothing downstream can tell that apart from a single record
+ * that genuinely had two collection times — SHACL would report a maxCount
+ * violation on a node that looks well-formed, pointing nowhere near the cause.
+ *
+ * The ids are derivable from the instance id
+ * (`sessionIds`), which makes a collision easy to produce by accident: two
+ * during-session reports both derive `…-report-during-session`. Catching it here
+ * turns a confusing downstream violation into a direct statement of what is
+ * wrong.
+ */
+export function assertDistinctIds(bundle) {
+  const seen = new Map()
+  const claim = (id, what) => {
+    if (id === undefined) return
+    if (seen.has(id)) {
+      throw new Error(
+        `Duplicate identifier "${id}" (${seen.get(id)} and ${what}). ` +
+        'Two records sharing an id merge into one RDF node instead of colliding.',
+      )
+    }
+    seen.set(id, what)
+  }
+
+  claim(bundle.specification?.id, 'the specification')
+  claim(bundle.instance?.id, 'the instance')
+  for (const [index, event] of (bundle.events ?? []).entries()) claim(event.id, `events[${index}]`)
+  for (const [index, report] of (bundle.reports ?? []).entries()) {
+    claim(report.id, `reports[${index}]`)
+    for (const [i, item] of (report.items ?? []).entries()) claim(item.id, `reports[${index}].items[${i}]`)
+    for (const [i, record] of (report.unwantedExperiences?.records ?? []).entries()) {
+      claim(record.id, `reports[${index}].unwantedExperiences.records[${i}]`)
+    }
+  }
+  return true
 }
 
 /**

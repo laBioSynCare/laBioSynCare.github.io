@@ -4,6 +4,7 @@ import { DataFactory, Parser, Store } from 'n3'
 import SHACLValidator from 'rdf-validate-shacl'
 import { CONCEPT_TABLES, projectSession } from './sessionProjection.js'
 import { GOLDEN_SESSIONS } from './fixtures/goldenSessions.js'
+import { openSession } from './sessionRecorder.js'
 
 // Gate P0-B, second half: the RDF projection of every golden session validates.
 //
@@ -105,6 +106,67 @@ describe('session projection SHACL conformance (golden, KR-02)', () => {
         expect(declared, `${path} → ${value} → sstim-v:${local}`).toContain(`${SSTIM_V}${local}`)
       }
     }
+  })
+
+  it('a session the recorder produced projects to a conformant graph', () => {
+    // The two halves have only ever met through the schema. A recorder change
+    // that produced a valid bundle which nonetheless projected badly — a
+    // fabricated event, an offset past the recorded duration — would pass both
+    // suites and fail only here.
+    const clock = { currentTime: 512.5 }
+    const recorder = openSession({
+      specification: {
+        id: 'recorded-session-spec',
+        label: 'Recorded session specification',
+        created: '2026-08-13T09:00:00Z',
+        source: {
+          kind: 'preset',
+          ref: 'https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed',
+          label: 'Perform — Alpha 10 seed',
+          contentHash: '32e114684d8a8e9d03a2a45d85b004d0aa9ddf21bfcc19b35bdf49b0e62ab79e',
+        },
+        durationSeconds: 600,
+        masterVolume: 0.2,
+        outputGuarantee: 'perceptually-equivalent',
+      },
+      timingContext: clock,
+      instanceId: 'recorded-session',
+      startedAt: '2026-08-13T09:01:00Z',
+      deliveryModalities: ['auditory'],
+    })
+
+    recorder.mark('playback-start')
+    clock.currentTime += 200
+    recorder.pause()
+    clock.currentTime += 60
+    // Closed while still paused — the case that used to invent a resume.
+    clock.currentTime += 10
+
+    const bundle = recorder.close({
+      endedAt: '2026-08-13T09:05:30Z',
+      privacy: {
+        classification: 'synthetic',
+        reportingRole: 'synthetic',
+        consentBasis: 'none-required-synthetic',
+        policyVersion: '1.0.0',
+        visibility: 'public',
+        deidentification: 'none',
+        withdrawn: false,
+        freeTextIncluded: false,
+      },
+    })
+
+    expect(bundle.events.map((e) => e.type)).toEqual([
+      'session-open', 'playback-start', 'playback-pause', 'session-interrupt',
+    ])
+    // No event beyond the duration the same close() recorded.
+    for (const event of bundle.events) {
+      expect(event.offsetSeconds).toBeLessThanOrEqual(bundle.instance.actualDurationSeconds)
+    }
+
+    const report = validate(bundle)
+    expect(violationKeys(report)).toEqual([])
+    expect(report.conforms).toBe(true)
   })
 
   it('a graph missing the source type would not conform, so the stub is load-bearing', () => {

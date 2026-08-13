@@ -81,9 +81,14 @@ export function openSession({
     if (closed) throw new Error('This session instance is closed; a closed record is never modified.')
   }
 
-  function mark(type, detail) {
+  /**
+   * @param {string} type
+   * @param {object} [detail]
+   * @param {number} [at]  explicit offset, for the closing event only — see close()
+   */
+  function mark(type, detail, at) {
     assertOpen()
-    const event = { id: ids.event(events.length), type, offsetSeconds: round(offset()) }
+    const event = { id: ids.event(events.length), type, offsetSeconds: at ?? round(offset()) }
     if (detail && Object.keys(detail).length > 0) event.detail = detail
     events.push(event)
     return event
@@ -147,17 +152,25 @@ export function openSession({
       if (!endedAt) throw new Error('close() needs an endedAt wall clock.')
       if (!privacy) throw new Error('close() needs a privacy profile; a session record without one cannot be stored or exported.')
 
+      endOffset = round(offset())
+
+      // Closing while paused settles the accounting; it does not invent a
+      // resume. An earlier version emitted one so the pause had a partner,
+      // which put an event that never happened into a timeline whose whole
+      // purpose is recording what did. A session paused and then ended reads as
+      // pause → interrupt, because that is what occurred.
       if (pausedAtOffset !== null) {
-        const event = mark('playback-resume')
-        pausedTotal += event.offsetSeconds - pausedAtOffset
+        pausedTotal += endOffset - pausedAtOffset
         pausedAtOffset = null
       }
 
-      endOffset = round(offset())
       const deliveredSeconds = round(Math.max(0, endOffset - pausedTotal))
       const completionStatus = status ?? deriveCompletionStatus(deliveredSeconds, specification.durationSeconds)
 
-      mark(completionStatus === 'completed' ? 'session-complete' : 'session-interrupt')
+      // At exactly endOffset, not at "now": re-reading the clock here would put
+      // the closing event a few microseconds past the duration the same close()
+      // just recorded, leaving a timeline that runs beyond its own session.
+      mark(completionStatus === 'completed' ? 'session-complete' : 'session-interrupt', undefined, endOffset)
       closed = true
 
       const instance = {
