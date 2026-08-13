@@ -579,7 +579,7 @@ most of the record travels:
 
 | Carried | Terms |
 |---|---|
-| The execution timeline | `sstim:SessionEvent`, `hasEventType`, `eventOffsetSeconds` — ordering lives in the offset, never in statement order |
+| The execution timeline | `sstim:SessionEvent`, `hasEventType`, `sessionClockOffsetSeconds` — ordering lives in the offset, never in statement order |
 | The clock that orders it | `clockOriginSeconds`, `hasTimingAuthority` |
 | Delivered vs elapsed time | `deliveredDurationSeconds`, with SHACL-SPARQL holding delivered ≤ elapsed |
 | What the record can promise | `hasReproducibilityLevel`, `configurationDigest` + `digestAlgorithm` |
@@ -588,7 +588,7 @@ most of the record travels:
 | Perceived helpfulness and the stated goal | `rolePerceivedHelpfulness`, `roleStatedGoal` |
 | Instrument provenance | `sstim:ObservationInstrument` with `instrumentVersion` |
 | Unwanted experiences | `sstim:UnwantedExperienceObservation` with category, severity, onset, persistence, action, resolution, perceived relatedness |
-| `during-session` reports | `sstim-v:reportDuringSession` |
+| `during-session` reports | `sstim-v:reportDuringSession`, placed on the session clock by `sessionClockOffsetSeconds` |
 
 The five legacy scalars are emitted **alongside** the observations, not instead
 of them, so existing consumers keep working.

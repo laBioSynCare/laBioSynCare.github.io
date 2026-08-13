@@ -430,7 +430,7 @@
     "masterVolume": { "@id": "sstim:masterVolume", "@type": "xsd:decimal" },
     "actualDurationSeconds": { "@id": "sstim:actualDurationSeconds", "@type": "xsd:integer" },
     "completionStatus": "sstim:completionStatus",
-    "eventOffsetSeconds": { "@id": "sstim:eventOffsetSeconds", "@type": "xsd:decimal" },
+    "sessionClockOffsetSeconds": { "@id": "sstim:sessionClockOffsetSeconds", "@type": "xsd:decimal" },
     "clockOriginSeconds": { "@id": "sstim:clockOriginSeconds", "@type": "xsd:decimal" },
     "deliveredDurationSeconds": { "@id": "sstim:deliveredDurationSeconds", "@type": "xsd:decimal" },
     "configurationDigest": "sstim:configurationDigest",

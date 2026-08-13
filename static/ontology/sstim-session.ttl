@@ -274,11 +274,12 @@ sstim:hasEventType a owl:ObjectProperty, owl:FunctionalProperty ;
     skos:definition "Identifies the single controlled category of an observed session event."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
-sstim:eventOffsetSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:SessionEvent ;
+sstim:sessionClockOffsetSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionEvent sstim:SelfReport ) ] ;
     rdfs:range  xsd:decimal ;
-    rdfs:label  "event offset (s)"@en ;
+    rdfs:label  "session clock offset (s)"@en ;
     skos:definition "Seconds elapsed on the session's timing context between the clock origin recorded on the session instance and this occurrence. Offsets order the timeline; wall-clock timestamps, where present, place the session in the calendar and order nothing."@en ;
+    skos:scopeNote "Applies to anything placed on that clock. An event always is. A self-report is only when it was collected during delivery — a pre-session or follow-up report happens off the session clock, and an offset for it would be a fabricated placement."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:clockOriginSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;

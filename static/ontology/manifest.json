@@ -281,7 +281,7 @@
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "48e3b7e9209f9a96e82f7dff51ea0e1223eef76b7f09dd88945a5c0428a7b053"
+        "sha256": "17c25d807d29fabe906379aeca0818fc669da92b9d7f4178163567ff9d59ffa2"
       },
       "runtime": {
         "url": "/ontology/sstim-session.ttl",
@@ -672,7 +672,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e8afe57aa143dac9d6b6332925305c499db431629e51b5bdf8da4d91cb7af50b"
+        "sha256": "c67c1936c5b58128972ff1262e4eef794445d1e93dc9c7e9f953636125fb4516"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -890,7 +890,8 @@
       ],
       "fixtures": {
         "positive": [
-          "test/fixtures/rdf/full-profile/positive-delivered-exposure.ttl"
+          "test/fixtures/rdf/full-profile/positive-delivered-exposure.ttl",
+          "test/fixtures/rdf/full-profile/positive-recorded-session.ttl"
         ],
         "outOfScope": [
           "test/fixtures/rdf/full-profile/out-of-scope-foreign-vocabulary.ttl"
@@ -900,9 +901,10 @@
         ]
       },
       "competencyQueries": [
-        "test/competency/full.rq"
+        "test/competency/full.rq",
+        "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "a5aeafd266943f6ce8299f9dfd055119c9acd99ed204a22bb18d60d3fd4c4e33"
+      "sha256": "b681e275687368f76371613246946281130215e2c93ff8226968d5b6b968cadb"
     }
   ]
 }

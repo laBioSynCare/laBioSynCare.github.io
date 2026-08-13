@@ -117,7 +117,7 @@ describe('the execution timeline (ADR 0048)', () => {
 
     const first = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-event-0000'
     expect(objects(store, first, `${SSTIM}hasEventType`)[0].value).toBe(`${SSTIM_V}eventSessionOpen`)
-    expect(objects(store, first, `${SSTIM}eventOffsetSeconds`)[0].value).toBe('0')
+    expect(objects(store, first, `${SSTIM}sessionClockOffsetSeconds`)[0].value).toBe('0')
   })
 
   it('keeps ordering in the offsets, not in statement order', () => {
@@ -129,7 +129,7 @@ describe('the execution timeline (ADR 0048)', () => {
     const inst = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful'
 
     for (const event of objects(store, inst, `${SSTIM}hasSessionEvent`)) {
-      expect(objects(store, event.value, `${SSTIM}eventOffsetSeconds`)).toHaveLength(1)
+      expect(objects(store, event.value, `${SSTIM}sessionClockOffsetSeconds`)).toHaveLength(1)
     }
   })
 
@@ -160,12 +160,23 @@ describe('the execution timeline (ADR 0048)', () => {
 })
 
 describe('qualified observations (ADR 0048)', () => {
-  it('projects a during-session report under its own phase', () => {
+  it('projects a during-session report under its own phase, placed on the session clock', () => {
+    // Both halves matter. Without the phase the report cannot be projected at
+    // all; without the offset, how far into the session the answer was given is
+    // unrecoverable — the report-collected event knows, but the link back to
+    // the report is event detail, which is withheld.
     const { quads } = projectSession(during)
     const store = new Store(quads)
     const iri = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-multiple-report-during-session'
 
     expect(objects(store, iri, `${SSTIM}hasReportPhase`)[0].value).toBe(`${SSTIM_V}reportDuringSession`)
+    expect(objects(store, iri, `${SSTIM}sessionClockOffsetSeconds`)[0].value).toBe('300')
+  })
+
+  it('gives a post-session report no session-clock offset to fabricate', () => {
+    const store = new Store(projectSession(helpful).quads)
+    const post = 'https://w3id.org/sstim/implementation/bsclab/session/synthetic-helpful-report-immediate-post'
+    expect(objects(store, post, `${SSTIM}sessionClockOffsetSeconds`)).toHaveLength(0)
   })
 
   it('projects perceived helpfulness with its scale and prompt', () => {

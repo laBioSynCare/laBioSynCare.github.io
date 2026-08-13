@@ -1025,6 +1025,13 @@ sstim-sh:SelfReportShape a sh:NodeShape ;
         sh:class sstim:ObservationInstrument ;
         sh:message "hasInstrument must point at one sstim:ObservationInstrument."@en ;
     ] ;
+    # Optional, because only a report collected during delivery sits on the
+    # session clock at all. Bounded when present.
+    sh:property [
+        sh:path sstim:sessionClockOffsetSeconds ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "sessionClockOffsetSeconds must be a single non-negative decimal."@en ;
+    ] ;
 
     sh:property [
         sh:path sstim:primaryAffect ;
@@ -1081,7 +1088,7 @@ sstim-sh:SessionEventShape a sh:NodeShape ;
         sh:message "SessionEvent must identify exactly one event type."@en ;
     ] ;
     sh:property [
-        sh:path sstim:eventOffsetSeconds ;
+        sh:path sstim:sessionClockOffsetSeconds ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;

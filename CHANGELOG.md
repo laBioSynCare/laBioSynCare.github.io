@@ -21,9 +21,11 @@ file is the human-readable summary.
 
 - **Session events and the clock that orders them**
   ([ADR 0048](docs/decisions/0048-session-events-and-qualified-observations.md)):
-  `sstim:SessionEvent` with a ten-member type scheme, `sstim:eventOffsetSeconds`,
-  `sstim:clockOriginSeconds` and `sstim:hasTimingAuthority`. Ordering lives in
-  the offset, never in statement order. This is the term set the HED event
+  `sstim:SessionEvent` with a ten-member type scheme,
+  `sstim:clockOriginSeconds` and `sstim:hasTimingAuthority`, placed by
+  `sstim:sessionClockOffsetSeconds` — which a during-session self-report also
+  carries, since it is the same measurement against the same clock. Ordering
+  lives in the offset, never in statement order. This is the term set the HED event
   profile needs — before it, SSTIM could not say that anything occurred during a
   session.
 - **Delivered versus elapsed duration**: `sstim:deliveredDurationSeconds`, with
@@ -44,6 +46,11 @@ file is the human-readable summary.
   controlled schemes, 57 concepts, all four languages.
 - `sstim-v:reportDuringSession` — the fourth self-report phase. A during-session
   report previously had no phase and could not be represented at all.
+- A second Full competency question and its positive fixture, covering the
+  execution timeline: *what happened, in what order, on which clock, and did it
+  run to completion?* A term set with no executable demonstration is a claim
+  rather than a contract, and `make core-profile-contract` now runs this one
+  against its own fixture.
 
 ### Changed
 
@@ -57,6 +64,12 @@ file is the human-readable summary.
   recorded as exceptions, and additions are counted rather than rejected. The
   old test conflated "identical" with "compatible", which held only while the
   ontology was forbidden to grow.
+- Re-audited the live Wikidata technique mappings: added a conservative
+  `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened
+  `sstim-v:techBinauralBeats` from `skos:exactMatch` to `skos:relatedMatch`
+  because Q863539 also represents a perceptual phenomenon and music genre.
+- Corrected the VoID sidecar's modification date and its description of the
+  primary Turtle distribution. No released `0.13.0` artifact was changed.
 
 ### Fixed
 
@@ -88,13 +101,6 @@ file is the human-readable summary.
 - A report's engine-clock offset is required for during-session reports and
   refused for the others, so a report collected before or after the session
   cannot carry a fabricated placement on a clock it never ran on.
-
-- Re-audited the live Wikidata technique mappings: added a conservative
-  `skos:closeMatch` from `sstim-v:techMonauralBeats` to Q6898437 and weakened
-  `sstim-v:techBinauralBeats` from `skos:exactMatch` to `skos:relatedMatch`
-  because Q863539 also represents a perceptual phenomenon and music genre.
-- Corrected the VoID sidecar's modification date and its description of the
-  primary Turtle distribution. No released `0.13.0` artifact was changed.
 
 ## [0.13.0] - 2026-08-04
 

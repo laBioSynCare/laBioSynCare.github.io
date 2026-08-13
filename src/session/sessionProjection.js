@@ -437,11 +437,11 @@ export function projectSession(bundle, options = {}) {
     const node = BSCLAB_SESSION(event.id)
     add(node, a, SSTIM('SessionEvent'))
     add(node, SSTIM('hasEventType'), SSTIM_V(concept))
-    add(node, SSTIM('eventOffsetSeconds'), dec(event.offsetSeconds))
+    add(node, SSTIM('sessionClockOffsetSeconds'), dec(event.offsetSeconds))
     add(instNode, SSTIM('hasSessionEvent'), node)
     keep(`${base}/id`, 'IRI identity')
     keep(`${base}/type`, 'sstim:hasEventType')
-    keep(`${base}/offsetSeconds`, 'sstim:eventOffsetSeconds')
+    keep(`${base}/offsetSeconds`, 'sstim:sessionClockOffsetSeconds')
 
     if (event.wallClock !== undefined) {
       // prov:startedAtTime, not prov:atTime: the latter has domain
@@ -492,9 +492,13 @@ export function projectSession(bundle, options = {}) {
     keep(`${base}/collectedAt`, 'prov:generatedAtTime')
 
     if (report.collectedAtOffsetSeconds !== undefined) {
-      drop(`${base}/collectedAtOffsetSeconds`,
-        'Where on the session clock the report was collected has no property on sstim:SelfReport. The report-collected event carries the same instant, so the fact survives on the timeline; it is not recoverable from the report node itself.',
-        'an engine-clock offset property on sstim:SelfReport')
+      // Only a during-session report has one, and the schema enforces that.
+      // Without it, how far into the session an answer was given would be
+      // unrecoverable from the graph: the report-collected event knows, but the
+      // link from that event back to its report is event detail, which is
+      // withheld.
+      add(reportNode, SSTIM('sessionClockOffsetSeconds'), dec(report.collectedAtOffsetSeconds))
+      keep(`${base}/collectedAtOffsetSeconds`, 'sstim:sessionClockOffsetSeconds')
     }
 
     // ── Instrument ──

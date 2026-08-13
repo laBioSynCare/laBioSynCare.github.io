@@ -37,7 +37,7 @@ This ADR adds those terms.
 
 `sstim:SessionEvent` (⊑ `prov:Activity`), linked from `sstim:SessionInstance` by
 `sstim:hasSessionEvent`, typed by `sstim:hasEventType` against a ten-member
-controlled scheme, and placed by `sstim:eventOffsetSeconds`.
+controlled scheme, and placed by `sstim:sessionClockOffsetSeconds`.
 
 **Ordering lives in the offset, not in statement order.** An RDF graph is a set;
 a consumer reading a timeline off statement order would get a different answer
@@ -100,6 +100,13 @@ recordable as an observation with its own response state.
 `sstim-v:reportDuringSession` closes the fourth phase. Until now a during-session
 report had no phase and could not be represented at all.
 
+A during-session report also carries `sstim:sessionClockOffsetSeconds`, which is
+why that property has a union domain rather than being named for events: it is
+the same measurement against the same clock, and without it on the report there
+is no path in the graph from an answer to how far into the session it was given
+— the report-collected event knows, but the link back to its report is event
+detail, which is withheld.
+
 ### 5. Unwanted experiences, and what they are not
 
 `sstim:UnwantedExperienceObservation` with a controlled category, participant-
@@ -131,7 +138,9 @@ non-conformant.
 ## Consequences
 
 **Terms.** 435 uniquely owned OWL terms (was 398), 519 concepts (was 461), 62
-schemes (was 53). All in `sstim-session.ttl` and `sstim-vocab.ttl` — no new
+schemes (was 53). The Full profile gained a second competency question and its
+positive fixture, covering the execution timeline: a term set with no executable
+demonstration is a claim rather than a contract. All in `sstim-session.ttl` and `sstim-vocab.ttl` — no new
 module, no new dependency edge, no new route. A later split into an
 `observation` module stays open if the session module grows further; ADR 0043
 already records finer packaging as deferred work.
