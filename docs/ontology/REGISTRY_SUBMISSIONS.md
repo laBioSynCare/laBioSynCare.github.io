@@ -396,6 +396,30 @@ Required follow-up: Optional polish via the ontology Edit form — add documenta
                     Nightly re-pull means Pages deploys flow in automatically.
 ```
 
+**Submission 14 (0.14.0) failed to parse — `ERROR_RDF`, 2026-08-14 01:14 UTC.**
+The first parse failure in fourteen submissions; 13 (2026-08-08) completed the
+full pipeline. Diagnosed the same day and **the artifact was cleared**: the
+served `sstim-full.owl` returns 200 with a matching `content-length`, is
+byte-identical to a locally regenerated bundle, parses under rdflib *and* under
+the OWL API (ROBOT 4.5.29, exit 0), declares exactly one `owl:Ontology`, and has
+no entity punning, no invalid typed literals, no malformed IRIs or language
+tags. Its two OWL 2 DL violations (`xsd:duration` in exposure) are identical to
+the submission that parsed successfully. BioPortal recorded `errorMessage: null`
+and `parsingLog: null`, which a genuine syntax rejection normally populates, so
+the evidence points at their pipeline rather than at our RDF. The ontology stayed
+browsable throughout on submission 13's metrics.
+
+One real defect surfaced while diagnosing, unrelated to the failure: **the bundle
+carried no `owl:versionIRI`**, because `robot annotate --ontology-iri` does not
+carry the Kernel's version IRI through the merge. Every submission since the
+first was therefore an unversioned upload at the same ontology IRI, with no
+immutable version for a registry to cite. Fixed in `make bioportal-bundle`, which
+now passes `--version-iri` on a released line, omits it on a `-dev` line (ADR
+0020: a version IRI names an immutable version, and a development line is not
+one), and fails if either invariant is broken. The same pass added a guard for an
+empty module list, which previously produced a valid, empty bundle rather than an
+error.
+
 **Release dates — BioPortal reads `dct:issued`.** The submission list's
 **Released** column is populated from the root ontology's `dct:issued`, not from
 the upload date. Because `dct:issued` had never been bumped past the ontology's

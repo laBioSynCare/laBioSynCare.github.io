@@ -347,14 +347,28 @@ export:
 ## Merge the manifest-defined Full semantic profile (excluding SHACL shapes)
 ## into one RDF/XML OWL file for BioPortal ingest.
 ## Generated into dist/ (deploy artifact only), never committed; override BIOPORTAL_OUT=.
+##
+## Carries owl:versionIRI only on a released line. `robot annotate --ontology-iri`
+## sets the ontology IRI and does not carry the Kernel's version IRI through the
+## merge, so every submission since the first has been unversioned — registries
+## saw a stream of same-IRI uploads with no immutable version to cite. A -dev
+## line still gets none, for the reason ADR 0020 gives: a version IRI names an
+## immutable version, and a development line is not one.
 bioportal-bundle:
 	@set -e; \
 	mkdir -p $(dir $(BIOPORTAL_OUT)); \
 	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
+	if [ $(words $(BIOPORTAL_MODULES)) -eq 0 ]; then \
+		echo "bioportal-bundle: no modules — the manifest query failed, and a bundle built from nothing still writes a valid, empty ontology" >&2; \
+		exit 1; \
+	fi; \
 	cat $(BIOPORTAL_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	version_iri="$$(node -e 'const s = require("./static/ontology/manifest.json").suite; process.stdout.write(s.status === "released" && !s.version.includes("-") ? `$${s.ontologyIri}/$${s.version}` : "")')"; \
+	version_arg=""; \
+	if [ -n "$$version_iri" ]; then version_arg="--version-iri $$version_iri"; fi; \
 	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
-		annotate --ontology-iri https://w3id.org/sstim \
+		annotate --ontology-iri https://w3id.org/sstim $$version_arg \
 		--output $(BIOPORTAL_OUT) > "$$tmpdir/robot.log" 2>&1; then \
 		cat "$$tmpdir/robot.log"; \
 		exit 1; \
@@ -365,7 +379,15 @@ bioportal-bundle:
 		exit 1; \
 	fi; \
 	test -s $(BIOPORTAL_OUT); \
-	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules"
+	if [ -n "$$version_iri" ] && ! grep -q "versionIRI" $(BIOPORTAL_OUT); then \
+		echo "bioportal-bundle: released line but the bundle carries no owl:versionIRI" >&2; \
+		exit 1; \
+	fi; \
+	if [ -z "$$version_iri" ] && grep -q "versionIRI" $(BIOPORTAL_OUT); then \
+		echo "bioportal-bundle: development line must not claim a version IRI" >&2; \
+		exit 1; \
+	fi; \
+	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules$${version_iri:+ at $$version_iri}"
 
 ## Generate WIDOCO HTML reference documentation from the Full semantic profile
 ## (default into dist/ontology/docs/ for the Pages artifact; override DOCS_DIR=).
