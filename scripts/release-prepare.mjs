@@ -22,8 +22,16 @@
 // not. SSTIM submissions 1–8 all showed 2026-04-12 because that distinction was
 // missed once already.
 //
+// Beyond the ontology itself it carries the release into the four places that
+// describe it: the changelog section, CITATION.cff, the entrance metadata, and
+// void.ttl's version and counts. Every one of those was a hand edit for 0.14.0,
+// and every one was caught by a gate failing afterwards rather than by being
+// done — which works, but costs a full validate cycle each time and leaves the
+// release half-cut in between.
+//
 // Usage:  node scripts/release-prepare.mjs 0.14.0 [--date YYYY-MM-DD]
 
+import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -193,7 +201,85 @@ const prepared = prepareReleaseManifest(manifest, version)
 writeFileSync(MANIFEST_PATH, `${JSON.stringify(prepared, null, 2)}\n`, 'utf8')
 changes.push('static/ontology/manifest.json')
 
+// ── The four documents that describe the release ─────────────────────────────
+
+function editFile(file, edits) {
+  const path = join(ROOT, file)
+  let text = readFileSync(path, 'utf8')
+  for (const [pattern, replacement, what] of edits) {
+    text = replaceOnce(text, pattern, replacement, what, file)
+  }
+  writeFileSync(path, text, 'utf8')
+  changes.push(file)
+}
+
+// The changelog's Unreleased section becomes this release's section. Its
+// content is the release notes, so an empty one means the release has nothing
+// written about it — worth stopping for, not worth guessing at.
+const changelog = readFileSync(join(ROOT, 'CHANGELOG.md'), 'utf8')
+const unreleased = changelog.match(/## \[Unreleased\]\n([\s\S]*?)(?=\n## \[)/)
+if (!unreleased) {
+  console.error('release-prepare: CHANGELOG.md has no [Unreleased] section to cut.')
+  process.exit(1)
+}
+if (unreleased[1].trim().length < 40) {
+  console.error('release-prepare: CHANGELOG.md\'s [Unreleased] section is empty; write the release notes first.')
+  process.exit(1)
+}
+editFile('CHANGELOG.md', [
+  [/## \[Unreleased\]/, `## [${version}] - ${releaseDate}`, '[Unreleased] heading'],
+])
+
+editFile('CITATION.cff', [
+  [/^version: .+$/m, `version: ${version}`, 'version'],
+  [/^date-released: .+$/m, `date-released: ${releaseDate}`, 'date-released'],
+])
+
+editFile('src/ui/entrance/releaseMetadata.js', [
+  [/export const RELEASE_VERSION = '[^']*'/, `export const RELEASE_VERSION = '${version}'`, 'RELEASE_VERSION'],
+  [/export const RELEASE_DATE = '[^']*'/, `export const RELEASE_DATE = '${releaseDate}'`, 'RELEASE_DATE'],
+])
+
+// void.ttl describes the release being cut. The counts come from the same
+// rdflib the quality audit uses, over the live modules — byte-identical to what
+// the snapshot will freeze — so the audit cannot reject numbers this wrote.
+let counts
+try {
+  counts = JSON.parse(execFileSync('python3', [join(ROOT, 'scripts/void-counts.py')], { cwd: ROOT }).toString())
+} catch (error) {
+  console.error(`release-prepare: could not compute VoID counts (${error.message.split('\n')[0]}).`)
+  console.error('  Run inside the dev shell: rdflib is required, as it is for the audit that checks them.')
+  process.exit(1)
+}
+// Scoped to the root dataset's own block. void.ttl declares void:triples three
+// times — once for the term space and once for each of the instance and
+// ecosystem subsets — so an unscoped edit would rewrite whichever came first.
+// replaceOnce caught that rather than letting it through, which is the whole
+// reason it refuses ambiguity instead of taking the first match.
+const VOID_PATH = 'static/ontology/void.ttl'
+const voidText = readFileSync(join(ROOT, VOID_PATH), 'utf8')
+const rootStart = voidText.indexOf('<https://w3id.org/sstim/void>')
+if (rootStart < 0) throw new Error(`${VOID_PATH}: no root dataset block`)
+const rootEnd = voidText.indexOf('\n\n<', rootStart)
+const rootBlock = voidText.slice(rootStart, rootEnd < 0 ? undefined : rootEnd)
+
+let updatedRoot = rootBlock
+for (const [pattern, replacement, what] of [
+  [/dcat:version "[^"]*" ;/, `dcat:version "${version}" ;`, 'dcat:version'],
+  [/void:triples \d+ ;/, `void:triples ${counts.triples} ;`, 'void:triples'],
+  [/void:classes \d+ ;/, `void:classes ${counts.classes} ;`, 'void:classes'],
+  [/void:properties \d+ ;/, `void:properties ${counts.properties} ;`, 'void:properties'],
+]) {
+  updatedRoot = replaceOnce(updatedRoot, pattern, replacement, what, `${VOID_PATH} root dataset`)
+}
+writeFileSync(join(ROOT, VOID_PATH), voidText.replace(rootBlock, updatedRoot), 'utf8')
+changes.push(VOID_PATH)
+
 console.log(`release-prepare: ${current} → ${version}, issued ${releaseDate}`)
 console.log(`  ${manifest.modules.length} modules, ${manifest.profiles.length} profile entry points, 1 manifest`)
-console.log('  next: update void.ttl, run `make validate`, commit, then `make snapshot VERSION=' + version + '`')
-console.log('  checksums are stale until `node scripts/sstim-manifest.mjs sync-checksums`')
+console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
+console.log(`  ${changes.length} files changed`)
+console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`, `make validate`, commit,')
+console.log(`        then \`make snapshot VERSION=${version} RELEASE_DATE=${releaseDate}\` — the snapshot`)
+console.log('        defaults to today and refuses a module set dated otherwise — and after the tag and DOI,')
+console.log(`        \`node scripts/release-open-dev.mjs\` to reopen the mutable line`)

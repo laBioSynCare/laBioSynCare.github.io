@@ -515,9 +515,17 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    added afterwards; `release-prepare` refuses to run without it, because the two
    releases before this rule both shipped without one and nothing else noticed.
    Then run `node scripts/release-prepare.mjs X.Y.Z --date YYYY-MM-DD`, which does
-   the rest of this step and step 4: the release version in **every manifest-owned
-   module and profile entry point**, and the `owl:versionIRI` and
-   `mod:status "released"` in the root Kernel. Populate every profile's
+   the rest of this step, step 4, and step 5: the release version in **every
+   manifest-owned module and profile entry point**, the `owl:versionIRI` and
+   `mod:status "released"` in the root Kernel, the frozen import and artifact
+   IRIs on every profile, the manifest's immutable release URLs, and the four
+   documents that describe the release — the changelog section, `CITATION.cff`,
+   the entrance metadata, and `void.ttl`'s version and counts. Those four were
+   hand edits for 0.14.0 and each was caught by a gate failing afterwards rather
+   than by being done. Pass the same date to `make snapshot` below: it defaults
+   to today and refuses a module set dated otherwise. What it deliberately does
+   not touch is prose — `truth-audit` still catches a `TODO.md` line naming the
+   previous release as current, and a script should not guess at wording. Populate every profile's
    positive, out-of-scope, and adversarial fixture sets and at least one
    competency query. Every listed contract path must already name an existing
    repository file. Bump **`dct:issued`** and `dct:modified` to the release

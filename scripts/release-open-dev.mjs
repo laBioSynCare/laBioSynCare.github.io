@@ -112,6 +112,22 @@ for (const profile of manifest.profiles) {
   writeFileSync(path, text, 'utf8')
 }
 
+// A fresh Unreleased section, so the next change has somewhere to be written
+// and release-prepare has something to cut. Keep a Changelog convention, and
+// release-prepare refuses to run on an empty one.
+const CHANGELOG = join(ROOT, 'CHANGELOG.md')
+const changelog = readFileSync(CHANGELOG, 'utf8')
+if (!changelog.includes('## [Unreleased]')) {
+  const marker = `## [${released}]`
+  const at = changelog.indexOf(marker)
+  if (at < 0) throw new Error(`CHANGELOG.md: no ${marker} section to open a new line above`)
+  writeFileSync(
+    CHANGELOG,
+    `${changelog.slice(0, at)}## [Unreleased]\n\nNothing yet on the ${next} line.\n\n${changelog.slice(at)}`,
+    'utf8',
+  )
+}
+
 manifest.$schema = 'https://w3id.org/sstim/manifest-schema/1'
 manifest.suite.version = next
 manifest.suite.status = 'development'
