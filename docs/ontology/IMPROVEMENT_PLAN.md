@@ -267,7 +267,7 @@ covered by tests.
 
 #### 1.4 Repair SKOS and external mappings
 
-> **Status 2026-08-14 — KR-09 closed; KR-08 still open.**
+> **Status 2026-08-15 — KR-08 and KR-09 both closed. Phase 1.4 complete.**
 > The downgrades landed earlier: no `skos:exactMatch` assertion remains, and the
 > eleven external mappings are `closeMatch` or `relatedMatch`. The missing half
 > was provenance — the rationale lived only in Turtle comments, which no
@@ -280,12 +280,18 @@ covered by tests.
 > revisions were not recorded at verification time, and inventing them would be
 > worse than naming the date that was.
 >
-> **KR-08 remains open and is the larger half of 1.4.** Band scope notes still
-> carry unqualified outcome prose, and the scheme still conflates the observed
-> neural-oscillation sense with the stimulus-frequency-target sense. Splitting
-> them changes what `sstim-v:alpha` means, so it needs its own ADR — the
-> vocabulary already says so in a `skos:editorialNote`. The mapping annotations
-> above name that split as the precondition for revisiting `exactMatch`.
+> **KR-08 closed 2026-08-15 by
+> [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)**, and
+> not as the audit framed it. The scheme was never conflated: a band is a Hz
+> interval throughout, and `alpha10` and `gamma40` sit in it naming no rhythm.
+> What was missing was a term for the rhythm, now
+> `sstim-v:NeuralOscillationScheme`. The outcome prose left the bands for the
+> rhythms as evidence claims or dated `noKnownEvidenceInSSTIM` assertions —
+> three sourced, seven not, none deleted — and `make band-scope-notes` checks
+> both that no band claims an outcome and that no association silently vanished.
+> With the rhythm as subject, four of the five Wikidata mappings reached
+> `exactMatch`; beta stayed `closeMatch` because the item spans a range SSTIM
+> splits.
 
 - Separate stimulus temporal-frequency targets from observed neural-band
   classifications; relate them only through a qualified hypothesis,

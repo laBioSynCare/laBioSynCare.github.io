@@ -17,7 +17,40 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.15.0-dev line.
+### Added
+
+- **Neural oscillations as their own terms**
+  ([ADR 0049](docs/decisions/0049-neural-oscillations-and-frequency-ambits.md),
+  closes KR-08): `sstim:NeuralOscillationType` and six named rhythms, each
+  carrying its conventional ambit via `sstim:hasTypicalFrequencyBand`, the wider
+  range it actually occupies (`sstim:extendedHzMin`/`Max`), the topography that
+  identifies it alongside frequency, and the state it is observed in. Rhythm,
+  wave and oscillation are recorded as near-synonyms with their divergences
+  named, rather than as bare alternate labels.
+- Four neural-oscillation references, every DOI resolved through Crossref before
+  being written.
+- `make band-scope-notes` — fails if a frequency band claims an outcome, or if
+  an association ADR 0049 moved off the band scope notes stopped being recorded.
+
+### Changed
+
+- **The five band-to-Wikidata mappings moved to the rhythms**, where the items
+  point: Q2469782 describes "a neural oscillation", not a Hz interval. Four
+  became `skos:exactMatch`. Beta stayed `closeMatch` — Q831014 spans 12.5–30 Hz
+  while SSTIM holds the sensorimotor rhythm apart at 12–15, so the item subsumes
+  an entity SSTIM keeps separate. Each band carries a `skos:historyNote` naming
+  where its mapping went.
+- **Outcome prose left the six primary band scope notes.** Nothing was deleted:
+  three associations became evidence assessments with a tier and a citation,
+  seven became dated `noKnownEvidenceInSSTIM` knowledge-status assertions. That a
+  widely repeated association is unevidenced is itself recorded.
+- `AssessmentProposition` and `EvidenceAssessmentClaim` accept a
+  `NeuralOscillationType` subject. The evidence model assessed only what BSC
+  delivers, and an assessment about an endogenous rhythm is neither a preset nor
+  a technique.
+- The frequency-band scheme description no longer calls these "neural oscillation
+  frequency bands", and its editorial note records the resolution instead of
+  deferring it.
 
 ## [0.14.0] - 2026-08-13
 
