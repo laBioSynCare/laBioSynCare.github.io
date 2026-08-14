@@ -267,6 +267,26 @@ covered by tests.
 
 #### 1.4 Repair SKOS and external mappings
 
+> **Status 2026-08-14 — KR-09 closed; KR-08 still open.**
+> The downgrades landed earlier: no `skos:exactMatch` assertion remains, and the
+> eleven external mappings are `closeMatch` or `relatedMatch`. The missing half
+> was provenance — the rationale lived only in Turtle comments, which no
+> consumer can read. Each mapping now carries an `owl:Axiom` annotation with the
+> source item, the date it was last verified, the reviewer where one is on
+> record, and why it is not `exactMatch`. The plain triples are untouched, so
+> nothing consuming them changes.
+>
+> `dct:date` is a verification date, not a source revision id: Wikidata
+> revisions were not recorded at verification time, and inventing them would be
+> worse than naming the date that was.
+>
+> **KR-08 remains open and is the larger half of 1.4.** Band scope notes still
+> carry unqualified outcome prose, and the scheme still conflates the observed
+> neural-oscillation sense with the stimulus-frequency-target sense. Splitting
+> them changes what `sstim-v:alpha` means, so it needs its own ADR — the
+> vocabulary already says so in a `skos:editorialNote`. The mapping annotations
+> above name that split as the precondition for revisiting `exactMatch`.
+
 - Separate stimulus temporal-frequency targets from observed neural-band
   classifications; relate them only through a qualified hypothesis,
   observation, or evidence assessment.

@@ -27,6 +27,7 @@
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
+@prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix wd:    <http://www.wikidata.org/entity/> .
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
@@ -113,6 +114,125 @@ sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
 # Note: Wikidata items for Martigli oscillation, Sonic Symmetry permutation
 # technique, and the SSTIM ontology itself are pending — Wikidata contribution
 # work item tracked in TODO.md.
+
+
+###########################################################################
+# Mapping provenance (KR-09)
+#
+# The rationale for every external mapping used to live only in the Turtle
+# comments above, which no consumer can read. These annotated axioms carry the
+# same facts as data: which source item was checked, when it was last verified,
+# who reviewed it where a review is on record, and why the assertion is
+# closeMatch or relatedMatch rather than exactMatch.
+#
+# The plain mapping triples above are untouched, so nothing that already
+# consumes them changes. An annotation is about an assertion, not a second
+# assertion.
+#
+# `dct:date` is the date the target item was last verified against live
+# Wikidata, not a source revision id: Wikidata revisions were not recorded at
+# verification time, and inventing them would be worse than naming the date
+# that was. Re-verify before upgrading any of these to exactMatch — the
+# disposition for KR-09 requires an extension/intension test, not label
+# similarity.
+###########################################################################
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:alpha ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2469782 ;
+    dct:source <http://www.wikidata.org/entity/Q2469782> ;
+    dct:date "2026-07-24"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:delta ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2623205 ;
+    dct:source <http://www.wikidata.org/entity/Q2623205> ;
+    dct:date "2026-07-24"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:theta ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2370623 ;
+    dct:source <http://www.wikidata.org/entity/Q2370623> ;
+    dct:date "2026-07-24"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:beta ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q831014 ;
+    dct:source <http://www.wikidata.org/entity/Q831014> ;
+    dct:date "2026-07-24"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:gamma ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2623017 ;
+    dct:source <http://www.wikidata.org/entity/Q2623017> ;
+    dct:date "2026-07-24"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:voiceBinaural ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q863539 ;
+    dct:source <http://www.wikidata.org/entity/Q863539> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A BSC binaural voice is a parameter bundle that can realize binaural beats. It is not identical to the perceptual phenomenon or the music genre the Wikidata item also represents."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:voiceSymmetry ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q98000061 ;
+    dct:source <http://www.wikidata.org/entity/Q98000061> ;
+    dct:date "2026-06-01"^^xsd:date ;
+    skos:editorialNote "A BSC Symmetry voice is a parameter bundle whose isochronic pulse train is one realizable output, not the technique itself."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techIsochronicTones ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q98000061 ;
+    dct:source <http://www.wikidata.org/entity/Q98000061> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The Wikidata item names the same technique. closeMatch rather than exactMatch because the item carries no definition boundary against neighbouring pulsed-tone techniques."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techMonauralBeats ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q6898437 ;
+    dct:source <http://www.wikidata.org/entity/Q6898437> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A thin Wikidata item: it names the technique but supplies little intension, so closeMatch is the strongest defensible assertion."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techBinauralBeats ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q863539 ;
+    dct:source <http://www.wikidata.org/entity/Q863539> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Q863539 also represents a perceptual phenomenon and a music genre, so a stimulation technique is related to it rather than close to it. Downgraded from exactMatch in the 0.14.0-dev line."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:mechMultisensory ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q17166073 ;
+    dct:source <http://www.wikidata.org/entity/Q17166073> ;
+    dct:date "2026-06-01"^^xsd:date ;
+    skos:editorialNote "This concept is a proposed-mechanism category in an evidence model, not the cognitive phenomenon itself, so relatedMatch is intentionally weaker than exactMatch."@en .
 
 
 ###########################################################################
