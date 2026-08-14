@@ -107,16 +107,36 @@ beta — so `smrOscillation` is minted while `lowBetaOscillation` is not.
   "alpha is prominent with eyes closed" describes when you see it, not what it
   does for you. Outcome and function claims are §4's business and never appear
   here.
-- `skos:altLabel` — "alpha rhythm", "alpha waves". **No separate rhythm concept.**
-  "Rhythm", "wave" and "oscillation" are used synonymously for these entities in
-  the literature, and Wikidata itself mixes them ("alpha wave" but "theta
-  rhythm"). Minting `alphaNeuralRhythm` beside `alphaOscillation` would require a
-  defensible difference in meaning that does not exist. The synonymy is stated
-  rather than merely implied: each concept carries the alternate labels *and* a
-  `skos:scopeNote` recording that the three words name the same thing here. As a
-  side effect this begins closing the `skos:altLabel` gap, where the vocabulary
-  currently has none at all.
+- `skos:altLabel` — "alpha rhythm", "alpha waves". **No separate rhythm concept**,
+  because for these particular entities all three words denote the same thing.
+  Wikidata itself mixes them: "alpha wave" but "theta rhythm".
 - Associated states, functions and effects — only through §4.
+
+**The three words are near-synonyms, not exact ones, and the concepts say so.**
+Recording them as alternate labels without qualification would assert an
+interchangeability that does not hold in general:
+
+- **Oscillation** is the rhythmic fluctuation of neural activity itself — the
+  process. It is the most general of the three and the least overloaded, which is
+  why it is the head term here.
+- **Wave** names how that process appears in a recorded signal, and EEG also uses
+  it for deflections that are not oscillatory at all: a P300 wave, a sharp wave,
+  a K-complex. "Wave" is therefore broader than "oscillation" in one direction
+  and narrower in another, and the two are not substitutable outside the named
+  band rhythms.
+- **Rhythm** implies an oscillation regular and characteristic enough to be named
+  and attributed to a state or a generator. A transient oscillatory burst is an
+  oscillation but not a rhythm, so "rhythm" is the narrower term.
+
+Each concept therefore carries the alternate labels *and* a `skos:scopeNote`
+stating that the three are interchangeable for the named band rhythms while
+naming the divergences above. That is the difference between recording usage and
+asserting identity — and it is the same discipline §5 applies to `exactMatch`.
+
+As a side effect this begins closing the `skos:altLabel` gap, where the
+vocabulary currently has none at all, and it puts "brain waves" — the phrase
+most people actually search for — within reach of a generic matcher for the
+first time.
 
 ### 4. Every association is recorded, and its evidential standing with it
 
@@ -188,6 +208,14 @@ precondition for revisiting.
 The band keeps no Wikidata mapping. A Hz interval has no Wikidata counterpart
 worth asserting.
 
+**Consumers following the old mapping are not left at a dead end.** Anyone who
+resolved `sstim-v:alpha skos:closeMatch wd:Q2469782` will now find nothing on the
+band, so each of the five bands gains a `skos:historyNote` recording that its
+external mapping moved to the named oscillation and when. The band is reachable
+from the oscillation through `hasTypicalFrequencyBand`, and the reverse traversal
+is a query rather than a second property: an inverse would restate the same fact
+in a form that can drift out of step with it.
+
 ### 6. Medical-domain associations are recorded, not avoided
 
 Some of these associations touch sleep, pain, and mood, and more exist in the
@@ -210,6 +238,31 @@ Recording that a claim exists and is weakly supported is the opposite of making
 it. The constraint on the work is therefore not silence but discipline: every
 such record carries a real citation or an explicit `noKnownEvidenceInSSTIM`, and
 no citation is invented to fill a gap.
+
+## Acceptance
+
+This ADR is implemented when all five hold, and each is checkable rather than
+asserted:
+
+1. **No `sstim:FrequencyBand` scope note carries outcome vocabulary.** A lint over
+   the vocabulary fails on outcome and state language in a band's scope note —
+   sleep, relaxation, stress, pain, attention, mood, cognition and their obvious
+   relatives. It is deliberately blunt: a false positive costs one rewording, and
+   the failure it prevents is the one that produced KR-08.
+2. **Every association in the §4 table is reachable** from its oscillation as
+   either an `EvidenceAssessmentClaim` with a tier or a `KnowledgeStatusAssertion`
+   at `noKnownEvidenceInSSTIM`. None is merely deleted, and a competency query
+   returns the full set with its evidential standing.
+3. **Every band with a sub-band declares the hierarchy**, with `skos:broader` and
+   its inverse materialised, as the quality audit already requires elsewhere.
+4. **`make validate` passes unchanged**, including HermiT consistency, the
+   entailment gate added for KR-05, and the full-union compatibility check: every
+   0.12 baseline triple must still survive, since this ADR narrows two things but
+   removes no term.
+5. **No citation in the resulting claims is unverifiable.** Every
+   `EvidenceAssessmentClaim` names a real reference with a resolvable DOI, or the
+   association is recorded as unevidenced instead. This one is checked by a human,
+   because it is the one an automated gate cannot judge.
 
 ## Consequences
 
@@ -251,6 +304,15 @@ at, not a different kind of band.
 
 **A dedicated `supportingEvidenceStrength` property.** Rejected in favour of the
 existing tier and knowledge-status machinery — see §4.
+
+**Recording rhythm, wave and oscillation as plain synonyms.** Rejected: "wave"
+also names non-oscillatory EEG deflections and "rhythm" implies a regularity an
+oscillatory burst need not have, so unqualified alternate labels would assert an
+interchangeability that fails outside the named band rhythms — see §3.
+
+**An inverse of `hasTypicalFrequencyBand`.** Rejected: it restates one fact in
+two places, which is how the two places come to disagree. Reverse traversal is a
+query.
 
 **Drop the unevidenced associations.** Rejected: their weakness is information.
 
