@@ -1,0 +1,30 @@
+# KR-05 — an exposure profile does not make its subject a stimulation.
+#
+# sstim-ex:hasExposureProfile carries a union domain over StimulationProtocol,
+# StimulationTechnique, Stimulation and Preset. An exploratory protocol may hold
+# an exposure profile without being any of them: ADR 0034 deliberately reparented
+# sstim-ex:ExploratoryProtocol off SensoryStimulationProtocol so that a baseline
+# defined by the *absence* of stimulation stops being typed as sensory
+# stimulation by inheritance. Three committed protocols rely on that — the
+# silence/darkness baseline, the smell/taste device boundary, and the wifi EM
+# field hypothesis — and all three use hasExposureProfile.
+#
+# A union domain entails membership in the anonymous union, never in a named
+# disjunct, so the reasoner infers nothing here. Narrowing the domain back to a
+# single class would infer that named class instead, and a silence baseline
+# would become a stimulation. This query returns rows only if that happens.
+PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sstim:    <https://w3id.org/sstim#>
+PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
+
+SELECT ?protocol ?unintendedType WHERE {
+  ?protocol rdf:type sstim-ex:ExploratoryProtocol ;
+            rdf:type ?unintendedType .
+  FILTER(?unintendedType IN (
+    sstim:Stimulation, sstim:SensoryStimulation,
+    sstim:StimulationProtocol, sstim:StimulationTechnique, sstim:Preset
+  ))
+  # Seven of the ten exploratory protocols assert a sensory type outright; only
+  # an *inferred* one is a defect, so anything stated in the sources is excluded.
+  FILTER NOT EXISTS { ?protocol rdf:type sstim:SensoryStimulationProtocol }
+}

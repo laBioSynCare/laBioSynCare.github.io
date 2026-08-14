@@ -163,6 +163,24 @@ covered by tests.
 
 #### 1.1 OWL domain/range and category audit
 
+> **Status 2026-08-14 — KR-05 closed.** The domain contradictions the audit named
+> were repaired in 0.11.0: `hasExposureProfile`, `hasBodyPlacement`,
+> `hasPerceptualGain`/`Loss` and `hasExposureLimit` carry union domains, and
+> `hasKnowledgeStatus` carries none, which is the disposition's "no domain plus
+> SHACL target rules" option. What was missing is the other half of the
+> disposition — the entailment fixtures — now `make entailment-check`: HermiT
+> materializes class assertions over the Full closure plus every committed
+> instance, and three queries fail the build if a union domain ever infers a
+> named type.
+>
+> This is not theoretical. Three committed exploratory protocols — the
+> silence/darkness baseline, the wifi EM field hypothesis, and the smell/taste
+> device boundary — use `hasExposureProfile` while deliberately *not* being
+> sensory-typed, because ADR 0034 reparented `ExploratoryProtocol` so that a
+> baseline defined by the absence of stimulation stops being a stimulation by
+> inheritance. Narrowing that domain back to one class re-infers
+> `sstim:Stimulation` on all three; the gate was verified by doing exactly that.
+
 - Resolve every definition/domain mismatch identified in exposure properties.
   Choose a true common domain, an explicit union, domain-specific
   subproperties, or no OWL domain plus SHACL constraints.

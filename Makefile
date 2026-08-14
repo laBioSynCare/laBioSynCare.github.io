@@ -211,6 +211,42 @@ shacl-session-projection:
 	fi; \
 	echo "shacl-session-projection: passed ($$count projected graphs conform)"
 
+## Assert the repaired OWL domains infer no unintended type (KR-05). The audit's
+## concern was that a domain is an inference rule, not a validation hint: a
+## property typed to one class makes every subject using it a member of that
+## class. The repair was union domains, which entail membership in an anonymous
+## union and therefore nothing named — but only a reasoner can show that, and
+## only a fixture keeps it true. Materializes class assertions with HermiT over
+## the Full closure plus every committed instance, then fails if any query
+## returns a row.
+entailment-check:
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	queries="$$(ls test/entailment/*.rq 2>/dev/null)"; \
+	if [ -z "$$queries" ]; then echo "entailment-check: no queries found" >&2; exit 1; fi; \
+	if [ $(words $(FULL_SEMANTIC_MODULES)) -eq 0 ]; then \
+		echo "entailment-check: no modules — the manifest query failed, and reasoning over instances alone infers nothing and passes" >&2; \
+		exit 1; \
+	fi; \
+	cat $(FULL_SEMANTIC_MODULES) $(INSTANCE_FILES) > "$$tmpdir/merged.ttl"; \
+	$(ROBOT) reason --input "$$tmpdir/merged.ttl" --reasoner $(REASONER) \
+		--axiom-generators "ClassAssertion" --output "$$tmpdir/reasoned.owl" > "$$tmpdir/robot.log" 2>&1 \
+		|| { cat "$$tmpdir/robot.log"; exit 1; }; \
+	failed=0; count=0; \
+	for q in $$queries; do \
+		$(ROBOT) query --input "$$tmpdir/reasoned.owl" --query "$$q" "$$tmpdir/out.csv" > /dev/null 2>&1; \
+		rows=$$(($$(wc -l < "$$tmpdir/out.csv") - 1)); \
+		count=$$((count + 1)); \
+		if [ "$$rows" -gt 0 ]; then \
+			echo "entailment-check: FAILED $$(basename $$q) — $$rows unintended entailment(s)" >&2; \
+			cat "$$tmpdir/out.csv" >&2; \
+			failed=1; \
+		fi; \
+	done; \
+	[ "$$failed" -eq 0 ] || exit 1; \
+	echo "entailment-check: passed ($$count queries, no unintended type inferred)"
+
 ## Run all SHACL validations
 shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection
 
@@ -337,7 +373,7 @@ release-dryrun:
 	node scripts/release-dryrun.mjs
 
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract w3id-routes release-dryrun truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract w3id-routes release-dryrun truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
