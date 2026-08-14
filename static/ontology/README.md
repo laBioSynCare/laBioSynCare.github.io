@@ -510,8 +510,13 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    quality audit enforces that all modules carry the same version and that a
    `-dev` line never claims released status.
 2. Run the complete validation suite and review semantic diffs.
-3. Set the release version in **every manifest-owned module and profile entry
-   point**, synchronize manifest checksums, and set the `owl:versionIRI` and
+3. Add the release's own `skos:historyNote` to the Kernel — `"vX.Y.Z (date): …"@en`
+   — saying what changed and why. It is frozen with the snapshot, so it cannot be
+   added afterwards; `release-prepare` refuses to run without it, because the two
+   releases before this rule both shipped without one and nothing else noticed.
+   Then run `node scripts/release-prepare.mjs X.Y.Z --date YYYY-MM-DD`, which does
+   the rest of this step and step 4: the release version in **every manifest-owned
+   module and profile entry point**, and the `owl:versionIRI` and
    `mod:status "released"` in the root Kernel. Populate every profile's
    positive, out-of-scope, and adversarial fixture sets and at least one
    competency query. Every listed contract path must already name an existing
@@ -564,6 +569,15 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    and no real live-only ecosystem records.
 10. Tag and publish the GitHub release so Zenodo archives the same commit.
 11. Add the resulting version DOI without rewriting a published snapshot.
+12. **Reopen the mutable line the same day:**
+    `node scripts/release-open-dev.mjs X.Y+1.0-dev`, then sync checksums and
+    validate. Until this runs, the live sources claim `mod:status "released"` at
+    the version just frozen, so the next ontology edit silently makes a released
+    line differ from the snapshot carrying its name — the 0.8.0–0.10.0 defect the
+    2026-07-24 audit found. Every gate passes in that state, because the line is
+    internally consistent and merely mislabelled. `void.ttl`, `CITATION.cff` and
+    the entrance metadata stay on the released version by design: they describe
+    the latest immutable release, not the development line.
 
 A development manifest intentionally carries no immutable release URLs, which is
 what makes a `-dev` line noncitable even when its module and publication

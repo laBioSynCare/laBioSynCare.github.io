@@ -2,7 +2,7 @@
 #
 #  SSTIM Full Profile entrypoint
 #
-#  Version: 0.14.0
+#  Version: 0.15.0-dev
 #  Date:    2026-08-04
 #  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -20,8 +20,7 @@
 @prefix role: <http://www.w3.org/ns/dx/prof/role/> .
 
 <https://w3id.org/sstim/profile/full> a owl:Ontology, prof:Profile ;
-    owl:versionIRI <https://w3id.org/sstim/0.14.0/sstim-full-profile.ttl> ;
-    owl:versionInfo "0.14.0" ;
+    owl:versionInfo "0.15.0-dev" ;
     prof:hasToken "full" ;
     prof:isProfileOf <https://w3id.org/sstim> ;
     prof:hasResource
@@ -49,22 +48,22 @@
         <https://w3id.org/sstim/ecosystem>,
         <https://w3id.org/sstim/patch-studio> ;
     owl:imports
-        <https://w3id.org/sstim/0.14.0/sstim-core.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-stimulus.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-common.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-technique.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-configuration.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-session.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-evidence.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-neuromodulation.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-patch-studio.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-vocab.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-exposure.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-ecosystem.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-neuromodulation-evidence.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-evidence-exposure.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-technique-exposure.ttl>,
-        <https://w3id.org/sstim/0.14.0/sstim-alignments.ttl> ;
+        <https://w3id.org/sstim/kernel>,
+        <https://w3id.org/sstim/stimulus>,
+        <https://w3id.org/sstim/common>,
+        <https://w3id.org/sstim/technique>,
+        <https://w3id.org/sstim/configuration>,
+        <https://w3id.org/sstim/session>,
+        <https://w3id.org/sstim/evidence>,
+        <https://w3id.org/sstim/neuromodulation>,
+        <https://w3id.org/sstim/patch-studio>,
+        <https://w3id.org/sstim/vocab>,
+        <https://w3id.org/sstim/module/exposure>,
+        <https://w3id.org/sstim/ecosystem>,
+        <https://w3id.org/sstim/neuromodulation-evidence>,
+        <https://w3id.org/sstim/evidence-exposure>,
+        <https://w3id.org/sstim/technique-exposure>,
+        <https://w3id.org/sstim/alignments> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
@@ -77,16 +76,16 @@
 
 <https://w3id.org/sstim/profile/full#entrypoint> a prof:ResourceDescriptor ;
     prof:hasRole role:specification ;
-    prof:hasArtifact <https://w3id.org/sstim/0.14.0/sstim-full-profile.ttl> ;
+    prof:hasArtifact <https://w3id.org/sstim/profile/full> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/full#constraints> a prof:ResourceDescriptor ;
     prof:hasRole role:constraints ;
-    prof:hasArtifact <https://w3id.org/sstim/0.14.0/sstim-shapes.ttl> ;
+    prof:hasArtifact <https://w3id.org/sstim/shapes> ;
     dct:conformsTo <http://www.w3.org/ns/shacl#> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/full#manifest> a prof:ResourceDescriptor ;
     prof:hasRole role:schema ;
-    prof:hasArtifact <https://w3id.org/sstim/0.14.0/manifest> ;
+    prof:hasArtifact <https://w3id.org/sstim/manifest> ;
     dct:format "application/json" .

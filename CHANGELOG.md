@@ -15,6 +15,10 @@ and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
 file is the human-readable summary.
 
+## [Unreleased]
+
+Nothing yet on the 0.15.0-dev line.
+
 ## [0.14.0] - 2026-08-13
 
 Published under version DOI `10.5281/zenodo.21923315`, with

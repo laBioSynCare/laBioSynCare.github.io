@@ -2,7 +2,7 @@
 #
 #  SSTIM BSC Catalog and Patch Studio Profile Module
 #
-#  Version:    0.14.0
+#  Version:    0.15.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/patch-studio> a owl:Ontology ;
-    owl:versionInfo "0.14.0" ;
+    owl:versionInfo "0.15.0-dev" ;
     dct:title "SSTIM BSC Catalog and Patch Studio Profile Module"@en ;
     dct:description "BSC-specific voice, grouping, permutation, audio synthesis, visual, haptic, and authoring parameters over the generic configuration and session model."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

@@ -59,6 +59,21 @@ const base = `${manifest.suite.ontologyIri}/${version}/`
 const kernelPath = manifest.modules.find((m) => m.id === 'core').source.path
 const changes = []
 
+// Every frozen snapshot through 0.12.0 carried its own release note, and
+// CHANGELOG.md tells readers that per-change rationale lives in the ontology's
+// skos:historyNote. Then 0.13.0 shipped without one and 0.14.0 repeated it,
+// because nothing looks wrong when a note is missing — the release validates,
+// the snapshot freezes, and the omission is only visible to someone counting.
+// Refusing to prepare without it is the only thing that would have caught either.
+if (!readFileSync(join(ROOT, kernelPath), 'utf8').includes(`"v${version} (`)) {
+  console.error(
+    `release-prepare: the Kernel has no skos:historyNote for v${version}.\n` +
+    `  Add one to ${kernelPath}, in the form "v${version} (YYYY-MM-DD): …"@en, saying what\n` +
+    '  changed and why. It is frozen with the snapshot, so it cannot be added afterwards.',
+  )
+  process.exit(1)
+}
+
 /**
  * Replace exactly once, or fail loudly: a silent no-op here ships a bad release.
  *
