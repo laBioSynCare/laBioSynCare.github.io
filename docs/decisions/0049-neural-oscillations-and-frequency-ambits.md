@@ -1,6 +1,6 @@
 # ADR 0049 — Neural oscillations and frequency ambits
 
-**Status:** Proposed — 2026-08-14
+**Status:** Accepted — 2026-08-14 · implemented 2026-08-15
 
 ## Context
 
@@ -47,12 +47,13 @@ class whose definition already says "named Hz range".
 Their scope notes lose the outcome prose (§4). Sub-band scope notes ("Lower
 portion of the delta band") are already pure ambit language and are untouched.
 
-**The band hierarchy is completed.** `lowAlpha`, `highAlpha`, `lowBeta`,
-`midBeta`, `highBeta`, `lowDelta`, `highDelta`, `lowTheta` and `highTheta`
-currently declare only `skos:inScheme`; none says which band it is part of. Each
-gains `skos:broader` to its parent, with the inverse materialised, so the
-sub-ambits are navigable rather than merely co-located. `alpha10` and `gamma40`
-likewise become narrower than `alpha` and `gamma`.
+**The band hierarchy needs nothing.** An earlier draft of this ADR claimed the
+sub-bands declared no parent and would gain `skos:broader`. That was wrong — it
+came from reading a truncated window of the file. Every sub-band already
+declares `skos:broader` to its parent and every parent the matching
+`skos:narrower`, `alpha10` and `gamma40` included. The quality audit already
+enforces that materialisation. Recorded here because the mistake reached an
+accepted ADR before it was caught.
 
 ### 2. A new controlled category for the rhythms
 
@@ -253,8 +254,9 @@ asserted:
    either an `EvidenceAssessmentClaim` with a tier or a `KnowledgeStatusAssertion`
    at `noKnownEvidenceInSSTIM`. None is merely deleted, and a competency query
    returns the full set with its evidential standing.
-3. **Every band with a sub-band declares the hierarchy**, with `skos:broader` and
-   its inverse materialised, as the quality audit already requires elsewhere.
+3. **The band hierarchy still round-trips**, `skos:broader` and `skos:narrower`
+   materialised in both directions — already true, and already enforced by the
+   quality audit, so this is a regression check rather than new work.
 4. **`make validate` passes unchanged**, including HermiT consistency, the
    entailment gate added for KR-05, and the full-union compatibility check: every
    0.12 baseline triple must still survive, since this ADR narrows two things but
@@ -263,6 +265,45 @@ asserted:
    `EvidenceAssessmentClaim` names a real reference with a resolvable DOI, or the
    association is recorded as unevidenced instead. This one is checked by a human,
    because it is the one an automated gate cannot judge.
+
+## Implementation notes
+
+Implemented 2026-08-15. Five things the ADR did not anticipate, recorded because
+each cost a round trip and the next reader should not pay it again.
+
+**The evidence machinery refused a rhythm as a subject.** Both
+`sstim-sh:AssessmentPropositionShape` and `sstim-sh:EvidenceAssessmentClaimShape`
+restricted their subject to a Preset or a Technique — the model assesses what BSC
+delivers. An assessment about an endogenous rhythm is neither, so both `sh:or`
+lists were widened to admit `sstim:NeuralOscillationType`, exactly as ADR 0034
+widened them for non-sensory techniques. Refusing them would have forced these
+associations back into unqualified prose, which is the defect this ADR removes.
+
+**Four of nine associations found a source; five did not.** Klimesch 1999 and
+2012 and Fries 2009 carry alpha, theta and gamma at `tierModerate`. Delta's
+"heavy down-regulation", theta's creativity, meditation and chronic-pain support,
+alpha's stress reduction, SMR's sustained attention, and beta's active cognition
+are all `noKnownEvidenceInSSTIM`, dated. Sterman 2006 was located and
+deliberately **not** cited for SMR and attention: it studies epilepsy, and citing
+it for attention would misrepresent what it examined. Four other candidate DOIs
+recalled during the work resolved through Crossref to unrelated papers, which is
+why every citation here was resolved before being written.
+
+**The lint found one the hand pass missed.** `alpha10`'s scope note called it
+"the canonical 10 Hz calming and meditation target" — an outcome claim on a
+delivery target, in a concept nobody thought to re-read. Acceptance condition 1
+caught it on its first run.
+
+**A language-tagged literal on an `xsd:string` range made the ontology
+inconsistent.** `hasCorticalTopography` and `hasOscillationStateContext` were
+given `@en` values against an `xsd:string` range, which HermiT rejects. Caught by
+`make entailment-check` — the gate added for KR-05 the day before, which merges
+instances and so sees what `make reason` alone does not.
+
+**Adding a reference is not a local act.** Each new `PublicSafeReference` needs an
+exact w3id entity route and moves a deliberately pinned count in the route
+contract. Both were updated; the four new routes join the preset/reference block
+that is still unsubmitted upstream.
 
 ## Consequences
 
@@ -275,9 +316,6 @@ unchanged, so presets, protocols and the frozen snapshots are unaffected.
 oscillation frequency bands" to name ambits, and the `skos:editorialNote`
 declaring the conflation deferred is replaced by a note recording this
 resolution.
-
-**The band hierarchy becomes navigable**, which it was not: nine sub-bands
-currently declare no parent.
 
 **KR-08 closes** on both complaints: the outcome prose is qualified, sourced and
 strength-rated or explicitly marked unevidenced, and the alleged scheme

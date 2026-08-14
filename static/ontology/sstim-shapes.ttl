@@ -529,8 +529,16 @@ sstim-sh:EvidenceAssessmentClaimShape a sh:NodeShape ;
     ] ;
     sh:property [
         sh:path sstim:evaluatesSubject ; sh:minCount 1 ; sh:maxCount 1 ;
-        sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
-        sh:message "EvidenceAssessmentClaim must evaluate exactly one Preset or Technique (ADR 0013 range)."@en ;
+        # Widened by ADR 0049 alongside sstim:propositionSubject, for the same
+        # reason: an assessment of what an endogenous rhythm covaries with is
+        # not an assessment of anything BSC delivers, and the alternative was
+        # leaving those associations as unsourced prose.
+        sh:or (
+            [ sh:class sstim:Preset ]
+            [ sh:class sstim:SensoryStimulationTechnique ]
+            [ sh:class sstim:NeuralOscillationType ]
+        ) ;
+        sh:message "EvidenceAssessmentClaim must evaluate exactly one Preset, Technique or NeuralOscillationType (ADR 0013 range, widened by ADR 0049)."@en ;
     ] ;
     # supportsRelation, when present as the 0.7 compatibility alias, must equal evaluatesSubject.
     sh:property [
@@ -601,8 +609,19 @@ sstim-sh:AssessmentPropositionShape a sh:NodeShape ;
     sh:name "AssessmentProposition"@en ;
     sh:property [
         sh:path sstim:propositionSubject ; sh:minCount 1 ; sh:maxCount 1 ;
-        sh:or ( [ sh:class sstim:Preset ] [ sh:class sstim:SensoryStimulationTechnique ] ) ;
-        sh:message "AssessmentProposition must have exactly one Preset/Technique subject."@en ;
+        # ADR 0049 widened this to admit a named neural oscillation. The evidence
+        # machinery was built to assess what BSC delivers — a preset or a
+        # technique — but the associations moved off the frequency-band scope
+        # notes are about the endogenous rhythm, not about anything delivered.
+        # Refusing them here would have forced them back into unqualified prose,
+        # which is the defect ADR 0049 exists to remove. The same widening ADR
+        # 0034 made for non-sensory techniques, for the same reason.
+        sh:or (
+            [ sh:class sstim:Preset ]
+            [ sh:class sstim:SensoryStimulationTechnique ]
+            [ sh:class sstim:NeuralOscillationType ]
+        ) ;
+        sh:message "AssessmentProposition must have exactly one Preset, Technique or NeuralOscillationType subject."@en ;
     ] ;
     sh:property [
         sh:path sstim:propositionOutcome ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidenceOutcomeConcept ;

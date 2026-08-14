@@ -227,6 +227,7 @@ export const INSTANCE_URLS = {
   ],
   evidence: [
     '/ontology/instances/evidence/technique-evidence.ttl',
+    '/ontology/instances/evidence/oscillation-associations.ttl',
   ],
   experiments: [
     '/ontology/instances/experiments/free-view-stereo-headphones.ttl',

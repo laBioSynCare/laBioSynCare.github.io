@@ -73,20 +73,37 @@
 # single-sense Wikidata items cannot be claimed with exactMatch's confidence.
 # Revisit once RDF-08's oscillation-band/stimulus-target split lands.
 
-# alpha wave: https://www.wikidata.org/wiki/Q2469782
-sstim-v:alpha skos:closeMatch wd:Q2469782 .
+# Moved to the oscillations by ADR 0049 (2026-08-15). Each Wikidata item
+# describes itself as a neural oscillation — Q2469782 is "neural oscillation in
+# the frequency range of 8-12 Hz" — so the band, a Hz interval, was never its
+# counterpart. The history notes keep anyone who resolved the old mapping from
+# reaching a dead end.
+sstim-v:alpha skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2469782 describes a neural oscillation, not a Hz interval, and now maps to sstim-v:alphaOscillation. This band is reachable from that concept through sstim:hasTypicalFrequencyBand."@en .
+sstim-v:delta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2623205 now maps to sstim-v:deltaOscillation."@en .
+sstim-v:theta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2370623 now maps to sstim-v:thetaOscillation."@en .
+sstim-v:beta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q831014 now maps to sstim-v:betaOscillation."@en .
+sstim-v:gamma skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2623017 now maps to sstim-v:gammaOscillation."@en .
 
-# delta wave: https://www.wikidata.org/wiki/Q2623205
-sstim-v:delta skos:closeMatch wd:Q2623205 .
 
-# theta rhythm: https://www.wikidata.org/wiki/Q2370623
-sstim-v:theta skos:closeMatch wd:Q2370623 .
+###########################################################################
+# Wikidata alignments — neural oscillations (ADR 0049)
+#
+# Verified against live Wikidata on 2026-08-15. Four are exactMatch: the items
+# describe the same named rhythm SSTIM names, and the numeric bounds they quote
+# differ only as delimiting conventions differ, which is not an intension
+# difference.
+#
+# Beta is the exception, and it is why the extension test exists. Q831014 spans
+# 12.5-30 Hz, while SSTIM holds the sensorimotor rhythm apart at 12-15 Hz and
+# starts beta at 15. Wikidata's beta wave therefore subsumes an entity SSTIM
+# keeps separate, so the two are close rather than identical.
+###########################################################################
 
-# beta wave: https://www.wikidata.org/wiki/Q831014
-sstim-v:beta skos:closeMatch wd:Q831014 .
-
-# gamma wave: https://www.wikidata.org/wiki/Q2623017
-sstim-v:gamma skos:closeMatch wd:Q2623017 .
+sstim-v:alphaOscillation skos:exactMatch wd:Q2469782 .
+sstim-v:deltaOscillation skos:exactMatch wd:Q2623205 .
+sstim-v:thetaOscillation skos:exactMatch wd:Q2370623 .
+sstim-v:gammaOscillation skos:exactMatch wd:Q2623017 .
+sstim-v:betaOscillation  skos:closeMatch wd:Q831014 .
 
 # A BSC binaural voice is a parameter bundle that can realize binaural beats;
 # it is not identical to the perceptual phenomenon or musical genre represented
@@ -138,49 +155,49 @@ sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
 ###########################################################################
 
 [] a owl:Axiom ;
-    owl:annotatedSource sstim-v:alpha ;
-    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedSource sstim-v:alphaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
     owl:annotatedTarget wd:Q2469782 ;
     dct:source <http://www.wikidata.org/entity/Q2469782> ;
-    dct:date "2026-07-24"^^xsd:date ;
+    dct:date "2026-08-15"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
-    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
 
 [] a owl:Axiom ;
-    owl:annotatedSource sstim-v:delta ;
-    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedSource sstim-v:deltaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
     owl:annotatedTarget wd:Q2623205 ;
     dct:source <http://www.wikidata.org/entity/Q2623205> ;
-    dct:date "2026-07-24"^^xsd:date ;
+    dct:date "2026-08-15"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
-    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
 
 [] a owl:Axiom ;
-    owl:annotatedSource sstim-v:theta ;
-    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedSource sstim-v:thetaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
     owl:annotatedTarget wd:Q2370623 ;
     dct:source <http://www.wikidata.org/entity/Q2370623> ;
-    dct:date "2026-07-24"^^xsd:date ;
+    dct:date "2026-08-15"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
-    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
 
 [] a owl:Axiom ;
-    owl:annotatedSource sstim-v:beta ;
+    owl:annotatedSource sstim-v:betaOscillation ;
     owl:annotatedProperty skos:closeMatch ;
     owl:annotatedTarget wd:Q831014 ;
     dct:source <http://www.wikidata.org/entity/Q831014> ;
-    dct:date "2026-07-24"^^xsd:date ;
+    dct:date "2026-08-15"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
-    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+    skos:editorialNote "Q831014 spans 12.5-30 Hz while SSTIM holds the sensorimotor rhythm apart at 12-15 Hz and begins beta at 15, so the Wikidata item subsumes an entity SSTIM keeps separate. Close rather than identical, by extension rather than by label."@en .
 
 [] a owl:Axiom ;
-    owl:annotatedSource sstim-v:gamma ;
-    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedSource sstim-v:gammaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
     owl:annotatedTarget wd:Q2623017 ;
     dct:source <http://www.wikidata.org/entity/Q2623017> ;
-    dct:date "2026-07-24"^^xsd:date ;
+    dct:date "2026-08-15"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
-    skos:editorialNote "Each Wikidata item is the observed-EEG-oscillation sense of the band, a neurophysiological phenomenon, while this concept is also used unsplit as a stimulus-frequency target via sstim:targetsFrequencyBand. Until those two senses are separate classes (KR-08), extensional identity with a single-sense item cannot be claimed with exactMatch's confidence."@en .
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
 
 [] a owl:Axiom ;
     owl:annotatedSource sstim-v:voiceBinaural ;

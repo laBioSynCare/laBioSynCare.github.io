@@ -85,6 +85,40 @@ DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES = {
     (SSTIM_V.techMonauralBeats, SKOS.closeMatch, WD.Q6898437),
 }
 
+DCTERMS_NS = Namespace("http://purl.org/dc/terms/")
+
+# ADR 0049 rewrote thirteen baseline triples, all of them deliberate narrowings
+# recorded in that ADR's Consequences:
+#
+#   - the five band-to-Wikidata closeMatch assertions, which moved to the named
+#     oscillations, where the items actually point (Q2469782 describes "a neural
+#     oscillation", not a Hz interval);
+#   - the six primary-band scope notes, whose outcome prose became evidence
+#     claims on the oscillations or dated knowledge-status assertions recording
+#     that no evidence was found;
+#   - the scheme description, which called these "neural oscillation frequency
+#     bands" when they are frequency ambits; and
+#   - the scheme editorial note, which declared the conflation deferred and now
+#     records its resolution.
+#
+# Matched by subject and predicate rather than by exact literal: the ADR
+# rewrote these fields wholesale, so pinning the old strings here would only
+# have to be updated again the next time the wording is improved.
+OSCILLATION_MIGRATION_FIELDS = {
+    # alpha10 joined the list when the ADR 0049 lint caught "calming and
+    # meditation target" in its scope note — an outcome claim on a delivery
+    # target, missed by hand and found by the check.
+    (SSTIM_V.alpha10, SKOS.scopeNote),
+    (SSTIM_V.delta, SKOS.scopeNote), (SSTIM_V.theta, SKOS.scopeNote),
+    (SSTIM_V.alpha, SKOS.scopeNote), (SSTIM_V.smr, SKOS.scopeNote),
+    (SSTIM_V.beta, SKOS.scopeNote), (SSTIM_V.gamma, SKOS.scopeNote),
+    (SSTIM_V.delta, SKOS.closeMatch), (SSTIM_V.theta, SKOS.closeMatch),
+    (SSTIM_V.alpha, SKOS.closeMatch), (SSTIM_V.beta, SKOS.closeMatch),
+    (SSTIM_V.gamma, SKOS.closeMatch),
+    (SSTIM_V.FrequencyBandScheme, DCTERMS_NS.description),
+    (SSTIM_V.FrequencyBandScheme, SKOS.editorialNote),
+}
+
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
 
@@ -127,7 +161,24 @@ DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES = {
 # anonymous and their canonical labels move when any one of them changes. The
 # alternatives themselves stay covered by the SHACL suites, which execute the
 # shape against real data instead of comparing its serialisation.
-SELF_REPORT_OR_LIST_ROOTS = ((SSTIM_SH.SelfReportShape, SH["or"]),)
+SELF_REPORT_OR_LIST_ROOTS = (
+    (SSTIM_SH.SelfReportShape, SH["or"]),
+    # ADR 0049 widened two sh:or alternative lists to admit
+    # sstim:NeuralOscillationType as an assessment subject, so an evidence
+    # assessment can be made about an endogenous rhythm rather than only about
+    # something BSC delivers. Adding a third alternative rebuilds the RDF list,
+    # which changes the canonical identity of every blank node in it.
+    #
+    # These two entries exclude the whole sh:property closure of the affected
+    # shapes rather than the lists alone, because the lists are nested inside
+    # anonymous property blocks and cannot be addressed by name. The cost is
+    # that other property changes on these two shapes would also stop being
+    # caught here; the benefit is that the shapes remain executed against real
+    # data by the SHACL suites, which is a stronger check than comparing their
+    # serialisation.
+    (SSTIM_SH.AssessmentPropositionShape, SH.property),
+    (SSTIM_SH.EvidenceAssessmentClaimShape, SH.property),
+)
 
 
 def bnode_closure(graph: Graph, roots: tuple[tuple, ...]) -> set:
@@ -208,6 +259,8 @@ def normalized(
         if triple in DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES:
             continue
         if triple in DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES:
+            continue
+        if (subject, predicate) in OSCILLATION_MIGRATION_FIELDS:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue

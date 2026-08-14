@@ -183,7 +183,7 @@
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "875e22679625e1cd28057a3ba9dc91723e932a75749235417eb8832a93d2e021"
+        "sha256": "1345fcd6e3889574219525b87f7fe23fedb244a2b56683fde3552b7cc4566f2e"
       },
       "runtime": {
         "url": "/ontology/sstim-common.ttl",
@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "b2fac365b18f519f84a7a23dca6636a47663cf892733310f2b115f0bcd521eef"
+        "sha256": "6b0572e014637f4b199cae80e16023fe10c62d8a9b828857912c89b15b2b993f"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -635,7 +635,7 @@
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "20c38bd0cb8f28c4bd99aa07e3ab002b2c3a13304d38bbeae31eeb577970c6c8"
+        "sha256": "de69f56bfdc5003ec87ca21ddf6477fc67f48fb4de9920adc71415815700d8a0"
       },
       "runtime": {
         "url": "/ontology/sstim-alignments.ttl",
@@ -672,7 +672,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "5874693273006cc75569270e8cb15759a47d8e029c40e6304ef1c5f12f23c7f9"
+        "sha256": "6cf61debe48500f14111dd229846195b473b8a244cb470b0b52f27abc4d0bfc5"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -841,7 +841,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "be4552ad61cd6ef8624305292e92f662044be378f973181aafb3aa8ccb9127cb"
+      "sha256": "e13281b98e41bf81f636a0c7349e37ef455f529dc30908686309e30373aae66f"
     },
     {
       "id": "full",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "d524f0772f8057a7cab7a992c3e394db667dbe4234f61a19d1319fd564464df6"
+      "sha256": "609f4fcbe7fb92d5485e7b974cafa9459b2a079b9ff20236a5d8780db7aa4d1e"
     }
   ]
 }

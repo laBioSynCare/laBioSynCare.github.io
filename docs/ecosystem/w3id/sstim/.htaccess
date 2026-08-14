@@ -212,7 +212,7 @@ RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;
 RewriteRule ^implementation/bsclab/preset/(heal-theta-breathing-seed|perform-alpha-10-seed)/?$ https://labiosyncare.github.io/graph/#bsclab-preset:$1 [R=303,L,NE]
 
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
-RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ https://labiosyncare.github.io/graph/#sstim-ref:$1 [R=303,L,NE]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008|KLIMESCH_1999|KLIMESCH_2012|FRIES_2009|BUZSAKI_2004)/?$ https://labiosyncare.github.io/graph/#sstim-ref:$1 [R=303,L,NE]
 
 RewriteCond %{HTTP_ACCEPT} ^$ [OR]
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
@@ -221,8 +221,8 @@ RewriteRule ^implementation/bsclab/preset/(heal-theta-breathing-seed|perform-alp
 
 RewriteCond %{HTTP_ACCEPT} ^$ [OR]
 RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/turtle|application/x-turtle|\*/\*)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
-RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ https://labiosyncare.github.io/ontology/instances/references/references.ttl [R=303,L]
-RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008)/?$ - [R=406,L]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008|KLIMESCH_1999|KLIMESCH_2012|FRIES_2009|BUZSAKI_2004)/?$ https://labiosyncare.github.io/ontology/instances/references/references.ttl [R=303,L]
+RewriteRule ^ref/(INGENDOH_2023|PICTON_2003|SKOE_KRAUS_2010|ZACCARO_2018|VIALATTE_2010|PETIT_2021|STEIN_STANFORD_2008|KLIMESCH_1999|KLIMESCH_2012|FRIES_2009|BUZSAKI_2004)/?$ - [R=406,L]
 # END audited BSC preset and reference routes
 
 # -------------------------------------------------------------------------

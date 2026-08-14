@@ -58,8 +58,8 @@ sstim-v:FrequencyBandScheme a skos:ConceptScheme ;
                    "Vocabolario Bande di Frequenza SSTIM"@it,
                    "Vocabulário de Bandas de Frequência SSTIM"@pt,
                    "Vocabulario de Bandas de Frecuencia SSTIM"@es ;
-    dct:description "Controlled vocabulary of neural oscillation frequency bands used in BSC protocol design. BSC operational taxonomy — not a medical diagnostic taxonomy."@en ;
-    skos:editorialNote "Known conflation, tracked as RDF-08 (2026-07-24 audit): these concepts are used both as the observed-EEG-oscillation sense (what this scheme's own description names) and, via sstim:targetsFrequencyBand, as the stimulus-frequency-target sense — a temporal frequency a preset applies, which is a different thing from an observed brain rhythm. Per-band skos:scopeNote text also carries informal outcome associations (sleep, mood, focus, and similar) that are not qualified evidence records and must not be read as such; see sstim:EvidenceAssessmentClaim for the authoritative evidence model. Splitting the two senses into distinct classes and migrating the outcome language into qualified evidence records is deferred pending a dedicated ADR — not completed in the 2026-07-24 Gate B pass, which only fixed the concrete, unambiguous sub-bug (sstim:primaryFrequencyBand replacing the unordered-property 'first entry is primary' claim)."@en ;
+    dct:description "Controlled vocabulary of named frequency ambits — Hz intervals — used in BSC protocol design for targeting and evidence classification. An ambit is not a rhythm: the named neural oscillations are sstim-v:NeuralOscillationScheme, and each points here through sstim:hasTypicalFrequencyBand. BSC operational taxonomy — not a medical diagnostic taxonomy."@en ;
+    skos:editorialNote "Resolved 2026-08-15 (ADR 0049). The earlier note here recorded a suspected conflation between an observed-EEG-oscillation sense and a stimulus-frequency-target sense of these concepts, deferred pending a dedicated ADR. The suspicion was mistaken: a band is a Hz interval throughout — sstim-v:alpha10 and sstim-v:gamma40 sit in this same scheme and name no rhythm — and a band does not change identity by being aimed at, since it is the relation sstim:targetsFrequencyBand that makes one a target. What was missing was a term for the rhythm itself, now sstim-v:NeuralOscillationScheme. The outcome associations that used to sit in the per-band scope notes moved to those rhythms as evidence claims or as dated knowledge-status assertions where no evidence was found."@en ;
     skos:hasTopConcept sstim-v:allFrequencyBands .
 
 
@@ -81,7 +81,7 @@ sstim-v:delta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "delta" ;
     skos:broader sstim-v:allFrequencyBands ;
     skos:narrower sstim-v:lowDelta, sstim-v:highDelta ;
-    skos:scopeNote "0.5–4 Hz. Deep sleep, heavy down-regulation."@en ;
+    skos:scopeNote "0.5–4 Hz. The conventional ambit by which the delta rhythm is delimited; the rhythm itself is sstim-v:deltaOscillation."@en ;
     sstim:hzMin "0.5"^^xsd:decimal ;
     sstim:hzMax "4"^^xsd:decimal .
 
@@ -91,7 +91,7 @@ sstim-v:theta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "theta" ;
     skos:broader sstim-v:allFrequencyBands ;
     skos:narrower sstim-v:lowTheta, sstim-v:highTheta ;
-    skos:scopeNote "4–8 Hz. Meditation, creativity, memory, sleep onset, chronic pain support."@en ;
+    skos:scopeNote "4–8 Hz. The conventional ambit by which the theta rhythm is delimited; the rhythm itself is sstim-v:thetaOscillation."@en ;
     sstim:hzMin "4"^^xsd:decimal ;
     sstim:hzMax "8"^^xsd:decimal .
 
@@ -101,7 +101,7 @@ sstim-v:alpha a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "alpha" ;
     skos:broader sstim-v:allFrequencyBands ;
     skos:narrower sstim-v:lowAlpha, sstim-v:highAlpha, sstim-v:alpha10 ;
-    skos:scopeNote "8–13 Hz. Relaxation, stress reduction, calm alertness."@en ;
+    skos:scopeNote "8–13 Hz. The conventional ambit by which the alpha rhythm is delimited; the rhythm itself is sstim-v:alphaOscillation."@en ;
     sstim:hzMin "8"^^xsd:decimal ;
     sstim:hzMax "13"^^xsd:decimal .
 
@@ -110,7 +110,7 @@ sstim-v:smr a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:prefLabel "SMR"@en, "SMR"@it, "SMR"@pt, "SMR"@es ;
     skos:notation "smr" ;
     skos:broader sstim-v:allFrequencyBands ;
-    skos:scopeNote "12–15 Hz. Sensorimotor rhythm. Focused calm, sustained attention."@en ;
+    skos:scopeNote "12–15 Hz. The conventional ambit by which the sensorimotor rhythm is delimited; the rhythm itself is sstim-v:smrOscillation."@en ;
     sstim:hzMin "12"^^xsd:decimal ;
     sstim:hzMax "15"^^xsd:decimal .
 
@@ -120,7 +120,7 @@ sstim-v:beta a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "beta" ;
     skos:broader sstim-v:allFrequencyBands ;
     skos:narrower sstim-v:lowBeta, sstim-v:midBeta, sstim-v:highBeta ;
-    skos:scopeNote "15–30 Hz. Active cognition, alertness."@en ;
+    skos:scopeNote "15–30 Hz. The conventional ambit by which the beta rhythm is delimited; the rhythm itself is sstim-v:betaOscillation."@en ;
     sstim:hzMin "15"^^xsd:decimal ;
     sstim:hzMax "30"^^xsd:decimal .
 
@@ -130,7 +130,7 @@ sstim-v:gamma a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "gamma" ;
     skos:broader sstim-v:allFrequencyBands ;
     skos:narrower sstim-v:gamma40 ;
-    skos:scopeNote "30–42 Hz. Higher-frequency cognitive activation."@en ;
+    skos:scopeNote "30–42 Hz. The conventional ambit by which the gamma rhythm is delimited, truncated at 42 Hz for delivery reasons rather than physiological ones; the rhythm itself is sstim-v:gammaOscillation."@en ;
     sstim:hzMin "30"^^xsd:decimal ;
     sstim:hzMax "42"^^xsd:decimal .
 
@@ -200,7 +200,7 @@ sstim-v:alpha10 a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
     skos:notation "alpha-10" ;
     skos:broader sstim-v:alpha ;
     skos:related sstim-v:lowAlpha, sstim-v:highAlpha ;
-    skos:scopeNote "The canonical 10 Hz calming and meditation target (Berger's classic alpha peak / typical individual alpha frequency). Distinguished from broad alpha because multiple protocols specifically target this frequency. 10 Hz sits exactly on the shared boundary of the two alpha sub-bands — the inclusive upper bound of low-alpha (8–10 Hz) and the inclusive lower bound of high-alpha (10–13 Hz) — so it is associatively related (skos:related) to both, not filed under either. skos:related is used rather than a cross-scheme mapping property such as skos:broadMatch because all three concepts are in this same scheme."@en ;
+    skos:scopeNote "The canonical 10 Hz stimulation target (Berger's classic alpha peak / typical individual alpha frequency). Distinguished from broad alpha because multiple protocols specifically target this frequency. It names a delivery target, not a rhythm and not an outcome: what targeting it is claimed to do is recorded against sstim-v:alphaOscillation with a tier and a source, or as a dated knowledge-status assertion where none was found. 10 Hz sits exactly on the shared boundary of the two alpha sub-bands — the inclusive upper bound of low-alpha (8–10 Hz) and the inclusive lower bound of high-alpha (10–13 Hz) — so it is associatively related (skos:related) to both, not filed under either. skos:related is used rather than a cross-scheme mapping property such as skos:broadMatch because all three concepts are in this same scheme."@en ;
     sstim:hzMin "10"^^xsd:decimal ;
     sstim:hzMax "10"^^xsd:decimal .
 
@@ -578,6 +578,111 @@ sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concep
     skos:notation "needs-update" ;
     skos:definition "Derived workflow summary (ADR 0027): the prior review decision was invalidated, or an explicit re-review trigger exists without a replacement decision."@en ;
     skos:historyNote "Redefined 2026-07-13 (ADR 0027) from a stored status to a derived summary."@en .
+
+
+###########################################################################
+# Neural oscillation scheme
+#
+# The named brain rhythms, added by ADR 0049. A rhythm is not its ambit: it is
+# identified by frequency together with recording topography and the state in
+# which it appears, and its edges are conventional rather than sharp. The ambit
+# it is usually delimited by is sstim:hasTypicalFrequencyBand; the wider range
+# it is reported to occupy is the extended min/max pair.
+#
+# What a rhythm is claimed to *do* is never here. Those are evidence claims
+# with a tier, a source and a population, or knowledge-status assertions where
+# no evidence was found. The scope notes below carry only observation
+# conditions.
+###########################################################################
+
+sstim-v:NeuralOscillationScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Neural Oscillation Vocabulary"@en ;
+    skos:definition "Controlled categories for the named rhythmic fluctuations of neural activity, delimited by conventional frequency ambits together with characteristic topography and observation state."@en ;
+    skos:hasTopConcept sstim-v:deltaOscillation, sstim-v:thetaOscillation, sstim-v:alphaOscillation, sstim-v:smrOscillation, sstim-v:betaOscillation, sstim-v:gammaOscillation .
+
+sstim-v:deltaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Delta oscillation"@en, "Oscillazione Delta"@it, "Oscilação Delta"@pt, "Oscilación Delta"@es ;
+    skos:altLabel "delta rhythm"@en, "delta waves"@en ;
+    skos:notation "delta-oscillation" ;
+    skos:definition "The lowest-frequency named cortical rhythm, delimited conventionally at roughly 0.5-4 Hz and among the highest in amplitude."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:delta ;
+    sstim:extendedHzMin "0.5"^^xsd:decimal ;
+    sstim:extendedHzMax "4.5"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Frontal and widespread cortical, with the highest amplitudes of the named rhythms." ;
+    sstim:hasOscillationStateContext "Characteristically prominent in slow-wave sleep." .
+
+sstim-v:thetaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Theta oscillation"@en, "Oscillazione Theta"@it, "Oscilação Teta"@pt, "Oscilación Theta"@es ;
+    skos:altLabel "theta rhythm"@en, "theta waves"@en ;
+    skos:notation "theta-oscillation" ;
+    skos:definition "A cortical and hippocampal rhythm delimited conventionally at roughly 4-8 Hz."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:theta ;
+    sstim:extendedHzMin "3.5"^^xsd:decimal ;
+    sstim:extendedHzMax "8.5"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Frontal midline in humans; hippocampal in intracranial recordings." ;
+    sstim:hasOscillationStateContext "Characteristically observed in drowsiness and at sleep onset." .
+
+sstim-v:alphaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Alpha oscillation"@en, "Oscillazione Alfa"@it, "Oscilação Alfa"@pt, "Oscilación Alfa"@es ;
+    skos:altLabel "alpha rhythm"@en, "alpha waves"@en ;
+    skos:notation "alpha-oscillation" ;
+    skos:definition "The posterior rhythm delimited conventionally at roughly 8-13 Hz, historically the first named human EEG rhythm."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:alpha ;
+    sstim:extendedHzMin "7.5"^^xsd:decimal ;
+    sstim:extendedHzMax "13.5"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Posterior and occipital, maximal over the visual cortex." ;
+    sstim:hasOscillationStateContext "Characteristically prominent during relaxed wakefulness with the eyes closed, and attenuated on eye opening." .
+
+sstim-v:smrOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Sensorimotor rhythm"@en, "Ritmo Sensomotorio"@it, "Ritmo Sensório-Motor"@pt, "Ritmo Sensoriomotor"@es ;
+    skos:altLabel "SMR"@en, "mu rhythm"@en ;
+    skos:notation "smr-oscillation" ;
+    skos:definition "A central rhythm delimited conventionally at roughly 12-15 Hz, overlapping the alpha and beta ambits and distinguished from them by its sensorimotor topography and its reactivity to movement rather than by frequency."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:smr ;
+    sstim:extendedHzMin "11.5"^^xsd:decimal ;
+    sstim:extendedHzMax "15.5"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Central, over the sensorimotor strip." ;
+    sstim:hasOscillationStateContext "Characteristically observed during motor quiescence and attenuated by movement or motor imagery." .
+
+sstim-v:betaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Beta oscillation"@en, "Oscillazione Beta"@it, "Oscilação Beta"@pt, "Oscilación Beta"@es ;
+    skos:altLabel "beta rhythm"@en, "beta waves"@en ;
+    skos:notation "beta-oscillation" ;
+    skos:definition "A rhythm delimited conventionally at roughly 15-30 Hz, lower in amplitude than the slower rhythms."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:beta ;
+    sstim:extendedHzMin "12.5"^^xsd:decimal ;
+    sstim:extendedHzMax "30.5"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Frontal and central." ;
+    sstim:hasOscillationStateContext "Characteristically observed during alert wakefulness." .
+
+sstim-v:gammaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, skos:Concept ;
+    skos:inScheme sstim-v:NeuralOscillationScheme ;
+    skos:topConceptOf sstim-v:NeuralOscillationScheme ;
+    skos:prefLabel "Gamma oscillation"@en, "Oscillazione Gamma"@it, "Oscilação Gama"@pt, "Oscilación Gamma"@es ;
+    skos:altLabel "gamma rhythm"@en, "gamma waves"@en ;
+    skos:notation "gamma-oscillation" ;
+    skos:definition "The fastest of the named rhythms, delimited conventionally from roughly 30 Hz upward; its upper bound varies by convention and by recording method, and SSTIM's gamma ambit stops at 42 Hz for delivery reasons rather than physiological ones."@en ;
+    skos:scopeNote '"Rhythm", "wave" and "oscillation" name this same entity interchangeably, but they are near-synonyms rather than exact ones and are not substitutable in general: an oscillation is the rhythmic fluctuation itself; a wave is how it appears in a recorded signal, a word EEG also uses for deflections that are not oscillatory at all such as a P300 wave or a K-complex; and a rhythm is an oscillation regular enough to be named and tied to a state or generator, which a transient oscillatory burst is not.'@en ;
+    sstim:hasTypicalFrequencyBand sstim-v:gamma ;
+    sstim:extendedHzMin "25"^^xsd:decimal ;
+    sstim:extendedHzMax "100"^^xsd:decimal ;
+    sstim:hasCorticalTopography "Widespread cortical." ;
+    sstim:hasOscillationStateContext "Characteristically observed during active sensory and cognitive processing." .
 
 
 ###########################################################################

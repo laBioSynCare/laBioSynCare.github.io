@@ -65,6 +65,53 @@ sstim:FrequencyBand a owl:Class ;
     skos:definition "An information entity describing a named Hz range used in BSC protocol design for targeting and evidence classification. BSC operational design category — not a medical diagnostic taxonomy or universal EEG ontology."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
+sstim:NeuralOscillationType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Neural Oscillation Type"@en,
+               "Tipo di Oscillazione Neurale"@it,
+               "Tipo de Oscilação Neural"@pt,
+               "Tipo de Oscilación Neural"@es ;
+    skos:definition "A controlled information category for a named rhythmic fluctuation of neural activity, such as the alpha or theta rhythm. Members are identified by a conventional frequency ambit together with characteristic recording topography and observation state; the ambit alone does not identify one."@en ;
+    skos:scopeNote "A category, not the rhythm. Following ADR 0021, this classifies a real neurophysiological phenomenon without being that phenomenon: SSTIM records no measured neural activity, so there is no class of measured oscillation events and no instance of one. Distinct from sstim:FrequencyBand, which is a Hz interval and nothing more, and from sstim:NeuralPhenomenon, which categorises kinds of phenomena such as oscillatory dynamics rather than the named rhythms themselves."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0049-neural-oscillations-and-frequency-ambits.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hasTypicalFrequencyBand a owl:ObjectProperty ;
+    rdfs:domain sstim:NeuralOscillationType ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "has typical frequency band"@en ;
+    skos:definition "Links a named neural oscillation to the conventional Hz ambit by which it is usually delimited. The ambit is a measurement convention rather than a boundary of the phenomenon: see sstim:extendedHzMin and sstim:extendedHzMax for the wider range the rhythm is reported to occupy."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:extendedHzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:NeuralOscillationType ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "extended minimum frequency (Hz)"@en ;
+    skos:definition "Lowest frequency at which this rhythm is reported to occur, which may fall below its conventional ambit. A rhythm modulates and its edges are conventional rather than sharp; recording only the typical ambit would assert a precision the phenomenon does not have."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:extendedHzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:NeuralOscillationType ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "extended maximum frequency (Hz)"@en ;
+    skos:definition "Highest frequency at which this rhythm is reported to occur, which may exceed its conventional ambit."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hasCorticalTopography a owl:DatatypeProperty ;
+    rdfs:domain sstim:NeuralOscillationType ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "has cortical topography"@en ;
+    skos:definition "Scalp or cortical region over which this rhythm is characteristically recorded. Topography is part of how a rhythm is identified alongside frequency: occipital alpha and central mu occupy overlapping ambits and are told apart by where they appear."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:hasOscillationStateContext a owl:DatatypeProperty ;
+    rdfs:domain sstim:NeuralOscillationType ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "has oscillation state context"@en ;
+    skos:definition "Behavioural or physiological state in which this rhythm is characteristically observed, such as eyes closed or slow-wave sleep."@en ;
+    skos:editorialNote "An observation condition, not an outcome. It records when the rhythm is seen, never what stimulating at that frequency does for anyone: effect and function statements are evidence claims with a tier, a source and a population, and never appear here."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
 sstim:FrequencyBandGroup a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Frequency Band Group"@en,

@@ -211,6 +211,14 @@ shacl-session-projection:
 	fi; \
 	echo "shacl-session-projection: passed ($$count projected graphs conform)"
 
+## Assert no frequency band claims an outcome, and that every association ADR
+## 0049 moved off the band scope notes is still recorded on its oscillation —
+## as an evidence claim with a tier or a dated knowledge-status assertion. Two
+## checks in opposite directions: the first stops a Hz interval claiming to
+## relax anyone, the second stops the repair becoming a deletion.
+band-scope-notes:
+	$(PYTHON) scripts/check-band-scope-notes.py
+
 ## Assert the repaired OWL domains infer no unintended type (KR-05). The audit's
 ## concern was that a domain is an inference rule, not a validation hint: a
 ## property typed to one class makes every subject using it a member of that
@@ -373,7 +381,7 @@ release-dryrun:
 	node scripts/release-dryrun.mjs
 
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract w3id-routes release-dryrun truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract w3id-routes release-dryrun truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)

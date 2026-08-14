@@ -335,7 +335,7 @@
     dct:title "BSC Lab public SSTIM instance data"@en ;
     dct:description "Public, non-clinical BSC Lab programme, framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static instances; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 1805 ;
+    void:triples 2079 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ecosystem/",

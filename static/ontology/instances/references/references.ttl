@@ -70,3 +70,50 @@ sstim-ref:STEIN_STANFORD_2008 a sstim:PublicSafeReference ;
     dct:issued "2008"^^xsd:gYear ;
     dct:identifier "doi:10.1038/nrn2331" ;
     dct:source <https://doi.org/10.1038/nrn2331> .
+
+###########################################################################
+# Neural oscillation references (ADR 0049)
+#
+# Added to source the band-to-state associations that used to sit unqualified
+# in the frequency-band scope notes. Every DOI here was resolved through the
+# Crossref API before being written, and the title, authors and year are the
+# ones Crossref returned rather than ones recalled: four other candidate DOIs
+# tried during this work resolved to unrelated papers, which is why none is
+# asserted from memory.
+###########################################################################
+
+# Verified via Crossref 2026-08-15: Brain Research Reviews.
+sstim-ref:KLIMESCH_1999 a sstim:PublicSafeReference ;
+    sstim:referenceKey "KLIMESCH_1999" ;
+    dct:title "EEG alpha and theta oscillations reflect cognitive and memory performance: a review and analysis" ;
+    dct:creator "Klimesch, Wolfgang" ;
+    dct:issued "1999"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/s0165-0173(98)00056-3" ;
+    dct:source <https://doi.org/10.1016/s0165-0173(98)00056-3> .
+
+# Verified via Crossref 2026-08-15: Trends in Cognitive Sciences.
+sstim-ref:KLIMESCH_2012 a sstim:PublicSafeReference ;
+    sstim:referenceKey "KLIMESCH_2012" ;
+    dct:title "Alpha-band oscillations, attention, and controlled access to stored information" ;
+    dct:creator "Klimesch, Wolfgang" ;
+    dct:issued "2012"^^xsd:gYear ;
+    dct:identifier "doi:10.1016/j.tics.2012.10.007" ;
+    dct:source <https://doi.org/10.1016/j.tics.2012.10.007> .
+
+# Verified via Crossref 2026-08-15: Annual Review of Neuroscience.
+sstim-ref:FRIES_2009 a sstim:PublicSafeReference ;
+    sstim:referenceKey "FRIES_2009" ;
+    dct:title "Neuronal Gamma-Band Synchronization as a Fundamental Process in Cortical Computation" ;
+    dct:creator "Fries, Pascal" ;
+    dct:issued "2009-06-01"^^xsd:date ;
+    dct:identifier "doi:10.1146/annurev.neuro.051508.135603" ;
+    dct:source <https://doi.org/10.1146/annurev.neuro.051508.135603> .
+
+# Verified via Crossref 2026-08-15: Science.
+sstim-ref:BUZSAKI_2004 a sstim:PublicSafeReference ;
+    sstim:referenceKey "BUZSAKI_2004" ;
+    dct:title "Neuronal Oscillations in Cortical Networks" ;
+    dct:creator "Buzsáki, György", "Draguhn, Andreas" ;
+    dct:issued "2004-06-25"^^xsd:date ;
+    dct:identifier "doi:10.1126/science.1099745" ;
+    dct:source <https://doi.org/10.1126/science.1099745> .

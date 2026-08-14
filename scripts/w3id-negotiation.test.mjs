@@ -208,7 +208,9 @@ test('every committed public preset and reference has an exact entity route', ()
   const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
 
   expect(presets).toHaveLength(2)
-  expect(references).toHaveLength(7)
+  // 7 + the four neural-oscillation references ADR 0049 added, each verified
+  // through Crossref before being written and each given an exact route below.
+  expect(references).toHaveLength(11)
 
   for (const { iri, sourceUrl } of [...presets, ...references]) {
     const path = sstimPath(iri)
