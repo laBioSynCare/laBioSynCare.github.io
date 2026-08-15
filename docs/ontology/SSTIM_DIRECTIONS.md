@@ -154,17 +154,46 @@ built and has been exercised (ADRs 0043, 0049). This is tractable, not cheap.
 known senses — proprioception, chemoreception and others the current scheme does
 not name — and that is not limited to a "session" or a "preset".
 
-### 4a. The modality scheme is short, and known to be
+### 4a. There are two modality vocabularies, not one short one
 
-`sstim-v:SensoryModalityScheme` declares **six** concepts: auditory, visual,
-somatosensory, interoceptive, vestibular, olfactory. Meanwhile
-`sstim-ex:StimulusChannel` recognises audio, visual, haptic, respiratory,
-olfactory, gustatory and electromagnetic paths. **The two lists disagree**, which
-is its own defect independent of length: gustatory is a delivery path with no
-modality concept behind it.
+The first draft of this section said the modality scheme was six concepts long
+and needed extending toward proprioception and chemoreception. That was written
+without reading the exposure module, and it is wrong in an instructive way.
+
+SSTIM carries **two** modality vocabularies:
+
+| Vocabulary | Count | Contents |
+|---|---|---|
+| `sstim:SensoryModality` (core vocab) | 6 | auditory, visual, somatosensory, interoceptive, vestibular, olfactory |
+| `sstim-ex:PerceivedModality` (exposure) | 12 | the six above, plus **proprioceptive**, gustatory, tactile, multimodal, social-perceptual, and not-directly-perceived |
+
+The first is a strict subset of the second. So proprioception — named in the
+direction as a missing sense — **already exists**, in the module that models
+delivery. Alongside it sits `sstim-ex:PhysicalDeliveryMedium` with 27 concepts
+(acoustic energy, airflow, thermal contact, focused ultrasound, chemical agent,
+electromagnetic radiation…), and `sstim-ex:perceivedModality` /
+`sstim-ex:deliveryMedium` hold apart *which sense is engaged* from *what
+physically arrives* — a distinction the core vocabulary does not make at all.
+
+**So the direction is not "add more senses". It is: reconcile the duplication.**
+A consumer entering through the core vocabulary sees six modalities; one entering
+through exposure sees twelve and a delivery taxonomy. Which it picks is an
+accident of which module it read first, and nothing tells it the two are related.
+That is a worse problem than a short list, because both lists are individually
+defensible.
+
+The chemoreception question survives the correction: olfactory and gustatory are
+both chemoreception, and whether to introduce the parent is a scientific
+modelling choice rather than a gap.
+
+A consequence for work already shipped: `static/schemas/preset.schema.json` draws
+its `modality` enum from the six-concept core scheme, so it offers fewer senses
+than SSTIM can already express. That is correct as long as the schema follows the
+core vocabulary — but it is the wrong vocabulary to be following, and the choice
+should be revisited when the two are reconciled.
 
 `static/schemas/preset.schema.json` briefly listed nine modalities, three of
-which SSTIM does not declare. That was caught by adding an enum-versus-vocabulary
+which the core scheme does not declare. That was caught by adding an enum-versus-vocabulary
 check to `make preset-contract`, which now fails if a schema mints a controlled
 value — the KR-17 failure pattern. The lesson is worth keeping: **the vocabulary
 leads, the schema follows**, and the check is what makes that true rather than
@@ -277,22 +306,44 @@ signals?*
    other tracks. Breathing-guidance (Martigli) and symmetry-derived control
    signals are the current kinds." That is the abstract signal, named.
 
+4. **A rendering layer, already surprisingly complete.**
+   `sstim-ex:StimulusChannel` carries `sstim-ex:deliveryMedium` (27 physical
+   media) and `sstim-ex:perceivedModality` (12 modalities) held apart, plus
+   per-rendering rates: `hasFrequencyHz` ("carrier or tone frequency"),
+   `hasFlickerRateHz` ("blink, pulse, or flicker rate… subject to
+   photosensitivity exposure limits"), `hasBeatFrequencyHz` ("monaural or
+   binaural beat frequency (the difference frequency)"), plus duty cycle, gain
+   and phase offset.
+
+   This is the rendering half of the answer, and it already knows that a carrier
+   is not the delivered rate.
+
 ### What is missing, and it is the connections
 
+- **The shared signal has no identity.** A specification targeting 10 Hz through
+  an audio channel and a visual one states `hasBeatFrequencyHz 10` on one and
+  `hasFlickerRateHz 10` on the other. Nothing asserts these are *the same* 10 Hz.
+  A consumer must infer it by comparing decimals — so the comparability
+  `StimulusSpecification` exists to provide is precisely what goes unstated. This
+  is the abstract-signal object, and it is the single biggest missing piece.
 - **No modulation relation.** `ControlTrack`'s definition says it modulates
   parameters of other tracks. Nothing in the graph can say *which* track or
-  *which* parameter. The statement lives in prose only.
-- **A channel cannot say which modality it is.** `StimulusChannel` lists the
-  paths in its definition; no property asserts one. So a multi-modal
-  specification cannot actually be read as multi-modal.
+  *which* parameter. The statement lives in prose only. (Verified: no property
+  in any module expresses it.)
 - **The abstract signal is not separable from a configuration.** `ControlTrack`
-  is a `Track`, so it belongs to one preset. There is no "10 Hz alpha signal"
-  object that two channels — or two studies — could share and be compared by.
+  is a `Track`, so it belongs to one preset. Even once a modulation relation
+  exists, there is no signal object two studies could share and be compared by.
+- **`hasFrequencyHz` carries two roles.** Its definition is "carrier or tone
+  frequency", so a 200 Hz audio carrier and a 10 Hz tactile vibration — a
+  carrier and a delivered rate — use one property for different things. The
+  carrier/rate distinction the other two properties make is not made here.
 - **Nothing joins the configuration layer to the specification layer.** Tracks
   are engine settings; channels are what reaches the subject. No relation
   connects them.
 
-So the idea is present three times and is not yet expressible once.
+So the idea is present four times and is not yet expressible once — and the gap
+is narrower and more specific than it first appeared. What is needed is chiefly
+*one* thing: a signal with an identity that several channels can point at.
 
 ### Should it be carrier and modulator?
 

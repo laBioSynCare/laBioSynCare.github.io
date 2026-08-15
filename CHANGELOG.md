@@ -129,6 +129,15 @@ file is the human-readable summary.
   `make preset-contract` now resolves all 45 controlled values across five
   schemes to declared `skos:notation`s and fails on invention (KR-17 pattern),
   and compares `permutationFunction`'s ceiling against the named permutations.
+- **Editorial notes on `sstim:ControlTrack`, `sstim:StimulusSpecification` and
+  `sstim-ex:StimulusChannel`** recording the abstract-signal/rendering question
+  on the terms themselves: that `ControlTrack`'s modulation is prose no property
+  expresses, that most of the rendering layer already exists on a channel
+  (delivery medium and perceived modality held apart, plus carrier, flicker and
+  beat rates) while the shared signal tying several channels to one target does
+  not, and that SSTIM carries two modality vocabularies —
+  `sstim-ex:PerceivedModality` with twelve concepts including proprioceptive,
+  and `sstim:SensoryModality` with six, a strict subset.
 - `make band-scope-notes` also checks frequency arithmetic: every oscillation's
   extended range must contain its typical ambit, and no band's interval may run
   backwards.

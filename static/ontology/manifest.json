@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "ed4c9732751d4b10130937951175d71065133aa42699000cce05b94a9e08931f"
+        "sha256": "1b4dcff83ce01e91ccd015ab81f122a39fde3b7abdf6598d8bd70777040721ca"
       },
       "runtime": {
         "url": "/ontology/sstim-stimulus.ttl",
@@ -247,7 +247,7 @@
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "25e6be22c78d5f9f57bbc34c11466c476cf13ed6b7af9dc369f5f2b03cadfd44"
+        "sha256": "dd67bd78153021bc92d2345e0f5d370e4ba590bb2f2b88ba15b1791ba37f21fd"
       },
       "runtime": {
         "url": "/ontology/sstim-configuration.ttl",
@@ -793,7 +793,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "f9d1a422dafa560ea8367182a9606e9ae17d8eaa1fbc3ffca1f7ff14414b370b"
+      "sha256": "6a49cfbd5daaf7b94dd26d3b457e6b96a7f8e0b1ff1e9be9667567874c807769"
     },
     {
       "id": "core-plus",
@@ -841,7 +841,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "e13281b98e41bf81f636a0c7349e37ef455f529dc30908686309e30373aae66f"
+      "sha256": "0c1830e0e7432b2537fe3de2947530a59cbfa54161ceca678f290ba84c2eb086"
     },
     {
       "id": "full",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "6dd4ca3dc99f0ae01001459c575670d8b7e616faba34283640268ad7d166baa2"
+      "sha256": "b0321b93cf0f7f31e02c5c145e838a0eabd0d14ff385a6efeeefbdab3ab6157d"
     }
   ]
 }

@@ -39,6 +39,10 @@ native Studio model. Do not conflate the projects.
 - `docs/concept/SCOPE.md` — what we claim and explicitly do not claim
 - `docs/technical/PRESET_FORMAT.md` — the preset data format specification
 - `static/ontology/README.md` — OWL/SKOS design decisions
+- `docs/ontology/SSTIM_DIRECTIONS.md` — where the model is going and why: SSTIM
+  is a universal standard and BioSynCare is one audio-focused application, so
+  SSTIM takes that format's hard-won parameter ranges and none of its structure.
+  Read before adding terms, and before assuming an audio idiom generalizes
 - `src/README.md` — full software architecture
 
 ---

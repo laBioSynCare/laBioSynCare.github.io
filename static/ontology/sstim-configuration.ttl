@@ -188,7 +188,9 @@ sstim:ControlTrack a owl:Class ;
     rdfs:subClassOf sstim:Track ;
     rdfs:label "Control Track"@en ;
     skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks. Breathing-guidance (Martigli) and symmetry-derived control signals are the current kinds."@en ;
-    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ;
+    skos:editorialNote "The modulation this definition describes is prose the graph cannot state: no property links a control track to the track and parameter it modulates. Two consequences follow. A configuration cannot be read to discover what drives what, and the control signal is not separable from the preset that contains it, so no shared signal object exists for two channels or two studies to be compared by. This is the abstract-signal half of SSTIM_DIRECTIONS.md §5: a time-varying function with a period or envelope and no modality, which a rendering then binds to a renderable parameter of some sensory channel. Carrier and modulator describe one audio rendering of such a signal, not the general structure — a carrier is needed because 10 Hz falls below the audible range, while a 10 Hz light flicker or vibration is presented directly."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0012-martigli-voice-parameters.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ontology/SSTIM_DIRECTIONS.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:composedOfTrack a owl:ObjectProperty ;
