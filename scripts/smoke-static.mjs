@@ -59,7 +59,15 @@ async function main() {
     process.exit(1)
   }
 
-  const port = 4179 + Math.floor(Math.random() * 200)
+  // A random port avoids collisions when runs overlap, but `fetch` refuses to
+  // connect to any port on the WHATWG bad-port list — it fails with "bad port"
+  // before a request is made, no matter that the server is listening. 4190
+  // (ManageSieve) is the only such port in this range, and drawing it failed a
+  // CI run once in roughly two hundred. Skip it rather than widen the range,
+  // which would only move the problem.
+  const BAD_PORTS = new Set([4190])
+  let port = 4179 + Math.floor(Math.random() * 200)
+  while (BAD_PORTS.has(port)) port = 4179 + Math.floor(Math.random() * 200)
   const server = await serve(port)
   const base = `http://127.0.0.1:${port}`
   console.log(`smoke-static: serving ${DIST} at ${base}\n`)
