@@ -25,7 +25,9 @@ Describing a protocol or claim does not establish efficacy.
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
   and Symmetry moved to protocol-scoped namespaces; coverage of all known
-  senses; and the recommendation on how a stimulation specification should
+  senses; abstract signals separated from their sensory renderings, with
+  carrier/modulator kept as one audio rendering rather than the universal
+  structure; and the recommendation on how a stimulation specification should
   compose — components for descriptions, events for occurrences, not one
   relation across both.
 - [Module architecture](MODULE_ARCHITECTURE.md) — the consumer guide to the

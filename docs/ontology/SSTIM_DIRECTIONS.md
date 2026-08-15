@@ -110,7 +110,9 @@ component, and an explicit *modulation* relation from a control source to a
 target parameter. The second is the more valuable, because it generalises: any
 parameter can be modulated by any control source, which is what a modular
 synthesis model looks like and what "Martigli-synced panning" is a single
-instance of.
+instance of. That half is developed in [§5](#5-abstract-signals-and-their-sensory-renderings),
+which is where it belongs — spatial position is one of the parameters a signal
+can be rendered onto.
 
 ---
 
@@ -246,6 +248,119 @@ across engines while a session stays a record of one execution.
 
 ---
 
+## 5. Abstract signals and their sensory renderings
+
+**The question.** *A breathing cue can be audio, visual, audiovisual, tactile,
+or use other senses. Can we have an abstract signal that then gets mapped into a
+sensory cue as needed? The same for a 10 Hz alpha signal — auditory, visual or
+tactile. Is this covered? Should it be modelled as modulating and carrier
+signals?*
+
+**Yes to the premise, partly to the coverage, and carefully to the carrier.**
+
+### What SSTIM already has, in three disconnected pieces
+
+1. **`sstim:StimulusSpecification`** — "an engine-independent description of a
+   sensory stimulation, stating what reaches the subject in physical or
+   perceptual units rather than the settings that make a particular engine
+   produce it. Two implementations whose output matches realise the same stimulus
+   specification, which is what makes them comparable." That is the abstract
+   layer, and it already carries `stimulusRegime` (determinate / stochastic /
+   adaptive).
+2. **`sstim:hasStimulusChannel` → `sstim-ex:StimulusChannel`** — one
+   specification may have several channels, "such as an audio, visual, haptic,
+   respiratory, olfactory, gustatory, or electromagnetic exposure path". So one
+   description reaching the subject through several senses is already the
+   intended shape.
+3. **`sstim:ControlTrack`** — "a track that produces no sensory output of its own
+   and instead supplies a time-varying control signal modulating parameters of
+   other tracks. Breathing-guidance (Martigli) and symmetry-derived control
+   signals are the current kinds." That is the abstract signal, named.
+
+### What is missing, and it is the connections
+
+- **No modulation relation.** `ControlTrack`'s definition says it modulates
+  parameters of other tracks. Nothing in the graph can say *which* track or
+  *which* parameter. The statement lives in prose only.
+- **A channel cannot say which modality it is.** `StimulusChannel` lists the
+  paths in its definition; no property asserts one. So a multi-modal
+  specification cannot actually be read as multi-modal.
+- **The abstract signal is not separable from a configuration.** `ControlTrack`
+  is a `Track`, so it belongs to one preset. There is no "10 Hz alpha signal"
+  object that two channels — or two studies — could share and be compared by.
+- **Nothing joins the configuration layer to the specification layer.** Tracks
+  are engine settings; channels are what reaches the subject. No relation
+  connects them.
+
+So the idea is present three times and is not yet expressible once.
+
+### Should it be carrier and modulator?
+
+**Within audio, yes. As the top-level model, no — and the reason is
+instructive.**
+
+A carrier exists because of a limitation of *hearing*, not because of anything
+about the signal:
+
+| Modality | 10 Hz presented how | Carrier needed? |
+|---|---|---|
+| Auditory | Amplitude-modulating an audible tone (isochronic); two carriers a few Hz apart (binaural beat); two carriers summed acoustically (monaural beat) | **Yes** — 10 Hz is below the audible range, so it cannot be presented directly |
+| Visual | A light flickering at 10 Hz | No |
+| Tactile | A vibration at 10 Hz, well inside mechanoreceptor range | No |
+
+Make carrier/modulator the universal structure and every visual or tactile
+stimulus has to invent a fictitious carrier. That is the audio assumption
+returning by a different door — the same error as `voices`, as four `waveform`
+fields, and as `panOsc`.
+
+**The universal structure is two layers, with carrier/modulator living in the
+lower one:**
+
+1. **An abstract signal** — a time-varying function with a frequency, period or
+   envelope and *no modality*. "10 Hz square." "A sinusoid whose period ramps
+   from 4 s to 8 s over 10 minutes." This is what a breathing cue and an alpha
+   target both are.
+2. **A rendering** — binds that signal to a renderable parameter of a channel in
+   some modality. *Which* parameter is modality-specific: audio amplitude, audio
+   frequency, luminance, size, spatial position, vibration intensity.
+
+Carrier and modulator then fall out as a *description of one audio rendering*.
+"Rendered onto a 250 Hz sine carrier by amplitude modulation" and "rendered as a
+binaural beat between 200 and 210 Hz carriers" are two renderings of the same
+abstract 10 Hz signal — which is exactly the comparability
+`StimulusSpecification` exists to provide, and which SSTIM cannot currently
+state.
+
+### One distinction worth keeping at the rendering layer
+
+Some renderings present the signal **physically**; others produce it
+**perceptually**. A visual flicker and an isochronic tone put a real 10 Hz
+modulation into the world. A binaural beat does not — no 10 Hz exists in either
+ear's signal; the beat is constructed by the auditory system from two carriers.
+A monaural beat sits between them: the 10 Hz exists acoustically in the summed
+waveform.
+
+That is not a detail. It changes what evidence transfers between renderings,
+which is precisely what SSTIM's evidence model
+([ADR 0027](../decisions/0027-evidence-claim-family-and-public-claim-gate.md),
+[ADR 0050](../decisions/0050-public-claim-applicability-contract.md)) is built
+to keep honest — a finding about visual flicker at 10 Hz should not silently
+authorize a claim about binaural beats at 10 Hz. The public-claim gate's modality
+clause already refuses the cross-modality case; the physical-versus-perceptual
+distinction is the finer one underneath it.
+
+### Why this is the keystone direction
+
+It explains the other three. §1's sampled waveform is a signal with an asset
+behind it. §2's modulation half is this relation. And the KR-07 finding that
+`breathing-oscillation` could not be moved to another modality has exactly this
+cause: its periods are the abstract signal, its `centerHz` and `amplitudeHz` are
+the audio rendering, and the two were defined as one parameter set. Separate the
+layers and the kind becomes portable; leave them glued and every new modality
+needs a new kind.
+
+---
+
 ## Sequencing
 
 Nothing here blocks the current audit work. In dependency order:
@@ -254,9 +369,13 @@ Nothing here blocks the current audit work. In dependency order:
    reproducibility story.
 2. **Modality scheme reconciliation** (§4a) — self-contained, and the
    channel/modality disagreement is a defect today rather than a future want.
-3. **Modulation and spatial position** (§2) — needs §1 only loosely; the
-   modulation relation is the generalisable half and is worth designing first.
-4. **Protocol namespacing** (§3) — a migration, so it wants the term set to have
+3. **Abstract signals and renderings** (§5) — the keystone. It supplies the
+   modulation relation §2 needs, explains why §4's kinds are stuck in audio, and
+   is what makes one description comparable across senses. Design this before
+   the pieces that depend on it.
+4. **Spatial position** (§2) — a rendering target once §5 exists, rather than a
+   facet invented on its own.
+5. **Protocol namespacing** (§3) — a migration, so it wants the term set to have
    stopped moving.
-5. **The specification layer** (§4b items 2 and 3) — the largest, and it should
+6. **The specification layer** (§4b items 2 and 3) — the largest, and it should
    subsume ADR 0040's open questions rather than run beside them.
