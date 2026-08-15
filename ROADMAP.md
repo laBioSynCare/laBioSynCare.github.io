@@ -107,7 +107,25 @@ primarily with AI-assisted development.
 
 ---
 
+
+**Who owns what.** Four documents carry forward-looking work, and they do not
+overlap: this one for strategy and phase sequencing, [`ROADMAP.md`](ROADMAP.md) for strategy and phase
+sequencing, [`TODO.md`](TODO.md) for operational tasks, and
+[`docs/ontology/IMPROVEMENT_PLAN.md`](docs/ontology/IMPROVEMENT_PLAN.md) for the
+audit-driven ontology sequence and its release gates. What exists *now* is
+[`docs/ontology/CURRENT_STATE.md`](docs/ontology/CURRENT_STATE.md); where the
+model is going is
+[`docs/ontology/SSTIM_DIRECTIONS.md`](docs/ontology/SSTIM_DIRECTIONS.md). A fact
+stated in one of them is not restated in another.
+
+---
+
 ## Baseline State (April 2026)
+
+*Historical.* This records the position the roadmap was written from, not the
+position now — for that, see
+[`docs/ontology/CURRENT_STATE.md`](docs/ontology/CURRENT_STATE.md). It is kept
+because the phase reasoning below only makes sense against it.
 
 - **BioSynCare** v2 just launched on App Store and Google Play with:
   Seraphony (AI on-demand session creation), Rooms (shared synchronous

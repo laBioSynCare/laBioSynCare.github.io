@@ -311,65 +311,28 @@ The main gaps are design and coverage gaps, not current parser failures:
 - Independent ontology, domain, privacy, and linked-data review remains
   desirable.
 
-## Recommended next steps
+## What to do next
 
-### 1. Bound the `0.14` change set
+This document says what exists; it deliberately does not carry a second copy of
+the work queue. Three documents own that, at three granularities:
 
-Record one coherent objective under `CHANGELOG.md`'s Unreleased heading before
-adding terms. Do not combine session redesign, participant observations,
-frequency semantics, and vocabulary packaging in one unreviewable release.
-Each semantic change needs its own ADR or accepted plan, migration note, SHACL
-changes, fixtures, competency query, context/application review, and explicit
-authorization for protected files.
+| For | Read |
+|---|---|
+| The audit-driven ontology sequence and its release gates | [Improvement plan](IMPROVEMENT_PLAN.md) |
+| Where the model is going, and why | [Design directions](SSTIM_DIRECTIONS.md) |
+| Operational tasks across the whole project | [`TODO.md`](../../TODO.md) |
 
-### 2. Establish the native session contract
-
-Reconcile `SESSION_MODEL.md`, the RDF session model, the Patch Studio package,
-and the future recorder around one versioned native schema. Define stable IDs,
-engine/application versions, configuration and asset hashes, monotonic events,
-interruptions, actual execution outcome, and a defensible reproducibility
-level. Preserve the current distinction between an engine configuration, a
-stimulus description, an intended execution, and an executed activity.
-
-### 3. Add qualified observations and privacy policy
-
-Model prompts, observation items, helpfulness, unwanted experiences,
-participant-perceived relatedness, explicit missingness states, visibility,
-consent, retention, withdrawal, and de-identification. Begin with synthetic
-golden cases. No real participant data should enter a public graph before this
-profile, its threat model, and its negative fixtures are accepted.
-
-### 4. Resolve public-expression governance
-
-Review ADRs 0028 and 0029. If accepted, implement exact proposition and
-expression revisions, a versioned BSC Lab policy, trusted-input and surface
-inventories outside RDF, and fail-closed adversarial tests. Until then, retain
-the existing reject-only posture and do not describe it as authorization.
-
-### 5. Repair semantic seams in bounded follow-ups
-
-Prioritize the observed-oscillation versus stimulus-target frequency split,
-then reconcile duplicate channel quantities and make sessions
-modality-neutral. Separately define concern-specific vocabulary and validation
-packages, and only then consider deeper Exposure/Evidence decomposition. Keep
-stable public term IRIs and provide explicit compatibility mappings where a
-meaning changes.
-
-### 6. Close runtime and maturity gaps
-
-Add browser-side SHACL for downloadable/public graphs, generate the instance
-inventory, complete the Patch Studio/catalog bridge without inferring evidence
-or intent, measure language coverage, attach mapping provenance, publish the
-remaining registry records, and obtain independent review. HED/BIDS/NWB work
-should follow a validated native session demonstrator rather than become its
-storage authority.
+The six recommendations that used to sit here were written before `0.14`. Three
+of them — bounding that change set, establishing the native session contract,
+and adding qualified observations — shipped in it, and a fourth was overtaken by
+[ADR 0050](../decisions/0050-public-claim-applicability-contract.md), which
+replaced the reject-only posture with an actual authorization contract. A
+next-steps list that recommends finished work is worse than none, and keeping
+one here meant maintaining it in four places instead of three.
 
 ## Release acceptance
 
-The next release is ready only when its selected change set passes
-`nix develop --command make validate` and `make test`, the protected sources and
-manifest are synchronized, generated serializations are graph-isomorphic,
-runtime-produced graphs in scope pass their applicable profile, public/private
-fixtures remain separated, documentation and the changelog describe the same
-model, and the immutable snapshot, routes, tag, citation metadata, and Zenodo
-record agree.
+The release gate is one list, and the improvement plan owns it:
+[next-release acceptance criteria](IMPROVEMENT_PLAN.md#next-release-acceptance-criteria).
+It was stated twice, in slightly different words, which is the way two lists
+start disagreeing about what "ready" means.

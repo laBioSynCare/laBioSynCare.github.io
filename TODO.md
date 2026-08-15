@@ -41,6 +41,19 @@ Phase tags:
 
 ---
 
+
+**Who owns what.** Four documents carry forward-looking work, and they do not
+overlap: this one for operational tasks, [`ROADMAP.md`](ROADMAP.md) for strategy and phase
+sequencing, [`TODO.md`](TODO.md) for operational tasks, and
+[`docs/ontology/IMPROVEMENT_PLAN.md`](docs/ontology/IMPROVEMENT_PLAN.md) for the
+audit-driven ontology sequence and its release gates. What exists *now* is
+[`docs/ontology/CURRENT_STATE.md`](docs/ontology/CURRENT_STATE.md); where the
+model is going is
+[`docs/ontology/SSTIM_DIRECTIONS.md`](docs/ontology/SSTIM_DIRECTIONS.md). A fact
+stated in one of them is not restated in another.
+
+---
+
 ## Current Focus (update when focus shifts)
 
 Phase 0 is complete; the repository is in Phase 1 with substantial Phase-2 work
