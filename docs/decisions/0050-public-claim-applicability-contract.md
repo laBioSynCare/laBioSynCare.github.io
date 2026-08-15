@@ -149,6 +149,29 @@ invalid, and nothing invalid belongs in the published term space.
   PROVISIONAL risk-reduction default. Reconcile it with the BioSynCare Reference
   enum and a qualified EU MDR adviser before launch, as before.
 
+### Revision, 2026-08-15: the gate could be switched off by an omission
+
+A later review found the one failure mode a safety gate must not have. The gate
+opens with `?level requiresEvidenceTierRank ?req`, and **nothing made that
+property mandatory**. A `sstim:PublicClaimLevel` without it matches nothing in
+the WHERE clause, so the entire constraint passes vacuously for every preset
+declaring that level. Adding a seventh claim level and forgetting one triple
+would have disabled the gate silently — no error, no warning, every preset at
+that level suddenly authorized.
+
+All six committed levels carry it, so the gate has always worked in practice.
+That is exactly why nothing caught it: correct data hides a fail-open contract.
+
+`sstim-sh:PublicClaimLevelShape` now requires `requiresEvidenceTierRank` and
+`claimLevelRank` on every level, and `sstim-sh:EvidenceTierValueShape` requires
+`tierRank` on every tier. Two fixtures were added: a level with no requirement
+and a tier with no rank must both be rejected. They are rejected by the
+vocabulary shapes rather than by the gate, which is the point — the gate never
+sees a level it cannot read.
+
+The missing-tier case fails *closed* (no claim can reach an unstated
+requirement), so only the level case was a hole; both are now invalid.
+
 ## Alternatives considered
 
 **Split the gate into one constraint per clause, for better diagnostics.**

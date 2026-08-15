@@ -45,7 +45,9 @@ already exist to carry that.
 
 ## 2. Panning
 
-**Direction.** Model spatialisation properly. Do not transcribe.
+**Direction.** Model **spatialization** properly, with **panning** as one
+technique under it and **localization** kept on the perceptual side. Do not
+transcribe.
 
 **What the catalog does, and why it cannot be copied.** `panOsc` is an integer
 0–3 selecting: static centre, hold-and-crossfade, sinusoidal, and
@@ -55,11 +57,47 @@ the breathing oscillator" as a fourth value of a position enum collapses two
 different things: *where the stimulus is in space* and *what drives that
 position over time*.
 
+### The terminology, checked
+
+The maintainer's sketch was *spatialization includes localization, with panning
+related to localization or a special case of it*. The literature supports the
+first half and inverts the second, and the distinction matters here more than it
+usually does.
+
+| Term | What it is | Which side of SSTIM's boundary |
+|---|---|---|
+| **Spatialization** | The rendering practice: placing a stimulus at an apparent position in space, by whatever means | Stimulus / delivery |
+| **Panning** | One spatialization *technique* — distributing a source across channels by amplitude, and its generalisations (VBAP, ambisonics, HRTF-based binaural rendering, wave field synthesis) | Stimulus / delivery |
+| **Localization** | The listener's perceptual determination of a source's direction and distance — psychophysics, not rendering | Response / observation |
+
+So panning is a special case of **spatialization**, not of localization; and
+localization is not contained in spatialization at all — it is its perceptual
+counterpart, what the subject does with what was delivered. Jens Blauert's
+standard reference is titled *Spatial Hearing: The Psychophysics of Human Sound
+Localization*, which places localization squarely on the perceptual side.
+
+Industry usage genuinely conflates them — spatial-audio writing routinely
+glosses spatialization as "localisation or placement of sounds in a virtual
+space" — which is precisely why a standard should not.
+
+**This maps onto a boundary SSTIM already draws.** `sstim:StimulusSpecification`
+states what reaches the subject; `sstim:ParticipantObservation` records what the
+subject reports. Spatialization belongs to the first, localization to the
+second — and localization is a genuinely interesting *observation* to be able to
+record ("where did you perceive it?"), which SSTIM cannot express today.
+
+Spatialization also generalises across senses in a way panning does not: a
+visual stimulus has a position in the visual field, a haptic one a body site
+(`sstim:hasBodyPlacement` already exists in the exposure module), an olfactory
+one a direction of airflow. Naming the general concept *spatialization* and
+panning as one auditory technique under it keeps the standard modality-neutral
+where the catalog's `panOsc` integer could not.
+
 **What a real model separates.**
 
-- **Spatial position** — where the stimulus is, which generalises beyond audio.
-  A visual stimulus has a position in the visual field; a haptic one has a body
-  site (`sstim:hasBodyPlacement` already exists in the exposure module).
+- **Spatial position** — where the stimulus is, per the table above; a
+  spatialization facet on a component, with panning as one auditory technique
+  for achieving it.
 - **Modulation** — that some parameter varies over time, driven by a source
   which may be a fixed function or another component. This is what the
   Martigli-synced mode really is, and SSTIM already has the shape of it:

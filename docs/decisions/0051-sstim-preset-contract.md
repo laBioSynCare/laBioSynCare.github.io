@@ -171,6 +171,34 @@ It runs in `make validate` via `make preset-contract`.
   by [ADR 0048](0048-session-events-and-qualified-observations.md) on the session
   side, where execution actually happens.
 
+### Revision, 2026-08-15: the modality claim was wider than the parameters
+
+A later review found that `breathing-oscillation` and `symmetry-sequence`
+accepted any modality while carrying audio-frequency parameters. This ADR's own
+positive fixture asserted a **visual** breathing oscillation with
+`centerHz: 180` — a 180 Hz visual breathing guide, which is meaningless. The
+schema validated it.
+
+The cause is worth stating because it points at the next piece of work: each
+kind's parameters currently describe *both* the oscillation and the thing it
+modulates. The periods are modality-neutral seconds; `centerHz` and
+`amplitudeHz` are what is being modulated, which in audio is frequency and in
+vision would be luminance, size or position. Until those are separated, a kind
+cannot be reused across senses.
+
+All four defined kinds are therefore now explicitly `auditory`, and the schema
+says so rather than leaving it implied. The structural claim is unchanged and
+still true — adding a visual kind needs a new parameter set and no
+restructuring — but the schema no longer implies that *these* kinds can be
+rendered through another sense. The separation that would make them portable is
+[direction §2](../ontology/SSTIM_DIRECTIONS.md), the same one panning needs.
+
+Two smaller corrections from the same review: the `modality` enum listed nine
+values where SSTIM declares six, so `make preset-contract` now resolves every
+controlled value in the schema to a declared `skos:notation` and fails on
+invention; and `permutationFunction`'s SHACL ceiling is now compared against the
+number of named permutations.
+
 ## Alternatives considered
 
 **Publish the catalog format as SSTIM's schema.** Rejected by the maintainer,

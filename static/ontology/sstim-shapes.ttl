@@ -837,6 +837,44 @@ sstim-sh:EvidenceSearchRecordShape a sh:NodeShape ;
         sh:message "EvidenceSearchRecord must record its as-of coverage-end date."@en ;
     ] .
 
+# The public-claim gate (BscCatalogPresetShape, ADR 0050) reads
+# requiresEvidenceTierRank to decide whether a preset needs evidence at all, and
+# tierRank to decide whether a claim is strong enough. Neither was mandatory.
+#
+# A PublicClaimLevel missing requiresEvidenceTierRank matches nothing in the
+# gate's WHERE clause, so the entire constraint passes vacuously for every preset
+# declaring that level — a safety gate failing open on an omission, which is the
+# worst way for one to fail. Adding a seventh claim level and forgetting one
+# triple would have disabled it silently.
+#
+# A tier missing tierRank fails closed instead (no claim can reach the
+# requirement), which is safe but still leaves the vocabulary incomplete.
+sstim-sh:PublicClaimLevelShape a sh:NodeShape ;
+    sh:targetClass sstim:PublicClaimLevel ;
+    sh:name "PublicClaimLevel"@en ;
+    sh:property [
+        sh:path sstim:requiresEvidenceTierRank ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ; sh:minInclusive 0 ;
+        sh:message "Every PublicClaimLevel must state requiresEvidenceTierRank: the public-claim gate reads it, and a level without one silently disables that gate."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:claimLevelRank ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ; sh:minInclusive 0 ;
+        sh:message "Every PublicClaimLevel must state its ordinal claimLevelRank."@en ;
+    ] .
+
+sstim-sh:EvidenceTierValueShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceTierValue ;
+    sh:name "EvidenceTierValue"@en ;
+    sh:property [
+        sh:path sstim:tierRank ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ; sh:minInclusive 0 ;
+        sh:message "Every EvidenceTierValue must state its ordinal tierRank: the public-claim gate compares it against the level's requirement."@en ;
+    ] .
+
 sstim-sh:EvidenceReviewDecisionShape a sh:NodeShape ;
     sh:targetClass sstim:EvidenceReviewDecision ;
     sh:name "EvidenceReviewDecision"@en ;

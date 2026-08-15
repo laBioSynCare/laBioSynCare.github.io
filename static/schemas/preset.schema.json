@@ -92,7 +92,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "modality", "kind", "parameters"],
-      "description": "One stimulation layer. `kind` selects which parameter set is required; `modality` says through which sense it is delivered. The two are independent on purpose: a breathing oscillation rendered as a moving light is the same kind in a different modality.",
+      "description": "One stimulation layer. `kind` selects which parameter set is required; `modality` says through which sense it is delivered.\n\nThe structure is modality-neutral; every kind defined so far is auditory, and each conditional below says so explicitly rather than leaving it implied. That is the honest state: SSTIM has no visual or haptic stimulation parameter set yet, and the reason is instructive — each kind\u0027s parameters currently describe both the oscillation and the thing it modulates, so they cannot be reused across senses. Adding a visual kind needs a new parameter set and no structural change.",
       "properties": {
         "id": {
           "type": "string",
@@ -126,7 +126,10 @@
         },
         {
           "if": { "properties": { "kind": { "const": "breathing-oscillation" } }, "required": ["kind"] },
-          "then": { "properties": { "parameters": { "$ref": "#/$defs/breathingParameters" } } }
+          "then": {
+            "properties": { "modality": { "const": "auditory" }, "parameters": { "$ref": "#/$defs/breathingParameters" } },
+            "description": "Auditory for now, and the restriction is a finding rather than a design choice. The oscillation itself is modality-neutral — its periods are seconds — but centerHz and amplitudeHz describe what it modulates, which in audio is frequency and in vision would be luminance, size or position. Until the oscillation is separated from the parameter it modulates, letting this kind claim another modality would validate a 180 Hz visual breathing guide, which is meaningless. See SSTIM_DIRECTIONS.md §2."
+          }
         },
         {
           "if": { "properties": { "kind": { "const": "breathing-binaural" } }, "required": ["kind"] },
@@ -136,7 +139,10 @@
         },
         {
           "if": { "properties": { "kind": { "const": "symmetry-sequence" } }, "required": ["kind"] },
-          "then": { "properties": { "parameters": { "$ref": "#/$defs/symmetryParameters" } } }
+          "then": {
+            "properties": { "modality": { "const": "auditory" }, "parameters": { "$ref": "#/$defs/symmetryParameters" } },
+            "description": "Auditory for the same reason: the sequence's timing is modality-neutral but baseHz and octaveSpan are pitch, which a visual or haptic sequence does not have. The timing half is what generalises."
+          }
         }
       ]
     },

@@ -376,7 +376,7 @@ def breathing_preset() -> dict:
             },
             {
                 "id": "pulse",
-                "modality": "visual",
+                "modality": "auditory",
                 "kind": "breathing-oscillation",
                 "level": 0.2,
                 "parameters": {
@@ -415,6 +415,9 @@ def schema_cases(base: dict) -> list[tuple[str, dict, str]]:
         ("level at 1.0", mutate(base, ("components", 0, "level"), 1.0), "level < 1"),
         ("a carrier below 80 Hz", mutate(base, ("components", 0, "parameters", "carrierLeftHz"), 60), "carrier range"),
         ("a visual binaural beat", mutate(base, ("components", 0, "modality"), "visual"), "binaural implies auditory"),
+        ("a visual breathing oscillation carrying an audio carrier",
+         mutate(breathing_preset(), ("components", 1, "modality"), "visual"),
+         "audio-parameterised kinds are auditory"),
         ("a component with no modality", mutate(base, ("components", 0, "modality"), None), "modality required"),
         ("a catalog abbreviation smuggled in", stray, "closed parameter set"),
         ("a permutation as an integer", mutate(

@@ -111,6 +111,27 @@ file is the human-readable summary.
   than 50. No committed instance was affected.
 - `PRESET_FORMAT.md` stated `iniVolume` as "0-1" in its per-type tables while
   its global limits section says 1.0 is invalid. It now reads `0 <= v < 1`.
+- **The public-claim gate could be switched off by omitting one triple.** It
+  opens with `?level requiresEvidenceTierRank ?req`, and nothing made that
+  property mandatory: a claim level without it matched nothing, so the whole
+  constraint passed vacuously for every preset declaring that level. All six
+  committed levels carry it, which is why correct data hid a fail-open contract.
+  `sstim-sh:PublicClaimLevelShape` and `sstim-sh:EvidenceTierValueShape` now
+  require the ranks the gate reads, with fixtures for both.
+- **The preset schema's modality claim was wider than its parameters.**
+  `breathing-oscillation` and `symmetry-sequence` accepted any modality while
+  carrying audio-frequency parameters — the shipped fixture asserted a 180 Hz
+  *visual* breathing guide and validated. All four defined kinds are now
+  explicitly auditory. The structure stays modality-neutral; what is missing is
+  the separation of an oscillation from the parameter it modulates, which is the
+  same thing spatialization needs.
+- The schema's `modality` enum listed nine values where SSTIM declares six.
+  `make preset-contract` now resolves all 45 controlled values across five
+  schemes to declared `skos:notation`s and fails on invention (KR-17 pattern),
+  and compares `permutationFunction`'s ceiling against the named permutations.
+- `make band-scope-notes` also checks frequency arithmetic: every oscillation's
+  extended range must contain its typical ambit, and no band's interval may run
+  backwards.
 
 ## [0.14.0] - 2026-08-13
 

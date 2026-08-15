@@ -286,6 +286,31 @@ CASES = [
         "currency",
     ),
     (
+        # Not a mutation of the assessment but of the *vocabulary*: a claim level
+        # that forgot to state what evidence it requires. Before ADR 0051 added
+        # PublicClaimLevelShape this made the gate pass vacuously for every
+        # preset using that level — the one failure mode a safety gate must not
+        # have. It is rejected by that shape rather than by the gate, which is
+        # the point: the gate can no longer be switched off by an omission.
+        "a claim level that states no evidence requirement",
+        None,
+        """
+        ex:invented-level a owl:NamedIndividual, sstim:PublicClaimLevel ;
+            rdfs:label "KR-04 fixture level with no requirement"@en ;
+            sstim:claimLevelRank 3 .
+        """,
+        "vocabulary integrity",
+    ),
+    (
+        "an evidence tier that states no rank",
+        None,
+        """
+        ex:invented-tier a owl:NamedIndividual, sstim:EvidenceTierValue ;
+            rdfs:label "KR-04 fixture tier with no rank"@en .
+        """,
+        "vocabulary integrity",
+    ),
+    (
         "a medical claim backed by the strongest possible evidence",
         "sstim:hasPublicClaimLevel sstim-v:claimC3StructureFunction",
         "sstim:hasPublicClaimLevel sstim-v:claimC4Medical",
@@ -366,7 +391,16 @@ def main() -> int:
             fixture += BORROWED
 
         text = report_for(base, shapes, fixture)
-        if GATE not in text:
+        if clause == "vocabulary integrity":
+            # Rejected by PublicClaimLevelShape / EvidenceTierValueShape rather
+            # than by the gate: the gate never sees a level it cannot read, which
+            # is precisely why the omission had to be made invalid.
+            if "must state" not in text:
+                failures.append(
+                    f"{label}: not rejected by the vocabulary shape — the gate "
+                    f"can still be disabled by omitting a triple (ADR 0050)"
+                )
+        elif GATE not in text:
             failures.append(
                 f"{label}: accepted — the {clause} clause of the contract is not "
                 f"load-bearing (ADR 0050)"
