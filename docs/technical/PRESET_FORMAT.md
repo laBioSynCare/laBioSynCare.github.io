@@ -485,7 +485,7 @@ Requires headphones for the binaural effect.
 
 | Field | Type | Default | Notes |
 |---|---|---|---|
-| `iniVolume` | number or null | 0.18 | 0–1. null = use default. >0.30 requires rationale |
+| `iniVolume` | number or null | 0.18 | 0 ≤ v < 1. null = use default. >0.30 requires rationale |
 
 **Forbidden:** all Martigli fields (`mf0`, `ma`, `mp0`, `mp1`, `md`,
 `isOn`, `waveformM`), all Symmetry fields (`f0`, `nnotes`, `noctaves`,
@@ -534,7 +534,7 @@ or as a textural tremolo layer when `isOn: false`.
 
 | Field | Type | Default | Notes |
 |---|---|---|---|
-| `iniVolume` | number or null | 0.25 | 0–1. null = use default |
+| `iniVolume` | number or null | 0.25 | 0 ≤ v < 1. null = use default |
 
 **Forbidden:** `fl`, `fr`, `waveformL`, `waveformR`, `panOsc`,
 `panOscPeriod`, `panOscTrans`, all Symmetry fields.

@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labiosyncare.github.io/schemas/preset.schema.json",
+  "title": "SSTIM preset",
+  "description": "A sensory stimulation preset: what to deliver, in which modalities, aimed at which frequency ambits, under which safety cautions. Audit finding KR-07 and improvement plan 1.3.\n\nThis is SSTIM's own contract, not any application's. It takes inspiration from the BioSynCare catalog format documented in docs/technical/PRESET_FORMAT.md — that format solved real delivery problems and its parameter ranges are carried over — but it deliberately does not reproduce it. Three differences are the point of the redesign: a preset is composed of modality-declaring COMPONENTS rather than audio `voices`, so a visual or haptic component needs no new structure; parameters are named with their units rather than abbreviated; and the product/catalog envelope of any one application (listing status, tiering, marketing copy, per-application evidence enums) is absent, because a standard does not ratify one vendor's product taxonomy. An application may carry its own fields alongside; this schema neither requires nor validates them.\n\nArithmetic cross-field rules that JSON Schema cannot express — binaural beat frequency, symmetry pulse rate, breath-reference agreement — are enforced by scripts/preset-contract.py, which also proves these bounds agree with SHACL and with the documented ranges. Neither layer is complete alone.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["model", "id", "name", "version", "targetBands", "components"],
+
+  "properties": {
+    "model": {
+      "const": "sstim-preset-1",
+      "description": "Model tag. A document carrying newer fields must never claim an older tag."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable slug, unique within its implementation. Becomes the local part of the preset IRI."
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this preset, independent of any catalog version."
+    },
+
+    "group": {
+      "enum": ["Heal", "Support", "Perform", "Indulge", "Transcend"],
+      "description": "Optional BSC framework grouping (sstim:inGroup). Optional because grouping is a framework's editorial scheme, not a property every standard-conformant preset must have."
+    },
+    "targetBands": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "description": "The frequency ambits this preset aims at, primary first. A band is a Hz interval, not a neural rhythm (ADR 0049).",
+      "items": { "$ref": "#/$defs/frequencyBand" }
+    },
+    "cautions": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Safety cautions (sstim:hasCautionTag).",
+      "items": { "$ref": "#/$defs/caution" }
+    },
+    "publicClaimLevel": {
+      "enum": ["C0", "C1", "C2", "C3", "C4", "C5"],
+      "description": "The strongest level of public statement this preset is presented with. C3 and above additionally require an authorizing evidence assessment satisfying the applicability contract (ADR 0050); this field alone authorizes nothing."
+    },
+
+    "breathReference": {
+      "type": "string",
+      "description": "The id of the single component whose oscillation guides breathing, if any. Replaces the catalog's paired hasBreathGuide flag and per-voice isOn booleans: one optional pointer cannot contradict itself, where two coupled fields can and did."
+    },
+
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "description": "1-6 stimulation components. Each declares its own modality, so a preset is not implicitly audio.",
+      "items": { "$ref": "#/$defs/component" }
+    }
+  },
+
+  "$defs": {
+    "frequencyBand": {
+      "enum": [
+        "delta", "theta", "alpha", "smr", "beta", "gamma",
+        "low-delta", "high-delta", "low-theta", "high-theta",
+        "low-alpha", "high-alpha", "low-beta", "mid-beta", "high-beta",
+        "alpha-10", "gamma-40"
+      ],
+      "description": "Lowercase SKOS concept local names from sstim-v:FrequencyBandScheme. \"gamma\" and \"gamma-40\" are distinct concepts."
+    },
+
+    "caution": {
+      "enum": [
+        "epilepsy-risk", "high-intensity", "stimulating", "fatigue-sensitive",
+        "emotionally-sensitive", "drowsy-use", "nighttime-only", "driving-unsafe",
+        "overload-sensitive", "advanced-use", "ultra-slow-breathing"
+      ]
+    },
+
+    "modality": {
+      "enum": [
+        "auditory", "visual", "somatosensory", "interoceptive",
+        "vestibular", "olfactory", "gustatory", "thermal", "nociceptive"
+      ],
+      "description": "From sstim-v:SensoryModalityScheme. Declared per component, never assumed."
+    },
+
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "modality", "kind", "parameters"],
+      "description": "One stimulation layer. `kind` selects which parameter set is required; `modality` says through which sense it is delivered. The two are independent on purpose: a breathing oscillation rendered as a moving light is the same kind in a different modality.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "modality": { "$ref": "#/$defs/modality" },
+        "kind": {
+          "enum": ["binaural-beat", "breathing-oscillation", "breathing-binaural", "symmetry-sequence"],
+          "description": "Named for what the component is, not for the engine that renders it."
+        },
+        "level": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMaximum": 1,
+          "description": "Relative intensity in [0, 1). Above 0.30 requires a rationale, which scripts/preset-contract.py enforces via the notes field. Omitted means the implementation's default for this kind."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free-text rationale. Required when level exceeds 0.30."
+        },
+        "parameters": { "type": "object" }
+      },
+
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "binaural-beat" } }, "required": ["kind"] },
+          "then": {
+            "properties": { "modality": { "const": "auditory" }, "parameters": { "$ref": "#/$defs/binauralParameters" } },
+            "description": "A binaural beat is produced by dichotic presentation and has no meaning outside hearing."
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "breathing-oscillation" } }, "required": ["kind"] },
+          "then": { "properties": { "parameters": { "$ref": "#/$defs/breathingParameters" } } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "breathing-binaural" } }, "required": ["kind"] },
+          "then": {
+            "properties": { "modality": { "const": "auditory" }, "parameters": { "$ref": "#/$defs/breathingBinauralParameters" } }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "symmetry-sequence" } }, "required": ["kind"] },
+          "then": { "properties": { "parameters": { "$ref": "#/$defs/symmetryParameters" } } }
+        }
+      ]
+    },
+
+    "carrierHz": {
+      "type": "number",
+      "minimum": 80,
+      "maximum": 1000,
+      "description": "Carrier frequency in Hz."
+    },
+    "amplitudeHz": { "type": "number", "minimum": 1, "maximum": 400 },
+    "initialPeriodSeconds": { "type": "number", "minimum": 0.1, "maximum": 120 },
+    "finalPeriodSeconds": { "type": "number", "minimum": 0.1, "maximum": 240 },
+    "transitionSeconds": { "type": "number", "minimum": 0.1, "maximum": 3600 },
+
+    "binauralParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["carrierLeftHz", "carrierRightHz"],
+      "properties": {
+        "carrierLeftHz": { "$ref": "#/$defs/carrierHz" },
+        "carrierRightHz": { "$ref": "#/$defs/carrierHz" }
+      }
+    },
+
+    "breathingParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["centerHz", "amplitudeHz", "initialPeriodSeconds", "finalPeriodSeconds", "transitionSeconds"],
+      "properties": {
+        "centerHz": { "type": "number", "minimum": 80, "maximum": 400 },
+        "amplitudeHz": { "$ref": "#/$defs/amplitudeHz" },
+        "initialPeriodSeconds": { "$ref": "#/$defs/initialPeriodSeconds" },
+        "finalPeriodSeconds": { "$ref": "#/$defs/finalPeriodSeconds" },
+        "transitionSeconds": { "$ref": "#/$defs/transitionSeconds" }
+      }
+    },
+
+    "breathingBinauralParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "carrierLeftHz", "carrierRightHz", "amplitudeHz",
+        "initialPeriodSeconds", "finalPeriodSeconds", "transitionSeconds"
+      ],
+      "properties": {
+        "carrierLeftHz": { "$ref": "#/$defs/carrierHz" },
+        "carrierRightHz": { "$ref": "#/$defs/carrierHz" },
+        "amplitudeHz": { "$ref": "#/$defs/amplitudeHz" },
+        "initialPeriodSeconds": { "$ref": "#/$defs/initialPeriodSeconds" },
+        "finalPeriodSeconds": { "$ref": "#/$defs/finalPeriodSeconds" },
+        "transitionSeconds": { "$ref": "#/$defs/transitionSeconds" }
+      }
+    },
+
+    "symmetryParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseHz", "noteCount", "octaveSpan", "cycleSeconds", "permutation"],
+      "description": "A sequence of events evenly spaced in time and, when octaveSpan is non-zero, in pitch. octaveSpan 0 collapses it to an isochronic pulse train, which is the same object with one parameter at zero rather than a separate kind.",
+      "properties": {
+        "baseHz": { "type": "number", "minimum": 80 },
+        "noteCount": { "type": "integer", "minimum": 2 },
+        "octaveSpan": { "type": "number", "minimum": 0 },
+        "cycleSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "permutation": {
+          "enum": ["shuffle", "rotate-forward", "rotate-backward", "reverse", "identity"],
+          "description": "Named rather than the catalog's integer code. The ordinal encoding 0-4 survives only where RDF needs a number (sstim:permutationFunction), in the order listed here."
+        }
+      }
+    }
+  }
+}

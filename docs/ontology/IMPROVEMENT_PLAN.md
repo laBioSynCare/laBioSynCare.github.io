@@ -62,7 +62,7 @@ explicitly re-scoped with a recorded reason.
 | KR-04 | Public-claim gate approves wrong evidence | 1.2d (closed); ladder redesign remains 1.2b–1.2c |
 | KR-05 | OWL domains contradict definitions | 1.1 |
 | KR-06 | `EvidenceClaim` overloaded | 1.2a |
-| KR-07 | Patch/preset validation weaker than claim | 1.3 |
+| KR-07 | Patch/preset validation weaker than claim | 1.3 (closed) |
 | KR-08 | Outcome prose inside physical categories | 1.4 |
 | KR-09 | Overstated `exactMatch` alignments | 1.4 |
 | KR-10 | Ordered/controlled values collapse to literals | 1.3, 1.4 |
@@ -285,6 +285,34 @@ covered by tests.
 > population — that axis opens when they do.
 
 #### 1.3 Complete the executable-parameter contract
+
+**`[x]` Implemented 2026-08-15 ([ADR 0051](../decisions/0051-sstim-preset-contract.md)).
+Closes KR-07.** SSTIM now has its own preset contract,
+[`static/schemas/preset.schema.json`](../../static/schemas/preset.schema.json)
+(`sstim-preset-1`): modality-declaring components rather than audio voices,
+parameters named with their units, one breath pointer instead of two coupled
+flags, and no application product envelope. It takes the numeric parameter
+ranges from the BioSynCare catalog format and nothing else — that format is one
+audio-only application's incremental history, not a standard, and SSTIM reads it
+as an input rather than conforming to it.
+
+The four SHACL gaps the audit named are closed: a six-voice ceiling, the 35 Hz
+beat limit with its gamma-40 exception, the 50 Hz Symmetry pulse-rate limit, and
+a rationale requirement above the 0.30 conservative volume. Two documented
+ranges the shapes had drifted from (carriers, Symmetry base note) now match.
+
+The matrix is executed rather than tabulated: `make preset-contract` reads every
+bound out of the schema, the shapes and the format document and compares them —
+12 parameters against SHACL, 11 against the documented ranges — so a bound
+changed in one place fails until the others follow. The same gate carries the
+application-validation leg (beat frequency, pulse rate, breath reference, unique
+ids, level rationale) with 25 adversarial cases and 8 positive controls.
+
+Open, with reasons recorded in the ADR: panning and waveform selection have no
+SSTIM property at all and need a design pass rather than a transcription; and
+`sstim:composedOf` still ranges over the audio `sstim:Voice`, so a visual or
+haptic component is expressible in the schema and not yet in RDF — that is the
+question ADR 0040 left open, deliberately not pre-empted here.
 
 - Build a single matrix mapping each executable parameter to JSON field,
   datatype/unit, range, cross-field rules, RDF property, and SHACL path.

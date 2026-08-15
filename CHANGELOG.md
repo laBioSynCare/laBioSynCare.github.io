@@ -36,6 +36,24 @@ file is the human-readable summary.
   committed data (nothing claims above C1), so without adversarial fixtures a
   deleted clause would be invisible to every other check. The harness is itself
   mutation-tested: removing the direction clause fails exactly two cases.
+- **SSTIM's own preset contract**
+  ([ADR 0051](docs/decisions/0051-sstim-preset-contract.md), closes KR-07):
+  `static/schemas/preset.schema.json`, model tag `sstim-preset-1`. A preset is
+  composed of 1-6 modality-declaring **components**, not audio voices, so a
+  visual or haptic component needs no new structure. Parameters carry their
+  units in their names; one optional `breathReference` replaces a header flag
+  and a per-voice flag that had to agree; there is no application product
+  envelope. It takes the numeric parameter ranges from the BioSynCare catalog
+  format documented in `PRESET_FORMAT.md` and nothing else — that format is one
+  audio-only application's incremental history, and a standard does not ratify
+  one vendor's catalog taxonomy.
+- `make preset-contract` — the parameter matrix, executed rather than tabulated.
+  It reads every bound out of the schema, the SHACL shapes and the format
+  document and compares them (12 parameters against SHACL, 11 against the
+  documented ranges), so a bound changed in one place fails until the others
+  follow. It also carries the cross-field rules no JSON Schema can express —
+  beat frequency, pulse rate, breath-reference resolution, unique component ids,
+  the level rationale — with 25 adversarial cases and 8 positive controls.
 
 ### Changed
 
@@ -78,6 +96,18 @@ file is the human-readable summary.
 - The frequency-band scheme description no longer calls these "neural oscillation
   frequency bands", and its editorial note records the resolution instead of
   deferring it.
+- **The four preset validation gaps KR-07 named are closed** in SHACL: a preset
+  is capped at six voices; the binaural beat `|fl - fr|` may not exceed 35 Hz
+  unless it is exactly 40 Hz in a preset declaring `gamma-40` (a preset-level
+  constraint, since the voice cannot see the target band); the Symmetry pulse
+  rate `nnotes / d` may not exceed 50 Hz; and a voice louder than 0.30 must
+  record why in an `rdfs:comment` — a rationale requirement rather than a hard
+  ceiling, which is what the specification actually says. Two ranges the shapes
+  had drifted from now match the specification: carriers are `[80, 1000]` Hz
+  rather than anything above 0, and the Symmetry base note is >= 80 Hz rather
+  than 50. No committed instance was affected.
+- `PRESET_FORMAT.md` stated `iniVolume` as "0-1" in its per-type tables while
+  its global limits section says 1.0 is invalid. It now reads `0 <= v < 1`.
 
 ## [0.14.0] - 2026-08-13
 

@@ -161,7 +161,7 @@ DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES = {
 # anonymous and their canonical labels move when any one of them changes. The
 # alternatives themselves stay covered by the SHACL suites, which execute the
 # shape against real data instead of comparing its serialisation.
-SELF_REPORT_OR_LIST_ROOTS = (
+EXCLUDED_SHAPE_PROPERTY_ROOTS = (
     (SSTIM_SH.SelfReportShape, SH["or"]),
     # ADR 0049 widened two sh:or alternative lists to admit
     # sstim:NeuralOscillationType as an assessment subject, so an evidence
@@ -178,6 +178,23 @@ SELF_REPORT_OR_LIST_ROOTS = (
     # serialisation.
     (SSTIM_SH.AssessmentPropositionShape, SH.property),
     (SSTIM_SH.EvidenceAssessmentClaimShape, SH.property),
+    # ADR 0051 tightened the catalog preset and voice property shapes for KR-07:
+    # a six-voice ceiling, carriers bounded to the documented [80, 1000] rather
+    # than anything above 0, and a Symmetry base note at the documented 80 Hz
+    # rather than 50. Every one of those blocks is anonymous, so every triple in
+    # it is replaced and its canonical label moves.
+    #
+    # The same trade as above applies, and more strongly here: these bounds are
+    # not merely executed against real data by the SHACL suites, they are read
+    # back out of the shapes and compared against the JSON Schema and the
+    # documented ranges by `make preset-contract`, which then drives 25
+    # adversarial fixtures through them. Comparing their serialisation against a
+    # 0.12 baseline would add nothing that check does not do better.
+    (SSTIM_SH.BscCatalogPresetShape, SH.property),
+    (SSTIM_SH.BinauralVoiceShape, SH.property),
+    (SSTIM_SH.MartigliVoiceShape, SH.property),
+    (SSTIM_SH.MartigliBinauralVoiceShape, SH.property),
+    (SSTIM_SH.SymmetryVoiceShape, SH.property),
 )
 
 
@@ -291,7 +308,7 @@ def normalized(
 ) -> Graph:
     result = Graph()
     ontology_subjects = set(graph.subjects(RDF.type, OWL.Ontology))
-    excluded_bnodes = bnode_closure(graph, SELF_REPORT_OR_LIST_ROOTS)
+    excluded_bnodes = bnode_closure(graph, EXCLUDED_SHAPE_PROPERTY_ROOTS)
     excluded_bnodes |= public_claim_gate_nodes(graph)
     for triple in graph:
         subject, predicate, obj = triple
@@ -336,7 +353,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )

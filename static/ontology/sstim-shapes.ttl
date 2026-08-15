@@ -189,11 +189,13 @@ sstim-sh:BscCatalogPresetShape a sh:NodeShape ;
         sh:message "presetVersion must be a semantic version string X.Y.Z."@en ;
     ] ;
 
+    # KR-07: the class definition caps a preset at six voices and the format
+    # specification says 1-6, but nothing enforced the ceiling.
     sh:property [
         sh:path sstim:composedOf ;
-        sh:minCount 1 ;
+        sh:minCount 1 ; sh:maxCount 6 ;
         sh:class sstim:Voice ;
-        sh:message "Preset must be composed of at least one Voice."@en ;
+        sh:message "Preset must be composed of 1-6 Voices."@en ;
     ] ;
 
     sh:property [
@@ -235,6 +237,32 @@ sstim-sh:BscCatalogPresetShape a sh:NodeShape ;
             }
             GROUP BY $this ?guide
             HAVING ( ( ?guide && COUNT(?v) != 1 ) || ( !?guide && COUNT(?v) != 0 ) )
+        """ ;
+    ] ;
+
+    # KR-07: the binaural beat frequency is |fl - fr| and the format
+    # specification caps it at 35 Hz, with one exception — exactly 40 Hz for a
+    # deliberate gamma-40 design, which must then declare gamma-40 as a target
+    # band. Neither the cap nor the exception was enforced, so a voice whose
+    # carriers were each individually legal could produce any beat at all.
+    #
+    # This has to be a preset-level constraint: the exception depends on the
+    # preset's targetsFrequencyBand, which the voice cannot see. It covers both
+    # carrier-pair subtypes, since both derive the beat the same way.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Binaural beat frequency |fl - fr| must not exceed 35 Hz, unless it is exactly 40 Hz in a preset that declares gamma-40 as a target band."@en ;
+        sh:select """
+            SELECT $this ?beat WHERE {
+                $this <https://w3id.org/sstim#composedOf> ?voice .
+                ?voice <https://w3id.org/sstim#carrierFreqLeft> ?fl ;
+                       <https://w3id.org/sstim#carrierFreqRight> ?fr .
+                BIND( ABS( ?fl - ?fr ) AS ?beat )
+                FILTER( ?beat > 35 )
+                FILTER( ! ( ?beat = 40 && EXISTS {
+                    $this <https://w3id.org/sstim#targetsFrequencyBand> <https://w3id.org/sstim/vocab#gamma40> .
+                } ) )
+            }
         """ ;
     ] ;
 
@@ -353,7 +381,25 @@ sstim-sh:VoiceShape a sh:NodeShape ;
         [ sh:class sstim:MartigliBinauralVoice ]
         [ sh:class sstim:SymmetryVoice ]
     ) ;
-    sh:message "Voice must be typed as exactly one of the four subtypes: Binaural, Martigli, Martigli-Binaural, or Symmetry."@en .
+    sh:message "Voice must be typed as exactly one of the four subtypes: Binaural, Martigli, Martigli-Binaural, or Symmetry."@en ;
+
+    # KR-07: the shape admitted any volume below 1.0, while the format
+    # specification caps the conservative default at 0.30 and requires an
+    # explicit rationale above it. A hard ceiling would forbid a legitimately
+    # louder design outright, so the requirement is the rationale, not the
+    # ceiling: above 0.30 the voice must carry an rdfs:comment saying why.
+    # 1.0 stays invalid outright via the per-subtype sh:maxExclusive.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A voice louder than iniVolume 0.30 must record why in an rdfs:comment (format specification, conservative volume limits)."@en ;
+        sh:select """
+            SELECT $this ?volume WHERE {
+                $this <https://w3id.org/sstim#initialVolume> ?volume .
+                FILTER( ?volume > 0.30 )
+                FILTER NOT EXISTS { $this <http://www.w3.org/2000/01/rdf-schema#comment> ?rationale }
+            }
+        """ ;
+    ] .
 
 
 sstim-sh:BinauralVoiceShape a sh:NodeShape ;
@@ -364,16 +410,16 @@ sstim-sh:BinauralVoiceShape a sh:NodeShape ;
         sh:path sstim:carrierFreqLeft ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
-        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
-        sh:message "fl must be a positive decimal less than 1000 Hz."@en ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
     ] ;
 
     sh:property [
         sh:path sstim:carrierFreqRight ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
-        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
-        sh:message "fr must be a positive decimal less than 1000 Hz."@en ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
     ] ;
 
     sh:property [
@@ -393,8 +439,8 @@ sstim-sh:SymmetryVoiceShape a sh:NodeShape ;
         sh:path sstim:baseFrequency ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
-        sh:minInclusive 50 ;
-        sh:message "f0 must be >= 50 Hz."@en ;
+        sh:minInclusive 80 ;
+        sh:message "f0 must be >= 80 Hz."@en ;
     ] ;
 
     sh:property [
@@ -427,6 +473,25 @@ sstim-sh:SymmetryVoiceShape a sh:NodeShape ;
         sh:datatype xsd:integer ;
         sh:minInclusive 0 ; sh:maxInclusive 4 ;
         sh:message "permfunc must be 0, 1, 2, 3, or 4."@en ;
+    ] ;
+
+    # KR-07: the pulse rate is nnotes/d Hz and the engine supports at most 50 Hz
+    # (onset interval >= 20 ms). Nothing enforced it, so nnotes and d could each
+    # be individually legal and jointly produce a rate the engine cannot deliver.
+    # This is the constraint CLAUDE.md §4.7 states and the one an isochronic
+    # design is validated by.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Symmetry pulse rate (nnotes / d) must not exceed 50 Hz — the onset interval d/nnotes must stay at or above 20 ms."@en ;
+        sh:select """
+            SELECT $this ?rate WHERE {
+                $this <https://w3id.org/sstim#noteCount> ?nnotes .
+                $this <https://w3id.org/sstim#cycleDuration> ?d .
+                FILTER( ?d > 0 )
+                BIND( ?nnotes / ?d AS ?rate )
+                FILTER( ?rate > 50 )
+            }
+        """ ;
     ] .
 
 
@@ -512,15 +577,15 @@ sstim-sh:MartigliBinauralVoiceShape a sh:NodeShape ;
         sh:path sstim:carrierFreqLeft ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
-        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
-        sh:message "fl must be a positive decimal less than 1000 Hz."@en ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fl must be a decimal in [80, 1000] Hz."@en ;
     ] ;
     sh:property [
         sh:path sstim:carrierFreqRight ;
         sh:minCount 1 ; sh:maxCount 1 ;
         sh:datatype xsd:decimal ;
-        sh:minExclusive 0 ; sh:maxExclusive 1000 ;
-        sh:message "fr must be a positive decimal less than 1000 Hz."@en ;
+        sh:minInclusive 80 ; sh:maxInclusive 1000 ;
+        sh:message "fr must be a decimal in [80, 1000] Hz."@en ;
     ] ;
     sh:property [
         sh:path sstim:martigliAmplitude ;
