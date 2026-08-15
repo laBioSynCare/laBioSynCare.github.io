@@ -102,28 +102,11 @@ SHACL profile, local-IRI resolution, and graph-specific golden assertions.
 **`[x]` Done 2026-08-13, with the ontology half of KR-03 explicitly deferred —
 see below.**
 
-- `[x]` Create a versioned JSON Schema for the native BSC session bundle.
-  [`static/schemas/session.schema.json`](../../static/schemas/session.schema.json),
-  model tag `bsc-lab-session-bundle-1`. It lives under `static/` so its `$id`
-  dereferences, as `manifest.schema.json` does.
-- `[x]` Define stable IDs for the session specification, session instance, event,
-  report, and observation item. All derived from the instance id by
-  `sessionIds()`; the recorder rejects a specification whose id is not derivable.
-- `[x]` Record the exact source preset/patch/configuration and content hashes,
-  engine and application versions, clock origin, monotonic event offsets,
-  wall-clock timestamps where appropriate, interruption/resume events, and actual
-  outcome of execution. Offsets come from the engine timing context only; a test
-  spies on `Date.now`/`performance.now` and fails if either is consulted.
-  `deliveredSeconds` is separated from `actualDurationSeconds`, so a paused
-  session is not recorded as a short one.
-- `[x]` Decide and document which output guarantee is supported: `outputGuarantee`
-  is a required enum of `bit-exact` / `signal-equivalent` /
-  `perceptually-equivalent`. Web Audio sessions declare the third unless a
-  deterministic offline render proves otherwise.
-- `[x]` Correct `SESSION_MODEL.md` to the same contract. The document now states
-  that it is not the contract and that the schema wins where they disagree.
-  `userMp0`/`userMp1`/`userMd` and `headphoneMode` — names that existed nowhere
-  but that document — are gone.
+The five deliverables — versioned schema, derivable stable ids, execution record
+on the engine clock, a declared output guarantee, and a corrected
+`SESSION_MODEL.md` — all shipped; the schema and
+[ADR 0048](../decisions/0048-session-events-and-qualified-observations.md) are
+the record of what they became.
 
 **Gate P0-B: passing.** `make session-contract` checks that every golden bundle
 validates, that the projection accounts for every leaf field, that only
@@ -181,15 +164,15 @@ covered by tests.
 > inheritance. Narrowing that domain back to one class re-infers
 > `sstim:Stimulation` on all three; the gate was verified by doing exactly that.
 
-- Resolve every definition/domain mismatch identified in exposure properties.
-  Choose a true common domain, an explicit union, domain-specific
-  subproperties, or no OWL domain plus SHACL constraints.
-- Add domain/range entailment tests to detect unintended inferred types.
-- Separate physical delivery medium from presentation/cue arrangement.
-- Assign a single owning module to upper-model axioms and remove duplicated
-  sources of truth.
-- Add a pinned minimal BFO/OBI/IAO/PROV import closure for CI reasoning, or
-  explicitly narrow documentation to the local-graph consistency claim.
+Closed with KR-05: the domain mismatches, the entailment tests that detect an
+unintended inferred type (`make entailment-check`), the physical-medium versus
+cue-arrangement split (`sstim-ex:deliveryMedium` beside
+`sstim-ex:hasStimulusPattern`), and single-module ownership of the upper-model
+axioms (`make module-boundaries`).
+
+**Still open.** Add a pinned minimal BFO/OBI/IAO/PROV import closure for CI
+reasoning, or narrow the documentation explicitly to the local-graph consistency
+claim that `make reason` actually makes.
 
 #### 1.2 Refactor evidence and public-claim governance
 
@@ -208,30 +191,17 @@ covered by tests.
 > ladder redesign; the facet-based redesign in ADRs 0028–0029 remains open and
 > is unaffected.
 
-- Separate literature evidence assessments, hypotheses/research questions,
-  observations, boundary applicability, requirements, design objectives, and
-  planned outcomes. Do not require an effect hypothesis on every exposure
-  profile. Migrate every existing pseudo-claim through the reviewed ledger.
-- Replace the directionally misleading subject relation `supportsRelation` with
-  the evidence-specific neutral `evaluatesSubject`, retaining a materialized
-  deprecated alias during the compatibility window.
-- Give every assessment one atomic bounded proposition and explicit outcome,
-  modality, population/model, protocol/context, and comparator scope. Require a
-  qualified evidence basis, a governance record for research outputs, and
-  separate source-level modality, intervention, study design, population/model,
-  synthesis, and observed-result metadata.
-- Deprecate the overloaded legacy modality-tag and assessment-summary fields;
-  expose only lossless mappings in the 0.7 compatibility view.
-- Model assessment, search, and review as PROV activities that generate
-  immutable assessment revisions, search records, and review decisions. Keep
-  reviewer relationship, independence determination, and decision as separate
-  axes without making external review a core validity requirement.
-- Recalculate migrated evidence tier and claim direction under the versioned
-  assessment method; legacy editorial ratings are inputs, not approved results.
-- Permit only scoped search findings from a reproducible search record. Use a
-  scoped, dated, attributed status assertion when SSTIM has not assessed or
-  recorded evidence; never assert that evidence or a mechanism universally
-  does not exist.
+Closed by ADR 0027: the claim-family split, `evaluatesSubject` replacing the
+directionally misleading `supportsRelation`, one atomic bounded proposition and
+explicit outcome per assessment, the overloaded legacy tags deprecated,
+assessment/search/review modelled as PROV activities generating immutable
+records, and scoped search findings permitted only from a reproducible search
+record.
+
+**Still open.** Recalculate migrated evidence tier and claim direction under the
+versioned rubric — the migration carried the legacy editorial rating forward
+under `method/adr-0027-migration/1` rather than inventing a re-assessment, and
+that re-assessment has not been done.
 
 **1.2b — Policy-neutral claim semantics
 ([ADR 0028](../decisions/0028-atomic-claim-propositions-and-public-expressions.md))**
@@ -316,14 +286,23 @@ multi-modal component does project to RDF today, through the generic
 profile a preset follows. See
 [SSTIM_DIRECTIONS.md](SSTIM_DIRECTIONS.md).
 
-- Build a single matrix mapping each executable parameter to JSON field,
-  datatype/unit, range, cross-field rules, RDF property, and SHACL path.
-- Reconcile voice count, binaural-difference, target-frequency, Symmetry-rate,
-  conservative-gain, visual-flicker, haptic, and breathing constraints.
-- Link RDF controlled values to their concept IRIs. Keep application numeric
-  codes only as versioned adapter values.
-- Add generator/app/model version, random seed where relevant, assets, and
-  checksums needed for the selected reproducibility level.
+Closed by ADR 0051: the parameter matrix, executed rather than tabulated
+(`make preset-contract` reads every bound from the schema, the shapes and the
+format document and compares them); and the voice-count, binaural-difference,
+target-frequency, Symmetry-rate and conservative-gain constraints. The
+reproducibility metadata — generator and application version, assets, checksums,
+declared level — shipped on the session side in
+[ADR 0048](../decisions/0048-session-events-and-qualified-observations.md),
+where execution actually happens.
+
+**Still open.**
+
+- Visual-flicker and haptic constraints. Both are named in this phase and
+  neither has an SSTIM parameter to constrain; see
+  [design directions](SSTIM_DIRECTIONS.md) §1, §2 and §5.
+- Link RDF controlled values to their concept IRIs, keeping application numeric
+  codes only as versioned adapter values. `sstim:permutationFunction` is still
+  an ordinal where the schema uses a named enum.
 
 #### 1.4 Repair SKOS and external mappings
 
@@ -353,23 +332,20 @@ profile a preset follows. See
 > `exactMatch`; beta stayed `closeMatch` because the item spans a range SSTIM
 > splits.
 
-- Separate stimulus temporal-frequency targets from observed neural-band
-  classifications; relate them only through a qualified hypothesis,
-  observation, or evidence assessment.
-- Remove sleep, pain, stress, relaxation, cognition, and other outcome
-  implications from physical band definitions/scope notes.
-- Represent primary and secondary target roles explicitly; never depend on RDF
-  triple order.
+Closed by ADR 0049: the target/oscillation separation, outcome prose removed
+from the band definitions, explicit primary and secondary target roles
+(`sstim:primaryFrequencyBand`, never triple order), both ends of every mapping
+identified in a scheme, every `exactMatch` re-audited, and per-mapping
+provenance as `owl:Axiom` annotations.
+
+**Still open.**
+
 - Clarify how vendor-neutral technique concepts relate to framework-specific
   techniques and implementation voice types using domain properties.
-- Require both ends of a SKOS mapping to be identified concepts in schemes.
-- Re-audit every `exactMatch`; downgrade when extension and intension are not
-  demonstrably interchangeable.
-- Add mapping provenance: target version/date, source, reviewer, rationale, and
-  confidence. Store structural/field transformations outside SKOS.
-- Add honest per-scheme language-coverage targets, translation review, aliases,
-  and locale-aware label fallback. Use hierarchy or SKOS Collections only where
-  a genuine generic or grouping relation exists.
+- Honest per-scheme language-coverage targets, translation review, aliases, and
+  locale-aware label fallback — this is KR-16, which remains open here and in
+  2.3 and Phase 4. Use hierarchy or SKOS Collections only where a genuine
+  generic or grouping relation exists.
 
 #### 1.5 Repair privacy-sensitive RDF surfaces
 
