@@ -76,7 +76,10 @@ ADR 0011 while the series continued to grow.
 ## `ontology/` — plans and reviews
 
 [`ontology/CURRENT_STATE.md`](ontology/CURRENT_STATE.md) is the maintained
-current-state and next-steps summary. [`ontology/README.md`](ontology/README.md)
+current-state and next-steps summary, and
+[`ontology/SSTIM_DIRECTIONS.md`](ontology/SSTIM_DIRECTIONS.md) records where the
+model is going and why — waveforms, panning and modulation, protocol
+namespacing, and coverage of all known senses. [`ontology/README.md`](ontology/README.md)
 indexes the module architecture, improvement and publication plans, registry
 submissions, and the dated audits.
 Ontology design itself is documented at

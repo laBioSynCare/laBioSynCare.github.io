@@ -1,6 +1,6 @@
 # SSTIM Current State and Next Steps
 
-**Status:** maintained current-state summary, reviewed 2026-08-08. This is the
+**Status:** maintained current-state summary, reviewed 2026-08-15. This is the
 starting point for ontology work. Dated audits remain evidence for individual
 decisions, but they describe the repository state on their stated dates rather
 than the state summarized here.
@@ -12,15 +12,16 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.14.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
-| What can be cited? | `0.13.0`, released 2026-08-04 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.21792692` | [`void.ttl`](../../static/ontology/void.ttl) |
+| What is being edited? | `0.15.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.14.0`, released 2026-08-13 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| Which DOI identifies that release? | `10.5281/zenodo.21923315` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
-| What changed? | No semantic change is yet recorded for `0.14.0-dev` | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| What changed? | Neural oscillations, the public-claim contract and the preset contract — see Unreleased | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
 The live line is mutable, carries no `owl:versionIRI`, and is not a citable
-release. The frozen [`0.13.0/`](../../static/ontology/0.13.0/) directory is the
+release. The frozen [`0.14.0/`](../../static/ontology/0.14.0/) directory is the
 latest immutable whole-set snapshot. Its version IRI resolves to the frozen
 namespace catalogue rather than to `sstim-core.ttl`, which is now only the
 two-class Kernel.
@@ -111,7 +112,8 @@ ecosystem projection use separate graph and storage boundaries.
 
 ## Validation and publication state
 
-The complete pinned gate passed on 2026-08-08:
+The complete pinned gate passed on 2026-08-15 (25 checks under `make validate`,
+810 tests under `make test`, and CI green on `main`):
 
 ```bash
 nix develop --command make validate
@@ -205,8 +207,8 @@ Its most practical uses today are:
    evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
    entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
    `/sstim/profile/core-plus`, and `/sstim/profile/full`.
-2. **Pin a release for published work.** Use the immutable `0.13.0` profile and
-   module URLs for a paper or dataset. Use `0.14.0-dev` only when intentionally
+2. **Pin a release for published work.** Use the immutable `0.14.0` profile and
+   module URLs for a paper or dataset. Use `0.15.0-dev` only when intentionally
    testing mutable development sources.
 3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and
    controlled concepts, but mint protocols, presets, sessions, assessments and
@@ -237,9 +239,36 @@ SSTIM should also not yet be used as a clinical decision system, proof that a
 stimulation has an effect, a production schema for identifiable participant
 observations, or a claim of turnkey HED/BIDS/NWB interoperability.
 
+## Phase 1 of the improvement plan is complete
+
+Every audit finding scheduled for Phase 1 is closed, most of them in the week to
+2026-08-15:
+
+| Finding | Closed by |
+|---|---|
+| KR-02, KR-03 | [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md) — session events on the engine clock, qualified observations where absence carries its reason. Released as `0.14.0` |
+| KR-05 | Union domains repaired, with entailment fixtures (`make entailment-check`) proving no unintended type is inferred |
+| KR-08, KR-09 | [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md) — neural oscillations as their own terms; outcome prose left the frequency bands without being deleted; alignments re-pointed and provenance-annotated |
+| KR-04 | [ADR 0050](../decisions/0050-public-claim-applicability-contract.md) — an eight-clause applicability contract replaced a single tier test. No claim can currently authorize C3 or C5, because no evidence review has ever been run |
+| KR-07 | [ADR 0051](../decisions/0051-sstim-preset-contract.md) — SSTIM's own preset contract, and the four named SHACL gaps closed |
+
+What that leaves open is in [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) (where
+the model is going) and Phases 1.2b–1.2c, 1.5 and beyond in the
+[improvement plan](IMPROVEMENT_PLAN.md).
+
 ## Known limitations
 
 The main gaps are design and coverage gaps, not current parser failures:
+
+- **Waveform and spatialisation have no SSTIM terms at all.** Both are
+  output-affecting, so KR-07's "many output-affecting parameters are not
+  captured" is only partly closed. Directions §1 and §2.
+- **The modality scheme names six senses and disagrees with the channel list.**
+  `sstim-ex:StimulusChannel` recognises gustatory and electromagnetic paths that
+  no modality concept backs. Direction §4a.
+- **Martigli and Symmetry parameters sit in the core namespace.** They are named
+  specific techniques, not universal primitives, and belong in protocol-scoped
+  namespaces. Direction §3.
 
 - `SessionSpecification` and `masterVolume` remain audio-shaped, but the
   executed-session gap closed on 2026-08-13. The native contract

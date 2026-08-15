@@ -48,7 +48,8 @@ import sys
 
 from jsonschema import Draft202012Validator
 from pyshacl import validate as shacl_validate
-from rdflib import Graph, Namespace, BNode
+from rdflib import Graph, Namespace, BNode, RDF
+from rdflib.namespace import SKOS
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "static" / "schemas" / "preset.schema.json"
@@ -82,6 +83,18 @@ PARAMETER_MAP = {
     # is now corrected there, but there is still no range cell to read, so
     # only the SHACL half of this one is compared.
     "level": ("initialVolume", None),
+}
+
+# Schema enum -> the SSTIM class whose concepts' skos:notation it must draw from.
+# Without this the schema could invent controlled values that resolve to nothing,
+# which is the KR-17 failure the session projection was built to avoid — and did
+# invent three sensory modalities before this check existed.
+ENUM_SCHEMES = {
+    ("$defs", "frequencyBand"): "FrequencyBand",
+    ("$defs", "caution"): "CautionTag",
+    ("$defs", "modality"): "SensoryModality",
+    ("properties", "group"): "PresetGroup",
+    ("properties", "publicClaimLevel"): "PublicClaimLevel",
 }
 
 # The ordinal encoding RDF needs, in the order the schema lists the names.
@@ -180,7 +193,10 @@ def shacl_bounds(graph: Graph) -> tuple[dict[str, dict], list[str]]:
         SSTIM_SH.MartigliBinauralVoiceShape,
         SSTIM_SH.SymmetryVoiceShape,
     ]
-    wanted = {prop for prop, _ in PARAMETER_MAP.values()}
+    # permutationFunction is not in PARAMETER_MAP — it is a named enum in JSON
+    # and an ordinal in RDF — but its ceiling is compared against the number
+    # of names, so it must still be collected.
+    wanted = {prop for prop, _ in PARAMETER_MAP.values()} | {"permutationFunction"}
     collected: dict[str, list[dict]] = {}
     for node_shape in voice_shapes:
         if (node_shape, None, None) not in graph:
@@ -386,16 +402,14 @@ def mutate(preset: dict, path: tuple, value) -> dict:
 
 
 def schema_cases(base: dict) -> list[tuple[str, dict, str]]:
-    seven = json.loads(json.dumps(base))
-    seven["components"] = [
-        dict(seven["components"][0], id=f"c{i}") for i in range(7)
-    ]
+    empty = json.loads(json.dumps(base))
+    empty["components"] = []
     stray = json.loads(json.dumps(base))
     stray["components"][0]["parameters"]["fl"] = 200
     return [
         ("an older model tag on a newer document", mutate(base, ("model",), "sstim-preset-0"), "model tag"),
         ("a non-slug id", mutate(base, ("id",), "Contract Fixture"), "id pattern"),
-        ("seven components", seven, "component count 1-6"),
+        ("a preset delivering nothing", empty, "at least one component"),
         ("three target bands", mutate(base, ("targetBands",), ["alpha", "smr", "beta"]), "targetBands length"),
         ("an uppercase band", mutate(base, ("targetBands",), ["ALPHA"]), "band enum"),
         ("level at 1.0", mutate(base, ("components", 0, "level"), 1.0), "level < 1"),
@@ -548,6 +562,43 @@ def main() -> int:
             f"matches the schema's order {listed}"
         )
 
+    # ── 0. Controlled values must resolve to declared concepts ───────────────
+    vocabulary = Graph()
+    for path in module_paths():
+        vocabulary.parse(path, format="turtle")
+
+    checked_values = 0
+    for pointer, class_name in ENUM_SCHEMES.items():
+        node = schema
+        for step in pointer:
+            node = node[step]
+        declared = {
+            str(notation)
+            for concept in vocabulary.subjects(RDF.type, SSTIM[class_name])
+            for notation in vocabulary.objects(concept, SKOS.notation)
+        }
+        if not declared:
+            failures.append(
+                f"{'/'.join(pointer)}: no sstim:{class_name} concept carries a "
+                f"skos:notation — the check would pass vacuously"
+            )
+            continue
+        offered = set(node["enum"])
+        invented = sorted(offered - declared)
+        if invented:
+            failures.append(
+                f"{'/'.join(pointer)}: {invented} are not notations of any declared "
+                f"sstim:{class_name} — the schema is minting controlled values (KR-17)"
+            )
+        checked_values += len(offered)
+        missing = sorted(declared - offered)
+        if missing:
+            print(
+                f"preset-contract: sstim:{class_name} declares {len(missing)} concept(s) "
+                f"the schema does not offer — {', '.join(missing)}",
+                file=sys.stderr,
+            )
+
     # ── 1. Three-way bound agreement ─────────────────────────────────────────
     shapes = Graph().parse(SHAPES, format="turtle")
     from_schema, schema_problems = schema_bounds(schema)
@@ -555,6 +606,19 @@ def main() -> int:
     from_doc = doc_bounds()
     failures.extend(schema_problems)
     failures.extend(shacl_problems)
+
+    ceiling = normalized(from_shacl.get("permutationFunction", {})).get("max")
+    if ceiling is None:
+        failures.append(
+            "sstim:permutationFunction carries no upper bound, so the named "
+            "permutations here cannot be checked against the ordinal encoding"
+        )
+    elif int(ceiling) != len(PERMUTATIONS) - 1:
+        failures.append(
+            f"the schema offers {len(PERMUTATIONS)} named permutations but "
+            f"sstim:permutationFunction admits ordinals 0..{int(ceiling)} — one "
+            f"of them accepts a value the other rejects"
+        )
 
     compared_shacl = 0
     compared_doc = 0
@@ -692,7 +756,8 @@ def main() -> int:
         return 1
 
     print(
-        f"preset-contract: passed ({compared_shacl} parameters agree with SHACL, "
+        f"preset-contract: passed ({checked_values} controlled values resolve to "
+        f"declared concepts; {compared_shacl} parameters agree with SHACL, "
         f"{compared_doc} with the ranges PRESET_FORMAT.md records; "
         f"{len(schema_negative)} schema, {len(cross_negative)} cross-field and "
         f"{len(rdf_negative)} RDF adversarial cases rejected; "

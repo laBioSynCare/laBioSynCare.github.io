@@ -27,9 +27,10 @@ become binding on the standard.
 
 The reasons that format cannot be SSTIM's are specific, not stylistic:
 
-- **It is audio-only.** Its unit of composition is a `voice`. SSTIM covers nine
-  sensory modalities, and a standard whose core structure assumes hearing cannot
-  express a visual or haptic preset without a parallel structure.
+- **It is audio-only.** Its unit of composition is a `voice`. SSTIM names six
+  sensory modalities today and intends to name more, and a standard whose core
+  structure assumes hearing cannot express a visual or haptic preset without a
+  parallel structure.
 - **It grew incrementally around delivery problems.** Its shape records which
   technical obstacles were overcome in which order — `waveformL`/`waveformR`/
   `waveformM`/`waveform` are four fields for one concept, `hasBreathGuide`
@@ -55,8 +56,11 @@ modality-independent in substance.
 model tag `sstim-preset-1`. It takes the catalog's parameter ranges and nothing
 else. Four structural differences carry the design:
 
-**Components, not voices.** A preset is composed of 1–6 *components*, each
-declaring its own `modality` from the SSTIM modality scheme. A visual or haptic
+**Components, not voices.** A preset is composed of one or more *components*,
+each declaring its own `modality` from the SSTIM modality scheme. There is no
+component ceiling: the six-layer limit is the BSC catalog profile's real engine
+constraint, and carrying it into a modality-neutral contract would have been the
+transcription this schema exists to avoid. A visual or haptic
 component needs no new structure — the audio assumption is simply absent. `kind`
 and `modality` are independent on purpose: a breathing oscillation rendered as a
 moving light is the same kind in a different modality.
@@ -139,13 +143,20 @@ It runs in `make validate` via `make preset-contract`.
   (`docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`). The two
   structures are close enough that one is straightforward and different enough
   that it must be written down rather than assumed.
-- **Three modalities are expressible in the schema and not yet in RDF.** A
-  component may declare `visual` or `somatosensory`, but `sstim:composedOf`
-  ranges over `sstim:Voice`, an audio class. The Patch Studio side already has
-  `AudioTrack`/`VisualTrack`/`HapticTrack`, so the terms exist in a neighbouring
-  model. Reconciling them is the open question ADR 0040 left, and this ADR
-  deliberately does not pre-empt it: the JSON contract is the source and RDF is
-  the projection, as it is for sessions, so the schema may lead.
+- **A multi-modal component projects to RDF today**, through
+  `sstim:composedOfTrack` (domain `sstim:Preset`, range `sstim:Track`) and the
+  `AudioTrack`/`VisualTrack`/`HapticTrack`/`ControlTrack` subclasses, with
+  `sstim:Voice rdfs:subClassOf sstim:AudioTrack`. `sstim:composedOf` ranging over
+  the audio `sstim:Voice` is the BSC catalog *profile's* composition relation,
+  not the generic one — which is why the six-voice ceiling belongs on
+  `BscCatalogPresetShape` and not on this schema.
+
+  *This corrects an earlier revision of this ADR*, which stated that a visual or
+  haptic component was expressible in the schema and not yet in RDF. It was
+  wrong: the generic path already existed and was simply missed. What remains
+  genuinely open is narrower — `composedOf` and `composedOfTrack` share the
+  domain `sstim:Preset` with nothing marking which profile a given preset
+  follows, so a document could mix them.
 - **Panning and waveform selection have no SSTIM property at all.** They are
   output-affecting, so KR-07's "many output-affecting parameters are not
   captured" is not fully closed. They are also the clearest example of what not
@@ -166,11 +177,10 @@ It runs in `make validate` via `make preset-contract`.
 and correctly: it would bind a public standard to one proprietary application's
 incremental history, and it would make SSTIM audio-only by construction.
 
-**Defer the schema until ADR 0040 resolves Patch versus Preset.** Tempting,
-since the modality gap above touches it. Rejected: KR-07 is about validation
-strength, most of which is parameter-level and does not depend on that
-resolution, and leaving the four named gaps open for an unscheduled ADR trades a
-real fix for a hypothetical one.
+**Defer the schema until ADR 0040 resolves Patch versus Preset.** Rejected:
+KR-07 is about validation strength, most of which is parameter-level and does not
+depend on that resolution, and leaving the four named gaps open for an
+unscheduled ADR trades a real fix for a hypothetical one.
 
 **Keep `voices` and add sibling arrays for other modalities.** This is what an
 incremental extension of the catalog format would look like, and it is exactly

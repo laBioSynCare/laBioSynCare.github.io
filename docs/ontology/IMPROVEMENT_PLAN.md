@@ -9,7 +9,7 @@ and phase numbering below is dependency order, not a version.
 **Primary audit:** [RDF knowledge-representation audit, 2026-07-13](reviews/2026-07-13-rdf-knowledge-representation-audit.md)
 
 For the implemented baseline and the ordered work that remains after the
-modular `0.13.0` release, start with the maintained
+`0.14.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
 logic and acceptance gates; it is not a claim that every bullet is still open.
 
@@ -309,10 +309,12 @@ application-validation leg (beat frequency, pulse rate, breath reference, unique
 ids, level rationale) with 25 adversarial cases and 8 positive controls.
 
 Open, with reasons recorded in the ADR: panning and waveform selection have no
-SSTIM property at all and need a design pass rather than a transcription; and
-`sstim:composedOf` still ranges over the audio `sstim:Voice`, so a visual or
-haptic component is expressible in the schema and not yet in RDF — that is the
-question ADR 0040 left open, deliberately not pre-empted here.
+SSTIM property at all and need a design pass rather than a transcription. A
+multi-modal component does project to RDF today, through the generic
+`sstim:composedOfTrack`; what remains is that it and the catalog-profile
+`sstim:composedOf` share the domain `sstim:Preset` with nothing marking which
+profile a preset follows. See
+[SSTIM_DIRECTIONS.md](SSTIM_DIRECTIONS.md).
 
 - Build a single matrix mapping each executable parameter to JSON field,
   datatype/unit, range, cross-field rules, RDF property, and SHACL path.

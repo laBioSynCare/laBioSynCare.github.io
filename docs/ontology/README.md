@@ -21,6 +21,13 @@ Describing a protocol or claim does not establish efficacy.
 - [Current state and next steps](CURRENT_STATE.md) — maintained starting point:
   released versus development state, implemented profiles and semantic scope,
   validation evidence, known limits, and the recommended work sequence.
+- [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
+  decisions: waveforms as a vocabulary including sampled sources; panning
+  modelled as spatial position plus an explicit modulation relation; Martigli
+  and Symmetry moved to protocol-scoped namespaces; coverage of all known
+  senses; and the recommendation on how a stimulation specification should
+  compose — components for descriptions, events for occurrences, not one
+  relation across both.
 - [Module architecture](MODULE_ARCHITECTURE.md) — the consumer guide to the
   modular line: dependency table, profile and SHACL selection, Full-union
   compatibility contract, named-graph ownership, deferred gaps. Accepted in

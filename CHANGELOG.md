@@ -39,8 +39,11 @@ file is the human-readable summary.
 - **SSTIM's own preset contract**
   ([ADR 0051](docs/decisions/0051-sstim-preset-contract.md), closes KR-07):
   `static/schemas/preset.schema.json`, model tag `sstim-preset-1`. A preset is
-  composed of 1-6 modality-declaring **components**, not audio voices, so a
-  visual or haptic component needs no new structure. Parameters carry their
+  composed of modality-declaring **components**, not audio voices, so a visual
+  or haptic component needs no new structure — and projects to RDF today through
+  the generic `sstim:composedOfTrack`, which already ranges over
+  `sstim:Track`. There is no component ceiling: the six-layer limit is the BSC
+  catalog profile's engine constraint, and belongs on that profile's shape. Parameters carry their
   units in their names; one optional `breathReference` replaces a header flag
   and a per-voice flag that had to agree; there is no application product
   envelope. It takes the numeric parameter ranges from the BioSynCare catalog

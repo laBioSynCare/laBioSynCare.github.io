@@ -56,8 +56,7 @@
     "components": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 6,
-      "description": "1-6 stimulation components. Each declares its own modality, so a preset is not implicitly audio.",
+      "description": "At least one stimulation component; each declares its own modality, so a preset is not implicitly audio. Deliberately un-capped: the six-layer ceiling belongs to the BSC catalog profile, where it is a real engine limit (sstim:composedOf, \"1-6 voice specifications\"), and carrying it into a modality-neutral contract would have been exactly the transcription this schema exists to avoid. A preset combining audio, visual and haptic layers has no principled reason to stop at six.",
       "items": { "$ref": "#/$defs/component" }
     }
   },
@@ -84,9 +83,9 @@
     "modality": {
       "enum": [
         "auditory", "visual", "somatosensory", "interoceptive",
-        "vestibular", "olfactory", "gustatory", "thermal", "nociceptive"
+        "vestibular", "olfactory"
       ],
-      "description": "From sstim-v:SensoryModalityScheme. Declared per component, never assumed."
+      "description": "From sstim-v:SensoryModalityScheme, and exactly the concepts it declares — scripts/preset-contract.py fails if this list invents a value. The scheme is known to be incomplete (proprioception, chemoreception and thermoception are among the senses it does not yet name, and sstim-ex:StimulusChannel already recognises gustatory and electromagnetic paths the modality scheme does not); widening it is an ontology decision, not a schema one, so this list follows the vocabulary rather than leading it."
     },
 
     "component": {

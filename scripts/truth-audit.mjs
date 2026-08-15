@@ -117,6 +117,12 @@ const PROSE = ['README.md', 'SECURITY.md', 'docs/technical/PORTABLE_DEPLOYMENT.m
   // unwatched, because the scan covered the page it specifies but not the
   // specification. Those identifiers now live only in releaseMetadata.js.
   'docs/technical/PUBLIC_ENTRANCE.md',
+  // The maintained current-state summary calls itself the starting point for
+  // ontology work, and its authoritative-facts table names the live line, the
+  // citable release and its DOI. It was unwatched and went two releases stale —
+  // the same failure as PUBLIC_ENTRANCE above, one directory over. The
+  // improvement plan joins it because its phase notes name releases too.
+  'docs/ontology/CURRENT_STATE.md', 'docs/ontology/IMPROVEMENT_PLAN.md',
   // The ontology docs restate release facts more than anything else in the
   // repository, and were the last place still advertising a superseded line.
   'static/ontology/README.md', 'docs/ontology/README.md',
