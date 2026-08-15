@@ -21,6 +21,9 @@ Describing a protocol or claim does not establish efficacy.
 - [Current state and next steps](CURRENT_STATE.md) — maintained starting point:
   released versus development state, implemented profiles and semantic scope,
   validation evidence, known limits, and the recommended work sequence.
+- [Term index](TERM_INDEX.md) — generated and CI-checked: every class,
+  property and concept with its module and definition. The place to look
+  before concluding SSTIM lacks a term.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli

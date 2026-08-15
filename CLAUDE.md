@@ -550,6 +550,7 @@ the thing lives:
 | Application architecture | [`src/README.md`](src/README.md) |
 | Ontology sources and design | [`static/ontology/README.md`](static/ontology/README.md) |
 | Live ontology module inventory | `static/ontology/manifest.json` (machine-readable, authoritative) |
+| **Does SSTIM already have this term?** | [`docs/ontology/TERM_INDEX.md`](docs/ontology/TERM_INDEX.md) — generated, CI-checked. **Grep it before saying a term is missing.** 18 modules is more than anyone searches reliably by hand |
 | Tracked work | [`TODO.md`](TODO.md), [`ROADMAP.md`](ROADMAP.md) |
 
 The paths that carry invariants, and are therefore worth naming here:
