@@ -73,6 +73,9 @@ non-obvious choices. **[`decisions/README.md`](decisions/README.md) holds the
 index** — it is not duplicated here, because the copy that was went stale at
 ADR 0011 while the series continued to grow.
 
+[`DELIVERED.md`](DELIVERED.md) is an archive of completed `TODO.md` items —
+history, not tasks. Nothing reads it during work.
+
 ## `ontology/` — plans and reviews
 
 [`ontology/CURRENT_STATE.md`](ontology/CURRENT_STATE.md) is the maintained
