@@ -106,7 +106,7 @@ what a working task list cannot.
       `scripts/sstim-exposure-sanity.mjs` cover metadata, SKOS, evidence,
       safety, protocols, sessions, VoID, loader coverage, and dangling IRIs.*
 - [x] Accept and implement the SSTIM Core Profile and concern-module architecture in
-      [ADR 0043](docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
+      [ADR 0043](../docs/decisions/0043-sstim-core-profile-and-module-boundaries.md)
       `P1`
       *Accepted 2026-08-01 and implemented as a small Kernel, Core, Core Plus,
       optional concern/bridge modules, and a Full compatibility profile.* `static/ontology/manifest.json` is the source of
@@ -132,7 +132,7 @@ what a working task list cannot.
       *Done. Every profile declares a positive fixture and a SPARQL competency
       query; Core, Core Plus, and Full additionally declare out-of-scope and
       adversarial fixtures. Kernel has an empty shape closure, so per
-      [ADR 0045](docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)
+      [ADR 0045](../docs/decisions/0045-shapeless-profiles-are-discovery-entry-points.md)
       it is a discovery entry point and must not declare the negative
       categories. All of it is executed against each profile's own closure by
       `make core-profile-contract`. Pages targets were deployed and verified on
@@ -296,7 +296,7 @@ what a working task list cannot.
 ### Engine interfaces and implementations
 - [x] ~~`src/engines/audio/IAudioEngine.js`~~ — shipped, with four
       implementations: Vanilla Web Audio, AudioWorklet, AudioWorklet+WASM, and
-      Null. See [`src/engines/README.md`](src/engines/README.md).
+      Null. See [`src/engines/README.md`](../src/engines/README.md).
 - [x] ~~`src/engines/audio/VanillaWebAudioEngine.js`~~ — shipped; the default.
 
 ### AudioWorklet processors (in static/worklets/, never bundled)
@@ -304,7 +304,7 @@ what a working task list cannot.
       **superseded by one unified processor.** `bsc-voice.worklet.js` covers
       every voice type, with `bsc-voice-wasm.worklet.js` + `bsc-osc.wasm` as the
       WASM oscillator variant. Recorded in
-      [`AUDIO_ENGINE_ARCHITECTURE.md`](docs/technical/AUDIO_ENGINE_ARCHITECTURE.md).
+      [`AUDIO_ENGINE_ARCHITECTURE.md`](../docs/technical/AUDIO_ENGINE_ARCHITECTURE.md).
 
 ### UI — Patch Studio (`src/ui/creator/`)
 - [x] ~~`PresetCreator.svelte` — add/remove control/audio/visual/haptic
@@ -314,7 +314,7 @@ what a working task list cannot.
 - [x] Decide the product boundary: one canonical Studio model/runtime with
       ordinary first-class colour-field and spatial visual tracks, Field
       templates/routes, and a shared visual projection stage —
-      [`PATCH_STUDIO_FIELD_INTEGRATION.md`](docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
+      [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md)
       `P2`
 - [x] Add first-class colour-field and four spatial-scene track contracts in
       model 2, followed by the current `patch-studio-model-3` boundary for the
@@ -351,7 +351,7 @@ what a working task list cannot.
 - [x] ~~Extract pure `src/ui/creator/waveformPaths.js`~~ — SVG scope geometry
       + `isoEnvSpec`.
 - [x] ~~Extract a cloud-patches store~~ — shipped as the storage seam
-      ([ADR 0038](docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)):
+      ([ADR 0038](../docs/decisions/0038-identity-providers-and-the-two-seam-adapter.md)):
       `src/storage/` holds `PatchStore` with local and Firestore implementations
       and a conformance suite; `src/firebase/patches.js` is gone.
 - [x] ~~Unit tests for `modulation.js` + `waveformPaths.js`~~ —
