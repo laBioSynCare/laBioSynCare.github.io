@@ -181,6 +181,50 @@ SELF_REPORT_OR_LIST_ROOTS = (
 )
 
 
+# ADR 0050 rewrote the public-claim gate on sstim-sh:BscCatalogPresetShape from a
+# single tier test into an eight-clause applicability contract (KR-04). The
+# constraint is an anonymous sh:SPARQLConstraint, so every triple in it is
+# replaced and its canonical blank-node label moves with it.
+#
+# It is excluded by what it is rather than by where it sits: the one SPARQL
+# constraint on that shape whose query consults requiresEvidenceTierRank. The
+# shape's other two SPARQL constraints — the breath-guide count and the
+# primary-band containment — stay fully policed, which excluding the shape's
+# whole sh:sparql closure would not achieve.
+#
+# The replacement is not compared here. It is executed against sixteen
+# adversarial fixtures by scripts/public-claim-gate-negative.py, which is a
+# stronger check than comparing its serialisation.
+PUBLIC_CLAIM_GATE_MARKER = "requiresEvidenceTierRank"
+
+
+def public_claim_gate_nodes(graph: Graph) -> set:
+    """The anonymous SPARQL constraint implementing the public-claim gate."""
+    matched = [
+        node
+        for node in graph.objects(SSTIM_SH.BscCatalogPresetShape, SH.sparql)
+        if isinstance(node, BNode)
+        and any(PUBLIC_CLAIM_GATE_MARKER in str(query) for query in graph.objects(node, SH.select))
+    ]
+    if len(matched) != 1:
+        raise ValueError(
+            f"expected exactly one public-claim gate constraint on "
+            f"sstim-sh:BscCatalogPresetShape, found {len(matched)} — the gate was "
+            f"renamed, duplicated or deleted, and this exception no longer describes it"
+        )
+    reachable: set[BNode] = set()
+    frontier = list(matched)
+    while frontier:
+        node = frontier.pop()
+        if node in reachable:
+            continue
+        reachable.add(node)
+        for _, obj in graph.predicate_objects(node):
+            if isinstance(obj, BNode) and obj not in reachable:
+                frontier.append(obj)
+    return reachable
+
+
 def bnode_closure(graph: Graph, roots: tuple[tuple, ...]) -> set:
     """Blank nodes reachable from the given (subject, predicate) starting points."""
     reachable: set[BNode] = set()
@@ -248,6 +292,7 @@ def normalized(
     result = Graph()
     ontology_subjects = set(graph.subjects(RDF.type, OWL.Ontology))
     excluded_bnodes = bnode_closure(graph, SELF_REPORT_OR_LIST_ROOTS)
+    excluded_bnodes |= public_claim_gate_nodes(graph)
     for triple in graph:
         subject, predicate, obj = triple
         if subject in ontology_subjects or predicate == RDFS.isDefinedBy:
@@ -291,7 +336,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )

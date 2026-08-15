@@ -31,8 +31,35 @@ file is the human-readable summary.
   being written.
 - `make band-scope-notes` — fails if a frequency band claims an outcome, or if
   an association ADR 0049 moved off the band scope notes stopped being recorded.
+- `make shacl-public-claim-gate` — 16 adversarial fixtures across the 10 clauses
+  of the public-claim contract, plus 2 positive controls. The gate never fires on
+  committed data (nothing claims above C1), so without adversarial fixtures a
+  deleted clause would be invisible to every other check. The harness is itself
+  mutation-tested: removing the direction clause fails exactly two cases.
 
 ### Changed
+
+- **The public-claim gate now requires an applicability contract, not just a
+  tier** ([ADR 0050](docs/decisions/0050-public-claim-applicability-contract.md),
+  closes KR-04). It asked one question — does *some* claim linked by the
+  deprecated `sstim:supportsRelation` reach the required tier — so a rigorous
+  study *refuting* a preset authorized the public claim it disproved. So did an
+  assessment of a different subject, evidence from a modality the preset does not
+  deliver, an unreviewed or withdrawn claim, and a claim citing literature no
+  basis of it ever used. Authorization now requires one assessment satisfying all
+  of: supporting direction, sufficient tier, the preset as both proposition
+  subject and scope intervention, a declared population, a modality the preset
+  actually delivers (derived through `followsProtocol` → `usesTechnique` →
+  `techniqueModality`), a public-safe citation that is also one of its own
+  evidence bases, a confirming review decision with no contradicting decision
+  against the same revision, and no deprecation or supersession.
+
+  **Consequence, and it is intended:** no `sstim:EvidenceReviewDecision` exists
+  anywhere in SSTIM, so no claim can currently authorize C3 or C5. No evidence
+  review has been run, so the honest count of presets entitled to a public
+  structure/function claim is zero. Nothing breaks today — both presets sit at
+  C1. This hardens the existing C0–C5 ladder and neither adopts nor pre-empts the
+  facet-based redesign proposed in ADRs 0028–0029.
 
 - **The five band-to-Wikidata mappings moved to the rhythms**, where the items
   point: Q2469782 describes "a neural oscillation", not a Hz interval. Four

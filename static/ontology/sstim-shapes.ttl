@@ -238,26 +238,99 @@ sstim-sh:BscCatalogPresetShape a sh:NodeShape ;
         """ ;
     ] ;
 
-    # P7.2 (ADR 0018): public-claim legality. A preset asserting a public claim
-    # level whose requiresEvidenceTierRank >= 1 must have a supporting EvidenceClaim
-    # (sstim:supportsRelation) at a tier whose rank meets that requirement. C0/C1/C2
-    # (requires 0) need no evidence; C4 medical (sentinel 7, above max tier 6) can
-    # never be satisfied, so asserting it publicly always fails. The mapping is the
-    # PROVISIONAL default in sstim-vocab (PublicClaimLevelScheme) — reconcile with
-    # the BioSynCare Reference enum and legal advice before launch.
+    # P7.2 (ADR 0018), hardened for audit finding KR-04 (ADR 0050): the
+    # public-claim applicability contract.
+    #
+    # A preset asserting a public claim level whose requiresEvidenceTierRank >= 1
+    # must be authorized by at least one EvidenceAssessmentClaim that satisfies
+    # EVERY clause below. C0/C1/C2 (requires 0) need no evidence; C4 medical
+    # (sentinel 7, above max tier 6) can never be satisfied, so asserting it
+    # publicly always fails.
+    #
+    # The original constraint required only a tier rank reached via the now
+    # deprecated sstim:supportsRelation. That accepted a *refuting* claim, a
+    # claim about a different preset, a claim in an unrelated modality, an
+    # unreviewed or withdrawn claim, and a claim citing a reference it never
+    # read. Each clause below closes one of those, and each has an adversarial
+    # negative fixture in scripts/public-claim-gate-negative.py proving it is
+    # load-bearing — a conjunct nobody can fail is a conjunct that is not there.
+    #
+    # Note the consequence, which is intended: no EvidenceReviewDecision exists
+    # in SSTIM yet, so no claim can currently authorize C3 or C5. That is the
+    # honest state of the evidence base, not a defect. The tier mapping remains
+    # the PROVISIONAL default in sstim-vocab (PublicClaimLevelScheme) —
+    # reconcile with the BioSynCare Reference enum and legal advice before
+    # launch. Full IRIs avoid an sh:prefixes block.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "A preset's public claim level requires supporting evidence at or above its required tier (sstim:requiresEvidenceTierRank); medical/condition (C4) and unbacked quantified (C5) claims are not publicly assertable."@en ;
+        sh:message "No evidence assessment satisfies the public-claim applicability contract for this preset's claim level. An authorizing assessment must: support (not refute or leave inconclusive) the claim; reach the tier rank the level requires; be about this preset in both its proposition subject and its scope intervention/context; declare a population or model; declare a sensory modality this preset actually delivers; cite a public-safe reference it also used as an evidence basis; carry a confirming review decision with no reject or revision-request against the same revision; and be neither deprecated nor superseded. Medical/condition (C4) claims are never publicly assertable."@en ;
         sh:select """
             SELECT DISTINCT $this WHERE {
                 $this <https://w3id.org/sstim#hasPublicClaimLevel> ?level .
                 ?level <https://w3id.org/sstim#requiresEvidenceTierRank> ?req .
                 FILTER( ?req >= 1 )
                 FILTER NOT EXISTS {
-                    ?claim <https://w3id.org/sstim#supportsRelation> $this ;
-                           <https://w3id.org/sstim#hasEvidenceTier> ?tier .
+                    # Direction and strength. hasClaimDirection is where an
+                    # assessment's direction lives; evaluatesSubject is neutral,
+                    # which is exactly why the old gate could be satisfied by a
+                    # well-evidenced refutation.
+                    ?claim a <https://w3id.org/sstim#EvidenceAssessmentClaim> ;
+                           <https://w3id.org/sstim#evaluatesSubject> $this ;
+                           <https://w3id.org/sstim#hasClaimDirection> <https://w3id.org/sstim/vocab#claimSupports> ;
+                           <https://w3id.org/sstim#hasEvidenceTier> ?tier ;
+                           <https://w3id.org/sstim#assessesProposition> ?proposition ;
+                           <https://w3id.org/sstim#citesReference> ?reference .
                     ?tier <https://w3id.org/sstim#tierRank> ?rank .
                     FILTER( ?rank >= ?req )
+
+                    # Subject. The bounded proposition must itself be about this
+                    # preset, not merely attached to a claim that points at it.
+                    ?proposition <https://w3id.org/sstim#propositionSubject> $this ;
+                                 <https://w3id.org/sstim#hasAssessmentScope> ?scope .
+
+                    # Context and population. The scope must name this preset as
+                    # the intervention it was established under, and must say in
+                    # whom or in what model.
+                    ?scope <https://w3id.org/sstim#scopeInterventionOrContext> $this ;
+                           <https://w3id.org/sstim#scopePopulationOrModel> ?population ;
+                           <https://w3id.org/sstim#scopeSensoryModality> ?modality .
+
+                    # Modality compatibility. The scope's modality must be one
+                    # the preset actually delivers, derived through the protocol
+                    # it follows and that protocol's techniques.
+                    $this <https://w3id.org/sstim#followsProtocol> ?protocol .
+                    ?protocol <https://w3id.org/sstim#usesTechnique> ?technique .
+                    ?technique <https://w3id.org/sstim#techniqueModality> ?modality .
+
+                    # Citation integrity. The cited reference must be public-safe
+                    # (PublicSafeReferenceShape then forces title, creator, date
+                    # and DOI) and must be a source the assessment actually used,
+                    # not decoration borrowed from a stronger literature.
+                    ?reference a <https://w3id.org/sstim#PublicSafeReference> .
+                    ?claim <https://w3id.org/sstim#hasEvidenceBasis> ?basis .
+                    ?basis <https://w3id.org/sstim#basisSource> ?reference .
+
+                    # Review state. ADR 0027 derives review state from immutable
+                    # decision records, never from the deprecated mutable
+                    # hasReviewStatus. Decisions carry no date, so ordering them
+                    # is not possible; instead any adverse decision against the
+                    # same immutable revision blocks it. A revision that was
+                    # confirmed and rejected is contradictory, not merely stale.
+                    ?decision a <https://w3id.org/sstim#EvidenceReviewDecision> ;
+                              <https://w3id.org/sstim#reviewsAssessment> ?claim ;
+                              <https://w3id.org/sstim#hasReviewDecision> <https://w3id.org/sstim/vocab#reviewConfirm> .
+                    FILTER NOT EXISTS {
+                        ?adverseDecision <https://w3id.org/sstim#reviewsAssessment> ?claim ;
+                                         <https://w3id.org/sstim#hasReviewDecision> ?adverse .
+                        FILTER( ?adverse IN ( <https://w3id.org/sstim/vocab#reviewReject>,
+                                              <https://w3id.org/sstim/vocab#reviewRequestRevision> ) )
+                    }
+
+                    # Currency. Withdrawn or superseded evidence authorizes
+                    # nothing, in either direction the supersession was written.
+                    FILTER NOT EXISTS { ?claim <http://www.w3.org/2002/07/owl#deprecated> true }
+                    FILTER NOT EXISTS { ?claim <http://purl.org/dc/terms/isReplacedBy> ?successor }
+                    FILTER NOT EXISTS { ?replacement <http://purl.org/dc/terms/replaces> ?claim }
                 }
             }
         """ ;

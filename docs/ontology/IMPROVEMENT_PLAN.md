@@ -59,7 +59,7 @@ explicitly re-scoped with a recorded reason.
 | KR-01 | Sensory Field export not SHACL-conformant | 0.1 |
 | KR-02 | Three incompatible session contracts | 0.2 |
 | KR-03 | Self-report model unsafe for stated use | 2.1–2.3 |
-| KR-04 | Public-claim gate approves wrong evidence | 1.2b–1.2c |
+| KR-04 | Public-claim gate approves wrong evidence | 1.2d (closed); ladder redesign remains 1.2b–1.2c |
 | KR-05 | OWL domains contradict definitions | 1.1 |
 | KR-06 | `EvidenceClaim` overloaded | 1.2a |
 | KR-07 | Patch/preset validation weaker than claim | 1.3 |
@@ -203,7 +203,10 @@ covered by tests.
 > `make validate`. Resolves KR-06 and the evidence-role/provenance half of KR-11.
 > Deferred as documented: the generated 0.7 compatibility view (a dist-only
 > build artifact) and re-assessment of migrated tiers under a dedicated rubric.
-> KR-04 (exact public-copy authorization) stays open under ADRs 0028–0029.
+> KR-04 was then closed by [ADR 0050](../decisions/0050-public-claim-applicability-contract.md)
+> (phase 1.2d), which hardened the existing gate rather than waiting for the
+> ladder redesign; the facet-based redesign in ADRs 0028–0029 remains open and
+> is unaffected.
 
 - Separate literature evidence assessments, hypotheses/research questions,
   observations, boundary applicability, requirements, design objectives, and
@@ -253,6 +256,33 @@ covered by tests.
 - Build the trusted input and public-copy inventory outside RDF, then validate
   the selected dataset and policy/as-of date with BSC-specific SHACL and
   adversarial fixtures.
+
+**1.2d — The public-claim applicability contract
+([ADR 0050](../decisions/0050-public-claim-applicability-contract.md))**
+
+> **`[x]` Implemented 2026-08-15 (ADR 0050 accepted). Closes KR-04.** The gate on
+> `sstim-sh:BscCatalogPresetShape` asked one question — does some claim linked by
+> the deprecated `supportsRelation` reach the required tier — and so accepted a
+> well-evidenced refutation, a claim about another subject, evidence from another
+> modality, unreviewed or withdrawn evidence, and a borrowed citation. It is now
+> a conjunction of eight clauses covering direction, strength, subject, context,
+> population, modality, citation integrity, and review/currency, all of which one
+> assessment must satisfy.
+>
+> Because no `EvidenceReviewDecision` exists anywhere in SSTIM, **no claim can
+> currently authorize C3 or C5**. That is intended: no evidence review has been
+> run, so the honest count of presets entitled to a public structure/function
+> claim is zero. Nothing breaks today because nothing claims above C1 — which is
+> also why the gate has never fired on committed data, and why
+> `scripts/public-claim-gate-negative.py` (16 adversarial cases, 10 clauses, 2
+> positive controls, itself mutation-tested) is the only thing that can tell a
+> working clause from a deleted one.
+>
+> This hardens the existing ladder. It does not adopt or pre-empt the facet-based
+> redesign in 1.2b–1.2c; those clauses are about applicability, not about which
+> ladder measures the claim, so they carry over. Population is checked for
+> declaration rather than compatibility, since presets state no target
+> population — that axis opens when they do.
 
 #### 1.3 Complete the executable-parameter contract
 

@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -187,6 +187,13 @@ shacl-private-ecosystem:
 shacl-session-negative:
 	$(PYTHON) scripts/session-shapes-negative.py
 
+## Assert every clause of the public-claim applicability contract is
+## load-bearing (KR-04, ADR 0050). The gate is a conjunction of eight clauses
+## and no committed preset sits above C1, so it never fires on real data: a
+## clause deleted by a careless edit would be invisible to every other check.
+shacl-public-claim-gate:
+	$(PYTHON) scripts/public-claim-gate-negative.py
+
 ## Validate the RDF the session projection actually emits, with SHACL-SPARQL
 ## active. The vitest harness beside the producer strips sh:sparql and
 ## shacl-instances only covers committed files, so without this the projection's
@@ -256,7 +263,7 @@ entailment-check:
 	echo "entailment-check: passed ($$count queries, no unintended type inferred)"
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection
+shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:

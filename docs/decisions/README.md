@@ -72,7 +72,8 @@ annotations lives here.
 | [0046](0046-one-studio-two-authoring-modes.md) | One Studio, first-class spatial visual tracks, and separate semantic products | Accepted · revised before implementation; partially implemented 2026-08-08 |
 | [0047](0047-programme-identity-path.md) | Programme identity: `/sstim/ecosystem/{id}`, adding a seventh canonical path to ADR 0007 | Accepted |
 | [0048](0048-session-events-and-qualified-observations.md) | Session events on the engine clock, and qualified participant observations where absence carries its reason — closes KR-02/KR-03 | Accepted |
-| [0049](0049-neural-oscillations-and-frequency-ambits.md) | Neural oscillations are the missing term; frequency bands were always ambits — closes KR-08 | Proposed |
+| [0049](0049-neural-oscillations-and-frequency-ambits.md) | Neural oscillations are the missing term; frequency bands were always ambits — closes KR-08 and KR-09 | Accepted |
+| [0050](0050-public-claim-applicability-contract.md) | Public claims need an applicability contract, not just a tier — closes KR-04 | Accepted |
 
 ## ADR lifecycle and revision policy
 
