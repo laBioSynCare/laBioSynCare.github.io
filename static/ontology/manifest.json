@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1b4dcff83ce01e91ccd015ab81f122a39fde3b7abdf6598d8bd70777040721ca"
+        "sha256": "7acb8234c87eea9435463f8447fda0a3f85a65bb882ba2f19727805b428ac414"
       },
       "runtime": {
         "url": "/ontology/sstim-stimulus.ttl",
@@ -793,7 +793,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "6a49cfbd5daaf7b94dd26d3b457e6b96a7f8e0b1ff1e9be9667567874c807769"
+      "sha256": "067b0d43c7ff15740f508b330ebfd79e97d9120a25ccf20a27c9765623110009"
     },
     {
       "id": "core-plus",
@@ -841,7 +841,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "0c1830e0e7432b2537fe3de2947530a59cbfa54161ceca678f290ba84c2eb086"
+      "sha256": "c9727d1d5846bd81ab1b07dbf91fda1746cef129a42aecf737e417e31bd73fc2"
     },
     {
       "id": "full",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "b0321b93cf0f7f31e02c5c145e838a0eabd0d14ff385a6efeeefbdab3ab6157d"
+      "sha256": "f8c48e5527fd5db749546895901d930b8b194fdfbe9a4d06bd837ec152501151"
     }
   ]
 }

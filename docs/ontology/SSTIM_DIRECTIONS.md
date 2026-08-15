@@ -175,12 +175,20 @@ electromagnetic radiation…), and `sstim-ex:perceivedModality` /
 `sstim-ex:deliveryMedium` hold apart *which sense is engaged* from *what
 physically arrives* — a distinction the core vocabulary does not make at all.
 
-**So the direction is not "add more senses". It is: reconcile the duplication.**
-A consumer entering through the core vocabulary sees six modalities; one entering
-through exposure sees twelve and a delivery taxonomy. Which it picks is an
-accident of which module it read first, and nothing tells it the two are related.
-That is a worse problem than a short list, because both lists are individually
-defensible.
+**And the two are already related.** All six shared concepts carry a
+`skos:closeMatch` from the exposure side — close rather than exact, deliberately,
+because the intensions differ: `PerceivedModality` is *the channel an exposure
+engages* and includes multimodal and not-directly-perceived, which are not
+senses, while `SensoryModality` is *a sense*. An earlier draft of this section
+called the duplication "real and unreconciled". It is real and reconciled, and
+saying otherwise was the fourth time in two days that a gap was asserted without
+checking — the reason [`TERM_INDEX.md`](TERM_INDEX.md) now exists.
+
+**So the direction here is small: state the choosing rule.** A consumer meeting
+both should be told which to use for what — a channel engages a perceived
+modality; a technique or an assessment scope is about a sensory modality — rather
+than left to infer it. That is a documentation and scope-note job, not a
+modelling one.
 
 The chemoreception question survives the correction: olfactory and gustatory are
 both chemoreception, and whether to introduce the parent is a scientific
@@ -418,8 +426,8 @@ Nothing here blocks the current audit work. In dependency order:
 
 1. **Waveforms** (§1) — self-contained, no migration, unblocks the sampled-asset
    reproducibility story.
-2. **Modality scheme reconciliation** (§4a) — self-contained, and the
-   channel/modality disagreement is a defect today rather than a future want.
+2. **State the modality choosing rule** (§4a) — a scope note, not a model change;
+   the two schemes are already bridged.
 3. **Abstract signals and renderings** (§5) — the keystone. It supplies the
    modulation relation §2 needs, explains why §4's kinds are stuck in audio, and
    is what makes one description comparable across senses. Design this before
