@@ -157,14 +157,49 @@ and comparability across implementations is the point.
 signal layer sits above both and is what the specification layer was always for.
 If anything it clarifies that question rather than waiting on it.
 
+## Questions resolved 2026-08-15
+
+**Signal shape and the waveform vocabulary are one vocabulary.** A signal's shape
+— sine, square, sawtooth, triangle, envelope, **noise**, sampled — is the same
+controlled vocabulary the waveform work in [directions §1](../ontology/SSTIM_DIRECTIONS.md)
+needs, seen from the other side. One vocabulary, used by a signal to say what
+shape it has and by a rendering to say what shape reaches the subject. The
+sampled case is what makes it more than an enum: a sampled signal's shape *is* an
+asset, so it needs a source, a licence and a checksum where a sine needs none.
+
+**A rendering is a class, `sstim:SignalRendering`.** Not a bare relation. SSTIM
+already reifies a qualified relation whenever it has attributes of its own —
+`sstim:EvidenceBasis`, `sstim:AssessmentScope`, `sstim:EvidenceReviewDecision`,
+`sstim:EvidenceSearchRecord`, `sstim-eco:EcosystemRelationship`,
+`sstim-eco:OrganizationMembership`, `sstim-eco:ImplementationResponsibility`,
+`sstim-ex:BoundaryApplicabilityStatement`, `sstim-ex:KnowledgeStatusAssertion`.
+A rendering carries at least three attributes — the mechanism, the
+physical-versus-perceptual marker, and which channel parameter it drives — so a
+relation would be the outlier here, and could not carry the marker that decision
+4 makes load-bearing for evidence transfer.
+
+**A signal declares its own frequency extent, and relates to a band by interval,
+not by membership.** The first draft said "falls within". That is right for a
+10 Hz tone and wrong for noise, which can span or wholly cover a band — and
+band-limited noise is a real stimulus, not an edge case.
+
+So a signal carries a lower and an upper bound, and its relation to a named band
+is one of *within*, *covers*, or *overlaps*. A point signal is the degenerate
+case where the two bounds are equal — exactly how `sstim-v:alpha10` and
+`sstim-v:gamma40` are already modelled, each with `hzMin` equal to `hzMax`. The
+ontology has been treating a point as a zero-width interval since before this
+ADR; signals just make the pattern explicit.
+
+This resolution and the first reinforce each other: **noise is a shape whose
+extent is wide**. White noise is shape *noise* across the full audible range;
+theta-band noise is the same shape bounded to 4–8 Hz. Neither needs a special
+case, and neither can be described by a single frequency number.
+
 ## Open questions
 
-- Whether a signal's shape is a controlled vocabulary (sine, square, ramp,
-  envelope, sampled) shared with the waveform work in directions §1, or a
-  separate axis. They are probably the same vocabulary seen from two sides.
-- Whether "rendering" is a class or a qualified relation. A class carries the
-  physical/perceptual marker and the mechanism more comfortably; a relation is
-  lighter. The evidence-transfer requirement in §4 argues for a class.
-- How a signal relates to `sstim:targetsFrequencyBand`. A band is an ambit
-  (ADR 0049) and a signal has an actual frequency, so the relation is
-  "falls within", not identity.
+- Whether `sstim:hzMin` / `sstim:hzMax` are widened by a union domain to cover
+  signals as well as bands, or a signal gets its own pair. The bounds mean the
+  same thing in both — the lower and upper edge of a frequency extent — which
+  argues for the union domain, and matches how KR-05 resolved comparable
+  mismatches. It is a domain widening on a live property, so it is additive but
+  wants recording.
