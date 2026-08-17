@@ -238,6 +238,22 @@ Turtle files are listed in section 1. After they exist:
       module still needs its `void:subset` and distribution written by hand, and
       the audit catches its absence rather than the manifest supplying it.*
 
+- [ ] Diagnose why `robot --strict` cannot load the Full closure `P2`
+      *Found 2026-08-17 while testing whether the OWL 2 DL fix mattered, and it
+      is a genuinely separate defect. `robot --strict convert` fails with
+      `INVALID ONTOLOGY FILE ERROR` and four `Entity not properly recognized,
+      missing triples in input? …error#ErrorN for type Class` messages. It
+      failed identically before and after the DL work — same error, same count
+      of four — so the missing declarations were never the cause and fixing
+      them was not the cure.*
+
+      *This matters more than the profile did: default ROBOT parsing is
+      non-strict and repairs quietly, so a consumer who loads strictly gets
+      nothing at all rather than a degraded graph. Reproduce with*
+      `nix develop -c robot --strict convert --input <full closure> --output /tmp/x.ofn`*,
+      then use* `-vvv` *for the stack trace to find which four entities. Not yet
+      diagnosed; do not guess at the cause.*
+
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
       `static/ontology/instances/references/` `P1`
