@@ -68,5 +68,12 @@ jobs:
       - name: Install dependencies
         run: nix develop --command npm ci
 
+      # -j4 because the runner has 4 cores and validate's prerequisites are
+      # independent scripts working in their own mktemp dirs. Measured locally,
+      # every gate passing in all three: 432s serial, 192s with -j4, 218s with
+      # -j4 -Otarget. The 26s buys grouped per-target output, without which an
+      # interleaved parallel failure is unreadable — worth it, and the number is
+      # recorded here so nobody has to re-derive why the slower flag is used.
+      # Drop to plain `make validate` when bisecting a flaky gate.
       - name: Run RDF, SHACL, OWL, quality, query, and export validation
-        run: nix develop --command make validate
+        run: nix develop --command make -j4 -Otarget validate

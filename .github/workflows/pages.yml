@@ -48,11 +48,60 @@ jobs:
       - name: Install dependencies
         run: nix develop --command npm ci
 
+      # Does this push touch anything the RDF contract is derived from? If not,
+      # the contract is byte-identical to the one already validated when it last
+      # changed, and re-proving it before publication establishes nothing while
+      # costing ~14 minutes of every deploy.
+      #
+      # The list is the union of validate-rdf.yml's trigger paths and the
+      # documents the gates actually read: docs/decisions (adr-index),
+      # docs/ontology (term-index-check reads TERM_INDEX.md), docs/technical
+      # (preset-contract compares PRESET_FORMAT.md ranges), static/schemas
+      # (preset-contract). It is deliberately wider than strictly necessary.
+      #
+      # ADD A PATH HERE when you add a gate that reads one. The failure mode is
+      # silent: a gate whose input is not listed simply stops running on the
+      # pushes that change it, and nothing reports that it was skipped.
+      - name: Decide whether the RDF contract needs revalidating
+        id: scope
+        run: |
+          set -euo pipefail
+          base="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" != "push" ] \
+             || [ -z "$base" ] \
+             || [ "$base" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+            echo "No usable base commit — validating everything."
+            exit 0
+          fi
+          if git diff --name-only "$base" "${{ github.sha }}" | grep -qE \
+              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|docs/ontology/|docs/decisions/|docs/technical/|docs/ecosystem/w3id/|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)'; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+            echo "RDF-relevant paths changed — running the full contract."
+          else
+            echo "full=false" >> "$GITHUB_OUTPUT"
+            echo "No RDF-relevant path changed — running truth-audit only."
+          fi
+
       # Publishing must never outrun the RDF contract. This includes isolated
       # ecosystem fixtures, adversarial SHACL-SPARQL cases, named-graph loader
       # checks, OWL consistency, and serialization round trips.
+      #
+      # -j4 because the runner has 4 cores and the targets are independent
+      # scripts in their own mktemp dirs. Measured locally, every gate passing:
+      # 432s serial, 192s with -j4, 218s with -j4 -Otarget. The 26s buys grouped
+      # per-target output, or a parallel failure is unreadable.
       - name: Validate RDF contract before publication
-        run: nix develop --command make validate
+        if: steps.scope.outputs.full == 'true'
+        run: nix develop --command make -j4 -Otarget validate
+
+      # The prose gate is not RDF-specific: it checks release versions, DOIs and
+      # every relative link in every tracked .md, so a docs-only push needs it
+      # exactly when it is skipping everything else.
+      - name: Assert the prose still matches the repository
+        if: steps.scope.outputs.full != 'true'
+        run: nix develop --command make truth-audit
 
       # RDF-11 (2026-07-24 audit): make validate alone omits the Vitest suite —
       # the runtime SHACL goldens for Sensory Field, the ADR 0027 negative
