@@ -33,6 +33,10 @@ Describing a protocol or claim does not establish efficacy.
   rather than absence: 15 classes have committed data and no SHACL shape, 34 of
   63 schemes have zero non-English labels, duration datatypes disagree. Also
   records what came back clean.
+- [Third pass, 2026-08-17](reviews/2026-08-17-third-pass.md) — soundness and
+  duplication, mostly in the four-day-old signal layer: rendering presence is
+  derivable from mechanism and only 2 of 5 cases are constrained, two unrelated
+  carrier properties, band-interval relations with no constraints at all.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
