@@ -56,9 +56,10 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   catalogued in [BARTOC](https://bartoc.org/en/node/21154) (node 21154, entered
   by a BARTOC editor on 2026-07-27) and in
   [FAIRsharing](https://fairsharing.org/8494) (record 8494, curated 2026-08-06,
-  DOI pending). A LOV submission is outstanding, though LOV has catalogued
-  nothing since November 2025, and a DBpedia Archivo
-  submission passed RDF validation but is blocked by a Databus outage. Tracked in
+  DOI pending) and in
+  [DBpedia Archivo](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim),
+  which archives every resolvable version. A LOV submission is outstanding,
+  though LOV has catalogued nothing since November 2025. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio
   with built-in Sensory Field starters, logbook, profile and settings are

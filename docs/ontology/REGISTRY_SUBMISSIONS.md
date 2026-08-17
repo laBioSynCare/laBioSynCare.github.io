@@ -84,7 +84,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
-| DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
+| DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt; rated ★☆☆☆ pending a Databus recheck | no | recheck ratings |
 | LOV | ⚠️ **submitted 2026-07-10 (attested by email only — the form issues no ticket); catalog dormant since 2025-11-22**, so this is not a moving queue. Absence verified 2026-08-17 by LOV SPARQL | no | escalate or drop |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
@@ -110,7 +110,7 @@ Status:             LIVE
 Required follow-up: none
 ```
 
-### DBpedia Archivo — ready now
+### DBpedia Archivo — INDEXED (2026-08-17)
 
 Submit the ontology URI; Archivo dereferences it, archives every version it can
 resolve, and returns an automated quality-star rating. No account.
@@ -175,19 +175,66 @@ on the `.tools.` host (the canonical `archivo.dbpedia.org` is down), not an
 ontology problem. Nothing to fix on our side — retry when DBpedia's Databus
 deployment / canonical host is healthy again.
 
+**Attempt 3 (2026-08-17) — ACCEPTED AND INDEXED.** The canonical host recovered:
+`archivo.dbpedia.org` answers 200 (it was dead nginx on 2026-07-11), as does
+`databus.dbpedia.org`. Submitted there rather than to `.tools.` — **the two hosts
+are separate indexes**, which this file did not record: canonical carries 1462
+`w3id.org` entries against `.tools.`'s 1245, and their listings differ by ~300 KB.
+Neither held SSTIM beforehand, so July's attempts left nothing behind.
+
+Preconditions re-verified first, because the ontology is no longer what it was
+when they were last checked in July (707 triples, a single `owl:Ontology`
+subject): now **10,436 triples and 16 subjects** (the ADR 0043 modules — the profile
+closure serves them all). `<https://w3id.org/sstim>` is still declared
+`a owl:Ontology`, which is the condition Archivo tests, and both `text/turtle`
+(728 KB) and `application/rdf+xml` (1.1 MB) parse. `application/n-triples` still
+406s, and still does not matter — Archivo generated the `nt` artifact itself.
+
+**Client timeout is not failure.** A 300 s POST returned zero bytes; a second
+attempt was still hanging when the record appeared in the index. Archivo crawls
+synchronously and the payload is now 15× its July size. Confirm by polling
+`/list` for the ontology, never by the POST's exit status.
+
 ```text
-Service:            DBpedia Archivo (archivo.tools.dbpedia.org)
+Service:            DBpedia Archivo (archivo.dbpedia.org — canonical host)
 Submitted URL:      https://w3id.org/sstim
-Submitted version:  0.6.0
-Release DOI submitted: 10.5281/zenodo.21302910
-Date:               2026-07-11
-Account/maintainer: — (anonymous suggestion)
-External record ID or URL:
-Status:             Passed RDF validation ("accessible in 2 formats", 707
-                    triples). NOT indexed — DBpedia Databus deployment failed
-                    server-side ("Not found"). Retry when Archivo infra healthy.
-Required follow-up: Re-submit later; if it persists, report the Databus
-                    deployment failure on the DBpedia forum / archivo GitHub.
+Submitted version:  0.16.0-dev line (10441 triples as counted by Archivo)
+Concept DOI:        10.5281/zenodo.21286974
+Date:               2026-08-17 (attempts 1 and 2: 2026-07-11)
+Account/maintainer: — (anonymous suggestion; source recorded "user-suggestion")
+External record ID or URL:  https://archivo.dbpedia.org/info?o=https://w3id.org/sstim
+                            https://databus.dbpedia.org/ontologies/w3id.org/sstim
+Status:             INDEXED 2026-08-17 (snapshot 2026.08.17-195305). Archived in
+                    owl, ttl and nt. Parsing ✔, Crawling Status ✔. Rated
+                    ★☆☆☆ (1/4): Min. License ✘, Good License ✘, Consistency ✘,
+                    LODE Conformity ✘.
+Required follow-up: **Re-check the four ✘ when the Databus is healthy — do not
+                    treat them as findings yet.** Two of them contradict
+                    measurements taken the same day:
+
+                      - License. All 16 ontology subjects carry dct:license
+                        (CC BY 4.0); https://w3id.org/sstim also carries
+                        cc:license. So Archivo selecting a different subject
+                        cannot explain it either.
+                      - Consistency. `nix develop -c make reason` reports ROBOT
+                        HermiT consistent across all 16 semantic modules.
+
+                    Meanwhile the Databus backend is still degraded: Archivo's
+                    own download endpoint returns
+                    `500 … There seems to be an error with the DBpedia Databus …
+                    HTTP Error 503`. Parsing and Crawling are the checks that run
+                    during the crawl; the four that failed are the ones needing
+                    the stored artifact. That is the best-supported explanation
+                    and it is not yet verified — re-run when downloads work.
+
+                    LODE Conformity has NOT been measured on our side; unlike the
+                    other three it may be a genuine finding. Measure before
+                    claiming either way.
+
+                    If the ✘ persist once downloads succeed, file against the
+                    archivo GitHub / DBpedia forum, and only then treat them as
+                    input to `IMPROVEMENT_PLAN.md` (compare the 87.5% FOOPS
+                    result already on file).
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
