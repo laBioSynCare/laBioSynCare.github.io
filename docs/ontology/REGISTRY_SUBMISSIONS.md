@@ -230,16 +230,56 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     beyond the rating: a scheme extracted on its own currently
                     travels with no licence at all.
 
-                    **Consistency ✘ — undiagnosed, do not assume it is ours or
-                    theirs.** Archivo runs *Pellet*, not HermiT:
-                    `pellet consistency -v --loader Jena <url>`, 600 s timeout,
-                    and counts a pass if either the with-imports or the
-                    ignore-imports run answers "Yes". Our `make reason` runs
-                    ROBOT/HermiT and passes on all 16 modules, and the served
-                    document has **zero** `owl:imports`, so imports are not the
-                    variable. Remaining candidates are a Pellet timeout, a Pellet
-                    load error, or a genuine reasoner divergence. Measure with
-                    Pellet before concluding anything.
+                    **Consistency ✘ — measured, and NOT ours.** Do not spend
+                    ontology work on this star.
+
+                    Archivo runs Pellet, not HermiT. Reproduced with Openllet
+                    2.6.5, the maintained Pellet fork, using Archivo's exact
+                    invocation — resolve `com.github.galigator.openllet:
+                    openllet-cli:2.6.5` with maven, then:
+
+                      java -cp "$(cat cp.txt)" openllet.Openllet consistency \
+                        -v --loader Jena https://w3id.org/sstim
+
+                    Answer: **Consistent: Yes**, expressivity ALCHIF(D),
+                    consistency check 134–167 ms. It says Yes on the current
+                    graph *and* on the pre-2026-08-17 OWL Full graph fetched
+                    live. So being outside OWL 2 DL was never the cause, and the
+                    profile fix — worth doing on its own merits — will not move
+                    this star. An earlier note here, and the commit message of
+                    ee68977, claimed otherwise; this is the measurement that
+                    corrects them.
+
+                    The actual cause is in Archivo, and it is visible in its
+                    source. `archivo/crawling/discovery.py` line ~191 hands
+                    Pellet **Archivo's own stored artifact URL**, not the
+                    ontology IRI:
+
+                      url = content_access.get_location_url(file_metadata)
+                      consistency, output = self.test_suite.get_consistency(
+                          ontology_url=url, ignore_imports=False)
+
+                    That storage is the Databus, which is degraded — Archivo's
+                    own download endpoint answers `500 … There seems to be an
+                    error with the DBpedia Databus … HTTP Error 503`. Pellet
+                    cannot fetch what it is pointed at, `get_consistency`
+                    returns "Error - Exit N" rather than "Yes", and the star is
+                    lost to infrastructure. This also explains why the licence
+                    findings were genuine while this one is not: the SHACL
+                    checks run against the parsed in-memory graph and never
+                    touch the Databus.
+
+                    Note an upstream bug while reading that code. The loop is
+                    `for ignore_imports in [True, False]` but the call hardcodes
+                    `ignore_imports=False`, so the ignore-imports variant never
+                    ignores imports. `check_if_consistent` passes if either run
+                    says Yes, so the intended safety net is one check executed
+                    twice. Worth reporting to dbpedia/archivo; it does not
+                    change our situation, since our single check already passes.
+
+                    Expect ★★★☆ after the recrawl, and the fourth star only when
+                    DBpedia's Databus recovers. Re-test with the download
+                    endpoint above: if it stops 503ing, the star should follow.
 
                     **LODE Conformity ✘ — 192 results, but only 3 of the shapes
                     carry `sh:Violation` severity** (the other 12 are Warning or
