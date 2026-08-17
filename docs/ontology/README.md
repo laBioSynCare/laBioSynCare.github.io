@@ -24,6 +24,11 @@ Describing a protocol or claim does not establish efficacy.
 - [Term index](TERM_INDEX.md) — generated and CI-checked: every class,
   property and concept with its module and definition. The place to look
   before concluding SSTIM lacks a term.
+- [Review, 2026-08-17](reviews/2026-08-17-ontology-vocabulary-and-data-review.md)
+  — findings only, nothing fixed: 65% of properties and 75% of classes have no
+  instance data, the 17 frequency bands carry no `skos:definition`, 17 notation
+  collisions (three days old), `citesReference` is load-bearing and
+  unconstrained, and one dangling IRI in published data.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
