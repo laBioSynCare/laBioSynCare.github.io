@@ -513,6 +513,7 @@ sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
 ###########################################################################
 
 sstim-ex:StimulusChannelRoleScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Stimulus Channel Role Scheme"@en ;
     skos:definition "Roles a stimulus channel can play in an exposure profile: intended causal intervention, concomitant exposure, control or sham, or feedback."@en ;
     skos:hasTopConcept
@@ -552,6 +553,7 @@ sstim-ex:roleFeedback a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:
     skos:definition "A channel that returns a measured or derived signal to the participant."@en .
 
 sstim-ex:DeliveryMediumScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Delivery Medium Scheme"@en ;
     skos:definition "Physical media, energies, materials, and interfaces used to deliver or model an exposure."@en ;
     skos:hasTopConcept
@@ -573,6 +575,7 @@ sstim-ex:DeliveryMediumScheme a skos:ConceptScheme ;
         sstim-ex:mediumAppliedMagneticField .
 
 sstim-ex:PerceivedModalityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Perceived Modality Scheme"@en ;
     skos:definition "Perceived or engaged modalities for SSTIM exposure profiles."@en ;
     skos:hasTopConcept
@@ -590,6 +593,7 @@ sstim-ex:PerceivedModalityScheme a skos:ConceptScheme ;
         sstim-ex:modalityNotDirectlyPerceived .
 
 sstim-ex:DeviceCapabilityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Device Capability Scheme"@en ;
     skos:definition "Hardware and environmental capabilities required for SSTIM exposure delivery, separation, sensing, or immersion."@en ;
     skos:hasTopConcept
@@ -625,6 +629,7 @@ sstim-ex:DeviceCapabilityScheme a skos:ConceptScheme ;
         sstim-ex:capabilityUltravioletLightOutput .
 
 sstim-ex:BodyPlacementScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Body Placement Scheme"@en ;
     skos:definition "Body or near-body placements for exposure devices, media, and channels."@en ;
     skos:hasTopConcept
@@ -641,6 +646,7 @@ sstim-ex:BodyPlacementScheme a skos:ConceptScheme ;
         sstim-ex:placementNearbyEnvironment .
 
 sstim-ex:StimulusPatternScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Stimulus Pattern Scheme"@en ;
     skos:definition "Temporal, spatial, stochastic, color, and texture patterns for stimulus channels."@en ;
     skos:hasTopConcept
@@ -658,6 +664,7 @@ sstim-ex:StimulusPatternScheme a skos:ConceptScheme ;
         sstim-ex:patternTextured .
 
 sstim-ex:AudioNoiseColorScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Audio Noise Color Scheme"@en ;
     skos:definition "Named audio-noise color conventions. Names vary across communities and should be defined by spectral slope when possible."@en ;
     skos:scopeNote "SSTIM should avoid assuming that color-noise names are exact scientific definitions unless spectral slope or generation method is documented."@en ;
@@ -671,6 +678,7 @@ sstim-ex:AudioNoiseColorScheme a skos:ConceptScheme ;
         sstim-ex:audioNoiseBlackSilence .
 
 sstim-ex:VisualNoiseScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Visual Noise Scheme"@en ;
     skos:definition "Visual noise and simple field stimuli for visual exposure channels."@en ;
     skos:hasTopConcept
@@ -683,6 +691,7 @@ sstim-ex:VisualNoiseScheme a skos:ConceptScheme ;
         sstim-ex:visualFieldWhite .
 
 sstim-ex:EffectDimensionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Effect Dimension Scheme"@en ;
     skos:definition "Effect, risk, comfort, and measurement dimensions that exposure claims can concern."@en ;
     skos:hasTopConcept
@@ -709,6 +718,7 @@ sstim-ex:EffectDimensionScheme a skos:ConceptScheme ;
         sstim-ex:effectGravityPerception .
 
 sstim-ex:KnowledgeStatusScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Knowledge Status Scheme"@en ;
     skos:definition "Local SSTIM/BSC Lab knowledge and delivery status markers. These statuses do not assert global scientific absence unless a separate literature review supports that claim."@en ;
     skos:hasTopConcept
@@ -721,6 +731,7 @@ sstim-ex:KnowledgeStatusScheme a skos:ConceptScheme ;
         sstim-ex:outsideBSCLabScope .
 
 sstim-ex:ExperimentContextScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Experiment Context Scheme"@en ;
     skos:definition "Reusable contexts for non-clinical exploratory protocol instances."@en ;
     skos:hasTopConcept
@@ -732,6 +743,7 @@ sstim-ex:ExperimentContextScheme a skos:ConceptScheme ;
         sstim-ex:contextCapabilityBoundary .
 
 sstim-ex:PerceptualGainScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Perceptual Gain Scheme"@en ;
     skos:definition "Reusable perceptual gains for exposure examples."@en ;
     skos:hasTopConcept
@@ -745,6 +757,7 @@ sstim-ex:PerceptualGainScheme a skos:ConceptScheme ;
         sstim-ex:gainSocialReflection .
 
 sstim-ex:PerceptualLossScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Perceptual Loss Scheme"@en ;
     skos:definition "Reusable perceptual losses, costs, or limitations for exposure examples."@en ;
     skos:hasTopConcept
@@ -757,6 +770,7 @@ sstim-ex:PerceptualLossScheme a skos:ConceptScheme ;
         sstim-ex:lossDeviceFeasibility .
 
 sstim-ex:ComfortBoundaryScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "Comfort Boundary Scheme"@en ;
     skos:definition "Reusable comfort, fatigue, awareness, and risk boundaries for exposure profiles."@en ;
     skos:hasTopConcept

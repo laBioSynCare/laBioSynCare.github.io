@@ -420,6 +420,7 @@ sstim-eco:addedOn a owl:DatatypeProperty ;
 ###########################################################################
 
 sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Ecosystem Relationship Vocabulary"@en ;
     dct:description "Controlled types assigned to qualified ecosystem relationship records. A term such as contributor, stakeholder, organization member, or implementation developer describes one sourced agent-target relationship, not the agent globally."@en ;
     skos:hasTopConcept sstim-eco:contributor, sstim-eco:stakeholder,
@@ -568,6 +569,7 @@ sstim-eco:implementationOperator a owl:NamedIndividual,
 ###########################################################################
 
 sstim-eco:EcosystemPurposeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Ecosystem Purpose Vocabulary"@en ;
     dct:description "Controlled purposes that scope qualified ecosystem relationships and their public engagement activities."@en ;
     skos:hasTopConcept sstim-eco:purposePublicDiscovery,
@@ -615,6 +617,7 @@ sstim-eco:purposeArchivalPublication a owl:NamedIndividual, sstim-eco:EcosystemP
 ###########################################################################
 
 sstim-eco:EngagementOutcomeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Engagement Outcome Vocabulary"@en ;
     dct:description "Minimal controlled outcomes for ecosystem engagement activities. Only positive admission outcomes may be projected publicly; negative and operational outcomes, messages, channels, and evidence remain private."@en ;
     skos:hasTopConcept sstim-eco:outcomeNotificationSent,

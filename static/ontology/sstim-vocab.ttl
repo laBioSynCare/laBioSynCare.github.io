@@ -54,6 +54,7 @@
 ###########################################################################
 
 sstim-v:FrequencyBandScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Frequency Band Vocabulary"@en,
                    "Vocabolario Bande di Frequenza SSTIM"@it,
                    "Vocabulário de Bandas de Frequência SSTIM"@pt,
@@ -267,6 +268,7 @@ sstim-v:gamma40 a owl:NamedIndividual, sstim:FrequencyBand, skos:Concept ;
 ###########################################################################
 
 sstim-v:PresetGroupScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Preset Group Vocabulary"@en ;
     skos:hasTopConcept sstim-v:groupHeal, sstim-v:groupSupport,
                        sstim-v:groupPerform, sstim-v:groupIndulge,
@@ -308,6 +310,7 @@ sstim-v:groupTranscend a owl:NamedIndividual, sstim:PresetGroup, skos:Concept ;
 ###########################################################################
 
 sstim-v:EvidenceTierScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Evidence Tier Vocabulary"@en ;
     skos:hasTopConcept sstim-v:tierSpeculative, sstim-v:tierAnecdotal,
                        sstim-v:tierPreliminary, sstim-v:tierModerate,
@@ -369,6 +372,7 @@ sstim-v:tierEstablished a owl:NamedIndividual, sstim:EvidenceTierValue, skos:Con
 # sense and REVIEW's synthesis-type sense were never one axis), not a 1:1
 # per-tag successor.
 sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     owl:deprecated true ;
     skos:prefLabel "SSTIM Evidence Modality Tag Vocabulary (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: superseded by the orthogonal basis axes (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention). Survives only for the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
@@ -458,6 +462,7 @@ sstim-v:modalityMULTISENSORY a owl:NamedIndividual, sstim:EvidenceModalityTag, s
 ###########################################################################
 
 sstim-v:PublicClaimLevelScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Public Claim Level Vocabulary"@en ;
     skos:hasTopConcept sstim-v:claimC0Descriptive, sstim-v:claimC1Experiential,
         sstim-v:claimC2Wellness, sstim-v:claimC3StructureFunction,
@@ -519,6 +524,7 @@ sstim-v:claimC5Quantified a owl:NamedIndividual, sstim:PublicClaimLevel, skos:Co
 ###########################################################################
 
 sstim-v:ClaimDirectionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Evidence Claim Direction Vocabulary"@en ;
     skos:hasTopConcept sstim-v:claimSupports, sstim-v:claimMixed,
         sstim-v:claimInconclusive, sstim-v:claimRefutes .
@@ -549,6 +555,7 @@ sstim-v:claimRefutes a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
 
 
 sstim-v:EffectDirectionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Effect Direction Vocabulary"@en ;
     skos:hasTopConcept sstim-v:effectIncrease, sstim-v:effectDecrease, sstim-v:effectNoChange .
 
@@ -572,6 +579,7 @@ sstim-v:effectNoChange a owl:NamedIndividual, sstim:EffectDirection, skos:Concep
 
 
 sstim-v:ReviewStatusScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Evidence Review Status Vocabulary"@en ;
     skos:hasTopConcept sstim-v:reviewProvisional, sstim-v:reviewReviewed, sstim-v:reviewNeedsUpdate .
 
@@ -613,6 +621,7 @@ sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concep
 ###########################################################################
 
 sstim-v:NeuralOscillationScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural Oscillation Vocabulary"@en ;
     skos:definition "Controlled categories for the named rhythmic fluctuations of neural activity, delimited by conventional frequency ambits together with characteristic topography and observation state."@en ;
     skos:hasTopConcept sstim-v:deltaOscillation, sstim-v:thetaOscillation, sstim-v:alphaOscillation, sstim-v:smrOscillation, sstim-v:betaOscillation, sstim-v:gammaOscillation .
@@ -707,6 +716,7 @@ sstim-v:gammaOscillation a owl:NamedIndividual, sstim:NeuralOscillationType, sko
 ###########################################################################
 
 sstim-v:SelfReportPhaseScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Self-Report Phase Vocabulary"@en ;
     skos:definition "Controlled phases for locating a consent-governed self-report relative to its associated session."@en ;
     skos:hasTopConcept sstim-v:reportPreSession, sstim-v:reportDuringSession,
@@ -755,6 +765,7 @@ sstim-v:reportFollowUp a owl:NamedIndividual, sstim:SelfReportPhase, skos:Concep
 ###########################################################################
 
 sstim-v:SessionEventTypeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Session Event Type Vocabulary"@en ;
     skos:definition "Controlled categories of occurrence during a session execution, as observed by the delivering system."@en ;
     skos:hasTopConcept sstim-v:eventSessionOpen, sstim-v:eventPlaybackStart,
@@ -849,6 +860,7 @@ sstim-v:eventObservationCollected a owl:NamedIndividual, sstim:SessionEventType,
 ###########################################################################
 
 sstim-v:TimingAuthorityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Timing Authority Vocabulary"@en ;
     skos:definition "Controlled categories identifying which timing surface produced a session's clock origin and event offsets."@en ;
     skos:hasTopConcept sstim-v:timingAudioHardwareClock, sstim-v:timingMonotonicSubstitute .
@@ -879,6 +891,7 @@ sstim-v:timingMonotonicSubstitute a owl:NamedIndividual, sstim:TimingAuthority, 
 ###########################################################################
 
 sstim-v:ReproducibilityLevelScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Reproducibility Level Vocabulary"@en ;
     skos:definition "Controlled categories stating how exactly a session specification's output can be reproduced."@en ;
     skos:hasTopConcept sstim-v:reproIdenticalRendering, sstim-v:reproEquivalentSignal,
@@ -915,6 +928,7 @@ sstim-v:reproEquivalentPresentation a owl:NamedIndividual, sstim:Reproducibility
 ###########################################################################
 
 sstim-v:VoiceTypeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Voice Type Vocabulary"@en ;
     skos:hasTopConcept sstim-v:voiceBinaural, sstim-v:voiceMartigli,
         sstim-v:voiceMartigliBinaural, sstim-v:voiceSymmetry .
@@ -949,6 +963,7 @@ sstim-v:voiceSymmetry a owl:NamedIndividual, sstim:VoiceType, skos:Concept ;
 ###########################################################################
 
 sstim-v:SensoryModalityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Sensory Modality Vocabulary"@en ;
     skos:hasTopConcept sstim-v:modalityAuditory, sstim-v:modalityVisual,
         sstim-v:modalitySomatosensory, sstim-v:modalityInteroceptive,
@@ -1007,6 +1022,7 @@ sstim-v:modalityOlfactory a owl:NamedIndividual, sstim:SensoryModality, skos:Con
 ###########################################################################
 
 sstim-v:StimulationMechanismScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Stimulation Mechanism Vocabulary"@en ;
     skos:hasTopConcept sstim-v:mechThalamocortical, sstim-v:mechAutonomic,
         sstim-v:mechStochastic, sstim-v:mechAttentional, sstim-v:mechGamma40,
@@ -1189,6 +1205,7 @@ sstim-v:mechMultisensory a owl:NamedIndividual, sstim:StimulationMechanism, skos
 ###########################################################################
 
 sstim-v:PermutationFunctionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en ;
     skos:hasTopConcept sstim-v:permShuffle, sstim-v:permRotateForward,
         sstim-v:permRotateBackward, sstim-v:permReverse, sstim-v:permIdentity .
@@ -1231,6 +1248,7 @@ sstim-v:permIdentity a owl:NamedIndividual, sstim:PermutationFunction, skos:Conc
 ###########################################################################
 
 sstim-v:CautionSeverityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Caution Severity Vocabulary"@en ;
     skos:definition "Ordinal interface-priority categories for SSTIM caution tags; not clinical risk probabilities."@en ;
     skos:hasTopConcept sstim-v:cautionSeverityInfo, sstim-v:cautionSeverityLow,
@@ -1269,6 +1287,7 @@ sstim-v:cautionSeverityHigh a owl:NamedIndividual, sstim:CautionSeverity, skos:C
     sstim:cautionSeverityRank 4 .
 
 sstim-v:CautionTagScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Preset Caution Tag Vocabulary"@en ;
     skos:hasTopConcept sstim-v:cautionEpilepsyRisk, sstim-v:cautionStimulating,
         sstim-v:cautionDrowsyUse, sstim-v:cautionDrivingUnsafe, sstim-v:cautionNighttimeOnly,
@@ -1417,6 +1436,7 @@ sstim-v:cautionUltraSlowBreathing a owl:NamedIndividual, sstim:CautionTag, skos:
 ###########################################################################
 
 sstim-v:StimulusTemporalStructureScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Stimulus Temporal Structure Vocabulary"@en ;
     skos:definition "Temporal organizations of an applied stimulus or agent. Values are non-disjoint and may be combined: carrier periodicity, pulse pattern, and administration schedule are different temporal features."@en ;
     skos:hasTopConcept sstim-v:temporalPeriodic, sstim-v:temporalQuasiPeriodic,
@@ -1469,6 +1489,7 @@ sstim-v:temporalAdaptive a owl:NamedIndividual, sstim:StimulusTemporalStructure,
 ###########################################################################
 
 sstim-v:TechniqueScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Stimulation Technique Vocabulary"@en ,
                    "Vocabolario delle Tecniche di Stimolazione SSTIM"@it ,
                    "Vocabulário de Técnicas de Estimulação SSTIM"@pt ,
@@ -2107,6 +2128,7 @@ sstim-v:techReferencePitchRetuning skos:narrower sstim-v:techSolfeggioTuning .
 ###########################################################################
 
 sstim-v:ModalityApplicabilityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled statements of how sensory modality applies to an evidence source: mixed, unknown/not reported, or not applicable (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Evidence Modality Applicability Vocabulary"@en ;
     skos:hasTopConcept sstim-v:applicabilityMixedModalities,
@@ -2133,6 +2155,7 @@ sstim-v:applicabilityNotApplicable a owl:NamedIndividual, sstim:ModalityApplicab
 
 
 sstim-v:StudyDesignScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled designs of the underlying studies contributing to an evidence source (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Study Design Vocabulary"@en ;
     skos:hasTopConcept sstim-v:designRandomizedControlledTrial, sstim-v:designControlledTrial,
@@ -2184,6 +2207,7 @@ sstim-v:designUnknownDesign a owl:NamedIndividual, sstim:StudyDesign, skos:Conce
 
 
 sstim-v:StudyModelScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled models or stages in which evidence was produced: human, preclinical animal, in vitro, computational (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Study Model Vocabulary"@en ;
     skos:hasTopConcept sstim-v:modelHuman, sstim-v:modelPreclinicalAnimal,
@@ -2228,6 +2252,7 @@ sstim-v:modelUnknownModel a owl:NamedIndividual, sstim:StudyModel, skos:Concept 
 
 
 sstim-v:EvidenceSynthesisTypeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled synthesis levels of an evidence source, from primary study to meta-analysis (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Evidence Synthesis Type Vocabulary"@en ;
     skos:hasTopConcept sstim-v:synthesisPrimaryStudy, sstim-v:synthesisNarrativeReview,
@@ -2272,6 +2297,7 @@ sstim-v:synthesisTutorial a owl:NamedIndividual, sstim:EvidenceSynthesisType, sk
 
 
 sstim-v:EvidencePropositionFormScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled logical forms of an assessment proposition; universal absence is named so validation can reject it (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Evidence Proposition Form Vocabulary"@en ;
     skos:hasTopConcept sstim-v:formBoundedRelation, sstim-v:formBoundedNullResult,
@@ -2303,6 +2329,7 @@ sstim-v:formUniversalAbsence a owl:NamedIndividual, sstim:EvidencePropositionFor
 
 
 sstim-v:ScopeMarkerScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled markers stating that a proposition scope axis is unknown, not reported, or not applicable (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Scope Marker Vocabulary"@en ;
     skos:hasTopConcept sstim-v:scopeUnknown, sstim-v:scopeNotReported, sstim-v:scopeNotApplicable .
@@ -2327,6 +2354,7 @@ sstim-v:scopeNotApplicable a owl:NamedIndividual, sstim:ScopeMarker, skos:Concep
 
 
 sstim-v:ReviewerRelationshipScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled relationships of a review agent to the assessed work (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Reviewer Relationship Vocabulary"@en ;
     skos:hasTopConcept sstim-v:reviewerSelf, sstim-v:reviewerSameOrganization,
@@ -2358,6 +2386,7 @@ sstim-v:reviewerUnknownRelationship a owl:NamedIndividual, sstim:ReviewerRelatio
 
 
 sstim-v:IndependenceDeterminationScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled policy-based reviewer-independence determinations (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Independence Determination Vocabulary"@en ;
     skos:hasTopConcept sstim-v:independenceIndependent, sstim-v:independenceNotIndependent,
@@ -2383,6 +2412,7 @@ sstim-v:independenceUndetermined a owl:NamedIndividual, sstim:IndependenceDeterm
 
 
 sstim-v:ReviewDecisionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled outcomes of an evidence review decision (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Review Decision Vocabulary"@en ;
     skos:hasTopConcept sstim-v:reviewConfirm, sstim-v:reviewRequestRevision, sstim-v:reviewReject .
@@ -2407,6 +2437,7 @@ sstim-v:reviewReject a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Conc
 
 
 sstim-v:ConflictDisclosureScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:definition "Controlled conflict-of-interest disclosure records for reviews (ADR 0027)."@en ;
     skos:prefLabel "SSTIM Conflict Disclosure Vocabulary"@en ;
     skos:hasTopConcept sstim-v:noConflictDeclared .
@@ -2476,6 +2507,7 @@ sstim-v:noConflictDeclared skos:topConceptOf sstim-v:ConflictDisclosureScheme .
 ###########################################################################
 
 sstim-v:NeuralAccessRouteScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural Access Route Vocabulary"@en ,
                    "Vocabolario delle Vie di Accesso Neurale SSTIM"@it ,
                    "Vocabulário de Vias de Acesso Neural SSTIM"@pt ,
@@ -2540,6 +2572,7 @@ sstim-v:routeIndirectNonSensoryPhysiologicalMediation a owl:NamedIndividual, sst
     skos:definition "Engagement of a neural target through an intermediate physiological process that is not canonical sensory transduction, such as a vascular, endocrine, or muscular pathway."@en .
 
 sstim-v:StimulationDeliveryApproachScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Stimulation Delivery Approach Vocabulary"@en ,
                    "Vocabolario degli Approcci di Somministrazione della Stimolazione SSTIM"@it ,
                    "Vocabulário de Abordagens de Administração da Estimulação SSTIM"@pt ,
@@ -2688,6 +2721,7 @@ sstim-v:InvasiveApproachCollection a skos:Collection ;
         sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal .
 
 sstim-v:NeuralTargetSiteScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural Target Site Vocabulary"@en ,
                    "Vocabolario dei Siti Bersaglio Neurali SSTIM"@it ,
                    "Vocabulário de Locais-Alvo Neurais SSTIM"@pt ,
@@ -2782,6 +2816,7 @@ sstim-v:targetCranialNerve a owl:NamedIndividual, sstim:NeuralTargetSite, skos:C
     skos:scopeNote "Kept as a separate seed category rather than a blanket child of the peripheral nervous system, because cranial-nerve anatomy is not uniformly peripheral."@en .
 
 sstim-v:NeuralSystemScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural System Vocabulary"@en ,
                    "Vocabolario dei Sistemi Neurali SSTIM"@it ,
                    "Vocabulário de Sistemas Neurais SSTIM"@pt ,
@@ -2902,6 +2937,7 @@ sstim-v:systemInteroceptive a owl:NamedIndividual, sstim:NeuralSystem, skos:Conc
     skos:definition "The interoceptive neural system as a distributed target."@en .
 
 sstim-v:NeuralPhenomenonScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Neural Phenomenon Vocabulary"@en ,
                    "Vocabolario dei Fenomeni Neurali SSTIM"@it ,
                    "Vocabulário de Fenómenos Neurais SSTIM"@pt ,
@@ -3124,6 +3160,7 @@ sstim-v:NeuromodulatoryEffectCollection a skos:Collection ;
 ###########################################################################
 
 sstim-v:ParticipantEngagementModeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Participant Engagement Mode Vocabulary"@en ,
                    "Vocabolario delle Modalità di Coinvolgimento del Partecipante SSTIM"@it ,
                    "Vocabulário de Modos de Envolvimento do Participante SSTIM"@pt ,
@@ -3343,6 +3380,7 @@ sstim-v:techBiofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique, s
 ###########################################################################
 
 sstim-v:ObservationRoleScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Observation Role Vocabulary"@en ;
     skos:definition "Controlled categories of what a qualified participant observation observes."@en ;
     skos:hasTopConcept sstim-v:roleStatedGoal, sstim-v:rolePerceivedHelpfulness,
@@ -3427,6 +3465,7 @@ sstim-v:roleUnwantedExperienceReport a owl:NamedIndividual, sstim:ObservationRol
 ###########################################################################
 
 sstim-v:ResponseStateScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Response State Vocabulary"@en ;
     skos:definition "Controlled categories stating why a participant observation does or does not carry a value."@en ;
     skos:hasTopConcept sstim-v:responseSupplied, sstim-v:responseNoneReported,
@@ -3492,6 +3531,7 @@ sstim-v:responseNotApplicable a owl:NamedIndividual, sstim:ResponseState, skos:C
 ###########################################################################
 
 sstim-v:UnwantedExperienceCategoryScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Unwanted Experience Category Vocabulary"@en ;
     skos:definition "Controlled, non-diagnostic categories for describing an unwanted experience a participant reported around a session."@en ;
     skos:editorialNote "Descriptive rather than clinical by design. These categories support noticing patterns and responding conservatively; they do not support classifying harm, and no mapping to a clinical adverse-event terminology is provided or implied."@en ;
@@ -3596,6 +3636,7 @@ sstim-v:experienceOther a owl:NamedIndividual, sstim:UnwantedExperienceCategory,
 ###########################################################################
 
 sstim-v:ReportedSeverityScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Reported Severity Vocabulary"@en ;
     skos:definition "Controlled categories recording how severe a participant said an unwanted experience was."@en ;
     skos:editorialNote "Participant-reported throughout. These are not clinical severity grades and carry no threshold for action, reporting, or classification."@en ;
@@ -3645,6 +3686,7 @@ sstim-v:severityUnknown a owl:NamedIndividual, sstim:ReportedSeverity, skos:Conc
 ###########################################################################
 
 sstim-v:ExperienceOnsetPhaseScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Experience Onset Phase Vocabulary"@en ;
     skos:definition "Controlled categories locating when an unwanted experience began, relative to the session."@en ;
     skos:scopeNote "Separate from the self-report phase scheme: when an experience began and when it was reported are different facts, and an experience is often described later than it started."@en ;
@@ -3707,6 +3749,7 @@ sstim-v:onsetUnknown a owl:NamedIndividual, sstim:ExperienceOnsetPhase, skos:Con
 ###########################################################################
 
 sstim-v:ExperiencePersistenceScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Experience Persistence Vocabulary"@en ;
     skos:definition "Controlled categories recording how long an unwanted experience lasted, as the participant described it."@en ;
     skos:hasTopConcept sstim-v:persistenceResolvedDuringSession,
@@ -3759,6 +3802,7 @@ sstim-v:persistenceUnknown a owl:NamedIndividual, sstim:ExperiencePersistence, s
 ###########################################################################
 
 sstim-v:ExperienceResponseActionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Experience Response Action Vocabulary"@en ;
     skos:definition "Controlled categories recording what a participant did in response to an unwanted experience."@en ;
     skos:scopeNote "What the participant did, not what they were advised to do. Recording the action makes a later resolution interpretable."@en ;
@@ -3837,6 +3881,7 @@ sstim-v:actionUnknown a owl:NamedIndividual, sstim:ExperienceResponseAction, sko
 ###########################################################################
 
 sstim-v:ExperienceResolutionScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Experience Resolution Vocabulary"@en ;
     skos:definition "Controlled categories recording the state an unwanted experience reached."@en ;
     skos:hasTopConcept sstim-v:resolutionResolved, sstim-v:resolutionImproved,
@@ -3890,6 +3935,7 @@ sstim-v:resolutionUnknown a owl:NamedIndividual, sstim:ExperienceResolution, sko
 ###########################################################################
 
 sstim-v:PerceivedRelatednessScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Perceived Relatedness Vocabulary"@en ;
     skos:definition "Controlled categories recording whether a participant perceived an experience as connected to the session."@en ;
     skos:editorialNote "Records a perception only. Temporal association is not causation, and neither is a participant's belief about it; establishing any causal relation requires the separate governed assessment process, not this property."@en ;
@@ -3948,21 +3994,25 @@ sstim-v:relatednessDeclined a owl:NamedIndividual, sstim:PerceivedRelatedness, s
 ###########################################################################
 
 sstim-v:SignalShapeScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Signal Shape Vocabulary"@en ;
     dct:description "The form of a time-varying signal, and equally the waveform a rendering presents."@en ;
     skos:hasTopConcept sstim-v:shapeSine, sstim-v:shapeSquare, sstim-v:shapeSawtooth, sstim-v:shapeTriangle, sstim-v:shapeEnvelope, sstim-v:shapeNoise, sstim-v:shapeSampled .
 
 sstim-v:RenderingMechanismScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Rendering Mechanism Vocabulary"@en ;
     dct:description "How a signal is made to reach a subject through one channel."@en ;
     skos:hasTopConcept sstim-v:mechanismDirectPresentation, sstim-v:mechanismAmplitudeModulation, sstim-v:mechanismFrequencyModulation, sstim-v:mechanismBinauralBeat, sstim-v:mechanismMonauralBeat .
 
 sstim-v:RenderingPresenceScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Rendering Presence Vocabulary"@en ;
     dct:description "Whether a rendering puts the signal physically into the world or produces it perceptually."@en ;
     skos:hasTopConcept sstim-v:presencePhysical, sstim-v:presencePerceptual .
 
 sstim-v:RenderableParameterScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "SSTIM Renderable Parameter Vocabulary"@en ;
     dct:description "The parameter a signal is rendered onto. Also the modulation relation."@en ;
     skos:hasTopConcept sstim-v:paramAmplitude, sstim-v:paramFrequency, sstim-v:paramLuminance, sstim-v:paramSize, sstim-v:paramSpatialPosition, sstim-v:paramVibrationIntensity .
