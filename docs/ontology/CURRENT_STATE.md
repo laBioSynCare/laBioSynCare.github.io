@@ -1,6 +1,6 @@
 # SSTIM Current State and Next Steps
 
-**Status:** maintained current-state summary, reviewed 2026-08-15. This is the
+**Status:** maintained current-state summary, reviewed 2026-08-17. This is the
 starting point for ontology work. Dated audits remain evidence for individual
 decisions, but they describe the repository state on their stated dates rather
 than the state summarized here.
@@ -12,19 +12,27 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.15.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
-| What can be cited? | `0.14.0`, released 2026-08-13 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.21923315` | [`void.ttl`](../../static/ontology/void.ttl) |
+| What is being edited? | `0.15.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.15.0`, released 2026-08-17 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| Which DOI identifies that release? | pending Zenodo archival of the `v0.15.0` tag | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
-| What changed? | Neural oscillations, the public-claim contract and the preset contract — see Unreleased | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| What changed? | The signal layer, neural oscillations, the public-claim contract and the preset contract | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
 The live line is mutable, carries no `owl:versionIRI`, and is not a citable
-release. The frozen [`0.14.0/`](../../static/ontology/0.14.0/) directory is the
+release. The frozen [`0.15.0/`](../../static/ontology/0.15.0/) directory is the
 latest immutable whole-set snapshot. Its version IRI resolves to the frozen
 namespace catalogue rather than to `sstim-core.ttl`, which is now only the
 two-class Kernel.
+
+For the moment between the snapshot and the reopen, the live sources *are* the
+release: they carry `mod:status "released"` and are byte-identical to the frozen
+directory. That state is deliberate and short. Until `release-open-dev.mjs`
+reopens the mutable line, any ontology edit would make a released line differ
+from the snapshot carrying its name — the defect the 2026-07-24 audit found in
+three earlier snapshots, which every gate passes because the line is internally
+consistent and merely mislabelled.
 
 ## Architecture as built
 
@@ -112,8 +120,8 @@ ecosystem projection use separate graph and storage boundaries.
 
 ## Validation and publication state
 
-The complete pinned gate passed on 2026-08-15 (25 checks under `make validate`,
-810 tests under `make test`, and CI green on `main`):
+The complete pinned gate passed on 2026-08-17, on the tree the `0.15.0`
+snapshot was cut from (`make validate`, and 816 tests under `make test`):
 
 ```bash
 nix develop --command make validate
@@ -207,9 +215,9 @@ Its most practical uses today are:
    evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
    entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
    `/sstim/profile/core-plus`, and `/sstim/profile/full`.
-2. **Pin a release for published work.** Use the immutable `0.14.0` profile and
-   module URLs for a paper or dataset. Use `0.15.0-dev` only when intentionally
-   testing mutable development sources.
+2. **Pin a release for published work.** Use the immutable `0.15.0` profile and
+   module URLs for a paper or dataset. Use the `-dev` line only when
+   intentionally testing mutable development sources.
 3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and
    controlled concepts, but mint protocols, presets, sessions, assessments and
    other records under the adopter's own stable namespace.
@@ -246,7 +254,7 @@ Every audit finding scheduled for Phase 1 is closed, most of them in the week to
 
 | Finding | Closed by |
 |---|---|
-| KR-02, KR-03 | [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md) — session events on the engine clock, qualified observations where absence carries its reason. Released as `0.14.0` |
+| KR-02, KR-03 | [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md) — session events on the engine clock, qualified observations where absence carries its reason. Released in `0.14.0` |
 | KR-05 | Union domains repaired, with entailment fixtures (`make entailment-check`) proving no unintended type is inferred |
 | KR-08, KR-09 | [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md) — neural oscillations as their own terms; outcome prose left the frequency bands without being deleted; alignments re-pointed and provenance-annotated |
 | KR-04 | [ADR 0050](../decisions/0050-public-claim-applicability-contract.md) — an eight-clause applicability contract replaced a single tier test. No claim can currently authorize C3 or C5, because no evidence review has ever been run |
