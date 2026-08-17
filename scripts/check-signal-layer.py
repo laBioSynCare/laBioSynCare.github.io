@@ -123,6 +123,24 @@ CASES = [
     ("a signal with no shape",
      BASELINE.replace("    sstim:hasSignalShape sstim-v:shapeSquare ;\n", ""),
      "must state its shape"),
+    # The band-interval relations are derivable from the two extents, so the
+    # failure they catch is an aim that disagrees with its own arithmetic.
+    ("a signal claiming to sit within a band it does not fit in",
+     BASELINE.replace("sstim:signalWithinBand sstim-v:alpha",
+                      "sstim:signalWithinBand sstim-v:theta"),
+     "lie inside the band"),
+    ("noise claiming to cover a band wider than itself",
+     NOISE.replace("sstim:signalCoversBand sstim-v:theta",
+                   "sstim:signalCoversBand sstim-v:beta"),
+     "contain the whole band"),
+    ("a signal claiming to overlap a band it is wholly inside",
+     BASELINE.replace("sstim:signalWithinBand sstim-v:alpha",
+                      "sstim:signalOverlapsBand sstim-v:alpha"),
+     "neither containing the other"),
+    ("a signal claiming to overlap a band it is disjoint from",
+     BASELINE.replace("sstim:signalWithinBand sstim-v:alpha",
+                      "sstim:signalOverlapsBand sstim-v:delta"),
+     "neither containing the other"),
     ("a rendering that names no presence",
      BASELINE.replace("    sstim:hasRenderingPresence sstim-v:presencePhysical ;\n    sstim:renderingCarrierHz 250.0 .",
                       "    sstim:renderingCarrierHz 250.0 ."),
@@ -199,8 +217,16 @@ def main() -> int:
         _, _, text = shacl_validate(data, shacl_graph=shapes, advanced=True)
         return text
 
+    OVERLAP = """
+ex:wide-noise a sstim:StimulationSignal ;
+    rdfs:label "noise straddling the alpha/beta boundary"@en ;
+    sstim:hasSignalShape sstim-v:shapeNoise ;
+    sstim:hzMin 10.0 ; sstim:hzMax 20.0 ;
+    sstim:signalOverlapsBand sstim-v:alpha .
+"""
     for label, fixture in (("one signal rendered two ways", BASELINE),
-                           ("band-limited noise covering a band", NOISE)):
+                           ("band-limited noise covering a band", NOISE),
+                           ("noise genuinely straddling a band edge", OVERLAP)):
         text = report(fixture)
         if "Conforms: False" in text:
             failures.append(f"the positive fixture '{label}' was rejected\n{text}")
@@ -225,7 +251,7 @@ def main() -> int:
         f"signal-layer: passed ({len(REQUIRED_CLASSES)} classes, "
         f"{len(REQUIRED_PROPERTIES)} properties and {concepts} concepts present; "
         f"{bands_with_bounds} bands unaffected by the domain widening; "
-        f"{len(CASES)} adversarial cases rejected, 2 positive controls accepted)"
+        f"{len(CASES)} adversarial cases rejected, 3 positive controls accepted)"
     )
     return 0
 

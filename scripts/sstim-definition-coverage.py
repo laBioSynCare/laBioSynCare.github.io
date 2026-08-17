@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Every published term must define itself.
+"""Every published term must define itself and be addressable by notation.
 
 Directed by the maintainer after the first-pass review found that all 17
 `sstim:FrequencyBand` concepts — the most-referenced vocabulary in SSTIM —
@@ -15,6 +15,18 @@ published as a blank entry in the reference documentation.
 A definition is also held to a floor: it must not merely restate the label, and
 it must be long enough to distinguish the term from a sibling. Both bars are low
 on purpose — this catches absence and near-absence, not style.
+
+The second half checks `skos:notation` uniqueness, and the rule it enforces is
+**per category, not global**. A review first read the 17 cross-category repeats
+as defects; they are not. `eye-strain` names a comfort boundary, an effect and a
+reported experience, and those are three different things that share a word.
+What must never repeat is one notation twice inside one category, because that
+is what a consumer resolves against — `preset-contract.py` resolves 45
+controlled values by (category, notation) exactly.
+
+So the rule was always per-category and was simply never written down or
+checked. It holds today across 77 categories with zero collisions; this keeps it
+holding.
 """
 
 from __future__ import annotations
@@ -100,6 +112,36 @@ def main() -> int:
                     f"it to BREVITY_ALLOWED if the brevity is deliberate."
                 )
 
+    # ── notation uniqueness, per category ───────────────────────────────────
+    from collections import defaultdict
+
+    by_category: dict[URIRef, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+    for concept in subjects["concept"]:
+        categories = [
+            t for t in graph.objects(concept, RDF.type)
+            if ours(t) and t != SKOS.Concept
+        ]
+        for notation in graph.objects(concept, SKOS.notation):
+            for category in categories:
+                by_category[category][str(notation)].append(local(concept))
+
+    if not by_category:
+        raise SystemExit(
+            "definition-coverage: no concept carries both a category and a notation — "
+            "the uniqueness check would pass vacuously"
+        )
+
+    collisions = 0
+    for category, notations in by_category.items():
+        for notation, names in notations.items():
+            if len(names) > 1:
+                collisions += 1
+                failures.append(
+                    f"notation {notation!r} is used by {names} within one category "
+                    f"({local(category)}) — a consumer resolving by (category, "
+                    f"notation) cannot tell them apart"
+                )
+
     if failures:
         print(f"definition-coverage: FAILED ({len(failures)})", file=sys.stderr)
         for failure in failures:
@@ -107,7 +149,8 @@ def main() -> int:
         return 1
 
     print(
-        f"definition-coverage: passed ({checked} terms defined — "
+        f"definition-coverage: passed ({checked} terms defined, "
+        f"{len(by_category)} categories with unique notations — "
         + ", ".join(
             f"{len(v)} " + {"class": "classes", "property": "properties"}.get(k, k + "s")
             for k, v in subjects.items()

@@ -172,6 +172,7 @@ sstim:hasSignalShape a owl:ObjectProperty, owl:FunctionalProperty ;
 
 sstim:signalSourceAsset a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  iao:0000030 ;
     rdfs:label  "signal source asset"@en ;
     skos:definition "The recorded material a sampled signal is taken from — a violin note, a voice, rainfall. Required when the shape is sampled and meaningless otherwise: a sampled signal is only reproducible if the sample is identified."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .

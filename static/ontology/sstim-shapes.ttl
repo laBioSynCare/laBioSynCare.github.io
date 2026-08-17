@@ -886,6 +886,60 @@ sstim-sh:StimulationSignalShape a sh:NodeShape ;
         """ ;
     ] ;
 
+    # The three band-interval relations are derivable from the two extents, and
+    # were assertable independently of them — a signal spanning 4-8 Hz could
+    # claim signalWithinBand alpha (8-13 Hz) and conform. Every ingredient for
+    # the check was already present, and ADR 0049 had added exactly this
+    # containment check for oscillations six weeks earlier.
+    #
+    # Asserted rather than inferred, deliberately: which relation holds is a
+    # design statement about what the signal is aimed at, and stating it lets
+    # this catch the case where the aim and the arithmetic disagree.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "signalWithinBand requires the signal's whole extent to lie inside the band: check hzMin/hzMax against the band's."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#signalWithinBand> ?band ;
+                      <https://w3id.org/sstim#hzMin> ?low ;
+                      <https://w3id.org/sstim#hzMax> ?high .
+                ?band <https://w3id.org/sstim#hzMin> ?bandLow ;
+                      <https://w3id.org/sstim#hzMax> ?bandHigh .
+                FILTER( ?low < ?bandLow || ?high > ?bandHigh )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "signalCoversBand requires the signal's extent to contain the whole band; a signal narrower than the band overlaps it at most."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#signalCoversBand> ?band ;
+                      <https://w3id.org/sstim#hzMin> ?low ;
+                      <https://w3id.org/sstim#hzMax> ?high .
+                ?band <https://w3id.org/sstim#hzMin> ?bandLow ;
+                      <https://w3id.org/sstim#hzMax> ?bandHigh .
+                FILTER( ?low > ?bandLow || ?high < ?bandHigh )
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "signalOverlapsBand requires the extents to intersect with neither containing the other; use signalWithinBand or signalCoversBand for containment, and neither when they are disjoint."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#signalOverlapsBand> ?band ;
+                      <https://w3id.org/sstim#hzMin> ?low ;
+                      <https://w3id.org/sstim#hzMax> ?high .
+                ?band <https://w3id.org/sstim#hzMin> ?bandLow ;
+                      <https://w3id.org/sstim#hzMax> ?bandHigh .
+                FILTER( ?high < ?bandLow || ?low > ?bandHigh
+                        || ( ?low >= ?bandLow && ?high <= ?bandHigh )
+                        || ( ?low <= ?bandLow && ?high >= ?bandHigh ) )
+            }
+        """ ;
+    ] ;
+
     # The sampled shape is an asset, not a function. Without its source the
     # signal cannot be reproduced, and reproducibility is why it is a shape of
     # its own rather than an unnamed special case.
