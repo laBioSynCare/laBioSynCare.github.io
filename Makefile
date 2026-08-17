@@ -339,6 +339,14 @@ session-contract:
 preset-contract:
 	$(PYTHON) scripts/preset-contract.py
 
+## Answer "does SSTIM define this IRI, and where?" across all five places it
+## could live -- live modules, committed instances, frozen snapshots, and the
+## external live ecosystem store a repository grep structurally cannot see.
+## Reports INCOMPLETE rather than "absent" when the live store is unreachable.
+##   make locate IRI=sstim:composedOfTrack
+locate:
+	$(PYTHON) scripts/locate-iri.py $(IRI) $(if $(OFFLINE),--offline,)
+
 ## Regenerate the SSTIM term index: every class, property and concept with its
 ## module and definition, in one greppable file. Grep it before concluding that
 ## SSTIM lacks a term.

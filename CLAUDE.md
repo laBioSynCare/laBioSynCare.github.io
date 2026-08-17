@@ -238,6 +238,50 @@ If you are generating any string that will appear in the UI or in a preset's
 `descEng`/`descIta`/`descPrt`/`descEsp` fields, re-read `docs/concept/SCOPE.md`
 before writing it.
 
+### 3.6 A claim that something is missing requires a named instrument
+
+**Before writing that anything is absent, undefined, untested, unresolved, or
+not done, name the instrument you used and confirm it could see the place the
+thing would be.** If you cannot, say the claim is unverified. This is an
+invariant because the failure is silent, self-consistent, and expensive: it has
+reached an accepted ADR, and it has come within one command of republishing a
+live public graph to add a record that was already there.
+
+The rule covers three cases that "check your greps" does not:
+
+1. **Findings you inherit.** A claim in a review document, an ADR, a commit
+   message, or `TODO.md` is someone's past measurement, and it decays. Re-measure
+   before acting on it. A 2026-08-17 review's central table called four of six
+   RDF emitters unverified; two of the six emit no RDF at all, and one of the
+   "untested" files was covered by a suite one directory away.
+2. **Claims you make with no measurement.** Asserting that a persistent
+   identifier resolves because a *related* one does is not a check. `curl` it.
+3. **External services.** An eventually-consistent index answers "absent" for a
+   thing that exists. Zenodo's search API reported no `0.15.0` DOI for over an
+   hour after minting; resolving the concept DOI answered instantly.
+
+**Where SSTIM things actually live.** No single grep sees more than two of these,
+and picking the wrong one produces a confident, wrong absence:
+
+| Kind | Lives in | A repo grep sees it? |
+|---|---|---|
+| Classes, properties, concepts | the 18 manifest-owned modules | yes — but use `docs/ontology/TERM_INDEX.md`, which is generated and CI-checked |
+| Public reference data | `static/ontology/instances/**` | yes |
+| Released artifacts | `static/ontology/<version>/` | yes, and they are immutable |
+| **Real ecosystem agents and relationships** | **the external live-only store** | **no — ADR 0031 keeps them out of git on purpose; only synthetic fixtures are committed** |
+| Version DOIs | `void.ttl`, `CITATION.cff`, `src/ui/entrance/releaseMetadata.js`, `CURRENT_STATE.md` | yes, and `make truth-audit` compares them |
+
+For any SSTIM identifier, the executable answer is:
+
+```bash
+python3 scripts/locate-iri.py sstim:composedOfTrack
+python3 scripts/locate-iri.py https://w3id.org/sstim/organization/aeterni-anima
+```
+
+It checks all five places, including the live store, and reports **INCOMPLETE**
+rather than "absent" when it cannot reach one — an unreachable instrument must
+never read as evidence of absence.
+
 ---
 
 ## 4. Preset Format — Critical Rules
