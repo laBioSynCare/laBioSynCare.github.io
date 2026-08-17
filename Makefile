@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check preset-contract term-index term-index-check adr-index definition-coverage signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -225,6 +225,31 @@ shacl-session-projection:
 ## relax anyone, the second stops the repair becoming a deletion.
 band-scope-notes:
 	$(PYTHON) scripts/check-band-scope-notes.py
+
+## Assert every profile closure is in OWL 2 DL, which is a different question
+## from `make reason` and one that gate cannot answer. ROBOT loads non-strictly,
+## so an undeclared annotation property is silently coerced into one and HermiT
+## is handed a well-formed DL ontology — it passed for months while the
+## published artifact was OWL Full with 5935 profile violations. A consumer's
+## reasoner sees the profile, not our loader's repairs, and so does DBpedia
+## Archivo, whose fourth star is exactly "loading this ontology into a reasoner
+## has a high chance of succeeding". Checks all four closures, because a
+## violation can hide in a module the Full profile includes and Kernel does not.
+validate-profile:
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	for profile in kernel core core-plus full; do \
+		$(MANIFEST_CLI) files $$profile | tr '\n' ' ' | xargs cat > "$$tmpdir/$$profile.ttl"; \
+		if ! $(ROBOT) validate-profile --input "$$tmpdir/$$profile.ttl" \
+			--profile DL --output "$$tmpdir/$$profile-report.txt" \
+			> "$$tmpdir/robot.log" 2>&1; then \
+			echo "validate-profile: $$profile closure is NOT in OWL 2 DL" >&2; \
+			sed -n '1,40p' "$$tmpdir/$$profile-report.txt" >&2; \
+			exit 1; \
+		fi; \
+		echo "validate-profile: $$profile closure in OWL 2 DL"; \
+	done
 
 ## Assert the repaired OWL domains infer no unintended type (KR-05). The audit's
 ## concern was that a domain is an inference rule, not a validation hint: a
@@ -472,7 +497,7 @@ validate-status:
 		echo "validate-status: the tree has changed since; re-run make validate"; \
 	fi
 
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage signal-layer w3id-routes release-dryrun truth-audit validate-stamp
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage signal-layer w3id-routes release-dryrun truth-audit validate-stamp
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)

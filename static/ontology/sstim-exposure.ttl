@@ -493,11 +493,20 @@ sstim-ex:limitQuantity a owl:DatatypeProperty, owl:FunctionalProperty ;
     skos:definition "Physical quantity an exposure limit constrains (for example \"flash frequency\", \"sound pressure level\", or \"effective irradiance\")."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:limitAveragingTime a owl:DatatypeProperty, owl:FunctionalProperty ;
+sstim-ex:limitAveragingTimeSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim-ex:ExposureLimit ;
-    rdfs:range xsd:duration ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "limit averaging time (s)"@en ;
+    skos:definition "Averaging or reference time over which an exposure limit is defined, in seconds — an 8-hour dose is 28800. Seconds rather than a duration literal because xsd:duration is only partially ordered (P1M and P30D are not comparable) and is therefore outside the OWL 2 datatype map, which put every Full closure in OWL Full. Carrying the unit in the property name follows the SSTIM parameter convention."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:limitAveragingTime a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:limitAveragingTimeSeconds ;
+    rdfs:domain sstim-ex:ExposureLimit ;
     rdfs:label "limit averaging time"@en ;
-    skos:definition "Averaging or reference time over which an exposure limit is defined (for example an 8-hour dose), as an xsd:duration."@en ;
+    skos:definition "Averaging or reference time over which an exposure limit is defined, as an xsd:duration. Deprecated: xsd:duration is outside the OWL 2 datatype map, so its use made the Full closure OWL Full rather than OWL 2 DL. Replaced by sstim-ex:limitAveragingTimeSeconds. The range axiom is withdrawn rather than retyped, so that no xsd:duration reference remains anywhere in the closure."@en ;
+    skos:historyNote "Deprecated 2026-08-17. Both public values were \"PT8H\" and are now 28800 seconds on the replacement property."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:limitMaxFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -2067,7 +2076,7 @@ sstim-ex:limitHearingNiosh a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitQuantity "sound pressure level" ;
     sstim-ex:limitValue "85"^^xsd:decimal ;
     sstim-ex:limitUnit "dBA" ;
-    sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
+    sstim-ex:limitAveragingTimeSeconds "28800"^^xsd:decimal ;
     sstim-ex:appliesToPlacement sstim-ex:placementEars ;
     sstim-ex:conformsToStandard <https://www.cdc.gov/niosh/docs/98-126/> ;
     skos:definition "NIOSH occupational recommended exposure limit of 85 dBA as an 8-hour time-weighted average, with a 3 dB exchange rate (each 3 dB increase halves the recommended duration). This occupational limit is not a general-public listening recommendation. BSC Lab cannot measure delivered sound pressure level and treats this record as advisory rather than a safety guarantee."@en .
@@ -2077,7 +2086,7 @@ sstim-ex:limitUvActinicIec a owl:NamedIndividual, sstim-ex:ExposureLimit ;
     sstim-ex:limitQuantity "effective radiant exposure" ;
     sstim-ex:limitValue "30"^^xsd:decimal ;
     sstim-ex:limitUnit "J/m2" ;
-    sstim-ex:limitAveragingTime "PT8H"^^xsd:duration ;
+    sstim-ex:limitAveragingTimeSeconds "28800"^^xsd:decimal ;
     sstim-ex:appliesToPlacement sstim-ex:placementEyes , sstim-ex:placementWholeBody ;
     sstim-ex:conformsToStandard <https://www.icnirp.org/cms/upload/publications/ICNIRPUV2004.pdf> ,
         <https://webstore.iec.ch/publication/7076> ;

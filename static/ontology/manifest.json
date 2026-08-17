@@ -85,7 +85,7 @@
       "source": {
         "path": "static/ontology/sstim-core.ttl",
         "mediaType": "text/turtle",
-        "sha256": "79e1a8bd804c68da2766df996095866e55255910e966af3398b8e903caf8e1ad"
+        "sha256": "ea0d96b63295eea08d9253eaef31286c1d9a08598cb393b88a81d635ba1d17bc"
       },
       "runtime": {
         "url": "/ontology/sstim-core.ttl",
@@ -460,7 +460,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "03856c5de6603417e30a004b00fc3dac05ec4cae41a0de72c1cbd91482edae68"
+        "sha256": "0cce305749b877e346e9ab28cd675a7ec236543287989371b24510c9ab548930"
       },
       "runtime": {
         "url": "/ontology/sstim-exposure.ttl",
@@ -745,7 +745,7 @@
       "competencyQueries": [
         "test/competency/kernel.rq"
       ],
-      "sha256": "9a3e14ffb68dd5df8d2a9b378096bd16c1efcea5db6a6361e1ffcc814f2a826a"
+      "sha256": "22306474d73c6054ae595541c6787f1bfffd3a7e78613f8c61c98920b2804e16"
     },
     {
       "id": "core",
@@ -794,7 +794,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "dc46aa605cd637a54f7b642c3eec2a1ef962ed3908133201e4aeb55fa792e393"
+      "sha256": "d336ebb7f865722cc3e4dae6fa167054f12eee927da67181dbb2ca2fb894b4e3"
     },
     {
       "id": "core-plus",
@@ -842,7 +842,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "a4e18d1722019bb657a3567772cd93f8607777baa4e551d78711485c0bbc7674"
+      "sha256": "f3e87e4afc835ad0255b5ae2c6f692e0642e5e30b945d746b6c2ccad381eb7ab"
     },
     {
       "id": "full",
@@ -905,7 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "9bc818e9e510b8bde044903b11ecf3a097d3e1e0e2ff9e01c83dafc3caefac58"
+      "sha256": "416a5823482becf012c676a74b95ff747d2efcba5c03a7426c23d03d7e5d3e15"
     }
   ]
 }

@@ -153,6 +153,52 @@ SIGNAL_EXTENT_MIGRATION_FIELDS = {
     (SSTIM_V.approachTranscutaneous, SKOS.definition),
 }
 
+XSD = Namespace("http://www.w3.org/2001/XMLSchema#")
+
+# xsd:duration left the ontology on 2026-08-17, and this is a real break for a
+# consumer pinned to 0.12 — recorded rather than waved through.
+#
+# xsd:duration is outside the OWL 2 datatype map because it is only partially
+# ordered: P1M and P30D cannot be compared. Its two uses put every Full closure
+# in OWL Full rather than OWL 2 DL, which costs DBpedia Archivo's fourth star
+# and, more to the point, means a consumer's reasoner may refuse the ontology.
+# Declaring the datatype does not help — the violation only changes from
+# "undeclared datatype" to "defined datatype in datatype restriction", so the
+# datatype had to go rather than be legitimised.
+#
+# sstim-ex:limitAveragingTime is therefore deprecated (owl:deprecated, with
+# dct:isReplacedBy) rather than deleted, and its range axiom is withdrawn so no
+# xsd:duration reference survives anywhere in the closure. The replacement is
+# sstim-ex:limitAveragingTimeSeconds, an xsd:decimal count of seconds carrying
+# its unit in the name per the SSTIM parameter convention. Both public values
+# were "PT8H"; both are now 28800.
+#
+# What a pinned consumer loses is the two averaging-time assertions under the
+# old predicate. The deprecation triples point at the replacement, so the
+# migration is discoverable from the graph itself.
+DURATION_DATATYPE_MIGRATION_TRIPLES = {
+    (SSTIM_EX.limitAveragingTime, RDFS.range, XSD.duration),
+    (
+        SSTIM_EX.limitAveragingTime,
+        SKOS.definition,
+        Literal(
+            "Averaging or reference time over which an exposure limit is "
+            "defined (for example an 8-hour dose), as an xsd:duration.",
+            lang="en",
+        ),
+    ),
+    (
+        SSTIM_EX.limitHearingNiosh,
+        SSTIM_EX.limitAveragingTime,
+        Literal("PT8H", datatype=XSD.duration),
+    ),
+    (
+        SSTIM_EX.limitUvActinicIec,
+        SSTIM_EX.limitAveragingTime,
+        Literal("PT8H", datatype=XSD.duration),
+    ),
+}
+
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
 
@@ -388,6 +434,8 @@ def normalized(
         if triple in DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES:
             continue
         if triple in DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES:
+            continue
+        if triple in DURATION_DATATYPE_MIGRATION_TRIPLES:
             continue
         if (subject, predicate) in OSCILLATION_MIGRATION_FIELDS:
             continue

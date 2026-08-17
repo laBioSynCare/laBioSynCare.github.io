@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-163 classes · 300 properties · 545 concepts · 18 modules
+163 classes · 301 properties · 545 concepts · 18 modules
 
 ## Classes
 
@@ -245,7 +245,8 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim-ex:knowledgeAsOfDate` | data | exposure | — → XMLSchema:date | The date as of which a knowledge-status assertion holds for its named corpus. |
 | `sstim-ex:knowledgeScope` | object | exposure | — → — | The identified corpus or repository a knowledge-status assertion is scoped to. |
 | `sstim-ex:knowledgeScopeNote` | data | exposure | — → 22-rdf-syntax-ns:langString | A language-tagged description of the corpus or scope of a knowledge-status assertion, used when no scope IRI exists. |
-| `sstim-ex:limitAveragingTime` | data | exposure | sstim-ex:ExposureLimit → XMLSchema:duration | Averaging or reference time over which an exposure limit is defined (for example an 8-hour dose), as an xsd:duration. |
+| `sstim-ex:limitAveragingTime` | data | exposure | sstim-ex:ExposureLimit → — | Averaging or reference time over which an exposure limit is defined, as an xsd:duration. Deprecated: xsd:duration is outside the OWL 2 datatype map,… |
+| `sstim-ex:limitAveragingTimeSeconds` | data | exposure | sstim-ex:ExposureLimit → XMLSchema:decimal | Averaging or reference time over which an exposure limit is defined, in seconds — an 8-hour dose is 28800. Seconds rather than a duration literal… |
 | `sstim-ex:limitMaxFrequencyHz` | data | exposure | sstim-ex:ExposureLimit → XMLSchema:decimal | Maximum frequency permitted by a cited exposure or accessibility rule, in hertz; compliance with the value is not an individual safety guarantee. |
 | `sstim-ex:limitQuantity` | data | exposure | sstim-ex:ExposureLimit → XMLSchema:string | Physical quantity an exposure limit constrains (for example "flash frequency", "sound pressure level", or "effective irradiance"). |
 | `sstim-ex:limitUnit` | data | exposure | sstim-ex:ExposureLimit → XMLSchema:string | Unit of an exposure limit value (for example "dBA" or "J/m2"). A QUDT unit IRI may be linked separately where precision is required. |

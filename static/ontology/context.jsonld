@@ -1456,6 +1456,10 @@
     },
     "limitUnit": "sstim-ex:limitUnit",
     "limitQuantity": "sstim-ex:limitQuantity",
+    "limitAveragingTimeSeconds": {
+      "@id": "sstim-ex:limitAveragingTimeSeconds",
+      "@type": "xsd:decimal"
+    },
     "limitAveragingTime": {
       "@id": "sstim-ex:limitAveragingTime",
       "@type": "xsd:duration"

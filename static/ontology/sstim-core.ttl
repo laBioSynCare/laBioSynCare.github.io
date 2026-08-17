@@ -32,6 +32,9 @@
 @prefix mod:   <https://w3id.org/mod#> .
 
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix org:   <http://www.w3.org/ns/org#> .
 
 
 ###########################################################################
@@ -130,6 +133,119 @@ sstim:SensoryStimulation a owl:Class ;
     skos:scopeNote "Conscious perception is not required, and an incidental sensation arising from another primary route is insufficient. Covers entrainment-based stimulation (binaural beats, isochronous tones), non-entrainment stimulation (stochastic resonance, attentional anchoring), and autonomic stimulation (paced respiratory entrainment). Does not include passive incidental sensory exposure."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+###########################################################################
+# External Term Declarations — OWL 2 DL conformance
+###########################################################################
+#
+# OWL 2 DL requires a declaration axiom for every annotation property, class
+# and datatype an ontology uses. SSTIM reuses 59 terms from SKOS, Dublin Core,
+# PROV, ORG, VOAF, VoID, VANN, FOAF, BIBO, MOD, Creative Commons and the OBO
+# upper ontologies, and declared none of them. Every profile closure was
+# therefore OWL Full rather than OWL 2 DL — 5935 profile violations, of which
+# skos:prefLabel alone accounted for 1443.
+#
+# The gate that should have caught this could not see it. `make reason` runs
+# HermiT through ROBOT, whose non-strict loading silently coerces undeclared
+# properties into annotation properties, so the reasoner was handed a
+# well-formed DL ontology and passed while the published artifact was not one.
+# `make validate-profile` now asserts the profile directly, and is part of
+# `make validate`.
+#
+# These are declarations and nothing more: they state the role SSTIM already
+# uses each term in, assert no subsumption, and change no entailment. They
+# live in this module because sstim-core.ttl is the only one present in every
+# profile closure (kernel < core < core-plus < full).
+#
+# Two datatypes fell outside the OWL 2 datatype map. They needed opposite
+# treatments, and the difference is the useful part of this note:
+#
+#   xsd:date      Declared, below. The 13 affected ranges carry calendar dates
+#                 — evidenceDate, validFrom, reviewedOn, searchCoverageStart
+#                 and so on. xsd:dateTime is in the map, but adopting it would
+#                 require inventing a time of day that is not known, and would
+#                 invalidate every existing date literal in the public instance
+#                 data and in the live ecosystem store. Declaring clears the
+#                 violation; the only cost is that a reasoner treats the values
+#                 as opaque, and SSTIM orders dates in SPARQL, not in OWL.
+#
+#   xsd:duration  Removed, not declared — declaring it did not work. The
+#                 violation merely changed shape, from "undeclared datatype" to
+#                 "defined datatype in datatype restriction", because OWL 2 DL
+#                 rejects a defined datatype in that position however it was
+#                 introduced. xsd:duration is only partially ordered (P1M and
+#                 P30D are not comparable), which is why OWL 2 excludes it, so
+#                 there was no declaration that could rescue it.
+#                 sstim-ex:limitAveragingTime is therefore deprecated in favour
+#                 of sstim-ex:limitAveragingTimeSeconds, an xsd:decimal count of
+#                 seconds carrying its unit in the name per the SSTIM parameter
+#                 convention. Both public values were "PT8H"; both are now
+#                 28800. No xsd:duration reference remains in any closure.
+###########################################################################
+
+# Annotation properties (40)
+bibo:doi a owl:AnnotationProperty .
+cc:license a owl:AnnotationProperty .
+dct:created a owl:AnnotationProperty .
+dct:creator a owl:AnnotationProperty .
+dct:description a owl:AnnotationProperty .
+dct:hasPart a owl:AnnotationProperty .
+dct:identifier a owl:AnnotationProperty .
+dct:isPartOf a owl:AnnotationProperty .
+dct:isReplacedBy a owl:AnnotationProperty .
+dct:issued a owl:AnnotationProperty .
+dct:license a owl:AnnotationProperty .
+dct:modified a owl:AnnotationProperty .
+dct:publisher a owl:AnnotationProperty .
+dct:requires a owl:AnnotationProperty .
+dct:source a owl:AnnotationProperty .
+dct:title a owl:AnnotationProperty .
+foaf:logo a owl:AnnotationProperty .
+mod:status a owl:AnnotationProperty .
+skos:altLabel a owl:AnnotationProperty .
+skos:broader a owl:AnnotationProperty .
+skos:closeMatch a owl:AnnotationProperty .
+skos:definition a owl:AnnotationProperty .
+skos:editorialNote a owl:AnnotationProperty .
+skos:exactMatch a owl:AnnotationProperty .
+skos:example a owl:AnnotationProperty .
+skos:hasTopConcept a owl:AnnotationProperty .
+skos:historyNote a owl:AnnotationProperty .
+skos:inScheme a owl:AnnotationProperty .
+skos:member a owl:AnnotationProperty .
+skos:narrower a owl:AnnotationProperty .
+skos:notation a owl:AnnotationProperty .
+skos:note a owl:AnnotationProperty .
+skos:prefLabel a owl:AnnotationProperty .
+skos:related a owl:AnnotationProperty .
+skos:relatedMatch a owl:AnnotationProperty .
+skos:scopeNote a owl:AnnotationProperty .
+skos:topConceptOf a owl:AnnotationProperty .
+vann:preferredNamespacePrefix a owl:AnnotationProperty .
+vann:preferredNamespaceUri a owl:AnnotationProperty .
+void:inDataset a owl:AnnotationProperty .
+
+# Classes (17)
+bfo:0000015 a owl:Class .
+bfo:0000016 a owl:Class .
+bfo:0000029 a owl:Class .
+bfo:0000040 a owl:Class .
+dct:Standard a owl:Class .
+obo:COB_0000082 a owl:Class .
+obo:IAO_0000030 a owl:Class .
+obo:OBI_0000272 a owl:Class .
+org:Membership a owl:Class .
+prov:Activity a owl:Class .
+prov:Agent a owl:Class .
+prov:Entity a owl:Class .
+prov:Plan a owl:Class .
+skos:Collection a owl:Class .
+skos:Concept a owl:Class .
+skos:ConceptScheme a owl:Class .
+voaf:Vocabulary a owl:Class .
+
+# Datatypes outside the OWL 2 datatype map (2) — see the note above
+xsd:date a rdfs:Datatype .
 
 ###########################################################################
 # End of sstim-core.ttl
