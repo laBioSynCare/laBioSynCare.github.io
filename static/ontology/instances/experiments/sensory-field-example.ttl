@@ -37,6 +37,7 @@ this:profile a sstim-ex:ExposureProfile ;
     sstim-ex:hasResearchQuestion this:calm-arousal-claim .
 
 this:visual-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:flicker-rendering ;
     rdfs:label "Color-field visual channel"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
     sstim-ex:perceivedModality sstim-ex:modalityVisual ;
@@ -50,6 +51,7 @@ this:visual-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasBoundaryApplicability this:photosensitivity-claim .
 
 this:left-ear-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:left-beat-rendering ;
     rdfs:label "Left-ear tone channel"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
@@ -62,6 +64,7 @@ this:left-ear-channel a sstim-ex:StimulusChannel ;
     sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
 
 this:right-ear-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:right-beat-rendering ;
     rdfs:label "Right-ear tone channel"@en ;
     sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
     sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
@@ -88,3 +91,59 @@ this:calm-arousal-claim a sstim-ex:ResearchQuestion ;
     dct:modified "2026-07-13"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
 
+# ── ADR 0052: the signals these channels deliver, and how ────────────────────
+#
+# The first real instance data for the signal layer. Until now it was exercised
+# only by synthetic fixtures, which is what left three soundness faults in it
+# for four days — a term set is not proven until something real has had to
+# commit to it.
+#
+# Committing to it here says two things the profile could not say before. The
+# ear pair renders ONE signal: the 4 Hz beat exists in neither ear's waveform
+# and is constructed from carriers 4 Hz apart, so both renderings name the same
+# sstim:StimulationSignal and both are perceptually constructed. And the visual
+# channel renders a DIFFERENT one — 3 Hz, not 4 — so this profile is not one
+# signal delivered two ways, and now says so rather than leaving a reader to
+# compare two decimals and guess.
+
+this:beat-signal a sstim:StimulationSignal ;
+    rdfs:label "4 Hz binaural beat"@en ;
+    sstim:hasSignalShape sstim-v:shapeSine ;
+    sstim:hzMin "4.0"^^xsd:decimal ;
+    sstim:hzMax "4.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:theta .
+
+this:flicker-signal a sstim:StimulationSignal ;
+    rdfs:label "3 Hz visual flicker"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "3.0"^^xsd:decimal ;
+    sstim:hzMax "3.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:delta .
+
+# Both ears render the same signal. Neither carries it alone, which is why the
+# mechanism is a binaural beat and the presence is perceptual rather than
+# physical — asserted here, and checked against sstim:impliesPresence.
+this:left-beat-rendering a sstim:SignalRendering ;
+    rdfs:label "Left carrier of the binaural beat"@en ;
+    sstim:rendersSignal this:beat-signal ;
+    sstim:rendersOntoParameter sstim-v:paramFrequency ;
+    sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "200.0"^^xsd:decimal .
+
+this:right-beat-rendering a sstim:SignalRendering ;
+    rdfs:label "Right carrier of the binaural beat"@en ;
+    sstim:rendersSignal this:beat-signal ;
+    sstim:rendersOntoParameter sstim-v:paramFrequency ;
+    sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "204.0"^^xsd:decimal .
+
+# The flicker is presented as itself: a real 3 Hz modulation of luminance, with
+# no carrier, because vision receives 3 Hz directly where hearing cannot.
+this:flicker-rendering a sstim:SignalRendering ;
+    rdfs:label "Luminance flicker"@en ;
+    sstim:rendersSignal this:flicker-signal ;
+    sstim:rendersOntoParameter sstim-v:paramLuminance ;
+    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .

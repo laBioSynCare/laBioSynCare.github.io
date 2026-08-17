@@ -60,6 +60,7 @@ ONTOLOGY = ROOT / "static" / "ontology"
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SSTIM = Namespace("https://w3id.org/sstim#")
 SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
+SH = Namespace("http://www.w3.org/ns/shacl#")
 
 # SSTIM parameter -> (SSTIM property, catalog field it was derived from).
 # The one hand-written fact: no artifact records the correspondence, because the
@@ -705,13 +706,15 @@ def main() -> int:
     for path in module_paths():
         ontology.parse(path, format="turtle")
 
-    def report(fixture: str) -> str:
-        graph = Graph()
-        for triple in ontology:
-            graph.add(triple)
-        graph.parse(data=fixture, format="turtle")
-        _, _, text = shacl_validate(graph, shacl_graph=shapes, advanced=True)
-        return text
+    # One pySHACL run for all of them. It costs ~7s over the 13,020-triple
+    # closure no matter how few fixture triples ride along, so a run per fixture
+    # spent most of a minute re-checking an ontology that passes every time.
+    # Fixtures share a run by being rewritten into their own IRI namespaces, and
+    # each is judged on the results whose focus node is its own — which also
+    # turns "something failed with this text" into "this fixture failed for this
+    # reason".
+    def namespaced(fixture: str, tag: str) -> str:
+        return re.sub(r"\bex:", f"ex:{tag}-", fixture)
 
     seven_names, seven_blocks = many_voices(7)
     six_names, six_blocks = many_voices(6)
@@ -737,19 +740,38 @@ def main() -> int:
         ("a Symmetry base note below 80 Hz", rdf_preset("ex:voice", symmetry_voice(4, 1.0, 60.0)), ">= 80 Hz"),
     ]
 
-    for label, fixture in rdf_positive:
-        text = report(fixture)
-        if "Conforms: False" in text:
-            failures.append(f"RDF: {label} rejected, but it is valid\n{text}")
+    combined = Graph()
+    for triple in ontology:
+        combined.add(triple)
+    for index, (_, fixture) in enumerate(rdf_positive):
+        combined.parse(data=namespaced(fixture, f"p{index}"), format="turtle")
+    for index, (_, fixture, _) in enumerate(rdf_negative):
+        combined.parse(data=namespaced(fixture, f"n{index}"), format="turtle")
 
-    for label, fixture, fragment in rdf_negative:
-        text = report(fixture)
-        if "Conforms: False" not in text:
+    _, results, _ = shacl_validate(combined, shacl_graph=shapes, advanced=True)
+    reported: dict[str, list[str]] = {}
+    for result in results.subjects(RDF.type, SH.ValidationResult):
+        for focus in results.objects(result, SH.focusNode):
+            for message in results.objects(result, SH.resultMessage):
+                reported.setdefault(str(focus), []).append(str(message))
+
+    def messages_for(tag: str) -> list[str]:
+        prefix = f"https://example.org/kr07-fixture/{tag}-"
+        return [m for node, ms in reported.items() if node.startswith(prefix) for m in ms]
+
+    for index, (label, _) in enumerate(rdf_positive):
+        hits = messages_for(f"p{index}")
+        if hits:
+            failures.append(f"RDF: {label} rejected, but it is valid: {hits[:2]}")
+
+    for index, (label, _, fragment) in enumerate(rdf_negative):
+        hits = messages_for(f"n{index}")
+        if not hits:
             failures.append(f"RDF: {label} accepted, but must be rejected")
-        elif fragment not in text:
+        elif not any(fragment in m for m in hits):
             failures.append(
                 f"RDF: {label} rejected, but not by its own constraint "
-                f"(expected a message containing {fragment!r})"
+                f"(expected a message containing {fragment!r}, got {hits[:2]})"
             )
 
     if failures:
