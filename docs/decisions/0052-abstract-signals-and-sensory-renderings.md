@@ -136,6 +136,40 @@ spatialization does not need a mechanism of its own.
 - The Patch Studio and catalog profiles are unaffected until they choose to
   reference a signal.
 
+### Revision, 2026-08-17: the frequency split is a hierarchy, not a deprecation
+
+The Consequences above said `sstim-ex:hasFrequencyHz` "needs splitting… and
+wants a deprecation, not an edit". Implementation went a better way, on the
+maintainer's suggestion: keep it as the **generic parent** of a family whose
+members say which role a frequency plays.
+
+    hasFrequencyHz                      a frequency this channel presents
+    ├── hasCarrierFrequencyHz           bears a signal the sense cannot receive
+    ├── hasToneFrequencyHz              is itself the stimulus
+    └── hasModulationFrequencyHz        the rate at which something varies
+        ├── hasFlickerRateHz            (existing)
+        └── hasBeatFrequencyHz          (existing)
+
+This is strictly better than deprecating. No migration: every existing
+assertion stays valid, and the two live users — the Sensory Field exporter and
+its committed example — keep working unchanged. A consumer asking "what
+frequencies does this channel present?" still queries one property and now gets
+answers from the whole family by entailment, while one needing the role queries
+the specific child. Deprecation would have broken the first question to answer
+the second.
+
+**It also caught a defect in the first attempt.** `hasFrequencyHz` was
+`owl:FunctionalProperty`. A channel presenting a 200 Hz carrier modulated at
+10 Hz has two frequencies, so a functional parent would have entailed 200 = 10
+and made the graph inconsistent the moment both were asserted. The parent
+therefore drops functionality — a weakening, safe for existing data — and each
+child keeps it, which is where the constraint belongs.
+`hasModulationFrequencyHz` is also non-functional, since a channel may be
+modulated in amplitude at one rate and position at another.
+
+`make reason` confirms HermiT stays consistent across the semantic closure with
+the hierarchy in place.
+
 ## Alternatives considered
 
 **Carrier and modulator as the top-level model.** Rejected above: it makes the

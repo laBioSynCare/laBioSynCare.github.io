@@ -138,6 +138,19 @@ file is the human-readable summary.
   not, and that SSTIM carries two modality vocabularies —
   `sstim-ex:PerceivedModality` with twelve concepts including proprioceptive,
   and `sstim:SensoryModality` with six, a strict subset.
+- **`sstim-ex:hasFrequencyHz` becomes the generic parent of a frequency family**
+  rather than being deprecated: `hasCarrierFrequencyHz` (bears a signal the sense
+  cannot receive directly), `hasToneFrequencyHz` (is itself the stimulus), and
+  `hasModulationFrequencyHz` (the rate something varies at), which
+  `hasFlickerRateHz` and `hasBeatFrequencyHz` now specialise. It meant "carrier
+  or tone frequency" — two things under one name. No migration: every existing
+  assertion stays valid and now answers the generic question by entailment,
+  which a deprecation would have broken.
+
+  The parent drops `owl:FunctionalProperty`, and had to: a channel presenting a
+  200 Hz carrier modulated at 10 Hz has two frequencies, and a functional parent
+  would have entailed 200 = 10. Each child keeps functionality, which is where
+  it belongs.
 - **`sstim:hzMin` and `sstim:hzMax` accept a signal as well as a band.** The
   bound means the same thing on both — the edge of a frequency extent — and a
   signal needs one because noise spans a range rather than sitting at a point. A

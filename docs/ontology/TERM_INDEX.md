@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-163 classes · 296 properties · 545 concepts · 18 modules
+163 classes · 299 properties · 545 concepts · 18 modules
 
 ## Classes
 
@@ -219,6 +219,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim-ex:hasBeatFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | Monaural or binaural beat frequency (the difference frequency) of an audio stimulus channel, in hertz. |
 | `sstim-ex:hasBodyPlacement` | object | exposure | sstim-ex:ExposureProfile | sstim-ex:StimulusChannel | sstim-ex:DeviceCapability → sstim-ex:BodyPlacement | Links an exposure profile, stimulus channel, or capability to a body or near-body placement. |
 | `sstim-ex:hasBoundaryApplicability` | object | exposure | — → sstim-ex:BoundaryApplicabilityStatement | Links an exposure profile or stimulus channel to a qualified boundary-applicability statement. Direct hasComfortBoundary / hasExposureLimit links… |
+| `sstim-ex:hasCarrierFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | The frequency of a carrier this channel presents: a frequency whose job is to bear a signal the sense cannot receive directly. The 200 and 210 Hz… |
 | `sstim-ex:hasComfortBoundary` | object | exposure | sstim-ex:ExposureProfile | sstim-ex:StimulusChannel → sstim-ex:ComfortBoundary | Links an exposure profile or stimulus channel to a comfort, discomfort, fatigue, awareness, or risk boundary. |
 | `sstim-ex:hasDesignObjective` | object | exposure | — → sstim-ex:ExposureDesignObjective | Links an exposure profile or protocol to a desired delivery capability or experience objective. |
 | `sstim-ex:hasDutyCycle` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | On-fraction of each blink or pulse cycle for a stimulus channel, between 0 and 1. |
@@ -227,11 +228,12 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim-ex:hasExposureLimit` | object | exposure | sstim-ex:ComfortBoundary | sstim-ex:DeviceCapability → sstim-ex:ExposureLimit | Links a comfort boundary or device capability to a quantified exposure limit against which a delivery is checked. |
 | `sstim-ex:hasExposureProfile` | object | exposure | sstim:StimulationProtocol | sstim:StimulationTechnique | sstim:Stimulation | sstim:Preset → sstim-ex:ExposureProfile | Links a protocol, technique, represented stimulation process or intervention, preset, or experiment instance to a structured exposure profile. |
 | `sstim-ex:hasFlickerRateHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | Blink, pulse, or flicker rate of a stimulus channel, in hertz. Visual flicker rate is subject to photosensitivity exposure limits. |
-| `sstim-ex:hasFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | Carrier or tone frequency of a stimulus channel, in hertz. |
+| `sstim-ex:hasFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | A frequency this stimulus channel presents, in hertz, without saying what role it plays. The generic parent of the frequency family; assert a… |
 | `sstim-ex:hasGainLevel` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | Relative output amplitude of a stimulus channel, between 0 and 1. This is a relative level, not a calibrated physical intensity. |
 | `sstim-ex:hasHypothesis` | object | exposure | — → sstim-ex:ExposureHypothesis | Links an exposure profile or protocol to a stated hypothesis. Optional: a delivery-only profile states none, and generators must never fabricate one. |
 | `sstim-ex:hasKnowledgeStatus` | object | exposure | — → sstim-ex:KnowledgeStatus | Links a protocol, exposure profile, channel, device capability, statement role, or knowledge-status assertion to a controlled SSTIM/BSC Lab… |
 | `sstim-ex:hasKnowledgeStatusAssertion` | object | exposure | — → sstim-ex:KnowledgeStatusAssertion | Links a preset, technique, protocol, exposure profile, or stimulus channel to a scoped, dated knowledge-status assertion about it. Each assertion… |
+| `sstim-ex:hasModulationFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | The rate at which something about this channel varies, as distinct from a carrier that bears it. The general case of a flicker rate and of a beat… |
 | `sstim-ex:hasPerceptualGain` | object | exposure | sstim-ex:ExposureProfile | sstim:StimulationProtocol → sstim-ex:PerceptualGain | Links an exposure profile or protocol to a perceived gain created by the setup. |
 | `sstim-ex:hasPerceptualLoss` | object | exposure | sstim-ex:ExposureProfile | sstim:StimulationProtocol → sstim-ex:PerceptualLoss | Links an exposure profile or protocol to a perceived loss, cost, or limitation created by the setup. |
 | `sstim-ex:hasPhaseOffset` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | Phase offset of a stimulus channel's modulation relative to other channels, as a fraction of a cycle between 0 and 1. |
@@ -239,6 +241,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim-ex:hasProtocolRequirement` | object | exposure | — → sstim-ex:ProtocolRequirement | Links an exposure profile, stimulus channel, or protocol to a requirement that constrains it. |
 | `sstim-ex:hasResearchQuestion` | object | exposure | — → sstim-ex:ResearchQuestion | Links an exposure profile or protocol to an open research question. |
 | `sstim-ex:hasStimulusPattern` | object | exposure | sstim-ex:StimulusChannel → sstim-ex:StimulusPattern | Links a stimulus channel to a temporal, spatial, color, noise, or texture pattern. |
+| `sstim-ex:hasToneFrequencyHz` | data | exposure | sstim-ex:StimulusChannel → XMLSchema:decimal | The frequency of a tone or periodic stimulus that is itself what reaches the subject, carrying nothing — a 440 Hz reference tone, or a 10 Hz… |
 | `sstim-ex:knowledgeAsOfDate` | data | exposure | — → XMLSchema:date | The date as of which a knowledge-status assertion holds for its named corpus. |
 | `sstim-ex:knowledgeScope` | object | exposure | — → — | The identified corpus or repository a knowledge-status assertion is scoped to. |
 | `sstim-ex:knowledgeScopeNote` | data | exposure | — → 22-rdf-syntax-ns:langString | A language-tagged description of the corpus or scope of a knowledge-status assertion, used when no scope IRI exists. |

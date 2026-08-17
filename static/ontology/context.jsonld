@@ -1517,6 +1517,18 @@
     "renderingCarrierHz": {
       "@id": "sstim:renderingCarrierHz",
       "@type": "xsd:decimal"
+    },
+    "hasCarrierFrequencyHz": {
+      "@id": "sstim-ex:hasCarrierFrequencyHz",
+      "@type": "xsd:decimal"
+    },
+    "hasToneFrequencyHz": {
+      "@id": "sstim-ex:hasToneFrequencyHz",
+      "@type": "xsd:decimal"
+    },
+    "hasModulationFrequencyHz": {
+      "@id": "sstim-ex:hasModulationFrequencyHz",
+      "@type": "xsd:decimal"
     }
   }
 }

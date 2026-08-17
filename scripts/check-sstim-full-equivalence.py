@@ -133,6 +133,15 @@ OSCILLATION_MIGRATION_FIELDS = {
 SIGNAL_EXTENT_MIGRATION_FIELDS = {
     (SSTIM.hzMin, RDFS.domain), (SSTIM.hzMax, RDFS.domain),
     (SSTIM.hzMin, SKOS.definition), (SSTIM.hzMax, SKOS.definition),
+    # ADR 0052 also made sstim-ex:hasFrequencyHz the generic parent of a
+    # frequency family, which replaced its "carrier or tone frequency"
+    # definition and removed owl:FunctionalProperty from it. The removal is the
+    # substantive part and it is a weakening: a channel presenting a 200 Hz
+    # carrier modulated at 10 Hz has two frequencies, and a functional parent
+    # would have entailed 200 = 10. Every existing assertion stays valid; the
+    # subproperties carry the functionality that actually belongs to them.
+    (SSTIM_EX.hasFrequencyHz, SKOS.definition),
+    (SSTIM_EX.hasFrequencyHz, RDF.type),
 }
 
 SH = Namespace("http://www.w3.org/ns/shacl#")

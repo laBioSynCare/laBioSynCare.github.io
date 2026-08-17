@@ -352,14 +352,57 @@ sstim-ex:affordsDeliveryMedium a owl:ObjectProperty ;
     skos:definition "Links a device capability to the physical delivery medium it produces or affords, making the capability-to-medium pairing explicit rather than implied by naming."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
-sstim-ex:hasFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+# ADR 0052. hasFrequencyHz meant "carrier or tone frequency" — two things under
+# one name. Rather than deprecate it, it becomes the generic parent of a family
+# that says which role a frequency plays, so existing assertions stay valid and
+# a consumer asking "what frequencies does this channel present?" still gets an
+# answer from one property.
+#
+# The parent loses owl:FunctionalProperty in the process, and must: a channel
+# presenting a 200 Hz carrier modulated at 10 Hz has two frequencies, and a
+# functional parent would have entailed 200 = 10 and made the graph
+# inconsistent. Each subproperty stays functional, which is where the constraint
+# actually belongs.
+sstim-ex:hasFrequencyHz a owl:DatatypeProperty ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "frequency (Hz)"@en ;
-    skos:definition "Carrier or tone frequency of a stimulus channel, in hertz."@en ;
+    skos:definition "A frequency this stimulus channel presents, in hertz, without saying what role it plays. The generic parent of the frequency family; assert a subproperty where the role is known, and this one only where it genuinely is not."@en ;
+    skos:historyNote "Until 0.15 this was defined as \"carrier or tone frequency\" and was functional. Both were wrong for a generic: the two senses are different things, and a channel may present several frequencies at once. ADR 0052 made it the parent of hasCarrierFrequencyHz, hasToneFrequencyHz and hasModulationFrequencyHz, and dropped functionality, which is a weakening — every existing assertion remains valid and now also entails nothing it did not before."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasCarrierFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim-ex:hasFrequencyHz ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "carrier frequency (Hz)"@en ;
+    skos:definition "The frequency of a carrier this channel presents: a frequency whose job is to bear a signal the sense cannot receive directly. The 200 and 210 Hz tones of a 10 Hz binaural beat are carriers, as is the audible tone an isochronic rate modulates."@en ;
+    skos:scopeNote "A carrier exists because of a limitation of the sense addressed, not because of anything about the signal: 10 Hz falls below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasToneFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim-ex:hasFrequencyHz ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "tone frequency (Hz)"@en ;
+    skos:definition "The frequency of a tone or periodic stimulus that is itself what reaches the subject, carrying nothing — a 440 Hz reference tone, or a 10 Hz vibration delivered as itself."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
+
+sstim-ex:hasModulationFrequencyHz a owl:DatatypeProperty ;
+    rdfs:subPropertyOf sstim-ex:hasFrequencyHz ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "modulation frequency (Hz)"@en ;
+    skos:definition "The rate at which something about this channel varies, as distinct from a carrier that bears it. The general case of a flicker rate and of a beat frequency, both of which specialise it."@en ;
+    skos:scopeNote "Not functional, because a channel may be modulated in more than one respect at once — amplitude at one rate and spatial position at another. Where the modulation is a flicker or a beat, assert the specific subproperty."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasFlickerRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim-ex:hasModulationFrequencyHz ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "flicker rate (Hz)"@en ;
@@ -367,6 +410,7 @@ sstim-ex:hasFlickerRateHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 
 sstim-ex:hasBeatFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:subPropertyOf sstim-ex:hasModulationFrequencyHz ;
     rdfs:domain sstim-ex:StimulusChannel ;
     rdfs:range xsd:decimal ;
     rdfs:label "beat frequency (Hz)"@en ;
