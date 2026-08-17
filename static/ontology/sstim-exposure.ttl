@@ -1049,7 +1049,7 @@ sstim-ex:modalityOlfactory a owl:NamedIndividual, sstim-ex:PerceivedModality, sk
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "olfactory"@en ;
     skos:notation "olfactory" ;
-    skos:definition "Perceived smell."@en ;
+    skos:definition "The chemical sense responding to airborne volatile compounds. Distinguished from gustation, which responds to compounds in solution, though the two combine in flavour."@en ;
     skos:closeMatch sstim-v:modalityOlfactory .
 
 sstim-ex:modalityGustatory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
@@ -1057,7 +1057,7 @@ sstim-ex:modalityGustatory a owl:NamedIndividual, sstim-ex:PerceivedModality, sk
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
     skos:prefLabel "gustatory"@en ;
     skos:notation "gustatory" ;
-    skos:definition "Perceived taste."@en .
+    skos:definition "The chemical sense responding to compounds in solution at the tongue. Distinguished from olfaction, which responds to airborne volatiles, though the two combine in flavour."@en .
 
 sstim-ex:modalitySocialPerceptual a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
@@ -1442,6 +1442,7 @@ sstim-ex:audioNoiseWhite a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:C
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "white noise"@en ;
+    skos:definition "Noise with equal power per unit frequency, so its spectrum is flat. Perceptually bright, because hearing resolves higher frequencies into wider bands."@en ;
     skos:notation "white" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
 
@@ -1449,6 +1450,7 @@ sstim-ex:audioNoisePink a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "pink noise"@en ;
+    skos:definition "Noise with equal power per octave, falling at about 3 dB per octave. The closest of the coloured noises to how broadband sound is heard."@en ;
     skos:notation "pink" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
 
@@ -1456,6 +1458,7 @@ sstim-ex:audioNoiseBrownRed a owl:NamedIndividual, sstim-ex:AudioNoiseColor, sko
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "brown/red noise"@en ;
+    skos:definition "Noise falling at about 6 dB per octave, weighting low frequencies heavily. Perceptually deep and rumbling."@en ;
     skos:notation "brown-red" ;
     skos:altLabel "Brownian noise"@en, "red noise"@en ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
@@ -1464,6 +1467,7 @@ sstim-ex:audioNoiseBlue a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "blue noise"@en ;
+    skos:definition "Noise rising at about 3 dB per octave, the inverse of pink. Perceptually thin and hissing."@en ;
     skos:notation "blue" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
 
@@ -1471,6 +1475,7 @@ sstim-ex:audioNoiseVioletPurple a owl:NamedIndividual, sstim-ex:AudioNoiseColor,
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "violet/purple noise"@en ;
+    skos:definition "Noise rising at about 6 dB per octave, the inverse of brown. The brightest of the coloured noises."@en ;
     skos:notation "violet-purple" ;
     skos:altLabel "purple noise"@en ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
@@ -1479,6 +1484,7 @@ sstim-ex:audioNoiseGrey a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
     skos:prefLabel "grey noise"@en ;
+    skos:definition "Noise shaped to a psychoacoustic equal-loudness contour, so it is perceived as roughly equally loud across frequency rather than being flat in power."@en ;
     skos:notation "grey" ;
     skos:scopeNote "Define by spectral slope, loudness weighting, or generation method when used in a protocol."@en .
 

@@ -142,6 +142,15 @@ SIGNAL_EXTENT_MIGRATION_FIELDS = {
     # subproperties carry the functionality that actually belongs to them.
     (SSTIM_EX.hasFrequencyHz, SKOS.definition),
     (SSTIM_EX.hasFrequencyHz, RDF.type),
+    # Three definitions replaced 2026-08-17 rather than added, after the
+    # definition-coverage gate found them too short to distinguish a term from
+    # its sibling: "Perceived taste.", "Perceived smell." and "Delivered across
+    # intact skin." Each now says what it is *not* as well as what it is, which
+    # is the whole job of a definition in a scheme of near neighbours. The 26
+    # definitions added in the same pass are additions and need no exception.
+    (SSTIM_EX.modalityGustatory, SKOS.definition),
+    (SSTIM_EX.modalityOlfactory, SKOS.definition),
+    (SSTIM_V.approachTranscutaneous, SKOS.definition),
 }
 
 SH = Namespace("http://www.w3.org/ns/shacl#")

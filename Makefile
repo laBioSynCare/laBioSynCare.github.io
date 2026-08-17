@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check preset-contract term-index term-index-check adr-index signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check preset-contract term-index term-index-check adr-index definition-coverage signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -355,6 +355,12 @@ term-index-check:
 adr-index:
 	$(PYTHON) scripts/check-adr-index.py
 
+## Every published class, property and concept must define itself, and the
+## definition must not merely restate the label. Directed after all 17 frequency
+## bands were found carrying a scope note and no skos:definition.
+definition-coverage:
+	$(PYTHON) scripts/sstim-definition-coverage.py
+
 ## Assert the ADR 0052 signal layer is present, that widening hzMin/hzMax left
 ## bands untouched, and that its four constraints reject what they claim to.
 signal-layer:
@@ -416,7 +422,7 @@ release-dryrun:
 	node scripts/release-dryrun.mjs
 
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index signal-layer w3id-routes release-dryrun truth-audit
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage signal-layer w3id-routes release-dryrun truth-audit
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
