@@ -316,7 +316,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f86f3629d0938658a0126f1c64d420314009e4065845802d24ec843c8fd913b2"
+        "sha256": "b19f1d9c3d77afce7f800518393a98117f9eef329ac30ad76639ff600e3c20dd"
       },
       "runtime": {
         "url": "/ontology/sstim-evidence.ttl",
@@ -673,7 +673,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "9d6e0162c7b53942578834a4478c0345ef5a41957058a4574cfdb398583f9c5c"
+        "sha256": "5adafbf521fc6569ee478ddd56d8203b2fa9b4f8b05f0038db080418cbcef340"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -905,7 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "04679d465358a90d17c6a42357ebcbe7d430e957d146d38b78cd9ea06f07b3e1"
+      "sha256": "2f3c4138b698a720956bd7e8e72bb71b4d6615397922ae1d0407f154cbb47401"
     }
   ]
 }

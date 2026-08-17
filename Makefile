@@ -422,7 +422,33 @@ release-dryrun:
 	node scripts/release-dryrun.mjs
 
 ## Run the current ontology validation suite
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage signal-layer w3id-routes release-dryrun truth-audit
+## Record that the full suite passed, against which commit and which tree.
+## `make validate` runs ~18 minutes, so the expensive mistake is re-running it
+## on a tree that has not changed — and the dangerous one is trusting a stamp
+## from a tree that has. The tree hash is what distinguishes them.
+.PHONY: validate-stamp validate-status
+validate-stamp:
+	@printf '%s  commit=%s  tree=%s  suite=passed\n' \
+		"$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+		"$$(git rev-parse --short HEAD 2>/dev/null || echo none)" \
+		"$$(git stash create >/dev/null 2>&1; git rev-parse HEAD^{tree} 2>/dev/null || echo none)" \
+		>> .validation.log
+	@echo "validate: recorded in .validation.log"
+
+## When did the full suite last pass, and is this tree still the one it passed on?
+validate-status:
+	@if [ ! -f .validation.log ]; then echo "validate-status: never recorded"; exit 0; fi
+	@last="$$(tail -1 .validation.log)"; \
+	echo "last passing run: $$last"; \
+	stamped="$$(echo "$$last" | sed -n 's/.*tree=\([0-9a-f]*\).*/\1/p')"; \
+	current="$$(git rev-parse HEAD^{tree} 2>/dev/null || echo none)"; \
+	if [ "$$stamped" = "$$current" ]; then \
+		echo "validate-status: this tree is the one that passed — no need to re-run"; \
+	else \
+		echo "validate-status: the tree has changed since; re-run make validate"; \
+	fi
+
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage signal-layer w3id-routes release-dryrun truth-audit validate-stamp
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)

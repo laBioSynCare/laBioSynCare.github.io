@@ -139,6 +139,7 @@ sstim:supportsRelation a owl:ObjectProperty ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:citesReference a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
     rdfs:range  sstim:BibliographicReference ;
     rdfs:label  "cites reference"@en ;
     skos:definition "Links an evidence assessment to a bibliographic reference. For every bibliographic basis source the assessment carries a matching citesReference triple (ADR 0027); publication clearance is a separate concern (ADR 0029)."@en ;

@@ -1035,6 +1035,20 @@ sstim-sh:SignalRenderingShape a sh:NodeShape ;
         """ ;
     ] .
 
+# citesReference is read by the public-claim gate (ADR 0050) and had no domain,
+# no range and no property shape — so the safety property held by one SPARQL
+# constraint rather than by the model, and a second consumer reading the
+# property got no guarantees at all.
+sstim-sh:EvidenceClaimCitationShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceClaim ;
+    sh:name "EvidenceClaim citations"@en ;
+    sh:property [
+        sh:path sstim:citesReference ;
+        sh:nodeKind sh:IRI ;
+        sh:class sstim:BibliographicReference ;
+        sh:message "A cited reference must be a declared BibliographicReference — sstim:PublicSafeReference specialises it — not a bare IRI standing for nothing."@en ;
+    ] .
+
 sstim-sh:PublicClaimLevelShape a sh:NodeShape ;
     sh:targetClass sstim:PublicClaimLevel ;
     sh:name "PublicClaimLevel"@en ;

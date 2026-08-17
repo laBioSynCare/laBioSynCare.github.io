@@ -26,14 +26,16 @@ invalid, and nothing invalid belongs in the published term space.
 
 import json
 from pathlib import Path
+import re
 import sys
 
 from pyshacl import validate
-from rdflib import Graph
+from rdflib import Graph, Namespace, RDF
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "static" / "ontology"
 SHAPES = ONTOLOGY / "sstim-shapes.ttl"
+SH = Namespace("http://www.w3.org/ns/shacl#")
 
 # The gate identifies itself. Matching the whole message would break on every
 # wording change; matching this phrase breaks only if the gate stops firing.
@@ -339,13 +341,32 @@ def module_paths() -> list[Path]:
     return paths
 
 
-def report_for(base: Graph, shapes: Graph, fixture: str) -> str:
-    graph = Graph()
-    for triple in base:
-        graph.add(triple)
-    graph.parse(data=PREAMBLE + fixture, format="turtle")
-    _, _, text = validate(graph, shacl_graph=shapes, advanced=True)
-    return text
+# One pySHACL run for every fixture, not one per fixture. The graph pySHACL
+# processes is 13,020 ontology triples plus a handful of fixture triples, and it
+# costs ~7s regardless — so twenty separate runs spent ~140 seconds re-checking
+# an ontology that is identical and conformant every time.
+#
+# Fixtures share a run by being rewritten into their own IRI namespaces, and
+# each is judged only on the results whose focus node is its own. That is more
+# precise than the per-report text matching it replaces: a message found
+# anywhere in a report proved something failed with that text, where a message
+# on the fixture's own focus node proves this fixture failed for this reason.
+def namespaced(fixture: str, tag: str) -> str:
+    return re.sub(r"\bex:", f"ex:{tag}-", fixture)
+
+
+def messages_by_focus(results: Graph) -> dict[str, list[str]]:
+    reported: dict[str, list[str]] = {}
+    for result in results.subjects(RDF.type, SH.ValidationResult):
+        for focus in results.objects(result, SH.focusNode):
+            for message in results.objects(result, SH.resultMessage):
+                reported.setdefault(str(focus), []).append(str(message))
+    return reported
+
+
+def messages_for(reported: dict[str, list[str]], tag: str) -> list[str]:
+    prefix = f"https://example.org/kr04-fixture/{tag}-"
+    return [m for node, ms in reported.items() if node.startswith(prefix) for m in ms]
 
 
 def main() -> int:
@@ -360,47 +381,54 @@ def main() -> int:
 
     failures: list[str] = []
 
-    # ── Positive controls ────────────────────────────────────────────────────
-    for label, fixture in (
-        ("baseline satisfying the whole contract", BASELINE),
-        ("C1 preset with no evidence", UNGATED),
-    ):
-        text = report_for(base, shapes, fixture)
-        if GATE in text:
-            failures.append(f"{label}: the gate fired on data that satisfies it")
-        elif "Conforms: False" in text:
-            failures.append(
-                f"{label}: rejected by some other shape, so the gate is untested here\n"
-                f"{text}"
-            )
+    # ── One run, every fixture ──────────────────────────────────────────────
+    combined = Graph()
+    for triple in base:
+        combined.add(triple)
 
-    # ── Adversarial negatives ────────────────────────────────────────────────
-    for label, old, new, clause in CASES:
-        if old is None:
-            fixture = BASELINE + "\n" + new
+    positives = [("baseline satisfying the whole contract", BASELINE),
+                 ("C1 preset with no evidence", UNGATED)]
+    for index, (_, fixture) in enumerate(positives):
+        combined.parse(data=PREAMBLE + namespaced(fixture, f"p{index}"), format="turtle")
+
+    prepared: list[tuple[str, str, str]] = []
+    for index, (label, old_text, new_text, clause) in enumerate(CASES):
+        if old_text is None:
+            fixture = BASELINE + "\n" + new_text
         else:
-            found = BASELINE.count(old)
+            found = BASELINE.count(old_text)
             if found != 1:
                 failures.append(
                     f"{label}: mutation matched the baseline {found} times, expected 1 — "
                     f"the fixture is stale, not the gate"
                 )
                 continue
-            fixture = BASELINE.replace(old, new)
+            fixture = BASELINE.replace(old_text, new_text)
         if "ex:borrowed-reference" in fixture:
             fixture += BORROWED
+        tag = f"n{index}"
+        combined.parse(data=PREAMBLE + namespaced(fixture, tag), format="turtle")
+        prepared.append((label, clause, tag))
 
-        text = report_for(base, shapes, fixture)
+    _, results, _ = validate(combined, shacl_graph=shapes, advanced=True)
+    reported = messages_by_focus(results)
+
+    for index, (label, _) in enumerate(positives):
+        hits = messages_for(reported, f"p{index}")
+        if hits:
+            failures.append(f"{label}: the gate fired on data that satisfies it: {hits[:2]}")
+
+    for label, clause, tag in prepared:
+        hits = messages_for(reported, tag)
         if clause == "vocabulary integrity":
             # Rejected by PublicClaimLevelShape / EvidenceTierValueShape rather
-            # than by the gate: the gate never sees a level it cannot read, which
-            # is precisely why the omission had to be made invalid.
-            if "must state" not in text:
+            # than by the gate: the gate never sees a level it cannot read.
+            if not any("must state" in m for m in hits):
                 failures.append(
-                    f"{label}: not rejected by the vocabulary shape — the gate "
-                    f"can still be disabled by omitting a triple (ADR 0050)"
+                    f"{label}: not rejected by the vocabulary shape — the gate can "
+                    f"still be disabled by omitting a triple (ADR 0050)"
                 )
-        elif GATE not in text:
+        elif not any(GATE in m for m in hits):
             failures.append(
                 f"{label}: accepted — the {clause} clause of the contract is not "
                 f"load-bearing (ADR 0050)"

@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import sys
 
 from pyshacl import validate as shacl_validate
@@ -39,6 +40,7 @@ SHAPES = ONTOLOGY / "sstim-shapes.ttl"
 SSTIM = Namespace("https://w3id.org/sstim#")
 SSTIM_V = Namespace("https://w3id.org/sstim/vocab#")
 OWL = Namespace("http://www.w3.org/2002/07/owl#")
+SH = Namespace("http://www.w3.org/ns/shacl#")
 
 REQUIRED_CLASSES = [
     "StimulationSignal", "SignalRendering",
@@ -101,6 +103,16 @@ ex:theta-noise a sstim:StimulationSignal ;
     sstim:hasSignalShape sstim-v:shapeNoise ;
     sstim:hzMin 4.0 ; sstim:hzMax 8.0 ;
     sstim:signalCoversBand sstim-v:theta .
+"""
+
+# Noise straddling a band edge: neither contained nor containing, the case the
+# overlap relation exists for.
+OVERLAP = """
+ex:wide-noise a sstim:StimulationSignal ;
+    rdfs:label "noise straddling the alpha/beta boundary"@en ;
+    sstim:hasSignalShape sstim-v:shapeNoise ;
+    sstim:hzMin 10.0 ; sstim:hzMax 20.0 ;
+    sstim:signalOverlapsBand sstim-v:alpha .
 """
 
 CASES = [
@@ -218,39 +230,64 @@ def main() -> int:
             f"domain widening was supposed to change nothing about bands"
         )
 
-    # ── Constraints, adversarially ──────────────────────────────────────────
+    # ── Constraints, adversarially, in one pySHACL run ──────────────────────
+    #
+    # Each fixture used to be validated against the whole 13,020-triple closure
+    # on its own. pySHACL takes ~7s over that graph regardless of how many
+    # fixture triples ride along, so 15 fixtures cost ~105 seconds to check
+    # about 150 triples — and 13,020 of the 13,170 were identical every time
+    # and passed every time.
+    #
+    # They now share one run. Every fixture is rewritten into its own IRI
+    # namespace (ex:f3-alpha-signal rather than ex:alpha-signal) so the subjects
+    # cannot collide, and each is judged on the results whose focus node is its
+    # own. That is also strictly more precise than what it replaced: matching a
+    # message anywhere in a per-fixture report proved "something failed with
+    # this text", where matching it on the fixture's own focus node proves this
+    # fixture failed for this reason.
     shapes = Graph().parse(SHAPES, format="turtle")
 
-    def report(fixture: str) -> str:
-        data = Graph()
-        for triple in graph:
-            data.add(triple)
-        data.parse(data=PREAMBLE + fixture, format="turtle")
-        _, _, text = shacl_validate(data, shacl_graph=shapes, advanced=True)
-        return text
+    def namespaced(fixture: str, tag: str) -> str:
+        return re.sub(r"\bex:", f"ex:{tag}-", fixture)
 
-    OVERLAP = """
-ex:wide-noise a sstim:StimulationSignal ;
-    rdfs:label "noise straddling the alpha/beta boundary"@en ;
-    sstim:hasSignalShape sstim-v:shapeNoise ;
-    sstim:hzMin 10.0 ; sstim:hzMax 20.0 ;
-    sstim:signalOverlapsBand sstim-v:alpha .
-"""
-    for label, fixture in (("one signal rendered two ways", BASELINE),
-                           ("band-limited noise covering a band", NOISE),
-                           ("noise genuinely straddling a band edge", OVERLAP)):
-        text = report(fixture)
-        if "Conforms: False" in text:
-            failures.append(f"the positive fixture '{label}' was rejected\n{text}")
+    combined = Graph()
+    for triple in graph:
+        combined.add(triple)
 
-    for label, fixture, fragment in CASES:
-        text = report(fixture)
-        if "Conforms: False" not in text:
+    positives = [("one signal rendered two ways", BASELINE),
+                 ("band-limited noise covering a band", NOISE),
+                 ("noise genuinely straddling a band edge", OVERLAP)]
+    for index, (_, fixture) in enumerate(positives):
+        combined.parse(data=PREAMBLE + namespaced(fixture, f"p{index}"), format="turtle")
+    for index, (_, fixture, _) in enumerate(CASES):
+        combined.parse(data=PREAMBLE + namespaced(fixture, f"n{index}"), format="turtle")
+
+    _, results, _ = shacl_validate(combined, shacl_graph=shapes, advanced=True)
+
+    # focus node -> the messages reported against it
+    reported: dict[str, list[str]] = {}
+    for result in results.subjects(RDF.type, SH.ValidationResult):
+        for focus in results.objects(result, SH.focusNode):
+            for message in results.objects(result, SH.resultMessage):
+                reported.setdefault(str(focus), []).append(str(message))
+
+    def messages_for(tag: str) -> list[str]:
+        prefix = f"https://example.org/adr52-fixture/{tag}-"
+        return [m for node, ms in reported.items() if node.startswith(prefix) for m in ms]
+
+    for index, (label, _) in enumerate(positives):
+        hits = messages_for(f"p{index}")
+        if hits:
+            failures.append(f"the positive fixture '{label}' was rejected: {hits[:3]}")
+
+    for index, (label, _, fragment) in enumerate(CASES):
+        hits = messages_for(f"n{index}")
+        if not hits:
             failures.append(f"{label}: accepted, but must be rejected")
-        elif fragment not in text:
+        elif not any(fragment in m for m in hits):
             failures.append(
-                f"{label}: rejected, but not by its own constraint "
-                f"(expected a message containing {fragment!r})"
+                f"{label}: rejected, but not by its own constraint — expected a "
+                f"message containing {fragment!r}, got {hits[:2]}"
             )
 
     if failures:
