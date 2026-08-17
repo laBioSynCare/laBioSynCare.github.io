@@ -314,15 +314,35 @@ ok(`${links} relative doc links resolve`)
 // broken *reference* degrades to plain text rather than to a dead link the
 // resolver above would have caught.
 const changelogText = read('CHANGELOG.md') ?? ''
-const changelogTags = new Set(
-  execSync('git tag', { encoding: 'utf8' }).trim().split('\n').filter(Boolean),
-)
+let changelogTags
+try {
+  changelogTags = new Set(
+    execSync('git tag', { encoding: 'utf8' }).trim().split('\n').filter(Boolean),
+  )
+} catch {
+  changelogTags = new Set()
+}
 const changelogSections = [...changelogText.matchAll(/^## \[(\d+\.\d+\.\d+)\]/gm)].map((m) => m[1])
 const changelogDefs = new Map(
   [...changelogText.matchAll(/^\[(Unreleased|\d+\.\d+\.\d+)\]: (\S+)$/gm)].map((m) => [m[1], m[2]]),
 )
 
-for (const version of changelogSections) {
+// Seeing no tags means the instrument is blind, not that thirteen releases were
+// never tagged — CLAUDE.md §3.6. actions/checkout fetches no tags by default, and
+// this check read that silence as absence in both directions at once: the section
+// loop below skips on a missing tag and so passed silently, while the definition
+// loop fails on one and reported every release as naming a tag that does not
+// exist. Answering "incomplete" is the only honest output, and it must fail
+// rather than pass, or a tagless CI would quietly stop checking the changelog.
+if (changelogTags.size === 0) {
+  fail(
+    'CHANGELOG.md',
+    'no git tags visible, so the changelog link check is INCOMPLETE, not failing — ' +
+      'in CI set actions/checkout `fetch-tags: true`; locally run `git fetch --tags`',
+  )
+}
+
+for (const version of changelogTags.size === 0 ? [] : changelogSections) {
   // 0.1.0 and 0.4.0 were never tagged, so they have no release to point at.
   if (!changelogTags.has(`v${version}`)) continue
   const target = changelogDefs.get(version)
@@ -332,7 +352,7 @@ for (const version of changelogSections) {
     fail('CHANGELOG.md', `link definition for [${version}] does not point at v${version}: ${target}`)
   }
 }
-for (const [version, target] of changelogDefs) {
+for (const [version, target] of changelogTags.size === 0 ? [] : changelogDefs) {
   if (version === 'Unreleased') continue
   if (!changelogTags.has(`v${version}`)) {
     fail('CHANGELOG.md', `link definition [${version}] names a tag that does not exist`)

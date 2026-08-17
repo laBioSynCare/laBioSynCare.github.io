@@ -36,8 +36,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Tags are not optional here: truth-audit checks every CHANGELOG release
+      # link against the tag it names, and actions/checkout fetches no tags by
+      # default. Without this the gate reported all thirteen releases as naming
+      # tags that do not exist, while silently skipping the checks that key off
+      # the same list.
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       # Toolchain (python3.12 + pyshacl + ROBOT) comes from the pinned flake
       # devShell, so local `make validate` and CI run the same validators.

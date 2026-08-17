@@ -21,8 +21,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # fetch-tags because the build runs truth-audit, which resolves every
+      # CHANGELOG release link against its tag; a tagless checkout makes that
+      # gate report absence it cannot actually observe.
       - name: Check out repository
         uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+          fetch-depth: 0
 
       # Build the deployed artifact with the same pinned flake toolchain as
       # local dev and the lint/validate workflows — one source of truth.
