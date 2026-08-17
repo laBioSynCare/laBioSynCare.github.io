@@ -85,10 +85,10 @@ and schema must be deployed and the perma-id matrix verified first.
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
-| LOV | 🕓 **submitted 2026-07-10, pending curator review** | no | — |
-| BARTOC | 🕓 **submitted via issue #319, pending editor** | yes (GitHub) | — |
+| LOV | 🕓 **submitted 2026-07-10; still not in the catalog** — verified absent 2026-08-17 by LOV SPARQL (944 vocabularies, zero `sstim` hits) | no | — |
+| BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
-| FAIRsharing | 🕓 **record 8494 under curator review** — curator edited it 2026-08-07 (DOI pending) | yes | — |
+| FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -231,17 +231,31 @@ Release DOI submitted: 10.5281/zenodo.21302910
 Date:               2026-07-10 (resubmitted 2026-07-11; both acknowledged)
 Account/maintainer: — (form; confirmation emailed to renato.fabbri@gmail.com)
 External record ID or URL:  (assigned on integration)
-Status:             SUBMITTED — pending manual curator review. Not yet in the
-                    catalog (vocab API returns 404 as of 2026-07-11). This is
-                    the expected queued state; LOV curation is manual and slow.
-Required follow-up: Wait for the curator email. Do NOT keep resubmitting — the
-                    form just re-acknowledges and it doesn't speed the queue. If
-                    no response in several weeks, email the curators
+Status:             SUBMITTED — pending manual curator review. Still absent from
+                    the catalog as of 2026-08-17, five weeks in. This is the
+                    expected queued state; LOV curation is manual and slow.
+
+                    Verified absent with a working instrument, not a 404: the
+                    `api/v2/vocabulary/*` endpoints now 404 for *every* query
+                    (they are gone, not empty), so a 404 there is no longer
+                    evidence of anything. The SPARQL endpoint answers:
+
+                      curl -sL -G https://lov.linkeddata.es/dataset/lov/sparql \
+                        --data-urlencode 'query=PREFIX voaf:<http://purl.org/vocommons/voaf#>
+                          SELECT ?v WHERE { ?v a voaf:Vocabulary
+                          FILTER(CONTAINS(LCASE(STR(?v)),"sstim")) }' \
+                        -H 'Accept: application/sparql-results+json'
+
+                    944 vocabularies indexed, zero sstim hits; a SKOS control
+                    query returns rows, so the endpoint can see what it holds.
+Required follow-up: Several weeks have now passed with no curator response — the
+                    escalation condition below is met. Do NOT resubmit the form;
+                    it just re-acknowledges. Email the curators
                     (py.vandenbussche@gmail.com; ghislain.atemezing@gmail.com;
                     mpoveda@fi.upm.es). On integration, record the LOV vocab URL.
 ```
 
-### BARTOC — ready now (GitHub login required)
+### BARTOC — LIVE (node 21154, since 2026-07-27)
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://bartoc.org/edit` — **requires login**; BARTOC's login server supports
@@ -325,14 +339,31 @@ Submitted version:  0.6.0
 Concept DOI:        10.5281/zenodo.21286974
 Date:               2026-07-11
 Account/maintainer: @ttm (GitHub login; not on editor whitelist)
-External record ID or URL:  https://github.com/gbv/bartoc.org/issues/319
-                            (pre-assigned node http://bartoc.org/en/node/21154)
-Status:             SUBMITTED via issue #319 — clarifying comment posted and the
-                    ttps:// typo corrected (2026-07-11). Cleanly pending a BARTOC
-                    editor to add the vocabulary or whitelist @ttm.
-Required follow-up: Wait for editor action. On integration, record the live node
-                    URL (reserved node 21154). Metadata is community-editable, so
-                    any field can be corrected after it goes live.
+External record ID or URL:  https://bartoc.org/en/node/21154 (LIVE)
+                            submission trail: https://github.com/gbv/bartoc.org/issues/319
+Status:             LIVE since 2026-07-27T16:14:06Z (modified 16:16:58Z), created
+                    by BARTOC editor Jakob Voß — the editor acted on the issue
+                    rather than whitelisting @ttm, so the record is curator-made,
+                    not self-served. Verified public 2026-08-17 by three
+                    instruments: anonymous `GET /en/node/21154` → 200; the JSKOS
+                    API `GET /api/data?uri=...` returns the full record; and it is
+                    the top hit for `sstim` in public vocabulary search.
+
+                    **Do not read issue #319's open state as pending submission.**
+                    That issue is titled "Error 403 when saving" — it tracks the
+                    whitelist *bug*, not this vocabulary. It stayed open behind a
+                    record that had already gone live, and this file asserted
+                    "pending editor" for three weeks because the two were
+                    conflated. Instrument for the real question is the node URL,
+                    never the issue.
+Required follow-up: **Refresh the stale `extent`.** The live record reads
+                    "56 classes, 124 properties, 295 concepts, 30 concept schemes
+                    (2026-07)"; TERM_INDEX.md is at 157 / 284 / 525, so the public
+                    record understates SSTIM roughly threefold. Metadata is
+                    community-editable (PDDL), so this is a login-and-edit fix.
+                    Nothing else on the record is version-pinned: `identifier` is
+                    https://w3id.org/sstim, the link is the concept DOI, and the
+                    homepage 200s — all age correctly.
 ```
 
 ### BioPortal — ready now (account created @rfabbri)
@@ -528,8 +559,10 @@ Submitted version:  0.6.0
 Concept DOI:        10.5281/zenodo.21286974
 Date:               2026-07-12 (skeleton record created)
 Account/maintainer: @renato.fabbri (FAIRsharing account)
-External record ID or URL:  https://fairsharing.org/8494 (hidden until approved)
-Status:             UNDER CURATOR REVIEW (curator edit 2026-08-07). Completed
+External record ID or URL:  https://fairsharing.org/8494 — PUBLIC, and findable
+                            by searching "sstim" from a logged-out session
+                            (checked in a second browser, 2026-08-17)
+Status:             PUBLIC, AWAITING DOI (curator edit 2026-08-06). Completed
                     2026-07-12: taxonomies set to "Not Applicable" → record left
                     "incomplete" and read "awaiting review by FAIRsharing
                     curators". All required fields done; rich metadata (object
@@ -537,18 +570,41 @@ Status:             UNDER CURATOR REVIEW (curator edit 2026-08-07). Completed
                     data processes, CC BY 4.0, BSC Lab maintainer, IAO/BFO/OBI
                     extends, Zenodo cross-ref). Recommended-missing (funding org,
                     publications, citations) intentionally skipped — do not block
-                    review/DOI. On 2026-08-07 FAIRsharing curator Lea.Girard
-                    (10801) modified the record, so review has begun; the
-                    notification asserted neither approval nor a DOI, and the
-                    edits themselves are unread (see the two checks below).
-Required follow-up: Wait for curator approval → FAIRsharing DOI issued (currently
-                    "Awaiting DOI"). Record the DOI when it lands. Two things to
-                    check at the next login — neither is scriptable, because
-                    `/8494` serves an empty app shell while logged out and
-                    api.fairsharing.org needs a JWT: (1) diff the curator's
-                    2026-08-07 edits at `https://fairsharing.org/8494?history=show`
+                    review/DOI. FAIRsharing curator Lea.Girard (10801) modified
+                    and reviewed the record on 2026-08-06 16:50 (the record's own
+                    "Last Edited"/"Last Reviewed" is the authority; this file
+                    previously said 08-07, the notification's date), so review has
+                    begun; it asserted neither approval nor a DOI, and the edits
+                    themselves are unread (see the two checks below).
+Required follow-up: The record is already public; what is still outstanding is
+                    only the DOI. Record it when it lands.
+
+                    **Public visibility is NOT scriptable from here — check it in
+                    a logged-out browser.** Do not try to be clever about this.
+                    Two proxies have now been tried and both are invalid:
+
+                      - `api.fairsharing.org/fairsharing_records/8494` → 401, and
+                        the search endpoints 404. No anonymous API to ask.
+                      - The server-rendered `<title>`. Public records *sometimes*
+                        carry a record-specific title and sometimes serve the bare
+                        "FAIRsharing" shell — 8480 and 8500 render titles while
+                        8490, 8494, 8505, 8510 and 8520 do not, with the same
+                        result under a real browser User-Agent. It is a prerender
+                        cache artifact, uncorrelated with visibility.
+
+                    On 2026-08-17 the second proxy was used to conclude the record
+                    was not yet public. **That was wrong** — a logged-out session
+                    in a second browser reaches the record and finds it by
+                    searching "sstim". The error is the §3.6 one exactly: the
+                    instrument was checked for one direction only (public records
+                    can render titles) and the converse was assumed. When no
+                    instrument can see the place, the answer is INCOMPLETE, not
+                    "absent".
+
+                    Two things still needing a login: (1) diff the curator's
+                    2026-08-06 edits at `https://fairsharing.org/8494?history=show`
                     against the intended values above; (2) the record was
-                    submitted at 0.6.0 and the current release is 0.13.0 —
+                    submitted at 0.6.0 and the current release is 0.15.0 —
                     confirm no data-process URL pins a stale version. Also note
                     the same-day automated completeness mail listed
                     "Organisation links" as not yet present, which contradicts

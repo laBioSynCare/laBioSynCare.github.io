@@ -52,10 +52,12 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   failures registry-dependent.
 - **Registry discoverability:** the `sstim` prefix resolves at prefix.cc and the
   ontology is parsed and browsable in
-  [BioPortal](https://bioportal.bioontology.org/ontologies/SSTIM); LOV,
-  [BARTOC](https://github.com/gbv/bartoc.org/issues/319), and FAIRsharing
-  (record 8494) await curator review, and a DBpedia Archivo submission passed
-  RDF validation but is blocked by a Databus outage. Tracked in
+  [BioPortal](https://bioportal.bioontology.org/ontologies/SSTIM), and it is
+  catalogued in [BARTOC](https://bartoc.org/en/node/21154) (node 21154, entered
+  by a BARTOC editor on 2026-07-27) and in
+  [FAIRsharing](https://fairsharing.org/8494) (record 8494, curated 2026-08-06,
+  DOI pending). LOV still awaits curator review, and a DBpedia Archivo
+  submission passed RDF validation but is blocked by a Databus outage. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio
   with built-in Sensory Field starters, logbook, profile and settings are
