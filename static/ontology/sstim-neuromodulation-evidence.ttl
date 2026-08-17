@@ -2,7 +2,7 @@
 #
 #  SSTIM Neuromodulation–Evidence Bridge Module
 #
-#  Version:    0.15.0
+#  Version:    0.16.0-dev
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/neuromodulation-evidence> a owl:Ontology ;
-    owl:versionInfo "0.15.0" ;
+    owl:versionInfo "0.16.0-dev" ;
     dct:title "SSTIM Neuromodulation–Evidence Bridge Module"@en ;
     dct:description "Optional outcome relations connecting generic evidence concepts with neuromodulation access-route, target-site, system, and phenomenon facets."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

@@ -15,6 +15,10 @@ and [TODO.md](TODO.md). The rationale for each change lives in the
 [ADRs](docs/decisions/) and the `skos:historyNote`s on the ontology nodes; this
 file is the human-readable summary.
 
+## [Unreleased]
+
+Nothing yet on the 0.16.0-dev line.
+
 ## [0.15.0] - 2026-08-17
 
 ### Added

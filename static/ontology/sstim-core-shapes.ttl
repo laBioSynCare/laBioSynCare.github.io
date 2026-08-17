@@ -2,7 +2,7 @@
 #
 #  SSTIM Core Profile SHACL shapes
 #
-#  Version: 0.15.0
+#  Version: 0.16.0-dev
 #  Date:    2026-08-04
 #  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -25,7 +25,7 @@
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 
 <https://w3id.org/sstim/core-shapes> a owl:Ontology ;
-    owl:versionInfo "0.15.0" ;
+    owl:versionInfo "0.16.0-dev" ;
     dct:title "SSTIM Core Profile SHACL Shapes"@en ;
     dct:description "Weak SHACL Core constraints for the minimal SSTIM Core Profile: labelled stimulus descriptions with a regime, optional process references, labelled declared channels, and positive channel duration when asserted."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
