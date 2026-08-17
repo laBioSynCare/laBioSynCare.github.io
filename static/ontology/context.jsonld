@@ -1529,6 +1529,10 @@
     "hasModulationFrequencyHz": {
       "@id": "sstim-ex:hasModulationFrequencyHz",
       "@type": "xsd:decimal"
+    },
+    "impliesPresence": {
+      "@id": "sstim:impliesPresence",
+      "@type": "@id"
     }
   }
 }

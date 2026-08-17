@@ -954,6 +954,25 @@ sstim-sh:StimulationSignalShape a sh:NodeShape ;
         """ ;
     ] .
 
+# Two carrier properties exist on purpose, one per layer (ADR 0041): emission on
+# the channel, binding on the rendering. Two names for one quantity is only
+# defensible if they cannot disagree, so this is what makes it defensible.
+sstim-sh:ChannelCarrierAgreementShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:StimulusChannel ;
+    sh:name "StimulusChannel carrier agreement"@en ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A channel's carrier frequency and the carrier of a rendering it presents state the same quantity at two layers and must agree."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasSignalRendering> ?rendering ;
+                      <https://w3id.org/sstim/exposure#hasCarrierFrequencyHz> ?channelCarrier .
+                ?rendering <https://w3id.org/sstim#renderingCarrierHz> ?renderingCarrier .
+                FILTER( ?channelCarrier != ?renderingCarrier )
+            }
+        """ ;
+    ] .
+
 sstim-sh:SignalRenderingShape a sh:NodeShape ;
     sh:targetClass sstim:SignalRendering ;
     sh:name "SignalRendering"@en ;
@@ -983,16 +1002,22 @@ sstim-sh:SignalRenderingShape a sh:NodeShape ;
         sh:message "renderingCarrierHz must be a single positive decimal."@en ;
     ] ;
 
-    # A binaural beat is the standard case of a signal that reaches neither ear.
-    # Recording it as physically present would let a finding about a real 10 Hz
-    # modulation authorize a claim about a constructed one.
+    # Presence is a fact about the mechanism, not a choice per rendering, so each
+    # mechanism declares what it implies (sstim:impliesPresence) and this rejects
+    # any rendering that contradicts its own. The earlier version of this rule
+    # named binaural-beat and physical explicitly and so covered one of the five
+    # mechanisms; a monaural beat declared perceptual passed. Reading the implied
+    # value from the mechanism covers every mechanism including ones not yet
+    # named, and cannot fall out of step with the vocabulary.
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "A binaural-beat rendering is perceptually constructed, not physically present: the signal is absent from each ear's waveform."@en ;
+        sh:message "The stated rendering presence contradicts its mechanism. Presence follows from the mechanism — a binaural beat is perceptually constructed because the signal is absent from each ear's waveform, while amplitude modulation, a monaural beat and direct presentation all put a real modulation into the world."@en ;
         sh:select """
             SELECT $this WHERE {
-                $this <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismBinauralBeat> ;
-                      <https://w3id.org/sstim#hasRenderingPresence> <https://w3id.org/sstim/vocab#presencePhysical> .
+                $this <https://w3id.org/sstim#hasRenderingMechanism> ?mechanism ;
+                      <https://w3id.org/sstim#hasRenderingPresence> ?stated .
+                ?mechanism <https://w3id.org/sstim#impliesPresence> ?implied .
+                FILTER( ?stated != ?implied )
             }
         """ ;
     ] ;

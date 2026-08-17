@@ -378,7 +378,7 @@ sstim-ex:hasCarrierFrequencyHz a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range xsd:decimal ;
     rdfs:label "carrier frequency (Hz)"@en ;
     skos:definition "The frequency of a carrier this channel presents: a frequency whose job is to bear a signal the sense cannot receive directly. The 200 and 210 Hz tones of a 10 Hz binaural beat are carriers, as is the audible tone an isochronic rate modulates."@en ;
-    skos:scopeNote "A carrier exists because of a limitation of the sense addressed, not because of anything about the signal: 10 Hz falls below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all."@en ;
+    skos:scopeNote "A carrier exists because of a limitation of the sense addressed, not because of anything about the signal: 10 Hz falls below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all. Beside sstim:renderingCarrierHz, which states the same quantity one layer up, on the rendering that chose it. This one describes emission and joins the sstim-ex:hasFrequencyHz family so a consumer can ask what a channel presents without knowing how it was specified; that one describes a binding. Where both are asserted they must agree, which SHACL enforces."@en ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/exposure> .
 

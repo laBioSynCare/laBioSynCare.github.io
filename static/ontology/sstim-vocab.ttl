@@ -4012,30 +4012,35 @@ sstim-v:shapeSampled a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:definition "A signal whose form is a recording rather than a function — a violin note, a voice, rainfall. Carries a source asset, without which the signal is not reproducible."@en .
 
 sstim-v:mechanismDirectPresentation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
     skos:prefLabel "Direct presentation"@en ;
     skos:notation "direct-presentation" ;
     skos:definition "The signal is presented as itself, with no carrier — a light flickering at the signal rate, or a vibration at it."@en .
 
 sstim-v:mechanismAmplitudeModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
     skos:prefLabel "Amplitude modulation"@en ;
     skos:notation "amplitude-modulation" ;
     skos:definition "The signal modulates the amplitude of a carrier. The isochronic case: a 10 Hz signal on an audible tone."@en .
 
 sstim-v:mechanismFrequencyModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
     skos:prefLabel "Frequency modulation"@en ;
     skos:notation "frequency-modulation" ;
     skos:definition "The signal modulates the frequency of a carrier."@en .
 
 sstim-v:mechanismBinauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    sstim:impliesPresence sstim-v:presencePerceptual ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
     skos:prefLabel "Binaural beat"@en ;
     skos:notation "binaural-beat" ;
     skos:definition "Two carriers differing by the signal frequency are presented dichotically. The signal is absent from each ear and constructed by the auditory system, so this mechanism is perceptual rather than physical."@en .
 
 sstim-v:mechanismMonauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
     skos:prefLabel "Monaural beat"@en ;
     skos:notation "monaural-beat" ;

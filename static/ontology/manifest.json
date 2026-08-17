@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "3c29957db1700f558c6545b4ae24de4ea93a27cab387afa8864e11e6ceec7452"
+        "sha256": "2df84d6f79e8031b9074938766a8d66bfcacf248b7b2e0bbd1c3ff826f860ceb"
       },
       "runtime": {
         "url": "/ontology/sstim-stimulus.ttl",
@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "9c02ad6631ba57482d6ff1b34f29c42a0ec9b16c605b3b790ae2c5f1c7917ec9"
+        "sha256": "00fc418d1b643898dc7579e3cf46a45ee8e3a4a223cc378abbebe83a297d58cc"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -460,7 +460,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e63410dcd90f0318612410c5fd484641aad341cb83a54b4290950115bc3148bb"
+        "sha256": "86697d1ff300e71a44a95e462f1d96b3a6bfdc1a996d4872394466e427e57253"
       },
       "runtime": {
         "url": "/ontology/sstim-exposure.ttl",
@@ -673,7 +673,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "4ae8f304e3375c652ca11f2b692648657e98c8df5afd1de83919b28c9e67ac68"
+        "sha256": "9d6e0162c7b53942578834a4478c0345ef5a41957058a4574cfdb398583f9c5c"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -794,7 +794,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "247f6552d1e6ae7a852814ff32201b3ef78090a4d31d702ed23018b9b2274e40"
+      "sha256": "e15f5127c36c83c839007cf9569039076848fb0ed0753276d39db39acb40eebc"
     },
     {
       "id": "core-plus",
@@ -842,7 +842,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "f0fccc53a9bc8da08884e86090baac298d1dee4e8c17ee28b3996df2dfc5a503"
+      "sha256": "0767ac6d3b942d9cdd36c2cf7be927311cad9b2876eb80b5c2a7220ba5ed2b51"
     },
     {
       "id": "full",
@@ -905,7 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "0e1ef3486ead8a5658a0a7eabcceec72073bc121e0d3aca82e4580f06dc79b12"
+      "sha256": "04679d465358a90d17c6a42357ebcbe7d430e957d146d38b78cd9ea06f07b3e1"
     }
   ]
 }

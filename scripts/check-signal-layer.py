@@ -49,6 +49,7 @@ REQUIRED_PROPERTIES = [
     "signalWithinBand", "signalCoversBand", "signalOverlapsBand",
     "hasSignalRendering", "rendersSignal", "rendersOntoParameter",
     "hasRenderingMechanism", "hasRenderingPresence", "renderingCarrierHz",
+    "impliesPresence",
 ]
 REQUIRED_CONCEPTS = {
     "SignalShape": ["shapeSine", "shapeSquare", "shapeSawtooth", "shapeTriangle",
@@ -109,9 +110,6 @@ CASES = [
     ("a sampled signal with no source",
      BASELINE.replace("sstim-v:shapeSquare", "sstim-v:shapeSampled"),
      "sampled signal must identify"),
-    ("a binaural beat claimed as physically present",
-     BASELINE.replace("sstim-v:mechanismAmplitudeModulation", "sstim-v:mechanismBinauralBeat"),
-     "perceptually constructed"),
     ("a directly presented rendering carrying a carrier",
      BASELINE.replace(
          """    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
@@ -120,6 +118,20 @@ CASES = [
     sstim:hasRenderingPresence sstim-v:presencePhysical ;
     sstim:renderingCarrierHz 250.0 ."""),
      "has no carrier"),
+    # The old rule named binaural and physical explicitly, so it covered one of
+    # five mechanisms. These are the four that used to pass.
+    ("a monaural beat claimed as perceptually constructed",
+     BASELINE.replace("sstim-v:mechanismAmplitudeModulation", "sstim-v:mechanismMonauralBeat")
+             .replace("sstim:hasRenderingPresence sstim-v:presencePhysical ;\n    sstim:renderingCarrierHz 250.0 .",
+                      "sstim:hasRenderingPresence sstim-v:presencePerceptual ;\n    sstim:renderingCarrierHz 250.0 ."),
+     "contradicts its mechanism"),
+    ("amplitude modulation claimed as perceptually constructed",
+     BASELINE.replace("sstim:hasRenderingPresence sstim-v:presencePhysical ;\n    sstim:renderingCarrierHz 250.0 .",
+                      "sstim:hasRenderingPresence sstim-v:presencePerceptual ;\n    sstim:renderingCarrierHz 250.0 ."),
+     "contradicts its mechanism"),
+    ("a binaural beat claimed as physically present",
+     BASELINE.replace("sstim-v:mechanismAmplitudeModulation", "sstim-v:mechanismBinauralBeat"),
+     "contradicts its mechanism"),
     ("a signal with no shape",
      BASELINE.replace("    sstim:hasSignalShape sstim-v:shapeSquare ;\n", ""),
      "must state its shape"),

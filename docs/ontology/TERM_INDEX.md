@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-163 classes · 299 properties · 545 concepts · 18 modules
+163 classes · 300 properties · 545 concepts · 18 modules
 
 ## Classes
 
@@ -374,6 +374,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:hzMin` | data | common | sstim:FrequencyBand | sstim:StimulationSignal → XMLSchema:decimal | Lower bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies. |
 | `sstim:implementsFramework` | object | technique | sstim:SensoryStimulationImplementation → sstim:SensoryStimulationFramework | Links an implementation to the framework it realizes. |
 | `sstim:implementsProtocol` | object | technique | sstim:SensoryStimulationImplementation → sstim:SensoryStimulationProtocol | Links an implementation to a protocol it realizes. |
+| `sstim:impliesPresence` | object | stimulus | sstim:RenderingMechanism → sstim:RenderingPresence | The presence a mechanism necessarily produces. Whether a signal physically reaches the subject or is constructed by the nervous system is a fact… |
 | `sstim:inGroup` | object | patch-studio | sstim:Preset → sstim:PresetGroup | Links a preset to its group classification. Each preset belongs to exactly one group. |
 | `sstim:incorporatesTechnique` | object | technique | sstim:SensoryStimulationFramework → sstim:SensoryStimulationTechnique | Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from… |
 | `sstim:independencePolicy` | object | evidence | — → — | The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations. |
