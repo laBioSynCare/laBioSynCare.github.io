@@ -60,7 +60,7 @@
         <https://www.w3.org/TR/skos-reference/>,
         <https://www.w3.org/TR/shacl/>,
         <https://www.w3.org/TR/prov-o/> ;
-    dcat:version "0.14.0" ;
+    dcat:version "0.15.0" ;
     foaf:homepage <https://labiosyncare.github.io/> ;
     dcat:landingPage <https://labiosyncare.github.io/> ;
     # WIDOCO reference documentation — generated per release in CI, never
@@ -69,9 +69,9 @@
     foaf:primaryTopic <https://w3id.org/sstim> ;
     void:rootResource <https://w3id.org/sstim> ;
     void:uriSpace "https://w3id.org/sstim" ;
-    void:triples 12212 ;
-    void:classes 156 ;
-    void:properties 279 ;
+    void:triples 13023 ;
+    void:classes 163 ;
+    void:properties 300 ;
     dcat:keyword "sensory stimulation", "ontology", "SKOS vocabulary",
         "brainwave entrainment", "binaural beats", "isochronic tones",
         "audio-visual entrainment", "vibrotactile stimulation", "paced breathing",

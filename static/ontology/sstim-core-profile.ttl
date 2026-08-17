@@ -2,7 +2,7 @@
 #
 #  SSTIM Core Profile entrypoint
 #
-#  Version: 0.15.0-dev
+#  Version: 0.15.0
 #  Date:    2026-08-04
 #  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -19,7 +19,8 @@
 @prefix role: <http://www.w3.org/ns/dx/prof/role/> .
 
 <https://w3id.org/sstim/profile/core> a owl:Ontology, prof:Profile ;
-    owl:versionInfo "0.15.0-dev" ;
+    owl:versionIRI <https://w3id.org/sstim/0.15.0/sstim-core-profile.ttl> ;
+    owl:versionInfo "0.15.0" ;
     prof:hasToken "core" ;
     prof:isProfileOf <https://w3id.org/sstim> ;
     prof:hasResource
@@ -33,13 +34,13 @@
         <https://w3id.org/sstim>,
         <https://w3id.org/sstim/stimulus> ;
     owl:imports
-        <https://w3id.org/sstim/kernel>,
-        <https://w3id.org/sstim/stimulus> ;
+        <https://w3id.org/sstim/0.15.0/sstim-core.ttl>,
+        <https://w3id.org/sstim/0.15.0/sstim-stimulus.ttl> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-08-13"^^xsd:date ;
-    dct:modified "2026-08-13"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso
         <https://w3id.org/sstim/manifest>,
@@ -48,16 +49,16 @@
 
 <https://w3id.org/sstim/profile/core#entrypoint> a prof:ResourceDescriptor ;
     prof:hasRole role:specification ;
-    prof:hasArtifact <https://w3id.org/sstim/profile/core> ;
+    prof:hasArtifact <https://w3id.org/sstim/0.15.0/sstim-core-profile.ttl> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/core#constraints> a prof:ResourceDescriptor ;
     prof:hasRole role:constraints ;
-    prof:hasArtifact <https://w3id.org/sstim/core-shapes> ;
+    prof:hasArtifact <https://w3id.org/sstim/0.15.0/sstim-core-shapes.ttl> ;
     dct:conformsTo <http://www.w3.org/ns/shacl#> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/core#manifest> a prof:ResourceDescriptor ;
     prof:hasRole role:schema ;
-    prof:hasArtifact <https://w3id.org/sstim/manifest> ;
+    prof:hasArtifact <https://w3id.org/sstim/0.15.0/manifest> ;
     dct:format "application/json" .

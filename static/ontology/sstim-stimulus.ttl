@@ -2,7 +2,7 @@
 #
 #  SSTIM Core Stimulus Description Module
 #
-#  Version:    0.15.0-dev
+#  Version:    0.15.0
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -30,7 +30,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/stimulus> a owl:Ontology ;
-    owl:versionInfo "0.15.0-dev" ;
+    owl:versionInfo "0.15.0" ;
     dct:title "SSTIM Core Stimulus Description Module"@en ;
     dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, and optional stimulation target."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -38,8 +38,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-07-31"^^xsd:date ;
-    dct:issued "2026-08-13"^^xsd:date ;
-    dct:modified "2026-08-13"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 

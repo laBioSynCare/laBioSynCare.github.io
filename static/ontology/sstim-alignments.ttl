@@ -3,7 +3,7 @@
 #  SSTIM External Alignments  —  sstim-alignments.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.15.0-dev
+#  Version:    0.15.0
 #  Date:       2026-08-08
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -40,7 +40,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
-    owl:versionInfo "0.15.0-dev" ;
+    owl:versionInfo "0.15.0" ;
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -48,8 +48,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:issued "2026-08-13"^^xsd:date ;
-    dct:modified "2026-08-13"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
     skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .

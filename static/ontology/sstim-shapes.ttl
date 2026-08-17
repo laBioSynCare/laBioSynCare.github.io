@@ -3,7 +3,7 @@
 #  SSTIM SHACL Shapes  —  sstim-shapes.ttl
 #
 #  Namespace:  https://w3id.org/sstim/shapes#
-#  Version:    0.15.0-dev
+#  Version:    0.15.0
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
@@ -41,7 +41,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/shapes> a owl:Ontology ;
-    owl:versionInfo "0.15.0-dev" ;
+    owl:versionInfo "0.15.0" ;
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -49,8 +49,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
-    dct:issued "2026-08-13"^^xsd:date ;
-    dct:modified "2026-08-13"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0031-qualified-ecosystem-records.md> .
 

@@ -2,7 +2,7 @@
 #
 #  SSTIM Intervention and Session Module
 #
-#  Version:    0.15.0-dev
+#  Version:    0.15.0
 #  Date:       2026-08-04
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/session> a owl:Ontology ;
-    owl:versionInfo "0.15.0-dev" ;
+    owl:versionInfo "0.15.0" ;
     dct:title "SSTIM Intervention and Session Module"@en ;
     dct:description "Planned stimulation interventions, session specifications and executions, configuration overrides, and consent-governed self-reports."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -47,8 +47,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-08-13"^^xsd:date ;
-    dct:modified "2026-08-13"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> .
 
 
