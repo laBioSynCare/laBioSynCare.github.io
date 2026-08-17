@@ -197,9 +197,15 @@ indexed, examiner-searchable records.
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and
       public-safe `/implementation/biosyncare/...` identity/metadata paths if
       they are ever published `P1`
-      *Exact audited rules are staged for the BSC framework, BSC Lab,
-      the public BioSynCare application identity, and the Patch Studio component.
-      Deeper preset/session/annotation/evidence/reference routes remain.*
+      *Exact audited rules are live for the BSC framework, BSC Lab, the public
+      BioSynCare application identity, and the Patch Studio component. The
+      **preset and reference** routes went live 2026-08-17 in w3id PR #6561,
+      after sitting prepared-but-unsubmitted through two earlier PRs — both IRI
+      families answered 404 in the meantime. **Session, annotation and evidence
+      routes remain**, and each needs its subject to be publicly resolvable
+      before it is worth routing. Versioned snapshot routes are no longer part
+      of this task at all: [ADR 0053](docs/decisions/0053-wildcard-snapshot-routes.md)
+      made them four patterns covering every release, cut or not.*
       *No second top-level w3id namespace. Keep room for future
       `/technique/{id}/`, `/protocol/{id}/`, `/framework/{id}/`,
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`

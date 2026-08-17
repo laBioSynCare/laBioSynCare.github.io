@@ -303,6 +303,58 @@ for (const file of tracked) {
 }
 ok(`${links} relative doc links resolve`)
 
+// ── the changelog's own link references ──────────────────────────────────────
+//
+// Keep a Changelog writes section headings as `## [X.Y.Z]`, which renders as a
+// literal `[0.15.0]` unless a matching link definition exists at the foot of the
+// file. Nothing regenerates that block: `release-prepare` renames the Unreleased
+// section and stops there, so a release silently leaves its own heading
+// unlinked. By 0.15.0, 11 of 15 sections had no definition and `[Unreleased]`
+// still compared from v0.8.0 — seven releases stale, and invisible because a
+// broken *reference* degrades to plain text rather than to a dead link the
+// resolver above would have caught.
+const changelogText = read('CHANGELOG.md') ?? ''
+const changelogTags = new Set(
+  execSync('git tag', { encoding: 'utf8' }).trim().split('\n').filter(Boolean),
+)
+const changelogSections = [...changelogText.matchAll(/^## \[(\d+\.\d+\.\d+)\]/gm)].map((m) => m[1])
+const changelogDefs = new Map(
+  [...changelogText.matchAll(/^\[(Unreleased|\d+\.\d+\.\d+)\]: (\S+)$/gm)].map((m) => [m[1], m[2]]),
+)
+
+for (const version of changelogSections) {
+  // 0.1.0 and 0.4.0 were never tagged, so they have no release to point at.
+  if (!changelogTags.has(`v${version}`)) continue
+  const target = changelogDefs.get(version)
+  if (!target) {
+    fail('CHANGELOG.md', `section [${version}] has no link definition at the foot of the file`)
+  } else if (!target.includes(`v${version}`)) {
+    fail('CHANGELOG.md', `link definition for [${version}] does not point at v${version}: ${target}`)
+  }
+}
+for (const [version, target] of changelogDefs) {
+  if (version === 'Unreleased') continue
+  if (!changelogTags.has(`v${version}`)) {
+    fail('CHANGELOG.md', `link definition [${version}] names a tag that does not exist`)
+  }
+  if (!changelogSections.includes(version)) {
+    fail('CHANGELOG.md', `link definition [${version}] has no matching section`)
+  }
+  void target
+}
+// The Unreleased diff must start at the newest release, or it advertises a
+// range that silently swallows whole releases — which is exactly what it did.
+const unreleasedTarget = changelogDefs.get('Unreleased')
+if (!unreleasedTarget) {
+  fail('CHANGELOG.md', 'no [Unreleased] link definition')
+} else if (!unreleasedTarget.includes(`v${RELEASE_VERSION}...`)) {
+  fail(
+    'CHANGELOG.md',
+    `[Unreleased] compares from ${unreleasedTarget.split('/').pop()}; the release is v${RELEASE_VERSION}`,
+  )
+}
+ok(`changelog: ${changelogSections.length} sections, every tagged one linked`)
+
 // ── report ───────────────────────────────────────────────────────────────────
 
 if (VERBOSE || problems.length === 0) {

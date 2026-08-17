@@ -17,7 +17,26 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.16.0-dev line.
+### Changed
+
+- **Immutable snapshot routes are patterns, not an enumeration**
+  ([ADR 0053](docs/decisions/0053-wildcard-snapshot-routes.md)). Four rules now
+  cover every version, including releases not yet cut, replacing 30 enumerated
+  ones — so a release no longer needs a pull request against
+  `perma-id/w3id.org`. The w3id maintainer asked for this while merging the
+  0.14.0 routes. One rule stays an enumeration and cannot grow: the pre-modular
+  snapshots `0.1.0`–`0.12.0`, whose version IRI resolves to `sstim-core.ttl`
+  because that file was the whole ontology before ADR 0043 split it.
+
+  No published identifier changed meaning: every frozen artifact resolves to the
+  same URL as before, checked by executing the committed rules against every file
+  in every snapshot. What is given up is fail-closed routing — a version-shaped
+  path that was never released now redirects to a Pages URL that answers 404,
+  rather than 404ing at w3id.
+- The public preset and reference identity routes are live at last. They had been
+  prepared but never submitted, so `https://w3id.org/sstim/ref/{id}` and the two
+  `implementation/bsclab/preset/{id}` IRIs answered 404 despite being published
+  identifiers.
 
 ## [0.15.0] - 2026-08-17
 
@@ -1023,8 +1042,17 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.15.0
+[0.14.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.14.0
+[0.13.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.13.0
+[0.12.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.12.0
+[0.11.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.11.0
+[0.10.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.10.0
+[0.9.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.9.0
 [0.8.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.8.0
 [0.7.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.7.0
 [0.6.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.6.0
 [0.5.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.5.0
+[0.3.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.3.0
+[0.2.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.2.0
