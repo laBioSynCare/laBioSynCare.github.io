@@ -14,7 +14,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.16.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.15.0`, released 2026-08-17 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | pending Zenodo archival of the `v0.15.0` tag | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.21981526` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | The signal layer, neural oscillations, the public-claim contract and the preset contract | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
