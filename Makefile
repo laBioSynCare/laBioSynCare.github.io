@@ -426,12 +426,28 @@ release-dryrun:
 ## `make validate` runs ~18 minutes, so the expensive mistake is re-running it
 ## on a tree that has not changed — and the dangerous one is trusting a stamp
 ## from a tree that has. The tree hash is what distinguishes them.
+##
+## It must be the WORKING tree, not HEAD's. The first version of this wrote
+## `git stash create >/dev/null; git rev-parse HEAD^{tree}`, which discards the
+## stash commit and hashes HEAD regardless — so an uncommitted edit to a
+## protected ontology module stamped identically to a clean checkout, and
+## validate-status answered "no need to re-run" on a tree the suite had never
+## seen. That is precisely the failure the stamp exists to prevent, and it was
+## live while the pending session-module edit sat in the tree.
+##
+## `git stash create` writes a commit for the dirty state and prints nothing at
+## all when the tree is clean, so the fallback to HEAD is the clean case. It does
+## not cover untracked files; a new module that is not yet added is invisible
+## here and caught by manifest-check instead, which scans the inventory directory
+## rather than the index.
+TREE_HASH = tree="$$(git stash create 2>/dev/null)"; \
+	git rev-parse "$${tree:-HEAD}^{tree}" 2>/dev/null || echo none
 .PHONY: validate-stamp validate-status
 validate-stamp:
 	@printf '%s  commit=%s  tree=%s  suite=passed\n' \
 		"$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
 		"$$(git rev-parse --short HEAD 2>/dev/null || echo none)" \
-		"$$(git stash create >/dev/null 2>&1; git rev-parse HEAD^{tree} 2>/dev/null || echo none)" \
+		"$$($(TREE_HASH))" \
 		>> .validation.log
 	@echo "validate: recorded in .validation.log"
 
@@ -441,7 +457,7 @@ validate-status:
 	@last="$$(tail -1 .validation.log)"; \
 	echo "last passing run: $$last"; \
 	stamped="$$(echo "$$last" | sed -n 's/.*tree=\([0-9a-f]*\).*/\1/p')"; \
-	current="$$(git rev-parse HEAD^{tree} 2>/dev/null || echo none)"; \
+	current="$$($(TREE_HASH))"; \
 	if [ "$$stamped" = "$$current" ]; then \
 		echo "validate-status: this tree is the one that passed — no need to re-run"; \
 	else \
