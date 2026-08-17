@@ -37,6 +37,10 @@ Describing a protocol or claim does not establish efficacy.
   duplication, mostly in the four-day-old signal layer: rendering presence is
   derivable from mechanism and only 2 of 5 cases are constrained, two unrelated
   carrier properties, band-interval relations with no constraints at all.
+- [Fourth pass, 2026-08-17](reviews/2026-08-17-fourth-pass.md) — what produces
+  and what verifies the ontology: the CLAUDE.md §5.5 named-graph invariant has
+  no test at all, four of six runtime RDF emitters are unverified, and phase 0.1
+  carries a finding recorded as closed on partial evidence.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
