@@ -208,33 +208,58 @@ Status:             INDEXED 2026-08-17 (snapshot 2026.08.17-195305). Archived in
                     owl, ttl and nt. Parsing ✔, Crawling Status ✔. Rated
                     ★☆☆☆ (1/4): Min. License ✘, Good License ✘, Consistency ✘,
                     LODE Conformity ✘.
-Required follow-up: **Re-check the four ✘ when the Databus is healthy — do not
-                    treat them as findings yet.** Two of them contradict
-                    measurements taken the same day:
+Required follow-up: **Two of the three lost stars are ours to fix, and the cause
+                    is confirmed — not a Databus artifact.** Archivo's tests are
+                    SHACL shapes in its own repo, and they were run locally
+                    against the served document (`shacl-library/license-I.ttl`,
+                    `license-II.ttl`, `LODE.ttl` from `dbpedia/archivo`):
 
-                      - License. All 16 ontology subjects carry dct:license
-                        (CC BY 4.0); https://w3id.org/sstim also carries
-                        cc:license. So Archivo selecting a different subject
-                        cannot explain it either.
-                      - Consistency. `nix develop -c make reason` reports ROBOT
-                        HermiT consistent across all 16 semantic modules.
+                      nix develop -c pyshacl -s license-I.ttl -df turtle \
+                        -f human <(curl -sL -H 'Accept: text/turtle' \
+                        https://w3id.org/sstim)
 
-                    Meanwhile the Databus backend is still degraded: Archivo's
-                    own download endpoint returns
-                    `500 … There seems to be an error with the DBpedia Databus …
-                    HTTP Error 503`. Parsing and Crawling are the checks that run
-                    during the crawl; the four that failed are the ones needing
-                    the stored artifact. That is the best-supported explanation
-                    and it is not yet verified — re-run when downloads work.
+                    **Min. License ✘ and Good License ✘ — 67 violations each,
+                    every one a `skos:ConceptScheme`, none an ontology.** Both
+                    shapes declare `sh:targetClass owl:Ontology,
+                    skos:ConceptScheme`, so every scheme must carry a license of
+                    its own. All 16 ontologies have `dct:license`; all 67 schemes
+                    have none. Fix: give each scheme
+                    `dct:license <https://creativecommons.org/licenses/by/4.0/>`
+                    — an IRI, since license-IIb also requires `sh:nodeKind
+                    sh:IRI`. That is worth exactly two stars, and it is defensible
+                    beyond the rating: a scheme extracted on its own currently
+                    travels with no licence at all.
 
-                    LODE Conformity has NOT been measured on our side; unlike the
-                    other three it may be a genuine finding. Measure before
-                    claiming either way.
+                    **Consistency ✘ — undiagnosed, do not assume it is ours or
+                    theirs.** Archivo runs *Pellet*, not HermiT:
+                    `pellet consistency -v --loader Jena <url>`, 600 s timeout,
+                    and counts a pass if either the with-imports or the
+                    ignore-imports run answers "Yes". Our `make reason` runs
+                    ROBOT/HermiT and passes on all 16 modules, and the served
+                    document has **zero** `owl:imports`, so imports are not the
+                    variable. Remaining candidates are a Pellet timeout, a Pellet
+                    load error, or a genuine reasoner divergence. Measure with
+                    Pellet before concluding anything.
 
-                    If the ✘ persist once downloads succeed, file against the
-                    archivo GitHub / DBpedia forum, and only then treat them as
-                    input to `IMPROVEMENT_PLAN.md` (compare the 87.5% FOOPS
-                    result already on file).
+                    **LODE Conformity ✘ — 192 results, but only 3 of the shapes
+                    carry `sh:Violation` severity** (the other 12 are Warning or
+                    Info, "will not be displayed"). The three that count, each
+                    failing on all 16 ontologies:
+                      - `rdfs:label` missing or not a Literal
+                      - `rdfs:comment` missing or not a Literal
+                      - `dc:title` missing — **Dublin Core elements 1.1**
+                        (`http://purl.org/dc/elements/1.1/title`), of which the
+                        graph contains zero triples. SSTIM uses `dcterms:`
+                        throughout; LODE reads the older `dc:`.
+                    Also flagged at warning severity: `owl:versionIRI` absent on
+                    all 16. Note this file's earlier claim that the root carries
+                    `owl:versionIRI` was wrong for the mutable line.
+
+                    Archivo re-crawls every 8 h, so a deployed fix should lift
+                    the rating without resubmission. The Databus backend is
+                    separately still degraded — Archivo's download endpoint
+                    returns `500 … HTTP Error 503` — which affects artifact
+                    retrieval, not these four verdicts.
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
