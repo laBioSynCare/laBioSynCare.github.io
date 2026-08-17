@@ -1,128 +1,107 @@
 import { expect, test } from 'vitest'
-import { readdirSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import {
   END,
+  SITE,
   START,
   generatedRegion,
+  legacyVersions,
+  parseRules,
+  resolvePath,
+  simulate,
   snapshotInventory,
 } from './sstim-w3id-snapshot-routes.mjs'
 
-const ontologyDir = resolve(dirname(fileURLToPath(import.meta.url)), '../static/ontology')
+// The predecessor of this suite asserted the region contained no `[0-9]+`,
+// pinning the enumerated design ADR 0053 replaced. What replaces that assertion
+// is not weaker: the enumeration was checked by regenerating its text, which
+// only ever proved the generator agreed with itself, while these run the rules.
 
-function compareSemver(a, b) {
-  const left = a.split('.').map(Number)
-  const right = b.split('.').map(Number)
-  for (let index = 0; index < 3; index += 1) {
-    if (left[index] !== right[index]) return left[index] - right[index]
+test('every frozen artifact routes to its own URL', () => {
+  const { failures, checked, snapshots } = simulate()
+  expect(failures).toEqual([])
+  expect(snapshots).toBeGreaterThan(10)
+  // Four artifacts plus two bare-IRI spellings for the smallest snapshot; the
+  // guard is against a silently empty inventory, which is how a gate passes
+  // while checking nothing.
+  expect(checked).toBeGreaterThan(snapshots * 6)
+})
+
+test('the rule count does not grow with the number of releases', () => {
+  // This is the property the w3id maintainer asked for on perma-id/w3id.org#6548:
+  // a new release must not mean a new rule, and therefore not a new pull request.
+  const real = snapshotInventory()
+  const modular = { version: '0.13.0', turtle: ['sstim-core.ttl', 'sstim-namespace.ttl'], manifest: true, schema: true }
+  const fifty = Array.from({ length: 50 }, (_, index) => ({
+    ...modular,
+    version: `1.${index}.0`,
+  }))
+  expect(parseRules(generatedRegion([...real, ...fifty])).length)
+    .toBe(parseRules(generatedRegion(real)).length)
+})
+
+test('a modular version IRI resolves to the whole ontology, not the Kernel', () => {
+  const rules = parseRules(generatedRegion())
+  // ADR 0043 made sstim-core.ttl the two-class Kernel. Answering a version IRI
+  // with it would hand a registry client a fraction of the release.
+  expect(resolvePath('0.15.0', rules)).toBe(`${SITE}0.15.0/sstim-namespace.ttl`)
+  expect(resolvePath('0.15.0/', rules)).toBe(`${SITE}0.15.0/sstim-namespace.ttl`)
+  // Pre-modular snapshots keep the meaning they were frozen with.
+  expect(resolvePath('0.1.0', rules)).toBe(`${SITE}0.1.0/sstim-core.ttl`)
+})
+
+test('a release not yet cut already has working routes', () => {
+  const rules = parseRules(generatedRegion())
+  expect(resolvePath('0.16.0/sstim-vocab.ttl', rules)).toBe(`${SITE}0.16.0/sstim-vocab.ttl`)
+  expect(resolvePath('0.16.0/manifest', rules)).toBe(`${SITE}0.16.0/manifest.json`)
+  expect(resolvePath('9.9.9', rules)).toBe(`${SITE}9.9.9/sstim-namespace.ttl`)
+})
+
+test('hyphenated module names route, which the character class must allow', () => {
+  const rules = parseRules(generatedRegion())
+  for (const file of ['sstim-core-plus-profile.ttl', 'sstim-neuromodulation-evidence.ttl']) {
+    expect(resolvePath(`0.15.0/${file}`, rules)).toBe(`${SITE}0.15.0/${file}`)
   }
-  return 0
-}
+})
 
-function regexLiteral(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
+test('the simulation catches a generator that drops the legacy rule', () => {
+  // Mutation: without it, a pre-modular version IRI falls through to the
+  // modular rule and answers with a namespace catalogue that snapshot lacks.
+  const region = generatedRegion()
+  const broken = region.split('\n').filter((line) => !line.includes('0\\.1\\.0|')).join('\n')
+  const { failures } = simulate(snapshotInventory(), broken)
+  expect(failures.length).toBeGreaterThan(0)
+  expect(failures.join('\n')).toContain('sstim-core.ttl')
+})
 
-test('the generated region is the exact current frozen snapshot inventory', () => {
+test('the simulation catches a file pattern that excludes hyphens', () => {
+  const region = generatedRegion().replace('sstim-[a-z0-9-]+', 'sstim-[a-z0-9]+')
+  const { failures } = simulate(snapshotInventory(), region)
+  expect(failures.length).toBeGreaterThan(0)
+  expect(failures.join('\n')).toContain('no rule matched')
+})
+
+test('a modular snapshot missing its namespace catalogue is refused', () => {
+  const inventory = [{ version: '0.13.0', turtle: ['sstim-core.ttl'], manifest: true, schema: true }]
+  expect(() => generatedRegion(inventory)).toThrow(/lacks sstim-namespace\.ttl/)
+})
+
+test('a snapshot missing the Kernel file is refused', () => {
+  const inventory = [{ version: '0.13.0', turtle: ['sstim-vocab.ttl'], manifest: true, schema: true }]
+  expect(() => generatedRegion(inventory)).toThrow(/lacks sstim-core\.ttl/)
+})
+
+test('the legacy set is exactly the pre-manifest snapshots', () => {
   const inventory = snapshotInventory()
-  const region = generatedRegion(inventory)
-  const expectedInventory = readdirSync(ontologyDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && /^\d+\.\d+\.\d+$/.test(entry.name))
-    .map((entry) => {
-      const files = readdirSync(join(ontologyDir, entry.name), { withFileTypes: true })
-        .filter((file) => file.isFile())
-        .map((file) => file.name)
-        .sort()
-      return {
-        version: entry.name,
-        turtle: files.filter((file) => file.endsWith('.ttl')),
-        manifest: files.includes('manifest.json'),
-        schema: files.includes('manifest.schema.json'),
-      }
-    })
-    .sort((a, b) => compareSemver(a.version, b.version))
+  expect(legacyVersions(inventory)).toEqual(
+    inventory.filter((snapshot) => !snapshot.manifest).map((snapshot) => snapshot.version),
+  )
+  // It cannot grow: `make snapshot` refuses a module set without a manifest.
+  expect(legacyVersions(inventory).every((version) => version.startsWith('0.'))).toBe(true)
+})
 
-  expect(inventory).toEqual(expectedInventory)
+test('the region is delimited by its markers', () => {
+  const region = generatedRegion()
   expect(region.startsWith(START)).toBe(true)
   expect(region.endsWith(END)).toBe(true)
-  expect(region).not.toContain('[0-9]+')
-  expect(region).not.toContain('[A-Za-z0-9._-]+')
-  for (const snapshot of expectedInventory) {
-    const versionPattern = regexLiteral(snapshot.version)
-    const filesPattern = snapshot.turtle.map(regexLiteral).join('|')
-    expect(region).toContain(
-      `RewriteRule ^${versionPattern}/(${filesPattern})$ ` +
-      `https://labiosyncare.github.io/ontology/${snapshot.version}/$1 [R=302,L]`,
-    )
-    expect(region.includes(`^${versionPattern}/manifest$`)).toBe(snapshot.manifest)
-    expect(region.includes(`^${versionPattern}/manifest\\.schema\\.json$`)).toBe(snapshot.schema)
-  }
-})
-
-test('future modular snapshots gain exact manifest and schema routes only when present', () => {
-  const region = generatedRegion([
-    {
-      version: '1.0.0',
-      turtle: ['sstim-core-profile.ttl', 'sstim-core.ttl', 'sstim-namespace.ttl'],
-      manifest: true,
-      schema: true,
-    },
-  ])
-
-  expect(region).toContain(
-    'RewriteRule ^1\\.0\\.0/(sstim-core-profile\\.ttl|sstim-core\\.ttl|sstim-namespace\\.ttl)$ https://labiosyncare.github.io/ontology/1.0.0/$1 [R=302,L]',
-  )
-  expect(region).toContain(
-    'RewriteRule ^1\\.0\\.0/manifest$ https://labiosyncare.github.io/ontology/1.0.0/manifest.json [R=302,L]',
-  )
-  expect(region).toContain(
-    'RewriteRule ^1\\.0\\.0/manifest\\.schema\\.json$ https://labiosyncare.github.io/ontology/1.0.0/manifest.schema.json [R=302,L]',
-  )
-})
-
-test('a frozen snapshot without the root artifact is rejected', () => {
-  expect(() => generatedRegion([
-    { version: '1.0.0', turtle: ['sstim-vocab.ttl'], manifest: false, schema: false },
-  ])).toThrow('frozen snapshot lacks sstim-core.ttl')
-})
-
-test('a pre-modular version IRI resolves to sstim-core.ttl, which was the whole ontology', () => {
-  const region = generatedRegion([
-    { version: '0.12.0', turtle: ['sstim-core.ttl'], manifest: false, schema: false },
-  ])
-
-  expect(region).toContain(
-    'RewriteRule ^0\\.12\\.0/?$ https://labiosyncare.github.io/ontology/0.12.0/sstim-core.ttl [R=302,L]',
-  )
-})
-
-test('a modular version IRI resolves to the whole ontology, never to the Kernel module', () => {
-  // After ADR 0043 sstim-core.ttl is the two-class Kernel. Resolving
-  // owl:versionIRI <https://w3id.org/sstim/x.y.z> to it would hand a registry a
-  // fraction of the release, so a modular snapshot must freeze a catalogue.
-  expect(() => generatedRegion([
-    {
-      version: '0.13.0',
-      turtle: ['sstim-core.ttl', 'sstim-stimulus.ttl'],
-      manifest: true,
-      schema: true,
-    },
-  ])).toThrow('would resolve to the Kernel module instead of the released ontology')
-
-  const region = generatedRegion([
-    {
-      version: '0.13.0',
-      turtle: ['sstim-core.ttl', 'sstim-namespace.ttl'],
-      manifest: true,
-      schema: true,
-    },
-  ])
-  expect(region).toContain(
-    'RewriteRule ^0\\.13\\.0/?$ https://labiosyncare.github.io/ontology/0.13.0/sstim-namespace.ttl [R=302,L]',
-  )
-  expect(region).not.toContain(
-    'RewriteRule ^0\\.13\\.0/?$ https://labiosyncare.github.io/ontology/0.13.0/sstim-core.ttl',
-  )
 })

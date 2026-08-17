@@ -280,14 +280,29 @@ test('every routed public preset and reference is materialized as a Graph node',
   for (const { iri } of references) expect(nodes.get(iri)?.kind).toBe('catalogReference')
 }, 30_000)
 
-test('snapshot routes are exact, so unknown versions and files 404', () => {
+test('snapshot routes are patterns, bounded to version-shaped paths (ADR 0053)', () => {
+  // What must not change: a real snapshot resolves to its own files, and a
+  // pre-modular version IRI still answers with the Kernel file that was the
+  // whole ontology when it was frozen.
   expect(go('0.12.0', 'text/turtle').doc).toBe('0.12.0/sstim-core.ttl')
   expect(go('0.12.0/sstim-core.ttl', '*/*').doc).toBe('0.12.0/sstim-core.ttl')
+  expect(go('0.15.0', 'text/turtle').doc).toBe('0.15.0/sstim-namespace.ttl')
 
-  // The wildcard this replaced would have redirected both of these.
-  expect(go('0.99.0', 'text/turtle').status).toBe(404)
-  expect(go('0.12.0/sstim-nonexistent.ttl', '*/*').status).toBe(404)
+  // What ADR 0053 knowingly gave up: these used to 404 here. They now redirect
+  // to a Pages URL that 404s, which is the price of not sending the w3id
+  // maintainer a pull request for every release.
+  expect(go('0.99.0', 'text/turtle').status).toBe(302)
+  expect(go('0.12.0/sstim-nonexistent.ttl', '*/*').status).toBe(302)
+
+  // What stays bounded, and is the reason this test still exists: the wildcard
+  // matches version-shaped paths only. Anything else must still 404 here.
   expect(go('nonexistent', 'text/turtle').status).toBe(404)
+  expect(go('0.15/sstim-core.ttl', '*/*').status).toBe(404)
+  expect(go('v0.15.0/sstim-core.ttl', '*/*').status).toBe(404)
+  expect(go('0.15.0.0/sstim-core.ttl', '*/*').status).toBe(404)
+  expect(go('0.15.0/subdir/sstim-core.ttl', '*/*').status).toBe(404)
+  expect(go('0.15.0/SSTIM-Core.ttl', '*/*').status).toBe(404)
+  expect(go('0.15.0/sstim-core.json', '*/*').status).toBe(404)
 })
 
 test('no rule is shadowed by an earlier one', () => {

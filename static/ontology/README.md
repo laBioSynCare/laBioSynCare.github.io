@@ -566,12 +566,15 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    because `sstim-core.ttl` is the Kernel rather than the release. Nothing to do
    by hand, but do not delete these files: the route generator refuses to emit
    the bare-version route for a snapshot that lacks `sstim-namespace.ttl`.
-8. Regenerate the persistent snapshot routes with
-   `node scripts/sstim-w3id-snapshot-routes.mjs --write` and commit the updated
-   `docs/ecosystem/w3id/sstim/.htaccess`, then submit it upstream. Without this
-   the new version has no w3id routes; `make w3id-routes` (part of
-   `make validate`) fails until the committed region matches the frozen
-   snapshots on disk.
+8. **Nothing to do for w3id routes.** Since
+   [ADR 0053](../../docs/decisions/0053-wildcard-snapshot-routes.md) the
+   snapshot region is four patterns covering every version, so a new release
+   acquires its persistent routes without an edit here or a pull request against
+   `perma-id/w3id.org`. `make w3id-routes` (part of `make validate`) still runs,
+   and now proves the claim by executing the committed rules against every file
+   in every frozen snapshot rather than by regenerating their text. If it fails
+   after a release, the snapshot is missing an artifact the routes promise —
+   most likely `sstim-namespace.ttl`, which the version IRI resolves to.
 9. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.

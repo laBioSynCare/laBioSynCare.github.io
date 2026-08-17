@@ -5,7 +5,7 @@ import {
   loadManifest,
   validateManifest,
 } from './sstim-manifest.mjs'
-import { generatedRegion } from './sstim-w3id-snapshot-routes.mjs'
+import { generatedRegion, parseRules, resolvePath } from './sstim-w3id-snapshot-routes.mjs'
 import {
   modelSnapshotInventory,
   nextVersion,
@@ -42,13 +42,17 @@ test('the modelled snapshot freezes a whole-ontology artifact for the version IR
   expect(inventory.manifest).toBe(true)
   expect(inventory.schema).toBe(true)
 
-  const region = generatedRegion([inventory])
-  const bare = region.split('\n').find((line) => line.includes('/?$ '))
+  // Since ADR 0053 the region is patterns rather than per-version rules, so the
+  // assertion runs them instead of reading them. Same guarantee, one layer
+  // closer to what a client actually receives.
+  const rules = parseRules(generatedRegion([inventory]))
+  const site = 'https://labiosyncare.github.io/ontology/'
   // The bare version route resolves owl:versionIRI, so it must answer with the
   // release. sstim-core.ttl is the two-class Kernel and would be a wrong answer.
-  expect(bare).toContain('sstim-namespace.ttl')
-  expect(bare).not.toContain('sstim-core.ttl')
-  expect(region).toContain(`^${NEXT.replace(/\./g, '\\.')}/manifest$`)
+  expect(resolvePath(NEXT, rules)).toBe(`${site}${NEXT}/sstim-namespace.ttl`)
+  expect(resolvePath(`${NEXT}/manifest`, rules)).toBe(`${site}${NEXT}/manifest.json`)
+  expect(resolvePath(`${NEXT}/sstim-full-profile.ttl`, rules))
+    .toBe(`${site}${NEXT}/sstim-full-profile.ttl`)
 })
 
 test('the rehearsal fails when the snapshot would freeze no whole-ontology artifact', () => {

@@ -44,6 +44,14 @@ export function expandRule(pattern, target) {
     .map((alternative) => target.replace('$1', unescapeRegex(alternative)))
 }
 
+// A rule whose version is a wildcard cannot be expanded into a file list: it
+// deliberately routes releases that do not exist yet (ADR 0053). Those rules are
+// proved instead by `sstim-w3id-snapshot-routes.mjs --check`, which executes
+// them against every file in every frozen snapshot. The token is matched
+// exactly, so this skips the version wildcard and nothing else — a hand-written
+// rule with a different loose pattern still has to name a publishable target.
+const VERSION_WILDCARD = '(\\d+\\.\\d+\\.\\d+)'
+
 export function routeTargets(htaccess) {
   const targets = []
   const ruleRe = /^RewriteRule\s+\^(\S*)\$\s+(\S+)\s+\[/gm
@@ -52,6 +60,7 @@ export function routeTargets(htaccess) {
     const [, pattern, target] = match
     // `- [R=406,L]` is the deliberate not-acceptable fallthrough, not a document.
     if (target === '-') continue
+    if (pattern.startsWith(VERSION_WILDCARD)) continue
     targets.push(...expandRule(pattern, target))
   }
   return targets

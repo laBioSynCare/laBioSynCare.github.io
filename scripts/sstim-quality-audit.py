@@ -1256,66 +1256,70 @@ if w3id_text.count('Header always set Vary "Accept"') != 1:
     fail("w3id staging: expected exactly one always-on Vary: Accept directive")
 
 
-# The immutable snapshot route region is generated from actual frozen files.
-# Unknown versions/files must remain 404 instead of receiving a redirect to a
-# missing Pages target. Modular snapshots gain manifest and frozen-schema routes
-# only when the corresponding sidecars are present in that exact directory.
-snapshot_route_start = "# BEGIN generated exact SSTIM snapshot routes"
-snapshot_route_end = "# END generated exact SSTIM snapshot routes"
+# The immutable snapshot route region is four patterns covering every version
+# (ADR 0053), not an enumeration of frozen files. This audit owns the staging
+# file's structure; whether those patterns actually route every frozen artifact
+# is proved by `make w3id-routes`, which executes the committed rules against
+# every file in every snapshot directory.
+#
+# What used to be here was a second, independent Python reimplementation of the
+# JavaScript generator -- two models of one contract, each able to pass while
+# the other was wrong. Replacing it with a structural check plus a pointer is
+# the correction, not a loss of coverage: the routing claim is now executed
+# rather than modelled twice.
+snapshot_route_start = "# BEGIN generated SSTIM snapshot routes"
+snapshot_route_end = "# END generated SSTIM snapshot routes"
 if w3id_text.count(snapshot_route_start) != 1 or w3id_text.count(snapshot_route_end) != 1:
-    fail("w3id staging: expected one generated exact SSTIM snapshot route region")
+    fail("w3id staging: expected one generated SSTIM snapshot route region")
 else:
     snapshot_route_block = w3id_text.split(snapshot_route_start, 1)[1].split(
         snapshot_route_end, 1
     )[0]
-    expected_snapshot_directives: list[str] = []
-    snapshot_directories = sorted(
-        (
-            path
-            for path in ONTOLOGY_DIR.iterdir()
-            if path.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", path.name)
-        ),
-        key=lambda path: tuple(int(part) for part in path.name.split(".")),
+    site = "https://labiosyncare.github.io/ontology/"
+    required_patterns = (
+        rf"RewriteRule ^(\d+\.\d+\.\d+)/(sstim-[a-z0-9-]+\.ttl)$ {site}$1/$2 [R=302,L]",
+        rf"RewriteRule ^(\d+\.\d+\.\d+)/manifest$ {site}$1/manifest.json [R=302,L]",
+        rf"RewriteRule ^(\d+\.\d+\.\d+)/manifest\.schema\.json$ {site}$1/manifest.schema.json [R=302,L]",
+        rf"RewriteRule ^(\d+\.\d+\.\d+)/?$ {site}$1/sstim-namespace.ttl [R=302,L]",
     )
-    for directory in snapshot_directories:
-        version = directory.name
-        version_pattern = version.replace(".", r"\.")
-        files = sorted(path.name for path in directory.iterdir() if path.is_file())
-        turtle_files = [file for file in files if file.endswith(".ttl")]
-        if "sstim-core.ttl" not in turtle_files:
-            fail(f"w3id staging: {version} snapshot lacks sstim-core.ttl")
+    directives = directive_lines(snapshot_route_block)
+    for required in required_patterns:
+        if required not in directives:
+            fail(f"w3id staging: snapshot route region is missing {required!r}")
+    # Pre-modular snapshots are a closed set whose version IRI must still answer
+    # with the Kernel file that was the whole ontology when they were frozen.
+    legacy = sorted(
+        (
+            path.name
+            for path in ONTOLOGY_DIR.iterdir()
+            if path.is_dir()
+            and re.fullmatch(r"\d+\.\d+\.\d+", path.name)
+            and not (path / "manifest.json").is_file()
+        ),
+        key=lambda name: tuple(int(part) for part in name.split(".")),
+    )
+    if legacy:
+        legacy_pattern = "|".join(name.replace(".", r"\.") for name in legacy)
+        expected_legacy = (
+            f"RewriteRule ^({legacy_pattern})/?$ {site}$1/sstim-core.ttl [R=302,L]"
+        )
+        if expected_legacy not in directives:
+            fail(
+                "w3id staging: the pre-modular bare-version route does not match "
+                "the snapshots that lack a manifest"
+            )
+    # The invariants the enumeration used to enforce by construction.
+    for path in sorted(ONTOLOGY_DIR.iterdir()):
+        if not (path.is_dir() and re.fullmatch(r"\d+\.\d+\.\d+", path.name)):
             continue
-        turtle_pattern = "|".join(file.replace(".", r"\.") for file in turtle_files)
-        expected_snapshot_directives.append(
-            f"RewriteRule ^{version_pattern}/({turtle_pattern})$ "
-            f"https://labiosyncare.github.io/ontology/{version}/$1 [R=302,L]"
-        )
-        if "manifest.json" in files:
-            expected_snapshot_directives.append(
-                f"RewriteRule ^{version_pattern}/manifest$ "
-                f"https://labiosyncare.github.io/ontology/{version}/manifest.json [R=302,L]"
+        files = {file.name for file in path.iterdir() if file.is_file()}
+        if "sstim-core.ttl" not in files:
+            fail(f"w3id staging: {path.name} snapshot lacks sstim-core.ttl")
+        if "manifest.json" in files and "sstim-namespace.ttl" not in files:
+            fail(
+                f"w3id staging: {path.name} is modular but lacks sstim-namespace.ttl, "
+                "so its version IRI would resolve to the Kernel"
             )
-        if "manifest.schema.json" in files:
-            expected_snapshot_directives.append(
-                f"RewriteRule ^{version_pattern}/manifest\\.schema\\.json$ "
-                f"https://labiosyncare.github.io/ontology/{version}/manifest.schema.json [R=302,L]"
-            )
-        # The bare version route resolves owl:versionIRI, so it must answer with
-        # the whole release. Through 0.12.0 sstim-core.ttl was the whole release;
-        # after ADR 0043 it is the two-class Kernel, and a modular snapshot
-        # freezes a namespace catalogue for this route to point at instead.
-        root_artifact = (
-            "sstim-namespace.ttl" if "manifest.json" in files else "sstim-core.ttl"
-        )
-        expected_snapshot_directives.append(
-            f"RewriteRule ^{version_pattern}/?$ "
-            f"https://labiosyncare.github.io/ontology/{version}/{root_artifact} [R=302,L]"
-        )
-    if directive_lines(snapshot_route_block) != tuple(expected_snapshot_directives):
-        fail(
-            "w3id staging: frozen snapshot routes do not exactly match the "
-            "repository snapshot artifact inventory"
-        )
 
 void_route_start = "# BEGIN audited SSTIM void routes"
 void_route_end = "# END audited SSTIM void routes"
