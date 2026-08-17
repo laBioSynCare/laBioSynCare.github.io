@@ -29,6 +29,10 @@ Describing a protocol or claim does not establish efficacy.
   instance data, the 17 frequency bands carry no `skos:definition`, 17 notation
   collisions (three days old), `citesReference` is load-bearing and
   unconstrained, and one dangling IRI in published data.
+- [Second pass, 2026-08-17](reviews/2026-08-17-second-pass.md) — incoherence
+  rather than absence: 15 classes have committed data and no SHACL shape, 34 of
+  63 schemes have zero non-English labels, duration datatypes disagree. Also
+  records what came back clean.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
