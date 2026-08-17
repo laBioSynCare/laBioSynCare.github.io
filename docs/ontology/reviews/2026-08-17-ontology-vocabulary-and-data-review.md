@@ -118,6 +118,14 @@ The ADR 0050 public-claim gate requires the authorizing assessment to
 bases. That property has **no `rdfs:domain`, no `rdfs:range`, and no SHACL
 property shape** — zero occurrences as an `sh:path` anywhere.
 
+> **Correction and status, 2026-08-17.** It had a range,
+> `sstim:BibliographicReference`; only the domain and the shape were missing, and
+> both were added in `1596fa8`. The overcount was found by adding a duplicate
+> union range and having `make module-boundaries` reject it — which is the right
+> way round: the gate knew, and the review had not asked it. The broader finding
+> below (78 domainless properties, never separated into deliberate and
+> overlooked) stands and is unaddressed.
+
 So nothing outside the gate constrains what may be cited or by what. The gate
 compensates by checking the reference's type itself, which means the safety
 property holds — but it holds by one SPARQL constraint rather than by the model,

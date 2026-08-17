@@ -3,6 +3,13 @@ import { SSTIM_EX } from '../../rdf/namespaces.js'
 // Maps Sensory Field UI concepts to the exposure ontology terms they emit,
 // for inline "what this means in the ontology" links. Mirrors the Patch Studio
 // bridge in src/ui/creator/semantic.js.
+//
+// This is a display lookup table, not an RDF emitter: it constructs no quads.
+// Its tests live with that mirror, in ../creator/semantic.test.js, which checks
+// every IRI here against the Full module closure (KR-17). They are together
+// because they are one kind of thing and one kind of failure. A 2026-08-17
+// review concluded this file was untested after searching for a test file beside
+// it; the pointer is here so the next search ends differently.
 
 export const FIELD_SEMANTICS = {
   visual: {

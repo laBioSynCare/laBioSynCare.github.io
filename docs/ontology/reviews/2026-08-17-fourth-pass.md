@@ -36,6 +36,54 @@ close, it protects a stated invariant, and nothing else covers it.
 
 ## 2. Four of six runtime RDF emitters are unverified
 
+> **Correction, 2026-08-17 (same day, before the 0.15.0 release).** This section
+> is wrong in three of its six rows, and the error is the one this repository
+> has now made repeatedly: I counted files by grepping for a name, and did not
+> check what the files do or where their tests live. The original table and text
+> are preserved below the correction, because the reasoning built on it in §3 and
+> §6 was published and should be readable against what it was actually claiming.
+>
+> **`src/ui/creator/semantic.js` and `src/ui/field/fieldSemantic.js` are not RDF
+> emitters.** Neither contains a single `quad()`, `addQuad`, `Writer` or
+> `DataFactory` call. They are display lookup tables mapping a UI concept to an
+> ontology IRI so the interface can link to it. A SHACL conformance test over
+> them would have nothing to validate: they produce no graph. The exhaustive
+> emitter inventory — every file in `src/` constructing quads, minus the
+> namespace factory, the Cytoscape element builder and the loader — is three
+> files, not six:
+>
+> | Emitter | SHACL test | Other tests |
+> |---|---|---|
+> | `src/session/sessionProjection.js` | yes | yes |
+> | `src/ui/field/exposureProfile.js` | yes | yes |
+> | `src/rdf/annotations/annotationRdf.js` | no — see below | yes (`annotationRdf.graph.test.js`) |
+>
+> **`fieldSemantic.js` is not untested.** Its 14 IRIs are checked against the
+> Full module closure by
+> [`src/ui/creator/semantic.test.js`](../../../src/ui/creator/semantic.test.js)
+> line 53, "every Sensory Field mapping targets a declared IRI" — the KR-17
+> registry test, which covers both lookup tables together because they are the
+> same kind of thing. I searched for a test file *beside* the source and
+> concluded from its absence that nothing covered it. A neighbouring directory
+> was enough to hide it.
+>
+> **`annotationRdf.js` has no SHACL test because it has no shapes to test
+> against.** `sstim-shapes.ttl` contains zero Web Annotation shapes — no `oa:`
+> prefix appears in it at all. Validating OA output requires first deciding the
+> annotation shape and privacy defaults, which is KR-12, is scheduled in phase
+> 1.5, and is entangled with ADR 0031's public/private split. That is a real gap
+> and it is the one item in this section that survives; it is a missing design
+> decision rather than a missing test, and inventing shapes to make a gate green
+> before the release would be the wrong order.
+>
+> So Gate P0-A stands at **two of three emitters SHACL-tested, with the third
+> blocked on a phase-1.5 deliverable** — not "two of five" with three cheap fixes
+> outstanding. The practical consequence is that §3's charge (a never-completed
+> phase carrying a finding recorded as closed) is milder than written, and §6's
+> "checked in two places out of five" should read two of three.
+
+**Original section, as published:**
+
 | Emitter | SHACL test | Any test |
 |---|---|---|
 | `src/session/sessionProjection.js` | yes | yes |

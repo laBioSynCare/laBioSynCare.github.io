@@ -83,8 +83,14 @@ approved. It makes existing claims testable and stops non-conformant output.
 
 #### 0.1 Runtime RDF conformance
 
+**`[~]` Substantially done; one bullet blocked on 1.5 — see the gate status
+below.** Carrying no marker at all is what let a compression pass skip this
+section while a finding inside it was recorded as closed.
+
 - Add golden-output tests for Sensory Field, Patch Studio semantic links, Web
-  Annotations, and future session exports.
+  Annotations, and future session exports. `[~]` — Sensory Field, the Patch
+  Studio/Field semantic registries and the session projection are done; Web
+  Annotations wait on shapes that do not exist (KR-12, phase 1.5).
 - Run SSTIM SHACL and unresolved-local-IRI checks on generated graphs in CI.
 - Cover a state matrix: visual only, audio only, depth, blinking, monaural,
   binaural, and mixed fields.
@@ -96,6 +102,24 @@ approved. It makes existing claims testable and stops non-conformant output.
 
 **Gate P0-A:** every public/downloadable runtime graph passes its applicable
 SHACL profile, local-IRI resolution, and graph-specific golden assertions.
+
+**Gate P0-A status, 2026-08-17: two of three emitters, third blocked by design.**
+The repository contains exactly three files that construct RDF for output —
+`src/session/sessionProjection.js`, `src/ui/field/exposureProfile.js`, and
+`src/rdf/annotations/annotationRdf.js`. The first two have SHACL conformance
+suites over a state matrix (`*.shacl.test.js`, run by `make test`). The third has
+no SHACL test because **SSTIM declares no Web Annotation shapes at all**: there is
+no `oa:` prefix in `sstim-shapes.ttl`, so there is nothing to validate against.
+Writing them means first settling the annotation shape and privacy defaults,
+which is KR-12 in 1.5 and depends on ADR 0031's public/private split. It is
+tracked there rather than here, and minting shapes to turn this gate green ahead
+of that decision would invert the order. Local-IRI resolution is covered for both
+lookup registries by the KR-17 test in `src/ui/creator/semantic.test.js`.
+
+The [fourth-pass review](reviews/2026-08-17-fourth-pass.md) reported this gate as
+two of five emitters with three cheap fixes outstanding. That count included two
+display lookup tables that emit no RDF and missed an existing test in a
+neighbouring directory; the review carries the correction and the evidence.
 
 #### 0.2 Establish one native session contract
 
