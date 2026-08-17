@@ -281,7 +281,7 @@
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "6fa5716e03e17fc71113cb6063befb00cdebbe0b823a2bdfdcea4be3c785633d"
+        "sha256": "e021f63ff29c0f8955ba8ec31342492bd0bc00721f764e061536fba8d5900259"
       },
       "runtime": {
         "url": "/ontology/sstim-session.ttl",
@@ -905,7 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "2f3c4138b698a720956bd7e8e72bb71b4d6615397922ae1d0407f154cbb47401"
+      "sha256": "f0e722515bf3cf7ff5d4ba914a21568ff6b37cae7fde103f07d0d23ee7c4f8b1"
     }
   ]
 }

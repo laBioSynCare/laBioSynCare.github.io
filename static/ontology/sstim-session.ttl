@@ -162,6 +162,7 @@ sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range  xsd:integer ;
     rdfs:label  "actual duration (seconds)"@en ;
     skos:definition "Observed playback duration of a recorded session instance in whole seconds."@en ;
+    skos:scopeNote "Whole seconds deliberately, where sstim:deliveredDurationSeconds beside it is a decimal. Elapsed time is observed once at the end of a session and second granularity is all a recorder can honestly claim; delivered time accumulates fractional segments and is exact. The coarser side is therefore the observed one, which is the opposite of the usual intuition and is why it is written down here. It has a consequence: the SHACL constraint holding delivered <= elapsed can be violated by rounding alone, by less than one second, with no real overrun — so a producer must round elapsed UP rather than to nearest. src/session/sessionRecorder.js does, and did not at first, which is how this was found."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:completionStatus a owl:DatatypeProperty, owl:FunctionalProperty ;
