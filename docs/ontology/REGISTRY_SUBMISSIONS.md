@@ -182,6 +182,29 @@ are separate indexes**, which this file did not record: canonical carries 1462
 `w3id.org` entries against `.tools.`'s 1245, and their listings differ by ~300 KB.
 Neither held SSTIM beforehand, so July's attempts left nothing behind.
 
+**Do not submit to `archivo.tools.dbpedia.org`. Its crawler is dead.** Measured
+2026-08-17: across 3798 crawl timestamps in its listing the newest is
+**2025-02-03**, eighteen months stale, while canonical's newest is the same day
+it was read. Canonical indexes 2010 ontologies to `.tools.`'s 1899, and the two
+have genuinely diverged rather than one mirroring the other — 13 ontologies
+appear only in `.tools.`, 124 only in canonical. It is an abandoned parallel
+deployment that took traffic while canonical was down in July, not a mirror.
+
+    python3 - <<'EOF'
+    import re, urllib.request
+    for n, u in [("canonical","https://archivo.dbpedia.org/list"),
+                 ("tools","https://archivo.tools.dbpedia.org/list")]:
+        h = urllib.request.urlopen(u).read().decode("utf8", "replace")
+        print(n, "newest crawl:", max(re.findall(r"\b20\d\d\.\d\d\.\d\d-\d{6}\b", h)))
+    EOF
+
+SSTIM's absence from `.tools.` is the recorded July failure, not an oversight to
+correct: that attempt passed the RDF checks there and died at Databus
+deployment, so it never entered the index. Adding it now would be worse than
+leaving it — nothing would ever recrawl the entry, so whatever rating it landed
+on would stand permanently, and with the Databus still 503ing that could be
+★☆☆☆ forever in a public index nobody maintains.
+
 Preconditions re-verified first, because the ontology is no longer what it was
 when they were last checked in July (707 triples, a single `owl:Ontology`
 subject): now **10,436 triples and 16 subjects** (the ADR 0043 modules — the profile
