@@ -85,7 +85,7 @@ and schema must be deployed and the perma-id matrix verified first.
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ⚠️ validated, blocked by DBpedia Databus outage | no | retry later |
-| LOV | 🕓 **submitted 2026-07-10; still not in the catalog** — verified absent 2026-08-17 by LOV SPARQL (944 vocabularies, zero `sstim` hits) | no | — |
+| LOV | ⚠️ **submitted 2026-07-10 (attested by email only — the form issues no ticket); catalog dormant since 2025-11-22**, so this is not a moving queue. Absence verified 2026-08-17 by LOV SPARQL | no | escalate or drop |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
@@ -230,29 +230,55 @@ Submitted version:  0.6.0
 Release DOI submitted: 10.5281/zenodo.21302910
 Date:               2026-07-10 (resubmitted 2026-07-11; both acknowledged)
 Account/maintainer: — (form; confirmation emailed to renato.fabbri@gmail.com)
-External record ID or URL:  (assigned on integration)
-Status:             SUBMITTED — pending manual curator review. Still absent from
-                    the catalog as of 2026-08-17, five weeks in. This is the
-                    expected queued state; LOV curation is manual and slow.
+External record ID or URL:  none — the suggest form issues no ticket or record id
+Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
+                    Two separate facts, previously collapsed into "slow":
 
-                    Verified absent with a working instrument, not a 404: the
-                    `api/v2/vocabulary/*` endpoints now 404 for *every* query
-                    (they are gone, not empty), so a 404 there is no longer
-                    evidence of anything. The SPARQL endpoint answers:
+                    (1) **We cannot prove the submission from outside.** LOV's
+                    suggest form returns no tracking identifier, opens no public
+                    issue, and exposes no submitter-visible queue. The only
+                    artifact anywhere is the acknowledgement email of 2026-07-10
+                    and 2026-07-11 in renato.fabbri@gmail.com. That mail *is* the
+                    evidence; nothing in this repository or on LOV corroborates
+                    it. Treat "we submitted to LOV" as attested by mail only.
+
+                    (2) **LOV has ingested nothing since 2025-11-22.** This is
+                    not inference from our absence — it is LOV's own pipeline
+                    writing snapshot files to its own domain, and the newest one
+                    is nine months old:
 
                       curl -sL -G https://lov.linkeddata.es/dataset/lov/sparql \
-                        --data-urlencode 'query=PREFIX voaf:<http://purl.org/vocommons/voaf#>
-                          SELECT ?v WHERE { ?v a voaf:Vocabulary
-                          FILTER(CONTAINS(LCASE(STR(?v)),"sstim")) }' \
+                        --data-urlencode 'query=PREFIX dcat:<http://www.w3.org/ns/dcat#>
+                          PREFIX dct:<http://purl.org/dc/terms/>
+                          SELECT (COUNT(*) AS ?n) WHERE {
+                            ?v dcat:distribution ?d . ?d dct:issued ?iss
+                            FILTER(STR(?iss) > "2025-11-22") }' \
                         -H 'Accept: application/sparql-results+json'
 
-                    944 vocabularies indexed, zero sstim hits; a SKOS control
-                    query returns rows, so the endpoint can see what it holds.
-Required follow-up: Several weeks have now passed with no curator response — the
-                    escalation condition below is met. Do NOT resubmit the form;
-                    it just re-acknowledges. Email the curators
-                    (py.vandenbussche@gmail.com; ghislain.atemezing@gmail.com;
-                    mpoveda@fi.upm.es). On integration, record the LOV vocab URL.
+                    2026-08-17: 1782 snapshots in total, **0** after 2025-11-22.
+                    Our submission arrived 7.5 months into that dormancy, so our
+                    absence says nothing about our vocabulary's quality and the
+                    wait is not a queue position.
+
+                    Catalog absence separately confirmed the same day: 944
+                    vocabularies indexed, zero sstim hits, with a SKOS control
+                    query returning rows so the endpoint demonstrably sees its
+                    own contents. Note the `api/v2/vocabulary/*` endpoints this
+                    file used to cite now 404 for *every* query — they are gone,
+                    not empty, so a 404 there is no longer evidence of anything.
+Required follow-up: **Do not wait, and do not resubmit** — the form only
+                    re-acknowledges, and there is no pipeline behind it to
+                    re-enter. A curator email is the only remaining path and may
+                    go unanswered; send it to `mpoveda@fi.upm.es` first, the
+                    institutional address at the group that hosts LOV. The other
+                    two contacts on file (py.vandenbussche@gmail.com,
+                    ghislain.atemezing@gmail.com) are personal addresses of
+                    long-standing project figures and may no longer be current.
+
+                    **Do not present LOV as "pending review" in funding or
+                    outreach prose.** Pending implies a queue that is moving.
+                    Say submitted, and note the catalog's dormancy if the claim
+                    carries any weight. On integration, record the LOV vocab URL.
 ```
 
 ### BARTOC — LIVE (node 21154, since 2026-07-27)
