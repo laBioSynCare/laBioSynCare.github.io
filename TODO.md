@@ -224,8 +224,13 @@ Turtle files are listed in section 1. After they exist:
       every release since: `void.ttl` carries one
       subset per frozen module, uses the correct Kernel and Exposure access
       endpoints, and the quality audit checks it against the frozen manifest.
-      Generation from the live manifest is still open, so metadata maintenance
-      is checked but not yet single-source.*
+      The **counts** are now generated rather than hand-edited —
+      `scripts/void-counts.py` computes triples/classes/properties from the live
+      modules the manifest names, and `release-prepare` writes what it returns,
+      so the audit's authority and the release's numbers have one implementation
+      between them. What remains hand-maintained is the **subset block**: a new
+      module still needs its `void:subset` and distribution written by hand, and
+      the audit catches its absence rather than the manifest supplying it.*
 
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
