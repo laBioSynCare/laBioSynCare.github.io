@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-157 classes · 284 properties · 525 concepts · 18 modules
+163 classes · 296 properties · 545 concepts · 18 modules
 
 ## Classes
 
@@ -120,6 +120,9 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:PresetGroup` | patch-studio |  | A classification of BSC presets by design character, evidence strength, and use context. Five groups: Heal, Support, Perform, Indulge, Transcend. |
 | `sstim:PublicClaimLevel` | evidence |  | A named ceiling on what a sensory-stimulation product may assert about itself on a public-facing surface, ordered from descriptive fact to… |
 | `sstim:PublicSafeReference` | evidence | sstim:BibliographicReference | A peer-reviewed publication cleared for citation in BSC user-facing content. Must be cleared in the BSC Reference Agent before use in preset… |
+| `sstim:RenderableParameter` | stimulus |  | A controlled information category naming the parameter a signal is rendered onto — amplitude, frequency, luminance, size, spatial position,… |
+| `sstim:RenderingMechanism` | stimulus |  | A controlled information category naming how a signal is made to reach a subject through one channel: amplitude modulation of a carrier, a binaural… |
+| `sstim:RenderingPresence` | stimulus |  | A controlled information category recording whether a rendering puts the signal physically into the world or produces it perceptually. An isochronic… |
 | `sstim:ReportedSeverity` | session |  | A controlled category recording how severe a participant said an experience was. |
 | `sstim:ReproducibilityLevel` | session |  | A controlled category stating which reproduction claim a session record supports: identical rendered output, equivalent generated signal within… |
 | `sstim:ResponseState` | session |  | A controlled category stating why a value is or is not present on an observation. |
@@ -148,12 +151,15 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:SessionEventType` | session |  | A controlled category of occurrence during a session execution. |
 | `sstim:SessionInstance` | session | sstim:SensoryStimulationIntervention | The record of an actual execution of a session specification, including timing, completion status, platform, and optional self-report. Append-only:… |
 | `sstim:SessionSpecification` | session |  | A complete, reproducible description of a specific intended execution of a preset, including user-defined overrides of preset defaults. The unit of… |
+| `sstim:SignalRendering` | stimulus |  | How one signal is made to reach a subject through one channel: onto which renderable parameter, by which mechanism, and whether the result is… |
+| `sstim:SignalShape` | stimulus |  | A controlled information category naming the form of a time-varying signal: the periodic shapes (sine, square, sawtooth, triangle), an envelope,… |
 | `sstim:SourceGovernanceRecord` | evidence |  | An immutable record governing a research output used as evidence: source version and digest, custodian, access classification, consent/ethics basis… |
 | `sstim:Stimulation` | core |  | A deliberately parameterized process in which structured physical energy, mechanical input, a chemical agent, or another controlled input is applied… |
 | `sstim:StimulationDeliveryApproach` | common |  | A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external,… |
 | `sstim:StimulationIntervention` | session | sstim:Stimulation | A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer… |
 | `sstim:StimulationMechanism` | common |  | A controlled information category identifying a proposed neurobiological or psychophysiological pathway through which a stimulus may produce a… |
 | `sstim:StimulationProtocol` | technique |  | A structured method specification for using one or more stimulation techniques toward an intended use, including composition rules, timing,… |
+| `sstim:StimulationSignal` | stimulus |  | A time-varying function with a frequency extent, a shape, and no modality: what is to be delivered, said independently of any sense it might be… |
 | `sstim:StimulationTechnique` | technique |  | A reusable information-content category for a parameterizable stimulation method. Classification records the method's declared design intent and… |
 | `sstim:StimulusSpecification` | stimulus |  | An engine-independent description of a sensory stimulation, stating what reaches the subject in physical or perceptual units rather than the… |
 | `sstim:StimulusTemporalStructure` | common |  | The temporal organization of an applied stimulus or agent. Values cover carrier periodicity (periodic, quasi-periodic, aperiodic), closed-loop… |
@@ -339,6 +345,8 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:hasPersistence` | object | session | sstim:UnwantedExperienceObservation → sstim:ExperiencePersistence | Records how long the experience persisted, as a controlled category. |
 | `sstim:hasPropositionForm` | object | evidence | — → sstim:EvidencePropositionForm | The single controlled logical form of an assessment proposition. |
 | `sstim:hasPublicClaimLevel` | object | evidence | sstim:Preset → sstim:PublicClaimLevel | Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that… |
+| `sstim:hasRenderingMechanism` | object | stimulus | sstim:SignalRendering → sstim:RenderingMechanism | How the rendering produces the signal in this channel: amplitude modulation of a carrier, a binaural or monaural beat, direct presentation. |
+| `sstim:hasRenderingPresence` | object | stimulus | sstim:SignalRendering → sstim:RenderingPresence | Whether this rendering puts the signal physically into the world or produces it perceptually. Required on every rendering, because evidence does not… |
 | `sstim:hasReportPhase` | object | session | sstim:SelfReport → sstim:SelfReportPhase | Identifies the single collection phase of a session-associated self-report. |
 | `sstim:hasReportedSeverity` | object | session | sstim:UnwantedExperienceObservation → sstim:ReportedSeverity | Records how severe the participant said this experience was. |
 | `sstim:hasReproducibilityLevel` | object | session | sstim:SessionSpecification → sstim:ReproducibilityLevel | States which reproduction claim this specification supports. Required to be stated rather than assumed: this class's own definition promises fully… |
@@ -350,14 +358,17 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:hasReviewerRelationship` | object | evidence | — → sstim:ReviewerRelationship | The reviewer's relationship to the assessed work: self, same organization, external, or unknown. |
 | `sstim:hasSelfReport` | object | session | sstim:SessionInstance → sstim:SelfReport | Links a session instance to zero or more consent-governed self-reports collected at explicit phases. Multiple reports support pre/post and follow-up… |
 | `sstim:hasSessionEvent` | object | session | sstim:SessionInstance → sstim:SessionEvent | Links a recorded execution to the occurrences observed during it. Order is carried by each event's offset rather than by the order of these… |
+| `sstim:hasSignal` | object | stimulus | sstim:StimulusSpecification → sstim:StimulationSignal | Links a stimulus specification to a signal it describes. A specification may carry several, and several channels may render the same one. |
+| `sstim:hasSignalRendering` | object | stimulus | sstim-ex:StimulusChannel → sstim:SignalRendering | Links a stimulus channel to a rendering it presents. |
+| `sstim:hasSignalShape` | object | stimulus | sstim:StimulationSignal → sstim:SignalShape | The form of the signal: a periodic shape, an envelope, noise, or a sampled recording. |
 | `sstim:hasSourceGovernanceRecord` | object | evidence | — → sstim:SourceGovernanceRecord | Links a governed research output to its single immutable source-governance record. |
 | `sstim:hasStimulationTarget` | object | stimulus | — → BFO_0000040 | BFO_0000029 | What the stimulation is directed at: a person, a non-human animal, a plant, an object or material, or a place. Absence is meaningful and permitted —… |
 | `sstim:hasStimulusChannel` | object | stimulus | sstim:StimulusSpecification → sstim-ex:StimulusChannel | Links a specification to a channel through which stimulation reaches the subject. |
 | `sstim:hasStimulusTemporalStructure` | object | technique | sstim:StimulationTechnique → sstim:StimulusTemporalStructure | Links a stimulation technique to one or more controlled descriptions of its temporal organization, such as periodic, quasi-periodic, aperiodic,… |
 | `sstim:hasTimingAuthority` | object | session | sstim:SessionInstance → sstim:TimingAuthority | Identifies the single timing surface whose readings produced this execution's clock origin and event offsets. |
 | `sstim:hasTypicalFrequencyBand` | object | common | sstim:NeuralOscillationType → sstim:FrequencyBand | Links a named neural oscillation to the conventional Hz ambit by which it is usually delimited. The ambit is a measurement convention rather than a… |
-| `sstim:hzMax` | data | common | sstim:FrequencyBand → XMLSchema:decimal | Upper bound (inclusive) of the frequency band in Hz. |
-| `sstim:hzMin` | data | common | sstim:FrequencyBand → XMLSchema:decimal | Lower bound (inclusive) of the frequency band in Hz. |
+| `sstim:hzMax` | data | common | sstim:FrequencyBand | sstim:StimulationSignal → XMLSchema:decimal | Upper bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies. |
+| `sstim:hzMin` | data | common | sstim:FrequencyBand | sstim:StimulationSignal → XMLSchema:decimal | Lower bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies. |
 | `sstim:implementsFramework` | object | technique | sstim:SensoryStimulationImplementation → sstim:SensoryStimulationFramework | Links an implementation to the framework it realizes. |
 | `sstim:implementsProtocol` | object | technique | sstim:SensoryStimulationImplementation → sstim:SensoryStimulationProtocol | Links an implementation to a protocol it realizes. |
 | `sstim:inGroup` | object | patch-studio | sstim:Preset → sstim:PresetGroup | Links a preset to its group classification. Each preset belongs to exactly one group. |
@@ -414,6 +425,9 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:recommendedAction` | data | common | sstim:CautionTag → XMLSchema:string | Plain-language action an interface should present when a caution applies, such as reduce intensity, disable a channel, stop, or avoid the context. |
 | `sstim:referenceKey` | data | evidence | sstim:PublicSafeReference → XMLSchema:string | Short uppercase key (e.g. 'INGENDOH_2023') matching citation keys in preset techDesc fields. |
 | `sstim:referencesPreset` | object | session | sstim:SessionSpecification → sstim:Preset | Links a session specification to the preset it executes. |
+| `sstim:renderingCarrierHz` | data | stimulus | sstim:SignalRendering → XMLSchema:decimal | The carrier frequency this rendering uses, where it needs one. A carrier exists because of a limitation of the sense being addressed and not because… |
+| `sstim:rendersOntoParameter` | object | stimulus | sstim:SignalRendering → sstim:RenderableParameter | The parameter the signal drives — amplitude, frequency, luminance, spatial position, vibration intensity. This is also how one layer modulates… |
+| `sstim:rendersSignal` | object | stimulus | sstim:SignalRendering → sstim:StimulationSignal | The single signal this rendering delivers. Two renderings naming one signal are the assertion that two channels deliver the same thing. |
 | `sstim:reportedConfidence` | data | session | sstim:ParticipantObservation → XMLSchema:decimal | How confident the participant said they were in their own answer, from 0 to 1, where the instrument collects it. |
 | `sstim:reportsUnwantedExperience` | object | session | sstim:ParticipantObservation → sstim:UnwantedExperienceObservation | Links the observation that asked about unwanted experiences to the experiences the participant described. The asking is an observation with its own… |
 | `sstim:requiresEvidenceTierRank` | data | evidence | sstim:PublicClaimLevel → XMLSchema:integer | Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required… |
@@ -438,6 +452,10 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:searchResultCount` | data | evidence | — → XMLSchema:integer | The number of results the executed search returned. |
 | `sstim:searchSource` | data | evidence | — → XMLSchema:string | A database or source searched, one value per source. |
 | `sstim:sessionClockOffsetSeconds` | data | session | sstim:SessionEvent | sstim:SelfReport → XMLSchema:decimal | Seconds elapsed on the session's timing context between the clock origin recorded on the session instance and this occurrence. Offsets order the… |
+| `sstim:signalCoversBand` | object | common | sstim:StimulationSignal → sstim:FrequencyBand | The signal's frequency extent contains the whole of this named band — broadband noise covering theta, for instance. The converse of… |
+| `sstim:signalOverlapsBand` | object | common | sstim:StimulationSignal → sstim:FrequencyBand | The signal's frequency extent and the band intersect, with neither containing the other. Recorded rather than inferred, because a partial overlap is… |
+| `sstim:signalSourceAsset` | object | stimulus | sstim:StimulationSignal → — | The recorded material a sampled signal is taken from — a violin note, a voice, rainfall. Required when the shape is sampled and meaningless… |
+| `sstim:signalWithinBand` | object | common | sstim:StimulationSignal → sstim:FrequencyBand | The signal's whole frequency extent lies inside this named band. A point signal such as 10 Hz within alpha is the ordinary case. |
 | `sstim:sleepiness` | data | session | sstim:SelfReport → XMLSchema:integer | Sleepiness rating at the report's declared collection phase, from 1 (alert) to 5 (very drowsy). |
 | `sstim:soundPressureLevelDb` | data | common | sstim-ex:StimulusChannel → XMLSchema:decimal | Sound pressure level at the subject's ear, in decibels SPL. This is the quantity sstim:masterVolume is not: a normalized engine gain is not a level,… |
 | `sstim:specifiedBy` | object | configuration | sstim:Preset → sstim:StimulusSpecification | Links an engine configuration to the stimulus specification it realises. |
@@ -791,6 +809,11 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:mechStochastic` | sstim:StimulationMechanism | vocab | SR |
 | `sstim-v:mechThalamocortical` | sstim:StimulationMechanism | vocab | THALCORT |
 | `sstim-v:mechUltrasonic` | sstim:StimulationMechanism | vocab | USND |
+| `sstim-v:mechanismAmplitudeModulation` | sstim:RenderingMechanism | vocab | amplitude-modulation |
+| `sstim-v:mechanismBinauralBeat` | sstim:RenderingMechanism | vocab | binaural-beat |
+| `sstim-v:mechanismDirectPresentation` | sstim:RenderingMechanism | vocab | direct-presentation |
+| `sstim-v:mechanismFrequencyModulation` | sstim:RenderingMechanism | vocab | frequency-modulation |
+| `sstim-v:mechanismMonauralBeat` | sstim:RenderingMechanism | vocab | monaural-beat |
 | `sstim-v:midBeta` | sstim:FrequencyBand | vocab | mid-beta |
 | `sstim-v:modalityAUD` | sstim:EvidenceModalityTag | vocab | AUD |
 | `sstim-v:modalityAV` | sstim:EvidenceModalityTag | vocab | AV |
@@ -820,6 +843,12 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:onsetLaterSameDay` | sstim:ExperienceOnsetPhase | vocab | onset-later-same-day |
 | `sstim-v:onsetNextDay` | sstim:ExperienceOnsetPhase | vocab | onset-next-day |
 | `sstim-v:onsetUnknown` | sstim:ExperienceOnsetPhase | vocab | onset-unknown |
+| `sstim-v:paramAmplitude` | sstim:RenderableParameter | vocab | amplitude |
+| `sstim-v:paramFrequency` | sstim:RenderableParameter | vocab | frequency |
+| `sstim-v:paramLuminance` | sstim:RenderableParameter | vocab | luminance |
+| `sstim-v:paramSize` | sstim:RenderableParameter | vocab | size |
+| `sstim-v:paramSpatialPosition` | sstim:RenderableParameter | vocab | spatial-position |
+| `sstim-v:paramVibrationIntensity` | sstim:RenderableParameter | vocab | vibration-intensity |
 | `sstim-v:permIdentity` | sstim:PermutationFunction | vocab | 4 |
 | `sstim-v:permReverse` | sstim:PermutationFunction | vocab | 3 |
 | `sstim-v:permRotateBackward` | sstim:PermutationFunction | vocab | 2 |
@@ -844,6 +873,8 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:phenomenonSynapticTransmission` | sstim:NeuralPhenomenon | vocab | phenomenon-synaptic-transmission |
 | `sstim-v:phenomenonTemporalCoordination` | sstim:NeuralPhenomenon | vocab | phenomenon-temporal-coordination |
 | `sstim-v:phenomenonVisualSteadyStateResponse` | sstim:NeuralPhenomenon | vocab | phenomenon-visual-steady-state-response |
+| `sstim-v:presencePerceptual` | sstim:RenderingPresence | vocab | perceptual |
+| `sstim-v:presencePhysical` | sstim:RenderingPresence | vocab | physical |
 | `sstim-v:relatednessDeclined` | sstim:PerceivedRelatedness | vocab | relatedness-declined |
 | `sstim-v:relatednessPossiblyRelated` | sstim:PerceivedRelatedness | vocab | relatedness-possibly-related |
 | `sstim-v:relatednessRelated` | sstim:PerceivedRelatedness | vocab | relatedness-related |
@@ -898,6 +929,13 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:severityModerate` | sstim:ReportedSeverity | vocab | moderate |
 | `sstim-v:severitySevere` | sstim:ReportedSeverity | vocab | severe |
 | `sstim-v:severityUnknown` | sstim:ReportedSeverity | vocab | severity-unknown |
+| `sstim-v:shapeEnvelope` | sstim:SignalShape | vocab | envelope |
+| `sstim-v:shapeNoise` | sstim:SignalShape | vocab | noise |
+| `sstim-v:shapeSampled` | sstim:SignalShape | vocab | sampled |
+| `sstim-v:shapeSawtooth` | sstim:SignalShape | vocab | sawtooth |
+| `sstim-v:shapeSine` | sstim:SignalShape | vocab | sine |
+| `sstim-v:shapeSquare` | sstim:SignalShape | vocab | square |
+| `sstim-v:shapeTriangle` | sstim:SignalShape | vocab | triangle |
 | `sstim-v:smr` | sstim:FrequencyBand | vocab | smr |
 | `sstim-v:smrOscillation` | sstim:NeuralOscillationType | vocab | smr-oscillation |
 | `sstim-v:synthesisLiteratureReview` | sstim:EvidenceSynthesisType | vocab | literature-review |

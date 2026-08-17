@@ -38,7 +38,7 @@
     dct:title "SSTIM Controlled Vocabulary"@en ;
     dct:description "Multilingual SKOS concept schemes and dual-typed controlled values for sensory stimulation modalities, mechanisms, techniques, evidence, cautions, session reporting, and implementation metadata."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/technique> ;
+    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
@@ -3916,3 +3916,179 @@ sstim-v:relatednessDeclined a owl:NamedIndividual, sstim:PerceivedRelatedness, s
         "Relação recusada"@pt, "Relación no declarada"@es ;
     skos:notation "relatedness-declined" ;
     skos:definition "The participant chose not to say whether they thought the session was involved."@en .
+
+
+###########################################################################
+# Part 12 — Signals and renderings (ADR 0052)
+#
+# One vocabulary of shapes serves both the signal and the waveform it is
+# presented as: the same fact seen from either side. Mechanism and presence
+# describe the rendering rather than the signal, because a carrier is a fact
+# about the sense being addressed and not about what is being delivered.
+###########################################################################
+
+sstim-v:SignalShapeScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Signal Shape Vocabulary"@en ;
+    dct:description "The form of a time-varying signal, and equally the waveform a rendering presents."@en ;
+    skos:hasTopConcept sstim-v:shapeSine, sstim-v:shapeSquare, sstim-v:shapeSawtooth, sstim-v:shapeTriangle, sstim-v:shapeEnvelope, sstim-v:shapeNoise, sstim-v:shapeSampled .
+
+sstim-v:RenderingMechanismScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Rendering Mechanism Vocabulary"@en ;
+    dct:description "How a signal is made to reach a subject through one channel."@en ;
+    skos:hasTopConcept sstim-v:mechanismDirectPresentation, sstim-v:mechanismAmplitudeModulation, sstim-v:mechanismFrequencyModulation, sstim-v:mechanismBinauralBeat, sstim-v:mechanismMonauralBeat .
+
+sstim-v:RenderingPresenceScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Rendering Presence Vocabulary"@en ;
+    dct:description "Whether a rendering puts the signal physically into the world or produces it perceptually."@en ;
+    skos:hasTopConcept sstim-v:presencePhysical, sstim-v:presencePerceptual .
+
+sstim-v:RenderableParameterScheme a skos:ConceptScheme ;
+    skos:prefLabel "SSTIM Renderable Parameter Vocabulary"@en ;
+    dct:description "The parameter a signal is rendered onto. Also the modulation relation."@en ;
+    skos:hasTopConcept sstim-v:paramAmplitude, sstim-v:paramFrequency, sstim-v:paramLuminance, sstim-v:paramSize, sstim-v:paramSpatialPosition, sstim-v:paramVibrationIntensity .
+
+sstim-v:shapeSine a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Sine"@en ;
+    skos:notation "sine" ;
+    skos:definition "A single-frequency sinusoid. The default periodic shape, and the only one the BSC catalog ever used."@en .
+
+sstim-v:shapeSquare a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Square"@en ;
+    skos:notation "square" ;
+    skos:definition "A periodic shape alternating between two levels with a duty cycle. Its harmonic content makes it audibly and visually harsher than a sinusoid at the same rate."@en .
+
+sstim-v:shapeSawtooth a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Sawtooth"@en ;
+    skos:notation "sawtooth" ;
+    skos:definition "A periodic shape rising linearly and resetting sharply, or its mirror image."@en .
+
+sstim-v:shapeTriangle a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Triangle"@en ;
+    skos:notation "triangle" ;
+    skos:definition "A periodic shape rising and falling linearly, with weaker harmonics than a square at the same rate."@en .
+
+sstim-v:shapeEnvelope a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Envelope"@en ;
+    skos:notation "envelope" ;
+    skos:definition "A non-repeating contour over time, such as a period ramping from one value to another across a session. Shape and repetition are independent: an envelope may modulate a periodic signal."@en .
+
+sstim-v:shapeNoise a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Noise"@en ;
+    skos:notation "noise" ;
+    skos:scopeNote "The clearest case for the interval model: noise cannot be described by a single frequency number, so a signal states a lower and an upper bound and relates to a band by containment or overlap rather than membership."@en ;
+    skos:definition "A stochastic signal occupying a frequency extent rather than a point. White noise spans the whole audible range and band-limited noise a named interval; both are this shape with different bounds."@en .
+
+sstim-v:shapeSampled a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
+    skos:inScheme sstim-v:SignalShapeScheme ;
+    skos:prefLabel "Sampled"@en ;
+    skos:notation "sampled" ;
+    skos:scopeNote "The one shape that is an asset rather than a function, which is why it needs provenance and a checksum where a sine needs neither."@en ;
+    skos:definition "A signal whose form is a recording rather than a function — a violin note, a voice, rainfall. Carries a source asset, without which the signal is not reproducible."@en .
+
+sstim-v:mechanismDirectPresentation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    skos:inScheme sstim-v:RenderingMechanismScheme ;
+    skos:prefLabel "Direct presentation"@en ;
+    skos:notation "direct-presentation" ;
+    skos:definition "The signal is presented as itself, with no carrier — a light flickering at the signal rate, or a vibration at it."@en .
+
+sstim-v:mechanismAmplitudeModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    skos:inScheme sstim-v:RenderingMechanismScheme ;
+    skos:prefLabel "Amplitude modulation"@en ;
+    skos:notation "amplitude-modulation" ;
+    skos:definition "The signal modulates the amplitude of a carrier. The isochronic case: a 10 Hz signal on an audible tone."@en .
+
+sstim-v:mechanismFrequencyModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    skos:inScheme sstim-v:RenderingMechanismScheme ;
+    skos:prefLabel "Frequency modulation"@en ;
+    skos:notation "frequency-modulation" ;
+    skos:definition "The signal modulates the frequency of a carrier."@en .
+
+sstim-v:mechanismBinauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    skos:inScheme sstim-v:RenderingMechanismScheme ;
+    skos:prefLabel "Binaural beat"@en ;
+    skos:notation "binaural-beat" ;
+    skos:definition "Two carriers differing by the signal frequency are presented dichotically. The signal is absent from each ear and constructed by the auditory system, so this mechanism is perceptual rather than physical."@en .
+
+sstim-v:mechanismMonauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
+    skos:inScheme sstim-v:RenderingMechanismScheme ;
+    skos:prefLabel "Monaural beat"@en ;
+    skos:notation "monaural-beat" ;
+    skos:definition "Two carriers differing by the signal frequency are summed acoustically before delivery, so the signal is physically present in the combined waveform."@en .
+
+sstim-v:presencePhysical a owl:NamedIndividual, sstim:RenderingPresence, skos:Concept ;
+    skos:inScheme sstim-v:RenderingPresenceScheme ;
+    skos:prefLabel "Physically present"@en ;
+    skos:notation "physical" ;
+    skos:definition "The signal exists as a real modulation in what reaches the subject, and could be measured at the point of delivery."@en .
+
+sstim-v:presencePerceptual a owl:NamedIndividual, sstim:RenderingPresence, skos:Concept ;
+    skos:inScheme sstim-v:RenderingPresenceScheme ;
+    skos:prefLabel "Perceptually constructed"@en ;
+    skos:notation "perceptual" ;
+    skos:definition "The signal does not exist in what reaches the subject and is constructed by the nervous system — a binaural beat being the standard case. Evidence about a physically present signal does not transfer to this without argument."@en .
+
+sstim-v:paramAmplitude a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Amplitude"@en ;
+    skos:notation "amplitude" ;
+    skos:definition "The intensity of the stimulus in its own units."@en .
+
+sstim-v:paramFrequency a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Frequency"@en ;
+    skos:notation "frequency" ;
+    skos:definition "The frequency of a carrier or tone the signal drives."@en .
+
+sstim-v:paramLuminance a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Luminance"@en ;
+    skos:notation "luminance" ;
+    skos:definition "The brightness of a visual stimulus."@en .
+
+sstim-v:paramSize a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Size"@en ;
+    skos:notation "size" ;
+    skos:definition "The extent of a visual stimulus, as used by an expanding and contracting breathing guide."@en .
+
+sstim-v:paramSpatialPosition a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Spatial position"@en ;
+    skos:notation "spatial-position" ;
+    skos:definition "Where the stimulus appears in space. A signal rendered onto this parameter is what the BSC catalog encoded as a Martigli-synced panning mode."@en .
+
+sstim-v:paramVibrationIntensity a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
+    skos:inScheme sstim-v:RenderableParameterScheme ;
+    skos:prefLabel "Vibration intensity"@en ;
+    skos:notation "vibration-intensity" ;
+    skos:definition "The strength of a haptic stimulus."@en .
+
+sstim-v:shapeSine skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeSquare skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeSawtooth skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeTriangle skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeEnvelope skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeNoise skos:topConceptOf sstim-v:SignalShapeScheme .
+sstim-v:shapeSampled skos:topConceptOf sstim-v:SignalShapeScheme .
+
+sstim-v:mechanismDirectPresentation skos:topConceptOf sstim-v:RenderingMechanismScheme .
+sstim-v:mechanismAmplitudeModulation skos:topConceptOf sstim-v:RenderingMechanismScheme .
+sstim-v:mechanismFrequencyModulation skos:topConceptOf sstim-v:RenderingMechanismScheme .
+sstim-v:mechanismBinauralBeat skos:topConceptOf sstim-v:RenderingMechanismScheme .
+sstim-v:mechanismMonauralBeat skos:topConceptOf sstim-v:RenderingMechanismScheme .
+
+sstim-v:presencePhysical skos:topConceptOf sstim-v:RenderingPresenceScheme .
+sstim-v:presencePerceptual skos:topConceptOf sstim-v:RenderingPresenceScheme .
+
+sstim-v:paramAmplitude skos:topConceptOf sstim-v:RenderableParameterScheme .
+sstim-v:paramFrequency skos:topConceptOf sstim-v:RenderableParameterScheme .
+sstim-v:paramLuminance skos:topConceptOf sstim-v:RenderableParameterScheme .
+sstim-v:paramSize skos:topConceptOf sstim-v:RenderableParameterScheme .
+sstim-v:paramSpatialPosition skos:topConceptOf sstim-v:RenderableParameterScheme .
+sstim-v:paramVibrationIntensity skos:topConceptOf sstim-v:RenderableParameterScheme .

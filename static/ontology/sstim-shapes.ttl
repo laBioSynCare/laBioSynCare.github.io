@@ -849,6 +849,113 @@ sstim-sh:EvidenceSearchRecordShape a sh:NodeShape ;
 #
 # A tier missing tierRank fails closed instead (no claim can reach the
 # requirement), which is safe but still leaves the vocabulary incomplete.
+# ADR 0052. Two constraints here are the ones that stop the signal layer being
+# decoration: a signal must state a frequency extent that runs the right way, and
+# a sampled signal must identify what it was sampled from — without which it is
+# not reproducible, which is the whole reason the shape is distinguished.
+sstim-sh:StimulationSignalShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulationSignal ;
+    sh:name "StimulationSignal"@en ;
+    sh:property [
+        sh:path sstim:hasSignalShape ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:SignalShape ;
+        sh:message "A stimulation signal must state its shape."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hzMin ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "A stimulation signal must state the lower bound of its frequency extent; a point signal states the same value twice."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hzMax ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0 ;
+        sh:message "A stimulation signal must state the upper bound of its frequency extent."@en ;
+    ] ;
+
+    # A point signal is the degenerate interval, exactly as sstim-v:alpha10 and
+    # sstim-v:gamma40 already are; an inverted one is never meaningful.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A signal's frequency extent must not run backwards: hzMin may equal hzMax, which is a point signal, but may not exceed it."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hzMin> ?low ;
+                      <https://w3id.org/sstim#hzMax> ?high .
+                FILTER( ?low > ?high )
+            }
+        """ ;
+    ] ;
+
+    # The sampled shape is an asset, not a function. Without its source the
+    # signal cannot be reproduced, and reproducibility is why it is a shape of
+    # its own rather than an unnamed special case.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A sampled signal must identify the material it was sampled from (sstim:signalSourceAsset); a sampled signal without its source is not reproducible."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasSignalShape> <https://w3id.org/sstim/vocab#shapeSampled> .
+                FILTER NOT EXISTS { $this <https://w3id.org/sstim#signalSourceAsset> ?asset }
+            }
+        """ ;
+    ] .
+
+sstim-sh:SignalRenderingShape a sh:NodeShape ;
+    sh:targetClass sstim:SignalRendering ;
+    sh:name "SignalRendering"@en ;
+    sh:property [
+        sh:path sstim:rendersSignal ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:StimulationSignal ;
+        sh:message "A rendering must name the single signal it delivers."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:rendersOntoParameter ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:RenderableParameter ;
+        sh:message "A rendering must name the parameter the signal drives."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasRenderingMechanism ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:RenderingMechanism ;
+        sh:message "A rendering must name its mechanism."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasRenderingPresence ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:RenderingPresence ;
+        sh:message "A rendering must state whether the signal is physically present or perceptually constructed: evidence does not transfer freely between the two."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:renderingCarrierHz ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ; sh:minExclusive 0 ;
+        sh:message "renderingCarrierHz must be a single positive decimal."@en ;
+    ] ;
+
+    # A binaural beat is the standard case of a signal that reaches neither ear.
+    # Recording it as physically present would let a finding about a real 10 Hz
+    # modulation authorize a claim about a constructed one.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A binaural-beat rendering is perceptually constructed, not physically present: the signal is absent from each ear's waveform."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismBinauralBeat> ;
+                      <https://w3id.org/sstim#hasRenderingPresence> <https://w3id.org/sstim/vocab#presencePhysical> .
+            }
+        """ ;
+    ] ;
+
+    # Direct presentation means no carrier, by definition. A carrier alongside it
+    # says the rendering is not direct after all.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A directly presented rendering has no carrier: 10 Hz reaching the subject as itself is what direct presentation means."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismDirectPresentation> ;
+                      <https://w3id.org/sstim#renderingCarrierHz> ?carrier .
+            }
+        """ ;
+    ] .
+
 sstim-sh:PublicClaimLevelShape a sh:NodeShape ;
     sh:targetClass sstim:PublicClaimLevel ;
     sh:name "PublicClaimLevel"@en ;

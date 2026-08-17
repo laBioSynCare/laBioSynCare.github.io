@@ -18,7 +18,6 @@
     "bsclab-evidence": "https://w3id.org/sstim/implementation/bsclab/evidence/",
     "biosyncare": "https://w3id.org/sstim/implementation/biosyncare/",
     "sstim-ref": "https://w3id.org/sstim/ref/",
-
     "owl": "http://www.w3.org/2002/07/owl#",
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
@@ -37,7 +36,6 @@
     "cc": "http://creativecommons.org/ns#",
     "bibo": "http://purl.org/ontology/bibo/",
     "mod": "https://w3id.org/mod#",
-
     "wd": "http://www.wikidata.org/entity/",
     "wdt": "http://www.wikidata.org/prop/direct/",
     "bfo": "http://purl.obolibrary.org/obo/BFO_",
@@ -45,15 +43,22 @@
     "iao": "http://purl.obolibrary.org/obo/IAO_",
     "cob": "http://purl.obolibrary.org/obo/COB_",
     "ro": "http://purl.obolibrary.org/obo/RO_",
-
     "id": "@id",
     "type": "@type",
     "label": "rdfs:label",
     "comment": "rdfs:comment",
-    "seeAlso": { "@id": "rdfs:seeAlso", "@type": "@id" },
-    "isDefinedBy": { "@id": "rdfs:isDefinedBy", "@type": "@id" },
-    "subClassOf": { "@id": "rdfs:subClassOf", "@type": "@id" },
-
+    "seeAlso": {
+      "@id": "rdfs:seeAlso",
+      "@type": "@id"
+    },
+    "isDefinedBy": {
+      "@id": "rdfs:isDefinedBy",
+      "@type": "@id"
+    },
+    "subClassOf": {
+      "@id": "rdfs:subClassOf",
+      "@type": "@id"
+    },
     "Class": "owl:Class",
     "Ontology": "owl:Ontology",
     "ObjectProperty": "owl:ObjectProperty",
@@ -62,7 +67,6 @@
     "NamedIndividual": "owl:NamedIndividual",
     "Concept": "skos:Concept",
     "ConceptScheme": "skos:ConceptScheme",
-
     "Stimulation": "sstim:Stimulation",
     "Neuromodulation": "sstim:Neuromodulation",
     "SensoryRouteNeuromodulation": "sstim:SensoryRouteNeuromodulation",
@@ -91,7 +95,6 @@
     "SelfDirectedNeuromodulation": "sstim:SelfDirectedNeuromodulation",
     "DeliberateSelfRegulation": "sstim:DeliberateSelfRegulation",
     "Neuroplasticity": "sstim:Neuroplasticity",
-
     "SensoryStimulation": "sstim:SensoryStimulation",
     "SensoryStimulationIntervention": "sstim:SensoryStimulationIntervention",
     "SensoryStimulationTechnique": "sstim:SensoryStimulationTechnique",
@@ -146,14 +149,12 @@
     "MartigliVoice": "sstim:MartigliVoice",
     "MartigliBinauralVoice": "sstim:MartigliBinauralVoice",
     "SymmetryVoice": "sstim:SymmetryVoice",
-
     "Track": "sstim:Track",
     "AudioTrack": "sstim:AudioTrack",
     "VisualTrack": "sstim:VisualTrack",
     "HapticTrack": "sstim:HapticTrack",
     "ControlTrack": "sstim:ControlTrack",
     "StimulusSpecification": "sstim:StimulusSpecification",
-
     "ExposureProfile": "sstim-ex:ExposureProfile",
     "StimulusChannel": "sstim-ex:StimulusChannel",
     "StimulusChannelRole": "sstim-ex:StimulusChannelRole",
@@ -192,7 +193,6 @@
     "EcosystemRelationScheme": "sstim-eco:EcosystemRelationScheme",
     "EcosystemPurposeScheme": "sstim-eco:EcosystemPurposeScheme",
     "EngagementOutcomeScheme": "sstim-eco:EngagementOutcomeScheme",
-
     "Person": "schema:Person",
     "Organization": "schema:Organization",
     "FoafPerson": "foaf:Person",
@@ -202,21 +202,58 @@
     "ProvAgent": "prov:Agent",
     "ProvEntity": "prov:Entity",
     "ProvActivity": "prov:Activity",
-
-    "hasEcosystemRelationship": { "@id": "sstim-eco:hasEcosystemRelationship", "@type": "@id" },
-    "relationshipAgent": { "@id": "sstim-eco:relationshipAgent", "@type": "@id" },
-    "relationshipTarget": { "@id": "sstim-eco:relationshipTarget", "@type": "@id" },
-    "hasRelationshipType": { "@id": "sstim-eco:hasRelationshipType", "@type": "@id" },
-    "relationshipPurpose": { "@id": "sstim-eco:relationshipPurpose", "@type": "@id" },
-    "publicationStatus": { "@id": "sstim-eco:publicationStatus", "@type": "@id" },
-    "validFrom": { "@id": "sstim-eco:validFrom", "@type": "xsd:date" },
-    "validUntil": { "@id": "sstim-eco:validUntil", "@type": "xsd:date" },
-    "reviewedOn": { "@id": "sstim-eco:reviewedOn", "@type": "xsd:date" },
-    "hasEngagementActivity": { "@id": "sstim-eco:hasEngagementActivity", "@type": "@id" },
-    "engagementFor": { "@id": "sstim-eco:engagementFor", "@type": "@id" },
-    "engagementPurpose": { "@id": "sstim-eco:engagementPurpose", "@type": "@id" },
-    "engagementOutcome": { "@id": "sstim-eco:engagementOutcome", "@type": "@id" },
-
+    "hasEcosystemRelationship": {
+      "@id": "sstim-eco:hasEcosystemRelationship",
+      "@type": "@id"
+    },
+    "relationshipAgent": {
+      "@id": "sstim-eco:relationshipAgent",
+      "@type": "@id"
+    },
+    "relationshipTarget": {
+      "@id": "sstim-eco:relationshipTarget",
+      "@type": "@id"
+    },
+    "hasRelationshipType": {
+      "@id": "sstim-eco:hasRelationshipType",
+      "@type": "@id"
+    },
+    "relationshipPurpose": {
+      "@id": "sstim-eco:relationshipPurpose",
+      "@type": "@id"
+    },
+    "publicationStatus": {
+      "@id": "sstim-eco:publicationStatus",
+      "@type": "@id"
+    },
+    "validFrom": {
+      "@id": "sstim-eco:validFrom",
+      "@type": "xsd:date"
+    },
+    "validUntil": {
+      "@id": "sstim-eco:validUntil",
+      "@type": "xsd:date"
+    },
+    "reviewedOn": {
+      "@id": "sstim-eco:reviewedOn",
+      "@type": "xsd:date"
+    },
+    "hasEngagementActivity": {
+      "@id": "sstim-eco:hasEngagementActivity",
+      "@type": "@id"
+    },
+    "engagementFor": {
+      "@id": "sstim-eco:engagementFor",
+      "@type": "@id"
+    },
+    "engagementPurpose": {
+      "@id": "sstim-eco:engagementPurpose",
+      "@type": "@id"
+    },
+    "engagementOutcome": {
+      "@id": "sstim-eco:engagementOutcome",
+      "@type": "@id"
+    },
     "organizationMember": "sstim-eco:organizationMember",
     "implementationDeveloper": "sstim-eco:implementationDeveloper",
     "implementationPublisher": "sstim-eco:implementationPublisher",
@@ -242,126 +279,377 @@
     "outcomeRecordAmended": "sstim-eco:outcomeRecordAmended",
     "outcomeRemovalRequested": "sstim-eco:outcomeRemovalRequested",
     "outcomeConsentWithdrawn": "sstim-eco:outcomeConsentWithdrawn",
-
-    "sameAs": { "@id": "schema:sameAs", "@type": "@id" },
-    "url": { "@id": "schema:url", "@type": "@id" },
-    "member": { "@id": "org:member", "@type": "@id" },
-    "organization": { "@id": "org:organization", "@type": "@id" },
-    "role": { "@id": "org:role", "@type": "@id" },
-
-    "relationshipType": { "@id": "sstim-eco:relationshipType", "@type": "@id" },
-    "relatesTo": { "@id": "sstim-eco:relatesTo", "@type": "@id" },
-    "expertiseArea": { "@id": "sstim-eco:expertiseArea", "@type": "@id" },
-    "hasContributedTo": { "@id": "sstim-eco:hasContributedTo", "@type": "@id" },
-    "couldContributeTo": { "@id": "sstim-eco:couldContributeTo", "@type": "@id" },
-    "curatedBy": { "@id": "sstim-eco:curatedBy", "@type": "@id" },
+    "sameAs": {
+      "@id": "schema:sameAs",
+      "@type": "@id"
+    },
+    "url": {
+      "@id": "schema:url",
+      "@type": "@id"
+    },
+    "member": {
+      "@id": "org:member",
+      "@type": "@id"
+    },
+    "organization": {
+      "@id": "org:organization",
+      "@type": "@id"
+    },
+    "role": {
+      "@id": "org:role",
+      "@type": "@id"
+    },
+    "relationshipType": {
+      "@id": "sstim-eco:relationshipType",
+      "@type": "@id"
+    },
+    "relatesTo": {
+      "@id": "sstim-eco:relatesTo",
+      "@type": "@id"
+    },
+    "expertiseArea": {
+      "@id": "sstim-eco:expertiseArea",
+      "@type": "@id"
+    },
+    "hasContributedTo": {
+      "@id": "sstim-eco:hasContributedTo",
+      "@type": "@id"
+    },
+    "couldContributeTo": {
+      "@id": "sstim-eco:couldContributeTo",
+      "@type": "@id"
+    },
+    "curatedBy": {
+      "@id": "sstim-eco:curatedBy",
+      "@type": "@id"
+    },
     "recordSource": "sstim-eco:recordSource",
     "consentStatus": "sstim-eco:consentStatus",
-    "archivalConsent": { "@id": "sstim-eco:archivalConsent", "@type": "xsd:boolean" },
+    "archivalConsent": {
+      "@id": "sstim-eco:archivalConsent",
+      "@type": "xsd:boolean"
+    },
     "notificationStatus": "sstim-eco:notificationStatus",
-    "notifiedOn": { "@id": "sstim-eco:notifiedOn", "@type": "xsd:date" },
+    "notifiedOn": {
+      "@id": "sstim-eco:notifiedOn",
+      "@type": "xsd:date"
+    },
     "notificationChannel": "sstim-eco:notificationChannel",
     "responseStatus": "sstim-eco:responseStatus",
-    "respondedOn": { "@id": "sstim-eco:respondedOn", "@type": "xsd:date" },
+    "respondedOn": {
+      "@id": "sstim-eco:respondedOn",
+      "@type": "xsd:date"
+    },
     "responseNote": "sstim-eco:responseNote",
     "contributionStatus": "sstim-eco:contributionStatus",
-    "addedOn": { "@id": "sstim-eco:addedOn", "@type": "xsd:date" },
-
+    "addedOn": {
+      "@id": "sstim-eco:addedOn",
+      "@type": "xsd:date"
+    },
     "VoidDataset": "void:Dataset",
     "DcatDataset": "dcat:Dataset",
     "Distribution": "dcat:Distribution",
-
     "title": "dct:title",
     "description": "dct:description",
     "identifier": "dct:identifier",
     "creator": "dct:creator",
-    "publisher": { "@id": "dct:publisher", "@type": "@id" },
-    "license": { "@id": "dct:license", "@type": "@id" },
-    "ccLicense": { "@id": "cc:license", "@type": "@id" },
+    "publisher": {
+      "@id": "dct:publisher",
+      "@type": "@id"
+    },
+    "license": {
+      "@id": "dct:license",
+      "@type": "@id"
+    },
+    "ccLicense": {
+      "@id": "cc:license",
+      "@type": "@id"
+    },
     "created": "dct:created",
     "modified": "dct:modified",
     "issued": "dct:issued",
-    "hasVersion": { "@id": "dct:hasVersion", "@type": "@id" },
+    "hasVersion": {
+      "@id": "dct:hasVersion",
+      "@type": "@id"
+    },
     "bibliographicCitation": "dct:bibliographicCitation",
     "doi": "bibo:doi",
     "ontologyStatus": "mod:status",
-    "logo": { "@id": "foaf:logo", "@type": "@id" },
+    "logo": {
+      "@id": "foaf:logo",
+      "@type": "@id"
+    },
     "datasetVersion": "dcat:version",
-    "isPartOf": { "@id": "dct:isPartOf", "@type": "@id" },
-    "requires": { "@id": "dct:requires", "@type": "@id" },
-    "source": { "@id": "dct:source", "@type": "@id" },
-    "references": { "@id": "dct:references", "@type": "@id" },
-
-    "homepage": { "@id": "foaf:homepage", "@type": "@id" },
-    "primaryTopic": { "@id": "foaf:primaryTopic", "@type": "@id" },
-    "landingPage": { "@id": "dcat:landingPage", "@type": "@id" },
+    "isPartOf": {
+      "@id": "dct:isPartOf",
+      "@type": "@id"
+    },
+    "requires": {
+      "@id": "dct:requires",
+      "@type": "@id"
+    },
+    "source": {
+      "@id": "dct:source",
+      "@type": "@id"
+    },
+    "references": {
+      "@id": "dct:references",
+      "@type": "@id"
+    },
+    "homepage": {
+      "@id": "foaf:homepage",
+      "@type": "@id"
+    },
+    "primaryTopic": {
+      "@id": "foaf:primaryTopic",
+      "@type": "@id"
+    },
+    "landingPage": {
+      "@id": "dcat:landingPage",
+      "@type": "@id"
+    },
     "keyword": "dcat:keyword",
     "distribution": "dcat:distribution",
-    "accessURL": { "@id": "dcat:accessURL", "@type": "@id" },
-    "downloadURL": { "@id": "dcat:downloadURL", "@type": "@id" },
-    "mediaType": { "@id": "dcat:mediaType", "@type": "@id" },
-    "rootResource": { "@id": "void:rootResource", "@type": "@id" },
+    "accessURL": {
+      "@id": "dcat:accessURL",
+      "@type": "@id"
+    },
+    "downloadURL": {
+      "@id": "dcat:downloadURL",
+      "@type": "@id"
+    },
+    "mediaType": {
+      "@id": "dcat:mediaType",
+      "@type": "@id"
+    },
+    "rootResource": {
+      "@id": "void:rootResource",
+      "@type": "@id"
+    },
     "uriSpace": "void:uriSpace",
-    "vocabulary": { "@id": "void:vocabulary", "@type": "@id" },
-    "feature": { "@id": "void:feature", "@type": "@id" },
-    "exampleResource": { "@id": "void:exampleResource", "@type": "@id" },
-    "subset": { "@id": "void:subset", "@type": "@id" },
-    "dataDump": { "@id": "void:dataDump", "@type": "@id" },
-    "inDataset": { "@id": "void:inDataset", "@type": "@id" },
+    "vocabulary": {
+      "@id": "void:vocabulary",
+      "@type": "@id"
+    },
+    "feature": {
+      "@id": "void:feature",
+      "@type": "@id"
+    },
+    "exampleResource": {
+      "@id": "void:exampleResource",
+      "@type": "@id"
+    },
+    "subset": {
+      "@id": "void:subset",
+      "@type": "@id"
+    },
+    "dataDump": {
+      "@id": "void:dataDump",
+      "@type": "@id"
+    },
+    "inDataset": {
+      "@id": "void:inDataset",
+      "@type": "@id"
+    },
     "preferredNamespacePrefix": "vann:preferredNamespacePrefix",
     "preferredNamespaceUri": "vann:preferredNamespaceUri",
-
-    "prefLabel": { "@id": "skos:prefLabel", "@container": "@language" },
-    "altLabel": { "@id": "skos:altLabel", "@container": "@language" },
-    "definition": { "@id": "skos:definition", "@container": "@language" },
-    "scopeNote": { "@id": "skos:scopeNote", "@container": "@language" },
-    "historyNote": { "@id": "skos:historyNote", "@container": "@language" },
-    "editorialNote": { "@id": "skos:editorialNote", "@container": "@language" },
+    "prefLabel": {
+      "@id": "skos:prefLabel",
+      "@container": "@language"
+    },
+    "altLabel": {
+      "@id": "skos:altLabel",
+      "@container": "@language"
+    },
+    "definition": {
+      "@id": "skos:definition",
+      "@container": "@language"
+    },
+    "scopeNote": {
+      "@id": "skos:scopeNote",
+      "@container": "@language"
+    },
+    "historyNote": {
+      "@id": "skos:historyNote",
+      "@container": "@language"
+    },
+    "editorialNote": {
+      "@id": "skos:editorialNote",
+      "@container": "@language"
+    },
     "notation": "skos:notation",
-    "inScheme": { "@id": "skos:inScheme", "@type": "@id" },
-    "hasTopConcept": { "@id": "skos:hasTopConcept", "@type": "@id" },
-    "topConceptOf": { "@id": "skos:topConceptOf", "@type": "@id" },
-    "broader": { "@id": "skos:broader", "@type": "@id" },
-    "narrower": { "@id": "skos:narrower", "@type": "@id" },
-    "exactMatch": { "@id": "skos:exactMatch", "@type": "@id" },
-    "closeMatch": { "@id": "skos:closeMatch", "@type": "@id" },
-    "broadMatch": { "@id": "skos:broadMatch", "@type": "@id" },
-    "narrowMatch": { "@id": "skos:narrowMatch", "@type": "@id" },
-    "relatedMatch": { "@id": "skos:relatedMatch", "@type": "@id" },
-
-    "targetsFrequencyBand": { "@id": "sstim:targetsFrequencyBand", "@type": "@id" },
-    "primaryFrequencyBand": { "@id": "sstim:primaryFrequencyBand", "@type": "@id" },
-    "hasEvidenceTier": { "@id": "sstim:hasEvidenceTier", "@type": "@id" },
-    "hasModalityTag": { "@id": "sstim:hasModalityTag", "@type": "@id" },
-    "supportsRelation": { "@id": "sstim:supportsRelation", "@type": "@id" },
-    "citesReference": { "@id": "sstim:citesReference", "@type": "@id" },
-    "hasClaimDirection": { "@id": "sstim:hasClaimDirection", "@type": "@id" },
-    "hasEffectDirection": { "@id": "sstim:hasEffectDirection", "@type": "@id" },
-    "hasReviewStatus": { "@id": "sstim:hasReviewStatus", "@type": "@id" },
-    "proposedMechanism": { "@id": "sstim:proposedMechanism", "@type": "@id" },
-    "neuralAccessRoute": { "@id": "sstim:neuralAccessRoute", "@type": "@id" },
-    "stimulationDeliveryApproach": { "@id": "sstim:stimulationDeliveryApproach", "@type": "@id" },
-    "intendedNeuralTargetSite": { "@id": "sstim:intendedNeuralTargetSite", "@type": "@id" },
-    "intendedNeuralSystem": { "@id": "sstim:intendedNeuralSystem", "@type": "@id" },
-    "intendedNeuralPhenomenon": { "@id": "sstim:intendedNeuralPhenomenon", "@type": "@id" },
-    "participantEngagementMode": { "@id": "sstim:participantEngagementMode", "@type": "@id" },
-    "mechanismNeuralAccessRoute": { "@id": "sstim:mechanismNeuralAccessRoute", "@type": "@id" },
-    "mechanismNeuralTargetSite": { "@id": "sstim:mechanismNeuralTargetSite", "@type": "@id" },
-    "mechanismNeuralSystem": { "@id": "sstim:mechanismNeuralSystem", "@type": "@id" },
-    "mechanismNeuralPhenomenon": { "@id": "sstim:mechanismNeuralPhenomenon", "@type": "@id" },
-    "outcomeNeuralAccessRoute": { "@id": "sstim:outcomeNeuralAccessRoute", "@type": "@id" },
-    "outcomeNeuralTargetSite": { "@id": "sstim:outcomeNeuralTargetSite", "@type": "@id" },
-    "outcomeNeuralSystem": { "@id": "sstim:outcomeNeuralSystem", "@type": "@id" },
-    "outcomeNeuralPhenomenon": { "@id": "sstim:outcomeNeuralPhenomenon", "@type": "@id" },
-    "techniqueModality": { "@id": "sstim:techniqueModality", "@type": "@id" },
-    "hasStimulusTemporalStructure": { "@id": "sstim:hasStimulusTemporalStructure", "@type": "@id" },
-    "composedOf": { "@id": "sstim:composedOf", "@type": "@id" },
-    "composedOfTrack": { "@id": "sstim:composedOfTrack", "@type": "@id" },
-    "describesStimulation": { "@id": "sstim:describesStimulation", "@type": "@id" },
-    "specifiedBy": { "@id": "sstim:specifiedBy", "@type": "@id" },
-    "hasStimulusChannel": { "@id": "sstim:hasStimulusChannel", "@type": "@id" },
-    "hasStimulationTarget": { "@id": "sstim:hasStimulationTarget", "@type": "@id" },
-    "disablesTrack": { "@id": "sstim:disablesTrack", "@type": "@id" },
+    "inScheme": {
+      "@id": "skos:inScheme",
+      "@type": "@id"
+    },
+    "hasTopConcept": {
+      "@id": "skos:hasTopConcept",
+      "@type": "@id"
+    },
+    "topConceptOf": {
+      "@id": "skos:topConceptOf",
+      "@type": "@id"
+    },
+    "broader": {
+      "@id": "skos:broader",
+      "@type": "@id"
+    },
+    "narrower": {
+      "@id": "skos:narrower",
+      "@type": "@id"
+    },
+    "exactMatch": {
+      "@id": "skos:exactMatch",
+      "@type": "@id"
+    },
+    "closeMatch": {
+      "@id": "skos:closeMatch",
+      "@type": "@id"
+    },
+    "broadMatch": {
+      "@id": "skos:broadMatch",
+      "@type": "@id"
+    },
+    "narrowMatch": {
+      "@id": "skos:narrowMatch",
+      "@type": "@id"
+    },
+    "relatedMatch": {
+      "@id": "skos:relatedMatch",
+      "@type": "@id"
+    },
+    "targetsFrequencyBand": {
+      "@id": "sstim:targetsFrequencyBand",
+      "@type": "@id"
+    },
+    "primaryFrequencyBand": {
+      "@id": "sstim:primaryFrequencyBand",
+      "@type": "@id"
+    },
+    "hasEvidenceTier": {
+      "@id": "sstim:hasEvidenceTier",
+      "@type": "@id"
+    },
+    "hasModalityTag": {
+      "@id": "sstim:hasModalityTag",
+      "@type": "@id"
+    },
+    "supportsRelation": {
+      "@id": "sstim:supportsRelation",
+      "@type": "@id"
+    },
+    "citesReference": {
+      "@id": "sstim:citesReference",
+      "@type": "@id"
+    },
+    "hasClaimDirection": {
+      "@id": "sstim:hasClaimDirection",
+      "@type": "@id"
+    },
+    "hasEffectDirection": {
+      "@id": "sstim:hasEffectDirection",
+      "@type": "@id"
+    },
+    "hasReviewStatus": {
+      "@id": "sstim:hasReviewStatus",
+      "@type": "@id"
+    },
+    "proposedMechanism": {
+      "@id": "sstim:proposedMechanism",
+      "@type": "@id"
+    },
+    "neuralAccessRoute": {
+      "@id": "sstim:neuralAccessRoute",
+      "@type": "@id"
+    },
+    "stimulationDeliveryApproach": {
+      "@id": "sstim:stimulationDeliveryApproach",
+      "@type": "@id"
+    },
+    "intendedNeuralTargetSite": {
+      "@id": "sstim:intendedNeuralTargetSite",
+      "@type": "@id"
+    },
+    "intendedNeuralSystem": {
+      "@id": "sstim:intendedNeuralSystem",
+      "@type": "@id"
+    },
+    "intendedNeuralPhenomenon": {
+      "@id": "sstim:intendedNeuralPhenomenon",
+      "@type": "@id"
+    },
+    "participantEngagementMode": {
+      "@id": "sstim:participantEngagementMode",
+      "@type": "@id"
+    },
+    "mechanismNeuralAccessRoute": {
+      "@id": "sstim:mechanismNeuralAccessRoute",
+      "@type": "@id"
+    },
+    "mechanismNeuralTargetSite": {
+      "@id": "sstim:mechanismNeuralTargetSite",
+      "@type": "@id"
+    },
+    "mechanismNeuralSystem": {
+      "@id": "sstim:mechanismNeuralSystem",
+      "@type": "@id"
+    },
+    "mechanismNeuralPhenomenon": {
+      "@id": "sstim:mechanismNeuralPhenomenon",
+      "@type": "@id"
+    },
+    "outcomeNeuralAccessRoute": {
+      "@id": "sstim:outcomeNeuralAccessRoute",
+      "@type": "@id"
+    },
+    "outcomeNeuralTargetSite": {
+      "@id": "sstim:outcomeNeuralTargetSite",
+      "@type": "@id"
+    },
+    "outcomeNeuralSystem": {
+      "@id": "sstim:outcomeNeuralSystem",
+      "@type": "@id"
+    },
+    "outcomeNeuralPhenomenon": {
+      "@id": "sstim:outcomeNeuralPhenomenon",
+      "@type": "@id"
+    },
+    "techniqueModality": {
+      "@id": "sstim:techniqueModality",
+      "@type": "@id"
+    },
+    "hasStimulusTemporalStructure": {
+      "@id": "sstim:hasStimulusTemporalStructure",
+      "@type": "@id"
+    },
+    "composedOf": {
+      "@id": "sstim:composedOf",
+      "@type": "@id"
+    },
+    "composedOfTrack": {
+      "@id": "sstim:composedOfTrack",
+      "@type": "@id"
+    },
+    "describesStimulation": {
+      "@id": "sstim:describesStimulation",
+      "@type": "@id"
+    },
+    "specifiedBy": {
+      "@id": "sstim:specifiedBy",
+      "@type": "@id"
+    },
+    "hasStimulusChannel": {
+      "@id": "sstim:hasStimulusChannel",
+      "@type": "@id"
+    },
+    "hasStimulationTarget": {
+      "@id": "sstim:hasStimulationTarget",
+      "@type": "@id"
+    },
+    "disablesTrack": {
+      "@id": "sstim:disablesTrack",
+      "@type": "@id"
+    },
     "stimulusRegime": "sstim:stimulusRegime",
     "channelFrequencyHz": "sstim:channelFrequencyHz",
     "channelDurationSeconds": "sstim:channelDurationSeconds",
@@ -370,100 +658,308 @@
     "flashRateHz": "sstim:flashRateHz",
     "masterBrightness": "sstim:masterBrightness",
     "scheduledStart": "sstim:scheduledStart",
-    "definesTechnique": { "@id": "sstim:definesTechnique", "@type": "@id" },
-    "incorporatesTechnique": { "@id": "sstim:incorporatesTechnique", "@type": "@id" },
-    "usesTechnique": { "@id": "sstim:usesTechnique", "@type": "@id" },
-    "definedByFramework": { "@id": "sstim:definedByFramework", "@type": "@id" },
-    "implementsFramework": { "@id": "sstim:implementsFramework", "@type": "@id" },
-    "implementsProtocol": { "@id": "sstim:implementsProtocol", "@type": "@id" },
-    "forImplementation": { "@id": "sstim:forImplementation", "@type": "@id" },
-    "followsProtocol": { "@id": "sstim:followsProtocol", "@type": "@id" },
-    "inGroup": { "@id": "sstim:inGroup", "@type": "@id" },
-    "hasDeliveryModality": { "@id": "sstim:hasDeliveryModality", "@type": "@id" },
-    "hasIntendedEffect": { "@id": "sstim:hasIntendedEffect", "@type": "@id" },
-    "hasCautionTag": { "@id": "sstim:hasCautionTag", "@type": "@id" },
-    "hasCautionSeverity": { "@id": "sstim:hasCautionSeverity", "@type": "@id" },
-    "hasPublicClaimLevel": { "@id": "sstim:hasPublicClaimLevel", "@type": "@id" },
-    "derivedFrom": { "@id": "sstim:derivedFrom", "@type": "@id" },
-    "referencesPreset": { "@id": "sstim:referencesPreset", "@type": "@id" },
-    "usesSpecification": { "@id": "sstim:usesSpecification", "@type": "@id" },
-    "hasSelfReport": { "@id": "sstim:hasSelfReport", "@type": "@id" },
-    "hasReportPhase": { "@id": "sstim:hasReportPhase", "@type": "@id" },
-    "hasSessionEvent": { "@id": "sstim:hasSessionEvent", "@type": "@id" },
-    "hasEventType": { "@id": "sstim:hasEventType", "@type": "@id" },
-    "hasTimingAuthority": { "@id": "sstim:hasTimingAuthority", "@type": "@id" },
-    "hasReproducibilityLevel": { "@id": "sstim:hasReproducibilityLevel", "@type": "@id" },
-    "hasObservation": { "@id": "sstim:hasObservation", "@type": "@id" },
-    "hasObservationRole": { "@id": "sstim:hasObservationRole", "@type": "@id" },
-    "hasResponseState": { "@id": "sstim:hasResponseState", "@type": "@id" },
-    "hasInstrument": { "@id": "sstim:hasInstrument", "@type": "@id" },
-    "reportsUnwantedExperience": { "@id": "sstim:reportsUnwantedExperience", "@type": "@id" },
-    "hasExperienceCategory": { "@id": "sstim:hasExperienceCategory", "@type": "@id" },
-    "hasReportedSeverity": { "@id": "sstim:hasReportedSeverity", "@type": "@id" },
-    "hasOnsetPhase": { "@id": "sstim:hasOnsetPhase", "@type": "@id" },
-    "hasPersistence": { "@id": "sstim:hasPersistence", "@type": "@id" },
-    "hasResponseAction": { "@id": "sstim:hasResponseAction", "@type": "@id" },
-    "hasResolutionState": { "@id": "sstim:hasResolutionState", "@type": "@id" },
-    "hasPerceivedRelatedness": { "@id": "sstim:hasPerceivedRelatedness", "@type": "@id" },
-
+    "definesTechnique": {
+      "@id": "sstim:definesTechnique",
+      "@type": "@id"
+    },
+    "incorporatesTechnique": {
+      "@id": "sstim:incorporatesTechnique",
+      "@type": "@id"
+    },
+    "usesTechnique": {
+      "@id": "sstim:usesTechnique",
+      "@type": "@id"
+    },
+    "definedByFramework": {
+      "@id": "sstim:definedByFramework",
+      "@type": "@id"
+    },
+    "implementsFramework": {
+      "@id": "sstim:implementsFramework",
+      "@type": "@id"
+    },
+    "implementsProtocol": {
+      "@id": "sstim:implementsProtocol",
+      "@type": "@id"
+    },
+    "forImplementation": {
+      "@id": "sstim:forImplementation",
+      "@type": "@id"
+    },
+    "followsProtocol": {
+      "@id": "sstim:followsProtocol",
+      "@type": "@id"
+    },
+    "inGroup": {
+      "@id": "sstim:inGroup",
+      "@type": "@id"
+    },
+    "hasDeliveryModality": {
+      "@id": "sstim:hasDeliveryModality",
+      "@type": "@id"
+    },
+    "hasIntendedEffect": {
+      "@id": "sstim:hasIntendedEffect",
+      "@type": "@id"
+    },
+    "hasCautionTag": {
+      "@id": "sstim:hasCautionTag",
+      "@type": "@id"
+    },
+    "hasCautionSeverity": {
+      "@id": "sstim:hasCautionSeverity",
+      "@type": "@id"
+    },
+    "hasPublicClaimLevel": {
+      "@id": "sstim:hasPublicClaimLevel",
+      "@type": "@id"
+    },
+    "derivedFrom": {
+      "@id": "sstim:derivedFrom",
+      "@type": "@id"
+    },
+    "referencesPreset": {
+      "@id": "sstim:referencesPreset",
+      "@type": "@id"
+    },
+    "usesSpecification": {
+      "@id": "sstim:usesSpecification",
+      "@type": "@id"
+    },
+    "hasSelfReport": {
+      "@id": "sstim:hasSelfReport",
+      "@type": "@id"
+    },
+    "hasReportPhase": {
+      "@id": "sstim:hasReportPhase",
+      "@type": "@id"
+    },
+    "hasSessionEvent": {
+      "@id": "sstim:hasSessionEvent",
+      "@type": "@id"
+    },
+    "hasEventType": {
+      "@id": "sstim:hasEventType",
+      "@type": "@id"
+    },
+    "hasTimingAuthority": {
+      "@id": "sstim:hasTimingAuthority",
+      "@type": "@id"
+    },
+    "hasReproducibilityLevel": {
+      "@id": "sstim:hasReproducibilityLevel",
+      "@type": "@id"
+    },
+    "hasObservation": {
+      "@id": "sstim:hasObservation",
+      "@type": "@id"
+    },
+    "hasObservationRole": {
+      "@id": "sstim:hasObservationRole",
+      "@type": "@id"
+    },
+    "hasResponseState": {
+      "@id": "sstim:hasResponseState",
+      "@type": "@id"
+    },
+    "hasInstrument": {
+      "@id": "sstim:hasInstrument",
+      "@type": "@id"
+    },
+    "reportsUnwantedExperience": {
+      "@id": "sstim:reportsUnwantedExperience",
+      "@type": "@id"
+    },
+    "hasExperienceCategory": {
+      "@id": "sstim:hasExperienceCategory",
+      "@type": "@id"
+    },
+    "hasReportedSeverity": {
+      "@id": "sstim:hasReportedSeverity",
+      "@type": "@id"
+    },
+    "hasOnsetPhase": {
+      "@id": "sstim:hasOnsetPhase",
+      "@type": "@id"
+    },
+    "hasPersistence": {
+      "@id": "sstim:hasPersistence",
+      "@type": "@id"
+    },
+    "hasResponseAction": {
+      "@id": "sstim:hasResponseAction",
+      "@type": "@id"
+    },
+    "hasResolutionState": {
+      "@id": "sstim:hasResolutionState",
+      "@type": "@id"
+    },
+    "hasPerceivedRelatedness": {
+      "@id": "sstim:hasPerceivedRelatedness",
+      "@type": "@id"
+    },
     "evidenceOutcome": "sstim:evidenceOutcome",
     "studyPopulation": "sstim:studyPopulation",
     "comparator": "sstim:comparator",
-    "evidenceDate": { "@id": "sstim:evidenceDate", "@type": "xsd:date" },
+    "evidenceDate": {
+      "@id": "sstim:evidenceDate",
+      "@type": "xsd:date"
+    },
     "reviewedBy": "sstim:reviewedBy",
-    "cautionSeverityRank": { "@id": "sstim:cautionSeverityRank", "@type": "xsd:integer" },
+    "cautionSeverityRank": {
+      "@id": "sstim:cautionSeverityRank",
+      "@type": "xsd:integer"
+    },
     "triggerCondition": "sstim:triggerCondition",
     "affectedPopulation": "sstim:affectedPopulation",
     "recommendedAction": "sstim:recommendedAction",
-    "displayPriority": { "@id": "sstim:displayPriority", "@type": "xsd:integer" },
-    "hzMin": { "@id": "sstim:hzMin", "@type": "xsd:decimal" },
-    "hasTypicalFrequencyBand": { "@id": "sstim:hasTypicalFrequencyBand", "@type": "@id" },
-    "extendedHzMin": { "@id": "sstim:extendedHzMin", "@type": "xsd:decimal" },
-    "extendedHzMax": { "@id": "sstim:extendedHzMax", "@type": "xsd:decimal" },
+    "displayPriority": {
+      "@id": "sstim:displayPriority",
+      "@type": "xsd:integer"
+    },
+    "hzMin": {
+      "@id": "sstim:hzMin",
+      "@type": "xsd:decimal"
+    },
+    "hasTypicalFrequencyBand": {
+      "@id": "sstim:hasTypicalFrequencyBand",
+      "@type": "@id"
+    },
+    "extendedHzMin": {
+      "@id": "sstim:extendedHzMin",
+      "@type": "xsd:decimal"
+    },
+    "extendedHzMax": {
+      "@id": "sstim:extendedHzMax",
+      "@type": "xsd:decimal"
+    },
     "hasCorticalTopography": "sstim:hasCorticalTopography",
     "hasOscillationStateContext": "sstim:hasOscillationStateContext",
-    "hzMax": { "@id": "sstim:hzMax", "@type": "xsd:decimal" },
-    "tierRank": { "@id": "sstim:tierRank", "@type": "xsd:integer" },
-    "claimLevelRank": { "@id": "sstim:claimLevelRank", "@type": "xsd:integer" },
-    "requiresEvidenceTierRank": { "@id": "sstim:requiresEvidenceTierRank", "@type": "xsd:integer" },
-    "platformDeliverable": { "@id": "sstim:platformDeliverable", "@type": "xsd:boolean" },
+    "hzMax": {
+      "@id": "sstim:hzMax",
+      "@type": "xsd:decimal"
+    },
+    "tierRank": {
+      "@id": "sstim:tierRank",
+      "@type": "xsd:integer"
+    },
+    "claimLevelRank": {
+      "@id": "sstim:claimLevelRank",
+      "@type": "xsd:integer"
+    },
+    "requiresEvidenceTierRank": {
+      "@id": "sstim:requiresEvidenceTierRank",
+      "@type": "xsd:integer"
+    },
+    "platformDeliverable": {
+      "@id": "sstim:platformDeliverable",
+      "@type": "xsd:boolean"
+    },
     "presetVersion": "sstim:presetVersion",
-    "hasBreathGuide": { "@id": "sstim:hasBreathGuide", "@type": "xsd:boolean" },
-    "durationSeconds": { "@id": "sstim:durationSeconds", "@type": "xsd:integer" },
-    "breathingPeriodInitial": { "@id": "sstim:breathingPeriodInitial", "@type": "xsd:decimal" },
-    "breathingPeriodFinal": { "@id": "sstim:breathingPeriodFinal", "@type": "xsd:decimal" },
-    "breathingTransitionDuration": { "@id": "sstim:breathingTransitionDuration", "@type": "xsd:decimal" },
-    "masterVolume": { "@id": "sstim:masterVolume", "@type": "xsd:decimal" },
-    "actualDurationSeconds": { "@id": "sstim:actualDurationSeconds", "@type": "xsd:integer" },
+    "hasBreathGuide": {
+      "@id": "sstim:hasBreathGuide",
+      "@type": "xsd:boolean"
+    },
+    "durationSeconds": {
+      "@id": "sstim:durationSeconds",
+      "@type": "xsd:integer"
+    },
+    "breathingPeriodInitial": {
+      "@id": "sstim:breathingPeriodInitial",
+      "@type": "xsd:decimal"
+    },
+    "breathingPeriodFinal": {
+      "@id": "sstim:breathingPeriodFinal",
+      "@type": "xsd:decimal"
+    },
+    "breathingTransitionDuration": {
+      "@id": "sstim:breathingTransitionDuration",
+      "@type": "xsd:decimal"
+    },
+    "masterVolume": {
+      "@id": "sstim:masterVolume",
+      "@type": "xsd:decimal"
+    },
+    "actualDurationSeconds": {
+      "@id": "sstim:actualDurationSeconds",
+      "@type": "xsd:integer"
+    },
     "completionStatus": "sstim:completionStatus",
-    "sessionClockOffsetSeconds": { "@id": "sstim:sessionClockOffsetSeconds", "@type": "xsd:decimal" },
-    "clockOriginSeconds": { "@id": "sstim:clockOriginSeconds", "@type": "xsd:decimal" },
-    "deliveredDurationSeconds": { "@id": "sstim:deliveredDurationSeconds", "@type": "xsd:decimal" },
+    "sessionClockOffsetSeconds": {
+      "@id": "sstim:sessionClockOffsetSeconds",
+      "@type": "xsd:decimal"
+    },
+    "clockOriginSeconds": {
+      "@id": "sstim:clockOriginSeconds",
+      "@type": "xsd:decimal"
+    },
+    "deliveredDurationSeconds": {
+      "@id": "sstim:deliveredDurationSeconds",
+      "@type": "xsd:decimal"
+    },
     "configurationDigest": "sstim:configurationDigest",
     "digestAlgorithm": "sstim:digestAlgorithm",
-    "observedOrdinalValue": { "@id": "sstim:observedOrdinalValue", "@type": "xsd:integer" },
-    "observedBooleanValue": { "@id": "sstim:observedBooleanValue", "@type": "xsd:boolean" },
+    "observedOrdinalValue": {
+      "@id": "sstim:observedOrdinalValue",
+      "@type": "xsd:integer"
+    },
+    "observedBooleanValue": {
+      "@id": "sstim:observedBooleanValue",
+      "@type": "xsd:boolean"
+    },
     "observedTextValue": "sstim:observedTextValue",
-    "scaleMinimum": { "@id": "sstim:scaleMinimum", "@type": "xsd:integer" },
-    "scaleMaximum": { "@id": "sstim:scaleMaximum", "@type": "xsd:integer" },
+    "scaleMinimum": {
+      "@id": "sstim:scaleMinimum",
+      "@type": "xsd:integer"
+    },
+    "scaleMaximum": {
+      "@id": "sstim:scaleMaximum",
+      "@type": "xsd:integer"
+    },
     "scaleMinimumLabel": "sstim:scaleMinimumLabel",
     "scaleMaximumLabel": "sstim:scaleMaximumLabel",
     "promptIdentifier": "sstim:promptIdentifier",
     "promptText": "sstim:promptText",
-    "reportedConfidence": { "@id": "sstim:reportedConfidence", "@type": "xsd:decimal" },
+    "reportedConfidence": {
+      "@id": "sstim:reportedConfidence",
+      "@type": "xsd:decimal"
+    },
     "instrumentVersion": "sstim:instrumentVersion",
-    "onsetOffsetSeconds": { "@id": "sstim:onsetOffsetSeconds", "@type": "xsd:decimal" },
-    "experienceDurationSeconds": { "@id": "sstim:experienceDurationSeconds", "@type": "xsd:decimal" },
-    "primaryAffect": { "@id": "sstim:primaryAffect", "@type": "xsd:integer" },
-    "focusRating": { "@id": "sstim:focusRating", "@type": "xsd:integer" },
-    "sleepiness": { "@id": "sstim:sleepiness", "@type": "xsd:integer" },
-    "subjectiveQuality": { "@id": "sstim:subjectiveQuality", "@type": "xsd:integer" },
-    "goalAchieved": { "@id": "sstim:goalAchieved", "@type": "xsd:boolean" },
+    "onsetOffsetSeconds": {
+      "@id": "sstim:onsetOffsetSeconds",
+      "@type": "xsd:decimal"
+    },
+    "experienceDurationSeconds": {
+      "@id": "sstim:experienceDurationSeconds",
+      "@type": "xsd:decimal"
+    },
+    "primaryAffect": {
+      "@id": "sstim:primaryAffect",
+      "@type": "xsd:integer"
+    },
+    "focusRating": {
+      "@id": "sstim:focusRating",
+      "@type": "xsd:integer"
+    },
+    "sleepiness": {
+      "@id": "sstim:sleepiness",
+      "@type": "xsd:integer"
+    },
+    "subjectiveQuality": {
+      "@id": "sstim:subjectiveQuality",
+      "@type": "xsd:integer"
+    },
+    "goalAchieved": {
+      "@id": "sstim:goalAchieved",
+      "@type": "xsd:boolean"
+    },
     "referenceKey": "sstim:referenceKey",
     "evidenceNotes": "sstim:evidenceNotes",
-    "modifiedAt": { "@id": "sstim:modifiedAt", "@type": "xsd:dateTime" },
+    "modifiedAt": {
+      "@id": "sstim:modifiedAt",
+      "@type": "xsd:dateTime"
+    },
     "modifiedBy": "sstim:modifiedBy",
-
     "EvidenceAssessmentClaim": "sstim:EvidenceAssessmentClaim",
     "BibliographicReference": "sstim:BibliographicReference",
     "GovernedResearchOutput": "sstim:GovernedResearchOutput",
@@ -498,38 +994,130 @@
     "PlannedOutcomeSpecification": "sstim-ex:PlannedOutcomeSpecification",
     "KnowledgeStatusAssertion": "sstim-ex:KnowledgeStatusAssertion",
     "KnowledgeStatusActivity": "sstim-ex:KnowledgeStatusActivity",
-
-    "evaluatesSubject": { "@id": "sstim:evaluatesSubject", "@type": "@id" },
-    "assessesProposition": { "@id": "sstim:assessesProposition", "@type": "@id" },
-    "hasEvidenceBasis": { "@id": "sstim:hasEvidenceBasis", "@type": "@id" },
-    "basisSource": { "@id": "sstim:basisSource", "@type": "@id" },
-    "hasSourceGovernanceRecord": { "@id": "sstim:hasSourceGovernanceRecord", "@type": "@id" },
-    "propositionSubject": { "@id": "sstim:propositionSubject", "@type": "@id" },
-    "propositionOutcome": { "@id": "sstim:propositionOutcome", "@type": "@id" },
-    "hasAssessmentScope": { "@id": "sstim:hasAssessmentScope", "@type": "@id" },
-    "hasPropositionForm": { "@id": "sstim:hasPropositionForm", "@type": "@id" },
-    "scopeSensoryModality": { "@id": "sstim:scopeSensoryModality", "@type": "@id" },
-    "scopePopulationOrModel": { "@id": "sstim:scopePopulationOrModel", "@type": "@id" },
-    "scopeInterventionOrContext": { "@id": "sstim:scopeInterventionOrContext", "@type": "@id" },
-    "scopeComparator": { "@id": "sstim:scopeComparator", "@type": "@id" },
-    "basisSensoryModality": { "@id": "sstim:basisSensoryModality", "@type": "@id" },
-    "basisModalityApplicability": { "@id": "sstim:basisModalityApplicability", "@type": "@id" },
-    "basisIntervention": { "@id": "sstim:basisIntervention", "@type": "@id" },
-    "basisStudyDesign": { "@id": "sstim:basisStudyDesign", "@type": "@id" },
-    "basisStudyModel": { "@id": "sstim:basisStudyModel", "@type": "@id" },
-    "basisStudyPopulation": { "@id": "sstim:basisStudyPopulation", "@type": "@id" },
-    "basisSynthesisType": { "@id": "sstim:basisSynthesisType", "@type": "@id" },
-    "basisObservedOutcome": { "@id": "sstim:basisObservedOutcome", "@type": "@id" },
-    "basisComparator": { "@id": "sstim:basisComparator", "@type": "@id" },
-    "basisObservedEffectDirection": { "@id": "sstim:basisObservedEffectDirection", "@type": "@id" },
-    "reviewsAssessment": { "@id": "sstim:reviewsAssessment", "@type": "@id" },
-    "reviewRubric": { "@id": "sstim:reviewRubric", "@type": "@id" },
-    "hasReviewerRelationship": { "@id": "sstim:hasReviewerRelationship", "@type": "@id" },
-    "hasIndependenceDetermination": { "@id": "sstim:hasIndependenceDetermination", "@type": "@id" },
-    "hasReviewDecision": { "@id": "sstim:hasReviewDecision", "@type": "@id" },
-    "independencePolicy": { "@id": "sstim:independencePolicy", "@type": "@id" },
-    "conflictDisclosure": { "@id": "sstim:conflictDisclosure", "@type": "@id" },
-    "custodian": { "@id": "sstim:custodian", "@type": "@id" },
+    "evaluatesSubject": {
+      "@id": "sstim:evaluatesSubject",
+      "@type": "@id"
+    },
+    "assessesProposition": {
+      "@id": "sstim:assessesProposition",
+      "@type": "@id"
+    },
+    "hasEvidenceBasis": {
+      "@id": "sstim:hasEvidenceBasis",
+      "@type": "@id"
+    },
+    "basisSource": {
+      "@id": "sstim:basisSource",
+      "@type": "@id"
+    },
+    "hasSourceGovernanceRecord": {
+      "@id": "sstim:hasSourceGovernanceRecord",
+      "@type": "@id"
+    },
+    "propositionSubject": {
+      "@id": "sstim:propositionSubject",
+      "@type": "@id"
+    },
+    "propositionOutcome": {
+      "@id": "sstim:propositionOutcome",
+      "@type": "@id"
+    },
+    "hasAssessmentScope": {
+      "@id": "sstim:hasAssessmentScope",
+      "@type": "@id"
+    },
+    "hasPropositionForm": {
+      "@id": "sstim:hasPropositionForm",
+      "@type": "@id"
+    },
+    "scopeSensoryModality": {
+      "@id": "sstim:scopeSensoryModality",
+      "@type": "@id"
+    },
+    "scopePopulationOrModel": {
+      "@id": "sstim:scopePopulationOrModel",
+      "@type": "@id"
+    },
+    "scopeInterventionOrContext": {
+      "@id": "sstim:scopeInterventionOrContext",
+      "@type": "@id"
+    },
+    "scopeComparator": {
+      "@id": "sstim:scopeComparator",
+      "@type": "@id"
+    },
+    "basisSensoryModality": {
+      "@id": "sstim:basisSensoryModality",
+      "@type": "@id"
+    },
+    "basisModalityApplicability": {
+      "@id": "sstim:basisModalityApplicability",
+      "@type": "@id"
+    },
+    "basisIntervention": {
+      "@id": "sstim:basisIntervention",
+      "@type": "@id"
+    },
+    "basisStudyDesign": {
+      "@id": "sstim:basisStudyDesign",
+      "@type": "@id"
+    },
+    "basisStudyModel": {
+      "@id": "sstim:basisStudyModel",
+      "@type": "@id"
+    },
+    "basisStudyPopulation": {
+      "@id": "sstim:basisStudyPopulation",
+      "@type": "@id"
+    },
+    "basisSynthesisType": {
+      "@id": "sstim:basisSynthesisType",
+      "@type": "@id"
+    },
+    "basisObservedOutcome": {
+      "@id": "sstim:basisObservedOutcome",
+      "@type": "@id"
+    },
+    "basisComparator": {
+      "@id": "sstim:basisComparator",
+      "@type": "@id"
+    },
+    "basisObservedEffectDirection": {
+      "@id": "sstim:basisObservedEffectDirection",
+      "@type": "@id"
+    },
+    "reviewsAssessment": {
+      "@id": "sstim:reviewsAssessment",
+      "@type": "@id"
+    },
+    "reviewRubric": {
+      "@id": "sstim:reviewRubric",
+      "@type": "@id"
+    },
+    "hasReviewerRelationship": {
+      "@id": "sstim:hasReviewerRelationship",
+      "@type": "@id"
+    },
+    "hasIndependenceDetermination": {
+      "@id": "sstim:hasIndependenceDetermination",
+      "@type": "@id"
+    },
+    "hasReviewDecision": {
+      "@id": "sstim:hasReviewDecision",
+      "@type": "@id"
+    },
+    "independencePolicy": {
+      "@id": "sstim:independencePolicy",
+      "@type": "@id"
+    },
+    "conflictDisclosure": {
+      "@id": "sstim:conflictDisclosure",
+      "@type": "@id"
+    },
+    "custodian": {
+      "@id": "sstim:custodian",
+      "@type": "@id"
+    },
     "propositionText": "sstim:propositionText",
     "propositionDigest": "sstim:propositionDigest",
     "basisOutcomeNote": "sstim:basisOutcomeNote",
@@ -537,101 +1125,398 @@
     "basisComparatorNote": "sstim:basisComparatorNote",
     "searchSource": "sstim:searchSource",
     "searchQuery": "sstim:searchQuery",
-    "searchCoverageStart": { "@id": "sstim:searchCoverageStart", "@type": "xsd:date" },
-    "searchCoverageEnd": { "@id": "sstim:searchCoverageEnd", "@type": "xsd:date" },
+    "searchCoverageStart": {
+      "@id": "sstim:searchCoverageStart",
+      "@type": "xsd:date"
+    },
+    "searchCoverageEnd": {
+      "@id": "sstim:searchCoverageEnd",
+      "@type": "xsd:date"
+    },
     "searchEligibilityCriteria": "sstim:searchEligibilityCriteria",
-    "searchResultCount": { "@id": "sstim:searchResultCount", "@type": "xsd:integer" },
+    "searchResultCount": {
+      "@id": "sstim:searchResultCount",
+      "@type": "xsd:integer"
+    },
     "searchDigest": "sstim:searchDigest",
     "governedSourceVersion": "sstim:governedSourceVersion",
     "governedSourceDigest": "sstim:governedSourceDigest",
     "accessClassification": "sstim:accessClassification",
     "consentBasisNote": "sstim:consentBasisNote",
     "permittedUseScope": "sstim:permittedUseScope",
-    "hasHypothesis": { "@id": "sstim-ex:hasHypothesis", "@type": "@id" },
-    "hasResearchQuestion": { "@id": "sstim-ex:hasResearchQuestion", "@type": "@id" },
-    "hasBoundaryApplicability": { "@id": "sstim-ex:hasBoundaryApplicability", "@type": "@id" },
-    "hasProtocolRequirement": { "@id": "sstim-ex:hasProtocolRequirement", "@type": "@id" },
-    "hasDesignObjective": { "@id": "sstim-ex:hasDesignObjective", "@type": "@id" },
-    "hasPlannedOutcome": { "@id": "sstim-ex:hasPlannedOutcome", "@type": "@id" },
-    "hasKnowledgeStatusAssertion": { "@id": "sstim-ex:hasKnowledgeStatusAssertion", "@type": "@id" },
-    "appliesBoundary": { "@id": "sstim-ex:appliesBoundary", "@type": "@id" },
-    "knowledgeAsOfDate": { "@id": "sstim-ex:knowledgeAsOfDate", "@type": "xsd:date" },
-    "knowledgeScope": { "@id": "sstim-ex:knowledgeScope", "@type": "@id" },
+    "hasHypothesis": {
+      "@id": "sstim-ex:hasHypothesis",
+      "@type": "@id"
+    },
+    "hasResearchQuestion": {
+      "@id": "sstim-ex:hasResearchQuestion",
+      "@type": "@id"
+    },
+    "hasBoundaryApplicability": {
+      "@id": "sstim-ex:hasBoundaryApplicability",
+      "@type": "@id"
+    },
+    "hasProtocolRequirement": {
+      "@id": "sstim-ex:hasProtocolRequirement",
+      "@type": "@id"
+    },
+    "hasDesignObjective": {
+      "@id": "sstim-ex:hasDesignObjective",
+      "@type": "@id"
+    },
+    "hasPlannedOutcome": {
+      "@id": "sstim-ex:hasPlannedOutcome",
+      "@type": "@id"
+    },
+    "hasKnowledgeStatusAssertion": {
+      "@id": "sstim-ex:hasKnowledgeStatusAssertion",
+      "@type": "@id"
+    },
+    "appliesBoundary": {
+      "@id": "sstim-ex:appliesBoundary",
+      "@type": "@id"
+    },
+    "knowledgeAsOfDate": {
+      "@id": "sstim-ex:knowledgeAsOfDate",
+      "@type": "xsd:date"
+    },
+    "knowledgeScope": {
+      "@id": "sstim-ex:knowledgeScope",
+      "@type": "@id"
+    },
     "knowledgeScopeNote": "sstim-ex:knowledgeScopeNote",
-
-    "wasAttributedTo": { "@id": "prov:wasAttributedTo", "@type": "@id" },
-    "wasAssociatedWith": { "@id": "prov:wasAssociatedWith", "@type": "@id" },
-    "wasInformedBy": { "@id": "prov:wasInformedBy", "@type": "@id" },
-    "wasRevisionOf": { "@id": "prov:wasRevisionOf", "@type": "@id" },
-    "wasGeneratedBy": { "@id": "prov:wasGeneratedBy", "@type": "@id" },
-    "generated": { "@id": "prov:generated", "@type": "@id" },
-    "invalidated": { "@id": "prov:invalidated", "@type": "@id" },
-    "startedAtTime": { "@id": "prov:startedAtTime", "@type": "xsd:dateTime" },
-    "endedAtTime": { "@id": "prov:endedAtTime", "@type": "xsd:dateTime" },
-    "generatedAtTime": { "@id": "prov:generatedAtTime", "@type": "xsd:dateTime" },
-
-    "carrierFreqLeft": { "@id": "sstim:carrierFreqLeft", "@type": "xsd:decimal" },
-    "carrierFreqRight": { "@id": "sstim:carrierFreqRight", "@type": "xsd:decimal" },
-    "initialVolume": { "@id": "sstim:initialVolume", "@type": "xsd:decimal" },
-    "panPosition": { "@id": "sstim:panPosition", "@type": "xsd:decimal" },
-    "baseFrequency": { "@id": "sstim:baseFrequency", "@type": "xsd:decimal" },
-    "beatHz": { "@id": "sstim:beatHz", "@type": "xsd:decimal" },
-    "pulseRateHz": { "@id": "sstim:pulseRateHz", "@type": "xsd:decimal" },
-    "noteDurationFraction": { "@id": "sstim:noteDurationFraction", "@type": "xsd:decimal" },
-    "noteCount": { "@id": "sstim:noteCount", "@type": "xsd:integer" },
-    "octaveSpan": { "@id": "sstim:octaveSpan", "@type": "xsd:decimal" },
-    "cycleDuration": { "@id": "sstim:cycleDuration", "@type": "xsd:decimal" },
-    "permutationFunction": { "@id": "sstim:permutationFunction", "@type": "xsd:integer" },
-    "breathingPhaseRatio": { "@id": "sstim:breathingPhaseRatio", "@type": "xsd:decimal" },
-    "breathingAmplitude": { "@id": "sstim:breathingAmplitude", "@type": "xsd:decimal" },
-    "martigliCenterFreq": { "@id": "sstim:martigliCenterFreq", "@type": "xsd:decimal" },
-    "martigliAmplitude": { "@id": "sstim:martigliAmplitude", "@type": "xsd:decimal" },
-    "martigliPeriodInitial": { "@id": "sstim:martigliPeriodInitial", "@type": "xsd:decimal" },
-    "martigliPeriodFinal": { "@id": "sstim:martigliPeriodFinal", "@type": "xsd:decimal" },
-    "martigliTransitionDuration": { "@id": "sstim:martigliTransitionDuration", "@type": "xsd:decimal" },
-    "isBreathReference": { "@id": "sstim:isBreathReference", "@type": "xsd:boolean" },
-    "rotationSpeed": { "@id": "sstim:rotationSpeed", "@type": "xsd:decimal" },
-    "visualSideCount": { "@id": "sstim:visualSideCount", "@type": "xsd:integer" },
-    "visualDensity": { "@id": "sstim:visualDensity", "@type": "xsd:decimal" },
-    "stimulationIntensity": { "@id": "sstim:stimulationIntensity", "@type": "xsd:decimal" },
-    "hapticPattern": { "@id": "sstim:hapticPattern", "@type": "xsd:integer" },
-    "tempoBpm": { "@id": "sstim:tempoBpm", "@type": "xsd:decimal" },
-    "beatsPerBar": { "@id": "sstim:beatsPerBar", "@type": "xsd:integer" },
-
-    "hasExposureProfile": { "@id": "sstim-ex:hasExposureProfile", "@type": "@id" },
-    "usesStimulusChannel": { "@id": "sstim-ex:usesStimulusChannel", "@type": "@id" },
-    "deliveryMedium": { "@id": "sstim-ex:deliveryMedium", "@type": "@id" },
-    "characteristicDeliveryMedium": { "@id": "sstim-ex:characteristicDeliveryMedium", "@type": "@id" },
-    "channelRole": { "@id": "sstim-ex:channelRole", "@type": "@id" },
-    "perceivedModality": { "@id": "sstim-ex:perceivedModality", "@type": "@id" },
-    "requiresDeviceCapability": { "@id": "sstim-ex:requiresDeviceCapability", "@type": "@id" },
-    "hasBodyPlacement": { "@id": "sstim-ex:hasBodyPlacement", "@type": "@id" },
-    "hasComfortBoundary": { "@id": "sstim-ex:hasComfortBoundary", "@type": "@id" },
-    "hasPerceptualGain": { "@id": "sstim-ex:hasPerceptualGain", "@type": "@id" },
-    "hasPerceptualLoss": { "@id": "sstim-ex:hasPerceptualLoss", "@type": "@id" },
-    "hasEffectClaim": { "@id": "sstim-ex:hasEffectClaim", "@type": "@id" },
-    "hasExperimentContext": { "@id": "sstim-ex:hasExperimentContext", "@type": "@id" },
-    "hasKnowledgeStatus": { "@id": "sstim-ex:hasKnowledgeStatus", "@type": "@id" },
-    "hasStimulusPattern": { "@id": "sstim-ex:hasStimulusPattern", "@type": "@id" },
-    "concernsEffectDimension": { "@id": "sstim-ex:concernsEffectDimension", "@type": "@id" },
-    "hasExposureLimit": { "@id": "sstim-ex:hasExposureLimit", "@type": "@id" },
-    "conformsToStandard": { "@id": "sstim-ex:conformsToStandard", "@type": "@id" },
-    "appliesToPlacement": { "@id": "sstim-ex:appliesToPlacement", "@type": "@id" },
-    "affordsDeliveryMedium": { "@id": "sstim-ex:affordsDeliveryMedium", "@type": "@id" },
-    "hasFrequencyHz": { "@id": "sstim-ex:hasFrequencyHz", "@type": "xsd:decimal" },
-    "hasFlickerRateHz": { "@id": "sstim-ex:hasFlickerRateHz", "@type": "xsd:decimal" },
-    "hasBeatFrequencyHz": { "@id": "sstim-ex:hasBeatFrequencyHz", "@type": "xsd:decimal" },
-    "hasDutyCycle": { "@id": "sstim-ex:hasDutyCycle", "@type": "xsd:decimal" },
-    "hasGainLevel": { "@id": "sstim-ex:hasGainLevel", "@type": "xsd:decimal" },
-    "hasPhaseOffset": { "@id": "sstim-ex:hasPhaseOffset", "@type": "xsd:decimal" },
+    "wasAttributedTo": {
+      "@id": "prov:wasAttributedTo",
+      "@type": "@id"
+    },
+    "wasAssociatedWith": {
+      "@id": "prov:wasAssociatedWith",
+      "@type": "@id"
+    },
+    "wasInformedBy": {
+      "@id": "prov:wasInformedBy",
+      "@type": "@id"
+    },
+    "wasRevisionOf": {
+      "@id": "prov:wasRevisionOf",
+      "@type": "@id"
+    },
+    "wasGeneratedBy": {
+      "@id": "prov:wasGeneratedBy",
+      "@type": "@id"
+    },
+    "generated": {
+      "@id": "prov:generated",
+      "@type": "@id"
+    },
+    "invalidated": {
+      "@id": "prov:invalidated",
+      "@type": "@id"
+    },
+    "startedAtTime": {
+      "@id": "prov:startedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    "endedAtTime": {
+      "@id": "prov:endedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    "generatedAtTime": {
+      "@id": "prov:generatedAtTime",
+      "@type": "xsd:dateTime"
+    },
+    "carrierFreqLeft": {
+      "@id": "sstim:carrierFreqLeft",
+      "@type": "xsd:decimal"
+    },
+    "carrierFreqRight": {
+      "@id": "sstim:carrierFreqRight",
+      "@type": "xsd:decimal"
+    },
+    "initialVolume": {
+      "@id": "sstim:initialVolume",
+      "@type": "xsd:decimal"
+    },
+    "panPosition": {
+      "@id": "sstim:panPosition",
+      "@type": "xsd:decimal"
+    },
+    "baseFrequency": {
+      "@id": "sstim:baseFrequency",
+      "@type": "xsd:decimal"
+    },
+    "beatHz": {
+      "@id": "sstim:beatHz",
+      "@type": "xsd:decimal"
+    },
+    "pulseRateHz": {
+      "@id": "sstim:pulseRateHz",
+      "@type": "xsd:decimal"
+    },
+    "noteDurationFraction": {
+      "@id": "sstim:noteDurationFraction",
+      "@type": "xsd:decimal"
+    },
+    "noteCount": {
+      "@id": "sstim:noteCount",
+      "@type": "xsd:integer"
+    },
+    "octaveSpan": {
+      "@id": "sstim:octaveSpan",
+      "@type": "xsd:decimal"
+    },
+    "cycleDuration": {
+      "@id": "sstim:cycleDuration",
+      "@type": "xsd:decimal"
+    },
+    "permutationFunction": {
+      "@id": "sstim:permutationFunction",
+      "@type": "xsd:integer"
+    },
+    "breathingPhaseRatio": {
+      "@id": "sstim:breathingPhaseRatio",
+      "@type": "xsd:decimal"
+    },
+    "breathingAmplitude": {
+      "@id": "sstim:breathingAmplitude",
+      "@type": "xsd:decimal"
+    },
+    "martigliCenterFreq": {
+      "@id": "sstim:martigliCenterFreq",
+      "@type": "xsd:decimal"
+    },
+    "martigliAmplitude": {
+      "@id": "sstim:martigliAmplitude",
+      "@type": "xsd:decimal"
+    },
+    "martigliPeriodInitial": {
+      "@id": "sstim:martigliPeriodInitial",
+      "@type": "xsd:decimal"
+    },
+    "martigliPeriodFinal": {
+      "@id": "sstim:martigliPeriodFinal",
+      "@type": "xsd:decimal"
+    },
+    "martigliTransitionDuration": {
+      "@id": "sstim:martigliTransitionDuration",
+      "@type": "xsd:decimal"
+    },
+    "isBreathReference": {
+      "@id": "sstim:isBreathReference",
+      "@type": "xsd:boolean"
+    },
+    "rotationSpeed": {
+      "@id": "sstim:rotationSpeed",
+      "@type": "xsd:decimal"
+    },
+    "visualSideCount": {
+      "@id": "sstim:visualSideCount",
+      "@type": "xsd:integer"
+    },
+    "visualDensity": {
+      "@id": "sstim:visualDensity",
+      "@type": "xsd:decimal"
+    },
+    "stimulationIntensity": {
+      "@id": "sstim:stimulationIntensity",
+      "@type": "xsd:decimal"
+    },
+    "hapticPattern": {
+      "@id": "sstim:hapticPattern",
+      "@type": "xsd:integer"
+    },
+    "tempoBpm": {
+      "@id": "sstim:tempoBpm",
+      "@type": "xsd:decimal"
+    },
+    "beatsPerBar": {
+      "@id": "sstim:beatsPerBar",
+      "@type": "xsd:integer"
+    },
+    "hasExposureProfile": {
+      "@id": "sstim-ex:hasExposureProfile",
+      "@type": "@id"
+    },
+    "usesStimulusChannel": {
+      "@id": "sstim-ex:usesStimulusChannel",
+      "@type": "@id"
+    },
+    "deliveryMedium": {
+      "@id": "sstim-ex:deliveryMedium",
+      "@type": "@id"
+    },
+    "characteristicDeliveryMedium": {
+      "@id": "sstim-ex:characteristicDeliveryMedium",
+      "@type": "@id"
+    },
+    "channelRole": {
+      "@id": "sstim-ex:channelRole",
+      "@type": "@id"
+    },
+    "perceivedModality": {
+      "@id": "sstim-ex:perceivedModality",
+      "@type": "@id"
+    },
+    "requiresDeviceCapability": {
+      "@id": "sstim-ex:requiresDeviceCapability",
+      "@type": "@id"
+    },
+    "hasBodyPlacement": {
+      "@id": "sstim-ex:hasBodyPlacement",
+      "@type": "@id"
+    },
+    "hasComfortBoundary": {
+      "@id": "sstim-ex:hasComfortBoundary",
+      "@type": "@id"
+    },
+    "hasPerceptualGain": {
+      "@id": "sstim-ex:hasPerceptualGain",
+      "@type": "@id"
+    },
+    "hasPerceptualLoss": {
+      "@id": "sstim-ex:hasPerceptualLoss",
+      "@type": "@id"
+    },
+    "hasEffectClaim": {
+      "@id": "sstim-ex:hasEffectClaim",
+      "@type": "@id"
+    },
+    "hasExperimentContext": {
+      "@id": "sstim-ex:hasExperimentContext",
+      "@type": "@id"
+    },
+    "hasKnowledgeStatus": {
+      "@id": "sstim-ex:hasKnowledgeStatus",
+      "@type": "@id"
+    },
+    "hasStimulusPattern": {
+      "@id": "sstim-ex:hasStimulusPattern",
+      "@type": "@id"
+    },
+    "concernsEffectDimension": {
+      "@id": "sstim-ex:concernsEffectDimension",
+      "@type": "@id"
+    },
+    "hasExposureLimit": {
+      "@id": "sstim-ex:hasExposureLimit",
+      "@type": "@id"
+    },
+    "conformsToStandard": {
+      "@id": "sstim-ex:conformsToStandard",
+      "@type": "@id"
+    },
+    "appliesToPlacement": {
+      "@id": "sstim-ex:appliesToPlacement",
+      "@type": "@id"
+    },
+    "affordsDeliveryMedium": {
+      "@id": "sstim-ex:affordsDeliveryMedium",
+      "@type": "@id"
+    },
+    "hasFrequencyHz": {
+      "@id": "sstim-ex:hasFrequencyHz",
+      "@type": "xsd:decimal"
+    },
+    "hasFlickerRateHz": {
+      "@id": "sstim-ex:hasFlickerRateHz",
+      "@type": "xsd:decimal"
+    },
+    "hasBeatFrequencyHz": {
+      "@id": "sstim-ex:hasBeatFrequencyHz",
+      "@type": "xsd:decimal"
+    },
+    "hasDutyCycle": {
+      "@id": "sstim-ex:hasDutyCycle",
+      "@type": "xsd:decimal"
+    },
+    "hasGainLevel": {
+      "@id": "sstim-ex:hasGainLevel",
+      "@type": "xsd:decimal"
+    },
+    "hasPhaseOffset": {
+      "@id": "sstim-ex:hasPhaseOffset",
+      "@type": "xsd:decimal"
+    },
     "referencePitchNote": "sstim-ex:referencePitchNote",
-    "referencePitchHz": { "@id": "sstim-ex:referencePitchHz", "@type": "xsd:decimal" },
-    "retunedFromReferenceHz": { "@id": "sstim-ex:retunedFromReferenceHz", "@type": "xsd:decimal" },
-    "pitchShiftCents": { "@id": "sstim-ex:pitchShiftCents", "@type": "xsd:decimal" },
-    "limitValue": { "@id": "sstim-ex:limitValue", "@type": "xsd:decimal" },
+    "referencePitchHz": {
+      "@id": "sstim-ex:referencePitchHz",
+      "@type": "xsd:decimal"
+    },
+    "retunedFromReferenceHz": {
+      "@id": "sstim-ex:retunedFromReferenceHz",
+      "@type": "xsd:decimal"
+    },
+    "pitchShiftCents": {
+      "@id": "sstim-ex:pitchShiftCents",
+      "@type": "xsd:decimal"
+    },
+    "limitValue": {
+      "@id": "sstim-ex:limitValue",
+      "@type": "xsd:decimal"
+    },
     "limitUnit": "sstim-ex:limitUnit",
     "limitQuantity": "sstim-ex:limitQuantity",
-    "limitAveragingTime": { "@id": "sstim-ex:limitAveragingTime", "@type": "xsd:duration" },
-    "limitMaxFrequencyHz": { "@id": "sstim-ex:limitMaxFrequencyHz", "@type": "xsd:decimal" }
+    "limitAveragingTime": {
+      "@id": "sstim-ex:limitAveragingTime",
+      "@type": "xsd:duration"
+    },
+    "limitMaxFrequencyHz": {
+      "@id": "sstim-ex:limitMaxFrequencyHz",
+      "@type": "xsd:decimal"
+    },
+    "StimulationSignal": "sstim:StimulationSignal",
+    "SignalRendering": "sstim:SignalRendering",
+    "SignalShape": "sstim:SignalShape",
+    "RenderingMechanism": "sstim:RenderingMechanism",
+    "RenderingPresence": "sstim:RenderingPresence",
+    "RenderableParameter": "sstim:RenderableParameter",
+    "hasSignal": {
+      "@id": "sstim:hasSignal",
+      "@type": "@id"
+    },
+    "hasSignalShape": {
+      "@id": "sstim:hasSignalShape",
+      "@type": "@id"
+    },
+    "signalSourceAsset": {
+      "@id": "sstim:signalSourceAsset",
+      "@type": "@id"
+    },
+    "signalWithinBand": {
+      "@id": "sstim:signalWithinBand",
+      "@type": "@id"
+    },
+    "signalCoversBand": {
+      "@id": "sstim:signalCoversBand",
+      "@type": "@id"
+    },
+    "signalOverlapsBand": {
+      "@id": "sstim:signalOverlapsBand",
+      "@type": "@id"
+    },
+    "hasSignalRendering": {
+      "@id": "sstim:hasSignalRendering",
+      "@type": "@id"
+    },
+    "rendersSignal": {
+      "@id": "sstim:rendersSignal",
+      "@type": "@id"
+    },
+    "rendersOntoParameter": {
+      "@id": "sstim:rendersOntoParameter",
+      "@type": "@id"
+    },
+    "hasRenderingMechanism": {
+      "@id": "sstim:hasRenderingMechanism",
+      "@type": "@id"
+    },
+    "hasRenderingPresence": {
+      "@id": "sstim:hasRenderingPresence",
+      "@type": "@id"
+    },
+    "renderingCarrierHz": {
+      "@id": "sstim:renderingCarrierHz",
+      "@type": "xsd:decimal"
+    }
   }
 }

@@ -138,6 +138,10 @@ file is the human-readable summary.
   not, and that SSTIM carries two modality vocabularies —
   `sstim-ex:PerceivedModality` with twelve concepts including proprioceptive,
   and `sstim:SensoryModality` with six, a strict subset.
+- **`sstim:hzMin` and `sstim:hzMax` accept a signal as well as a band.** The
+  bound means the same thing on both — the edge of a frequency extent — and a
+  signal needs one because noise spans a range rather than sitting at a point. A
+  domain widening, so every existing band assertion is unaffected.
 - `make band-scope-notes` also checks frequency arithmetic: every oscillation's
   extended range must contain its typical ambit, and no band's interval may run
   backwards.

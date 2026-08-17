@@ -75,7 +75,7 @@ annotations lives here.
 | [0049](0049-neural-oscillations-and-frequency-ambits.md) | Neural oscillations are the missing term; frequency bands were always ambits — closes KR-08 and KR-09 | Accepted |
 | [0050](0050-public-claim-applicability-contract.md) | Public claims need an applicability contract, not just a tier — closes KR-04 | Accepted |
 | [0051](0051-sstim-preset-contract.md) | SSTIM's own preset contract: modality-neutral components, inspired by the BioSynCare catalog and bound to none — closes KR-07 | Accepted |
-| [0052](0052-abstract-signals-and-sensory-renderings.md) | One signal, several sensory renderings: carrier and modulator are an audio rendering, not the universal structure | Proposed |
+| [0052](0052-abstract-signals-and-sensory-renderings.md) | One signal, several sensory renderings: carrier and modulator are an audio rendering, not the universal structure | Accepted |
 
 ## ADR lifecycle and revision policy
 

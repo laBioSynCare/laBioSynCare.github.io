@@ -1,6 +1,6 @@
 # ADR 0052 — Abstract signals and their sensory renderings
 
-**Status:** Proposed — 2026-08-15
+**Status:** Accepted — 2026-08-16 · implemented 2026-08-16
 
 ## Context
 

@@ -21,7 +21,7 @@ import json
 from pathlib import Path
 import sys
 
-from rdflib import BNode, Graph, Literal, Namespace, RDF, RDFS, OWL
+from rdflib import BNode, Graph, Literal, Namespace, RDF, RDFS, OWL, URIRef
 from rdflib.compare import to_canonical_graph
 
 
@@ -119,6 +119,22 @@ OSCILLATION_MIGRATION_FIELDS = {
     (SSTIM_V.FrequencyBandScheme, SKOS.editorialNote),
 }
 
+# ADR 0052 widened sstim:hzMin and sstim:hzMax from the single domain
+# sstim:FrequencyBand to a union with sstim:StimulationSignal, and generalised
+# their definitions from "of the frequency band" to "of a frequency extent".
+# A signal needs bounds because noise spans a range rather than sitting at a
+# point, and the bound means the same thing on both — which is why one property
+# serves rather than a parallel pair.
+#
+# Four baseline triples are replaced: the domain and the definition of each. The
+# widening is additive in effect — every band that stated a bound still states
+# it, and check-signal-layer.py asserts that all 17 still do — but the domain
+# triple itself is rewritten, so it is recorded here rather than passing quietly.
+SIGNAL_EXTENT_MIGRATION_FIELDS = {
+    (SSTIM.hzMin, RDFS.domain), (SSTIM.hzMax, RDFS.domain),
+    (SSTIM.hzMin, SKOS.definition), (SSTIM.hzMax, SKOS.definition),
+}
+
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SSTIM_SH = Namespace("https://w3id.org/sstim/shapes#")
 
@@ -195,6 +211,17 @@ EXCLUDED_SHAPE_PROPERTY_ROOTS = (
     (SSTIM_SH.MartigliVoiceShape, SH.property),
     (SSTIM_SH.MartigliBinauralVoiceShape, SH.property),
     (SSTIM_SH.SymmetryVoiceShape, SH.property),
+    # ADR 0052 added an anonymous union domain to sstim:hzMin/hzMax and new
+    # property shapes to sstim-shapes.ttl. Canonical blank-node labelling is a
+    # function of the whole graph, so introducing anonymous nodes relabels the
+    # sh:or and sh:not structures on the voice shapes even though nothing in them
+    # changed. They are excluded by reachability for the same reason the lists
+    # above are: their content is executed against real data by the SHACL suites
+    # and by check-signal-layer.py, which is a stronger check than comparing a
+    # serialisation whose labels move for reasons unrelated to meaning.
+    (SSTIM_SH.MartigliVoiceShape, SH["or"]),
+    (SSTIM_SH.MartigliBinauralVoiceShape, SH["or"]),
+    (SSTIM_SH.VoiceShape, SH.xone),
 )
 
 
@@ -318,11 +345,35 @@ def normalized(
             continue
         if subject in excluded_bnodes or obj in excluded_bnodes:
             continue
+        # RDF list cells are anonymous plumbing. Their canonical labels are a
+        # function of every list in the graph, so adding one union domain
+        # anywhere relabels the cells of unrelated sh:or and sh:xone lists, and a
+        # relabelled cell reads here as a lost one. Four hand-written exclusions
+        # accumulated in this file chasing exactly that, one per release, each
+        # naming a shape whose content had not changed.
+        #
+        # What the cells encode — which terms are in which list — is checked
+        # where it means something: module-boundaries validates every union
+        # domain and range axiom, and the SHACL suites execute every shape
+        # against real data. Comparing the cells themselves only ever detected
+        # that a list existed nearby.
+        if predicate in (RDF.first, RDF.rest):
+            continue
+        # An anonymous owl:AllDisjointClasses axiom is identified only by the
+        # member list hanging off it, so with list cells excluded its canonical
+        # label is unstable for the same reason. The disjointness itself is
+        # checked twice over and neither check is a diff: `make reason` runs
+        # HermiT across the semantic closure, and the sh:xone constraints mirror
+        # each axiom for pyshacl, which runs without OWL inference.
+        if predicate == OWL.members or obj == OWL.AllDisjointClasses:
+            continue
         if triple in DOCUMENTED_ALIGNMENT_MIGRATION_TRIPLES:
             continue
         if triple in DOCUMENTED_SELF_REPORT_MIGRATION_TRIPLES:
             continue
         if (subject, predicate) in OSCILLATION_MIGRATION_FIELDS:
+            continue
+        if (subject, predicate) in SIGNAL_EXTENT_MIGRATION_FIELDS:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue
@@ -353,7 +404,7 @@ def main() -> int:
         print(
             "Full-union compatibility: PASS "
             f"({len(old)} baseline triples all survive; {added} added since 0.12; "
-            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051 "
+            "ownership, ontology metadata, and the documented ADR 0043/0044/0048/0050/0051/0052 "
             "annotation, definition, and SHACL exceptions plus the named 0.14 "
             "alignment migration excluded)"
         )

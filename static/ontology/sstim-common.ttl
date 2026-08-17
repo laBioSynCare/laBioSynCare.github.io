@@ -192,18 +192,41 @@ sstim:hasCautionSeverity a owl:ObjectProperty, owl:FunctionalProperty ;
     skos:definition "Assigns exactly one interface-priority severity category to a caution tag."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
+sstim:signalWithinBand a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "signal within band"@en ;
+    skos:definition "The signal's whole frequency extent lies inside this named band. A point signal such as 10 Hz within alpha is the ordinary case."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:signalCoversBand a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "signal covers band"@en ;
+    skos:definition "The signal's frequency extent contains the whole of this named band — broadband noise covering theta, for instance. The converse of signalWithinBand, and the reason the signal/band relation is an interval relation rather than membership."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
+sstim:signalOverlapsBand a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "signal overlaps band"@en ;
+    skos:definition "The signal's frequency extent and the band intersect, with neither containing the other. Recorded rather than inferred, because a partial overlap is a design decision worth stating."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/common> .
+
 sstim:hzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:FrequencyBand ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "Hz minimum"@en ;
-    skos:definition "Lower bound (inclusive) of the frequency band in Hz."@en ;
+    skos:definition "Lower bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
+    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the lower edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:hzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
-    rdfs:domain sstim:FrequencyBand ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:FrequencyBand sstim:StimulationSignal ) ] ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "Hz maximum"@en ;
-    skos:definition "Upper bound (inclusive) of the frequency band in Hz."@en ;
+    skos:definition "Upper bound (inclusive) of a frequency extent in Hz, whether that extent is a named band or the extent a signal occupies."@en ;
+    skos:historyNote "Domain widened 2026-08-16 (ADR 0052) from sstim:FrequencyBand to a union with sstim:StimulationSignal. The bound means the same thing in both — the upper edge of a frequency extent — and a signal needs one because noise spans a range rather than sitting at a point. Existing band assertions are unaffected."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/common> .
 
 sstim:cautionSeverityRank a owl:DatatypeProperty, owl:FunctionalProperty ;

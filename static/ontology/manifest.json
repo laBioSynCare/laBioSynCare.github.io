@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "7acb8234c87eea9435463f8447fda0a3f85a65bb882ba2f19727805b428ac414"
+        "sha256": "af36a82db02524a166750b0032c79f38ab4c83ae6d10f5c4d40f76f2029aed91"
       },
       "runtime": {
         "url": "/ontology/sstim-stimulus.ttl",
@@ -183,7 +183,7 @@
       "source": {
         "path": "static/ontology/sstim-common.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1345fcd6e3889574219525b87f7fe23fedb244a2b56683fde3552b7cc4566f2e"
+        "sha256": "c9b89dc8d457a7b3e946326f909ddea8be049b98960457de77f317cfbb0e2fc5"
       },
       "runtime": {
         "url": "/ontology/sstim-common.ttl",
@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "6b0572e014637f4b199cae80e16023fe10c62d8a9b828857912c89b15b2b993f"
+        "sha256": "a8669c5906bb85d0e57969848f36c33ef580a338fe19f0d25c149c7fa99c99ba"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -433,6 +433,7 @@
         "neuromodulation",
         "patch-studio",
         "session",
+        "stimulus",
         "technique"
       ],
       "requiresProfiles": [],
@@ -672,7 +673,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "419fd3aa26bdc4182104a1bb5437d035e65ca4e1d3add0bfa076d2e41ed2970d"
+        "sha256": "6161ca473d41bfcb6c9d012b7d0f3a7aecb21f772ac2a71f01adb23cd7d56472"
       },
       "runtime": {
         "url": "/ontology/sstim-shapes.ttl",
@@ -793,7 +794,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "067b0d43c7ff15740f508b330ebfd79e97d9120a25ccf20a27c9765623110009"
+      "sha256": "98a3418640eacce41f83a970bd3757ce4d07e4a2bdad72dcb894ba3abe02c9cd"
     },
     {
       "id": "core-plus",
@@ -841,7 +842,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "c9727d1d5846bd81ab1b07dbf91fda1746cef129a42aecf737e417e31bd73fc2"
+      "sha256": "6a007b66b0854b3b6acb70cb96b5dec8c548667c51518f67d75a1f6083ae91d0"
     },
     {
       "id": "full",
@@ -904,7 +905,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "f8c48e5527fd5db749546895901d930b8b194fdfbe9a4d06bd837ec152501151"
+      "sha256": "d9821525ac530ef2a7f12fa073e56b51c0b7d163e56ade4fa453e0e0015a4f2b"
     }
   ]
 }
