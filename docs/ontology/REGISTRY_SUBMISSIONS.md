@@ -89,7 +89,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
-| OLS | ⚠️ if accepted | yes | low |
+| OLS4 | ✅ **actionable** — absent (404) but non-OBO w3id ontologies are accepted and `EBISPOT/ols4` merges "Add X" PRs weekly; needs one entry in `ebi_ontologies.json` on `dev` | yes (GitHub) | **high** |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | DBpedia KG Catalog | 🕓 **submitted 2026-08-18** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run yet | yes (GitHub) | watch |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -969,11 +969,48 @@ Office decides what goes on *their* instance, so the answer may be a redirect.
 Status: **drafted, not sent.** Send it, then record the reply here before doing
 anything else with this registry.
 
-### OLS (Ontology Lookup Service) — only if accepted
+### OLS4 (EBI Ontology Lookup Service) — ACTIONABLE NOW
 
-OBO-adjacent browsing without changing SSTIM identifiers. OLS ingests via a
-config entry (a PR to the EBI OLS config repository) — **confirm the current
-repository and format**. Lower priority; pursue after Archivo/LOV land.
+OBO-adjacent browsing without changing SSTIM identifiers. The old note here said
+"confirm the current repository and format" and rated this low priority behind
+Archivo and LOV. Both of those turned out to be dormant, and this one is not, so
+the priority was backwards. Confirmed 2026-08-18:
+
+**Absence measured, not assumed.** `GET /ols4/api/ontologies/sstim` and `/SSTIM`
+both return 404 against 282 indexed ontologies.
+
+**Non-OBO ontologies are accepted.** 207 of the 282 come from
+`purl.obolibrary.org`, but **13 are served from `w3id.org`** — our own namespace
+host — including AIO, Biolink, CPONT, CRediT, MIXS, METPO, ROR and Value Sets.
+Several are scholarly infrastructure rather than biomedical, so the profile is
+broader than "OBO Foundry only".
+
+**The repository is alive**, unlike Archivo's: `EBISPOT/ols4`, last pushed
+2026-08-14, 98 stars, and a steady stream of merged "Add X ontology" pull
+requests — #1349 Value Sets and #1350 CMPO on 11 and 14 August, #1348 REHABO,
+#1337 UOGTO, #1332 AIO. 41 issues and PRs match that pattern.
+
+**The exact mechanism**, taken from merged PR #1349 rather than guessed: a single
+entry appended to **`ebi_ontologies.json`** at the repository root, on the
+**`dev`** branch. `dataload/configs/*.json` is a separate, older mechanism and
+`foundry.json` is the auto-pulled OBO set; neither is the route. Fields used by
+recent entries:
+
+    id, creator[], is_foundary (their spelling), preferredPrefix, title, uri,
+    description, homepage, mailing_list, label_property[],
+    definition_property[], synonym_property[], hierarchical_property[],
+    base_uri, reasoner, oboSlims, ontology_purl
+
+**We already publish the artifact it needs.** OLS ingests one file;
+`https://labiosyncare.github.io/ontology/sstim-full.owl` is live, 1160658 bytes,
+`application/rdf+xml` — the merged OWL bundle CI generates for BioPortal, which
+serves this purpose too. No new build step is required.
+
+Note SSTIM's SKOS layer is a good fit for the `definition_property` and
+`synonym_property` fields, which recent entries point at `skos:definition` and
+`skos:altLabel`. Our `skos:altLabel` coverage is currently zero — see
+`make language-coverage` and the alias note in `CURRENT_STATE.md` — so the
+synonym field would be declared but empty.
 
 ```text
 Service:            OLS (EBI)
