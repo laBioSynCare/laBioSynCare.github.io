@@ -911,6 +911,43 @@ Required follow-up: Watch for the label, the automated validation comment, and
                     "ontologies". One edit to the issue changes it.
 ```
 
+### ShowVoc (EU Publications Office) — EVALUATED, NOT SUBMITTED
+
+<https://showvoc.op.europa.eu/> — an EU Publications Office instance of ShowVoc,
+the Semantic Turkey / VocBench browser. Raised 2026-08-18; researched rather than
+submitted, and the reasoning is here so it is not re-researched.
+
+**What it holds**, from `st-core-services/Projects/listProjects` on 2026-08-18:
+255 datasets, of which 143 are `data.europa.eu`, 83 `publications.europa.eu` and
+14 `inspire.ec.europa.eu`. Only about seven are third-party, and every one is a
+major international reference vocabulary — three OBO ontologies, GeoNames, the
+NCI Thesaurus, OMG, EFSA. By model: 233 SKOS, 20 OWL, 2 RDFS.
+
+**A public contribution workflow exists in the software.** The Angular bundle
+carries `/contribution` and `/contributions` routes, `contributorName` /
+`contributorLastName` / `contributorEmail` fields, and token-based
+`load/stable/:token` and `load/dev/:format/:token` flows — the standard ShowVoc
+model where a request is approved by an administrator who then sends a load link.
+
+**Whether that workflow is open on the EU instance could not be verified from
+outside**, and the entry says so rather than guessing: system settings return
+"Access denied. You need to be logged in", and the bundle exposes no contact
+address. Note also that Semantic Turkey answers **HTTP 200 with an error body**
+— a probe for a non-existent service returned 200 carrying
+`NoResourceFoundException`. A status code is not an answer here.
+
+**Recommendation: ask before submitting.** The contrast with the DBpedia KG
+Catalog is the whole argument. There, the maintainer solicited beta submissions
+in a channel we are in, ontologies were explicitly in scope, and an ontology was
+already catalogued. Here there is no invitation, no confirmed public route, and
+a peer group of long-established reference vocabularies. An unsolicited
+submission from a four-month-old ontology risks reading as noise in an
+institutional context where that is expensive and hard to undo.
+
+If pursued: ask the ShowVoc/VocBench maintainers (ART group, Univ. Roma Tor
+Vergata) or the Publications Office whether third-party vocabularies are
+accepted, and only then use the contribution form.
+
 ### OLS (Ontology Lookup Service) — only if accepted
 
 OBO-adjacent browsing without changing SSTIM identifiers. OLS ingests via a

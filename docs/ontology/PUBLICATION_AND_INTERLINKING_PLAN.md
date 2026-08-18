@@ -206,6 +206,7 @@ Submissions follow successful WIDOCO and w3id verification.
 | LOV | Submit | Vocabulary discovery and term search; requires stable dereferencing and metadata. |
 | prefix.cc | **Done** | Public prefix-to-namespace lookup (`sstim` registered). |
 | BARTOC | Submit | Discovery for the SKOS terminology layer. |
+| DBpedia KG Catalog | Submit | New, actively developed, maintainer soliciting beta testers; ontologies in scope (domain 8) with CSO as precedent. |
 | BioPortal | Submit | Biomedical browsing, APIs, and candidate mapping discovery. |
 | OLS | Submit if accepted | OBO-adjacent browsing without changing SSTIM identifiers. |
 | FAIRsharing | Submit | FAIR standard/resource registration linked to the DOI. |
