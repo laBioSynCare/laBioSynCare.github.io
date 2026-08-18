@@ -111,26 +111,21 @@ def local(term) -> str:
     return text.rsplit("#", 1)[-1] if "#" in text else text.rsplit("/", 1)[-1]
 
 
-# HED tag values may not contain spaces, and a SKOS notation is already the
-# hyphenated form the vocabulary settled on — `modulation-frequency` — so the
-# parameter kind travels as its notation with the leading `param` stripped and
-# capitalised, which is what HED's Parameter-label expects.
-PARAM_LABELS = {
-    "paramLevel": "Level",
-    "paramCarrierFrequency": "Carrier-frequency",
-    "paramModulationFrequency": "Modulation-frequency",
-    "paramDutyCycle": "Duty-cycle",
-    "paramPhaseOffset": "Phase-offset",
-}
+def fill_detail(spec: dict, entry: dict, row: dict) -> str:
+    """Append the filled detailTemplate to an event's base HED string.
 
-
-def fill_detail(entry: dict, row: dict) -> str:
-    """Append the filled detailTemplate to an event's base HED string."""
-    label = PARAM_LABELS.get(row["kind"])
+    The parameter kind's HED label comes from the mapping contract's
+    `parameterKinds`, not from a table in here. It was a dict in this file until
+    crosswalk 0.4.0, which put it in the wrong place twice: it is part of the
+    SSTIM-to-HED contract rather than of one generator, and nothing checked it
+    still covered `sstim-v:StimulationParameterKindScheme`. `make hed-crosswalk`
+    now checks exactly that, the same way it has always checked the event map.
+    """
+    label = spec.get("parameterKinds", {}).get(row["kind"])
     if label is None:
         raise SystemExit(
             f"hed-bundle: no HED Parameter-label for {row['kind']} — add it to "
-            f"PARAM_LABELS when the parameter-kind scheme grows"
+            f"parameterKinds in the crosswalk (make hed-crosswalk enforces coverage)"
         )
     detail = entry["detailTemplate"].format(
         parameterKind=label, valueAfter=row["after"], valueBefore=row["before"]
@@ -169,7 +164,7 @@ def read_events(graph: Graph, spec: dict) -> list[dict]:
         # the part the event type alone determines, so a reverse lookup still
         # recovers the type after the detail tags are stripped.
         if "detailTemplate" in entry and row["kind"] and row["after"] is not None:
-            row["hed"] = fill_detail(entry, row)
+            row["hed"] = fill_detail(spec, entry, row)
         else:
             row["hed"] = entry["hed"]
         rows.append(row)
@@ -567,7 +562,7 @@ def build(bundle: dict, out: Path) -> dict:
 # ── checking ─────────────────────────────────────────────────────────────────
 
 
-def check_bundle(bundle: dict, shacl: bool) -> list[str]:
+def check_bundle(bundle: dict) -> list[str]:
     import shutil
     import tempfile
 
@@ -596,8 +591,6 @@ def check_bundle(bundle: dict, shacl: bool) -> list[str]:
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
-    if shacl:
-        problems += shacl_check(bundle)
     return problems
 
 
@@ -698,14 +691,21 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
     return problems
 
 
-def shacl_check(bundle: dict) -> list[str]:
-    """Decision 7 requires the bundle to pass SSTIM SHACL.
+def shacl_check(bundles: tuple) -> list[str]:
+    """Decision 7 requires the bundles to pass SSTIM SHACL.
 
     The fixed bundle's source is a manifest-declared Full-profile fixture and is
-    already validated by `make shacl-modules`; the modulated source is owned by
-    this gate, so this is the only place it gets checked. Both are validated here
-    rather than only the one that needs it, because a check that covers half its
-    inputs invites the reader to assume it covers all of them.
+    already validated by `make shacl-modules`; the segmented and modulated
+    sources are owned by this gate, so this is the only place they get checked.
+    All are validated rather than only the ones that need it, because a check
+    covering half its inputs invites the reader to assume it covers all of them.
+
+    Takes every bundle at once because the closure is the expensive part. Parsing
+    the sixteen Full modules and the shapes per bundle cost about eight seconds
+    each, and this gate runs in `make validate` on every CI push. The sources use
+    disjoint `example:` namespaces and cannot interact, so one pass over their
+    union answers the same question; if it fails, each source is re-validated
+    alone to say which one, since a pooled report cannot.
     """
     from pyshacl import validate as shacl_validate
 
@@ -713,17 +713,38 @@ def shacl_check(bundle: dict) -> list[str]:
         ["node", "scripts/sstim-manifest.mjs", "files", "full"],
         cwd=ROOT, capture_output=True, text=True, check=True,
     ).stdout.split()
-    data = Graph()
+    closure = Graph()
     for path in files:
-        data.parse(ROOT / path, format="turtle")
-    data.parse(ROOT / bundle["source"], format="turtle")
+        closure.parse(ROOT / path, format="turtle")
     shapes = Graph()
     shapes.parse(ROOT / "static" / "ontology" / "sstim-shapes.ttl", format="turtle")
-    conforms, _graph, text = shacl_validate(data, shacl_graph=shapes, advanced=True)
-    if not conforms:
-        head = "\n".join(text.strip().splitlines()[:12])
-        return [f"{bundle['id']}: source fails SSTIM Full shapes\n{head}"]
-    return []
+
+    pooled = Graph()
+    for triple in closure:
+        pooled.add(triple)
+    for bundle in bundles:
+        pooled.parse(ROOT / bundle["source"], format="turtle")
+    conforms, _graph, _text = shacl_validate(pooled, shacl_graph=shapes, advanced=True)
+    if conforms:
+        return []
+
+    problems = []
+    for bundle in bundles:
+        single = Graph()
+        for triple in closure:
+            single.add(triple)
+        single.parse(ROOT / bundle["source"], format="turtle")
+        ok, _g, text = shacl_validate(single, shacl_graph=shapes, advanced=True)
+        if not ok:
+            head = "\n".join(text.strip().splitlines()[:12])
+            problems.append(f"{bundle['id']}: source fails SSTIM Full shapes\n{head}")
+    # The union failed but no source fails alone: that is a real finding, not a
+    # flake, and hiding it behind a clean pass would be the worst outcome.
+    return problems or [
+        "the union of all bundle sources fails SSTIM Full shapes while each "
+        "source passes alone — a cross-source interaction the disjoint-namespace "
+        "assumption says cannot happen"
+    ]
 
 
 def main() -> int:
@@ -745,7 +766,9 @@ def main() -> int:
 
     problems: list[str] = []
     for bundle in BUNDLES:
-        problems += check_bundle(bundle, shacl=not args.no_shacl)
+        problems += check_bundle(bundle)
+    if not args.no_shacl:
+        problems += shacl_check(BUNDLES)
     if problems:
         print(f"hed-bundle: FAILED ({len(problems)} issue(s))")
         for problem in problems:

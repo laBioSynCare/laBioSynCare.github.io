@@ -237,6 +237,13 @@ indexed, examiner-searchable records.
       sidecar entry named `HED` crashes the validator's HED parser; that is
       question 6 to the HED Working Group.*
 
+      *Two of the four warnings are the wrapper's, not ours, and go away with a
+      real dataset: set `HEDVersion` in `dataset_description.json` — BIDS warns
+      `HED_VERSION_NOT_DEFINED` without it, and our HED version lives only in
+      `bundle-manifest.json`, which a BIDS consumer does not read — and write a
+      README longer than a line. Re-measured 2026-08-18 with both in place:
+      zero errors, and only `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` left.*
+
       *Not emitted, for two stated reasons. Decision 3 gates the dataset on "a
       consented research use case" and there is none. And decision 7 requires a
       published binding to pass its validator, which means on every change:

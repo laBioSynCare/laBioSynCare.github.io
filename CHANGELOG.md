@@ -98,6 +98,16 @@ file is the human-readable summary.
   rather than a bare `(Experiment-control, Constrained)`. `hed` remains the part
   the event type alone determines, and `make hed-roundtrip` strips detail tags
   before reversing.
+- **Crosswalk 0.4.0 moves the parameter-kind labels into the contract.** They
+  had been a `PARAM_LABELS` dict inside `generate-hed-bundle.py` — the wrong
+  place twice over: they are part of the SSTIM-to-HED mapping, not of one
+  generator, and nothing checked they still covered
+  `sstim-v:StimulationParameterKindScheme`. A sixth kind would have produced
+  annotations with no `Parameter-label` until some fixture happened to use it,
+  which is the same silent-undercoverage hole `make hed-crosswalk` has always
+  closed for event types — rebuilt one level down, hours after describing it.
+  The gate now checks both schemes, in both directions, and validates each event
+  template filled with every real kind rather than one invented sample.
 - **A third demonstrator bundle, `test/fixtures/hed-bundle-segmented/`**, covering
   the "explicitly segmented" stimulus of decision 5 with piecewise events. There
   is now one bundle per shape the decision names — fixed, segmented, continuous —

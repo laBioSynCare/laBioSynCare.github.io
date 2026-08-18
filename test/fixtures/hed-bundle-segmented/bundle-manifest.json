@@ -8,7 +8,7 @@
     "sstim": "0.16.0-dev",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
-    "mapping": "0.3.0",
+    "mapping": "0.4.0",
     "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
   },

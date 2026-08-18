@@ -7,7 +7,7 @@ one-way, loss-declaring adapter. This checks the adapter's mapping table, which
 is the part that silently rots — a HED tag that never existed, or that a schema
 release removed, produces annotations that look fine and validate nowhere.
 
-Four things are checked, and the first is the one that motivated the script.
+Five things are checked, and the first is the one that motivated the script.
 
 1. **Every mapped string is valid HED against the pinned schema**, which
    subsumes the weaker property that each tag exists. Writing this map by hand
@@ -19,6 +19,12 @@ Four things are checked, and the first is the one that motivated the script.
 2. **The mapping covers `sstim-v:SessionEventTypeScheme` exactly.** A new event
    type with no HED mapping would silently produce an incomplete profile, and a
    mapping for a retired event type is dead weight that reads as coverage.
+
+   The same holds for `sstim-v:StimulationParameterKindScheme` and the
+   `parameterKinds` table. That table was written into the generator as a Python
+   dict with nothing checking it — the identical undercoverage hole, rebuilt one
+   level down within hours of the first being described. It now lives in the
+   mapping contract, where it belongs and where this check can see it.
 
 3. **Loss is declared where the mapping is not injective.** Two SSTIM event
    types that emit identical HED must both say why, because that is precisely
@@ -68,10 +74,14 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
 SCHEME = URIRef("https://w3id.org/sstim/vocab#SessionEventTypeScheme")
 
-# Representative values for validating a detailTemplate. A template is not a HED
-# string until it is filled, so validating the template text would check nothing;
-# these stand in for a real event's values.
-SAMPLE = {"parameterKind": "Level", "valueAfter": "0.15", "valueBefore": "0.30"}
+# A numeric stand-in for the value half of a detailTemplate. The *label* half is
+# never invented: every real parameter kind is substituted in turn below, so the
+# check covers the mapping rather than one representative of it.
+SAMPLE_VALUE = "0.15"
+
+PARAM_KIND_SCHEME = URIRef(
+    "https://w3id.org/sstim/vocab#StimulationParameterKindScheme"
+)
 
 
 def fill_template(entry: dict, values: dict) -> str:
@@ -80,6 +90,11 @@ def fill_template(entry: dict, values: dict) -> str:
     The base `hed` stays the part determined by the event type alone, so a
     reverse lookup can recover it by stripping detail tags. The template adds
     what HED can express and the type alone cannot.
+
+    `generate-hed-bundle.py` performs the same substitution when it emits a
+    bundle. The two are one expression each rather than a shared module, and the
+    duplication is bounded by `make hed-bundle-check`, which revalidates every
+    string actually emitted — a drift between them cannot ship silently.
     """
     detail = entry["detailTemplate"].format(**values)
     return f"{entry['hed'][:-1]}, {detail})"
@@ -115,6 +130,15 @@ PROSE_CLAIMS = (
         "lossy+events",
     ),
 )
+
+
+def kind_labels(spec: dict) -> dict:
+    """SSTIM parameter kind -> HED Parameter-label value, from the contract."""
+    return {
+        name: label
+        for name, label in spec.get("parameterKinds", {}).items()
+        if not name.startswith("$")
+    }
 
 
 def check_prose(counts: dict) -> list[str]:
@@ -187,8 +211,15 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
         # emitted annotation unchecked, which is the shape of the 0.1.0 defect:
         # every part inspected, the actual output never.
         variants = [("", entry["hed"])]
-        if "detailTemplate" in entry:
-            variants.append((" + detail", fill_template(entry, SAMPLE)))
+        for kind, label in sorted(kind_labels(spec).items()):
+            if "detailTemplate" in entry:
+                variants.append((
+                    f" + {kind}",
+                    fill_template(
+                        entry, {"parameterKind": label, "valueAfter": SAMPLE_VALUE,
+                                "valueBefore": SAMPLE_VALUE},
+                    ),
+                ))
         for suffix, string in variants:
             hed_string = HedString(string, schema, def_dict=definitions)
             issues = hed_string.validate(schema)
@@ -232,6 +263,20 @@ def main() -> int:
     for extra in sorted(mapped - concepts):
         failures.append(f"{extra} is mapped but is not in the scheme")
 
+    # 2b. and so does the parameter-kind map, for exactly the same reason. This
+    # table lived in the generator with nothing checking it, so a sixth kind
+    # added to the scheme would have produced annotations missing a
+    # Parameter-label until some fixture happened to exercise it.
+    kinds = {
+        str(c).split("#")[-1]
+        for c in graph.subjects(SKOS.inScheme, PARAM_KIND_SCHEME)
+    }
+    labels = kind_labels(spec)
+    for missing in sorted(kinds - set(labels)):
+        failures.append(f"{missing} is in the parameter-kind scheme with no HED label")
+    for extra in sorted(set(labels) - kinds):
+        failures.append(f"{extra} has a HED label but is not in the parameter-kind scheme")
+
     # 3. collisions must declare their loss
     by_hed: dict[str, list[str]] = {}
     for event, entry in spec["events"].items():
@@ -261,6 +306,7 @@ def main() -> int:
         f"hed-crosswalk: passed ({len(mapped)} event types and {ndefs} definitions "
         f"validate as HED {version} via hedtools, {tag_count} distinct tags, "
         f"{lossy} mappings declare information loss, "
+        f"{len(kind_labels(spec))} parameter kinds cover their scheme, "
         f"{len(PROSE_CLAIMS)} prose restatements agree)"
     )
     return 0

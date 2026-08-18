@@ -408,6 +408,13 @@ but it is the prerequisite for everything after.
    remains is precise: HED has no Safety or Threshold tag, so a HED-only consumer
    sees a constrained parameter without learning the constraint was protective.
 
+   Mapping 0.4.0 then moved the parameter-kind labels out of the generator and
+   into the contract as `parameterKinds`, because the first version of this work
+   rebuilt the exact hole described two paragraphs above: a mapping table with
+   nothing checking it still covered its scheme. `make hed-crosswalk` now holds
+   both schemes to exact coverage and validates each template filled with every
+   real kind rather than one invented sample.
+
    **Decision 6 and 7 gaps closed with it.** Decision 6 asks for cross-artifact
    IDs, which were absent: `events.tsv` now carries an `event_id` column and the
    manifest a `crossArtifactIds` map, and `--check` resolves every one against a

@@ -1,6 +1,6 @@
 {
   "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. An event type may also carry a detailTemplate, whose tags are appended when the event record holds the values they need. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
-  "mappingVersion": "0.3.0",
+  "mappingVersion": "0.4.0",
   "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
   "hedSchema": {
     "name": "HED standard schema",
@@ -84,5 +84,14 @@
     "$comment": "HED definitions naming the two temporal scopes SSTIM events open and close. A consumer must supply these to a HED validator alongside the events, which is what the events.json sidecar does.",
     "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
     "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
+  },
+  "sstimParameterKindScheme": "https://w3id.org/sstim/vocab#StimulationParameterKindScheme",
+  "parameterKinds": {
+    "$comment": "SSTIM parameter kind -> HED Parameter-label value, for the detailTemplates above. This lived in scripts/generate-hed-bundle.py as a PARAM_LABELS dict until 0.4.0, which was the wrong place twice over: it is part of the mapping contract, not of one generator, and nothing checked it still covered the scheme. A kind added to sstim-v:StimulationParameterKindScheme would have gone unmapped until some fixture happened to use it — the same silent-undercoverage failure `events` is checked for.",
+    "paramLevel": "Level",
+    "paramCarrierFrequency": "Carrier-frequency",
+    "paramModulationFrequency": "Modulation-frequency",
+    "paramDutyCycle": "Duty-cycle",
+    "paramPhaseOffset": "Phase-offset"
   }
 }

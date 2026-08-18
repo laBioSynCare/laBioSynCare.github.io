@@ -284,7 +284,10 @@ hed-bundle:
 ## emitting traces reported "bundle-manifest.json is stale" and never said that
 ## it had flattened a time-varying stimulus.
 ##
-## Pass --no-shacl to skip the SHACL pass (~15s of the ~19s) while iterating.
+## The SHACL pass validates every source in one run over their union, because
+## parsing the sixteen Full modules per bundle cost ~8s each and this runs in CI
+## on every push; a failure re-validates each source alone to attribute it. Pass
+## --no-shacl to skip it entirely while iterating.
 hed-bundle-check:
 	$(PYTHON) scripts/generate-hed-bundle.py --check
 
