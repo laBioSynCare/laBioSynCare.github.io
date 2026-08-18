@@ -2,7 +2,7 @@
 #
 #  SSTIM Technique–Exposure Bridge Module
 #
-#  Version:    0.16.0
+#  Version:    0.17.0-dev
 #  Date:       2026-08-18
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -39,7 +39,7 @@
 ###########################################################################
 
 <https://w3id.org/sstim/technique-exposure> a owl:Ontology ;
-    owl:versionInfo "0.16.0" ;
+    owl:versionInfo "0.17.0-dev" ;
     dct:title "SSTIM Technique–Exposure Bridge Module"@en ;
     dct:description "Characteristic physical delivery media asserted for vocabulary-owned stimulation and neuromodulation techniques."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;

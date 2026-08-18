@@ -27,6 +27,7 @@
 //
 // Usage:  node scripts/release-open-dev.mjs 0.15.0-dev
 
+import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -139,7 +140,16 @@ for (const entry of [...manifest.modules, ...manifest.profiles]) {
 }
 writeFileSync(MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
 
+// The ADR 0025 demonstrator bundles record the SSTIM suite version, so both ends
+// of a release make them stale — the prepare that moves it to X.Y.Z and the
+// reopen that moves it to X.Y+1.0-dev. `release-prepare` was taught to
+// regenerate them while cutting 0.16.0; this end was missed, and `make validate`
+// failed on the reopen commit for exactly the same reason it had failed on the
+// prepare commit an hour earlier. Half a fix is its own kind of defect.
+execFileSync('python3', [join(ROOT, 'scripts/generate-hed-bundle.py')], { cwd: ROOT, stdio: 'pipe' })
+
 console.log(`release-open-dev: ${released} → ${next}`)
 console.log(`  ${manifest.modules.length} modules, ${manifest.profiles.length} profile entry points, 1 manifest`)
 console.log('  void.ttl, CITATION.cff and the entrance metadata still describe ' + released + ', by design')
+console.log('  HED demonstrator bundles regenerated for the development line')
 console.log('  next: node scripts/sstim-manifest.mjs sync-checksums, then `make validate`')

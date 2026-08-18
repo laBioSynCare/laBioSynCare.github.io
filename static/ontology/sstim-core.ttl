@@ -3,7 +3,7 @@
 #  SSTIM Core Kernel  —  sstim-core.ttl
 #
 #  Namespace:  https://w3id.org/sstim
-#  Version:    0.16.0
+#  Version:    0.17.0-dev
 #  Date:       2026-08-18
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
@@ -54,9 +54,8 @@
     # endpoint need not be an ontology or version IRI of this module: an OWL 2
     # import names an ontology *document* (Structural Specification 3.4,
     # directlyImportsDocuments), not an ontology IRI.
-    owl:versionIRI <https://w3id.org/sstim/0.16.0> ;
-    owl:versionInfo "0.16.0" ;
-    owl:priorVersion <https://w3id.org/sstim/0.15.0> ;
+    owl:versionInfo "0.17.0-dev" ;
+    owl:priorVersion <https://w3id.org/sstim/0.16.0> ;
     dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
               "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
               "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
@@ -78,7 +77,7 @@
     dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     cc:license <https://creativecommons.org/licenses/by/4.0/> ;
-    mod:status "released"@en ;
+    mod:status "under development"@en ;
     foaf:logo <https://labiosyncare.github.io/icons/icon.svg> ;
     vann:preferredNamespacePrefix "sstim" ;
     vann:preferredNamespaceUri "https://w3id.org/sstim#" ;

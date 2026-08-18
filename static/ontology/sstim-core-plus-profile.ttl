@@ -2,7 +2,7 @@
 #
 #  SSTIM Core Plus Profile entrypoint
 #
-#  Version: 0.16.0
+#  Version: 0.17.0-dev
 #  Date:    2026-08-18
 #  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -20,8 +20,7 @@
 @prefix role: <http://www.w3.org/ns/dx/prof/role/> .
 
 <https://w3id.org/sstim/profile/core-plus> a owl:Ontology, prof:Profile ;
-    owl:versionIRI <https://w3id.org/sstim/0.16.0/sstim-core-plus-profile.ttl> ;
-    owl:versionInfo "0.16.0" ;
+    owl:versionInfo "0.17.0-dev" ;
     prof:hasToken "core-plus" ;
     prof:isProfileOf <https://w3id.org/sstim> ;
     prof:hasResource
@@ -36,9 +35,9 @@
         <https://w3id.org/sstim/stimulus>,
         <https://w3id.org/sstim/common> ;
     owl:imports
-        <https://w3id.org/sstim/0.16.0/sstim-core.ttl>,
-        <https://w3id.org/sstim/0.16.0/sstim-stimulus.ttl>,
-        <https://w3id.org/sstim/0.16.0/sstim-common.ttl> ;
+        <https://w3id.org/sstim/kernel>,
+        <https://w3id.org/sstim/stimulus>,
+        <https://w3id.org/sstim/common> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
@@ -51,16 +50,16 @@
 
 <https://w3id.org/sstim/profile/core-plus#entrypoint> a prof:ResourceDescriptor ;
     prof:hasRole role:specification ;
-    prof:hasArtifact <https://w3id.org/sstim/0.16.0/sstim-core-plus-profile.ttl> ;
+    prof:hasArtifact <https://w3id.org/sstim/profile/core-plus> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/core-plus#constraints> a prof:ResourceDescriptor ;
     prof:hasRole role:constraints ;
-    prof:hasArtifact <https://w3id.org/sstim/0.16.0/sstim-core-shapes.ttl> ;
+    prof:hasArtifact <https://w3id.org/sstim/core-shapes> ;
     dct:conformsTo <http://www.w3.org/ns/shacl#> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/core-plus#manifest> a prof:ResourceDescriptor ;
     prof:hasRole role:schema ;
-    prof:hasArtifact <https://w3id.org/sstim/0.16.0/manifest> ;
+    prof:hasArtifact <https://w3id.org/sstim/manifest> ;
     dct:format "application/json" .
