@@ -85,7 +85,7 @@ and schema must be deployed and the perma-id matrix verified first.
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
 | DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
-| LOV | ⚠️ **submitted 2026-07-10 (attested by email only — the form issues no ticket); catalog dormant since 2025-11-22**, so this is not a moving queue. Absence verified 2026-08-17 by LOV SPARQL | no | escalate or drop |
+| LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
@@ -335,12 +335,21 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                         grep -oE '\b20[0-9]{2}\.[0-9]{2}\.[0-9]{2}-[0-9]{6}\b' |
                         cut -d- -f1 | sort | uniq -c | tail -6
 
-                    The "every 8 h" figure this file used to assert has no source.
-                    Archivo's about page says only that it "updates the already
-                    enlisted ontologies regularly" and states no cadence; the
-                    README and source name none either. It was an assumption,
-                    repeated until it was quoted as fact — and acting on it means
-                    waiting indefinitely for an event that will not occur.
+                    **The "every 8 h" figure is documented, and this file was
+                    wrong to call it sourceless on 2026-08-18.** It is on
+                    <https://archivo.dbpedia.org/rating>: "All these ontologies
+                    get updated regularily three times a day (currently 02:00 am,
+                    10:00 am and 06:00 pm)." I checked /about, the README and the
+                    source, missed /rating, and concluded absence from three
+                    negative searches — the exact error 3.6 exists to prevent,
+                    committed while writing about 3.6.
+
+                    This makes the finding **stronger**, not weaker. Archivo does
+                    not merely fail to meet an assumed cadence; it publishes a
+                    three-times-daily schedule and has missed it by roughly six
+                    months while continuing to display timestamps that look
+                    current. A documented SLA silently unmet is a better bug
+                    report than a disappointed expectation.
 
                     There is no user-facing way to force one: `/add`
                     short-circuits on an already-listed URI with "The Ontology is
@@ -459,10 +468,41 @@ Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
                     evidence; nothing in this repository or on LOV corroborates
                     it. Treat "we submitted to LOV" as attested by mail only.
 
-                    (2) **LOV has ingested nothing since 2025-11-22.** This is
-                    not inference from our absence — it is LOV's own pipeline
-                    writing snapshot files to its own domain, and the newest one
-                    is nine months old:
+                    (2) **LOV is slow, NOT dormant — corrected 2026-08-18.**
+                    An earlier version of this entry said LOV had ingested
+                    nothing since 2025-11-22 and advised treating it as dead.
+                    That was wrong, and wrong in an instructive way.
+
+                    LOV's own homepage carries a "Latest insertion" list showing
+                    **gist on 2026-07-05, rml-lv on 2026-06-12 and oso on
+                    2026-05-07**. It is still curating. Our submission of
+                    2026-07-10 arrived five days after the most recent insertion,
+                    so it is in a moving queue, not an abandoned one, and
+                    escalating to the curators is reasonable rather than futile.
+
+                    **What the earlier measurement actually measured.** The
+                    SPARQL endpoint at `/dataset/lov/sparql` serves a stale dump.
+                    Queried for the prefixes of the three vocabularies inserted
+                    in 2026 — `rml-lv`, `gist`, `oso` — it returns **0** for each.
+                    So its "1782 distributions, newest 2025-11-22" describes when
+                    that dump was frozen, not when LOV last worked.
+
+                    The methodological point is worth more than the fact. That
+                    measurement *had* a control: a SKOS query returned rows, so
+                    the endpoint demonstrably saw its own contents. But a stale
+                    dump answers control queries perfectly. **A control proves an
+                    instrument is connected, not that it is current** — and to
+                    test currency the control must be something recent, which is
+                    exactly what querying for a 2026 insertion does.
+
+                    (3) **SSTIM is genuinely absent from LOV**, but the earlier
+                    proof was unsound and had to be redone. The stale endpoint
+                    predates our submission entirely, so it could not have
+                    answered the question either way. Re-verified against the
+                    live site with a working control:
+                    `/dataset/lov/vocabs/sstim` → **404**, while
+                    `/dataset/lov/vocabs/skos` → **200**. Right answer, wrong
+                    reasoning, which is luck rather than method:
 
                       curl -sL -G https://lov.linkeddata.es/dataset/lov/sparql \
                         --data-urlencode 'query=PREFIX dcat:<http://www.w3.org/ns/dcat#>
