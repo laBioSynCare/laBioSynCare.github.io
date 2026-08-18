@@ -17,7 +17,45 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Added
+
+- **SSTIM is in the OWL 2 DL profile**
+  ([ADR 0054](docs/decisions/0054-owl-dl-conformance-and-the-duration-datatype.md)).
+  Every profile closure was OWL Full: 5935 violations, from 57 external terms —
+  SKOS, Dublin Core, PROV, ORG, VOAF, VoID, VANN, FOAF, BIBO, MOD, Creative
+  Commons and the OBO uppers — used without the declaration axiom OWL 2 DL
+  requires. `skos:prefLabel` alone accounted for 1443. All 57 are now declared in
+  `sstim-core.ttl`, the one module present in every closure. They state the role
+  each term was already used in and change no entailment.
+- `make validate-profile` asserts all four closures against OWL 2 DL directly,
+  and is part of `make validate`. `make reason` could not have caught this and
+  never will: ROBOT loads non-strictly, so an undeclared annotation property is
+  silently coerced into one and HermiT is handed a well-formed DL ontology.
+- `sstim-ex:limitAveragingTimeSeconds`, an `xsd:decimal` count of seconds,
+  replacing a duration literal.
+- Every `skos:ConceptScheme` now carries `dct:license` (CC BY 4.0) — 67 of them,
+  across the vocabulary, exposure and ecosystem modules. A scheme extracted on
+  its own previously travelled with no licence at all.
+
 ### Changed
+
+- **`sstim-ex:limitAveragingTime` is deprecated** in favour of
+  `sstim-ex:limitAveragingTimeSeconds`, with `owl:deprecated` and
+  `dct:isReplacedBy`, and its range axiom withdrawn. Both public values were
+  `"PT8H"` and are now `28800`.
+
+  `xsd:duration` had to leave rather than be declared: declaring it changes the
+  violation from "undeclared datatype" to "defined datatype in datatype
+  restriction", because OWL 2 DL rejects a defined datatype in that position
+  however it arrives. It is only partially ordered — `P1M` and `P30D` do not
+  compare — which is why OWL 2 excludes it. `xsd:date` went the other way and is
+  declared, because `xsd:dateTime` would mean inventing a time of day that is not
+  known.
+
+  **This breaks a consumer pinned to the 0.12 baseline.** Four published triples
+  are gone; they are recorded in `check-sstim-full-equivalence.py`'s exception
+  list rather than the gate being loosened. The deprecation triples point at the
+  replacement, so the migration is discoverable from the graph.
 
 - **Immutable snapshot routes are patterns, not an enumeration**
   ([ADR 0053](docs/decisions/0053-wildcard-snapshot-routes.md)). Four rules now
