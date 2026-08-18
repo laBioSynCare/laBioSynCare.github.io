@@ -900,15 +900,17 @@ Required follow-up: Watch for the label, the automated validation comment, and
                     that release is cut — the catalogue models versions, so it is
                     a metadata addition rather than a resubmission.
 
-                    **Chosen domain is a judgement call worth revisiting.**
-                    "Linguistics, Social & Digital Knowledge Systems" was chosen
-                    because that is where the README puts ontologies, and because
-                    "Life Sciences & Health" would nudge SSTIM toward the clinical
-                    reading that SCOPE.md and CLAUDE.md 3.5 exist to avoid. The
-                    counter-argument is real: the README says the domain should
-                    reflect *content*, SSTIM's content is sensory stimulation, and
-                    `cso` chose the domain of its subject matter rather than
-                    "ontologies". One edit to the issue changes it.
+                    **Domain is Life Sciences & Health**, changed by the
+                    maintainer's decision on 2026-08-18 and verified live on the
+                    issue. It was first submitted under "Linguistics, Social &
+                    Digital Knowledge Systems", on the reasoning that the README
+                    lists ontologies there and that a health domain might imply
+                    the clinical reading SCOPE.md avoids. Renato chose the
+                    subject-matter domain instead, which is what the README
+                    actually asks for — "the main domain reflecting the content
+                    of the KG" — and is what `cso` did. The no-clinical-efficacy
+                    sentence sits in the abstract, so the disclaimer travels with
+                    the record rather than depending on the classification.
 ```
 
 ### ShowVoc (EU Publications Office) — EVALUATED, NOT SUBMITTED
@@ -944,9 +946,28 @@ a peer group of long-established reference vocabularies. An unsolicited
 submission from a four-month-old ontology risks reading as noise in an
 institutional context where that is expensive and hard to undo.
 
-If pursued: ask the ShowVoc/VocBench maintainers (ART group, Univ. Roma Tor
-Vergata) or the Publications Office whether third-party vocabularies are
-accepted, and only then use the contribution form.
+**The support channel, found on the project's own site rather than guessed.**
+<https://showvoc.uniroma2.it/support> says support is hosted on VocBench's
+discussion groups and asks for a `[ShowVoc]` subject prefix:
+
+  Users:      https://groups.google.com/g/vocbench-user   (reachable, HTTP 200)
+  Developers: https://groups.google.com/g/vocbench-developer
+
+That is a Google Group, so it cannot be posted from a script the way the GitHub
+submissions were — it needs a human with a Google account, which is why the
+message is drafted rather than sent.
+
+**Enquiry drafted 2026-08-18:**
+[`outreach/2026-08-18-showvoc-enquiry.md`](outreach/2026-08-18-showvoc-enquiry.md).
+It asks three things: whether the Publications Office instance accepts datasets
+from outside the EU institutions, whether the in-app contribution workflow is
+the right route or the request should go to the Publications Office directly,
+and whether a community instance would be a better home. Note the division of
+responsibility behind that framing — ART builds ShowVoc, but the Publications
+Office decides what goes on *their* instance, so the answer may be a redirect.
+
+Status: **drafted, not sent.** Send it, then record the reply here before doing
+anything else with this registry.
 
 ### OLS (Ontology Lookup Service) — only if accepted
 
