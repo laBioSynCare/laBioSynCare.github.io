@@ -1,0 +1,40 @@
+{
+  "$comment": "Bundle manifest for the ADR 0025 demonstrator. Synthetic data only.",
+  "generatedBy": "scripts/generate-hed-bundle.py",
+  "synthetic": true,
+  "containsPersonalData": false,
+  "versions": {
+    "hedSchema": "8.4.0",
+    "mapping": "0.1.0",
+    "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme"
+  },
+  "clock": {
+    "basis": "sstim:sessionClockOffsetSeconds",
+    "origin": "The session clock origin declared by the session record; not wall-clock time.",
+    "note": "SSTIM's authority for timing is the engine timing context, so offsets are engine-clock seconds rather than derived from a host clock."
+  },
+  "source": {
+    "file": "test/fixtures/rdf/full-profile/positive-recorded-session.ttl",
+    "sha256": "af795e22fab5b7a426deb5e8adf122ab3cc2a498c1a71ce9537e3b81aff6aaad",
+    "eventCount": 5
+  },
+  "artifacts": [
+    {
+      "file": "events.tsv",
+      "sha256": "da3f5a60af494fe7d02f51cf557e5288b4c08849857d4ea97bf362ccbfc39a8a"
+    },
+    {
+      "file": "events.json",
+      "sha256": "71c09ff09658934a935a43c202070d693489a9a2f6b80e6d813b58fc113199a9"
+    }
+  ],
+  "declaredLoss": {
+    "eventPlaybackResume": "HED does not distinguish a resume from a fresh onset; the pairing with the preceding Pause carries that in SSTIM only.",
+    "eventSessionInterrupt": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
+  },
+  "notValidated": [
+    "HED syntax is not validated here. Tag existence against the pinned schema is checked by `make hed-crosswalk`; full validation requires hedtools, which is not in the flake.",
+    "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain.",
+    "Round-trip from HED back to SSTIM is not attempted and is not possible for the lossy mappings above, by construction."
+  ]
+}

@@ -272,13 +272,27 @@ but it is the prerequisite for everything after.
    and `Intensity`, none of which are HED 8.4.0 tags. It also fails if the map
    drifts from the scheme, or if two event types collide without declaring it.
 
-   **Still missing, and none of it is optional for decision 7:** the generated
-   events table itself, the bundle manifest with cross-artifact IDs and hashes,
-   round-trip or declared-loss tests, and validation by an actual HED validator.
-   The last needs `hedtools`, which is not in the flake — so what exists today
-   verifies that the tags are real and the coverage is complete, not that the
-   emitted annotations are syntactically valid HED. Do not describe the bridge as
-   working on the strength of this.
+   *The generated table and manifest exist too.* `make hed-bundle` reads the
+   recorded-session fixture, walks its event timeline on the session clock, and
+   writes [`test/fixtures/hed-bundle/`](../../test/fixtures/hed-bundle/): a
+   BIDS-style `events.tsv` with a `HED` column, its `events.json` sidecar, and
+   `bundle-manifest.json` carrying artifact hashes, the pinned HED and mapping
+   versions, the clock assumption, and a `declaredLoss` map. `make
+   hed-bundle-check` regenerates and compares, so a crosswalk edit not reflected
+   in the artifacts fails rather than drifting.
+
+   `duration` is `n/a` throughout, deliberately: SSTIM records instantaneous
+   timeline marks, and inventing a span would assert something the native record
+   does not contain.
+
+   **Still missing, and none of it is optional for decision 7:** validation by an
+   actual HED validator, and round-trip or declared-loss *tests* as opposed to
+   declared-loss *documentation*. The validator needs `hedtools`, which is not in
+   the flake — so what exists verifies that the tags are real, the coverage is
+   complete, and the artifacts are current, not that the emitted annotations are
+   syntactically valid HED. The bundle's own manifest lists this under
+   `notValidated`, along with the absence of a BIDS dataset. Do not describe the
+   bridge as working on the strength of this.
 2. **Take it to the HED Working Group** with the ask of decision 9: encode and
    reproduce, never endorse. This is also the most credible inbound-link path
    SSTIM has — HED annotations live in real published EEG datasets, and a

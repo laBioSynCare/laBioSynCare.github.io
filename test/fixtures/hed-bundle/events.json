@@ -1,0 +1,23 @@
+{
+  "onset": {
+    "Description": "Seconds from the session clock origin.",
+    "Units": "s"
+  },
+  "duration": {
+    "Description": "Always n/a — SSTIM session events are instantaneous timeline marks."
+  },
+  "event_type": {
+    "Description": "SSTIM session event type, the authoritative value.",
+    "TermURL": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
+    "Levels": {
+      "eventSessionOpen": "Session opened",
+      "eventPlaybackStart": "Playback started",
+      "eventPlaybackPause": "Playback paused",
+      "eventPlaybackResume": "Playback resumed",
+      "eventSessionInterrupt": "Session interrupted"
+    }
+  },
+  "HED": {
+    "Description": "Generated from event_type by the crosswalk, HED 8.4.0."
+  }
+}

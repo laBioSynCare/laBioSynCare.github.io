@@ -1,0 +1,6 @@
+onset	duration	event_type	HED
+0.000	n/a	eventSessionOpen	(Experiment-structure, Time-block, Onset)
+0.300	n/a	eventPlaybackStart	(Sensory-event, Experimental-stimulus, Sensory-presentation, Onset)
+190.000	n/a	eventPlaybackPause	(Experiment-control, Pause)
+250.000	n/a	eventPlaybackResume	(Experiment-control, Sensory-presentation, Onset)
+400.000	n/a	eventSessionInterrupt	(Experiment-structure, Time-block, Offset)
