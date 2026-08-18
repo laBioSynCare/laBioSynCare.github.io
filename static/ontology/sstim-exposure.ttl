@@ -534,7 +534,10 @@ sstim-ex:StimulusChannelRoleScheme a skos:ConceptScheme ;
 sstim-ex:roleIntendedIntervention a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
     skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
     skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
-    skos:prefLabel "intended intervention channel"@en ;
+    skos:prefLabel "intended intervention channel"@en,
+                   "canale di intervento previsto"@it,
+                   "canal de intervenção pretendida"@pt,
+                   "canal de intervención prevista"@es ;
     skos:notation "intended-intervention" ;
     skos:definition "A channel intended to mediate the intervention objective. Only an intended channel is eligible to participate in sensory-route classification, and its asserted neural access route still decides that question."@en ;
     skos:scopeNote "Deliberate co-stimulation is not concomitant: two or more causal channels may each carry this role."@en .
@@ -542,7 +545,10 @@ sstim-ex:roleIntendedIntervention a owl:NamedIndividual, sstim-ex:StimulusChanne
 sstim-ex:roleConcomitant a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
     skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
     skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
-    skos:prefLabel "concomitant channel"@en ;
+    skos:prefLabel "concomitant channel"@en,
+                   "canale concomitante"@it,
+                   "canal concomitante"@pt,
+                   "canal concomitante"@es ;
     skos:notation "concomitant" ;
     skos:definition "An associated channel or exposure that accompanies the intervention but is not intended to mediate its objective — for example a TMS coil click or an ultrasound-associated sound."@en ;
     skos:scopeNote "Reserved for unintended accompaniment. Recording a concomitant channel never reclassifies the primary technique, and such a channel cannot satisfy a route-consistency requirement."@en .
@@ -550,14 +556,20 @@ sstim-ex:roleConcomitant a owl:NamedIndividual, sstim-ex:StimulusChannelRole, sk
 sstim-ex:roleControlOrSham a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
     skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
     skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
-    skos:prefLabel "control or sham channel"@en ;
+    skos:prefLabel "control or sham channel"@en,
+                   "canale di controllo o sham"@it,
+                   "canal de controle ou sham"@pt,
+                   "canal de control o sham"@es ;
     skos:notation "control-or-sham" ;
     skos:definition "A channel serving as a control or sham condition rather than as the intended causal path."@en .
 
 sstim-ex:roleFeedback a owl:NamedIndividual, sstim-ex:StimulusChannelRole, skos:Concept ;
     skos:inScheme sstim-ex:StimulusChannelRoleScheme ;
     skos:topConceptOf sstim-ex:StimulusChannelRoleScheme ;
-    skos:prefLabel "feedback channel"@en ;
+    skos:prefLabel "feedback channel"@en,
+                   "canale di feedback"@it,
+                   "canal de retroalimentação"@pt,
+                   "canal de retroalimentación"@es ;
     skos:notation "feedback" ;
     skos:definition "A channel that returns a measured or derived signal to the participant."@en .
 
@@ -813,14 +825,20 @@ sstim-ex:mediumAcousticEnergy a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMe
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:narrower sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration,
         sstim-ex:mediumFocusedUltrasound ;
-    skos:prefLabel "acoustic energy"@en ;
+    skos:prefLabel "acoustic energy"@en,
+                   "energia acustica"@it,
+                   "energia acústica"@pt,
+                   "energía acústica"@es ;
     skos:notation "acoustic-energy" ;
     skos:definition "Mechanical wave energy applied as a stimulus, whether or not it is audible."@en .
 
 sstim-ex:mediumFocusedUltrasound a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumAcousticEnergy ;
-    skos:prefLabel "focused ultrasound"@en ;
+    skos:prefLabel "focused ultrasound"@en,
+                   "ultrasuoni focalizzati"@it,
+                   "ultrassom focalizado"@pt,
+                   "ultrasonido focalizado"@es ;
     skos:notation "focused-ultrasound" ;
     skos:definition "Acoustic energy focused on a spatial target, applied above the audible range as the intended causal medium."@en ;
     skos:scopeNote "An audible or somatosensory concomitant may still be present and is recorded as a separate channel with a concomitant role, not by reclassifying this medium."@en .
@@ -829,7 +847,10 @@ sstim-ex:mediumMechanicalForce a owl:NamedIndividual, sstim-ex:PhysicalDeliveryM
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:narrower sstim-ex:mediumMechanicalVibration ;
-    skos:prefLabel "mechanical force"@en ;
+    skos:prefLabel "mechanical force"@en,
+                   "forza meccanica"@it,
+                   "força mecânica"@pt,
+                   "fuerza mecánica"@es ;
     skos:notation "mechanical-force" ;
     skos:definition "Applied mechanical force, displacement, or motion delivered to the body or a contacting surface."@en .
 
@@ -838,7 +859,10 @@ sstim-ex:mediumElectromagneticRadiation a owl:NamedIndividual, sstim-ex:Physical
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:narrower sstim-ex:mediumVisualLight, sstim-ex:mediumInfraredRadiation,
         sstim-ex:mediumUltravioletRadiation ;
-    skos:prefLabel "electromagnetic radiation"@en ;
+    skos:prefLabel "electromagnetic radiation"@en,
+                   "radiazione elettromagnetica"@it,
+                   "radiação eletromagnética"@pt,
+                   "radiación electromagnética"@es ;
     skos:notation "electromagnetic-radiation" ;
     skos:definition "Radiated electromagnetic energy applied as a stimulus, across the optical range and adjacent bands."@en .
 
@@ -846,7 +870,10 @@ sstim-ex:mediumThermalEnergy a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMed
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:narrower sstim-ex:mediumThermalContact ;
-    skos:prefLabel "thermal energy"@en ;
+    skos:prefLabel "thermal energy"@en,
+                   "energia termica"@it,
+                   "energia térmica"@pt,
+                   "energía térmica"@es ;
     skos:notation "thermal-energy" ;
     skos:definition "Applied heating or cooling delivered as a stimulus by any transfer path."@en .
 
@@ -855,7 +882,10 @@ sstim-ex:mediumChemicalAgent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMed
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:narrower sstim-ex:mediumPharmacologicalAgent, sstim-ex:mediumOlfactoryChemicalExposure,
         sstim-ex:mediumGustatoryChemicalExposure ;
-    skos:prefLabel "chemical agent"@en ;
+    skos:prefLabel "chemical agent"@en,
+                   "agente chimico"@it,
+                   "agente químico"@pt,
+                   "agente químico"@es ;
     skos:notation "chemical-agent" ;
     skos:definition "A chemical substance applied as the controlled input of a stimulation method."@en ;
     skos:scopeNote "A neutral delivery category. Unlike the effect-oriented MeSH sense of chemical stimulation, it asserts no increase in any physiological or metabolic parameter, and no response at all; a chemical medium is not by itself neuromodulation, since olfactory and gustatory inputs are chemical and sensory."@en .
@@ -863,7 +893,10 @@ sstim-ex:mediumChemicalAgent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMed
 sstim-ex:mediumPharmacologicalAgent a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumChemicalAgent ;
-    skos:prefLabel "pharmacological agent"@en ;
+    skos:prefLabel "pharmacological agent"@en,
+                   "agente farmacologico"@it,
+                   "agente farmacológico"@pt,
+                   "agente farmacológico"@es ;
     skos:notation "pharmacological-agent" ;
     skos:definition "A pharmacological substance delivered as the controlled input of a stimulation method."@en ;
     skos:scopeNote "Ordinary systemic neuroactive pharmacotherapy is outside the neuromodulation technique catalog; a bounded method qualifies only with an explicit neuromodulatory objective and an identified neural target."@en .
@@ -872,7 +905,10 @@ sstim-ex:mediumAppliedElectricCurrent a owl:NamedIndividual, sstim-ex:PhysicalDe
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:related sstim-ex:mediumAppliedElectricField ;
-    skos:prefLabel "applied electric current"@en ;
+    skos:prefLabel "applied electric current"@en,
+                   "corrente elettrica applicata"@it,
+                   "corrente elétrica aplicada"@pt,
+                   "corriente eléctrica aplicada"@es ;
     skos:notation "applied-electric-current" ;
     skos:definition "Electric current delivered through electrodes in contact with tissue or the body surface."@en ;
     skos:scopeNote "Applied current is not by itself brain stimulation: peripheral nerve, muscle, and cardiac applications use the same medium and are separated by the route, approach, and target facets."@en .
@@ -881,7 +917,10 @@ sstim-ex:mediumAppliedElectricField a owl:NamedIndividual, sstim-ex:PhysicalDeli
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
     skos:related sstim-ex:mediumAppliedElectricCurrent ;
-    skos:prefLabel "applied electric field"@en ;
+    skos:prefLabel "applied electric field"@en,
+                   "campo elettrico applicato"@it,
+                   "campo elétrico aplicado"@pt,
+                   "campo eléctrico aplicado"@es ;
     skos:notation "applied-electric-field" ;
     skos:definition "An electric field present in tissue, whether applied directly or induced by a changing magnetic field."@en ;
     skos:scopeNote "The field induced in tissue by TMS is an established physical transformation, so it is represented here as a secondary tissue-field interaction in the exposure or device description — not as a proposed mechanism. How that field produces a neural response remains a mechanism and evidence question."@en .
@@ -889,126 +928,180 @@ sstim-ex:mediumAppliedElectricField a owl:NamedIndividual, sstim-ex:PhysicalDeli
 sstim-ex:mediumAppliedMagneticField a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "applied magnetic field"@en ;
+    skos:prefLabel "applied magnetic field"@en,
+                   "campo magnetico applicato"@it,
+                   "campo magnético aplicado"@pt,
+                   "campo magnético aplicado"@es ;
     skos:notation "applied-magnetic-field" ;
     skos:definition "A magnetic field applied by a coil or magnet as the primary delivered medium."@en .
 
 sstim-ex:mediumAirConductedSound a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumAcousticEnergy ;
-    skos:prefLabel "air-conducted sound"@en ;
+    skos:prefLabel "air-conducted sound"@en,
+                   "suono per via aerea"@it,
+                   "som conduzido pelo ar"@pt,
+                   "sonido conducido por aire"@es ;
     skos:notation "air-conducted-sound" ;
     skos:definition "Sound delivered through air before reaching the ear or body."@en .
 
 sstim-ex:mediumContactAcousticVibration a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumAcousticEnergy ;
-    skos:prefLabel "contact acoustic vibration"@en ;
+    skos:prefLabel "contact acoustic vibration"@en,
+                   "vibrazione acustica per contatto"@it,
+                   "vibração acústica por contato"@pt,
+                   "vibración acústica por contacto"@es ;
     skos:notation "contact-acoustic-vibration" ;
     skos:definition "Acoustic energy delivered through contact with a vibrating object or surface."@en .
 
 sstim-ex:mediumMechanicalVibration a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumMechanicalForce ;
-    skos:prefLabel "mechanical vibration"@en ;
+    skos:prefLabel "mechanical vibration"@en,
+                   "vibrazione meccanica"@it,
+                   "vibração mecânica"@pt,
+                   "vibración mecánica"@es ;
     skos:notation "mechanical-vibration" ;
     skos:definition "Mechanical motion delivered by an actuator, transducer, surface, or object."@en .
 
 sstim-ex:mediumVisualLight a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumElectromagneticRadiation ;
-    skos:prefLabel "visual light"@en ;
+    skos:prefLabel "visual light"@en,
+                   "luce visibile"@it,
+                   "luz visível"@pt,
+                   "luz visible"@es ;
     skos:notation "visual-light" ;
     skos:definition "Visible light delivered by a display, lamp, projector, or environment."@en .
 
 sstim-ex:mediumElectromagneticField a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "electromagnetic field"@en ;
+    skos:prefLabel "electromagnetic field"@en,
+                   "campo elettromagnetico"@it,
+                   "campo eletromagnético"@pt,
+                   "campo electromagnético"@es ;
     skos:notation "electromagnetic-field" ;
     skos:definition "Electromagnetic exposure modeled as a physical medium without asserting stimulation efficacy."@en .
 
 sstim-ex:mediumRespiratoryCue a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "respiratory cue"@en ;
+    skos:prefLabel "respiratory cue"@en,
+                   "segnale respiratorio"@it,
+                   "sinal respiratório"@pt,
+                   "señal respiratoria"@es ;
     skos:notation "respiratory-cue" ;
     skos:definition "A visual, auditory, haptic, or other cue used to guide breathing behavior."@en .
 
 sstim-ex:mediumStereoscopicVisualPresentation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "stereoscopic visual presentation"@en ;
+    skos:prefLabel "stereoscopic visual presentation"@en,
+                   "presentazione visiva stereoscopica"@it,
+                   "apresentação visual estereoscópica"@pt,
+                   "presentación visual estereoscópica"@es ;
     skos:notation "stereoscopic-visual-presentation" ;
     skos:definition "Visual presentation arranged to create binocular depth perception."@en .
 
 sstim-ex:mediumOlfactoryChemicalExposure a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumChemicalAgent ;
-    skos:prefLabel "olfactory chemical exposure"@en ;
+    skos:prefLabel "olfactory chemical exposure"@en,
+                   "esposizione chimica olfattiva"@it,
+                   "exposição química olfativa"@pt,
+                   "exposición química olfativa"@es ;
     skos:notation "olfactory-chemical-exposure" ;
     skos:definition "Chemical exposure intended or likely to be perceived through smell."@en .
 
 sstim-ex:mediumGustatoryChemicalExposure a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumChemicalAgent ;
-    skos:prefLabel "gustatory chemical exposure"@en ;
+    skos:prefLabel "gustatory chemical exposure"@en,
+                   "esposizione chimica gustativa"@it,
+                   "exposição química gustativa"@pt,
+                   "exposición química gustativa"@es ;
     skos:notation "gustatory-chemical-exposure" ;
     skos:definition "Chemical exposure intended or likely to be perceived through taste."@en .
 
 sstim-ex:mediumLiquidGelImmersion a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "liquid/gel immersion"@en ;
+    skos:prefLabel "liquid/gel immersion"@en,
+                   "immersione in liquido/gel"@it,
+                   "imersão em líquido/gel"@pt,
+                   "inmersión en líquido/gel"@es ;
     skos:notation "liquid-gel-immersion" ;
     skos:definition "Liquid or gel contact used as an immersive tactile, thermal, or pressure medium."@en .
 
 sstim-ex:mediumTextileClothingContact a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "textile/clothing contact"@en ;
+    skos:prefLabel "textile/clothing contact"@en,
+                   "contatto con tessuto/indumento"@it,
+                   "contato com tecido/vestuário"@pt,
+                   "contacto con tejido/prenda"@es ;
     skos:notation "textile-clothing-contact" ;
     skos:definition "Contact through clothing, textiles, or wearable material."@en .
 
 sstim-ex:mediumRigidSurfaceContact a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "rigid surface contact"@en ;
+    skos:prefLabel "rigid surface contact"@en,
+                   "contatto con superficie rigida"@it,
+                   "contato com superfície rígida"@pt,
+                   "contacto con superficie rígida"@es ;
     skos:notation "rigid-surface-contact" ;
     skos:definition "Contact with a hard, rigid, or shaped surface."@en .
 
 sstim-ex:mediumThermalContact a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumThermalEnergy ;
-    skos:prefLabel "thermal contact"@en ;
+    skos:prefLabel "thermal contact"@en,
+                   "contatto termico"@it,
+                   "contato térmico"@pt,
+                   "contacto térmico"@es ;
     skos:notation "thermal-contact" ;
     skos:definition "Temperature exposure delivered through contact or near-contact."@en .
 
 sstim-ex:mediumAirflow a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "airflow"@en ;
+    skos:prefLabel "airflow"@en,
+                   "flusso d'aria"@it,
+                   "fluxo de ar"@pt,
+                   "flujo de aire"@es ;
     skos:notation "airflow" ;
     skos:definition "Moving air used as a tactile, thermal, or proximity cue."@en .
 
 sstim-ex:mediumFluidMotion a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:topConceptOf sstim-ex:DeliveryMediumScheme ;
-    skos:prefLabel "fluid motion"@en ;
+    skos:prefLabel "fluid motion"@en,
+                   "moto di fluido"@it,
+                   "movimento de fluido"@pt,
+                   "movimiento de fluido"@es ;
     skos:notation "fluid-motion" ;
     skos:definition "Moving water, gel, or other fluid used as a tactile or immersive cue."@en .
 
 sstim-ex:mediumInfraredRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumElectromagneticRadiation ;
-    skos:prefLabel "infrared radiation"@en ;
+    skos:prefLabel "infrared radiation"@en,
+                   "radiazione infrarossa"@it,
+                   "radiação infravermelha"@pt,
+                   "radiación infrarroja"@es ;
     skos:notation "infrared-radiation" ;
     skos:definition "Non-visible optical radiation in the infrared range, modeled as physical exposure without asserting perceptual or physiological effect."@en .
 
 sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeliveryMedium, skos:Concept ;
     skos:inScheme sstim-ex:DeliveryMediumScheme ;
     skos:broader sstim-ex:mediumElectromagneticRadiation ;
-    skos:prefLabel "ultraviolet radiation"@en ;
+    skos:prefLabel "ultraviolet radiation"@en,
+                   "radiazione ultravioletta"@it,
+                   "radiação ultravioleta"@pt,
+                   "radiación ultravioleta"@es ;
     skos:notation "ultraviolet-radiation" ;
     skos:definition "Non-visible optical radiation in the ultraviolet range, modeled as physical exposure. Any at-body delivery is bounded by the optical-radiation comfort boundary (sstim-ex:boundaryOpticalRadiation), which carries an exposure limit citing IEC 62471 / ICNIRP. BSC Lab does not currently deliver ultraviolet radiation at the body."@en ;
     skos:scopeNote "Ultraviolet exposure to skin and especially the eyes is hazardous; model it with sstim-ex:boundaryOpticalRadiation and an appropriate knowledge status rather than as a benign visual cue."@en .
@@ -1016,21 +1109,30 @@ sstim-ex:mediumUltravioletRadiation a owl:NamedIndividual, sstim-ex:PhysicalDeli
 sstim-ex:modalityAuditory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "auditory"@en ;
+    skos:prefLabel "auditory"@en,
+                   "uditiva"@it,
+                   "auditiva"@pt,
+                   "auditiva"@es ;
     skos:notation "auditory" ;
     skos:closeMatch sstim-v:modalityAuditory .
 
 sstim-ex:modalityVisual a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "visual"@en ;
+    skos:prefLabel "visual"@en,
+                   "visiva"@it,
+                   "visual"@pt,
+                   "visual"@es ;
     skos:notation "visual" ;
     skos:closeMatch sstim-v:modalityVisual .
 
 sstim-ex:modalityTactile a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "tactile"@en ;
+    skos:prefLabel "tactile"@en,
+                   "tattile"@it,
+                   "tátil"@pt,
+                   "táctil"@es ;
     skos:notation "tactile" ;
     skos:definition "Perceived cutaneous touch, pressure, vibration, texture, or temperature."@en ;
     skos:scopeNote "The tactile percept is a sub-modality of the somatosensory body-sense channel (sstim-ex:modalitySomatosensory); distinct from the haptic device path and the vibrotactile mechanism (P5.5 convention; ADR 0019)."@en .
@@ -1038,7 +1140,10 @@ sstim-ex:modalityTactile a owl:NamedIndividual, sstim-ex:PerceivedModality, skos
 sstim-ex:modalitySomatosensory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "somatosensory"@en ;
+    skos:prefLabel "somatosensory"@en,
+                   "somatosensoriale"@it,
+                   "somatossensorial"@pt,
+                   "somatosensorial"@es ;
     skos:notation "somatosensory" ;
     skos:definition "Body-perceived sensation including touch, vibration, pressure, proprioception, or related body sensation."@en ;
     skos:scopeNote "Superordinate body-sense channel: the tactile percept (sstim-ex:modalityTactile) is a sub-modality, the haptic actuator is the device path, and vibrotactile is the mechanism (P5.5 convention; ADR 0019)."@en ;
@@ -1047,7 +1152,10 @@ sstim-ex:modalitySomatosensory a owl:NamedIndividual, sstim-ex:PerceivedModality
 sstim-ex:modalityInteroceptive a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "interoceptive"@en ;
+    skos:prefLabel "interoceptive"@en,
+                   "interocettiva"@it,
+                   "interoceptiva"@pt,
+                   "interoceptiva"@es ;
     skos:notation "interoceptive" ;
     skos:definition "Perception or guidance involving internal body state, such as breath awareness."@en ;
     skos:closeMatch sstim-v:modalityInteroceptive .
@@ -1055,7 +1163,10 @@ sstim-ex:modalityInteroceptive a owl:NamedIndividual, sstim-ex:PerceivedModality
 sstim-ex:modalityVestibular a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "vestibular"@en ;
+    skos:prefLabel "vestibular"@en,
+                   "vestibolare"@it,
+                   "vestibular"@pt,
+                   "vestibular"@es ;
     skos:notation "vestibular" ;
     skos:definition "Perceived balance, motion, orientation, or gravity-related sensation."@en ;
     skos:closeMatch sstim-v:modalityVestibular .
@@ -1063,14 +1174,20 @@ sstim-ex:modalityVestibular a owl:NamedIndividual, sstim-ex:PerceivedModality, s
 sstim-ex:modalityProprioceptive a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "proprioceptive"@en ;
+    skos:prefLabel "proprioceptive"@en,
+                   "propriocettiva"@it,
+                   "proprioceptiva"@pt,
+                   "propioceptiva"@es ;
     skos:notation "proprioceptive" ;
     skos:definition "Perceived body position, movement, force, or relation in space."@en .
 
 sstim-ex:modalityOlfactory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "olfactory"@en ;
+    skos:prefLabel "olfactory"@en,
+                   "olfattiva"@it,
+                   "olfativa"@pt,
+                   "olfativa"@es ;
     skos:notation "olfactory" ;
     skos:definition "The chemical sense responding to airborne volatile compounds. Distinguished from gustation, which responds to compounds in solution, though the two combine in flavour."@en ;
     skos:closeMatch sstim-v:modalityOlfactory .
@@ -1078,211 +1195,310 @@ sstim-ex:modalityOlfactory a owl:NamedIndividual, sstim-ex:PerceivedModality, sk
 sstim-ex:modalityGustatory a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "gustatory"@en ;
+    skos:prefLabel "gustatory"@en,
+                   "gustativa"@it,
+                   "gustativa"@pt,
+                   "gustativa"@es ;
     skos:notation "gustatory" ;
     skos:definition "The chemical sense responding to compounds in solution at the tongue. Distinguished from olfaction, which responds to airborne volatiles, though the two combine in flavour."@en .
 
 sstim-ex:modalitySocialPerceptual a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "social-perceptual"@en ;
+    skos:prefLabel "social-perceptual"@en,
+                   "socio-percettiva"@it,
+                   "socioperceptiva"@pt,
+                   "socioperceptiva"@es ;
     skos:notation "social-perceptual" ;
     skos:definition "Perception of social relationship, grouping, similarity, or interaction structure as part of a sensory protocol."@en .
 
 sstim-ex:modalityMultimodal a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "multimodal"@en ;
+    skos:prefLabel "multimodal"@en,
+                   "multimodale"@it,
+                   "multimodal"@pt,
+                   "multimodal"@es ;
     skos:notation "multimodal" ;
     skos:definition "Exposure intentionally engaging more than one perceived modality."@en .
 
 sstim-ex:modalityNotDirectlyPerceived a owl:NamedIndividual, sstim-ex:PerceivedModality, skos:Concept ;
     skos:inScheme sstim-ex:PerceivedModalityScheme ;
     skos:topConceptOf sstim-ex:PerceivedModalityScheme ;
-    skos:prefLabel "not directly perceived"@en ;
+    skos:prefLabel "not directly perceived"@en,
+                   "non percepita direttamente"@it,
+                   "não percebida diretamente"@pt,
+                   "no percibida directamente"@es ;
     skos:notation "not-directly-perceived" ;
     skos:definition "Exposure channel modeled physically without asserting a direct conscious sensory percept."@en .
 
 sstim-ex:capabilityHeadphones a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "headphones"@en ;
+    skos:prefLabel "headphones"@en,
+                   "cuffie"@it,
+                   "fones de ouvido"@pt,
+                   "auriculares"@es ;
     skos:notation "headphones" ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumAirConductedSound .
 
 sstim-ex:capabilityHrtfSpatialAudio a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "HRTF/spatial audio"@en ;
+    skos:prefLabel "HRTF/spatial audio"@en,
+                   "audio spaziale/HRTF"@it,
+                   "áudio espacial/HRTF"@pt,
+                   "audio espacial/HRTF"@es ;
     skos:notation "hrtf-spatial-audio" .
 
 sstim-ex:capabilityStereoSeparation a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "stereo separation"@en ;
+    skos:prefLabel "stereo separation"@en,
+                   "separazione stereo"@it,
+                   "separação estéreo"@pt,
+                   "separación estéreo"@es ;
     skos:notation "stereo-separation" .
 
 sstim-ex:capabilityDisplayLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "display light output"@en ;
+    skos:prefLabel "display light output"@en,
+                   "emissione luminosa del display"@it,
+                   "emissão de luz do display"@pt,
+                   "emisión de luz de la pantalla"@es ;
     skos:notation "display-light-output" ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumVisualLight .
 
 sstim-ex:capabilityDisplayFlicker a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "display flicker"@en ;
+    skos:prefLabel "display flicker"@en,
+                   "sfarfallio del display"@it,
+                   "cintilação do display"@pt,
+                   "parpadeo de la pantalla"@es ;
     skos:notation "display-flicker" .
 
 sstim-ex:capabilityFreeViewStereoscopy a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "free-view stereoscopy"@en ;
+    skos:prefLabel "free-view stereoscopy"@en,
+                   "stereoscopia a occhio nudo"@it,
+                   "estereoscopia de visão livre"@pt,
+                   "estereoscopía de visión libre"@es ;
     skos:notation "free-view-stereoscopy" ;
     skos:definition "Stereoscopic perception through eye convergence/divergence or hand-separated viewing rather than a headset."@en .
 
 sstim-ex:capabilityVrHeadset a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "VR headset"@en ;
+    skos:prefLabel "VR headset"@en,
+                   "visore VR"@it,
+                   "headset de RV"@pt,
+                   "visor de RV"@es ;
     skos:notation "vr-headset" .
 
 sstim-ex:capabilityArGlasses a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "AR glasses"@en ;
+    skos:prefLabel "AR glasses"@en,
+                   "occhiali AR"@it,
+                   "óculos de RA"@pt,
+                   "gafas de RA"@es ;
     skos:notation "ar-glasses" .
 
 sstim-ex:capabilityFullVisualOcclusion a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "full visual occlusion"@en ;
+    skos:prefLabel "full visual occlusion"@en,
+                   "occlusione visiva totale"@it,
+                   "oclusão visual total"@pt,
+                   "oclusión visual total"@es ;
     skos:notation "full-visual-occlusion" ;
     skos:definition "Capability to block outside vision while presenting intended visual content."@en .
 
 sstim-ex:capabilityPhoneVibration a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "phone vibration"@en ;
+    skos:prefLabel "phone vibration"@en,
+                   "vibrazione del telefono"@it,
+                   "vibração do telefone"@pt,
+                   "vibración del teléfono"@es ;
     skos:notation "phone-vibration" .
 
 sstim-ex:capabilityHapticActuator a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "haptic actuator"@en ;
+    skos:prefLabel "haptic actuator"@en,
+                   "attuatore aptico"@it,
+                   "atuador háptico"@pt,
+                   "actuador háptico"@es ;
     skos:notation "haptic-actuator" .
 
 sstim-ex:capabilityMultiDeviceBodyPlacement a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "multi-device body placement"@en ;
+    skos:prefLabel "multi-device body placement"@en,
+                   "posizionamento corporeo multi-dispositivo"@it,
+                   "posicionamento corporal multidispositivo"@pt,
+                   "colocación corporal multidispositivo"@es ;
     skos:notation "multi-device-body-placement" .
 
 sstim-ex:capabilitySensorInput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "sensor input"@en ;
+    skos:prefLabel "sensor input"@en,
+                   "ingresso sensoriale"@it,
+                   "entrada de sensor"@pt,
+                   "entrada de sensor"@es ;
     skos:notation "sensor-input" .
 
 sstim-ex:capabilityAmbientRadioEmitter a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "ambient radio emitter"@en ;
+    skos:prefLabel "ambient radio emitter"@en,
+                   "emettitore radio ambientale"@it,
+                   "emissor de rádio ambiental"@pt,
+                   "emisor de radio ambiental"@es ;
     skos:notation "ambient-radio-emitter" ;
     skos:definition "Nearby radiofrequency source such as a Wi-Fi router, phone radio, or comparable environmental emitter. This does not assert stimulation efficacy."@en .
 
 sstim-ex:capabilityScentDelivery a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "scent delivery"@en ;
+    skos:prefLabel "scent delivery"@en,
+                   "erogazione di odori"@it,
+                   "liberação de aromas"@pt,
+                   "emisión de aromas"@es ;
     skos:notation "scent-delivery" .
 
 sstim-ex:capabilityTasteDelivery a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "taste delivery"@en ;
+    skos:prefLabel "taste delivery"@en,
+                   "erogazione di sapori"@it,
+                   "liberação de sabores"@pt,
+                   "emisión de sabores"@es ;
     skos:notation "taste-delivery" .
 
 sstim-ex:capabilityLiquidGelTactileImmersion a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "liquid/gel/tactile immersion"@en ;
+    skos:prefLabel "liquid/gel/tactile immersion"@en,
+                   "immersione tattile in liquido/gel"@it,
+                   "imersão tátil em líquido/gel"@pt,
+                   "inmersión táctil en líquido/gel"@es ;
     skos:notation "liquid-gel-tactile-immersion" .
 
 sstim-ex:capabilityThermalActuation a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "thermal actuation"@en ;
+    skos:prefLabel "thermal actuation"@en,
+                   "attuazione termica"@it,
+                   "atuação térmica"@pt,
+                   "actuación térmica"@es ;
     skos:notation "thermal-actuation" .
 
 sstim-ex:capabilityAirflowActuation a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "airflow actuation"@en ;
+    skos:prefLabel "airflow actuation"@en,
+                   "attuazione del flusso d'aria"@it,
+                   "atuação de fluxo de ar"@pt,
+                   "actuación de flujo de aire"@es ;
     skos:notation "airflow-actuation" .
 
 sstim-ex:capabilityJointForceActuation a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "joint force actuation"@en ;
+    skos:prefLabel "joint force actuation"@en,
+                   "attuazione di forza articolare"@it,
+                   "atuação de força articular"@pt,
+                   "actuación de fuerza articular"@es ;
     skos:notation "joint-force-actuation" .
 
 sstim-ex:capabilityGravityCueing a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "gravity cueing"@en ;
+    skos:prefLabel "gravity cueing"@en,
+                   "segnalazione gravitazionale"@it,
+                   "sinalização gravitacional"@pt,
+                   "señalización gravitacional"@es ;
     skos:notation "gravity-cueing" .
 
 sstim-ex:capabilityBodyPositionTracking a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "body-position tracking"@en ;
+    skos:prefLabel "body-position tracking"@en,
+                   "tracciamento della posizione corporea"@it,
+                   "rastreamento da posição corporal"@pt,
+                   "seguimiento de la posición corporal"@es ;
     skos:notation "body-position-tracking" .
 
 sstim-ex:capabilityRoomScaleTracking a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "room-scale tracking"@en ;
+    skos:prefLabel "room-scale tracking"@en,
+                   "tracciamento su scala ambiente"@it,
+                   "rastreamento em escala de sala"@pt,
+                   "seguimiento a escala de sala"@es ;
     skos:notation "room-scale-tracking" .
 
 sstim-ex:capabilityLocomotionInterface a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "locomotion interface"@en ;
+    skos:prefLabel "locomotion interface"@en,
+                   "interfaccia di locomozione"@it,
+                   "interface de locomoção"@pt,
+                   "interfaz de locomoción"@es ;
     skos:notation "locomotion-interface" ;
     skos:definition "Capability for walking, moving around, redirected walking, treadmill, platform, controller, or comparable locomotion support."@en .
 
 sstim-ex:capabilityWearableSpeakerArray a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "wearable speaker array"@en ;
+    skos:prefLabel "wearable speaker array"@en,
+                   "schiera di altoparlanti indossabile"@it,
+                   "matriz de alto-falantes vestível"@pt,
+                   "matriz de altavoces ponible"@es ;
     skos:notation "wearable-speaker-array" .
 
 sstim-ex:capabilityWearableLightArray a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "wearable light array"@en ;
+    skos:prefLabel "wearable light array"@en,
+                   "schiera di luci indossabile"@it,
+                   "matriz de luzes vestível"@pt,
+                   "matriz de luces ponible"@es ;
     skos:notation "wearable-light-array" .
 
 sstim-ex:capabilityTactileDisplay a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "tactile display"@en ;
+    skos:prefLabel "tactile display"@en,
+                   "display tattile"@it,
+                   "display tátil"@pt,
+                   "pantalla táctil"@es ;
     skos:notation "tactile-display" ;
     skos:definition "Capability to render spatial or patterned tactile information on the body."@en .
 
 sstim-ex:capabilityTactileCamera a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "tactile camera"@en ;
+    skos:prefLabel "tactile camera"@en,
+                   "camera tattile"@it,
+                   "câmera tátil"@pt,
+                   "cámara táctil"@es ;
     skos:notation "tactile-camera" ;
     skos:definition "Exploratory capability concept for mapping captured environmental or visual structure into tactile presentation."@en .
 
 sstim-ex:capabilityInfraredLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "infrared light output"@en ;
+    skos:prefLabel "infrared light output"@en,
+                   "emissione di luce infrarossa"@it,
+                   "emissão de luz infravermelha"@pt,
+                   "emisión de luz infrarroja"@es ;
     skos:notation "infrared-light-output" ;
     skos:definition "Capability to emit non-visible infrared optical radiation. Exploratory; not a current BSC Lab delivery capability."@en ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumInfraredRadiation .
@@ -1290,7 +1506,10 @@ sstim-ex:capabilityInfraredLightOutput a owl:NamedIndividual, sstim-ex:DeviceCap
 sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:DeviceCapability, skos:Concept ;
     skos:inScheme sstim-ex:DeviceCapabilityScheme ;
     skos:topConceptOf sstim-ex:DeviceCapabilityScheme ;
-    skos:prefLabel "ultraviolet light output"@en ;
+    skos:prefLabel "ultraviolet light output"@en,
+                   "emissione di luce ultravioletta"@it,
+                   "emissão de luz ultravioleta"@pt,
+                   "emisión de luz ultravioleta"@es ;
     skos:notation "ultraviolet-light-output" ;
     skos:definition "Capability to emit non-visible ultraviolet optical radiation. Exploratory and optical-safety-bounded; not a current BSC Lab delivery capability."@en ;
     sstim-ex:affordsDeliveryMedium sstim-ex:mediumUltravioletRadiation .
@@ -1298,173 +1517,257 @@ sstim-ex:capabilityUltravioletLightOutput a owl:NamedIndividual, sstim-ex:Device
 sstim-ex:placementEars a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "ears"@en ;
+    skos:prefLabel "ears"@en,
+                   "orecchie"@it,
+                   "orelhas"@pt,
+                   "oídos"@es ;
     skos:notation "ears" .
 
 sstim-ex:placementEyes a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "eyes"@en ;
+    skos:prefLabel "eyes"@en,
+                   "occhi"@it,
+                   "olhos"@pt,
+                   "ojos"@es ;
     skos:notation "eyes" .
 
 sstim-ex:placementNose a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "nose"@en ;
+    skos:prefLabel "nose"@en,
+                   "naso"@it,
+                   "nariz"@pt,
+                   "nariz"@es ;
     skos:notation "nose" .
 
 sstim-ex:placementMouth a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "mouth"@en ;
+    skos:prefLabel "mouth"@en,
+                   "bocca"@it,
+                   "boca"@pt,
+                   "boca"@es ;
     skos:notation "mouth" .
 
 sstim-ex:placementHands a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "hands"@en ;
+    skos:prefLabel "hands"@en,
+                   "mani"@it,
+                   "mãos"@pt,
+                   "manos"@es ;
     skos:notation "hands" .
 
 sstim-ex:placementFeet a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "feet"@en ;
+    skos:prefLabel "feet"@en,
+                   "piedi"@it,
+                   "pés"@pt,
+                   "pies"@es ;
     skos:notation "feet" .
 
 sstim-ex:placementTopOfHead a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "top of head"@en ;
+    skos:prefLabel "top of head"@en,
+                   "sommità del capo"@it,
+                   "topo da cabeça"@pt,
+                   "parte superior de la cabeza"@es ;
     skos:notation "top-of-head" .
 
 sstim-ex:placementTorso a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "torso"@en ;
+    skos:prefLabel "torso"@en,
+                   "torso"@it,
+                   "tronco"@pt,
+                   "torso"@es ;
     skos:notation "torso" .
 
 sstim-ex:placementJoints a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "joints"@en ;
+    skos:prefLabel "joints"@en,
+                   "articolazioni"@it,
+                   "articulações"@pt,
+                   "articulaciones"@es ;
     skos:notation "joints" .
 
 sstim-ex:placementWholeBody a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "whole body"@en ;
+    skos:prefLabel "whole body"@en,
+                   "corpo intero"@it,
+                   "corpo inteiro"@pt,
+                   "cuerpo entero"@es ;
     skos:notation "whole-body" .
 
 sstim-ex:placementNearbyEnvironment a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:topConceptOf sstim-ex:BodyPlacementScheme ;
-    skos:prefLabel "nearby environment"@en ;
+    skos:prefLabel "nearby environment"@en,
+                   "ambiente circostante"@it,
+                   "ambiente próximo"@pt,
+                   "entorno cercano"@es ;
     skos:notation "nearby-environment" .
 
 sstim-ex:placementEarLeft a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:broader sstim-ex:placementEars ;
-    skos:prefLabel "left ear"@en ;
+    skos:prefLabel "left ear"@en,
+                   "orecchio sinistro"@it,
+                   "orelha esquerda"@pt,
+                   "oído izquierdo"@es ;
     skos:notation "ear-left" ;
     skos:definition "The left ear specifically, for dichotic or per-ear delivery such as a binaural beat."@en .
 
 sstim-ex:placementEarRight a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:broader sstim-ex:placementEars ;
-    skos:prefLabel "right ear"@en ;
+    skos:prefLabel "right ear"@en,
+                   "orecchio destro"@it,
+                   "orelha direita"@pt,
+                   "oído derecho"@es ;
     skos:notation "ear-right" ;
     skos:definition "The right ear specifically, for dichotic or per-ear delivery such as a binaural beat."@en .
 
 sstim-ex:placementEyeLeft a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:broader sstim-ex:placementEyes ;
-    skos:prefLabel "left eye"@en ;
+    skos:prefLabel "left eye"@en,
+                   "occhio sinistro"@it,
+                   "olho esquerdo"@pt,
+                   "ojo izquierdo"@es ;
     skos:notation "eye-left" ;
     skos:definition "The left eye specifically, for dichoptic or per-eye delivery such as stereoscopic depth or interocular frequency tagging."@en .
 
 sstim-ex:placementEyeRight a owl:NamedIndividual, sstim-ex:BodyPlacement, skos:Concept ;
     skos:inScheme sstim-ex:BodyPlacementScheme ;
     skos:broader sstim-ex:placementEyes ;
-    skos:prefLabel "right eye"@en ;
+    skos:prefLabel "right eye"@en,
+                   "occhio destro"@it,
+                   "olho direito"@pt,
+                   "ojo derecho"@es ;
     skos:notation "eye-right" ;
     skos:definition "The right eye specifically, for dichoptic or per-eye delivery such as stereoscopic depth or interocular frequency tagging."@en .
 
 sstim-ex:patternContinuous a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "continuous"@en ;
+    skos:prefLabel "continuous"@en,
+                   "continuo"@it,
+                   "contínuo"@pt,
+                   "continuo"@es ;
     skos:notation "continuous" .
 
 sstim-ex:patternPulsed a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "pulsed"@en ;
+    skos:prefLabel "pulsed"@en,
+                   "pulsato"@it,
+                   "pulsado"@pt,
+                   "pulsado"@es ;
     skos:notation "pulsed" .
 
 sstim-ex:patternBlinking a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "blinking"@en ;
+    skos:prefLabel "blinking"@en,
+                   "lampeggiante"@it,
+                   "piscante"@pt,
+                   "parpadeante"@es ;
     skos:notation "blinking" .
 
 sstim-ex:patternMoving a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "moving"@en ;
+    skos:prefLabel "moving"@en,
+                   "in movimento"@it,
+                   "em movimento"@pt,
+                   "en movimiento"@es ;
     skos:notation "moving" .
 
 sstim-ex:patternStatic a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "static"@en ;
+    skos:prefLabel "static"@en,
+                   "statico"@it,
+                   "estático"@pt,
+                   "estático"@es ;
     skos:notation "static" .
 
 sstim-ex:patternStochastic a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "stochastic"@en ;
+    skos:prefLabel "stochastic"@en,
+                   "stocastico"@it,
+                   "estocástico"@pt,
+                   "estocástico"@es ;
     skos:notation "stochastic" .
 
 sstim-ex:patternAdaptive a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "adaptive"@en ;
+    skos:prefLabel "adaptive"@en,
+                   "adattivo"@it,
+                   "adaptativo"@pt,
+                   "adaptativo"@es ;
     skos:notation "adaptive" .
 
 sstim-ex:patternNoise a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "noise"@en ;
+    skos:prefLabel "noise"@en,
+                   "rumore"@it,
+                   "ruído"@pt,
+                   "ruido"@es ;
     skos:notation "noise" .
 
 sstim-ex:patternFixedColor a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "fixed color"@en ;
+    skos:prefLabel "fixed color"@en,
+                   "colore fisso"@it,
+                   "cor fixa"@pt,
+                   "color fijo"@es ;
     skos:notation "fixed-color" .
 
 sstim-ex:patternChangingColor a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "changing color"@en ;
+    skos:prefLabel "changing color"@en,
+                   "colore variabile"@it,
+                   "cor variável"@pt,
+                   "color variable"@es ;
     skos:notation "changing-color" .
 
 sstim-ex:patternRhythmic a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "rhythmic"@en ;
+    skos:prefLabel "rhythmic"@en,
+                   "ritmico"@it,
+                   "rítmico"@pt,
+                   "rítmico"@es ;
     skos:notation "rhythmic" .
 
 sstim-ex:patternTextured a owl:NamedIndividual, sstim-ex:StimulusPattern, skos:Concept ;
     skos:inScheme sstim-ex:StimulusPatternScheme ;
     skos:topConceptOf sstim-ex:StimulusPatternScheme ;
-    skos:prefLabel "textured"@en ;
+    skos:prefLabel "textured"@en,
+                   "testurizzato"@it,
+                   "texturizado"@pt,
+                   "texturizado"@es ;
     skos:notation "textured" .
 
 sstim-ex:audioNoiseWhite a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "white noise"@en ;
+    skos:prefLabel "white noise"@en,
+                   "rumore bianco"@it,
+                   "ruído branco"@pt,
+                   "ruido blanco"@es ;
     skos:definition "Noise with equal power per unit frequency, so its spectrum is flat. Perceptually bright, because hearing resolves higher frequencies into wider bands."@en ;
     skos:notation "white" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
@@ -1472,7 +1775,10 @@ sstim-ex:audioNoiseWhite a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:C
 sstim-ex:audioNoisePink a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "pink noise"@en ;
+    skos:prefLabel "pink noise"@en,
+                   "rumore rosa"@it,
+                   "ruído rosa"@pt,
+                   "ruido rosa"@es ;
     skos:definition "Noise with equal power per octave, falling at about 3 dB per octave. The closest of the coloured noises to how broadband sound is heard."@en ;
     skos:notation "pink" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
@@ -1480,7 +1786,10 @@ sstim-ex:audioNoisePink a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
 sstim-ex:audioNoiseBrownRed a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "brown/red noise"@en ;
+    skos:prefLabel "brown/red noise"@en,
+                   "rumore marrone/rosso"@it,
+                   "ruído marrom/vermelho"@pt,
+                   "ruido marrón/rojo"@es ;
     skos:definition "Noise falling at about 6 dB per octave, weighting low frequencies heavily. Perceptually deep and rumbling."@en ;
     skos:notation "brown-red" ;
     skos:altLabel "Brownian noise"@en, "red noise"@en ;
@@ -1489,7 +1798,10 @@ sstim-ex:audioNoiseBrownRed a owl:NamedIndividual, sstim-ex:AudioNoiseColor, sko
 sstim-ex:audioNoiseBlue a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "blue noise"@en ;
+    skos:prefLabel "blue noise"@en,
+                   "rumore blu"@it,
+                   "ruído azul"@pt,
+                   "ruido azul"@es ;
     skos:definition "Noise rising at about 3 dB per octave, the inverse of pink. Perceptually thin and hissing."@en ;
     skos:notation "blue" ;
     skos:scopeNote "Define by spectral slope or generation method when used in a protocol."@en .
@@ -1497,7 +1809,10 @@ sstim-ex:audioNoiseBlue a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
 sstim-ex:audioNoiseVioletPurple a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "violet/purple noise"@en ;
+    skos:prefLabel "violet/purple noise"@en,
+                   "rumore violetto/porpora"@it,
+                   "ruído violeta/púrpura"@pt,
+                   "ruido violeta/púrpura"@es ;
     skos:definition "Noise rising at about 6 dB per octave, the inverse of brown. The brightest of the coloured noises."@en ;
     skos:notation "violet-purple" ;
     skos:altLabel "purple noise"@en ;
@@ -1506,7 +1821,10 @@ sstim-ex:audioNoiseVioletPurple a owl:NamedIndividual, sstim-ex:AudioNoiseColor,
 sstim-ex:audioNoiseGrey a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "grey noise"@en ;
+    skos:prefLabel "grey noise"@en,
+                   "rumore grigio"@it,
+                   "ruído cinza"@pt,
+                   "ruido gris"@es ;
     skos:definition "Noise shaped to a psychoacoustic equal-loudness contour, so it is perceived as roughly equally loud across frequency rather than being flat in power."@en ;
     skos:notation "grey" ;
     skos:scopeNote "Define by spectral slope, loudness weighting, or generation method when used in a protocol."@en .
@@ -1514,279 +1832,414 @@ sstim-ex:audioNoiseGrey a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
 sstim-ex:audioNoiseBlackSilence a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Concept ;
     skos:inScheme sstim-ex:AudioNoiseColorScheme ;
     skos:topConceptOf sstim-ex:AudioNoiseColorScheme ;
-    skos:prefLabel "black/silence"@en ;
+    skos:prefLabel "black/silence"@en,
+                   "nero/silenzio"@it,
+                   "preto/silêncio"@pt,
+                   "negro/silencio"@es ;
     skos:notation "black-silence" ;
     skos:definition "Silence, near-silence, muting, or absence of intended audio stimulus."@en .
 
 sstim-ex:visualNoiseLuminance a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "luminance noise"@en ;
+    skos:prefLabel "luminance noise"@en,
+                   "rumore di luminanza"@it,
+                   "ruído de luminância"@pt,
+                   "ruido de luminancia"@es ;
     skos:notation "luminance-noise" .
 
 sstim-ex:visualNoiseChromatic a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "chromatic noise"@en ;
+    skos:prefLabel "chromatic noise"@en,
+                   "rumore cromatico"@it,
+                   "ruído cromático"@pt,
+                   "ruido cromático"@es ;
     skos:notation "chromatic-noise" .
 
 sstim-ex:visualNoisePixel a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "pixel noise"@en ;
+    skos:prefLabel "pixel noise"@en,
+                   "rumore di pixel"@it,
+                   "ruído de pixel"@pt,
+                   "ruido de píxel"@es ;
     skos:notation "pixel-noise" .
 
 sstim-ex:visualNoiseMoving a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "moving visual noise"@en ;
+    skos:prefLabel "moving visual noise"@en,
+                   "rumore visivo in movimento"@it,
+                   "ruído visual em movimento"@pt,
+                   "ruido visual en movimiento"@es ;
     skos:notation "moving-visual-noise" .
 
 sstim-ex:visualFieldStaticColor a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "static color field"@en ;
+    skos:prefLabel "static color field"@en,
+                   "campo di colore statico"@it,
+                   "campo de cor estático"@pt,
+                   "campo de color estático"@es ;
     skos:notation "static-color-field" .
 
 sstim-ex:visualFieldBlack a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "black field"@en ;
+    skos:prefLabel "black field"@en,
+                   "campo nero"@it,
+                   "campo preto"@pt,
+                   "campo negro"@es ;
     skos:notation "black-field" .
 
 sstim-ex:visualFieldWhite a owl:NamedIndividual, sstim-ex:VisualNoiseType, skos:Concept ;
     skos:inScheme sstim-ex:VisualNoiseScheme ;
     skos:topConceptOf sstim-ex:VisualNoiseScheme ;
-    skos:prefLabel "white field"@en ;
+    skos:prefLabel "white field"@en,
+                   "campo bianco"@it,
+                   "campo branco"@pt,
+                   "campo blanco"@es ;
     skos:notation "white-field" .
 
 sstim-ex:knownInSSTIM a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "known in SSTIM"@en ;
+    skos:prefLabel "known in SSTIM"@en,
+                   "noto in SSTIM"@it,
+                   "conhecido no SSTIM"@pt,
+                   "conocido en SSTIM"@es ;
     skos:notation "knownInSSTIM" ;
     skos:definition "Locally known or already represented within SSTIM."@en .
 
 sstim-ex:hypothesisInSSTIM a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "hypothesis in SSTIM"@en ;
+    skos:prefLabel "hypothesis in SSTIM"@en,
+                   "ipotesi in SSTIM"@it,
+                   "hipótese no SSTIM"@pt,
+                   "hipótesis en SSTIM"@es ;
     skos:notation "hypothesisInSSTIM" ;
     skos:definition "Represented as a hypothesis or exploratory modeling candidate within SSTIM."@en .
 
 sstim-ex:unknownToSSTIM a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "unknown to SSTIM"@en ;
+    skos:prefLabel "unknown to SSTIM"@en,
+                   "sconosciuto a SSTIM"@it,
+                   "desconhecido para o SSTIM"@pt,
+                   "desconocido para SSTIM"@es ;
     skos:notation "unknownToSSTIM" ;
     skos:definition "Not yet reviewed or settled within SSTIM."@en .
 
 sstim-ex:noKnownEvidenceInSSTIM a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "no known evidence in SSTIM"@en ;
+    skos:prefLabel "no known evidence in SSTIM"@en,
+                   "nessuna evidenza nota in SSTIM"@it,
+                   "nenhuma evidência conhecida no SSTIM"@pt,
+                   "ninguna evidencia conocida en SSTIM"@es ;
     skos:notation "noKnownEvidenceInSSTIM" ;
     skos:definition "No supporting evidence is currently recorded in SSTIM. This is not a global scientific absence claim."@en .
 
 sstim-ex:notCurrentlyUsedInBSCLab a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "not currently used in BSC Lab"@en ;
+    skos:prefLabel "not currently used in BSC Lab"@en,
+                   "attualmente non usato in BSC Lab"@it,
+                   "atualmente não usado no BSC Lab"@pt,
+                   "actualmente no usado en BSC Lab"@es ;
     skos:notation "notCurrentlyUsedInBSCLab" .
 
 sstim-ex:notCurrentlyDeliverableByBSCLab a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "not currently deliverable by BSC Lab"@en ;
+    skos:prefLabel "not currently deliverable by BSC Lab"@en,
+                   "attualmente non erogabile da BSC Lab"@it,
+                   "atualmente não entregável pelo BSC Lab"@pt,
+                   "actualmente no entregable por BSC Lab"@es ;
     skos:notation "notCurrentlyDeliverableByBSCLab" .
 
 sstim-ex:outsideBSCLabScope a owl:NamedIndividual, sstim-ex:KnowledgeStatus, skos:Concept ;
     skos:inScheme sstim-ex:KnowledgeStatusScheme ;
     skos:topConceptOf sstim-ex:KnowledgeStatusScheme ;
-    skos:prefLabel "outside BSC Lab scope"@en ;
+    skos:prefLabel "outside BSC Lab scope"@en,
+                   "fuori dall'ambito di BSC Lab"@it,
+                   "fora do escopo do BSC Lab"@pt,
+                   "fuera del alcance de BSC Lab"@es ;
     skos:notation "outsideBSCLabScope" .
 
 sstim-ex:contextExploratoryNonClinical a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "exploratory non-clinical"@en ;
+    skos:prefLabel "exploratory non-clinical"@en,
+                   "esplorativo non clinico"@it,
+                   "exploratório não clínico"@pt,
+                   "exploratorio no clínico"@es ;
     skos:notation "exploratory-non-clinical" .
 
 sstim-ex:contextBiohacking a owl:NamedIndividual, sstim-ex:BiohackingContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "biohacking"@en ;
+    skos:prefLabel "biohacking"@en,
+                   "biohacking"@it,
+                   "biohacking"@pt,
+                   "biohacking"@es ;
     skos:notation "biohacking" .
 
 sstim-ex:contextBscLabPrototype a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "BSC Lab prototype"@en ;
+    skos:prefLabel "BSC Lab prototype"@en,
+                   "prototipo BSC Lab"@it,
+                   "protótipo BSC Lab"@pt,
+                   "prototipo BSC Lab"@es ;
     skos:notation "bsc-lab-prototype" .
 
 sstim-ex:contextSelfObservation a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "self-observation"@en ;
+    skos:prefLabel "self-observation"@en,
+                   "auto-osservazione"@it,
+                   "auto-observação"@pt,
+                   "autoobservación"@es ;
     skos:notation "self-observation" .
 
 sstim-ex:contextSocialProtocol a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "social protocol"@en ;
+    skos:prefLabel "social protocol"@en,
+                   "protocollo sociale"@it,
+                   "protocolo social"@pt,
+                   "protocolo social"@es ;
     skos:notation "social-protocol" .
 
 sstim-ex:contextCapabilityBoundary a owl:NamedIndividual, sstim-ex:ExperimentContext, skos:Concept ;
     skos:inScheme sstim-ex:ExperimentContextScheme ;
     skos:topConceptOf sstim-ex:ExperimentContextScheme ;
-    skos:prefLabel "capability boundary"@en ;
+    skos:prefLabel "capability boundary"@en,
+                   "limite di capacità"@it,
+                   "limite de capacidade"@pt,
+                   "límite de capacidad"@es ;
     skos:notation "capability-boundary" .
 
 sstim-ex:gainStereoDepth a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "stereo-depth gain"@en ;
+    skos:prefLabel "stereo-depth gain"@en,
+                   "guadagno di profondità stereo"@it,
+                   "ganho de profundidade estéreo"@pt,
+                   "ganancia de profundidad estéreo"@es ;
     skos:notation "stereo-depth" .
 
 sstim-ex:gainAudioImmersion a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "audio immersion gain"@en ;
+    skos:prefLabel "audio immersion gain"@en,
+                   "guadagno di immersione audio"@it,
+                   "ganho de imersão de áudio"@pt,
+                   "ganancia de inmersión de audio"@es ;
     skos:notation "audio-immersion" .
 
 sstim-ex:gainSpatialAudio a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "spatial audio gain"@en ;
+    skos:prefLabel "spatial audio gain"@en,
+                   "guadagno di audio spaziale"@it,
+                   "ganho de áudio espacial"@pt,
+                   "ganancia de audio espacial"@es ;
     skos:notation "spatial-audio" .
 
 sstim-ex:gainSpatialPresence a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "spatial presence gain"@en ;
+    skos:prefLabel "spatial presence gain"@en,
+                   "guadagno di presenza spaziale"@it,
+                   "ganho de presença espacial"@pt,
+                   "ganancia de presencia espacial"@es ;
     skos:notation "spatial-presence" ;
     skos:definition "Gain in the sense of being located in, moving through, or interacting with a spatial environment."@en .
 
 sstim-ex:gainBodyVibration a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "body vibration gain"@en ;
+    skos:prefLabel "body vibration gain"@en,
+                   "guadagno di vibrazione corporea"@it,
+                   "ganho de vibração corporal"@pt,
+                   "ganancia de vibración corporal"@es ;
     skos:notation "body-vibration" .
 
 sstim-ex:gainTactileImmersion a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "tactile immersion gain"@en ;
+    skos:prefLabel "tactile immersion gain"@en,
+                   "guadagno di immersione tattile"@it,
+                   "ganho de imersão tátil"@pt,
+                   "ganancia de inmersión táctil"@es ;
     skos:notation "tactile-immersion" .
 
 sstim-ex:gainThermalProximity a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "thermal proximity gain"@en ;
+    skos:prefLabel "thermal proximity gain"@en,
+                   "guadagno di prossimità termica"@it,
+                   "ganho de proximidade térmica"@pt,
+                   "ganancia de proximidad térmica"@es ;
     skos:notation "thermal-proximity" .
 
 sstim-ex:gainSocialReflection a owl:NamedIndividual, sstim-ex:PerceptualGain, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualGainScheme ;
     skos:topConceptOf sstim-ex:PerceptualGainScheme ;
-    skos:prefLabel "social reflection gain"@en ;
+    skos:prefLabel "social reflection gain"@en,
+                   "guadagno di riflessione sociale"@it,
+                   "ganho de reflexão social"@pt,
+                   "ganancia de reflexión social"@es ;
     skos:notation "social-reflection" .
 
 sstim-ex:lossHorizontalField a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "horizontal-field loss"@en ;
+    skos:prefLabel "horizontal-field loss"@en,
+                   "perdita di campo orizzontale"@it,
+                   "perda de campo horizontal"@pt,
+                   "pérdida de campo horizontal"@es ;
     skos:notation "horizontal-field" .
 
 sstim-ex:lossEnvironmentalAwareness a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "environmental-awareness loss"@en ;
+    skos:prefLabel "environmental-awareness loss"@en,
+                   "perdita di consapevolezza ambientale"@it,
+                   "perda de percepção do ambiente"@pt,
+                   "pérdida de conciencia del entorno"@es ;
     skos:notation "environmental-awareness" .
 
 sstim-ex:lossOutsideVision a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "outside-vision loss"@en ;
+    skos:prefLabel "outside-vision loss"@en,
+                   "perdita della visione esterna"@it,
+                   "perda de visão externa"@pt,
+                   "pérdida de visión externa"@es ;
     skos:notation "outside-vision" .
 
 sstim-ex:lossComfort a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "comfort loss"@en ;
+    skos:prefLabel "comfort loss"@en,
+                   "perdita di comfort"@it,
+                   "perda de conforto"@pt,
+                   "pérdida de confort"@es ;
     skos:notation "comfort" .
 
 sstim-ex:lossDeliverability a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "deliverability loss"@en ;
+    skos:prefLabel "deliverability loss"@en,
+                   "perdita di erogabilità"@it,
+                   "perda de entregabilidade"@pt,
+                   "pérdida de entregabilidad"@es ;
     skos:notation "deliverability" .
 
 sstim-ex:lossClaimCertainty a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "claim-certainty loss"@en ;
+    skos:prefLabel "claim-certainty loss"@en,
+                   "perdita di certezza dell'affermazione"@it,
+                   "perda de certeza da afirmação"@pt,
+                   "pérdida de certeza de la afirmación"@es ;
     skos:notation "claim-certainty" .
 
 sstim-ex:lossDeviceFeasibility a owl:NamedIndividual, sstim-ex:PerceptualLoss, skos:Concept ;
     skos:inScheme sstim-ex:PerceptualLossScheme ;
     skos:topConceptOf sstim-ex:PerceptualLossScheme ;
-    skos:prefLabel "device-feasibility loss"@en ;
+    skos:prefLabel "device-feasibility loss"@en,
+                   "perdita di fattibilità del dispositivo"@it,
+                   "perda de viabilidade do dispositivo"@pt,
+                   "pérdida de viabilidad del dispositivo"@es ;
     skos:notation "device-feasibility" .
 
 sstim-ex:boundaryEyeStrain a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "eye-strain boundary"@en ;
+    skos:prefLabel "eye-strain boundary"@en,
+                   "limite di affaticamento visivo"@it,
+                   "limite de fadiga visual"@pt,
+                   "límite de fatiga visual"@es ;
     skos:notation "eye-strain" .
 
 sstim-ex:boundaryHearingRisk a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "hearing-risk boundary"@en ;
+    skos:prefLabel "hearing-risk boundary"@en,
+                   "limite di rischio uditivo"@it,
+                   "limite de risco auditivo"@pt,
+                   "límite de riesgo auditivo"@es ;
     skos:notation "hearing-risk" ;
     sstim-ex:hasExposureLimit sstim-ex:limitHearingNiosh .
 
 sstim-ex:boundaryPhotosensitivity a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "photosensitivity boundary"@en ;
+    skos:prefLabel "photosensitivity boundary"@en,
+                   "limite di fotosensibilità"@it,
+                   "limite de fotossensibilidade"@pt,
+                   "límite de fotosensibilidad"@es ;
     skos:notation "photosensitivity" ;
     sstim-ex:hasExposureLimit sstim-ex:limitFlickerWcag .
 
 sstim-ex:boundaryThermalComfort a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "thermal-comfort boundary"@en ;
+    skos:prefLabel "thermal-comfort boundary"@en,
+                   "limite di comfort termico"@it,
+                   "limite de conforto térmico"@pt,
+                   "límite de confort térmico"@es ;
     skos:notation "thermal-comfort" .
 
 sstim-ex:boundaryBodyContactComfort a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "body-contact-comfort boundary"@en ;
+    skos:prefLabel "body-contact-comfort boundary"@en,
+                   "limite di comfort del contatto corporeo"@it,
+                   "limite de conforto de contato corporal"@pt,
+                   "límite de confort de contacto corporal"@es ;
     skos:notation "body-contact-comfort" .
 
 sstim-ex:boundaryEnvironmentalAwareness a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "environmental-awareness boundary"@en ;
+    skos:prefLabel "environmental-awareness boundary"@en,
+                   "limite di consapevolezza ambientale"@it,
+                   "limite de percepção do ambiente"@pt,
+                   "límite de conciencia del entorno"@es ;
     skos:notation "environmental-awareness" .
 
 sstim-ex:boundaryIsolation a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "isolation boundary"@en ;
+    skos:prefLabel "isolation boundary"@en,
+                   "limite di isolamento"@it,
+                   "limite de isolamento"@pt,
+                   "límite de aislamiento"@es ;
     skos:notation "isolation" .
 
 sstim-ex:boundaryBalanceRisk a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "balance-risk boundary"@en ;
+    skos:prefLabel "balance-risk boundary"@en,
+                   "limite di rischio di equilibrio"@it,
+                   "limite de risco de equilíbrio"@pt,
+                   "límite de riesgo de equilibrio"@es ;
     skos:notation "balance-risk" .
 
 sstim-ex:boundaryOpticalRadiation a owl:NamedIndividual, sstim-ex:ComfortBoundary, skos:Concept ;
     skos:inScheme sstim-ex:ComfortBoundaryScheme ;
     skos:topConceptOf sstim-ex:ComfortBoundaryScheme ;
-    skos:prefLabel "optical-radiation boundary"@en ;
+    skos:prefLabel "optical-radiation boundary"@en,
+                   "limite di radiazione ottica"@it,
+                   "limite de radiação óptica"@pt,
+                   "límite de radiación óptica"@es ;
     skos:notation "optical-radiation" ;
     skos:definition "Boundary for non-visible optical-radiation exposure (infrared or ultraviolet) reaching the body, especially the eyes."@en ;
     sstim-ex:hasExposureLimit sstim-ex:limitUvActinicIec .
@@ -1794,129 +2247,192 @@ sstim-ex:boundaryOpticalRadiation a owl:NamedIndividual, sstim-ex:ComfortBoundar
 sstim-ex:effectPleasantness a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "pleasantness"@en ;
+    skos:prefLabel "pleasantness"@en,
+                   "piacevolezza"@it,
+                   "agradabilidade"@pt,
+                   "agrado"@es ;
     skos:notation "pleasantness" .
 
 sstim-ex:effectDiscomfort a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "discomfort"@en ;
+    skos:prefLabel "discomfort"@en,
+                   "disagio"@it,
+                   "desconforto"@pt,
+                   "malestar"@es ;
     skos:notation "discomfort" .
 
 sstim-ex:effectCalm a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "calm"@en ;
+    skos:prefLabel "calm"@en,
+                   "calma"@it,
+                   "calma"@pt,
+                   "calma"@es ;
     skos:notation "calm" .
 
 sstim-ex:effectStress a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "stress"@en ;
+    skos:prefLabel "stress"@en,
+                   "stress"@it,
+                   "estresse"@pt,
+                   "estrés"@es ;
     skos:notation "stress" .
 
 sstim-ex:effectArousal a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "arousal"@en ;
+    skos:prefLabel "arousal"@en,
+                   "attivazione"@it,
+                   "ativação"@pt,
+                   "activación"@es ;
     skos:notation "arousal" .
 
 sstim-ex:effectHeartRate a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "heart rate"@en ;
+    skos:prefLabel "heart rate"@en,
+                   "frequenza cardiaca"@it,
+                   "frequência cardíaca"@pt,
+                   "frecuencia cardíaca"@es ;
     skos:notation "heart-rate" .
 
 sstim-ex:effectBloodPressure a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "blood pressure"@en ;
+    skos:prefLabel "blood pressure"@en,
+                   "pressione arteriosa"@it,
+                   "pressão arterial"@pt,
+                   "presión arterial"@es ;
     skos:notation "blood-pressure" .
 
 sstim-ex:effectBreathRate a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "breath rate"@en ;
+    skos:prefLabel "breath rate"@en,
+                   "frequenza respiratoria"@it,
+                   "frequência respiratória"@pt,
+                   "frecuencia respiratoria"@es ;
     skos:notation "breath-rate" .
 
 sstim-ex:effectPhysiologicalResponse a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "physiological response"@en ;
+    skos:prefLabel "physiological response"@en,
+                   "risposta fisiologica"@it,
+                   "resposta fisiológica"@pt,
+                   "respuesta fisiológica"@es ;
     skos:notation "physiological-response" ;
     skos:definition "Generic physiological-response dimension for exploratory claims where no specific measure is selected."@en .
 
 sstim-ex:effectTactileSensation a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "tactile sensation"@en ;
+    skos:prefLabel "tactile sensation"@en,
+                   "sensazione tattile"@it,
+                   "sensação tátil"@pt,
+                   "sensación táctil"@es ;
     skos:notation "tactile-sensation" .
 
 sstim-ex:effectBodyVibration a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "body vibration"@en ;
+    skos:prefLabel "body vibration"@en,
+                   "vibrazione corporea"@it,
+                   "vibração corporal"@pt,
+                   "vibración corporal"@es ;
     skos:notation "body-vibration" .
 
 sstim-ex:effectImmersion a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "immersion"@en ;
+    skos:prefLabel "immersion"@en,
+                   "immersione"@it,
+                   "imersão"@pt,
+                   "inmersión"@es ;
     skos:notation "immersion" .
 
 sstim-ex:effectSpatialPresence a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "spatial presence"@en ;
+    skos:prefLabel "spatial presence"@en,
+                   "presenza spaziale"@it,
+                   "presença espacial"@pt,
+                   "presencia espacial"@es ;
     skos:notation "spatial-presence" ;
     skos:definition "Sense of being located in, moving through, or interacting with a spatial environment."@en .
 
 sstim-ex:effectProprioception a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "proprioception"@en ;
+    skos:prefLabel "proprioception"@en,
+                   "propriocezione"@it,
+                   "propriocepção"@pt,
+                   "propiocepción"@es ;
     skos:notation "proprioception" .
 
 sstim-ex:effectEyeStrain a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "eye strain"@en ;
+    skos:prefLabel "eye strain"@en,
+                   "affaticamento visivo"@it,
+                   "fadiga visual"@pt,
+                   "fatiga visual"@es ;
     skos:notation "eye-strain" .
 
 sstim-ex:effectHearingRisk a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "hearing risk"@en ;
+    skos:prefLabel "hearing risk"@en,
+                   "rischio uditivo"@it,
+                   "risco auditivo"@pt,
+                   "riesgo auditivo"@es ;
     skos:notation "hearing-risk" .
 
 sstim-ex:effectPhotosensitivityRisk a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "photosensitivity risk"@en ;
+    skos:prefLabel "photosensitivity risk"@en,
+                   "rischio di fotosensibilità"@it,
+                   "risco de fotossensibilidade"@pt,
+                   "riesgo de fotosensibilidad"@es ;
     skos:notation "photosensitivity-risk" .
 
 sstim-ex:effectBalanceRisk a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "balance risk"@en ;
+    skos:prefLabel "balance risk"@en,
+                   "rischio di equilibrio"@it,
+                   "risco de equilíbrio"@pt,
+                   "riesgo de equilibrio"@es ;
     skos:notation "balance-risk" .
 
 sstim-ex:effectSocialConnectedness a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "social connectedness"@en ;
+    skos:prefLabel "social connectedness"@en,
+                   "connessione sociale"@it,
+                   "conexão social"@pt,
+                   "conexión social"@es ;
     skos:notation "social-connectedness" .
 
 sstim-ex:effectTemperaturePerception a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "temperature perception"@en ;
+    skos:prefLabel "temperature perception"@en,
+                   "percezione della temperatura"@it,
+                   "percepção da temperatura"@pt,
+                   "percepción de la temperatura"@es ;
     skos:notation "temperature-perception" .
 
 sstim-ex:effectGravityPerception a owl:NamedIndividual, sstim-ex:EffectDimension, skos:Concept ;
     skos:inScheme sstim-ex:EffectDimensionScheme ;
     skos:topConceptOf sstim-ex:EffectDimensionScheme ;
-    skos:prefLabel "gravity perception"@en ;
+    skos:prefLabel "gravity perception"@en,
+                   "percezione della gravità"@it,
+                   "percepção da gravidade"@pt,
+                   "percepción de la gravedad"@es ;
     skos:notation "gravity-perception" .
 
 

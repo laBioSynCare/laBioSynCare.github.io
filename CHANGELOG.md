@@ -37,10 +37,21 @@ file is the human-readable summary.
   across the vocabulary, exposure and ecosystem modules. A scheme extracted on
   its own previously travelled with no licence at all.
 - `make language-coverage` measures multilingual coverage per scheme and refuses
-  to let it drift. SSTIM advertises four languages; 269 of 545 concepts carry all
-  four and 33 of 67 schemes are complete. A scheme must be complete or wholly
-  untranslated, a new scheme must ship translated or be recorded as debt, and a
-  translated scheme must leave the ledger. Closes the metric KR-16 lacked.
+  to let it drift. A scheme must be complete or wholly untranslated, a new scheme
+  must ship translated or be recorded as debt, and a translated scheme must leave
+  the ledger. Closes the metric KR-16 lacked.
+- **The SKOS vocabulary is fully multilingual.** All 545 concepts now carry
+  English, Italian, Portuguese and Spanish `skos:prefLabel` values, across all 67
+  concept schemes. The gate found 269 of 545 complete; the remaining 276 labels
+  were added the same day, so `make language-coverage` reports 100% and its
+  ledger of untranslated schemes is empty.
+
+  Two honest qualifications travel with this. The 276 new labels were written by
+  the maintainers and have had **no native review** — a review request is open,
+  and several known soft spots are named in it rather than left to be found. And
+  `skos:definition` remains English-only for all 545 concepts: translating
+  definitions is a substantially larger job and a separate decision, not an
+  oversight.
 - `make definition-coverage` gained a bar against definitions that restate their
   label, implementing the second-pass review's finding that a length check
   cannot catch them.

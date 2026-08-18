@@ -531,25 +531,37 @@ sstim-v:ClaimDirectionScheme a skos:ConceptScheme ;
 
 sstim-v:claimSupports a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
     skos:inScheme sstim-v:ClaimDirectionScheme ;
-    skos:prefLabel "Supports"@en ;
+    skos:prefLabel "Supports"@en,
+                   "Sostiene"@it,
+                   "Apoia"@pt,
+                   "Apoya"@es ;
     skos:notation "supports" ;
     skos:definition "The body of cited evidence, on balance, supports the asserted relation."@en .
 
 sstim-v:claimMixed a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
     skos:inScheme sstim-v:ClaimDirectionScheme ;
-    skos:prefLabel "Mixed"@en ;
+    skos:prefLabel "Mixed"@en,
+                   "Misto"@it,
+                   "Misto"@pt,
+                   "Mixto"@es ;
     skos:notation "mixed" ;
     skos:definition "The cited evidence is mixed: some studies support the relation and others do not."@en .
 
 sstim-v:claimInconclusive a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
     skos:inScheme sstim-v:ClaimDirectionScheme ;
-    skos:prefLabel "Inconclusive"@en ;
+    skos:prefLabel "Inconclusive"@en,
+                   "Inconcludente"@it,
+                   "Inconclusivo"@pt,
+                   "No concluyente"@es ;
     skos:notation "inconclusive" ;
     skos:definition "The cited evidence is insufficient to determine whether the relation holds."@en .
 
 sstim-v:claimRefutes a owl:NamedIndividual, sstim:ClaimDirection, skos:Concept ;
     skos:inScheme sstim-v:ClaimDirectionScheme ;
-    skos:prefLabel "Refutes"@en ;
+    skos:prefLabel "Refutes"@en,
+                   "Confuta"@it,
+                   "Refuta"@pt,
+                   "Refuta"@es ;
     skos:notation "refutes" ;
     skos:definition "The body of cited evidence, on balance, does not support (or refutes) the asserted relation."@en .
 
@@ -561,19 +573,28 @@ sstim-v:EffectDirectionScheme a skos:ConceptScheme ;
 
 sstim-v:effectIncrease a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
     skos:inScheme sstim-v:EffectDirectionScheme ;
-    skos:prefLabel "Increase"@en ;
+    skos:prefLabel "Increase"@en,
+                   "Aumento"@it,
+                   "Aumento"@pt,
+                   "Aumento"@es ;
     skos:notation "increase" ;
     skos:definition "The measured outcome increased relative to the comparator."@en .
 
 sstim-v:effectDecrease a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
     skos:inScheme sstim-v:EffectDirectionScheme ;
-    skos:prefLabel "Decrease"@en ;
+    skos:prefLabel "Decrease"@en,
+                   "Diminuzione"@it,
+                   "Diminuição"@pt,
+                   "Disminución"@es ;
     skos:notation "decrease" ;
     skos:definition "The measured outcome decreased relative to the comparator."@en .
 
 sstim-v:effectNoChange a owl:NamedIndividual, sstim:EffectDirection, skos:Concept ;
     skos:inScheme sstim-v:EffectDirectionScheme ;
-    skos:prefLabel "No Change"@en ;
+    skos:prefLabel "No Change"@en,
+                   "Nessuna variazione"@it,
+                   "Sem alteração"@pt,
+                   "Sin cambio"@es ;
     skos:notation "no-change" ;
     skos:definition "No measurable change in the outcome relative to the comparator."@en .
 
@@ -585,21 +606,30 @@ sstim-v:ReviewStatusScheme a skos:ConceptScheme ;
 
 sstim-v:reviewProvisional a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
     skos:inScheme sstim-v:ReviewStatusScheme ;
-    skos:prefLabel "Provisional"@en ;
+    skos:prefLabel "Provisional"@en,
+                   "Provvisorio"@it,
+                   "Provisório"@pt,
+                   "Provisional"@es ;
     skos:notation "provisional" ;
     skos:definition "Derived workflow summary (ADR 0027): no current review decision exists under the named rubric. Not authoritative data; derived from EvidenceReviewDecision records in the 0.7 compatibility view only."@en ;
     skos:historyNote "Redefined 2026-07-13 (ADR 0027) from a stored status to a derived summary."@en .
 
 sstim-v:reviewReviewed a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
     skos:inScheme sstim-v:ReviewStatusScheme ;
-    skos:prefLabel "Reviewed"@en ;
+    skos:prefLabel "Reviewed"@en,
+                   "Revisionato"@it,
+                   "Revisado"@pt,
+                   "Revisado"@es ;
     skos:notation "reviewed" ;
     skos:definition "Derived workflow summary (ADR 0027): a current recorded review decision exists, regardless of its outcome or independence. Independence is a property of the review activity, never implied by this value."@en ;
     skos:historyNote "Redefined 2026-07-13 (ADR 0027): the earlier definition claimed independent review that the recorded data could not establish."@en .
 
 sstim-v:reviewNeedsUpdate a owl:NamedIndividual, sstim:ReviewStatus, skos:Concept ;
     skos:inScheme sstim-v:ReviewStatusScheme ;
-    skos:prefLabel "Needs Update"@en ;
+    skos:prefLabel "Needs Update"@en,
+                   "Da aggiornare"@it,
+                   "Necessita atualização"@pt,
+                   "Necesita actualización"@es ;
     skos:notation "needs-update" ;
     skos:definition "Derived workflow summary (ADR 0027): the prior review decision was invalidated, or an explicit re-review trigger exists without a replacement decision."@en ;
     skos:historyNote "Redefined 2026-07-13 (ADR 0027) from a stored status to a derived summary."@en .
@@ -2137,19 +2167,28 @@ sstim-v:ModalityApplicabilityScheme a skos:ConceptScheme ;
 
 sstim-v:applicabilityMixedModalities a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
     skos:inScheme sstim-v:ModalityApplicabilityScheme ;
-    skos:prefLabel "Mixed modalities"@en ;
+    skos:prefLabel "Mixed modalities"@en,
+                   "Modalità multiple"@it,
+                   "Modalidades mistas"@pt,
+                   "Modalidades mixtas"@es ;
     skos:notation "mixed-modalities" ;
     skos:definition "The source spans several sensory modalities; every canonical modality it actually supports is still listed explicitly."@en .
 
 sstim-v:applicabilityUnknownModality a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
     skos:inScheme sstim-v:ModalityApplicabilityScheme ;
-    skos:prefLabel "Unknown / not reported"@en ;
+    skos:prefLabel "Unknown / not reported"@en,
+                   "Sconosciuta / non riportata"@it,
+                   "Desconhecida / não relatada"@pt,
+                   "Desconocida / no informada"@es ;
     skos:notation "unknown-modality" ;
     skos:definition "The source does not report, or the extraction did not establish, the sensory modality."@en .
 
 sstim-v:applicabilityNotApplicable a owl:NamedIndividual, sstim:ModalityApplicability, skos:Concept ;
     skos:inScheme sstim-v:ModalityApplicabilityScheme ;
-    skos:prefLabel "Not applicable"@en ;
+    skos:prefLabel "Not applicable"@en,
+                   "Non applicabile"@it,
+                   "Não aplicável"@pt,
+                   "No aplicable"@es ;
     skos:notation "not-applicable-modality" ;
     skos:definition "Sensory modality does not apply to this source (for example a paced-breathing intervention with no sensory delivery claim)."@en .
 
@@ -2165,43 +2204,64 @@ sstim-v:StudyDesignScheme a skos:ConceptScheme ;
 
 sstim-v:designRandomizedControlledTrial a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Randomized controlled trial"@en ;
+    skos:prefLabel "Randomized controlled trial"@en,
+                   "Studio controllato randomizzato"@it,
+                   "Ensaio controlado randomizado"@pt,
+                   "Ensayo controlado aleatorizado"@es ;
     skos:notation "rct" ;
     skos:definition "Randomized allocation to intervention and control conditions."@en .
 
 sstim-v:designControlledTrial a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Controlled trial (non-randomized)"@en ;
+    skos:prefLabel "Controlled trial (non-randomized)"@en,
+                   "Studio controllato (non randomizzato)"@it,
+                   "Ensaio controlado (não randomizado)"@pt,
+                   "Ensayo controlado (no aleatorizado)"@es ;
     skos:notation "controlled-trial" ;
     skos:definition "Controlled comparison without randomized allocation."@en .
 
 sstim-v:designObservational a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Observational"@en ;
+    skos:prefLabel "Observational"@en,
+                   "Osservazionale"@it,
+                   "Observacional"@pt,
+                   "Observacional"@es ;
     skos:notation "observational" ;
     skos:definition "Observational design without experimenter-controlled allocation."@en .
 
 sstim-v:designCaseReport a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Case report / case series"@en ;
+    skos:prefLabel "Case report / case series"@en,
+                   "Descrizione di caso / serie di casi"@it,
+                   "Relato de caso / série de casos"@pt,
+                   "Reporte de caso / serie de casos"@es ;
     skos:notation "case-report" ;
     skos:definition "Individual case descriptions without systematic comparison."@en .
 
 sstim-v:designPreclinicalExperiment a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Preclinical experiment"@en ;
+    skos:prefLabel "Preclinical experiment"@en,
+                   "Esperimento preclinico"@it,
+                   "Experimento pré-clínico"@pt,
+                   "Experimento preclínico"@es ;
     skos:notation "preclinical-experiment" ;
     skos:definition "Controlled experiment in a preclinical model rather than human participants."@en .
 
 sstim-v:designMixedDesigns a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Mixed designs"@en ;
+    skos:prefLabel "Mixed designs"@en,
+                   "Disegni misti"@it,
+                   "Delineamentos mistos"@pt,
+                   "Diseños mixtos"@es ;
     skos:notation "mixed-designs" ;
     skos:definition "The source aggregates studies of several designs (typical of reviews)."@en .
 
 sstim-v:designUnknownDesign a owl:NamedIndividual, sstim:StudyDesign, skos:Concept ;
     skos:inScheme sstim-v:StudyDesignScheme ;
-    skos:prefLabel "Unknown design"@en ;
+    skos:prefLabel "Unknown design"@en,
+                   "Disegno sconosciuto"@it,
+                   "Delineamento desconhecido"@pt,
+                   "Diseño desconocido"@es ;
     skos:notation "unknown-design" ;
     skos:definition "The underlying design was not reported or has not been extracted."@en .
 
@@ -2216,37 +2276,55 @@ sstim-v:StudyModelScheme a skos:ConceptScheme ;
 
 sstim-v:modelHuman a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "Human participants"@en ;
+    skos:prefLabel "Human participants"@en,
+                   "Partecipanti umani"@it,
+                   "Participantes humanos"@pt,
+                   "Participantes humanos"@es ;
     skos:notation "human" ;
     skos:definition "Findings produced with human participants."@en .
 
 sstim-v:modelPreclinicalAnimal a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "Preclinical animal model"@en ;
+    skos:prefLabel "Preclinical animal model"@en,
+                   "Modello animale preclinico"@it,
+                   "Modelo animal pré-clínico"@pt,
+                   "Modelo animal preclínico"@es ;
     skos:notation "preclinical-animal" ;
     skos:definition "Findings produced in a non-human animal model. Replaces the modality-tag misuse of PRECLINICAL as a modality."@en .
 
 sstim-v:modelInVitro a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "In vitro"@en ;
+    skos:prefLabel "In vitro"@en,
+                   "In vitro"@it,
+                   "In vitro"@pt,
+                   "In vitro"@es ;
     skos:notation "in-vitro" ;
     skos:definition "Findings produced in vitro."@en .
 
 sstim-v:modelComputational a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "Computational model"@en ;
+    skos:prefLabel "Computational model"@en,
+                   "Modello computazionale"@it,
+                   "Modelo computacional"@pt,
+                   "Modelo computacional"@es ;
     skos:notation "computational" ;
     skos:definition "Findings produced by simulation or computational modeling."@en .
 
 sstim-v:modelMixedModels a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "Mixed models"@en ;
+    skos:prefLabel "Mixed models"@en,
+                   "Modelli misti"@it,
+                   "Modelos mistos"@pt,
+                   "Modelos mixtos"@es ;
     skos:notation "mixed-models" ;
     skos:definition "The source aggregates findings across several models or stages."@en .
 
 sstim-v:modelUnknownModel a owl:NamedIndividual, sstim:StudyModel, skos:Concept ;
     skos:inScheme sstim-v:StudyModelScheme ;
-    skos:prefLabel "Unknown model"@en ;
+    skos:prefLabel "Unknown model"@en,
+                   "Modello sconosciuto"@it,
+                   "Modelo desconhecido"@pt,
+                   "Modelo desconocido"@es ;
     skos:notation "unknown-model" ;
     skos:definition "The model or stage was not reported or has not been extracted."@en .
 
@@ -2261,37 +2339,55 @@ sstim-v:EvidenceSynthesisTypeScheme a skos:ConceptScheme ;
 
 sstim-v:synthesisPrimaryStudy a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Primary study"@en ;
+    skos:prefLabel "Primary study"@en,
+                   "Studio primario"@it,
+                   "Estudo primário"@pt,
+                   "Estudio primario"@es ;
     skos:notation "primary-study" ;
     skos:definition "An original empirical study, not a synthesis of other studies."@en .
 
 sstim-v:synthesisNarrativeReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Narrative review"@en ;
+    skos:prefLabel "Narrative review"@en,
+                   "Rassegna narrativa"@it,
+                   "Revisão narrativa"@pt,
+                   "Revisión narrativa"@es ;
     skos:notation "narrative-review" ;
     skos:definition "A review without a systematic search and selection protocol."@en .
 
 sstim-v:synthesisSystematicReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Systematic review"@en ;
+    skos:prefLabel "Systematic review"@en,
+                   "Revisione sistematica"@it,
+                   "Revisão sistemática"@pt,
+                   "Revisión sistemática"@es ;
     skos:notation "systematic-review" ;
     skos:definition "A review with a documented systematic search, selection, and appraisal protocol. Matches the narrower meaning the legacy REVIEW tag claimed."@en .
 
 sstim-v:synthesisMetaAnalysis a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Meta-analysis"@en ;
+    skos:prefLabel "Meta-analysis"@en,
+                   "Meta-analisi"@it,
+                   "Meta-análise"@pt,
+                   "Metaanálisis"@es ;
     skos:notation "meta-analysis" ;
     skos:definition "A quantitative synthesis of results across studies."@en .
 
 sstim-v:synthesisLiteratureReview a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Literature review"@en ;
+    skos:prefLabel "Literature review"@en,
+                   "Rassegna della letteratura"@it,
+                   "Revisão da literatura"@pt,
+                   "Revisión de la literatura"@es ;
     skos:notation "literature-review" ;
     skos:definition "A survey of the literature without a documented systematic protocol or quantitative synthesis."@en .
 
 sstim-v:synthesisTutorial a owl:NamedIndividual, sstim:EvidenceSynthesisType, skos:Concept ;
     skos:inScheme sstim-v:EvidenceSynthesisTypeScheme ;
-    skos:prefLabel "Tutorial"@en ;
+    skos:prefLabel "Tutorial"@en,
+                   "Tutorial"@it,
+                   "Tutorial"@pt,
+                   "Tutorial"@es ;
     skos:notation "tutorial" ;
     skos:definition "An instructional source synthesizing established methods and findings."@en .
 
@@ -2305,25 +2401,37 @@ sstim-v:EvidencePropositionFormScheme a skos:ConceptScheme ;
 
 sstim-v:formBoundedRelation a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
     skos:inScheme sstim-v:EvidencePropositionFormScheme ;
-    skos:prefLabel "Bounded relation"@en ;
+    skos:prefLabel "Bounded relation"@en,
+                   "Relazione delimitata"@it,
+                   "Relação delimitada"@pt,
+                   "Relación delimitada"@es ;
     skos:notation "bounded-relation" ;
     skos:definition "The proposition asserts a relation, difference, or response within an explicit scope."@en .
 
 sstim-v:formBoundedNullResult a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
     skos:inScheme sstim-v:EvidencePropositionFormScheme ;
-    skos:prefLabel "Bounded null result"@en ;
+    skos:prefLabel "Bounded null result"@en,
+                   "Risultato nullo delimitato"@it,
+                   "Resultado nulo delimitado"@pt,
+                   "Resultado nulo delimitado"@es ;
     skos:notation "bounded-null-result" ;
     skos:definition "The proposition asserts the absence of an effect within an explicit scope, backed by evidence that tested it."@en .
 
 sstim-v:formScopedSearchFinding a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
     skos:inScheme sstim-v:EvidencePropositionFormScheme ;
-    skos:prefLabel "Scoped search finding"@en ;
+    skos:prefLabel "Scoped search finding"@en,
+                   "Esito di ricerca circoscritto"@it,
+                   "Achado de busca delimitado"@pt,
+                   "Hallazgo de búsqueda delimitado"@es ;
     skos:notation "scoped-search-finding" ;
     skos:definition "The proposition states that no eligible evidence was found within a documented search scope as of a date. Requires an evidence search record basis."@en .
 
 sstim-v:formUniversalAbsence a owl:NamedIndividual, sstim:EvidencePropositionForm, skos:Concept ;
     skos:inScheme sstim-v:EvidencePropositionFormScheme ;
-    skos:prefLabel "Universal absence"@en ;
+    skos:prefLabel "Universal absence"@en,
+                   "Assenza universale"@it,
+                   "Ausência universal"@pt,
+                   "Ausencia universal"@es ;
     skos:notation "universal-absence" ;
     skos:definition "The proposition asserts that no evidence or mechanism exists at all. Never conformant: a finite search cannot support it. Present in the vocabulary so validation can name and reject it."@en .
 
@@ -2336,19 +2444,28 @@ sstim-v:ScopeMarkerScheme a skos:ConceptScheme ;
 
 sstim-v:scopeUnknown a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
     skos:inScheme sstim-v:ScopeMarkerScheme ;
-    skos:prefLabel "Unknown"@en ;
+    skos:prefLabel "Unknown"@en,
+                   "Sconosciuto"@it,
+                   "Desconhecido"@pt,
+                   "Desconocido"@es ;
     skos:notation "scope-unknown" ;
     skos:definition "The value of this scope axis is unknown."@en .
 
 sstim-v:scopeNotReported a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
     skos:inScheme sstim-v:ScopeMarkerScheme ;
-    skos:prefLabel "Not reported"@en ;
+    skos:prefLabel "Not reported"@en,
+                   "Non riportato"@it,
+                   "Não relatado"@pt,
+                   "No informado"@es ;
     skos:notation "scope-not-reported" ;
     skos:definition "The sources did not report a value for this scope axis."@en .
 
 sstim-v:scopeNotApplicable a owl:NamedIndividual, sstim:ScopeMarker, skos:Concept ;
     skos:inScheme sstim-v:ScopeMarkerScheme ;
-    skos:prefLabel "Not applicable"@en ;
+    skos:prefLabel "Not applicable"@en,
+                   "Non applicabile"@it,
+                   "Não aplicável"@pt,
+                   "No aplicable"@es ;
     skos:notation "scope-not-applicable" ;
     skos:definition "This scope axis does not apply to the proposition."@en .
 
@@ -2362,25 +2479,37 @@ sstim-v:ReviewerRelationshipScheme a skos:ConceptScheme ;
 
 sstim-v:reviewerSelf a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
     skos:inScheme sstim-v:ReviewerRelationshipScheme ;
-    skos:prefLabel "Self"@en ;
+    skos:prefLabel "Self"@en,
+                   "Autore stesso"@it,
+                   "O próprio autor"@pt,
+                   "El propio autor"@es ;
     skos:notation "self" ;
     skos:definition "The reviewer is the author of the assessed work."@en .
 
 sstim-v:reviewerSameOrganization a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
     skos:inScheme sstim-v:ReviewerRelationshipScheme ;
-    skos:prefLabel "Same organization"@en ;
+    skos:prefLabel "Same organization"@en,
+                   "Stessa organizzazione"@it,
+                   "Mesma organização"@pt,
+                   "Misma organización"@es ;
     skos:notation "same-organization" ;
     skos:definition "The reviewer belongs to the same organization as the assessed work's authors."@en .
 
 sstim-v:reviewerExternal a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
     skos:inScheme sstim-v:ReviewerRelationshipScheme ;
-    skos:prefLabel "External"@en ;
+    skos:prefLabel "External"@en,
+                   "Esterno"@it,
+                   "Externo"@pt,
+                   "Externo"@es ;
     skos:notation "external" ;
     skos:definition "The reviewer is external to the authoring organization. Never implies independence by itself."@en .
 
 sstim-v:reviewerUnknownRelationship a owl:NamedIndividual, sstim:ReviewerRelationship, skos:Concept ;
     skos:inScheme sstim-v:ReviewerRelationshipScheme ;
-    skos:prefLabel "Unknown relationship"@en ;
+    skos:prefLabel "Unknown relationship"@en,
+                   "Relazione sconosciuta"@it,
+                   "Relação desconhecida"@pt,
+                   "Relación desconocida"@es ;
     skos:notation "unknown-relationship" ;
     skos:definition "The reviewer's relationship to the assessed work is not established."@en .
 
@@ -2394,19 +2523,28 @@ sstim-v:IndependenceDeterminationScheme a skos:ConceptScheme ;
 
 sstim-v:independenceIndependent a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
     skos:inScheme sstim-v:IndependenceDeterminationScheme ;
-    skos:prefLabel "Independent"@en ;
+    skos:prefLabel "Independent"@en,
+                   "Indipendente"@it,
+                   "Independente"@pt,
+                   "Independiente"@es ;
     skos:notation "independent" ;
     skos:definition "Determined independent under a named policy, with recorded conflict disclosure."@en .
 
 sstim-v:independenceNotIndependent a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
     skos:inScheme sstim-v:IndependenceDeterminationScheme ;
-    skos:prefLabel "Not independent"@en ;
+    skos:prefLabel "Not independent"@en,
+                   "Non indipendente"@it,
+                   "Não independente"@pt,
+                   "No independiente"@es ;
     skos:notation "not-independent" ;
     skos:definition "Determined not independent under a named policy, with recorded conflict disclosure."@en .
 
 sstim-v:independenceUndetermined a owl:NamedIndividual, sstim:IndependenceDetermination, skos:Concept ;
     skos:inScheme sstim-v:IndependenceDeterminationScheme ;
-    skos:prefLabel "Undetermined"@en ;
+    skos:prefLabel "Undetermined"@en,
+                   "Non determinato"@it,
+                   "Não determinado"@pt,
+                   "No determinado"@es ;
     skos:notation "undetermined" ;
     skos:definition "No independence determination has been made."@en .
 
@@ -2419,19 +2557,28 @@ sstim-v:ReviewDecisionScheme a skos:ConceptScheme ;
 
 sstim-v:reviewConfirm a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
     skos:inScheme sstim-v:ReviewDecisionScheme ;
-    skos:prefLabel "Confirm"@en ;
+    skos:prefLabel "Confirm"@en,
+                   "Conferma"@it,
+                   "Confirmação"@pt,
+                   "Confirmación"@es ;
     skos:notation "confirm" ;
     skos:definition "The review confirms the assessment revision under the named rubric."@en .
 
 sstim-v:reviewRequestRevision a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
     skos:inScheme sstim-v:ReviewDecisionScheme ;
-    skos:prefLabel "Request revision"@en ;
+    skos:prefLabel "Request revision"@en,
+                   "Richiesta di revisione"@it,
+                   "Solicitação de revisão"@pt,
+                   "Solicitud de revisión"@es ;
     skos:notation "request-revision" ;
     skos:definition "The review requests a new assessment revision."@en .
 
 sstim-v:reviewReject a owl:NamedIndividual, sstim:ReviewDecisionValue, skos:Concept ;
     skos:inScheme sstim-v:ReviewDecisionScheme ;
-    skos:prefLabel "Reject"@en ;
+    skos:prefLabel "Reject"@en,
+                   "Rifiuto"@it,
+                   "Rejeição"@pt,
+                   "Rechazo"@es ;
     skos:notation "reject" ;
     skos:definition "The review rejects the assessment revision under the named rubric."@en .
 
@@ -2444,7 +2591,10 @@ sstim-v:ConflictDisclosureScheme a skos:ConceptScheme ;
 
 sstim-v:noConflictDeclared a owl:NamedIndividual, sstim:ConflictDisclosure, skos:Concept ;
     skos:inScheme sstim-v:ConflictDisclosureScheme ;
-    skos:prefLabel "No conflict declared"@en ;
+    skos:prefLabel "No conflict declared"@en,
+                   "Nessun conflitto dichiarato"@it,
+                   "Nenhum conflito declarado"@pt,
+                   "Ningún conflicto declarado"@es ;
     skos:notation "no-conflict-declared" ;
     skos:definition "The explicit declaration that the reviewer declared no conflict of interest. Case-specific disclosures are separate ConflictDisclosure records."@en .
 
@@ -4019,44 +4169,65 @@ sstim-v:RenderableParameterScheme a skos:ConceptScheme ;
 
 sstim-v:shapeSine a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Sine"@en ;
+    skos:prefLabel "Sine"@en,
+                   "Sinusoide"@it,
+                   "Senoide"@pt,
+                   "Senoide"@es ;
     skos:notation "sine" ;
     skos:definition "A single-frequency sinusoid. The default periodic shape, and the only one the BSC catalog ever used."@en .
 
 sstim-v:shapeSquare a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Square"@en ;
+    skos:prefLabel "Square"@en,
+                   "Onda quadra"@it,
+                   "Onda quadrada"@pt,
+                   "Onda cuadrada"@es ;
     skos:notation "square" ;
     skos:definition "A periodic shape alternating between two levels with a duty cycle. Its harmonic content makes it audibly and visually harsher than a sinusoid at the same rate."@en .
 
 sstim-v:shapeSawtooth a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Sawtooth"@en ;
+    skos:prefLabel "Sawtooth"@en,
+                   "Dente di sega"@it,
+                   "Dente de serra"@pt,
+                   "Diente de sierra"@es ;
     skos:notation "sawtooth" ;
     skos:definition "A periodic shape rising linearly and resetting sharply, or its mirror image."@en .
 
 sstim-v:shapeTriangle a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Triangle"@en ;
+    skos:prefLabel "Triangle"@en,
+                   "Onda triangolare"@it,
+                   "Onda triangular"@pt,
+                   "Onda triangular"@es ;
     skos:notation "triangle" ;
     skos:definition "A periodic shape rising and falling linearly, with weaker harmonics than a square at the same rate."@en .
 
 sstim-v:shapeEnvelope a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Envelope"@en ;
+    skos:prefLabel "Envelope"@en,
+                   "Inviluppo"@it,
+                   "Envelope"@pt,
+                   "Envolvente"@es ;
     skos:notation "envelope" ;
     skos:definition "A non-repeating contour over time, such as a period ramping from one value to another across a session. Shape and repetition are independent: an envelope may modulate a periodic signal."@en .
 
 sstim-v:shapeNoise a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Noise"@en ;
+    skos:prefLabel "Noise"@en,
+                   "Rumore"@it,
+                   "Ruído"@pt,
+                   "Ruido"@es ;
     skos:notation "noise" ;
     skos:scopeNote "The clearest case for the interval model: noise cannot be described by a single frequency number, so a signal states a lower and an upper bound and relates to a band by containment or overlap rather than membership."@en ;
     skos:definition "A stochastic signal occupying a frequency extent rather than a point. White noise spans the whole audible range and band-limited noise a named interval; both are this shape with different bounds."@en .
 
 sstim-v:shapeSampled a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
     skos:inScheme sstim-v:SignalShapeScheme ;
-    skos:prefLabel "Sampled"@en ;
+    skos:prefLabel "Sampled"@en,
+                   "Campionato"@it,
+                   "Amostrado"@pt,
+                   "Muestreado"@es ;
     skos:notation "sampled" ;
     skos:scopeNote "The one shape that is an asset rather than a function, which is why it needs provenance and a checksum where a sine needs neither."@en ;
     skos:definition "A signal whose form is a recording rather than a function — a violin note, a voice, rainfall. Carries a source asset, without which the signal is not reproducible."@en .
@@ -4064,83 +4235,122 @@ sstim-v:shapeSampled a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
 sstim-v:mechanismDirectPresentation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
     sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
-    skos:prefLabel "Direct presentation"@en ;
+    skos:prefLabel "Direct presentation"@en,
+                   "Presentazione diretta"@it,
+                   "Apresentação direta"@pt,
+                   "Presentación directa"@es ;
     skos:notation "direct-presentation" ;
     skos:definition "The signal is presented as itself, with no carrier — a light flickering at the signal rate, or a vibration at it."@en .
 
 sstim-v:mechanismAmplitudeModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
     sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
-    skos:prefLabel "Amplitude modulation"@en ;
+    skos:prefLabel "Amplitude modulation"@en,
+                   "Modulazione di ampiezza"@it,
+                   "Modulação de amplitude"@pt,
+                   "Modulación de amplitud"@es ;
     skos:notation "amplitude-modulation" ;
     skos:definition "The signal modulates the amplitude of a carrier. The isochronic case: a 10 Hz signal on an audible tone."@en .
 
 sstim-v:mechanismFrequencyModulation a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
     sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
-    skos:prefLabel "Frequency modulation"@en ;
+    skos:prefLabel "Frequency modulation"@en,
+                   "Modulazione di frequenza"@it,
+                   "Modulação de frequência"@pt,
+                   "Modulación de frecuencia"@es ;
     skos:notation "frequency-modulation" ;
     skos:definition "The signal modulates the frequency of a carrier."@en .
 
 sstim-v:mechanismBinauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
     sstim:impliesPresence sstim-v:presencePerceptual ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
-    skos:prefLabel "Binaural beat"@en ;
+    skos:prefLabel "Binaural beat"@en,
+                   "Battimento binaurale"@it,
+                   "Batimento binaural"@pt,
+                   "Batido binaural"@es ;
     skos:notation "binaural-beat" ;
     skos:definition "Two carriers differing by the signal frequency are presented dichotically. The signal is absent from each ear and constructed by the auditory system, so this mechanism is perceptual rather than physical."@en .
 
 sstim-v:mechanismMonauralBeat a owl:NamedIndividual, sstim:RenderingMechanism, skos:Concept ;
     sstim:impliesPresence sstim-v:presencePhysical ;
     skos:inScheme sstim-v:RenderingMechanismScheme ;
-    skos:prefLabel "Monaural beat"@en ;
+    skos:prefLabel "Monaural beat"@en,
+                   "Battimento monoaurale"@it,
+                   "Batimento monoaural"@pt,
+                   "Batido monoaural"@es ;
     skos:notation "monaural-beat" ;
     skos:definition "Two carriers differing by the signal frequency are summed acoustically before delivery, so the signal is physically present in the combined waveform."@en .
 
 sstim-v:presencePhysical a owl:NamedIndividual, sstim:RenderingPresence, skos:Concept ;
     skos:inScheme sstim-v:RenderingPresenceScheme ;
-    skos:prefLabel "Physically present"@en ;
+    skos:prefLabel "Physically present"@en,
+                   "Fisicamente presente"@it,
+                   "Fisicamente presente"@pt,
+                   "Físicamente presente"@es ;
     skos:notation "physical" ;
     skos:definition "The signal exists as a real modulation in what reaches the subject, and could be measured at the point of delivery."@en .
 
 sstim-v:presencePerceptual a owl:NamedIndividual, sstim:RenderingPresence, skos:Concept ;
     skos:inScheme sstim-v:RenderingPresenceScheme ;
-    skos:prefLabel "Perceptually constructed"@en ;
+    skos:prefLabel "Perceptually constructed"@en,
+                   "Costruito percettivamente"@it,
+                   "Construído perceptualmente"@pt,
+                   "Construido perceptualmente"@es ;
     skos:notation "perceptual" ;
     skos:definition "The signal does not exist in what reaches the subject and is constructed by the nervous system — a binaural beat being the standard case. Evidence about a physically present signal does not transfer to this without argument."@en .
 
 sstim-v:paramAmplitude a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Amplitude"@en ;
+    skos:prefLabel "Amplitude"@en,
+                   "Ampiezza"@it,
+                   "Amplitude"@pt,
+                   "Amplitud"@es ;
     skos:notation "amplitude" ;
     skos:definition "The intensity of the stimulus in its own units."@en .
 
 sstim-v:paramFrequency a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Frequency"@en ;
+    skos:prefLabel "Frequency"@en,
+                   "Frequenza"@it,
+                   "Frequência"@pt,
+                   "Frecuencia"@es ;
     skos:notation "frequency" ;
     skos:definition "The frequency of a carrier or tone the signal drives."@en .
 
 sstim-v:paramLuminance a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Luminance"@en ;
+    skos:prefLabel "Luminance"@en,
+                   "Luminanza"@it,
+                   "Luminância"@pt,
+                   "Luminancia"@es ;
     skos:notation "luminance" ;
     skos:definition "The brightness of a visual stimulus."@en .
 
 sstim-v:paramSize a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Size"@en ;
+    skos:prefLabel "Size"@en,
+                   "Dimensione"@it,
+                   "Tamanho"@pt,
+                   "Tamaño"@es ;
     skos:notation "size" ;
     skos:definition "The extent of a visual stimulus, as used by an expanding and contracting breathing guide."@en .
 
 sstim-v:paramSpatialPosition a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Spatial position"@en ;
+    skos:prefLabel "Spatial position"@en,
+                   "Posizione spaziale"@it,
+                   "Posição espacial"@pt,
+                   "Posición espacial"@es ;
     skos:notation "spatial-position" ;
     skos:definition "Where the stimulus appears in space. A signal rendered onto this parameter is what the BSC catalog encoded as a Martigli-synced panning mode."@en .
 
 sstim-v:paramVibrationIntensity a owl:NamedIndividual, sstim:RenderableParameter, skos:Concept ;
     skos:inScheme sstim-v:RenderableParameterScheme ;
-    skos:prefLabel "Vibration intensity"@en ;
+    skos:prefLabel "Vibration intensity"@en,
+                   "Intensità di vibrazione"@it,
+                   "Intensidade de vibração"@pt,
+                   "Intensidad de vibración"@es ;
     skos:notation "vibration-intensity" ;
     skos:definition "The strength of a haptic stimulus."@en .
 

@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
-"""Measure multilingual coverage per scheme, and stop it drifting further.
+"""Measure multilingual coverage per scheme, and stop it regressing.
 
 SSTIM advertises four languages. BARTOC records `en | it | es | pt`, FAIRsharing
 lists the same four, and every module title is translated. Measured against the
-concepts, that claim was half true on 2026-08-18: 269 of 545 concepts carried
-all four languages and 276 carried English alone.
+concepts on 2026-08-18, that claim was half true: 269 of 545 concepts carried all
+four languages and 276 carried English alone, across 34 schemes.
 
-The second-pass review of 2026-08-17 found the useful part of the shape — no
-scheme is *partially* translated. Translation has been an all-or-nothing act per
-scheme that simply stopped being performed as new modules landed, so the
-vocabulary divides cleanly into schemes with four languages and schemes with
-one. Its disposition was that a per-scheme count would give KR-16 the metric it
-lacks. This is that count, made executable.
+The vocabulary was completed the same day — all 545 concepts now carry all four
+languages — so this gate changed job. It no longer tracks debt down; it stops the
+claim drifting back out of truth as new schemes are added.
+
+The second-pass review of 2026-08-17 found the shape that made completion
+tractable: no scheme was *partially* translated. Translation had been an
+all-or-nothing act per scheme that simply stopped being performed as new modules
+landed, so the vocabulary divided cleanly into schemes with four languages and
+schemes with one.
 
 Three rules, and the second is the one that matters:
 
 1. A scheme is *complete* when every concept in it carries a prefLabel in all
-   four languages, and *untranslated* when every concept carries English only.
+   four languages, and *untranslated* when every concept carries English alone.
+   Untranslated means English and nothing else: a scheme carrying en+it+pt but no
+   Spanish is partial, not untranslated, because being three-quarters done is a
+   different state from not being started.
 2. A scheme that is neither — partially translated — fails. That property is
    what makes a per-scheme report meaningful rather than a vague percentage, and
-   it holds today by accident. This makes it hold on purpose.
-3. A scheme absent from UNTRANSLATED below must be complete. A new scheme is
-   therefore translated before it ships, or it is added here deliberately and
-   the count in this docstring stops matching, which is the point: the list is a
-   ledger of debt, not a waiver, and it should only ever get shorter.
+   it held by accident before this gate existed. Now it holds on purpose.
+3. UNTRANSLATED is empty, and every scheme must therefore be complete. A new
+   scheme ships translated or is added to that set deliberately, which makes the
+   set a ledger of debt rather than a waiver — and the gate fails if a listed
+   scheme has since been translated, so it cannot overstate the debt either.
 
-Nothing here translates anything. It measures, and it refuses to let the
-measurement quietly get worse.
+A concept in no scheme would be invisible to all of the above, so that is checked
+too. Every concept is in exactly one scheme today.
+
+Only `skos:prefLabel` is in scope. All 545 `skos:definition` values are English
+only, and translating them is a larger job and a separate decision.
 """
 
 from __future__ import annotations
@@ -46,23 +55,7 @@ REQUIRED = ("en", "it", "pt", "es")
 # a decision that it should stay English. Remove a name when its scheme is
 # translated; the gate fails if a name here has become complete, so the ledger
 # cannot silently overstate the debt either.
-UNTRANSLATED = {
-    "AudioNoiseColorScheme", "BodyPlacementScheme", "ClaimDirectionScheme",
-    "ComfortBoundaryScheme", "ConflictDisclosureScheme",
-    "DeliveryMediumScheme", "DeviceCapabilityScheme",
-    "EcosystemPurposeScheme", "EcosystemRelationScheme",
-    "EffectDimensionScheme", "EffectDirectionScheme",
-    "EngagementOutcomeScheme", "EvidencePropositionFormScheme",
-    "EvidenceSynthesisTypeScheme", "ExperimentContextScheme",
-    "IndependenceDeterminationScheme", "KnowledgeStatusScheme",
-    "ModalityApplicabilityScheme", "PerceivedModalityScheme",
-    "PerceptualGainScheme", "PerceptualLossScheme",
-    "RenderableParameterScheme", "RenderingMechanismScheme",
-    "RenderingPresenceScheme", "ReviewDecisionScheme", "ReviewStatusScheme",
-    "ReviewerRelationshipScheme", "ScopeMarkerScheme", "SignalShapeScheme",
-    "StimulusChannelRoleScheme", "StimulusPatternScheme",
-    "StudyDesignScheme", "StudyModelScheme", "VisualNoiseScheme",
-}
+UNTRANSLATED: set[str] = set()
 
 
 def local(term) -> str:

@@ -355,14 +355,15 @@ products, and Community Group work is not a W3C Standard.
 The most useful thing an outside contributor can do right now needs a language
 and domain sense, not knowledge of this repository.
 
-**[Translate the vocabulary](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/15).**
-SSTIM publishes in English, Italian, Portuguese and Spanish, and 276 of its 545
-concepts currently carry English alone. Translation has been all-or-nothing per
-scheme, so one scheme is one clean pull request — the smallest is a single
-concept. `make language-coverage` is both the specification and the verifier:
-it requires a scheme to be complete or wholly untranslated, and it fails if the
-recorded debt drifts in either direction. Five schemes have their own
-[good first issues](https://github.com/laBioSynCare/laBioSynCare.github.io/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+**[Review the translations](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/15).**
+SSTIM publishes in English, Italian, Portuguese and Spanish, and as of
+2026-08-18 all 545 concepts carry all four — but the 276 labels added that day
+were written by the maintainers and have had no native review. If you speak one
+of these languages and know the domain, reading a scheme and saying which terms
+a practitioner would not actually use is the most valuable thing you can do
+here. These are controlled-vocabulary labels, so the bar is idiomatic usage, not
+a defensible rendering. `make language-coverage` verifies coverage; it cannot
+verify that a translation is *good*.
 
 **Propose a term.** If SSTIM is missing a concept you need, open a
 [term proposal](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/new?template=term-proposal.md).

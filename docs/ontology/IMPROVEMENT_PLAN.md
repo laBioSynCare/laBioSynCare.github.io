@@ -371,14 +371,17 @@ provenance as `owl:Axiom` annotations.
   2.3 and Phase 4. Use hierarchy or SKOS Collections only where a genuine
   generic or grouping relation exists.
 
-  *Measured and gated 2026-08-18.* `make language-coverage` reports 269 of 545
-  concepts carrying all four languages and 33 of 67 schemes complete, and holds
-  the line: a scheme must be complete or wholly untranslated, a new scheme must
-  ship translated or be recorded as debt, and a translated scheme must leave the
-  ledger. So the *targets* half of this item now has its metric; the
-  *translation* half — 34 schemes, 276 concepts — is the work that remains, and
-  is now countable rather than impressionistic. Aliases stay unmeasured:
-  `skos:altLabel` coverage is zero.
+  *Measured, completed and gated 2026-08-18, in that order.* The metric came
+  first — `make language-coverage` found 269 of 545 concepts carrying all four
+  languages — and the remaining 276 were translated the same day, so the gate
+  now reports 100% and guards against regression rather than tracking debt.
+
+  What remains of KR-16 is narrower and should not be confused with coverage:
+  the 276 new labels have had **no native review**, `skos:definition` is
+  English-only for all 545 concepts by deliberate decision, and `skos:altLabel`
+  coverage is zero and unmeasured. Locale-aware label fallback in the
+  application is also untouched. So the *label-coverage* half of this item is
+  closed and the *quality, alias and runtime* halves are not.
 
 #### 1.5 Repair privacy-sensitive RDF surfaces
 

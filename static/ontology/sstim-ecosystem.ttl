@@ -435,49 +435,70 @@ sstim-eco:EcosystemRelationScheme a skos:ConceptScheme ;
 sstim-eco:contributor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Contributor"@en ;
+    skos:prefLabel "Contributor"@en,
+                   "Contributore"@it,
+                   "Contribuidor"@pt,
+                   "Contribuidor"@es ;
     skos:notation "contributor" ;
     skos:definition "An agent that has contributed to the sensory-stimulation field — in knowledge, research, practice, or business."@en .
 
 sstim-eco:stakeholder a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Stakeholder"@en ;
+    skos:prefLabel "Stakeholder"@en,
+                   "Portatore di interesse"@it,
+                   "Parte interessada"@pt,
+                   "Parte interesada"@es ;
     skos:notation "stakeholder" ;
     skos:definition "An agent with an active stake or investment in the sensory-stimulation field or in SSTIM."@en .
 
 sstim-eco:researchCollaborator a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Research collaborator"@en ;
+    skos:prefLabel "Research collaborator"@en,
+                   "Collaboratore di ricerca"@it,
+                   "Colaborador de pesquisa"@pt,
+                   "Colaborador de investigación"@es ;
     skos:notation "research-collaborator" ;
     skos:definition "An agent collaborating on research relevant to SSTIM."@en .
 
 sstim-eco:scientificAdvisor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Scientific advisor"@en ;
+    skos:prefLabel "Scientific advisor"@en,
+                   "Consulente scientifico"@it,
+                   "Consultor científico"@pt,
+                   "Asesor científico"@es ;
     skos:notation "scientific-advisor" ;
     skos:definition "An agent providing scientific guidance to the SSTIM/BSC Lab effort."@en .
 
 sstim-eco:citedAuthor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Cited author"@en ;
+    skos:prefLabel "Cited author"@en,
+                   "Autore citato"@it,
+                   "Autor citado"@pt,
+                   "Autor citado"@es ;
     skos:notation "cited-author" ;
     skos:definition "An author whose work is cited by SSTIM's evidence or references. Historical or current; implies no ongoing engagement."@en .
 
 sstim-eco:toolVendor a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Tool vendor"@en ;
+    skos:prefLabel "Tool vendor"@en,
+                   "Fornitore di strumenti"@it,
+                   "Fornecedor de ferramentas"@pt,
+                   "Proveedor de herramientas"@es ;
     skos:notation "tool-vendor" ;
     skos:definition "An organization producing tools, devices, or applications for sensory stimulation."@en .
 
 sstim-eco:standardsBody a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Standards body"@en ;
+    skos:prefLabel "Standards body"@en,
+                   "Ente di normazione"@it,
+                   "Organismo de normalização"@pt,
+                   "Organismo de normalización"@es ;
     skos:notation "standards-body" ;
     skos:definition "An organization that develops standards relevant to sensory stimulation or its interoperability."@en .
 
@@ -485,7 +506,10 @@ sstim-eco:funder a owl:NamedIndividual, sstim-eco:RelationshipType,
         sstim-eco:ImplementationResponsibilityType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Funder"@en ;
+    skos:prefLabel "Funder"@en,
+                   "Finanziatore"@it,
+                   "Financiador"@pt,
+                   "Financiador"@es ;
     skos:notation "funder" ;
     skos:definition "An agent that funds work relevant to SSTIM or the field."@en .
 
@@ -493,28 +517,40 @@ sstim-eco:institutionalHost a owl:NamedIndividual, sstim-eco:RelationshipType,
         sstim-eco:ImplementationResponsibilityType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Institutional host"@en ;
+    skos:prefLabel "Institutional host"@en,
+                   "Ente ospitante"@it,
+                   "Instituição anfitriã"@pt,
+                   "Institución anfitriona"@es ;
     skos:notation "institutional-host" ;
     skos:definition "An institution hosting people or projects that work in the field."@en .
 
 sstim-eco:peerProject a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Peer project"@en ;
+    skos:prefLabel "Peer project"@en,
+                   "Progetto affine"@it,
+                   "Projeto congênere"@pt,
+                   "Proyecto afín"@es ;
     skos:notation "peer-project" ;
     skos:definition "A peer initiative or platform with goals adjacent to SSTIM/BSC Lab."@en .
 
 sstim-eco:referencedSource a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Referenced source"@en ;
+    skos:prefLabel "Referenced source"@en,
+                   "Fonte referenziata"@it,
+                   "Fonte referenciada"@pt,
+                   "Fuente referenciada"@es ;
     skos:notation "referenced-source" ;
     skos:definition "An agent that produces sources referenced by SSTIM, without a closer relationship."@en .
 
 sstim-eco:organizationMember a owl:NamedIndividual, sstim-eco:RelationshipType, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Organization member"@en ;
+    skos:prefLabel "Organization member"@en,
+                   "Membro dell'organizzazione"@it,
+                   "Membro da organização"@pt,
+                   "Miembro de la organización"@es ;
     skos:notation "organization-member" ;
     skos:definition "A person related to an organization through a sourced, time-qualified org:Membership record and an identified ORG role."@en .
 
@@ -523,7 +559,10 @@ sstim-eco:implementationDeveloper a owl:NamedIndividual,
         skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Implementation developer"@en ;
+    skos:prefLabel "Implementation developer"@en,
+                   "Sviluppatore dell'implementazione"@it,
+                   "Desenvolvedor da implementação"@pt,
+                   "Desarrollador de la implementación"@es ;
     skos:notation "implementation-developer" ;
     skos:definition "An agent responsible for developing a specific sensory-stimulation implementation."@en .
 
@@ -532,7 +571,10 @@ sstim-eco:implementationPublisher a owl:NamedIndividual,
         skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Implementation publisher"@en ;
+    skos:prefLabel "Implementation publisher"@en,
+                   "Editore dell'implementazione"@it,
+                   "Publicador da implementação"@pt,
+                   "Editor de la implementación"@es ;
     skos:notation "implementation-publisher" ;
     skos:definition "An agent responsible for publishing or distributing a specific sensory-stimulation implementation."@en .
 
@@ -541,7 +583,10 @@ sstim-eco:implementationMaintainer a owl:NamedIndividual,
         skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Implementation maintainer"@en ;
+    skos:prefLabel "Implementation maintainer"@en,
+                   "Manutentore dell'implementazione"@it,
+                   "Mantenedor da implementação"@pt,
+                   "Mantenedor de la implementación"@es ;
     skos:notation "implementation-maintainer" ;
     skos:definition "An agent responsible for maintaining a specific sensory-stimulation implementation."@en .
 
@@ -550,7 +595,10 @@ sstim-eco:implementationProvider a owl:NamedIndividual,
         skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Implementation provider"@en ;
+    skos:prefLabel "Implementation provider"@en,
+                   "Fornitore dell'implementazione"@it,
+                   "Fornecedor da implementação"@pt,
+                   "Proveedor de la implementación"@es ;
     skos:notation "implementation-provider" ;
     skos:definition "An agent that makes a specific sensory-stimulation implementation available for use without necessarily developing it."@en .
 
@@ -559,7 +607,10 @@ sstim-eco:implementationOperator a owl:NamedIndividual,
         skos:Concept ;
     skos:inScheme sstim-eco:EcosystemRelationScheme ;
     skos:topConceptOf sstim-eco:EcosystemRelationScheme ;
-    skos:prefLabel "Implementation operator"@en ;
+    skos:prefLabel "Implementation operator"@en,
+                   "Operatore dell'implementazione"@it,
+                   "Operador da implementação"@pt,
+                   "Operador de la implementación"@es ;
     skos:notation "implementation-operator" ;
     skos:definition "An agent responsible for operating a specific sensory-stimulation implementation in a declared context."@en .
 
@@ -579,35 +630,50 @@ sstim-eco:EcosystemPurposeScheme a skos:ConceptScheme ;
 sstim-eco:purposePublicDiscovery a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemPurposeScheme ;
     skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
-    skos:prefLabel "Public discovery"@en ;
+    skos:prefLabel "Public discovery"@en,
+                   "Reperibilità pubblica"@it,
+                   "Descoberta pública"@pt,
+                   "Descubrimiento público"@es ;
     skos:notation "public-discovery" ;
     skos:definition "Recording a sourced professional relationship so users can discover relevant people and organizations."@en .
 
 sstim-eco:purposePublicAttribution a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemPurposeScheme ;
     skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
-    skos:prefLabel "Public attribution"@en ;
+    skos:prefLabel "Public attribution"@en,
+                   "Attribuzione pubblica"@it,
+                   "Atribuição pública"@pt,
+                   "Atribución pública"@es ;
     skos:notation "public-attribution" ;
     skos:definition "Recording a sourced relationship to give accurate public credit or responsibility attribution."@en .
 
 sstim-eco:purposeOutreach a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemPurposeScheme ;
     skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
-    skos:prefLabel "Outreach"@en ;
+    skos:prefLabel "Outreach"@en,
+                   "Divulgazione"@it,
+                   "Divulgação"@pt,
+                   "Divulgación"@es ;
     skos:notation "outreach" ;
     skos:definition "Recording an engagement for transparent ecosystem outreach and follow-up."@en .
 
 sstim-eco:purposeLivePublication a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemPurposeScheme ;
     skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
-    skos:prefLabel "Live publication"@en ;
+    skos:prefLabel "Live publication"@en,
+                   "Pubblicazione dinamica"@it,
+                   "Publicação dinâmica"@pt,
+                   "Publicación dinámica"@es ;
     skos:notation "live-publication" ;
     skos:definition "Publishing a record in a controlled mutable dataset outside the Zenodo-tracked release repository and its immutable DOI deposits."@en .
 
 sstim-eco:purposeArchivalPublication a owl:NamedIndividual, sstim-eco:EcosystemPurpose, skos:Concept ;
     skos:inScheme sstim-eco:EcosystemPurposeScheme ;
     skos:topConceptOf sstim-eco:EcosystemPurposeScheme ;
-    skos:prefLabel "Archival publication"@en ;
+    skos:prefLabel "Archival publication"@en,
+                   "Pubblicazione archivistica"@it,
+                   "Publicação arquivística"@pt,
+                   "Publicación archivística"@es ;
     skos:notation "archival-publication" ;
     skos:definition "Eligibility for permanent citable archival publication. The archival pipeline is not implemented by ADR 0031."@en .
 
@@ -630,60 +696,96 @@ sstim-eco:EngagementOutcomeScheme a skos:ConceptScheme ;
 
 sstim-eco:outcomeNotificationSent a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Notification sent"@en ; skos:notation "notification-sent" ;
+    skos:prefLabel "Notification sent"@en,
+                   "Notifica inviata"@it,
+                   "Notificação enviada"@pt,
+                   "Notificación enviada"@es ; skos:notation "notification-sent" ;
     skos:definition "Notification was sent; no channel, address, or message is published."@en .
 
 sstim-eco:outcomeNotificationFailed a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Notification failed"@en ; skos:notation "notification-failed" ;
+    skos:prefLabel "Notification failed"@en,
+                   "Notifica non riuscita"@it,
+                   "Falha na notificação"@pt,
+                   "Notificación fallida"@es ; skos:notation "notification-failed" ;
     skos:definition "A notification attempt failed; operational details remain private."@en .
 
 sstim-eco:outcomeAcknowledged a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Acknowledged"@en ; skos:notation "acknowledged" ;
+    skos:prefLabel "Acknowledged"@en,
+                   "Riscontro ricevuto"@it,
+                   "Reconhecido"@pt,
+                   "Acuse recibido"@es ; skos:notation "acknowledged" ;
     skos:definition "The subject acknowledged the engagement without this value implying broader consent."@en .
 
 sstim-eco:outcomeChangesRequested a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Changes requested"@en ; skos:notation "changes-requested" ;
+    skos:prefLabel "Changes requested"@en,
+                   "Modifiche richieste"@it,
+                   "Alterações solicitadas"@pt,
+                   "Cambios solicitados"@es ; skos:notation "changes-requested" ;
     skos:definition "The subject requested changes to the relationship record."@en .
 
 sstim-eco:outcomeObjected a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Objected"@en ; skos:notation "objected" ;
+    skos:prefLabel "Objected"@en,
+                   "Obiezione sollevata"@it,
+                   "Objeção apresentada"@pt,
+                   "Objeción presentada"@es ; skos:notation "objected" ;
     skos:definition "The subject objected to the scoped relationship or its publication."@en .
 
 sstim-eco:outcomeConsentGranted a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Consent granted"@en ; skos:notation "consent-granted" ;
+    skos:prefLabel "Consent granted"@en,
+                   "Consenso concesso"@it,
+                   "Consentimento concedido"@pt,
+                   "Consentimiento concedido"@es ; skos:notation "consent-granted" ;
     skos:definition "Consent was granted for the activity's declared relationship and purpose only."@en .
 
 sstim-eco:outcomeConsentDeclined a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Consent declined"@en ; skos:notation "consent-declined" ;
+    skos:prefLabel "Consent declined"@en,
+                   "Consenso negato"@it,
+                   "Consentimento recusado"@pt,
+                   "Consentimiento denegado"@es ; skos:notation "consent-declined" ;
     skos:definition "Consent was declined for the activity's declared relationship and purpose only."@en .
 
 sstim-eco:outcomePublicationApproved a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Publication approved"@en ; skos:notation "publication-approved" ;
+    skos:prefLabel "Publication approved"@en,
+                   "Pubblicazione approvata"@it,
+                   "Publicação aprovada"@pt,
+                   "Publicación aprobada"@es ; skos:notation "publication-approved" ;
     skos:definition "The curated record was approved for the relationship's declared purpose in the mutable live dataset."@en .
 
 sstim-eco:outcomePublicationWithheld a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Publication withheld"@en ; skos:notation "publication-withheld" ;
+    skos:prefLabel "Publication withheld"@en,
+                   "Pubblicazione sospesa"@it,
+                   "Publicação retida"@pt,
+                   "Publicación retenida"@es ; skos:notation "publication-withheld" ;
     skos:definition "Publication was withheld for the activity's declared purpose."@en .
 
 sstim-eco:outcomeRecordAmended a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Record amended"@en ; skos:notation "record-amended" ;
+    skos:prefLabel "Record amended"@en,
+                   "Registrazione modificata"@it,
+                   "Registro emendado"@pt,
+                   "Registro enmendado"@es ; skos:notation "record-amended" ;
     skos:definition "The qualified relationship record was amended through an identified revision."@en .
 
 sstim-eco:outcomeRemovalRequested a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Removal requested"@en ; skos:notation "removal-requested" ;
+    skos:prefLabel "Removal requested"@en,
+                   "Rimozione richiesta"@it,
+                   "Remoção solicitada"@pt,
+                   "Eliminación solicitada"@es ; skos:notation "removal-requested" ;
     skos:definition "Removal of the scoped live relationship record was requested."@en .
 
 sstim-eco:outcomeConsentWithdrawn a owl:NamedIndividual, sstim-eco:EngagementOutcome, skos:Concept ;
     skos:inScheme sstim-eco:EngagementOutcomeScheme ; skos:topConceptOf sstim-eco:EngagementOutcomeScheme ;
-    skos:prefLabel "Consent withdrawn"@en ; skos:notation "consent-withdrawn" ;
+    skos:prefLabel "Consent withdrawn"@en,
+                   "Consenso revocato"@it,
+                   "Consentimento retirado"@pt,
+                   "Consentimiento retirado"@es ; skos:notation "consent-withdrawn" ;
     skos:definition "Previously granted consent was withdrawn for the scoped relationship and purpose."@en .

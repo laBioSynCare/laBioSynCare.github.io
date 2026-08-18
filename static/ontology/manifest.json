@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "2bf45a1ffcd5cb7f4fbf7352f7a97e4fd0d0d2f2c2edf203a2a725e5af9075a3"
+        "sha256": "a42019a4359d77cadc2d8e072674434ec6880ab61c58c06dc67c01394dd04338"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -460,7 +460,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "0cce305749b877e346e9ab28cd675a7ec236543287989371b24510c9ab548930"
+        "sha256": "bcb066fda35dad2661a19de64f29d53afef16de7051119cf493cea9858c791fc"
       },
       "runtime": {
         "url": "/ontology/sstim-exposure.ttl",
@@ -497,7 +497,7 @@
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "9c8ee30710700edfa792f08a7c226e621bb51dac2f5776a150d46d23e53c8ab1"
+        "sha256": "0317958c62339efa0977be53b7aa9df626b3e6964dd67ee3adf6ac54de71c779"
       },
       "runtime": {
         "url": "/ontology/sstim-ecosystem.ttl",
@@ -902,7 +902,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "a4045a5523069dedf7a7636d5322a85cf86b834428abb7b0300776d300a149d5"
+      "sha256": "eda58d73eaf2a3e0a7795eb0df6b43bfba4f1ac590bd5cdb38343ed0327ca083"
     }
   ]
 }

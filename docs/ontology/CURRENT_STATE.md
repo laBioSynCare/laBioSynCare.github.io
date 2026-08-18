@@ -312,13 +312,15 @@ The main gaps are design and coverage gaps, not current parser failures:
   frequency-band concepts still conflate observed neural oscillations with
   stimulus targets.
 - External mappings need per-mapping provenance and continued conservative
-  review. Multilingual preferred labels are substantial but uneven, and now
-  measured: 269 of 545 concepts carry all four languages and 33 of 67 schemes
-  are complete, with the other 34 English-only. `make language-coverage`
-  reports this and refuses to let it drift — a scheme must be complete or wholly
-  untranslated, a new scheme must ship translated or be recorded as debt, and a
-  scheme that gets translated must leave the ledger. Alias coverage remains
-  weak and unmeasured.
+  review. **Multilingual preferred labels are complete**: all 545 concepts carry
+  English, Italian, Portuguese and Spanish, across all 67 concept schemes, as of
+  2026-08-18. `make language-coverage` measures it and now guards against
+  regression rather than tracking debt — a new scheme must ship translated or be
+  recorded deliberately. The 276 labels added that day were written by the
+  maintainers and have **not yet had native review**; see the review request in
+  the repository issues. `skos:definition` remains English-only for all 545
+  concepts, deliberately, and alias coverage (`skos:altLabel`) remains zero and
+  unmeasured.
 - VoID subsets are checked against the frozen release manifest but are not
   generated from the live manifest, leaving an avoidable maintenance seam.
 - Independent ontology, domain, privacy, and linked-data review remains
