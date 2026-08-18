@@ -282,6 +282,22 @@ Turtle files are listed in section 1. After they exist:
       exception. Two seconds per run versus ROBOT's eight, which is what made
       minimisation affordable.*
 
+- [~] Post the ShowVoc enquiry once admitted to the VocBench group `P2`
+      *Drafted and committed at
+      [`docs/ontology/outreach/2026-08-18-showvoc-enquiry.md`](docs/ontology/outreach/2026-08-18-showvoc-enquiry.md).
+      Membership requested 2026-08-18; awaiting moderation. Must be posted by a
+      human — the documented support channel is
+      [`groups.google.com/g/vocbench-user`](https://groups.google.com/g/vocbench-user)
+      with a `[ShowVoc]` subject prefix, and a Google Group cannot be posted to
+      from tooling, unlike every other registry contact so far.*
+
+      *It asks whether the EU Publications Office instance accepts datasets from
+      outside the EU institutions, whether the in-app contribution flow is the
+      route, and whether a community instance would suit better. Record the
+      reply in `REGISTRY_SUBMISSIONS.md` under the ShowVoc entry — and do not
+      submit anything there before the reply arrives, which is the point of
+      asking.*
+
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
       `static/ontology/instances/references/` `P1`
