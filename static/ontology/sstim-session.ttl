@@ -249,6 +249,13 @@ sstim:SessionEventType a owl:Class ;
     skos:definition "A controlled category of occurrence during a session execution."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
+sstim:StimulationParameterKind a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Parameter Kind"@en ;
+    skos:definition "A controlled, modality-neutral category naming which delivery quantity a mid-session change acted on, such as the level, the carrier, or the modulation rate."@en ;
+    skos:scopeNote "Kinds, not field names. A vocabulary of named product fields would bind SSTIM to one application's parameter list; these categories are meant to hold for an auditory, visual or haptic channel alike, and an implementation maps its own field onto the kind."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
 sstim:TimingAuthority a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Timing Authority"@en ;
@@ -273,6 +280,30 @@ sstim:hasEventType a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:range  sstim:SessionEventType ;
     rdfs:label  "has event type"@en ;
     skos:definition "Identifies the single controlled category of an observed session event."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasChangedParameter a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionEvent ;
+    rdfs:range  sstim:StimulationParameterKind ;
+    rdfs:label  "has changed parameter"@en ;
+    skos:definition "Identifies which delivery quantity an event changed, for the events that change one: a parameter the participant or protocol altered mid-session, and a value a safety boundary constrained."@en ;
+    skos:scopeNote "Only for discrete changes that the record cannot otherwise recover. A modulation declared in the specification — a breathing period gliding from one value to another over a stated transition — is already fully described there, and restating it as events would create a second source able to disagree with the first."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:parameterValueBefore a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionEvent ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "parameter value before"@en ;
+    skos:definition "The value the changed quantity held immediately before this event. On a safety-limit event this is the value that was requested, which is the half a consumer cannot reconstruct from the delivered value alone."@en ;
+    skos:scopeNote "Optional. At the first change of a session the prior value is the one the specification declares, and repeating it here would be derived rather than observed."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:parameterValueAfter a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionEvent ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "parameter value after"@en ;
+    skos:definition "The value the changed quantity held immediately after this event, in the unit the parameter kind is measured in. On a safety-limit event this is the value actually delivered."@en ;
+    skos:scopeNote "Unitless here on purpose: the unit follows from the parameter kind and the channel it applies to, and carrying a unit string on every event would invite two records of the same change to disagree about it."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:sessionClockOffsetSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;

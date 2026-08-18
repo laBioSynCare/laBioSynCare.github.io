@@ -246,17 +246,23 @@ hed-roundtrip:
 ## because 8.4.0 has no Incomplete tag, so the manifest says a consumer reading
 ## the table alone cannot tell a finished session from an abandoned one.
 ##
-## Two bundles, because one cannot test the harder half of decision 5:
+## One bundle per stimulus shape decision 5 names, because one bundle could only
+## ever test the easiest of them:
 ##
-##   test/fixtures/hed-bundle             fixed stimulus; events are the whole story
-##   test/fixtures/hed-bundle-modulated   a Martigli breathing period gliding from
-##                                        mp0 to mp1, carrying a linked trace
+##   test/fixtures/hed-bundle             fixed; events are the whole story
+##   test/fixtures/hed-bundle-segmented   stepped; piecewise events, each carrying
+##                                        its parameter kind and new value
+##   test/fixtures/hed-bundle-modulated   continuous; a Martigli breathing period
+##                                        gliding mp0 to mp1, carrying a linked trace
 ##
 ## Decision 5 forbids flattening a time-varying stimulus "into a misleading
-## single row". SSTIM has no parameter-change event type — the ten in
-## SessionEventTypeScheme are lifecycle, safety and observation — so piecewise
-## events would need new terms and the linked trace is what is emitted. The
-## generator refuses to write a modulated bundle without one.
+## single row" and allows either piecewise events or a linked trace. Both are
+## now available: sstim-v:eventParameterChanged and the parameter-kind scheme
+## landed 2026-08-18, and before that a sstim:SessionEvent could carry only its
+## type and its clock offset. Which one applies is not a preference — a discrete
+## change the specification does not contain is an event, a modulation it
+## declares in full stays declarative and is rendered. The generator refuses to
+## write a continuously modulated bundle without a trace.
 ##
 ## The trace runs on delivered time: the breathing arc advances only while audio
 ## is playing, so the pause at 190 s displaces every later sample, and samples

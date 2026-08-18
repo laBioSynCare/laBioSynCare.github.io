@@ -47,7 +47,10 @@ scope for the standard schema, or is this properly a library-schema concern?
 ## 2. Safety-constrained delivery has no vocabulary
 
 `eventSafetyLimitApplied` records that a delivery parameter was constrained by a
-safety boundary — a level reduced, a flash rate capped. We map it to:
+safety boundary — a level reduced, a flash rate capped. We now carry the
+parameter and the delivered value in `Parameter-label` / `Parameter-value` tags,
+so what follows is about the *protective* character of the constraint, which is
+the part we could not express. The base mapping is:
 
 ```
 (Experiment-control, Constrained)
@@ -94,18 +97,32 @@ We emit it as a linked continuous trace beside the events table — a BIDS-style
 `stimulus.tsv` sampled at 1 Hz, with `n/a` where the session was paused, because
 nothing was being delivered there.
 
-Before choosing that, we checked whether HED could carry the piecewise form, and
-it can. A placeholder definition validates against 8.4.0:
+We use piecewise events for a *stepped* stimulus, in a separate bundle: each
+segment boundary is an event carrying the parameter and its new value, which we
+emit as
+
+```
+(Experiment-control, Modify, Parameter-label/Modulation-frequency, Parameter-value/14)
+```
+
+and a safety-constrained value as
+
+```
+(Experiment-control, Constrained, Parameter-label/Level, Parameter-value/0.3)
+```
+
+We also checked that HED can carry a continuous parameter as placeholder marks,
+and it can — this validates against 8.4.0:
 
 ```
 (Definition/Sstim-breath-period/#, (Time-interval/# s))
 (Def/Sstim-breath-period/7.774, Inset)
 ```
 
-So the limitation is on our side rather than HED's: SSTIM has no event type
-meaning "a parameter changed" to attach those marks to, and minting one is an
-ontology decision we did not want to make as a side effect of building a
-demonstrator.
+So both forms are available to us, and we chose per stimulus shape: discrete
+steps become events, a modulation our specification already declares in full
+becomes a trace. We would rather be told this is the wrong cut than discover it
+later.
 
 **Questions.** For a parameter that varies continuously through a session, does
 HED expect a linked continuous recording, or a series of placeholder-`Def/`
@@ -114,11 +131,53 @@ breakpoints, and does `Inset` remain the right scope tag for them? And is
 `Time-interval/# s` the intended way to carry a period, or is there a better
 value tag we have missed?
 
+For the stepped case: are `Experiment-control` with `Modify` and
+`Parameter-label` / `Parameter-value` the intended idiom for "the experimenter
+or participant changed a delivery parameter to this value", or is
+`Control-variable` closer to what you mean? We could not tell from the schema
+alone which of the two the group considers canonical here.
+
 We also have a related modelling question we suspect is out of scope but would
 rather ask: our arc advances on *delivered* time, so a pause displaces the whole
 remainder of the sweep on the session clock. Does HED have any notion of a
 timeline that stops and restarts, or is reconciling that strictly the annotator's
 job before the table is written?
+
+## 6. A sidecar entry named `HED` is unusable, so our HED column has no description
+
+This one is concrete enough to be a bug report, and we are unsure whose.
+
+Our `events.tsv` has a column literally named `HED`, which is the BIDS
+convention. BIDS also warns when a custom column has no sidecar description
+(`CUSTOM_COLUMN_WITHOUT_DESCRIPTION`). But every attempt to describe it crashes
+the validator, because a sidecar entry named `HED` is read as HED annotations
+rather than as that column's description.
+
+Measured on 2026-08-18 with `bids-validator` 1.15.0 on a minimal behavioral
+dataset, changing nothing but the sidecar:
+
+| Sidecar entry | Result |
+|---|---|
+| `"HED": {"Description": "...", "Definitions": [...]}` | `INTERNAL ERROR. SOME VALIDATION STEPS MAY NOT HAVE OCCURRED` |
+| `"HED": {"Definitions": [...]}` | same internal error |
+| `"HED": {"Description": "..."}` | same internal error |
+| no `HED` entry; definitions under their own non-column key | **0 errors**, 1 warning: `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` |
+
+The stack lands in `BidsSidecar._filterHedStrings`, which maps over the entry's
+values and hands each to the HED parser; prose and a `Definitions` array are not
+HED strings, and it throws rather than reporting an issue.
+
+We took the last row — definitions in their own entry, no `HED` entry — because
+a warning is better than an unvalidated dataset. An internal error is not a
+failed validation, it is no validation, and we would rather not ship artifacts
+whose validator silently stopped early.
+
+**Questions.** Is a sidecar entry named `HED` simply not allowed when a column of
+that name exists, and is the `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` warning
+therefore expected and correct to ignore? If it is allowed, the crash looks like
+a validator defect and we are happy to file it with the reproduction above. And
+is the entry key for definitions arbitrary — we used `sstim_hed_definitions` —
+or is there a name the ecosystem expects?
 
 ---
 
@@ -130,6 +189,7 @@ we expect to keep covering them; HED is a generated event-semantic profile over
 our native record, never primary storage. Where the two disagree about what a
 record means, our adapter is one-way and versioned, and the loss is declared.
 
-The five questions above are all of the form "have we encoded this the way you
+The six questions above are all of the form "have we encoded this the way you
 intend", and a "no, and that is out of scope for HED" is a useful answer to
-four of them.
+four of them. Question 6 is the exception: it is a reproducible crash, and we
+will file it wherever you prefer.

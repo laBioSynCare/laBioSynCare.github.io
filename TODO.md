@@ -186,7 +186,17 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Session model
-- [ ] Decide whether SSTIM needs a parameter-change session event type `P2`
+- [x] Decide whether SSTIM needs a parameter-change session event type — **yes,
+      shipped 2026-08-18**, the same day it was raised `P2`
+      *`sstim-v:eventParameterChanged`, `sstim:StimulationParameterKind` with its
+      five modality-neutral kinds, and the before/after value properties now
+      exist, constrained by SHACL and exercised by the segmented demonstrator
+      bundle. The design question below resolved to* both *rather than either:
+      a discrete change the plan does not contain is an event; a modulation the
+      specification already declares in full stays declarative and is rendered as
+      a trace. That line lives in `sstim:hasChangedParameter`'s scope note so it
+      binds future records, not just this ADR. Original reasoning kept below.*
+
       *Raised 2026-08-18 while building the modulated HED demonstrator. ADR 0025
       decision 5 allows a time-varying stimulus to be carried as **either**
       piecewise events **or** a linked trace. Only the trace was available:
@@ -207,6 +217,42 @@ indexed, examiner-searchable records.
       consumer reading only the events table sees nothing of the modulation.
       Protected file (CLAUDE.md §3.4). Worth carrying into the HED Working Group
       thread (question 5) before minting anything.*
+
+- [ ] Decide whether an exposure boundary should be nameable on a safety event `P3`
+      *Left open on 2026-08-18 while closing the one above. A
+      `sstim-v:eventSafetyLimitApplied` event now carries the parameter kind and
+      the requested and delivered values, which is most of what the crosswalk
+      wrongly claimed it already held. What it still cannot say is **which**
+      boundary applied — `sstim-ex:ExposureLimit` individuals exist, but linking
+      to one means the session module depending on exposure, which today it does
+      not (`dct:requires` names core, stimulus, common, configuration). That is a
+      module-coupling decision, not a term, and it is recorded honestly in the
+      crosswalk meanwhile: the boundary identity is held by neither side.*
+
+- [ ] Emit the BIDS Behavioral binding of ADR 0025 decision 3 `P3`
+      *Evaluated 2026-08-18 rather than assumed, and it is reachable: wrapped in
+      a minimal behavioral dataset, all three demonstrator bundles validate with*
+      **zero errors** *under `bids-validator` 1.15.0. One warning is unfixable —
+      `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED` column, because any
+      sidecar entry named `HED` crashes the validator's HED parser; that is
+      question 6 to the HED Working Group.*
+
+      *Not emitted, for two stated reasons. Decision 3 gates the dataset on "a
+      consented research use case" and there is none. And decision 7 requires a
+      published binding to pass its validator, which means on every change:
+      `bids-validator` 1.15.0 is 578 packages and 672 MB, too heavy for a
+      `make validate` that runs in CI on every push. The modern Deno validator is
+      the likelier route — `deno run -A jsr:@bids/validator` — and would mean
+      adding Deno to `flake.nix`. Start there, not from scratch.*
+
+- [ ] Decide whether SSTIM should name software engine identity `P3`
+      *Raised 2026-08-18. `sstim-v:eventEngineFallback` records that delivery
+      moved between engine implementations and nothing names which. The
+      crosswalk claimed the engine pair was "SSTIM-only", which was false, and
+      that claim is now withdrawn rather than made true — enumerating software
+      engines looks like an implementation concern that a universal standard
+      should not carry, but the reproducibility argument for recording it is
+      real, since two engines are not sample-identical. Decide deliberately.*
 
 ### Ontology namespace
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC

@@ -1488,6 +1488,62 @@ sstim-sh:SessionEventShape a sh:NodeShape ;
         sh:datatype xsd:decimal ;
         sh:minInclusive 0 ;
         sh:message "SessionEvent must carry one non-negative offset on the session timing context."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasChangedParameter ;
+        sh:maxCount 1 ; sh:class sstim:StimulationParameterKind ;
+        sh:message "hasChangedParameter must identify a single sstim:StimulationParameterKind."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:parameterValueBefore ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "parameterValueBefore must be a single decimal."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:parameterValueAfter ;
+        sh:maxCount 1 ; sh:datatype xsd:decimal ;
+        sh:message "parameterValueAfter must be a single decimal."@en ;
+    ] ;
+
+    # A parameter-changed event that does not say what changed, or to what, is a
+    # mark with no content: a consumer reading the timeline learns that something
+    # happened and cannot reconstruct the stimulus. That is precisely the
+    # flattening ADR 0025 decision 5 exists to prevent, so the type carries its
+    # own completeness requirement rather than relying on a producer's care.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A parameter-changed event must carry both hasChangedParameter and parameterValueAfter."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventParameterChanged> .
+                FILTER NOT EXISTS {
+                    $this <https://w3id.org/sstim#hasChangedParameter> ?kind .
+                    $this <https://w3id.org/sstim#parameterValueAfter> ?after .
+                }
+            }
+        """ ;
+    ] ;
+
+    # The change properties belong to the events that change something. Hanging
+    # them on a playback-stop or an observation says a value moved at a moment
+    # when nothing did, and nothing else in the record would contradict it.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "hasChangedParameter and the parameter values apply only to a parameter-changed or safety-limit event."@en ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/sstim#hasEventType> ?type .
+                { $this <https://w3id.org/sstim#hasChangedParameter> ?any }
+                UNION
+                { $this <https://w3id.org/sstim#parameterValueAfter> ?any }
+                UNION
+                { $this <https://w3id.org/sstim#parameterValueBefore> ?any }
+                FILTER(?type NOT IN (
+                    <https://w3id.org/sstim/vocab#eventParameterChanged>,
+                    <https://w3id.org/sstim/vocab#eventSafetyLimitApplied>
+                ))
+            }
+        """ ;
     ] .
 
 

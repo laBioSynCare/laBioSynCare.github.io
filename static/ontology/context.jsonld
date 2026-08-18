@@ -109,6 +109,7 @@
     "SelfReport": "sstim:SelfReport",
     "SessionEvent": "sstim:SessionEvent",
     "SessionEventType": "sstim:SessionEventType",
+    "StimulationParameterKind": "sstim:StimulationParameterKind",
     "TimingAuthority": "sstim:TimingAuthority",
     "ReproducibilityLevel": "sstim:ReproducibilityLevel",
     "ParticipantObservation": "sstim:ParticipantObservation",
@@ -742,6 +743,10 @@
       "@id": "sstim:hasEventType",
       "@type": "@id"
     },
+    "hasChangedParameter": {
+      "@id": "sstim:hasChangedParameter",
+      "@type": "@id"
+    },
     "hasTimingAuthority": {
       "@id": "sstim:hasTimingAuthority",
       "@type": "@id"
@@ -887,6 +892,14 @@
     "completionStatus": "sstim:completionStatus",
     "sessionClockOffsetSeconds": {
       "@id": "sstim:sessionClockOffsetSeconds",
+      "@type": "xsd:decimal"
+    },
+    "parameterValueBefore": {
+      "@id": "sstim:parameterValueBefore",
+      "@type": "xsd:decimal"
+    },
+    "parameterValueAfter": {
+      "@id": "sstim:parameterValueAfter",
       "@type": "xsd:decimal"
     },
     "clockOriginSeconds": {

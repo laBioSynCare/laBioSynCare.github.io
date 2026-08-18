@@ -6,9 +6,10 @@ loss in a manifest is not a test: a manifest can claim loss that does not exist,
 or miss loss that does, and either way a consumer trusts a sentence rather than a
 property. This asserts the property.
 
-The round trip is HED back to SSTIM. Each emitted HED string is looked up in a
-reverse index of the crosswalk, giving the set of SSTIM event types that could
-have produced it. Four things then have to hold, and the third is what makes
+The round trip is HED back to SSTIM. Each emitted HED string has its detail tags
+stripped — `Parameter-label` and `Parameter-value` carry an event's values, not
+its identity — and the remainder is looked up in a reverse index of the
+crosswalk, giving the set of SSTIM event types that could have produced it. Four things then have to hold, and the third is what makes
 this a test of the declaration rather than of the mapping:
 
 1. **Soundness.** The originating event type is always among the candidates.
@@ -45,8 +46,16 @@ gate exists to prevent.
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
+
+# Detail tags carry per-event values, not event identity, so they are removed
+# before the reverse lookup. Crosswalk 0.3.0 introduced them precisely so that
+# HED could carry a parameter and its value; leaving them in would make every
+# parameterised row look like an unmapped string, which is how this gate first
+# reported them.
+DETAIL_TAG = re.compile(r",\s*Parameter-(?:label|value)/[^,)]+")
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
@@ -54,6 +63,7 @@ MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
 # reversed would be exactly the untested artifact this gate exists to prevent.
 BUNDLES = (
     ROOT / "test" / "fixtures" / "hed-bundle",
+    ROOT / "test" / "fixtures" / "hed-bundle-segmented",
     ROOT / "test" / "fixtures" / "hed-bundle-modulated",
 )
 
@@ -73,7 +83,11 @@ def read_rows(bundle: Path) -> list[tuple[str, str, str]]:
     for line in lines[1:]:
         cells = line.split("\t")
         rows.append(
-            (cells[index["onset"]], cells[index["event_type"]], cells[index["HED"]])
+            (
+                cells[index["onset"]],
+                cells[index["event_type"]],
+                DETAIL_TAG.sub("", cells[index["HED"]]),
+            )
         )
     return rows
 

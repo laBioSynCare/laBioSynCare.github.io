@@ -4,7 +4,7 @@
 
 This exists to be grepped before concluding that SSTIM lacks a term. It was added after three consecutive claims that a term was missing when it was not — the generic `sstim:composedOfTrack`, `sstim-ex:perceivedModality`, and the per-rendering rate properties on a stimulus channel. Eighteen modules is more than anyone reliably searches by hand.
 
-163 classes · 301 properties · 545 concepts · 18 modules
+164 classes · 304 properties · 551 concepts · 18 modules
 
 ## Classes
 
@@ -158,6 +158,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:StimulationDeliveryApproach` | common |  | A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external,… |
 | `sstim:StimulationIntervention` | session | sstim:Stimulation | A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer… |
 | `sstim:StimulationMechanism` | common |  | A controlled information category identifying a proposed neurobiological or psychophysiological pathway through which a stimulus may produce a… |
+| `sstim:StimulationParameterKind` | session |  | A controlled, modality-neutral category naming which delivery quantity a mid-session change acted on, such as the level, the carrier, or the… |
 | `sstim:StimulationProtocol` | technique |  | A structured method specification for using one or more stimulation techniques toward an intended use, including composition rules, timing,… |
 | `sstim:StimulationSignal` | stimulus |  | A time-varying function with a frequency extent, a shape, and no modality: what is to be delivered, said independently of any sense it might be… |
 | `sstim:StimulationTechnique` | technique |  | A reusable information-content category for a parameterizable stimulation method. Classification records the method's declared design intent and… |
@@ -329,6 +330,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:hasBreathGuide` | data | patch-studio | sstim:Preset → XMLSchema:boolean | True iff the preset contains exactly one voice with isOn=true. Governs visual breathing animation and haptic pulse delivery. |
 | `sstim:hasCautionSeverity` | object | common | sstim:CautionTag → sstim:CautionSeverity | Assigns exactly one interface-priority severity category to a caution tag. |
 | `sstim:hasCautionTag` | object | configuration | sstim:Preset → sstim:CautionTag | Links a preset to a safety or usage advisory flag. A preset may carry zero or more caution tags. |
+| `sstim:hasChangedParameter` | object | session | sstim:SessionEvent → sstim:StimulationParameterKind | Identifies which delivery quantity an event changed, for the events that change one: a parameter the participant or protocol altered mid-session,… |
 | `sstim:hasClaimDirection` | object | evidence | sstim:EvidenceClaim → sstim:ClaimDirection | Whether the cited evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation. |
 | `sstim:hasCorticalTopography` | data | common | sstim:NeuralOscillationType → XMLSchema:string | Scalp or cortical region over which this rhythm is characteristically recorded. Topography is part of how a rhythm is identified alongside… |
 | `sstim:hasDeliveryModality` | object | session | sstim:SensoryStimulationIntervention → sstim:SensoryModality | Links an executed sensory stimulation intervention to one or more broad controlled modality categories engaged by its delivery. Use the exposure… |
@@ -412,6 +414,8 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:outcomeNeuralSystem` | object | neuromodulation-evidence | sstim:EvidenceOutcomeConcept → sstim:NeuralSystem | Tags an evidence outcome concept with the distributed neural system the finding is about. |
 | `sstim:outcomeNeuralTargetSite` | object | neuromodulation-evidence | sstim:EvidenceOutcomeConcept → sstim:NeuralTargetSite | Tags an evidence outcome concept with the neural site the finding is about, which may differ from the intended target site of the technique assessed. |
 | `sstim:panPosition` | data | patch-studio | sstim:Voice | sstim:AudioTrack → XMLSchema:decimal | Stereo position from left to right. |
+| `sstim:parameterValueAfter` | data | session | sstim:SessionEvent → XMLSchema:decimal | The value the changed quantity held immediately after this event, in the unit the parameter kind is measured in. On a safety-limit event this is the… |
+| `sstim:parameterValueBefore` | data | session | sstim:SessionEvent → XMLSchema:decimal | The value the changed quantity held immediately before this event. On a safety-limit event this is the value that was requested, which is the half a… |
 | `sstim:participantEngagementMode` | object | technique | — → sstim:ParticipantEngagementMode | Links a stimulation or neuromodulation process, technique, or protocol to the degree and kind of active participation it requires of the individual.… |
 | `sstim:permittedUseScope` | data | evidence | — → 22-rdf-syntax-ns:langString | The permitted use and release scope of a governed research output as evidence. |
 | `sstim:permutationFunction` | data | patch-studio | sstim:Voice → XMLSchema:integer | Permutation function selector for sequence ordering. Values match the skos:notation of sstim-v:PermutationFunctionScheme members (0=shuffle,… |
@@ -762,6 +766,7 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:engagementPassiveReceptive` | sstim:ParticipantEngagementMode | vocab | engagement-passive-receptive |
 | `sstim-v:eventEngineFallback` | sstim:SessionEventType | vocab | engine-fallback |
 | `sstim-v:eventObservationCollected` | sstim:SessionEventType | vocab | observation-collected |
+| `sstim-v:eventParameterChanged` | sstim:SessionEventType | vocab | parameter-changed |
 | `sstim-v:eventPlaybackPause` | sstim:SessionEventType | vocab | playback-pause |
 | `sstim-v:eventPlaybackResume` | sstim:SessionEventType | vocab | playback-resume |
 | `sstim-v:eventPlaybackStart` | sstim:SessionEventType | vocab | playback-start |
@@ -849,8 +854,13 @@ Controlled values. A schema offering a controlled value that is not here is mint
 | `sstim-v:onsetNextDay` | sstim:ExperienceOnsetPhase | vocab | onset-next-day |
 | `sstim-v:onsetUnknown` | sstim:ExperienceOnsetPhase | vocab | onset-unknown |
 | `sstim-v:paramAmplitude` | sstim:RenderableParameter | vocab | amplitude |
+| `sstim-v:paramCarrierFrequency` | sstim:StimulationParameterKind | vocab | carrier-frequency |
+| `sstim-v:paramDutyCycle` | sstim:StimulationParameterKind | vocab | duty-cycle |
 | `sstim-v:paramFrequency` | sstim:RenderableParameter | vocab | frequency |
+| `sstim-v:paramLevel` | sstim:StimulationParameterKind | vocab | level |
 | `sstim-v:paramLuminance` | sstim:RenderableParameter | vocab | luminance |
+| `sstim-v:paramModulationFrequency` | sstim:StimulationParameterKind | vocab | modulation-frequency |
+| `sstim-v:paramPhaseOffset` | sstim:StimulationParameterKind | vocab | phase-offset |
 | `sstim-v:paramSize` | sstim:RenderableParameter | vocab | size |
 | `sstim-v:paramSpatialPosition` | sstim:RenderableParameter | vocab | spatial-position |
 | `sstim-v:paramVibrationIntensity` | sstim:RenderableParameter | vocab | vibration-intensity |

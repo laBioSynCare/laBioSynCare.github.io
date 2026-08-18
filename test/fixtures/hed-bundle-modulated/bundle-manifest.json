@@ -8,7 +8,7 @@
     "sstim": "0.16.0-dev",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
-    "mapping": "0.2.0",
+    "mapping": "0.3.0",
     "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
   },
@@ -35,6 +35,7 @@
   },
   "modulation": {
     "timeVarying": true,
+    "shape": "continuous",
     "parameter": "breathing-cycle period (Martigli)",
     "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
     "mp0": 4.0,
@@ -52,7 +53,7 @@
     },
     {
       "file": "events.json",
-      "sha256": "54dd735576013e19de841781c0a6e2057e02735607a32050af730dcb09b5ba48"
+      "sha256": "b476584354db07b9923cd6c63b12235e0af9dee2126c462fe3a370a30082ef6e"
     },
     {
       "file": "stimulus.tsv",

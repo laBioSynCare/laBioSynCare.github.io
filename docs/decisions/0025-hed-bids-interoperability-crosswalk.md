@@ -262,7 +262,7 @@ but it is the prerequisite for everything after.
 
    *Started 2026-08-18: the mapping contract exists.*
    [`static/schemas/sstim-hed-event-map.json`](../../static/schemas/sstim-hed-event-map.json)
-   maps all ten `sstim-v:SessionEventTypeScheme` types to HED 8.4.0 annotations,
+   maps all eleven `sstim-v:SessionEventTypeScheme` types to HED 8.4.0 annotations,
    one-way and versioned, with `lossyBecause` on the five mappings that lose
    information — including the pair `eventSessionComplete` and
    `eventSessionInterrupt`, which emit identical HED because 8.4.0 has no
@@ -312,33 +312,54 @@ but it is the prerequisite for everything after.
    single row."* The fixed fixture has no modulation, so the requirement was
    satisfied vacuously and nothing would have noticed if it stopped being.
 
-   There are now two bundles:
+   Decision 5 names three stimulus shapes, and there is now one bundle for each:
 
-   | Bundle | Source | Shape |
-   |---|---|---|
-   | [`test/fixtures/hed-bundle/`](../../test/fixtures/hed-bundle/) | the recorded-session fixture | fixed stimulus; the events are the whole story |
-   | [`test/fixtures/hed-bundle-modulated/`](../../test/fixtures/hed-bundle-modulated/) | [`modulated-session.ttl`](../../test/fixtures/rdf/hed-bundle/modulated-session.ttl) | a Martigli breathing period gliding 4 s → 10 s over 300 s, with a linked trace |
+   | Bundle | Source | Shape | Representation |
+   |---|---|---|---|
+   | [`test/fixtures/hed-bundle/`](../../test/fixtures/hed-bundle/) | the recorded-session fixture | fixed | events alone |
+   | [`test/fixtures/hed-bundle-segmented/`](../../test/fixtures/hed-bundle-segmented/) | [`segmented-session.ttl`](../../test/fixtures/rdf/hed-bundle/segmented-session.ttl) | explicitly segmented | **piecewise events** |
+   | [`test/fixtures/hed-bundle-modulated/`](../../test/fixtures/hed-bundle-modulated/) | [`modulated-session.ttl`](../../test/fixtures/rdf/hed-bundle/modulated-session.ttl) | continuously modulated | **linked trace** |
 
-   **Of the two representations decision 5 allows, only one was available — and
-   the constraint is ours, not HED's.** Piecewise events would need an event type
-   meaning "a parameter changed", and `sstim-v:SessionEventTypeScheme` has none:
-   its ten types are session and playback lifecycle, safety and observation.
-   Minting one is an ontology decision under
-   [ADR 0004](0004-protected-ontology-files.md), not something a demonstrator
-   should do on its way past. HED itself is perfectly able to carry the piecewise
-   form — a placeholder definition validates against 8.4.0, checked with
-   `hedtools` rather than assumed:
+   Each manifest declares its own `modulation.shape`, so a bundle states which
+   clause it demonstrates rather than leaving a reader to infer it from whether a
+   trace happens to be present.
+
+   **Piecewise events needed a term SSTIM did not have, and now does.** A
+   `sstim:SessionEvent` could carry exactly two things — its type and its clock
+   offset — so nothing could say *what* changed at a boundary or *to what*. Added
+   2026-08-18, in the session module and the vocabulary:
+
+   - `sstim-v:eventParameterChanged`, an eleventh session event type;
+   - `sstim:StimulationParameterKind` with
+     `sstim-v:StimulationParameterKindScheme` — five modality-neutral kinds
+     (level, carrier frequency, modulation frequency, duty cycle, phase offset),
+     deliberately quantities rather than one application's field names;
+   - `sstim:hasChangedParameter`, `sstim:parameterValueBefore` and
+     `sstim:parameterValueAfter`.
+
+   SHACL requires a parameter-changed event to carry both the kind and the new
+   value — a boundary mark with no content is the flattening this decision
+   forbids, wearing a different hat — and forbids those properties on events that
+   change nothing. Both constraints were checked by feeding them violations.
+
+   **The line between segmented and continuous is deliberate.** A discrete change
+   the plan does not contain is an event. A modulation the specification already
+   declares in full — a breathing period gliding from `mp0` to `mp1` over `md` —
+   stays declarative and is rendered as a trace, because restating it as events
+   would create a second source able to disagree with the first. That rule is
+   written into `sstim:hasChangedParameter`'s scope note, not just here.
+
+   The modulated bundle's trace is `stimulus.tsv` + `stimulus.json`, in the shape
+   of a BIDS continuous recording: no header row, columns named in the sidecar,
+   `SamplingFrequency` and `StartTime` declared. Whether a continuous parameter is
+   better carried as a trace or as placeholder-`Def/` marks is
+   [question 5 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md);
+   HED can express either, and a placeholder definition validates against 8.4.0:
 
    ```
    (Definition/Sstim-breath-period/#, (Time-interval/# s))
    (Def/Sstim-breath-period/7.774, Inset)
    ```
-
-   So the modulated bundle carries a linked trace, `stimulus.tsv` +
-   `stimulus.json`, in the shape of a BIDS continuous recording: no header row,
-   columns named in the sidecar, `SamplingFrequency` and `StartTime` declared.
-   Whether the trace or the piecewise marks is the idiom HED intends is
-   [question 5 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md).
 
    **The trace advances on delivered time, and that is the interesting part.**
    The breathing arc `P(d) = mp0 + (mp1 − mp0) · min(d/md, 1)` moves only while
@@ -355,6 +376,38 @@ but it is the prerequisite for everything after.
    one. That guard was the actual gap: the ADR had stated the rule since July and
    no instrument could tell whether it held.
 
+   **Two `lossyBecause` statements were false, and in the flattering
+   direction.** Decision 6 requires the adapter to be explicit about loss, and
+   `make hed-roundtrip` already tested that declared loss is real and not
+   overclaimed *as ambiguity*. Neither it nor anything else could check the other
+   half of such a sentence — the assertion that SSTIM holds what HED drops.
+
+   - `eventSafetyLimitApplied` said "Which boundary applied, and the requested
+     versus delivered values, are SSTIM-only and must be read from the session
+     record." There was nowhere in the session record to read them from.
+   - `eventEngineFallback` said "The engine pair is SSTIM-only." SSTIM has no
+     engine-identity term at all; `eventEngineFallback` is the only occurrence of
+     the word in the ontology.
+
+   Both pointed a consumer at data that did not exist, and both erred toward "our
+   model is richer than the profile" — which is the direction nobody audits. The
+   first is now true: the safety event carries its parameter kind, the requested
+   value and the delivered one. The second is withdrawn rather than reworded,
+   because nothing is lost relative to a record that never held it; naming
+   software engines is an implementation concern and a separate decision, not
+   something to assert so a loss statement reads well.
+
+   **HED turned out to be able to carry more than the crosswalk was asking of
+   it.** `Parameter-label/#` and `Parameter-value/#` exist in 8.4.0, so mapping
+   0.3.0 adds an optional `detailTemplate` per event type: `hed` stays the part
+   the event type alone determines and is what a reverse lookup matches after
+   detail tags are stripped, while the template carries per-event values. A
+   safety clamp now emits
+   `(Experiment-control, Constrained, Parameter-label/Level, Parameter-value/0.3)`
+   instead of a bare `(Experiment-control, Constrained)`. The declared loss that
+   remains is precise: HED has no Safety or Threshold tag, so a HED-only consumer
+   sees a constrained parameter without learning the constraint was protective.
+
    **Decision 6 and 7 gaps closed with it.** Decision 6 asks for cross-artifact
    IDs, which were absent: `events.tsv` now carries an `event_id` column and the
    manifest a `crossArtifactIds` map, and `--check` resolves every one against a
@@ -364,6 +417,39 @@ but it is the prerequisite for everything after.
    Decision 7's "SSTIM SHACL" is now run over both sources against the
    Full-profile shapes; the modulated source is not a manifest-declared profile
    fixture, so this gate is the only place it is validated.
+
+   **The sidecar was not BIDS-conformant, and running the real validator is how
+   that was found.** The bundles have been described as "BIDS-style" throughout,
+   which was doing a lot of work: nothing had ever handed one to a BIDS tool. On
+   2026-08-18 that was measured, with `bids-validator` 1.15.0 on a minimal
+   behavioral dataset wrapped around each bundle's `events.tsv` and sidecar.
+
+   The first run returned `INTERNAL ERROR. SOME VALIDATION STEPS MAY NOT HAVE
+   OCCURRED` — which is not a failed validation but no validation, the same class
+   of answer as an unreachable instrument under `CLAUDE.md` §3.6. The cause was
+   ours: the sidecar carried a `"HED"` entry holding a `Description` and a
+   `Definitions` array, and in a BIDS sidecar `HED` is reserved for a column's
+   HED annotations. The validator maps over that entry's values and hands each to
+   the HED parser, which throws on prose.
+
+   Definitions now live in their own non-column entry, `sstim_hed_definitions`,
+   with the definitions under its `HED` key — where BIDS-HED expects them. With
+   that change **all three bundles validate with zero errors.** One warning
+   remains and is unfixable: `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED`
+   column itself, because every way of describing it reintroduces the crash. That
+   is [question 6 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
+   with the reproduction table.
+
+   **The full BIDS Behavioral binding of decision 3 is still not emitted, and the
+   reason is now evidence rather than inertia.** It is achievable — the hard part,
+   the events table and its HED, validates clean. What is not achievable cheaply
+   is decision 7's requirement that a *published* binding pass its validator on
+   every change: `bids-validator` 1.15.0 is 578 packages and 672 MB, which is not
+   a dependency to add to a `make validate` that already runs in CI on every
+   push. Decision 3 also gates the dataset on "a consented research use case",
+   and there is none. So the position is: the binding is demonstrably reachable,
+   it is not published, and the repository does not claim it. Recorded in
+   `TODO.md` with the measurement so the next person starts from the evidence.
 
    **What remains is optional under this ADR, not required.** A BIDS Behavioral
    dataset is decision 3's first optional binding and is explicitly not part of

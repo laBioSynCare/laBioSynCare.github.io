@@ -20,12 +20,14 @@
       "eventSessionInterrupt": "Session interrupted"
     }
   },
-  "HED": {
-    "Description": "Generated from event_type by the crosswalk, HED 8.4.0.",
-    "Definitions": [
-      "(Definition/Sstim-session, (Experiment-structure, Time-block))",
-      "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
-    ],
-    "$comment": "The Definitions must be supplied to a HED validator alongside this table: Onset, Offset, Pause and Inset are scope tags that require exactly one paired Def/, so the events do not validate without them."
+  "sstim_hed_definitions": {
+    "Description": "HED definitions the HED column references. Not a column of events.tsv. Onset, Offset, Pause and Inset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
+    "HED": {
+      "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
+      "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
+    }
+  },
+  "GeneratedHedColumn": {
+    "Description": "The events.tsv column named HED is generated from the native columns by the crosswalk, HED 8.4.0. Where an event changes a parameter, its Parameter-label and Parameter-value tags come from parameter_kind and value_after. SSTIM is canonical and HED is derived, so the native columns are the ones to read."
   }
 }

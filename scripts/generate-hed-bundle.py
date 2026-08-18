@@ -12,7 +12,7 @@ manifest recording every artifact hash, every pinned version, the clock
 assumption, the cross-artifact identifiers, and — the part that matters most —
 what the HED column cannot carry.
 
-**Loss is a first-class output.** Five of the ten event mappings lose
+**Loss is a first-class output.** Five of the eleven event mappings lose
 information, and each manifest names every one that its own events actually use;
 `declaredLoss` is keyed on the rows emitted, not on the whole crosswalk, so it
 stays a statement about those artifacts. `eventSessionComplete` and
@@ -82,6 +82,15 @@ BUNDLES = (
         "purpose": "A constant stimulus, where the event timeline is the whole story.",
     },
     {
+        "id": "segmented",
+        "source": "test/fixtures/rdf/hed-bundle/segmented-session.ttl",
+        "out": "test/fixtures/hed-bundle-segmented",
+        "purpose": (
+            "An explicitly segmented stimulus, carried as the piecewise events ADR 0025 "
+            "decision 5 names first. Each boundary is an event with its parameter and value."
+        ),
+    },
+    {
         "id": "modulated",
         "source": "test/fixtures/rdf/hed-bundle/modulated-session.ttl",
         "out": "test/fixtures/hed-bundle-modulated",
@@ -102,6 +111,33 @@ def local(term) -> str:
     return text.rsplit("#", 1)[-1] if "#" in text else text.rsplit("/", 1)[-1]
 
 
+# HED tag values may not contain spaces, and a SKOS notation is already the
+# hyphenated form the vocabulary settled on — `modulation-frequency` — so the
+# parameter kind travels as its notation with the leading `param` stripped and
+# capitalised, which is what HED's Parameter-label expects.
+PARAM_LABELS = {
+    "paramLevel": "Level",
+    "paramCarrierFrequency": "Carrier-frequency",
+    "paramModulationFrequency": "Modulation-frequency",
+    "paramDutyCycle": "Duty-cycle",
+    "paramPhaseOffset": "Phase-offset",
+}
+
+
+def fill_detail(entry: dict, row: dict) -> str:
+    """Append the filled detailTemplate to an event's base HED string."""
+    label = PARAM_LABELS.get(row["kind"])
+    if label is None:
+        raise SystemExit(
+            f"hed-bundle: no HED Parameter-label for {row['kind']} — add it to "
+            f"PARAM_LABELS when the parameter-kind scheme grows"
+        )
+    detail = entry["detailTemplate"].format(
+        parameterKind=label, valueAfter=row["after"], valueBefore=row["before"]
+    )
+    return f"{entry['hed'][:-1]}, {detail})"
+
+
 # ── reading the session ──────────────────────────────────────────────────────
 
 
@@ -117,15 +153,26 @@ def read_events(graph: Graph, spec: dict) -> list[dict]:
         entry = spec["events"].get(name)
         if entry is None:
             raise SystemExit(f"hed-bundle: no HED mapping for {name}")
-        rows.append(
-            {
-                "onset": float(offset),
-                "event_id": local(event),
-                "iri": str(event),
-                "type": name,
-                "hed": entry["hed"],
-            }
-        )
+        kind = next(graph.objects(event, S("hasChangedParameter")), None)
+        before = next(graph.objects(event, S("parameterValueBefore")), None)
+        after = next(graph.objects(event, S("parameterValueAfter")), None)
+        row = {
+            "onset": float(offset),
+            "event_id": local(event),
+            "iri": str(event),
+            "type": name,
+            "kind": local(kind) if kind is not None else None,
+            "before": f"{float(before):g}" if before is not None else None,
+            "after": f"{float(after):g}" if after is not None else None,
+        }
+        # HED carries the values when the event has them. The base string stays
+        # the part the event type alone determines, so a reverse lookup still
+        # recovers the type after the detail tags are stripped.
+        if "detailTemplate" in entry and row["kind"] and row["after"] is not None:
+            row["hed"] = fill_detail(entry, row)
+        else:
+            row["hed"] = entry["hed"]
+        rows.append(row)
     rows.sort(key=lambda r: (r["onset"], r["event_id"]))
     return rows
 
@@ -211,13 +258,25 @@ def build_trace(sweep: dict, events: list[dict]) -> list[tuple[float, str, str]]
 # ── writing the bundle ───────────────────────────────────────────────────────
 
 
-def write_events(out: Path, rows: list[dict], spec: dict) -> None:
-    lines = ["onset\tduration\tevent_id\tevent_type\tHED"]
+def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
+    """Write events.tsv and its sidecar. Returns whether parameter columns were
+    emitted — they appear only when some event in this bundle changes one, so a
+    fixed-stimulus table is not padded with three columns of n/a."""
+    parametric = any(r["kind"] for r in rows)
+    columns = ["onset", "duration", "event_id", "event_type"]
+    if parametric:
+        columns += ["parameter_kind", "value_before", "value_after"]
+    columns.append("HED")
+
+    lines = ["\t".join(columns)]
     # duration is n/a: SSTIM records instantaneous timeline events, and inventing
     # a duration would assert a span the native record does not contain.
-    lines += [
-        f"{r['onset']:.3f}\tn/a\t{r['event_id']}\t{r['type']}\t{r['hed']}" for r in rows
-    ]
+    for r in rows:
+        cells = [f"{r['onset']:.3f}", "n/a", r["event_id"], r["type"]]
+        if parametric:
+            cells += [r["kind"] or "n/a", r["before"] or "n/a", r["after"] or "n/a"]
+        cells.append(r["hed"])
+        lines.append("\t".join(cells))
     (out / "events.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     sidecar = {
@@ -237,24 +296,70 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> None:
             "TermURL": spec["sstimEventScheme"],
             "Levels": {r["type"]: spec["events"][r["type"]]["label"] for r in rows},
         },
-        "HED": {
+        # NOT a key named "HED". In a BIDS sidecar, `HED` inside an entry is
+        # reserved for that column's HED annotations, so a `"HED": {...}` entry
+        # holding prose and a Definitions array is read as HED and is not.
+        # bids-validator 1.15.0 crashes on it in BidsSidecar._filterHedStrings and
+        # reports "INTERNAL ERROR. SOME VALIDATION STEPS MAY NOT HAVE OCCURRED" —
+        # which is not a failed validation, it is no validation at all. Measured
+        # 2026-08-18: with this entry shaped as it was, that error; with the
+        # definitions moved below, the dataset validates with zero errors.
+        #
+        # A column literally named HED in events.tsv needs no sidecar entry; BIDS
+        # assembles it directly. So the column is described here for a human and
+        # the definitions live in their own non-column entry, which is where
+        # BIDS-HED expects definitions to be declared.
+        "sstim_hed_definitions": {
             "Description": (
-                f"Generated from event_type by the crosswalk, HED "
-                f"{spec['hedSchema']['version']}."
+                "HED definitions the HED column references. Not a column of events.tsv. "
+                "Onset, Offset, Pause and Inset are scope tags requiring exactly one "
+                "paired Def/, so the events do not validate without these in scope."
             ),
-            "Definitions": [
-                v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")
-            ],
-            "$comment": (
-                "The Definitions must be supplied to a HED validator alongside this "
-                "table: Onset, Offset, Pause and Inset are scope tags that require "
-                "exactly one paired Def/, so the events do not validate without them."
-            ),
+            "HED": {
+                name: value
+                for name, value in spec.get("definitions", {}).items()
+                if not name.startswith("$")
+            },
+        },
+        "GeneratedHedColumn": {
+            "Description": (
+                f"The events.tsv column named HED is generated from the native columns by "
+                f"the crosswalk, HED {spec['hedSchema']['version']}. Where an event changes "
+                f"a parameter, its Parameter-label and Parameter-value tags come from "
+                f"parameter_kind and value_after. SSTIM is canonical and HED is derived, so "
+                f"the native columns are the ones to read."
+            )
         },
     }
+    if parametric:
+        sidecar["parameter_kind"] = {
+            "Description": (
+                "Local name of the sstim:StimulationParameterKind this event changed, or "
+                "n/a. Modality-neutral by design: the kind names the quantity, not one "
+                "application's field."
+            ),
+            "TermURL": "https://w3id.org/sstim/vocab#StimulationParameterKindScheme",
+            "Levels": {
+                r["kind"]: r["kind"] for r in rows if r["kind"]
+            },
+        }
+        sidecar["value_before"] = {
+            "Description": (
+                "The value the parameter held immediately before the event, or n/a. On a "
+                "safety-limit event this is the value that was requested."
+            )
+        }
+        sidecar["value_after"] = {
+            "Description": (
+                "The value the parameter held immediately after the event, or n/a. On a "
+                "safety-limit event this is the value actually delivered. The unit follows "
+                "from the parameter kind and is deliberately not repeated per row."
+            )
+        }
     (out / "events.json").write_text(
         json.dumps(sidecar, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
+    return parametric
 
 
 def write_trace(out: Path, trace: list[tuple[float, str, str]], sweep: dict) -> None:
@@ -313,10 +418,36 @@ def build(bundle: dict, out: Path) -> dict:
     sweep = read_sweep(graph)
 
     out.mkdir(parents=True, exist_ok=True)
-    write_events(out, events, spec)
+    parametric = write_events(out, events, spec)
 
     artifacts = ["events.tsv", "events.json"]
-    modulation = {"timeVarying": False, "note": "Fixed stimulus; the events are complete."}
+    # Three shapes, and the manifest says which one this is rather than leaving a
+    # reader to infer it from whether a trace happens to be present. ADR 0025
+    # decision 5 treats them differently, so conflating them in the record would
+    # make the bundle unable to state which clause it is demonstrating.
+    steps = [r for r in events if r["type"] == "eventParameterChanged"]
+    if steps:
+        modulation = {
+            "timeVarying": False,
+            "shape": "segmented",
+            "representation": "piecewise events",
+            "stepCount": len(steps),
+            "note": (
+                "An explicitly segmented stimulus. Each boundary is a "
+                "sstim-v:eventParameterChanged event carrying its parameter kind and the "
+                "value it took, so the segmentation is recoverable from the events table "
+                "alone. This is the first of the two representations ADR 0025 decision 5 "
+                "allows; it became expressible on 2026-08-18, when a sstim:SessionEvent "
+                "could still carry only its type and its clock offset."
+            ),
+        }
+    else:
+        modulation = {
+            "timeVarying": False,
+            "shape": "fixed",
+            "representation": "events alone",
+            "note": "Fixed stimulus; the events are complete.",
+        }
 
     if sweep is not None:
         # The guard, not a feature. ADR 0025 decision 5 forbids flattening a
@@ -334,6 +465,7 @@ def build(bundle: dict, out: Path) -> dict:
         artifacts += ["stimulus.tsv", "stimulus.json"]
         modulation = {
             "timeVarying": True,
+            "shape": "continuous",
             "parameter": "breathing-cycle period (Martigli)",
             "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
             "mp0": sweep["mp0"],
@@ -474,10 +606,12 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
     problems: list[str] = []
     manifest = json.loads((out / "bundle-manifest.json").read_text(encoding="utf-8"))
     spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-    rows = [
-        line.split("\t")
-        for line in (out / "events.tsv").read_text(encoding="utf-8").splitlines()[1:]
-    ]
+    # By header, not by position. The table has grown a column twice now — the
+    # event_id of decision 6, then the parameter columns — and a positional
+    # unpack broke on each.
+    lines = (out / "events.tsv").read_text(encoding="utf-8").splitlines()
+    header = lines[0].split("\t")
+    rows = [dict(zip(header, line.split("\t"))) for line in lines[1:]]
 
     # Emitted HED must validate. Decision 7 makes validation a publication gate,
     # and a bundle can be perfectly current and still wrong — this runs on the
@@ -490,9 +624,11 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
         [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")],
         schema,
     )
-    for onset, _dur, _eid, etype, hed in rows:
-        if HedString(hed, schema, def_dict=defs).validate(schema):
-            problems.append(f"{tag}: invalid HED at t={onset} ({etype}): {hed}")
+    for row in rows:
+        if HedString(row["HED"], schema, def_dict=defs).validate(schema):
+            problems.append(
+                f"{tag}: invalid HED at t={row['onset']} ({row['event_type']}): {row['HED']}"
+            )
 
     # Identifier consistency (decision 7). The manifest's id map and the table's
     # event_id column must both resolve in the source graph — a hash proves the
@@ -500,10 +636,12 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
     graph = Graph()
     graph.parse(ROOT / bundle["source"], format="turtle")
     subjects = {local(s) for s in graph.subjects(RDF.type, S("SessionEvent"))}
-    for _onset, _dur, eid, _etype, _hed in rows:
-        if eid not in subjects:
-            problems.append(f"{tag}: event_id '{eid}' resolves to no sstim:SessionEvent")
-    if set(manifest["crossArtifactIds"]["ids"]) != {r[2] for r in rows}:
+    for row in rows:
+        if row["event_id"] not in subjects:
+            problems.append(
+                f"{tag}: event_id '{row['event_id']}' resolves to no sstim:SessionEvent"
+            )
+    if set(manifest["crossArtifactIds"]["ids"]) != {r["event_id"] for r in rows}:
         problems.append(f"{tag}: manifest crossArtifactIds do not match the events table")
 
     # The trace, and the property the ADR actually cares about.
@@ -538,8 +676,7 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
             # the same way on both sides — that is what the committed fixture and
             # its reviewed values are for.
             published = [
-                {"onset": float(r[0]), "type": r[3]}
-                for r in rows
+                {"onset": float(r["onset"]), "type": r["event_type"]} for r in rows
             ]
             spans = delivery_spans(published)
             for index, (period, _rate) in enumerate(trace):
@@ -598,10 +735,10 @@ def main() -> int:
     if not args.check:
         for bundle in BUNDLES:
             manifest = build(bundle, ROOT / bundle["out"])
-            kind = "modulated" if manifest["modulation"]["timeVarying"] else "fixed"
             print(
                 f"hed-bundle: wrote {bundle['out']} "
-                f"({manifest['source']['eventCount']} events, {kind}, "
+                f"({manifest['source']['eventCount']} events, "
+                f"{manifest['modulation']['shape']}, "
                 f"{len(manifest['artifacts'])} artifacts)"
             )
         return 0
@@ -616,19 +753,19 @@ def main() -> int:
         return 1
 
     total_events = total_loss = 0
-    traced = 0
+    shapes = []
     for bundle in BUNDLES:
         manifest = json.loads(
             (ROOT / bundle["out"] / "bundle-manifest.json").read_text(encoding="utf-8")
         )
         total_events += manifest["source"]["eventCount"]
         total_loss += len(manifest["declaredLoss"])
-        traced += 1 if manifest["modulation"]["timeVarying"] else 0
+        shapes.append(manifest["modulation"]["shape"])
     print(
         f"hed-bundle: {len(BUNDLES)} bundles current and valid "
         f"({total_events} events validate as HED, every event_id resolves, "
-        f"{total_loss} declaring information loss, "
-        f"{traced} time-varying and carrying a linked trace)"
+        f"{total_loss} declaring information loss; "
+        f"shapes: {', '.join(sorted(shapes))})"
     )
     return 0
 

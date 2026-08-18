@@ -68,9 +68,28 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
 SCHEME = URIRef("https://w3id.org/sstim/vocab#SessionEventTypeScheme")
 
+# Representative values for validating a detailTemplate. A template is not a HED
+# string until it is filled, so validating the template text would check nothing;
+# these stand in for a real event's values.
+SAMPLE = {"parameterKind": "Level", "valueAfter": "0.15", "valueBefore": "0.30"}
+
+
+def fill_template(entry: dict, values: dict) -> str:
+    """Append a filled detailTemplate to the base HED string.
+
+    The base `hed` stays the part determined by the event type alone, so a
+    reverse lookup can recover it by stripping detail tags. The template adds
+    what HED can express and the type alone cannot.
+    """
+    detail = entry["detailTemplate"].format(**values)
+    return f"{entry['hed'][:-1]}, {detail})"
+
+
 NUMBER_WORDS = {
     1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
     6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+    11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen",
+    16: "sixteen", 17: "seventeen", 18: "eighteen", 19: "nineteen", 20: "twenty",
 }
 
 # Prose that restates a count this script derives, and the count it must equal.
@@ -163,12 +182,20 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
     # which is the thing worth counting.
     tags: set[str] = set()
     for event, entry in sorted(spec["events"].items()):
-        hed_string = HedString(entry["hed"], schema, def_dict=definitions)
-        issues = hed_string.validate(schema)
-        if issues:
-            detail = get_printable_issue_string(issues).strip().splitlines()
-            failures.append(f"{event}: {entry['hed']} — {detail[-1].strip()}")
-        tags.update(tag.short_base_tag for tag in hed_string.get_all_tags())
+        # Both the base string and, where one exists, the string a filled
+        # detailTemplate produces. Validating only the base would leave the
+        # emitted annotation unchecked, which is the shape of the 0.1.0 defect:
+        # every part inspected, the actual output never.
+        variants = [("", entry["hed"])]
+        if "detailTemplate" in entry:
+            variants.append((" + detail", fill_template(entry, SAMPLE)))
+        for suffix, string in variants:
+            hed_string = HedString(string, schema, def_dict=definitions)
+            issues = hed_string.validate(schema)
+            if issues:
+                detail = get_printable_issue_string(issues).strip().splitlines()
+                failures.append(f"{event}{suffix}: {string} — {detail[-1].strip()}")
+            tags.update(tag.short_base_tag for tag in hed_string.get_all_tags())
 
     # The definitions are validated above by DefinitionDict, which is the only
     # correct way: a `Definition/` tag is illegal in event position, so running

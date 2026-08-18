@@ -1,6 +1,6 @@
 {
-  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
-  "mappingVersion": "0.2.0",
+  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. An event type may also carry a detailTemplate, whose tags are appended when the event record holds the values they need. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
+  "mappingVersion": "0.3.0",
   "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
   "hedSchema": {
     "name": "HED standard schema",
@@ -12,7 +12,8 @@
     "HED annotations are generated from SSTIM event types; they are never primary storage (ADR 0025 decision 2).",
     "These are profile mappings, not concept equivalences. No skos:exactMatch is asserted between an SSTIM event type and a HED tag, per ADR 0025 decision 6.",
     "Version 0.1.0 of this map wrote scope tags bare, as (Experiment-structure, Time-block, Onset). That is invalid HED: a scope tag requires exactly one paired Def/. The tag-existence check passed it because every tag existed; only hedtools caught it. That is the whole argument for decision 7 requiring a real validator.",
-    "Where SSTIM distinguishes something HED does not, the difference is recorded in `lossyBecause` rather than forced into a tag."
+    "Where SSTIM distinguishes something HED does not, the difference is recorded in `lossyBecause` rather than forced into a tag.",
+    "Version 0.3.0 added detailTemplate. `hed` remains the part determined by the event type alone and is what a reverse lookup matches after detail tags are stripped; the template carries per-event values HED can express and the type cannot. It exists because two lossyBecause statements were false: they told a consumer that the safety boundary values and the engine identities were 'SSTIM-only', when a sstim:SessionEvent could carry nothing but its type and its clock offset. ADR 0025 decision 5's terms fixed the first; the second was an overclaim and is withdrawn."
   ],
   "events": {
     "eventSessionOpen": {
@@ -55,20 +56,28 @@
     "eventSafetyLimitApplied": {
       "label": "Safety limit applied",
       "hed": "(Experiment-control, Constrained)",
-      "rationale": "A delivery parameter was constrained by a safety boundary.",
-      "lossyBecause": "HED 8.4.0 has no Safety or Threshold tag. Which boundary applied, and the requested versus delivered values, are SSTIM-only and must be read from the session record."
+      "rationale": "A delivery parameter was constrained by a safety boundary. Constrained names the constraining; the detail tags name the parameter and the value actually delivered.",
+      "lossyBecause": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did.",
+      "detailTemplate": "Parameter-label/{parameterKind}, Parameter-value/{valueAfter}"
     },
     "eventEngineFallback": {
       "label": "Engine fallback",
       "hed": "(Experiment-control, Computational-evidence)",
-      "rationale": "Delivery moved to a different engine implementation; the change is computational rather than sensory.",
-      "lossyBecause": "HED has no vocabulary for software engine identity. The engine pair is SSTIM-only."
+      "rationale": "Delivery moved to a different engine implementation; the change is computational rather than sensory. The mapping is unique, so the event type reverses exactly.",
+      "note": "No lossyBecause. This previously said the engine pair was 'SSTIM-only', which was false: SSTIM has no engine-identity term, so nothing is lost relative to a record that never held it. Naming software engines is an implementation concern and a separate ontology decision, not something to assert here so that a loss statement reads well."
     },
     "eventObservationCollected": {
       "label": "Observation collected",
       "hed": "(Experiment-procedure, Participant-response)",
       "rationale": "A phase-qualified report was collected from the participant.",
       "lossyBecause": "The instrument, its version, the response state and any unwanted-experience structure are SSTIM-only. HED records that a response occurred, not what it asserted."
+    },
+    "eventParameterChanged": {
+      "label": "Parameter changed",
+      "hed": "(Experiment-control, Modify)",
+      "detailTemplate": "Parameter-label/{parameterKind}, Parameter-value/{valueAfter}",
+      "rationale": "A delivery quantity was set to a new value part-way through the session. Experiment-control places it as a control action rather than a stimulus, Modify names the act, and the detail tags carry which parameter and what it became — which is what makes a segmented stimulus recoverable from the events table.",
+      "lossyBecause": "HED carries the parameter kind and the new value but not the unit, which follows from the kind and the channel in SSTIM, nor the previous value in sstim:parameterValueBefore."
     }
   },
   "definitions": {

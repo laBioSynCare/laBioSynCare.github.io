@@ -59,6 +59,49 @@ file is the human-readable summary.
 - `make definition-coverage` gained a bar against definitions that restate their
   label, implementing the second-pass review's finding that a length check
   cannot catch them.
+- **The HED bundles' sidecars were not BIDS-conformant, and now are.** They had
+  been called "BIDS-style" without ever being handed to a BIDS tool. Measured
+  2026-08-18 with `bids-validator` 1.15.0: the first run returned `INTERNAL
+  ERROR. SOME VALIDATION STEPS MAY NOT HAVE OCCURRED`, which is no validation
+  rather than a failed one. The cause was ours — a sidecar entry named `HED`
+  holding a `Description` and a `Definitions` array, where BIDS reserves `HED`
+  for a column's annotations and hands the entry's values to the HED parser.
+  Definitions moved to their own `sstim_hed_definitions` entry, and **all three
+  bundles now validate with zero errors**. The one remaining warning,
+  `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED` column, cannot be fixed
+  without reintroducing the crash and is raised with the HED Working Group.
+- **A session event can say what changed and to what** — `sstim-v:eventParameterChanged`
+  (an eleventh session event type), `sstim:StimulationParameterKind` with
+  `sstim-v:StimulationParameterKindScheme` (level, carrier frequency, modulation
+  frequency, duty cycle, phase offset), and `sstim:hasChangedParameter`,
+  `sstim:parameterValueBefore`, `sstim:parameterValueAfter`. Until now a
+  `sstim:SessionEvent` could carry exactly two things, its type and its clock
+  offset, so a stepped stimulus was unrecordable and a safety clamp could not say
+  which value it clamped.
+
+  The parameter kinds are modality-neutral quantities rather than field names, so
+  they hold for an auditory, visual or haptic channel alike and SSTIM does not
+  inherit one application's parameter list. SHACL requires a parameter-changed
+  event to carry both the kind and the new value, and forbids those properties on
+  events that change nothing; both constraints were checked against violations.
+  All four profile closures remain in OWL 2 DL.
+- **Two `lossyBecause` statements in the HED crosswalk were false.**
+  `eventSafetyLimitApplied` told consumers the requested and delivered values
+  "must be read from the session record" when the session record could not hold
+  them; `eventEngineFallback` called the engine pair "SSTIM-only" when SSTIM has
+  no engine-identity term at all. Both erred toward "our model is richer than the
+  profile", which is the direction nothing audited. The first is now true; the
+  second is withdrawn rather than reworded.
+- **Crosswalk 0.3.0 adds `detailTemplate`**, so HED carries per-event values it
+  was always able to express: a safety clamp emits
+  `(Experiment-control, Constrained, Parameter-label/Level, Parameter-value/0.3)`
+  rather than a bare `(Experiment-control, Constrained)`. `hed` remains the part
+  the event type alone determines, and `make hed-roundtrip` strips detail tags
+  before reversing.
+- **A third demonstrator bundle, `test/fixtures/hed-bundle-segmented/`**, covering
+  the "explicitly segmented" stimulus of decision 5 with piecewise events. There
+  is now one bundle per shape the decision names — fixed, segmented, continuous —
+  and each manifest declares its own `modulation.shape`.
 - **The time-varying half of ADR 0025 decision 5 is built and enforced.** A
   second demonstrator bundle, `test/fixtures/hed-bundle-modulated/`, carries a
   Martigli breathing period gliding 4 s → 10 s over 300 s as a linked BIDS-style

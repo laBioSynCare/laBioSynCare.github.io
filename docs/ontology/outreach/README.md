@@ -23,4 +23,4 @@ or an unpublished identifier. These files are public.
 | Message | Status |
 |---|---|
 | [`2026-08-18-showvoc-enquiry.md`](2026-08-18-showvoc-enquiry.md) | Drafted. Awaiting admission to the `vocbench-user` Google Group, then to be posted by Renato — Google Groups cannot be posted to from tooling. |
-| [`2026-08-18-hed-working-group-questions.md`](2026-08-18-hed-working-group-questions.md) | Drafted. Five questions raised by implementing the ADR 0025 crosswalk — chiefly that HED 8.4.0 cannot distinguish a completed session from an interrupted one, and how a continuously varying parameter should be carried. Both demonstrator bundles now exist and can be linked. |
+| [`2026-08-18-hed-working-group-questions.md`](2026-08-18-hed-working-group-questions.md) | Drafted. Six questions raised by implementing the ADR 0025 crosswalk — chiefly that HED 8.4.0 cannot distinguish a completed session from an interrupted one, and how a continuously varying parameter should be carried. Both demonstrator bundles now exist and can be linked. |

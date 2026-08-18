@@ -802,7 +802,8 @@ sstim-v:SessionEventTypeScheme a skos:ConceptScheme ;
         sstim-v:eventPlaybackPause, sstim-v:eventPlaybackResume,
         sstim-v:eventPlaybackStop, sstim-v:eventSessionComplete,
         sstim-v:eventSessionInterrupt, sstim-v:eventEngineFallback,
-        sstim-v:eventSafetyLimitApplied, sstim-v:eventObservationCollected .
+        sstim-v:eventSafetyLimitApplied, sstim-v:eventObservationCollected,
+        sstim-v:eventParameterChanged .
 
 sstim-v:eventSessionOpen a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
     skos:inScheme sstim-v:SessionEventTypeScheme ;
@@ -3669,6 +3670,76 @@ sstim-v:responseNotApplicable a owl:NamedIndividual, sstim:ResponseState, skos:C
         "Não aplicável"@pt, "No aplicable"@es ;
     skos:notation "not-applicable" ;
     skos:definition "The question does not apply to this session, as when a session ended too early for an item about how it went."@en .
+
+
+sstim-v:eventParameterChanged a owl:NamedIndividual, sstim:SessionEventType, skos:Concept ;
+    skos:inScheme sstim-v:SessionEventTypeScheme ;
+    skos:topConceptOf sstim-v:SessionEventTypeScheme ;
+    skos:prefLabel "Parameter changed"@en, "Parametro modificato"@it,
+        "Parâmetro alterado"@pt, "Parámetro modificado"@es ;
+    skos:notation "parameter-changed" ;
+    skos:definition "A delivery quantity was set to a new value part-way through the session, by the participant or by the protocol. Carries the parameter kind and the value it took, so a segmented stimulus is recoverable from the timeline rather than only from the specification."@en ;
+    skos:editorialNote "Added 2026-08-18 (ADR 0025 decision 5). Without it a stimulus that steps between values mid-session could only be described by flattening it into one row, which that decision forbids. A modulation the specification already declares in full stays declarative and is rendered as a linked trace; this type is for changes the plan does not contain."@en .
+
+
+###########################################################################
+# Stimulation parameter kind scheme
+#
+# Which delivery quantity a mid-session change acted on. Added 2026-08-18
+# (ADR 0025 decision 5). Deliberately small and modality-neutral: SSTIM is a
+# universal standard and one application's field list is not one. Each kind
+# names a quantity an auditory, visual or haptic channel can all be said to
+# have, and an implementation maps its own field onto the kind.
+###########################################################################
+
+sstim-v:StimulationParameterKindScheme a skos:ConceptScheme ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:prefLabel "SSTIM Stimulation Parameter Kind Vocabulary"@en ;
+    skos:definition "Controlled, modality-neutral categories for the delivery quantity that a mid-session parameter change acted on."@en ;
+    skos:editorialNote "Kept short on purpose. A scheme that tried to enumerate every adjustable field would track one implementation's UI and would be wrong for the next; these are the quantities that recur across modalities."@en ;
+    skos:hasTopConcept sstim-v:paramLevel, sstim-v:paramCarrierFrequency,
+        sstim-v:paramModulationFrequency, sstim-v:paramDutyCycle,
+        sstim-v:paramPhaseOffset .
+
+sstim-v:paramLevel a owl:NamedIndividual, sstim:StimulationParameterKind, skos:Concept ;
+    skos:inScheme sstim-v:StimulationParameterKindScheme ;
+    skos:topConceptOf sstim-v:StimulationParameterKindScheme ;
+    skos:prefLabel "Level"@en, "Livello"@it,
+        "Nível"@pt, "Nivel"@es ;
+    skos:notation "level" ;
+    skos:definition "How strongly the channel is presented: sound amplitude, display luminance, or vibration intensity, as a fraction of the channel's own full scale."@en .
+
+sstim-v:paramCarrierFrequency a owl:NamedIndividual, sstim:StimulationParameterKind, skos:Concept ;
+    skos:inScheme sstim-v:StimulationParameterKindScheme ;
+    skos:topConceptOf sstim-v:StimulationParameterKindScheme ;
+    skos:prefLabel "Carrier frequency"@en, "Frequenza portante"@it,
+        "Frequência da portadora"@pt, "Frecuencia portadora"@es ;
+    skos:notation "carrier-frequency" ;
+    skos:definition "The frequency of the signal that bears the modulation, in hertz — the tone a beat is built on rather than the rate of the beat itself."@en .
+
+sstim-v:paramModulationFrequency a owl:NamedIndividual, sstim:StimulationParameterKind, skos:Concept ;
+    skos:inScheme sstim-v:StimulationParameterKindScheme ;
+    skos:topConceptOf sstim-v:StimulationParameterKindScheme ;
+    skos:prefLabel "Modulation frequency"@en, "Frequenza di modulazione"@it,
+        "Frequência de modulação"@pt, "Frecuencia de modulación"@es ;
+    skos:notation "modulation-frequency" ;
+    skos:definition "The rate at which something about the channel varies, in hertz: a flicker rate, a beat frequency, or a pulse rate."@en .
+
+sstim-v:paramDutyCycle a owl:NamedIndividual, sstim:StimulationParameterKind, skos:Concept ;
+    skos:inScheme sstim-v:StimulationParameterKindScheme ;
+    skos:topConceptOf sstim-v:StimulationParameterKindScheme ;
+    skos:prefLabel "Duty cycle"@en, "Ciclo di lavoro"@it,
+        "Ciclo de trabalho"@pt, "Ciclo de trabajo"@es ;
+    skos:notation "duty-cycle" ;
+    skos:definition "The fraction of each modulation period during which the channel is presented rather than silent or dark, between zero and one."@en .
+
+sstim-v:paramPhaseOffset a owl:NamedIndividual, sstim:StimulationParameterKind, skos:Concept ;
+    skos:inScheme sstim-v:StimulationParameterKindScheme ;
+    skos:topConceptOf sstim-v:StimulationParameterKindScheme ;
+    skos:prefLabel "Phase offset"@en, "Sfasamento"@it,
+        "Deslocamento de fase"@pt, "Desfase"@es ;
+    skos:notation "phase-offset" ;
+    skos:definition "Where this channel's modulation sits relative to another's, as a fraction of a cycle between zero and one."@en .
 
 
 ###########################################################################
