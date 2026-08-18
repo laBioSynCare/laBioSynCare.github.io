@@ -2,9 +2,10 @@
 
 > **Read this file completely before touching any other file in this repository.**
 > It is the directive for every AI coding agent working here. Only Claude Code
-> loads it automatically — `AGENTS.md`, `GEMINI.md` and
-> `.github/copilot-instructions.md` are planned (`TODO.md` §1) and do not exist,
-> so an agent on another tool must be pointed here explicitly.
+> loads it automatically, so `AGENTS.md`, `GEMINI.md` and
+> `.github/copilot-instructions.md` exist to point other tools here. They are
+> deliberately thin — a digest of the invariants and a pointer — because three
+> copies of this file would drift out of agreement with it and with each other.
 > Maintained by Renato Fabbri; update it in the same commit that changes what it
 > describes (§12).
 
@@ -83,9 +84,10 @@ npx @sveltejs/mcp
 ```
 
 If an AI agent generates Svelte 4 syntax (`export let`, `$:`, `on:click`,
-`<slot />`), reject it and regenerate with an explicit runes instruction. The
-`.cursor/rules/*.mdc` files this section used to require are planned and do not
-exist (`TODO.md` §1); this file is the rule source until they do.
+`<slot />`), reject it and regenerate with an explicit runes instruction.
+`.cursor/rules/rdf.mdc` and `.cursor/rules/audio-engine.mdc` exist and are
+scoped by glob; like the other agent files they summarise and point here rather
+than restating, so this file remains the rule source.
 
 ### Local dev server
 
@@ -609,7 +611,9 @@ static/ontology/       Turtle served same-origin (copied to dist/); §3.4 protec
 static/_headers        COOP/COEP/CORP for a future custom host; GitHub Pages ignores it
 src/rdf/namespaces.js  the only place an ontology IRI may be written (§5.1)
 src/service-worker.js  three binding constraints — see §9 and ADR 0009
-schemas/               (planned) preset.schema.json, session.schema.json
+static/schemas/        preset.schema.json + session.schema.json — SSTIM's own
+                       contracts, checked by `make preset-contract` and
+                       `make session-contract`. Not under `schemas/`.
 ```
 
 ---
@@ -731,10 +735,15 @@ trips, the w3id route contract, `make truth-audit`, and `make release-dryrun`.
 For application changes, `make test` (Vitest, beside the source) and `make check`
 (SvelteKit sync + svelte-check).
 
-**Planned and not yet present:** `schemas/preset.schema.json` with an `ajv` gate
-over catalog presets, a dedicated `tests/` subtree, and `hooks/pre-commit`. When
-the hook lands it should run the local validation mirror automatically — fix
-violations rather than passing `--no-verify`.
+`make preset-contract` is the preset gate and it exists: it holds
+`static/schemas/preset.schema.json`, `sstim-shapes.ttl` and the ranges in
+`PRESET_FORMAT.md` to the same numbers, and rejects schema, cross-field and RDF
+adversarial cases. `ajv` and `ajv-formats` are installed and used from it.
+`make session-contract` does the equivalent for `session.schema.json`.
+
+**Planned and not yet present:** a dedicated `tests/` subtree, and
+`hooks/pre-commit`. When the hook lands it should run the local validation
+mirror automatically — fix violations rather than passing `--no-verify`.
 
 ---
 

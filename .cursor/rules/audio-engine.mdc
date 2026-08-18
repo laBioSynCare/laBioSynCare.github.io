@@ -1,0 +1,22 @@
+---
+description: Audio engine and timing invariants for BSC Lab
+globs: ["src/engines/**", "src/core/**", "static/worklets/**", "src/ui/creator/**"]
+alwaysApply: false
+---
+
+Read [`CLAUDE.md`](../../CLAUDE.md) §3 and §6 before touching audio. The three
+rules that produce silent, hard-to-diagnose failures:
+
+- **`engine.getAudioContext().currentTime` is the only clock** for audio-visual
+  sync. Never `Date.now()`, `performance.now()`, `setTimeout` or `setInterval`.
+  Visual frames read that clock each rAF and compute absolute positions; never
+  accumulate deltas.
+- **Never bundle `static/worklets/`.** They load by URL at runtime. No `import`,
+  and no `new URL(..., import.meta.url)` — both put them in Vite's module graph.
+- **Never allocate inside `AudioWorkletProcessor.process()`.** Pre-allocate in
+  the constructor. No `new`, no spread, no closures: ~2.67 ms per quantum, and
+  GC on the audio thread is audible.
+
+Engines implement `src/engines/audio/IAudioEngine.js` and register in
+`audioEngines.js`. Check `getCapabilities()` before using an optional feature;
+never call an engine-specific method from a caller.

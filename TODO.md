@@ -127,12 +127,6 @@ before software construction and are retained here as the original checklist.
 ### Reference documents (Phase 0 — committed)
 
 ### Generated artifacts (still to produce)
-- [ ] `AGENTS.md` — from `CLAUDE.md` `P1`
-- [ ] `GEMINI.md` — from `CLAUDE.md` `P1`
-- [ ] `.github/copilot-instructions.md` — from `CLAUDE.md` `P1`
-- [ ] `.cursor/rules/rdf.mdc` — from `static/ontology/README.md` + `CLAUDE.md` `P1`
-- [ ] `.cursor/rules/audio-engine.mdc` — from `src/core/README.md` `P1`
-- [ ] `schemas/preset.schema.json` — from `docs/technical/PRESET_FORMAT.md` `P1`
 
 ---
 

@@ -51,6 +51,31 @@ what a working task list cannot.
 - [x] `docs/ecosystem/PARTNERS.md` `P0`
 - [x] `docs/ecosystem/CONSORTIUM_INVITATION.md` `P0`
 
+### Preset schema (recorded delivered 2026-08-18)
+- [x] `static/schemas/preset.schema.json` — from `docs/technical/PRESET_FORMAT.md` `P1`
+      *Shipped with ADR 0051 and gated by `make preset-contract`, which holds the
+      schema, `sstim-shapes.ttl` and the documented ranges to the same numbers.
+      The task stayed open in `TODO.md`, and `CLAUDE.md` described it as planned
+      in two places, because all three named the path `schemas/` while the file
+      lives at `static/schemas/`. A false absence of exactly the kind §3.6 exists
+      to catch, sitting inside the file that defines §3.6.*
+
+### Agent instruction files (2026-08-18)
+- [x] `AGENTS.md` — from `CLAUDE.md` `P1`
+- [x] `GEMINI.md` — from `CLAUDE.md` `P1`
+- [x] `.github/copilot-instructions.md` — from `CLAUDE.md` `P1`
+- [x] `.cursor/rules/rdf.mdc` `P1`
+- [x] `.cursor/rules/audio-engine.mdc` `P1`
+      *Written as thin pointers rather than derived copies. `CLAUDE.md` is 769
+      lines; three or five copies of it would drift out of agreement with it and
+      with each other, which is the failure this repository spends most of its
+      gates preventing. Each file carries a digest of the invariants where a
+      mistake is expensive — the engine clock, worklet bundling, allocation in
+      `process()`, ontology-file protection, health claims, naming your
+      instrument, Svelte 5 runes — and says `CLAUDE.md` wins on any
+      disagreement. The two `.mdc` files are glob-scoped so Cursor loads the RDF
+      rules for ontology paths and the audio rules for engine paths.*
+
 ### Generated artifacts (still to produce)
 - [x] `docs/README.md` — index over `concept/` `technical/` `ecosystem/` `P0`
 - [x] `static/ontology/instances/README.md` — layout + current emptiness note `P0`
