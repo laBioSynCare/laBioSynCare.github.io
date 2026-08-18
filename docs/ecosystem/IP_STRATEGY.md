@@ -46,8 +46,41 @@ these techniques after the disclosure date faces this prior art directly.
 are CC BY 4.0. The vocabulary, class hierarchy, and SPARQL patterns are free for
 any researcher or developer to use, extend, and redistribute.
 
-**BSC Lab open-source software.** The application codebase is MIT licensed.
-Any researcher can fork it, run it, and build on it.
+*CC BY 4.0 versus CC0 — a decision kept open deliberately, reviewed 2026-08-18.*
+OBO Foundry accepts either. CC BY preserves an enforceable attribution right,
+which is worth something to a single-maintainer project that needs citations for
+funding. The argument for CC0 is adoption friction: a consumer embedding a
+handful of SSTIM terms in a dataset has no clear answer to "must I attribute?" —
+individual terms are unlikely to be copyrightable, a compilation may be, and
+that ambiguity is a real tax on cautious institutional users, who are exactly
+the adopters worth having.
+
+The asymmetry decides it for now. Relicensing CC BY to CC0 later is available,
+since copyright is held by one person; relicensing away from CC0 is not. So CC
+BY keeps the option and CC0 spends it. **Revisit only when a concrete potential
+adopter names the licence as a blocker** — not speculatively, and not because
+CC0 is fashionable in vocabulary circles.
+
+**BSC Lab open-source software.** The application codebase is **Apache License
+2.0**. Any researcher can fork it, run it, and build on it, and a commercial
+implementation may use it without copyleft obligations.
+
+*This document said MIT until 2026-08-18. It was written on 2026-04-21, the
+licence files landed on 2026-04-25 choosing Apache 2.0, and the plan was never
+updated — a four-day gap that survived four months in the document that is
+supposed to be authoritative about intellectual property.*
+
+**Apache 2.0 rather than MIT is the right choice here, and specifically because
+of the strategy above.** MIT grants copyright permission and says nothing about
+patents. Apache 2.0 §3 grants an express patent licence from every contributor
+and terminates it for anyone who initiates patent litigation over the work. For
+a project whose entire IP posture is defensive publication against future patent
+claims, a licence that is silent on patents undercuts the strategy: a
+contributor could contribute an implementation and later assert a patent over
+it. Apache 2.0 §5 also places inbound contributions under the same terms without
+requiring a contributor licence agreement, which keeps the contribution path
+light. Neither licence imposes copyleft, so the closed commercial implementation
+is unaffected by the change.
 
 ---
 
