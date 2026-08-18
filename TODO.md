@@ -239,20 +239,55 @@ Turtle files are listed in section 1. After they exist:
       the audit catches its absence rather than the manifest supplying it.*
 
 - [ ] Diagnose why `robot --strict` cannot load the Full closure `P2`
-      *Found 2026-08-17 while testing whether the OWL 2 DL fix mattered, and it
-      is a genuinely separate defect. `robot --strict convert` fails with
-      `INVALID ONTOLOGY FILE ERROR` and four `Entity not properly recognized,
-      missing triples in input? …error#ErrorN for type Class` messages. It
-      failed identically before and after the DL work — same error, same count
-      of four — so the missing declarations were never the cause and fixing
-      them was not the cure.*
+      *Found 2026-08-17 while testing whether the OWL 2 DL fix mattered. It is a
+      separate, pre-existing defect: the closure at a61ae5f fails identically to
+      the closure after the DL work, so the missing declarations were never the
+      cause and declaring them was not the cure.*
 
-      *This matters more than the profile did: default ROBOT parsing is
-      non-strict and repairs quietly, so a consumer who loads strictly gets
-      nothing at all rather than a degraded graph. Reproduce with*
-      `nix develop -c robot --strict convert --input <full closure> --output /tmp/x.ofn`*,
-      then use* `-vvv` *for the stack trace to find which four entities. Not yet
-      diagnosed; do not guess at the cause.*
+      *This matters more than the profile question it came from. ROBOT parses
+      non-strictly by default and repairs quietly, so every gate we run is blind
+      to it, while a consumer who loads strictly gets no ontology at all rather
+      than a degraded one.*
+
+      **Reproduce:**
+      `nix develop -c robot --strict --input-format ttl convert --input <closure> --output /tmp/x.ofn`
+      *(force the format — without it OWL API tries 17 parsers and the output is
+      unreadable).*
+
+      **What is established, so nobody re-derives it:**
+      - *The instrument works. A minimal hand-written OWL Turtle file
+        strict-loads, and so does `sstim-core.ttl` alone (28 KB of OFN out).*
+      - *7 of 16 modules fail alone: stimulus, common, session, evidence,
+        neuromodulation, patch-studio, exposure. The other 9 pass alone.*
+      - *Cumulatively, `sstim-core` passes and adding `sstim-stimulus` breaks it.*
+      - *Within stimulus there are at least **two independent triggers**: a
+        subject-prefix bisect flips on the module's own `owl:Ontology` header,
+        yet deleting all 12 header triples still fails.*
+      - *The message is `Entity not properly recognized, missing triples in
+        input? …error#ErrorN for type Class`. **The N is a parser-attempt
+        counter, not an entity count** — OWL API tries every parser and each
+        logs once, which is why every failing module reports exactly four. An
+        earlier version of this entry read it as "four bad entities"; it is not.*
+      - *Both Turtle parsers report **empty** error text inside the
+        `UnparsableOntologyException`, which is why this is hard.*
+
+      **Hypotheses already refuted — do not retry these:**
+      1. *Missing OWL 2 DL declarations. Fixed; failure unchanged.*
+      2. *The `owl:unionOf` range on `sstim:hasStimulationTarget`. Replaced with
+         a plain class; still fails.*
+      3. *Undeclared class-position terms. Checked exhaustively over
+         `rdfs:domain`, `rdfs:range` on object properties, `rdfs:subClassOf`,
+         `owl:equivalentClass`, `owl:disjointWith`, and every `unionOf` /
+         `intersectionOf` / `someValuesFrom` / `allValuesFrom` / `onClass`
+         member: **0 undeclared**.*
+      4. *Serialisation. An rdflib round-trip of stimulus still fails, so it is
+         semantic rather than syntactic.*
+      5. *Multiple `owl:Ontology` headers from `cat`-ing modules. `robot merge`
+         produces a single-header 1.2 MB artifact that also fails strict.*
+
+      *Next step: instrument OWL API directly rather than through ROBOT — load
+      with `OWLOntologyLoaderConfiguration.setStrict(true)` and print the
+      unconsumed triples, which is the only thing that will name the construct.*
 
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
