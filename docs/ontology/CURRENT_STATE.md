@@ -14,7 +14,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.16.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.16.0`, released 2026-08-18 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | pending Zenodo archival of the `v0.16.0` tag | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.22003777` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | OWL 2 DL conformance, a fully multilingual vocabulary, and the ADR 0025 HED interoperability profile | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
