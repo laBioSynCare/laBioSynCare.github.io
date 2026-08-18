@@ -388,9 +388,22 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                        so it is a specific API path rather than the whole
                        Databus being down.
 
-                    Plan on the rating staying frozen. Do not hold a release for
-                    it, and do not cite the Archivo stars anywhere until they
-                    reflect a crawl of the current graph.
+                    **Reported upstream 2026-08-18**, as @ttm:
+
+                    - [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58)
+                      — the updater has not crawled since 2026-02-23, with the
+                      one-line reproduction against their own listing.
+                    - [dbpedia/archivo#59](https://github.com/dbpedia/archivo/issues/59)
+                      — the `ignore_imports` bug, offering a PR.
+                    - A comment on
+                      [#55](https://github.com/dbpedia/archivo/issues/55#issuecomment-5325726361)
+                      recording that `list` and `databus.dbpedia.org` both answer
+                      200 while the download path returns 500, so it looks like
+                      one API path rather than the whole service.
+
+                    Plan on the rating staying frozen regardless. Do not hold a
+                    release for it, and do not cite the Archivo stars anywhere
+                    until they reflect a crawl of the current graph.
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
