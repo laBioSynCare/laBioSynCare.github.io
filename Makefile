@@ -226,8 +226,9 @@ shacl-session-projection:
 band-scope-notes:
 	$(PYTHON) scripts/check-band-scope-notes.py
 
-## Test that the declared loss in the HED bundle is real and exactly as
-## declared (ADR 0025 decision 7). Documenting loss in a manifest is not a test:
+## Test that the declared loss in the HED bundles is real and exactly as
+## declared (ADR 0025 decision 7). Both bundles are reversed — an artifact
+## nobody round-tripped is the unexercised case this gate exists to prevent. Documenting loss in a manifest is not a test:
 ## a manifest can claim loss that does not exist, or miss loss that does, and a
 ## consumer then trusts a sentence rather than a property. Reverses every emitted
 ## HED string through the crosswalk and asserts soundness, that every ambiguous
@@ -236,20 +237,48 @@ band-scope-notes:
 hed-roundtrip:
 	$(PYTHON) scripts/check-hed-roundtrip.py
 
-## Generate the ADR 0025 demonstrator: the synthetic native+HED conformance
-## bundle. Reads the recorded-session fixture, walks its event timeline on the
-## session clock, and emits a BIDS-style events.tsv with a HED column, its
-## sidecar, and a manifest carrying artifact hashes, pinned versions, the clock
-## assumption, and what the HED column cannot carry. Loss is a first-class
+## Generate the ADR 0025 demonstrators: two synthetic native+HED conformance
+## bundles. Each reads a session fixture, walks its event timeline on the session
+## clock, and emits a BIDS-style events.tsv with a HED column, its sidecar, and a
+## manifest carrying artifact hashes, pinned versions, cross-artifact ids, the
+## clock assumption, and what the HED column cannot carry. Loss is a first-class
 ## output: eventSessionComplete and eventSessionInterrupt emit identical HED
 ## because 8.4.0 has no Incomplete tag, so the manifest says a consumer reading
 ## the table alone cannot tell a finished session from an abandoned one.
+##
+## Two bundles, because one cannot test the harder half of decision 5:
+##
+##   test/fixtures/hed-bundle             fixed stimulus; events are the whole story
+##   test/fixtures/hed-bundle-modulated   a Martigli breathing period gliding from
+##                                        mp0 to mp1, carrying a linked trace
+##
+## Decision 5 forbids flattening a time-varying stimulus "into a misleading
+## single row". SSTIM has no parameter-change event type — the ten in
+## SessionEventTypeScheme are lifecycle, safety and observation — so piecewise
+## events would need new terms and the linked trace is what is emitted. The
+## generator refuses to write a modulated bundle without one.
+##
+## The trace runs on delivered time: the breathing arc advances only while audio
+## is playing, so the pause at 190 s displaces every later sample, and samples
+## inside the pause are n/a rather than interpolated. Writing a value there would
+## assert an exposure that did not happen.
 hed-bundle:
 	$(PYTHON) scripts/generate-hed-bundle.py
 
-## Assert the committed bundle matches what the generator produces now, so a
-## crosswalk edit that is not reflected in the artifacts fails instead of
-## drifting. Same regenerate-and-compare pattern as term-index-check.
+## Assert the committed bundles match what the generator produces now, and are
+## correct as well as current. Same regenerate-and-compare pattern as
+## term-index-check, plus the content checks decision 7 asks for: emitted HED
+## revalidates, every event_id resolves to a sstim:SessionEvent in the source
+## graph, each source conforms to the Full-profile shapes, and each trace agrees
+## with its own events.tsv about when delivery was open.
+##
+## Staleness and correctness are checked independently, against the freshly
+## regenerated copy. They were not at first, and the semantic checks sat behind
+## the byte comparison where they could never fire: a generator that stopped
+## emitting traces reported "bundle-manifest.json is stale" and never said that
+## it had flattened a time-varying stimulus.
+##
+## Pass --no-shacl to skip the SHACL pass (~15s of the ~19s) while iterating.
 hed-bundle-check:
 	$(PYTHON) scripts/generate-hed-bundle.py --check
 

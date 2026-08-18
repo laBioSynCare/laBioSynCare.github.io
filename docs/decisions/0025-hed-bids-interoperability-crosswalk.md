@@ -305,12 +305,77 @@ but it is the prerequisite for everything after.
    being lossy in the process: `Inset` expresses "resume inside an open scope"
    exactly, so `eventPlaybackResume` no longer declares loss.
 
+   **The time-varying half of decision 5 is built, 2026-08-18.** The paragraph
+   above described one bundle, and one bundle could not test the sentence in
+   decision 5 that does the most work: *"Time-varying modulation requires either
+   piecewise events or a linked trace; it must not be flattened into a misleading
+   single row."* The fixed fixture has no modulation, so the requirement was
+   satisfied vacuously and nothing would have noticed if it stopped being.
+
+   There are now two bundles:
+
+   | Bundle | Source | Shape |
+   |---|---|---|
+   | [`test/fixtures/hed-bundle/`](../../test/fixtures/hed-bundle/) | the recorded-session fixture | fixed stimulus; the events are the whole story |
+   | [`test/fixtures/hed-bundle-modulated/`](../../test/fixtures/hed-bundle-modulated/) | [`modulated-session.ttl`](../../test/fixtures/rdf/hed-bundle/modulated-session.ttl) | a Martigli breathing period gliding 4 s → 10 s over 300 s, with a linked trace |
+
+   **Of the two representations decision 5 allows, only one was available — and
+   the constraint is ours, not HED's.** Piecewise events would need an event type
+   meaning "a parameter changed", and `sstim-v:SessionEventTypeScheme` has none:
+   its ten types are session and playback lifecycle, safety and observation.
+   Minting one is an ontology decision under
+   [ADR 0004](0004-protected-ontology-files.md), not something a demonstrator
+   should do on its way past. HED itself is perfectly able to carry the piecewise
+   form — a placeholder definition validates against 8.4.0, checked with
+   `hedtools` rather than assumed:
+
+   ```
+   (Definition/Sstim-breath-period/#, (Time-interval/# s))
+   (Def/Sstim-breath-period/7.774, Inset)
+   ```
+
+   So the modulated bundle carries a linked trace, `stimulus.tsv` +
+   `stimulus.json`, in the shape of a BIDS continuous recording: no header row,
+   columns named in the sidecar, `SamplingFrequency` and `StartTime` declared.
+   Whether the trace or the piecewise marks is the idiom HED intends is
+   [question 5 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md).
+
+   **The trace advances on delivered time, and that is the interesting part.**
+   The breathing arc `P(d) = mp0 + (mp1 − mp0) · min(d/md, 1)` moves only while
+   audio is playing. The session pauses at 190 s and resumes at 250 s, so the arc
+   freezes: the period reads 7.774 s at t=189 and 7.794 s at t=250, and the whole
+   remainder of the sweep lands 60 s later on the session clock than a naive
+   reading would put it. Samples inside the pause are `n/a`, not interpolated —
+   nothing was being delivered, and a number there would assert an exposure that
+   did not happen.
+
+   **The requirement is now enforced rather than merely met.** `make hed-bundle`
+   refuses to write a bundle whose source declares a sweep without emitting a
+   trace, and `make hed-bundle-check` fails if a committed bundle has flattened
+   one. That guard was the actual gap: the ADR had stated the rule since July and
+   no instrument could tell whether it held.
+
+   **Decision 6 and 7 gaps closed with it.** Decision 6 asks for cross-artifact
+   IDs, which were absent: `events.tsv` now carries an `event_id` column and the
+   manifest a `crossArtifactIds` map, and `--check` resolves every one against a
+   `sstim:SessionEvent` in the source graph — decision 7's "identifier
+   consistency", which a file hash does not provide. The manifests also carry the
+   SSTIM suite and application versions, which decision 6 lists and they did not.
+   Decision 7's "SSTIM SHACL" is now run over both sources against the
+   Full-profile shapes; the modulated source is not a manifest-declared profile
+   fixture, so this gate is the only place it is validated.
+
    **What remains is optional under this ADR, not required.** A BIDS Behavioral
    dataset is decision 3's first optional binding and is explicitly not part of
-   the minimum semantic authority chain; NWB is later still. The bundle is also
-   one synthetic session rather than a family of them. Neither blocks decision 7,
-   and neither licenses describing the bridge as finished — what exists is a
-   validated crosswalk and one validated demonstrator.
+   the minimum semantic authority chain; NWB is later still. These files are
+   BIDS-*style* and the manifests say so: a real continuous recording would be
+   gzipped, entity-named, and inside a validator-clean dataset. Two synthetic
+   sessions are still not a family of them, the trace carries the breathing
+   period rather than the instantaneous carrier frequency, and the
+   trace-versus-events check cannot catch a `delivery_spans()` that is wrong the
+   same way on both sides. None of this blocks decision 7, and none of it
+   licenses describing the bridge as finished — what exists is a validated
+   crosswalk and two validated demonstrators.
 2. **Take it to the HED Working Group** with the ask of decision 9: encode and
    reproduce, never endorse. This is also the most credible inbound-link path
    SSTIM has — HED annotations live in real published EEG datasets, and a

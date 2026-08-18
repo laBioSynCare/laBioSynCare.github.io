@@ -1,29 +1,54 @@
 #!/usr/bin/env python3
-"""Generate the synthetic native+HED conformance bundle of ADR 0025 decision 5.
+"""Generate the synthetic native+HED conformance bundles of ADR 0025 decision 5.
 
 HED is a *generated* event-semantic profile over SSTIM's native session record,
-not a second source of truth. This script is that generator, and the bundle it
-writes is the demonstrator the ADR asks for: coordinated, versioned artifacts
-that a reviewer can validate rather than a prose claim that a bridge exists.
+not a second source of truth. This script is that generator, and the bundles it
+writes are the demonstrator the ADR asks for: coordinated, versioned artifacts a
+reviewer can validate rather than a prose claim that a bridge exists.
 
 It reads an SSTIM session graph, walks the event timeline on the session clock,
 and emits a BIDS-style tab-separated events table with a `HED` column, beside a
 manifest recording every artifact hash, every pinned version, the clock
-assumption, and — the part that matters most — what the HED column cannot carry.
+assumption, the cross-artifact identifiers, and — the part that matters most —
+what the HED column cannot carry.
 
 **Loss is a first-class output.** Five of the ten event mappings lose
-information, and the manifest names every one that this bundle's events actually
-use — `declaredLoss` is keyed on the rows emitted, not on the whole crosswalk, so
-it stays a statement about these artifacts. `eventSessionComplete` and
+information, and each manifest names every one that its own events actually use;
+`declaredLoss` is keyed on the rows emitted, not on the whole crosswalk, so it
+stays a statement about those artifacts. `eventSessionComplete` and
 `eventSessionInterrupt` emit identical HED because HED 8.4.0 has no Incomplete,
 Abort or Terminate tag, so a consumer reading the events table alone cannot tell
 a finished session from an abandoned one. That is a real limitation of the
 crosswalk, and publishing it beside the bundle is the difference between an
 interoperability profile and an interoperability claim.
 
-Run with --check to verify the committed bundle is current, which is how CI uses
-it: the bundle is regenerated into a temporary directory and compared, so a
-mapping edit that is not reflected in the artifacts fails rather than drifting.
+**Two bundles, because one of them cannot test the harder half of decision 5.**
+
+    fixed       a constant stimulus. Events are the whole story.
+    modulated   a Martigli voice whose breathing period glides from mp0 to mp1.
+
+Decision 5 says a time-varying stimulus "requires either piecewise events or a
+linked trace; it must not be flattened into a misleading single row". SSTIM has
+no event type for a parameter change — `sstim-v:SessionEventTypeScheme` holds ten
+lifecycle, safety and observation types and none of them is one — so piecewise
+events are not available without minting terms, and the linked trace is the
+representation this generator produces. `emit_trace` below is therefore not a
+feature of the modulated bundle; it is the condition on which that bundle is
+allowed to exist at all, enforced in `build`.
+
+**The trace runs on delivered time, not session time.** The breathing arc
+advances only while audio is playing, so a pause displaces every later sample on
+the session clock. Samples inside a pause are `n/a` rather than interpolated:
+the stimulus was not being delivered, and writing a value there would assert an
+exposure that did not happen. `--check` verifies that those `n/a` spans line up
+with the pause/resume rows in `events.tsv`, which is the cross-artifact
+consistency decision 7 asks for.
+
+Run with --check to verify the committed bundles are current *and* correct,
+which is how CI uses it: each bundle is regenerated into a temporary directory
+and compared, the emitted HED is revalidated, identifiers are resolved against
+the source graph, and the traces are checked against the events. Pass
+--no-shacl to skip the SSTIM SHACL pass when iterating locally.
 """
 
 from __future__ import annotations
@@ -31,6 +56,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 from rdflib import Graph, URIRef
@@ -38,62 +64,234 @@ from rdflib.namespace import RDF
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
-SESSION = ROOT / "test" / "fixtures" / "rdf" / "full-profile" / "positive-recorded-session.ttl"
-OUT_DIR = ROOT / "test" / "fixtures" / "hed-bundle"
+MANIFEST_PATH = ROOT / "static" / "ontology" / "manifest.json"
+PACKAGE_PATH = ROOT / "package.json"
 
 SSTIM = "https://w3id.org/sstim#"
+S = lambda name: URIRef(SSTIM + name)  # noqa: E731
+
+TRACE_HZ = 1.0
+
+# The bundles, and what each is for. Keeping the fixed one at the original path
+# means every link written to it still resolves.
+BUNDLES = (
+    {
+        "id": "fixed",
+        "source": "test/fixtures/rdf/full-profile/positive-recorded-session.ttl",
+        "out": "test/fixtures/hed-bundle",
+        "purpose": "A constant stimulus, where the event timeline is the whole story.",
+    },
+    {
+        "id": "modulated",
+        "source": "test/fixtures/rdf/hed-bundle/modulated-session.ttl",
+        "out": "test/fixtures/hed-bundle-modulated",
+        "purpose": (
+            "A time-varying stimulus, which ADR 0025 decision 5 forbids flattening "
+            "into a single row. Carries a linked trace."
+        ),
+    },
+)
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(out: Path) -> None:
-    spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-    graph = Graph()
-    graph.parse(SESSION, format="turtle")
+def local(term) -> str:
+    text = str(term)
+    return text.rsplit("#", 1)[-1] if "#" in text else text.rsplit("/", 1)[-1]
 
-    ev_class = URIRef(SSTIM + "SessionEvent")
-    p_type = URIRef(SSTIM + "hasEventType")
-    p_offset = URIRef(SSTIM + "sessionClockOffsetSeconds")
 
+# ── reading the session ──────────────────────────────────────────────────────
+
+
+def read_events(graph: Graph, spec: dict) -> list[dict]:
+    """Every sstim:SessionEvent, ordered by its offset on the session clock."""
     rows = []
-    for event in graph.subjects(RDF.type, ev_class):
-        etype = next(graph.objects(event, p_type), None)
-        offset = next(graph.objects(event, p_offset), None)
+    for event in graph.subjects(RDF.type, S("SessionEvent")):
+        etype = next(graph.objects(event, S("hasEventType")), None)
+        offset = next(graph.objects(event, S("sessionClockOffsetSeconds")), None)
         if etype is None or offset is None:
             raise SystemExit(f"hed-bundle: {event} lacks an event type or clock offset")
-        local = str(etype).split("#")[-1]
-        entry = spec["events"].get(local)
+        name = local(etype)
+        entry = spec["events"].get(name)
         if entry is None:
-            raise SystemExit(f"hed-bundle: no HED mapping for {local}")
-        rows.append((float(offset), local, entry["hed"], str(event)))
-    rows.sort()
+            raise SystemExit(f"hed-bundle: no HED mapping for {name}")
+        rows.append(
+            {
+                "onset": float(offset),
+                "event_id": local(event),
+                "iri": str(event),
+                "type": name,
+                "hed": entry["hed"],
+            }
+        )
+    rows.sort(key=lambda r: (r["onset"], r["event_id"]))
+    return rows
 
-    out.mkdir(parents=True, exist_ok=True)
-    lines = ["onset\tduration\tevent_type\tHED"]
+
+def read_sweep(graph: Graph) -> dict | None:
+    """The one declarative modulation in SSTIM that a single row cannot express.
+
+    A steady periodic modulation — a flicker rate, a beat frequency — is fully
+    described by its rate, so one row carrying that rate is honest. A *parameter
+    that itself changes across the session* is not: a Martigli breathing period
+    gliding from mp0 to mp1 over md seconds has no single value to put in a
+    column. That distinction, not "is anything oscillating", is what decision 5
+    is about, so only the sweep is detected here.
+
+    Returns None when the configuration is fixed.
+    """
+    for track in graph.subjects(S("martigliPeriodInitial"), None):
+        mp0 = next(graph.objects(track, S("martigliPeriodInitial")), None)
+        mp1 = next(graph.objects(track, S("martigliPeriodFinal")), None)
+        md = next(graph.objects(track, S("martigliTransitionDuration")), None)
+        if mp0 is None or mp1 is None or md is None:
+            continue
+        if float(mp0) == float(mp1):
+            continue  # declared, but not actually sweeping
+        return {
+            "track": local(track),
+            "mp0": float(mp0),
+            "mp1": float(mp1),
+            "md": float(md),
+        }
+    return None
+
+
+def delivery_spans(events: list[dict]) -> list[tuple[float, float]]:
+    """The [start, end) spans during which audio was actually being delivered."""
+    opens = {"eventPlaybackStart", "eventPlaybackResume"}
+    closes = {
+        "eventPlaybackStop",
+        "eventPlaybackPause",
+        "eventSessionInterrupt",
+        "eventSessionComplete",
+    }
+    spans, open_at = [], None
+    for row in events:
+        if row["type"] in opens and open_at is None:
+            open_at = row["onset"]
+        elif row["type"] in closes and open_at is not None:
+            spans.append((open_at, row["onset"]))
+            open_at = None
+    if open_at is not None:
+        spans.append((open_at, events[-1]["onset"]))
+    return spans
+
+
+def build_trace(sweep: dict, events: list[dict]) -> list[tuple[float, str, str]]:
+    """Sample the breathing arc on the session clock.
+
+    P(d) = mp0 + (mp1 - mp0) * min(d / md, 1), where d is *delivered* time —
+    BREATHING_MODEL.md. Delivered time is what the engine advances, so it stops
+    during a pause and the remainder of the arc slides later on the session
+    clock. Samples outside a delivery span are n/a: nothing was being delivered,
+    and a number there would assert an exposure that did not occur.
+    """
+    spans = delivery_spans(events)
+    end = events[-1]["onset"]
+    step = 1.0 / TRACE_HZ
+    out = []
+    t = 0.0
+    while t <= end + 1e-9:
+        delivered = sum(max(0.0, min(t, b) - a) for a, b in spans)
+        inside = any(a <= t < b for a, b in spans)
+        if inside:
+            period = sweep["mp0"] + (sweep["mp1"] - sweep["mp0"]) * min(
+                delivered / sweep["md"], 1.0
+            )
+            out.append((t, f"{period:.4f}", f"{1.0 / period:.6f}"))
+        else:
+            out.append((t, "n/a", "n/a"))
+        t = round(t + step, 6)
+    return out
+
+
+# ── writing the bundle ───────────────────────────────────────────────────────
+
+
+def write_events(out: Path, rows: list[dict], spec: dict) -> None:
+    lines = ["onset\tduration\tevent_id\tevent_type\tHED"]
     # duration is n/a: SSTIM records instantaneous timeline events, and inventing
     # a duration would assert a span the native record does not contain.
-    lines += [f"{o:.3f}\tn/a\t{t}\t{h}" for o, t, h, _ in rows]
+    lines += [
+        f"{r['onset']:.3f}\tn/a\t{r['event_id']}\t{r['type']}\t{r['hed']}" for r in rows
+    ]
     (out / "events.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
+    sidecar = {
+        "onset": {"Description": "Seconds from the session clock origin.", "Units": "s"},
+        "duration": {
+            "Description": "Always n/a — SSTIM session events are instantaneous timeline marks."
+        },
+        "event_id": {
+            "Description": (
+                "Local name of the sstim:SessionEvent this row was generated from. "
+                "Joins the row to the source graph and to the manifest's "
+                "crossArtifactIds; ADR 0025 decision 6."
+            )
+        },
+        "event_type": {
+            "Description": "SSTIM session event type, the authoritative value.",
+            "TermURL": spec["sstimEventScheme"],
+            "Levels": {r["type"]: spec["events"][r["type"]]["label"] for r in rows},
+        },
+        "HED": {
+            "Description": (
+                f"Generated from event_type by the crosswalk, HED "
+                f"{spec['hedSchema']['version']}."
+            ),
+            "Definitions": [
+                v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")
+            ],
+            "$comment": (
+                "The Definitions must be supplied to a HED validator alongside this "
+                "table: Onset, Offset, Pause and Inset are scope tags that require "
+                "exactly one paired Def/, so the events do not validate without them."
+            ),
+        },
+    }
     (out / "events.json").write_text(
+        json.dumps(sidecar, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+
+
+def write_trace(out: Path, trace: list[tuple[float, str, str]], sweep: dict) -> None:
+    # BIDS continuous recordings carry no header row; the columns are named in
+    # the sidecar. Followed here because the point of the exercise is to be
+    # BIDS-shaped, and noted in the manifest because it makes the file less
+    # readable on its own than events.tsv is.
+    (out / "stimulus.tsv").write_text(
+        "\n".join(f"{p}\t{r}" for _, p, r in trace) + "\n", encoding="utf-8"
+    )
+    (out / "stimulus.json").write_text(
         json.dumps(
             {
-                "onset": {"Description": "Seconds from the session clock origin.", "Units": "s"},
-                "duration": {"Description": "Always n/a — SSTIM session events are instantaneous timeline marks."},
-                "event_type": {
-                    "Description": "SSTIM session event type, the authoritative value.",
-                    "TermURL": spec["sstimEventScheme"],
-                    "Levels": {t: spec["events"][t]["label"] for _, t, _, _ in rows},
+                "SamplingFrequency": TRACE_HZ,
+                "StartTime": 0.0,
+                "Columns": ["breathing_period_s", "breathing_rate_hz"],
+                "breathing_period_s": {
+                    "Description": (
+                        "Instantaneous breathing-cycle period of the Martigli control "
+                        f"track '{sweep['track']}', from "
+                        "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1) with "
+                        f"mp0={sweep['mp0']}, mp1={sweep['mp1']}, md={sweep['md']}. "
+                        "d is delivered time, not session time."
+                    ),
+                    "Units": "s",
                 },
-                "HED": {
-                    "Description": f"Generated from event_type by the crosswalk, HED {spec['hedSchema']['version']}.",
-                    "Definitions": [
-                        v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")
-                    ],
-                    "$comment": "The Definitions must be supplied to a HED validator alongside this table: Onset, Offset, Pause and Inset are scope tags that require exactly one paired Def/, so the events do not validate without them.",
+                "breathing_rate_hz": {
+                    "Description": "1 / breathing_period_s, for consumers that prefer a rate.",
+                    "Units": "Hz",
                 },
+                "$comment": (
+                    "This is the linked trace ADR 0025 decision 5 requires for a "
+                    "time-varying stimulus. n/a marks samples outside a delivery "
+                    "span — the session was paused and nothing was being delivered, "
+                    "so no value is asserted. Those spans correspond exactly to the "
+                    "playback-pause and playback-resume rows in events.tsv."
+                ),
             },
             indent=2,
             ensure_ascii=False,
@@ -102,110 +300,337 @@ def build(out: Path) -> None:
         encoding="utf-8",
     )
 
-    used = sorted({t for _, t, _, _ in rows})
+
+def build(bundle: dict, out: Path) -> dict:
+    spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
+    source = ROOT / bundle["source"]
+    graph = Graph()
+    graph.parse(source, format="turtle")
+
+    events = read_events(graph, spec)
+    if not events:
+        raise SystemExit(f"hed-bundle[{bundle['id']}]: {bundle['source']} has no events")
+    sweep = read_sweep(graph)
+
+    out.mkdir(parents=True, exist_ok=True)
+    write_events(out, events, spec)
+
+    artifacts = ["events.tsv", "events.json"]
+    modulation = {"timeVarying": False, "note": "Fixed stimulus; the events are complete."}
+
+    if sweep is not None:
+        # The guard, not a feature. ADR 0025 decision 5 forbids flattening a
+        # time-varying stimulus into a misleading single row, and this is the
+        # only place that can tell the difference between complying and not.
+        trace = build_trace(sweep, events)
+        if len({p for _, p, _ in trace if p != "n/a"}) < 2:
+            raise SystemExit(
+                f"hed-bundle[{bundle['id']}]: the source declares a sweep "
+                f"({sweep['mp0']}s -> {sweep['mp1']}s over {sweep['md']}s) but the "
+                f"trace is constant. Emitting it would flatten a time-varying "
+                f"stimulus, which ADR 0025 decision 5 forbids."
+            )
+        write_trace(out, trace, sweep)
+        artifacts += ["stimulus.tsv", "stimulus.json"]
+        modulation = {
+            "timeVarying": True,
+            "parameter": "breathing-cycle period (Martigli)",
+            "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
+            "mp0": sweep["mp0"],
+            "mp1": sweep["mp1"],
+            "md": sweep["md"],
+            "track": sweep["track"],
+            "representation": "linked trace",
+            "why": (
+                "ADR 0025 decision 5 allows piecewise events or a linked trace. The "
+                "trace is used because sstim-v:SessionEventTypeScheme has no "
+                "parameter-change event type to attach breakpoints to, and minting "
+                "one is an ontology decision under ADR 0004. The constraint is "
+                "SSTIM's, not HED's: a placeholder definition such as "
+                "(Definition/Sstim-breath-period/#, (Time-interval/# s)) used as "
+                "(Def/Sstim-breath-period/7.774, Inset) validates against 8.4.0."
+            ),
+            "timeBase": (
+                "delivered time — the arc advances only inside a delivery span, so "
+                "the pause displaces every later sample on the session clock"
+            ),
+        }
+
+    suite = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["suite"]["version"]
+    app = json.loads(PACKAGE_PATH.read_text(encoding="utf-8"))["version"]
+
     manifest = {
-        "$comment": "Bundle manifest for the ADR 0025 demonstrator. Synthetic data only.",
+        "$comment": (
+            f"Bundle manifest for the ADR 0025 demonstrator ({bundle['id']}). "
+            f"{bundle['purpose']} Synthetic data only."
+        ),
+        "bundleId": bundle["id"],
         "generatedBy": "scripts/generate-hed-bundle.py",
         "synthetic": True,
         "containsPersonalData": False,
         "versions": {
+            "sstim": suite,
+            "application": app,
             "hedSchema": spec["hedSchema"]["version"],
             "mapping": spec["mappingVersion"],
             "sstimEventScheme": spec["sstimEventScheme"],
+            "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)",
         },
         "clock": {
             "basis": "sstim:sessionClockOffsetSeconds",
             "origin": "The session clock origin declared by the session record; not wall-clock time.",
-            "note": "SSTIM's authority for timing is the engine timing context, so offsets are engine-clock seconds rather than derived from a host clock.",
+            "note": (
+                "SSTIM's authority for timing is the engine timing context, so offsets "
+                "are engine-clock seconds rather than derived from a host clock."
+            ),
         },
         "source": {
-            "file": str(SESSION.relative_to(ROOT)),
-            "sha256": sha256(SESSION),
-            "eventCount": len(rows),
+            "file": bundle["source"],
+            "sha256": sha256(source),
+            "eventCount": len(events),
         },
+        "crossArtifactIds": {
+            "column": "event_id",
+            "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
+            "ids": {r["event_id"]: r["iri"] for r in events},
+        },
+        "modulation": modulation,
         "artifacts": [
-            {"file": "events.tsv", "sha256": sha256(out / "events.tsv")},
-            {"file": "events.json", "sha256": sha256(out / "events.json")},
+            {"file": name, "sha256": sha256(out / name)} for name in artifacts
         ],
         "declaredLoss": {
-            t: spec["events"][t]["lossyBecause"]
-            for t in used
-            if "lossyBecause" in spec["events"][t]
+            r["type"]: spec["events"][r["type"]]["lossyBecause"]
+            for r in events
+            if "lossyBecause" in spec["events"][r["type"]]
         },
         "validated": [
             "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
             "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
             "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
             "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
+            "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes.",
         ],
         "notValidated": [
-            "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain.",
+            "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
             "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision.",
         ],
     }
+    if sweep is not None:
+        manifest["validated"].append(
+            "The trace is non-constant, and its n/a spans coincide with the "
+            "playback-pause and playback-resume rows in events.tsv."
+        )
+        manifest["notValidated"].append(
+            "The trace carries the breathing period, which is fully determined by "
+            "mp0/mp1/md. It does not carry the instantaneous carrier frequency, "
+            "which would require integrating the oscillator phase and is a "
+            "rendering concern rather than a semantic one."
+        )
     (out / "bundle-manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
+    return manifest
+
+
+# ── checking ─────────────────────────────────────────────────────────────────
+
+
+def check_bundle(bundle: dict, shacl: bool) -> list[str]:
+    import shutil
+    import tempfile
+
+    out = ROOT / bundle["out"]
+    tag = bundle["id"]
+    problems: list[str] = []
+
+    # Regenerate into a temporary directory, then check *that* — not the
+    # committed bytes. Checking the committed copy meant every semantic guard
+    # below sat behind the staleness comparison and could only run once the
+    # bundle already matched, so a generator that stopped emitting traces
+    # reported "bundle-manifest.json is stale" and never said what was wrong.
+    # Staleness and correctness are separate questions and both answers are
+    # useful, so both are always produced.
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        build(bundle, tmp)
+        for f in sorted(tmp.iterdir()):
+            committed = out / f.name
+            if not committed.exists() or committed.read_bytes() != f.read_bytes():
+                problems.append(f"{tag}: {f.name} is stale — run `make hed-bundle`")
+        for f in sorted(out.iterdir()) if out.exists() else []:
+            if not (tmp / f.name).exists():
+                problems.append(f"{tag}: {f.name} is no longer generated — delete it")
+        problems += inspect_bundle(bundle, tmp, tag)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    if shacl:
+        problems += shacl_check(bundle)
+    return problems
+
+
+def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
+    """Everything that must hold of a bundle's content, staleness aside."""
+    problems: list[str] = []
+    manifest = json.loads((out / "bundle-manifest.json").read_text(encoding="utf-8"))
+    spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
+    rows = [
+        line.split("\t")
+        for line in (out / "events.tsv").read_text(encoding="utf-8").splitlines()[1:]
+    ]
+
+    # Emitted HED must validate. Decision 7 makes validation a publication gate,
+    # and a bundle can be perfectly current and still wrong — this runs on the
+    # freshly generated copy, so it is checking the generator, not the commit.
+    from hed import load_schema_version
+    from hed.models import DefinitionDict, HedString
+
+    schema = load_schema_version(spec["hedSchema"]["version"])
+    defs = DefinitionDict(
+        [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")],
+        schema,
+    )
+    for onset, _dur, _eid, etype, hed in rows:
+        if HedString(hed, schema, def_dict=defs).validate(schema):
+            problems.append(f"{tag}: invalid HED at t={onset} ({etype}): {hed}")
+
+    # Identifier consistency (decision 7). The manifest's id map and the table's
+    # event_id column must both resolve in the source graph — a hash proves the
+    # bytes did not change, not that the identifiers mean anything.
+    graph = Graph()
+    graph.parse(ROOT / bundle["source"], format="turtle")
+    subjects = {local(s) for s in graph.subjects(RDF.type, S("SessionEvent"))}
+    for _onset, _dur, eid, _etype, _hed in rows:
+        if eid not in subjects:
+            problems.append(f"{tag}: event_id '{eid}' resolves to no sstim:SessionEvent")
+    if set(manifest["crossArtifactIds"]["ids"]) != {r[2] for r in rows}:
+        problems.append(f"{tag}: manifest crossArtifactIds do not match the events table")
+
+    # The trace, and the property the ADR actually cares about.
+    sweep = read_sweep(graph)
+    if sweep is None:
+        if manifest["modulation"]["timeVarying"]:
+            problems.append(f"{tag}: manifest claims time-varying, the source is fixed")
+        if (out / "stimulus.tsv").exists():
+            problems.append(f"{tag}: a trace exists for a fixed stimulus")
+    else:
+        if not (out / "stimulus.tsv").exists():
+            problems.append(
+                f"{tag}: the source declares a sweep and no trace was emitted — "
+                f"ADR 0025 decision 5 forbids flattening it into the events table"
+            )
+        else:
+            trace = [
+                line.split("\t")
+                for line in (out / "stimulus.tsv").read_text(encoding="utf-8").splitlines()
+            ]
+            values = {p for p, _ in trace if p != "n/a"}
+            if len(values) < 2:
+                problems.append(f"{tag}: the trace is constant for a swept parameter")
+            # The n/a spans must be the pauses a *consumer* would read out of
+            # events.tsv, so the spans are recomputed from the emitted table
+            # rather than from the graph. Deriving both sides from
+            # delivery_spans() would only prove the function agrees with itself;
+            # this proves the two published artifacts tell one story, which is
+            # the property someone reading the bundle actually depends on.
+            #
+            # It does not, and cannot, catch a delivery_spans() that is wrong in
+            # the same way on both sides — that is what the committed fixture and
+            # its reviewed values are for.
+            published = [
+                {"onset": float(r[0]), "type": r[3]}
+                for r in rows
+            ]
+            spans = delivery_spans(published)
+            for index, (period, _rate) in enumerate(trace):
+                at = index / TRACE_HZ
+                inside = any(a <= at < b for a, b in spans)
+                if inside and period == "n/a":
+                    problems.append(
+                        f"{tag}: trace is n/a at t={at} but events.tsv says delivery "
+                        f"was open — the two artifacts disagree"
+                    )
+                    break
+                if not inside and period != "n/a":
+                    problems.append(
+                        f"{tag}: trace carries {period} at t={at} but events.tsv says "
+                        f"delivery was closed — that asserts an exposure that did not happen"
+                    )
+                    break
+
+    return problems
+
+
+def shacl_check(bundle: dict) -> list[str]:
+    """Decision 7 requires the bundle to pass SSTIM SHACL.
+
+    The fixed bundle's source is a manifest-declared Full-profile fixture and is
+    already validated by `make shacl-modules`; the modulated source is owned by
+    this gate, so this is the only place it gets checked. Both are validated here
+    rather than only the one that needs it, because a check that covers half its
+    inputs invites the reader to assume it covers all of them.
+    """
+    from pyshacl import validate as shacl_validate
+
+    files = subprocess.run(
+        ["node", "scripts/sstim-manifest.mjs", "files", "full"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.split()
+    data = Graph()
+    for path in files:
+        data.parse(ROOT / path, format="turtle")
+    data.parse(ROOT / bundle["source"], format="turtle")
+    shapes = Graph()
+    shapes.parse(ROOT / "static" / "ontology" / "sstim-shapes.ttl", format="turtle")
+    conforms, _graph, text = shacl_validate(data, shacl_graph=shapes, advanced=True)
+    if not conforms:
+        head = "\n".join(text.strip().splitlines()[:12])
+        return [f"{bundle['id']}: source fails SSTIM Full shapes\n{head}"]
+    return []
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
+    ap.add_argument("--no-shacl", action="store_true", help="skip the SSTIM SHACL pass")
     args = ap.parse_args()
 
     if not args.check:
-        build(OUT_DIR)
-        n = len((OUT_DIR / "events.tsv").read_text().splitlines()) - 1
-        print(f"hed-bundle: wrote {OUT_DIR.relative_to(ROOT)} ({n} events)")
+        for bundle in BUNDLES:
+            manifest = build(bundle, ROOT / bundle["out"])
+            kind = "modulated" if manifest["modulation"]["timeVarying"] else "fixed"
+            print(
+                f"hed-bundle: wrote {bundle['out']} "
+                f"({manifest['source']['eventCount']} events, {kind}, "
+                f"{len(manifest['artifacts'])} artifacts)"
+            )
         return 0
 
-    import shutil, tempfile
+    problems: list[str] = []
+    for bundle in BUNDLES:
+        problems += check_bundle(bundle, shacl=not args.no_shacl)
+    if problems:
+        print(f"hed-bundle: FAILED ({len(problems)} issue(s))")
+        for problem in problems:
+            print(f"  - {problem}")
+        return 1
 
-    tmp = Path(tempfile.mkdtemp())
-    try:
-        build(tmp)
-        stale = [
-            f.name
-            for f in sorted(tmp.iterdir())
-            if not (OUT_DIR / f.name).exists()
-            or (OUT_DIR / f.name).read_bytes() != f.read_bytes()
-        ]
-        if stale:
-            print(f"hed-bundle: STALE ({', '.join(stale)}) — run `make hed-bundle`")
-            return 1
-        # Staleness is not enough: the committed table must also be valid HED.
-        # Decision 7 makes validation a publication gate, and a bundle that is
-        # merely *current* can still be current and wrong.
-        from hed import load_schema_version
-        from hed.models import HedString, DefinitionDict
-
-        spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-        schema = load_schema_version(spec["hedSchema"]["version"])
-        defs = DefinitionDict(
-            [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")],
-            schema,
+    total_events = total_loss = 0
+    traced = 0
+    for bundle in BUNDLES:
+        manifest = json.loads(
+            (ROOT / bundle["out"] / "bundle-manifest.json").read_text(encoding="utf-8")
         )
-        bad = []
-        rows = (OUT_DIR / "events.tsv").read_text().splitlines()[1:]
-        for line in rows:
-            hed = line.split("\t")[3]
-            issues = HedString(hed, schema, def_dict=defs).validate(schema)
-            if issues:
-                bad.append(f"{line.split(chr(9))[2]}: {hed}")
-        if bad:
-            print(f"hed-bundle: INVALID HED in {len(bad)} row(s)")
-            for b in bad:
-                print(f"  - {b}")
-            return 1
-
-        loss = json.loads((OUT_DIR / "bundle-manifest.json").read_text())["declaredLoss"]
-        print(
-            f"hed-bundle: current and valid ({len(rows)} events validate as HED "
-            f"{schema.version}, {len(loss)} declaring information loss)"
-        )
-        return 0
-    finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+        total_events += manifest["source"]["eventCount"]
+        total_loss += len(manifest["declaredLoss"])
+        traced += 1 if manifest["modulation"]["timeVarying"] else 0
+    print(
+        f"hed-bundle: {len(BUNDLES)} bundles current and valid "
+        f"({total_events} events validate as HED, every event_id resolves, "
+        f"{total_loss} declaring information loss, "
+        f"{traced} time-varying and carrying a linked trace)"
+    )
+    return 0
 
 
 if __name__ == "__main__":

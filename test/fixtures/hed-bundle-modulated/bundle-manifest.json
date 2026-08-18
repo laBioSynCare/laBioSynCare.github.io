@@ -1,0 +1,82 @@
+{
+  "$comment": "Bundle manifest for the ADR 0025 demonstrator (modulated). A time-varying stimulus, which ADR 0025 decision 5 forbids flattening into a single row. Carries a linked trace. Synthetic data only.",
+  "bundleId": "modulated",
+  "generatedBy": "scripts/generate-hed-bundle.py",
+  "synthetic": true,
+  "containsPersonalData": false,
+  "versions": {
+    "sstim": "0.16.0-dev",
+    "application": "0.1.0",
+    "hedSchema": "8.4.0",
+    "mapping": "0.2.0",
+    "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
+    "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
+  },
+  "clock": {
+    "basis": "sstim:sessionClockOffsetSeconds",
+    "origin": "The session clock origin declared by the session record; not wall-clock time.",
+    "note": "SSTIM's authority for timing is the engine timing context, so offsets are engine-clock seconds rather than derived from a host clock."
+  },
+  "source": {
+    "file": "test/fixtures/rdf/hed-bundle/modulated-session.ttl",
+    "sha256": "4beeb21022dbbda543bf9dfb76a6e02d1eb1bf7f48417326a501ecb325bb58c8",
+    "eventCount": 5
+  },
+  "crossArtifactIds": {
+    "column": "event_id",
+    "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
+    "ids": {
+      "event-open": "https://example.org/sstim/hed-modulated/event-open",
+      "event-start": "https://example.org/sstim/hed-modulated/event-start",
+      "event-pause": "https://example.org/sstim/hed-modulated/event-pause",
+      "event-resume": "https://example.org/sstim/hed-modulated/event-resume",
+      "event-interrupt": "https://example.org/sstim/hed-modulated/event-interrupt"
+    }
+  },
+  "modulation": {
+    "timeVarying": true,
+    "parameter": "breathing-cycle period (Martigli)",
+    "law": "P(d) = mp0 + (mp1 - mp0) * min(d / md, 1)",
+    "mp0": 4.0,
+    "mp1": 10.0,
+    "md": 300.0,
+    "track": "voice",
+    "representation": "linked trace",
+    "why": "ADR 0025 decision 5 allows piecewise events or a linked trace. The trace is used because sstim-v:SessionEventTypeScheme has no parameter-change event type to attach breakpoints to, and minting one is an ontology decision under ADR 0004. The constraint is SSTIM's, not HED's: a placeholder definition such as (Definition/Sstim-breath-period/#, (Time-interval/# s)) used as (Def/Sstim-breath-period/7.774, Inset) validates against 8.4.0.",
+    "timeBase": "delivered time — the arc advances only inside a delivery span, so the pause displaces every later sample on the session clock"
+  },
+  "artifacts": [
+    {
+      "file": "events.tsv",
+      "sha256": "8f61d9f25b8920c180a84bf14b93a94a4726e88e5a7249c5adaed43b3346cca8"
+    },
+    {
+      "file": "events.json",
+      "sha256": "54dd735576013e19de841781c0a6e2057e02735607a32050af730dcb09b5ba48"
+    },
+    {
+      "file": "stimulus.tsv",
+      "sha256": "62d82d7b726101ff8c5aa3589925ab41c6d605a58d3ab4958f7b72cc11b40ed3"
+    },
+    {
+      "file": "stimulus.json",
+      "sha256": "e4bdefa56e796c2c977b581e7fe4aeb2f3f56279a31334ab7bea44360929d038"
+    }
+  ],
+  "declaredLoss": {
+    "eventSessionInterrupt": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
+  },
+  "validated": [
+    "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+    "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
+    "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
+    "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
+    "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes.",
+    "The trace is non-constant, and its n/a spans coincide with the playback-pause and playback-resume rows in events.tsv."
+  ],
+  "notValidated": [
+    "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
+    "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision.",
+    "The trace carries the breathing period, which is fully determined by mp0/mp1/md. It does not carry the instantaneous carrier frequency, which would require integrating the oscillator phase and is a rendering concern rather than a semantic one."
+  ]
+}

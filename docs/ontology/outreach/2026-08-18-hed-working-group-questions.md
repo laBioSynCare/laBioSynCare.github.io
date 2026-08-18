@@ -8,8 +8,9 @@ These came out of implementing a crosswalk, not out of reading the specification
 which is why they are concrete. The artifacts are in this repository and can be
 run: [`static/schemas/sstim-hed-event-map.json`](../../../static/schemas/sstim-hed-event-map.json)
 is the mapping, `make hed-crosswalk` validates it with `hedtools` against HED
-8.4.0, and [`test/fixtures/hed-bundle/`](../../../test/fixtures/hed-bundle/) is a
-generated synthetic events table.
+8.4.0, and [`test/fixtures/hed-bundle/`](../../../test/fixtures/hed-bundle/) and
+[`test/fixtures/hed-bundle-modulated/`](../../../test/fixtures/hed-bundle-modulated/)
+are generated synthetic bundles — a fixed stimulus and a time-varying one.
 
 The ask is the one ADR 0025 decision 9 sets: **encode and reproduce, never
 endorse.** We are not asking anyone to validate BSC Lab or agree with a health
@@ -83,6 +84,42 @@ which is weak; the engine identities themselves stay in the SSTIM record.
 producing a stimulus? Our reading is no, and that this belongs in the native
 record — confirmation would let us stop looking.
 
+## 5. A continuously varying stimulus parameter — trace, or piecewise `Def/`?
+
+Our modulated demonstrator has a breathing-cycle period that glides from 4 s to
+10 s over 300 s and then holds. It is not a steady periodic modulation with a
+rate we could put in one column; the parameter itself changes across the session.
+
+We emit it as a linked continuous trace beside the events table — a BIDS-style
+`stimulus.tsv` sampled at 1 Hz, with `n/a` where the session was paused, because
+nothing was being delivered there.
+
+Before choosing that, we checked whether HED could carry the piecewise form, and
+it can. A placeholder definition validates against 8.4.0:
+
+```
+(Definition/Sstim-breath-period/#, (Time-interval/# s))
+(Def/Sstim-breath-period/7.774, Inset)
+```
+
+So the limitation is on our side rather than HED's: SSTIM has no event type
+meaning "a parameter changed" to attach those marks to, and minting one is an
+ontology decision we did not want to make as a side effect of building a
+demonstrator.
+
+**Questions.** For a parameter that varies continuously through a session, does
+HED expect a linked continuous recording, or a series of placeholder-`Def/`
+marks at breakpoints? If the latter, is there a convention for choosing
+breakpoints, and does `Inset` remain the right scope tag for them? And is
+`Time-interval/# s` the intended way to carry a period, or is there a better
+value tag we have missed?
+
+We also have a related modelling question we suspect is out of scope but would
+rather ask: our arc advances on *delivered* time, so a pause displaces the whole
+remainder of the sweep on the session clock. Does HED have any notion of a
+timeline that stops and restarts, or is reconciling that strictly the annotator's
+job before the table is written?
+
 ---
 
 ## What we are not asking
@@ -93,6 +130,6 @@ we expect to keep covering them; HED is a generated event-semantic profile over
 our native record, never primary storage. Where the two disagree about what a
 record means, our adapter is one-way and versioned, and the loss is declared.
 
-The four questions above are all of the form "have we encoded this the way you
+The five questions above are all of the form "have we encoded this the way you
 intend", and a "no, and that is out of scope for HED" is a useful answer to
-three of them.
+four of them.

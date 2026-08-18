@@ -59,6 +59,33 @@ file is the human-readable summary.
 - `make definition-coverage` gained a bar against definitions that restate their
   label, implementing the second-pass review's finding that a length check
   cannot catch them.
+- **The time-varying half of ADR 0025 decision 5 is built and enforced.** A
+  second demonstrator bundle, `test/fixtures/hed-bundle-modulated/`, carries a
+  Martigli breathing period gliding 4 s → 10 s over 300 s as a linked BIDS-style
+  trace (`stimulus.tsv` + `stimulus.json`) rather than flattening it into the
+  events table, which decision 5 forbids. The trace advances on *delivered* time,
+  so the pause at 190 s freezes the arc and displaces the rest of the sweep;
+  samples inside the pause are `n/a` rather than interpolated, because nothing
+  was being delivered there.
+
+  The requirement had been stated since July with no instrument able to tell
+  whether it held. `make hed-bundle` now refuses to write a bundle whose source
+  declares a sweep without a trace, and `make hed-bundle-check` fails if a
+  committed bundle flattened one.
+
+  Piecewise events were the other representation decision 5 allows and were not
+  available: SSTIM has no parameter-change event type. HED can carry that form —
+  `(Definition/Sstim-breath-period/#, (Time-interval/# s))` validates against
+  8.4.0 — so the gap is SSTIM's, and it is recorded as an ontology decision to
+  take rather than made in passing.
+- **Cross-artifact identifiers, which decision 6 requires and the bundles
+  lacked.** `events.tsv` carries an `event_id` column and each manifest a
+  `crossArtifactIds` map; `make hed-bundle-check` resolves every one against a
+  `sstim:SessionEvent` in the source graph. A file hash proves the bytes did not
+  change, not that the identifiers mean anything. The manifests also carry the
+  SSTIM suite and application versions, which decision 6 lists, and both sources
+  are now validated against the Full-profile SHACL shapes — for the modulated
+  source, this gate is the only place that happens.
 - `make hed-crosswalk` gained a fourth check: the prose that restates its counts
   must still match them. Crosswalk 0.2.0 defined the two temporal scopes and
   `eventPlaybackResume` stopped being lossy, taking the count from six to five —

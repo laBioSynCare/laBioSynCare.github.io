@@ -1,0 +1,17 @@
+{
+  "SamplingFrequency": 1.0,
+  "StartTime": 0.0,
+  "Columns": [
+    "breathing_period_s",
+    "breathing_rate_hz"
+  ],
+  "breathing_period_s": {
+    "Description": "Instantaneous breathing-cycle period of the Martigli control track 'voice', from P(d) = mp0 + (mp1 - mp0) * min(d / md, 1) with mp0=4.0, mp1=10.0, md=300.0. d is delivered time, not session time.",
+    "Units": "s"
+  },
+  "breathing_rate_hz": {
+    "Description": "1 / breathing_period_s, for consumers that prefer a rate.",
+    "Units": "Hz"
+  },
+  "$comment": "This is the linked trace ADR 0025 decision 5 requires for a time-varying stimulus. n/a marks samples outside a delivery span — the session was paused and nothing was being delivered, so no value is asserted. Those spans correspond exactly to the playback-pause and playback-resume rows in events.tsv."
+}

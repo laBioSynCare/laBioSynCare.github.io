@@ -185,6 +185,29 @@ indexed, examiner-searchable records.
       *Note: urgent — do before further BioSynCare commits. Simple
       work-for-hire clause or joint ownership declaration.*
 
+### Session model
+- [ ] Decide whether SSTIM needs a parameter-change session event type `P2`
+      *Raised 2026-08-18 while building the modulated HED demonstrator. ADR 0025
+      decision 5 allows a time-varying stimulus to be carried as **either**
+      piecewise events **or** a linked trace. Only the trace was available:
+      `sstim-v:SessionEventTypeScheme` has ten types — session and playback
+      lifecycle, safety, observation — and none of them means "a parameter
+      changed", so there is nothing to hang a breakpoint on.*
+
+      *The constraint is ours, not HED's. A HED placeholder definition carries
+      the piecewise form fine, verified with `hedtools` against 8.4.0 rather than
+      assumed:* `(Definition/Sstim-breath-period/#, (Time-interval/# s))` *used as*
+      `(Def/Sstim-breath-period/7.774, Inset)` *— both valid.*
+
+      *So this is a genuine ontology question and deliberately not answered as a
+      side effect of a demonstrator: does a session timeline want to record
+      parameter changes as events, or is a declarative sweep plus a generated
+      trace the right model? The trace has one clear advantage — it is derived,
+      so it cannot disagree with the configuration — and one clear cost: a
+      consumer reading only the events table sees nothing of the modulation.
+      Protected file (CLAUDE.md §3.4). Worth carrying into the HED Working Group
+      thread (question 5) before minting anything.*
+
 ### Ontology namespace
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
