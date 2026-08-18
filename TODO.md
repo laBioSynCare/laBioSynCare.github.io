@@ -238,56 +238,55 @@ Turtle files are listed in section 1. After they exist:
       module still needs its `void:subset` and distribution written by hand, and
       the audit catches its absence rather than the manifest supplying it.*
 
-- [ ] Diagnose why `robot --strict` cannot load the Full closure `P2`
-      *Found 2026-08-17 while testing whether the OWL 2 DL fix mattered. It is a
-      separate, pre-existing defect: the closure at a61ae5f fails identically to
-      the closure after the DL work, so the missing declarations were never the
-      cause and declaring them was not the cure.*
+- [~] `robot --strict` cannot load the closure — **diagnosed; upstream OWL API
+      bug, not an SSTIM defect** `P3`
+      *Investigated 2026-08-18 with a direct OWL API probe
+      (`OWLOntologyLoaderConfiguration.setStrict(true)`) plus greedy subject
+      minimisation, after ROBOT proved unable to surface a usable message —
+      both Turtle parsers report empty error text, and the `error#ErrorN`
+      counter is a parser-attempt index, not an entity count.*
 
-      *This matters more than the profile question it came from. ROBOT parses
-      non-strictly by default and repairs quietly, so every gate we run is blind
-      to it, while a consumer who loads strictly gets no ontology at all rather
-      than a degraded one.*
+      **Three independent triggers, each minimised to one subject and then
+      reproduced in a six-line file containing no SSTIM content:**
 
-      **Reproduce:**
-      `nix develop -c robot --strict --input-format ttl convert --input <closure> --output /tmp/x.ofn`
-      *(force the format — without it OWL API tries 17 parsers and the output is
-      unreadable).*
+      | Construct | Strict parser |
+      |---|---|
+      | Two or more `owl:Ontology` headers in one document | rejected — *"Expected one ontology declaration, found multiple ones"* |
+      | `rdfs:domain [ owl:unionOf (…) ]`, any property type, typed bnode or not | rejected |
+      | `rdfs:range [ a owl:Class ; owl:unionOf (…) ]` | rejected |
+      | `rdfs:range [ owl:unionOf (…) ]` — same, without the redundant type | **accepted** |
+      | plain named-class domain or range | accepted |
 
-      **What is established, so nobody re-derives it:**
-      - *The instrument works. A minimal hand-written OWL Turtle file
-        strict-loads, and so does `sstim-core.ttl` alone (28 KB of OFN out).*
-      - *7 of 16 modules fail alone: stimulus, common, session, evidence,
-        neuromodulation, patch-studio, exposure. The other 9 pass alone.*
-      - *Cumulatively, `sstim-core` passes and adding `sstim-stimulus` breaks it.*
-      - *Within stimulus there are at least **two independent triggers**: a
-        subject-prefix bisect flips on the module's own `owl:Ontology` header,
-        yet deleting all 12 header triples still fails.*
-      - *The message is `Entity not properly recognized, missing triples in
-        input? …error#ErrorN for type Class`. **The N is a parser-attempt
-        counter, not an entity count** — OWL API tries every parser and each
-        logs once, which is why every failing module reports exactly four. An
-        earlier version of this entry read it as "four bad entities"; it is not.*
-      - *Both Turtle parsers report **empty** error text inside the
-        `UnparsableOntologyException`, which is why this is hard.*
+      *The first is an artifact of assembling the closure with `cat`; `robot
+      merge` produces a single header and removes it. The other two are ordinary
+      OWL: a union domain is **valid OWL 2 DL**, and ROBOT's own
+      `validate-profile` — the same OWL API — confirms every closure is in the
+      DL profile. **OWL API's strict parser therefore rejects what OWL API's
+      profile validator accepts**, which is where the bug lives.*
 
-      **Hypotheses already refuted — do not retry these:**
-      1. *Missing OWL 2 DL declarations. Fixed; failure unchanged.*
-      2. *The `owl:unionOf` range on `sstim:hasStimulationTarget`. Replaced with
-         a plain class; still fails.*
-      3. *Undeclared class-position terms. Checked exhaustively over
-         `rdfs:domain`, `rdfs:range` on object properties, `rdfs:subClassOf`,
-         `owl:equivalentClass`, `owl:disjointWith`, and every `unionOf` /
-         `intersectionOf` / `someValuesFrom` / `allValuesFrom` / `onClass`
-         member: **0 undeclared**.*
-      4. *Serialisation. An rdflib round-trip of stimulus still fails, so it is
-         semantic rather than syntactic.*
-      5. *Multiple `owl:Ontology` headers from `cat`-ing modules. `robot merge`
-         produces a single-header 1.2 MB artifact that also fails strict.*
+      **Decision: do not contort the ontology to satisfy it.** The union domains
+      on `sstim:hzMin`/`hzMax` were introduced deliberately by ADR 0052 and are
+      the correct model; the union range on `sstim:hasStimulationTarget` is the
+      point of that property. Dropping the redundant `a owl:Class` from the 53
+      anonymous class expressions would fix one trigger of three and is not
+      worth the churn on its own.
 
-      *Next step: instrument OWL API directly rather than through ROBOT — load
-      with `OWLOntologyLoaderConfiguration.setStrict(true)` and print the
-      unconsumed triples, which is the only thing that will name the construct.*
+      *Practical risk is low and was over-stated when this item was filed.
+      Strict mode is opt-in and rare; every default path works. Pellet/Openllet
+      loads the live graph through Jena and answers `Consistent: Yes`, ROBOT's
+      default parsing is non-strict, and rdflib, pySHACL and Comunica are
+      unaffected. Nothing we run or publish depends on it.*
+
+      **Remaining work is upstream, not here:** report to `owlcs/owlapi` with the
+      six-line reproduction. Optionally assemble the published closure with
+      `robot merge` rather than `cat`, which is defensible independently — one
+      ontology header is better hygiene for any OWL consumer.
+
+      *Probe harness kept in the ADR 0054 discussion rather than committed: a
+      `pom.xml` depending on `net.sourceforge.owlapi:owlapi-distribution:4.5.29`
+      and a 25-line `StrictProbe.java` that prints the Turtle parser's real
+      exception. Two seconds per run versus ROBOT's eight, which is what made
+      minimisation affordable.*
 
 ### Phase 1 instances
 - [~] Convert cleared public references to RDF in
