@@ -84,7 +84,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
 | prefix.cc | ✅ **done** | no | — |
-| DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt; rated ★☆☆☆ pending a Databus recheck | no | recheck ratings |
+| DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
 | LOV | ⚠️ **submitted 2026-07-10 (attested by email only — the form issues no ticket); catalog dormant since 2025-11-22**, so this is not a moving queue. Absence verified 2026-08-17 by LOV SPARQL | no | escalate or drop |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
@@ -126,9 +126,11 @@ resolve, and returns an automated quality-star rating. No account.
   N-Triples remains an optional unsupported representation);
   (2) the `owl:Ontology` IRI in the returned document equals the submitted URL —
   SSTIM's ontology subject is `<https://w3id.org/sstim>`, matching exactly ✅.
-- **After:** Archivo crawls every 8 h once accepted; record the Archivo IRI +
-  star rating and file any actionable findings against `IMPROVEMENT_PLAN.md`
-  (compare with the 87.5% FOOPS result already on file).
+- **After:** record the Archivo IRI and star rating, and file any actionable
+  findings against `IMPROVEMENT_PLAN.md` (compare with the 87.5% FOOPS result
+  already on file). **Do not expect an automatic re-crawl.** This bullet used to
+  promise one "every 8 h"; that figure has no source and the updater has not run
+  since 2026-02-23 — see the status block below.
 
 **Rejection diagnosis (2026-07-11) — was transient; retry.** A first submission
 was rejected with "No RDF content accessible or parseable." Root-caused by
@@ -300,9 +302,10 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     twice. Worth reporting to dbpedia/archivo; it does not
                     change our situation, since our single check already passes.
 
-                    Expect ★★★☆ after the recrawl, and the fourth star only when
-                    DBpedia's Databus recovers. Re-test with the download
-                    endpoint above: if it stops 503ing, the star should follow.
+                    **There will be no recrawl, so expect nothing to change.**
+                    See the entry below: Archivo's updater has not run since
+                    2026-02-23. The ★☆☆☆ is frozen against the graph as it was at
+                    submission, before the licences were deployed.
 
                     **LODE Conformity ✘ — 192 results, but only 3 of the shapes
                     carry `sh:Violation` severity** (the other 12 are Warning or
@@ -318,11 +321,39 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     all 16. Note this file's earlier claim that the root carries
                     `owl:versionIRI` was wrong for the mutable line.
 
-                    Archivo re-crawls every 8 h, so a deployed fix should lift
-                    the rating without resubmission. The Databus backend is
-                    separately still degraded — Archivo's download endpoint
-                    returns `500 … HTTP Error 503` — which affects artifact
-                    retrieval, not these four verdicts.
+                    **Archivo's automated updater is not running, so none of
+                    this will lift the rating on its own.** Measured 2026-08-18,
+                    12.4 h after our crawl and with no re-crawl: across all 4020
+                    crawl timestamps in the public listing, the newest day is
+                    2026-08-17 and it carries exactly two — both of them SSTIM's
+                    own two columns, written by the synchronous crawl our `/add`
+                    triggered. Before that, nothing since **2026-02-23**. Nearly
+                    six months.
+
+                      curl -sL https://archivo.dbpedia.org/list |
+                        grep -oE '\b20[0-9]{2}\.[0-9]{2}\.[0-9]{2}-[0-9]{6}\b' |
+                        cut -d- -f1 | sort | uniq -c | tail -6
+
+                    The "every 8 h" figure this file used to assert has no source.
+                    Archivo's about page says only that it "updates the already
+                    enlisted ontologies regularly" and states no cadence; the
+                    README and source name none either. It was an assumption,
+                    repeated until it was quoted as fact — and acting on it means
+                    waiting indefinitely for an event that will not occur.
+
+                    There is no user-facing way to force one: `/add`
+                    short-circuits on an already-listed URI with "The Ontology is
+                    already part of Archivo!", and `routes.py` exposes no
+                    re-crawl endpoint. Do **not** work around this by submitting
+                    a variant IRI — that mints a duplicate entry for one
+                    ontology in a public index.
+
+                    Action is therefore upstream, not here: report to the DBpedia
+                    forum or `dbpedia/archivo`, covering both the stalled updater
+                    and the Databus 503 that costs the consistency star, and ask
+                    for a re-crawl of `https://w3id.org/sstim`. The Databus
+                    endpoint still returns `500 … HTTP Error 503`; the two
+                    failures may share a cause.
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
