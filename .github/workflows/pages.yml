@@ -88,10 +88,21 @@ jobs:
       # ecosystem fixtures, adversarial SHACL-SPARQL cases, named-graph loader
       # checks, OWL consistency, and serialization round trips.
       #
-      # -j4 because the runner has 4 cores and the targets are independent
-      # scripts in their own mktemp dirs. Measured locally, every gate passing:
-      # 432s serial, 192s with -j4, 218s with -j4 -Otarget. The 26s buys grouped
-      # per-target output, or a parallel failure is unreadable.
+      # -j4 because validate's prerequisites are independent scripts working in
+      # their own mktemp dirs.
+      # Measured locally, every gate passing: 432s serial, 192s with -j4, 218s
+      # with -j4 -Otarget; the 26s buys grouped per-target output, without which
+      # an interleaved parallel failure is unreadable.
+      #
+      # That local ratio does NOT transfer to CI and nobody should quote it as
+      # if it does. The runner has 4 cores and ecosystem-contract already spawns
+      # min(4, cpu_count) pySHACL workers by itself, so make-level -j mostly
+      # oversubscribes. Worse, runner-to-runner variance is larger than the
+      # effect: the same commit running the same `make validate` took 629s on
+      # one runner and 867s on another, a 38% spread, and the first runs after
+      # this change were 665s and 551s. Direction is mildly positive, n is too
+      # small to claim anything. Collect samples before tuning -j further, and
+      # drop to plain `make validate` when bisecting a flaky gate.
       - name: Validate RDF contract before publication
         if: steps.scope.outputs.full == 'true'
         run: nix develop --command make -j4 -Otarget validate
