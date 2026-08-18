@@ -91,6 +91,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
 | OLS | ⚠️ if accepted | yes | low |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
+| DBpedia KG Catalog | 🕓 **submitted 2026-08-18** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run yet | yes (GitHub) | watch |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
 ---
@@ -853,6 +854,61 @@ Required follow-up: The record is already public; what is still outstanding is
                     the BSC Lab maintaining-org entry recorded here; it is more
                     likely counting the deliberately absent funder/collaborator
                     roles, but verify the maintainer link actually saved.
+```
+
+### DBpedia KG Catalog — SUBMITTED (2026-08-18)
+
+A new, actively developed DBpedia catalogue (<https://kg-catalog.dbpedia.org/>),
+announced on the DBpedia Slack by Milan Dojchinovski (@m1ci) inviting beta
+testers. Backed by the GitHub repository `m1ci/lod-next-gen`. Worth being early
+in: the maintainer is present and asking for feedback, which is the opposite of
+the two dormant catalogues above.
+
+**Ontologies are in scope**, checked before submitting rather than assumed:
+domain 8, "Linguistics, Social & Digital Knowledge Systems", reads "Includes
+linguistics, **ontologies**, social networks…", and the Computer Science
+Ontology is already catalogued as `cso`.
+
+**Two submission routes.** Option 1 is a guided GitHub issue form, recommended
+by the guide and validated automatically. Option 2 is a YAML pull request
+against `knowledge-graphs/<id>/metadata.yaml`. We used Option 1.
+
+**No Databus publishing is required.** `cso` sets both `moss-publish` and
+`databus-publish` to `false` and points its distributions at self-hosted files,
+which is what we mirrored — so this submission does not depend on the Databus
+that is currently failing for Archivo.
+
+```text
+Service:            DBpedia KG Catalog (m1ci/lod-next-gen)
+Submitted URL:      https://github.com/m1ci/lod-next-gen/issues/46
+Submitted version:  0.15.0 (artifact version id 2026.08.17)
+Distribution:       https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl
+                    ttl, 727857 bytes,
+                    sha256 838b09a862af283d8a3ace16872f05cb43eb69ee061f3217077e94bc66cc2dfc
+                    Verified live and hashed from the served bytes before posting.
+Date:               2026-08-18
+Account/maintainer: @ttm
+Status:             SUBMITTED — **not yet validated.** The issue form declares a
+                    `new-kg` label and `validate-new-kg.yml` gates on it, but a
+                    non-collaborator cannot set labels through the API, so `gh
+                    issue create --label new-kg` silently dropped it. Recorded as
+                    a comment on the issue, with an offer to re-submit via the
+                    web form or as a PR instead. Submitting through the browser
+                    form would have applied the label automatically.
+Required follow-up: Watch for the label, the automated validation comment, and
+                    the PR their workflow opens. Update the entry to 0.16.0 once
+                    that release is cut — the catalogue models versions, so it is
+                    a metadata addition rather than a resubmission.
+
+                    **Chosen domain is a judgement call worth revisiting.**
+                    "Linguistics, Social & Digital Knowledge Systems" was chosen
+                    because that is where the README puts ontologies, and because
+                    "Life Sciences & Health" would nudge SSTIM toward the clinical
+                    reading that SCOPE.md and CLAUDE.md 3.5 exist to avoid. The
+                    counter-argument is real: the README says the domain should
+                    reflect *content*, SSTIM's content is sensory stimulation, and
+                    `cso` chose the domain of its subject matter rather than
+                    "ontologies". One edit to the issue changes it.
 ```
 
 ### OLS (Ontology Lookup Service) — only if accepted
