@@ -348,12 +348,49 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     a variant IRI — that mints a duplicate entry for one
                     ontology in a public index.
 
-                    Action is therefore upstream, not here: report to the DBpedia
-                    forum or `dbpedia/archivo`, covering both the stalled updater
-                    and the Databus 503 that costs the consistency star, and ask
-                    for a re-crawl of `https://w3id.org/sstim`. The Databus
-                    endpoint still returns `500 … HTTP Error 503`; the two
-                    failures may share a cause.
+                    **Upstream state, checked 2026-08-18 before writing
+                    anything.** This is a known, long-running infrastructure
+                    problem, so calibrate expectations rather than expecting a
+                    fix. `dbpedia/archivo` issue **#55**, "Frontend/ web service
+                    down", has been open since 2025-05-07 and was last touched
+                    2026-06-22. On 2025-09-12 the maintainer JJ-Author replied:
+
+                      > I think we need to change the hosting provider. The proxy
+                      > and the server are hosted by 2 different departments of
+                      > our university, and it is an up and down
+
+                    The exact error we see — "There seems to be an error with the
+                    DBpedia Databus" — was reported on that issue in September
+                    2025 and is still happening eleven months later.
+
+                    **Removal and resubmission is not an option, so do not plan
+                    around it.** Archivo exposes fifteen routes and none deletes;
+                    only someone with database access could remove the entry, and
+                    a fresh `/add` would meet the same Databus failure anyway.
+
+                    Three distinct things could be reported, and two are new —
+                    a search of the tracker finds no issue mentioning "updater"
+                    or "stale":
+
+                    1. **The updater has not run since 2026-02-23.** Measurable
+                       from Archivo's own public listing with the command above.
+                       Nobody has said this.
+                    2. **The code bug in `discovery.py`**: the loop is
+                       `for ignore_imports in [True, False]` while the call
+                       hardcodes `ignore_imports=False`, so the ignore-imports
+                       variant never ignores imports and
+                       `check_if_consistent`'s either-passes fallback is one
+                       check executed twice. Small and PR-able. Not reported.
+                    3. The download 500, which is a "me too" on #55 — though
+                       with one sharper detail than that thread has:
+                       `databus.dbpedia.org` itself answers **200** while
+                       Archivo's download path returns 500 citing a Databus 503,
+                       so it is a specific API path rather than the whole
+                       Databus being down.
+
+                    Plan on the rating staying frozen. Do not hold a release for
+                    it, and do not cite the Archivo stars anywhere until they
+                    reflect a crawl of the current graph.
 ```
 
 ### LOV (Linked Open Vocabularies) — ready now
