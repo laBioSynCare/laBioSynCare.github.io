@@ -1,0 +1,75 @@
+{
+  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Every tag here is verified to exist in the pinned schema by `make hed-crosswalk`.",
+  "mappingVersion": "0.1.0",
+  "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
+  "hedSchema": {
+    "name": "HED standard schema",
+    "version": "8.4.0",
+    "url": "https://raw.githubusercontent.com/hed-standard/hed-schemas/main/standard_schema/hedxml/HED8.4.0.xml"
+  },
+  "direction": "sstim-to-hed",
+  "notes": [
+    "HED annotations are generated from SSTIM event types; they are never primary storage (ADR 0025 decision 2).",
+    "These are profile mappings, not concept equivalences. No skos:exactMatch is asserted between an SSTIM event type and a HED tag, per ADR 0025 decision 6.",
+    "Temporal-scope tags (Onset, Offset, Pause) are emitted for the session block and the delivery block. A consumer pairing them must respect HED scoping rules.",
+    "Where SSTIM distinguishes something HED does not, the difference is recorded in `lossyBecause` rather than forced into a tag."
+  ],
+  "events": {
+    "eventSessionOpen": {
+      "label": "Session opened",
+      "hed": "(Experiment-structure, Time-block, Onset)",
+      "rationale": "The session instance is a structural time block; opening it starts that block."
+    },
+    "eventSessionComplete": {
+      "label": "Session completed",
+      "hed": "(Experiment-structure, Time-block, Offset)",
+      "rationale": "Closes the session block after the intended duration was delivered.",
+      "lossyBecause": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
+    },
+    "eventSessionInterrupt": {
+      "label": "Session interrupted",
+      "hed": "(Experiment-structure, Time-block, Offset)",
+      "rationale": "Closes the session block early.",
+      "lossyBecause": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
+    },
+    "eventPlaybackStart": {
+      "label": "Playback started",
+      "hed": "(Sensory-event, Experimental-stimulus, Sensory-presentation, Onset)",
+      "rationale": "Stimulus delivery begins; the presented stimulus is the experimental one."
+    },
+    "eventPlaybackStop": {
+      "label": "Playback stopped",
+      "hed": "(Sensory-event, Experimental-stimulus, Sensory-presentation, Offset)",
+      "rationale": "Stimulus delivery ends."
+    },
+    "eventPlaybackPause": {
+      "label": "Playback paused",
+      "hed": "(Experiment-control, Pause)",
+      "rationale": "Delivery is suspended without closing the session block."
+    },
+    "eventPlaybackResume": {
+      "label": "Playback resumed",
+      "hed": "(Experiment-control, Sensory-presentation, Onset)",
+      "rationale": "Delivery restarts after a pause.",
+      "lossyBecause": "HED does not distinguish a resume from a fresh onset; the pairing with the preceding Pause carries that in SSTIM only."
+    },
+    "eventSafetyLimitApplied": {
+      "label": "Safety limit applied",
+      "hed": "(Experiment-control, Constrained)",
+      "rationale": "A delivery parameter was constrained by a safety boundary.",
+      "lossyBecause": "HED 8.4.0 has no Safety or Threshold tag. Which boundary applied, and the requested versus delivered values, are SSTIM-only and must be read from the session record."
+    },
+    "eventEngineFallback": {
+      "label": "Engine fallback",
+      "hed": "(Experiment-control, Computational-evidence)",
+      "rationale": "Delivery moved to a different engine implementation; the change is computational rather than sensory.",
+      "lossyBecause": "HED has no vocabulary for software engine identity. The engine pair is SSTIM-only."
+    },
+    "eventObservationCollected": {
+      "label": "Observation collected",
+      "hed": "(Experiment-procedure, Participant-response)",
+      "rationale": "A phase-qualified report was collected from the participant.",
+      "lossyBecause": "The instrument, its version, the response state and any unwanted-experience structure are SSTIM-only. HED records that a response occurred, not what it asserted."
+    }
+  }
+}

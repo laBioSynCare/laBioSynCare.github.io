@@ -31,3 +31,4 @@ dist-smoke/
 # Written by `make validate`: when the suite last passed and on which tree.
 # Local state, not a repository fact.
 .validation.log
+.hed-schema-cache/

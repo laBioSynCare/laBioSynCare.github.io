@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -225,6 +225,19 @@ shacl-session-projection:
 ## relax anyone, the second stops the repair becoming a deletion.
 band-scope-notes:
 	$(PYTHON) scripts/check-band-scope-notes.py
+
+## Verify the SSTIM to HED crosswalk against the pinned HED schema (ADR 0025).
+## HED is a generated profile, not primary storage, so the mapping table is the
+## part that rots silently: a tag that never existed, or that a schema release
+## removed, yields annotations that look right and validate nowhere. Tags are
+## read out of HED8.4.0.xml rather than trusted — the first hand-written draft
+## contained Pulse, Modulation and Intensity, none of which are HED 8.4.0 tags.
+## Also asserts the map covers SessionEventTypeScheme exactly, and that any two
+## event types emitting identical HED both declare what a HED-only consumer
+## loses. Tag existence and coverage only; full HED syntax validation needs
+## hedtools and remains required before any interoperability claim.
+hed-crosswalk:
+	$(PYTHON) scripts/check-hed-crosswalk.py
 
 ## Measure multilingual coverage per scheme and refuse to let it drift. SSTIM
 ## advertises four languages in BARTOC, FAIRsharing and every module title; when
@@ -508,7 +521,7 @@ validate-status:
 		echo "validate-status: the tree has changed since; re-run make validate"; \
 	fi
 
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage language-coverage signal-layer w3id-routes release-dryrun truth-audit validate-stamp
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage language-coverage hed-crosswalk signal-layer w3id-routes release-dryrun truth-audit validate-stamp
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)

@@ -259,6 +259,26 @@ but it is the prerequisite for everything after.
    or explicitly segmented stimulus, coordinated IDs, and the manifest of
    decision 6. Small on purpose. It is what turns 199 lines of prose into
    something a reviewer can react to.
+
+   *Started 2026-08-18: the mapping contract exists.*
+   [`static/schemas/sstim-hed-event-map.json`](../../static/schemas/sstim-hed-event-map.json)
+   maps all ten `sstim-v:SessionEventTypeScheme` types to HED 8.4.0 annotations,
+   one-way and versioned, with `lossyBecause` on the six mappings that lose
+   information — including the pair `eventSessionComplete` and
+   `eventSessionInterrupt`, which emit identical HED because 8.4.0 has no
+   Incomplete, Abort or Terminate tag, so completion status is SSTIM-only.
+   `make hed-crosswalk` reads the tags out of the pinned schema rather than
+   trusting them; the first hand-written draft contained `Pulse`, `Modulation`
+   and `Intensity`, none of which are HED 8.4.0 tags. It also fails if the map
+   drifts from the scheme, or if two event types collide without declaring it.
+
+   **Still missing, and none of it is optional for decision 7:** the generated
+   events table itself, the bundle manifest with cross-artifact IDs and hashes,
+   round-trip or declared-loss tests, and validation by an actual HED validator.
+   The last needs `hedtools`, which is not in the flake — so what exists today
+   verifies that the tags are real and the coverage is complete, not that the
+   emitted annotations are syntactically valid HED. Do not describe the bridge as
+   working on the strength of this.
 2. **Take it to the HED Working Group** with the ask of decision 9: encode and
    reproduce, never endorse. This is also the most credible inbound-link path
    SSTIM has — HED annotations live in real published EEG datasets, and a
