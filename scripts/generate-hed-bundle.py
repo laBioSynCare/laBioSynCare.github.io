@@ -29,8 +29,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 from rdflib import Graph, URIRef
@@ -136,10 +134,11 @@ def build(out: Path) -> None:
             "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
             "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
             "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
+            "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
         ],
         "notValidated": [
             "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain.",
-            "Round-trip from HED back to SSTIM is not attempted and is not possible for the lossy mappings above, by construction. What is asserted is that the loss is declared, not that it is recoverable.",
+            "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision.",
         ],
     }
     (out / "bundle-manifest.json").write_text(

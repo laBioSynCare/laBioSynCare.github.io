@@ -253,16 +253,20 @@ hed-bundle:
 hed-bundle-check:
 	$(PYTHON) scripts/generate-hed-bundle.py --check
 
-## Verify the SSTIM to HED crosswalk against the pinned HED schema (ADR 0025).
-## HED is a generated profile, not primary storage, so the mapping table is the
-## part that rots silently: a tag that never existed, or that a schema release
-## removed, yields annotations that look right and validate nowhere. Tags are
-## read out of HED8.4.0.xml rather than trusted — the first hand-written draft
-## contained Pulse, Modulation and Intensity, none of which are HED 8.4.0 tags.
+## Validate the SSTIM to HED crosswalk with hedtools against the pinned schema
+## (ADR 0025 decision 7). HED is a generated profile, not primary storage, so the
+## mapping table is the part that rots silently.
+##
+## This replaced a regex that only checked whether each tag name appeared in the
+## schema XML, and the replacement paid for itself immediately: every temporal
+## mapping in crosswalk 0.1.0 was invalid HED. Onset, Offset, Pause and Inset are
+## scope tags requiring exactly one paired Def/, and the map wrote them bare. All
+## those tags exist, so the regex passed a string that would never have validated
+## anywhere — a confident wrong answer, which is worse than no check.
+##
 ## Also asserts the map covers SessionEventTypeScheme exactly, and that any two
 ## event types emitting identical HED both declare what a HED-only consumer
-## loses. Tag existence and coverage only; full HED syntax validation needs
-## hedtools and remains required before any interoperability claim.
+## loses. See hed-roundtrip for whether those declarations are true.
 hed-crosswalk:
 	$(PYTHON) scripts/check-hed-crosswalk.py
 

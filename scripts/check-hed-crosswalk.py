@@ -34,13 +34,21 @@ itself: every scope mapping in version 0.1.0 of the map was **invalid HED**.
 to be paired with exactly one `Def/` tag, and the map wrote them bare, as
 `(Experiment-structure, Time-block, Onset)`. Every tag in that string exists, so
 tag-existence checking passed it; it would never have validated anywhere.
+
+The validation is **offline**. `hedtools` ships the standard schemas inside the
+package, so `load_schema_version("8.4.0")` reads `schema_data/HED8.4.0.xml` from
+the installed tree rather than fetching it. Verified by running the validator
+with `socket` disabled. This matters more than it looks: a gate that silently
+depends on a third-party host is a gate that fails when that host does, and this
+repository has spent enough time on registries that were down. The HED schema
+version is pinned in the crosswalk and the flake pins `hedtools`, so the whole
+check is reproducible from the lockfile.
 """
 
 from __future__ import annotations
 
 import json
 import re
-import sys
 from pathlib import Path
 
 from rdflib import Graph, URIRef

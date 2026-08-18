@@ -43,7 +43,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from rdflib import Graph, URIRef
+from rdflib import Graph
 from rdflib.namespace import RDF, SKOS
 
 ROOT = Path(__file__).resolve().parents[1]
