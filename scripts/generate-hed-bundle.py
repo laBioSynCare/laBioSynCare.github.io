@@ -11,8 +11,10 @@ and emits a BIDS-style tab-separated events table with a `HED` column, beside a
 manifest recording every artifact hash, every pinned version, the clock
 assumption, and — the part that matters most — what the HED column cannot carry.
 
-**Loss is a first-class output.** Six of the ten event mappings lose information,
-and the manifest names each one. `eventSessionComplete` and
+**Loss is a first-class output.** Five of the ten event mappings lose
+information, and the manifest names every one that this bundle's events actually
+use — `declaredLoss` is keyed on the rows emitted, not on the whole crosswalk, so
+it stays a statement about these artifacts. `eventSessionComplete` and
 `eventSessionInterrupt` emit identical HED because HED 8.4.0 has no Incomplete,
 Abort or Terminate tag, so a consumer reading the events table alone cannot tell
 a finished session from an abandoned one. That is a real limitation of the

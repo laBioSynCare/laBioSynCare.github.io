@@ -267,6 +267,12 @@ hed-bundle-check:
 ## Also asserts the map covers SessionEventTypeScheme exactly, and that any two
 ## event types emitting identical HED both declare what a HED-only consumer
 ## loses. See hed-roundtrip for whether those declarations are true.
+##
+## Finally it checks the prose that restates these counts. Crosswalk 0.2.0 took
+## the lossy count from six to five and three sentences kept saying six, so the
+## numbers the ADR and the generator quote are now compared against the map. A
+## pattern that matches nothing fails too — a check that stopped looking is not
+## a check that passed.
 hed-crosswalk:
 	$(PYTHON) scripts/check-hed-crosswalk.py
 
@@ -278,6 +284,11 @@ hed-crosswalk:
 ## keeps the list of English-only schemes honest in both directions — a scheme
 ## that gets translated must leave the list. Closes the metric gap KR-16 was
 ## missing.
+##
+## It also *reports* skos:altLabel coverage without gating it: how many aliases a
+## concept deserves is an ontology decision, not this gate's. It is printed
+## because nothing measured it, and four documents consequently stated that alias
+## coverage was zero while fifteen aliases sat in the graph.
 language-coverage:
 	$(PYTHON) scripts/sstim-language-coverage.py
 

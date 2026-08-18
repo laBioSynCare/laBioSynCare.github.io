@@ -263,14 +263,15 @@ but it is the prerequisite for everything after.
    *Started 2026-08-18: the mapping contract exists.*
    [`static/schemas/sstim-hed-event-map.json`](../../static/schemas/sstim-hed-event-map.json)
    maps all ten `sstim-v:SessionEventTypeScheme` types to HED 8.4.0 annotations,
-   one-way and versioned, with `lossyBecause` on the six mappings that lose
+   one-way and versioned, with `lossyBecause` on the five mappings that lose
    information — including the pair `eventSessionComplete` and
    `eventSessionInterrupt`, which emit identical HED because 8.4.0 has no
    Incomplete, Abort or Terminate tag, so completion status is SSTIM-only.
-   `make hed-crosswalk` reads the tags out of the pinned schema rather than
-   trusting them; the first hand-written draft contained `Pulse`, `Modulation`
-   and `Intensity`, none of which are HED 8.4.0 tags. It also fails if the map
-   drifts from the scheme, or if two event types collide without declaring it.
+   `make hed-crosswalk` validates every mapped string against the pinned schema
+   with `hedtools`, which subsumes checking that each tag exists; the first
+   hand-written draft contained `Pulse`, `Modulation` and `Intensity`, none of
+   which are HED 8.4.0 tags. It also fails if the map drifts from the scheme, or
+   if two event types collide without declaring it.
 
    *The generated table and manifest exist too.* `make hed-bundle` reads the
    recorded-session fixture, walks its event timeline on the session clock, and

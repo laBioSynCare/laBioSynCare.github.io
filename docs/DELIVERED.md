@@ -66,15 +66,16 @@ what a working task list cannot.
 - [x] `.github/copilot-instructions.md` — from `CLAUDE.md` `P1`
 - [x] `.cursor/rules/rdf.mdc` `P1`
 - [x] `.cursor/rules/audio-engine.mdc` `P1`
-      *Written as thin pointers rather than derived copies. `CLAUDE.md` is 769
-      lines; three or five copies of it would drift out of agreement with it and
-      with each other, which is the failure this repository spends most of its
-      gates preventing. Each file carries a digest of the invariants where a
-      mistake is expensive — the engine clock, worklet bundling, allocation in
-      `process()`, ontology-file protection, health claims, naming your
-      instrument, Svelte 5 runes — and says `CLAUDE.md` wins on any
-      disagreement. The two `.mdc` files are glob-scoped so Cursor loads the RDF
-      rules for ontology paths and the audio rules for engine paths.*
+      *Written as thin pointers rather than derived copies. `CLAUDE.md` is the
+      better part of eight hundred lines and still growing; three or five copies
+      of it would drift out of agreement with it and with each other, which is
+      the failure this repository spends most of its gates preventing. Each file
+      carries a digest of the invariants where a mistake is expensive — the
+      engine clock, worklet bundling, allocation in `process()`, ontology-file
+      protection, health claims, naming your instrument, Svelte 5 runes — and
+      says `CLAUDE.md` wins on any disagreement. The two `.mdc` files are
+      glob-scoped so Cursor loads the RDF rules for ontology paths and the audio
+      rules for engine paths.*
 
 ### Generated artifacts (still to produce)
 - [x] `docs/README.md` — index over `concept/` `technical/` `ecosystem/` `P0`

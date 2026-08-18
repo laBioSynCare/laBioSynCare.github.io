@@ -319,8 +319,10 @@ The main gaps are design and coverage gaps, not current parser failures:
   recorded deliberately. The 276 labels added that day were written by the
   maintainers and have **not yet had native review**; see the review request in
   the repository issues. `skos:definition` remains English-only for all 545
-  concepts, deliberately, and alias coverage (`skos:altLabel`) remains zero and
-  unmeasured.
+  concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
+  than absent: 15 alternate labels on 8 of the 545 concepts, all English, mostly
+  the oscillation aliases [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
+  added. `make language-coverage` reports it but does not gate it.
 - VoID subsets are checked against the frozen release manifest but are not
   generated from the live manifest, leaving an avoidable maintenance seam.
 - Independent ontology, domain, privacy, and linked-data review remains

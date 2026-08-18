@@ -40,9 +40,10 @@
 
           # HED validation for ADR 0025. `hedtools` is the reference
           # implementation from the HED Working Group and is what ADR 0025
-          # decision 7 means by "HED validation against the pinned schema" —
-          # checking that a tag exists in the schema, which `make hed-crosswalk`
-          # already does, is not the same as validating HED syntax. Two of its
+          # decision 7 means by "HED validation against the pinned schema".
+          # `make hed-crosswalk` used to check only that each tag existed in the
+          # schema, which is not the same thing and passed a mapping that would
+          # never have validated anywhere; it now runs hedtools. Two of its
           # dependencies are also absent from nixpkgs, so all three are vendored
           # from PyPI here on the same pattern as pySHACL. Bump version + hash to
           # upgrade; the HED *schema* version is pinned separately, in

@@ -380,22 +380,41 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
-- [ ] Consider `skos:altLabel` coverage in `sstim-vocab.ttl` — currently **zero**
-      `P2`
+- [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of 545 concepts**, all
+      English `P2`
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,
       and an alias as `skos:altLabel`. SSTIM and Wikidata therefore agree exactly
-      on `skos:prefLabel`, which makes them directly comparable — but
-      `sstim-vocab.ttl` has 239 `skos:notation` values and **no `skos:altLabel`
-      at all**. Reconciliation and entity-linking tools (OpenRefine, Wikidata
-      search, generic matchers) resolve strings against prefLabel *and* altLabel,
-      so today a match succeeds only on the exact prefLabel in one of the four
-      languages. Nothing resolves "isochronic tones" to
-      `techIsochronicTones` ("Isochronic Tone Stimulation"), "monaural beats" to
-      `techMonauralBeats`, "gated pulse train" to either, or "alpha rhythm" /
-      "ritmo alfa" to `sstim-v:alpha`. This is a usability gap for other people's
-      tooling, and it is the cheap half of interoperability. Protected file
-      (CLAUDE.md §3.4): needs explicit instruction and per-term review.*
+      on `skos:prefLabel`, which makes them directly comparable. Reconciliation
+      and entity-linking tools (OpenRefine, Wikidata search, generic matchers)
+      resolve strings against prefLabel *and* altLabel, so for all but eight
+      concepts a match succeeds only on the exact prefLabel in one of the four
+      languages.
+      Nothing resolves "isochronic tones" to `techIsochronicTones` ("Isochronic
+      Tone Stimulation"), "monaural beats" to `techMonauralBeats`, or "gated
+      pulse train" to either. This is a usability gap for other people's tooling,
+      and it is the cheap half of interoperability. Protected file (CLAUDE.md
+      §3.4): needs explicit instruction and per-term review.*
+
+      *Restated 2026-08-18 after measuring it. This said "currently **zero**" and
+      "**no `skos:altLabel` at all**" from 2026-08-01 until then, and by then it
+      was false in this repository's own accepted record:
+      [ADR 0049](docs/decisions/0049-neural-oscillations-and-frequency-ambits.md)
+      added the oscillation aliases on 2026-08-15 and says in its own text that
+      it "begins closing the `skos:altLabel` gap". Six oscillation concepts carry
+      "alpha rhythm" / "alpha waves" and their siblings, and `audioNoiseBrownRed`
+      and `audioNoiseVioletPurple` carry noise-colour aliases. So "alpha rhythm"
+      does now resolve, which is why that example left the list above. A
+      sixteenth alias, "Patch" on `sstim:Preset`, is on an OWL class rather than
+      a concept, which is why `make language-coverage` reports fifteen: it counts
+      concepts in schemes. Both numbers are right about different questions —
+      name which one you mean. The claim had propagated into
+      `CURRENT_STATE.md`, `IMPROVEMENT_PLAN.md` and `REGISTRY_SUBMISSIONS.md`,
+      the last of which was about to declare an empty synonym field to a
+      registry — and all three of those sentences were written on 2026-08-18,
+      three days after the aliases landed and in the same days' work as §3.6
+      itself. `make language-coverage` now reports the count, so the number has a
+      command behind it rather than a memory.*
 - [?] Create items for project-specific techniques only after independent
       published sources establish notability `P2`
 - [?] Edit related Wikipedia articles only after independent sources support

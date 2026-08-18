@@ -4,7 +4,8 @@
 SSTIM advertises four languages. BARTOC records `en | it | es | pt`, FAIRsharing
 lists the same four, and every module title is translated. Measured against the
 concepts on 2026-08-18, that claim was half true: 269 of 545 concepts carried all
-four languages and 276 carried English alone, across 34 schemes.
+four languages and 276 carried English alone. 33 of the 67 schemes were complete
+and 34 were untranslated.
 
 The vocabulary was completed the same day — all 545 concepts now carry all four
 languages — so this gate changed job. It no longer tracks debt down; it stops the
@@ -34,8 +35,15 @@ Three rules, and the second is the one that matters:
 A concept in no scheme would be invisible to all of the above, so that is checked
 too. Every concept is in exactly one scheme today.
 
-Only `skos:prefLabel` is in scope. All 545 `skos:definition` values are English
-only, and translating them is a larger job and a separate decision.
+Only `skos:prefLabel` is *gated*. `skos:altLabel` is **reported and not gated**,
+because how many aliases a concept should carry is an ontology decision and not
+this script's to make. It is reported at all because the alternative was worse:
+with nothing measuring aliases, four documents stated that alias coverage was
+zero, and by the time they said it the graph already carried fifteen. A number
+nothing prints is a number that gets remembered wrongly — CLAUDE.md §3.6.
+
+All 545 `skos:definition` values are English only, and translating them is a
+larger job and a separate decision.
 """
 
 from __future__ import annotations
@@ -144,6 +152,22 @@ def main() -> int:
                 "so the recorded debt matches the ontology"
             )
 
+    # Alias coverage: reported, never gated. See the module docstring for why
+    # this is measured at all — an unmeasured number is one that gets restated
+    # from memory, and this one was restated as zero in four documents while the
+    # aliases sat in the graph.
+    #
+    # Scoped to concepts in schemes, like every count above it, so the one
+    # skos:altLabel on the class sstim:Preset is out of scope and the graph holds
+    # one more alias than this reports. Say which question you are answering.
+    alias_labels = [
+        (c, label)
+        for c in concepts_seen
+        for label in graph.objects(c, SKOS.altLabel)
+    ]
+    alias_concepts = {c for c, _ in alias_labels}
+    alias_langs = sorted({label.language for _, label in alias_labels if label.language})
+
     total_schemes = len(complete) + len(untranslated) + len(partial)
     concepts_total = len(concepts_seen)
     concepts_full = len(concepts_complete)
@@ -160,6 +184,11 @@ def main() -> int:
         f"{len(complete)}/{total_schemes} schemes complete in {'/'.join(REQUIRED)}, "
         f"{pct_s:.0f}%; {concepts_full}/{concepts_total} concepts, {pct_c:.0f}%; "
         f"{len(untranslated)} schemes are recorded translation debt)"
+    )
+    print(
+        f"language-coverage: aliases (not gated) — {len(alias_labels)} "
+        f"skos:altLabel on {len(alias_concepts)}/{concepts_total} concepts, "
+        f"{'/'.join(alias_langs) if alias_langs else 'none'}"
     )
     return 0
 

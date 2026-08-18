@@ -39,7 +39,11 @@ file is the human-readable summary.
 - `make language-coverage` measures multilingual coverage per scheme and refuses
   to let it drift. A scheme must be complete or wholly untranslated, a new scheme
   must ship translated or be recorded as debt, and a translated scheme must leave
-  the ledger. Closes the metric KR-16 lacked.
+  the ledger. Closes the metric KR-16 lacked. It also reports — without gating —
+  `skos:altLabel` coverage, which is 15 aliases on 8 of the 545 concepts. Four
+  documents had called that coverage zero; the aliases had been in the graph
+  since [ADR 0049](docs/decisions/0049-neural-oscillations-and-frequency-ambits.md)
+  landed on 2026-08-15, and nothing measured them, so the claim went unchallenged.
 - **The SKOS vocabulary is fully multilingual.** All 545 concepts now carry
   English, Italian, Portuguese and Spanish `skos:prefLabel` values, across all 67
   concept schemes. The gate found 269 of 545 complete; the remaining 276 labels
@@ -55,6 +59,14 @@ file is the human-readable summary.
 - `make definition-coverage` gained a bar against definitions that restate their
   label, implementing the second-pass review's finding that a length check
   cannot catch them.
+- `make hed-crosswalk` gained a fourth check: the prose that restates its counts
+  must still match them. Crosswalk 0.2.0 defined the two temporal scopes and
+  `eventPlaybackResume` stopped being lossy, taking the count from six to five —
+  the gate printed five the same day while the ADR and the generator's docstring
+  went on saying six. A pattern matching nothing fails too, so rewording the
+  prose cannot silently retire the check. Its reported tag count is also derived
+  from `hedtools` now rather than a regex, which had counted `Def` and the two
+  definition names as tags and missed the six tags inside the definitions.
 
 ### Changed
 

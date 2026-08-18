@@ -7,13 +7,14 @@ one-way, loss-declaring adapter. This checks the adapter's mapping table, which
 is the part that silently rots — a HED tag that never existed, or that a schema
 release removed, produces annotations that look fine and validate nowhere.
 
-Three things are checked, and the first is the one that motivated the script.
+Four things are checked, and the first is the one that motivated the script.
 
-1. **Every HED tag in the mapping exists in the pinned schema.** Tags are read
-   out of `HED8.4.0.xml` itself rather than trusted. Writing this map by hand
+1. **Every mapped string is valid HED against the pinned schema**, which
+   subsumes the weaker property that each tag exists. Writing this map by hand
    the first time produced `Pulse`, `Modulation` and `Intensity`, none of which
-   are HED 8.4.0 tags; all three were caught this way before they reached an
-   artifact.
+   are HED 8.4.0 tags; all three were caught before they reached an artifact,
+   back when this check was tag-existence only. It no longer is — see below for
+   why that mattered.
 
 2. **The mapping covers `sstim-v:SessionEventTypeScheme` exactly.** A new event
    type with no HED mapping would silently produce an incomplete profile, and a
@@ -25,6 +26,15 @@ Three things are checked, and the first is the one that motivated the script.
    `eventSessionComplete` and `eventSessionInterrupt` are the live example: HED
    8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is
    SSTIM-only and the map has to admit it.
+
+4. **Prose that restates these counts still agrees with them.** Crosswalk 0.2.0
+   defined the two scopes and `eventPlaybackResume` stopped being lossy, taking
+   the count from six to five. The gate printed five the same day; three
+   sentences went on saying six, in the ADR, in the generator's docstring and by
+   implication in the flake. `truth-audit.mjs` exists for exactly this class of
+   drift and reaches versions, DOIs and links — not a number only this script
+   derives. A docstring cannot be generated, so the next best thing is to fail
+   when a restatement stops matching.
 
 Validation is by `hedtools`, the HED Working Group's reference implementation,
 which ADR 0025 decision 7 requires. It replaced a regex that only checked whether
@@ -58,6 +68,72 @@ ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
 SCHEME = URIRef("https://w3id.org/sstim/vocab#SessionEventTypeScheme")
 
+NUMBER_WORDS = {
+    1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+    6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+}
+
+# Prose that restates a count this script derives, and the count it must equal.
+# `key` names the derived counts, `+`-joined, one per capture group in the
+# pattern — so a sentence quoting both the lossy count and the total is checked
+# on both. Add a row when new prose starts quoting these numbers, and prefer not
+# writing the number at all: the only prose that cannot go stale is prose that
+# does not restate a fact.
+PROSE_CLAIMS = (
+    (
+        "docs/decisions/0025-hed-bids-interoperability-crosswalk.md",
+        r"`lossyBecause` on the (\w+) mappings that lose",
+        "lossy",
+    ),
+    (
+        "docs/decisions/0025-hed-bids-interoperability-crosswalk.md",
+        r"maps all (\w+) `sstim-v:SessionEventTypeScheme` types",
+        "events",
+    ),
+    (
+        "scripts/generate-hed-bundle.py",
+        r"\*\*Loss is a first-class output\.\*\* (\w+) of the (\w+) event mappings",
+        "lossy+events",
+    ),
+)
+
+
+def check_prose(counts: dict) -> list[str]:
+    """Fail when prose restating a derived count stops matching it."""
+    problems: list[str] = []
+    for relative, pattern, key in PROSE_CLAIMS:
+        path = ROOT / relative
+        if not path.exists():
+            problems.append(f"{relative}: named by PROSE_CLAIMS but does not exist")
+            continue
+        match = re.search(pattern, path.read_text(encoding="utf-8"))
+        if match is None:
+            # A pattern that matches nothing is a blind check, not a passing one.
+            problems.append(
+                f"{relative}: no sentence matches /{pattern}/ — the prose was "
+                f"reworded, so this check stopped looking at anything. Update the "
+                f"pattern or drop the row."
+            )
+            continue
+        keys = key.split("+")
+        if len(keys) != len(match.groups()):
+            problems.append(
+                f"{relative}: /{pattern}/ has {len(match.groups())} capture "
+                f"group(s) but key '{key}' names {len(keys)} count(s)"
+            )
+            continue
+        # Past ten there is no word, so fall back to the digits rather than
+        # raising — a gate that crashes on the eleventh event type is a gate
+        # that has to be repaired before anyone can see what it was reporting.
+        expected = [NUMBER_WORDS.get(counts[k], str(counts[k])) for k in keys]
+        found = [g.lower() for g in match.groups()]
+        if found != expected:
+            problems.append(
+                f"{relative}: prose says {' / '.join(found)} where the crosswalk "
+                f"derives {' / '.join(expected)} — {match.group(0).strip()}"
+            )
+    return problems
+
 
 def validate_strings(spec: dict) -> tuple[list[str], int]:
     """Validate every mapped HED string against the pinned schema, with the
@@ -79,6 +155,12 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
     for issue in definitions.issues:
         failures.append(f"definition: {issue}")
 
+    # Count schema tags, not words. A regex over the mapping strings counted
+    # `Def` and the definition *names* (`Sstim-session`, `Sstim-delivery`) as
+    # tags, and never saw the tags inside the definitions at all — so the
+    # headline number was wrong in both directions. `short_base_tag` is the
+    # schema term hedtools resolved, with any `Def/<name>` extension stripped,
+    # which is the thing worth counting.
     tags: set[str] = set()
     for event, entry in sorted(spec["events"].items()):
         hed_string = HedString(entry["hed"], schema, def_dict=definitions)
@@ -86,7 +168,14 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
         if issues:
             detail = get_printable_issue_string(issues).strip().splitlines()
             failures.append(f"{event}: {entry['hed']} — {detail[-1].strip()}")
-        tags.update(re.findall(r"[A-Za-z][A-Za-z0-9-]*", entry["hed"]))
+        tags.update(tag.short_base_tag for tag in hed_string.get_all_tags())
+
+    # The definitions are validated above by DefinitionDict, which is the only
+    # correct way: a `Definition/` tag is illegal in event position, so running
+    # them through the event validator reports DEFINITION_INVALID on a perfectly
+    # good definition. They are parsed here for their tags alone.
+    for string in defs:
+        tags.update(tag.short_base_tag for tag in HedString(string, schema).get_all_tags())
     return failures, len(tags)
 
 
@@ -130,18 +219,22 @@ def main() -> int:
                     f"lossyBecause — a consumer reading HED alone cannot tell them apart"
                 )
 
+    # 4. prose restating these counts still agrees with them
+    lossy = sum(1 for e in spec["events"].values() if "lossyBecause" in e)
+    failures += check_prose({"events": len(spec["events"]), "lossy": lossy})
+
     if failures:
         print(f"hed-crosswalk: FAILED ({len(failures)} issue(s))")
         for failure in failures:
             print(f"  - {failure}")
         return 1
 
-    lossy = sum(1 for e in spec["events"].values() if "lossyBecause" in e)
     ndefs = len([k for k in spec.get("definitions", {}) if not k.startswith("$")])
     print(
         f"hed-crosswalk: passed ({len(mapped)} event types and {ndefs} definitions "
         f"validate as HED {version} via hedtools, {tag_count} distinct tags, "
-        f"{lossy} mappings declare information loss)"
+        f"{lossy} mappings declare information loss, "
+        f"{len(PROSE_CLAIMS)} prose restatements agree)"
     )
     return 0
 

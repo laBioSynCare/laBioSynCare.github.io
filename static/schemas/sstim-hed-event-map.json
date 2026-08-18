@@ -1,5 +1,5 @@
 {
-  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. Validated by hedtools against the pinned schema in `make hed-validate`.",
+  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
   "mappingVersion": "0.2.0",
   "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
   "hedSchema": {
