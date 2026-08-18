@@ -57,9 +57,12 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   by a BARTOC editor on 2026-07-27) and in
   [FAIRsharing](https://fairsharing.org/8494) (record 8494, curated 2026-08-06,
   DOI pending) and in
-  [DBpedia Archivo](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim),
-  which archives every resolvable version. A LOV submission is outstanding,
-  though LOV has catalogued nothing since November 2025. Tracked in
+  [DBpedia Archivo](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim).
+  A LOV submission is outstanding and its queue is slow but moving. Archivo's
+  rating is frozen at the state of first submission — its updater has not run
+  since February 2026, which is
+  [reported upstream](https://github.com/dbpedia/archivo/issues/58) — so treat
+  its star count as stale rather than current. Tracked in
   [registry submissions](docs/ontology/REGISTRY_SUBMISSIONS.md).
 - **Web app:** ontology graph, SPARQL workbench, preset browser, Patch Studio
   with built-in Sensory Field starters, logbook, profile and settings are
@@ -346,6 +349,32 @@ products, and Community Group work is not a W3C Standard.
   submitted text, kept as a record
 - [Ontology publication plan](docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
 - [Contributing](CONTRIBUTING.md)
+
+## Contributing
+
+The most useful thing an outside contributor can do right now needs a language
+and domain sense, not knowledge of this repository.
+
+**[Translate the vocabulary](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/15).**
+SSTIM publishes in English, Italian, Portuguese and Spanish, and 276 of its 545
+concepts currently carry English alone. Translation has been all-or-nothing per
+scheme, so one scheme is one clean pull request — the smallest is a single
+concept. `make language-coverage` is both the specification and the verifier:
+it requires a scheme to be complete or wholly untranslated, and it fails if the
+recorded debt drifts in either direction. Five schemes have their own
+[good first issues](https://github.com/laBioSynCare/laBioSynCare.github.io/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+
+**Propose a term.** If SSTIM is missing a concept you need, open a
+[term proposal](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/new?template=term-proposal.md).
+Grep [`docs/ontology/TERM_INDEX.md`](docs/ontology/TERM_INDEX.md) first — it is
+generated from the 18 modules and CI-checked, and 18 modules is more than anyone
+searches reliably by hand. A proposal does not require a pull request; describing
+the gap and the evidence is the contribution.
+
+**Before a pull request**, read [`CONTRIBUTING.md`](CONTRIBUTING.md) and
+[`CLAUDE.md`](CLAUDE.md) — the latter carries the invariants that are expensive
+to violate, including that ontology files under `static/ontology/` are not
+modified without explicit instruction. `make validate` is the gate CI runs.
 
 ## Citation And License
 
