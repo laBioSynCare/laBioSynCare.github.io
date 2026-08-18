@@ -371,6 +371,15 @@ provenance as `owl:Axiom` annotations.
   2.3 and Phase 4. Use hierarchy or SKOS Collections only where a genuine
   generic or grouping relation exists.
 
+  *Measured and gated 2026-08-18.* `make language-coverage` reports 269 of 545
+  concepts carrying all four languages and 33 of 67 schemes complete, and holds
+  the line: a scheme must be complete or wholly untranslated, a new scheme must
+  ship translated or be recorded as debt, and a translated scheme must leave the
+  ledger. So the *targets* half of this item now has its metric; the
+  *translation* half — 34 schemes, 276 concepts — is the work that remains, and
+  is now countable rather than impressionistic. Aliases stay unmeasured:
+  `skos:altLabel` coverage is zero.
+
 #### 1.5 Repair privacy-sensitive RDF surfaces
 
 > **Ecosystem F1–F2 implemented 2026-07-15 ([ADR 0031](../decisions/0031-qualified-ecosystem-records.md)).**

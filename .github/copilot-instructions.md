@@ -48,6 +48,17 @@ and includes the reasoning, which matters more than the rule.
 7. **Svelte 5 runes only.** `$props()`, `$state()`, `$derived()`, `onclick`,
    `{@render children()}`. Not `export let`, `$:`, `on:click`, `<slot />`.
 
+## Where to look, by what you are touching
+
+| Touching | Read first |
+|---|---|
+| Presets, voices, bands, groups | `../CLAUDE.md` §4 — the enums are **case-sensitive** and wrong case fails silently: `Binaural`, `Martigli`, `Martigli-Binaural`, `Symmetry`; groups `Heal`, `Support`, `Perform`, `Indulge`, `Transcend`; waveform fields are numeric `0`, never `"sine"` |
+| RDF, OWL, SKOS, SHACL | `../CLAUDE.md` §5 and `static/ontology/README.md` |
+| Audio engines, worklets, timing | `../CLAUDE.md` §3.1–3.3 and §6, `src/engines/README.md` |
+| Service worker / PWA | `../CLAUDE.md` §9 and ADR 0009 — never auto-reload, never intercept cross-origin, never precache the heavy assets |
+| Svelte components | `../CLAUDE.md` §2 — runes only |
+| Anything user-facing | `docs/concept/SCOPE.md` — wellness framing, no medical claims |
+
 ## Before you commit
 
 `make validate` for anything under `static/ontology/` — it is the same gate CI

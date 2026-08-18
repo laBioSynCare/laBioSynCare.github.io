@@ -36,6 +36,14 @@ file is the human-readable summary.
 - Every `skos:ConceptScheme` now carries `dct:license` (CC BY 4.0) — 67 of them,
   across the vocabulary, exposure and ecosystem modules. A scheme extracted on
   its own previously travelled with no licence at all.
+- `make language-coverage` measures multilingual coverage per scheme and refuses
+  to let it drift. SSTIM advertises four languages; 269 of 545 concepts carry all
+  four and 33 of 67 schemes are complete. A scheme must be complete or wholly
+  untranslated, a new scheme must ship translated or be recorded as debt, and a
+  translated scheme must leave the ledger. Closes the metric KR-16 lacked.
+- `make definition-coverage` gained a bar against definitions that restate their
+  label, implementing the second-pass review's finding that a length check
+  cannot catch them.
 
 ### Changed
 
@@ -56,6 +64,27 @@ file is the human-readable summary.
   are gone; they are recorded in `check-sstim-full-equivalence.py`'s exception
   list rather than the gate being loosened. The deprecation triples point at the
   replacement, so the migration is discoverable from the graph.
+- `sstim-ex:limitAveragingTime` deprecation (already recorded above) is joined by
+  two smaller corrections. `sstim:durationSeconds` now says it is whole seconds
+  and why: it is an *intended* duration, chosen by a person or shipped as a
+  preset default, and intent is not authored at sub-second precision, while what
+  actually happened stays decimal in `sstim:deliveredDurationSeconds`. The
+  second-pass review found two integer durations among nine decimals with
+  nothing recording whether the coarseness was meaningful; the sibling was
+  answered on 2026-08-17 and this one was missed.
+- **Each axiom is now asserted exactly once.** `sstim-alignments.ttl` restated
+  five upper-ontology `rdfs:subClassOf` axioms that `sstim-common`, `-technique`,
+  `-session` and `-evidence` already carried, so every Full serialization held
+  10575 raw triples against 10570 distinct — the reason DBpedia Archivo counts
+  five more than rdflib. The axiom belongs to the module that defines the class,
+  which reaches profiles alignments does not: `sstim-common` is in Core Plus
+  while alignments is Full-only. The rationale prose stays in place as comments,
+  following the convention the file already used for
+  `sstim:SessionInstance → prov:Activity`.
+
+  Consequently `sstim-alignments.ttl` no longer references `common`, `session`
+  or `technique`, and its `dct:requires` — and its manifest entry — narrow to
+  `evidence` and `vocab`. Both had over-declared.
 
 - **Immutable snapshot routes are patterns, not an enumeration**
   ([ADR 0053](docs/decisions/0053-wildcard-snapshot-routes.md)). Four rules now
