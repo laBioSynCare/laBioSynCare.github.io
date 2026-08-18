@@ -185,6 +185,40 @@ indexed, examiner-searchable records.
       *Note: urgent — do before further BioSynCare commits. Simple
       work-for-hire clause or joint ownership declaration.*
 
+### Registries
+- [ ] **Correct the prefix.cc registration** — it maps `sstim` to
+      `https://w3id.org/sstim/`, the ontology declares `https://w3id.org/sstim#` `P0`
+      *Found 2026-08-18 by `make registry-verify`, the first time anything
+      fetched it. Every term IRI a consumer builds from the registered prefix is
+      wrong and 404s: `https://w3id.org/sstim/Preset` does not resolve. The
+      tracker asserted the hash form and marked the entry DONE, so this had been
+      wrong and unnoticed since before 2026-07-11.*
+
+      *Needs a signed-in account, so a human must do it: log in at
+      <http://prefix.cc/> and re-submit `sstim` against `https://w3id.org/sstim#`.
+      prefix.cc keeps the most-voted mapping and there is currently one entry.
+      Then re-run `make registry-verify`, which compares against the namespace
+      parsed out of `sstim-core.ttl` and cannot drift from it.*
+
+      *Note the site's TLS certificate expired 2025-12-31, so `https://prefix.cc`
+      fails certificate validation and plain `http://` is the only way to read
+      it. That is probably why nobody checked.*
+
+- [ ] Get native review of the Italian, Portuguese and Spanish labels `P2`
+      *All 551 concepts carry four languages, but the 276 labels written on
+      2026-08-18 and the 6 written on 2026-08-19 were written by the maintainers
+      and no native speaker has read any of them.*
+
+      *`make language-coverage` now gates one mechanical property — a
+      translation must not give two concepts the same label where English
+      distinguishes them — and that found four real defects with no native
+      speaker involved: `actionStoppedSession` colliding with
+      `eventSessionInterrupt` in it/pt, `relatednessUnknown` with
+      `reviewerUnknownRelationship` in pt/es, and `actionDeclined` reading
+      "refused" in Portuguese for a concept about declining to answer. All are
+      corrected. **This is not review.** It cannot see register, idiom, or a
+      label that is simply wrong without colliding with anything.*
+
 ### Session model
 - [x] Decide whether SSTIM needs a parameter-change session event type — **yes,
       shipped 2026-08-18**, the same day it was raised `P2`

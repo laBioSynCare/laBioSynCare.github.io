@@ -52,7 +52,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://labiosyncare.github.io
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
 ## Build the production bundle
 build:
@@ -313,6 +313,22 @@ hed-bundle-check:
 ## a check that passed.
 hed-crosswalk:
 	$(PYTHON) scripts/check-hed-crosswalk.py
+
+## Measure what the public registries actually say about SSTIM. NETWORK, opt-in,
+## and deliberately NOT part of `make validate` — every other gate here is
+## offline and deterministic, and this one would fail on a third party's outage.
+##
+## It exists because the registry tracker records *external* state, which rots
+## with nothing noticing. prefix.cc had served `sstim -> https://w3id.org/sstim/`
+## since before 2026-07-11 while the ontology declares `https://w3id.org/sstim#`
+## and the tracker said so and marked it DONE. Every term IRI built from that
+## prefix is a 404. Nobody had fetched it, partly because prefix.cc's TLS
+## certificate expired 2025-12-31 and the ordinary https check dies first.
+##
+## Reports three states, not two: an unreachable registry is INCOMPLETE, never
+## absence, and does not set the exit status (CLAUDE.md §3.6).
+registry-verify:
+	$(PYTHON) scripts/verify-registries.py
 
 ## Measure multilingual coverage per scheme and refuse to let it drift. SSTIM
 ## advertises four languages in BARTOC, FAIRsharing and every module title; when

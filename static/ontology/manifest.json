@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "1988a7d0d95c5df1b398fa295d213831283b510b547bc9d2871d6db0e81d04c7"
+        "sha256": "81a884606e8fe62badfab6f05aeeed7791a4c136bf85f7e64432ae365c46fa0c"
       },
       "runtime": {
         "url": "/ontology/sstim-vocab.ttl",
@@ -902,7 +902,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "cfabeee782ba0e964c053685f21f47af384a194670808e2e61fc24b179fdc4ad"
+      "sha256": "a368cbec663dd7fa468282b358610c553971792bc7bf33cda64660dcd0aef4f6"
     }
   ]
 }

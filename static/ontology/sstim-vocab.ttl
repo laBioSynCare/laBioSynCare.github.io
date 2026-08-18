@@ -4059,8 +4059,8 @@ sstim-v:actionPausedSession a owl:NamedIndividual, sstim:ExperienceResponseActio
 sstim-v:actionStoppedSession a owl:NamedIndividual, sstim:ExperienceResponseAction, skos:Concept ;
     skos:inScheme sstim-v:ExperienceResponseActionScheme ;
     skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
-    skos:prefLabel "Stopped the session"@en, "Sessione interrotta"@it,
-        "Sessão interrompida"@pt, "Sesión detenida"@es ;
+    skos:prefLabel "Stopped the session"@en, "Sessione fermata"@it,
+        "Sessão parada"@pt, "Sesión detenida"@es ;
     skos:notation "action-stopped-session" ;
     skos:definition "The participant ended delivery."@en .
 
@@ -4084,7 +4084,7 @@ sstim-v:actionDeclined a owl:NamedIndividual, sstim:ExperienceResponseAction, sk
     skos:inScheme sstim-v:ExperienceResponseActionScheme ;
     skos:topConceptOf sstim-v:ExperienceResponseActionScheme ;
     skos:prefLabel "Action declined"@en, "Azione non dichiarata"@it,
-        "Ação recusada"@pt, "Acción no declarada"@es ;
+        "Ação não declarada"@pt, "Acción no declarada"@es ;
     skos:notation "action-declined" ;
     skos:definition "The participant chose not to say what they did."@en .
 
@@ -4192,7 +4192,7 @@ sstim-v:relatednessUnknown a owl:NamedIndividual, sstim:PerceivedRelatedness, sk
     skos:inScheme sstim-v:PerceivedRelatednessScheme ;
     skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
     skos:prefLabel "Relatedness unknown"@en, "Correlazione sconosciuta"@it,
-        "Relação desconhecida"@pt, "Relación desconocida"@es ;
+        "Correlação desconhecida"@pt, "Correlación desconocida"@es ;
     skos:notation "relatedness-unknown" ;
     skos:definition "The participant's view is not recoverable from the record."@en .
 
@@ -4200,7 +4200,7 @@ sstim-v:relatednessDeclined a owl:NamedIndividual, sstim:PerceivedRelatedness, s
     skos:inScheme sstim-v:PerceivedRelatednessScheme ;
     skos:topConceptOf sstim-v:PerceivedRelatednessScheme ;
     skos:prefLabel "Relatedness declined"@en, "Correlazione non dichiarata"@it,
-        "Relação recusada"@pt, "Relación no declarada"@es ;
+        "Correlação não declarada"@pt, "Correlación no declarada"@es ;
     skos:notation "relatedness-declined" ;
     skos:definition "The participant chose not to say whether they thought the session was involved."@en .
 

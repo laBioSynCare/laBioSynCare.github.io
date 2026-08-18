@@ -59,6 +59,31 @@ file is the human-readable summary.
 - `make definition-coverage` gained a bar against definitions that restate their
   label, implementing the second-pass review's finding that a length check
   cannot catch them.
+- **`make registry-verify`** measures what the public registries actually serve,
+  deriving the expected namespace from `sstim-core.ttl` rather than restating it.
+  Network, opt-in, and deliberately outside `make validate`; it reports three
+  states, because an unreachable registry is INCOMPLETE and never absence.
+
+  It exists because it immediately found the worst defect in the tracker:
+  **prefix.cc served `sstim` → `https://w3id.org/sstim/`** — a slash where the
+  ontology has a hash — while `REGISTRY_SUBMISSIONS.md` asserted the hash form
+  and marked the entry DONE. Anything resolving the prefix built every term IRI
+  wrong, and `https://w3id.org/sstim/Preset` is a 404. Nobody had fetched it,
+  partly because prefix.cc's TLS certificate expired 2025-12-31 and an ordinary
+  `https://` check dies before it can answer. Correcting the registration needs a
+  signed-in account and is now the tracker's only P0.
+- **Four translation defects, found by gating a property rather than by review.**
+  A translation must not collapse a distinction English makes, and three did:
+  "Session interrupted" and "Stopped the session" shared a label in Italian and
+  Portuguese, and "Relatedness unknown" and "Unknown relationship" shared one in
+  Portuguese and Spanish. In every case a sibling language already distinguished
+  them. A fourth, flagged in the 2026-08-18 translation pass and left open:
+  `actionDeclined` read "Ação recusada" — the action was refused — for a concept
+  defined as the participant choosing not to say what they did.
+
+  The 276 labels written that day still have had **no native review**. This gate
+  is not a substitute for one; it catches a class of error that does not need a
+  native speaker to see.
 - **The HED bundles' sidecars were not BIDS-conformant, and now are.** They had
   been called "BIDS-style" without ever being handed to a BIDS tool. Measured
   2026-08-18 with `bids-validator` 1.15.0: the first run returned `INTERNAL

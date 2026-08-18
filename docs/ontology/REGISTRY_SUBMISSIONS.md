@@ -81,26 +81,73 @@ released line remain valid. **Never present a mutable `-dev` line as a release**
 its generated namespace catalogues, Kernel/module endpoints, profiles, manifest,
 and schema must be deployed and the perma-id matrix verified first.
 
+> **Measured 2026-08-18** with `make registry-verify` and `gh`, not inherited.
+> Three states, because two would lie: **verified**, **wrong**, and
+> **INCOMPLETE** — an unreachable service is an unreachable instrument and never
+> evidence of absence (CLAUDE.md §3.6).
+>
+> | Registry | Result that day |
+> |---|---|
+> | prefix.cc | **wrong** — slash where the ontology has a hash, see below |
+> | BARTOC · FAIRsharing | verified 200 |
+> | LOV | absent, confirmed against a `skos` control that answered 200 |
+> | OLS4 #1351 · KG Catalog #46 | both still **open**, no maintainer response yet |
+> | DBpedia Archivo | **INCOMPLETE** — timed out; `dbpedia.org` itself also failed to answer, so this is their infrastructure and says nothing about our record |
+> | BioPortal | **INCOMPLETE** — the web UI answers 403 to a plain client and the REST API 401 without an API key, so neither confirms nor denies the entry below |
+
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
-| prefix.cc | ✅ **done** | no | — |
-| DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
+| prefix.cc | ❌ **WRONG NAMESPACE — fix first** — serves `sstim` → `https://w3id.org/sstim/`; SSTIM declares `https://w3id.org/sstim#`. Every term IRI built from this prefix 404s (`https://w3id.org/sstim/Preset`). Measured 2026-08-18 by `make registry-verify`; its TLS certificate expired 2025-12-31, so `https://` fails before answering and plain `http://` is the only way to read it | yes, to correct | **P0** |
+| DBpedia Archivo | ✅ **indexed 2026-08-17** (not re-confirmable 2026-08-18 — the host timed out, and so did `dbpedia.org`) — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
 | LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
-| BioPortal | ✅ **parsed & live** (ontologies/SSTIM) — browsable on **submission 13's** metrics, 67 classes and 334 concepts as *BioPortal* counted them on 2026-08-08. Not SSTIM's current size: submission 14 failed to parse (see below) and nothing has been ingested since, so the portal is several releases behind the 164 classes and 551 concepts the repository now holds | account ✓ (@rfabbri) | re-submit |
+| BioPortal | ✅ **parsed & live** (ontologies/SSTIM) — *unverified 2026-08-18: web 403 to a plain client, REST API 401 without a key* — browsable on **submission 13's** metrics, 67 classes and 334 concepts as *BioPortal* counted them on 2026-08-08. Not SSTIM's current size: submission 14 failed to parse (see below) and nothing has been ingested since, so the portal is several releases behind the 164 classes and 551 concepts the repository now holds | account ✓ (@rfabbri) | re-submit |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
-| OLS4 | 🕓 **PR open 2026-08-18** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0, mergeable | yes (GitHub) | watch |
+| OLS4 | 🕓 **PR open** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. Re-checked 2026-08-18 via `gh`: still open, not draft, **no comments** | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
-| DBpedia KG Catalog | 🕓 **submitted 2026-08-18** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run yet | yes (GitHub) | watch |
+| DBpedia KG Catalog | 🕓 **submitted** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run. Re-checked 2026-08-18 via `gh`: open, **still no labels**, one comment and it is ours | yes (GitHub) | watch |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
 ---
 
 ## 3. Per-registry records
 
-### prefix.cc — DONE
+### prefix.cc — WRONG, and it is the most damaging entry here
 
-Prefix `sstim` → `https://w3id.org/sstim#` is registered.
+**What is registered is not what this file said.** Measured 2026-08-18 over plain
+HTTP, in all four serialisations prefix.cc offers:
+
+```text
+$ curl http://prefix.cc/sstim.file.txt
+sstim	https://w3id.org/sstim/
+```
+
+SSTIM's namespace is `https://w3id.org/sstim#`. The registration has a **slash
+where the ontology has a hash**, and this file asserted the hash form and marked
+the entry DONE.
+
+**Why it matters more than a typo.** Resolving a prefix is the entire purpose of
+prefix.cc, and SPARQL editors, reconciliation tools and RDF libraries do it
+automatically. A consumer who takes the registered mapping builds
+`sstim:Preset` as `https://w3id.org/sstim/Preset`, which returns **404** —
+verified — as does every other term. Nothing they write about SSTIM uses an IRI
+that exists.
+
+**Why nobody caught it.** No instrument ever fetched it. prefix.cc's TLS
+certificate expired **2025-12-31** (`CN=prefix.cc`, Starfield G2), so an ordinary
+`https://` check fails on the certificate before it can return an answer, and the
+failure looks like a network problem rather than a wrong record. `make
+registry-verify` now reads it over `http://` — it is a public prefix mapping with
+no secret in it — and compares against the namespace parsed out of
+`sstim-core.ttl`, so it cannot drift from the ontology the way this prose did.
+
+**To fix:** log in at <http://prefix.cc/> (Google/OpenID) and re-submit `sstim`
+against `https://w3id.org/sstim#`. prefix.cc keeps the most-voted mapping per
+prefix, and there is currently only one entry, so a corrected submission from a
+signed-in account should replace it. Then re-run `make registry-verify`.
+
+*Historical record of what was believed, kept because the rest of this entry
+was written against it:*
 
 ```text
 Service:            prefix.cc

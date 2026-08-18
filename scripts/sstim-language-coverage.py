@@ -35,6 +35,22 @@ Three rules, and the second is the one that matters:
 A concept in no scheme would be invisible to all of the above, so that is checked
 too. Every concept is in exactly one scheme today.
 
+A translation must also not **collapse a distinction English makes**: two
+concepts with different English labels and the same label in another language
+are indistinguishable to anyone reading in it. That is mechanical, so it is
+gated, and it is the closest thing to review this vocabulary has had — the 276
+labels written on 2026-08-18 were not written by native speakers and have not
+been read by any. It found three collisions on its first run, and in each case a
+sibling language already made the distinction, which is what made the fix
+evident rather than a guess.
+
+What it cannot see is wording. `actionDeclined` read "Ação recusada" in
+Portuguese — the action was *refused* — for a concept defined as the participant
+choosing not to say what they did, while Italian and Spanish both said "not
+declared". Corrected 2026-08-18 on the evidence of the definition and two
+sibling languages, not on taste, but a check that catches that class of error
+without false positives has not been written and may not be writable.
+
 Only `skos:prefLabel` is *gated*. `skos:altLabel` is **reported and not gated**,
 because how many aliases a concept should carry is an ontology decision and not
 this script's to make. It is reported at all because the alternative was worse:
@@ -83,6 +99,7 @@ def main() -> int:
     # push the reported total past the number of concepts that exist.
     concepts_seen: set = set()
     concepts_complete: set = set()
+    labels_by_concept: dict = {}
 
     for scheme in graph.subjects(RDF.type, SKOS.ConceptScheme):
         members = [c for c in graph.subjects(SKOS.inScheme, scheme)]
@@ -92,11 +109,13 @@ def main() -> int:
         english_only = 0
         seen_languages: set[str] = set()
         for concept in members:
-            langs = {
-                label.language
+            by_language = {
+                label.language: str(label)
                 for label in graph.objects(concept, SKOS.prefLabel)
                 if label.language
             }
+            labels_by_concept[concept] = by_language
+            langs = set(by_language)
             seen_languages |= langs
             concepts_seen.add(concept)
             if all(code in langs for code in REQUIRED):
@@ -128,6 +147,31 @@ def main() -> int:
         if c not in concepts_seen
     )
 
+    # A translation must not collapse a distinction English makes. Two concepts
+    # with different English labels and the *same* label in another language are
+    # indistinguishable to anyone reading in that language — the vocabulary
+    # silently loses a term for them. Unlike wording, this is mechanical, so it
+    # is gated rather than left to the native review that has not happened yet.
+    #
+    # It found three on its first run, all in the 276 labels written on
+    # 2026-08-18: "Session interrupted" and "Stopped the session" collided in
+    # Italian and Portuguese, and "Relatedness unknown" and "Unknown
+    # relationship" collided in Portuguese and Spanish. In each case a sibling
+    # language already made the distinction, which is what made the fix obvious
+    # and is the reason this check is worth more than it looks.
+    collisions = []
+    for language in REQUIRED:
+        by_label: dict[str, set] = {}
+        for concept, langs in labels_by_concept.items():
+            if language in langs:
+                by_label.setdefault(langs[language], set()).add(concept)
+        for label, concepts_sharing in sorted(by_label.items()):
+            if len(concepts_sharing) < 2:
+                continue
+            english = {labels_by_concept[c].get("en") for c in concepts_sharing}
+            if len(english) > 1:
+                collisions.append((language, label, sorted(e for e in english if e)))
+
     issues = []
     for name in orphans:
         issues.append(
@@ -139,6 +183,12 @@ def main() -> int:
             f"{name} is partially translated ({full}/{total} concepts complete, "
             f"missing: {missing}) — finish it; per-scheme all-or-nothing is what "
             "makes this report meaningful rather than a vague percentage"
+        )
+    for language, label, english in collisions:
+        issues.append(
+            f"{language}: {label!r} is the label for {len(english)} concepts that "
+            f"English distinguishes ({', '.join(repr(e) for e in english)}) — a "
+            f"reader in {language} cannot tell them apart"
         )
     for name in sorted(set(untranslated) - UNTRANSLATED):
         issues.append(
