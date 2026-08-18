@@ -88,7 +88,7 @@ and schema must be deployed and the perma-id matrix verified first.
 >
 > | Registry | Result that day |
 > |---|---|
-> | prefix.cc | **wrong** — slash where the ontology has a hash, see below |
+> | prefix.cc | **was wrong** — slash where the ontology has a hash; corrected the same day, see below |
 > | BARTOC · FAIRsharing | verified 200 |
 > | LOV | absent, confirmed against a `skos` control that answered 200 |
 > | OLS4 #1351 · KG Catalog #46 | both still **open**, no maintainer response yet |
@@ -97,7 +97,7 @@ and schema must be deployed and the perma-id matrix verified first.
 
 | Registry | Can submit now? | Account? | Priority |
 |---|---|---|---|
-| prefix.cc | ❌ **WRONG NAMESPACE — fix first** — serves `sstim` → `https://w3id.org/sstim/`; SSTIM declares `https://w3id.org/sstim#`. Every term IRI built from this prefix 404s (`https://w3id.org/sstim/Preset`). Measured 2026-08-18 by `make registry-verify`; its TLS certificate expired 2025-12-31, so `https://` fails before answering and plain `http://` is the only way to read it | yes, to correct | **P0** |
+| prefix.cc | ✅ **corrected 2026-08-18** — now serves `sstim` → `https://w3id.org/sstim#` in all four serialisations (`txt`, `json`, `ttl`, `sparql`), verified by `make registry-verify`. It had served the slash form since before 2026-07-11; the hash entry was added and voted above it, and the slash form remains listed but outranked. Its TLS certificate expired 2025-12-31, so `https://` still fails certificate validation and plain `http://` is the only way to read it | yes | — |
 | DBpedia Archivo | ✅ **indexed 2026-08-17** (not re-confirmable 2026-08-18 — the host timed out, and so did `dbpedia.org`) — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
 | LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
@@ -112,10 +112,22 @@ and schema must be deployed and the perma-id matrix verified first.
 
 ## 3. Per-registry records
 
-### prefix.cc — WRONG, and it is the most damaging entry here
+### prefix.cc — was wrong, corrected 2026-08-18
 
-**What is registered is not what this file said.** Measured 2026-08-18 over plain
-HTTP, in all four serialisations prefix.cc offers:
+**Fixed.** All four serialisations now serve the hash form:
+
+```text
+$ curl http://prefix.cc/sstim.file.sparql
+PREFIX sstim: <https://w3id.org/sstim#>
+```
+
+The correct URI was added as an alternative and voted above the old one; prefix.cc
+serves the top-ranked URI, and the slash form remains listed but outranked. Confirmed
+by `make registry-verify`, which reads the mapping and compares it against the
+namespace parsed out of `sstim-core.ttl`.
+
+**What was wrong, kept because it is the reason the gate exists.** Measured 2026-08-18 over plain
+HTTP, before the correction, in all four serialisations prefix.cc offers:
 
 ```text
 $ curl http://prefix.cc/sstim.file.txt
@@ -141,10 +153,10 @@ registry-verify` now reads it over `http://` — it is a public prefix mapping w
 no secret in it — and compares against the namespace parsed out of
 `sstim-core.ttl`, so it cannot drift from the ontology the way this prose did.
 
-**To fix:** log in at <http://prefix.cc/> (Google/OpenID) and re-submit `sstim`
-against `https://w3id.org/sstim#`. prefix.cc keeps the most-voted mapping per
-prefix, and there is currently only one entry, so a corrected submission from a
-signed-in account should replace it. Then re-run `make registry-verify`.
+**How it was fixed, 2026-08-18:** "Add alternative URI" on <http://prefix.cc/sstim>
+with `https://w3id.org/sstim#`, then voted so it outranks the slash form.
+prefix.cc serves the top-ranked URI, so both may coexist as long as the hash form
+wins — `make registry-verify` is what says whether it still does.
 
 *Historical record of what was believed, kept because the rest of this entry
 was written against it:*

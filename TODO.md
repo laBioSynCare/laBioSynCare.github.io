@@ -186,19 +186,20 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Registries
-- [ ] **Correct the prefix.cc registration** — it maps `sstim` to
-      `https://w3id.org/sstim/`, the ontology declares `https://w3id.org/sstim#` `P0`
+- [x] **Correct the prefix.cc registration** — **done 2026-08-18**, hours after it
+      was found. All four serialisations now serve `https://w3id.org/sstim#`,
+      verified by `make registry-verify`. The hash URI was added as an
+      alternative and voted above the slash one, which remains listed but
+      outranked; prefix.cc serves the top-ranked URI, so the gate is what says
+      whether it still wins. `P0`
       *Found 2026-08-18 by `make registry-verify`, the first time anything
       fetched it. Every term IRI a consumer builds from the registered prefix is
       wrong and 404s: `https://w3id.org/sstim/Preset` does not resolve. The
       tracker asserted the hash form and marked the entry DONE, so this had been
       wrong and unnoticed since before 2026-07-11.*
 
-      *Needs a signed-in account, so a human must do it: log in at
-      <http://prefix.cc/> and re-submit `sstim` against `https://w3id.org/sstim#`.
-      prefix.cc keeps the most-voted mapping and there is currently one entry.
-      Then re-run `make registry-verify`, which compares against the namespace
-      parsed out of `sstim-core.ttl` and cannot drift from it.*
+      *It needed a signed-in account, so Renato did it: "Add alternative URI" with
+      `https://w3id.org/sstim#`, then voted it above the slash form.*
 
       *Note the site's TLS certificate expired 2025-12-31, so `https://prefix.cc`
       fails certificate validation and plain `http://` is the only way to read

@@ -70,8 +70,11 @@ file is the human-readable summary.
   and marked the entry DONE. Anything resolving the prefix built every term IRI
   wrong, and `https://w3id.org/sstim/Preset` is a 404. Nobody had fetched it,
   partly because prefix.cc's TLS certificate expired 2025-12-31 and an ordinary
-  `https://` check dies before it can answer. Correcting the registration needs a
-  signed-in account and is now the tracker's only P0.
+  `https://` check dies before it can answer.
+
+  **Corrected the same day** — all four serialisations now serve the hash form,
+  confirmed by re-running the gate. The slash form is still listed but outranked,
+  which is why the check compares what is *served* rather than what exists.
 - **Four translation defects, found by gating a property rather than by review.**
   A translation must not collapse a distinction English makes, and three did:
   "Session interrupted" and "Stopped the session" shared a label in Italian and
