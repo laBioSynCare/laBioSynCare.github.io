@@ -1,6 +1,6 @@
 {
-  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Every tag here is verified to exist in the pinned schema by `make hed-crosswalk`.",
-  "mappingVersion": "0.1.0",
+  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. Validated by hedtools against the pinned schema in `make hed-validate`.",
+  "mappingVersion": "0.2.0",
   "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
   "hedSchema": {
     "name": "HED standard schema",
@@ -11,47 +11,46 @@
   "notes": [
     "HED annotations are generated from SSTIM event types; they are never primary storage (ADR 0025 decision 2).",
     "These are profile mappings, not concept equivalences. No skos:exactMatch is asserted between an SSTIM event type and a HED tag, per ADR 0025 decision 6.",
-    "Temporal-scope tags (Onset, Offset, Pause) are emitted for the session block and the delivery block. A consumer pairing them must respect HED scoping rules.",
+    "Version 0.1.0 of this map wrote scope tags bare, as (Experiment-structure, Time-block, Onset). That is invalid HED: a scope tag requires exactly one paired Def/. The tag-existence check passed it because every tag existed; only hedtools caught it. That is the whole argument for decision 7 requiring a real validator.",
     "Where SSTIM distinguishes something HED does not, the difference is recorded in `lossyBecause` rather than forced into a tag."
   ],
   "events": {
     "eventSessionOpen": {
       "label": "Session opened",
-      "hed": "(Experiment-structure, Time-block, Onset)",
-      "rationale": "The session instance is a structural time block; opening it starts that block."
+      "hed": "(Def/Sstim-session, Onset)",
+      "rationale": "Opens the session scope defined as Sstim-session."
     },
     "eventSessionComplete": {
       "label": "Session completed",
-      "hed": "(Experiment-structure, Time-block, Offset)",
-      "rationale": "Closes the session block after the intended duration was delivered.",
+      "hed": "(Def/Sstim-session, Offset)",
+      "rationale": "Closes the session scope after the intended duration was delivered.",
       "lossyBecause": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
     },
     "eventSessionInterrupt": {
       "label": "Session interrupted",
-      "hed": "(Experiment-structure, Time-block, Offset)",
-      "rationale": "Closes the session block early.",
+      "hed": "(Def/Sstim-session, Offset)",
+      "rationale": "Closes the session scope early.",
       "lossyBecause": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
     },
     "eventPlaybackStart": {
       "label": "Playback started",
-      "hed": "(Sensory-event, Experimental-stimulus, Sensory-presentation, Onset)",
-      "rationale": "Stimulus delivery begins; the presented stimulus is the experimental one."
+      "hed": "(Def/Sstim-delivery, Onset)",
+      "rationale": "Opens the delivery scope defined as Sstim-delivery."
     },
     "eventPlaybackStop": {
       "label": "Playback stopped",
-      "hed": "(Sensory-event, Experimental-stimulus, Sensory-presentation, Offset)",
-      "rationale": "Stimulus delivery ends."
+      "hed": "(Def/Sstim-delivery, Offset)",
+      "rationale": "Closes the delivery scope."
     },
     "eventPlaybackPause": {
       "label": "Playback paused",
-      "hed": "(Experiment-control, Pause)",
-      "rationale": "Delivery is suspended without closing the session block."
+      "hed": "(Def/Sstim-delivery, Pause)",
+      "rationale": "Suspends delivery without closing the session scope."
     },
     "eventPlaybackResume": {
       "label": "Playback resumed",
-      "hed": "(Experiment-control, Sensory-presentation, Onset)",
-      "rationale": "Delivery restarts after a pause.",
-      "lossyBecause": "HED does not distinguish a resume from a fresh onset; the pairing with the preceding Pause carries that in SSTIM only."
+      "hed": "(Def/Sstim-delivery, Inset)",
+      "rationale": "Delivery restarts inside the still-open delivery scope. Inset marks an intermediate point within a scope, which is exactly a resume."
     },
     "eventSafetyLimitApplied": {
       "label": "Safety limit applied",
@@ -71,5 +70,10 @@
       "rationale": "A phase-qualified report was collected from the participant.",
       "lossyBecause": "The instrument, its version, the response state and any unwanted-experience structure are SSTIM-only. HED records that a response occurred, not what it asserted."
     }
+  },
+  "definitions": {
+    "$comment": "HED definitions naming the two temporal scopes SSTIM events open and close. A consumer must supply these to a HED validator alongside the events, which is what the events.json sidecar does.",
+    "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
+    "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
   }
 }

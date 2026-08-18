@@ -87,7 +87,13 @@ def build(out: Path) -> None:
                     "TermURL": spec["sstimEventScheme"],
                     "Levels": {t: spec["events"][t]["label"] for _, t, _, _ in rows},
                 },
-                "HED": {"Description": f"Generated from event_type by the crosswalk, HED {spec['hedSchema']['version']}."},
+                "HED": {
+                    "Description": f"Generated from event_type by the crosswalk, HED {spec['hedSchema']['version']}.",
+                    "Definitions": [
+                        v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")
+                    ],
+                    "$comment": "The Definitions must be supplied to a HED validator alongside this table: Onset, Offset, Pause and Inset are scope tags that require exactly one paired Def/, so the events do not validate without them.",
+                },
             },
             indent=2,
             ensure_ascii=False,
@@ -126,10 +132,14 @@ def build(out: Path) -> None:
             for t in used
             if "lossyBecause" in spec["events"][t]
         },
+        "validated": [
+            "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+            "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
+            "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
+        ],
         "notValidated": [
-            "HED syntax is not validated here. Tag existence against the pinned schema is checked by `make hed-crosswalk`; full validation requires hedtools, which is not in the flake.",
             "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain.",
-            "Round-trip from HED back to SSTIM is not attempted and is not possible for the lossy mappings above, by construction.",
+            "Round-trip from HED back to SSTIM is not attempted and is not possible for the lossy mappings above, by construction. What is asserted is that the loss is declared, not that it is recoverable.",
         ],
     }
     (out / "bundle-manifest.json").write_text(
@@ -162,11 +172,35 @@ def main() -> int:
         if stale:
             print(f"hed-bundle: STALE ({', '.join(stale)}) — run `make hed-bundle`")
             return 1
-        n = len((OUT_DIR / "events.tsv").read_text().splitlines()) - 1
+        # Staleness is not enough: the committed table must also be valid HED.
+        # Decision 7 makes validation a publication gate, and a bundle that is
+        # merely *current* can still be current and wrong.
+        from hed import load_schema_version
+        from hed.models import HedString, DefinitionDict
+
+        spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
+        schema = load_schema_version(spec["hedSchema"]["version"])
+        defs = DefinitionDict(
+            [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")],
+            schema,
+        )
+        bad = []
+        rows = (OUT_DIR / "events.tsv").read_text().splitlines()[1:]
+        for line in rows:
+            hed = line.split("\t")[3]
+            issues = HedString(hed, schema, def_dict=defs).validate(schema)
+            if issues:
+                bad.append(f"{line.split(chr(9))[2]}: {hed}")
+        if bad:
+            print(f"hed-bundle: INVALID HED in {len(bad)} row(s)")
+            for b in bad:
+                print(f"  - {b}")
+            return 1
+
         loss = json.loads((OUT_DIR / "bundle-manifest.json").read_text())["declaredLoss"]
         print(
-            f"hed-bundle: current ({n} events, {len(loss)} of them emitting HED that "
-            f"declares information loss)"
+            f"hed-bundle: current and valid ({len(rows)} events validate as HED "
+            f"{schema.version}, {len(loss)} declaring information loss)"
         )
         return 0
     finally:

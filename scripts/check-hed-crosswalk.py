@@ -26,9 +26,14 @@ Three things are checked, and the first is the one that motivated the script.
    8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is
    SSTIM-only and the map has to admit it.
 
-This validates *tag existence and coverage*, not HED syntax. Full validation
-against a HED validator is the remaining step and needs `hedtools`, which is not
-in the flake; ADR 0025 decision 7 requires it before any interoperability claim.
+Validation is by `hedtools`, the HED Working Group's reference implementation,
+which ADR 0025 decision 7 requires. It replaced a regex that only checked whether
+each tag name appeared in the schema XML, and the replacement immediately earned
+itself: every scope mapping in version 0.1.0 of the map was **invalid HED**.
+`Onset`, `Offset`, `Pause` and `Inset` are temporal-scope tags that HED requires
+to be paired with exactly one `Def/` tag, and the map wrote them bare, as
+`(Experiment-structure, Time-block, Onset)`. Every tag in that string exists, so
+tag-existence checking passed it; it would never have validated anywhere.
 """
 
 from __future__ import annotations
@@ -36,8 +41,6 @@ from __future__ import annotations
 import json
 import re
 import sys
-import urllib.request
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from rdflib import Graph, URIRef
@@ -45,60 +48,51 @@ from rdflib.namespace import SKOS
 
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "static" / "schemas" / "sstim-hed-event-map.json"
-CACHE = ROOT / ".hed-schema-cache"
 SCHEME = URIRef("https://w3id.org/sstim/vocab#SessionEventTypeScheme")
 
 
-def hed_tags(url: str, version: str) -> set[str]:
-    cache = CACHE / f"HED{version}.xml"
-    if not cache.exists():
-        CACHE.mkdir(exist_ok=True)
-        urllib.request.urlretrieve(url, cache)
-    root = ET.parse(cache).getroot()
-    if root.get("version") != version:
+def validate_strings(spec: dict) -> tuple[list[str], int]:
+    """Validate every mapped HED string against the pinned schema, with the
+    definitions in scope. Returns (failures, distinct tag count)."""
+    from hed import load_schema_version
+    from hed.models import HedString, DefinitionDict
+    from hed.errors import get_printable_issue_string
+
+    version = spec["hedSchema"]["version"]
+    schema = load_schema_version(version)
+    if schema.version != version:
         raise SystemExit(
-            f"hed-crosswalk: cached schema is {root.get('version')}, map pins {version}"
+            f"hed-crosswalk: hedtools loaded {schema.version}, map pins {version}"
         )
+
+    defs = [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")]
+    definitions = DefinitionDict(defs, schema)
+    failures: list[str] = []
+    for issue in definitions.issues:
+        failures.append(f"definition: {issue}")
+
     tags: set[str] = set()
-
-    def walk(node, path=""):
-        for child in node.findall("node"):
-            name = child.findtext("name")
-            if not name:
-                continue
-            full = f"{path}/{name}" if path else name
-            tags.add(name)
-            tags.add(full)
-            walk(child, full)
-
-    schema = root.find("schema")
-    walk(root if schema is None else schema)
-    return tags
+    for event, entry in sorted(spec["events"].items()):
+        hed_string = HedString(entry["hed"], schema, def_dict=definitions)
+        issues = hed_string.validate(schema)
+        if issues:
+            detail = get_printable_issue_string(issues).strip().splitlines()
+            failures.append(f"{event}: {entry['hed']} — {detail[-1].strip()}")
+        tags.update(re.findall(r"[A-Za-z][A-Za-z0-9-]*", entry["hed"]))
+    return failures, len(tags)
 
 
 def main() -> int:
     spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
     version = spec["hedSchema"]["version"]
+
+    # 1. every mapped string is valid HED against the pinned schema
     try:
-        tags = hed_tags(spec["hedSchema"]["url"], version)
-    except Exception as exc:  # offline, or the schema moved
-        print(f"hed-crosswalk: INCOMPLETE — could not read the pinned schema ({exc})")
-        print("  This is not a pass. An unreachable schema cannot confirm a tag exists.")
+        failures, tag_count = validate_strings(spec)
+    except Exception as exc:  # no network for the schema, or hedtools missing
+        print(f"hed-crosswalk: INCOMPLETE — could not validate ({exc})")
+        print("  This is not a pass. An unreachable validator confirms nothing.")
         return 1
-
-    failures: list[str] = []
-
-    # 1. every tag in the map is a real tag in the pinned schema
-    used: dict[str, list[str]] = {}
-    for event, entry in spec["events"].items():
-        found = re.findall(r"[A-Za-z][A-Za-z0-9-]*(?:/[A-Za-z][A-Za-z0-9-]*)*", entry["hed"])
-        for tag in found:
-            used.setdefault(tag, []).append(event)
-            if tag not in tags:
-                failures.append(
-                    f"{event}: '{tag}' is not a tag in HED {version} — "
-                    f"check https://www.hedtags.org/display_hed.html?schema={version}"
-                )
 
     # 2. the map covers the SSTIM scheme exactly
     graph = Graph()
@@ -135,9 +129,10 @@ def main() -> int:
         return 1
 
     lossy = sum(1 for e in spec["events"].values() if "lossyBecause" in e)
+    ndefs = len([k for k in spec.get("definitions", {}) if not k.startswith("$")])
     print(
-        f"hed-crosswalk: passed ({len(mapped)} event types mapped to HED {version}, "
-        f"{len(used)} distinct tags all present in the pinned schema, "
+        f"hed-crosswalk: passed ({len(mapped)} event types and {ndefs} definitions "
+        f"validate as HED {version} via hedtools, {tag_count} distinct tags, "
         f"{lossy} mappings declare information loss)"
     )
     return 0

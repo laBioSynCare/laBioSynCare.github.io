@@ -38,6 +38,68 @@
             pythonImportsCheck = [ "owlrl" ];
           };
 
+          # HED validation for ADR 0025. `hedtools` is the reference
+          # implementation from the HED Working Group and is what ADR 0025
+          # decision 7 means by "HED validation against the pinned schema" —
+          # checking that a tag exists in the schema, which `make hed-crosswalk`
+          # already does, is not the same as validating HED syntax. Two of its
+          # dependencies are also absent from nixpkgs, so all three are vendored
+          # from PyPI here on the same pattern as pySHACL. Bump version + hash to
+          # upgrade; the HED *schema* version is pinned separately, in
+          # static/schemas/sstim-hed-event-map.json.
+          click-option-group = py.pkgs.buildPythonPackage rec {
+            pname = "click_option_group";
+            version = "0.5.9";
+            pyproject = true;
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-+U7SvEz2kFLg8pWSvR53GheJvXv8SC3QvEghNK/5WCM=";
+            };
+            # hatchling + hatch-vcs, not setuptools. hatch-vcs derives the
+            # version from git metadata that a PyPI sdist does not carry, so it
+            # is supplied explicitly.
+            build-system = with py.pkgs; [ hatchling hatch-vcs ];
+            env.HATCH_VCS_PRETEND_VERSION = version;
+            dependencies = [ py.pkgs.click ];
+            dontCheckRuntimeDeps = true;
+            doCheck = false;
+            pythonImportsCheck = [ "click_option_group" ];
+          };
+
+          semantic-version = py.pkgs.buildPythonPackage rec {
+            pname = "semantic_version";
+            version = "2.10.0";
+            pyproject = true;
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-vau20zaZjLs3jUuds6S1ah4yNXAdwF6iaQ2amX7VBBw=";
+            };
+            build-system = [ py.pkgs.setuptools ];
+            dontCheckRuntimeDeps = true;
+            doCheck = false;
+            pythonImportsCheck = [ "semantic_version" ];
+          };
+
+          hedtools = py.pkgs.buildPythonPackage rec {
+            pname = "hedtools";
+            version = "1.2.0";
+            pyproject = true;
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-7mHiWfMPDDPjfEqpRql/X7b6w5JlPN4CHPwzPF+vSNE=";
+            };
+            # setuptools-scm also derives the version from git; the sdist has
+            # none, so it is pretended here.
+            build-system = with py.pkgs; [ setuptools setuptools-scm ];
+            env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
+            dependencies = with py.pkgs; [
+              click defusedxml inflect numpy openpyxl pandas portalocker typeguard
+            ] ++ [ click-option-group semantic-version ];
+            dontCheckRuntimeDeps = true;
+            doCheck = false;
+            pythonImportsCheck = [ "hed" ];
+          };
+
           pyshacl = py.pkgs.buildPythonApplication rec {
             pname = "pyshacl";
             version = "0.26.0";
@@ -165,7 +227,7 @@
 
             packages = [
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
-              (py.withPackages (ps: [ ps.rdflib ps.jsonschema ]))  # RDF tooling + manifest JSON Schema validation
+              (py.withPackages (ps: [ ps.rdflib ps.jsonschema hedtools ]))  # RDF tooling, manifest JSON Schema validation, HED validation (ADR 0025)
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
               pylode              # vendored `pylode` CLI — SKOS vocab HTML docs (`make vocab-docs`)
               robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`

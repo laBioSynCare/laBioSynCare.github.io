@@ -18,6 +18,11 @@
     }
   },
   "HED": {
-    "Description": "Generated from event_type by the crosswalk, HED 8.4.0."
+    "Description": "Generated from event_type by the crosswalk, HED 8.4.0.",
+    "Definitions": [
+      "(Definition/Sstim-session, (Experiment-structure, Time-block))",
+      "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
+    ],
+    "$comment": "The Definitions must be supplied to a HED validator alongside this table: Onset, Offset, Pause and Inset are scope tags that require exactly one paired Def/, so the events do not validate without them."
   }
 }
