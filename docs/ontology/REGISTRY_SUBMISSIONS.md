@@ -89,7 +89,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ✅ **parsed & live** (ontologies/SSTIM — 67 classes, 334 concepts) | account ✓ (@rfabbri) | — |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
-| OLS4 | ✅ **actionable** — absent (404) but non-OBO w3id ontologies are accepted and `EBISPOT/ols4` merges "Add X" PRs weekly; needs one entry in `ebi_ontologies.json` on `dev` | yes (GitHub) | **high** |
+| OLS4 | 🕓 **PR open 2026-08-18** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0, mergeable | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | DBpedia KG Catalog | 🕓 **submitted 2026-08-18** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run yet | yes (GitHub) | watch |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -1013,14 +1013,39 @@ Note SSTIM's SKOS layer is a good fit for the `definition_property` and
 synonym field would be declared but empty.
 
 ```text
-Service:            OLS (EBI)
-Submitted URL:
-Submitted version:  0.6.0
-Date:
-Account/maintainer:
-External record ID or URL:
-Status:
-Required follow-up:
+Service:            OLS4 (EBI Ontology Lookup Service)
+Submitted URL:      https://github.com/EBISPOT/ols4/pull/1351
+Submitted version:  0.15.0
+Date:               2026-08-18
+Account/maintainer: @ttm (fork ttm/ols4, branch add-sstim-ontology)
+External record ID or URL:  https://www.ebi.ac.uk/ols4/ontologies/sstim (on merge)
+Status:             PR OPEN — one entry appended to ebi_ontologies.json against
+                    the dev branch. 35 insertions, 0 deletions, mergeable. Their
+                    recent "Add X ontology" PRs merged within days.
+Required follow-up: Watch #1351. On merge, confirm the ontology resolves at
+                    /ols4/ontologies/sstim and record the URL above.
+
+                    **Bump ontology_purl at every release.** It pins the frozen
+                    0.15.0 snapshot deliberately: the unversioned path
+                    /ontology/sstim-namespace.ttl serves the mutable -dev line,
+                    and this file's own rule is never to present that as a
+                    release. The cost is a one-line PR per release, and the PR
+                    description offers them a rolling URL instead if they would
+                    rather have fewer. Added to the release checklist below.
+
+                    Config choices, recorded so a reviewer's question has an
+                    answer: `reasoner` omitted (as in most entries) because the
+                    hierarchy is asserted, not inferred, so load-time reasoning
+                    buys nothing even though the ontology is OWL 2 DL and
+                    consistent under HermiT, JFact and Openllet; `base_uri`
+                    lists four namespaces because SSTIM is modular;
+                    `label_property` carries both rdfs:label and skos:prefLabel
+                    since classes use one and concepts the other; and
+                    `synonym_property` is declared as skos:altLabel for future
+                    use, stated plainly in the PR as currently empty.
+
+                    Verified before opening: the ontology_purl returns 200 as
+                    text/turtle, 727857 bytes, parsing to 10437 triples.
 ```
 
 ### OpenAIRE — deferred

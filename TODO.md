@@ -282,6 +282,21 @@ Turtle files are listed in section 1. After they exist:
       exception. Two seconds per run versus ROBOT's eight, which is what made
       minimisation affordable.*
 
+- [~] Watch OLS4 PR #1351, then bump `ontology_purl` at every release `P2`
+      *[EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351) adds SSTIM
+      to `ebi_ontologies.json` on `dev` — 35 insertions, no deletions,
+      mergeable. Their recent "Add X ontology" PRs merged within days. On merge,
+      confirm <https://www.ebi.ac.uk/ols4/ontologies/sstim> resolves and record
+      it in `REGISTRY_SUBMISSIONS.md`.*
+
+      ***Then it becomes a per-release chore.*** *The entry pins the frozen
+      snapshot — `…/ontology/0.15.0/sstim-namespace.ttl` — on purpose, because
+      the unversioned path serves the mutable `-dev` line and this project does
+      not advertise that as a release. So each release needs a one-line follow-up
+      PR bumping the version in that URL, or OLS keeps serving the previous one.
+      The PR description offers EBI a rolling URL instead if they would rather
+      have fewer PRs; if they accept, this item disappears.*
+
 - [~] Post the ShowVoc enquiry once admitted to the VocBench group `P2`
       *Drafted and committed at
       [`docs/ontology/outreach/2026-08-18-showvoc-enquiry.md`](docs/ontology/outreach/2026-08-18-showvoc-enquiry.md).
