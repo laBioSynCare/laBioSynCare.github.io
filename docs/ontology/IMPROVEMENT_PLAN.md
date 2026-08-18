@@ -9,7 +9,7 @@ and phase numbering below is dependency order, not a version.
 **Primary audit:** [RDF knowledge-representation audit, 2026-07-13](reviews/2026-07-13-rdf-knowledge-representation-audit.md)
 
 For the implemented baseline and the ordered work that remains after the
-`0.15.0` release, start with the maintained
+`0.16.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
 logic and acceptance gates; it is not a claim that every bullet is still open.
 

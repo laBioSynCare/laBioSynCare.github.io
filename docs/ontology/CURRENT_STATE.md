@@ -1,6 +1,6 @@
 # SSTIM Current State and Next Steps
 
-**Status:** maintained current-state summary, reviewed 2026-08-17. This is the
+**Status:** maintained current-state summary, reviewed 2026-08-18. This is the
 starting point for ontology work. Dated audits remain evidence for individual
 decisions, but they describe the repository state on their stated dates rather
 than the state summarized here.
@@ -12,16 +12,16 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.16.0-dev`, synchronized development suite | [`manifest.json`](../../static/ontology/manifest.json) |
-| What can be cited? | `0.15.0`, released 2026-08-17 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.21981526` | [`void.ttl`](../../static/ontology/void.ttl) |
+| What is being edited? | `0.16.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.16.0`, released 2026-08-18 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| Which DOI identifies that release? | pending Zenodo archival of the `v0.16.0` tag | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
-| What changed? | The signal layer, neural oscillations, the public-claim contract and the preset contract | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| What changed? | OWL 2 DL conformance, a fully multilingual vocabulary, and the ADR 0025 HED interoperability profile | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
 The live line is mutable, carries no `owl:versionIRI`, and is not a citable
-release. The frozen [`0.15.0/`](../../static/ontology/0.15.0/) directory is the
+release. The frozen [`0.16.0/`](../../static/ontology/0.16.0/) directory is the
 latest immutable whole-set snapshot. Its version IRI resolves to the frozen
 namespace catalogue rather than to `sstim-core.ttl`, which is now only the
 two-class Kernel.
@@ -215,7 +215,7 @@ Its most practical uses today are:
    evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
    entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
    `/sstim/profile/core-plus`, and `/sstim/profile/full`.
-2. **Pin a release for published work.** Use the immutable `0.15.0` profile and
+2. **Pin a release for published work.** Use the immutable `0.16.0` profile and
    module URLs for a paper or dataset. Use the `-dev` line only when
    intentionally testing mutable development sources.
 3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and

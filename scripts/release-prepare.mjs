@@ -24,7 +24,8 @@
 //
 // Beyond the ontology itself it carries the release into the four places that
 // describe it: the changelog section, CITATION.cff, the entrance metadata, and
-// void.ttl's version and counts. Every one of those was a hand edit for 0.14.0,
+// void.ttl's version and counts. It also regenerates the ADR 0025 HED bundles,
+// which embed the suite version and therefore go stale on every release. Every one of those was a hand edit for 0.14.0,
 // and every one was caught by a gate failing afterwards rather than by being
 // done — which works, but costs a full validate cycle each time and leaves the
 // release half-cut in between.
@@ -308,7 +309,15 @@ changes.push(VOID_PATH)
 
 console.log(`release-prepare: ${current} → ${version}, issued ${releaseDate}`)
 console.log(`  ${manifest.modules.length} modules, ${manifest.profiles.length} profile entry points, 1 manifest`)
+// The ADR 0025 demonstrator bundles record the SSTIM suite version they were
+// generated against, so bumping the line makes every one of them stale and
+// `make hed-bundle-check` fails on the release commit. Regenerate here rather
+// than leaving a gate red for the person cutting it to rediscover — which is
+// what happened on 0.16.0.
+execFileSync('python3', [join(ROOT, 'scripts/generate-hed-bundle.py')], { cwd: ROOT, stdio: 'pipe' })
+
 console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
+console.log('  HED demonstrator bundles regenerated for the release version')
 console.log(`  ${changes.length} files changed`)
 console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`, `make validate`, commit,')
 console.log(`        then \`make snapshot VERSION=${version} RELEASE_DATE=${releaseDate}\` — the snapshot`)

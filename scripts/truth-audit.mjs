@@ -145,12 +145,40 @@ const IS_HISTORY = /histor|changelog|superseded|previous|prior|until 0\.|was |fo
 // history be rewritten every release.
 const IS_DATED_LOG_ROW = (line) => line.trimStart().startsWith('|') && /\d{4}-\d{2}-\d{2}/.test(line)
 
+// The same is true of a fenced submission record, which is the other shape those
+// logs take: a ```text block with `Service:`, `Submitted version:` and a `Date:`.
+// Cutting 0.16.0 flagged the KG Catalog record's `0.15.0` distribution URL, whose
+// sha256 was hashed from the served bytes on the day it was submitted — a fact
+// about 2026-08-18 that a later release cannot make untrue. Rewriting it to the
+// new version would turn a verified record into a false one, which is a strictly
+// worse failure than the stale prose this audit exists to catch.
+function datedLogBlockLines(text) {
+  const lines = text.split('\n')
+  const exempt = new Set()
+  let open = null
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*```/.test(lines[i])) {
+      if (open === null) {
+        open = i
+      } else {
+        const block = lines.slice(open + 1, i)
+        if (block.some((l) => /^\s*Date:\s*\d{4}-\d{2}-\d{2}/.test(l))) {
+          for (let j = open; j <= i; j++) exempt.add(j + 1)
+        }
+        open = null
+      }
+    }
+  }
+  return exempt
+}
+
 for (const file of PROSE) {
   const text = read(file)
   if (!text) continue
+  const loggedLines = datedLogBlockLines(text)
   text.split('\n').forEach((line, i) => {
     // History, changelogs and superseded-ADR notes legitimately name old versions.
-    if (IS_HISTORY.test(line) || IS_DATED_LOG_ROW(line)) return
+    if (IS_HISTORY.test(line) || IS_DATED_LOG_ROW(line) || loggedLines.has(i + 1)) return
     if (!/sstim|ontology|release/i.test(line)) return
     for (const m of line.matchAll(olderVersion)) {
       const found = m[1]
