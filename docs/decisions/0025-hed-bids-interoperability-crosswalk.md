@@ -285,14 +285,31 @@ but it is the prerequisite for everything after.
    timeline marks, and inventing a span would assert something the native record
    does not contain.
 
-   **Still missing, and none of it is optional for decision 7:** validation by an
-   actual HED validator, and round-trip or declared-loss *tests* as opposed to
-   declared-loss *documentation*. The validator needs `hedtools`, which is not in
-   the flake — so what exists verifies that the tags are real, the coverage is
-   complete, and the artifacts are current, not that the emitted annotations are
-   syntactically valid HED. The bundle's own manifest lists this under
-   `notValidated`, along with the absence of a BIDS dataset. Do not describe the
-   bridge as working on the strength of this.
+   *Decision 7's publication gate is met as of 2026-08-18.* `hedtools` is
+   vendored into the flake, and `make hed-crosswalk` validates every mapping and
+   definition against the pinned schema with it. `make hed-bundle-check`
+   regenerates the artifacts, compares them, and validates the emitted table's
+   own HED — a bundle can be current and still wrong. `make hed-roundtrip`
+   reverses every emitted string through the crosswalk and asserts that declared
+   loss is real, complete, and not overclaimed.
+
+   **The validator earned its place immediately, and the way it did is the
+   argument for decision 7.** Every temporal mapping in crosswalk 0.1.0 was
+   invalid HED: `Onset`, `Offset`, `Pause` and `Inset` are scope tags that
+   require exactly one paired `Def/`, and the map wrote them bare, as
+   `(Experiment-structure, Time-block, Onset)`. Every tag in that string exists
+   in the schema, so the tag-existence check that stood in for a validator passed
+   it, and it would never have validated anywhere. Crosswalk 0.2.0 defines
+   `Sstim-session` and `Sstim-delivery` and references them. One mapping stopped
+   being lossy in the process: `Inset` expresses "resume inside an open scope"
+   exactly, so `eventPlaybackResume` no longer declares loss.
+
+   **What remains is optional under this ADR, not required.** A BIDS Behavioral
+   dataset is decision 3's first optional binding and is explicitly not part of
+   the minimum semantic authority chain; NWB is later still. The bundle is also
+   one synthetic session rather than a family of them. Neither blocks decision 7,
+   and neither licenses describing the bridge as finished — what exists is a
+   validated crosswalk and one validated demonstrator.
 2. **Take it to the HED Working Group** with the ask of decision 9: encode and
    reproduce, never endorse. This is also the most credible inbound-link path
    SSTIM has — HED annotations live in real published EEG datasets, and a
