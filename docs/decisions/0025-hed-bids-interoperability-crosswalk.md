@@ -1,6 +1,19 @@
 # ADR 0025 — SSTIM ↔ HED event semantics with optional BIDS research bindings
 
-**Status:** Proposed — 2026-07-12; revised twice on 2026-07-13 after session-use-case review and the RDF audit
+**Status:** Accepted — 2026-08-18 · proposed 2026-07-12, revised twice on
+2026-07-13 after session-use-case review and the RDF audit, and revised again on
+acceptance against what shipped in between
+
+> **Gate 2 is provisionally accepted, pending a scientific read.** The
+> acceptance gates below require agreement on four points. Three are
+> architectural or self-restraining and are the maintainer's to decide, as with
+> every other ADR here. The second — the observational, non-causal
+> helpfulness/unwanted-experience model and its consent/privacy posture — turns
+> on human-participant data, where the cost of being wrong is not a refactor.
+> It is accepted provisionally and marked for review by the project's scientific
+> advisor before any real participant data is collected, which the Consequences
+> already make a precondition. Accepting the direction does not depend on that
+> read; collecting data does.
 
 ## Context
 
@@ -27,11 +40,24 @@ cautions, protocols, and the relationship between a specification and an
 executed session.
 
 The repository already has `sstim:SessionInstance`, phase-qualified
-`sstim:SelfReport`, and Sensory Field exposure concepts. It does not yet have a
-structured representation for a user's perceived helpfulness or unwanted
-experience. Treating such input merely as free text would lose useful structure;
-treating it as proof of benefit or a causally attributed medical "side effect"
-would overstate what a self-report establishes.
+`sstim:SelfReport`, and Sensory Field exposure concepts.
+
+> **Superseded by events, and left visible rather than rewritten.** When this
+> was proposed it continued: "It does not yet have a structured representation
+> for a user's perceived helpfulness or unwanted experience." That gap was
+> closed on 2026-08-13 by
+> [ADR 0048](0048-session-events-and-qualified-observations.md), which added
+> `sstim:ParticipantObservation` with a required six-value response state,
+> `sstim:UnwantedExperienceObservation` and `sstim:ObservationInstrument`, along
+> with a session event timeline on the engine clock, clock origin and timing
+> authority, delivered versus elapsed duration, a declared reproducibility level
+> and a configuration digest. Verified present on acceptance. Decision 4 below
+> is therefore largely *implemented* rather than pending, which is the single
+> biggest change to this ADR's standing since July.
+
+Treating such input merely as free text would lose useful structure; treating it
+as proof of benefit or a causally attributed medical "side effect" would
+overstate what a self-report establishes.
 
 This ADR therefore separates three decisions that the original proposal
 combined: the canonical SSTIM session model, HED event-semantic alignment, and
@@ -52,7 +78,9 @@ optional dataset bindings such as BIDS.
    a runtime dependency.** SSTIM describes stimulus construction, execution, and
    domain context; HED describes what events mean on a timeline. A versioned
    adapter maps stable native event types to a pinned released HED schema
-   (initial review target: HED 8.4.0). Native storage does not embed ad hoc HED
+   (initial review target: HED 8.4.0 — rechecked on acceptance 2026-08-18 and
+   still the latest standard schema in `hed-standard/hed-schemas`, so the pin
+   needs no bump). Native storage does not embed ad hoc HED
    strings as its source of truth. A partnered HED library remains a later
    option, gated by repeated external gaps and HED Working Group review.
 
@@ -78,9 +106,18 @@ optional dataset bindings such as BIDS.
    value distinctly. These records mean "the participant reported X
    after/during the session." They do not assert efficacy, diagnosis, injury,
    clinical adverse-event status, or causal attribution to the stimulus. They
-   never become `sstim:EvidenceClaim` merely through export or aggregation. The
-   RDF work needed for this structure is specified in the ontology improvement
-   plan and remains subject to the protected-source review policy.
+   never become `sstim:EvidenceClaim` merely through export or aggregation.
+
+   *Built 2026-08-13 by [ADR 0048](0048-session-events-and-qualified-observations.md).*
+   `sstim:ParticipantObservation`, `sstim:UnwantedExperienceObservation` and
+   `sstim:ObservationInstrument` exist, the six-value response state is
+   required, and missing, declined and unknown are distinctly representable.
+   What 0048 deliberately did **not** mint is consent terminology: that is
+   entangled with [ADR 0031](0031-qualified-ecosystem-records.md)'s
+   public/private split and needs its own decision. So the structure is in place
+   and the consent layer is not, which is exactly why gate 2 here is
+   provisional. Further RDF work remains subject to the protected-source review
+   policy.
 
 5. **The required demonstrator is a synthetic native+HED conformance bundle, not
    a claim that current exporters already provide one.** It contains coordinated,
@@ -165,8 +202,19 @@ optional dataset bindings such as BIDS.
   experience semantics before collecting real participant data.
 - Patch Studio and Sensory Field exports cannot be described as a completed
   bridge until the native recorder, provenance-complete RDF export, HED mapping,
-  and conformance tests exist. The RDF audit already shows that the live Sensory
-  Field export does not meet the current SHACL contract.
+  and conformance tests exist.
+
+  *Corrected on acceptance.* This previously ended "The RDF audit already shows
+  that the live Sensory Field export does not meet the current SHACL contract."
+  That was true in July and is no longer the whole picture:
+  `src/ui/field/exposureProfile.shacl.test.js` now exists and passes with ten
+  tests, so the exporter has a conformance gate beside it. Verified by running
+  it on acceptance. What remains missing is the rest of the chain — the native
+  recorder, the HED mapping and the cross-artifact conformance bundle — not
+  SHACL conformance of that one exporter. Note also that the Sensory Field was
+  folded into Patch Studio on 2026-08-09 ([ADR 0046](0046-one-studio-two-authoring-modes.md)),
+  so "Sensory Field export" now names a starter family inside the Studio rather
+  than a separate surface.
 - Any RDF vocabulary, SHACL, context, alignment, or instance-data change remains
   a separately reviewed implementation step under
   [ADR 0004](0004-protected-ontology-files.md) and `CLAUDE.md`.
@@ -187,6 +235,40 @@ ADR 0025 should move from **Proposed** to **Accepted** only when reviewers:
 
 The demonstrator is an implementation consequence, not a prerequisite for
 accepting the direction.
+
+**How the gates were met, 2026-08-18.**
+
+| Gate | Disposition |
+|---|---|
+| 1 — SSTIM canonical, HED generated, BIDS/NWB optional | **Accepted.** Architectural, and the layering has held through ADRs 0046, 0048 and 0051 without pressure to invert it. |
+| 2 — observational model, consent and privacy posture | **Provisionally accepted.** The observational half is built and verified (ADR 0048). The consent half is deliberately unbuilt and belongs with ADR 0031. Marked for the scientific advisor's read before any real participant data is collected — which the Consequences already require independently. |
+| 3 — phased RDF plan, stable IDs, clocks, versions, hashes | **Accepted, and substantially delivered.** ADR 0048 shipped the event timeline on the engine clock, clock origin, timing authority, delivered versus elapsed duration, declared reproducibility level and configuration digest. |
+| 4 — interoperability claimed only after validators pass | **Accepted**, and it is the reason accepting is low-risk: this gate is a restraint on claims, not a promise of capability. Nothing here licenses an interoperability claim today. |
+
+Accepting is therefore a commitment to a direction and to that restraint. It is
+not a claim that the bridge exists, and the repository should keep saying so
+until the bundle in decision 5 validates.
+
+## Next steps, now that this is accepted
+
+Accepting a direction is worth little without the next concrete move, and this
+ADR's own logic names it: the demonstrator is not a prerequisite for acceptance,
+but it is the prerequisite for everything after.
+
+1. **Build the minimal synthetic native+HED bundle** of decision 5 — one fixed
+   or explicitly segmented stimulus, coordinated IDs, and the manifest of
+   decision 6. Small on purpose. It is what turns 199 lines of prose into
+   something a reviewer can react to.
+2. **Take it to the HED Working Group** with the ask of decision 9: encode and
+   reproduce, never endorse. This is also the most credible inbound-link path
+   SSTIM has — HED annotations live in real published EEG datasets, and a
+   validated crosswalk puts SSTIM identifiers next to them.
+3. **Get gate 2 read** by the scientific advisor before any real participant
+   data, and mint the consent terminology deliberately with ADR 0031 rather than
+   as a side effect of this work.
+4. **Do not describe the bridge as existing** until the bundle passes the
+   validators in decision 7. Gate 4 is a standing restraint, not a milestone
+   that acceptance retires.
 
 ## See also
 
