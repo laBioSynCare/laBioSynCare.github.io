@@ -4,8 +4,8 @@
 #
 #  Namespace:  https://w3id.org/sstim/exposure#
 #  Module IRI: https://w3id.org/sstim/exposure
-#  Version:    0.16.0-dev
-#  Date:       2026-08-04
+#  Version:    0.16.0
+#  Date:       2026-08-18
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0
 #
@@ -42,7 +42,7 @@
     # ADR 0044, so profiles import the exact module retrieval endpoint
     # https://w3id.org/sstim/module/exposure. An OWL 2 import names an
     # ontology *document*, not an ontology IRI, so no version IRI is needed.
-    owl:versionInfo "0.16.0-dev" ;
+    owl:versionInfo "0.16.0" ;
     dct:title "SSTIM Exposure and Experiment Module"@en ;
     dct:description "Reusable SSTIM module for separating physical delivery medium, perceived modality, device capability, body placement, comfort boundary, experiment context, effect claims, and knowledge status."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
@@ -50,8 +50,8 @@
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-06-18"^^xsd:date ;
-    dct:issued "2026-08-17"^^xsd:date ;
-    dct:modified "2026-08-17"^^xsd:date ;
+    dct:issued "2026-08-18"^^xsd:date ;
+    dct:modified "2026-08-18"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ,
         <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0011-sensory-field-and-flash-safety.md> ;

@@ -12,8 +12,8 @@ abstract: >-
   protocols, parameters, qualified evidence assessments, and ecosystem
   relationships. Committed ecosystem-agent fixtures are synthetic.
 type: software
-version: 0.15.0
-date-released: 2026-08-17
+version: 0.16.0
+date-released: 2026-08-18
 doi: 10.5281/zenodo.21981526
 authors:
   - family-names: Fabbri

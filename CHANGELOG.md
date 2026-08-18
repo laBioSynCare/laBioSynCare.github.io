@@ -17,6 +17,10 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Nothing yet on the 0.17.0-dev line.
+
+## [0.16.0] - 2026-08-18
+
 ### Added
 
 - **SSTIM is in the OWL 2 DL profile**
@@ -1240,7 +1244,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.16.0
 [0.15.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.15.0
 [0.14.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.14.0
 [0.13.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.13.0

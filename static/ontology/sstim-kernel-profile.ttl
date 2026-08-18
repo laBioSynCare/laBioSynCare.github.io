@@ -2,8 +2,8 @@
 #
 #  SSTIM Kernel Profile entrypoint
 #
-#  Version: 0.16.0-dev
-#  Date:    2026-08-04
+#  Version: 0.16.0
+#  Date:    2026-08-18
 #  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
 #  Low-level entrypoint for the dependency-free stimulation process anchor.
@@ -19,7 +19,8 @@
 @prefix role: <http://www.w3.org/ns/dx/prof/role/> .
 
 <https://w3id.org/sstim/profile/kernel> a owl:Ontology, prof:Profile ;
-    owl:versionInfo "0.16.0-dev" ;
+    owl:versionIRI <https://w3id.org/sstim/0.16.0/sstim-kernel-profile.ttl> ;
+    owl:versionInfo "0.16.0" ;
     prof:hasToken "kernel" ;
     prof:isProfileOf <https://w3id.org/sstim> ;
     prof:hasResource
@@ -30,12 +31,12 @@
     dct:isPartOf <https://w3id.org/sstim> ;
     dct:requires <https://w3id.org/sstim> ;
     owl:imports
-        <https://w3id.org/sstim/kernel> ;
+        <https://w3id.org/sstim/0.16.0/sstim-core.ttl> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-08-01"^^xsd:date ;
-    dct:issued "2026-08-17"^^xsd:date ;
-    dct:modified "2026-08-17"^^xsd:date ;
+    dct:issued "2026-08-18"^^xsd:date ;
+    dct:modified "2026-08-18"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso
         <https://w3id.org/sstim/manifest>,
@@ -43,10 +44,10 @@
 
 <https://w3id.org/sstim/profile/kernel#entrypoint> a prof:ResourceDescriptor ;
     prof:hasRole role:specification ;
-    prof:hasArtifact <https://w3id.org/sstim/profile/kernel> ;
+    prof:hasArtifact <https://w3id.org/sstim/0.16.0/sstim-kernel-profile.ttl> ;
     dct:format "text/turtle" .
 
 <https://w3id.org/sstim/profile/kernel#manifest> a prof:ResourceDescriptor ;
     prof:hasRole role:schema ;
-    prof:hasArtifact <https://w3id.org/sstim/manifest> ;
+    prof:hasArtifact <https://w3id.org/sstim/0.16.0/manifest> ;
     dct:format "application/json" .

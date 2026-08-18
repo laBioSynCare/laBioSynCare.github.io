@@ -53,6 +53,11 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(releaseDate)) {
   process.exit(2)
 }
 
+// Only for the placeholder sentence in the fresh Unreleased section; the actual
+// reopening is release-open-dev's job and may legitimately choose otherwise.
+const [major, minor] = version.split('.')
+const nextDevLine = `${major}.${Number(minor) + 1}.0-dev`
+
 const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'))
 const current = manifest.suite.version
 if (current !== `${version}-dev`) {
@@ -99,7 +104,17 @@ function replaceOnce(text, pattern, replacement, what, file) {
 }
 
 function bumpMetadata(text, file) {
+  // The banner's Date must move with its Version. It did not until 0.16.0: the
+  // line was stamped 2026-08-04 across every module by the ADR 0043 split and
+  // never touched again, while the Version directly above it advanced with each
+  // release. By 0.16.0 the pair read "Version: 0.16.0 / Date: 2026-08-04", and
+  // the date matched nothing — not dct:issued, and not dct:created, which is per
+  // module (2026-04-12 for vocab, 2026-06-18 for exposure, 2026-08-01 for
+  // session). A banner restating what the RDF already carries is the drift this
+  // repository keeps finding; here it is made to agree instead of removed,
+  // because the banner is what a human opening the file reads first.
   let out = replaceOnce(text, new RegExp(`#  Version:( +)${escape(current)}\\b`), `#  Version:$1${version}`, 'header version comment', file)
+  out = replaceOnce(out, /#(  +)Date:( +)\d{4}-\d{2}-\d{2}/, `#$1Date:$2${releaseDate}`, 'header date comment', file)
   out = replaceOnce(out, new RegExp(`owl:versionInfo "${escape(current)}"`), `owl:versionInfo "${version}"`, 'owl:versionInfo', file)
   out = replaceOnce(out, /dct:issued "\d{4}-\d{2}-\d{2}"\^\^xsd:date/, `dct:issued "${releaseDate}"^^xsd:date`, 'dct:issued', file)
   out = replaceOnce(out, /dct:modified "\d{4}-\d{2}-\d{2}"\^\^xsd:date/, `dct:modified "${releaseDate}"^^xsd:date`, 'dct:modified', file)
@@ -226,8 +241,24 @@ if (unreleased[1].trim().length < 40) {
   console.error('release-prepare: CHANGELOG.md\'s [Unreleased] section is empty; write the release notes first.')
   process.exit(1)
 }
+// Renaming the heading is not enough, and stopping there is what left eleven of
+// fifteen sections rendering as literal `[0.15.0]` with no link. Keep A Changelog
+// resolves `## [X.Y.Z]` against a definition at the foot of the file, and nothing
+// regenerated that block, so every release silently left its own heading
+// unlinked and `[Unreleased]` comparing from wherever it last did — v0.8.0 by the
+// time anyone looked, seven releases stale. A broken *reference* degrades to
+// plain text rather than to a dead link, which is why no link checker saw it.
+//
+// So: rename the heading, open a fresh empty Unreleased above it, add this
+// version's definition, and repoint the Unreleased comparison at this version.
+// `truth-audit` checks all of it afterwards.
 editFile('CHANGELOG.md', [
-  [/## \[Unreleased\]/, `## [${version}] - ${releaseDate}`, '[Unreleased] heading'],
+  [/## \[Unreleased\]/, `## [Unreleased]\n\nNothing yet on the ${nextDevLine} line.\n\n## [${version}] - ${releaseDate}`, '[Unreleased] heading'],
+  [
+    /^\[Unreleased\]: (\S+)\/compare\/v[\d.]+\.\.\.HEAD$/m,
+    `[Unreleased]: $1/compare/v${version}...HEAD\n[${version}]: $1/releases/tag/v${version}`,
+    '[Unreleased] link definition',
+  ],
 ])
 
 editFile('CITATION.cff', [

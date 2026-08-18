@@ -354,7 +354,12 @@ for (const version of changelogTags.size === 0 ? [] : changelogSections) {
 }
 for (const [version, target] of changelogTags.size === 0 ? [] : changelogDefs) {
   if (version === 'Unreleased') continue
-  if (!changelogTags.has(`v${version}`)) {
+  // The version being cut is legitimately untagged: `release-prepare` writes its
+  // section and link definition, and the tag is created several steps later, on
+  // the snapshot commit. Failing here would make a release impossible to prepare
+  // without either a broken gate or a deliberately incomplete changelog — the
+  // state that left eleven sections unlinked in the first place.
+  if (!changelogTags.has(`v${version}`) && version !== RELEASE_VERSION) {
     fail('CHANGELOG.md', `link definition [${version}] names a tag that does not exist`)
   }
   if (!changelogSections.includes(version)) {

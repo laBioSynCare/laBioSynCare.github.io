@@ -222,6 +222,29 @@ distinct_versions = set(module_versions.values())
 if len(distinct_versions) > 1:
     fail(f"module owl:versionInfo values diverge: {sorted(module_versions.items())}")
 
+# The human-readable banner at the top of each file restates the version and a
+# date that the RDF below already carries. Restated facts drift: the Version line
+# moved with every release because release-prepare rewrote it, while the Date
+# line sat at 2026-08-04 from the ADR 0043 split until 0.16.0, so the pair came
+# to read "Version: 0.16.0 / Date: 2026-08-04" and the date matched neither
+# dct:issued nor the module's own dct:created. Nothing could see it, because
+# nothing read the comments.
+BANNER = re.compile(r"^#\s+Version:\s+(\S+)\s*$\n^#\s+Date:\s+(\d{4}-\d{2}-\d{2})\s*$", re.M)
+for path, module_iri in MODULES.items():
+    banner = BANNER.search(path.read_text(encoding="utf-8"))
+    if banner is None:
+        fail(f"{path.name}: no 'Version:' + 'Date:' banner pair to check")
+        continue
+    banner_version, banner_date = banner.group(1), banner.group(2)
+    if banner_version != module_versions.get(path.name):
+        fail(
+            f"{path.name}: banner says Version {banner_version}, "
+            f"owl:versionInfo says {module_versions.get(path.name)}"
+        )
+    issued = [str(v) for v in modules.objects(module_iri, DCTERMS.issued)]
+    if issued and banner_date != issued[0]:
+        fail(f"{path.name}: banner says Date {banner_date}, dct:issued says {issued[0]}")
+
 whole_set_version = next(iter(distinct_versions), "")
 if "-" in whole_set_version:
     for path, module_iri in MODULES.items():
