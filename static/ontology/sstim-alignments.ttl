@@ -44,7 +44,7 @@
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim/common>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
@@ -255,21 +255,30 @@ sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
 ###########################################################################
 # OBO Foundry class alignments
 ###########################################################################
+#
+# The rationale below is kept even where the axiom is now a comment: it is why
+# the mapping is what it is, and it is not recorded anywhere else. Each axiom is
+# asserted once, in the module that defines the class, following the convention
+# this file already used for sstim:SessionInstance -> prov:Activity.
 
 # Sensory stimulation intervention → planned process.
 # OBI_0000011 is obsolete and must not appear in live logical axioms. SSTIM
 # uses the active, broader COB_0000082 'planned process' term because an
 # intervention need not be completely executed (verified via OLS, 2026-07-10).
-sstim:SensoryStimulationIntervention rdfs:subClassOf cob:0000082 .
+# sstim:SensoryStimulationIntervention rdfs:subClassOf cob:0000082 .
+#   Asserted in sstim-session.ttl; commented here so the Full closure does
+#   not carry the axiom twice.
 
 # Technique → information content entity. OBI_0000272 requires enough detail
 # for independent process reproduction; a reusable technique category is less
 # specific and is therefore not an OBI protocol (ADR 0014 review disposition).
-sstim:SensoryStimulationTechnique rdfs:subClassOf iao:0000030 .
+# sstim:SensoryStimulationTechnique rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-technique.ttl; commented here to avoid a duplicate.
 
 # Protocol → OBI protocol. A preset is an information content entity that FOLLOWS
 # a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
-sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
+# sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
+#   Asserted in sstim-technique.ttl; commented here to avoid a duplicate.
 
 # Session instance → PROV Activity (stated in sstim-session.ttl; repeated here
 # for cross-reference in alignment context)
@@ -278,10 +287,14 @@ sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
 # Evidence claim → IAO information content entity.
 # (Was iao:0000001 'conditional specification' — wrong; an evidence claim is
 # not a conditional specification. iao:0000030 is the correct generalization.)
-sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
+# sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-evidence.ttl; commented here to avoid a duplicate.
 
 # Frequency band → IAO information content entity
-sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
+# sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-common.ttl, which reaches Core Plus; alignments is
+#   Full-only, so asserting it here as well would add a duplicate triple
+#   without widening the profile that carries the parent.
 
 # Reference → IAO document
 sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .

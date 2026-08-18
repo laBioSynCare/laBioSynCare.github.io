@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from rdflib import Graph, Namespace, RDF, RDFS, SKOS, URIRef
+from rdflib import BNode, Graph, Namespace, RDF, RDFS, SKOS, URIRef
 from rdflib.namespace import OWL
 
 
@@ -183,6 +183,37 @@ def main() -> int:
                         f"{module_id}: rdfs:isDefinedBy points to undeclared module {defined_by}"
                     )
 
+    # No axiom may be asserted by two modules. Five upper-ontology alignments
+    # were, on 2026-08-18: sstim-alignments.ttl repeated subClassOf axioms that
+    # sstim-common, -technique, -session and -evidence already stated, so every
+    # Full serialization carried them twice — 10575 raw triples against 10570
+    # distinct, which is why DBpedia Archivo counted five more than rdflib did.
+    #
+    # The axiom belongs to the module that defines the class, because that
+    # module reaches profiles alignments does not: sstim-common is in Core Plus
+    # while alignments is Full-only, so asserting there as well adds a duplicate
+    # without widening the profile that carries the parent. This file already
+    # used exactly that convention for sstim:SessionInstance -> prov:Activity,
+    # as a comment; the other five simply had not followed it.
+    #
+    # Blank-node triples are skipped: their identifiers differ per parse, so
+    # equality across modules is not meaningful.
+    asserted_in: dict[tuple, set[str]] = defaultdict(set)
+    for module_id, graph in graphs.items():
+        for triple in graph:
+            if any(isinstance(term, BNode) for term in triple):
+                continue
+            asserted_in[triple].add(module_id)
+    for triple, owners in sorted(asserted_in.items(), key=lambda kv: str(kv[0])):
+        if len(owners) > 1:
+            subject, predicate, obj = triple
+            errors.append(
+                f"duplicate axiom in {', '.join(sorted(owners))}: "
+                f"<{subject}> <{predicate}> <{obj}> — assert it once, in the "
+                "module that defines the subject, and cross-reference it as a "
+                "comment elsewhere"
+            )
+
     if errors:
         print(f"module-boundaries: FAIL ({len(errors)} issue(s))", file=sys.stderr)
         for error in errors:
@@ -193,7 +224,8 @@ def main() -> int:
         "module-boundaries: PASS "
         f"({len(modules)} modules, {len(declarations)} uniquely owned OWL terms, "
         f"{len(resource_declarations)} named public resources with one source, "
-        f"{len(axis_sources)} undivided domain/range axioms)"
+        f"{len(axis_sources)} undivided domain/range axioms, "
+        "no axiom asserted by two modules)"
     )
     return 0
 

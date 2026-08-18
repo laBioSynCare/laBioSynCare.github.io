@@ -636,17 +636,14 @@
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "b281661fff693af3ff0e7282815b6606522df4d0794bdcf79cb1c816aa4c8ccc"
+        "sha256": "6f2b048c5d5f3847b12baa57d5df941102f0c794b40aa48845b87d7ddb228085"
       },
       "runtime": {
         "url": "/ontology/sstim-alignments.ttl",
         "graphIri": "https://w3id.org/sstim/graph/alignments"
       },
       "requires": [
-        "common",
         "evidence",
-        "session",
-        "technique",
         "vocab"
       ],
       "requiresProfiles": [],
@@ -905,7 +902,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "416a5823482becf012c676a74b95ff747d2efcba5c03a7426c23d03d7e5d3e15"
+      "sha256": "64fdb0780b8cd921f51d3ce77d717adae30c3c7504962070522f90e800558682"
     }
   ]
 }
