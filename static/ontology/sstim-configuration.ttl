@@ -133,7 +133,8 @@ sstim:durationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
     # entailing that a preset is a session specification.
     rdfs:range  xsd:integer ;
     rdfs:label  "duration (seconds)"@en ;
-    skos:definition "Intended total duration in seconds, either of a session specification or as the default carried by a preset."@en ;
+    skos:definition "Intended total duration in whole seconds, either of a session specification or as the default carried by a preset."@en ;
+    skos:scopeNote "Whole seconds deliberately, as with sstim:actualDurationSeconds and unlike the decimal durations around it. This is an intended duration — something a person chose, or a preset shipped as its default — and intent is not authored at sub-second precision. What actually happened is measured separately and finely: sstim:deliveredDurationSeconds is a decimal. Recorded because the second-pass review of 2026-08-17 found two integer durations among nine decimals with nothing saying whether the difference was meaningful; the other one was answered the same day and this one was not."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
 sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;

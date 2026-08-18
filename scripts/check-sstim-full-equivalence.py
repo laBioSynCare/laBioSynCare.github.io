@@ -151,6 +151,15 @@ SIGNAL_EXTENT_MIGRATION_FIELDS = {
     (SSTIM_EX.modalityGustatory, SKOS.definition),
     (SSTIM_EX.modalityOlfactory, SKOS.definition),
     (SSTIM_V.approachTranscutaneous, SKOS.definition),
+    # sstim:durationSeconds gained the word "whole" on 2026-08-18. The
+    # second-pass review found two integer durations among nine decimals with
+    # nothing recording whether the coarseness was meaningful;
+    # sstim:actualDurationSeconds was answered the same day and this one was
+    # missed. It is an *intended* duration — chosen by a person or shipped as a
+    # preset default — and intent is not authored at sub-second precision, while
+    # what actually happened stays decimal in sstim:deliveredDurationSeconds. A
+    # replacement rather than an addition, so it is recorded here.
+    (SSTIM.durationSeconds, SKOS.definition),
 }
 
 XSD = Namespace("http://www.w3.org/2001/XMLSchema#")

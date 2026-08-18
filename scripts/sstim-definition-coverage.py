@@ -27,11 +27,26 @@ controlled values by (category, notation) exactly.
 So the rule was always per-category and was simply never written down or
 checked. It holds today across 77 categories with zero collisions; this keeps it
 holding.
+
+The third part answers the second-pass review of 2026-08-17, which found
+nineteen definitions "too thin to define" and concluded that a length check is
+the wrong instrument: `paramLuminance: "The brightness of a visual stimulus."`
+clears any length bar while saying nothing the label does not. Its disposition
+was that the bar should be "a definition must distinguish the term from its
+siblings".
+
+The approximation used here is that a definition must contribute at least three
+content words the label does not already have. It is crude, and it is the only
+mechanical proxy for "says something new" that does not require judgement. 17 terms fail it today; they are listed in RESTATES_LABEL as debt rather than
+waived, so a new concept cannot ship with a definition that restates its label,
+and the existing eleven stay visible until someone who knows the domain rewrites
+them. Writing neuroscience definitions is not a job for a mechanical gate.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -49,6 +64,34 @@ BREVITY_ALLOWED = {
     "modelInVitro", "modelInVivo",
 }
 MIN_DEFINITION = 30
+
+# A definition must add at least this many content words the label does not have.
+MIN_NOVEL_WORDS = 3
+
+# Concepts whose definition restates their label, as of 2026-08-18. Debt, not a
+# waiver: each needs a definition that distinguishes it from its siblings, and
+# the gate fails if one is fixed and left listed, so the ledger stays honest.
+RESTATES_LABEL = {
+    "approachEpidural", "approachIntrathecal", "mediumRigidSurfaceContact",
+    "modelHuman", "modelInVitro", "phenomenonAutonomicNeuralRegulation",
+    "phenomenonConnectivityOrPlasticity", "phenomenonExcitabilityOrFiring",
+    "phenomenonNeurochemicalSignaling", "phenomenonSynapticTransmission",
+    "resolutionUnchanged", "searchEligibilityCriteria", "severityUnknown",
+    "targetCranialNerve", "targetPeripheralNerve", "targetSpinalCord",
+    "visualDensity",
+}
+
+# Words too common to count as contributed meaning.
+_STOPWORDS = frozenset(
+    "the a an of in to for and or is are was were be been being with by on at as"
+    " that which it its this these those from into over under between within not"
+    " no any all each per such other than then when where while about".split()
+)
+
+
+def _content_words(text: str) -> set[str]:
+    """Lowercase alphabetic words carrying meaning, stopwords removed."""
+    return {w for w in re.findall(r"[a-z]+", text.casefold())} - _STOPWORDS
 
 
 def main() -> int:
@@ -111,6 +154,23 @@ def main() -> int:
                     f"({best!r}) — too short to distinguish it from a sibling. Add "
                     f"it to BREVITY_ALLOWED if the brevity is deliberate."
                 )
+            else:
+                novel = _content_words(best) - set().union(
+                    *(_content_words(l) for l in labels)
+                ) if labels else _content_words(best)
+                restates = len(novel) < MIN_NOVEL_WORDS
+                if restates and name not in RESTATES_LABEL:
+                    failures.append(
+                        f"{kind} {name}: the definition adds {len(novel)} content "
+                        f"word(s) the label does not have ({best!r}) — say what "
+                        f"distinguishes it from its siblings, or record it in "
+                        f"RESTATES_LABEL deliberately."
+                    )
+                elif not restates and name in RESTATES_LABEL:
+                    failures.append(
+                        f"{kind} {name}: no longer restates its label — remove it "
+                        f"from RESTATES_LABEL so the recorded debt stays honest."
+                    )
 
     # ── notation uniqueness, per category ───────────────────────────────────
     from collections import defaultdict

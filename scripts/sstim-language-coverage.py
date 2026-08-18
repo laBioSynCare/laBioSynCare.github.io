@@ -77,44 +77,74 @@ def main() -> int:
         graph.parse(ROOT / module["source"]["path"], format="turtle")
 
     complete, untranslated, partial = [], [], []
-    concepts_total = concepts_full = 0
+    # Counted as sets, not by summing per scheme: skos:inScheme is multi-valued,
+    # and a concept in two schemes would otherwise be counted twice and could
+    # push the reported total past the number of concepts that exist.
+    concepts_seen: set = set()
+    concepts_complete: set = set()
 
     for scheme in graph.subjects(RDF.type, SKOS.ConceptScheme):
         members = [c for c in graph.subjects(SKOS.inScheme, scheme)]
         if not members:
             continue
         full = 0
+        english_only = 0
+        seen_languages: set[str] = set()
         for concept in members:
             langs = {
                 label.language
                 for label in graph.objects(concept, SKOS.prefLabel)
                 if label.language
             }
+            seen_languages |= langs
+            concepts_seen.add(concept)
             if all(code in langs for code in REQUIRED):
                 full += 1
-        concepts_total += len(members)
-        concepts_full += full
+                concepts_complete.add(concept)
+            elif langs == {"en"}:
+                english_only += 1
         name = local(scheme)
         if full == len(members):
             complete.append(name)
-        elif full == 0:
+        elif english_only == len(members):
+            # Untranslated means English and nothing else. A scheme carrying,
+            # say, en+it+pt but no Spanish is *partial*, not untranslated, and
+            # must not be excusable by the ledger below — being three-quarters
+            # done is a different state from not being started, and only the
+            # second is debt someone can pick up in one pass.
             untranslated.append(name)
         else:
-            partial.append((name, full, len(members)))
+            missing = sorted(set(REQUIRED) - seen_languages) or ["mixed per concept"]
+            partial.append((name, full, len(members), ", ".join(missing)))
+
+    # A concept in no scheme is invisible to every check above, which is the
+    # failure mode this repository keeps rediscovering: a gate that silently
+    # stops covering something reads exactly like a gate that passes. Every
+    # concept is in exactly one scheme today; this keeps it that way.
+    orphans = sorted(
+        local(c)
+        for c in graph.subjects(RDF.type, SKOS.Concept)
+        if c not in concepts_seen
+    )
 
     issues = []
-    for name, full, total in sorted(partial):
+    for name in orphans:
         issues.append(
-            f"{name} is partially translated ({full}/{total} concepts complete) — "
-            "translate the remainder; per-scheme all-or-nothing is what makes "
-            "this report meaningful"
+            f"{name} is a skos:Concept in no scheme, so no language check can "
+            "see it — give it a skos:inScheme"
+        )
+    for name, full, total, missing in sorted(partial):
+        issues.append(
+            f"{name} is partially translated ({full}/{total} concepts complete, "
+            f"missing: {missing}) — finish it; per-scheme all-or-nothing is what "
+            "makes this report meaningful rather than a vague percentage"
         )
     for name in sorted(set(untranslated) - UNTRANSLATED):
         issues.append(
             f"{name} is English-only and is not recorded as known debt — "
             "translate it, or add it to UNTRANSLATED in this script deliberately"
         )
-    for name in sorted(UNTRANSLATED - set(untranslated) - {n for n, _, _ in partial}):
+    for name in sorted(UNTRANSLATED - set(untranslated) - {row[0] for row in partial}):
         if name in complete:
             issues.append(
                 f"{name} is now fully translated — remove it from UNTRANSLATED "
@@ -122,6 +152,8 @@ def main() -> int:
             )
 
     total_schemes = len(complete) + len(untranslated) + len(partial)
+    concepts_total = len(concepts_seen)
+    concepts_full = len(concepts_complete)
     if issues:
         print(f"language-coverage: FAILED ({len(issues)} issue(s))")
         for issue in issues:

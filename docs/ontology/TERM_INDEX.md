@@ -309,7 +309,7 @@ This exists to be grepped before concluding that SSTIM lacks a term. It was adde
 | `sstim:digestAlgorithm` | data | session | sstim:SessionSpecification → XMLSchema:string | Identifier of the algorithm and canonicalisation that produced the configuration digest, without which the digest cannot be recomputed. |
 | `sstim:disablesTrack` | object | session | sstim:SessionSpecification → sstim:Track | A layer of the configuration that this session turns off — a soundscape left out, an ambience muted. Listing what was disabled keeps the… |
 | `sstim:displayPriority` | data | common | sstim:CautionTag → XMLSchema:integer | Positive integer used to order caution messages within the same severity; lower numbers display first. |
-| `sstim:durationSeconds` | data | configuration | — → XMLSchema:integer | Intended total duration in seconds, either of a session specification or as the default carried by a preset. |
+| `sstim:durationSeconds` | data | configuration | — → XMLSchema:integer | Intended total duration in whole seconds, either of a session specification or as the default carried by a preset. |
 | `sstim:evaluatesSubject` | object | evidence | — → sstim:Preset | sstim:StimulationTechnique | Links an evidence assessment to the preset or technique it evaluates. Neutral: the assessment's direction lives exclusively in hasClaimDirection.… |
 | `sstim:evidenceDate` | data | evidence | — → XMLSchema:date | Deprecated ADR 0027: source publication dates stay as dct:issued on the bibliographic reference; assessment and review dates come from their… |
 | `sstim:evidenceNotes` | annotation | evidence | — → — | Internal human-readable note on evidence basis and caveats. Not for user-facing display. |
