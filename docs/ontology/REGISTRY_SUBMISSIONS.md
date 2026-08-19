@@ -1109,7 +1109,7 @@ serves this purpose too. No new build step is required.
 Note SSTIM's SKOS layer is a good fit for the `definition_property` and
 `synonym_property` fields, which recent entries point at `skos:definition` and
 `skos:altLabel`. Our `skos:altLabel` coverage is thin — 15 labels on 8 of the
-545 concepts, all English — so the synonym field would be declared and mostly,
+551 concepts, all English — so the synonym field would be declared and mostly,
 not entirely, empty. See `make language-coverage` and the alias note in
 `CURRENT_STATE.md`.
 

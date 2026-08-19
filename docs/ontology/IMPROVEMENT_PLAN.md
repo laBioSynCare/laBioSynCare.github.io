@@ -378,8 +378,8 @@ provenance as `owl:Axiom` annotations.
 
   What remains of KR-16 is narrower and should not be confused with coverage:
   the 276 new labels have had **no native review**, `skos:definition` is
-  English-only for all 545 concepts by deliberate decision, and `skos:altLabel`
-  coverage is 15 labels on 8 of the 545 concepts, all English — thin, but not the
+  English-only for all 551 concepts by deliberate decision, and `skos:altLabel`
+  coverage is 15 labels on 8 of the 551 concepts, all English — thin, but not the
   zero this said until it was measured. Locale-aware label fallback in the
   application is also untouched. So the *label-coverage* half of this item is
   closed and the *quality, alias and runtime* halves are not.

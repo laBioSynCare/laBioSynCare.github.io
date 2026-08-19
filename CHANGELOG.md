@@ -19,6 +19,15 @@ file is the human-readable summary.
 
 ### Fixed
 
+- **Ten prose totals still said 545 concepts** after ADR 0025's six terms took the
+  vocabulary to 551 — in the release changelog, the public README's call for
+  translators, `CURRENT_STATE.md`, `IMPROVEMENT_PLAN.md`, `TODO.md`, the OLS4
+  notes, and an unsent ShowVoc enquiry that would have quoted a stale figure to a
+  registry. The count is generated into `TERM_INDEX.md` and CI-checked there, so
+  the number was never in doubt; nothing compared the prose to it. `truth-audit`
+  now does, matching only present-tense totals — "all N", "of the N" — so a
+  historical measurement like "269 of 545 carried all four" stays true and
+  unflagged.
 - **The registry pull URL served the development line, so BioPortal had been
   ingesting `-dev` snapshots nightly.**
   `https://labiosyncare.github.io/ontology/sstim-full.owl` is BioPortal's and
@@ -60,11 +69,11 @@ file is the human-readable summary.
   to let it drift. A scheme must be complete or wholly untranslated, a new scheme
   must ship translated or be recorded as debt, and a translated scheme must leave
   the ledger. Closes the metric KR-16 lacked. It also reports — without gating —
-  `skos:altLabel` coverage, which is 15 aliases on 8 of the 545 concepts. Four
+  `skos:altLabel` coverage, which is 15 aliases on 8 of the 551 concepts. Four
   documents had called that coverage zero; the aliases had been in the graph
   since [ADR 0049](docs/decisions/0049-neural-oscillations-and-frequency-ambits.md)
   landed on 2026-08-15, and nothing measured them, so the claim went unchallenged.
-- **The SKOS vocabulary is fully multilingual.** All 545 concepts now carry
+- **The SKOS vocabulary is fully multilingual.** All 551 concepts now carry
   English, Italian, Portuguese and Spanish `skos:prefLabel` values, across all 67
   concept schemes. The gate found 269 of 545 complete; the remaining 276 labels
   were added the same day, so `make language-coverage` reports 100% and its
@@ -73,7 +82,7 @@ file is the human-readable summary.
   Two honest qualifications travel with this. The 276 new labels were written by
   the maintainers and have had **no native review** — a review request is open,
   and several known soft spots are named in it rather than left to be found. And
-  `skos:definition` remains English-only for all 545 concepts: translating
+  `skos:definition` remains English-only for all 551 concepts: translating
   definitions is a substantially larger job and a separate decision, not an
   oversight.
 - `make definition-coverage` gained a bar against definitions that restate their

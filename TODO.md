@@ -491,7 +491,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
-- [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of 545 concepts**, all
+- [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of the 551 concepts**, all
       English `P2`
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,

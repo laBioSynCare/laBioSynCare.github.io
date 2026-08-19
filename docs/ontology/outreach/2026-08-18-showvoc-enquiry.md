@@ -31,8 +31,8 @@ I would like to ask before doing anything, rather than submit and find out.
    instance where a vocabulary like this would be more appropriate?
 
 Happy to provide anything useful — SKOS and OWL statistics, the SHACL shapes, or
-a specific distribution file. SSTIM is currently 545 SKOS concepts across 67
-concept schemes plus 163 OWL classes, and it is already catalogued in BARTOC,
+a specific distribution file. SSTIM is currently 551 SKOS concepts across 68
+concept schemes plus 164 OWL classes, and it is already catalogued in BARTOC,
 FAIRsharing and BioPortal, so I can supply metadata in whatever form is easiest.
 
 Thanks very much for ShowVoc and VocBench, and for the support group.

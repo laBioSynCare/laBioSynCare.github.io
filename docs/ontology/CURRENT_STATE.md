@@ -312,15 +312,15 @@ The main gaps are design and coverage gaps, not current parser failures:
   frequency-band concepts still conflate observed neural oscillations with
   stimulus targets.
 - External mappings need per-mapping provenance and continued conservative
-  review. **Multilingual preferred labels are complete**: all 545 concepts carry
+  review. **Multilingual preferred labels are complete**: all 551 concepts carry
   English, Italian, Portuguese and Spanish, across all 67 concept schemes, as of
   2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be
   recorded deliberately. The 276 labels added that day were written by the
   maintainers and have **not yet had native review**; see the review request in
-  the repository issues. `skos:definition` remains English-only for all 545
+  the repository issues. `skos:definition` remains English-only for all 551
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
-  than absent: 15 alternate labels on 8 of the 545 concepts, all English, mostly
+  than absent: 15 alternate labels on 8 of the 551 concepts, all English, mostly
   the oscillation aliases [ADR 0049](../decisions/0049-neural-oscillations-and-frequency-ambits.md)
   added. `make language-coverage` reports it but does not gate it.
 - VoID subsets are checked against the frozen release manifest but are not

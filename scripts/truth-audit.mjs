@@ -408,6 +408,47 @@ if (!unreleasedTarget) {
 }
 ok(`changelog: ${changelogSections.length} sections, every tagged one linked`)
 
+// ── 5. prose totals agree with the generated term index ──────────────────────
+//
+// Adding six concepts for ADR 0025 left ten sentences across seven documents
+// saying "545 concepts" — including the release changelog, the public README's
+// call for translators, and an unsent enquiry to ShowVoc that would have quoted
+// a stale figure to a registry. The count is generated into TERM_INDEX.md and
+// CI-checked there, so the number itself was never in doubt; nothing compared
+// the prose to it.
+//
+// Only *totals* are checked. "269 of 545 concepts carried all four" is a
+// measurement of 2026-08-18 and stays true forever, so the patterns below match
+// "all N" and "of the N" — the shapes a present-tense total takes — and leave a
+// bare "of N" alone. That distinction is the whole reason this can be gated at
+// all rather than nagging about every number in a history section.
+const termIndex = read('docs/ontology/TERM_INDEX.md') ?? ''
+const indexCounts = termIndex.match(/(\d+) classes · (\d+) properties · (\d+) concepts/)
+if (!indexCounts) {
+  fail('docs/ontology/TERM_INDEX.md', 'no "N classes · N properties · N concepts" line to check prose against')
+} else {
+  const totals = { classes: indexCounts[1], properties: indexCounts[2], concepts: indexCounts[3] }
+  const TOTAL_CLAIM = /\b(?:all|of the)\s+(\d+)\s+(concepts|classes|properties)\b/g
+  const scanned = ['README.md', 'CHANGELOG.md', 'TODO.md', 'docs/ontology/CURRENT_STATE.md',
+    'docs/ontology/IMPROVEMENT_PLAN.md', 'docs/ontology/REGISTRY_SUBMISSIONS.md',
+    'docs/ontology/outreach/2026-08-18-showvoc-enquiry.md']
+  let claims = 0
+  for (const file of scanned) {
+    const text = read(file)
+    if (!text) continue
+    text.split('\n').forEach((line, i) => {
+      if (IS_HISTORY.test(line)) return
+      for (const m of line.matchAll(TOTAL_CLAIM)) {
+        claims++
+        if (m[1] !== totals[m[2]]) {
+          fail(file, `line ${i + 1} claims ${m[1]} ${m[2]}; the term index says ${totals[m[2]]}`)
+        }
+      }
+    })
+  }
+  ok(`${claims} prose totals match the term index (${totals.concepts} concepts)`)
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 
 if (VERBOSE || problems.length === 0) {
