@@ -17,7 +17,23 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.17.0-dev line.
+### Fixed
+
+- **The registry pull URL served the development line, so BioPortal had been
+  ingesting `-dev` snapshots nightly.**
+  `https://labiosyncare.github.io/ontology/sstim-full.owl` is BioPortal's and
+  OLS4's "load from URL" target, and CI regenerates it on every push to `main` —
+  built, until now, from the working sources. BioPortal's submission history is
+  the result: 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, each parsed and indexed, its
+  "Version information" naming a mutable line nobody can cite, and its Version
+  IRI stuck at 0.14.0 because a `-dev` bundle correctly carries none and the
+  portal kept the last one it had seen.
+
+  A stable URL a registry polls is a promise about the current *release*.
+  `make bioportal-bundle` now reads the released version from `void.ttl` and
+  builds from that version's frozen directory, so the artifact changes only when
+  a release is cut, always carries its `owl:versionIRI`, and fails outright if a
+  `-dev` line ever reaches it.
 
 ## [0.16.0] - 2026-08-18
 

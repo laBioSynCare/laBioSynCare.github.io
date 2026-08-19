@@ -101,7 +101,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | DBpedia Archivo | ✅ **indexed 2026-08-17** (not re-confirmable 2026-08-18 — the host timed out, and so did `dbpedia.org`) — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
 | LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
-| BioPortal | ✅ **parsed & live** (ontologies/SSTIM) — *unverified 2026-08-18: web 403 to a plain client, REST API 401 without a key* — browsable on **submission 13's** metrics, 67 classes and 334 concepts as *BioPortal* counted them on 2026-08-08. Not SSTIM's current size: submission 14 failed to parse (see below) and nothing has been ingested since, so the portal is several releases behind the 164 classes and 551 concepts the repository now holds | account ✓ (@rfabbri) | re-submit |
+| BioPortal | ⚠️ **live but had been ingesting development lines** — the nightly pull URL served whatever was on `main`, so submissions read 0.15.0-dev, 0.16.0-dev, 0.17.0-dev. Fixed at source 2026-08-19: the URL now serves the frozen release. The portal keeps a stale `Version IRI` of 0.14.0 from the last submission that carried one and needs one clean pull of 0.16.0 to correct itself. Observed on the public page 2026-08-19; the REST API needs a key | account ✓ (@rfabbri) | **watch the next nightly** |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
 | OLS4 | 🕓 **PR open** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. Re-checked 2026-08-18 via `gh`: still open, not draft, **no comments** | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
@@ -724,7 +724,7 @@ HermiT-consistent. Served at
 **`https://labiosyncare.github.io/ontology/sstim-full.owl`** (RDF/XML).
 
 - **Entry point:** `https://bioportal.bioontology.org/ontologies/new` (log in).
-- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl`
+- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl` — **serves the latest frozen release since 2026-08-19**, not the working line. It had served whatever was on `main`, and CI regenerates it on every push, so BioPortal's nightly pull ingested a development snapshot each night: its submission history reads 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, all parsed and indexed, with "Version information" naming a mutable line nobody can cite and the Version IRI stuck at 0.14.0 — a `-dev` bundle correctly carries none, so BioPortal kept the last one it had seen. `make bioportal-bundle` now builds from `static/ontology/<release>/` and refuses to emit a `-dev` line at all.
 
 **Form fields:**
 

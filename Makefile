@@ -42,7 +42,23 @@ ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
 # (validation constraints, not browsable terms). The RDF closure is unioned
 # before OWL translation, and the bundle is explicitly assigned the root IRI.
-BIOPORTAL_MODULES := $(FULL_SEMANTIC_MODULES)
+#
+# **Built from the frozen release, not from the live line.** BioPortal and OLS4
+# pull https://labiosyncare.github.io/ontology/sstim-full.owl nightly, and CI
+# regenerates it on every push to main — so building it from the working sources
+# fed the registries a development snapshot every night. BioPortal's submission
+# history is a list of them: 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, each parsed and
+# indexed, its "Version information" reading a mutable line that no one can cite,
+# and its Version IRI stuck at 0.14.0 because a -dev bundle correctly carries
+# none and BioPortal kept the last one it saw.
+#
+# A stable URL a registry polls is a promise about the current *release*. The
+# released version is read from void.ttl, which is the file that defines what is
+# citable, and the modules come from that version's frozen directory — so this
+# artifact changes only when a release is cut.
+BIOPORTAL_RELEASE := $(shell $(PYTHON) -c "import re,pathlib;print(re.search(r'dcat:version\s+\"([^\"]+)\"',pathlib.Path('static/ontology/void.ttl').read_text()).group(1))")
+BIOPORTAL_SNAPSHOT := static/ontology/$(BIOPORTAL_RELEASE)
+BIOPORTAL_MODULES := $(shell node -e 'const m=require("./$(BIOPORTAL_SNAPSHOT)/manifest.json");const p=m.profiles.find(x=>x.id==="full");const by=Object.fromEntries(m.modules.map(x=>[x.id,x.source.path.split("/").pop()]));process.stdout.write(p.modules.map(id=>"$(BIOPORTAL_SNAPSHOT)/"+by[id]).join(" "))')
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(sort $(wildcard $(INSTANCE_ROOT)/*/*.ttl) $(wildcard $(INSTANCE_ROOT)/*/*/*.ttl))
@@ -644,11 +660,9 @@ bioportal-bundle:
 		exit 1; \
 	fi; \
 	cat $(BIOPORTAL_MODULES) > "$$tmpdir/sstim-full.ttl"; \
-	version_iri="$$(node -e 'const s = require("./static/ontology/manifest.json").suite; process.stdout.write(s.status === "released" && !s.version.includes("-") ? `$${s.ontologyIri}/$${s.version}` : "")')"; \
-	version_arg=""; \
-	if [ -n "$$version_iri" ]; then version_arg="--version-iri $$version_iri"; fi; \
+	version_iri="https://w3id.org/sstim/$(BIOPORTAL_RELEASE)"; \
 	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
-		annotate --ontology-iri https://w3id.org/sstim $$version_arg \
+		annotate --ontology-iri https://w3id.org/sstim --version-iri "$$version_iri" \
 		--output $(BIOPORTAL_OUT) > "$$tmpdir/robot.log" 2>&1; then \
 		cat "$$tmpdir/robot.log"; \
 		exit 1; \
@@ -659,15 +673,15 @@ bioportal-bundle:
 		exit 1; \
 	fi; \
 	test -s $(BIOPORTAL_OUT); \
-	if [ -n "$$version_iri" ] && ! grep -q "versionIRI" $(BIOPORTAL_OUT); then \
-		echo "bioportal-bundle: released line but the bundle carries no owl:versionIRI" >&2; \
+	if ! grep -q "versionIRI" $(BIOPORTAL_OUT); then \
+		echo "bioportal-bundle: the bundle carries no owl:versionIRI" >&2; \
 		exit 1; \
 	fi; \
-	if [ -z "$$version_iri" ] && grep -q "versionIRI" $(BIOPORTAL_OUT); then \
-		echo "bioportal-bundle: development line must not claim a version IRI" >&2; \
+	if grep -q "$(BIOPORTAL_RELEASE)-dev\|-dev</owl:versionInfo>" $(BIOPORTAL_OUT); then \
+		echo "bioportal-bundle: a development line reached the artifact registries pull" >&2; \
 		exit 1; \
 	fi; \
-	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) modules$${version_iri:+ at $$version_iri}"
+	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) frozen $(BIOPORTAL_RELEASE) modules at $$version_iri"
 
 ## Generate WIDOCO HTML reference documentation from the Full semantic profile
 ## (default into dist/ontology/docs/ for the Pages artifact; override DOCS_DIR=).
