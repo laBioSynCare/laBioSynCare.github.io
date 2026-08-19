@@ -56,6 +56,13 @@ ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
 # released version is read from void.ttl, which is the file that defines what is
 # citable, and the modules come from that version's frozen directory — so this
 # artifact changes only when a release is cut.
+#
+# The merge is then post-processed: `robot merge` unions sixteen module headers
+# onto one ontology node, so the bundle asserted sixteen titles, sixteen
+# descriptions and six creation dates about one ontology. BioPortal picked
+# "August 1, 2026" — the day the ADR 0043 split created eight module files —
+# over the 2026-04-12 the Kernel states, and rendered the description as every
+# module blurb joined by commas.
 BIOPORTAL_RELEASE := $(shell $(PYTHON) -c "import re,pathlib;print(re.search(r'dcat:version\s+\"([^\"]+)\"',pathlib.Path('static/ontology/void.ttl').read_text()).group(1))")
 BIOPORTAL_SNAPSHOT := static/ontology/$(BIOPORTAL_RELEASE)
 BIOPORTAL_MODULES := $(shell node -e 'const m=require("./$(BIOPORTAL_SNAPSHOT)/manifest.json");const p=m.profiles.find(x=>x.id==="full");const by=Object.fromEntries(m.modules.map(x=>[x.id,x.source.path.split("/").pop()]));process.stdout.write(p.modules.map(id=>"$(BIOPORTAL_SNAPSHOT)/"+by[id]).join(" "))')
@@ -673,6 +680,7 @@ bioportal-bundle:
 		exit 1; \
 	fi; \
 	test -s $(BIOPORTAL_OUT); \
+	$(PYTHON) scripts/collapse-bundle-metadata.py $(BIOPORTAL_OUT); \
 	if ! grep -q "versionIRI" $(BIOPORTAL_OUT); then \
 		echo "bioportal-bundle: the bundle carries no owl:versionIRI" >&2; \
 		exit 1; \

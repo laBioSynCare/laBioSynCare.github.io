@@ -28,6 +28,21 @@ file is the human-readable summary.
   now does, matching only present-tense totals — "all N", "of the N" — so a
   historical measurement like "269 of 545 carried all four" stays true and
   unflagged.
+- **The registry bundle asserted sixteen titles, sixteen descriptions and six
+  creation dates about one ontology.** `robot merge` unions every module header
+  onto a single ontology node, so a registry got the whole module set's metadata
+  as claims about SSTIM itself and picked from it arbitrarily. BioPortal chose
+  **August 1, 2026** as the creation date — the day ADR 0043's split created eight
+  module files — over the 2026-04-12 the Kernel states and Zenodo, `CITATION.cff`
+  and the registry tracker all use, and rendered the description as every module
+  blurb joined by commas.
+
+  `make bioportal-bundle` now collapses those three to the Kernel's own values,
+  the Kernel being the file that carries `https://w3id.org/sstim` itself. Its
+  *set*, not a single value: the title is legitimately four, one per published
+  language — what it is not is sixteen. `dct:requires`, `rdfs:seeAlso`,
+  `dct:hasPart` and `skos:historyNote` stay many-valued, because they are.
+  Verified the result still loads under the OWL API and is still OWL 2 DL.
 - **The registry pull URL served the development line, so BioPortal had been
   ingesting `-dev` snapshots nightly.**
   `https://labiosyncare.github.io/ontology/sstim-full.owl` is BioPortal's and
