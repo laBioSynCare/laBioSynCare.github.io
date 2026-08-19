@@ -734,7 +734,8 @@ HermiT-consistent. Served at
 | Name | Sensory Stimulation Ontology |
 | Location | **Load from URL** (NOT upload) → `https://labiosyncare.github.io/ontology/sstim-full.owl` — "loaded nightly", so Pages deploys flow in |
 | Representation language | **OWL** (RDF/XML) |
-| Status | production (or beta for pre-1.0) |
+| Status | **`beta`** while pre-1.0. BioPortal's vocabulary is `alpha` / `beta` / `production` / `retired` / `under development` — there is no `released`, so this is *not* the same field as the ontology's own `mod:status`, which says `under development` on the working line and `released` on a frozen one and describes which line you are on rather than how mature it is. Do not copy one into the other. `under development` understates 16 releases with DOIs, SHACL and OWL 2 DL conformance; `production` overstates an ontology that is pre-1.0, has never had an independent review ([ADR 0022](../decisions/0022-0.6-release-review-posture.md)) and carries 282 labels no native speaker has read. Revisit at 1.0. |
+| Version IRI | Extracted from the bundle; leave it alone once the pull is correct. It read `https://w3id.org/sstim/0.14.0` until 2026-08-19 — the last submission that carried one, since every bundle after it was a `-dev` line and correctly carried none. The release bundle now carries `https://w3id.org/sstim/0.16.0`, verified locally, so the next nightly pull should replace it. If it does not, the field is stored rather than re-extracted and needs one manual correction. |
 | Contact | Renato Fabbri — `renato.fabbri@gmail.com` |
 | Homepage | `https://labiosyncare.github.io/ontology/docs/` |
 | Documentation | `https://labiosyncare.github.io/ontology/docs/` |
