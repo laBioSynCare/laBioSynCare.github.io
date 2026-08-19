@@ -700,8 +700,9 @@ Status:             LIVE since 2026-07-27T16:14:06Z (modified 16:16:58Z), create
                     never the issue.
 Required follow-up: **Refresh the stale `extent`.** The live record reads
                     "56 classes, 124 properties, 295 concepts, 30 concept schemes
-                    (2026-07)"; TERM_INDEX.md is at 157 / 284 / 525, so the public
-                    record understates SSTIM roughly threefold. Metadata is
+                    (2026-07)"; TERM_INDEX.md is at 164 / 304 / 551 with 68 schemes
+                    as of 0.16.0, so the public record understates SSTIM roughly
+                    threefold and its scheme count by more than twice. Metadata is
                     community-editable (PDDL), so this is a login-and-edit fix.
                     Nothing else on the record is version-pinned: `identifier` is
                     https://w3id.org/sstim, the link is the concept DOI, and the
