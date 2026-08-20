@@ -3,9 +3,6 @@
     "Description": "Seconds from the session clock origin.",
     "Units": "s"
   },
-  "duration": {
-    "Description": "Always n/a — SSTIM session events are instantaneous timeline marks."
-  },
   "event_id": {
     "Description": "Local name of the sstim:SessionEvent this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6."
   },
@@ -26,6 +23,9 @@
       "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
       "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
     }
+  },
+  "SstimDurationConvention": {
+    "Description": "duration is always n/a in this bundle. SSTIM session events are instantaneous timeline marks, and inventing a duration would assert a span the native record does not contain. This is a note, not a redefinition of the BIDS-required duration column."
   },
   "GeneratedHedColumn": {
     "Description": "The events.tsv column named HED is generated from the native columns by the crosswalk, HED 8.4.0. Where an event changes a parameter, its Parameter-label and Parameter-value tags come from parameter_kind and value_after. SSTIM is canonical and HED is derived, so the native columns are the ones to read."

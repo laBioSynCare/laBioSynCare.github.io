@@ -1,8 +1,29 @@
 # Questions for the HED Working Group, from building an SSTIM → HED profile
 
-Status: **drafted, not sent.** Intended for the HED Working Group via
-<https://github.com/hed-standard/hed-schemas> issues or the HED community
-channels. See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
+Status: **sent 2026-08-20**, as @ttm, split by which repository owns each
+question:
+
+- Questions 1-5, the schema-modelling ones —
+  [hed-standard/hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416)
+- Question 6, the reproducible `bids-validator` crash —
+  [hed-standard/hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836),
+  that being the repository holding `BidsSidecar._filterHedStrings`
+
+`hed-schemas` has Discussions enabled but empty, and an issue tracker carrying
+this exact kind of vocabulary-gap question (#390, #354), so both went to issues.
+
+**Reply, same day.** A maintainer asked us to retest question 6 against
+`bids-validator` 3.0.1 — 1.15.0 is the superseded npm line, and 3.x ships via
+Deno/JSR. Retested 2026-08-20: **the crash is fixed and question 6 is answered.**
+A top-level `HED` sidecar key is illegal (`SIDECAR_INVALID`), so the
+`CUSTOM_COLUMN_WITHOUT_DESCRIPTION` warning was correct to ignore, and that
+warning no longer exists in 3.x. Two new findings were reported back on the
+thread: 3.0.1 catches the illegal key only when another entry also carries an
+`HED` sub-key, so a lone one silently skips validation of the whole column; and
+our own sidecar was redefining the BIDS-required `duration` column, now fixed.
+Questions 1-5 are unanswered as of this writing.
+
+See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
 
 These came out of implementing a crosswalk, not out of reading the specification,
 which is why they are concrete. The artifacts are in this repository and can be

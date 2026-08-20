@@ -447,13 +447,39 @@ but it is the prerequisite for everything after.
    is [question 6 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
    with the reproduction table.
 
+   **Answered, and re-measured on 3.0.1 (2026-08-20).** A maintainer asked us to
+   retest on the current major line, and the answer arrived with it: a top-level
+   `HED` sidecar key is **illegal**, not merely awkward — 3.0.1 reports
+   `SIDECAR_INVALID`, "The string 'HED' or 'n/a' was illegally used as a
+   top-level sidecar key", where 1.15.0 crashed.
+   `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` no longer exists in 3.x, so the warning
+   that prompted the question is gone and the layout we ship validates with
+   **0 errors** unchanged. Two findings came out of the retest, both in
+   [hed-standard/hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836):
+
+   - 3.0.1 reports the illegal key only when *another* sidecar entry also carries
+     an `HED` sub-key. A **lone** top-level `HED` key is silently ignored, and the
+     `HED` column of `events.tsv` then goes unvalidated entirely — a deliberately
+     bogus tag that raises `HED_ERROR` in our layout passes with zero errors under
+     it. Same failure class as the original crash, presenting as a clean pass.
+   - Our own sidecar redefined `duration`, a BIDS-required column, which 3.0.1
+     flags as `TSV_COLUMN_TYPE_REDEFINED` and ignores; 1.15.0 never mentioned it.
+     The entry is gone, its rationale moved to a non-column
+     `SstimDurationConvention` key, and all three bundles are 0 errors on 3.0.1.
+
    **The full BIDS Behavioral binding of decision 3 is still not emitted, and the
    reason is now evidence rather than inertia.** It is achievable — the hard part,
    the events table and its HED, validates clean. What is not achievable cheaply
    is decision 7's requirement that a *published* binding pass its validator on
    every change: `bids-validator` 1.15.0 is 578 packages and 672 MB, which is not
    a dependency to add to a `make validate` that already runs in CI on every
-   push. Decision 3 also gates the dataset on "a consented research use case",
+   push. **That figure describes the superseded npm line and must not be
+   requoted as the current cost.** npm's `bids-validator` is still `latest`
+   1.15.0 with no 2.x or 3.x published; the current 3.0.1 ships via Deno/JSR
+   (`deno run -A jsr:@bids/validator@3.0.1`) and installs no `node_modules` at
+   all. Whether that is cheap enough to gate on is now an open question rather
+   than a settled no, and needs a measured CI run before decision 7 is
+   revisited. Decision 3 also gates the dataset on "a consented research use case",
    and there is none. So the position is: the binding is demonstrably reachable,
    it is not published, and the repository does not claim it. Recorded in
    `TODO.md` with the measurement so the next person starts from the evidence.

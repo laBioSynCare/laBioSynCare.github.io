@@ -30,7 +30,7 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
 
 | Circle | Target | The ask | Status |
 |---|---|---|---|
-| Standards | **HED Working Group** (INCF-endorsed) | Review one SSTIM–HED/BIDS worked example | not-contacted |
+| Standards | **HED Working Group** (INCF-endorsed) | Review one SSTIM–HED/BIDS worked example | contacted 2026-08-20 — [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) (5 encoding questions), [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836) (validator crash); awaiting reply |
 | Research | **IIT U-VIP lab** (Monica Gori, Genoa) | Nominate one protocol to encode across BIDS/HED/SSTIM | not-contacted |
 | Research | **UniGe–San Martino–IIT ANTARES Joint Lab** | Nominate one protocol to encode | not-contacted |
 | Research | **IMRF** (Intl. Multisensory Research Forum; 2026 meeting) | Present the interoperability / reproducibility result | not-contacted |

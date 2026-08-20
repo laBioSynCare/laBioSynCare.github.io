@@ -276,9 +276,13 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
 
     sidecar = {
         "onset": {"Description": "Seconds from the session clock origin.", "Units": "s"},
-        "duration": {
-            "Description": "Always n/a — SSTIM session events are instantaneous timeline marks."
-        },
+        # NOT a "duration" entry. onset and duration are BIDS-required columns
+        # with defined types, and describing duration in the sidecar is a
+        # redefinition: bids-validator 3.0.1 raises TSV_COLUMN_TYPE_REDEFINED
+        # ("Format \"string\" must be number") and ignores it. Measured
+        # 2026-08-20: dropping this entry clears the warning and changes nothing
+        # else. The convention it documented now lives in SstimDurationConvention
+        # below, which is not a column and so is not a redefinition.
         "event_id": {
             "Description": (
                 "Local name of the sstim:SessionEvent this row was generated from. "
@@ -300,6 +304,20 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
         # 2026-08-18: with this entry shaped as it was, that error; with the
         # definitions moved below, the dataset validates with zero errors.
         #
+        # Re-measured 2026-08-20 on bids-validator 3.0.1, which answers the
+        # question and does not change the layout. The crash is gone: a top-level
+        # "HED" key now reports SIDECAR_INVALID, "The string 'HED' or 'n/a' was
+        # illegally used as a top-level sidecar key" — so this entry is not
+        # merely awkward, it is illegal, and CUSTOM_COLUMN_WITHOUT_DESCRIPTION no
+        # longer exists in 3.x. But 3.0.1 only reports it when another entry also
+        # carries an HED sub-key; a lone top-level "HED" key is silently ignored
+        # and the events column then goes unvalidated, which a deliberately bogus
+        # tag confirmed. Reported as hed-standard/hed-javascript#836.
+        #
+        # Note the distribution split before pinning a version anywhere: npm's
+        # `bids-validator` is still latest 1.15.0 with no 2.x/3.x published; 3.0.1
+        # ships only via Deno/JSR (deno run -A jsr:@bids/validator@3.0.1).
+        #
         # A column literally named HED in events.tsv needs no sidecar entry; BIDS
         # assembles it directly. So the column is described here for a human and
         # the definitions live in their own non-column entry, which is where
@@ -315,6 +333,14 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
                 for name, value in spec.get("definitions", {}).items()
                 if not name.startswith("$")
             },
+        },
+        "SstimDurationConvention": {
+            "Description": (
+                "duration is always n/a in this bundle. SSTIM session events are "
+                "instantaneous timeline marks, and inventing a duration would assert a "
+                "span the native record does not contain. This is a note, not a "
+                "redefinition of the BIDS-required duration column."
+            )
         },
         "GeneratedHedColumn": {
             "Description": (

@@ -131,7 +131,7 @@ projection.
       HED mapping needs. The projection still reports what it withholds.*
 - [ ] Generate a version-pinned HED mapping and synthetic core bundle.
 - [ ] Add and validate the optional complete BIDS Behavioral binding.
-- [ ] Request HED Working Group review.
+- [x] Request HED Working Group review. Sent 2026-08-20 as six questions split by owning repository: [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) and [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836). Awaiting reply.
 
 **Reference (for §"what are these", so we don't re-look-up):**
 - **HED** — Hierarchical Event Descriptors: controlled vocabulary for *what occurred*
