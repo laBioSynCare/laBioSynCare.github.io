@@ -105,6 +105,44 @@ a withdrawal removes the person from the live graph and from current documents,
 and the frozen release keeps whatever it already said. Say this out loud when
 asking consent 3, before it is given, not after it is withdrawn.
 
+## The core-concept instrument: discriminating cases
+
+For any interview about what "sensory stimulation" means, **do not ask for a
+definition.** Eight specialists produce eight elegant, incompatible definitions
+and no usable data. Present cases instead and ask what changes between adjacent
+ones. This is ontology elicitation, and it produces a boundary rather than a
+sentence.
+
+Present these ten, then for each ask: *Would your field call this sensory
+stimulation? If not, what would you call it? What necessary property changes
+between this case and the one beside it?*
+
+| # | Case | Paired with | The variable it isolates |
+|---|---|---|---|
+| 1 | 10 Hz binaural beat session | 2 | Intended recipient benefit |
+| 2 | Checkerboard presented during EEG to elicit a VEP | 1 | Response sought, no benefit intended |
+| 3 | Ordinary cooking smells in a kitchen | 4 | Deliberate delivery |
+| 4 | Perfume deliberately introduced into a shop | 3 | Delivery yes, recipient benefit no |
+| 5 | Animal environmental enrichment | 6 | Non-human recipient with a nervous system |
+| 6 | Patterned blue light applied to a plant | 5 | Recipient without afferent processing |
+| 7 | Snoezelen multisensory room session | 8 | Practice family versus parameterized protocol |
+| 8 | Infant tactile-kinesthetic stimulation in a NICU | 7 | Clinical setting, youngest recipient |
+| 9 | Paced breathing guided by an auditory cue | 1 | Whether the cue or the breathing is the stimulation |
+| 10 | Direct tACS at 10 Hz | 1 | Sensory route versus direct neural route |
+
+The pairings are the point. A single case elicits an opinion; a pair where only
+one property differs elicits **which property is load-bearing for that field**,
+which is the thing the sense inventory needs and the thing a definition question
+never surfaces.
+
+Record answers against the three intentionality variables and the chain positions
+in [`SENSORY_STIMULATION_SENSE_REVIEW.md`](../ontology/SENSORY_STIMULATION_SENSE_REVIEW.md),
+not as free text. Two cases are known to be unsettled inside SSTIM itself (6 and
+4), so disagreement there is data, not a wrong answer.
+
+Ask case 6 carefully. See the plant caution in
+[`INTERVIEW_TARGETS.md`](INTERVIEW_TARGETS.md).
+
 ## Checklists
 
 ### Before the call

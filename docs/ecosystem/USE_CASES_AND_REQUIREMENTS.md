@@ -237,6 +237,30 @@ Each has an encoded example attached, so the discussion can be concrete.
 7. **Profile granularity.** Are four profiles the right number, and are the
    boundaries in the right places?
 
+## The proposed first substantive topic for the group
+
+The core concept of this vocabulary is not settled, and that is an asset rather
+than an embarrassment.
+
+[`SENSORY_STIMULATION_SENSE_REVIEW.md`](../ontology/SENSORY_STIMULATION_SENSE_REVIEW.md)
+records what is open: the formal and prose definitions of
+`sstim:SensoryStimulation` disagree about whether a recipient needs afferent
+processing; "declared purpose" is carrying three separable variables; the clause
+that decides the scope is not an inspectable term; and several established
+disciplinary senses have never been mapped against ours.
+
+Presenting a finished definition invites acquiescence. Presenting a provisional
+model and asking a room of specialists to break it is a real standards problem,
+needs no consent machinery to discuss in public, and is the one question where an
+outsider's answer genuinely changes the vocabulary rather than decorating it.
+
+> **We make the best provisional model we can, then ask specialists to break it.**
+
+The discriminating-cases instrument in
+[`INTERVIEW_PROTOCOL.md`](INTERVIEW_PROTOCOL.md) works as a group exercise as
+well as an interview one, and it produces a boundary the group can then argue
+about with something concrete on the table.
+
 ## Non-scope
 
 Restating the charter, because a use cases document is where scope creep starts:
