@@ -199,6 +199,53 @@ Status: `not-contacted` / `contacted` / `scheduled` / `interviewed` / `encoded`
 | G3 | S2 | Expert review | Web audio and timing | Patch Studio and the three-clock architecture, not SSTIM terms | W3C Audio CG | in `OUTREACH_TARGETS.md` | not-contacted |
 | n/a | n/a | Exploratory | Field mapping, Italy | Objective: identify real candidates for the rows above | Any | UNIMORE, UNIPR, IIT, UERJ/IPRJ orbits | not-contacted |
 
+## Track A block: the core concept itself
+
+Separate from the matrix above, because these interviews answer a different kind
+of question and carry a different evidence order. The instrument, the relation
+taxonomy and the sense-inventory schema are in
+[`SENSORY_STIMULATION_SENSE_REVIEW.md`](../ontology/SENSORY_STIMULATION_SENSE_REVIEW.md).
+
+**Interviews are the third evidence stream here, not the first.** Terminological
+analysis (MeSH, SNOMED CT, UMLS, Wikidata, OBI/EFO) needs no informants and
+starts immediately; corpus and literature analysis supplies the attested
+meanings with citations. Only then are the questions specific enough to be worth
+an expert's time. Asking eight specialists what a phrase means, before that
+work, yields eight personal definitions and no inventory.
+
+Most of these are therefore **expert review** type: short, confirmatory, booked
+against the sense inventory rather than against new terms.
+
+**Two informants for the central senses**, one embedded practitioner or
+researcher and one with review or terminology breadth. A single idiosyncratic
+expert would otherwise define the vocabulary by default. Peripheral stress-test
+senses can start with one.
+
+| Tier | What it establishes | Sense or skill | Overlaps an existing row? |
+|---|---|---|---|
+| 1 | The dominant scientific baseline | Basic sensory neuroscience, psychophysics | Partly, the ASSR row |
+| 1 | An established clinical use of the exact phrase | Disorders of consciousness, coma stimulation programmes | New |
+| 1 | The densest terminology in the field: stimulation, integration, modulation, processing, diet | Occupational therapy, Ayres SI | **Yes**, the ADR 0030 row |
+| 1 | An established practice family | Multisensory environments, Snoezelen | **Yes**, the ADR 0030 row |
+| 1 | What counts as "sensory" at all, given interoception | Respiratory and interoceptive | **Yes**, the G1/S1 row |
+| 2 | The recipient axis at its youngest edge | Neonatal, NICU developmental care | New |
+| 2 | The largest non-clinical deployed practice | Special education, PMLD sensory rooms | New |
+| 2 | Whether a non-human recipient is in scope | Animal sensory enrichment | New |
+| 2 | Whether a persuasive purpose is in scope | Sensory marketing, experience design | New |
+| 3 | How to structure a sense inventory properly | Terminology and lexicography (ISO TC 37 orbit) | New |
+| 3 | Correct SKOS for senses, variants and mappings | Knowledge organization, ISKO orbit | Partly, the ontology review row |
+| 3 | Whether our mappings would be accepted upstream | Biomedical terminology curator (MeSH, UMLS, SNOMED) | New |
+| 4 | Cultural and historical semantics of the senses | Sensory studies (the Concordia school is the obvious entry point, to verify before any RDF) | New |
+| 4 | The record of overclaiming in this exact space | Historian of sensory therapies, and of AVE / mind machines | New |
+
+**Where a row overlaps, it is one interview with two objectives, not two
+approaches to the same person.** The Snoezelen and OT conversations already
+scheduled for ADR 0030 should carry the sense questions as well; splitting them
+would waste the informant's goodwill and produce two partial records.
+
+**A caution on tier 4:** historians of sensory therapy will supply a long record
+of overclaiming in this space. That is useful before the CG kickoff, not after.
+
 ## Notes on ranking
 
 **Auditory entrainment is deprioritized for vocabulary expansion and retained
