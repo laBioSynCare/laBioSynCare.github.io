@@ -85,6 +85,12 @@ acting on its findings.
   — validation passed; blocked on a Databus outage.
 - [Sensory taxonomy review](SENSORY_TAXONOMY_REVIEW.md) — an external
   expanded-senses proposal assessed against SSTIM's modeling boundaries.
+- [Sensory stimulation sense review](SENSORY_STIMULATION_SENSE_REVIEW.md) — the
+  core term's own lexical account: the relation taxonomy that keeps a
+  disciplinary sense from being recorded as a synonym, a sense-inventory schema,
+  the two scope stress tests (animal enrichment, sensory marketing) that the
+  current definition admits, and the evidence order that puts terminological and
+  corpus work ahead of interviews.
 - [Raw maintainer notes](raw-notes/) — provenance for design questions. Inputs to
   review, never normative.
 
