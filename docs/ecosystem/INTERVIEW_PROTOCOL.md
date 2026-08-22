@@ -155,6 +155,30 @@ consent for approved status pending. Outstanding:
    with relationship type `contributor`.
 5. Record the outcome in the interview log.
 
-Until step 2 has an answer, no further substantive external interview is
-scheduled. One unresolved attribution is an oversight. A pipeline that scales
-before resolving it is a policy.
+## What the open remediation blocks
+
+An earlier draft of this document blocked every further substantive external
+interview until step 2 has an answer. That was incoherent with the three types
+above: it applied a blanket rule to a document whose whole point is that the
+three types carry different governance weight.
+
+The block is on **conversion into public contribution artifacts**, not on
+learning:
+
+| Type | Blocked while a prior attribution is unresolved? |
+|---|---|
+| Contribution (produces public RDF, ADRs, terms) | **Yes.** This is the exact operation that failed |
+| Expert review | No, provided review attribution is agreed up front |
+| Exploratory | No. Private notes, ordinary consent, nothing public |
+
+**The guard that makes this safe is on the conversion, not the calendar.** The
+Theo case did not begin as a decision to use someone's expertise without
+crediting them. It began as a conversation that turned out to be valuable and
+was then converted into public artifacts without going back. So: an exploratory
+or expert-review interview may not be converted into a contribution artifact
+without first running consents 2 through 5 in full, as a new decision, with the
+drafts in hand. Reclassifying afterwards is the failure mode, and it has a name
+now.
+
+One unresolved attribution is an oversight. A pipeline that converts freely
+while one is open would make it a policy.
