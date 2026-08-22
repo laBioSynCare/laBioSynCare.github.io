@@ -97,11 +97,15 @@ side, or no assertion at all is a modelling decision for the sense review, not a
 lookup. SNOMED's sense is one row in the inventory, and on present evidence it
 looks narrower than SSTIM's.
 
-**Pending protected-file edit.** Correcting the comment in
-`static/ontology/sstim-alignments.ttl` requires an explicit maintainer
-instruction naming that file
+**Applied 2026-08-22** to `static/ontology/sstim-alignments.ttl`, on an explicit
+maintainer instruction naming the file
 ([ADR 0004](../decisions/0004-protected-ontology-files.md), `CLAUDE.md` §3.4).
-The correction is a comment change only; no mapping is asserted either way.
+The comment now records the audit beside the 2026-07-10 MeSH one, in the same
+form: dated finding, named instrument, explicit non-assertion with its reason.
+No mapping is asserted in either direction. The edit changed the module's
+sha256, so `manifest.json` digests were resynchronized with
+`node scripts/sstim-manifest.mjs sync-checksums`; the module digest and the Full
+profile rollup both moved.
 
 ## The relation taxonomy
 

@@ -332,8 +332,22 @@ iao:0000030 rdfs:label "information content entity"@en .
 # Pending alignments (tracked as GitHub Issues)
 ###########################################################################
 
-# TODO: SNOMED CT alignment for clinical context descriptions
-# SNOMED 229070002 = sensory stimulation (procedure) — verify current URI
+# SNOMED CT audit (2026-08-22): the identifier previously recorded here,
+# 229070002, is "Stretching exercises (procedure)". Sensory stimulation is
+# 226056003, active FSN "Sensory stimulation (procedure)", inactive FSN
+# "Sensory stimulation (regime/therapy)". Verified by CodeSystem/$lookup on
+# http://snomed.info/sct at tx.fhir.org, the HL7 FHIR terminology server;
+# 229070002 is independently corroborated as Stretching exercises by the HL7
+# Europe hospital discharge encounter-type value set. browser.ihtsdotools.org,
+# BioPortal and the Athena API all return 403, and snomedbrowser.com is now a
+# parked domain: use tx.fhir.org.
+#
+# No mapping is asserted. SNOMED types 226056003 as a clinical procedure,
+# while sstim:SensoryStimulation is a BFO process class spanning experimental,
+# expressive and accessibility purposes with no clinical commitment, so the
+# SNOMED sense looks narrower than ours. Whether that earns skos:closeMatch, a
+# broadMatch from the SNOMED side, or nothing is a modelling decision, tracked
+# as decision 4 in docs/ontology/SENSORY_STIMULATION_SENSE_REVIEW.md.
 
 # MeSH audit (2026-07-10): D012910 is Snake Venoms, not Sensory Stimulation.
 # No exact or close MeSH mapping is asserted. D012677 (Sensation) is adjacent
