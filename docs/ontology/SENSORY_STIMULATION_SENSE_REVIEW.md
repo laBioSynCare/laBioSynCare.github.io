@@ -48,9 +48,9 @@ Across all 785 terms there are 25 external mapping assertions, essentially all
 Wikidata. `sstim:SensoryStimulation` itself carries no `altLabel`, no
 `hiddenLabel`, no `example`, and no external mapping. One live TODO in
 `sstim-alignments.ttl` names a SNOMED CT identifier as unverified and unasserted.
-See the next section: that identifier is now disputed.
+See the next section: that identifier is wrong, and the correct one is known.
 
-### The SNOMED CT identifier is disputed and remains unverified
+### The SNOMED CT identifier was wrong, and is now resolved
 
 `sstim-alignments.ttl` carries the comment:
 
@@ -59,40 +59,49 @@ See the next section: that identifier is now disputed.
 # SNOMED 229070002 = sensory stimulation (procedure) - verify current URI
 ```
 
-An external review reports that **229070002 is "Stretching exercises"** and that
-sensory stimulation is **226056003**, citing an HL7 Europe value set and an
-ICNP-to-SNOMED mapping document. A third-party search separately associated
-229070002 with physiotherapy, which is consistent with the first claim and
-inconsistent with our comment.
+**That identifier is incorrect.** Resolved 2026-08-22 against the HL7 FHIR
+terminology server `tx.fhir.org`, using `CodeSystem/$lookup` on
+`http://snomed.info/sct`:
 
-**Neither identifier is verified, and the second must not simply replace the
-first.** Swapping an unverified identifier for another unverified identifier is
-the same failure with better provenance-looking sources. Verification attempted
-2026-08-22, unsuccessfully:
+| Code | Display | Fully specified name |
+|---|---|---|
+| `229070002` | Stretching exercises | Stretching exercises (procedure) |
+| `226056003` | Sensory stimulation | Sensory stimulation (procedure); *inactive:* Sensory stimulation (regime/therapy) |
 
-| Instrument | Result |
-|---|---|
-| `browser.ihtsdotools.org` Snowstorm API, both concept IDs | HTTP 403 |
-| BioPortal SNOMEDCT class pages, both concept IDs | HTTP 403 |
-| General web search, both concept IDs | No authoritative FSN returned |
+`229070002` is independently corroborated as "Stretching exercises" by the HL7
+Europe Hospital Discharge Report encounter-type value set. The comment's own
+"verify current URI" flag was correct to distrust it, and because it was never
+promoted out of a comment, no wrong mapping was ever asserted in RDF.
 
-Per `CLAUDE.md` §3.6, an unreachable instrument is not evidence. The status is
-**INCOMPLETE**, not "corrected". What would settle it: a licensed SNOMED CT
-browser session, the UMLS REST API with an API key, or any SNOMED member-country
-terminology server. Until one of those answers, the repository comment stays as
-it is with the dispute recorded beside it, and no mapping is asserted in either
-direction.
+Route matters here, and is recorded so nobody repeats the dead ends. Four
+instruments were unreachable or useless: `browser.ihtsdotools.org` Snowstorm
+(HTTP 403), BioPortal SNOMEDCT class pages (HTTP 403), `athena.ohdsi.org` API
+(HTTP 403), and `snomedbrowser.com`, which is now a parked domain redirecting to
+an unrelated site. General web search returned no authoritative FSN for either
+code. `tx.fhir.org` answered both immediately.
 
-This is the third mapping error or near-error caught by refusing to assert on
-inherited authority, after the MeSH D012910 audit and the prefix.cc namespace
-mismatch. The pattern is worth naming: **identifiers quoted in comments decay
-silently, and a plausible correction is still a claim requiring an instrument.**
+**Two findings survive beyond the digits.**
 
-Reproduce with `python3 scripts/locate-iri.py sstim:SensoryStimulation` for
-location, and the coverage snippet in
-[`INTERVIEW_TARGETS.md`](../ecosystem/INTERVIEW_TARGETS.md) for the counts.
+First, the correction was itself a claim requiring an instrument. An external
+review supplied the right answer with plausible sources, and adopting it on that
+basis would have replaced an unverified identifier with an unverified identifier.
+The digits happened to be right; the method would have been wrong, and the next
+time it would not be.
 
----
+Second, **the identifier is resolved but the mapping is not.** SNOMED's concept
+is a *procedure*, and its inactive FSN shows it was retyped from
+"(regime/therapy)". SSTIM's `sstim:SensoryStimulation` is a BFO process class
+covering experimental, expressive and accessibility purposes with no clinical
+commitment. Whether that is `skos:closeMatch`, `skos:broadMatch` from the SNOMED
+side, or no assertion at all is a modelling decision for the sense review, not a
+lookup. SNOMED's sense is one row in the inventory, and on present evidence it
+looks narrower than SSTIM's.
+
+**Pending protected-file edit.** Correcting the comment in
+`static/ontology/sstim-alignments.ttl` requires an explicit maintainer
+instruction naming that file
+([ADR 0004](../decisions/0004-protected-ontology-files.md), `CLAUDE.md` §3.4).
+The correction is a comment change only; no mapping is asserted either way.
 
 ## The relation taxonomy
 
@@ -481,10 +490,10 @@ and receiving eight personal definitions. Interviews come last for that reason.
    relevant professional vocabularies. Every candidate mapping is verified
    against the authoritative record before assertion, following the convention
    the 2026-07-10 MeSH audit already established in `sstim-alignments.ttl`: a
-   recorded non-assertion with its reason is a result. The disputed SNOMED CT
-   identifier above is the first item, and it needs a licensed terminology
-   service rather than another search engine. This stream needs no interviews and
-   can start immediately.
+   recorded non-assertion with its reason is a result. The SNOMED CT identifier
+   above is resolved; what remains is the modelling decision about which mapping
+   relation, if any, to assert. `tx.fhir.org` is the working instrument for
+   SNOMED lookups. This stream needs no interviews and can start immediately.
 2. **Corpus and literature analysis.** How the phrase is used across
    disciplines, and how that has shifted over time. This produces attested
    meanings with citations, which is what the inventory's `attested meaning`
@@ -511,9 +520,9 @@ decidable now and the rest are not.
 2. The formal relation to each other attested sense.
 3. Whether the definition is correctly broad, accidentally broad, or correctly
    broad with a narrower declared scope.
-4. Which SNOMED CT concept, if any, corresponds: 229070002, 226056003, or
-   neither, resolved against a licensed terminology service rather than a
-   secondary source.
+4. Whether `226056003` "Sensory stimulation (procedure)", now verified, warrants
+   `skos:closeMatch`, a `broadMatch` from the SNOMED side, or no assertion, given
+   that SNOMED types it as a clinical procedure and SSTIM as a process class.
 5. Whether treating exposure as the same process from the recipient side is
    SSTIM's settled position, since the meronymy analysis currently assumes it.
 6. Whether `SensoryStimulation` requires a nervous-system-bearing recipient, and

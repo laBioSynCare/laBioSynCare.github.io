@@ -89,8 +89,8 @@ acting on its findings.
   core term's own lexical account: the relation taxonomy that keeps a
   disciplinary sense from being recorded as a synonym, a sense-inventory schema,
   the three scope stress tests (animal enrichment, sensory marketing, plants)
-  that the current definition admits or excludes, a disputed and still
-  unverified SNOMED CT identifier, and the evidence order that puts
+  that the current definition admits or excludes, a SNOMED CT identifier found wrong and
+  corrected, and the evidence order that puts
   terminological and corpus work ahead of interviews.
 - [Raw maintainer notes](raw-notes/) — provenance for design questions. Inputs to
   review, never normative.
