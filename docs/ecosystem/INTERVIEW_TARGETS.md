@@ -232,6 +232,7 @@ senses can start with one.
 | 2 | The largest non-clinical deployed practice | Special education, PMLD sensory rooms | New |
 | 2 | Whether a non-human recipient is in scope | Animal sensory enrichment | New |
 | 2 | Whether a persuasive purpose is in scope | Sensory marketing, experience design | New |
+| 2 | Whether "sensory" means neural sensation or biological detection. The clause that decides it may be an accident of ADR 0034 | Plant sensory biology, plant stimulus perception and response | New |
 | 3 | How to structure a sense inventory properly | Terminology and lexicography (ISO TC 37 orbit) | New |
 | 3 | Correct SKOS for senses, variants and mappings | Knowledge organization, ISKO orbit | Partly, the ontology review row |
 | 3 | Whether our mappings would be accepted upstream | Biomedical terminology curator (MeSH, UMLS, SNOMED) | New |
@@ -245,6 +246,12 @@ would waste the informant's goodwill and produce two partial records.
 
 **A caution on tier 4:** historians of sensory therapy will supply a long record
 of overclaiming in this space. That is useful before the CG kickoff, not after.
+
+**A caution on the plant row:** approach it knowing that "plant neurobiology"
+drew a signed objection from roughly three dozen plant biologists in 2007. A
+plant scientist hearing "sensory stimulation for plants" will hear that
+argument, not ours. Lead with the modelling question, which is genuinely open,
+rather than with a proposal to extend the term.
 
 ## Notes on ranking
 
