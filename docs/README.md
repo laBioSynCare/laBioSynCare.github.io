@@ -138,6 +138,13 @@ of `static/favicon.svg` and `static/icons/`.
   status-discipline wording;
   [`W3C_COMMUNITY_GROUP_PROPOSAL.md`](ecosystem/W3C_COMMUNITY_GROUP_PROPOSAL.md)
   is the submitted proposal, kept as a record and not updated.
+  First deliverable draft:
+  [`USE_CASES_AND_REQUIREMENTS.md`](ecosystem/USE_CASES_AND_REQUIREMENTS.md) —
+  14 use cases derived from encoded Turtle rather than invented, each linked to
+  its instance file and competency query, with 16 requirements and the open
+  questions where an outside answer would change the vocabulary.
+  Interviews: [`INTERVIEW_TARGETS.md`](ecosystem/INTERVIEW_TARGETS.md),
+  [`INTERVIEW_PROTOCOL.md`](ecosystem/INTERVIEW_PROTOCOL.md).
   Outreach: [`INVITATION_TEMPLATE.md`](ecosystem/INVITATION_TEMPLATE.md),
   [`CONSORTIUM_INVITATION.md`](ecosystem/CONSORTIUM_INVITATION.md).
   People: [`ADVISORY_BOARD.md`](ecosystem/ADVISORY_BOARD.md) (**the source of
