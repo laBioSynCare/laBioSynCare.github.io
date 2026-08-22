@@ -169,6 +169,128 @@ below, not in the table as settled fact.
 
 ---
 
+## The causal chain, used as an instrument
+
+Most of what looks like disciplinary polysemy is disagreement about **where on
+one chain** the word points:
+
+```text
+stimulus -> delivery/presentation -> sensory transduction -> afferent processing
+         -> sensory-system activity -> percept/perception -> response/outcome
+```
+
+An experimenter saying "stimulation" often means delivery. A physiologist may
+mean transduction or afferent activity. A practitioner may mean the percept. A
+marketer may mean the response. These are different positions, not different
+words, and the disagreement exists **before** disciplinary polysemy is added on
+top.
+
+This makes the chain the better instrument for the inventory's `relation to the
+SSTIM sense` field: ask which position a sense denotes, then derive the relation,
+rather than assigning exact/narrower/overlapping by feel.
+
+**Which chain positions exist as SSTIM terms:**
+
+| Position | SSTIM term |
+|---|---|
+| Stimulus, and its specification | `sstim:StimulusSpecification` |
+| Delivery, as a process | `sstim:Stimulation`, `sstim:SensoryStimulation` |
+| Sensory transduction | **absent** |
+| Afferent processing | **absent** |
+| Mechanism, as an explanation | `sstim:StimulationMechanism` |
+| Percept, perception | **absent** |
+| Response, observation | `sstim:ParticipantObservation` |
+
+**The clause that decides the plant question is not a term.** "Afferent
+processing" appears only as prose inside the definition of
+`sstim:SensoryStimulation`. It carries the scope decision, and it cannot be
+reasoned over, mapped to an external vocabulary, or disputed precisely, because
+it is not an inspectable entity.
+
+That asymmetry is the point. It does **not** follow that every absent position
+deserves a class. Adding seven would repeat the duplicate-hierarchy error
+[SENSORY_TAXONOMY_REVIEW](SENSORY_TAXONOMY_REVIEW.md) already documented when it
+rejected an external proposal's ten new OWL classes. Use the chain to decide
+which distinctions SSTIM must represent, and add only those.
+
+## Three intentionality variables, not one purpose
+
+SSTIM's definition requires a "declared purpose". That single clause is doing the
+work of three independent variables:
+
+1. Was the sensory input **deliberately delivered**?
+2. Was a particular **response intentionally elicited or measured**?
+3. Was a **benefit to the recipient** intended?
+
+| Case | Delivered | Response sought | Benefit intended |
+|---|---|---|---|
+| Ordinary cooking smells | no | no | no |
+| Checkerboard during EEG | yes | yes | no |
+| Perfume introduced into a shop | yes | yes | no (not to the recipient) |
+| Calming sensory session | yes | yes | yes |
+
+Separating them matters for two reasons.
+
+**It keeps "intentional" from sliding into "therapeutic".** A researcher
+presenting a checkerboard purely to measure a VEP is unambiguously performing
+intentional sensory stimulation with no benefit intended, and any definition that
+implies otherwise is wrong in a direction that also breaches `CLAUDE.md` §3.5.
+
+**It explains the sensory marketing stress test.** Perfume in a shop scores
+yes/yes/no. SSTIM's single "purpose" clause cannot see the difference between
+variable 2 and variable 3, which is exactly why the case falls inside the
+definition and still feels wrong. The stress test is not evidence that the
+definition is too broad; it is evidence that one clause is carrying two
+distinctions.
+
+## Definition authority, and the drift that exposed it
+
+The plant analysis surfaced a divergence that matters independently of plants:
+
+| Text | Requirement | Plants |
+|---|---|---|
+| `sstim:SensoryStimulation` `skos:definition` | sensory transduction **and afferent processing** | excluded |
+| [`SENSORY_STIMULATION.md`](../concept/SENSORY_STIMULATION.md) | transduction by sensory receptors | ambiguous |
+
+Two questions follow, and the first is decidable now without any research:
+
+1. **Which text is normative** when the canonical RDF definition and the concept
+   document disagree?
+2. Was "afferent" an intentional scope decision, or a side effect of
+   [ADR 0034](../decisions/0034-neuromodulation-relation-and-neural-target-axis.md),
+   whose subject was sensory-route versus direct-neural rather than neural versus
+   non-neural organisms?
+
+**Proposed guard, not yet implemented.** A release check so the two cannot
+silently diverge again. There is precedent and a place to put it: `make
+truth-audit` already enforces cross-file agreement for version DOIs across
+`void.ttl`, `CITATION.cff`, `releaseMetadata.js` and `CURRENT_STATE.md`, and
+`scripts/sstim-definition-coverage.py` already checks definition quality. Neither
+compares an RDF definition against its prose counterpart. Extending the latter is
+a small change to an existing script rather than new machinery.
+
+## Protocol, execution, event: the layer exists, one relation does not
+
+Checked 2026-08-22, because an external review asked whether SSTIM lacks a
+neutral realization concept. It does not:
+
+- `sstim:SensoryStimulationIntervention` is `subClassOf COB_0000082`
+  ("planned process"), chosen deliberately over the obsolete OBI_0000011 because
+  "an intervention need not be completely executed", verified via OLS 2026-07-10.
+  So "intervention" here carries planned-process semantics, not therapeutic ones.
+- `sstim:SensoryStimulation` is itself `subClassOf BFO_0000015`, a process class,
+  so particular occurrences instantiate it directly. A checkerboard presented
+  only to elicit a VEP is an instance of `SensoryStimulation` and simply not an
+  instance of `SensoryStimulationIntervention`.
+
+**The gap is the relation, not a class.** `describesStimulation`
+(`StimulusSpecification` to `Stimulation`) is the **only** property in the whole
+ontology whose range is `Stimulation` or any subclass of it. `followsProtocol`
+links a `Preset` to a `SensoryStimulationProtocol`; `implementsProtocol` links
+software to a protocol. Nothing links a **protocol to the process that realizes
+it**. The three-layer chain is therefore complete at the specification end and
+broken at the protocol end.
+
 ## Sense inventory schema
 
 One row per attested sense. The load-bearing field is **relation to the SSTIM
@@ -382,7 +504,8 @@ contribution interviews.
 
 ## Decisions this review must produce
 
-An ADR, and only then vocabulary changes:
+Recorded here as repo truth pending a decision. No ADR is opened yet; item 7 is
+decidable now and the rest are not.
 
 1. Which attested sense, if any, `sstim:SensoryStimulation` is coextensional with.
 2. The formal relation to each other attested sense.
@@ -395,10 +518,17 @@ An ADR, and only then vocabulary changes:
    SSTIM's settled position, since the meronymy analysis currently assumes it.
 6. Whether `SensoryStimulation` requires a nervous-system-bearing recipient, and
    whether the "afferent processing" clause was written to do that work.
-7. Which lexical variants and synonyms are genuine `altLabel`s of the existing
-   concept, and which apparent synonyms are separate concepts.
-8. Whether any sense warrants its own concept in the scheme, and if so under
-   which relation.
+7. **Which text is normative** when the RDF definition and the concept document
+   disagree, and whether a drift check enforces it.
+8. Whether "declared purpose" should split into deliberate delivery, intended
+   response, and intended recipient benefit.
+9. Which chain positions warrant SSTIM terms, given that `AfferentProcessing`
+   currently carries a scope decision without being inspectable.
+10. Whether a protocol-to-execution realization relation should exist.
+11. Which lexical variants and synonyms are genuine `altLabel`s of the existing
+    concept, and which apparent synonyms are separate concepts.
+12. Whether any sense warrants its own concept in the scheme, and if so under
+    which relation.
 
 ## Not proposed
 
