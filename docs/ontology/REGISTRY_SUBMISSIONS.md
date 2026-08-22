@@ -103,7 +103,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ⚠️ **live but had been ingesting development lines** — the nightly pull URL served whatever was on `main`, so submissions read 0.15.0-dev, 0.16.0-dev, 0.17.0-dev. Fixed at source 2026-08-19: the URL now serves the frozen release. The portal keeps a stale `Version IRI` of 0.14.0 from the last submission that carried one and needs one clean pull of 0.16.0 to correct itself. Observed on the public page 2026-08-19; the REST API needs a key | account ✓ (@rfabbri) | **watch the next nightly** |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
-| OLS4 | 🕓 **PR open** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. Re-checked 2026-08-18 via `gh`: still open, not draft, **no comments** | yes (GitHub) | watch |
+| OLS4 | 🕓 **PR open, under review** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. A collaborator (@haideriqbal) asked on 2026-08-20 for the biomedical use case, the developing group or institute, and the long-term maintenance plan; **answered 2026-08-21**, including an offer to bump `ontology_purl` to the shipped 0.16.0 or switch to a rolling URL | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
 | DBpedia KG Catalog | 🕓 **submitted** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run. Re-checked 2026-08-18 via `gh`: open, **still no labels**, one comment and it is ours | yes (GitHub) | watch |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
@@ -1121,11 +1121,34 @@ Submitted version:  0.15.0
 Date:               2026-08-18
 Account/maintainer: @ttm (fork ttm/ols4, branch add-sstim-ontology)
 External record ID or URL:  https://www.ebi.ac.uk/ols4/ontologies/sstim (on merge)
-Status:             PR OPEN — one entry appended to ebi_ontologies.json against
-                    the dev branch. 35 insertions, 0 deletions, mergeable. Their
-                    recent "Add X ontology" PRs merged within days.
+Status:             PR OPEN, UNDER REVIEW — one entry appended to
+                    ebi_ontologies.json against the dev branch. 35 insertions,
+                    0 deletions, mergeable. Their recent "Add X ontology" PRs
+                    merged within days.
+
+                    2026-08-20: collaborator @haideriqbal asked three questions —
+                    the biomedical use case, which group or institute developed
+                    it, and the long-term maintenance and update plan. Answered
+                    2026-08-21 in the PR thread. The reply's substance, so a
+                    later enquiry from another registry stays consistent with
+                    it: the ontology describes and contextualizes sensory
+                    stimulation for research and applied practice, and does not
+                    prescribe or certify; invasiveness is a modelled axis rather
+                    than a scope limit, with interventional techniques defined
+                    and placed but the parameter-level depth on sensory-route
+                    stimulation; the project is independent rather than an
+                    institutional deliverable, with the W3C CG as its
+                    vendor-neutral home; and maintenance rests on frozen
+                    per-release snapshots with version DOIs, the CI gate, and
+                    stable IRIs with deprecation over deletion.
 Required follow-up: Watch #1351. On merge, confirm the ontology resolves at
                     /ols4/ontologies/sstim and record the URL above.
+
+                    Awaiting their answer on two offers made 2026-08-21: bump
+                    ontology_purl to the shipped 0.16.0 now, or leave it pinned
+                    at the reviewed 0.15.0; and a one-line bump PR per release
+                    versus a rolling URL. Act on whichever they choose rather
+                    than changing the entry under an in-flight review.
 
                     **Bump ontology_purl at every release.** It pins the frozen
                     0.15.0 snapshot deliberately: the unversioned path

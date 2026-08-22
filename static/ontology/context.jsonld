@@ -37,6 +37,7 @@
     "bibo": "http://purl.org/ontology/bibo/",
     "mod": "https://w3id.org/mod#",
     "wd": "http://www.wikidata.org/entity/",
+    "snomed": "http://snomed.info/id/",
     "wdt": "http://www.wikidata.org/prop/direct/",
     "bfo": "http://purl.obolibrary.org/obo/BFO_",
     "obi": "http://purl.obolibrary.org/obo/OBI_",

@@ -215,6 +215,7 @@ skos:historyNote a owl:AnnotationProperty .
 skos:inScheme a owl:AnnotationProperty .
 skos:member a owl:AnnotationProperty .
 skos:narrower a owl:AnnotationProperty .
+skos:narrowMatch a owl:AnnotationProperty .
 skos:notation a owl:AnnotationProperty .
 skos:note a owl:AnnotationProperty .
 skos:prefLabel a owl:AnnotationProperty .

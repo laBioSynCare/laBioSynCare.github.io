@@ -29,6 +29,7 @@
 
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix snomed: <http://snomed.info/id/> .
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
@@ -42,14 +43,14 @@
 <https://w3id.org/sstim/alignments> a owl:Ontology ;
     owl:versionInfo "0.17.0-dev" ;
     dct:title "SSTIM External Alignments"@en ;
-    dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
+    dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata, OBO Foundry, and SNOMED CT resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-08-18"^^xsd:date ;
-    dct:modified "2026-08-18"^^xsd:date ;
+    dct:modified "2026-08-22"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
     skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
@@ -312,6 +313,51 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 
 
 ###########################################################################
+# SNOMED CT alignments
+###########################################################################
+
+# Audited 2026-08-22. The identifier this file previously recorded, 229070002,
+# denotes stretching exercises and not sensory stimulation; sensory stimulation
+# is 226056003. Both were resolved by CodeSystem/$lookup on
+# http://snomed.info/sct at tx.fhir.org, the HL7 FHIR terminology server, and
+# the incorrect one is independently corroborated by the HL7 Europe hospital
+# discharge encounter-type value set. browser.ihtsdotools.org, BioPortal and the
+# Athena API all answer 403, and snomedbrowser.com is now a parked domain, so
+# tx.fhir.org is the working instrument for any future SNOMED lookup.
+#
+# LICENCE, read before extending this section. SNOMED CT is licensed by SNOMED
+# International. Brazil and Italy are both outside the 53 Member territories, so
+# an Affiliate Licence for this project would come from MLDS directly and may be
+# fee-bearing by World Bank territory band; the published licensing FAQ does not
+# address reference-only use. These mappings therefore assert IRIs under the
+# public SNOMED CT URI Standard and deliberately carry no SNOMED description
+# text, hierarchy, definition, or attribute content as data. Do not add SNOMED
+# labels or child concepts here. Confirm the affiliate position before relying
+# on these mappings; withdrawing them is a one-commit change.
+#
+# Both relations follow the KR-09 extension/intension test, not label similarity.
+
+sstim:SensoryStimulation skos:narrowMatch snomed:226056003 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim:SensoryStimulation ;
+    owl:annotatedProperty skos:narrowMatch ;
+    owl:annotatedTarget snomed:226056003 ;
+    dct:date "2026-08-22"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Intension: the SNOMED concept carries an explicit therapeutic intent attribute, while this class admits experimental, expressive, accessibility and informational purposes and asserts no therapeutic commitment. Extension: the SNOMED concept subsumes clinical tactile technique, while this class covers binaural beats, photic driving and isochronic tones, which it does not subsume. Hence narrowMatch. Deliberately not closeMatch: asserting interchangeability would import a therapeutic framing this project disclaims (docs/concept/SCOPE.md and the no-medical-claims invariant)."@en .
+
+sstim:Stimulation skos:relatedMatch snomed:122545008 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim:Stimulation ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget snomed:122545008 ;
+    dct:date "2026-08-22"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The direction is left undetermined on purpose. This class's definition admits any deliberately parameterized process applied to an identified biological, sensory or neural process, under which the SNOMED concept would be narrower. Its scope note instead describes a neutral umbrella over sensory stimulation and interventional neuromodulation, under which the two merely overlap, because the SNOMED concept subsumes procedural stimulation that is neither. That is the same definition-versus-scope-note divergence recorded for sensory stimulation and non-neural recipients in docs/ontology/SENSORY_STIMULATION_SENSE_REVIEW.md. relatedMatch asserts the association without asserting a subsumption that a definition-authority decision could invalidate; upgrade to narrowMatch if the definition text is ruled normative."@en .
+
+###########################################################################
 # External upper-ontology term labels (display stubs)
 #
 # Local rdfs:label assertions for the external BFO/OBI/IAO IRIs referenced
@@ -331,23 +377,6 @@ iao:0000030 rdfs:label "information content entity"@en .
 ###########################################################################
 # Pending alignments (tracked as GitHub Issues)
 ###########################################################################
-
-# SNOMED CT audit (2026-08-22): the identifier previously recorded here,
-# 229070002, is "Stretching exercises (procedure)". Sensory stimulation is
-# 226056003, active FSN "Sensory stimulation (procedure)", inactive FSN
-# "Sensory stimulation (regime/therapy)". Verified by CodeSystem/$lookup on
-# http://snomed.info/sct at tx.fhir.org, the HL7 FHIR terminology server;
-# 229070002 is independently corroborated as Stretching exercises by the HL7
-# Europe hospital discharge encounter-type value set. browser.ihtsdotools.org,
-# BioPortal and the Athena API all return 403, and snomedbrowser.com is now a
-# parked domain: use tx.fhir.org.
-#
-# No mapping is asserted. SNOMED types 226056003 as a clinical procedure,
-# while sstim:SensoryStimulation is a BFO process class spanning experimental,
-# expressive and accessibility purposes with no clinical commitment, so the
-# SNOMED sense looks narrower than ours. Whether that earns skos:closeMatch, a
-# broadMatch from the SNOMED side, or nothing is a modelling decision, tracked
-# as decision 4 in docs/ontology/SENSORY_STIMULATION_SENSE_REVIEW.md.
 
 # MeSH audit (2026-07-10): D012910 is Snake Venoms, not Sensory Stimulation.
 # No exact or close MeSH mapping is asserted. D012677 (Sensation) is adjacent
