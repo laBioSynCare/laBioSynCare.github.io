@@ -110,6 +110,10 @@ of `static/favicon.svg` and `static/icons/`.
   standards bodies and events, with the ask per target, the 90-day sequence, KPIs,
   and a consent-governed log
   ([ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md)).
+- [`INTERVIEW_TARGETS.md`](ecosystem/INTERVIEW_TARGETS.md) — who to interview and
+  why, scored on two axes (ontology gap, scientific/strategic), with the measured
+  modality-coverage baseline that ranks them and the Track A / Track B boundary
+  that keeps SSTIM contribution separate from BioSynCare product discovery.
 - [`ECOSYSTEM_OPERATIONS.md`](ecosystem/ECOSYSTEM_OPERATIONS.md) — running the
   consent-gated publication pipeline.
 - [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
