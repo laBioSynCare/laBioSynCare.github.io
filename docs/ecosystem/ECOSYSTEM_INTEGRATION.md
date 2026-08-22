@@ -115,7 +115,12 @@ required a native recorder/schema, report/privacy semantics, and runtime RDF
 conformance before the HED and BIDS adapters. **The first of those is done.**
 HED describes what occurred and when; until 2026-08-13 SSTIM could not say that
 anything occurred at all, and now the native bundle carries an ordered,
-engine-clock event timeline that a HED mapping can be generated from. The
+engine-clock event timeline. **Revised 2026-08-22:** an earlier version of this
+paragraph said a HED mapping could be generated from it, which was premature. The
+clock and the ordering are there; the event *vocabulary* covers device and system
+occurrences only, and `sstim:SessionEvent` cannot reference a stimulus. Stimulus
+presentation, participant response, and contextual events are all absent. See the
+measurement in [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md). The
 mapping itself is the next piece of work, and it does not need the ontology
 terms — HED annotations are generated from the native bundle, not from the RDF
 projection.

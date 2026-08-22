@@ -67,6 +67,93 @@ prompt/capture, participant action, and unwanted-experience reporting. The exact
 event vocabulary is part of the session model, not an unversioned list in an
 exporter.
 
+### What ADR 0048 actually shipped against that list
+
+Measured 2026-08-22. The requirement above names stimulus block start/end and
+participant action. The shipped `SessionEventTypeScheme` contains eleven
+concepts, and every one of them is a system, transport, or session-lifecycle
+event:
+
+```text
+eventSessionOpen        eventPlaybackStart      eventPlaybackPause
+eventPlaybackResume     eventPlaybackStop       eventParameterChanged
+eventEngineFallback     eventSafetyLimitApplied eventSessionInterrupt
+eventObservationCollected                       eventSessionComplete
+```
+
+`sstim:SessionEvent` carries exactly four properties: `hasEventType`,
+`hasChangedParameter`, `parameterValueBefore`, `parameterValueAfter`. **It cannot
+reference a stimulus, a channel, or a specification at all.**
+
+So of the four event families a HED projection needs, SSTIM has one:
+
+| Family | State |
+|---|---|
+| Device and system events | Shipped |
+| Stimulus presentation events | **Absent** |
+| Participant and response events | **Absent** (`eventObservationCollected` records that collection occurred, not what the participant did) |
+| Contextual events | **Absent** |
+
+`eventPlaybackStart` is transport control, not stimulus onset. HED annotates
+occurrences of stimuli; that is the one thing this timeline cannot express. The
+claim in [`ECOSYSTEM_INTEGRATION.md`](ECOSYSTEM_INTEGRATION.md) that the bundle
+"carries an ordered, engine-clock event timeline that a HED mapping can be
+generated from" is true of the clock and the ordering, and premature about the
+mapping.
+
+### The constraint on fixing it: minimum bridge only
+
+**Do not close this by building an event vocabulary inside SSTIM.** That is
+already the stated posture in
+[`ECOSYSTEM_INTEGRATION.md`](ECOSYSTEM_INTEGRATION.md) Workstream 2 ("Do not
+replace HED or fork a HED library without repeated reviewed gaps"), and the
+temptation here is precisely to duplicate the standard SSTIM chose HED to avoid
+duplicating.
+
+The question is not "what event types does stimulation research need", which is
+HED's job. It is:
+
+> What is the **minimum** SSTIM event model needed to connect a stimulation
+> execution to HED?
+
+On the measurements above, that is small: a relation from a `SessionEvent` to the
+thing presented (stimulus, channel, or specification), plus enough event types to
+discriminate presentation from participant response from system occurrence. SSTIM
+supplies *that something was presented, at time t, per this specification*. HED
+supplies *what kind of thing it was*. Roughly two relations and a handful of
+concepts, not a vocabulary.
+
+### An execution is not the sum of its events
+
+A HED-described event occurring during an execution is not thereby part of the
+stimulation process. A participant sneezing, an experimenter entering the room,
+or an amplifier failing are all annotatable occurrences that are not constituents
+of the stimulation. The four families above are the partition that keeps
+execution-internal events separable from everything else that happened at the
+same time.
+
+### BIDS granularity: runs, not sessions
+
+Event files in BIDS attach to recordings and runs according to the BIDS entities,
+not one per session. A session may contain several runs and therefore several
+event files. The correct shape is:
+
+```text
+one SSTIM protocol -> N executions -> each execution may correspond to
+one or several BIDS runs -> each run carries many HED-described events
+```
+
+**Do not equate an execution with a BIDS run.** Sometimes they align; an
+execution may also span runs. Any binding that hard-codes the equality will break
+on the first multi-run session.
+
+Note the related SSTIM-side gap recorded in
+[`SENSORY_STIMULATION_SENSE_REVIEW.md`](../ontology/SENSORY_STIMULATION_SENSE_REVIEW.md):
+`describesStimulation` is the only property whose range is `Stimulation` or a
+subclass, so a specification reaches its process and a **protocol never reaches
+the execution that realizes it**. The protocol-to-execution edge in the diagram
+above has no property behind it today.
+
 ## Structured user experience
 
 For an ordinary session, the useful question is indeed “how was it?”—but that
@@ -198,6 +285,12 @@ when that loss is explicit and tested.
   contract, but it remains an exposure/configuration summary rather than the
   native executed-session and event contract required by this profile.
 - Browser-side RDF validation and HED/BIDS/NWB adapters do not exist.
+- The shipped session event vocabulary covers device and system occurrences only.
+  Stimulus-presentation, participant-response, and contextual events are absent,
+  and `sstim:SessionEvent` cannot reference a stimulus. See the measurement above:
+  this, not the timeline itself, is what blocks the mapping.
+- No property relates a `SensoryStimulationProtocol` to the process that realizes
+  it.
 
 These are tracked in the
 [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md) and documented in the
