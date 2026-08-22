@@ -114,6 +114,11 @@ of `static/favicon.svg` and `static/icons/`.
   why, scored on two axes (ontology gap, scientific/strategic), with the measured
   modality-coverage baseline that ranks them and the Track A / Track B boundary
   that keeps SSTIM contribution separate from BioSynCare product discovery.
+- [`INTERVIEW_PROTOCOL.md`](ecosystem/INTERVIEW_PROTOCOL.md) — the five separate
+  consents, the relationship types, review-before-publication, and withdrawal
+  handling, written against the controlled values in `sstim-ecosystem.ttl`
+  ([ADR 0024](decisions/0024-stakeholder-ecosystem-modeling.md),
+  [ADR 0031](decisions/0031-qualified-ecosystem-records.md)).
 - [`ECOSYSTEM_OPERATIONS.md`](ecosystem/ECOSYSTEM_OPERATIONS.md) — running the
   consent-gated publication pipeline.
 - [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
