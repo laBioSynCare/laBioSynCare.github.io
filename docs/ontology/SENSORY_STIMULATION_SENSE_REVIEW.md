@@ -88,24 +88,58 @@ basis would have replaced an unverified identifier with an unverified identifier
 The digits happened to be right; the method would have been wrong, and the next
 time it would not be.
 
-Second, **the identifier is resolved but the mapping is not.** SNOMED's concept
-is a *procedure*, and its inactive FSN shows it was retyped from
-"(regime/therapy)". SSTIM's `sstim:SensoryStimulation` is a BFO process class
-covering experimental, expressive and accessibility purposes with no clinical
-commitment. Whether that is `skos:closeMatch`, `skos:broadMatch` from the SNOMED
-side, or no assertion at all is a modelling decision for the sense review, not a
-lookup. SNOMED's sense is one row in the inventory, and on present evidence it
-looks narrower than SSTIM's.
+Second, the identifier and the mapping are separate questions, and they were
+settled separately.
 
-**Applied 2026-08-22** to `static/ontology/sstim-alignments.ttl`, on an explicit
-maintainer instruction naming the file
-([ADR 0004](../decisions/0004-protected-ontology-files.md), `CLAUDE.md` §3.4).
-The comment now records the audit beside the 2026-07-10 MeSH one, in the same
-form: dated finding, named instrument, explicit non-assertion with its reason.
-No mapping is asserted in either direction. The edit changed the module's
-sha256, so `manifest.json` digests were resynchronized with
-`node scripts/sstim-manifest.mjs sync-checksums`; the module digest and the Full
-profile rollup both moved.
+### The mappings, asserted 2026-08-23
+
+A corrected identifier in a comment is invisible to SPARQL, to the knowledge
+browser, to WIDOCO and to registry ingest, so it left the alignment module doing
+none of its job. Two triples now carry it, at different strengths because the
+evidence differs:
+
+| Assertion | Why |
+|---|---|
+| `sstim:SensoryStimulation skos:narrowMatch snomed:226056003` | The SNOMED concept carries an explicit therapeutic intent attribute and subsumes clinical tactile technique; ours admits experimental, expressive and accessibility purposes and covers binaural beats and photic driving. Deliberately **not** `closeMatch`: asserting interchangeability with a therapeutically intended concept would import the framing [`SCOPE.md`](../concept/SCOPE.md) and `CLAUDE.md` §3.5 exist to exclude |
+| `sstim:Stimulation skos:relatedMatch snomed:122545008` | Direction undetermined on purpose. SNOMED's concept sits under *Procedure by method* and subsumes labour augmentation and bone-growth stimulation. Our **definition** would make it narrower; our **scope note** would make the two merely overlap. Upgrade to `narrowMatch` if the definition text is ruled normative |
+
+That second row is the point worth carrying forward: it is **the same
+definition-versus-scope-note divergence** as the plants case, in a second
+independent term. One instance is an oversight; two on the project's central
+terms is the argument for the drift check.
+
+### Licence position: enquiry sent, reply pending
+
+SNOMED CT is licensed content and SSTIM is CC BY 4.0. Brazil and Italy are both
+outside the 53 Member territories, and the published licensing FAQ has no
+carve-out for reference-only use, so the position could not be cleared from
+public documents.
+
+Exposure was minimised rather than assumed: the triples assert IRIs under the
+public SNOMED CT URI Standard and carry no SNOMED description, hierarchy,
+definition or attribute content as data. The editorial notes describe SNOMED's
+children rather than enumerating them, and the alignment file instructs future
+editors not to add labels or child concepts.
+
+**An enquiry went to `info@snomed.org` on 2026-08-23**, asking only whether
+reference-only IRI use requires an Affiliate Licence. Reply pending; do not
+re-open the question until it arrives. The draft and its reasoning are at
+`/Users/renatofabbri/sstim-drafts/snomed-licence-enquiry.md`.
+
+Note for whoever handles the reply: the Qualifying Research Projects fee
+exemption is **not** the route to take first. Its published conditions include
+SNOMED CT-encoded materials becoming SNOMED International property, which is
+incompatible with CC BY 4.0 publication and would be worse than a fee.
+
+**Mechanics, recorded because three validation runs failed before one passed.**
+The edits changed the module sha256 and the Full profile rollup, so
+`node scripts/sstim-manifest.mjs sync-checksums` was required. Adding `sstim:`
+subjects made `alignments` depend on the `core` module for the first time, which
+had to be declared in both `manifest.json` and the module's own `dct:requires`,
+which cross-check each other. And `skos:narrowMatch` had never been used in
+SSTIM, so it was undeclared as an annotation property and put the Full closure
+outside OWL 2 DL until it was declared in `sstim-core.ttl` beside its siblings.
+None of the three was visible in the diff.
 
 ## The relation taxonomy
 
@@ -524,9 +558,10 @@ decidable now and the rest are not.
 2. The formal relation to each other attested sense.
 3. Whether the definition is correctly broad, accidentally broad, or correctly
    broad with a narrower declared scope.
-4. Whether `226056003` "Sensory stimulation (procedure)", now verified, warrants
-   `skos:closeMatch`, a `broadMatch` from the SNOMED side, or no assertion, given
-   that SNOMED types it as a clinical procedure and SSTIM as a process class.
+4. Whether the `relatedMatch` on `sstim:Stimulation` should become a
+   `narrowMatch`. That follows directly from item 7: it turns on whether the
+   definition or the scope note governs. The `narrowMatch` on
+   `sstim:SensoryStimulation` is settled.
 5. Whether treating exposure as the same process from the recipient side is
    SSTIM's settled position, since the meronymy analysis currently assumes it.
 6. Whether `SensoryStimulation` requires a nervous-system-bearing recipient, and
