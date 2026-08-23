@@ -1036,7 +1036,7 @@ changes at breakpoints.
 | SSTIM Workbench branding | Public terminology is coherent; semantic-review ledger is closed; BSC identities and historical material remain unchanged | **PASS** by inspection of the deployed site; BSC identities unchanged |
 | Production parity | Old/new route-and-behavior comparison has no unexplained high-value regression | **PASS**: no migration-introduced failure; M-02 and M-03 reproduce identically on old production |
 | Parallel publication authority | Release freeze or identical-artifact dual-publish process prevents source/target semantic drift | **Chosen 2026-08-23: dual publication.** Both repositories carry the identical commit; one workflow derives its mount from the repository. Semantic artifacts are byte-identical across origins; application bundles differ only by Firebase configuration |
-| Rollback rehearsal | Target Pages is repointed to/from the preserved scaffold successfully; reverse staged W3ID rules pass before production cutover | **Not run**: required before W3ID cutover |
+| Rollback rehearsal | Target Pages is repointed to/from the preserved scaffold successfully; reverse staged W3ID rules pass before production cutover | **PASS for Pages, 2026-08-23**: rolled back in 21s, restored in 873s, and the rehearsal corrected the documented procedure, which was missing the build request. Reverse staged W3ID rules still to run before cutover |
 | Old production operational | Scheduled HTTP/browser smoke tests remain green through acceptance window | **PASS**: serving `e6b3948`, all sampled routes 200 |
 
 Do not turn “not yet tested” into “pass” based on the old deployment or a local
@@ -1114,13 +1114,48 @@ the imported history.
 Publication rollback remains deliberately simple before W3ID cutover:
 
 - Base-path regression: continue publishing the last known-good old-site commit.
-- Target Pages regression: redeploy the last accepted target artifact or point
-  Pages back to its preserved scaffold branch.
+- Target Pages regression: redeploy the last accepted target artifact, or roll
+  back to the preserved scaffold branch with the **two** steps below. One step is
+  not enough, which the 2026-08-23 rehearsal established rather than assumed.
 - Branding problem: revert the narrow branding commits without reverting the
   history import or base-path work.
 - Firebase/auth problem: leave target cloud features disabled.
 - Documentation generator problem: block target acceptance; keep old generated
   documentation online.
+
+### Pages rollback, rehearsed 2026-08-23
+
+Executed against the live target and restored afterwards, so these are measured
+timings rather than an estimate.
+
+**To roll back:**
+
+1. `PUT /repos/w3c-cg/sstim/pages` with
+   `{"build_type":"legacy","source":{"branch":"pages/pre-migration-scaffold","path":"/"}}`
+2. `POST /repos/w3c-cg/sstim/pages/builds`
+
+**Step 2 is not optional, and its absence is silent.** The plan previously said
+only "point Pages back to its preserved scaffold branch". Doing exactly that
+changed the configuration, returned `status: built`, and served the Workbench
+unchanged for ten minutes: switching the source does not queue a build, and the
+existing Actions deployment keeps serving until something replaces it. A rollback
+performed as written would have looked applied while changing nothing, which is
+the worst way to fail during an incident. With step 2, the scaffold was live in
+**21 seconds**.
+
+**To restore:**
+
+1. `PUT /repos/w3c-cg/sstim/pages` with `{"build_type":"workflow"}`
+2. `gh workflow run "Deploy GitHub Pages" --repo w3c-cg/sstim --ref main`
+
+Restore took **873 seconds**, because it is a full Nix build with both
+documentation generators, not a Jekyll render. Budget roughly fifteen minutes to
+come back and under a minute to leave. That asymmetry is the operationally
+important number: rolling back is cheap, so use it early rather than debugging a
+broken deployment in front of readers.
+
+The scaffold branch survived the exercise at `7d4a4a7`, still protected against
+deletion and force-update.
 
 After W3ID cutover, rollback means reverting the reviewed upstream W3ID target
 diff and verifying every negotiation route. That higher operational cost is why

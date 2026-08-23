@@ -535,8 +535,11 @@ What remains:
    repositories.
 2. **Resolve ledger entry M-01**, the manifest path semantics. It decides
    whether the manifest routes can point at the project site at all.
-3. **Rehearse rollback**: repoint target Pages to `pages/pre-migration-scaffold`
-   and back, and prove the reverse staged W3ID rules pass.
+3. ~~Rehearse the Pages rollback.~~ **Done 2026-08-23**: rolled back in 21
+   seconds, restored in 873 seconds, procedure corrected in the plan because
+   repointing Pages alone does nothing without an explicit build request. What
+   remains under this heading is proving the reverse staged W3ID rules pass,
+   which belongs with the cutover.
 4. **Obtain W3C status wording approval** for the site.
 5. **Decide the GitHub Release and Zenodo relationship** for the target before
    any first tag operation there. Nothing has been minted or moved, and the
