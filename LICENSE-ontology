@@ -1,0 +1,29 @@
+BSC Lab Ontology and Documentation License
+
+Copyright 2026 Renato Fabbri
+
+The following repository materials are licensed under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0):
+
+- `static/ontology/` ontology, vocabulary, SHACL shapes, alignments, and RDF
+  instance data
+- `docs/` reference documents
+- root project documents including `README.md`, `ROADMAP.md`, `TODO.md`,
+  `CONTRIBUTING.md`, `CLAUDE.md`, and `CITATION.cff`
+- preset catalog data contributed to this repository, unless a file states a
+  different license
+
+SPDX-License-Identifier: CC-BY-4.0
+
+Canonical legal code:
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Human-readable summary:
+https://creativecommons.org/licenses/by/4.0/
+
+Attribution request:
+When using or adapting these materials, credit "BSC Lab / SSTIM ontology,
+Renato Fabbri" and include a link to this repository when reasonably possible.
+
+Software source code, build configuration, and application runtime code are
+licensed separately under the Apache License, Version 2.0. See `LICENSE`.

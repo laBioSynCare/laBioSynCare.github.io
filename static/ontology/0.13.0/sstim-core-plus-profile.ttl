@@ -1,0 +1,66 @@
+###########################################################################
+#
+#  SSTIM Core Plus Profile entrypoint
+#
+#  Version: 0.13.0
+#  Date:    2026-08-04
+#  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Core Plus adds reusable common descriptors only. Technique, vocabulary,
+#  exposure, evidence, configuration, session, ecosystem, and implementation
+#  concerns remain independently selectable extensions.
+#
+###########################################################################
+
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prof: <http://www.w3.org/ns/dx/prof/> .
+@prefix role: <http://www.w3.org/ns/dx/prof/role/> .
+
+<https://w3id.org/sstim/profile/core-plus> a owl:Ontology, prof:Profile ;
+    owl:versionIRI <https://w3id.org/sstim/0.13.0/sstim-core-plus-profile.ttl> ;
+    owl:versionInfo "0.13.0" ;
+    prof:hasToken "core-plus" ;
+    prof:isProfileOf <https://w3id.org/sstim> ;
+    prof:hasResource
+        <https://w3id.org/sstim/profile/core-plus#entrypoint>,
+        <https://w3id.org/sstim/profile/core-plus#constraints>,
+        <https://w3id.org/sstim/profile/core-plus#manifest> ;
+    dct:title "SSTIM Core Plus Profile"@en ;
+    dct:description "The SSTIM Core Profile plus reusable common descriptors for modalities, bands, mechanisms, temporal structure, delivery approach, cautions, and calibrated channel quantities."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires
+        <https://w3id.org/sstim>,
+        <https://w3id.org/sstim/stimulus>,
+        <https://w3id.org/sstim/common> ;
+    owl:imports
+        <https://w3id.org/sstim/0.13.0/sstim-core.ttl>,
+        <https://w3id.org/sstim/0.13.0/sstim-stimulus.ttl>,
+        <https://w3id.org/sstim/0.13.0/sstim-common.ttl> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-04"^^xsd:date ;
+    dct:modified "2026-08-04"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso
+        <https://w3id.org/sstim/manifest>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md> .
+
+<https://w3id.org/sstim/profile/core-plus#entrypoint> a prof:ResourceDescriptor ;
+    prof:hasRole role:specification ;
+    prof:hasArtifact <https://w3id.org/sstim/0.13.0/sstim-core-plus-profile.ttl> ;
+    dct:format "text/turtle" .
+
+<https://w3id.org/sstim/profile/core-plus#constraints> a prof:ResourceDescriptor ;
+    prof:hasRole role:constraints ;
+    prof:hasArtifact <https://w3id.org/sstim/0.13.0/sstim-core-shapes.ttl> ;
+    dct:conformsTo <http://www.w3.org/ns/shacl#> ;
+    dct:format "text/turtle" .
+
+<https://w3id.org/sstim/profile/core-plus#manifest> a prof:ResourceDescriptor ;
+    prof:hasRole role:schema ;
+    prof:hasArtifact <https://w3id.org/sstim/0.13.0/manifest> ;
+    dct:format "application/json" .

@@ -1,0 +1,36 @@
+# Full competency question (ADR 0048):
+#   "What happened during this session, in what order, on which clock — and did
+#    execution run to completion or stop early?"
+#
+# Improvement plan 2.3 question 2. Before ADR 0048 SSTIM could not answer any
+# part of it: a session record said that it ran and for how long, and nothing
+# more. That was the gap blocking an event-semantic projection such as HED,
+# which describes occurrences.
+#
+# Why this is a Full question and not a smaller one: it joins the execution
+# (Session), the controlled event vocabulary (Vocabulary), and the timing
+# authority that makes the offsets mean something. Core describes a stimulus and
+# has no execution at all; Core Plus adds calibrated magnitudes and still has
+# no notion that anything occurred.
+#
+# The ordering comes from the offsets, never from statement order — an RDF graph
+# is a set, so a consumer reading the timeline off the order triples happen to
+# arrive in would get a different answer each time. Hence ORDER BY.
+PREFIX sstim:   <https://w3id.org/sstim#>
+PREFIX sstim-v: <https://w3id.org/sstim/vocab#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?instance ?status ?authority ?origin ?offset ?event WHERE {
+  ?instance a sstim:SessionInstance ;
+      sstim:completionStatus ?status ;
+      sstim:clockOriginSeconds ?origin ;
+      sstim:hasTimingAuthority ?timingAuthority ;
+      sstim:hasSessionEvent ?occurrence .
+  ?occurrence sstim:sessionClockOffsetSeconds ?offset ;
+      sstim:hasEventType ?eventType .
+  ?eventType skos:prefLabel ?event .
+  ?timingAuthority skos:prefLabel ?authority .
+  FILTER(LANG(?event) = "en")
+  FILTER(LANG(?authority) = "en")
+}
+ORDER BY ?offset

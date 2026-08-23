@@ -1,0 +1,98 @@
+@prefix bsclab-evidence: <https://w3id.org/sstim/implementation/bsclab/evidence/> .
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/perform-alpha-10-seed#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:        <https://w3id.org/sstim#> .
+@prefix sstim-ref:    <https://w3id.org/sstim/ref/> .
+@prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix prov:         <http://www.w3.org/ns/prov#> .
+@prefix owl:          <http://www.w3.org/2002/07/owl#> .
+
+bsclab-preset:perform-alpha-10-seed a sstim:Preset ;
+    rdfs:label "Perform Alpha 10 Seed" ;
+    dct:description "Minimal Phase 1 RDF preset seed used to validate the BSC Lab preset instance model. This seed is not a clinical, health, or performance claim." ;
+    dct:created "2026-06-17"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:targetsFrequencyBand sstim-v:alpha10 ;
+    sstim:primaryFrequencyBand sstim-v:alpha10 ;
+    sstim:inGroup sstim-v:groupPerform ;
+    sstim:hasBreathGuide false ;
+    sstim:presetVersion "0.1.0" ;
+    sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
+    sstim:composedOf preset-local:binaural-voice .
+
+preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;
+    rdfs:label "Perform Alpha 10 Seed binaural voice" ;
+    sstim:carrierFreqLeft 200.0 ;
+    sstim:carrierFreqRight 210.0 ;
+    sstim:initialVolume 0.16 .
+
+# ── ADR 0027 migration: preset applicability assessment ──────────────────────
+# Migrated 2026-07-13 per the ADR 0027 migration ledger. Reuses the shared
+# migration method, role, outcome, population, and comparator descriptors
+# defined in instances/evidence/technique-evidence.ttl (one graph at validation).
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Perform Alpha 10 Seed auditory applicability assessment (revision 1)" ;
+    dct:description "Preset applicability assessment: cites a systematic review to keep the preset connected to public-safe literature. It is an applicability assessment, not an authorized public outcome claim." ;
+    sstim:evaluatesSubject bsclab-preset:perform-alpha-10-seed ;
+    sstim:supportsRelation bsclab-preset:perform-alpha-10-seed ;
+    sstim:hasEvidenceTier sstim-v:tierSpeculative ;
+    sstim:hasClaimDirection sstim-v:claimInconclusive ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/basis-1> ;
+    sstim:citesReference sstim-ref:INGENDOH_2023 ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/activity> ;
+    prov:wasDerivedFrom bsclab-evidence:perform-alpha-10-seed-auditory-review ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject bsclab-preset:perform-alpha-10-seed ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/preset-binaural-state-response> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "The binaural-beat component of the Perform Alpha 10 Seed preset has a reliable state outcome under sham or no-beat comparison. This remains an applicability assessment, not an authorized public outcome claim."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:modalityAuditory ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:scopeInterventionOrContext bsclab-preset:perform-alpha-10-seed ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/sham-or-no-beat> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:INGENDOH_2023 ;
+    sstim:basisSensoryModality sstim-v:modalityAuditory ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/healthy-human> ;
+    sstim:basisStudyDesign sstim-v:designMixedDesigns ;
+    sstim:basisSynthesisType sstim-v:synthesisSystematicReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/binaural-state-response-reliability> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/sham-or-no-beat> ;
+    sstim:basisOutcomeNote "The linked systematic review reports mixed results across studies; the preset relation does not turn the source into preset-outcome evidence."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/basis-1>,
+        sstim-ref:INGENDOH_2023,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0027-migration/1> ;
+    prov:endedAtTime "2026-07-13T21:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor> ] .
+
+bsclab-evidence:perform-alpha-10-seed-auditory-review
+    owl:deprecated true ;
+    rdfs:label "Superseded legacy evidence claim (see assessment revision 1)" ;
+    dct:isReplacedBy <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1> ;
+    dct:modified "2026-07-13"^^xsd:date .

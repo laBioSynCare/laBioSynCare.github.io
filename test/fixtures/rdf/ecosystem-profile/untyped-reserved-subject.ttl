@@ -1,0 +1,4 @@
+@prefix ex: <https://example.org/private-vocabulary/> .
+
+<https://w3id.org/sstim/specialist/untyped-private-record>
+    ex:rawConsentEvidence "Synthetic private evidence — must not publish" .

@@ -1,0 +1,14 @@
+# KR-05 — an exposure limit does not make a device capability a comfort boundary.
+#
+# sstim-ex:hasExposureLimit carries a union domain over ComfortBoundary and
+# DeviceCapability: a limit describes either. The audit found it typed to the
+# comfort boundary alone, which inferred that any capability declaring a limit
+# was a boundary — collapsing what the equipment can do into what the
+# participant can tolerate.
+PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
+
+SELECT ?capability WHERE {
+  ?capability rdf:type sstim-ex:DeviceCapability ;
+              rdf:type sstim-ex:ComfortBoundary .
+}

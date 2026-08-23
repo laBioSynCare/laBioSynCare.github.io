@@ -1,0 +1,8 @@
+@prefix ex: <https://example.org/private-vocabulary/> .
+
+# Overlay on the positive fixture. Public ecosystem profiles are closed:
+# private evidence cannot evade the explicit denylist by using a novel
+# predicate that happens not to be named there.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    ex:rawConsentEvidence "Synthetic raw consent evidence — private" .

@@ -1,0 +1,193 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static site
+    runs-on: ubuntu-latest
+
+    steps:
+      # fetch-tags because the build runs truth-audit, which resolves every
+      # CHANGELOG release link against its tag; a tagless checkout makes that
+      # gate report absence it cannot actually observe.
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      # Build the deployed artifact with the same pinned flake toolchain as
+      # local dev and the lint/validate workflows — one source of truth.
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Cache npm downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: nix develop --command npm ci
+
+      # Does this push touch anything the RDF contract is derived from? If not,
+      # the contract is byte-identical to the one already validated when it last
+      # changed, and re-proving it before publication establishes nothing while
+      # costing ~14 minutes of every deploy.
+      #
+      # The list is the union of validate-rdf.yml's trigger paths and the
+      # documents the gates actually read: docs/decisions (adr-index),
+      # docs/ontology (term-index-check reads TERM_INDEX.md), docs/technical
+      # (preset-contract compares PRESET_FORMAT.md ranges), static/schemas
+      # (preset-contract). It is deliberately wider than strictly necessary.
+      #
+      # ADD A PATH HERE when you add a gate that reads one. The failure mode is
+      # silent: a gate whose input is not listed simply stops running on the
+      # pushes that change it, and nothing reports that it was skipped.
+      - name: Decide whether the RDF contract needs revalidating
+        id: scope
+        run: |
+          set -euo pipefail
+          base="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" != "push" ] \
+             || [ -z "$base" ] \
+             || [ "$base" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+            echo "No usable base commit — validating everything."
+            exit 0
+          fi
+          if git diff --name-only "$base" "${{ github.sha }}" | grep -qE \
+              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|docs/ontology/|docs/decisions/|docs/technical/|docs/ecosystem/w3id/|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)'; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+            echo "RDF-relevant paths changed — running the full contract."
+          else
+            echo "full=false" >> "$GITHUB_OUTPUT"
+            echo "No RDF-relevant path changed — running truth-audit only."
+          fi
+
+      # Publishing must never outrun the RDF contract. This includes isolated
+      # ecosystem fixtures, adversarial SHACL-SPARQL cases, named-graph loader
+      # checks, OWL consistency, and serialization round trips.
+      #
+      # -j4 because validate's prerequisites are independent scripts working in
+      # their own mktemp dirs.
+      # Measured locally, every gate passing: 432s serial, 192s with -j4, 218s
+      # with -j4 -Otarget; the 26s buys grouped per-target output, without which
+      # an interleaved parallel failure is unreadable.
+      #
+      # That local ratio does NOT transfer to CI and nobody should quote it as
+      # if it does. The runner has 4 cores and ecosystem-contract already spawns
+      # min(4, cpu_count) pySHACL workers by itself, so make-level -j mostly
+      # oversubscribes. Worse, runner-to-runner variance is larger than the
+      # effect: the same commit running the same `make validate` took 629s on
+      # one runner and 867s on another, a 38% spread, and the first runs after
+      # this change were 665s and 551s. Direction is mildly positive, n is too
+      # small to claim anything. Collect samples before tuning -j further, and
+      # drop to plain `make validate` when bisecting a flaky gate.
+      - name: Validate RDF contract before publication
+        if: steps.scope.outputs.full == 'true'
+        run: nix develop --command make -j4 -Otarget validate
+
+      # The prose gate is not RDF-specific: it checks release versions, DOIs and
+      # every relative link in every tracked .md, so a docs-only push needs it
+      # exactly when it is skipping everything else.
+      - name: Assert the prose still matches the repository
+        if: steps.scope.outputs.full != 'true'
+        run: nix develop --command make truth-audit
+
+      # RDF-11 (2026-07-24 audit): make validate alone omits the Vitest suite —
+      # the runtime SHACL goldens for Sensory Field, the ADR 0027 negative
+      # fixtures, and the navigator/loader graph tests. Those previously ran
+      # only in the independent lint workflow, so Pages could publish while one
+      # of them failed. Block publication on the full suite too.
+      - name: Run runtime RDF unit tests before publication
+        run: nix develop --command make test
+
+      - name: Build static site
+        run: nix develop --command npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
+
+      # The build copies static/ontology/*.ttl into dist/ontology/; generate the
+      # JSON-LD + RDF/XML serializations beside them so https://w3id.org/sstim can
+      # content-negotiate application/ld+json and application/rdf+xml (PUBLICATION
+      # plan B2). This is a required deployment gate after the export completed
+      # successfully in CI on 2026-07-10.
+      - name: Export ontology serializations (JSON-LD + RDF/XML)
+        run: nix develop --command make export EXPORT_DIR=dist/ontology
+
+      # WIDOCO reference documentation is generated into the artifact only —
+      # never committed to main (ADR 0023). It owns /ontology/docs/; the app
+      # keeps the site root and all existing routes.
+      - name: Generate ontology reference documentation (WIDOCO)
+        run: nix develop --command make ontology-docs DOCS_DIR=dist/ontology/docs
+
+      # SKOS vocabulary docs (pyLODE vocpub) — WIDOCO is OWL-centric, so the
+      # concept schemes get their own page at /ontology/docs/vocab/. Artifact
+      # only, never committed.
+      - name: Generate SKOS vocabulary documentation (pyLODE)
+        run: nix develop --command make vocab-docs VOCAB_DOCS_DIR=dist/ontology/docs/vocab
+
+      # Merged single-file OWL bundle for BioPortal (which does not follow
+      # dct:isPartOf). Generated into the artifact only, never committed.
+      # Served at /ontology/sstim-full.owl.
+      - name: Generate merged OWL bundle for BioPortal
+        run: nix develop --command make bioportal-bundle BIOPORTAL_OUT=dist/ontology/sstim-full.owl
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+          include-hidden-files: true
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v5
+
+      # A green deploy step is not proof the site serves this commit. On
+      # 2026-07-31 every run here reported success while Pages was configured to
+      # publish a branch instead of this artifact, and the live site 404'd for
+      # hours. Fetch build-info.json back from the deployed URL and compare.
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Verify the deployed site serves this commit
+        run: node scripts/verify-deploy.mjs "${{ steps.deployment.outputs.page_url }}" "$GITHUB_SHA"

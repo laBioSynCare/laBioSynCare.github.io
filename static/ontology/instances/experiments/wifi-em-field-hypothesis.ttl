@@ -1,0 +1,48 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/wifi-em-field-hypothesis#> .
+
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a mere-exposure ambient-field hypothesis with modalityNotDirectlyPerceived
+# and no intended causal channel. Ambient exposure is not stimulation.
+bsclab-experiment:wifi-em-field-hypothesis a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Wi-Fi electromagnetic-field exposure hypothesis"@en ;
+    dct:description "Non-clinical modeling example for representing Wi-Fi, screen, cable, or nearby-device electromagnetic exposure as a physical delivery medium. It does not assert stimulation efficacy or physiological effect."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    skos:editorialNote "Capability-boundary hypothesis: electromagnetic-field exposure is represented for explicit uncertainty and is not mapped to a supported sensory stimulation technique."@en ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityAmbientRadioEmitter, sstim-ex:capabilitySensorInput ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Wi-Fi/EM field exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:usesStimulusChannel this:em-field-channel ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossClaimCertainty ;
+    sstim-ex:hasProtocolRequirement this:em-measurement-claim .
+
+this:em-field-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Electromagnetic-field exposure channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumElectromagneticField ;
+    sstim-ex:perceivedModality sstim-ex:modalityNotDirectlyPerceived ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityAmbientRadioEmitter, sstim-ex:capabilitySensorInput ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment, sstim-ex:placementTorso ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous, sstim-ex:patternPulsed ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM, sstim-ex:noKnownEvidenceInSSTIM .
+
+this:em-measurement-claim a sstim-ex:ExposureMeasurementRequirement ;
+    rdfs:label "EM exposure measurement requirement"@en ;
+    dct:description "Marks electric/magnetic exposure estimation as a measurement prerequisite before any SSTIM claim can be reviewed."@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+

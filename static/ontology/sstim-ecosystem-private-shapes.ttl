@@ -1,0 +1,382 @@
+###########################################################################
+# SSTIM access-controlled ecosystem-audit SHACL profile (ADR 0031)
+#
+# This file contains reusable validation rules only. Private ledger data must
+# never be committed under static/, loaded by the browser, described by VoID,
+# included in a snapshot, or passed to the public sstim-shapes.ttl profile.
+###########################################################################
+
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix owl:       <http://www.w3.org/2002/07/owl#> .
+@prefix org:       <http://www.w3.org/ns/org#> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:        <http://www.w3.org/ns/shacl#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix sstim-pv:  <https://w3id.org/sstim/private-shapes/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/sstim/private-shapes/ecosystem> a owl:Ontology ;
+    owl:versionInfo "0.7.0" ;
+    dct:title "SSTIM private ecosystem audit shapes"@en ;
+    dct:description "Validation profile for externally stored, access-controlled ecosystem audit events. It contains no private instance data and is not a public-projection profile."@en ;
+    dct:isPartOf <https://w3id.org/sstim/shapes> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    dct:issued "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+sstim-pv:PrivateRelationshipAuditShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:EcosystemRelationship ;
+    sh:name "Complete access-controlled relationship snapshot"@en ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path sstim-eco:relationshipAgent ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class prov:Agent ; sh:nodeKind sh:IRI ;
+        sh:message "A private relationship snapshot must retain exactly one responsible agent."@en ] ;
+    sh:property [ sh:path sstim-eco:relationshipTarget ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:disjoint sstim-eco:relationshipAgent ;
+        sh:pattern "^(https://|http://www\\.wikidata\\.org/entity/)" ;
+        sh:message "A private relationship snapshot must retain exactly one public-web IRI target."@en ] ;
+    sh:property [ sh:path sstim-eco:hasRelationshipType ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:RelationshipType ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path sstim-eco:relationshipPurpose ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemPurpose ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path dct:source ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:pattern "^(https://|http://www\\.wikidata\\.org/entity/)" ] ;
+    sh:property [ sh:path dct:created ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:date ] ;
+    sh:property [ sh:path sstim-eco:reviewedOn ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:date ] ;
+    sh:property [ sh:path prov:wasAttributedTo ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class prov:Agent ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path sstim-eco:hasEngagementActivity ; sh:minCount 1 ;
+        sh:class sstim-eco:EngagementActivity ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path dct:description ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path sstim-eco:validFrom ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path sstim-eco:validUntil ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path org:member ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path org:organization ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path org:role ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:wasRevisionOf ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    # ADR 0032: mirrors the public relationship shape's optional second
+    # admission basis so an amendment can add it to the private snapshot
+    # before the matching public value is mirrored.
+    sh:property [ sh:path sstim-eco:publicationStatus ; sh:maxCount 1 ;
+        sh:class sstim-eco:EngagementOutcome ; sh:nodeKind sh:IRI ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Every activity linked from a private relationship snapshot must govern that same relationship IRI."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#hasEngagementActivity> ?activity .
+                FILTER NOT EXISTS {
+                    ?activity <https://w3id.org/sstim/ecosystem#engagementFor> $this .
+                }
+            }
+        """ ;
+    ] .
+
+sstim-pv:PrivateEngagementActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:EngagementActivity ;
+    sh:name "Access-controlled ecosystem audit activity"@en ;
+    sh:nodeKind sh:IRI ;
+    sh:closed true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property [ sh:path rdfs:label ; sh:minCount 1 ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path dct:description ; sh:nodeKind sh:Literal ] ;
+    sh:property [ sh:path dct:source ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path sstim-eco:engagementFor ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ;
+        sh:message "A private audit activity must govern exactly one relationship IRI."@en ] ;
+    sh:property [ sh:path sstim-eco:engagementPurpose ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EcosystemPurpose ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class sstim-eco:EngagementOutcome ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:endedAtTime ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:dateTime ;
+        sh:pattern "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(Z|\\+00:00)$" ;
+        sh:message "Private audit timestamps must use UTC whole-second xsd:dateTime values."@en ] ;
+    sh:property [ sh:path prov:wasAssociatedWith ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class prov:Agent ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:generated ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:invalidated ; sh:nodeKind sh:IRI ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A private activity must be linked from a complete relationship snapshot with the same purpose."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <https://w3id.org/sstim/ecosystem#engagementPurpose> ?purpose .
+                FILTER NOT EXISTS {
+                    ?relationship a <https://w3id.org/sstim/ecosystem#EcosystemRelationship> ;
+                                  <https://w3id.org/sstim/ecosystem#relationshipPurpose> ?purpose ;
+                                  <https://w3id.org/sstim/ecosystem#hasEngagementActivity> $this .
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A private predecessor must govern the same relationship and be strictly earlier."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <http://www.w3.org/ns/prov#endedAtTime> ?current ;
+                      <http://www.w3.org/ns/prov#wasInformedBy> ?previous .
+                FILTER NOT EXISTS {
+                    ?previous <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                              <http://www.w3.org/ns/prov#endedAtTime> ?previousTime .
+                    FILTER(?previousTime < ?current)
+                }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private activities for one relationship must have distinct timestamp values."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <http://www.w3.org/ns/prov#endedAtTime> ?thisTime .
+                ?other <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                       <http://www.w3.org/ns/prov#endedAtTime> ?otherTime .
+                FILTER($this != ?other && ?thisTime = ?otherTime)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A blocking private outcome must never be followed by a positive public-admission outcome on the same relationship IRI."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <https://w3id.org/sstim/ecosystem#engagementOutcome> ?blockingOutcome ;
+                      <http://www.w3.org/ns/prov#endedAtTime> ?blockingTime .
+                FILTER(?blockingOutcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeChangesRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeObjected>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentDeclined>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationWithheld>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRecordAmended>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                ?later <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                       <https://w3id.org/sstim/ecosystem#engagementOutcome> ?laterOutcome ;
+                       <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                FILTER(?laterTime > ?blockingTime)
+                FILTER(?laterOutcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationSent>,
+                    <https://w3id.org/sstim/ecosystem#outcomeAcknowledged>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentGranted>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationApproved>
+                ))
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A final private decline, withholding, amendment, removal, or withdrawal event must be chronologically final for its relationship IRI."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                      <https://w3id.org/sstim/ecosystem#engagementOutcome> ?terminalOutcome ;
+                      <http://www.w3.org/ns/prov#endedAtTime> ?terminalTime .
+                FILTER(?terminalOutcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentDeclined>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationWithheld>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRecordAmended>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                ?later <https://w3id.org/sstim/ecosystem#engagementFor> ?relationship ;
+                       <http://www.w3.org/ns/prov#endedAtTime> ?laterTime .
+                FILTER(?laterTime > ?terminalTime)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private notification outcomes require NotificationActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationSent>,
+                    <https://w3id.org/sstim/ecosystem#outcomeNotificationFailed>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#NotificationActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private response outcomes require ResponseActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeAcknowledged>,
+                    <https://w3id.org/sstim/ecosystem#outcomeChangesRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeObjected>,
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#ResponseActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private publication outcomes require PublicationDecisionActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationApproved>,
+                    <https://w3id.org/sstim/ecosystem#outcomePublicationWithheld>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#PublicationDecisionActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private consent outcomes require ConsentDecisionActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentGranted>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentDeclined>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#ConsentDecisionActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private amendment outcomes require AmendmentActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome>
+                    <https://w3id.org/sstim/ecosystem#outcomeRecordAmended> .
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#AmendmentActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "Private removal/withdrawal outcomes require WithdrawalActivity typing."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementOutcome> ?outcome .
+                FILTER(?outcome IN (
+                    <https://w3id.org/sstim/ecosystem#outcomeRemovalRequested>,
+                    <https://w3id.org/sstim/ecosystem#outcomeConsentWithdrawn>
+                ))
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#WithdrawalActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "prov:generated may occur only on a private AmendmentActivity."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/ns/prov#generated> ?generated .
+                FILTER NOT EXISTS { $this a <https://w3id.org/sstim/ecosystem#AmendmentActivity> . }
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "prov:invalidated may occur only on a private AmendmentActivity or WithdrawalActivity."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <http://www.w3.org/ns/prov#invalidated> ?invalidated .
+                FILTER NOT EXISTS {
+                    $this a ?allowedType .
+                    FILTER(?allowedType IN (
+                        <https://w3id.org/sstim/ecosystem#AmendmentActivity>,
+                        <https://w3id.org/sstim/ecosystem#WithdrawalActivity>
+                    ))
+                }
+            }
+        """ ;
+    ] .
+
+sstim-pv:PrivateNotificationActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:NotificationActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeNotificationSent sstim-eco:outcomeNotificationFailed ) ] .
+
+sstim-pv:PrivateResponseActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:ResponseActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeAcknowledged sstim-eco:outcomeChangesRequested
+                sstim-eco:outcomeObjected sstim-eco:outcomeRemovalRequested ) ] ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A private response must identify at least one NotificationActivity predecessor."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                FILTER NOT EXISTS {
+                    $this <http://www.w3.org/ns/prov#wasInformedBy> ?notification .
+                    ?notification a <https://w3id.org/sstim/ecosystem#NotificationActivity> .
+                }
+            }
+        """ ;
+    ] .
+
+sstim-pv:PrivatePublicationDecisionActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:PublicationDecisionActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomePublicationApproved sstim-eco:outcomePublicationWithheld ) ] .
+
+sstim-pv:PrivateConsentDecisionActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:ConsentDecisionActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeConsentGranted sstim-eco:outcomeConsentDeclined
+                sstim-eco:outcomeConsentWithdrawn ) ] .
+
+sstim-pv:PrivateAmendmentActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:AmendmentActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:hasValue sstim-eco:outcomeRecordAmended ] ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:generated ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:nodeKind sh:IRI ; sh:class sstim-eco:EcosystemRelationship ;
+        sh:disjoint sstim-eco:engagementFor ;
+        sh:message "A private amendment must generate exactly one distinct replacement IRI with a complete EcosystemRelationship audit snapshot."@en ] ;
+    sh:property [ sh:path prov:invalidated ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:equals sstim-eco:engagementFor ; sh:nodeKind sh:IRI ;
+        sh:message "A private amendment must invalidate exactly the old governed relationship."@en ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A private amendment replacement must identify the old relationship with prov:wasRevisionOf."@en ;
+        sh:select """
+            SELECT DISTINCT $this WHERE {
+                $this <https://w3id.org/sstim/ecosystem#engagementFor> ?old ;
+                      <http://www.w3.org/ns/prov#generated> ?replacement .
+                FILTER NOT EXISTS {
+                    ?replacement <http://www.w3.org/ns/prov#wasRevisionOf> ?old .
+                }
+            }
+        """ ;
+    ] .
+
+sstim-pv:PrivateWithdrawalActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-eco:WithdrawalActivity ;
+    sh:property [ sh:path sstim-eco:engagementOutcome ;
+        sh:in ( sstim-eco:outcomeRemovalRequested sstim-eco:outcomeConsentWithdrawn ) ] ;
+    sh:property [ sh:path prov:wasInformedBy ; sh:minCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path prov:invalidated ; sh:minCount 1 ; sh:maxCount 1 ;
+        sh:equals sstim-eco:engagementFor ; sh:nodeKind sh:IRI ;
+        sh:message "A private withdrawal must invalidate exactly its governed relationship."@en ] .

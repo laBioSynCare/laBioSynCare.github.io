@@ -1,0 +1,66 @@
+{
+  "$comment": "Bundle manifest for the ADR 0025 demonstrator (fixed). A constant stimulus, where the event timeline is the whole story. Synthetic data only.",
+  "bundleId": "fixed",
+  "generatedBy": "scripts/generate-hed-bundle.py",
+  "synthetic": true,
+  "containsPersonalData": false,
+  "versions": {
+    "sstim": "0.17.0-dev",
+    "application": "0.1.0",
+    "hedSchema": "8.4.0",
+    "mapping": "0.4.0",
+    "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
+    "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
+  },
+  "clock": {
+    "basis": "sstim:sessionClockOffsetSeconds",
+    "origin": "The session clock origin declared by the session record; not wall-clock time.",
+    "note": "SSTIM's authority for timing is the engine timing context, so offsets are engine-clock seconds rather than derived from a host clock."
+  },
+  "source": {
+    "file": "test/fixtures/rdf/full-profile/positive-recorded-session.ttl",
+    "sha256": "af795e22fab5b7a426deb5e8adf122ab3cc2a498c1a71ce9537e3b81aff6aaad",
+    "eventCount": 5
+  },
+  "crossArtifactIds": {
+    "column": "event_id",
+    "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
+    "ids": {
+      "event-open": "https://example.org/sstim/session-fixture/event-open",
+      "event-start": "https://example.org/sstim/session-fixture/event-start",
+      "event-pause": "https://example.org/sstim/session-fixture/event-pause",
+      "event-resume": "https://example.org/sstim/session-fixture/event-resume",
+      "event-interrupt": "https://example.org/sstim/session-fixture/event-interrupt"
+    }
+  },
+  "modulation": {
+    "timeVarying": false,
+    "shape": "fixed",
+    "representation": "events alone",
+    "note": "Fixed stimulus; the events are complete."
+  },
+  "artifacts": [
+    {
+      "file": "events.tsv",
+      "sha256": "8f61d9f25b8920c180a84bf14b93a94a4726e88e5a7249c5adaed43b3346cca8"
+    },
+    {
+      "file": "events.json",
+      "sha256": "c31e3ec0a3a42b7463aa843620c161e913eb8116d9bc4d691811dd9ee55be053"
+    }
+  ],
+  "declaredLoss": {
+    "eventSessionInterrupt": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
+  },
+  "validated": [
+    "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+    "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
+    "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
+    "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
+    "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes."
+  ],
+  "notValidated": [
+    "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
+    "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision."
+  ]
+}

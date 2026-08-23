@@ -1,0 +1,176 @@
+###########################################################################
+#
+#  SSTIM External Alignments  —  sstim-alignments.ttl
+#
+#  Namespace:  https://w3id.org/sstim
+#  Version:    0.5.0
+#  Date:       2026-06-17
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0
+#
+#  External vocabulary alignments: Wikidata, OBO Foundry, Music Ontology.
+#  Updated independently when external URIs change or new alignments
+#  are identified. Source of truth for all skos:exactMatch and
+#  owl:equivalentClass assertions to external vocabularies.
+#
+#  Protected file — do not modify without explicit maintainer instruction.
+#
+###########################################################################
+
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix mo:    <http://purl.org/ontology/mo/> .
+
+
+###########################################################################
+# Wikidata alignments — frequency bands
+###########################################################################
+
+# All QIDs below were verified against live Wikidata (2026-06). The prior
+# QIDs in this section were incorrect (they resolved to unrelated entities
+# such as a Van Halen album and a stock exchange) and were replaced.
+
+# alpha wave: https://www.wikidata.org/wiki/Q2469782
+sstim-v:alpha skos:exactMatch wd:Q2469782 .
+
+# delta wave: https://www.wikidata.org/wiki/Q2623205
+sstim-v:delta skos:exactMatch wd:Q2623205 .
+
+# theta rhythm: https://www.wikidata.org/wiki/Q2370623
+sstim-v:theta skos:exactMatch wd:Q2370623 .
+
+# beta wave: https://www.wikidata.org/wiki/Q831014
+sstim-v:beta skos:exactMatch wd:Q831014 .
+
+# gamma wave: https://www.wikidata.org/wiki/Q2623017
+sstim-v:gamma skos:exactMatch wd:Q2623017 .
+
+# binaural beats: https://www.wikidata.org/wiki/Q863539
+sstim-v:voiceBinaural skos:closeMatch wd:Q863539 .
+
+# brainwave entrainment (close match — covers AVE, binaural beats):
+# https://www.wikidata.org/wiki/Q3508179
+sstim:SensoryStimulation skos:closeMatch wd:Q3508179 .
+
+# sensory stimulation therapy (nearest general concept):
+# https://www.wikidata.org/wiki/Q17163316
+sstim:SensoryStimulation skos:closeMatch wd:Q17163316 .
+
+# isochronic tones: https://www.wikidata.org/wiki/Q98000061
+sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
+
+# Technique vocabulary alignments (QIDs verified against live Wikidata, 2026-06).
+# Other techniques (monaural beats, RAS, ASSR, vibroacoustic, ultrasound
+# neuromodulation, etc.) are pending Wikidata alignment — tracked in TODO.md.
+sstim-v:techIsochronicTones skos:closeMatch wd:Q98000061 .
+sstim-v:techBinauralBeats skos:exactMatch wd:Q863539 .
+
+# Note: Wikidata items for Martigli oscillation, Sonic Symmetry permutation
+# technique, and the SSTIM ontology itself are pending — Wikidata contribution
+# work item tracked in TODO.md.
+
+
+###########################################################################
+# OBO Foundry class alignments
+###########################################################################
+
+# Sensory stimulation intervention → planned process.
+# OBI_0000011 is obsoleted in OBI; retained for tool continuity. COB_0000082
+# is the current canonical 'planned process' term (verified via OLS, 2026-06).
+sstim:SensoryStimulationIntervention rdfs:subClassOf obi:0000011, cob:0000082 .
+
+# Protocol → OBI protocol. A preset is an information content entity that FOLLOWS
+# a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
+sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
+
+# Session instance → PROV Activity (stated in sstim-core.ttl; repeated here
+# for cross-reference in alignment context)
+# sstim:SessionInstance rdfs:subClassOf prov:Activity .
+
+# Evidence claim → IAO information content entity.
+# (Was iao:0000001 'conditional specification' — wrong; an evidence claim is
+# not a conditional specification. iao:0000030 is the correct generalization.)
+sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
+
+# Frequency band → IAO information content entity
+sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
+
+# Reference → IAO document
+sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
+
+# Sensory modality → BFO role
+sstim:SensoryModality rdfs:subClassOf bfo:0000023 .
+
+# Stimulation mechanism → BFO process
+sstim:StimulationMechanism rdfs:subClassOf bfo:0000015 .
+
+# Intended effect → BFO disposition
+sstim:IntendedEffect rdfs:subClassOf bfo:0000016 .
+
+# ECO (Evidence & Conclusion Ontology) classifies evidence by TYPE / provenance,
+# not by strength, so it has no clean match for the SSTIM evidence-tier concepts
+# (speculative…established), which are GRADE-style strength grades. The former
+# `sstim-v:tierEstablished skos:closeMatch eco:0006151` mapping was removed:
+# ECO_0006151 is "documented statement evidence", not a systematic review, and
+# ECO has no review/meta-analysis strength term. Left unmapped intentionally.
+
+
+###########################################################################
+# Music Ontology alignments
+###########################################################################
+
+# Sessions have musical / acoustic qualities; loose relationship only.
+# NOTE: the Music Ontology host (purl.org/ontology/mo/) returned 503 at audit
+# time (2026-06), so these could not be re-verified live. mo:MusicalWork is a
+# stable core MO class; mo:Score could not be confirmed to exist and is disabled
+# pending verification.
+sstim:SensoryStimulationTechnique skos:relatedMatch mo:MusicalWork .
+# sstim:Preset skos:relatedMatch mo:Score .   # unverified — re-enable once confirmed
+
+
+###########################################################################
+# External upper-ontology term labels (display stubs)
+#
+# Local rdfs:label assertions for the external BFO/OBI/IAO IRIs referenced
+# above and in sstim-core.ttl, so the knowledge browser renders readable
+# names instead of opaque numeric IRIs. These are display aids, not
+# authoritative definitions — the canonical labels live in BFO/OBI/IAO.
+###########################################################################
+
+bfo:0000015 rdfs:label "process"@en .
+bfo:0000016 rdfs:label "disposition"@en .
+bfo:0000023 rdfs:label "role"@en .
+obi:0000011 rdfs:label "planned process (obsolete in OBI)"@en .
+obi:0000272 rdfs:label "protocol"@en .
+cob:0000082 rdfs:label "planned process"@en .
+iao:0000030 rdfs:label "information content entity"@en .
+
+
+###########################################################################
+# Pending alignments (tracked as GitHub Issues)
+###########################################################################
+
+# TODO: SNOMED CT alignment for clinical context descriptions
+# SNOMED 229070002 = sensory stimulation (procedure) — verify current URI
+
+# TODO: MeSH alignment
+# MeSH D012910 = Sensory Stimulation — verify URI format for LOD
+
+# TODO: NDF-RT / NCIm alignment for evidence claim mechanism terms
+
+###########################################################################
+# End of sstim-alignments.ttl
+###########################################################################

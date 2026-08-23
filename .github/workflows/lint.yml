@@ -1,0 +1,167 @@
+name: Lint and Build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  svelte:
+    name: SvelteKit check and static build (Nix)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      # Node 24 comes from the pinned flake devShell — identical to local dev.
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # Nix pins the toolchain; this caches the npm package downloads only.
+      - name: Cache npm downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: nix develop --command npm ci
+
+      - name: Run Svelte checks
+        run: nix develop --command npm run check
+
+      # Includes the runtime RDF conformance goldens (improvement plan 0.1):
+      # generated graphs are SHACL-checked here, not only curated fixtures.
+      - name: Run unit tests
+        run: nix develop --command make test
+
+      - name: Build static site
+        run: nix develop --command make build
+
+      # Rebuilds with no Firebase configuration at all and serves the result over
+      # plain HTTP, so "the core application runs as a credential-free static
+      # deployment" (docs/technical/PORTABLE_DEPLOYMENT.md) is verified on every
+      # commit rather than argued from the source. Also fails if a build inlines
+      # a Firebase API key.
+      - name: Verify credential-free static deployment
+        run: nix develop --command make smoke-static
+
+  # A separate job: this boots a real NixOS virtual machine, which needs KVM and
+  # takes minutes, so it must not gate the fast feedback above. It is the
+  # difference between "the module evaluates" and "an operator who enables it
+  # gets a correct instance" — routes, ontology media types, cross-origin
+  # headers, real 404s, and no credential in the artifact.
+  nixos-vm:
+    name: NixOS VM deployment test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Enable KVM for the test VM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Boot a clean NixOS VM and verify the deployment
+        run: nix build .#checks.x86_64-linux.nixos-vm -L
+
+  # The container path. Built from the same store path the NixOS module serves,
+  # then actually run and asserted against with the same conformance script, so
+  # "we also ship an image" is a tested claim rather than a build artifact.
+  oci-image:
+    name: OCI container deployment test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build the image
+        run: nix build .#packages.x86_64-linux.oci -L
+
+      - name: Load and run the container
+        run: |
+          docker load < result
+          docker run -d --name bsc-lab -p 8080:8080 bsc-lab:latest
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8080/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Assert the deployment conformance contract
+        run: bash scripts/smoke-http.sh http://localhost:8080
+
+      - name: Confirm the server does not run as root
+        run: |
+          user="$(docker exec bsc-lab id -u)"
+          echo "container uid: $user"
+          test "$user" != "0"
+
+      # Gap G6: the same image, run a second time with an operator's
+      # configuration mounted, must serve that configuration — and the first
+      # container, with nothing mounted, must keep 404ing it. One artifact, two
+      # deployments, no rebuild.
+      - name: Confirm an unconfigured container reports no configuration
+        run: |
+          code="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/runtime-config.json)"
+          echo "unconfigured runtime-config.json: HTTP $code"
+          test "$code" = "404"
+
+      - name: Run a second container with a mounted configuration
+        run: |
+          cat > /tmp/runtime-config.json <<'JSON'
+          {
+            "model": "bsc-lab-runtime-config-1",
+            "instance": { "id": "https://lab.example.org/", "name": "Example Research Lab" },
+            "identity": { "provider": "anonymous" },
+            "storage": { "provider": "local" }
+          }
+          JSON
+          docker run -d --name bsc-lab-configured -p 8081:8080 \
+            -v /tmp/runtime-config.json:/config/runtime-config.json:ro \
+            bsc-lab:latest
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8081/ >/dev/null && break
+            sleep 1
+          done
+
+      - name: Assert the configured container serves the operator's document
+        run: |
+          bash scripts/smoke-http.sh http://localhost:8081
+          body="$(curl -sf http://localhost:8081/runtime-config.json)"
+          echo "$body"
+          echo "$body" | grep -q 'Example Research Lab'
+          echo "$body" | grep -q 'bsc-lab-runtime-config-1'
+
+      - name: Assert both containers serve the identical application
+        run: |
+          a="$(curl -sf http://localhost:8080/build-info.json)"
+          b="$(curl -sf http://localhost:8081/build-info.json)"
+          test "$a" = "$b" || { echo "build-info diverged:"; echo "$a"; echo "$b"; exit 1; }
+          echo "both containers report: $a"
+
+      - name: Container logs on failure
+        if: failure()
+        run: |
+          docker logs bsc-lab || true
+          docker logs bsc-lab-configured || true

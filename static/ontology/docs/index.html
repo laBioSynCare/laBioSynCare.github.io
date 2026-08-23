@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>SSTIM reference documentation — generated at deploy time</title>
+    <style>
+      body {
+        max-width: 44rem;
+        margin: 4rem auto;
+        padding: 0 1.25rem;
+        font: 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+        color: #24211c;
+        background: #f7f3ea;
+      }
+      h1 { font-size: 1.4rem; line-height: 1.25; }
+      code { font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 0.92em; }
+      pre { overflow-x: auto; }
+      a { color: #0a5c8a; }
+      .note { border-left: 3px solid #c9c0ad; padding-left: 1rem; color: #5d5647; }
+      @media (prefers-color-scheme: dark) {
+        body { color: #e8e3d8; background: #16150f; }
+        a { color: #7cc0e8; }
+        .note { border-color: #3d3a30; color: #a8a294; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SSTIM reference documentation is generated at deploy time</h1>
+    <p>
+      You are seeing this placeholder because you are running BSC Lab from source. The OWL
+      reference (WIDOCO) and the SKOS vocabulary reference (pyLODE) are built by the Pages
+      workflow into the deployed artifact and are never committed
+      (<a
+        href="https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0023-ontology-docs-publication-path.md"
+        >ADR 0023</a
+      >). This file exists so that the links to <code>/ontology/docs/</code> in the
+      entrance, the About page and the top-bar menu land somewhere explanatory instead of a
+      404 during development; deployment overwrites it with the real index.
+    </p>
+    <p>To read the real documentation locally, build it into the ignored output tree:</p>
+    <pre><code>npm run build
+make ontology-docs DOCS_DIR=dist/ontology/docs
+make vocab-docs VOCAB_DOCS_DIR=dist/ontology/docs/vocab
+npm run preview -- --host 127.0.0.1 --port 4174</code></pre>
+    <p class="note">
+      Both generators need the pinned toolchain — run them inside <code>nix develop</code>.
+      Generate into <code>dist/</code>, which is gitignored, and not into
+      <code>static/</code>, where the output would overwrite this tracked placeholder.
+    </p>
+    <p>
+      The Turtle sources themselves are served here as static assets and need no build:
+      <a href="/ontology/manifest.json">manifest.json</a> lists every module, and the
+      <a href="/graph/">knowledge browser</a> reads them directly. The published
+      documentation is at
+      <a href="https://labiosyncare.github.io/ontology/docs/"
+        >labiosyncare.github.io/ontology/docs/</a
+      >.
+    </p>
+  </body>
+</html>

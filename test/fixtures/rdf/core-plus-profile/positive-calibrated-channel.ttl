@@ -1,0 +1,59 @@
+###########################################################################
+# Positive fixture for the SSTIM Core Plus Profile.
+#
+# Everything Core describes, plus the reusable descriptors Core Plus adds from
+# the Common module: a channel that carries calibrated physical magnitudes
+# (frequency in Hz, sound pressure level in dB) and a named frequency band with
+# explicit Hz bounds.
+#
+# The band is declared here rather than imported. sstim-vocab.ttl is a Full-only
+# compatibility aggregate in 0.13, so a Core Plus consumer has the FrequencyBand
+# *class* but none of its instances; declaring one locally is what a real Core
+# Plus adopter would do, and it keeps the fixture inside the profile closure.
+#
+# Deliberately absent: technique, preset, session, evidence, delivery medium,
+# perceived modality, and body placement. Core Plus is the optional shared
+# descriptor layer, not a step towards Full.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/core-plus-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Calibrated single-channel stimulus specification"@en ;
+    dct:identifier "core-plus-positive-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Calibrated sensory stimulation process"@en .
+
+# Core owns the duration and the channel link; Common owns the magnitudes.
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Calibrated auditory channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal .
+
+# A locally declared band. 10 Hz falls in [8, 13).
+example:alphaBand a sstim:FrequencyBand ;
+    skos:prefLabel "Alpha"@en ;
+    sstim:hzMin "8.0"^^xsd:decimal ;
+    sstim:hzMax "13.0"^^xsd:decimal .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

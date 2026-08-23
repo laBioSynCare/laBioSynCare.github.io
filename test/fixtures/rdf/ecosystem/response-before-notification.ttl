@@ -1,0 +1,23 @@
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/response-before-notification/> .
+
+# Overlay on the positive fixture. This additional response cites the 11:00
+# notification but is timestamped one minute earlier.
+
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-outreach-resonance>
+    sstim-eco:hasEngagementActivity ex:early-response .
+
+ex:early-response
+    a sstim-eco:EngagementActivity, sstim-eco:ResponseActivity, prov:Activity ;
+    rdfs:label "Premature synthetic response"@en ;
+    sstim-eco:engagementFor
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-outreach-resonance> ;
+    sstim-eco:engagementPurpose sstim-eco:purposeOutreach ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeAcknowledged ;
+    prov:endedAtTime "2026-07-15T10:59:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> ;
+    prov:wasInformedBy
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-resonance-outreach-notification> .

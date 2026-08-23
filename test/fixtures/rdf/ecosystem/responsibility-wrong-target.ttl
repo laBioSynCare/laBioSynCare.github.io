@@ -1,0 +1,37 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/responsibility-wrong-target/> .
+
+# Overlay on the positive fixture. This responsibility points to another
+# organization instead of a SensoryStimulationImplementation.
+
+<https://w3id.org/sstim/organization/synthetic-aurora-lab>
+    sstim-eco:hasEcosystemRelationship ex:responsibility .
+
+ex:responsibility
+    a sstim-eco:EcosystemRelationship,
+        sstim-eco:ImplementationResponsibility ;
+    rdfs:label "Responsibility with a non-implementation target"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/organization/synthetic-aurora-lab> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/organization/synthetic-resonance-coop> ;
+    sstim-eco:hasRelationshipType sstim-eco:implementationMaintainer ;
+    sstim-eco:relationshipPurpose sstim-eco:purposeLivePublication ;
+    dct:source <https://example.org/sources/wrong-responsibility> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity ex:decision .
+
+ex:decision a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Wrong-responsibility publication decision"@en ;
+    sstim-eco:engagementFor ex:responsibility ;
+    sstim-eco:engagementPurpose sstim-eco:purposeLivePublication ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T13:15:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

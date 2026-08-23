@@ -1,0 +1,34 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/archival-consent-grant/> .
+
+# Overlay on the positive fixture. Archival consent cannot be granted until
+# the separate permanent-publication pipeline and evidence gate exist.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    sstim-eco:hasEcosystemRelationship ex:relationship .
+
+ex:relationship a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Premature archival relationship"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget <https://example.org/targets/archival> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposeArchivalPublication ;
+    dct:source <https://example.org/sources/archival-relationship> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity ex:decision .
+
+ex:decision a sstim-eco:EngagementActivity,
+        sstim-eco:ConsentDecisionActivity, prov:Activity ;
+    rdfs:label "Premature archival consent decision"@en ;
+    sstim-eco:engagementFor ex:relationship ;
+    sstim-eco:engagementPurpose sstim-eco:purposeArchivalPublication ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T13:20:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

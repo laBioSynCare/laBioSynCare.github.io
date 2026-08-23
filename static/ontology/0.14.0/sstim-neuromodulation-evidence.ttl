@@ -1,0 +1,94 @@
+###########################################################################
+#
+#  SSTIM Neuromodulation–Evidence Bridge Module
+#
+#  Version:    0.14.0
+#  Date:       2026-08-04
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/neuromodulation-evidence> a owl:Ontology ;
+    owl:versionInfo "0.14.0" ;
+    dct:title "SSTIM Neuromodulation–Evidence Bridge Module"@en ;
+    dct:description "Optional outcome relations connecting generic evidence concepts with neuromodulation access-route, target-site, system, and phenomenon facets."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/evidence> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-13"^^xsd:date ;
+    dct:modified "2026-08-13"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Neuromodulation outcome evidence relations
+###########################################################################
+
+sstim:outcomeNeuralAccessRoute a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralAccessRoute ;
+    rdfs:label "outcome neural access route"@en ;
+    skos:definition "Tags an evidence outcome concept with the neural access route the finding is about. This is how a demonstrated route that competes with a technique's declared intended route is recorded without altering that declaration."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
+
+sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralTargetSite ;
+    rdfs:label "outcome neural target site"@en ;
+    skos:definition "Tags an evidence outcome concept with the neural site the finding is about, which may differ from the intended target site of the technique assessed."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
+
+sstim:outcomeNeuralSystem a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralSystem ;
+    rdfs:label "outcome neural system"@en ;
+    skos:definition "Tags an evidence outcome concept with the distributed neural system the finding is about."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
+
+sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralPhenomenon ;
+    rdfs:label "outcome neural phenomenon"@en ;
+    skos:definition "Tags an evidence outcome concept with the functional neural phenomenon the finding is about. This is the join that makes evidence about neural effects queryable across techniques and routes."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation-evidence> .
+
+
+###########################################################################
+# End of neuromodulation-evidence
+###########################################################################

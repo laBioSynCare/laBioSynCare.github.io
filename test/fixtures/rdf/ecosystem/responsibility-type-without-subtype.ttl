@@ -1,0 +1,4 @@
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-attribution-player>
+    sstim-eco:hasRelationshipType sstim-eco:implementationMaintainer .

@@ -1,0 +1,41 @@
+###########################################################################
+# Adversarial Core fixture: a stimulation target given as a literal.
+#
+# ADR 0044 §3 keeps sstim:hasStimulationTarget underconstrained in Core — no
+# domain, and no requirement that the target be a materialized BFO class — so
+# that Core neither depends on Session nor forces range entailment on its
+# consumers. The one thing it does insist on is that a target be a resource.
+#
+# A literal target cannot be described, aligned, or linked to anything, so it
+# defeats the purpose of recording a target at all. StimulationTargetLinkShape
+# rejects it with sh:nodeKind sh:BlankNodeOrIRI while still permitting an
+# untyped IRI.
+###########################################################################
+
+@prefix example: <https://example.org/sstim/core-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification whose target is a bare string"@en ;
+    dct:identifier "core-adversarial-literal-target" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget "a listener" .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Sensory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Auditory stimulus channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

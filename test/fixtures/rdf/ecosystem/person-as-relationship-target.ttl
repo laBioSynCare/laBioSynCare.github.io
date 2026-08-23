@@ -1,0 +1,8 @@
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+# A person placed only in the target position would evade the person consent
+# rule, which is intentionally anchored on relationshipAgent.
+
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-aurora-develops-player>
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> .

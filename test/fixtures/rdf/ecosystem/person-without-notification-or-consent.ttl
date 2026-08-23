@@ -1,0 +1,32 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/person-without-basis/> .
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    sstim-eco:hasEcosystemRelationship ex:relationship .
+
+ex:relationship a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Synthetic person relationship without admission basis"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-alex-rivera> ;
+    sstim-eco:relationshipTarget
+        <https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicAttribution ;
+    dct:source <https://example.org/sources/no-admission-basis> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity ex:approval .
+
+ex:approval a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic approval without person admission basis"@en ;
+    sstim-eco:engagementFor ex:relationship ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

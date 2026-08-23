@@ -1,0 +1,96 @@
+###########################################################################
+# Out-of-scope positive fixture for the SSTIM Core Profile.
+#
+# ADR 0043 §7: "The absence of an optional module means 'not asserted under
+# this profile', not 'rejected by SSTIM'." The converse matters just as much,
+# and is what this fixture proves: data that *carries* concerns Core does not
+# include must still validate under Core.
+#
+# Everything the Core closure owns is identical to the positive fixture. On top
+# of that this graph asserts delivery medium, perceived modality, body
+# placement, comfort boundary, caution tags, evidence tier, technique, preset
+# configuration, and session policy — none of which Core imports. A Core
+# validator has no shapes for them, so it must neither reject them nor demand
+# their companions.
+#
+# This fails the moment a Full-profile constraint is copied into
+# sstim-core-shapes.ttl: the leaked shape would start requiring, forbidding, or
+# type-checking one of these predicates, and a Core consumer would be forced to
+# adopt policy it never selected.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/core-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+#--------------------------------------------------------------------------
+# The Core-owned description. Identical in shape to the positive fixture.
+#--------------------------------------------------------------------------
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Stimulus specification carrying non-Core concerns"@en ;
+    dct:identifier "core-out-of-scope-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Sensory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Auditory stimulus channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .
+
+#--------------------------------------------------------------------------
+# Deliberately outside the Core closure. Core imports neither Exposure,
+# Common, Technique, Configuration, Session, nor Evidence, and must ignore
+# every assertion below rather than reject it or demand more of it.
+#--------------------------------------------------------------------------
+
+# Exposure: delivery, perception, placement, and comfort boundary.
+example:channel
+    sstim-ex:deliveryMedium sstim-v:mediumAirborneSound ;
+    sstim-ex:perceivedModality sstim-v:modalityAuditory .
+
+example:exposure a sstim-ex:ExposureProfile ;
+    rdfs:label "Exposure profile for the same channel"@en ;
+    sstim-ex:usesStimulusChannel example:channel ;
+    sstim-ex:hasBodyPlacement sstim-v:placementBothEars ;
+    sstim-ex:hasComfortBoundary example:boundary .
+
+example:boundary a sstim-ex:ComfortBoundary ;
+    rdfs:label "Comfort boundary"@en .
+
+# Common: caution metadata.
+example:specification sstim:hasCautionTag sstim-v:cautionPhotosensitivity .
+
+# Technique and Configuration: what a Full consumer would attach.
+example:preset a sstim:Preset ;
+    rdfs:label "Configuration for this specification" ;
+    sstim:usesTechnique sstim-v:techniqueBinauralBeat .
+
+# Session: execution policy Core deliberately does not describe.
+example:sessionPlan a sstim:SessionSpecification ;
+    rdfs:label "Session plan referencing the same target"@en ;
+    sstim:hasStimulationTarget example:target .
+
+# Evidence: a qualified claim about the technique, not about Core validity.
+example:claim a sstim:EvidenceAssessmentClaim ;
+    rdfs:label "Evidence assessment for the technique"@en ;
+    sstim:evaluatesSubject sstim-v:techniqueBinauralBeat ;
+    sstim:hasEvidenceTier sstim-v:tierPreliminary .

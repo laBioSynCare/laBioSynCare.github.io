@@ -1,0 +1,346 @@
+###########################################################################
+#
+#  SSTIM External Alignments  —  sstim-alignments.ttl
+#
+#  Namespace:  https://w3id.org/sstim
+#  Version:    0.16.0
+#  Date:       2026-08-18
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0
+#
+#  External vocabulary alignments: Wikidata and OBO Foundry.
+#  Updated independently when external URIs change or new alignments
+#  are identified. Source of truth for all skos:exactMatch and
+#  owl:equivalentClass assertions to external vocabularies.
+#
+#  Protected file — do not modify without explicit maintainer instruction.
+#
+###########################################################################
+
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/alignments> a owl:Ontology ;
+    owl:versionInfo "0.16.0" ;
+    dct:title "SSTIM External Alignments"@en ;
+    dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata and OBO Foundry resources."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-04-12"^^xsd:date ;
+    dct:issued "2026-08-18"^^xsd:date ;
+    dct:modified "2026-08-18"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
+    skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
+
+
+###########################################################################
+# Wikidata alignments — frequency bands
+###########################################################################
+
+# All QIDs below were verified against live Wikidata (2026-06). The prior
+# QIDs in this section were incorrect (they resolved to unrelated entities
+# such as a Van Halen album and a stock exchange) and were replaced.
+#
+# Re-audited 2026-07-24 (RDF-08/RDF-17, 2026-07-24 audit; reviewer: Renato
+# Fabbri). Downgraded exactMatch to closeMatch: each Wikidata item is the
+# observed-EEG-oscillation sense of the band (a neurophysiological phenomenon),
+# while sstim-v:alpha/delta/theta/beta/gamma are also used, unsplit, as
+# stimulus-frequency targets (sstim:targetsFrequencyBand). SSTIM's own
+# FrequencyBandScheme currently conflates those two senses (RDF-08); until
+# they are split into distinct classes, extensional identity with the
+# single-sense Wikidata items cannot be claimed with exactMatch's confidence.
+# Revisit once RDF-08's oscillation-band/stimulus-target split lands.
+
+# Moved to the oscillations by ADR 0049 (2026-08-15). Each Wikidata item
+# describes itself as a neural oscillation — Q2469782 is "neural oscillation in
+# the frequency range of 8-12 Hz" — so the band, a Hz interval, was never its
+# counterpart. The history notes keep anyone who resolved the old mapping from
+# reaching a dead end.
+sstim-v:alpha skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2469782 describes a neural oscillation, not a Hz interval, and now maps to sstim-v:alphaOscillation. This band is reachable from that concept through sstim:hasTypicalFrequencyBand."@en .
+sstim-v:delta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2623205 now maps to sstim-v:deltaOscillation."@en .
+sstim-v:theta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2370623 now maps to sstim-v:thetaOscillation."@en .
+sstim-v:beta skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q831014 now maps to sstim-v:betaOscillation."@en .
+sstim-v:gamma skos:historyNote "External mapping moved 2026-08-15 (ADR 0049): wd:Q2623017 now maps to sstim-v:gammaOscillation."@en .
+
+
+###########################################################################
+# Wikidata alignments — neural oscillations (ADR 0049)
+#
+# Verified against live Wikidata on 2026-08-15. Four are exactMatch: the items
+# describe the same named rhythm SSTIM names, and the numeric bounds they quote
+# differ only as delimiting conventions differ, which is not an intension
+# difference.
+#
+# Beta is the exception, and it is why the extension test exists. Q831014 spans
+# 12.5-30 Hz, while SSTIM holds the sensorimotor rhythm apart at 12-15 Hz and
+# starts beta at 15. Wikidata's beta wave therefore subsumes an entity SSTIM
+# keeps separate, so the two are close rather than identical.
+###########################################################################
+
+sstim-v:alphaOscillation skos:exactMatch wd:Q2469782 .
+sstim-v:deltaOscillation skos:exactMatch wd:Q2623205 .
+sstim-v:thetaOscillation skos:exactMatch wd:Q2370623 .
+sstim-v:gammaOscillation skos:exactMatch wd:Q2623017 .
+sstim-v:betaOscillation  skos:closeMatch wd:Q831014 .
+
+# A BSC binaural voice is a parameter bundle that can realize binaural beats;
+# it is not identical to the perceptual phenomenon or musical genre represented
+# by Wikidata Q863539.
+sstim-v:voiceBinaural skos:relatedMatch wd:Q863539 .
+
+# isochronic tones: https://www.wikidata.org/wiki/Q98000061
+sstim-v:voiceSymmetry skos:relatedMatch wd:Q98000061 .
+
+# Technique vocabulary alignments. Q863539 and Q6898437 were re-verified against
+# live Wikidata on 2026-08-08. Q6898437 is a thin item, so closeMatch is the
+# strongest defensible assertion. Q863539 also represents a perceptual phenomenon
+# and music genre, so the SSTIM stimulation technique is only related to it.
+# Other techniques (RAS, ASSR, vibroacoustic, ultrasound neuromodulation, etc.)
+# are pending Wikidata alignment — tracked in TODO.md.
+sstim-v:techIsochronicTones skos:closeMatch wd:Q98000061 .
+sstim-v:techMonauralBeats skos:closeMatch wd:Q6898437 .
+sstim-v:techBinauralBeats skos:relatedMatch wd:Q863539 .
+
+# Multisensory integration: verified Wikidata concept Q17166073. SSTIM's term
+# is a proposed-mechanism category, so relatedMatch is intentionally weaker
+# than exactMatch.
+sstim-v:mechMultisensory skos:relatedMatch wd:Q17166073 .
+
+# Note: Wikidata items for Martigli oscillation, Sonic Symmetry permutation
+# technique, and the SSTIM ontology itself are pending — Wikidata contribution
+# work item tracked in TODO.md.
+
+
+###########################################################################
+# Mapping provenance (KR-09)
+#
+# The rationale for every external mapping used to live only in the Turtle
+# comments above, which no consumer can read. These annotated axioms carry the
+# same facts as data: which source item was checked, when it was last verified,
+# who reviewed it where a review is on record, and why the assertion is
+# closeMatch or relatedMatch rather than exactMatch.
+#
+# The plain mapping triples above are untouched, so nothing that already
+# consumes them changes. An annotation is about an assertion, not a second
+# assertion.
+#
+# `dct:date` is the date the target item was last verified against live
+# Wikidata, not a source revision id: Wikidata revisions were not recorded at
+# verification time, and inventing them would be worse than naming the date
+# that was. Re-verify before upgrading any of these to exactMatch — the
+# disposition for KR-09 requires an extension/intension test, not label
+# similarity.
+###########################################################################
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:alphaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
+    owl:annotatedTarget wd:Q2469782 ;
+    dct:source <http://www.wikidata.org/entity/Q2469782> ;
+    dct:date "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:deltaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
+    owl:annotatedTarget wd:Q2623205 ;
+    dct:source <http://www.wikidata.org/entity/Q2623205> ;
+    dct:date "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:thetaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
+    owl:annotatedTarget wd:Q2370623 ;
+    dct:source <http://www.wikidata.org/entity/Q2370623> ;
+    dct:date "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:betaOscillation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q831014 ;
+    dct:source <http://www.wikidata.org/entity/Q831014> ;
+    dct:date "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Q831014 spans 12.5-30 Hz while SSTIM holds the sensorimotor rhythm apart at 12-15 Hz and begins beta at 15, so the Wikidata item subsumes an entity SSTIM keeps separate. Close rather than identical, by extension rather than by label."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:gammaOscillation ;
+    owl:annotatedProperty skos:exactMatch ;
+    owl:annotatedTarget wd:Q2623017 ;
+    dct:source <http://www.wikidata.org/entity/Q2623017> ;
+    dct:date "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Upgraded from closeMatch on the band to exactMatch on the rhythm (ADR 0049). The item describes a neural oscillation, which is what this concept now names; the earlier closeMatch was forced by the subject being a Hz interval. Quoted numeric bounds differ only as delimiting conventions differ."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:voiceBinaural ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q863539 ;
+    dct:source <http://www.wikidata.org/entity/Q863539> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A BSC binaural voice is a parameter bundle that can realize binaural beats. It is not identical to the perceptual phenomenon or the music genre the Wikidata item also represents."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:voiceSymmetry ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q98000061 ;
+    dct:source <http://www.wikidata.org/entity/Q98000061> ;
+    dct:date "2026-06-01"^^xsd:date ;
+    skos:editorialNote "A BSC Symmetry voice is a parameter bundle whose isochronic pulse train is one realizable output, not the technique itself."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techIsochronicTones ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q98000061 ;
+    dct:source <http://www.wikidata.org/entity/Q98000061> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The Wikidata item names the same technique. closeMatch rather than exactMatch because the item carries no definition boundary against neighbouring pulsed-tone techniques."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techMonauralBeats ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q6898437 ;
+    dct:source <http://www.wikidata.org/entity/Q6898437> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A thin Wikidata item: it names the technique but supplies little intension, so closeMatch is the strongest defensible assertion."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techBinauralBeats ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q863539 ;
+    dct:source <http://www.wikidata.org/entity/Q863539> ;
+    dct:date "2026-08-08"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Q863539 also represents a perceptual phenomenon and a music genre, so a stimulation technique is related to it rather than close to it. Downgraded from exactMatch in the 0.14.0-dev line."@en .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:mechMultisensory ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q17166073 ;
+    dct:source <http://www.wikidata.org/entity/Q17166073> ;
+    dct:date "2026-06-01"^^xsd:date ;
+    skos:editorialNote "This concept is a proposed-mechanism category in an evidence model, not the cognitive phenomenon itself, so relatedMatch is intentionally weaker than exactMatch."@en .
+
+
+###########################################################################
+# OBO Foundry class alignments
+###########################################################################
+#
+# The rationale below is kept even where the axiom is now a comment: it is why
+# the mapping is what it is, and it is not recorded anywhere else. Each axiom is
+# asserted once, in the module that defines the class, following the convention
+# this file already used for sstim:SessionInstance -> prov:Activity.
+
+# Sensory stimulation intervention → planned process.
+# OBI_0000011 is obsolete and must not appear in live logical axioms. SSTIM
+# uses the active, broader COB_0000082 'planned process' term because an
+# intervention need not be completely executed (verified via OLS, 2026-07-10).
+# sstim:SensoryStimulationIntervention rdfs:subClassOf cob:0000082 .
+#   Asserted in sstim-session.ttl; commented here so the Full closure does
+#   not carry the axiom twice.
+
+# Technique → information content entity. OBI_0000272 requires enough detail
+# for independent process reproduction; a reusable technique category is less
+# specific and is therefore not an OBI protocol (ADR 0014 review disposition).
+# sstim:SensoryStimulationTechnique rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-technique.ttl; commented here to avoid a duplicate.
+
+# Protocol → OBI protocol. A preset is an information content entity that FOLLOWS
+# a protocol via sstim:followsProtocol; it is not itself a protocol (see ADR 0014).
+# sstim:SensoryStimulationProtocol rdfs:subClassOf obi:0000272 .
+#   Asserted in sstim-technique.ttl; commented here to avoid a duplicate.
+
+# Session instance → PROV Activity (stated in sstim-session.ttl; repeated here
+# for cross-reference in alignment context)
+# sstim:SessionInstance rdfs:subClassOf prov:Activity .
+
+# Evidence claim → IAO information content entity.
+# (Was iao:0000001 'conditional specification' — wrong; an evidence claim is
+# not a conditional specification. iao:0000030 is the correct generalization.)
+# sstim:EvidenceClaim rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-evidence.ttl; commented here to avoid a duplicate.
+
+# Frequency band → IAO information content entity
+# sstim:FrequencyBand rdfs:subClassOf iao:0000030 .
+#   Asserted in sstim-common.ttl, which reaches Core Plus; alignments is
+#   Full-only, so asserting it here as well would add a duplicate triple
+#   without widening the profile that carries the parent.
+
+# Reference → IAO document
+sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
+
+# SSTIM controlled-value classes (including SensoryModality,
+# StimulationMechanism, and IntendedEffect) are information categories, not
+# the real-world roles, processes, or dispositions they classify (ADR 0021).
+
+# ECO (Evidence & Conclusion Ontology) classifies evidence by TYPE / provenance,
+# not by strength, so it has no clean match for the SSTIM evidence-tier concepts
+# (speculative…established), which are GRADE-style strength grades. The former
+# `sstim-v:tierEstablished skos:closeMatch eco:0006151` mapping was removed:
+# ECO_0006151 is "documented statement evidence", not a systematic review, and
+# ECO has no review/meta-analysis strength term. Left unmapped intentionally.
+
+
+###########################################################################
+# External upper-ontology term labels (display stubs)
+#
+# Local rdfs:label assertions for the external BFO/OBI/IAO IRIs referenced
+# above and across the semantic dependency modules, so the knowledge browser
+# renders readable
+# names instead of opaque numeric IRIs. These are display aids, not
+# authoritative definitions — the canonical labels live in BFO/OBI/IAO.
+###########################################################################
+
+bfo:0000015 rdfs:label "process"@en .
+bfo:0000016 rdfs:label "disposition"@en .
+obi:0000272 rdfs:label "protocol"@en .
+cob:0000082 rdfs:label "planned process"@en .
+iao:0000030 rdfs:label "information content entity"@en .
+
+
+###########################################################################
+# Pending alignments (tracked as GitHub Issues)
+###########################################################################
+
+# TODO: SNOMED CT alignment for clinical context descriptions
+# SNOMED 229070002 = sensory stimulation (procedure) — verify current URI
+
+# MeSH audit (2026-07-10): D012910 is Snake Venoms, not Sensory Stimulation.
+# No exact or close MeSH mapping is asserted. D012677 (Sensation) is adjacent
+# in scope but describes sensory transduction rather than designed stimulation.
+
+# TODO: NDF-RT / NCIm alignment for evidence claim mechanism terms
+
+###########################################################################
+# End of sstim-alignments.ttl
+###########################################################################

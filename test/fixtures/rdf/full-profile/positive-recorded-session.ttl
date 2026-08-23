@@ -1,0 +1,148 @@
+###########################################################################
+# Positive fixture for the SSTIM Full Profile — a recorded session.
+#
+# The companion to positive-delivered-exposure.ttl. That fixture answers how a
+# stimulus reaches a subject; this one answers what happened when it did.
+#
+#   Session       the specification, the execution, its clock, its timeline
+#   Vocabulary    the controlled event types, phases, roles and states
+#   Configuration the preset the specification executed
+#
+# It exists because ADR 0048 added an event model, and a term set with no
+# executable demonstration is a claim rather than a contract. The competency
+# query test/competency/full-session-timeline.rq runs against this file, so the
+# model cannot be declared and left unexercised.
+#
+# Synthetic throughout, and about no one: an illustrative recording used to
+# prove the terms join up. The values are not evidence of anything, and a
+# participant observation never becomes an evidence claim by being queried.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/session-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+
+###########################################################################
+# The configuration that was executed, and the plan that executed it
+###########################################################################
+
+example:preset a sstim:Preset ;
+    rdfs:label "Synthetic alpha configuration"@en .
+
+example:specification a sstim:SessionSpecification, prov:Plan ;
+    rdfs:label "Synthetic recorded session specification"@en ;
+    dct:created "2026-08-13T09:00:00Z"^^xsd:dateTime ;
+    sstim:referencesPreset example:preset ;
+    sstim:durationSeconds 600 ;
+    sstim:masterVolume 0.20 ;
+    # What the record can promise, stated rather than assumed: a live audio
+    # pipeline reproduces the presentation, not the samples.
+    sstim:hasReproducibilityLevel sstim-v:reproEquivalentPresentation ;
+    sstim:configurationDigest "32e114684d8a8e9d03a2a45d85b004d0aa9ddf21bfcc19b35bdf49b0e62ab79e" ;
+    sstim:digestAlgorithm "sha256-canonical-json" .
+
+
+###########################################################################
+# The execution
+#
+# Elapsed and delivered time differ because the session was paused: 400 s of
+# wall-to-wall execution, 340 s of stimulus. Recording only the first would
+# describe an exposure that did not happen.
+###########################################################################
+
+example:instance a sstim:SessionInstance ;
+    rdfs:label "Synthetic recorded session"@en ;
+    sstim:usesSpecification example:specification ;
+    sstim:actualDurationSeconds 400 ;
+    sstim:deliveredDurationSeconds 340.0 ;
+    sstim:clockOriginSeconds 3.25 ;
+    sstim:hasTimingAuthority sstim-v:timingAudioHardwareClock ;
+    sstim:completionStatus "interrupted" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory ;
+    prov:startedAtTime "2026-08-13T09:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-08-13T09:07:40Z"^^xsd:dateTime ;
+    sstim:hasSessionEvent example:event-open, example:event-start,
+        example:event-pause, example:event-resume, example:event-interrupt ;
+    sstim:hasSelfReport example:report .
+
+
+###########################################################################
+# The timeline
+#
+# Order lives in the offsets. These five statements are a set, and a consumer
+# that read them in the order they appear here would be reading an accident.
+###########################################################################
+
+example:event-open a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionOpen ;
+    sstim:sessionClockOffsetSeconds 0.0 .
+
+example:event-start a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackStart ;
+    sstim:sessionClockOffsetSeconds 0.3 .
+
+example:event-pause a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackPause ;
+    sstim:sessionClockOffsetSeconds 190.0 .
+
+example:event-resume a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackResume ;
+    sstim:sessionClockOffsetSeconds 250.0 .
+
+example:event-interrupt a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionInterrupt ;
+    sstim:sessionClockOffsetSeconds 400.0 .
+
+
+###########################################################################
+# One report, collected during delivery
+#
+# Its placement on the session clock is what makes it interpretable: a wall
+# clock cannot say how far into the session the answer was given.
+#
+# Three observations, and the point of the model is the second and third: an
+# answer that was declined and a question that was never asked are recorded as
+# such, rather than as the same silence an absent triple would produce.
+###########################################################################
+
+example:report a sstim:SelfReport ;
+    rdfs:label "Synthetic during-session report"@en ;
+    sstim:hasReportPhase sstim-v:reportDuringSession ;
+    sstim:sessionClockOffsetSeconds 300.0 ;
+    prov:generatedAtTime "2026-08-13T09:06:00Z"^^xsd:dateTime ;
+    sstim:hasInstrument example:instrument ;
+    sstim:hasObservation example:observation-affect, example:observation-focus,
+        example:observation-unwanted ;
+    # The legacy scalar, alongside the qualified observation rather than
+    # instead of it, so an existing consumer keeps reading what it always read.
+    sstim:primaryAffect 3 .
+
+example:instrument a sstim:ObservationInstrument ;
+    rdfs:label "Synthetic core report instrument 1.0.0"@en ;
+    dct:identifier "synthetic-core-report" ;
+    dct:language "en" ;
+    sstim:instrumentVersion "1.0.0" .
+
+example:observation-affect a sstim:ParticipantObservation ;
+    sstim:hasObservationRole sstim-v:rolePrimaryAffect ;
+    sstim:hasResponseState sstim-v:responseSupplied ;
+    sstim:observedOrdinalValue 3 ;
+    sstim:scaleMinimum 1 ;
+    sstim:scaleMaximum 5 ;
+    sstim:scaleMinimumLabel "very negative" ;
+    sstim:scaleMaximumLabel "very positive" ;
+    sstim:promptIdentifier "affect" ;
+    sstim:promptText "How do you feel right now?" .
+
+example:observation-focus a sstim:ParticipantObservation ;
+    sstim:hasObservationRole sstim-v:roleFocus ;
+    sstim:hasResponseState sstim-v:responseDeclined .
+
+example:observation-unwanted a sstim:ParticipantObservation ;
+    sstim:hasObservationRole sstim-v:roleUnwantedExperienceReport ;
+    sstim:hasResponseState sstim-v:responseNotAsked .

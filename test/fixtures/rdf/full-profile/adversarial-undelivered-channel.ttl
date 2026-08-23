@@ -1,0 +1,50 @@
+###########################################################################
+# Adversarial fixture for the SSTIM Full Profile.
+#
+# Full is the profile that claims to describe delivery, so the failure it must
+# catch is a channel that stops short of saying how the stimulus reaches anyone.
+# This graph is a perfectly valid *Core Plus* description — specification,
+# process, channel, duration, regime, calibrated frequency and level — and it
+# must be rejected under Full, which requires a delivery medium, a perceived
+# modality, and a body placement on every channel.
+#
+# That is the conformance direction of ADR 0043 §7 made executable: Full
+# entails the base constraints of the profiles it includes, and the converse is
+# deliberately false. A Core Plus-conformant graph is not Full-conformant, and
+# if this fixture ever passes, the two profiles have collapsed into one.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/full-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification whose channel is never delivered"@en ;
+    dct:identifier "full-adversarial-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Alpha auditory stimulation process"@en .
+
+# Calibrated, but no medium, no perceived modality, no placement.
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Channel that never reaches anyone"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

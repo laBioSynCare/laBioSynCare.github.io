@@ -1,0 +1,44 @@
+###########################################################################
+# Adversarial fixture for the SSTIM Core Plus Profile.
+#
+# Core Plus selects the same shape package as Core, so its adversarial case is
+# a Core Plus-shaped graph — one carrying Common's calibrated magnitudes — that
+# still breaks the Core contract underneath. That combination is the realistic
+# mistake: an author who has reached for frequency and SPL is describing a
+# physically specific stimulus, and is more likely, not less, to treat the
+# channel typing and duration as incidental.
+#
+# Two violations. The channel carries a calibrated frequency and level but is
+# never typed sstim-ex:StimulusChannel, so under inference mode "none" nothing
+# constrains it; and its duration is negative, which no elapsed stimulus can
+# have. Adding Common descriptors must not buy exemption from Core.
+###########################################################################
+
+@prefix example: <https://example.org/sstim/core-plus-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Calibrated but structurally broken specification"@en ;
+    dct:identifier "core-plus-adversarial-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Sensory stimulation process"@en .
+
+# Calibrated, but never declared a channel, and negative in duration.
+example:channel
+    rdfs:label "Uncalibrated-in-the-ways-that-matter channel"@en ;
+    sstim:channelDurationSeconds "-30.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

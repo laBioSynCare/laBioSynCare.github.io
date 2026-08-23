@@ -1,0 +1,7 @@
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# Overlay on the positive fixture. The synthetic person already has one
+# curator; a second curator makes public record accountability ambiguous.
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    prov:wasAttributedTo <https://example.org/agent/synthetic-second-curator> .

@@ -1,0 +1,112 @@
+###########################################################################
+# Synthetic recorded session with an EXPLICITLY SEGMENTED stimulus.
+#
+# The third shape ADR 0025 decision 5 contemplates, and the one that had no
+# fixture:
+#
+#   "The fixture must use a fixed or explicitly segmented stimulus within the
+#    repository's conservative defaults. Time-varying modulation requires either
+#    piecewise events or a linked trace; it must not be flattened into a
+#    misleading single row."
+#
+#   fixed      positive-recorded-session.ttl — events are the whole story
+#   segmented  this file — piecewise events carry each step
+#   continuous modulated-session.ttl — a declarative sweep, rendered as a trace
+#
+# Piecewise events became expressible on 2026-08-18 with
+# sstim-v:eventParameterChanged and the parameter-kind scheme. Before that a
+# sstim:SessionEvent could carry exactly two things — its type and its clock
+# offset — so a stepped stimulus could only have been recorded by flattening it,
+# which is what decision 5 forbids.
+#
+# The safety event is here on purpose. It is a parameter change too: a requested
+# level of 0.35 was constrained to 0.30. The crosswalk used to say those values
+# were "SSTIM-only", which was false, because there was nowhere to put them.
+#
+# Synthetic throughout, and about no one.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/hed-segmented/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+
+example:preset a sstim:Preset ;
+    rdfs:label "Synthetic stepped-rate configuration"@en .
+
+example:specification a sstim:SessionSpecification, prov:Plan ;
+    rdfs:label "Synthetic segmented session specification"@en ;
+    dct:created "2026-08-18T09:00:00Z"^^xsd:dateTime ;
+    sstim:referencesPreset example:preset ;
+    sstim:durationSeconds 600 ;
+    sstim:masterVolume 0.20 ;
+    sstim:hasReproducibilityLevel sstim-v:reproEquivalentPresentation ;
+    sstim:configurationDigest "b7c6d5e4f3a291807162534455667788990aabbccddeeff00112233445566778" ;
+    sstim:digestAlgorithm "sha256-canonical-json" .
+
+example:instance a sstim:SessionInstance ;
+    rdfs:label "Synthetic segmented session"@en ;
+    sstim:usesSpecification example:specification ;
+    sstim:actualDurationSeconds 600 ;
+    sstim:deliveredDurationSeconds 599.7 ;
+    sstim:clockOriginSeconds 1.5 ;
+    sstim:hasTimingAuthority sstim-v:timingAudioHardwareClock ;
+    sstim:completionStatus "completed" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory ;
+    prov:startedAtTime "2026-08-18T09:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-08-18T09:11:00Z"^^xsd:dateTime ;
+    sstim:hasSessionEvent example:event-open, example:event-start,
+        example:event-step-theta, example:event-step-gamma,
+        example:event-safety, example:event-complete .
+
+
+###########################################################################
+# The timeline
+#
+# Three segments at 10, 14 and 40 Hz. Each boundary is an event carrying the
+# parameter kind and the value it took, so the segmentation is recoverable from
+# the table alone — which is the whole point of the piecewise form.
+#
+# The first segment's rate is not restated as an event: it is what the
+# specification declares, and an event repeating it would be derived rather than
+# observed. The steps are the changes the plan does not contain.
+###########################################################################
+
+example:event-open a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionOpen ;
+    sstim:sessionClockOffsetSeconds 0.0 .
+
+example:event-start a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackStart ;
+    sstim:sessionClockOffsetSeconds 0.3 .
+
+example:event-step-theta a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventParameterChanged ;
+    sstim:sessionClockOffsetSeconds 120.0 ;
+    sstim:hasChangedParameter sstim-v:paramModulationFrequency ;
+    sstim:parameterValueBefore 10.0 ;
+    sstim:parameterValueAfter 14.0 .
+
+example:event-step-gamma a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventParameterChanged ;
+    sstim:sessionClockOffsetSeconds 240.0 ;
+    sstim:hasChangedParameter sstim-v:paramModulationFrequency ;
+    sstim:parameterValueBefore 14.0 ;
+    sstim:parameterValueAfter 40.0 .
+
+# Requested 0.35, delivered 0.30. Both halves are recorded: the requested value
+# is the one a consumer cannot reconstruct from the delivered value alone.
+example:event-safety a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSafetyLimitApplied ;
+    sstim:sessionClockOffsetSeconds 300.0 ;
+    sstim:hasChangedParameter sstim-v:paramLevel ;
+    sstim:parameterValueBefore 0.35 ;
+    sstim:parameterValueAfter 0.30 .
+
+example:event-complete a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionComplete ;
+    sstim:sessionClockOffsetSeconds 600.0 .

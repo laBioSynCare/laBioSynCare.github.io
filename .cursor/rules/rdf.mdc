@@ -1,0 +1,20 @@
+---
+description: SSTIM RDF, OWL, SKOS and SHACL rules for BSC Lab
+globs: ["static/ontology/**", "src/rdf/**", "scripts/sstim-*", "docs/ontology/**"]
+alwaysApply: false
+---
+
+Read [`CLAUDE.md`](../../CLAUDE.md) §5 and `static/ontology/README.md` before
+editing RDF. Summary of the rules that are expensive to get wrong:
+
+- **Never modify ontology files without an explicit instruction naming the
+  file.** `static/ontology/manifest.json` is the authoritative inventory.
+- **Never hardcode an ontology IRI.** Import from `src/rdf/namespaces.js`.
+- **Dual-typed SKOS concepts are deliberate.** A concept is both `skos:Concept`
+  and an instance of its OWL class. Removing either type breaks SHACL.
+- **Annotations live in named graphs**, never the default graph.
+- **Grep `docs/ontology/TERM_INDEX.md` before saying SSTIM lacks a term.** It is
+  generated from the 18 modules and CI-checked. For any IRI, the executable
+  answer is `python3 scripts/locate-iri.py <iri>`, which also checks the live
+  external store that no repo grep can see.
+- **`make validate` before committing** anything under `static/ontology/`.

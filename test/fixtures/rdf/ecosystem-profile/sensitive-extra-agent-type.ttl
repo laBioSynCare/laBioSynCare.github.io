@@ -1,0 +1,4 @@
+@prefix schema: <https://schema.org/> .
+
+<https://w3id.org/sstim/specialist/synthetic-alex-rivera>
+    a schema:Patient .
