@@ -397,6 +397,7 @@ repository*. Use the
 across releases.
 
 - Imported software: [Apache License 2.0](LICENSE).
+- Synthetic reference audio: [CC0 1.0 Universal](LICENSE-audio).
 - Imported ontology, vocabulary, documentation, and public reference data:
   [CC BY 4.0](LICENSE-ontology).
 - W3C Community Group contribution terms: [LICENSE.md](LICENSE.md). These
