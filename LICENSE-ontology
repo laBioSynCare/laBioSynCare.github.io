@@ -9,7 +9,8 @@ Attribution 4.0 International License (CC BY 4.0):
   instance data
 - `docs/` reference documents
 - root project documents including `README.md`, `ROADMAP.md`, `TODO.md`,
-  `CONTRIBUTING.md`, `CLAUDE.md`, and `CITATION.cff`
+  `CONTRIBUTING.md`, `CLAUDE.md`, and `CITATION.cff`, except any file or
+  portion carrying a distinct W3C or other license notice
 - preset catalog data contributed to this repository, unless a file states a
   different license
 

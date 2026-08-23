@@ -28,9 +28,8 @@ feature, you can remove yourself with the above syntax.
 
 The repository imported an established open-source sensory-stimulation
 platform alongside SSTIM. The following software, preset, ontology, and
-evidence requirements remain technically authoritative while the Community
-Group reconciles the contribution and licensing pathway described in the
-[repository migration runbook](docs/ecosystem/W3C_REPOSITORY_MIGRATION.md).
+evidence requirements remain technically authoritative under the approved
+migration and the scope recorded in [LICENSING.md](LICENSING.md).
 
 ---
 
@@ -43,7 +42,7 @@ Group reconciles the contribution and licensing pathway described in the
 5. [Layer 4 — Scientific evidence](#5-layer-4--scientific-evidence)
 6. [Pull request process](#6-pull-request-process)
 7. [Issue reporting](#7-issue-reporting)
-8. [Governance and licensing during migration](#8-governance-and-licensing-during-migration)
+8. [Governance and licensing](#8-governance-and-licensing)
 
 ---
 
@@ -345,7 +344,7 @@ security surface is the preset catalog export pipeline.
 
 ---
 
-## 8. Governance and licensing during migration
+## 8. Governance and licensing
 
 The W3C Community Group contribution instructions at the top of this document
 govern new substantive contributions. The imported baseline retains its

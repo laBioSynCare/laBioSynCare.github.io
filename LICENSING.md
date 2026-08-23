@@ -30,17 +30,17 @@ copyright, or change immutable releases.
 | SSTIM documentation | `docs/` and the root narrative documents listed in `LICENSE-ontology` | CC BY 4.0 | W3C CLA where the material is part of the Specification; otherwise the applicable CG/report contribution terms | Normative or informative only as explicitly designated |
 | Public reference/catalog data | preset catalog and other public reference data unless a file states otherwise | CC BY 4.0 | Applicable repository and CG contribution process | Nonnormative unless explicitly designated |
 | Other Community Group Reports | a deliverable explicitly designated as such by the CG | W3C Software and Document License unless the CG records another permitted treatment | Target `LICENSE.md` | Status stated by the report |
-| Formal W3C conformance Test Suite | only material explicitly designated and published as a W3C Test Suite | Applicable W3C test-suite licenses | Target `LICENSE.md` and W3C test-suite process | Not inferred from a file living under `test/` |
+| Formal W3C conformance Test Suite | only material explicitly designated and published as a W3C Test Suite | W3C 3-clause BSD License | Target `LICENSE.md` and W3C test-suite process | Not inferred from a file living under `test/` |
 | Target governance scaffold | `LICENSE.md`, `CODE_OF_CONDUCT.md`, `w3c.json` | Terms stated by those files | W3C Community Group process | Repository governance |
 
-If a file carries a more specific compatible notice, that notice controls for
+If a file carries a more specific license notice, that notice controls for
 that file. When classification is unclear, do not silently change the license;
 open a governance issue and obtain a maintainer/CG determination.
 
 ## Imported baseline
 
-The complete source tree and history through source commit `6cf49c9` retain the
-license and attribution supplied with that work:
+The source-main tree at `6cf49c9` and all preserved pre-migration refs and
+commits retain the license and attribution supplied with that work:
 
 - software, application runtime, build tooling, scripts and ordinary software
   tests: [Apache License 2.0](LICENSE);

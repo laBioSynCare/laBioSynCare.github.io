@@ -17,7 +17,8 @@ specific language governing permissions and limitations under the License.
 This repository uses a deliberate, path-based license split. See LICENSING.md
 for the artifact and contribution scope:
 
-  * Software — application source, build tooling, scripts, tests:
+  * Software — application source, build tooling, scripts, and ordinary
+    software tests not explicitly designated as a formal W3C Test Suite:
     Apache License 2.0, as above (see LICENSE).
 
   * The SSTIM ontology and its vocabulary, shapes and public instance data
