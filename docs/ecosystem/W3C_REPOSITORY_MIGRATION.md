@@ -1,7 +1,7 @@
 # Decision and staged migration plan: SSTIM to `w3c-cg/sstim`
 
 - **Status:** approved migration; executed 2026-08-23. See the
-  [final migration report](W3C_MIGRATION_REPORT.md)
+  [final migration report](W3C_REPOSITORY_MIGRATION_REPORT.md)
 - **Proposal/document date:** 2026-08-23
 - **Decision authority and approval date:** Community Group migration approval,
   including the complete history, existing licenses, SSTIM, and the complete
