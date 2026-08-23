@@ -19,6 +19,11 @@ const DIST = resolve(process.argv[2] ?? 'dist')
 const MOUNT = normalizeDeploymentBase(process.argv[3] ?? '')
 const COMPLETE_ARTIFACT = process.argv.includes('--complete')
 
+// The manifest states its runtime references relative to itself, so they are
+// resolved here the way any consumer must: against the directory the manifest
+// was fetched from, which is /ontology/.
+const ontologyRef = (reference) => `/ontology/${reference}`
+
 const TYPES = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
   '.json': 'application/json', '.ttl': 'text/turtle', '.svg': 'image/svg+xml',
@@ -143,10 +148,10 @@ async function main() {
 
     const publicSources = ontologyManifest
       ? [
-          ...ontologyManifest.modules.map(module => [module.id, module.runtime.url]),
+          ...ontologyManifest.modules.map(module => [module.id, ontologyRef(module.runtime.url)]),
           ...ontologyManifest.profiles
             .filter(profile => profile.runtime?.url)
-            .map(profile => [`profile:${profile.id}`, profile.runtime.url]),
+            .map(profile => [`profile:${profile.id}`, ontologyRef(profile.runtime.url)]),
         ]
       : []
     for (const [id, url] of publicSources) {
@@ -241,7 +246,7 @@ async function main() {
         '/ontology/docs/',
         '/ontology/docs/vocab/',
         ...(ontologyManifest?.namespaceDocuments ?? []).flatMap(document =>
-          Object.values(document.runtime),
+          Object.values(document.runtime).map(ontologyRef),
         ),
       ]
       for (const asset of generated) {
@@ -276,20 +281,37 @@ async function main() {
       }
     }
 
-    // 5. No credentials inlined. Vite loads .env from the project root in every
-    //    mode, so this fails loudly if the build picked one up — which is exactly
-    //    how an apparently "unset" build can still ship a key.
+    // 5. Firebase configuration matches what this deployment was given.
+    //
+    //    Two deployments publish this commit. The production owner site is
+    //    configured with Firebase and its bundle is *supposed* to carry the web
+    //    API key, which is a public client identifier, not a secret: access
+    //    control lives in Firestore rules. The W3C project site is deliberately
+    //    credential-free and must carry no key at all.
+    //
+    //    So the assertion is conditional, and it fails in both directions. An
+    //    unconfigured build that ships a key means Vite picked up a stray .env,
+    //    which is exactly how an apparently "unset" build leaks one. A
+    //    configured build that ships none means the variables did not reach the
+    //    build and sign-in would be broken on a site that offers it.
+    const expectFirebase = process.env.SSTIM_EXPECT_FIREBASE === 'true'
     const bundle = await import('node:fs/promises')
       .then(fs => fs.readdir(join(DIST, '_app/immutable'), { recursive: true }))
       .then(names => names.filter(n => n.endsWith('.js')))
-    let leaked = []
+    let carrying = []
     for (const name of bundle) {
       const text = await readFile(join(DIST, '_app/immutable', name), 'utf8')
-      if (/AIza[0-9A-Za-z_-]{20,}/.test(text)) leaked.push(name)
+      if (/AIza[0-9A-Za-z_-]{20,}/.test(text)) carrying.push(name)
     }
-    leaked.length === 0
-      ? ok('no Firebase API key inlined', `${bundle.length} bundle files scanned`)
-      : bad('Firebase API key inlined', leaked.join(', '))
+    if (expectFirebase) {
+      carrying.length > 0
+        ? ok('Firebase config present, as this deployment is configured', carrying.join(', '))
+        : bad('Firebase configured but no key reached the bundle', `${bundle.length} bundle files scanned`)
+    } else {
+      carrying.length === 0
+        ? ok('no Firebase API key inlined', `${bundle.length} bundle files scanned`)
+        : bad('Firebase API key inlined', carrying.join(', '))
+    }
 
     // 6. The unconfigured path shipped: the app has a defined behaviour with no
     //    Firebase rather than crashing on a missing global.

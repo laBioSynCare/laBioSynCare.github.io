@@ -190,7 +190,14 @@ jobs:
       # asserts that app routes, ontology sources, PWA files, worklets, WASM and
       # audio all resolve against that mount rather than against an assumed
       # origin root.
+      # SSTIM_EXPECT_FIREBASE tells the smoke test which of the two published
+      # deployments this is. The production owner site is configured and its
+      # bundle must carry the public Firebase web API key; the W3C project site
+      # has no variables and must carry none. Deriving it from the variable
+      # itself means neither site can drift into the other's expectation.
       - name: Verify the complete artifact at the deployment mount
+        env:
+          SSTIM_EXPECT_FIREBASE: ${{ vars.VITE_FIREBASE_API_KEY != '' }}
         run: nix develop --command node scripts/smoke-static.mjs dist "$SSTIM_BASE_PATH" --complete
 
       - name: Configure GitHub Pages
