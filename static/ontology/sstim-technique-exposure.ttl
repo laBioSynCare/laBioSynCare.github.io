@@ -1,0 +1,140 @@
+###########################################################################
+#
+#  SSTIM Technique–Exposure Bridge Module
+#
+#  Version:    0.17.0-dev
+#  Date:       2026-08-18
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/technique-exposure> a owl:Ontology ;
+    owl:versionInfo "0.17.0-dev" ;
+    dct:title "SSTIM Technique–Exposure Bridge Module"@en ;
+    dct:description "Characteristic physical delivery media asserted for vocabulary-owned stimulation and neuromodulation techniques."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/vocab> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-18"^^xsd:date ;
+    dct:modified "2026-08-18"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Characteristic delivery media
+###########################################################################
+
+sstim-v:techASMR sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techAcousticStartle sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techAmplitudeModulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techAudioTactile sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumMechanicalVibration .
+
+sstim-v:techAudiovisualEntrainment sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumVisualLight .
+
+sstim-v:techAuditoryIllusion sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techBinauralBeats sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techBroadbandNoise sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techClickTrain sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techClosedLoopAuditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techColorFieldStimulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight .
+
+sstim-v:techDBS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+
+sstim-v:techFractalRhythm sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techFrequencyModulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techGamma40Auditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techIntrathecalNeuromodulatoryAgentDelivery sstim-ex:characteristicDeliveryMedium sstim-ex:mediumPharmacologicalAgent .
+
+sstim-v:techIsochronicTones sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techMonauralBeats sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techMusicStructural sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techNotchedSound sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techPhoticDriving sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight .
+
+sstim-v:techReferencePitchRetuning sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techRepetitiveTMS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedMagneticField, sstim-ex:mediumAppliedElectricField .
+
+sstim-v:techRhythmicAuditoryCueing sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techRoughness sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techSolfeggioTuning sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techSonification sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techSpatialAuditory sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techSubliminalAudio sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techTACS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+
+sstim-v:techTDCS sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+
+sstim-v:techUltrasoundNeuromod sstim-ex:characteristicDeliveryMedium sstim-ex:mediumFocusedUltrasound .
+
+sstim-v:techVagusNerveStimulation sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+
+sstim-v:techVibroacoustic sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound, sstim-ex:mediumContactAcousticVibration .
+
+sstim-v:techVibrotactileEntrainment sstim-ex:characteristicDeliveryMedium sstim-ex:mediumMechanicalVibration .
+
+sstim-v:techVoiceMantra sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAirConductedSound .
+
+sstim-v:techElectroconvulsiveTherapy sstim-ex:characteristicDeliveryMedium sstim-ex:mediumAppliedElectricCurrent .
+
+sstim-v:techNeurofeedback sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight, sstim-ex:mediumAirConductedSound .
+
+sstim-v:techBiofeedback sstim-ex:characteristicDeliveryMedium sstim-ex:mediumVisualLight, sstim-ex:mediumAirConductedSound .
+
+
+###########################################################################
+# End of technique-exposure
+###########################################################################

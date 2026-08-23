@@ -1,0 +1,17 @@
+SSTIM Synthetic Reference Audio Dedication
+
+Copyright 2026 Renato Fabbri
+
+The synthetic reference audio loops under `static/audio/` are dedicated to the
+public domain under CC0 1.0 Universal.
+
+SPDX-License-Identifier: CC0-1.0
+
+Canonical legal code:
+https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+Human-readable summary:
+https://creativecommons.org/publicdomain/zero/1.0/
+
+These files are non-normative reference media for SSTIM Workbench. Their
+presence beside the SSTIM Specification does not make them normative.

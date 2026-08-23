@@ -1,0 +1,118 @@
+###########################################################################
+# Synthetic recorded session with a TIME-VARYING stimulus.
+#
+# The companion to full-profile/positive-recorded-session.ttl, which records a
+# fixed stimulus. This one exists because ADR 0025 decision 5 draws a line that
+# the fixed fixture cannot test:
+#
+#   "The fixture must use a fixed or explicitly segmented stimulus within the
+#    repository's conservative defaults. Time-varying modulation requires either
+#    piecewise events or a linked trace; it must not be flattened into a
+#    misleading single row."
+#
+# A Martigli voice is the repository's canonical time-varying case: the
+# breathing-cycle period glides linearly from mp0 to mp1 over md seconds and
+# holds thereafter (docs/technical/BREATHING_MODEL.md). Nothing in
+# sstim-v:SessionEventTypeScheme can express that — the ten event types name
+# session and playback lifecycle, safety and observation, and none of them is a
+# parameter change. So a HED events table built from events alone *would* flatten
+# this session into rows that imply a constant stimulus, which is exactly the
+# failure the ADR names. `make hed-bundle` emits a linked trace instead, and
+# refuses to emit the table without one.
+#
+# Deliberately parallel to the fixed fixture wherever it can be — same clock
+# origin, same pause/resume shape — so that a reader diffing the two bundles
+# sees the modulation and nothing else.
+#
+# Synthetic throughout, and about no one.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/hed-modulated/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+
+###########################################################################
+# The configuration, and the modulation that makes it time-varying
+#
+# P(t) = mp0 + (mp1 - mp0) * min(t / md, 1)   — BREATHING_MODEL.md
+#
+# 4 s cycles decelerating to 10 s over the first 300 s of delivery, then held.
+# mp0 >= 3 s because this voice is the breathing reference (CLAUDE.md §4.5).
+###########################################################################
+
+example:preset a sstim:Preset ;
+    rdfs:label "Synthetic decelerating-breath configuration"@en ;
+    sstim:composedOfTrack example:voice .
+
+example:voice a sstim:MartigliVoice ;
+    rdfs:label "Synthetic Martigli voice"@en ;
+    sstim:isBreathReference true ;
+    sstim:martigliCenterFreq 220.0 ;
+    sstim:martigliAmplitude 4.0 ;
+    sstim:martigliPeriodInitial 4.0 ;
+    sstim:martigliPeriodFinal 10.0 ;
+    sstim:martigliTransitionDuration 300.0 .
+
+example:specification a sstim:SessionSpecification, prov:Plan ;
+    rdfs:label "Synthetic modulated session specification"@en ;
+    dct:created "2026-08-18T09:00:00Z"^^xsd:dateTime ;
+    sstim:referencesPreset example:preset ;
+    sstim:durationSeconds 600 ;
+    sstim:masterVolume 0.20 ;
+    sstim:hasReproducibilityLevel sstim-v:reproEquivalentPresentation ;
+    sstim:configurationDigest "0f5f3b1c2f2a4d9e8c7b6a5948372615f4e3d2c1b0a99887766554433221100f" ;
+    sstim:digestAlgorithm "sha256-canonical-json" .
+
+
+###########################################################################
+# The execution
+#
+# Paused 190 -> 250, so 400 s elapsed and 340 s delivered. The distinction is
+# not cosmetic here: the breathing arc advances on *delivered* time, so the
+# pause moves the whole remaining sweep 60 s later on the session clock. A trace
+# that ignored the pause would misplace every sample after it.
+###########################################################################
+
+example:instance a sstim:SessionInstance ;
+    rdfs:label "Synthetic modulated session"@en ;
+    sstim:usesSpecification example:specification ;
+    sstim:actualDurationSeconds 400 ;
+    sstim:deliveredDurationSeconds 340.0 ;
+    sstim:clockOriginSeconds 3.25 ;
+    sstim:hasTimingAuthority sstim-v:timingAudioHardwareClock ;
+    sstim:completionStatus "interrupted" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory ;
+    prov:startedAtTime "2026-08-18T09:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-08-18T09:07:40Z"^^xsd:dateTime ;
+    sstim:hasSessionEvent example:event-open, example:event-start,
+        example:event-pause, example:event-resume, example:event-interrupt .
+
+
+###########################################################################
+# The timeline. Order lives in the offsets, not in the file.
+###########################################################################
+
+example:event-open a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionOpen ;
+    sstim:sessionClockOffsetSeconds 0.0 .
+
+example:event-start a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackStart ;
+    sstim:sessionClockOffsetSeconds 0.3 .
+
+example:event-pause a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackPause ;
+    sstim:sessionClockOffsetSeconds 190.0 .
+
+example:event-resume a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventPlaybackResume ;
+    sstim:sessionClockOffsetSeconds 250.0 .
+
+example:event-interrupt a sstim:SessionEvent ;
+    sstim:hasEventType sstim-v:eventSessionInterrupt ;
+    sstim:sessionClockOffsetSeconds 400.0 .

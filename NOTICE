@@ -1,0 +1,47 @@
+BSC Lab — the SSTIM ontology and the BSC Lab application
+Copyright 2026 Renato Fabbri
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+---
+
+This repository uses a deliberate, path-based license split. See LICENSING.md
+for the artifact and contribution scope:
+
+  * Software — application source, build tooling, scripts, JSON
+    contracts/crosswalks under static/schemas/ unless a file states otherwise,
+    and ordinary software tests not explicitly designated as a formal W3C Test
+    Suite: Apache License 2.0, as above (see LICENSE).
+
+  * Synthetic reference audio under static/audio/: CC0 1.0 Universal (see
+    LICENSE-audio). These generated loops are non-normative reference media.
+
+  * The SSTIM ontology and its vocabulary, shapes and public instance data
+    under static/ontology/: Creative Commons Attribution 4.0 International
+    (CC BY 4.0), see LICENSE-ontology. The ontology is the reusable, citable
+    scientific artifact and carries dct:license CC BY 4.0 in the RDF itself,
+    which is what registries and downstream consumers read.
+
+  * The three defensive publications in docs/technical/ — BREATHING_MODEL.md,
+    SYMMETRY_SYSTEM.md and MARTIGLI_BINAURAL.md — are CC BY 4.0. Their canonical
+    copies in this repository are maintained as immutable timestamped prior-art
+    records. That repository maintenance policy does not restrict downstream
+    copying or adaptation permitted by CC BY 4.0, subject to its attribution and
+    change-notice requirements.
+
+  * The unmodified historical file
+    static/docs/BioSynCare_Ecosystem_Brief_EN.pdf retains its existing
+    file/rightsholder status. Migration does not assign it a new license; see
+    LICENSING.md before adapting or republishing it.
+
+Cite the ontology by its concept DOI, https://doi.org/10.5281/zenodo.21286974,
+which resolves to the latest version.

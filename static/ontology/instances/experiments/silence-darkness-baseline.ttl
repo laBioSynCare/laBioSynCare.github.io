@@ -1,0 +1,66 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/silence-darkness-baseline#> .
+
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a baseline defined by the ABSENCE of stimulation: no technique, no
+# intended causal channel. Typing it as stimulation is exactly the mislabelling
+# ADR 0034 reparents ExploratoryProtocol to prevent.
+bsclab-experiment:silence-darkness-baseline a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Silence and darkness baseline"@en ;
+    dct:description "Non-clinical baseline setup for modeling black visual field and silence/near-silence as an exposure profile with comfort and isolation boundaries."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    skos:editorialNote "Control-condition protocol: intentionally models absence or minimization of active stimulation and therefore does not claim to use a stimulation technique."@en ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextSelfObservation ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Silence/darkness baseline exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-baseline-channel, this:audio-baseline-channel ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossEnvironmentalAwareness, sstim-ex:lossOutsideVision ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryIsolation, sstim-ex:boundaryEnvironmentalAwareness ;
+    sstim-ex:hasPlannedOutcome this:baseline-comfort-claim ;
+    sstim-ex:hasBoundaryApplicability this:isolation-boundary-claim .
+
+this:visual-baseline-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Black visual-field baseline channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:visualFieldBlack, sstim-ex:patternStatic .
+
+this:audio-baseline-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Silence baseline channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasStimulusPattern sstim-ex:audioNoiseBlackSilence, sstim-ex:patternStatic .
+
+this:baseline-comfort-claim a sstim-ex:PlannedOutcomeSpecification ;
+    rdfs:label "Baseline comfort observation target"@en ;
+    dct:description "Models silence and darkness as possible comparison conditions for self-report comfort or discomfort. No superiority over active BSC Lab patches is asserted."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectDiscomfort, sstim-ex:effectPleasantness ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:isolation-boundary-claim a sstim-ex:BoundaryApplicabilityStatement ;
+    rdfs:label "Isolation boundary"@en ;
+    dct:description "Marks reduced sound and light as requiring an isolation or environmental-awareness boundary."@en ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryIsolation, sstim-ex:boundaryEnvironmentalAwareness ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+

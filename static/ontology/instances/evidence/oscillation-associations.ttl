@@ -1,0 +1,355 @@
+###########################################################################
+#
+#  Neural oscillation associations  —  ADR 0049
+#
+#  The six frequency bands used to carry associations in their scope notes:
+#  "Deep sleep, heavy down-regulation", "Relaxation, stress reduction, calm
+#  alertness", and so on. Those were properties of a Hz interval, unsourced,
+#  undated and with no indication of how well supported they were.
+#
+#  ADR 0049 moves them here, onto the rhythms, and requires each to be one of
+#  two things and never a third. Either an evidence assessment with a tier and
+#  a citation, or a dated knowledge-status assertion recording that no evidence
+#  was found in the corpus. Restating them as prose on a better subject was
+#  explicitly refused: a scope note carries no tier, no source and no date.
+#
+#  Six of the nine end at noKnownEvidenceInSSTIM. That is the result, not a
+#  failure to finish: it records that a widely repeated association is not
+#  evidenced here, which is exactly what the old scope notes concealed.
+#
+#  Note what is *not* in this file. "Alpha is prominent with the eyes closed"
+#  and "delta is prominent in slow-wave sleep" are observation conditions, not
+#  outcomes — they say when a rhythm is seen, not what targeting it does — and
+#  they live on the concepts as sstim:hasOscillationStateContext.
+#
+#  Every DOI cited here was resolved through Crossref before being written.
+#
+###########################################################################
+
+@prefix bsclab-evidence: <https://w3id.org/sstim/implementation/bsclab/evidence/> .
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix owl:       <http://www.w3.org/2002/07/owl#> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-ref: <https://w3id.org/sstim/ref/> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1>
+    rdfs:label "ADR 0049 oscillation-association assessment method, revision 1"@en ;
+    dct:description "Each association previously asserted in a frequency-band scope note is assessed against literature located in 2026-08. Where a source is found and verified through Crossref, an assessment records it with a tier. Where none is found, a dated knowledge-status assertion records the absence rather than the association being deleted. No citation is asserted from memory. This method revision is immutable."@en ;
+    dct:created "2026-08-15"^^xsd:date .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor>
+    rdfs:label "Oscillation association editor"@en ;
+    dct:description "Curator role for the ADR 0049 association pass."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg>
+    rdfs:label "Human scalp-EEG cognitive studies"@en ;
+    dct:description "Adult human participants studied with scalp EEG in cognitive and memory paradigms."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity>
+    rdfs:label "Activity in other frequency bands"@en ;
+    dct:description "Comparison against activity outside the band under assessment, or against a task-free baseline."@en .
+
+
+# ── Assessed associations ────────────────────────────────────────────────────
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Alpha oscillation and attentional access to stored information (assessment revision 1)" ;
+    dct:description "Alpha-band activity covaries with attentional control and with access to stored information. An electrophysiological and cognitive-performance association observed in human scalp EEG — not a wellness outcome, and not a claim about stimulating at alpha frequencies." ;
+    sstim:evaluatesSubject sstim-v:alphaOscillation ;
+    sstim:supportsRelation sstim-v:alphaOscillation ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/basis-1> ;
+    sstim:citesReference sstim-ref:KLIMESCH_2012 ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/activity> ;
+    dct:modified "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:alphaOscillation ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/alpha-attention-access> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "Alpha-band oscillatory activity covaries with attentional control and controlled access to stored information in human scalp-EEG studies. The source is a review synthesising that literature; it concerns the endogenous rhythm and makes no claim about the effect of delivering stimulation at alpha frequencies."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:scopeNotApplicable ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:scopeInterventionOrContext sstim-v:alphaOscillation ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:KLIMESCH_2012 ;
+    sstim:basisModalityApplicability sstim-v:applicabilityNotApplicable ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/alpha-attention-access> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> ;
+    sstim:basisOutcomeNote "Reviewed association between alpha-band activity and attentional/memory access."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/alpha-attention-access>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Reviewed association between alpha-band activity and attentional/memory access."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/basis-1>, sstim-ref:KLIMESCH_2012,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Theta oscillation and memory performance (assessment revision 1)" ;
+    dct:description "Theta-band activity covaries with cognitive and memory performance in human scalp EEG. An observed association in the endogenous rhythm, not an outcome of stimulation." ;
+    sstim:evaluatesSubject sstim-v:thetaOscillation ;
+    sstim:supportsRelation sstim-v:thetaOscillation ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/basis-1> ;
+    sstim:citesReference sstim-ref:KLIMESCH_1999 ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/activity> ;
+    dct:modified "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:thetaOscillation ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/theta-memory-performance> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "Theta-band oscillatory activity covaries with cognitive and memory performance across human scalp-EEG studies. The source is a review and analysis of that literature; it concerns the endogenous rhythm and makes no claim about the effect of delivering stimulation at theta frequencies."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:scopeNotApplicable ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:scopeInterventionOrContext sstim-v:thetaOscillation ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:KLIMESCH_1999 ;
+    sstim:basisModalityApplicability sstim-v:applicabilityNotApplicable ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/theta-memory-performance> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> ;
+    sstim:basisOutcomeNote "Reviewed association between theta-band activity and memory performance."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/theta-memory-performance>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Reviewed association between theta-band activity and memory performance."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/basis-1>, sstim-ref:KLIMESCH_1999,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1>
+    a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
+    rdfs:label "Gamma oscillation and cortical processing (assessment revision 1)" ;
+    dct:description "Gamma-band synchronization is proposed as a mechanism of communication and computation between cortical populations. A mechanistic proposal with substantial supporting work, not a wellness outcome." ;
+    sstim:evaluatesSubject sstim-v:gammaOscillation ;
+    sstim:supportsRelation sstim-v:gammaOscillation ;
+    sstim:hasEvidenceTier sstim-v:tierModerate ;
+    sstim:hasClaimDirection sstim-v:claimSupports ;
+    sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/proposition> ;
+    sstim:hasEvidenceBasis <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/basis-1> ;
+    sstim:citesReference sstim-ref:FRIES_2009 ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/activity> ;
+    dct:modified "2026-08-15"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/proposition>
+    a sstim:AssessmentProposition ;
+    sstim:propositionSubject sstim-v:gammaOscillation ;
+    sstim:propositionOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/gamma-cortical-computation> ;
+    sstim:hasAssessmentScope <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/scope> ;
+    sstim:hasPropositionForm sstim-v:formBoundedRelation ;
+    sstim:propositionText "Gamma-band synchronization between neuronal populations is proposed as a fundamental process in cortical computation and inter-areal communication. The source is a review advancing that account; it concerns endogenous cortical dynamics and makes no claim about the effect of delivering stimulation at gamma frequencies."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/scope>
+    a sstim:AssessmentScope ;
+    sstim:scopeSensoryModality sstim-v:scopeNotApplicable ;
+    sstim:scopePopulationOrModel <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:scopeInterventionOrContext sstim-v:gammaOscillation ;
+    sstim:scopeComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/basis-1>
+    a sstim:EvidenceBasis ;
+    sstim:basisSource sstim-ref:FRIES_2009 ;
+    sstim:basisModalityApplicability sstim-v:applicabilityNotApplicable ;
+    sstim:basisStudyModel sstim-v:modelHuman ;
+    sstim:basisStudyPopulation <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg> ;
+    sstim:basisStudyDesign sstim-v:designUnknownDesign ;
+    sstim:basisSynthesisType sstim-v:synthesisNarrativeReview ;
+    sstim:basisObservedOutcome <https://w3id.org/sstim/implementation/bsclab/evidence/outcome/gamma-cortical-computation> ;
+    sstim:basisComparator <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity> ;
+    sstim:basisOutcomeNote "Reviewed mechanistic account of gamma-band synchronization in cortical computation."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/outcome/gamma-cortical-computation>
+    a sstim:EvidenceOutcomeConcept ;
+    rdfs:label "Reviewed mechanistic account of gamma-band synchronization in cortical computation."@en .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/activity>
+    a sstim:EvidenceAssessmentActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/basis-1>, sstim-ref:FRIES_2009,
+        <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+# ── Associations for which no evidence was located ───────────────────────────
+#
+# Recorded rather than deleted. Each says what was claimed, that nothing
+# supporting it was found in this corpus, and on what date — which is the
+# knowledge the old scope notes destroyed by stating the association flatly.
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/delta-down-regulation/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for deltaOscillation and heavy down-regulation (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/delta-down-regulation/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located characterising delta activity as heavy down-regulation. The phrase has no standard referent in the electrophysiology literature, and delta's association with slow-wave sleep is recorded instead as an observation condition on the concept, not as an outcome. Asserted in the sstim-v:delta scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:deltaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/delta-down-regulation/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-creativity/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for thetaOscillation and creativity (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/theta-creativity/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located supporting an association between theta activity and creativity at a standard this corpus would cite. The association is widely repeated in brainwave-entrainment material. Asserted in the sstim-v:theta scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:thetaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/theta-creativity/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-chronic-pain/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for thetaOscillation and chronic pain support (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/theta-chronic-pain/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located supporting an association between theta activity and chronic pain. This is the closest of the moved associations to a clinical claim, so it is recorded as unevidenced rather than softened: the absence is the finding. Asserted in the sstim-v:theta scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:thetaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/theta-chronic-pain/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-meditation/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for thetaOscillation and meditation (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/theta-meditation/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located at a standard this corpus would cite. Meditation-state EEG literature exists and was not assessed in this pass; the absence recorded here is of a located source, not of a literature. Asserted in the sstim-v:theta scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:thetaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/theta-meditation/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-stress-reduction/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for alphaOscillation and stress reduction (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-stress-reduction/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located supporting stress reduction as an outcome of alpha activity. Alpha's prominence during relaxed wakefulness is an observation condition and is recorded on the concept as such; that a rhythm accompanies a state is not evidence that producing the rhythm produces the state. Asserted in the sstim-v:alpha scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:alphaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-stress-reduction/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/smr-sustained-attention/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for smrOscillation and focused calm and sustained attention (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/smr-sustained-attention/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located supporting focused calm or sustained attention as an outcome of sensorimotor-rhythm activity. Sterman's SMR neurofeedback work concerns epilepsy and was deliberately not cited here, because citing it for attention would misrepresent what it studied. Asserted in the sstim-v:smr scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:smrOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/smr-sustained-attention/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/beta-active-cognition/status/1>
+    a sstim-ex:KnowledgeStatusAssertion ;
+    rdfs:label "Scoped knowledge-status assertion for betaOscillation and active cognition (noKnownEvidenceInSSTIM)"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:noKnownEvidenceInSSTIM ;
+    sstim-ex:knowledgeAsOfDate "2026-08-15"^^xsd:date ;
+    prov:wasGeneratedBy <https://w3id.org/sstim/implementation/bsclab/evidence/beta-active-cognition/status/1/activity> ;
+    sstim-ex:knowledgeScopeNote "No source was located treating active cognition as an outcome of beta activity. Beta's prominence during alert wakefulness is an observation condition and is recorded on the concept as such. Asserted in the sstim-v:beta scope note until ADR 0049 moved it here. This is a statement about the BSC Lab curated SSTIM corpus as of this date, not a universal claim about the world."@en .
+
+sstim-v:betaOscillation sstim-ex:hasKnowledgeStatusAssertion <https://w3id.org/sstim/implementation/bsclab/evidence/beta-active-cognition/status/1> .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/delta-down-regulation/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-creativity/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-chronic-pain/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/theta-meditation/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/alpha-stress-reduction/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/smr-sustained-attention/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .
+
+<https://w3id.org/sstim/implementation/bsclab/evidence/beta-active-cognition/status/1/activity>
+    a sstim-ex:KnowledgeStatusActivity ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0049-oscillation-association/1> ;
+    prov:endedAtTime "2026-08-15T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent <https://orcid.org/0000-0002-9699-629X> ;
+        prov:hadRole <https://w3id.org/sstim/implementation/bsclab/evidence/role/oscillation-association-editor> ] .

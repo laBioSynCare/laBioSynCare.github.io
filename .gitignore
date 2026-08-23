@@ -1,0 +1,33 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+sandbox/
+node_modules/
+.svelte-kit/
+dist/
+
+# Nix / direnv (flake.nix + flake.lock are committed; build outputs are not)
+.direnv/
+result
+result-*
+
+docs/credentials/
+docs/funding/
+
+.playwright-cli/
+
+# Local Python validation bytecode
+__pycache__/
+*.py[cod]
+
+# pyLODE writes a run log in the working dir (make vocab-docs)
+pylode.log
+
+# Credential-free build produced by `make smoke-static`
+dist-smoke/
+
+# Written by `make validate`: when the suite last passed and on which tree.
+# Local state, not a repository fact.
+.validation.log

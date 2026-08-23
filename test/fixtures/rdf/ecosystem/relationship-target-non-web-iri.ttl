@@ -1,0 +1,7 @@
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+# Overlay on a conforming relationship. Even though mailto: is syntactically an
+# IRI, a contact address must never be publishable as an ecosystem target.
+
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-alex-outreach-resonance>
+    sstim-eco:relationshipTarget <mailto:private-contact@example.net> .

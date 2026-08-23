@@ -1,0 +1,149 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/sensory-field-example#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# Reference exposure profile for the BSC Lab Sensory Field interface (ADR 0011).
+# Exercises the 0.4.0 exposure additions: per-ear laterality placements,
+# quantitative stimulus properties, and quantified safety boundaries. This is
+# the kind of profile the Sensory Field route emits at runtime; it is deliverable
+# by BSC Lab today, so its knowledge status is knownInSSTIM.
+
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:sensory-field-example a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
+    rdfs:label "Sensory Field reference exposure"@en ;
+    dct:description "Reference profile for the Sensory Field interface: a full-screen color field (static or gently blinking) with an independent per-ear tone forming a binaural beat. Non-clinical; no physiological benefit is asserted."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim:usesTechnique sstim-v:techBinauralBeats, sstim-v:techPhoticDriving ;
+    sstim-ex:hasExperimentContext sstim-ex:contextBscLabPrototype, sstim-ex:contextSelfObservation ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Sensory Field reference exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-channel, this:left-ear-channel, this:right-ear-channel ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain, sstim-ex:boundaryHearingRisk ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-claim ;
+    sstim-ex:hasResearchQuestion this:calm-arousal-claim .
+
+this:visual-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:flicker-rendering ;
+    rdfs:label "Color-field visual channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternFixedColor, sstim-ex:patternBlinking ;
+    sstim-ex:hasFlickerRateHz "3.0"^^xsd:decimal ;
+    sstim-ex:hasDutyCycle "0.5"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.6"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-claim .
+
+this:left-ear-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:left-beat-rendering ;
+    rdfs:label "Left-ear tone channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityStereoSeparation ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEarLeft ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
+    sstim-ex:hasFrequencyHz "200.0"^^xsd:decimal ;
+    sstim-ex:hasBeatFrequencyHz "4.0"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.18"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
+
+this:right-ear-channel a sstim-ex:StimulusChannel ;
+    sstim:hasSignalRendering this:right-beat-rendering ;
+    rdfs:label "Right-ear tone channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones, sstim-ex:capabilityStereoSeparation ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEarRight ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternContinuous ;
+    sstim-ex:hasFrequencyHz "204.0"^^xsd:decimal ;
+    sstim-ex:hasGainLevel "0.18"^^xsd:decimal ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
+
+this:photosensitivity-claim a sstim-ex:BoundaryApplicabilityStatement ;
+    rdfs:label "Flicker photosensitivity boundary"@en ;
+    dct:description "Marks the blinking visual field as bounded by a photosensitivity safeguard. The interface defaults to the three-flash frequency bound; this does not establish individual safety or replace the full WCAG below-threshold test."@en ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:calm-arousal-claim a sstim-ex:ResearchQuestion ;
+    rdfs:label "Calm/arousal self-observation target"@en ;
+    dct:description "Records the question of whether a static versus gently modulated color field and binaural tone relate to self-reported calm or arousal. No effect direction or magnitude is asserted."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectCalm, sstim-ex:effectArousal ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+# ── ADR 0052: the signals these channels deliver, and how ────────────────────
+#
+# The first real instance data for the signal layer. Until now it was exercised
+# only by synthetic fixtures, which is what left three soundness faults in it
+# for four days — a term set is not proven until something real has had to
+# commit to it.
+#
+# Committing to it here says two things the profile could not say before. The
+# ear pair renders ONE signal: the 4 Hz beat exists in neither ear's waveform
+# and is constructed from carriers 4 Hz apart, so both renderings name the same
+# sstim:StimulationSignal and both are perceptually constructed. And the visual
+# channel renders a DIFFERENT one — 3 Hz, not 4 — so this profile is not one
+# signal delivered two ways, and now says so rather than leaving a reader to
+# compare two decimals and guess.
+
+this:beat-signal a sstim:StimulationSignal ;
+    rdfs:label "4 Hz binaural beat"@en ;
+    sstim:hasSignalShape sstim-v:shapeSine ;
+    sstim:hzMin "4.0"^^xsd:decimal ;
+    sstim:hzMax "4.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:theta .
+
+this:flicker-signal a sstim:StimulationSignal ;
+    rdfs:label "3 Hz visual flicker"@en ;
+    sstim:hasSignalShape sstim-v:shapeSquare ;
+    sstim:hzMin "3.0"^^xsd:decimal ;
+    sstim:hzMax "3.0"^^xsd:decimal ;
+    sstim:signalWithinBand sstim-v:delta .
+
+# Both ears render the same signal. Neither carries it alone, which is why the
+# mechanism is a binaural beat and the presence is perceptual rather than
+# physical — asserted here, and checked against sstim:impliesPresence.
+this:left-beat-rendering a sstim:SignalRendering ;
+    rdfs:label "Left carrier of the binaural beat"@en ;
+    sstim:rendersSignal this:beat-signal ;
+    sstim:rendersOntoParameter sstim-v:paramFrequency ;
+    sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "200.0"^^xsd:decimal .
+
+this:right-beat-rendering a sstim:SignalRendering ;
+    rdfs:label "Right carrier of the binaural beat"@en ;
+    sstim:rendersSignal this:beat-signal ;
+    sstim:rendersOntoParameter sstim-v:paramFrequency ;
+    sstim:hasRenderingMechanism sstim-v:mechanismBinauralBeat ;
+    sstim:hasRenderingPresence sstim-v:presencePerceptual ;
+    sstim:renderingCarrierHz "204.0"^^xsd:decimal .
+
+# The flicker is presented as itself: a real 3 Hz modulation of luminance, with
+# no carrier, because vision receives 3 Hz directly where hearing cannot.
+this:flicker-rendering a sstim:SignalRendering ;
+    rdfs:label "Luminance flicker"@en ;
+    sstim:rendersSignal this:flicker-signal ;
+    sstim:rendersOntoParameter sstim-v:paramLuminance ;
+    sstim:hasRenderingMechanism sstim-v:mechanismDirectPresentation ;
+    sstim:hasRenderingPresence sstim-v:presencePhysical .

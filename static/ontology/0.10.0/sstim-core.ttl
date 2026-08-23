@@ -1,0 +1,1880 @@
+###########################################################################
+#
+#  SSTIM Core Ontology  —  sstim-core.ttl
+#
+#  Namespace:  https://w3id.org/sstim
+#  Version:    0.7.0
+#  Date:       2026-07-15
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  OWL 2 DL class hierarchy, object properties, datatype properties, and
+#  annotation properties for the Sensory Stimulation domain. Aligns to
+#  BFO 2020 (ISO/IEC 21838-2), OBI, IAO, and PROV-O.
+#
+#  Protected file — do not modify without explicit maintainer instruction.
+#  See CLAUDE.md section 3.4.
+#
+###########################################################################
+
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh: <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix voaf:  <http://purl.org/vocommons/voaf#> .
+@prefix void:  <http://rdfs.org/ns/void#> .
+@prefix vann:  <http://purl.org/vocab/vann/> .
+@prefix cc:    <http://creativecommons.org/ns#> .
+@prefix bibo:  <http://purl.org/ontology/bibo/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Ontology Metadata
+###########################################################################
+
+<https://w3id.org/sstim>
+    a owl:Ontology, voaf:Vocabulary ;
+    owl:versionIRI <https://w3id.org/sstim/0.10.0> ;
+    owl:versionInfo "0.10.0" ;
+    owl:priorVersion <https://w3id.org/sstim/0.9.0> ;
+    dct:title "Sensory Stimulation Ontology (SSTIM)"@en,
+              "Ontologia della Stimolazione Sensoriale (SSTIM)"@it,
+              "Ontologia de Estimulação Sensorial (SSTIM)"@pt,
+              "Ontología de Estimulación Sensorial (SSTIM)"@es ;
+    dct:description "An OWL 2 ontology for describing parameter-specified delivery of structured sensory input, including techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-04-12"^^xsd:date ;
+    dct:issued "2026-04-12"^^xsd:date ;
+    dct:modified "2026-07-24"^^xsd:date ;
+    dct:identifier "10.5281/zenodo.21286974" ;
+    bibo:doi "10.5281/zenodo.21286974" ;
+    dct:hasVersion <https://doi.org/10.5281/zenodo.21380171> ;
+    dct:bibliographicCitation "Fabbri, Renato (2026). BSC Lab - Sensory Stimulation Ontology (SSTIM) and open stimulation platform (v0.7.0). Zenodo. https://doi.org/10.5281/zenodo.21380171"@en ;
+    dct:source <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/concept/SENSORY_STIMULATION.md> ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    cc:license <https://creativecommons.org/licenses/by/4.0/> ;
+    mod:status "released"@en ;
+    foaf:logo <https://labiosyncare.github.io/icons/icon.svg> ;
+    vann:preferredNamespacePrefix "sstim" ;
+    vann:preferredNamespaceUri "https://w3id.org/sstim#" ;
+    void:inDataset <https://w3id.org/sstim/void> ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0016-publication-obo-posture-and-registries.md> ,
+        <https://labiosyncare.github.io/ontology/docs/> ;
+    skos:historyNote "v0.1.0 (2026-04): Initial public release. Vocabulary seeded from BSC preset catalog v0.9.1. Term 'Sensory Stimulation' adopted as the established umbrella over the coined term 'Sensory Harnessing'."@en,
+        "v0.2.0 (2026-06): Added sstim:CautionTag, sstim:VoiceType, and sstim:PermutationFunction classification classes and the sstim:hasCautionTag property; dual-typed the caution, voice-type, permutation, and stimulus-temporal-structure SKOS concepts; added the StimulusTemporalStructure concept scheme; completed it/pt/es prefLabel coverage across the vocabulary; added external upper-ontology label stubs. Backward-compatible minor release (no terms removed or renamed)."@en,
+        "v0.2.0 erratum (2026-06): Corrected external alignment IRIs that had been wrong since 0.1.0: every Wikidata QID (all resolved to unrelated entities), the EvidenceClaim parent (iao:0000001 'conditional specification' → iao:0000030 'information content entity'), the obsolete OBI planned-process parent (added cob:0000082), a non-existent ORCID (replaced with the verified ORCID 0000-0002-9699-629X), and a dead repository link. No vocabulary terms changed."@en,
+        "v0.3.0 (2026-06): Added sstim-v:TechniqueScheme — a vendor-neutral controlled vocabulary of auditory and cross-modal sensory stimulation techniques — together with seven new StimulationMechanism concepts (ASSR, auditory-motor coupling, closed-loop phase reinforcement, masking, vibrotactile mechanoreception, acoustic startle, ultrasonic neuromodulation) and the sstim:techniqueModality property. Two non-evidence-bearing folk techniques are catalogued and explicitly flagged via skos:editorialNote. Additive, backward-compatible release (no terms removed or renamed)."@en,
+        "v0.5.0 (2026-07): Domain-content coverage (P5) and evidence-integrity governance (P7). Added visual, tactile, and cross-modal techniques with the steady-state evoked-potential mechanism family (SSVEP, SSSEP, multisensory integration) (ADR 0015); reference-pitch retuning with the carrier-vs-modulation evidence firewall (ADR 0017); the modality-nomenclature cleanup — the somatosensory/haptic/tactile/vibrotactile convention and the sstim-v: to sstim-ex: perceived-modality closeMatch bridge (ADR 0019); visual/tactile/multisensory evidence-modality tags (VIS, TACTILE, MULTISENSORY); the C0-C5 public-claim-level taxonomy with SHACL claim-legality and the conditional-citation constraint (ADR 0018); and the first populated technique EvidenceClaim instances (P5.4, instance data). Version 0.4.0 was the standalone exposure / Sensory Field module release (ADR 0010, 0011). Additive, backward-compatible (no terms removed or renamed)."@en,
+        "v0.6.0 (2026-07): Semantic-quality release. Controlled vocabulary categories are modeled consistently as information content entities; session specifications are PROV plans and session instances are stimulation interventions; self-reports support explicit collection phases; caution tags carry machine-readable severity and action metadata; scalar cardinalities, definitions, evidence provenance, and integrity constraints are strengthened. An external automated audit removed the obsolete OBI planned-process superclass, narrowed the technique upper alignment, completed FAIR metadata, and corrected safety-source attribution. The maintainer guided and accepted the release review; independent human ontology review is deferred. See ADR 0021, ADR 0022, and the 2026-07-10 external automated review report."@en,
+        "v0.9.0 (2026-07): Stimulation and neuromodulation release (ADR 0034). Adds a neutral sstim:Stimulation umbrella and sstim:Neuromodulation sibling at the process, intervention, technique, and protocol layers, with the overlap named at each layer as a defined intersection class requiring an intended canonical sensory-transduction route: neither family subsumes the other. Adds five orthogonal facet axes — neural access route, delivery approach, neural target site, neural system, and neural phenomenon — kept separate because a route, a dynamic, a system, and an outcome domain are not values on one scale, and reused across intended, proposed-mechanism, and observed-outcome roles by distinct properties. Shared domains and ranges widen to the neutral parents so a non-sensory technique can be the subject of a conformant evidence assessment. Retypes focused-ultrasound neuromodulation off the sensory hierarchy and redefines it by its intended focused neural target rather than by absence of an audible percept; deprecates five response-as-mechanism entries (FFR, ASSR, SSVEP, SSSEP, acoustic startle) in favour of typed neural-phenomenon concepts, removing their mechanism typing and scheme topology rather than deprecating alone. Relabels TechniqueScheme, whose IRI was never sensory-scoped. Catalogues a six-technique non-sensory contrast set (rTMS, tDCS, tACS, DBS, VNS, targeted intrathecal delivery) so the route axis is exercised; none is referenced by any BSC preset, framework, protocol, or implementation, and inclusion asserts neither capability nor efficacy nor safety. Replaces the SHACL escape hatch in which any skos:editorialNote suppressed structural requirements with composed, disjointly-targeted shapes. Breaking on mutable latest for consumers of the retyped focused-ultrasound entry and the five deprecated mechanism IRIs; frozen 0.3.0-0.8.0 snapshots retain their published entailments."@en,
+        "v0.7.0 (2026-07): Evidence and ecosystem governance release. ADR 0027 replaces overloaded evidence claims with immutable assessment revisions, atomic bounded propositions, qualified evidence bases, explicit scope axes, source/search governance, and PROV review decisions while retaining deprecated compatibility terms. ADRs 0024 and 0031 add the neutral EcosystemAgent module, qualified relationships and memberships, implementation responsibility, purpose-scoped admission activities, a closed public projection, and separate access-controlled audit shapes. Public fixtures are synthetic; real live-only ecosystem records remain outside the Zenodo-tracked release repository."@en,
+        "v0.10.0 (2026-07, under development): Participant-engagement and contrast-set completion release (ADR 0035), from the 2026-07-22 Theo Marins interview. Adds a sixth orthogonal facet, sstim:ParticipantEngagementMode with the sstim:participantEngagementMode property and a passive-receptive / guided-following / active-self-regulatory scheme, distinguishing self-regulatory and cue-following practices from receptive exposure without touching the ADR 0034 axes. Catalogues electroconvulsive therapy in the non-sensory neuromodulation contrast set, and catalogues neurofeedback and biofeedback at the neutral sstim:StimulationTechnique layer — sensory-in, endogenous self-regulation out — rather than reopening sstim:Neuromodulation's exclusion of endogenous physiological neuromodulation. Names an invasive/minimally-invasive/non-invasive rollup over the delivery-approach values as SKOS collections, not a new primitive axis. ADR 0036 then resolves the two questions ADR 0035 parked: it disambiguates neuromodulation's intervention sense (pinned on sstim:Neuromodulation, its exclusion refined to admit deliberate self-directed but not spontaneous physiological modulation) from its effect sense (kept as a facet over sstim:outcomeNeuralPhenomenon, named by the sstim-v:NeuromodulatoryEffectCollection); adds sstim:Neurostimulation as the stimulation-based branch of interventional neuromodulation, with electric/magnetic/sensory as facet views rather than subclasses; adds the sstim:SelfDirectedNeuromodulation / sstim:InterventionalNeuromodulation split and re-types neurofeedback and biofeedback as self-directed neuromodulation techniques; and adds sstim:Neuroplasticity as a disposition stub. Additive and backward-compatible on mutable latest apart from one scope-note refinement on sstim:Neuromodulation and the two technique re-typings; no term removed or renamed."@en .
+
+
+###########################################################################
+# Part 1 — Core Activity Classes
+###########################################################################
+
+sstim:Stimulation a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:label "Stimulation"@en,
+               "Stimolazione"@it,
+               "Estimulação"@pt,
+               "Estimulación"@es ;
+    skos:definition "A deliberately parameterized process in which structured physical energy, mechanical input, a chemical agent, or another controlled input is applied as a stimulus with a declared design intent to elicit, perturb, regulate, or probe an identified biological, sensory, or neural process. Mere exposure, administration, or energy transfer without that stimulation intent is insufficient. Classification does not assert excitation, conscious perception, response, benefit, or safety."@en ;
+    skos:scopeNote "The neutral umbrella over sensory stimulation and interventional neuromodulation. It carries no commitment to an applied medium, delivery approach, biological access route, or anatomical target; those are recorded on separate facets (ADR 0034)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulation a owl:Class ;
+    rdfs:subClassOf bfo:0000015 ;
+    rdfs:subClassOf sstim:Stimulation ;
+    rdfs:label "Sensory Stimulation"@en,
+               "Stimolazione Sensoriale"@it,
+               "Estimulação Sensorial"@pt,
+               "Estimulación Sensorial"@es ;
+    skos:definition "A stimulation process whose defining intervention route engages canonical sensory transduction and afferent processing with structured input delivered according to specified parameters for a declared purpose. The class identifies the delivery process; any mechanism, response, or outcome is represented separately and requires its own evidence."@en ;
+    skos:scopeNote "Conscious perception is not required, and an incidental sensation arising from another primary route is insufficient. Covers entrainment-based stimulation (binaural beats, isochronous tones), non-entrainment stimulation (stochastic resonance, attentional anchoring), and autonomic stimulation (paced respiratory entrainment). Does not include passive incidental sensory exposure."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:Neuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation ;
+    rdfs:label "Neuromodulation"@en,
+               "Neuromodulazione"@it,
+               "Neuromodulação"@pt,
+               "Neuromodulación"@es ;
+    skos:definition "In SSTIM, a deliberately applied stimulation process whose declared intervention objective is to alter activity or function at an identified neural target. Anatomical site and distributed neural system are recorded on separate facets. Membership records target and design intent; whether modulation occurred is represented separately through observations and evidence."@en ;
+    skos:scopeNote "This is the INTERVENTION sense of neuromodulation — a deliberately applied process with the intent to modulate — as distinct from the physiological EFFECT sense (the resulting neural change), which is recorded on the outcome facet (sstim:outcomeNeuralPhenomenon), not here (ADR 0036). It excludes SPONTANEOUS physiological, neurotransmitter-level endogenous neuromodulation and stimulation performed solely to probe or measure a response; but DELIBERATE self-directed neuromodulation IS in scope (sstim:SelfDirectedNeuromodulation, ADR 0036). It does not mean treatment or successful modulation. It neither subsumes nor is subsumed by sstim:SensoryStimulation; the two overlap, and the overlap is named by sstim:SensoryRouteNeuromodulation (ADR 0034)."@en ;
+    skos:note "Two different definitions live in the word 'neuromodulation'; SSTIM keeps them apart. (1) By SENSE: this class is neuromodulation as INTERVENTION — an applied process intending to modulate. The neurophysiological EFFECT sense — the resulting change in neural activity — is not this class but a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon); the state-change effects are grouped by sstim-v:NeuromodulatoryEffectCollection. (2) By PARTICIPANT ENGAGEMENT: neuromodulation WITHOUT active engagement of the individual is interventional (sstim:InterventionalNeuromodulation — e.g. neurostimulation); neuromodulation WITH the individual's deliberate self-regulation is self-directed (sstim:SelfDirectedNeuromodulation — e.g. neurofeedback, meditation). This engagement axis is the one Theo Marins raised on 2026-07-22 (ADR 0035/0036)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# The named overlap. The explicit rdfs:subClassOf axioms are redundant for an OWL
+# reasoner given the owl:equivalentClass expression, but deliberate: the graph
+# navigator renders named subclass edges and does not project owl:intersectionOf.
+sstim:SensoryRouteNeuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulation, sstim:Neuromodulation ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulation
+          sstim:Neuromodulation
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] ;
+    rdfs:label "Sensory-Route Neuromodulation"@en,
+               "Neuromodulazione per Via Sensoriale"@it,
+               "Neuromodulação por Via Sensorial"@pt,
+               "Neuromodulación por Vía Sensorial"@es ;
+    skos:definition "A stimulation process that is both sensory stimulation and neuromodulation, and that declares canonical sensory transduction and afferent processing as an intended causal route. This is the overlap of the two families, not a subclass of either alone."@en ;
+    skos:scopeNote "Distinct from neuromodulation of a sensory system, which is a target-axis statement, and from a sensation merely accompanying neuromodulation, which is recorded through perceived modality and channel role (ADR 0034 §2)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0036: the agency split of neuromodulation. Externally applied vs. produced
+# by the individual's own deliberate self-regulation. Not declared disjoint —
+# some cases blur (device-assisted self-regulation). The split is carried on
+# techniques by the participant-engagement-mode facet (ADR 0035), so no parallel
+# technique classes or shapes are introduced.
+sstim:InterventionalNeuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:Neuromodulation ;
+    rdfs:label "Interventional Neuromodulation"@en,
+               "Neuromodulazione Interventistica"@it,
+               "Neuromodulação Intervencionista"@pt,
+               "Neuromodulación Intervencionista"@es ;
+    skos:definition "Neuromodulation applied to an individual by an external agent, device, or agent-administered means. This is the sense the ADR 0034 non-sensory contrast set occupies, and it corresponds on techniques to a non-self participant-engagement mode (passive-receptive or guided-following)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SelfDirectedNeuromodulation a owl:Class ;
+    rdfs:subClassOf sstim:Neuromodulation ;
+    rdfs:label "Self-Directed Neuromodulation"@en,
+               "Neuromodulazione Autodiretta"@it,
+               "Neuromodulação Autodirigida"@pt,
+               "Neuromodulación Autodirigida"@es ;
+    skos:definition "Neuromodulation produced by the individual's own deliberate self-regulation, corresponding on techniques to the active-self-regulatory participant-engagement mode (ADR 0035). Feedback- or cue-mediated forms — neurofeedback, biofeedback, paced-breathing guidance — have a delivery and are catalogued as techniques; pure practices with no applied stimulus, such as unguided meditation and volitional breathwork, are self-directed neuromodulation processes but fall outside the stimulation-technique catalogue (which requires a delivery medium)."@en ;
+    skos:scopeNote "Distinct from the spontaneous physiological, neurotransmitter-level endogenous neuromodulation that sstim:Neuromodulation excludes: self-directed neuromodulation is deliberate. Whether it is a strict subtype of intervention is a terminological choice; SSTIM files it under Neuromodulation because it is deliberate and goal-directed, while marking the no-applied-stimulus boundary (ADR 0036)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0036: neurostimulation as the stimulation-based (energy-applied) branch of
+# interventional neuromodulation. Electric and magnetic are FACET VIEWS on the
+# delivery medium, never subclasses; the sensory branch is the
+# sstim:SensoryRouteNeuromodulation overlap ADR 0034 already names. Pharmacological
+# neuromodulation (intrathecal delivery) is deliberately NOT neurostimulation.
+sstim:Neurostimulation a owl:Class ;
+    rdfs:subClassOf sstim:InterventionalNeuromodulation ;
+    rdfs:label "Neurostimulation"@en,
+               "Neurostimolazione"@it,
+               "Neuroestimulação"@pt,
+               "Neuroestimulación"@es ;
+    skos:definition "Interventional neuromodulation delivered by applied stimulation — energy applied to neural tissue (electrical, magnetic/electromagnetic, acoustic/ultrasonic) or, as its sensory branch, canonical sensory stimulation with a neural-modulation objective. It is the DELIVERY, distinct from the neuromodulatory EFFECT it is intended to cause (recorded on sstim:outcomeNeuralPhenomenon; ADR 0036)."@en ;
+    skos:scopeNote "Recovers 'neurostimulation is a type of neuromodulation' as a true statement under the intervention sense (ADR 0036). Kinds such as electric, magnetic, and sensory neurostimulation are views over the delivery-medium and route facets, not primitive subclasses: the sensory kind is sstim:SensoryRouteNeuromodulation. Stimulation applied solely to probe or measure is not neurostimulation in this sense (it lacks the modulation objective), and pharmacological neuromodulation is not neurostimulation at all."@en ;
+    skos:note "How this term is defined, on two axes. (1) DELIVERY vs. EFFECT: neurostimulation is the delivery — the applied stimulation itself — not the neuromodulatory effect it aims to produce. The effect (the resulting change in neural activity) is a separate thing, recorded as a neural phenomenon in the outcome role (sstim:outcomeNeuralPhenomenon), never as this class. (2) PARTICIPANT ENGAGEMENT: neurostimulation is the branch of neuromodulation applied WITHOUT active engagement of the individual — they receive it — as opposed to self-directed neuromodulation (neurofeedback, meditation) which the individual actively self-regulates. Theo Marins (2026-07-22) framed neurostimulation precisely as the neuromodulation that does not require the individual's active engagement (see the participant-engagement facet, ADR 0035, and ADR 0036)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0036: neuroplasticity is a DISPOSITION (a realizable capacity of the
+# nervous system), a different BFO category from the stimulation/neuromodulation
+# processes above. Stub: the anchor for future 'durable effect' modelling.
+sstim:Neuroplasticity a owl:Class ;
+    rdfs:subClassOf bfo:0000016 ;   # BFO 'disposition'
+    rdfs:label "Neuroplasticity"@en,
+               "Neuroplasticità"@it,
+               "Neuroplasticidade"@pt,
+               "Neuroplasticidad"@es ;
+    skos:definition "The disposition of a nervous system to undergo lasting structural or functional change in response to activity, experience, or stimulation. It is the capacity that durable neuromodulation realizes; it is not a process or an intervention."@en ;
+    skos:scopeNote "Related to neuromodulation bidirectionally, not as a one-way precondition: plasticity enables durable neuromodulatory change, while neuromodulators (e.g. acetylcholine, dopamine, noradrenaline) in turn gate plasticity by setting its induction thresholds. Modelled as a stub in 0.10.0 (ADR 0036); properties relating it to durable effects are deferred."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:StimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Stimulation Intervention"@en ;
+    skos:definition "A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer over sensory stimulation and neuromodulation interventions."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulation ;
+    rdfs:subClassOf sstim:StimulationIntervention ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Sensory Stimulation Intervention"@en,
+               "Intervento di Stimolazione Sensoriale"@it,
+               "Intervenção de Estimulação Sensorial"@pt,
+               "Intervención de Estimulación Sensorial"@es ;
+    skos:definition "A specific, designed execution of Sensory Stimulation with defined parameters, target modalities, intended effect, and delivery mechanism. An intervention can realize a session specification derived from a preset, protocol, or framework."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuromodulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:StimulationIntervention, sstim:Neuromodulation ;
+    rdfs:label "Neuromodulation Intervention"@en ;
+    skos:definition "A specific, designed execution of a neuromodulation process, with a declared neural access route, delivery approach, and intended neural target. Membership does not assert successful modulation, benefit, or safety."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryRouteNeuromodulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationIntervention, sstim:NeuromodulationIntervention ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationIntervention
+          sstim:NeuromodulationIntervention
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] ;
+    rdfs:label "Sensory-Route Neuromodulation Intervention"@en ;
+    skos:definition "A planned or executed intervention that is both a sensory stimulation intervention and a neuromodulation intervention, declaring canonical sensory transduction and afferent processing as an intended causal route."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 2 — Technique Classes
+###########################################################################
+
+sstim:StimulationTechnique a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Technique"@en ;
+    skos:definition "A reusable information-content category for a parameterizable stimulation method. Classification records the method's declared design intent and characteristic delivery, not that any response occurred."@en ;
+    skos:scopeNote "The neutral technique layer over sensory stimulation and interventional neuromodulation techniques. Electrical, magnetic, acoustic, optical, thermal, and chemical stimulation are property-based views over this class, not primitive subclasses (ADR 0034 §4)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationTechnique a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf sstim:StimulationTechnique ;
+    rdfs:label "Sensory Stimulation Technique"@en,
+               "Tecnica di Stimolazione Sensoriale"@it,
+               "Técnica de Estimulação Sensorial"@pt,
+               "Técnica de Estimulación Sensorial"@es ;
+    skos:definition "An information-content category for a reusable, parameterizable method of sensory stimulation, characterized by stimulus form, delivery mechanism, and any explicitly proposed response mechanism. A technique is less specific than a protocol and does not by itself provide enough detail to reproduce an intervention."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuromodulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:StimulationTechnique ;
+    rdfs:label "Neuromodulation Technique"@en,
+               "Tecnica di Neuromodulazione"@it,
+               "Técnica de Neuromodulação"@pt,
+               "Técnica de Neuromodulación"@es ;
+    skos:definition "A stimulation technique whose defining intervention objective is to alter activity or function at an identified neural target, with anatomical site and distributed neural system recorded separately. Membership does not assert successful modulation, benefit, or safety."@en ;
+    skos:scopeNote "Cataloguing a neuromodulation technique states that SSTIM can describe it, not that BSC Lab delivers it or that it is effective. A proposed neural mechanism or an evoked response is not by itself a neuromodulation objective (ADR 0034 §2)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0036: the browsable technique-layer counterpart of sstim:Neurostimulation.
+# The energy-delivery (physical-neural-route) branch of neuromodulation techniques.
+# Members are asserted explicitly on each technique (see sstim-vocab.ttl) — kept
+# ALSO typed sstim:NeuromodulationTechnique so its SHACL shape still fires, because
+# the validation gate runs without subclass inference.
+sstim:NeurostimulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:NeuromodulationTechnique ;
+    rdfs:label "Neurostimulation Technique"@en,
+               "Tecnica di Neurostimolazione"@it,
+               "Técnica de Neuroestimulação"@pt,
+               "Técnica de Neuroestimulación"@es ;
+    skos:definition "A neuromodulation technique that delivers applied stimulation — energy applied to neural tissue — rather than a pharmacological agent or the individual's own self-regulation. The technique-layer counterpart of sstim:Neurostimulation, and the browsable parent of the electrical, magnetic, and acoustic/ultrasonic neurostimulation entries."@en ;
+    skos:scopeNote "Its members share an energy-delivery route (physical neural interaction). The electric/magnetic/acoustic kinds are delivery-medium facet views, not subclasses; the sensory kind is sstim:SensoryRouteNeuromodulationTechnique. Pharmacological neuromodulation (e.g. intrathecal agent delivery) and self-directed neuromodulation (e.g. neurofeedback) are neuromodulation techniques but not neurostimulation, and are deliberately excluded."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0036-neurostimulation-neuromodulation-senses-and-self-directed-split.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryRouteNeuromodulationTechnique a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationTechnique, sstim:NeuromodulationTechnique ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationTechnique
+          sstim:NeuromodulationTechnique
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] ;
+    rdfs:label "Sensory-Route Neuromodulation Technique"@en ;
+    skos:definition "A technique that is both a sensory stimulation technique and a neuromodulation technique, declaring canonical sensory transduction and afferent processing as an intended causal route. A technique is dual-typed here only when neural-modulation intent is part of the technique concept's own definition, never because one possible use is neuromodulatory."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:EntrainmentBasedTechnique a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationTechnique ;
+    rdfs:label "Entrainment-Based Technique"@en ;
+    skos:definition "A Sensory Stimulation technique whose primary proposed mechanism involves frequency-following responses, phase-locking, or oscillatory coupling between a periodic stimulus and endogenous neural oscillations."@en ;
+    skos:example "Binaural beat stimulation, isochronous tone stimulation, photic driving, Symmetry permutation entrainment."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NonEntrainmentTechnique a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationTechnique ;
+    rdfs:label "Non-Entrainment Technique"@en ;
+    skos:definition "A Sensory Stimulation technique whose proposed mechanism does not rely on frequency-following responses. Includes stochastic resonance, autonomic respiratory entrainment, and attentional anchoring via ambient structured sound."@en ;
+    skos:example "Calibrated pink noise for stochastic resonance, Martigli breathing oscillation, ambient Symmetry sequences for attentional anchoring."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EntrainmentBasedTechnique owl:disjointWith sstim:NonEntrainmentTechnique .
+
+
+###########################################################################
+# Part 3 — Framework, Protocol, Implementation, Preset, and Session Classes
+###########################################################################
+
+sstim:SensoryStimulationFramework a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Stimulation Framework"@en ;
+    skos:definition "A broad information artifact defining a family of sensory stimulation principles, techniques, protocols, evidence rules, grouping logic, and design constraints. A framework can guide multiple protocols, implementations, presets, and sessions."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:StimulationProtocol a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf obi:0000272 ;
+    rdfs:label "Stimulation Protocol"@en ;
+    skos:definition "A structured method specification for using one or more stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. The neutral protocol layer over sensory stimulation and neuromodulation protocols."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuromodulationProtocol a owl:Class ;
+    rdfs:subClassOf sstim:StimulationProtocol ;
+    rdfs:label "Neuromodulation Protocol"@en ;
+    skos:definition "A protocol whose planned objective is to alter activity or function at an identified neural target. It remains an information artifact: a protocol records the planned objective through this type plus its route and target facets, while the realized process is typed as an intervention."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryRouteNeuromodulationProtocol a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulationProtocol, sstim:NeuromodulationProtocol ;
+    owl:equivalentClass [ a owl:Class ; owl:intersectionOf
+        ( sstim:SensoryStimulationProtocol
+          sstim:NeuromodulationProtocol
+          [ a owl:Restriction ;
+            owl:onProperty sstim:neuralAccessRoute ;
+            owl:someValuesFrom sstim:CanonicalSensoryTransductionAccessRoute ]
+        ) ] ;
+    rdfs:label "Sensory-Route Neuromodulation Protocol"@en ;
+    skos:definition "A protocol that is both a sensory stimulation protocol and a neuromodulation protocol, declaring canonical sensory transduction and afferent processing as an intended causal route."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationProtocol a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:subClassOf obi:0000272 ;
+    rdfs:subClassOf sstim:StimulationProtocol ;
+    rdfs:label "Sensory Stimulation Protocol"@en ;
+    skos:definition "A structured method specification for using one or more sensory stimulation techniques toward an intended use, including composition rules, timing, parameter ranges, constraints, and cautions. A protocol is narrower than a framework and can constrain many presets."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryStimulationImplementation a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Sensory Stimulation Implementation"@en ;
+    skos:definition "A concrete realization of a sensory stimulation framework or protocol, represented in SSTIM by the implementation identity and metadata. An implementation can be software, hardware, mechanical, manual, or hybrid."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:Preset a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Preset"@en,
+               "Preset"@it, "Preset"@pt, "Preset"@es ;
+    skos:definition "A reusable, versioned parameter configuration for a sensory stimulation implementation, specifying audio architecture, target frequency bands, evidence grounding, safety metadata, and multilingual content for a possible session. A preset follows a protocol or framework but is not itself the protocol."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0007-framework-protocol-implementation.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0014-preset-is-not-a-protocol.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SessionSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030, prov:Plan ;
+    rdfs:label "Session Specification"@en ;
+    skos:definition "A complete, reproducible description of a specific intended execution of a preset, including user-defined overrides of preset defaults. The unit of scientific reproducibility: given a specification and a conforming engine, the acoustic output is fully determined."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SessionInstance a owl:Class ;
+    rdfs:subClassOf prov:Activity, sstim:SensoryStimulationIntervention ;
+    rdfs:label "Session Instance"@en ;
+    skos:definition "The record of an actual execution of a session specification, including timing, completion status, platform, and optional self-report. Append-only: never modified after creation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SelfReport a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report"@en ;
+    skos:definition "A consent-governed, session-associated self-assessment capturing subjective affect, focus, sleepiness, quality, and optional free text at an explicitly identified collection phase."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 4 — Vocabulary Classification Classes
+###########################################################################
+
+sstim:FrequencyBand a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Frequency Band"@en,
+               "Banda di Frequenza"@it,
+               "Banda de Frequência"@pt,
+               "Banda de Frecuencia"@es ;
+    skos:definition "An information entity describing a named Hz range used in BSC protocol design for targeting and evidence classification. BSC operational design category — not a medical diagnostic taxonomy or universal EEG ontology."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:FrequencyBandGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Frequency Band Group"@en,
+               "Gruppo di Bande di Frequenza"@it,
+               "Grupo de Bandas de Frequência"@pt,
+               "Grupo de Bandas de Frecuencia"@es ;
+    skos:definition "A named collection of frequency bands used as a SKOS scheme root or aggregate grouping concept. Not a band with a specific Hz range; used for SKOS hierarchy navigation (skos:narrower* traversal) rather than for range arithmetic."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:PresetGroup a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Preset Group"@en ;
+    skos:definition "A classification of BSC presets by design character, evidence strength, and use context. Five groups: Heal, Support, Perform, Indulge, Transcend."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:EvidenceTierValue a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Tier Value"@en ;
+    skos:definition "A classification of empirical support strength for a specific stimulation claim, accounting for study quality, result consistency, modality match, and population match. Six tiers: speculative(1) through established(6). A tier is meaningful only together with the claim direction and the bounded proposition scope it was assigned to."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:EvidenceModalityTag a owl:Class ;
+    owl:deprecated true ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Modality Tag (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the tag conflated sensory modality (AUD, AV, VIS, TACTILE, MULTISENSORY), intervention (BREATH), study model (PRECLINICAL), and synthesis type (REVIEW). Authoritative data uses the orthogonal basis axes; the class survives only for the generated non-authoritative 0.7 compatibility view and is removed no earlier than 1.0."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryModality a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Sensory Modality"@en,
+               "Modalità Sensoriale"@it,
+               "Modalidade Sensorial"@pt,
+               "Modalidad Sensorial"@es ;
+    skos:definition "A controlled information category identifying a channel of sensory perception through which stimulation is delivered or perceived. Values include auditory, visual, somatosensory, interoceptive, vestibular, and olfactory."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:StimulationMechanism a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Mechanism"@en,
+               "Meccanismo di Stimolazione"@it,
+               "Mecanismo de Estimulação"@pt,
+               "Mecanismo de Estimulación"@es ;
+    skos:definition "A controlled information category identifying a proposed neurobiological or psychophysiological pathway through which a stimulus may produce a measured response or intended effect. Mechanism assignments require separate evidence assessment."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:IntendedEffect a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Intended Effect"@en ;
+    skos:definition "A controlled information category identifying a target change in physiological, psychological, or cognitive state that a sensory stimulation intervention is designed to facilitate. It records design intent, not a guaranteed outcome."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0021-controlled-value-semantics.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:StimulusTemporalStructure a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Temporal Structure"@en ;
+    skos:definition "The temporal organization of an applied stimulus or agent. Values cover carrier periodicity (periodic, quasi-periodic, aperiodic), closed-loop adaptation, discrete event and pulse-train patterns, and administration schedules. Values are non-disjoint and may be combined, because carrier periodicity, pulse pattern, and administration schedule are different temporal features. Detailed executed timing remains in the exposure profile."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 4b — Stimulation Facet Value Classes (ADR 0034)
+#
+# Route, approach, target site, neural system, and neural phenomenon are
+# orthogonal facets, not a class tree. They are controlled information
+# categories: NeuralTargetSite classifies a target, it is not an anatomical
+# entity. Carrier, approach, route, target, and effect are never inferred
+# from one another by naming.
+###########################################################################
+
+sstim:NeuralAccessRoute a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Neural Access Route"@en ;
+    skos:definition "A controlled category for the biological route through which a stimulation process is intended to engage a neural target. Route values describe the declared intended route; a competing or demonstrated actual mechanism remains an evidence-qualified statement recorded on a mechanism or outcome concept."@en ;
+    skos:scopeNote "'Receptor' on this axis means a canonical sensory receptor, never a molecular drug receptor. Mixed access is represented by multiple route values, which is not the same as uncertainty; an unresolved route is an epistemic status recorded by a scoped knowledge-status assertion, not a pseudo-route."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:CanonicalSensoryTransductionAccessRoute a owl:Class ;
+    rdfs:subClassOf sstim:NeuralAccessRoute ;
+    rdfs:label "Canonical Sensory Transduction Access Route"@en ;
+    skos:definition "A neural access route that engages canonical sensory receptor transduction and afferent processing. This is the route value that distinguishes the sensory-route neuromodulation overlap from approaches that bypass canonical sensory transduction."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SensoryTransductionBypassingAccessRoute a owl:Class ;
+    rdfs:subClassOf sstim:NeuralAccessRoute ;
+    rdfs:label "Sensory-Transduction-Bypassing Access Route"@en ;
+    skos:definition "A neural access route that reaches its target without canonical sensory receptor transduction, whether by physical neural interaction, biochemical or pharmacological engagement, or indirect non-sensory physiological mediation."@en ;
+    skos:scopeNote "An asserted bypass route positively identifies such a route; it does not prove the technique is non-sensory, because a hybrid may also declare an intended sensory route. Absence of a sensory type is not OWL negation."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:StimulationDeliveryApproach a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Delivery Approach"@en ;
+    skos:definition "A coarse, non-exclusive operational category summarizing how an input is introduced or an interface is positioned — for example external, transcutaneous, transcranial, implanted, or systemic. Detailed device, body placement, administration, and dose remain in the exposure profile."@en ;
+    skos:scopeNote "Values are deliberately non-exclusive: a method may be external, transcutaneous, and transcranial at once. No approach tag is inferred from any other facet."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuralTargetSite a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Neural Target Site"@en ;
+    skos:definition "A controlled information category for a broad anatomical target of a stimulation process, such as brain, cortex, deep-brain structure, spinal cord, peripheral nerve, or cranial nerve. It is a classification category, not the anatomical entity itself."@en ;
+    skos:scopeNote "A local target category may have more than one broader concept; no forced single-parent tree is required. External anatomy alignment is a separate, evidence-checked pass."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuralSystem a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Neural System"@en ;
+    skos:definition "A controlled information category for a distributed organizational neural system — sensory, motor, autonomic, or a named sensory subsystem. This is the axis for neuromodulation of a sensory system; it does not imply that the intervention entered through that sensory system."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:NeuralPhenomenon a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Neural Phenomenon"@en ;
+    skos:definition "A controlled information category for a coherent functional neural phenomenon, such as excitability or firing, oscillatory dynamics, temporal coordination, synaptic transmission, neurochemical signaling, connectivity or plasticity, and autonomic neural regulation."@en ;
+    skos:scopeNote "One value set is reused across proposed-mechanism, intended-target, and observed-outcome roles, which are kept distinct by three separate properties. This axis replaces any single 'target level' axis: a route, a dynamic, a system, and an outcome domain are not values on one scale."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ADR 0035: a sixth, orthogonal facet raised in the 2026-07-22 Theo Marins
+# interview. Route, approach, target site, system, and phenomenon (ADR 0034)
+# describe where and how a method engages the nervous system; none captures how
+# much the individual must actively participate. That distinction — passive
+# reception vs. following a pacing cue vs. active self-regulation — is what most
+# cleanly separates practices such as meditation, volitional breathwork,
+# neurofeedback, and biofeedback from receptive exposure, and it is deliberately
+# not a value on any ADR 0034 scale.
+sstim:ParticipantEngagementMode a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Participant Engagement Mode"@en ;
+    skos:definition "A controlled information category for the degree and kind of active participation a stimulation or neuromodulation method requires of the individual — from passive reception, through following an external pacing cue, to active self-regulation of one's own state. It records what the method demands of the participant, never whether that participation is effective."@en ;
+    skos:scopeNote "Orthogonal to the ADR 0034 route, approach, target-site, system, and phenomenon axes: a method's engagement mode is neither implied by nor implies any of them. It is the axis that distinguishes self-regulatory practices (meditation, volitional breathwork, neurofeedback, biofeedback) and cue-following practices (paced-breathing guidance) from purely receptive exposure (binaural beats to a resting listener, tDCS). By itself it never reclassifies a method as neuromodulation; the relationship between active self-regulation and the sstim:Neuromodulation definition is discussed in ADR 0035."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:CautionTag a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Caution Tag"@en,
+               "Etichetta di Cautela"@it,
+               "Etiqueta de Cautela"@pt,
+               "Etiqueta de Precaución"@es ;
+    skos:definition "A safety or usage advisory flag attached to a preset, signalling conditions under which the preset may be unsuitable (e.g. photosensitivity risk, drowsiness, high sensory intensity). Advisory wellness metadata, not a medical contraindication."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:CautionSeverity a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Caution Severity"@en ;
+    skos:definition "A controlled ordinal category for prioritizing a caution tag in user interfaces and validation. Severity describes the response required by the application; it is not a clinical diagnosis or risk probability."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SelfReportPhase a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report Phase"@en ;
+    skos:definition "A controlled category identifying when a self-report was collected relative to its associated session, such as before, immediately after, or at follow-up."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:PublicClaimLevel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Public Claim Level"@en,
+               "Livello di Affermazione Pubblica"@it,
+               "Nível de Alegação Pública"@pt,
+               "Nivel de Afirmación Pública"@es ;
+    skos:definition "A named ceiling on what a sensory-stimulation product may assert about itself on a public-facing surface, ordered from descriptive fact to quantified/superiority claims. Each level carries the minimum evidence-tier rank required to assert at that level publicly, so over-claiming is machine-checkable. A risk-reduction classification, not legal advice."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:VoiceType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice Type"@en ;
+    skos:definition "A named category of BSC audio voice (Binaural, Martigli, Martigli-Binaural, Symmetry) identifying the synthesis technique a voice realizes. Classification anchor for the SKOS voice-type vocabulary; distinct from the sstim:Voice parameter-bundle classes in Part 6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:PermutationFunction a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Permutation Function"@en ;
+    skos:definition "A named reordering rule applied to a Symmetry voice note sequence at each cycle boundary (identity, rotate forward, rotate backward, reversal, shuffle)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 5 — Evidence and Reference Classes
+###########################################################################
+
+sstim:EvidenceClaim a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Claim"@en ;
+    skos:definition "Compatibility superclass of evidence assessments. Direct instantiation is rejected by SHACL: every instance must carry a concrete evidence subtype (sstim:EvidenceAssessmentClaim). Hypotheses, research questions, boundary applicability, requirements, design objectives, planned outcomes, knowledge-status assertions, and session observations are never EvidenceClaims."@en ;
+    skos:historyNote "Narrowed 2026-07-13 (ADR 0027) from a single overloaded claim class to the compatibility superclass of EvidenceAssessmentClaim."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# Evidence-dimension value classes (P3 item 1). Dual-typed SKOS concepts in
+# sstim-vocab.ttl populate these (Pattern 2, ADR 0002).
+sstim:ClaimDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Claim Direction"@en ;
+    skos:definition "Whether a body of evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EffectDirection a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Effect Direction"@en ;
+    skos:definition "The direction of the measured outcome (increase, decrease, or no change). Wellness-neutral; describes what was measured, not a health claim."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ReviewStatus a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Review Status"@en ;
+    skos:definition "The audit status of an evidence claim's tier assignment (provisional, reviewed, or needs update)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:PublicSafeReference a owl:Class ;
+    rdfs:subClassOf sstim:BibliographicReference ;
+    rdfs:label "Public-Safe Reference"@en ;
+    skos:definition "A peer-reviewed publication cleared for citation in BSC user-facing content. Must be cleared in the BSC Reference Agent before use in preset techDesc fields."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 6 — Voice Classes
+#
+# Each class serves both as the technique (a kind of stimulation method)
+# and as the parameter bundle (the datatype properties that specify a
+# particular voice in a particular preset). See ADR 0006.
+###########################################################################
+
+sstim:Voice a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Voice"@en ;
+    skos:definition "An audio layer within a BSC preset, identified by its technique type (Binaural, Martigli, Martigli-Binaural, Symmetry) and carrying the parameters that fully specify that voice. A preset contains 1–6 voices."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0006-one-class-per-technique.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:BinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Binaural Voice"@en ;
+    skos:definition "Two sine tones at slightly different frequencies (fl, fr) presented dichotically to produce a perceived beat at |fr - fl| Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:MartigliVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli Voice"@en ;
+    skos:definition "A single tone whose frequency oscillates sinusoidally with a breathing arc that decelerates linearly from mp0 to mp1 over md seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:MartigliBinauralVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Martigli-Binaural Voice"@en ;
+    skos:definition "Binaural beat combined with Martigli breathing oscillation. Both carriers sweep in parallel, maintaining constant beat frequency while timbral register evolves with breathing."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:SymmetryVoice a owl:Class ;
+    rdfs:subClassOf sstim:Voice ;
+    rdfs:label "Symmetry Voice"@en ;
+    skos:definition "N notes log-distributed over I octaves, repeated with algebraic group permutation at each cycle boundary, at pulse rate N/d Hz. When I=0, reduces to traditional isochronous tone stimulation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+[] a owl:AllDisjointClasses ;
+    owl:members (
+        sstim:BinauralVoice
+        sstim:MartigliVoice
+        sstim:MartigliBinauralVoice
+        sstim:SymmetryVoice
+    ) .
+
+
+###########################################################################
+# Part 7 — Object Properties
+###########################################################################
+
+sstim:targetsFrequencyBand a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:FrequencyBand ;
+    rdfs:label  "targets frequency band"@en ;
+    skos:definition "Links a preset to 1–2 target frequency bands. First entry is the primary band."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasEvidenceTier a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:EvidenceTierValue ;
+    rdfs:label  "has evidence tier"@en ;
+    skos:definition "Links an evidence claim to its strength classification tier, accounting for study quality and modality matching."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasModalityTag a owl:ObjectProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:EvidenceModalityTag ;
+    rdfs:label  "has modality tag (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the tag mixed sensory modality with study model and synthesis type. Authoritative data uses the orthogonal basis axes (basisSensoryModality, basisModalityApplicability, basisStudyModel, basisSynthesisType, basisIntervention). Appears only in the generated non-authoritative 0.7 compatibility view; removed no earlier than 1.0."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:supportsRelation a owl:ObjectProperty ;
+    owl:deprecated true ;
+    rdfs:subPropertyOf sstim:evaluatesSubject ;
+    rdfs:range  [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label  "supports relation (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: the property name encodes a supporting direction the claim may not have. Use sstim:evaluatesSubject; direction lives exclusively in hasClaimDirection. Retained as a materialized compatibility alias during 0.7.x; removed no earlier than 1.0."@en ;
+    skos:historyNote "Deprecated 2026-07-13 in favour of sstim:evaluatesSubject (ADR 0027); original range decision from ADR 0013 is preserved on the replacement."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0013-evidence-support-relation-range.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:citesReference a owl:ObjectProperty ;
+    rdfs:range  sstim:BibliographicReference ;
+    rdfs:label  "cites reference"@en ;
+    skos:definition "Links an evidence assessment to a bibliographic reference. For every bibliographic basis source the assessment carries a matching citesReference triple (ADR 0027); publication clearance is a separate concern (ADR 0029)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# Evidence-claim dimensions. Direction and review status are required by the
+# validation profile; measured-effect direction and free-text study facets
+# remain optional when the source does not support them.
+sstim:hasClaimDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceClaim ;
+    rdfs:range  sstim:ClaimDirection ;
+    rdfs:label  "has claim direction"@en ;
+    skos:definition "Whether the cited evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasEffectDirection a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:EffectDirection ;
+    rdfs:label  "has effect direction (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: observed effect direction is source-level metadata; use sstim:basisObservedEffectDirection on the qualified evidence basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasReviewStatus a owl:ObjectProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  sstim:ReviewStatus ;
+    rdfs:label  "has review status (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: review state is derived from immutable EvidenceReviewDecision records, not stored as a mutable status. A non-authoritative 0.7 compatibility view may derive it; it is excluded from validation and authorization."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:evidenceOutcome a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "evidence outcome (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisObservedOutcome concept plus sstim:basisOutcomeNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:studyPopulation a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "study population (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisStudyPopulation descriptor plus sstim:basisPopulationNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:comparator a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "comparator (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: use the identified sstim:basisComparator descriptor plus sstim:basisComparatorNote on the qualified basis. Appears only in the generated non-authoritative 0.7 compatibility view."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:evidenceDate a owl:DatatypeProperty, owl:FunctionalProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:date ;
+    rdfs:label  "evidence date (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: source publication dates stay as dct:issued on the bibliographic reference; assessment and review dates come from their generating activities. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:reviewedBy a owl:DatatypeProperty ;
+    owl:deprecated true ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reviewed by (deprecated)"@en ;
+    skos:definition "Deprecated ADR 0027: reviewer identity and role live on the review activity's prov:qualifiedAssociation as agent IRIs, not name literals. A non-authoritative 0.7 compatibility view may derive it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:proposedMechanism a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationTechnique ;
+    rdfs:range  sstim:StimulationMechanism ;
+    rdfs:label  "proposed mechanism"@en ;
+    skos:definition "Links a stimulation technique to a controlled mechanism category proposed to explain a response. The relation records a hypothesis or evidence interpretation, not proof of causation."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:techniqueModality a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationTechnique ;
+    rdfs:range  sstim:SensoryModality ;
+    rdfs:label  "technique modality"@en ;
+    skos:definition "Coarse legacy/convenience relation linking a sensory stimulation technique to broad sensory modality tags. Use the SSTIM exposure module when physical delivery medium, perceived modality, device capability, body placement, experiment context, or knowledge status must be represented separately."@en ;
+    skos:scopeNote "Kept unchanged for compatibility with SSTIM 0.3.0 consumers. New detailed modeling should use sstim-exposure.ttl terms such as sstim-ex:deliveryMedium, sstim-ex:perceivedModality, and sstim-ex:requiresDeviceCapability."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0010-exposure-delivery-modality.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasStimulusTemporalStructure a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationTechnique ;
+    rdfs:range  sstim:StimulusTemporalStructure ;
+    rdfs:label  "has stimulus temporal structure"@en ;
+    skos:definition "Links a stimulation technique to one or more controlled descriptions of its temporal organization, such as periodic, quasi-periodic, aperiodic, adaptive, continuous, pulsed, or scheduled administration."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Stimulation facet properties (ADR 0034)
+#
+# Route, approach, and intended-target properties intentionally carry NO
+# rdfs:domain: one cross-layer property must not infer that a protocol
+# information artifact is a technique or a process. Permitted subjects are
+# enforced in SHACL (sstim-sh:StimulationFacetSubjectShape) instead —
+# omitting a domain avoids unwanted inference, it does not grant arbitrary
+# subjects permission to use the property. None of these is functional: a
+# technique may have several channels, approaches, routes, or targets.
+###########################################################################
+
+sstim:neuralAccessRoute a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralAccessRoute ;
+    rdfs:label "neural access route"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, intervention, or stimulus channel to the biological route through which its neural target is intended to be engaged. In a multi-channel exposure profile the channel-level binding is authoritative and the coarse value must be backed by it."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:stimulationDeliveryApproach a owl:ObjectProperty ;
+    rdfs:range sstim:StimulationDeliveryApproach ;
+    rdfs:label "stimulation delivery approach"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, or intervention to a coarse operational description of how the input is introduced or the interface positioned. Values are non-exclusive and may be combined."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:intendedNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralTargetSite ;
+    rdfs:label "intended neural target site"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, or intervention to the broad nervous-system site it is intended to engage. Records target intention, never delivered dose or observed effect."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:intendedNeuralSystem a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralSystem ;
+    rdfs:label "intended neural system"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, or intervention to the distributed neural system it is intended to engage. Independent of the entry route: targeting the auditory system does not imply entering through it."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:intendedNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:range sstim:NeuralPhenomenon ;
+    rdfs:label "intended neural phenomenon"@en ;
+    skos:definition "Links a stimulation process, technique, protocol, or intervention to the functional neural phenomenon it is intended to affect. Records target intention, not an observed result."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+# ADR 0035. Domainless like the ADR 0034 facet properties above, for the same
+# reason: one cross-layer property must not infer that a protocol information
+# artifact is a technique or a process. Permitted subjects are enforced in SHACL
+# (sstim-sh:StimulationFacetSubjectShape), which this property is added to.
+sstim:participantEngagementMode a owl:ObjectProperty ;
+    rdfs:range sstim:ParticipantEngagementMode ;
+    rdfs:label "participant engagement mode"@en ;
+    skos:definition "Links a stimulation or neuromodulation process, technique, or protocol to the degree and kind of active participation it requires of the individual. Not functional: a method with distinct phases may declare more than one mode. Records what the method demands of the participant, never whether the participation is effective."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0035-participant-engagement-mode-and-endogenous-self-regulation.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:mechanismNeuralAccessRoute a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralAccessRoute ;
+    rdfs:label "mechanism neural access route"@en ;
+    skos:definition "Tags a proposed mechanism with the neural access route it invokes. Hypothesis metadata: it never reclassifies the technique that proposes the mechanism."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:mechanismNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralTargetSite ;
+    rdfs:label "mechanism neural target site"@en ;
+    skos:definition "Tags a proposed mechanism with the neural site it invokes. Hypothesis metadata, distinct from a technique's intended target and from an evaluated outcome."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:mechanismNeuralSystem a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralSystem ;
+    rdfs:label "mechanism neural system"@en ;
+    skos:definition "Tags a proposed mechanism with the distributed neural system it invokes. Hypothesis metadata."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:mechanismNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationMechanism ;
+    rdfs:range sstim:NeuralPhenomenon ;
+    rdfs:label "mechanism neural phenomenon"@en ;
+    skos:definition "Tags a proposed mechanism with the functional neural phenomenon it invokes. Hypothesis metadata."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:outcomeNeuralAccessRoute a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralAccessRoute ;
+    rdfs:label "outcome neural access route"@en ;
+    skos:definition "Tags an evidence outcome concept with the neural access route the finding is about. This is how a demonstrated route that competes with a technique's declared intended route is recorded without altering that declaration."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:outcomeNeuralTargetSite a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralTargetSite ;
+    rdfs:label "outcome neural target site"@en ;
+    skos:definition "Tags an evidence outcome concept with the neural site the finding is about, which may differ from the intended target site of the technique assessed."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:outcomeNeuralSystem a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralSystem ;
+    rdfs:label "outcome neural system"@en ;
+    skos:definition "Tags an evidence outcome concept with the distributed neural system the finding is about."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:outcomeNeuralPhenomenon a owl:ObjectProperty ;
+    rdfs:domain sstim:EvidenceOutcomeConcept ;
+    rdfs:range sstim:NeuralPhenomenon ;
+    rdfs:label "outcome neural phenomenon"@en ;
+    skos:definition "Tags an evidence outcome concept with the functional neural phenomenon the finding is about. This is the join that makes evidence about neural effects queryable across techniques and routes."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:composedOf a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Voice ;
+    rdfs:label  "composed of"@en ;
+    skos:definition "Links a preset to its 1–6 voice specifications."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:definesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationFramework ;
+    rdfs:range  sstim:SensoryStimulationTechnique ;
+    rdfs:label  "defines technique"@en ;
+    skos:definition "Links a sensory stimulation framework to a technique that it defines or governs."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:incorporatesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationFramework ;
+    rdfs:range  sstim:SensoryStimulationTechnique ;
+    rdfs:label  "incorporates technique"@en ;
+    skos:definition "Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from sstim:definesTechnique, which is reserved for techniques the framework itself defines or governs; a framework that merely applies binaural beats or photic driving incorporates them rather than defining them."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0033-framework-scope-and-generic-technique-deduplication.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:usesTechnique a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulationProtocol ;
+    rdfs:range  sstim:StimulationTechnique ;
+    rdfs:label  "uses technique"@en ;
+    skos:definition "Links a stimulation protocol to a technique used by the protocol. Naming a method does not make the protocol sensory, nor imply that any framework originated or incorporates the technique."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:definedByFramework a owl:ObjectProperty ;
+    rdfs:domain obi:0000272 ;
+    rdfs:range  sstim:SensoryStimulationFramework ;
+    rdfs:label  "defined by framework"@en ;
+    skos:definition "Links a protocol to the broader framework that defines or constrains it. The domain is the general OBI protocol class, not a stimulation protocol: a capability-boundary or baseline protocol can be authored and constrained by a framework without thereby becoming stimulation (ADR 0034 §7)."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:implementsFramework a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationImplementation ;
+    rdfs:range  sstim:SensoryStimulationFramework ;
+    rdfs:label  "implements framework"@en ;
+    skos:definition "Links an implementation to the framework it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:implementsProtocol a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationImplementation ;
+    rdfs:range  sstim:SensoryStimulationProtocol ;
+    rdfs:label  "implements protocol"@en ;
+    skos:definition "Links an implementation to a protocol it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:forImplementation a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationImplementation ;
+    rdfs:label  "for implementation"@en ;
+    skos:definition "Links a preset to the implementation whose parameter model it configures."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:followsProtocol a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:SensoryStimulationProtocol ;
+    rdfs:label  "follows protocol"@en ;
+    skos:definition "Links a preset to the sensory stimulation protocol whose rules or constraints it follows."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:inGroup a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:PresetGroup ;
+    rdfs:label  "in group"@en ;
+    skos:definition "Links a preset to its group classification. Each preset belongs to exactly one group."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasDeliveryModality a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationIntervention ;
+    rdfs:range  sstim:SensoryModality ;
+    rdfs:label  "has delivery modality"@en ;
+    skos:definition "Links an executed sensory stimulation intervention to one or more broad controlled modality categories engaged by its delivery. Use the exposure module for channel-level physical-medium and perceived-modality detail."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasIntendedEffect a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:IntendedEffect ;
+    rdfs:label  "has intended effect"@en ;
+    skos:definition "Links a preset to one or more controlled design-intent categories. The relation describes purpose and does not assert that the effect occurred."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasCautionTag a owl:ObjectProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:CautionTag ;
+    rdfs:label  "has caution tag"@en ;
+    skos:definition "Links a preset to a safety or usage advisory flag. A preset may carry zero or more caution tags."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasCautionSeverity a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range  sstim:CautionSeverity ;
+    rdfs:label "has caution severity"@en ;
+    skos:definition "Assigns exactly one interface-priority severity category to a caution tag."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasPublicClaimLevel a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:PublicClaimLevel ;
+    rdfs:label  "has public claim level"@en ;
+    skos:definition "Links a preset to the highest public-facing claim level its user-facing copy uses. The legality constraint (PresetShape, ADR 0018) checks that supporting evidence meets the level's required tier."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:derivedFrom a owl:ObjectProperty, owl:AsymmetricProperty, owl:IrreflexiveProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  sstim:Preset ;
+    rdfs:label  "derived from"@en ;
+    skos:definition "Links a preset to its immediate predecessor preset version. The relation is directional, asymmetric, and not transitive; use repeated links to traverse a longer revision history."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:referencesPreset a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:Preset ;
+    rdfs:label  "references preset"@en ;
+    skos:definition "Links a session specification to the preset it executes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:usesSpecification a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SessionSpecification ;
+    rdfs:label  "uses specification"@en ;
+    skos:definition "Links a recorded session execution to the single immutable session specification it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasSelfReport a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SelfReport ;
+    rdfs:label  "has self-report"@en ;
+    skos:definition "Links a session instance to zero or more consent-governed self-reports collected at explicit phases. Multiple reports support pre/post and follow-up observations without overwriting prior data."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasReportPhase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  sstim:SelfReportPhase ;
+    rdfs:label "has report phase"@en ;
+    skos:definition "Identifies the single collection phase of a session-associated self-report."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 8 — Datatype Properties
+###########################################################################
+
+sstim:hzMin a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:FrequencyBand ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz minimum"@en ;
+    skos:definition "Lower bound (inclusive) of the frequency band in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hzMax a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:FrequencyBand ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "Hz maximum"@en ;
+    skos:definition "Upper bound (inclusive) of the frequency band in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:tierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:EvidenceTierValue ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "tier rank"@en ;
+    skos:definition "Ordinal rank 1–6 for SPARQL ORDER BY. Speculative=1, Anecdotal=2, Preliminary=3, Moderate=4, Strong=5, Established=6."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:claimLevelRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "claim level rank"@en ;
+    skos:definition "Ordinal rank 0–5 of a public claim level. C0 Descriptive=0, C1 Experiential=1, C2 Wellness=2, C3 Structure/Function=3, C4 Medical/Condition=4, C5 Quantified/Superiority=5."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:requiresEvidenceTierRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicClaimLevel ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "requires evidence tier rank"@en ;
+    skos:definition "Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required (descriptive/experiential/wellness). A value of 7 is an intentional sentinel above the maximum tier (6): no evidence can satisfy it, i.e. the level is never publicly assertable (C4 medical/condition). PROVISIONAL policy mapping — reconcile with the BioSynCare Reference publicClaimLevel/clinicalScope enum and a qualified EU MDR adviser before launch."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0018-evidence-integrity-and-public-claim-governance.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:cautionSeverityRank a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionSeverity ;
+    rdfs:range xsd:integer ;
+    rdfs:label "caution severity rank"@en ;
+    skos:definition "Ordinal rank used to sort caution severities from informational (1) through high-priority stop or avoid guidance (4)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:triggerCondition a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "trigger condition"@en ;
+    skos:definition "Machine-readable-content companion text describing the stimulus feature, context, or user state that activates a caution."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:affectedPopulation a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "affected population"@en ;
+    skos:definition "Conservative plain-language description of the users or contexts to which a caution is especially relevant; not a diagnostic classification."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:recommendedAction a owl:DatatypeProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:string ;
+    rdfs:label "recommended action"@en ;
+    skos:definition "Plain-language action an interface should present when a caution applies, such as reduce intensity, disable a channel, stop, or avoid the context."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:displayPriority a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:CautionTag ;
+    rdfs:range xsd:integer ;
+    rdfs:label "display priority"@en ;
+    skos:definition "Positive integer used to order caution messages within the same severity; lower numbers display first."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:platformDeliverable a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SensoryModality ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "platform deliverable"@en ;
+    skos:definition "Whether this modality is deliverable via standard consumer digital platforms without dedicated hardware."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:presetVersion a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "preset version"@en ;
+    skos:definition "Semantic version string (X.Y.Z) of this preset."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:hasBreathGuide a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:Preset ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "has breath guide"@en ;
+    skos:definition "True iff the preset contains exactly one voice with isOn=true. Governs visual breathing animation and haptic pulse delivery."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:durationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "duration (seconds)"@en ;
+    skos:definition "Intended total duration of a session specification in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:breathingPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "initial breathing period (s)"@en ;
+    skos:definition "User override for mp0. Must be >= 3.0 s for breathing guidance. Absent means use preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:breathingPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "final breathing period (s)"@en ;
+    skos:definition "Optional user override for the final guided-breathing cycle period in seconds; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "breathing transition duration (s)"@en ;
+    skos:definition "Optional duration in seconds over which guided breathing changes from its initial to final cycle period; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:masterVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "master volume"@en ;
+    skos:definition "Normalized master output gain requested by the session specification, from 0 (silent) to 1 (implementation maximum); not a calibrated sound-pressure level."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "actual duration (seconds)"@en ;
+    skos:definition "Observed playback duration of a recorded session instance in whole seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:completionStatus a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "completion status"@en ;
+    skos:definition "Values: 'completed' | 'interrupted' (>30% played) | 'abandoned' (<30% played)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:primaryAffect a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "primary affect"@en ;
+    skos:definition "Affect rating at the report's declared collection phase, from 1 (very negative) to 5 (very positive)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:focusRating a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "focus rating"@en ;
+    skos:definition "Attentional-focus rating at the report's declared collection phase, from 1 (scattered) to 5 (highly focused)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:sleepiness a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "sleepiness"@en ;
+    skos:definition "Sleepiness rating at the report's declared collection phase, from 1 (alert) to 5 (very drowsy)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:subjectiveQuality a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "subjective session quality"@en ;
+    skos:definition "Subjective quality rating for the associated session, normally collected after delivery, from 1 (poor) to 5 (excellent)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:goalAchieved a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "goal achieved"@en ;
+    skos:definition "Self-reported yes/no assessment of whether the participant's stated session goal was met; it is not an objective efficacy measure."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:referenceKey a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:PublicSafeReference ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "reference key"@en ;
+    skos:definition "Short uppercase key (e.g. 'INGENDOH_2023') matching citation keys in preset techDesc fields."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 9 — Annotation Properties
+###########################################################################
+
+sstim:evidenceNotes a owl:AnnotationProperty ;
+    rdfs:label "evidence notes"@en ;
+    skos:definition "Internal human-readable note on evidence basis and caveats. Not for user-facing display."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:modifiedAt a owl:AnnotationProperty ;
+    rdfs:label "modified at"@en ;
+    rdfs:range xsd:dateTime ;
+    skos:definition "Timestamp attached to a mutable annotation record when it was last edited. Ontology and evidence resources should use dct:modified and PROV-O for publication provenance."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+sstim:modifiedBy a owl:AnnotationProperty ;
+    rdfs:label "modified by"@en ;
+    skos:definition "Identifier attached to a mutable annotation record for the actor that last edited it. Published RDF should use prov:wasAttributedTo for agent provenance."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Part 10 — Evidence Assessment, Basis, Proposition, and Review Provenance
+#
+# ADR 0027: evidence assessments are separated from hypotheses, questions,
+# boundary applicability, requirements, design objectives, planned outcomes,
+# and knowledge-status assertions. Only an EvidenceAssessmentClaim carries
+# evidence tier, claim direction, a qualified basis, and review decisions.
+# Properties here deliberately carry no rdfs:domain (KR-05): allowed source
+# classes are enforced in SHACL, not by type inference.
+###########################################################################
+
+sstim:EvidenceAssessmentClaim a owl:Class ;
+    rdfs:subClassOf sstim:EvidenceClaim ;
+    rdfs:label "Evidence Assessment Claim"@en ;
+    skos:definition "A versioned, immutable assessment of an identified evidence basis about one atomic bounded proposition. The sole concrete evidence-bearing class: exactly one evidence tier and one claim direction, at least one qualified evidence basis, and exactly one assessed proposition. A correction mints a new revision IRI linked with prov:wasRevisionOf; it never edits a published revision in place."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:BibliographicReference a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Bibliographic Reference"@en ;
+    skos:definition "A bibliographic record of a published source. Being recorded implies neither endorsement nor permission to quote, reproduce, or display the source."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:GovernedResearchOutput a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Governed Research Output"@en ;
+    skos:definition "A versioned study record, dataset revision, or analysis output admitted as an evidence source. Requires exactly one source-governance record; an ungoverned dataset cannot serve as an evidence basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:SourceGovernanceRecord a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Source Governance Record"@en ;
+    skos:definition "An immutable record governing a research output used as evidence: source version and digest, custodian, access classification, consent/ethics basis or an explicit not-applicable determination, and permitted use scope, with generation time and a qualified responsible agent."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceBasis a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Basis"@en ;
+    skos:definition "One qualified contribution of a single source to an evidence assessment, carrying source-level modality, intervention, study design, model/population, synthesis, and observed-result metadata separately from the assessment's own conclusion."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceSearchRecord a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Search Record"@en ;
+    skos:definition "An immutable, reproducible record of a literature/evidence search: sources, exact query, coverage dates, eligibility criteria, result count, and content digest. Supports only scoped 'no eligible evidence found' findings, never universal absence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:AssessmentProposition a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Assessment Proposition"@en ;
+    skos:definition "One immutable, atomic, independently assessable proposition evaluated by an evidence assessment: exactly one subject, one outcome concept, one scope, one proposition form, and exact text or digest."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:AssessmentScope a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Assessment Scope"@en ;
+    skos:definition "The explicit modality, population/model, intervention/context, and comparator scope of an assessment proposition. Every axis carries a named value or an explicit unknown / not-reported / not-applicable marker; omission never means universal applicability."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceOutcomeConcept a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Outcome Concept"@en ;
+    skos:definition "A controlled endpoint, response, or mechanism category used to identify what a proposition or reported source result is about. It is a category, not an observed result or benefit."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:PopulationDescriptor a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Population Descriptor"@en ;
+    skos:definition "An identified description of a study population or participant group referenced by an assessment scope or evidence basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ComparatorDescriptor a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Comparator Descriptor"@en ;
+    skos:definition "An identified description of the comparison condition (for example sham, no-stimulus, baseline, or alternative frequency) referenced by an assessment scope or evidence basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ScopeMarker a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Scope Marker"@en ;
+    skos:definition "A controlled marker stating that a scope axis is unknown, not reported, or not applicable. Mutually exclusive with concrete values on the same axis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ModalityApplicability a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Modality Applicability"@en ;
+    skos:definition "A controlled statement of how sensory modality applies to an evidence source: mixed modalities, unknown/not reported, or not applicable. Distinct states, never a wildcard."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:StudyDesign a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Design"@en ;
+    skos:definition "The design of the underlying studies contributing to an evidence source (for example randomized controlled trial, observational, case report, preclinical experiment, mixed, or unknown)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:StudyModel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Study Model"@en ;
+    skos:definition "The model or stage in which an evidence source's findings were produced (for example human participants, preclinical animal model, in vitro, computational)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceSynthesisType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Synthesis Type"@en ;
+    skos:definition "The synthesis level of an evidence source: primary study, narrative review, systematic review, meta-analysis, literature review, or tutorial. A narrative review does not acquire systematic-review status merely because it synthesizes literature."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidencePropositionForm a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Proposition Form"@en ;
+    skos:definition "The logical form of an assessment proposition: bounded relation, bounded null result, scoped search finding, or universal absence. Universal-absence propositions never conform; a scoped search finding requires an evidence search record basis."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ReviewerRelationship a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Reviewer Relationship"@en ;
+    skos:definition "The relationship of a review's agent to the assessed work: self, same organization, external, or unknown. External relationship never implies independence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:IndependenceDetermination a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Independence Determination"@en ;
+    skos:definition "A policy-based determination of reviewer independence: independent, not independent, or undetermined. An independent or not-independent determination requires a named independence policy and conflict disclosure."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ReviewDecisionValue a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Review Decision Value"@en ;
+    skos:definition "The outcome of an evidence review: confirm, request revision, or reject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:ConflictDisclosure a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Conflict Disclosure"@en ;
+    skos:definition "A record of declared conflicts of interest for a review, including the explicit declaration that no conflict was declared."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceAssessmentActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Assessment Activity"@en ;
+    skos:definition "The PROV activity that generates an evidence assessment revision. It used every qualified basis, its sources, and the immutable rubric/method revision actually applied, and carries a qualified association naming the responsible agent and role."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceReviewActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Review Activity"@en ;
+    skos:definition "The PROV activity that reviews exactly one assessment revision under a named rubric/policy revision and generates an immutable evidence review decision."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceSearchActivity a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Evidence Search Activity"@en ;
+    skos:definition "The PROV activity that executes an evidence search and generates an immutable evidence search record, with execution times and a qualified responsible agent/role."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:EvidenceReviewDecision a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Evidence Review Decision"@en ;
+    skos:definition "An immutable review decision about one assessment revision: reviewer relationship, independence determination, and decision are independent axes. A later decision supersedes or invalidates the earlier one; no mutable effective-review pointer exists."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+# ── Assessment structure (object properties; SHACL enforces sources) ──────
+
+sstim:evaluatesSubject a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label "evaluates subject"@en ;
+    skos:definition "Links an evidence assessment to the preset or technique it evaluates. Neutral: the assessment's direction lives exclusively in hasClaimDirection. Replaces the directionally misleading supportsRelation."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0013-evidence-support-relation-range.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:assessesProposition a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:AssessmentProposition ;
+    rdfs:label "assesses proposition"@en ;
+    skos:definition "Links an evidence assessment to the single atomic bounded proposition it evaluates."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasEvidenceBasis a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceBasis ;
+    rdfs:label "has evidence basis"@en ;
+    skos:definition "Links an evidence assessment to a qualified basis. Every assessment has at least one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisSource a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:BibliographicReference sstim:GovernedResearchOutput sstim:EvidenceSearchRecord ) ] ;
+    rdfs:label "basis source"@en ;
+    skos:definition "The single source of a qualified evidence basis: a bibliographic reference, a governed research output, or an evidence search record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasSourceGovernanceRecord a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:SourceGovernanceRecord ;
+    rdfs:label "has source governance record"@en ;
+    skos:definition "Links a governed research output to its single immutable source-governance record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:propositionSubject a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique ) ] ;
+    rdfs:label "proposition subject"@en ;
+    skos:definition "The single subject of an assessment proposition; must match the assessment's evaluatesSubject value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:propositionOutcome a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidenceOutcomeConcept ;
+    rdfs:label "proposition outcome"@en ;
+    skos:definition "The single identified outcome concept an assessment proposition is about."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasAssessmentScope a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:AssessmentScope ;
+    rdfs:label "has assessment scope"@en ;
+    skos:definition "The single explicit scope of an assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasPropositionForm a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidencePropositionForm ;
+    rdfs:label "has proposition form"@en ;
+    skos:definition "The single controlled logical form of an assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:scopeSensoryModality a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:SensoryModality sstim:ScopeMarker ) ] ;
+    rdfs:label "scope sensory modality"@en ;
+    skos:definition "A named sensory modality of the proposition scope, or an explicit unknown / not-reported / not-applicable marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:scopePopulationOrModel a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:PopulationDescriptor sstim:StudyModel sstim:ScopeMarker ) ] ;
+    rdfs:label "scope population or model"@en ;
+    skos:definition "A named population descriptor or study model of the proposition scope, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:scopeInterventionOrContext a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:Preset sstim:StimulationTechnique sstim:StimulationProtocol sstim:StimulationIntervention sstim-ex:ExperimentContext sstim-ex:ExposureProfile sstim:ScopeMarker ) ] ;
+    rdfs:label "scope intervention or context"@en ;
+    skos:definition "The identified intervention, technique, protocol, context, or exposure profile the proposition scope covers, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:scopeComparator a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:ComparatorDescriptor sstim:ScopeMarker ) ] ;
+    rdfs:label "scope comparator"@en ;
+    skos:definition "The identified comparison condition of the proposition scope, or an explicit marker."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+# ── Basis metadata (orthogonal axes replacing the overloaded modality tag) ─
+
+sstim:basisSensoryModality a owl:ObjectProperty ;
+    rdfs:range sstim:SensoryModality ;
+    rdfs:label "basis sensory modality"@en ;
+    skos:definition "A canonical sensory modality the basis source explicitly supports. Zero modalities requires an explicit modality-applicability value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisModalityApplicability a owl:ObjectProperty ;
+    rdfs:range sstim:ModalityApplicability ;
+    rdfs:label "basis modality applicability"@en ;
+    skos:definition "How sensory modality applies to this basis source: mixed, unknown/not reported, or not applicable."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisIntervention a owl:ObjectProperty ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( sstim:StimulationTechnique sstim:StimulationProtocol sstim:StimulationIntervention sstim-ex:ExposureProfile ) ] ;
+    rdfs:label "basis intervention"@en ;
+    skos:definition "The studied technique, protocol, intervention, or exposure profile this basis source is about (for example paced breathing rather than an auditory cue)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisStudyDesign a owl:ObjectProperty ;
+    rdfs:range sstim:StudyDesign ;
+    rdfs:label "basis study design"@en ;
+    skos:definition "The design of the underlying studies contributing to this basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisStudyModel a owl:ObjectProperty ;
+    rdfs:range sstim:StudyModel ;
+    rdfs:label "basis study model"@en ;
+    skos:definition "The model or stage of this basis source's findings (human, preclinical animal, in vitro, computational)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisStudyPopulation a owl:ObjectProperty ;
+    rdfs:range sstim:PopulationDescriptor ;
+    rdfs:label "basis study population"@en ;
+    skos:definition "The identified population studied by this basis source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisSynthesisType a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceSynthesisType ;
+    rdfs:label "basis synthesis type"@en ;
+    skos:definition "The synthesis level of this basis source (primary study, narrative review, systematic review, meta-analysis, literature review, tutorial)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisObservedOutcome a owl:ObjectProperty ;
+    rdfs:range sstim:EvidenceOutcomeConcept ;
+    rdfs:label "basis observed outcome"@en ;
+    skos:definition "An outcome concept the basis source reports on, as source-level metadata distinct from the assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisComparator a owl:ObjectProperty ;
+    rdfs:range sstim:ComparatorDescriptor ;
+    rdfs:label "basis comparator"@en ;
+    skos:definition "A comparator the basis source used, as source-level metadata."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisObservedEffectDirection a owl:ObjectProperty ;
+    rdfs:range sstim:EffectDirection ;
+    rdfs:label "basis observed effect direction"@en ;
+    skos:definition "The direction of an outcome the basis source reports, as source-level metadata."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+# ── Review provenance ──────────────────────────────────────────────────────
+
+sstim:reviewsAssessment a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:EvidenceAssessmentClaim ;
+    rdfs:label "reviews assessment"@en ;
+    skos:definition "The single assessment revision an evidence review decision is about; must equal the revision its generating review activity used."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:reviewRubric a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "review rubric"@en ;
+    skos:definition "The immutable rubric or policy revision a review decision was made under."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasReviewerRelationship a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:ReviewerRelationship ;
+    rdfs:label "has reviewer relationship"@en ;
+    skos:definition "The reviewer's relationship to the assessed work: self, same organization, external, or unknown."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasIndependenceDetermination a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:IndependenceDetermination ;
+    rdfs:label "has independence determination"@en ;
+    skos:definition "The policy-based independence determination of a review decision. External relationship never implies independence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hasReviewDecision a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range sstim:ReviewDecisionValue ;
+    rdfs:label "has review decision"@en ;
+    skos:definition "The outcome of a review decision: confirm, request revision, or reject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:independencePolicy a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "independence policy"@en ;
+    skos:definition "The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:conflictDisclosure a owl:ObjectProperty ;
+    rdfs:range sstim:ConflictDisclosure ;
+    rdfs:label "conflict disclosure"@en ;
+    skos:definition "A conflict-of-interest disclosure record attached to an independence determination, including the explicit no-conflict-declared record."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+# ── Proposition, search-record, and governance-record literals ─────────────
+
+sstim:propositionText a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "proposition text"@en ;
+    skos:definition "The exact language-tagged text of an atomic assessment proposition."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:propositionDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "proposition digest"@en ;
+    skos:definition "An immutable content digest identifying the exact proposition when text alone is insufficient."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisOutcomeNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis outcome note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's reported outcome. Never a substitute for the identified outcome concept."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisPopulationNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis population note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's population. Never a substitute for the identified population descriptor."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:basisComparatorNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "basis comparator note"@en ;
+    skos:definition "Supplementary human-readable note on a basis source's comparator. Never a substitute for the identified comparator descriptor."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchSource a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search source"@en ;
+    skos:definition "A database or source searched, one value per source."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchQuery a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search query"@en ;
+    skos:definition "The exact query string executed by an evidence search."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchCoverageStart a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "search coverage start"@en ;
+    skos:definition "The earliest publication date the search covered, when bounded."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchCoverageEnd a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:date ;
+    rdfs:label "search coverage end"@en ;
+    skos:definition "The latest date the search covered; the as-of date of a scoped search finding."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchEligibilityCriteria a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "search eligibility criteria"@en ;
+    skos:definition "The eligibility criteria applied to search results."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchResultCount a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "search result count"@en ;
+    skos:definition "The number of results the executed search returned."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:searchDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "search digest"@en ;
+    skos:definition "A content digest of the search record's result set or export."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:governedSourceVersion a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "governed source version"@en ;
+    skos:definition "The exact version of the governed research output this governance record covers."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:governedSourceDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "governed source digest"@en ;
+    skos:definition "A content digest of the governed research output version."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:custodian a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:range prov:Agent ;
+    rdfs:label "custodian"@en ;
+    skos:definition "The agent that owns or is custodian of a governed research output."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:accessClassification a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "access classification"@en ;
+    skos:definition "The access classification of a governed research output (for example private, shared-research, de-identified, public)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:consentBasisNote a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "consent basis note"@en ;
+    skos:definition "The applicable consent or ethics basis for a governed research output, or an explicit not-applicable determination."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:permittedUseScope a owl:DatatypeProperty ;
+    rdfs:range rdf:langString ;
+    rdfs:label "permitted use scope"@en ;
+    skos:definition "The permitted use and release scope of a governed research output as evidence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# End of sstim-core.ttl
+###########################################################################

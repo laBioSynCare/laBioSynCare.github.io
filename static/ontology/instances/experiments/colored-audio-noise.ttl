@@ -1,0 +1,73 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/colored-audio-noise#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:colored-audio-noise a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
+    rdfs:label "Colored audio noise exposure"@en ;
+    dct:description "Non-clinical exploratory setup for comparing white, pink, brown/red, blue, violet/purple, grey, and black/silence audio conditions as defined stimulus patterns."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim:usesTechnique sstim-v:techBroadbandNoise ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBscLabPrototype ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Colored audio noise exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:usesStimulusChannel this:audio-channel ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk ;
+    sstim-ex:hasHypothesis this:pleasantness-claim ;
+    sstim-ex:hasResearchQuestion this:calm-stress-claim ;
+    sstim-ex:hasProtocolRequirement this:noise-definition-claim .
+
+this:audio-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Colored-noise audio channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasStimulusPattern
+        sstim-ex:patternNoise,
+        sstim-ex:audioNoiseWhite,
+        sstim-ex:audioNoisePink,
+        sstim-ex:audioNoiseBrownRed,
+        sstim-ex:audioNoiseBlue,
+        sstim-ex:audioNoiseVioletPurple,
+        sstim-ex:audioNoiseGrey,
+        sstim-ex:audioNoiseBlackSilence ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryHearingRisk .
+
+this:pleasantness-claim a sstim-ex:ExposureHypothesis ;
+    rdfs:label "Noise pleasantness hypothesis"@en ;
+    dct:description "Hypothesizes that named noise colors may differ in perceived pleasantness. The protocol must define spectral slope or generation method before comparison."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectPleasantness ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:calm-stress-claim a sstim-ex:ResearchQuestion ;
+    rdfs:label "Calm/stress response hypothesis"@en ;
+    dct:description "Records the question of whether different noise colors relate to calm or stress reports. No effect direction is asserted."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectCalm, sstim-ex:effectStress ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:noise-definition-claim a sstim-ex:ProtocolRequirement ;
+    rdfs:label "Noise naming definition requirement"@en ;
+    dct:description "Marks color-noise names as vocabulary labels that require spectral definition for reproducible experiments."@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+

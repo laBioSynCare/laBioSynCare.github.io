@@ -1,0 +1,153 @@
+# src/ui — User Interface Layer
+
+> **Status.** The shipped UI is the **knowledge browser** (graph, SPARQL,
+> annotations, presets) and **Patch Studio** (`creator/`), wrapped in shared
+> navigation, theming, and the photosensitivity safety layer. Studio now owns 14
+> visual track types, shared visual composition, Field starters, and legacy-state
+> adapters; public `/field/*` aliases replace-navigate to those starters under
+> [`PATCH_STUDIO_FIELD_INTEGRATION.md`](../../docs/technical/PATCH_STUDIO_FIELD_INTEGRATION.md).
+> Legacy `field/` components remain during compatibility/deprecation. The
+> standalone session `player/` and preset `browser/` components in the target
+> design are still planned.
+
+All UI components use Svelte 5 with **runes** syntax exclusively (`$state`,
+`$derived`, `$effect`, `$props`, `onclick`, `{@render ...}`). See `CLAUDE.md` §2
+for the runes mandate and the prohibited Svelte 4 patterns.
+
+---
+
+The directory-to-role map is in [`../README.md`](../README.md#directory-map).
+This file documents the conventions and the non-obvious parts of each surface.
+The session `player/` and standalone preset `browser/` of the target design are
+still planned.
+
+---
+
+## `creator/` — Patch Studio
+
+The primary authoring surface. A four-quadrant designer (controls, audio,
+visual, haptic) that builds an in-memory **patch draft**, renders audio through
+the selected engine, and composes 14 visual track types through one shared
+presentation stage. Knob/parameter changes are applied without a restart via
+`engine.setVoiceParameter()`; structural changes (e.g. noise colour, drone voice
+count, tremolo enable) rebuild the affected voice.
+
+- `PresetCreator.svelte` — the studio shell, transport, rAF live-evaluation loop,
+  scopes/previews, and the resizable, optionally fullscreen visual **mix** stage.
+- `presetDraft.js` + `visualTrackModel.js` — the additive data model (track
+  types, stage presentation, parameter ranges, factories, normalization and
+  validation). New exports use `patch-studio-model-3`; genuine model-1 and
+  model-2 documents migrate to it. Model 2 is the historical first spatial
+  schema, while model 3 makes the optional per-track depth-to-size cue explicit.
+  **Authoritative model spec:**
+  [`../../docs/technical/PATCH_STUDIO.md`](../../docs/technical/PATCH_STUDIO.md).
+- `controlSignals.js` — LFO / Permutation / general-rate Sinusoid evaluation.
+- `StudioVisualStage.svelte` — shared composition/presentation for ordinary
+  visual tracks; `SpatialTrackInspector.svelte` and `VisualStageControls.svelte`
+  expose track-local and stage-global settings. Spatial X/Y are camera-space
+  view-plane offsets; Z independently drives disparity/depth, with an opt-in
+  `depthAffectsScale` perspective cue.
+- `fieldStarters.js` + `fieldTrackAdapter.js` — pure Field starter bundles and
+  deterministic legacy-state conversion reports; they do not rewrite legacy
+  records automatically.
+- `tempo.js` — BPM / tempo-sync math. `semantic.js` — track/param → SSTIM terms.
+- `creatorSession.js` — cross-navigation session persistence.
+- `Knob.svelte` — the reusable rotary control (base value + live/modulated dot).
+- Tests sit beside each model, signal, starter, adapter, and scene helper.
+
+`AudioContext.resume()` is called inside the play button's gesture handler, never
+on mount (browser autoplay policy). The engine is built by
+`createAudioEngine()` from [`../engines/audio/audioEngines.js`](../engines/audio/audioEngines.js).
+
+---
+
+## `field/` — Sensory Field compatibility source
+
+The original guided colour, per-ear audio, blink, free-view depth, and
+stereoscopic-scene components remain here as legacy compatibility source and
+reusable scene-generation code. The public `/field/*` aliases no longer mount an
+autonomous Field workspace; prerendered compatibility pages open corresponding starter
+intents in Studio. Field is not a global-navigation tab.
+The as-built legacy contract is
+[`SENSORY_FIELD.md`](../../docs/technical/SENSORY_FIELD.md).
+
+[ADR 0046](../../docs/decisions/0046-one-studio-two-authoring-modes.md) requires
+ordinary first-class colour-field and spatial visual tracks in the same patch
+graph and shared stage, and the model/UI/route portion of that decision has
+shipped. Do not reintroduce the autonomous component as a second workspace or
+execution state. Runtime extraction, exact legacy fidelity and saved-state
+lifecycle proof, unified `ExposureProfile`/SHACL export, acceptance gates, and
+eventual duplicate runtime/persistence removal remain open in the integration
+plan.
+
+---
+
+## `graph/` — unified SSTIM graph navigator
+
+`OntologyGraph.svelte` renders three interlinked source layers with Cytoscape.js
+(lazy-loaded on first open): the versioned ontology/vocabulary, the versioned
+public catalog (BSC framework, BSC Lab, Patch Studio component, BioSynCare
+application), and the mutable approved public ecosystem. Qualified ecosystem
+records are projected as agent→target edges without discarding their record IRI,
+purpose, type, roles, sources, validity, or review date.
+
+The top-bar scope selector can show the full graph, Catalog + ecosystem,
+Ontology & vocabulary, Catalog focus, Ecosystem focus, or the existing thematic
+term views. Focus views retain one-hop ontology/catalog context. Search covers
+labels, aliases, and local names; colliding labels are visibly disambiguated
+(for example, `BioSynCare — application` and `BioSynCare — organization`). The
+left sidebar states which sources are versioned or live, shows live endpoint
+health, and offers a no-cache refresh. Edge/node layers can be toggled; nodes are
+searchable, centerable, and fit/relayout from the top bar. `graphSession.js`
+persists view state across navigation. Clicking a node opens the annotation
+panel; clicking a qualified relationship exposes its provenance.
+
+---
+
+## `annotation/` — annotation panel
+
+`AnnotationPanel.svelte` lists and edits annotations for the selected ontology
+node. Persistence goes through [`../rdf/annotations/AnnotationStore.js`](../rdf/annotations/AnnotationStore.js),
+which writes to **named graphs only** (never the default graph — `CLAUDE.md`
+§5.5). Public vs private visibility is per annotation; authorship comes from the
+optional Firebase sign-in.
+
+---
+
+## `navigation/`, `theme/`, `safety/`, `auth/`
+
+- **navigation/** — `AppTopBar.svelte` (graph scope/search/fit + keyboard help +
+  the global `+` menu), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
+  SPARQL · Logbook · Settings · About), `ProfileControl.svelte`,
+  `graphNavigation.js`. Sensory Field is discoverable through Studio's starter
+  palette rather than represented as another application screen.
+- **theme/** — `skins.js`: five palettes (default `paper`) applied via a
+  `data-skin` attribute, persisted to `localStorage`, pre-applied before first
+  paint by an inline script in `app.html` to avoid a flash of the wrong theme.
+- **safety/** — `visualSafety.js` (visual-stimulation policy store) and
+  `PhotosensitivityAdvisory.svelte` (page-load advisory). Spec:
+  [`../../docs/technical/PHOTOSENSITIVITY_SAFETY.md`](../../docs/technical/PHOTOSENSITIVITY_SAFETY.md).
+- **auth/** — `SignInForm.svelte`, used by the profile control and the Logbook
+  gate; backed by `src/firebase/`.
+
+---
+
+## Shared UI conventions
+
+**Styling.** Pico.css for semantic defaults plus component-scoped Svelte
+`<style>` blocks driven by skin CSS variables (`--app-*`). No Tailwind, no
+CSS-in-JS. Component colours must resolve from skin variables so every palette
+(including the light `paper`/`daylight` skins) stays legible — do not hard-code
+dark-only `#fff`/white-alpha values.
+
+**Error boundaries.** Every panel making async calls (SPARQL, RDF loading,
+Firebase) wraps its logic in try/catch and shows a human-readable error state.
+Never surface a raw N3.js parse error or SPARQL exception to the user.
+
+**Accessibility & safety.** Visual stimulation honors the global policy and
+`prefers-reduced-motion` via `safety/visualSafety.js` (not a `CSSEngine`).
+Interactive controls carry `aria-label`s; colour is never the sole information
+carrier; dialogs are dismissible with Esc.
+
+**Loading indicators.** Comunica (SPARQL, ~500 KB) and Cytoscape (graph,
+~300 KB) are lazy-loaded; show a loading indicator the first time each opens.

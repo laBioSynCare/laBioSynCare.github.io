@@ -1,0 +1,39 @@
+###########################################################################
+# Adversarial Core fixture: an untyped stimulus channel.
+#
+# ADR 0044 §2 hardened the optional channel link precisely because Core
+# declares inference mode "none". Without an explicit rdf:type, an untyped or
+# wrong-class value would slip past StimulusChannelShape — the shape targets
+# sstim-ex:StimulusChannel, and with no reasoner nothing infers that type.
+#
+# The link itself stays optional. What must be rejected is asserting it and
+# pointing it at something that is not a declared channel: here the value is a
+# plain resource carrying a duration, which looks channel-shaped but is not one.
+###########################################################################
+
+@prefix example: <https://example.org/sstim/core-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification whose channel is never typed"@en ;
+    dct:identifier "core-adversarial-untyped-channel" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Sensory stimulation process"@en .
+
+# Deliberately NOT `a sstim-ex:StimulusChannel`.
+example:channel
+    rdfs:label "Looks like a channel, is not declared one"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

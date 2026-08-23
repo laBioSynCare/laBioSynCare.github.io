@@ -1,0 +1,17 @@
+# Core competency question:
+#   "What does this specification deliver, through which channel, for how long,
+#    under which regime, and at what?"
+#
+# The smallest reproducible description ADR 0043 promises a Core adopter. Every
+# term is owned by the Kernel or Stimulus module, so answering it must not
+# require Common, Technique, Configuration, Session, Evidence, or Exposure.
+PREFIX sstim: <https://w3id.org/sstim#>
+
+SELECT ?specification ?process ?channel ?regime ?duration ?target WHERE {
+  ?specification a sstim:StimulusSpecification ;
+      sstim:describesStimulation ?process ;
+      sstim:stimulusRegime ?regime ;
+      sstim:hasStimulusChannel ?channel ;
+      sstim:hasStimulationTarget ?target .
+  ?channel sstim:channelDurationSeconds ?duration .
+}

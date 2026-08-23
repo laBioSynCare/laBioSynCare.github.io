@@ -1,0 +1,71 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/social-graph-sensory-protocol#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:social-graph-sensory-protocol a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
+    rdfs:label "Social graph sensory protocol"@en ;
+    dct:description "Non-clinical exploratory setup combining social-graph visualization, conversation, and sound as an aesthetic self-observation protocol."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim:usesTechnique sstim-v:techSonification, sstim-v:techSpatialAuditory ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextSocialProtocol ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Social graph sensory exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-social-channel, this:audio-social-channel, this:conversation-channel ;
+    sstim-ex:hasPerceptualGain sstim-ex:gainSocialReflection, sstim-ex:gainAudioImmersion ;
+    sstim-ex:hasHypothesis this:social-reflection-claim ;
+    sstim-ex:hasProtocolRequirement this:conversation-context-claim .
+
+this:visual-social-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Social-graph visualization channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight, sstim-ex:mediumStereoscopicVisualPresentation ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual, sstim-ex:modalitySocialPerceptual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityFreeViewStereoscopy ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternMoving, sstim-ex:patternAdaptive .
+
+this:audio-social-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Social protocol sound channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityHeadphones ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternRhythmic, sstim-ex:patternAdaptive .
+
+this:conversation-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Conversation and relation-reflection channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalitySocialPerceptual, sstim-ex:modalityAuditory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilitySensorInput ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNearbyEnvironment ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternAdaptive .
+
+this:social-reflection-claim a sstim-ex:ExposureHypothesis ;
+    rdfs:label "Social reflection hypothesis"@en ;
+    dct:description "Hypothesizes that seeing and hearing one's social structure during conversation may change perceived social reflection or connectedness. No therapeutic outcome is asserted."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectSocialConnectedness, sstim-ex:effectImmersion ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:conversation-context-claim a sstim-ex:ProtocolRequirement ;
+    rdfs:label "Conversation context requirement"@en ;
+    dct:description "Marks live or online conversation as part of the protocol context rather than as a guaranteed source of effect."@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+

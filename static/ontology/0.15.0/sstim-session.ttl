@@ -1,0 +1,618 @@
+###########################################################################
+#
+#  SSTIM Intervention and Session Module
+#
+#  Version:    0.15.0
+#  Date:       2026-08-04
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-v:   <https://w3id.org/sstim/vocab#> .
+@prefix sstim-sh:  <https://w3id.org/sstim/shapes#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix mod:   <https://w3id.org/mod#> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+@prefix cob:   <http://purl.obolibrary.org/obo/COB_> .
+@prefix ro:    <http://purl.obolibrary.org/obo/RO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/session> a owl:Ontology ;
+    owl:versionInfo "0.15.0" ;
+    dct:title "SSTIM Intervention and Session Module"@en ;
+    dct:description "Planned stimulation interventions, session specifications and executions, configuration overrides, and consent-governed self-reports."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/configuration> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-08-17"^^xsd:date ;
+    dct:modified "2026-08-17"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Interventions, sessions, executions, and self-reports
+###########################################################################
+
+sstim:StimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:Stimulation ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Stimulation Intervention"@en ;
+    skos:definition "A specific, designed execution of a stimulation process with defined parameters, delivery, and intended effect. The neutral planned-process layer over sensory stimulation and neuromodulation interventions."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SensoryStimulationIntervention a owl:Class ;
+    rdfs:subClassOf sstim:SensoryStimulation ;
+    rdfs:subClassOf sstim:StimulationIntervention ;
+    rdfs:subClassOf cob:0000082 ;   # COB 'planned process' — current canonical term
+    rdfs:label "Sensory Stimulation Intervention"@en,
+               "Intervento di Stimolazione Sensoriale"@it,
+               "Intervenção de Estimulação Sensorial"@pt,
+               "Intervención de Estimulación Sensorial"@es ;
+    skos:definition "A specific, designed execution of Sensory Stimulation with defined parameters, target modalities, intended effect, and delivery mechanism. An intervention can realize a session specification derived from a preset, protocol, or framework."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SessionSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030, prov:Plan ;
+    rdfs:label "Session Specification"@en ;
+    skos:definition "A complete, reproducible description of a specific intended execution of a preset, including user-defined overrides of preset defaults. The unit of scientific reproducibility: given a specification and a conforming engine, the acoustic output is fully determined."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SessionInstance a owl:Class ;
+    rdfs:subClassOf prov:Activity, sstim:SensoryStimulationIntervention ;
+    rdfs:label "Session Instance"@en ;
+    skos:definition "The record of an actual execution of a session specification, including timing, completion status, platform, and optional self-report. Append-only: never modified after creation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SelfReport a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report"@en ;
+    skos:definition "A consent-governed, session-associated collection event gathering a participant's own account at an explicitly identified phase. Its content is a set of qualified participant observations, each carrying the prompt, scale and response state that make it interpretable."@en ;
+    skos:scopeNote "The five scalar properties below — primary affect, focus rating, sleepiness, subjective quality and goal achieved — remain valid as documented simple projections of that model, and existing data keeps its meaning. They carry the answer and drop everything that qualifies it, so new authoring should attach sstim:ParticipantObservation instances and treat the scalars as a summary."@en ;
+    skos:historyNote "Definition revised 2026-08-13 (ADR 0048). The previous wording promised optional free text that no property supported, and named five fixed values as the report's content."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SelfReportPhase a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Self-Report Phase"@en ;
+    skos:definition "A controlled category identifying when a self-report was collected relative to its associated session, such as before, immediately after, or at follow-up."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasDeliveryModality a owl:ObjectProperty ;
+    rdfs:domain sstim:SensoryStimulationIntervention ;
+    rdfs:range  sstim:SensoryModality ;
+    rdfs:label  "has delivery modality"@en ;
+    skos:definition "Links an executed sensory stimulation intervention to one or more broad controlled modality categories engaged by its delivery. Use the exposure module for channel-level physical-medium and perceived-modality detail."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:referencesPreset a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:Preset ;
+    rdfs:label  "references preset"@en ;
+    skos:definition "Links a session specification to the preset it executes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:usesSpecification a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SessionSpecification ;
+    rdfs:label  "uses specification"@en ;
+    skos:definition "Links a recorded session execution to the single immutable session specification it realizes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasSelfReport a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SelfReport ;
+    rdfs:label  "has self-report"@en ;
+    skos:definition "Links a session instance to zero or more consent-governed self-reports collected at explicit phases. Multiple reports support pre/post and follow-up observations without overwriting prior data."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasReportPhase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  sstim:SelfReportPhase ;
+    rdfs:label "has report phase"@en ;
+    skos:definition "Identifies the single collection phase of a session-associated self-report."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingPeriodInitial a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "initial breathing period (s)"@en ;
+    skos:definition "User override for mp0. Must be >= 3.0 s for breathing guidance. Absent means use preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "final breathing period (s)"@en ;
+    skos:definition "Optional user override for the final guided-breathing cycle period in seconds; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "breathing transition duration (s)"@en ;
+    skos:definition "Optional duration in seconds over which guided breathing changes from its initial to final cycle period; absence means use the preset default."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "actual duration (seconds)"@en ;
+    skos:definition "Observed playback duration of a recorded session instance in whole seconds."@en ;
+    skos:scopeNote "Whole seconds deliberately, where sstim:deliveredDurationSeconds beside it is a decimal. Elapsed time is observed once at the end of a session and second granularity is all a recorder can honestly claim; delivered time accumulates fractional segments and is exact. The coarser side is therefore the observed one, which is the opposite of the usual intuition and is why it is written down here. It has a consequence: the SHACL constraint holding delivered <= elapsed can be violated by rounding alone, by less than one second, with no real overrun — so a producer must round elapsed UP rather than to nearest. src/session/sessionRecorder.js does, and did not at first, which is how this was found."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:completionStatus a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "completion status"@en ;
+    skos:definition "Values: 'completed' | 'interrupted' (>30% played) | 'abandoned' (<30% played)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:primaryAffect a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "primary affect"@en ;
+    skos:definition "Affect rating at the report's declared collection phase, from 1 (very negative) to 5 (very positive)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:focusRating a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "focus rating"@en ;
+    skos:definition "Attentional-focus rating at the report's declared collection phase, from 1 (scattered) to 5 (highly focused)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:sleepiness a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "sleepiness"@en ;
+    skos:definition "Sleepiness rating at the report's declared collection phase, from 1 (alert) to 5 (very drowsy)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:subjectiveQuality a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "subjective session quality"@en ;
+    skos:definition "Subjective quality rating for the associated session, normally collected after delivery, from 1 (poor) to 5 (excellent)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:goalAchieved a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "goal achieved"@en ;
+    skos:definition "Self-reported yes/no assessment of whether the participant's stated session goal was met; it is not an objective efficacy measure."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:disablesTrack a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:Track ;
+    rdfs:label  "disables track"@en ;
+    skos:definition "A layer of the configuration that this session turns off — a soundscape left out, an ambience muted. Listing what was disabled keeps the configuration itself unmodified, so the same preset remains comparable across sessions that used it differently."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scheduledStart a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:dateTime ;
+    rdfs:label  "scheduled start"@en ;
+    skos:definition "Intended start time of the session. A property of the plan, not of any execution: sstim:SessionInstance records when a session actually ran."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+###########################################################################
+# Execution timeline
+#
+# What happened during an execution, and on which clock. Added 2026-08-13
+# (ADR 0048) to close the half of KR-02 the native session contract could
+# express and this module could not: a session record that says it ran but
+# not what happened during it cannot be projected to an event-semantic
+# standard such as HED, because HED describes occurrences.
+#
+# The clock matters as much as the events. A session event is located by an
+# offset on the engine timing context that delivered the stimulus, not by a
+# wall clock: wall clocks drift against audio hardware, so a timeline built
+# from them cannot be aligned to the stimulus it describes.
+###########################################################################
+
+sstim:SessionEvent a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Session Event"@en ;
+    skos:definition "One observed occurrence during the execution of a session, located by its offset on the timing context that delivered the stimulus. An event records what the delivering system did — starting, pausing, resuming, falling back to another engine, applying a safety limit — and never what a participant experienced, which is a participant observation."@en ;
+    skos:scopeNote "Deliberately not a planned process: an event is observed during execution, whereas the session specification is the plan."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:SessionEventType a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Session Event Type"@en ;
+    skos:definition "A controlled category of occurrence during a session execution."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:TimingAuthority a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Timing Authority"@en ;
+    skos:definition "A controlled category identifying which timing surface produced a session's event offsets, so a consumer can tell whether they came from audio hardware or from a substitute clock."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ReproducibilityLevel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Reproducibility Level"@en ;
+    skos:definition "A controlled category stating which reproduction claim a session record supports: identical rendered output, equivalent generated signal within numerical tolerance, or only the same targets, arc, architecture and duration."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasSessionEvent a owl:ObjectProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:SessionEvent ;
+    rdfs:label  "has session event"@en ;
+    skos:definition "Links a recorded execution to the occurrences observed during it. Order is carried by each event's offset rather than by the order of these statements, because an RDF graph has no statement order."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasEventType a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionEvent ;
+    rdfs:range  sstim:SessionEventType ;
+    rdfs:label  "has event type"@en ;
+    skos:definition "Identifies the single controlled category of an observed session event."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:sessionClockOffsetSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionEvent sstim:SelfReport ) ] ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "session clock offset (s)"@en ;
+    skos:definition "Seconds elapsed on the session's timing context between the clock origin recorded on the session instance and this occurrence. Offsets order the timeline; wall-clock timestamps, where present, place the session in the calendar and order nothing."@en ;
+    skos:scopeNote "Applies to anything placed on that clock. An event always is. A self-report is only when it was collected during delivery — a pre-session or follow-up report happens off the session clock, and an offset for it would be a fabricated placement."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:clockOriginSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "clock origin (s)"@en ;
+    skos:definition "The timing context's own reading at the moment the session instance opened. Together with each event offset it reconstructs the exact timing-context reading of every occurrence, which a wall clock cannot do."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasTimingAuthority a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  sstim:TimingAuthority ;
+    rdfs:label  "has timing authority"@en ;
+    skos:definition "Identifies the single timing surface whose readings produced this execution's clock origin and event offsets."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:deliveredDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionInstance ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "delivered duration (s)"@en ;
+    skos:definition "Time during which the session was actually delivering stimulus, excluding paused intervals. Distinct from the elapsed duration: a session paused for ten minutes and a session that ran ten minutes shorter have the same elapsed time and different exposures, and only this quantity describes what reached the subject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasReproducibilityLevel a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  sstim:ReproducibilityLevel ;
+    rdfs:label  "has reproducibility level"@en ;
+    skos:definition "States which reproduction claim this specification supports. Required to be stated rather than assumed: this class's own definition promises fully determined output, which is a stronger claim than a specification alone can honour when the engine is not pinned."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:configurationDigest a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "configuration digest"@en ;
+    skos:definition "Lowercase hexadecimal digest of the exact configuration this specification executed. Naming a configuration establishes which one was intended; the digest establishes that it still says what it said, which is what reproducibility requires."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:digestAlgorithm a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "digest algorithm"@en ;
+    skos:definition "Identifier of the algorithm and canonicalisation that produced the configuration digest, without which the digest cannot be recomputed."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+###########################################################################
+# Qualified participant observations
+#
+# Added 2026-08-13 (ADR 0048) to close KR-03. The five scalar properties
+# above remain as documented simple projections of this model, but they
+# cannot carry what an ordinary session history needs: the participant's own
+# stated goal, a direct helpfulness magnitude, the instrument and prompt that
+# produced an answer, or the difference between an answer that was not given
+# and one that was never asked for.
+#
+# Two rules govern everything below.
+#
+# **Absence carries its reason.** A missing triple says only that a triple is
+# missing. "Nothing to report", "we did not ask", and "the participant
+# declined" are three different facts about a session, and a safety history
+# that cannot distinguish them is worse than one that is absent, because a
+# consumer would trust it.
+#
+# **An observation is not evidence and not a diagnosis.** Nothing here is a
+# clinical adverse-event classification, applies a clinical grading scale, or
+# attributes anything to the stimulation. Severity is what the participant
+# said it was; relatedness is what the participant thought it was. Turning
+# observations into an evidence claim requires the separate governed
+# assessment process in the evidence module, and no query or convenience
+# mapping may substitute for it.
+###########################################################################
+
+sstim:ParticipantObservation a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Participant Observation"@en ;
+    skos:definition "One qualified answer within a self-report: what was observed, what response state applies, the value if one was supplied, and the prompt and scale that produced it. Addressable in its own right, so an answer can be cited, corrected, or excluded without touching the rest of the report."@en ;
+    skos:scopeNote "A participant's account of their own experience. It is never an outcome measurement, an efficacy indicator, or evidence, whatever its value."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:UnwantedExperienceObservation a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Unwanted Experience Observation"@en ;
+    skos:definition "One unwanted experience as described by the participant: a controlled category, the severity they reported, when it began, how long it persisted, what they did about it, whether it resolved, and whether they perceived it as related to the session."@en ;
+    skos:editorialNote "Deliberately not named or modelled as a side effect or adverse event. Both terms assert a causal or clinical conclusion that a participant report cannot establish, and using them would make every record of ordinary discomfort read as a safety finding."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ObservationInstrument a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Observation Instrument"@en ;
+    skos:definition "The identified, versioned questionnaire in a given language that produced a set of observations. Reports are not comparable across instrument versions, so an observation without instrument provenance is not analysable."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ObservationRole a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Observation Role"@en ;
+    skos:definition "A controlled category of what a participant observation observes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ResponseState a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Response State"@en ;
+    skos:definition "A controlled category stating why a value is or is not present on an observation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:UnwantedExperienceCategory a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Unwanted Experience Category"@en ;
+    skos:definition "A controlled, non-diagnostic category describing an unwanted experience in the participant's own terms."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ReportedSeverity a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Reported Severity"@en ;
+    skos:definition "A controlled category recording how severe a participant said an experience was."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ExperienceOnsetPhase a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Experience Onset Phase"@en ;
+    skos:definition "A controlled category locating when an unwanted experience began, relative to the session."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ExperiencePersistence a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Experience Persistence"@en ;
+    skos:definition "A controlled category recording how long an unwanted experience lasted, as the participant described it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ExperienceResponseAction a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Experience Response Action"@en ;
+    skos:definition "A controlled category recording what the participant did in response to an unwanted experience."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:ExperienceResolution a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Experience Resolution"@en ;
+    skos:definition "A controlled category recording the state an unwanted experience reached."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:PerceivedRelatedness a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Perceived Relatedness"@en ;
+    skos:definition "A controlled category recording whether the participant perceived an experience as connected to the session. It records a perception and is never promoted to an attribution."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasObservation a owl:ObjectProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  sstim:ParticipantObservation ;
+    rdfs:label  "has observation"@en ;
+    skos:definition "Links a self-report to the qualified observations collected in it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasObservationRole a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  sstim:ObservationRole ;
+    rdfs:label  "has observation role"@en ;
+    skos:definition "Identifies the single thing this observation observes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasResponseState a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  sstim:ResponseState ;
+    rdfs:label  "has response state"@en ;
+    skos:definition "States why this observation does or does not carry a value. Required on every observation: an observation whose absence of value is unexplained cannot be interpreted or aggregated safely."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:observedOrdinalValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "observed ordinal value"@en ;
+    skos:definition "The value the participant supplied on an ordinal scale. Interpretable only together with the scale bounds and anchor labels recorded beside it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:observedBooleanValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:boolean ;
+    rdfs:label  "observed boolean value"@en ;
+    skos:definition "The value the participant supplied to a yes/no item."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:observedTextValue a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "observed text value"@en ;
+    skos:definition "Free text the participant supplied, such as a stated goal in their own words."@en ;
+    skos:editorialNote "Free text can carry identifying information. Exclude it from research exports and public projections by default, and include it only under an explicit decision recorded in the governing privacy profile."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scaleMinimum a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "scale minimum"@en ;
+    skos:definition "Lowest value the scale offered, as presented."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scaleMaximum a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:integer ;
+    rdfs:label  "scale maximum"@en ;
+    skos:definition "Highest value the scale offered, as presented."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scaleMinimumLabel a owl:DatatypeProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "scale minimum label"@en ;
+    skos:definition "Anchor text shown at the low end of the scale, without which the number is not interpretable."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:scaleMaximumLabel a owl:DatatypeProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "scale maximum label"@en ;
+    skos:definition "Anchor text shown at the high end of the scale."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:promptIdentifier a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prompt identifier"@en ;
+    skos:definition "Stable identifier of the question as shown, within its instrument."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:promptText a owl:DatatypeProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "prompt text"@en ;
+    skos:definition "The exact wording shown to the participant."@en ;
+    skos:editorialNote "Prompts must stay neutral with respect to the session's intended effect: a question that names the hoped-for outcome produces an answer about the question."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:reportedConfidence a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "reported confidence"@en ;
+    skos:definition "How confident the participant said they were in their own answer, from 0 to 1, where the instrument collects it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasInstrument a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SelfReport ;
+    rdfs:range  sstim:ObservationInstrument ;
+    rdfs:label  "has instrument"@en ;
+    skos:definition "Identifies the single versioned instrument that produced this report's observations."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:instrumentVersion a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:ObservationInstrument ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "instrument version"@en ;
+    skos:definition "Version of the instrument as administered. Answers collected under different versions are not directly comparable."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:reportsUnwantedExperience a owl:ObjectProperty ;
+    rdfs:domain sstim:ParticipantObservation ;
+    rdfs:range  sstim:UnwantedExperienceObservation ;
+    rdfs:label  "reports unwanted experience"@en ;
+    skos:definition "Links the observation that asked about unwanted experiences to the experiences the participant described. The asking is an observation with its own response state, so a report that asked and got nothing remains distinguishable from one that never asked."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasExperienceCategory a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:UnwantedExperienceCategory ;
+    rdfs:label  "has experience category"@en ;
+    skos:definition "Identifies the single controlled category describing this experience."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasReportedSeverity a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:ReportedSeverity ;
+    rdfs:label  "has reported severity"@en ;
+    skos:definition "Records how severe the participant said this experience was."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasOnsetPhase a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:ExperienceOnsetPhase ;
+    rdfs:label  "has onset phase"@en ;
+    skos:definition "Locates when this experience began relative to the session."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:onsetOffsetSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "onset offset (s)"@en ;
+    skos:definition "Where on the session's timing context the experience began, when it began during the session and the participant could place it."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:experienceDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "experience duration (s)"@en ;
+    skos:definition "How long the experience lasted, where the participant gave a duration."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasPersistence a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:ExperiencePersistence ;
+    rdfs:label  "has persistence"@en ;
+    skos:definition "Records how long the experience persisted, as a controlled category."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasResponseAction a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:ExperienceResponseAction ;
+    rdfs:label  "has response action"@en ;
+    skos:definition "Records what the participant did in response."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasResolutionState a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:ExperienceResolution ;
+    rdfs:label  "has resolution state"@en ;
+    skos:definition "Records the state the experience reached."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasPerceivedRelatedness a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:UnwantedExperienceObservation ;
+    rdfs:range  sstim:PerceivedRelatedness ;
+    rdfs:label  "has perceived relatedness"@en ;
+    skos:definition "Records whether the participant perceived this experience as connected to the session."@en ;
+    skos:editorialNote "A perception, not a finding. No query, export, or aggregation may read this as an attribution of cause."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/session> .
+
+sstim:hasStimulationTarget rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:StimulusSpecification sstim:SessionSpecification ) ] .
+
+sstim:durationSeconds rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+sstim:masterVolume rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+sstim:masterBrightness rdfs:domain [ a owl:Class ; owl:unionOf ( sstim:SessionSpecification sstim:Preset ) ] .
+
+
+###########################################################################
+# End of session
+###########################################################################

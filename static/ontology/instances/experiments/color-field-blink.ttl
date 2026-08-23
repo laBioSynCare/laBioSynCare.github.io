@@ -1,0 +1,67 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/color-field-blink#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# ADR 0034: sstim-ex:ExploratoryProtocol no longer inherits a stimulation type,
+# so a genuinely sensory exploratory protocol declares it explicitly. This one
+# delivers structured input intended to engage canonical sensory transduction.
+bsclab-experiment:color-field-blink a sstim-ex:ExploratoryProtocol, sstim:SensoryStimulationProtocol ;
+    rdfs:label "Color field and blink exposure"@en ;
+    dct:description "Non-clinical exploratory setup for modeling static or blinking display color fields and their comfort, arousal, and photosensitivity boundaries without asserting physiological effects as fact."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim:usesTechnique sstim-v:techColorFieldStimulation, sstim-v:techPhoticDriving ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextBscLabPrototype ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Color field blink exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    sstim-ex:usesStimulusChannel this:visual-channel ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasHypothesis this:color-arousal-claim ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-risk-claim ;
+    sstim-ex:hasResearchQuestion this:heart-rate-hypothesis .
+
+this:visual-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Blinking color-field visual channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumVisualLight ;
+    sstim-ex:perceivedModality sstim-ex:modalityVisual ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityDisplayLightOutput, sstim-ex:capabilityDisplayFlicker ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEyes ;
+    sstim-ex:hasStimulusPattern sstim-ex:patternBlinking, sstim-ex:patternFixedColor, sstim-ex:patternChangingColor, sstim-ex:visualFieldStaticColor ;
+    sstim-ex:hasComfortBoundary sstim-ex:boundaryPhotosensitivity, sstim-ex:boundaryEyeStrain ;
+    sstim-ex:hasBoundaryApplicability this:photosensitivity-risk-claim .
+
+this:color-arousal-claim a sstim-ex:ExposureHypothesis ;
+    rdfs:label "Color-field arousal hypothesis"@en ;
+    dct:description "Hypothesizes that static or blinking color fields may differ in perceived arousal or discomfort. No direction or magnitude is asserted."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectArousal, sstim-ex:effectDiscomfort ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:hypothesisInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:photosensitivity-risk-claim a sstim-ex:BoundaryApplicabilityStatement ;
+    rdfs:label "Photosensitivity risk boundary"@en ;
+    dct:description "Marks flicker and high-intensity visual exposure as requiring conservative photosensitivity handling. No clinical screening rule is asserted."@en ;
+    sstim-ex:appliesBoundary sstim-ex:boundaryPhotosensitivity ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:knownInSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+
+this:heart-rate-hypothesis a sstim-ex:ResearchQuestion ;
+    rdfs:label "Heart-rate response hypothesis"@en ;
+    dct:description "Records a question about whether blinking or static color fields relate to heart-rate changes. SSTIM records no settled answer here."@en ;
+    sstim-ex:concernsEffectDimension sstim-ex:effectHeartRate, sstim-ex:effectBloodPressure, sstim-ex:effectBreathRate ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:unknownToSSTIM ;
+    dct:modified "2026-07-13"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> .
+

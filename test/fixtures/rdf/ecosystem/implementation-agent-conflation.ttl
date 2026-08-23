@@ -1,0 +1,5 @@
+@prefix org:    <http://www.w3.org/ns/org#> .
+@prefix schema: <https://schema.org/> .
+
+<https://w3id.org/sstim/implementation/bsclab/synthetic-ecosystem-player>
+    a schema:Organization, org:Organization .

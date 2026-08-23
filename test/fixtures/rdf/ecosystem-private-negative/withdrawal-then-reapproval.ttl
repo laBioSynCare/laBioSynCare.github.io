@@ -1,0 +1,54 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix private: <https://example.org/private-ledger-negative/reapproval/> .
+@prefix record:  <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+private:operator a prov:Agent .
+
+record:terminal-private-record a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Relationship snapshot with invalid reapproval"@en ;
+    sstim-eco:relationshipAgent private:operator ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/reapproval> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/reapproval> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    sstim-eco:hasEngagementActivity private:prior, private:withdrawal,
+        private:reapproval .
+
+private:prior a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic prior approval"@en ;
+    sstim-eco:engagementFor record:terminal-private-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .
+
+private:withdrawal a sstim-eco:EngagementActivity,
+        sstim-eco:ConsentDecisionActivity, sstim-eco:WithdrawalActivity,
+        prov:Activity ;
+    rdfs:label "Synthetic terminal withdrawal"@en ;
+    sstim-eco:engagementFor record:terminal-private-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentWithdrawn ;
+    prov:endedAtTime "2026-07-15T12:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:prior ;
+    prov:invalidated record:terminal-private-record .
+
+private:reapproval a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Invalid synthetic reapproval"@en ;
+    sstim-eco:engagementFor record:terminal-private-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:10:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:withdrawal .

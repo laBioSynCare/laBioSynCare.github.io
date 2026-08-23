@@ -1,0 +1,511 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://labiosyncare.github.io/schemas/session.schema.json",
+  "title": "BSC Lab native session bundle",
+  "description": "The one authoritative contract for a recorded BSC Lab session: specification, instance, event timeline, phase-qualified reports, and the privacy profile that governs all of them. Improvement plan 0.2 and 2.1-2.2; audit findings KR-02 and KR-03. The RDF projection is derived from this document, never the other way round.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["model", "specification", "instance", "events", "reports", "privacy"],
+
+  "properties": {
+    "model": {
+      "const": "bsc-lab-session-bundle-1",
+      "description": "Model tag. A bundle carrying newer fields must never claim an older tag."
+    },
+
+    "specification": { "$ref": "#/$defs/specification" },
+    "instance": { "$ref": "#/$defs/instance" },
+
+    "events": {
+      "type": "array",
+      "description": "The execution timeline, ordered by offsetSeconds. Every event is placed on the engine timing clock, never on a wall clock.",
+      "items": { "$ref": "#/$defs/event" }
+    },
+
+    "reports": {
+      "type": "array",
+      "description": "Zero or more phase-qualified report collections. A report is an observation record, never evidence.",
+      "items": { "$ref": "#/$defs/report" }
+    },
+
+    "privacy": { "$ref": "#/$defs/privacy" }
+  },
+
+  "$defs": {
+
+    "id": {
+      "type": "string",
+      "description": "Stable local identifier. Projects to an IRI under the bsclab-session namespace, so it must be IRI-path safe and stable for the life of the record.",
+      "pattern": "^[a-z0-9][a-z0-9-]{2,127}$"
+    },
+
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+
+    "dateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Wall-clock instant, ISO 8601 with an explicit offset or Z. Wall clock places a session in the calendar; it never orders events within one."
+    },
+
+    "offsetSeconds": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Seconds elapsed on the engine timing context since instance.clockOriginSeconds. This is the only ordering authority inside a session (CLAUDE.md 3.1)."
+    },
+
+    "specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "created", "source", "durationSeconds", "masterVolume", "outputGuarantee"],
+      "description": "The immutable, citable unit of reproducibility: one intended execution. Held constant for the whole session. A mid-session parameter change closes this specification and opens a new one; it never mutates.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "maxLength": 200 },
+        "created": { "$ref": "#/$defs/dateTime" },
+        "scheduledStart": { "$ref": "#/$defs/dateTime" },
+
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ref", "label", "contentHash"],
+          "description": "Exactly what was executed, and proof it has not moved since. A specification without a content hash is not reproducible, only suggestive.",
+          "properties": {
+            "kind": {
+              "enum": ["preset", "patch"],
+              "description": "preset = a catalog preset; patch = a Patch Studio document, which ADR 0041 also projects as a sstim:Preset."
+            },
+            "ref": {
+              "type": "string",
+              "format": "uri",
+              "minLength": 1,
+              "description": "The configuration's IRI. For kind=patch this is the same IRI its own patch projection uses, so the session and the patch package agree on one identity rather than each minting their own."
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Human-readable name of the configuration. Required because the RDF projection types the source as a sstim:Preset, and sstim-sh:PresetShape requires a label."
+            },
+            "contentHash": { "$ref": "#/$defs/sha256" },
+            "contentHashAlgorithm": { "const": "sha256-canonical-json" },
+            "catalogVersion": { "type": "string", "maxLength": 64 }
+          }
+        },
+
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 7200,
+          "description": "Intended session length. The bounds are sstim-sh:SessionSpecShape's, not a second opinion: KR-02 existed because the JSON and the RDF disagreed, so where the shape is stricter the shape wins."
+        },
+        "masterVolume": { "type": "number", "minimum": 0, "maximum": 1 },
+        "masterBrightness": { "type": "number", "minimum": 0, "maximum": 1 },
+
+        "breathingPeriodInitial": {
+          "type": ["number", "null"],
+          "minimum": 3,
+          "description": "Override for mp0 in seconds. null means the source's own value was used — recorded explicitly so the record alone shows whether the participant changed the arc. Values below 3s are tremolo, not breathing guidance (CLAUDE.md 4.5)."
+        },
+        "breathingPeriodFinal": { "type": ["number", "null"], "minimum": 3 },
+        "breathingTransitionDuration": { "type": ["number", "null"], "minimum": 0 },
+
+        "disabledTracks": {
+          "type": "array",
+          "description": "Tracks this session turned off. Listing them keeps the source configuration unmodified and comparable across sessions that used it differently.",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+
+        "environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The reproduction chain as declared, never as inferred. Statements about equipment, never about a person (EQUIPMENT_CHECK.md principle 1).",
+          "properties": {
+            "audioEngine": {
+              "enum": ["vanilla-web-audio", "audio-worklet", "audio-worklet-wasm", "null-silent", "unknown"]
+            },
+            "audioEngineVersion": { "type": "string", "maxLength": 64 },
+            "wasmChecksum": { "$ref": "#/$defs/sha256" },
+            "outputRoute": {
+              "enum": ["headphones", "speakers", "unknown", "not-asked"],
+              "description": "Participant-declared reproduction route. Binaural findings apply only to headphone delivery, so an unknown route is recorded as unknown rather than assumed."
+            },
+            "sampleRateHz": { "type": "number", "exclusiveMinimum": 0 },
+            "outputLatencySeconds": { "type": "number", "minimum": 0 },
+            "platform": { "type": "string", "maxLength": 64 },
+            "appVersion": { "type": "string", "maxLength": 64 },
+            "sstimRelease": { "type": "string", "maxLength": 64 }
+          }
+        },
+
+        "outputGuarantee": {
+          "enum": ["bit-exact", "signal-equivalent", "perceptually-equivalent"],
+          "description": "Which reproduction claim this record supports (improvement plan 0.2). bit-exact requires a deterministic offline render and identical engine build; signal-equivalent asserts the same generated signal within numerical tolerance; perceptually-equivalent asserts only the same targets, arc, architecture and duration. Web Audio sessions are perceptually-equivalent unless a deterministic render proves otherwise — do not declare upward."
+        }
+      }
+    },
+
+    "instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "specificationId", "startedAt", "clockOriginSeconds", "completionStatus"],
+      "description": "The append-only record of one actual execution. Never modified after close; corrections attach as linked records.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "maxLength": 200 },
+        "specificationId": { "$ref": "#/$defs/id" },
+
+        "startedAt": { "$ref": "#/$defs/dateTime" },
+        "endedAt": { "$ref": "#/$defs/dateTime" },
+
+        "clockOriginSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The engine timing context's currentTime when the instance opened. Every event offset is measured from this value, so the pair (clockOriginSeconds, offsetSeconds) reconstructs the exact engine time of every event without a wall clock."
+        },
+        "clockSource": {
+          "enum": ["audio-context", "silent-monotonic"],
+          "description": "Which timing surface produced the offsets. Sounding engines return a real AudioContext; the capability-free Silent engine returns the documented monotonic surface."
+        },
+
+        "actualDurationSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Elapsed engine time between open and close, including paused intervals."
+        },
+        "deliveredSeconds": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Engine time actually delivering stimulus, i.e. actualDurationSeconds minus paused intervals. The quantity that matters for exposure; distinguished because a paused session is not a short one."
+        },
+
+        "completionStatus": {
+          "enum": ["completed", "interrupted", "abandoned", "in-progress"],
+          "description": "completed = ran the intended duration and ended normally; interrupted = stopped early past 30% of intended duration; abandoned = stopped within the first 30%; in-progress = the instance is still open and is not yet a record of anything."
+        },
+
+        "deliveryModalities": {
+          "type": "array",
+          "items": { "enum": ["auditory", "visual", "somatosensory"] },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "completionStatus": { "const": "in-progress" } },
+            "required": ["completionStatus"]
+          },
+          "then": true,
+          "else": {
+            "required": ["endedAt", "actualDurationSeconds", "deliveredSeconds"],
+            "description": "A closed instance must say when it ended and how much of it ran. Only an open one may omit them."
+          }
+        }
+      ]
+    },
+
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "offsetSeconds"],
+      "description": "One observed occurrence on the engine clock. Events record what the runtime did, not what the participant felt.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": {
+          "enum": [
+            "session-open",
+            "playback-start",
+            "playback-pause",
+            "playback-resume",
+            "playback-stop",
+            "session-complete",
+            "session-interrupt",
+            "engine-fallback",
+            "safety-clamp-applied",
+            "report-collected"
+          ],
+          "description": "Controlled event vocabulary. A recorder that observes something outside this list must extend the vocabulary rather than overload a neighbouring term."
+        },
+        "offsetSeconds": { "$ref": "#/$defs/offsetSeconds" },
+        "wallClock": {
+          "$ref": "#/$defs/dateTime",
+          "description": "Optional and derived. Present only where a calendar instant is genuinely needed; the offset remains authoritative."
+        },
+        "detail": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Type-specific facts. Deliberately narrow: an open detail bag becomes an undocumented second schema.",
+          "properties": {
+            "fromEngine": { "type": "string", "maxLength": 64 },
+            "toEngine": { "type": "string", "maxLength": 64 },
+            "reason": { "type": "string", "maxLength": 200 },
+            "clampedParameter": { "type": "string", "maxLength": 64 },
+            "requestedValue": { "type": "number" },
+            "deliveredValue": { "type": "number" },
+            "reportId": { "$ref": "#/$defs/id" }
+          }
+        }
+      }
+    },
+
+    "responseState": {
+      "enum": ["supplied", "none-reported", "not-asked", "declined", "unknown", "not-applicable"],
+      "description": "Why a value is or is not present. These are six different facts and collapsing them into a missing key destroys the distinction between 'nothing happened', 'we never asked', and 'they chose not to say' (KR-03).",
+      "default": "unknown"
+    },
+
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phase", "instrument", "items", "unwantedExperiences"],
+      "description": "One collection event. Each answer is a qualified observation item carrying its own prompt provenance and response state. A report never becomes an EvidenceClaim by type inference or convenience mapping.",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "phase": {
+          "enum": ["pre-session", "during-session", "immediate-post", "follow-up"],
+          "description": "When this collection happened relative to the session."
+        },
+        "collectedAt": { "$ref": "#/$defs/dateTime" },
+        "collectedAtOffsetSeconds": {
+          "$ref": "#/$defs/offsetSeconds",
+          "description": "Where on the engine clock the report was collected. Required for during-session reports and refused for the others: only a during-session report happens on that clock, and a wall-clock timestamp cannot say how far into the session an answer was given."
+        },
+
+        "instrument": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "language"],
+          "description": "Which questionnaire, in which version and language. Reports are not comparable across instrument versions, so a report without this provenance is not analysable.",
+          "properties": {
+            "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+            "language": { "type": "string", "pattern": "^[a-z]{2}(-[A-Za-z0-9]+)*$" }
+          }
+        },
+
+        "statedGoal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["responseState"],
+          "description": "What the participant said they wanted from the session, in their words. A stated goal is not a clinical target and carries no expected outcome.",
+          "properties": {
+            "responseState": { "$ref": "#/$defs/responseState" },
+            "text": { "type": "string", "maxLength": 500 }
+          }
+        },
+
+        "items": {
+          "type": "array",
+          "description": "Qualified observation items. Order is presentation order.",
+          "items": { "$ref": "#/$defs/observationItem" }
+        },
+
+        "unwantedExperiences": { "$ref": "#/$defs/unwantedExperienceBlock" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "phase": { "const": "during-session" } },
+            "required": ["phase"]
+          },
+          "then": { "required": ["collectedAtOffsetSeconds"] },
+          "else": {
+            "not": { "required": ["collectedAtOffsetSeconds"] },
+            "description": "A pre-session, post-session or follow-up report does not happen on the session clock, so an offset for it would be a fabricated placement."
+          }
+        }
+      ]
+    },
+
+    "observationItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "responseState"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "role": {
+          "enum": [
+            "perceived-helpfulness",
+            "primary-affect",
+            "focus",
+            "sleepiness",
+            "subjective-quality",
+            "goal-achieved"
+          ],
+          "description": "What this item observes. perceived-helpfulness is the direct magnitude item KR-03 found missing; goal-achieved remains a self-assessment against the participant's own stated goal and is not an efficacy measure."
+        },
+        "responseState": { "$ref": "#/$defs/responseState" },
+        "value": {
+          "type": ["number", "boolean", "null"],
+          "description": "Present if and only if responseState is 'supplied'."
+        },
+        "scale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "description": "The scale as presented. Without it, an integer is not interpretable.",
+          "properties": {
+            "kind": { "enum": ["ordinal", "boolean"] },
+            "min": { "type": "number" },
+            "max": { "type": "number" },
+            "minLabel": { "type": "string", "maxLength": 80 },
+            "maxLabel": { "type": "string", "maxLength": 80 }
+          }
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id"],
+          "description": "The exact question shown. Prompts must be neutral with respect to the session's intended target (SESSION_MODEL.md self-report design principles).",
+          "properties": {
+            "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "text": { "type": "string", "maxLength": 300 }
+          }
+        },
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Participant-declared confidence in their own answer, where the instrument collects it."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "responseState": { "const": "supplied" } }, "required": ["responseState"] },
+          "then": { "required": ["value"], "properties": { "value": { "not": { "type": "null" } } } },
+          "else": { "properties": { "value": { "type": "null" } } }
+        }
+      ]
+    },
+
+    "unwantedExperienceBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["responseState"],
+      "description": "Zero or more participant-reported unwanted experiences. Deliberately not named 'sideEffect': that word asserts a causal medical conclusion a participant report cannot establish (KR-03). Nothing here classifies a clinical adverse event, and nothing infers causation.",
+      "properties": {
+        "responseState": {
+          "$ref": "#/$defs/responseState",
+          "description": "'none-reported' after asking, 'not-asked' if the instrument omitted the question, 'declined' if the participant chose not to answer. An empty records array alone does not distinguish these."
+        },
+        "records": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/unwantedExperience" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "responseState": { "const": "supplied" } }, "required": ["responseState"] },
+          "then": { "required": ["records"], "properties": { "records": { "type": "array", "minItems": 1 } } },
+          "else": { "properties": { "records": { "type": "array", "maxItems": 0 } } }
+        }
+      ]
+    },
+
+    "unwantedExperience": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "participantReportedSeverity", "onsetPhase", "participantPerceivedRelatedness"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "category": {
+          "enum": [
+            "auditory-discomfort",
+            "visual-discomfort",
+            "eye-strain",
+            "head-sensation",
+            "dizziness",
+            "nausea",
+            "restlessness",
+            "low-mood",
+            "sleep-disruption",
+            "other"
+          ],
+          "description": "Neutral experience categories in the participant's terms. None of these is a diagnosis, and 'other' plus text is preferred over forcing a poor fit."
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Free text. Excluded from research exports by default: it can carry identifiers (improvement plan 2.2)."
+        },
+        "participantReportedSeverity": {
+          "enum": ["mild", "moderate", "severe", "declined", "unknown"],
+          "description": "Severity as the participant described it. Explicitly participant-reported: no clinical grading scale is implied or usable here."
+        },
+        "onsetPhase": {
+          "enum": ["before-session", "during-session", "immediately-after", "later-same-day", "next-day", "unknown"]
+        },
+        "onsetOffsetSeconds": {
+          "$ref": "#/$defs/offsetSeconds",
+          "description": "Where on the session clock it began, when onsetPhase is during-session and the participant could place it."
+        },
+        "persistence": {
+          "enum": ["resolved-during-session", "resolved-same-day", "resolved-later", "ongoing", "unknown"]
+        },
+        "durationSeconds": { "type": "number", "minimum": 0 },
+        "actionTaken": {
+          "enum": ["none", "reduced-intensity", "paused-session", "stopped-session", "removed-headphones", "other", "declined", "unknown"]
+        },
+        "resolution": {
+          "enum": ["resolved", "improved", "unchanged", "worsened", "unknown"]
+        },
+        "participantPerceivedRelatedness": {
+          "enum": ["related", "possibly-related", "unrelated", "unknown", "declined"],
+          "description": "The participant's own view of whether the session was involved. It is their perception and is never promoted to an attribution by any query or export."
+        }
+      }
+    },
+
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "reportingRole", "consentBasis", "policyVersion", "visibility", "deidentification", "withdrawn"],
+      "description": "The profile that governs this whole bundle. Required, not optional: a session record without a stated classification cannot be safely stored, exported, or committed (improvement plan 2.2, replacing the prose claim that reports are 'consent-governed').",
+      "properties": {
+        "classification": {
+          "enum": ["synthetic", "public-safe", "de-identified", "shared-research", "private"],
+          "description": "'synthetic' means machine-generated and about no one. The public-repository lint permits only 'synthetic' and 'public-safe' bundles to be committed, so this field is machine-testable rather than a comment."
+        },
+        "reportingRole": {
+          "enum": ["self", "observer", "synthetic"],
+          "description": "Who produced the reports. No identity is recorded here; pseudonym is the only handle and it is optional."
+        },
+        "pseudonym": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "A stable per-study handle, never an account id, device id, or email."
+        },
+        "consentBasis": {
+          "enum": ["none-required-synthetic", "app-usage", "research-opt-in", "not-obtained"],
+          "description": "'not-obtained' is a valid, storable state: it marks a record that exists but may not be used for research."
+        },
+        "policyVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "visibility": { "enum": ["local-only", "account", "shared-study", "public"] },
+        "retention": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "policy": { "enum": ["until-withdrawn", "fixed-period", "indefinite"] },
+            "untilDate": { "$ref": "#/$defs/dateTime" }
+          }
+        },
+        "deidentification": {
+          "enum": ["none", "pseudonymised", "aggregated"],
+          "description": "The transform actually applied, not the one intended."
+        },
+        "withdrawn": {
+          "type": "boolean",
+          "description": "Set when a participant withdraws. A withdrawn bundle must not be exported or projected to RDF regardless of every other field."
+        },
+        "freeTextIncluded": {
+          "type": "boolean",
+          "description": "Whether any free-text field carries content. Lets an export decide what to strip without parsing every nested item."
+        }
+      }
+    }
+  }
+}

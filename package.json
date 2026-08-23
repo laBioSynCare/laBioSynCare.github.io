@@ -1,0 +1,34 @@
+{
+  "name": "bsc-lab",
+  "version": "0.1.0",
+  "description": "SSTIM Workbench — open sensory-stimulation reference environment and Graph Navigator",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && node scripts/gen-build-info.mjs",
+    "preview": "vite preview",
+    "test": "vitest --passWithNoTests",
+    "validate": "make validate",
+    "check": "svelte-kit sync && svelte-check"
+  },
+  "dependencies": {
+    "@comunica/query-sparql-rdfjs": "^3.3.0",
+    "@picocss/pico": "^2.0.6",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.57.1",
+    "cytoscape": "^3.30.0",
+    "firebase": "^12.12.1",
+    "n3": "^1.17.3",
+    "rdf-validate-shacl": "^0.5.6"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "svelte": "^5.0.0",
+    "svelte-check": "^4.4.6",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
+  }
+}

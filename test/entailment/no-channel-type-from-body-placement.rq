@@ -1,0 +1,18 @@
+# KR-05 — a body placement does not make its subject a stimulus channel.
+#
+# sstim-ex:hasBodyPlacement carries a union domain over ExposureProfile,
+# StimulusChannel and DeviceCapability, because a placement describes all three.
+# The audit found it typed to the channel alone, which inferred that every
+# profile and every device capability carrying a placement *was* a channel.
+#
+# A profile or capability that is also a channel is that inference returning:
+# the three classes describe different things, and nothing in the sources
+# asserts an individual as two of them.
+PREFIX rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
+
+SELECT ?subject ?alsoTypedAs WHERE {
+  ?subject rdf:type sstim-ex:StimulusChannel ;
+           rdf:type ?alsoTypedAs .
+  FILTER(?alsoTypedAs IN (sstim-ex:ExposureProfile, sstim-ex:DeviceCapability))
+}

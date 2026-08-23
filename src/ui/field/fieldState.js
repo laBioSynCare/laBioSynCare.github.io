@@ -1,0 +1,305 @@
+// Sensory Field state model.
+//
+// A minimal "instrument": one full-screen visual field plus an independent
+// per-ear audio channel. Static is the f=0 (DC) case; blink/beat add the time
+// axis (Step 2). The shape mirrors the per-channel matrix in
+// docs/technical/SENSORY_FIELD.md and is what exposureProfile.js serialises to
+// an sstim-ex:ExposureProfile.
+//
+// Persistence mirrors the localStorage-guarded pattern used by skins.js and
+// audioEngines.js. Runtime audio nodes live in the component, not here.
+
+export const SENSORY_FIELD_MODEL = 'sensory-field-model-1'
+export const FIELD_STORAGE_KEY = 'bsclab.field'
+
+export const NOISE_COLORS = ['white', 'pink', 'brown']
+export const BEAT_MODES = ['none', 'monaural', 'binaural']
+export const DEPTH_VIEWING_MODES = ['parallel', 'cross']
+export const DEPTH_SOURCES = ['static', 'beat', 'breath']
+
+// Tone frequency bounds (Hz) and absolute caps shared with the UI sliders.
+export const TONE_MIN_HZ = 50
+export const TONE_MAX_HZ = 1000
+export const BEAT_MIN_HZ = 0
+export const BEAT_MAX_HZ = 40
+export const BLINK_MIN_HZ = 0.1
+export const BLINK_MAX_HZ = 60
+export const DEPTH_SEPARATION_MIN_PX = 0
+export const DEPTH_SEPARATION_MAX_PX = 160
+export const DEPTH_MODULATION_MIN_PX = 0
+export const DEPTH_MODULATION_MAX_PX = 80
+export const DEPTH_DOT_MIN_PX = 6
+export const DEPTH_DOT_MAX_PX = 40
+export const DEPTH_BREATH_MIN_SEC = 3
+export const DEPTH_BREATH_MAX_SEC = 30
+export const GRID_DEPTH_AXES = ['none', 'x', 'y', 'both']
+export const GRID_DEPTH_RANGE_MIN_PX = 0
+export const GRID_DEPTH_RANGE_MAX_PX = 80
+export const GRID_SIZE_MIN = 1
+export const GRID_SIZE_MAX = 7
+export const GRID_DOT_SCALE_MIN = 0.25
+export const GRID_DOT_SCALE_MAX = 4
+export const MARKER_MOTION_SOURCES = ['none', 'beat', 'breath']
+export const MARKER_MOTION_AMPLITUDE_MIN_PX = 0
+export const MARKER_MOTION_AMPLITUDE_MAX_PX = 200
+export const MARKER_TRAJECTORY_STEPS_MIN = 3
+export const MARKER_TRAJECTORY_STEPS_MAX = 36
+
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v))
+const TWO_PI = Math.PI * 2
+const numberOr = (value, fallback) => {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : fallback
+}
+
+export function createFieldState() {
+  return {
+    model: SENSORY_FIELD_MODEL,
+    visual: {
+      enabled: true,
+      color: '#3355ff',
+      offColor: '#000000',
+      intensity: 0.6,
+      blinkEnabled: false,
+      blinkRateHz: 1,
+      blinkDuty: 0.5,
+    },
+    depth: {
+      enabled: false,
+      viewingMode: 'parallel',
+      source: 'static',
+      baseSeparationPx: 48,
+      modulationPx: 18,
+      dotSizePx: 16,
+      breathPeriodSec: 10,
+      gridDepthAxis: 'none',
+      gridDepthRangePx: 24,
+      showCartesianPlane: true,
+      gridSize: 3,
+      gridDotScaleX: 1,
+      gridDotScaleY: 1,
+      markerMotionXSource: 'none',
+      markerMotionXAmplitudePx: 30,
+      markerMotionYSource: 'none',
+      markerMotionYAmplitudePx: 30,
+      markerMotionCircleSource: 'none',
+      markerMotionCircleAmplitudePx: 30,
+      markerTrajectoryEnabled: false,
+      markerTrajectorySteps: 12,
+    },
+    audio: {
+      enabled: true,
+      linkEars: true,
+      beatMode: 'none',
+      beatRateHz: 4,
+      left: createEarState(),
+      right: createEarState(),
+    },
+    // Per-session acknowledgement that the user accepts a flash rate inside the
+    // photosensitivity risk band. Never persisted — always re-confirmed.
+    flashRiskAccepted: false,
+  }
+}
+
+function normalizeDepth(depth = {}) {
+  const base = createFieldState().depth
+  return {
+    enabled: typeof depth.enabled === 'boolean' ? depth.enabled : base.enabled,
+    viewingMode: DEPTH_VIEWING_MODES.includes(depth.viewingMode) ? depth.viewingMode : base.viewingMode,
+    source: DEPTH_SOURCES.includes(depth.source) ? depth.source : base.source,
+    baseSeparationPx: clamp(
+      numberOr(depth.baseSeparationPx, base.baseSeparationPx),
+      DEPTH_SEPARATION_MIN_PX,
+      DEPTH_SEPARATION_MAX_PX,
+    ),
+    modulationPx: clamp(
+      numberOr(depth.modulationPx, base.modulationPx),
+      DEPTH_MODULATION_MIN_PX,
+      DEPTH_MODULATION_MAX_PX,
+    ),
+    dotSizePx: clamp(
+      numberOr(depth.dotSizePx, base.dotSizePx),
+      DEPTH_DOT_MIN_PX,
+      DEPTH_DOT_MAX_PX,
+    ),
+    breathPeriodSec: clamp(
+      numberOr(depth.breathPeriodSec, base.breathPeriodSec),
+      DEPTH_BREATH_MIN_SEC,
+      DEPTH_BREATH_MAX_SEC,
+    ),
+    gridDepthAxis: GRID_DEPTH_AXES.includes(depth.gridDepthAxis) ? depth.gridDepthAxis : base.gridDepthAxis,
+    gridDepthRangePx: clamp(
+      numberOr(depth.gridDepthRangePx, base.gridDepthRangePx),
+      GRID_DEPTH_RANGE_MIN_PX,
+      GRID_DEPTH_RANGE_MAX_PX,
+    ),
+    showCartesianPlane: typeof depth.showCartesianPlane === 'boolean' ? depth.showCartesianPlane : base.showCartesianPlane,
+    gridSize: clamp(
+      Math.round(numberOr(depth.gridSize, base.gridSize)),
+      GRID_SIZE_MIN,
+      GRID_SIZE_MAX,
+    ),
+    gridDotScaleX: clamp(numberOr(depth.gridDotScaleX, base.gridDotScaleX), GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX),
+    gridDotScaleY: clamp(numberOr(depth.gridDotScaleY, base.gridDotScaleY), GRID_DOT_SCALE_MIN, GRID_DOT_SCALE_MAX),
+    markerMotionXSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionXSource) ? depth.markerMotionXSource : base.markerMotionXSource,
+    markerMotionXAmplitudePx: clamp(numberOr(depth.markerMotionXAmplitudePx, base.markerMotionXAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerMotionYSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionYSource) ? depth.markerMotionYSource : base.markerMotionYSource,
+    markerMotionYAmplitudePx: clamp(numberOr(depth.markerMotionYAmplitudePx, base.markerMotionYAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerMotionCircleSource: MARKER_MOTION_SOURCES.includes(depth.markerMotionCircleSource) ? depth.markerMotionCircleSource : base.markerMotionCircleSource,
+    markerMotionCircleAmplitudePx: clamp(numberOr(depth.markerMotionCircleAmplitudePx, base.markerMotionCircleAmplitudePx), MARKER_MOTION_AMPLITUDE_MIN_PX, MARKER_MOTION_AMPLITUDE_MAX_PX),
+    markerTrajectoryEnabled: typeof depth.markerTrajectoryEnabled === 'boolean' ? depth.markerTrajectoryEnabled : base.markerTrajectoryEnabled,
+    markerTrajectorySteps: clamp(
+      Math.round(numberOr(depth.markerTrajectorySteps, base.markerTrajectorySteps)),
+      MARKER_TRAJECTORY_STEPS_MIN,
+      MARKER_TRAJECTORY_STEPS_MAX,
+    ),
+  }
+}
+
+function createEarState() {
+  return {
+    tone: true,
+    freqHz: 200,
+    noise: false,
+    noiseColor: 'pink',
+    gain: 0.18,
+  }
+}
+
+const isHexColor = (s) => typeof s === 'string' && /^#[0-9a-fA-F]{6}$/.test(s)
+
+function normalizeEar(ear = {}) {
+  const base = createEarState()
+  return {
+    tone: typeof ear.tone === 'boolean' ? ear.tone : base.tone,
+    freqHz: clamp(Number(ear.freqHz ?? base.freqHz) || base.freqHz, TONE_MIN_HZ, TONE_MAX_HZ),
+    noise: typeof ear.noise === 'boolean' ? ear.noise : base.noise,
+    noiseColor: NOISE_COLORS.includes(ear.noiseColor) ? ear.noiseColor : base.noiseColor,
+    gain: clamp(Number(ear.gain ?? base.gain) || 0, 0, 1),
+  }
+}
+
+/** Coerce an arbitrary (possibly persisted/older) object into a valid state. */
+export function normalizeFieldState(input) {
+  const base = createFieldState()
+  const v = input?.visual ?? {}
+  const a = input?.audio ?? {}
+  return {
+    model: SENSORY_FIELD_MODEL,
+    visual: {
+      enabled: typeof v.enabled === 'boolean' ? v.enabled : base.visual.enabled,
+      color: isHexColor(v.color) ? v.color : base.visual.color,
+      offColor: isHexColor(v.offColor) ? v.offColor : base.visual.offColor,
+      intensity: clamp(Number(v.intensity ?? base.visual.intensity) || 0, 0, 1),
+      blinkEnabled: typeof v.blinkEnabled === 'boolean' ? v.blinkEnabled : base.visual.blinkEnabled,
+      blinkRateHz: clamp(Number(v.blinkRateHz ?? base.visual.blinkRateHz) || base.visual.blinkRateHz, BLINK_MIN_HZ, BLINK_MAX_HZ),
+      blinkDuty: clamp(Number(v.blinkDuty ?? base.visual.blinkDuty) || base.visual.blinkDuty, 0.05, 0.95),
+    },
+    depth: normalizeDepth(input?.depth),
+    audio: {
+      enabled: typeof a.enabled === 'boolean' ? a.enabled : base.audio.enabled,
+      linkEars: typeof a.linkEars === 'boolean' ? a.linkEars : base.audio.linkEars,
+      beatMode: BEAT_MODES.includes(a.beatMode) ? a.beatMode : base.audio.beatMode,
+      beatRateHz: clamp(Number(a.beatRateHz ?? base.audio.beatRateHz) || 0, BEAT_MIN_HZ, BEAT_MAX_HZ),
+      left: normalizeEar(a.left),
+      right: normalizeEar(a.right),
+    },
+    flashRiskAccepted: false,
+  }
+}
+
+/**
+ * Resolve the effective per-ear frequencies, applying the link toggle and the
+ * binaural beat split (left = f − beat/2, right = f + beat/2). Returns the
+ * concrete values the audio engine and the exposure profile should use.
+ */
+export function resolveEarFrequencies(state) {
+  const { audio } = state
+  const left = audio.left.freqHz
+  const right = audio.linkEars ? audio.left.freqHz : audio.right.freqHz
+  if (audio.beatMode === 'binaural') {
+    const center = audio.linkEars ? left : (left + right) / 2
+    const half = audio.beatRateHz / 2
+    return {
+      left: clamp(center - half, TONE_MIN_HZ, TONE_MAX_HZ),
+      right: clamp(center + half, TONE_MIN_HZ, TONE_MAX_HZ),
+    }
+  }
+  return { left, right }
+}
+
+/**
+ * Resolve the delivered stereo point separation, in CSS pixels. The parent
+ * component passes AudioContext.currentTime while a session is running.
+ */
+export function resolveDepthSeparation(state, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const base = depth.baseSeparationPx
+  if (!depth.enabled || depth.source === 'static' || depth.modulationPx <= 0) return base
+
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (depth.source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (depth.source === 'breath') rate = 1 / depth.breathPeriodSec
+  if (rate <= 0) return base
+
+  const value = base + depth.modulationPx * Math.sin(time * rate * TWO_PI)
+  return clamp(value, DEPTH_SEPARATION_MIN_PX, DEPTH_SEPARATION_MAX_PX)
+}
+
+/**
+ * Resolve the X or Y position offset of the central marker, in CSS pixels.
+ * axis: 'x' | 'y'
+ */
+export function resolveMarkerMotion(state, axis, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const source = axis === 'x' ? depth.markerMotionXSource : depth.markerMotionYSource
+  const amplitude = axis === 'x' ? depth.markerMotionXAmplitudePx : depth.markerMotionYAmplitudePx
+  if (!source || source === 'none' || amplitude <= 0) return 0
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (source === 'breath') rate = 1 / (depth.breathPeriodSec || 10)
+  if (rate <= 0) return 0
+  return amplitude * Math.sin(time * rate * TWO_PI)
+}
+
+/**
+ * Resolve circular motion offset for the central marker.
+ * Returns { x, y } in CSS pixels: x = A·sin(ωt), y = A·cos(ωt).
+ * The quarter-phase offset between axes produces circular motion at any single rate.
+ */
+export function resolveMarkerCircle(state, t = 0) {
+  const depth = normalizeDepth(state?.depth)
+  const source = depth.markerMotionCircleSource
+  const amplitude = depth.markerMotionCircleAmplitudePx
+  if (!source || source === 'none' || amplitude <= 0) return { x: 0, y: 0 }
+  const time = Number.isFinite(t) ? t : 0
+  let rate = 0
+  if (source === 'beat') rate = Number(state?.audio?.beatRateHz) || 0
+  if (source === 'breath') rate = 1 / (depth.breathPeriodSec || 10)
+  if (rate <= 0) return { x: 0, y: 0 }
+  const phase = time * rate * TWO_PI
+  return { x: amplitude * Math.sin(phase), y: amplitude * Math.cos(phase) }
+}
+
+export function loadFieldState() {
+  if (typeof localStorage === 'undefined') return createFieldState()
+  try {
+    const raw = localStorage.getItem(FIELD_STORAGE_KEY)
+    if (!raw) return createFieldState()
+    return normalizeFieldState(JSON.parse(raw))
+  } catch {
+    return createFieldState()
+  }
+}
+
+export function saveFieldState(state) {
+  if (typeof localStorage === 'undefined') return
+  try {
+    const { flashRiskAccepted, ...persisted } = normalizeFieldState(state)
+    localStorage.setItem(FIELD_STORAGE_KEY, JSON.stringify(persisted))
+  } catch {
+    // Storage unavailable (private mode / quota) — settings just won't persist.
+  }
+}

@@ -1,0 +1,20 @@
+###########################################################################
+# Positive fixture for the SSTIM Kernel Profile.
+#
+# The Kernel owns two classes and nothing else: sstim:Stimulation and its
+# sensory specialisation. This graph is therefore deliberately almost empty —
+# any additional SSTIM predicate would come from a module Kernel does not
+# import, and the point of the fixture is that the anchor is usable alone.
+#
+# Kernel declares no shape closure, so this fixture is not validated: it is
+# executed by the Kernel competency query (ADR 0045). Both types are asserted
+# explicitly because every profile declares inference mode "none", so nothing
+# derives Stimulation from SensoryStimulation at query time.
+###########################################################################
+
+@prefix example: <https://example.org/sstim/kernel-fixture/> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "A sensory stimulation process"@en .

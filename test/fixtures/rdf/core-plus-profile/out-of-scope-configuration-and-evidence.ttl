@@ -1,0 +1,75 @@
+###########################################################################
+# Out-of-scope positive fixture for the SSTIM Core Plus Profile.
+#
+# Core Plus is the optional shared-descriptor layer: Core plus Common. It is
+# explicitly *not* a step towards Full. This fixture asserts the concerns Core
+# Plus omits — preset configuration, technique, session policy, evidence, and
+# exposure delivery — on top of a well-formed Core Plus description, and must
+# still validate.
+#
+# The failure this guards against is a Configuration or Exposure constraint
+# migrating into sstim-core-shapes.ttl, which Core and Core Plus share. Because
+# they share it, a leak silently widens the obligations of both profiles at
+# once, and this fixture is what notices.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/core-plus-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:     <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+# Core + Common: everything Core Plus actually owns.
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Calibrated specification carrying non-Core-Plus concerns"@en ;
+    dct:identifier "core-plus-out-of-scope-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Calibrated sensory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Calibrated auditory channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal .
+
+example:alphaBand a sstim:FrequencyBand ;
+    skos:prefLabel "Alpha"@en ;
+    sstim:hzMin "8.0"^^xsd:decimal ;
+    sstim:hzMax "13.0"^^xsd:decimal .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .
+
+# Outside the Core Plus closure. Core Plus imports neither Configuration,
+# Technique, Session, Evidence, nor Exposure, and must ignore all of it.
+example:preset a sstim:Preset ;
+    rdfs:label "Preset built from this specification" ;
+    sstim:targetsFrequencyBand example:alphaBand .
+
+example:channel
+    sstim-ex:deliveryMedium example:airborneSound ;
+    sstim-ex:perceivedModality example:auditory .
+
+example:airborneSound a sstim-ex:DeliveryMedium ;
+    rdfs:label "Airborne sound"@en .
+
+example:auditory a sstim-ex:PerceivedModality ;
+    rdfs:label "Auditory"@en .
+
+example:sessionPlan a sstim:SessionSpecification ;
+    rdfs:label "Session plan for the same target"@en ;
+    sstim:hasStimulationTarget example:target .

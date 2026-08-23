@@ -1,0 +1,41 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:    <https://schema.org/> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/missing-agent-kind/> .
+
+# Overlay on the positive fixture. This agent deliberately has neither the
+# schema:Person/foaf:Person nor schema:Organization/org:Organization pair.
+
+<https://w3id.org/sstim/specialist/synthetic-kindless>
+    a sstim-eco:EcosystemAgent, prov:Agent ;
+    rdfs:label "Kindless synthetic agent"@en ;
+    dct:source <https://example.org/sources/kindless-agent> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    dct:modified "2026-07-15"^^xsd:date ;
+    schema:url <https://example.org/people/kindless-agent> ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEcosystemRelationship ex:relationship .
+
+ex:relationship a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Kindless-agent relationship"@en ;
+    sstim-eco:relationshipAgent
+        <https://w3id.org/sstim/specialist/synthetic-kindless> ;
+    sstim-eco:relationshipTarget <https://example.org/targets/kindless> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicAttribution ;
+    dct:source <https://example.org/sources/kindless-relationship> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo <https://example.org/agent/synthetic-curator> ;
+    sstim-eco:hasEngagementActivity ex:activity .
+
+ex:activity a sstim-eco:EngagementActivity, prov:Activity ;
+    rdfs:label "Kindless-agent activity"@en ;
+    sstim-eco:engagementFor ex:relationship ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicAttribution ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeAcknowledged ;
+    prov:endedAtTime "2026-07-15T13:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

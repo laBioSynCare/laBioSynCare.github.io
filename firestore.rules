@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /rdfAnnotations/{annotationId} {
+      allow read: if resource.data.get('visibility', '') == 'public'
+        || (signedIn() && resource.data.userId == request.auth.uid);
+
+      allow create: if signedIn()
+        && validAnnotationCreate();
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid
+        && validAnnotationPayload();
+
+      allow delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && userId == request.auth.uid;
+      allow write: if signedIn()
+        && userId == request.auth.uid
+        && validUserPayload();
+    }
+
+    match /patchStudioPatches/{patchId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      allow create: if signedIn()
+        && validPatchPayload();
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && validPatchPayload();
+
+      allow delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // Server-admin-only SSTIM ecosystem audit ledger. Client SDK access is
+    // denied even to authenticated users; publication uses Google Cloud IAM.
+    match /sstimEcosystemAudit/{auditId} {
+      allow read, write: if false;
+    }
+  }
+
+  function signedIn() {
+    return request.auth != null;
+  }
+
+  function validUserPayload() {
+    return request.resource.data.keys().hasOnly([
+      'displayName',
+      'email',
+      'bio',
+      'affiliation',
+      'updatedAt'
+    ])
+    && request.resource.data.get('displayName', '') is string
+    && request.resource.data.get('displayName', '').size() <= 200
+    && request.resource.data.get('bio', '') is string
+    && request.resource.data.get('bio', '').size() <= 4000
+    && request.resource.data.get('affiliation', '') is string
+    && request.resource.data.get('affiliation', '').size() <= 200
+    && request.resource.data.get('email', '') is string
+    && request.resource.data.get('email', '').size() <= 200;
+  }
+
+  function validAnnotationCreate() {
+    return request.resource.data.userId == request.auth.uid
+      && validAnnotationPayload();
+  }
+
+  function validAnnotationPayload() {
+    return request.resource.data.keys().hasOnly([
+      'userId',
+      'userDisplayName',
+      'targetIri',
+      'annotationType',
+      'annotationText',
+      'visibility',
+      'createdAt',
+      'updatedAt'
+    ])
+    && request.resource.data.targetIri is string
+    && request.resource.data.annotationType is string
+    && request.resource.data.annotationText is string
+    && request.resource.data.annotationText.size() > 0
+    && request.resource.data.annotationText.size() <= 4000
+    && request.resource.data.visibility in ['public', 'private']
+    && request.resource.data.get('userDisplayName', '') is string
+    && request.resource.data.get('userDisplayName', '').size() <= 200;
+  }
+
+  function validPatchPayload() {
+    return request.resource.data.keys().hasOnly([
+      'userId',
+      'patchName',
+      'model',
+      'patch',
+      'createdAt',
+      'updatedAt'
+    ])
+    && request.resource.data.userId == request.auth.uid
+    && request.resource.data.patchName is string
+    && request.resource.data.patchName.size() > 0
+    && request.resource.data.patchName.size() <= 200
+    && request.resource.data.model in [
+      'patch-studio-model-1',
+      'patch-studio-model-2',
+      'patch-studio-model-3'
+    ]
+    && request.resource.data.patch is map
+    && request.resource.data.patch.model == request.resource.data.model
+    && request.resource.data.patch.patchName is string
+    && request.resource.data.patch.patchName.size() > 0
+    && request.resource.data.patch.patchName.size() <= 200
+    && request.resource.data.patch.patchName == request.resource.data.patchName;
+  }
+}

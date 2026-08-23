@@ -1,0 +1,6 @@
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<https://example.org/agent/disguised-private-evidence>
+    a prov:Agent ;
+    dct:description "Synthetic raw consent evidence must not masquerade as an actor."@en .

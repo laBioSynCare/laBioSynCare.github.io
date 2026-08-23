@@ -1,0 +1,55 @@
+@prefix dct:    <http://purl.org/dc/terms/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:  <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:   <http://www.w3.org/ns/prov#> .
+@prefix bsclab-experiment: <https://w3id.org/sstim/implementation/bsclab/experiment/> .
+@prefix this: <https://w3id.org/sstim/implementation/bsclab/experiment/smell-taste-device-boundary#> .
+
+# ADR 0034: deliberately NOT typed as any stimulation protocol — a capability-boundary document. Its own editorial note records that it
+# intentionally maps to no supported stimulation technique, and every channel is
+# notCurrentlyDeliverableByBSCLab or outsideBSCLabScope.
+bsclab-experiment:smell-taste-device-boundary a sstim-ex:ExploratoryProtocol ;
+    rdfs:label "Smell and taste device boundary"@en ;
+    dct:description "Non-clinical modeling example that treats olfactory and gustatory modalities as SSTIM-relevant while marking ordinary phone smell, device taste, and perfume-on-device usage as outside current BSC Lab delivery capability."@en ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    skos:editorialNote "Capability-boundary protocol: documents out-of-scope delivery paths and intentionally does not map them to a currently supported BSC stimulation technique."@en ;
+    sstim:definedByFramework <https://w3id.org/sstim/framework/bsc> ;
+    sstim-ex:hasExperimentContext sstim-ex:contextExploratoryNonClinical, sstim-ex:contextCapabilityBoundary ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
+    sstim-ex:hasExposureProfile this:profile .
+
+this:profile a sstim-ex:ExposureProfile ;
+    rdfs:label "Smell/taste boundary exposure profile"@en ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope ;
+    sstim-ex:usesStimulusChannel this:phone-smell-channel, this:perfume-device-channel, this:device-taste-channel ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery, sstim-ex:capabilityTasteDelivery ;
+    sstim-ex:hasPerceptualLoss sstim-ex:lossDeliverability, sstim-ex:lossDeviceFeasibility  .
+this:phone-smell-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Phone smell channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumOlfactoryChemicalExposure ;
+    sstim-ex:perceivedModality sstim-ex:modalityOlfactory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNose ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab .
+
+this:perfume-device-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Perfume-on-device olfactory channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumOlfactoryChemicalExposure ;
+    sstim-ex:perceivedModality sstim-ex:modalityOlfactory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityScentDelivery ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementNose ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:outsideBSCLabScope .
+
+this:device-taste-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Device taste channel"@en ;
+    sstim-ex:deliveryMedium sstim-ex:mediumGustatoryChemicalExposure ;
+    sstim-ex:perceivedModality sstim-ex:modalityGustatory ;
+    sstim-ex:requiresDeviceCapability sstim-ex:capabilityTasteDelivery ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementMouth ;
+    sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverableByBSCLab, sstim-ex:outsideBSCLabScope .
+

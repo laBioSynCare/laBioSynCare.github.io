@@ -1,0 +1,46 @@
+@prefix dct:       <http://purl.org/dc/terms/> .
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix private: <https://example.org/private-ledger-negative/incomplete-replacement/> .
+@prefix record:  <https://w3id.org/sstim/ecosystem-record/relationship/> .
+
+private:operator a prov:Agent .
+
+record:old-complete-record a sstim-eco:EcosystemRelationship ;
+    rdfs:label "Complete old relationship snapshot"@en ;
+    sstim-eco:relationshipAgent private:operator ;
+    sstim-eco:relationshipTarget <https://example.org/public-target/old-complete> ;
+    sstim-eco:hasRelationshipType sstim-eco:contributor ;
+    sstim-eco:relationshipPurpose sstim-eco:purposePublicDiscovery ;
+    dct:source <https://example.org/public-source/old-complete> ;
+    dct:created "2026-07-15"^^xsd:date ;
+    sstim-eco:reviewedOn "2026-07-15"^^xsd:date ;
+    prov:wasAttributedTo private:operator ;
+    sstim-eco:hasEngagementActivity private:prior, private:amendment .
+
+private:prior a sstim-eco:EngagementActivity,
+        sstim-eco:PublicationDecisionActivity, prov:Activity ;
+    rdfs:label "Synthetic prior decision"@en ;
+    sstim-eco:engagementFor record:old-complete-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomePublicationApproved ;
+    prov:endedAtTime "2026-07-15T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator .
+
+private:amendment a sstim-eco:EngagementActivity,
+        sstim-eco:AmendmentActivity, prov:Activity ;
+    rdfs:label "Invalid amendment with incomplete replacement"@en ;
+    sstim-eco:engagementFor record:old-complete-record ;
+    sstim-eco:engagementPurpose sstim-eco:purposePublicDiscovery ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeRecordAmended ;
+    prov:endedAtTime "2026-07-15T12:05:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith private:operator ;
+    prov:wasInformedBy private:prior ;
+    prov:generated record:incomplete-replacement ;
+    prov:invalidated record:old-complete-record .
+
+# Revision linkage alone is not a complete relationship snapshot.
+record:incomplete-replacement prov:wasRevisionOf record:old-complete-record .

@@ -1,0 +1,39 @@
+###########################################################################
+# Positive, self-contained SSTIM Core Profile instance fixture.
+#
+# Deliberately absent: delivery medium, perceived modality, body placement,
+# safety tags, evidence claims, techniques, presets, and session policy. Their
+# absence must remain conformant under the weak Core Profile shapes.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/core-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Minimal determinate stimulus specification"@en ;
+    dct:identifier "core-positive-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Minimal sensory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Single generic stimulus channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .

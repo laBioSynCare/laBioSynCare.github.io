@@ -1,0 +1,87 @@
+name: Validate RDF
+
+on:
+  pull_request:
+    paths:
+      - 'static/ontology/**'
+      - 'test/**'
+      - 'src/rdf/**'
+      - 'scripts/sstim-*.py'
+      - 'scripts/sstim-*.mjs'
+      - 'scripts/export-ontology.py'
+      - 'docs/ecosystem/w3id/**'
+      - 'Makefile'
+      - 'flake.nix'
+      - 'flake.lock'
+      - '.github/workflows/validate-rdf.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'static/ontology/**'
+      - 'test/**'
+      - 'src/rdf/**'
+      - 'scripts/sstim-*.py'
+      - 'scripts/sstim-*.mjs'
+      - 'scripts/export-ontology.py'
+      - 'docs/ecosystem/w3id/**'
+      - 'Makefile'
+      - 'flake.nix'
+      - 'flake.lock'
+      - '.github/workflows/validate-rdf.yml'
+
+jobs:
+  shacl:
+    name: RDF validation (Nix)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Tags are not optional here: truth-audit checks every CHANGELOG release
+      # link against the tag it names, and actions/checkout fetches no tags by
+      # default. Without this the gate reported all thirteen releases as naming
+      # tags that do not exist, while silently skipping the checks that key off
+      # the same list.
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+
+      # Toolchain (python3.12 + pyshacl + ROBOT) comes from the pinned flake
+      # devShell, so local `make validate` and CI run the same validators.
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # Nix pins the toolchain; this caches the npm package downloads only.
+      - name: Cache npm downloads
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      # `make validate` runs the SPARQL sanity and ecosystem runtime contract
+      # suites, which import N3, Comunica, Vitest, and rdf-validate-shacl.
+      - name: Install dependencies
+        run: nix develop --command npm ci
+
+      # -j4 because validate's prerequisites are independent scripts working in
+      # their own mktemp dirs.
+      # Measured locally, every gate passing: 432s serial, 192s with -j4, 218s
+      # with -j4 -Otarget; the 26s buys grouped per-target output, without which
+      # an interleaved parallel failure is unreadable.
+      #
+      # That local ratio does NOT transfer to CI and nobody should quote it as
+      # if it does. The runner has 4 cores and ecosystem-contract already spawns
+      # min(4, cpu_count) pySHACL workers by itself, so make-level -j mostly
+      # oversubscribes. Worse, runner-to-runner variance is larger than the
+      # effect: the same commit running the same `make validate` took 629s on
+      # one runner and 867s on another, a 38% spread, and the first runs after
+      # this change were 665s and 551s. Direction is mildly positive, n is too
+      # small to claim anything. Collect samples before tuning -j further, and
+      # drop to plain `make validate` when bisecting a flaky gate.
+      - name: Run RDF, SHACL, OWL, quality, query, and export validation
+        run: nix develop --command make -j4 -Otarget validate

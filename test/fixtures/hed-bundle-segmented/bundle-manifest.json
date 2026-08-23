@@ -1,0 +1,70 @@
+{
+  "$comment": "Bundle manifest for the ADR 0025 demonstrator (segmented). An explicitly segmented stimulus, carried as the piecewise events ADR 0025 decision 5 names first. Each boundary is an event with its parameter and value. Synthetic data only.",
+  "bundleId": "segmented",
+  "generatedBy": "scripts/generate-hed-bundle.py",
+  "synthetic": true,
+  "containsPersonalData": false,
+  "versions": {
+    "sstim": "0.17.0-dev",
+    "application": "0.1.0",
+    "hedSchema": "8.4.0",
+    "mapping": "0.4.0",
+    "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
+    "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
+  },
+  "clock": {
+    "basis": "sstim:sessionClockOffsetSeconds",
+    "origin": "The session clock origin declared by the session record; not wall-clock time.",
+    "note": "SSTIM's authority for timing is the engine timing context, so offsets are engine-clock seconds rather than derived from a host clock."
+  },
+  "source": {
+    "file": "test/fixtures/rdf/hed-bundle/segmented-session.ttl",
+    "sha256": "93f5094488a65ed2c9f8c8a88ab148817da05a3633d15b26e00116579cec07c6",
+    "eventCount": 6
+  },
+  "crossArtifactIds": {
+    "column": "event_id",
+    "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
+    "ids": {
+      "event-open": "https://example.org/sstim/hed-segmented/event-open",
+      "event-start": "https://example.org/sstim/hed-segmented/event-start",
+      "event-step-theta": "https://example.org/sstim/hed-segmented/event-step-theta",
+      "event-step-gamma": "https://example.org/sstim/hed-segmented/event-step-gamma",
+      "event-safety": "https://example.org/sstim/hed-segmented/event-safety",
+      "event-complete": "https://example.org/sstim/hed-segmented/event-complete"
+    }
+  },
+  "modulation": {
+    "timeVarying": false,
+    "shape": "segmented",
+    "representation": "piecewise events",
+    "stepCount": 2,
+    "note": "An explicitly segmented stimulus. Each boundary is a sstim-v:eventParameterChanged event carrying its parameter kind and the value it took, so the segmentation is recoverable from the events table alone. This is the first of the two representations ADR 0025 decision 5 allows; it became expressible on 2026-08-18, when a sstim:SessionEvent could still carry only its type and its clock offset."
+  },
+  "artifacts": [
+    {
+      "file": "events.tsv",
+      "sha256": "f3e61e41aeb210afe03c058cf93e41a00a362c835c00e69d706f917c4c192c2f"
+    },
+    {
+      "file": "events.json",
+      "sha256": "bbb1b883add4c131bda195ab26d031bf21edf9b96bb5da0f137813e6044950a2"
+    }
+  ],
+  "declaredLoss": {
+    "eventParameterChanged": "HED carries the parameter kind and the new value but not the unit, which follows from the kind and the channel in SSTIM, nor the previous value in sstim:parameterValueBefore.",
+    "eventSafetyLimitApplied": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did.",
+    "eventSessionComplete": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
+  },
+  "validated": [
+    "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+    "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
+    "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
+    "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
+    "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes."
+  ],
+  "notValidated": [
+    "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
+    "Full recovery of SSTIM from HED is impossible by construction wherever declaredLoss is non-empty, and is not claimed. `make hed-roundtrip` asserts the weaker property that actually matters: every emitted string reverses to a candidate set containing its own event type, every ambiguous set is declared, and no unique mapping claims a collision."
+  ]
+}

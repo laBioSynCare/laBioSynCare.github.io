@@ -1,0 +1,189 @@
+###########################################################################
+#
+#  SSTIM Parameter Properties  —  sstim-patch-studio.ttl
+#
+#  Namespace:  https://w3id.org/sstim
+#  Version:    0.2.0
+#  Date:       2026-04-12
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0
+#
+#  Datatype properties that quantify a voice (sstim:Voice) and a session
+#  authoring configuration (sstim:SessionSpecification). These are the
+#  numeric parameter properties shared by the BSC preset catalog model and
+#  the live Patch Studio authoring model; all terms are in the sstim#
+#  namespace and are part of the SSTIM ontology (rdfs:isDefinedBy
+#  <https://w3id.org/sstim>). The SHACL voice shapes in sstim-shapes.ttl
+#  constrain the voice properties below.
+#
+#  Protected file — do not modify without explicit maintainer instruction.
+#
+###########################################################################
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix sstim: <https://w3id.org/sstim#> .
+
+
+###########################################################################
+# Voice parameter datatype properties (domain sstim:Voice)
+###########################################################################
+
+sstim:carrierFreqLeft a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "left carrier frequency"@en ;
+    skos:definition "Left-ear carrier frequency for binaural presentation, in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:carrierFreqRight a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "right carrier frequency"@en ;
+    skos:definition "Right-ear carrier frequency for binaural presentation, in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:initialVolume a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "initial volume"@en ;
+    skos:definition "Initial output gain or amplitude for a voice."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:panPosition a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "pan position"@en ;
+    skos:definition "Stereo position from left to right."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:baseFrequency a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "base frequency"@en ;
+    skos:definition "Base, carrier, or center frequency for a voice, in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:beatHz a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "beat frequency"@en ;
+    skos:definition "Driven or perceived beat frequency in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:pulseRateHz a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "pulse rate"@en ;
+    skos:definition "Rhythmic pulse or sequence step rate in Hz."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:noteDurationFraction a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "note duration fraction"@en ;
+    skos:definition "Fraction of a rhythmic pulse occupied by the active note envelope."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:noteCount a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:integer ;
+    rdfs:label "note count"@en ;
+    skos:definition "Number of notes or sequence positions in a Symmetry cycle."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:octaveSpan a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "octave span"@en ;
+    skos:definition "Pitch span covered by a Symmetry sequence."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:cycleDuration a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "cycle duration"@en ;
+    skos:definition "Duration of one repeated control or sequence cycle, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:permutationFunction a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:integer ;
+    rdfs:label "permutation function"@en ;
+    skos:definition "Permutation function selector for sequence ordering. Values match the skos:notation of sstim-v:PermutationFunctionScheme members (0=shuffle, 1=rotate forward, 2=rotate backward, 3=reverse, 4=identity)."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:breathingPhaseRatio a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "breathing phase ratio"@en ;
+    skos:definition "Fraction of a breathing cycle assigned to the inhale phase."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:breathingAmplitude a owl:DatatypeProperty ;
+    rdfs:domain sstim:Voice ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "breathing amplitude"@en ;
+    skos:definition "Depth or excursion of a breathing-shaped control signal."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+
+###########################################################################
+# Session authoring parameter datatype properties
+# (domain sstim:SessionSpecification — visual, haptic, and tempo authoring)
+###########################################################################
+
+sstim:rotationSpeed a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "rotation speed"@en ;
+    skos:definition "Visual rotation rate or angular speed."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:visualSideCount a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:integer ;
+    rdfs:label "visual side count"@en ;
+    skos:definition "Number of sides used by a geometric visual form."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:visualDensity a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "visual density"@en ;
+    skos:definition "Density of rendered visual elements."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:stimulationIntensity a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "stimulation intensity"@en ;
+    skos:definition "Strength of haptic or sensory output."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:hapticPattern a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:integer ;
+    rdfs:label "haptic pattern"@en ;
+    skos:definition "Pattern index or selector for haptic delivery."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:tempoBpm a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "tempo BPM"@en ;
+    skos:definition "Optional authoring tempo in beats per minute."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+sstim:beatsPerBar a owl:DatatypeProperty ;
+    rdfs:domain sstim:SessionSpecification ;
+    rdfs:range xsd:integer ;
+    rdfs:label "beats per bar"@en ;
+    skos:definition "Number of beats in one authoring tempo bar."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim> .
+
+###########################################################################
+# End of sstim-patch-studio.ttl
+###########################################################################

@@ -1,0 +1,17 @@
+@prefix prov:      <http://www.w3.org/ns/prov#> .
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim-eco: <https://w3id.org/sstim/ecosystem#> .
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex:        <https://example.org/negative/generic-consent/> .
+
+<https://w3id.org/sstim/ecosystem-record/relationship/synthetic-aurora-develops-player>
+    sstim-eco:hasEngagementActivity ex:generic-consent .
+
+ex:generic-consent a sstim-eco:EngagementActivity, prov:Activity ;
+    rdfs:label "Untyped synthetic consent event"@en ;
+    sstim-eco:engagementFor
+        <https://w3id.org/sstim/ecosystem-record/relationship/synthetic-aurora-develops-player> ;
+    sstim-eco:engagementPurpose sstim-eco:purposeLivePublication ;
+    sstim-eco:engagementOutcome sstim-eco:outcomeConsentGranted ;
+    prov:endedAtTime "2026-07-15T11:30:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://example.org/agent/synthetic-curator> .

@@ -1,0 +1,29 @@
+# Core Plus competency question:
+#   "What is this channel's calibrated frequency and sound pressure level, and
+#    which named frequency band do those numbers fall in?"
+#
+# This is the question Core cannot answer. Core describes a channel's duration
+# and regime; it has no way to say how loud or how fast. The calibrated channel
+# quantities and the FrequencyBand class with its Hz bounds are owned by the
+# Common module, which is precisely what Core Plus adds, so a result here is the
+# evidence that Core Plus is a distinct contract rather than decoration on Core.
+#
+# Every term is owned by the Kernel, Stimulus, or Common module. Nothing here
+# needs Configuration's targetsFrequencyBand, Technique, Session, Evidence, or
+# Exposure: the band is matched numerically from hzMin/hzMax rather than by an
+# asserted link, which is what keeps the question inside the Core Plus closure.
+PREFIX sstim: <https://w3id.org/sstim#>
+PREFIX skos:  <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?specification ?channel ?hz ?spl ?band ?bandLabel WHERE {
+  ?specification a sstim:StimulusSpecification ;
+      sstim:hasStimulusChannel ?channel .
+  ?channel sstim:channelFrequencyHz ?hz ;
+      sstim:soundPressureLevelDb ?spl .
+  ?band a sstim:FrequencyBand ;
+      skos:prefLabel ?bandLabel ;
+      sstim:hzMin ?hzMin ;
+      sstim:hzMax ?hzMax .
+  FILTER(?hz >= ?hzMin && ?hz < ?hzMax)
+  FILTER(LANG(?bandLabel) = "en")
+}

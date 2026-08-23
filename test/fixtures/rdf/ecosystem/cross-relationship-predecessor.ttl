@@ -1,0 +1,9 @@
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+# Overlay on the positive fixture. The response already cites its own
+# notification; this second predecessor belongs to a different relationship
+# and must not be accepted merely because it is also a valid notification.
+
+<https://w3id.org/sstim/ecosystem-record/activity/synthetic-player-attribution-response>
+    prov:wasInformedBy
+        <https://w3id.org/sstim/ecosystem-record/activity/synthetic-resonance-outreach-notification> .

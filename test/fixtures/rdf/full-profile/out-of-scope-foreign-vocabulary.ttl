@@ -1,0 +1,81 @@
+###########################################################################
+# Out-of-scope positive fixture for the SSTIM Full Profile.
+#
+# Full omits no SSTIM concern, so its out-of-scope case is the other boundary:
+# data that mixes SSTIM with vocabularies SSTIM knows nothing about. A consumer's
+# graph is never only SSTIM — it carries Dublin Core, PROV, schema.org, FOAF,
+# and local project terms — and Full must describe its own subject matter
+# without passing judgement on the rest.
+#
+# ADR 0043 §7 puts it as: the absence of an optional module means "not asserted
+# under this profile", not "rejected by SSTIM". The same holds for terms no
+# SSTIM module defines at all.
+#
+# This fails if a Full shape ever closes a node (sh:closed) or constrains a
+# subject by anything other than its declared SSTIM type, which would make
+# SSTIM hostile to the graphs it is meant to be embedded in.
+###########################################################################
+
+@prefix example:  <https://example.org/sstim/full-fixture/> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix bfo:      <http://purl.obolibrary.org/obo/BFO_> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix foaf:     <http://xmlns.com/foaf/0.1/> .
+@prefix prov:     <http://www.w3.org/ns/prov#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:   <https://schema.org/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix lab:      <https://example.org/local-lab-schema/> .
+
+# A well-formed Full description, unchanged from the positive fixture.
+example:specification a sstim:StimulusSpecification ;
+    rdfs:label "Specification embedded in a foreign graph"@en ;
+    dct:identifier "full-out-of-scope-1" ;
+    dct:hasVersion "1" ;
+    prov:wasAttributedTo example:author ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:describesStimulation example:process ;
+    sstim:hasStimulusChannel example:channel ;
+    sstim:hasStimulationTarget example:target ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe .
+
+example:process a sstim:Stimulation, sstim:SensoryStimulation ;
+    rdfs:label "Alpha auditory stimulation process"@en .
+
+example:channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Calibrated auditory channel"@en ;
+    sstim:channelDurationSeconds "300.0"^^xsd:decimal ;
+    sstim:channelFrequencyHz "10.0"^^xsd:decimal ;
+    sstim:soundPressureLevelDb "65.0"^^xsd:decimal ;
+    sstim-ex:deliveryMedium sstim-ex:mediumAirConductedSound ;
+    sstim-ex:perceivedModality sstim-ex:modalityAuditory ;
+    sstim-ex:hasBodyPlacement sstim-ex:placementEars .
+
+example:target a bfo:0000040 ;
+    rdfs:label "Example material target"@en .
+
+example:author a prov:Agent ;
+    rdfs:label "Example fixture author"@en .
+
+#-- Outside SSTIM entirely. Full must neither reject nor interpret it. ----
+
+# Foreign types on the very nodes SSTIM describes.
+example:specification a schema:CreativeWork ;
+    schema:inLanguage "en" ;
+    lab:internalReviewState "pending" ;
+    lab:labNotebookPage 42 .
+
+example:author a foaf:Person, schema:Person ;
+    foaf:name "Example fixture author" ;
+    schema:affiliation example:institute .
+
+# Nodes with no SSTIM type at all.
+example:institute a schema:Organization ;
+    schema:name "Example Institute" .
+
+example:studyProtocol a lab:LocalProtocol ;
+    rdfs:label "Local study protocol, not a sstim:SensoryStimulationProtocol"@en ;
+    lab:appliesSpecification example:specification ;
+    lab:reviewBoardReference "IRB-2026-001" .

@@ -1,0 +1,53 @@
+@prefix bsclab-preset:  <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-session: <https://w3id.org/sstim/implementation/bsclab/session/> .
+@prefix dct:            <http://purl.org/dc/terms/> .
+@prefix prov:           <http://www.w3.org/ns/prov#> .
+@prefix rdfs:           <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:          <https://w3id.org/sstim#> .
+@prefix sstim-v:        <https://w3id.org/sstim/vocab#> .
+@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
+
+# Synthetic, non-personal fixture demonstrating the reproducibility and
+# pre/post self-report model. Values are illustrative and are not evidence.
+
+bsclab-session:synthetic-reference-001-spec a sstim:SessionSpecification, prov:Plan ;
+    rdfs:label "Synthetic reference session specification 001"@en ;
+    dct:description "Synthetic specification fixture for validating the SSTIM session model; it does not describe an actual participant or research observation."@en ;
+    dct:created "2026-07-10T12:00:00Z"^^xsd:dateTime ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    sstim:referencesPreset bsclab-preset:perform-alpha-10-seed ;
+    sstim:durationSeconds 600 ;
+    sstim:masterVolume 0.20 .
+
+bsclab-session:synthetic-reference-001 a sstim:SessionInstance ;
+    rdfs:label "Synthetic reference session 001"@en ;
+    dct:description "Non-personal example of a completed session execution with two phase-qualified synthetic self-reports."@en ;
+    sstim:usesSpecification bsclab-session:synthetic-reference-001-spec ;
+    sstim:actualDurationSeconds 600 ;
+    sstim:completionStatus "completed" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory ;
+    sstim:hasSelfReport bsclab-session:synthetic-reference-001-report-pre,
+        bsclab-session:synthetic-reference-001-report-post ;
+    prov:startedAtTime "2026-07-10T12:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-07-10T12:11:00Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://w3id.org/sstim/implementation/bsclab> .
+
+bsclab-session:synthetic-reference-001-report-pre a sstim:SelfReport ;
+    rdfs:label "Synthetic reference session 001 pre-session report"@en ;
+    dct:description "Illustrative pre-session values; synthetic and not evidence."@en ;
+    sstim:hasReportPhase sstim-v:reportPreSession ;
+    sstim:primaryAffect 3 ;
+    sstim:focusRating 3 ;
+    sstim:sleepiness 2 ;
+    prov:generatedAtTime "2026-07-10T12:00:30Z"^^xsd:dateTime .
+
+bsclab-session:synthetic-reference-001-report-post a sstim:SelfReport ;
+    rdfs:label "Synthetic reference session 001 immediate post-session report"@en ;
+    dct:description "Illustrative post-session values; synthetic and not evidence or an efficacy claim."@en ;
+    sstim:hasReportPhase sstim-v:reportImmediatePost ;
+    sstim:primaryAffect 4 ;
+    sstim:focusRating 4 ;
+    sstim:sleepiness 2 ;
+    sstim:subjectiveQuality 4 ;
+    sstim:goalAchieved true ;
+    prov:generatedAtTime "2026-07-10T12:11:15Z"^^xsd:dateTime .

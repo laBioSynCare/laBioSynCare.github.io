@@ -1,0 +1,31 @@
+# Full competency question:
+#   "How does this stimulus physically reach the subject — through which medium,
+#    perceived as which modality, placed where on the body — at what calibrated
+#    frequency and level, and under what caution?"
+#
+# Full's justification is that it joins concerns no smaller profile joins. The
+# terms here are owned by four modules over one connected description:
+# Kernel/Stimulus (the specification and its channel), Common (the calibrated
+# magnitudes and the caution relation), Exposure (medium, modality, placement),
+# and Vocabulary (the controlled caution value).
+#
+# No smaller published profile can answer it. Core stops at duration and regime;
+# Core Plus adds the magnitudes but still cannot say the sound is air-conducted
+# and sits at both ears. That gap is what makes this a Full question rather than
+# a larger version of Core's.
+PREFIX sstim:    <https://w3id.org/sstim#>
+PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
+PREFIX skos:     <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?specification ?channel ?hz ?spl ?medium ?modality ?placement ?caution WHERE {
+  ?specification a sstim:StimulusSpecification ;
+      sstim:hasStimulusChannel ?channel ;
+      sstim:hasCautionTag ?cautionTag .
+  ?channel sstim:channelFrequencyHz ?hz ;
+      sstim:soundPressureLevelDb ?spl ;
+      sstim-ex:deliveryMedium ?medium ;
+      sstim-ex:perceivedModality ?modality ;
+      sstim-ex:hasBodyPlacement ?placement .
+  ?cautionTag skos:prefLabel ?caution .
+  FILTER(LANG(?caution) = "en")
+}

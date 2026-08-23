@@ -1,0 +1,47 @@
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/heal-theta-breathing-seed#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:        <https://w3id.org/sstim#> .
+@prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+
+bsclab-preset:heal-theta-breathing-seed a sstim:Preset ;
+    rdfs:label "Heal Theta Breathing Seed" ;
+    dct:description "Minimal Phase 1 RDF preset seed exercising the Martigli-Binaural and Martigli voice shapes: a breathing-reference Martigli-Binaural voice plus a non-reference Martigli textural layer. Not a clinical, health, or performance claim." ;
+    dct:created "2026-06-17"^^xsd:date ;
+    dct:modified "2026-07-10"^^xsd:date ;
+    sstim:targetsFrequencyBand sstim-v:theta ;
+    sstim:primaryFrequencyBand sstim-v:theta ;
+    sstim:inGroup sstim-v:groupHeal ;
+    sstim:hasBreathGuide true ;
+    sstim:presetVersion "0.1.0" ;
+    sstim:hasPublicClaimLevel sstim-v:claimC1Experiential ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:guided-breathing-observation-reference ;
+    sstim:composedOf preset-local:mb-voice, preset-local:martigli-voice .
+
+# Breathing reference (isOn): constant 6 Hz theta beat, carriers sweep with breath.
+preset-local:mb-voice a sstim:Voice, sstim:MartigliBinauralVoice ;
+    rdfs:label "Heal Theta Breathing Seed Martigli-Binaural voice" ;
+    sstim:carrierFreqLeft 200.0 ;
+    sstim:carrierFreqRight 206.0 ;
+    sstim:martigliAmplitude 80.0 ;
+    sstim:martigliPeriodInitial 4.0 ;
+    sstim:martigliPeriodFinal 8.0 ;
+    sstim:martigliTransitionDuration 600.0 ;
+    sstim:isBreathReference true ;
+    sstim:initialVolume 0.25 .
+
+# Non-reference Martigli textural layer (fast tremolo; isOn=false so mp0 < 3 is allowed).
+preset-local:martigli-voice a sstim:Voice, sstim:MartigliVoice ;
+    rdfs:label "Heal Theta Breathing Seed Martigli textural voice" ;
+    sstim:martigliCenterFreq 180.0 ;
+    sstim:martigliAmplitude 60.0 ;
+    sstim:martigliPeriodInitial 1.5 ;
+    sstim:martigliPeriodFinal 2.0 ;
+    sstim:martigliTransitionDuration 300.0 ;
+    sstim:isBreathReference false ;
+    sstim:initialVolume 0.13 .
