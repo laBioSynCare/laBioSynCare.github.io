@@ -4,8 +4,8 @@
 - **Migration source:** `laBioSynCare/laBioSynCare.github.io`
 - **Migration target:** `w3c-cg/sstim`
 - **Candidate site:** `https://w3c-cg.github.io/sstim/`
-- **Status:** Gate G0 approved; source publication and target validation in
-  progress
+- **Status:** source history and integration branch published; draft target PR
+  and CI in progress; Pages deployment pending
 - **Production W3ID cutover:** not performed
 - **Old repository archival:** not performed
 
@@ -23,11 +23,14 @@ SSTIM, and the complete non-normative Workbench. Gate G0 is therefore passed;
 the implemented scope and future-contribution boundary are recorded in
 [`LICENSING.md`](../../LICENSING.md).
 
-The candidate is ready for publication to a source-bearing target branch with
-the 14 annotated historical tags and namespaced archival refs for the nine
-pull-request-only commits. GitHub Releases, Zenodo/DOI actions, production W3ID,
-external registries, target `main`, and the old deployment remain outside this
-checkpoint.
+The candidate is published at target branch
+`migration/import-complete-source`, with all 14 annotated historical tags,
+namespaced copies of every surviving source branch tip, and archival refs for
+all 12 observed pull-request heads. Draft
+[`w3c-cg/sstim#1`](https://github.com/w3c-cg/sstim/pull/1) is open against
+`main`; target CI is evaluating the real import. GitHub Releases, Zenodo/DOI
+actions, production W3ID, external registries, target `main`, and the old
+deployment remain unchanged.
 
 The following remote-safe work is complete:
 
@@ -40,10 +43,19 @@ The following remote-safe work is complete:
   source and is a recovery point, not a Pages source.
 - The committed integration candidate is durably preserved on the old
   repository's non-production `migration/w3c-integration` branch. This does not
-  change source `main`, its Pages deployment, or target repository state.
+  change source `main` or its Pages deployment.
+- The source-bearing candidate is published on target branch
+  `migration/import-complete-source`; source branch tips are under
+  `legacy/labiosyncare/*`, and source pull-request heads are under
+  `archive/labiosyncare/*`.
+- All 14 signedness-preserving annotated tag objects and peeled commits match
+  the source. The target still has no GitHub Releases, so tag publication did
+  not create a release or Zenodo deposit.
+- Draft pull request `w3c-cg/sstim#1` is open and mergeable. Its IPR status
+  check passed and its repository CI started successfully.
 - Target `main` and its live scaffold Pages deployment remain unchanged.
 
-## What was migrated in the local integration candidate
+## What was migrated in the integration candidate
 
 The complete source repository was merged into the target history, including:
 
@@ -79,24 +91,31 @@ rebase, archive copy, or replacement history.
 | Source root retained | `012b08ae64e7b5c577015035acef3fa21056870a` |
 | Source main history | 486 commits reachable from the imported source tip |
 | Target history | all 5 original commits remain reachable |
-| Source tags | all 14 annotated tag objects and peeled commits retained locally |
+| Source tags | all 14 annotated tag objects and peeled commits match on the target; no `v0.4.0` existed or was manufactured |
+| Complete source ref union | 495 source commits preserved: 486 reachable from source heads/tags plus 9 reachable only from historical PR refs |
+| Current candidate history | 502 commits before this report update; 511 in the union with archived PR-only history |
 | Object integrity | source mirror, target mirror and integration `git fsck` passed |
 | Protected ontology tree | source and candidate both `02bb35531085bd0708441e6a43ef190a82f87666` |
 | Production W3ID rules blob | source and candidate both `73617016e5139e98fb90cdc8fd86cdaf33c8f3d2` |
 
 Nine additional source commits are reachable only through historical pull
-request refs, not source `main` or the surviving branch heads. They are retained
-in the audited source mirror and are to be published under explicit namespaced
-archival branches; GitHub's reserved `refs/pull/*` must not be pushed.
+request refs, not source `main` or the surviving branch heads. All nine are now
+reachable on the target through `archive/labiosyncare/source-pr-2-head` through
+`source-pr-9-head`. Aliases for PRs 10–13 preserve the complete observed ref
+inventory even though those tips add no unique commits. GitHub's reserved
+`refs/pull/*` were not modified.
 
 The migration commits after the two-parent import are small, coherent stages:
 
 1. `33622c7` — import complete SSTIM baseline with both histories;
 2. `032edc1` — central project-page base-path support;
 3. `04ac29d` — staged W3ID targets without production cutover;
-4. `0e22efd` — SSTIM/SSTIM Workbench public identity; and
-5. `c01cc9a` — direct-Node compatibility for the central URL resolver; and
-6. `d9d2873` — deployment-aware audio resource test expectations.
+4. `0e22efd` — SSTIM/SSTIM Workbench public identity;
+5. `c01cc9a` — direct-Node compatibility for the central URL resolver;
+6. `d9d2873` — deployment-aware audio resource test expectations;
+7. `4ec4857` and `87a04c5` — acceptance and remote-staging reports; and
+8. `cd97b53`, `c9f15fe`, and `5a753cf` — approved licensing and media-scope
+   records.
 
 ## Changes made
 
@@ -182,13 +201,15 @@ The current UI no longer uses BSC Lab as the repository-wide public identity.
 ## Acceptance evidence
 
 All local checks below use the composed target-plus-source history. Gate G0 has
-passed; live target entries remain pending until the source-bearing branch and
-its pull request are published and checked.
+passed, the source-bearing branch and complete historical ref inventory are on
+the target, and draft PR CI is in progress. Live target entries remain pending
+because the Pages environment currently permits deployments from `main` only.
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| Git history preserved | **PASS for both default histories; archival publication in progress** | two-parent merge, both roots/ancestry and `git fsck` pass; nine PR-only commits are mapped to namespaced archival target refs |
-| Existing W3C repository history preserved | **PASS locally** | all five original target commits remain ancestors |
+| Git history preserved | **PASS on target** | two-parent merge, both roots/ancestry and `git fsck` pass; every source head, annotated tag and observed PR head is represented by an explicit target ref |
+| Existing W3C repository history preserved | **PASS on target branch** | all five original target commits remain ancestors; recovery branch preserves the exact original tip |
+| Target draft PR CI | **IN PROGRESS** | PR #1 is mergeable; IPR check passed and SvelteKit/NixOS VM/OCI/RDF workflows started on the target |
 | New GitHub Pages deployment healthy | **PENDING / cutover blocker** | target still intentionally serves its scaffold; local complete Pages artifact passes |
 | `/sstim/` routing works | **PASS locally** | mounted build and complete HTTP smoke pass; origin-root routes are not required |
 | Graph Navigator works | **PASS locally** | browser loaded 181 OWL resources, 551 SKOS concepts and 18 modules |
@@ -234,8 +255,10 @@ Additional final results:
 | Target `main` lacks protection | No protection/ruleset was visible; Maintain cannot configure it | **High** | **Yes for safe stewardship** | Admin establishes required reviews/status checks, blocks force pushes/deletion, and requires merge commits for the import |
 | Target integration inventory incomplete | Maintain cannot inspect Actions policy, hooks, deploy keys, installed Apps or all environment/org settings | **High for releases** | **No for historical tag/archive publication; yes for GitHub Release recreation** | Admin/organization owner audits integrations, especially any release webhook/Zenodo app, before Releases are recreated |
 | Shared GitHub Pages origin | Browser storage and same-origin script access are origin-scoped, not path-scoped | **High for private/authenticated Workbench state** | **Yes for promises of private/stateful hosting; no for public spec/Graph deployment** | Obtain explicit threat-model acceptance or use a dedicated origin for stateful/authenticated Workbench features; keep target build credential-free meanwhile |
-| Nine PR-only commits not yet published on target | GitHub pull-request refs cannot be mirrored to reserved target refs | **Medium** | **Yes for declaring complete remote history** | Push the audited commits under namespaced archival branches and record their mapping |
-| Live target acceptance unavailable | Imported branch has not yet been deployed; the current Pages environment permits only `main` | **High** | **Yes** | Push a draft integration branch and run PR CI; an Admin must authorize that branch in the Pages environment before live preview deployment |
+| Historical PR-only commits | GitHub pull-request refs cannot be mirrored to reserved target refs | **Resolved** | No | All observed heads are preserved under `archive/labiosyncare/*`; retain the mapping in this report |
+| Live target acceptance unavailable | The current Pages environment permits only `main`, so the draft branch cannot deploy before review | **High** | **Yes** | An Admin authorizes the migration branch for Pages preview, or the reviewed PR is merge-committed and the Actions deployment is validated immediately |
+| Combined citation/deposit license field | Existing `CITATION.cff` and `.zenodo.json` model v0.16 with a single CC BY 4.0 field despite the artifact-level Apache/CC BY/CC0 scope | **Medium for a future Release** | No for import; yes before a new target Release | Preserve historical metadata now; agree and validate a multi-license presentation before any future Release/Zenodo event |
+| Historical ecosystem PDF has no detected file-level license marker | `static/docs/BioSynCare_Ecosystem_Brief_EN.pdf` is outside the paths expressly covered by `LICENSE-ontology` | **Low for migration; material for reuse** | No for an unchanged history import | Preserve unchanged and do not present, adapt, or republish it as a new CG deliverable until the rightsholder records a specific disposition |
 | WIDOCO changelog uses the network | WIDOCO downloads immutable v0.16.0 from production when creating its changelog; its Nix package also warns about a missing default config file | **Medium** | No for current artifact; should be fixed for fully offline reproducibility | Vendor or explicitly supply the prior release input and remove the implicit network dependency in follow-up work |
 | Optional `runtime-config.json` returns 404 in a credential-free build | Runtime configuration is deliberately optional and the target build contains no Firebase variables | **Informational** | No | Keep documented optional behavior; add a public config only after the shared-origin/security decision |
 | Large JavaScript chunk warning | Current application graph produces bundles above Vite's warning threshold | **Low** | No | Track performance/code splitting separately; do not mix it into migration |
@@ -309,24 +332,23 @@ No registry was modified during this checkpoint.
 2. Decide whether stateful/authenticated Workbench features are acceptable on
    the shared `w3c-cg.github.io` origin. Keep the public deployment local-only
    and credential-free unless/until that decision says otherwise.
-3. Push the integration candidate as a non-main branch, plus audited namespaced
-   archival refs and tags. Do not recreate Releases yet.
-4. Open a draft pull request and require the full CI/build/validation matrix.
-5. Deploy the branch through Actions at `/sstim/`, without changing production
+3. Complete review of draft PR #1 and require the full CI/build/validation
+   matrix. Do not recreate Releases.
+4. Deploy the branch through Actions at `/sstim/`, without changing production
    W3ID or the old repository.
-6. Run the live acceptance matrix: routes/assets, Graph term links, Patch Studio,
+5. Run the live acceptance matrix: routes/assets, Graph term links, Patch Studio,
    worklet/WASM, PWA scope/cache containment, SPARQL, generated docs, all RDF
    representations, contexts/profiles/schemas, immutable releases and staged
    W3ID rules.
-7. Compare target artifacts and behavior with the old production deployment;
+6. Compare target artifacts and behavior with the old production deployment;
    resolve every cutover-blocking difference.
-8. Merge with a merge commit only after review. Confirm the target Pages build
+7. Merge with a merge commit only after review. Confirm the target Pages build
    identifies the accepted commit.
-9. Update mutable repository/home/documentation links in external registries.
+8. Update mutable repository/home/documentation links in external registries.
     Move machine-ingest URLs only after their frozen artifacts are accepted.
-10. Obtain a separate explicit authorization for production W3ID cutover; open
+9. Obtain a separate explicit authorization for production W3ID cutover; open
     the `perma-id/w3id.org` pull request and require its authoritative tests.
-11. Monitor HTML and RDF content negotiation after merge. Keep old production
+10. Monitor HTML and RDF content negotiation after merge. Keep old production
     operational as rollback/fallback. Archive or redirect it only through a
     later explicit decision.
 
@@ -351,7 +373,7 @@ No registry was modified during this checkpoint.
 
 The migration can stop here without affecting production. The source has the
 reviewed decision/runbook, both repositories have backups, the W3C scaffold has
-a recovery branch, the integration candidate is committed and remotely
-preserved on the source staging branch, target `main` still serves its original
-scaffold, old production is healthy, and production W3ID continues to resolve
-through the old deployment.
+a recovery branch, the complete source ref inventory and integration candidate
+are published under non-main target refs, and draft PR #1 is reviewable. Target
+`main` still serves its original scaffold, old production is healthy, and
+production W3ID continues to resolve through the old deployment.

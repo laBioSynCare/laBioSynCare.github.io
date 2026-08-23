@@ -17,9 +17,10 @@ specific language governing permissions and limitations under the License.
 This repository uses a deliberate, path-based license split. See LICENSING.md
 for the artifact and contribution scope:
 
-  * Software — application source, build tooling, scripts, and ordinary
-    software tests not explicitly designated as a formal W3C Test Suite:
-    Apache License 2.0, as above (see LICENSE).
+  * Software — application source, build tooling, scripts, JSON
+    contracts/crosswalks under static/schemas/ unless a file states otherwise,
+    and ordinary software tests not explicitly designated as a formal W3C Test
+    Suite: Apache License 2.0, as above (see LICENSE).
 
   * Synthetic reference audio under static/audio/: CC0 1.0 Universal (see
     LICENSE-audio). These generated loops are non-normative reference media.
