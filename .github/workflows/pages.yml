@@ -203,3 +203,10 @@ jobs:
 
       - name: Verify the deployed site serves this commit
         run: node scripts/verify-deploy.mjs "${{ steps.deployment.outputs.page_url }}" "$GITHUB_SHA"
+
+      # Production w3id.org still points at the legacy deployment. Resolve the
+      # committed production rules in memory with only their Pages locations
+      # overlaid, then prove every representative candidate target is live.
+      # This does not write or publish a replacement .htaccess.
+      - name: Verify staged W3ID resolution targets
+        run: node scripts/w3id-staged-smoke.mjs "${{ steps.deployment.outputs.page_url }}"

@@ -73,7 +73,7 @@ DEV_HOST   ?= 127.0.0.1
 DEV_PORT   ?= 4173
 PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
-DEPLOY_URL   ?= https://labiosyncare.github.io
+DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
 .PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
 
@@ -578,16 +578,19 @@ core-profile-contract:
 full-equivalence:
 	$(PYTHON) scripts/check-sstim-full-equivalence.py
 
-## Check the w3id route contract two ways. First, that the committed .htaccess
+## Check the w3id route contract three ways. First, that the committed .htaccess
 ## snapshot-route region still matches the frozen snapshots on disk: the unit
 ## test only regenerates the region in memory, so without this a release that
 ## forgets `--write` would silently ship without persistent routes for the new
 ## version. Second, that every /ontology/ redirect target is an artifact this
 ## repository actually publishes, so a renamed module or a dropped export flag
-## cannot turn a persistent identifier into a 404.
+## cannot turn a persistent identifier into a 404. Third, clone those exact
+## production rules in memory and prove the proposed W3C Pages locations change
+## targets only; the production registry file remains untouched.
 w3id-routes:
 	node scripts/sstim-w3id-snapshot-routes.mjs --check
 	node scripts/check-w3id-route-targets.mjs
+	node scripts/w3id-staged-routes.mjs --check
 
 ## Rehearse the next release against the current sources without cutting one.
 ## Cutting 0.13.0 was blocked three times by gates that had been wrong for weeks
