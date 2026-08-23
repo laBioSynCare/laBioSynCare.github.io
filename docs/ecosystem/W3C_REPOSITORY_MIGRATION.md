@@ -1025,7 +1025,7 @@ changes at breakpoints.
 | Interoperability | Existing HED/BIDS/crosswalk and session-conformance gates remain green | **PASS**: inside the same run |
 | WIDOCO | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-02 (pre-existing OOPS link 404) |
 | pyLODE | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-03 (pre-existing sibling `.ttl` 404) |
-| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all 28 runtime, 21 local instance, and one external values pass | Endpoints **PASS** (28 of 28 runtime, 21 of 21 local, 1 external). **Path semantics: ledger M-01, authorized for repair 2026-08-23** |
+| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all 28 runtime, 21 local instance, and one external values pass | **PASS**: 28 of 28 runtime, 21 of 21 local, 1 external. Path semantics **resolved 2026-08-23**: references are manifest-relative (M-01). Frozen manifests keep the absolute form and are immutable |
 | Immutable releases | Before/after hash manifests identical; target returns identical bodies | **PASS**: 7 of 7 sampled artifacts byte-identical across origins |
 | DOI/VoID/DCAT | Concept DOI `10.5281/zenodo.21286974` and v0.16.0 DOI `10.5281/zenodo.22003777` resolve to the same records; no deposit/concept DOI was created; frozen DOI-bearing metadata is identical | **PASS**: both resolve to record 22003777; `CITATION.cff` and `.zenodo.json` unchanged |
 | External registries | Network-capable verification records each registry result without changing records | 3 verified, 1 unreachable (LOV, M-05), 1 wrong (Archivo 406, M-04, independent of this migration) |
@@ -1035,7 +1035,7 @@ changes at breakpoints.
 | Firebase/auth, if enabled | Authorized domain, sign-in/out, rules, network isolation | Not applicable: the target build carries no Firebase configuration |
 | SSTIM Workbench branding | Public terminology is coherent; semantic-review ledger is closed; BSC identities and historical material remain unchanged | **PASS** by inspection of the deployed site; BSC identities unchanged |
 | Production parity | Old/new route-and-behavior comparison has no unexplained high-value regression | **PASS**: no migration-introduced failure; M-02 and M-03 reproduce identically on old production |
-| Parallel publication authority | Release freeze or identical-artifact dual-publish process prevents source/target semantic drift | **Still to choose**: the repositories are now deliberately divergent |
+| Parallel publication authority | Release freeze or identical-artifact dual-publish process prevents source/target semantic drift | **Chosen 2026-08-23: dual publication.** Both repositories carry the identical commit; one workflow derives its mount from the repository. Semantic artifacts are byte-identical across origins; application bundles differ only by Firebase configuration |
 | Rollback rehearsal | Target Pages is repointed to/from the preserved scaffold successfully; reverse staged W3ID rules pass before production cutover | **Not run**: required before W3ID cutover |
 | Old production operational | Scheduled HTTP/browser smoke tests remain green through acceptance window | **PASS**: serving `e6b3948`, all sampled routes 200 |
 

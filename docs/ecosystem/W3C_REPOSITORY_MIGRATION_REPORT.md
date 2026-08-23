@@ -84,6 +84,35 @@ invoking it: an instrument was named, but nobody checked it could see everywhere
 the thing lives. A grep for one key name is not a census of a schema with three
 more.
 
+### Dual publication, adopted 2026-08-23
+
+The parallel publication authority question is answered: **dual publication**,
+until Zenodo says how, or whether, a single publishing track can be kept. Both
+repositories carry the identical commit on `main`, and one workflow serves both.
+
+The mount is derived from the repository's own identity rather than hard-coded: a
+repository named `<owner>.github.io` is an owner site and builds at the origin
+root, anything else is a project site and builds at `/<repo>`. Two workflow files
+would have been the obvious alternative and would have reintroduced exactly the
+drift this plan forbids.
+
+**What "the same artifact" does and does not mean here, stated because the phrase
+promises more than it delivers.** The semantic artifacts are byte-identical
+across both origins, and that was measured: ontology Turtle, snapshots back to
+0.1.0, the JSON-LD context, and the manifest all hash the same from both sites.
+The *application bundles* are not identical. The production owner site is
+configured with Firebase and its bundle carries the public Firebase web API key;
+the W3C project site has no Firebase variables and carries none. One commit, two
+configurations. The deployment smoke test now judges each build against what it
+was given, and fails in both directions, so neither site can drift into the
+other's expectation.
+
+Two rules follow, and they are the whole discipline of this arrangement:
+
+1. Every commit reaches both repositories. A commit on one only is drift.
+2. Structural or release changes are made once, in the shared tree, never
+   separately per host.
+
 ### Fresh-clone preservation proof
 
 Run against a new clone of the target rather than the integration checkout, as
@@ -406,13 +435,16 @@ render.
 
 | ID | Surface and reproduction | Cause | Severity | Cutover impact | Recommended fix | Regression status | Verification |
 |---|---|---|---|---|---|---|---|
-| M-01 | `GET /sstim/ontology/manifest.json` returns runtime values starting `/ontology/...`. An external consumer resolving them against the manifest's own URL escapes to `https://w3c-cg.github.io/ontology/...` | The manifest states application-root paths; first-party loading works because `applicationAsset()` resolves them against the deployment base | High for third-party reuse, none for the application | **Blocks W3ID cutover of the manifest routes.** Does not block the repository move or the site | Decide the path semantics in the plan's manifest portability section, then keep manifest routes on a root-hosted origin or change the live manifest under the full ontology gate | Pre-existing shape, newly consequential under a project path | Re-run the 22-endpoint sweep plus an external-resolver test after the decision |
+| M-01 | `GET /sstim/ontology/manifest.json` returned runtime values starting `/ontology/...`. An external consumer resolving them against the manifest's own URL escaped to `https://w3c-cg.github.io/ontology/...` | The manifest stated application-root paths; first-party loading worked because the app prepends the deployment base | High for third-party reuse, none for the application | Blocked W3ID cutover of the manifest routes | **RESOLVED 2026-08-23.** All 28 references are now relative to the manifest, so they resolve against wherever it was fetched from. Authorized by the maintainer naming `static/ontology/manifest.json` (§3.4); `make validate` passed | Pre-existing shape, became consequential under a project path | 28 of 28 resolve from both origins. **Residual: the four frozen manifests (0.13.0 to 0.16.0) keep the absolute form and are immutable, so their W3ID targets must stay on a root-hosted origin** |
 | M-02 | `GET /ontology/docs/OOPSevaluation/oopsEval.html` returns 404, linked from the WIDOCO index | WIDOCO emits the link without generating the page | Low | None | Post-process the generated index, or generate the evaluation | **Pre-existing**: identical 404 on old production | Compare both origins after the fix |
 | M-03 | `GET /ontology/docs/vocab/sstim-vocab.ttl` returns 404, linked from the pyLODE vocabulary index | pyLODE links a sibling copy of the source that is not published beside the document | Low | None | Publish the sibling copy or rewrite the link | **Pre-existing**: identical 404 on old production | Compare both origins after the fix |
 | M-04 | DBpedia Archivo record answers HTTP 406 where 200 is expected (`scripts/verify-registries.py`) | Not determined | Medium | None for this migration | Investigate Archivo's negotiation against the unchanged production W3ID target | Independent of the migration: production W3ID rules and the old site were not changed | Re-run `verify-registries.py` |
 | M-05 | LOV control query did not answer 200, so the registry audit cannot distinguish absence from an outage | LOV timed out | Informational | None | Re-run when LOV responds | Unrelated to the migration | `verify-registries.py` reports `3 verified, 1 unreachable, 1 wrong` |
 
-No migration-introduced failure was found.
+| M-06 | The production owner site's Pages build failed on `FAIL Firebase API key inlined` at the first dual-publication push | The deployment smoke test asserted a credential-free bundle unconditionally. That is correct for the W3C site and wrong for the production site, which is configured with Firebase and whose bundle must carry the public web API key | Medium: blocked the second publication track | None for the W3C site; blocked publishing to the owner site | **RESOLVED 2026-08-23.** The assertion is conditional on what the build was given and fails in both directions; the workflow derives the case from the variable itself | Migration-introduced, by the credential-free target requirement meeting a configured host | Both deployments build and publish |
+
+Aside from M-06, which the dual-publication arrangement introduced and which is
+fixed, no migration-introduced failure was found.
 
 ## Maintain versus Admin access
 
