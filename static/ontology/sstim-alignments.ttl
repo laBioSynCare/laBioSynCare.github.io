@@ -332,8 +332,14 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 # address reference-only use. These mappings therefore assert IRIs under the
 # public SNOMED CT URI Standard and deliberately carry no SNOMED description
 # text, hierarchy, definition, or attribute content as data. Do not add SNOMED
-# labels or child concepts here. Confirm the affiliate position before relying
-# on these mappings; withdrawing them is a one-commit change.
+# labels or child concepts here.
+#
+# An enquiry was sent to info@snomed.org on 2026-08-23 asking the narrow
+# question: whether referencing concept identifiers as IRIs in an openly
+# published mapping, without redistributing SNOMED CT content, requires an
+# Affiliate Licence. Awaiting reply. Record the answer here when it arrives, and
+# do not re-open the question in the meantime. Withdrawing these mappings, if
+# the answer requires it, is a one-commit change.
 #
 # Both relations follow the KR-09 extension/intension test, not label similarity.
 
