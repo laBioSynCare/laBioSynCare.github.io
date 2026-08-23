@@ -53,9 +53,9 @@ test('the staged profile is an in-memory overlay over the production rules', () 
 test('every production target belongs to an explicit reviewed category', () => {
   expect(ruleCounts(productionRules)).toEqual({
     total: 75,
-    ontology: 39,
+    ontology: 38,
     graph: 16,
-    application: 2,
+    application: 3,
     external: 2,
     statusOnly: 16,
   })

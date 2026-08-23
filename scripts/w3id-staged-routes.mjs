@@ -20,11 +20,15 @@ export const LIVE_ECOSYSTEM_TARGET = 'https://biosyncare-lab.web.app/current.ttl
 // A deliberate tripwire. Adding a W3ID rule is a public-contract change, so a
 // changed category count should require someone to inspect and update this
 // inventory rather than letting an unfamiliar target pass through silently.
+// ontology 39 -> 38 and application 2 -> 3 on 2026-08-23: the exposure
+// namespace catalog's HTML representation moved from the reference index to the
+// application, so a term fragment can select its term. Same reason the bare
+// namespace already pointed there.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
   total: 75,
-  ontology: 39,
+  ontology: 38,
   graph: 16,
-  application: 2,
+  application: 3,
   external: 2,
   statusOnly: 16,
 })

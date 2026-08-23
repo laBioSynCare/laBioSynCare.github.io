@@ -1176,7 +1176,10 @@ else:
             "^exposure$",
             json_ld="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.jsonld",
             rdf_xml="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.rdf",
-            html="https://labiosyncare.github.io/ontology/docs/",
+            # Both namespace catalogs (this and `^$`) send HTML to the
+            # application: only it can honour a term fragment, which a server
+            # never sees and a generated index cannot anchor.
+            html="https://labiosyncare.github.io/",
             turtle="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.ttl",
         ),
         *negotiated_directives(

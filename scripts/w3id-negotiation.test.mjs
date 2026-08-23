@@ -21,6 +21,8 @@ import {
 
 const rules = loadRules()
 const ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
+// The application entrance, where a namespace catalog sends HTML.
+const APPLICATION = 'https://labiosyncare.github.io/'
 const BROWSER = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
@@ -128,6 +130,26 @@ test('q=0 makes a type unacceptable without poisoning the others', () => {
 
   // q=0 on a different type must not suppress the one actually requested.
   expect(go('', 'application/ld+json, text/html;q=0').doc).toBe('sstim-namespace.jsonld')
+})
+
+test('a namespace catalog sends HTML to the application, so a term fragment resolves', () => {
+  // A server never sees the fragment, so /sstim/exposure and
+  // /sstim/exposure#StimulusChannelRole arrive identically and one destination
+  // has to serve both. The generated index cannot serve the second: measured
+  // 2026-08-23, WIDOCO anchors by full IRI while the browser carries the bare
+  // local name, so nothing matched and the reader landed at the top of the page.
+  // Both namespace catalogs therefore point at the application, which reads the
+  // fragment client-side and selects the term.
+  expect(go('', BROWSER).doc).toBe(APPLICATION)
+  expect(go('exposure', BROWSER).doc).toBe(APPLICATION)
+  expect(go('exposure', 'text/html').doc).toBe(APPLICATION)
+  // Only HTML changes. Every RDF representation still serves the catalog.
+  expect(go('exposure', 'text/turtle').doc).toBe('sstim-exposure-namespace.ttl')
+  expect(go('exposure', 'application/ld+json').doc).toBe('sstim-exposure-namespace.jsonld')
+  // A module id is not a namespace catalog: no fragment arrives, so the
+  // reference index stays the right answer.
+  expect(go('module/exposure', BROWSER).doc).toBe('docs/')
+  expect(go('stimulus', BROWSER).doc).toBe('docs/')
 })
 
 test('a browser reaches human documentation, not RDF', () => {
