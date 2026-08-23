@@ -1,6 +1,11 @@
-import { asset, base, resolve } from '$app/paths'
-
 const URL_SCHEME = /^[A-Za-z][A-Za-z0-9+.-]*:/
+
+// Vite replaces this property with the validated `deploymentBase` literal.
+// Direct Node consumers (ontology/quality scripts) see no injected property and
+// deliberately retain logical root-relative paths that map into static/.
+const base = typeof globalThis.__SSTIM_DEPLOYMENT_BASE__ === 'string'
+  ? globalThis.__SSTIM_DEPLOYMENT_BASE__
+  : ''
 
 function isExternalOrFragment(value) {
   if (typeof value !== 'string') return false
@@ -17,7 +22,7 @@ function requireApplicationPath(value, kind) {
 export function applicationRoute(value) {
   if (isExternalOrFragment(value)) return value
   requireApplicationPath(value, 'Application route')
-  return resolve(value)
+  return base ? `${base}${value}` : value
 }
 
 /** Resolve a file from static/ against SvelteKit's configured mount path. */
@@ -30,7 +35,7 @@ export function applicationAsset(value) {
   const suffixAt = value.search(/[?#]/)
   const pathname = suffixAt === -1 ? value : value.slice(0, suffixAt)
   const suffix = suffixAt === -1 ? '' : value.slice(suffixAt)
-  return `${asset(pathname)}${suffix}`
+  return `${base}${pathname}${suffix}`
 }
 
 /**

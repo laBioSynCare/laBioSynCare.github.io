@@ -43,6 +43,14 @@ const staticDirectoryIndex = {
 export default defineConfig({
   plugins: [staticDirectoryIndex, sveltekit()],
 
+  // Application code and command-line RDF tooling share source inventories.
+  // Inject the browser mount at compile time instead of importing `$app/paths`
+  // into those inventories: direct Node validators then keep logical `/...`
+  // repository paths while every Vite-built browser URL receives one base.
+  define: {
+    'globalThis.__SSTIM_DEPLOYMENT_BASE__': JSON.stringify(deploymentBase),
+  },
+
   // Vite loads `.env` from the project root in every mode, so unsetting
   // VITE_FIREBASE_* in the shell is not enough to produce a genuinely
   // unconfigured build — a developer's local .env still gets inlined.
