@@ -446,6 +446,17 @@ render.
 Aside from M-06, which the dual-publication arrangement introduced and which is
 fixed, no migration-introduced failure was found.
 
+### Findings logged elsewhere
+
+Two defects surfaced on 2026-08-23 while fixing term-IRI resolution. Neither was
+caused by the migration and neither blocks it, so they are tracked in `TODO.md`
+and described in
+[`docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md`](../ontology/PUBLICATION_AND_INTERLINKING_PLAN.md)
+rather than in this report's ledger: `vocab#` and `ecosystem#` serve incomplete
+namespace documents because they span modules without a generated catalog, and
+neither documentation generator anchors by local name, so no term IRI has ever
+landed on its own entry in the documentation.
+
 ## Maintain versus Admin access
 
 GitHub's current
@@ -530,8 +541,13 @@ What remains:
 5. **Decide the GitHub Release and Zenodo relationship** for the target before
    any first tag operation there. Nothing has been minted or moved, and the
    organization integration audit (hooks, Apps, deploy keys) is still owed.
-6. **Publish user transition instructions**, including PWA re-installation, and
-   keep the old site reachable through the transition window.
+6. **Publish user transition instructions**, and keep both origins reachable
+   through the transition window. Tracked in `TODO.md`. The data path is proven
+   across both origins; the installed app is not transferable at all, because a
+   PWA installation is per-origin state owned by the browser and the operating
+   system with no web API to move or recreate it. The instruction is therefore
+   to install again from the new origin and carry the data with the existing
+   Settings export and import.
 7. **Update mutable repository, home and documentation links** in external
    registries. Move machine-ingest URLs only after their frozen artifacts are
    accepted. Ledger entry M-04 (Archivo 406) is worth resolving in the same

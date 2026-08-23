@@ -316,6 +316,47 @@ indexed, examiner-searchable records.
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
       data under SSTIM. Do not publish or route the private BioSynCare/BSC
       catalog from BSC Lab.*
+- [ ] Publish user transition instructions for the two published origins `P1`
+      *Do this as soon as the migration settles, and before any redirect or
+      archival of the old origin. Browser-stored data is keyed to the origin, so
+      `labiosyncare.github.io` and `w3c-cg.github.io` hold separate copies of
+      every logbook, annotation, patch, profile and preference. Nothing moves on
+      its own.*
+      *The data path already works and was browser-tested across both origins on
+      2026-08-23: Settings exports a `bsc-lab-instance-export-1` envelope
+      covering logbooks, annotations, patches, profile and preferences, and
+      Settings on the other origin restores it. What is missing is a page that
+      tells people to do it, and a link to that page from both sites.*
+      *The installed app is a separate matter and cannot be exported. A PWA
+      installation is per-origin state owned by the browser and the operating
+      system: there is no web API to read it, move it, or recreate it, and
+      `getInstalledRelatedApps` only reports whether one exists. So the
+      instruction is to install again from the new origin and then export and
+      import the data, which does carry across. Say that plainly rather than
+      implying the installation follows.*
+      *One field is not yet proven to survive: the `skin` preference travels in
+      the envelope, but the application normalises the stored value on load, so
+      the 2026-08-23 test could not isolate whether the import wrote it. Verify
+      that before publishing the instructions.*
+- [ ] Generate namespace catalogs for `vocab#` and `ecosystem#`, and point their
+      RDF representations at them `P1`
+      *A namespace that spans modules needs a generated catalog; that is why
+      `sstim` and `exposure` have one. Measured 2026-08-23: `vocab#` is defined
+      across vocab, alignments and technique-exposure, and `ecosystem#` across
+      ecosystem, shapes and ecosystem-private-shapes, yet `/sstim/vocab` returns
+      `sstim-vocab.ttl` alone. The terms defined elsewhere are absent from the
+      document that claims to describe the namespace, and nothing marks the
+      answer partial. Generate both the way `sstim-exposure-namespace.ttl` is
+      generated. See the two-defects section in
+      [`docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md`](docs/ontology/PUBLICATION_AND_INTERLINKING_PLAN.md).*
+- [ ] Add local-name anchors to the generated documentation `P1`
+      *WIDOCO anchors by full IRI, pyLODE by label, so no term IRI has ever
+      landed on its own entry in the documentation, in any namespace. The
+      browser route added on 2026-08-23 fixes this for the four namespaces that
+      can use it; `shapes#` and `core-shapes#` cannot, because SHACL shapes are
+      not drawable nodes. `scripts/fix-widoco-links.mjs` already post-processes
+      WIDOCO output and is where the `id` aliases belong; pyLODE needs the
+      equivalent. This is the real fix for the shape namespaces.*
 - [~] Register `sstim:` and scoped prefixes such as `bsc-fw:`,
       `bsclab-preset:`, and public-safe implementation prefixes at
       https://prefix.cc `P1`

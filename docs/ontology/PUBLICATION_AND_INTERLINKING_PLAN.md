@@ -159,14 +159,67 @@ verified.
 
 | Request | Machine-readable representation | HTML representation |
 |---|---|---|
-| `/sstim` | Generated Full semantic namespace catalog in negotiated Turtle, JSON-LD, or RDF/XML | BSC Lab knowledge browser; term fragments select graph nodes |
+| `/sstim` | Generated Full semantic namespace catalog in negotiated Turtle, JSON-LD, or RDF/XML | Knowledge browser; term fragments select graph nodes |
 | `/sstim/kernel` | Exact Kernel (`sstim-core`) in the negotiated RDF syntax | WIDOCO documentation |
-| `/sstim/exposure` | Generated Stimulus + Exposure namespace catalog in the negotiated RDF syntax | WIDOCO documentation |
+| `/sstim/exposure` | Generated Stimulus + Exposure namespace catalog in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
+| `/sstim/vocab` | Exact vocabulary module in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
+| `/sstim/ecosystem` | Exact ecosystem module in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
 | `/sstim/module/exposure` | Exact Exposure semantic module (`sstim-exposure`) in the negotiated RDF syntax; mutable distribution/import endpoint | WIDOCO documentation |
 | `/sstim/profile/{kernel,core,core-plus,full}` | PROF-enabled profile entry point in the negotiated RDF syntax | WIDOCO documentation |
 | `/sstim/manifest` | JSON suite manifest | Not a separate HTML contract |
 | `/sstim/manifest-schema/1` | JSON Schema for the manifest | Not a separate HTML contract |
-| Other `/sstim/<module-slug>` routes | Exact concern, bridge, vocabulary, alignment, or shape module in the negotiated RDF syntax | WIDOCO documentation |
+| Other `/sstim/<module-slug>` routes | Exact concern, bridge, alignment, or shape module in the negotiated RDF syntax | WIDOCO documentation |
+
+**The rule behind that column, adopted 2026-08-23.** A hash namespace whose terms
+are defined across more than one module resolves HTML to the knowledge browser;
+everything else resolves to the generated reference documentation.
+
+The reason is that a server never receives a fragment. `/sstim/vocab` and
+`/sstim/vocab#alpha` arrive identically, so one destination has to serve both,
+and only the browser can serve the second: it reads the fragment client-side,
+selects the term, and links onward to that term's reference entry. Neither
+generator can. Measured 2026-08-23: WIDOCO anchors by full IRI
+(`id="https://w3id.org/sstim/exposure#StimulusChannelRole"`) and pyLODE by label
+(`id="Alpha"` for `sstim-v:alpha`, which is also the wrong case), while the
+browser carries the bare local name. Both left the reader at the top of an index
+with nothing selected, which is what
+[perma-id/w3id.org#6594](https://github.com/perma-id/w3id.org/pull/6594) fixes.
+
+Four namespaces qualify by the module-spanning test: `sstim#` (14 modules),
+`vocab#` (3: vocab, alignments, technique-exposure), `ecosystem#` (3: ecosystem,
+shapes, ecosystem-private-shapes) and `exposure#` (2: exposure, stimulus).
+
+`shapes#` and `core-shapes#` deliberately do not. Each is defined by exactly one
+module, so its module file is already a complete namespace document, and SHACL
+shapes are not drawable in the knowledge browser: measured 2026-08-23,
+`/graph/#AudioTrackShape` selects nothing. Sending a shape IRI there would strand
+the reader on a graph with no selection, which is worse than a page that at least
+documents the shape. Revisit if shapes become drawable, or if the generated pages
+gain local-name anchors (see the two defects below).
+
+### Two known defects in this contract
+
+Both were found on 2026-08-23 while fixing the routing above. Neither is caused
+by it, and neither is fixed by it.
+
+**1. `vocab` and `ecosystem` serve incomplete namespace documents.** A namespace
+that spans modules needs a generated catalog, which is exactly why `sstim` and
+`exposure` have one. `vocab#` and `ecosystem#` span modules too and have none, so
+`/sstim/vocab` returns `sstim-vocab.ttl` alone: the `sstim-v:` terms defined in
+`alignments` and `technique-exposure` are simply absent from the document that
+claims to describe the namespace. `/sstim/ecosystem` has the same shape of gap.
+The fix is to generate catalogs for both, the way `sstim-exposure-namespace.ttl`
+is generated, and to point the RDF representations at them. Until then a consumer
+dereferencing either namespace for machine-readable data gets a partial answer
+with nothing marking it partial.
+
+**2. Neither documentation generator anchors by local name.** WIDOCO anchors by
+full IRI and pyLODE by label, so no term IRI has ever landed on its own entry in
+the documentation, in any namespace. `scripts/fix-widoco-links.mjs` already
+post-processes WIDOCO output and is the natural place to add local-name `id`
+aliases; pyLODE needs the equivalent. Fixing this would make term IRIs work in
+the documentation as well as in the browser, and it is the real fix for `shapes`
+and `core-shapes`, which cannot use the browser route at all.
 
 `/sstim/exposure` is a namespace document and must not appear as the Exposure
 module's `owl:imports` target. The live Full profile uses
