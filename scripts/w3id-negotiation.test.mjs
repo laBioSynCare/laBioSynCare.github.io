@@ -152,6 +152,27 @@ test('a namespace catalog sends HTML to the application, so a term fragment reso
   expect(go('stimulus', BROWSER).doc).toBe('docs/')
 })
 
+test('a multi-module hash namespace resolves HTML to the application', () => {
+  // sstim-v: is defined across vocab, alignments and technique-exposure, and
+  // sstim-eco: across ecosystem, shapes and the private shapes module, so a
+  // term fragment reaches these routes exactly as it reaches /sstim and
+  // /sstim/exposure.
+  expect(go('vocab', BROWSER).doc).toBe(APPLICATION)
+  expect(go('ecosystem', BROWSER).doc).toBe(APPLICATION)
+  // RDF representations are untouched.
+  expect(go('vocab', 'text/turtle').doc).toBe('sstim-vocab.ttl')
+  expect(go('ecosystem', 'application/ld+json').doc).toBe('sstim-ecosystem.jsonld')
+})
+
+test('shape namespaces stay on the reference index', () => {
+  // Measured 2026-08-23: /graph/#AudioTrackShape selects nothing, because SHACL
+  // shapes are not drawable nodes. Routing a shape IRI to the application would
+  // land the reader on a graph with no selection, which is worse than a page
+  // that at least documents the shape. Revisit if shapes become drawable.
+  expect(go('shapes', BROWSER).doc).toBe('docs/')
+  expect(go('core-shapes', BROWSER).doc).toBe('docs/')
+})
+
 test('a browser reaches human documentation, not RDF', () => {
   // The root is the one HTML target outside /ontology/: a person typing
   // w3id.org/sstim wants the project, not a generated reference page.
@@ -161,14 +182,19 @@ test('a browser reaches human documentation, not RDF', () => {
   expect(go('profile/core', BROWSER).doc).toBe('docs/')
 })
 
-test('the SKOS vocabulary has its own documentation page', () => {
-  // pyLODE generates docs/vocab/; WIDOCO generates docs/. Sending a reader
-  // asking for the vocabulary to the OWL reference index is a wrong answer,
-  // not merely a worse one.
-  expect(go('vocab', 'text/html').doc).toBe('docs/vocab/')
-  expect(go('vocab', BROWSER).doc).toBe('docs/vocab/')
-  // Only the HTML representation is special-cased.
-  expect(go('vocab', 'text/turtle').doc).toBe('sstim-vocab.ttl')
+test('the SKOS vocabulary keeps its own documentation page, one link away', () => {
+  // This test used to require /sstim/vocab to resolve to pyLODE's page, on the
+  // reasoning that sending a vocabulary reader to the OWL reference index is a
+  // wrong answer rather than a worse one. That reasoning held for a reader
+  // asking about the vocabulary and overlooked the reader following a term IRI,
+  // who is the more common case and was being served worst of all: pyLODE
+  // anchors by label (id="Alpha"), the browser carries the local name
+  // (#alpha), and nothing matched.
+  //
+  // The page did not move. It keeps its address, it keeps its generator, and
+  // every vocabulary term in the knowledge browser links to its entry there.
+  // What changed is which of the two readers the ambiguous URL serves first.
+  expect(go('vocab', 'text/html').doc).toBe(APPLICATION)
   expect(go('vocab', 'application/ld+json').doc).toBe('sstim-vocab.jsonld')
   expect(go('shapes', 'text/html').doc).toBe('docs/')
 })

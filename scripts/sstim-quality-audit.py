@@ -1144,16 +1144,15 @@ else:
     # those routes is overridden immediately before the shared module block, so
     # the override wins on ordering. Deriving it from the manifest keeps the
     # whole route table generated rather than hand-patched.
-    documentation_overrides = tuple(
-        directive
-        for module in MANIFEST["modules"]
-        if module["publication"].get("documentationUrl")
-        for directive in (
-            HTML_ACCEPT,
-            "RewriteRule "
-            f"^{module['publication']['persistentUrl'].removeprefix('https://w3id.org/sstim/')}$ "
-            f"{module['publication']['documentationUrl']} [R=303,L]",
-        )
+    # Hash namespaces defined across more than one module resolve HTML to the
+    # application, because a fragment can arrive at them and only the
+    # application can honour one. `documentationUrl` no longer drives a route:
+    # it still names where a term's reference entry lives, which the knowledge
+    # browser links to, but the pyLODE page cannot anchor a bare local name and
+    # so cannot be the destination for a term IRI.
+    documentation_overrides = (
+        HTML_ACCEPT,
+        "RewriteRule ^(vocab|ecosystem)$ https://labiosyncare.github.io/ [R=303,L]",
     )
     expected_manifest_directives = (
         "RewriteRule ^manifest$ https://labiosyncare.github.io/ontology/manifest.json [R=303,L]",

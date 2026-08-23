@@ -20,15 +20,20 @@ export const LIVE_ECOSYSTEM_TARGET = 'https://biosyncare-lab.web.app/current.ttl
 // A deliberate tripwire. Adding a W3ID rule is a public-contract change, so a
 // changed category count should require someone to inspect and update this
 // inventory rather than letting an unfamiliar target pass through silently.
-// ontology 39 -> 38 and application 2 -> 3 on 2026-08-23: the exposure
-// namespace catalog's HTML representation moved from the reference index to the
-// application, so a term fragment can select its term. Same reason the bare
-// namespace already pointed there.
+// 2026-08-23: every hash namespace whose terms span more than one module now
+// resolves HTML to the application, so a term fragment can select its term.
+// exposure, vocab and ecosystem joined the bare namespace, which already
+// pointed there. The rule count is unchanged: vocab's existing rule widened to
+// cover ecosystem rather than a new one being added, so ontology 39 -> 37 and
+// application 2 -> 4 on the same total of 75.
+// shapes and core-shapes stay on the reference index: their terms are not
+// drawable in the knowledge browser, so sending them there would select
+// nothing.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
   total: 75,
-  ontology: 38,
+  ontology: 37,
   graph: 16,
-  application: 3,
+  application: 4,
   external: 2,
   statusOnly: 16,
 })

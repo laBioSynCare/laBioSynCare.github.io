@@ -53,9 +53,9 @@ test('the staged profile is an in-memory overlay over the production rules', () 
 test('every production target belongs to an explicit reviewed category', () => {
   expect(ruleCounts(productionRules)).toEqual({
     total: 75,
-    ontology: 38,
+    ontology: 37,
     graph: 16,
-    application: 3,
+    application: 4,
     external: 2,
     statusOnly: 16,
   })
@@ -98,7 +98,9 @@ test('all expanded ontology targets preserve their publication-relative path', (
     .filter((target) => target.startsWith(PRODUCTION_TARGETS.ontology)))]
   const staged = production.map((target) => retargetTarget(target))
 
-  expect(production).toHaveLength(94)
+  // 93 since 2026-08-23: /ontology/docs/vocab/ was this set's only sole-owner
+  // target, and vocab's HTML moved to the application.
+  expect(production).toHaveLength(93)
   expect(staged.map((target) => target.slice(STAGED_TARGETS.ontology.length)))
     .toEqual(production.map((target) => target.slice(PRODUCTION_TARGETS.ontology.length)))
   expect(staged.every((target) => target.startsWith(STAGED_TARGETS.ontology))).toBe(true)
