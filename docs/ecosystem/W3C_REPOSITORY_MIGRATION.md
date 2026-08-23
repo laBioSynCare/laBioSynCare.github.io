@@ -1,6 +1,7 @@
 # Decision and staged migration plan: SSTIM to `w3c-cg/sstim`
 
-- **Status:** approved migration; staged execution in progress
+- **Status:** approved migration; executed 2026-08-23. See the
+  [final migration report](W3C_MIGRATION_REPORT.md)
 - **Proposal/document date:** 2026-08-23
 - **Decision authority and approval date:** Community Group migration approval,
   including the complete history, existing licenses, SSTIM, and the complete
@@ -992,51 +993,51 @@ changes at breakpoints.
 
 | Requirement | Evidence required before target acceptance | Audit status on 2026-08-23 |
 |---|---|---|
-| Source history preserved | Fresh target clone proves original source tip is ancestor of target `main`; commit count/ref report retained | Not yet migrated |
-| Non-main source history preserved | Every frozen source branch tip is reachable through a namespaced target branch; nine non-main commits accounted for | Not yet migrated |
-| Target history preserved | Fresh target clone proves original target tip is ancestor of target `main` | Not yet migrated |
-| Complete source tree imported | File/mode/symlink parity against frozen source, with only scaffold reconciliation and reviewed migration commits in the exception ledger | Not yet migrated |
-| Tags preserved | Fresh clone exact tag name, annotated-object-ID, and peeled-commit-ID comparison | Not yet migrated |
-| GitHub Release/Zenodo disposition | All 14 Release records have the complete ledger; target recreation is deferred or explicitly approved; no webhook/deposit/DOI event fired | Admin integration audit pending |
+| Source history preserved | Fresh target clone proves original source tip is ancestor of target `main`; commit count/ref report retained | **PASS**: `6cf49c9` ancestor of `773d64c`; 507 commits |
+| Non-main source history preserved | Every frozen source branch tip is reachable through a namespaced target branch; nine non-main commits accounted for | **PASS**: 3 heads, 12 archived PR heads |
+| Target history preserved | Fresh target clone proves original target tip is ancestor of target `main` | **PASS**: `7d4a4a7` ancestor of `773d64c` |
+| Complete source tree imported | File/mode/symlink parity against frozen source, with only scaffold reconciliation and reviewed migration commits in the exception ledger | **PASS**: protected ontology tree `84528db5` identical to the live source tip |
+| Tags preserved | Fresh clone exact tag name, annotated-object-ID, and peeled-commit-ID comparison | **PASS**: 14 of 14, object and peeled IDs |
+| GitHub Release/Zenodo disposition | All 14 Release records have the complete ledger; target recreation is deferred or explicitly approved; no webhook/deposit/DOI event fired | **PASS**: 14 on source, 0 on target, no event fired |
 | Governance/license boundary | G0 authority recorded and approved path/license/contribution notices implemented without retroactive-CLA claims | **Passed; decision recorded in `LICENSING.md`** |
-| Full-history credential scan | Every imported ref/object scanned without disclosing values; any finding rotated/remediated before push | Not run |
-| Target ref security | Required checks/PRs enabled; force update/deletion prohibited on `main`, archival branches, and imported tags; merge-commit method available | Target currently unprotected; W3C admin required |
-| W3C status wording | CG/W3C contact approves accurate non-endorsement/status and provenance text | Pending |
-| Target Pages healthy | HTTPS 200, expected commit, no missing build assets | Scaffold only |
-| `/sstim/` routing | Direct and in-app navigation for every prerendered route | Fails by inspection: no base strategy |
-| Root deployment retained | Empty-base build and old-site smoke tests | Existing site healthy in sampled checks |
-| Graph Navigator | Full manifest load, filters, relationships, external data failure behavior | Not yet tested on target |
-| SSTIM term deep link | Staged rules emit target `/sstim/`; direct target `.../sstim/#StimulationMechanism` selects the term in a browser; canonical W3ID still selects it on old production | Target client path not tested; canonical-to-new test waits for cutover |
-| BSC entity deep link | Preserved implementation/framework/component IRIs select the correct nodes | Target not tested |
-| SPARQL interface | Verified examples and bounded SELECT rendering work; unsupported UI forms retain their guidance; shared API tests separately cover ASK/CONSTRUCT | Target not tested |
-| Patch Studio | Load, starters, import/export, safety gates, engine start/stop, samples | Target not tested |
-| Worklet/WASM | Network 200 from `/sstim/`, processor registration, audible/rendered session behavior | Fails by inspection with current root URLs |
-| Pages WASM posture | Real Pages MIME/compile test passes for current non-threaded WASM; site does not claim COOP/COEP or threaded-WASM support | Not tested |
-| PWA install/scope | Manifest valid; scope `/sstim/`; install/offline/update passes | Fails by inspection with current manifest/SW |
+| Full-history credential scan | Every imported ref/object scanned without disclosing values; any finding rotated/remediated before push | **PASS**: gitleaks over source, target and all refs, no findings |
+| Target ref security | Required checks/PRs enabled; force update/deletion prohibited on `main`, archival branches, and imported tags; merge-commit method available | **PASS**: branch protection plus two rulesets applied 2026-08-23 |
+| W3C status wording | CG/W3C contact approves accurate non-endorsement/status and provenance text | Pending: W3C staff question 2 |
+| Target Pages healthy | HTTPS 200, expected commit, no missing build assets | **PASS**: `verify-deploy` confirms `773d64cd` |
+| `/sstim/` routing | Direct and in-app navigation for every prerendered route | **PASS**: 13 of 13 prerendered routes 200 |
+| Root deployment retained | Empty-base build and old-site smoke tests | **PASS**: NixOS VM and OCI gates green on `773d64c`; old site serving `e6b3948` |
+| Graph Navigator | Full manifest load, filters, relationships, external data failure behavior | **PASS**: 15100 quads, 749 nodes, 879 edges, live source available |
+| SSTIM term deep link | Staged rules emit target `/sstim/`; direct target `.../sstim/#StimulationMechanism` selects the term in a browser; canonical W3ID still selects it on old production | **PASS** for the target client path; canonical-to-new still waits for cutover |
+| BSC entity deep link | Preserved implementation/framework/component IRIs select the correct nodes | **PASS**: framework, component, preset and programme fragments each select |
+| SPARQL interface | Verified examples and bounded SELECT rendering work; unsupported UI forms retain their guidance; shared API tests separately cover ASK/CONSTRUCT | **PASS**: example query runs, 100 rows render |
+| Patch Studio | Load, starters, import/export, safety gates, engine start/stop, samples | **PASS** for load and controls; engine start/stop covered by the worklet render tests |
+| Worklet/WASM | Network 200 from `/sstim/`, processor registration, audible/rendered session behavior | **PASS**: 4 voices render non-silent from `/sstim/worklets/` |
+| Pages WASM posture | Real Pages MIME/compile test passes for current non-threaded WASM; site does not claim COOP/COEP or threaded-WASM support | **PASS**: `WebAssembly.compileStreaming` succeeds against `application/wasm` |
+| PWA install/scope | Manifest valid; scope `/sstim/`; install/offline/update passes | **PASS** for manifest and scope; offline and update not separately re-tested on target |
 | Cache isolation | Only SSTIM-owned caches deleted across an update | Implemented: mount-scoped cache prefix, only owned caches retired |
 | Fetch isolation | A request from an SSTIM client to a sibling project path is neither handled nor cached by the SSTIM worker | Implemented: `fetch` returns early outside the deployment mount |
 | Browser-data posture | Gate G1 option and its feature/copy matrix are implemented and browser-verified | **Resolved: option 3 accepted 2026-08-23** |
-| User state transition | Automated two-origin gate plus old Settings export/new Settings import with synthetic data; PWA reinstall instructions | Not tested |
-| Build/unit checks | `make test` and `make check` (plus project-base browser tests) | Must rerun on migration commit |
-| Reproducible/self-hosted deployment | Existing NixOS VM, non-root OCI, static smoke, and two-origin migration gates remain green | Must rerun on migration commit |
-| Ontology validation | Authoritative `make validate`/CI suite | Must rerun; no migration exemption |
-| SHACL/reasoning/quality | Existing profile, reasoning, competency, quality, release-truth gates | Must rerun |
-| Interoperability | Existing HED/BIDS/crosswalk and session-conformance gates remain green | Must rerun |
-| WIDOCO | Clean generation and `/sstim/` link/assets check | Target not tested |
-| pyLODE | Clean generation and `/sstim/` link/assets check | Target not tested |
-| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all 28 runtime, 21 local instance, and one external values pass | Target currently 404; path contract unresolved |
-| Immutable releases | Before/after hash manifests identical; target returns identical bodies | Must prove |
-| DOI/VoID/DCAT | Concept DOI `10.5281/zenodo.21286974` and v0.16.0 DOI `10.5281/zenodo.22003777` resolve to the same records; no deposit/concept DOI was created; frozen DOI-bearing metadata is identical | Must review |
-| External registries | Network-capable verification records each registry result without changing records | Audit was INCOMPLETE |
-| Staged W3ID matrix | All current contracts pass against target-specific test rules | Not run |
-| Canonical IRIs | Generated-RDF IRI-set comparison has no migration-induced change | Must prove |
-| No semantic release change | RDF canonicalization/diff and immutable hashes | Must prove |
-| Firebase/auth, if enabled | Authorized domain, sign-in/out, rules, network isolation | Target variables absent; Gate G1 first |
-| SSTIM Workbench branding | Public terminology is coherent; semantic-review ledger is closed; BSC identities and historical material remain unchanged | Not begun |
-| Production parity | Old/new route-and-behavior comparison has no unexplained high-value regression | Must prove |
-| Parallel publication authority | Release freeze or identical-artifact dual-publish process prevents source/target semantic drift | Must choose |
-| Rollback rehearsal | Target Pages is repointed to/from the preserved scaffold successfully; reverse staged W3ID rules pass before production cutover | Not run |
-| Old production operational | Scheduled HTTP/browser smoke tests remain green through acceptance window | Healthy in sampled audit |
+| User state transition | Automated two-origin gate plus old Settings export/new Settings import with synthetic data; PWA reinstall instructions | **PASS** for logbook and annotation across origins; `skin` untested; reinstall instructions still to publish |
+| Build/unit checks | `make test` and `make check` (plus project-base browser tests) | **PASS** on `773d64c` |
+| Reproducible/self-hosted deployment | Existing NixOS VM, non-root OCI, static smoke, and two-origin migration gates remain green | **PASS** on `773d64c` |
+| Ontology validation | Authoritative `make validate`/CI suite | **PASS**: `Validate RDF` green on `773d64c` |
+| SHACL/reasoning/quality | Existing profile, reasoning, competency, quality, release-truth gates | **PASS**: inside the same run |
+| Interoperability | Existing HED/BIDS/crosswalk and session-conformance gates remain green | **PASS**: inside the same run |
+| WIDOCO | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-02 (pre-existing OOPS link 404) |
+| pyLODE | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-03 (pre-existing sibling `.ttl` 404) |
+| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all runtime, local instance, and external values pass | Endpoints **PASS** (22 measured runtime, not 28; 21 local; 1 external). **Path semantics unresolved: ledger M-01** |
+| Immutable releases | Before/after hash manifests identical; target returns identical bodies | **PASS**: 7 of 7 sampled artifacts byte-identical across origins |
+| DOI/VoID/DCAT | Concept DOI `10.5281/zenodo.21286974` and v0.16.0 DOI `10.5281/zenodo.22003777` resolve to the same records; no deposit/concept DOI was created; frozen DOI-bearing metadata is identical | **PASS**: both resolve to record 22003777; `CITATION.cff` and `.zenodo.json` unchanged |
+| External registries | Network-capable verification records each registry result without changing records | 3 verified, 1 unreachable (LOV, M-05), 1 wrong (Archivo 406, M-04, independent of this migration) |
+| Staged W3ID matrix | All current contracts pass against target-specific test rules | **PASS**: 29 candidate targets, 9 Graph fragments, production file untouched |
+| Canonical IRIs | Generated-RDF IRI-set comparison has no migration-induced change | **PASS**: identical ontology tree and identical served bytes |
+| No semantic release change | RDF canonicalization/diff and immutable hashes | **PASS**: snapshot checksum ledger green in CI; served bytes identical |
+| Firebase/auth, if enabled | Authorized domain, sign-in/out, rules, network isolation | Not applicable: the target build carries no Firebase configuration |
+| SSTIM Workbench branding | Public terminology is coherent; semantic-review ledger is closed; BSC identities and historical material remain unchanged | **PASS** by inspection of the deployed site; BSC identities unchanged |
+| Production parity | Old/new route-and-behavior comparison has no unexplained high-value regression | **PASS**: no migration-introduced failure; M-02 and M-03 reproduce identically on old production |
+| Parallel publication authority | Release freeze or identical-artifact dual-publish process prevents source/target semantic drift | **Still to choose**: the repositories are now deliberately divergent |
+| Rollback rehearsal | Target Pages is repointed to/from the preserved scaffold successfully; reverse staged W3ID rules pass before production cutover | **Not run**: required before W3ID cutover |
+| Old production operational | Scheduled HTTP/browser smoke tests remain green through acceptance window | **PASS**: serving `e6b3948`, all sampled routes 200 |
 
 Do not turn “not yet tested” into “pass” based on the old deployment or a local
 root build.

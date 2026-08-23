@@ -107,15 +107,17 @@ of `static/favicon.svg` and `static/icons/`.
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
 - [`W3C_REPOSITORY_MIGRATION.md`](ecosystem/W3C_REPOSITORY_MIGRATION.md) —
-  **proposed; not production-cutover authorization.** Decision analysis and
-  checkpointed plan for moving the complete repository and parallel publication
-  site to `w3c-cg/sstim`, while preserving identifiers, histories, licensing
-  provenance, immutable releases, production W3ID routing, and the existing
-  Pages deployment.
+  **executed 2026-08-23; still not production-cutover authorization.** Decision
+  analysis, gates and checkpointed plan for moving the complete repository and
+  parallel publication site to `w3c-cg/sstim`, while preserving identifiers,
+  histories, licensing provenance, immutable releases, production W3ID routing,
+  and the existing Pages deployment. Its acceptance matrix now carries measured
+  results.
 - [`W3C_REPOSITORY_MIGRATION_REPORT.md`](ecosystem/W3C_REPOSITORY_MIGRATION_REPORT.md) —
-  the dated implementation and acceptance checkpoint: preserved-history
-  evidence, local `/sstim/` results, blockers, administrator requirements,
-  registry policy, and the remaining steps before any W3ID cutover.
+  the dated implementation and acceptance record: preserved-history evidence
+  from a fresh clone, live `/sstim/` results, the post-deployment failure
+  ledger, the applied ref protection, and the remaining steps before any W3ID
+  cutover.
 - [`OUTREACH_TARGETS.md`](ecosystem/OUTREACH_TARGETS.md) — prospective labs, orgs,
   standards bodies and events, with the ask per target, the 90-day sequence, KPIs,
   and a consent-governed log
