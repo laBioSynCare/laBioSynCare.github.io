@@ -101,24 +101,38 @@ the plan requires.
 The migration owner now holds Admin on `w3c-cg/sstim` and used it after the
 merge, closing the first safe-stop blocker:
 
-- `main`: pull request required (zero approvals, so a solo maintainer is not
-  deadlocked), all five checks required, force pushes and deletion prohibited.
+- `main`: force pushes and deletion prohibited. **No required checks and no
+  pull-request requirement**, so the maintainer pushes to `main` directly and
+  watches the workflows there. That is a deliberate choice, explained below.
 - Ruleset "Preserve imported history": deletion and non-fast-forward blocked on
   `archive/labiosyncare/**`, `legacy/labiosyncare/**` and
   `pages/pre-migration-scaffold`.
 - Ruleset "Protect imported release tags": deletion, non-fast-forward and update
   blocked on every tag.
 
-Applying that protection immediately exposed a deadlock worth recording, because
-it would recur in any repository that copies this setup. `RDF validation (Nix)`
-was a required check on a workflow filtered by path, and GitHub blocks a pull
-request whose required check never reports. A documentation-only change matches
-none of the filtered paths, so the first such pull request after protection
-could never merge. The filter moved inside the job: a relevance step resolves the
-merge base, applies the same path list to the diff, and gates the expensive
-steps on the result, failing open when the base cannot be resolved. The check now
-always reports, a docs pull request costs seconds, and an ontology pull request
-runs the full validation exactly as before.
+**Why the checks are not required, stated rather than left to be inferred.**
+Protection was first applied in its strict form: pull request required with zero
+approvals, all five checks required. That configuration is incompatible with a
+direct-push workflow, because GitHub blocks a push to a branch whose required
+checks cannot have run yet. The maintainer's working practice for this project is
+to push to `main` and watch CI there, so the requirement was removed and the
+guarantees that do not depend on it were kept: no force push and no deletion, on
+`main`, on every archival branch, and on every imported tag. History cannot be
+rewritten or destroyed. The trade accepted in exchange is real and worth naming:
+a commit that breaks a gate can reach `main` and must be corrected forward.
+
+The strict form also exposed a deadlock worth recording, because it recurs in any
+repository that copies this setup even without direct pushes.
+`RDF validation (Nix)` was a required check on a workflow filtered by path, and
+GitHub blocks a pull request whose required check never reports. A
+documentation-only change matches none of the filtered paths, so the first such
+pull request after protection could never merge. The filter moved inside the job:
+a relevance step resolves the merge base, applies the same path list to the diff,
+and gates the expensive steps on the result, failing open when the base cannot be
+resolved. The check now always reports, a docs change costs seconds, and an
+ontology change runs the full validation exactly as before. That fix is kept
+regardless of the requirement, because a Community Group repository will receive
+pull requests from people who are not the maintainer.
 
 ### User state transition, old origin to new
 

@@ -1001,7 +1001,7 @@ changes at breakpoints.
 | GitHub Release/Zenodo disposition | All 14 Release records have the complete ledger; target recreation is deferred or explicitly approved; no webhook/deposit/DOI event fired | **PASS**: 14 on source, 0 on target, no event fired |
 | Governance/license boundary | G0 authority recorded and approved path/license/contribution notices implemented without retroactive-CLA claims | **Passed; decision recorded in `LICENSING.md`** |
 | Full-history credential scan | Every imported ref/object scanned without disclosing values; any finding rotated/remediated before push | **PASS**: gitleaks over source, target and all refs, no findings |
-| Target ref security | Required checks/PRs enabled; force update/deletion prohibited on `main`, archival branches, and imported tags; merge-commit method available | **PASS**: branch protection plus two rulesets applied 2026-08-23 |
+| Target ref security | Force update/deletion prohibited on `main`, archival branches, and imported tags; merge-commit method available | **PASS** for force update and deletion, on all three ref classes. Required checks and the pull-request requirement were deliberately **not** kept: the maintainer pushes to `main` directly and watches CI there (see the report) |
 | W3C status wording | CG/W3C contact approves accurate non-endorsement/status and provenance text | Pending: W3C staff question 2 |
 | Target Pages healthy | HTTPS 200, expected commit, no missing build assets | **PASS**: `verify-deploy` confirms `773d64cd` |
 | `/sstim/` routing | Direct and in-app navigation for every prerendered route | **PASS**: 13 of 13 prerendered routes 200 |
