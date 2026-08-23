@@ -109,6 +109,17 @@ merge, closing the first safe-stop blocker:
 - Ruleset "Protect imported release tags": deletion, non-fast-forward and update
   blocked on every tag.
 
+Applying that protection immediately exposed a deadlock worth recording, because
+it would recur in any repository that copies this setup. `RDF validation (Nix)`
+was a required check on a workflow filtered by path, and GitHub blocks a pull
+request whose required check never reports. A documentation-only change matches
+none of the filtered paths, so the first such pull request after protection
+could never merge. The filter moved inside the job: a relevance step resolves the
+merge base, applies the same path list to the diff, and gates the expensive
+steps on the result, failing open when the base cannot be resolved. The check now
+always reports, a docs pull request costs seconds, and an ontology pull request
+runs the full validation exactly as before.
+
 ### User state transition, old origin to new
 
 Driven through the real Settings UI on both sites with synthetic data. A logbook
