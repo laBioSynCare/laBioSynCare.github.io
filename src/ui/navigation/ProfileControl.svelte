@@ -1,5 +1,6 @@
 <script>
   import { onDestroy } from 'svelte'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import { identityState, identityCapabilities, signOut } from '../../identity/identityState.js'
   import { pendingState } from '../../identity/IdentityProvider.js'
   import SignInForm from '../auth/SignInForm.svelte'
@@ -56,7 +57,7 @@
     {#if shortUid}
       <p><small>UID {shortUid}</small></p>
     {/if}
-    <a class="profile-link" href="/profile/">Edit profile</a>
+    <a class="profile-link" href={applicationRoute('/profile/')}>Edit profile</a>
     <button type="button" class="secondary outline" onclick={submitSignOut} aria-busy={busy} disabled={busy}>
       Log out
     </button>

@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { applicationRoute } from '../../../config/applicationUrls.js'
   import { visualStimulationOn, advisoryOpen, prefersReducedMotion } from '../../safety/visualSafety.js'
   import {
     loadTreeState, saveTreeState,
@@ -107,7 +108,7 @@
   <header class="tree-head">
     <h1>Stereoscopic Tree</h1>
     <p class="lede">
-      A companion to the <a href="/field/">Sensory Field</a>. The tree's leaves,
+      A companion to the <a href={applicationRoute('/field/')}>Sensory Field</a>. The tree's leaves,
       branches, and roots each have an (x, y, z) position, so it carries real
       depth. Choose how to see that depth: a free-view stereo pair, a single
       random-dot autostereogram, or a red / cyan anaglyph. Turn the tree to read

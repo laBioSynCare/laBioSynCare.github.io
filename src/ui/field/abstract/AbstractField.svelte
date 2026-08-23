@@ -1,6 +1,7 @@
 <script>
   // Abstraction scene page: owns the param + view state, derives the scene, and
   // hands both to the shared SceneStereo shell with scene-specific controls.
+  import { applicationRoute } from '../../../config/applicationUrls.js'
   import { generateAbstract, ABSTRACT_STYLES } from './abstractScene.js'
   import {
     loadAbstractState, saveAbstractState,
@@ -30,7 +31,7 @@
   {#snippet intro()}
     Shapes scattered in 3D space, in the spirit of a Miró, Kandinsky, or Paul Klee
     composition — each object at its own depth. A companion to the
-    <a href="/field/tree/">Stereoscopic Tree</a>; turn the scene to read the layout.
+    <a href={applicationRoute('/field/tree/')}>Stereoscopic Tree</a>; turn the scene to read the layout.
   {/snippet}
 
   {#snippet controls()}

@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { goto } from '$app/navigation'
+  import { applicationRoute } from '../config/applicationUrls.js'
   import ConversionBar from '../ui/entrance/ConversionBar.svelte'
   import ContributeProtocolModal from '../ui/entrance/ContributeProtocolModal.svelte'
   import CiteSstimModal from '../ui/entrance/CiteSstimModal.svelte'
@@ -39,8 +40,8 @@
       // line), and this door was the one place promising it as a capability.
       copy: 'Browse the SSTIM ontology, follow the evidence behind a claim, and query it all with SPARQL.',
       primary: [
-        { label: 'Explore the ontology', href: '/graph/' },
-        { label: 'Query with SPARQL', href: '/sparql/' },
+        { label: 'Explore the ontology', href: applicationRoute('/graph/') },
+        { label: 'Query with SPARQL', href: applicationRoute('/sparql/') },
       ],
       // The generated OWL/SKOS reference is what a standards or ontology peer
       // reads before the graph, and it was reachable only from the top-bar
@@ -56,10 +57,10 @@
       eyebrow: 'Experience',
       title: 'Try a session.',
       copy: 'Audio-visual sessions in your browser — no install, start gently.',
-      primary: [{ label: 'Open Patch Studio', href: '/creator/' }],
+      primary: [{ label: 'Open Patch Studio', href: applicationRoute('/creator/') }],
       secondary: [
-        { label: 'Start from a sensory template', href: '/creator/?starter=field' },
-        { label: 'Browse presets', href: '/presets/' },
+        { label: 'Start from a sensory template', href: applicationRoute('/creator/?starter=field') },
+        { label: 'Browse presets', href: applicationRoute('/presets/') },
       ],
     },
     {
@@ -111,7 +112,7 @@
     // hash to the knowledge browser so shared links keep resolving.
     const hash = window.location.hash
     if (hash && !hash.startsWith('#door-') && hash !== '#hero') {
-      goto('/graph/' + hash, { replaceState: true })
+      goto(applicationRoute('/graph/') + hash, { replaceState: true })
       return
     }
     // Mobile-only: once the hero has scrolled away, the doors stack into a
@@ -231,7 +232,7 @@
         ><Isotype name="biosyncare" size={17} />BioSynCare (commercial app)</a
       >
       <span aria-hidden="true"> · </span>
-      <a href="/about/">About</a>
+      <a href={applicationRoute('/about/')}>About</a>
     </p>
   </footer>
 </main>

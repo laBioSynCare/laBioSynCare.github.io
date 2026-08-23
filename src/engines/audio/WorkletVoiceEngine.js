@@ -1,6 +1,7 @@
 import { IAudioEngine } from './IAudioEngine.js'
 import { loadSample, sampleUrl } from './sampleLoader.js'
 import { holdThenRelease, teardownDelayMs } from './voiceRelease.js'
+import { applicationAsset } from '../../config/applicationUrls.js'
 
 const PARAM_RAMP = 0.02
 const ATTACK = 0.05
@@ -51,7 +52,7 @@ export class WorkletVoiceEngine extends IAudioEngine {
 
   /** Load the worklet module(s). Subclasses extend (e.g. fetch WASM bytes). */
   async _loadModules() {
-    await this._ctx.audioWorklet.addModule(this._moduleUrl)
+    await this._ctx.audioWorklet.addModule(applicationAsset(this._moduleUrl))
   }
 
   /** Hook: called after each voice node is created (subclass setup). */

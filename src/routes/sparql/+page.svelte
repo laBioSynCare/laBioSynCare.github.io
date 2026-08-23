@@ -1,5 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
+  import { applicationAsset, applicationRoute } from '../../config/applicationUrls.js'
   import ontologyManifest from '../../../static/ontology/manifest.json' with { type: 'json' }
   import {
     INSTANCE_URLS,
@@ -695,9 +696,9 @@ LIMIT 25</code></pre>
             After the query engine is ready, each run has a {QUERY_TIMEOUT_MS / 1000}-second time limit and can be cancelled. Use <code>LIMIT</code> for predictable slices.
           </p>
           <div class="guide-links">
-            <a href="/graph/">Browse visually →</a>
-            <a href="/presets/">Browse presets →</a>
-            <a href="/ontology/sstim-full-profile.ttl" download>Download Full profile entry point →</a>
+            <a href={applicationRoute('/graph/')}>Browse visually →</a>
+            <a href={applicationRoute('/presets/')}>Browse presets →</a>
+            <a href={applicationAsset('/ontology/sstim-full-profile.ttl')} download>Download Full profile entry point →</a>
           </div>
         </section>
       </aside>

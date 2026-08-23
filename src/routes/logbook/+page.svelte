@@ -1,6 +1,7 @@
 <script>
   import { onDestroy } from 'svelte'
   import { goto } from '$app/navigation'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import { identityState, identityCapabilities } from '../../identity/identityState.js'
   import { pendingState } from '../../identity/IdentityProvider.js'
   import SignInForm from '../../ui/auth/SignInForm.svelte'
@@ -16,7 +17,7 @@
   let gateVisible = $derived(auth.ready && identityCapabilities().canSignIn && !auth.identity.authenticated)
 
   function dismissGate() {
-    goto('/')
+    goto(applicationRoute('/'))
   }
 
   const TYPES = {

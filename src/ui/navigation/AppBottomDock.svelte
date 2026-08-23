@@ -1,20 +1,23 @@
 <script>
   import { page } from '$app/state'
+  import { applicationRoute } from '../../config/applicationUrls.js'
 
+  const appRoot = applicationRoute('/')
   const items = [
-    { href: '/graph/', label: 'Graph' },
-    { href: '/creator/', label: 'Patch Studio' },
-    { href: '/presets/', label: 'Presets' },
-    { href: '/sparql/', label: 'SPARQL' },
-    { href: '/logbook/', label: 'Logbook' },
-    { href: '/settings/', label: 'Settings' },
-    { href: '/about/', label: 'About' },
+    { href: applicationRoute('/graph/'), label: 'Graph' },
+    { href: applicationRoute('/creator/'), label: 'Patch Studio' },
+    { href: applicationRoute('/presets/'), label: 'Presets' },
+    { href: applicationRoute('/sparql/'), label: 'SPARQL' },
+    { href: applicationRoute('/logbook/'), label: 'Logbook' },
+    { href: applicationRoute('/settings/'), label: 'Settings' },
+    { href: applicationRoute('/about/'), label: 'About' },
   ]
 
   function isActive(href) {
     const path = page.url.pathname
-    if (href === '/') return path === '/'
-    return path.startsWith(href)
+    if (href === appRoot) return path === appRoot || path === appRoot.slice(0, -1)
+    const route = href.endsWith('/') ? href.slice(0, -1) : href
+    return path === route || path.startsWith(route + '/')
   }
 </script>
 

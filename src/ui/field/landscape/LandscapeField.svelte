@@ -1,6 +1,7 @@
 <script>
   // Landscape scene page: owns param + view state, derives the scene, and hands
   // both to the shared SceneStereo shell with scene-specific controls.
+  import { applicationRoute } from '../../../config/applicationUrls.js'
   import { generateLandscape, LANDSCAPE_PALETTES } from './landscapeScene.js'
   import {
     loadLandscapeState, saveLandscapeState,
@@ -30,7 +31,7 @@
   {#snippet intro()}
     A small countryside in depth — receding hills, a winding river, houses, trees,
     and flowers, each at its own distance. A companion to the
-    <a href="/field/tree/">Stereoscopic Tree</a>; turn the scene to look around.
+    <a href={applicationRoute('/field/tree/')}>Stereoscopic Tree</a>; turn the scene to look around.
   {/snippet}
 
   {#snippet controls()}

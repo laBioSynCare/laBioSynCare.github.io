@@ -1,5 +1,6 @@
 import { DataFactory, Parser, Store } from 'n3'
 import ontologyManifest from '../../static/ontology/manifest.json' with { type: 'json' }
+import { applicationAsset } from '../config/applicationUrls.js'
 import {
   ECOSYSTEM_AGENTS_GRAPH_IRI,
   ECOSYSTEM_FIXTURE_GRAPH_IRI,
@@ -138,7 +139,7 @@ const fullProfileModules = fullProfileModuleIds.map((id) => {
 export const ONTOLOGY_URLS = Object.freeze(Object.fromEntries(
   fullProfileModules.map(module => [
     ontologySourceKey(module.id),
-    module.runtime.url,
+    applicationAsset(module.runtime.url),
   ]),
 ))
 
@@ -153,7 +154,7 @@ export const ONTOLOGY_SOURCES = Object.freeze(Object.fromEntries(
       id: module.id,
       title: module.title,
       roles: Object.freeze([...module.roles]),
-      url: module.runtime.url,
+      url: applicationAsset(module.runtime.url),
       graph: module.runtime.graphIri,
       persistentUrl: module.publication.persistentUrl,
     }),
@@ -210,48 +211,48 @@ export const INSTANCE_URLS = {
   // Programme identity. Committed and citable, unlike the `ecosystem` group
   // below, which is the mutable live relationship projection.
   programmes: [
-    '/ontology/instances/programmes/biosyncare-ecosystem.ttl',
+    applicationAsset('/ontology/instances/programmes/biosyncare-ecosystem.ttl'),
   ],
   frameworks: [
-    '/ontology/instances/frameworks/bsc.ttl',
+    applicationAsset('/ontology/instances/frameworks/bsc.ttl'),
   ],
   implementations: [
-    '/ontology/instances/implementations/implementations.ttl',
+    applicationAsset('/ontology/instances/implementations/implementations.ttl'),
   ],
   presets: [
-    '/ontology/instances/presets/perform-alpha-10-seed.ttl',
-    '/ontology/instances/presets/heal-theta-breathing-seed.ttl',
+    applicationAsset('/ontology/instances/presets/perform-alpha-10-seed.ttl'),
+    applicationAsset('/ontology/instances/presets/heal-theta-breathing-seed.ttl'),
   ],
   protocols: [
-    '/ontology/instances/protocols/bsc-reference-protocols.ttl',
+    applicationAsset('/ontology/instances/protocols/bsc-reference-protocols.ttl'),
   ],
   evidence: [
-    '/ontology/instances/evidence/technique-evidence.ttl',
-    '/ontology/instances/evidence/oscillation-associations.ttl',
+    applicationAsset('/ontology/instances/evidence/technique-evidence.ttl'),
+    applicationAsset('/ontology/instances/evidence/oscillation-associations.ttl'),
   ],
   experiments: [
-    '/ontology/instances/experiments/free-view-stereo-headphones.ttl',
-    '/ontology/instances/experiments/multi-headphone-haptic.ttl',
-    '/ontology/instances/experiments/color-field-blink.ttl',
-    '/ontology/instances/experiments/colored-audio-noise.ttl',
-    '/ontology/instances/experiments/silence-darkness-baseline.ttl',
-    '/ontology/instances/experiments/social-graph-sensory-protocol.ttl',
-    '/ontology/instances/experiments/wifi-em-field-hypothesis.ttl',
-    '/ontology/instances/experiments/smell-taste-device-boundary.ttl',
-    '/ontology/instances/experiments/ideal-tactile-immersion.ttl',
-    '/ontology/instances/experiments/sensory-field-example.ttl',
+    applicationAsset('/ontology/instances/experiments/free-view-stereo-headphones.ttl'),
+    applicationAsset('/ontology/instances/experiments/multi-headphone-haptic.ttl'),
+    applicationAsset('/ontology/instances/experiments/color-field-blink.ttl'),
+    applicationAsset('/ontology/instances/experiments/colored-audio-noise.ttl'),
+    applicationAsset('/ontology/instances/experiments/silence-darkness-baseline.ttl'),
+    applicationAsset('/ontology/instances/experiments/social-graph-sensory-protocol.ttl'),
+    applicationAsset('/ontology/instances/experiments/wifi-em-field-hypothesis.ttl'),
+    applicationAsset('/ontology/instances/experiments/smell-taste-device-boundary.ttl'),
+    applicationAsset('/ontology/instances/experiments/ideal-tactile-immersion.ttl'),
+    applicationAsset('/ontology/instances/experiments/sensory-field-example.ttl'),
   ],
   references: [
-    '/ontology/instances/references/references.ttl',
+    applicationAsset('/ontology/instances/references/references.ttl'),
   ],
   sessions: [
-    '/ontology/instances/sessions/synthetic-reference-session.ttl',
+    applicationAsset('/ontology/instances/sessions/synthetic-reference-session.ttl'),
   ],
   ecosystem: [
     'https://biosyncare-lab.web.app/current.ttl',
   ],
   ecosystemFixtures: [
-    '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl',
+    applicationAsset('/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl'),
   ],
 }
 

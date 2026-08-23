@@ -1,5 +1,6 @@
 <script>
   import { onDestroy, onMount } from 'svelte'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import { loadStaticKnowledgeGraph } from '../../rdf/loader.js'
   import { listPresets } from '../../rdf/presets.js'
   import { toCurie } from '../../rdf/namespaces.js'
@@ -187,8 +188,8 @@
         reference seeds—not promises of a health or performance outcome.
       </p>
       <div class="hero-actions" aria-label="Catalog actions">
-        <a class="primary-action" href="/creator/">Open Patch Studio <span aria-hidden="true">→</span></a>
-        <a class="secondary-action" href="/sparql/">Query the source data</a>
+        <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio <span aria-hidden="true">→</span></a>
+        <a class="secondary-action" href={applicationRoute('/sparql/')}>Query the source data</a>
       </div>
     </div>
 
@@ -268,7 +269,7 @@
       <span aria-hidden="true">◇</span>
       <h2 id="empty-catalog-title">No published presets yet</h2>
       <p>The catalog loaded successfully, but it contains no preset records.</p>
-      <a href="/creator/">Create an independent patch in Patch Studio</a>
+      <a href={applicationRoute('/creator/')}>Create an independent patch in Patch Studio</a>
     </section>
   {:else}
     <section class="discovery-panel" aria-labelledby="browse-title">

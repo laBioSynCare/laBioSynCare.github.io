@@ -1,4 +1,5 @@
 import { WorkletVoiceEngine } from './WorkletVoiceEngine.js'
+import { applicationAsset } from '../../config/applicationUrls.js'
 
 const WASM_URL = '/worklets/bsc-osc.wasm'
 
@@ -33,8 +34,8 @@ export class WasmAudioWorkletEngine extends WorkletVoiceEngine {
 
   async _loadModules() {
     if (typeof WebAssembly === 'undefined') throw new Error('WebAssembly not supported on this browser')
-    await this._ctx.audioWorklet.addModule(this._moduleUrl)
-    const response = await fetch(WASM_URL)
+    await this._ctx.audioWorklet.addModule(applicationAsset(this._moduleUrl))
+    const response = await fetch(applicationAsset(WASM_URL))
     if (!response.ok) throw new Error(`Failed to load WASM oscillator (${response.status})`)
     this._wasmBytes = await response.arrayBuffer()
     this._wasmModule = await WebAssembly.compile(this._wasmBytes)

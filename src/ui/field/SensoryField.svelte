@@ -1,4 +1,5 @@
 <script>
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import { onMount, onDestroy } from 'svelte'
   import { createAudioEngine } from '../../engines/audio/audioEngines.js'
   import { visualStimulationOn, advisoryOpen } from '../safety/visualSafety.js'
@@ -260,9 +261,9 @@
       per-ear tone. Static is the resting (0&nbsp;Hz) case; turn on blink or a beat
       to add the time dimension. Every configuration maps to an
       exposure profile you can export. For richer depth scenes, see the
-      <a href="/field/tree/">Stereoscopic Tree</a>,
-      <a href="/field/abstract/">Abstraction</a>, and
-      <a href="/field/landscape/">3D Landscape</a>.
+      <a href={applicationRoute('/field/tree/')}>Stereoscopic Tree</a>,
+      <a href={applicationRoute('/field/abstract/')}>Abstraction</a>, and
+      <a href={applicationRoute('/field/landscape/')}>3D Landscape</a>.
     </p>
   </header>
 

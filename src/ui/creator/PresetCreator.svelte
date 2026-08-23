@@ -1,6 +1,7 @@
 <script>
   import { onDestroy, onMount, tick } from 'svelte'
   import { afterNavigate, replaceState } from '$app/navigation'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import Knob from './Knob.svelte'
   import SpatialTrackInspector from './SpatialTrackInspector.svelte'
   import StudioVisualStage from './StudioVisualStage.svelte'
@@ -1963,11 +1964,11 @@
       <details class="nav-menu">
         <summary title="Navigate">+</summary>
         <div class="nav-panel">
-          <a href="/creator/">Patch Studio</a>
-          <a href="/settings/">Settings</a>
-          <a href="/presets/">Presets</a>
-          <a href="/sparql/">SPARQL</a>
-          <a href="/graph/">Graph</a>
+          <a href={applicationRoute('/creator/')}>Patch Studio</a>
+          <a href={applicationRoute('/settings/')}>Settings</a>
+          <a href={applicationRoute('/presets/')}>Presets</a>
+          <a href={applicationRoute('/sparql/')}>SPARQL</a>
+          <a href={applicationRoute('/graph/')}>Graph</a>
         </div>
       </details>
     </div>

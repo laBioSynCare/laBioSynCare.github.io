@@ -3,6 +3,7 @@ import { join } from 'node:path'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
+import { deploymentBase } from './deployment.config.js'
 
 // GitHub Pages resolves `/dir/` to `/dir/index.html`; the dev server does not,
 // so a static directory index is reachable in production and 404s locally. That
@@ -20,7 +21,18 @@ const staticDirectoryIndex = {
   configureServer(server) {
     server.middlewares.use((req, _res, next) => {
       const [path, query = ''] = (req.url ?? '').split('?')
-      if (path.endsWith('/') && existsSync(join('static', path, 'index.html'))) {
+      const unmountedPath = deploymentBase === ''
+        ? path
+        : path === deploymentBase
+          ? '/'
+          : path.startsWith(`${deploymentBase}/`)
+            ? path.slice(deploymentBase.length)
+            : null
+
+      if (
+        unmountedPath?.endsWith('/') &&
+        existsSync(join('static', unmountedPath.slice(1), 'index.html'))
+      ) {
         req.url = `${path}index.html${query && `?${query}`}`
       }
       next()

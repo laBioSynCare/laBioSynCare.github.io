@@ -13,6 +13,7 @@
   // clicks "Reload", which promotes the waiting worker via SKIP_WAITING.
 
   import { dev } from '$app/environment'
+  import { applicationAsset, applicationRoute } from '../../config/applicationUrls.js'
   import { onMount } from 'svelte'
 
   let updateReady = $state(false)
@@ -45,7 +46,10 @@
     document.addEventListener('visibilitychange', checkForUpdate)
 
     navigator.serviceWorker
-      .register('/service-worker.js', { type: 'classic' })
+      .register(applicationAsset('/service-worker.js'), {
+        type: 'classic',
+        scope: applicationRoute('/'),
+      })
       .then((registration) => {
         activeRegistration = registration
 

@@ -17,9 +17,18 @@
 //   3. Never eagerly precache the heavy assets — the ambient *.wav (~2.8 MB)
 //      and the ontology *.ttl are runtime-cached on first use, not precached.
 
-import { build, files, prerendered, version } from '$service-worker'
+import { base, build, files, prerendered, version } from '$service-worker'
+import {
+  isWithinDeployment,
+  serviceWorkerCachePrefix,
+  staleOwnedCaches,
+} from './config/serviceWorkerScope.js'
 
-const CACHE = `bsc-lab-${version}`
+// CacheStorage is shared by every project under an origin. Include the mount in
+// the owner prefix, and only retire caches carrying that exact prefix, so the
+// SSTIM worker cannot delete another w3c-cg.github.io project's data.
+const CACHE_PREFIX = serviceWorkerCachePrefix(base)
+const CACHE = `${CACHE_PREFIX}${version}`
 
 // Trap 3: precache only what is needed to launch and to run a session offline.
 // The worklet + WASM kernel (~40 KB) is required for any session, so it is
@@ -56,8 +65,8 @@ self.addEventListener('activate', (event) => {
   // Drop caches from previous versions; take control of open clients.
   event.waitUntil(
     (async () => {
-      for (const key of await caches.keys()) {
-        if (key !== CACHE) await caches.delete(key)
+      for (const key of staleOwnedCaches(await caches.keys(), CACHE, CACHE_PREFIX)) {
+        await caches.delete(key)
       }
       await self.clients.claim()
     })(),
@@ -87,6 +96,10 @@ self.addEventListener('fetch', (event) => {
   // Firebase / Google-sign-in / CDN safety mechanism — those are all
   // cross-origin, so they go straight to the network, untouched.
   if (url.origin !== self.location.origin) return
+
+  // Project Pages shares an origin with sibling projects. Control and cache
+  // only this deployment mount, never another project's same-origin requests.
+  if (!isWithinDeployment(base, url.pathname)) return
 
   event.respondWith(respond(request, url))
 })
@@ -120,7 +133,7 @@ async function respond(request, url) {
 
     // Offline navigation with nothing cached for this route → the root shell.
     if (request.mode === 'navigate') {
-      const fallback = await cache.match('/')
+      const fallback = await cache.match(`${base}/`)
       if (fallback) return fallback
     }
 

@@ -1,6 +1,7 @@
 <script>
   // Static content page — no runes needed. The bottom-dock screens, described
   // here for orientation, are kept in the same order as AppBottomDock.svelte.
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import {
     CONCEPT_DOI,
     RELEASE_DATE,
@@ -20,7 +21,7 @@
 
   const screens = [
     {
-      href: '/graph/',
+      href: applicationRoute('/graph/'),
       label: 'Graph',
       role: 'Knowledge browser',
       emoji: '🕸️',
@@ -35,7 +36,7 @@
         'Public and private annotations remain separate from authoritative SSTIM terms.',
     },
     {
-      href: '/creator/',
+      href: applicationRoute('/creator/'),
       label: 'Patch Studio',
       role: 'Real-time authoring',
       emoji: '🎛️',
@@ -50,7 +51,7 @@
         'authoring metadata for now; this browser build does not provide a haptic delivery engine.',
     },
     {
-      href: '/presets/',
+      href: applicationRoute('/presets/'),
       label: 'Presets',
       role: 'Reference catalog',
       emoji: '🎚️',
@@ -65,7 +66,7 @@
         'BioSynCare catalog and not recommendations for treatment.',
     },
     {
-      href: '/sparql/',
+      href: applicationRoute('/sparql/'),
       label: 'SPARQL',
       role: 'Query workbench',
       emoji: '🔎',
@@ -80,7 +81,7 @@
         'you copy tabular results without sending the query to a remote endpoint.',
     },
     {
-      href: '/logbook/',
+      href: applicationRoute('/logbook/'),
       label: 'Logbook',
       role: 'Personal record',
       emoji: '📓',
@@ -97,7 +98,7 @@
         'committed to the repository.',
     },
     {
-      href: '/settings/',
+      href: applicationRoute('/settings/'),
       label: 'Settings',
       role: 'Appearance, engine, safety',
       emoji: '⚙️',
@@ -242,8 +243,8 @@
         knowledge graph for techniques, parameters, exposure, safety metadata, and evidence.
       </p>
       <div class="hero-actions" aria-label="Start using BSC Lab">
-        <a class="primary-action" href="/creator/">Open Patch Studio</a>
-        <a class="secondary-action" href="/graph/">Explore SSTIM</a>
+        <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio</a>
+        <a class="secondary-action" href={applicationRoute('/graph/')}>Explore SSTIM</a>
       </div>
       <p class="scope-note">
         <strong>Non-clinical scope.</strong> BSC Lab supports exploration and authoring. It
@@ -345,7 +346,7 @@
       <div class="callout-body">
         <h3>Annotate the ontology</h3>
         <p>
-          SSTIM terms can carry notes in the <a href="/graph/">Graph knowledge browser</a>.
+          SSTIM terms can carry notes in the <a href={applicationRoute('/graph/')}>Graph knowledge browser</a>.
           Notes use W3C Web Annotation records in named graphs kept separate from the
           authoritative ontology, so annotating never alters a source term. On a local-only
           deployment, notes stay in this browser; the public/private choice records sharing

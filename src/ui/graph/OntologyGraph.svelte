@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, tick } from 'svelte'
   import { replaceState } from '$app/navigation'
+  import { applicationAsset, applicationRoute } from '../../config/applicationUrls.js'
   import { buildGraphElements } from '../../rdf/graph.js'
   import { ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
@@ -1532,8 +1533,10 @@
   // page rather than a fragile per-term fragment).
   function docsUrlForIri(iri) {
     if (!iri) return null
-    if (iri.startsWith(SSTIM_BASE)) return '/ontology/docs/#' + iri.slice(SSTIM_BASE.length)
-    if (iri.startsWith(SSTIM_V_BASE)) return '/ontology/docs/vocab/'
+    if (iri.startsWith(SSTIM_BASE)) {
+      return applicationAsset('/ontology/docs/#' + iri.slice(SSTIM_BASE.length))
+    }
+    if (iri.startsWith(SSTIM_V_BASE)) return applicationAsset('/ontology/docs/vocab/')
     return null
   }
 
@@ -2746,7 +2749,7 @@
       </dd>
     </div>
   </dl>
-  <p class="guide-footer">See <a href="/about/">About</a> for the full picture.</p>
+  <p class="guide-footer">See <a href={applicationRoute('/about/')}>About</a> for the full picture.</p>
 </InfoModal>
 
 <style>

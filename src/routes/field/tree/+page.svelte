@@ -1,8 +1,9 @@
 <script>
   import { goto } from '$app/navigation'
   import { onMount } from 'svelte'
+  import { applicationRoute } from '../../../config/applicationUrls.js'
 
-  const studioHref = '/creator/?starter=tree'
+  const studioHref = applicationRoute('/creator/?starter=tree')
 
   onMount(() => {
     goto(studioHref, { replaceState: true })

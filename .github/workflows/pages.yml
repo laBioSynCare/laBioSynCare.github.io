@@ -19,6 +19,11 @@ jobs:
   build:
     name: Build static site
     runs-on: ubuntu-latest
+    env:
+      # w3c-cg/sstim is a GitHub project site. This single build-time mount is
+      # consumed by SvelteKit and every application URL resolver; no runtime
+      # code may scatter a literal `/sstim` prefix.
+      SSTIM_BASE_PATH: /sstim
 
     steps:
       # fetch-tags because the build runs truth-audit, which resolves every
@@ -158,6 +163,13 @@ jobs:
       # Served at /ontology/sstim-full.owl.
       - name: Generate merged OWL bundle for BioPortal
         run: nix develop --command make bioportal-bundle BIOPORTAL_OUT=dist/ontology/sstim-full.owl
+
+      # Serve the finished artifact at the exact GitHub project mount. This runs
+      # after RDF exports and both documentation generators, and also asserts
+      # that app routes, ontology sources, PWA files, worklets, WASM, and audio
+      # do not depend on an accidental origin-root deployment.
+      - name: Verify the complete artifact under /sstim
+        run: nix develop --command node scripts/smoke-static.mjs dist /sstim --complete
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6

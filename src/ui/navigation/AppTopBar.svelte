@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import ProfileControl from './ProfileControl.svelte'
   import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
@@ -269,7 +270,7 @@
         </button>
       </div>
     {:else}
-      <a class="brand" href="/">BSC Lab</a>
+      <a class="brand" href={applicationRoute('/')}>BSC Lab</a>
     {/if}
   </div>
 
@@ -285,14 +286,14 @@
   <details class="global-menu">
     <summary aria-label="Open navigation menu">+</summary>
     <div class="global-menu-panel">
-      <a href="/">Home</a>
-      <a href="/graph/">Graph</a>
-      <a href="/creator/">Patch Studio</a>
-      <a href="/presets/">Presets</a>
-      <a href="/sparql/">SPARQL</a>
-      <a href="/logbook/">Logbook</a>
-      <a href="/settings/">Settings</a>
-      <a href="/about/">About</a>
+      <a href={applicationRoute('/')}>Home</a>
+      <a href={applicationRoute('/graph/')}>Graph</a>
+      <a href={applicationRoute('/creator/')}>Patch Studio</a>
+      <a href={applicationRoute('/presets/')}>Presets</a>
+      <a href={applicationRoute('/sparql/')}>SPARQL</a>
+      <a href={applicationRoute('/logbook/')}>Logbook</a>
+      <a href={applicationRoute('/settings/')}>Settings</a>
+      <a href={applicationRoute('/about/')}>About</a>
       <!-- Generated docs (WIDOCO for OWL core, pyLODE for the SKOS vocabulary)
            exist only in the deployed artifact; rel="external" keeps the
            prerender crawler and router away from them -->

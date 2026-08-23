@@ -714,7 +714,9 @@ ontology-docs:
 	$(WIDOCO) -ontFile "$$tmpdir/sstim-full.owl" -outFolder $(DOCS_DIR) \
 		-confFile $(WIDOCO_CONF) -getOntologyMetadata \
 		-rewriteAll -lang en -uniteSections -noPlaceHolderText; \
-	cp $(DOCS_DIR)/index-en.html $(DOCS_DIR)/index.html
+	cp $(DOCS_DIR)/index-en.html $(DOCS_DIR)/index.html; \
+	node scripts/fix-widoco-links.mjs \
+		$(DOCS_DIR)/index-en.html $(DOCS_DIR)/index.html
 
 ## Generate pyLODE SKOS docs for the vocabulary module (vocpub profile).
 ## WIDOCO is OWL-centric; this documents the SKOS concept schemes.

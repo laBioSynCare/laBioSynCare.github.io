@@ -11,6 +11,7 @@ import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
 // rather than restating it.
 import { PREFIXES, toCurie } from '../src/rdf/namespaces.js'
 import { buildGraphElements } from '../src/rdf/graph.js'
+import { logicalApplicationPath } from '../src/config/applicationUrls.js'
 import {
   INSTANCE_URLS,
   mergeStores,
@@ -33,7 +34,11 @@ function go(path, accept) {
 function typedSubjects(sourceUrls, typeIri) {
   const records = []
   for (const sourceUrl of sourceUrls) {
-    const sourcePath = join(repoRoot, 'static', sourceUrl.replace(/^\//, ''))
+    const sourcePath = join(
+      repoRoot,
+      'static',
+      logicalApplicationPath(sourceUrl).replace(/^\//, ''),
+    )
     const quads = new Parser().parse(readFileSync(sourcePath, 'utf8'))
     const subjects = new Set(quads
       .filter((quad) => quad.predicate.value === RDF_TYPE && quad.object.value === typeIri)
@@ -79,7 +84,11 @@ async function buildLocalCatalogGraph(sourceUrls) {
   expect(sources.map(({ url }) => url).sort()).toEqual([...wanted].sort())
 
   const stores = await Promise.all(sources.map((source) => {
-    const sourcePath = join(repoRoot, 'static', source.url.replace(/^\//, ''))
+    const sourcePath = join(
+      repoRoot,
+      'static',
+      logicalApplicationPath(source.url).replace(/^\//, ''),
+    )
     return parseIntoStore(
       readFileSync(sourcePath, 'utf8'),
       source.format ?? 'text/turtle',
@@ -214,7 +223,7 @@ test('every committed public preset and reference has an exact entity route', ()
 
   for (const { iri, sourceUrl } of [...presets, ...references]) {
     const path = sstimPath(iri)
-    const sourceDoc = sourceUrl.replace(/^\/ontology\//, '')
+    const sourceDoc = logicalApplicationPath(sourceUrl).replace(/^\/ontology\//, '')
     const html = go(path, BROWSER)
 
     expect(html.status, `${iri} has no browser route`).toBe(303)

@@ -1,4 +1,5 @@
 import adapter from '@sveltejs/adapter-static'
+import { deploymentBase } from './deployment.config.js'
 
 // SvelteKit's version name defaults to a build timestamp. It is embedded in the
 // client bundle as the `__sveltekit_<id>` global and feeds the service worker's
@@ -18,6 +19,13 @@ const buildVersion = process.env.BSC_BUILD_VERSION
 export default {
   kit: {
     ...(buildVersion ? { version: { name: buildVersion } } : {}),
+    paths: {
+      base: deploymentBase,
+      // Project Pages needs deterministic mount-prefixed URLs in every
+      // prerendered page. Root and portable builds still use the same code by
+      // leaving SSTIM_BASE_PATH empty.
+      relative: false,
+    },
     adapter: adapter({
       pages: 'dist',
       assets: 'dist',

@@ -11,13 +11,14 @@ import {
 } from '../../rdf/loader.js'
 import { selectLimited } from '../../rdf/query.js'
 import { EXAMPLE_QUERIES } from './exampleQueries.js'
+import { logicalApplicationPath } from '../../config/applicationUrls.js'
 
 const STATIC_ROOT = fileURLToPath(new URL('../../../static/', import.meta.url))
 const staticExamples = EXAMPLE_QUERIES.filter(example => !example.requiresLive)
 const liveExamples = EXAMPLE_QUERIES.filter(example => example.requiresLive)
 
 async function loadRepositorySource(source) {
-  const path = join(STATIC_ROOT, source.url.replace(/^\/+/, ''))
+  const path = join(STATIC_ROOT, logicalApplicationPath(source.url).replace(/^\/+/, ''))
   const text = await readFile(path, 'utf8')
   return parseIntoStore(text, source.format ?? 'text/turtle', source.graph)
 }

@@ -4,6 +4,8 @@
 // caller owns, keyed by URL; the cache stores the in-flight promise so repeated
 // requests for the same clip decode only once.
 
+import { applicationAsset } from '../../config/applicationUrls.js'
+
 export const SAMPLE_BASE = '/audio/'
 
 export function sampleUrl(id) {
@@ -11,7 +13,7 @@ export function sampleUrl(id) {
 }
 
 export async function decodeSample(ctx, url) {
-  const resp = await fetch(url)
+  const resp = await fetch(applicationAsset(url))
   if (!resp.ok) throw new Error(`Sample "${url}" failed to load (${resp.status})`)
   const bytes = await resp.arrayBuffer()
   return await ctx.decodeAudioData(bytes)

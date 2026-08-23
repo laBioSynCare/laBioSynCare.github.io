@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import ontologyManifest from '../../static/ontology/manifest.json' with { type: 'json' }
+import { applicationAsset } from '../config/applicationUrls.js'
 import {
   INSTANCE_SOURCES,
   LIVE_ECOSYSTEM_FETCH_OPTIONS,
@@ -34,7 +35,7 @@ describe('unified navigator source boundary', () => {
     expect(Object.keys(ONTOLOGY_URLS)).toEqual(expectedKeys)
     expect(Object.keys(ONTOLOGY_SOURCES)).toEqual(expectedKeys)
     expect(ONTOLOGY_URLS).toEqual(Object.fromEntries(
-      fullProfileModules.map(module => [sourceKey(module.id), module.runtime.url]),
+      fullProfileModules.map(module => [sourceKey(module.id), applicationAsset(module.runtime.url)]),
     ))
 
     expect(Object.values(ONTOLOGY_SOURCES).map(source => ({
@@ -48,7 +49,7 @@ describe('unified navigator source boundary', () => {
       id: module.id,
       title: module.title,
       roles: module.roles,
-      url: module.runtime.url,
+      url: applicationAsset(module.runtime.url),
       graph: module.runtime.graphIri,
       persistentUrl: module.publication.persistentUrl,
     })))

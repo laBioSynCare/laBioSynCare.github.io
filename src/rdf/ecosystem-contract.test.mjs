@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { DataFactory, Parser, Store } from 'n3'
 import SHACLValidator from 'rdf-validate-shacl'
+import { applicationAsset } from '../config/applicationUrls.js'
 import {
   INSTANCE_SOURCES,
   INSTANCE_URLS,
@@ -26,7 +27,7 @@ const ONTOLOGY_DIR = new URL('static/ontology/', REPOSITORY_ROOT)
 const manifest = JSON.parse(readFileSync(new URL('static/ontology/manifest.json', REPOSITORY_ROOT), 'utf8'))
 const moduleById = new Map(manifest.modules.map(module => [module.id, module]))
 const fullProfile = manifest.profiles.find(profile => profile.id === 'full')
-const FIXTURE_URL = '/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
+const FIXTURE_URL = applicationAsset('/ontology/instances/ecosystem/fixtures/synthetic-ecosystem.ttl')
 const PUBLIC_URL = 'https://biosyncare-lab.web.app/current.ttl'
 const FIXTURE_FILE = 'instances/ecosystem/fixtures/synthetic-ecosystem.ttl'
 const GRAPH_IRI = 'https://w3id.org/sstim/graph/ecosystem-fixture'
