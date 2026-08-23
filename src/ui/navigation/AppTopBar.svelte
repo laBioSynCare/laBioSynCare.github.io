@@ -270,7 +270,7 @@
         </button>
       </div>
     {:else}
-      <a class="brand" href={applicationRoute('/')}>BSC Lab</a>
+      <a class="brand" href={applicationRoute('/')}>SSTIM Workbench</a>
     {/if}
   </div>
 

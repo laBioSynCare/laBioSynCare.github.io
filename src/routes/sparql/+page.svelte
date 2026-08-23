@@ -298,7 +298,7 @@ LIMIT 100`
 </script>
 
 <svelte:head>
-  <title>SPARQL workbench | BSC Lab</title>
+  <title>SPARQL workbench | SSTIM Workbench</title>
   <meta
     name="description"
     content="Run private, in-browser SELECT queries over the SSTIM ontology and versioned public catalog."

@@ -121,11 +121,11 @@ pkgs.dockerTools.buildLayeredImage {
     ExposedPorts."${toString port}/tcp" = { };
     WorkingDir = "/tmp";
     Labels = {
-      "org.opencontainers.image.title" = "BSC Lab";
+      "org.opencontainers.image.title" = "SSTIM Workbench";
       "org.opencontainers.image.description" =
         "Static sensory-stimulation workbench and SSTIM knowledge browser";
       "org.opencontainers.image.source" =
-        "https://github.com/laBioSynCare/laBioSynCare.github.io";
+        "https://github.com/w3c-cg/sstim";
       "org.opencontainers.image.licenses" = "Apache-2.0";
     };
   };

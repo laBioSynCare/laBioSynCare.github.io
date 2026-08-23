@@ -70,7 +70,9 @@
 
       <p class="cite-intro">
         Cite the specific release you used — <strong>v{VERSION}</strong>. Use the
-        concept DOI instead if you're referring to SSTIM across releases.
+        concept DOI instead if you're referring to SSTIM across releases. The
+        immutable release keeps its published historical title; the repository
+        migration does not rewrite DOI metadata or released artifacts.
       </p>
 
       <div class="cite-block">
@@ -109,7 +111,7 @@
       </dl>
 
       <p class="cite-alt">
-        Software is Apache-2.0; ontology, vocabulary, and documentation are CC BY 4.0.
+        Imported software retains Apache-2.0; imported ontology, vocabulary, and documentation retain CC BY 4.0. W3C contribution terms are artifact-specific.
         <a href={README_CITATION_URL} rel="external">Full citation & license details</a>
       </p>
     </div>

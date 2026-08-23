@@ -1,5 +1,5 @@
 {
-  description = "BSC Lab — open sensory stimulation platform and RDF knowledge graph browser";
+  description = "SSTIM Workbench — open sensory-stimulation reference environment and Graph Navigator";
 
   # Single pinned input. flake.lock records the exact nixpkgs revision so the
   # toolchain is byte-reproducible across contributor machines and CI.
@@ -13,7 +13,7 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f (import nixpkgs { inherit system; }));
     in
     {
-      # `nix develop` / direnv `use flake` — the canonical BSC Lab dev environment.
+      # `nix develop` / direnv `use flake` — the canonical SSTIM Workbench dev environment.
       devShells = forAllSystems (pkgs:
         let
           py = pkgs.python312;
@@ -239,13 +239,13 @@
             ];
 
             shellHook = ''
-              echo "BSC Lab dev shell — $(node --version) node, $(python3 --version), wabt $(wat2wasm --version)"
+              echo "SSTIM Workbench dev shell — $(node --version) node, $(python3 --version), wabt $(wat2wasm --version)"
               echo "Run 'make help' for available targets."
             '';
           };
         });
 
-      # `nix build` — the static BSC Lab site as an immutable package.
+      # `nix build` — the static SSTIM Workbench site as an immutable package.
       #
       # This closes gap G1 in docs/technical/PORTABLE_DEPLOYMENT.md and nothing
       # more. It is *not* self-hosting: there is deliberately no NixOS module,
@@ -316,8 +316,8 @@
           '';
 
           meta = {
-            description = "BSC Lab — static sensory-stimulation workbench and SSTIM knowledge browser";
-            homepage = "https://labiosyncare.github.io/";
+            description = "SSTIM Workbench — static sensory-stimulation workbench and Graph Navigator";
+            homepage = "https://w3c-cg.github.io/sstim/";
             license = pkgs.lib.licenses.asl20;
             platforms = pkgs.lib.platforms.all;
           };

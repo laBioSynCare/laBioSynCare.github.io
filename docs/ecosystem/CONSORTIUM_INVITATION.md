@@ -78,7 +78,7 @@ The group develops a lightweight SKOS/OWL vocabulary published at
 ontologies your community already uses. The vocabulary currently covers
 frequency bands, evidence tiers, stimulation mechanisms, sensory modalities,
 and preset protocol structure. It is seeded from the BSC Lab open-source
-platform (https://github.com/laBioSynCare/laBioSynCare.github.io) and intended
+platform (https://github.com/w3c-cg/sstim) and intended
 to be a community resource governed independently of any single product.
 
 Given your work on [SPECIFIC RELEVANT WORK], I believe your perspective would

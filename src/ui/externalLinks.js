@@ -11,12 +11,12 @@ import { applicationAsset } from '../config/applicationUrls.js'
 // enough to name here, and used by more than one surface. Per-instance values
 // belong in `src/config/runtimeConfig.js` — nothing here varies by deployment.
 
-export const GITHUB_URL = 'https://github.com/laBioSynCare/laBioSynCare.github.io'
+export const GITHUB_URL = 'https://github.com/w3c-cg/sstim'
 
 /** A file on the default branch: `ghBlob('docs/concept/SCOPE.md')`. */
 export const ghBlob = (path) => `${GITHUB_URL}/blob/main/${path}`
 
-export const W3C_GROUP_URL = 'https://www.w3.org/community/sstim/'
+export const W3C_GROUP_URL = 'https://www.w3.org/groups/cg/sstim/'
 
 // The separate commercial application (CLAUDE.md §11): a different repository,
 // a different codebase, sharing only the preset format and the SSTIM
@@ -25,8 +25,8 @@ export const W3C_GROUP_URL = 'https://www.w3.org/community/sstim/'
 // the institutional footer rather than inside a door.
 export const BIOSYNCARE_URL = 'https://biosyncare.com/'
 
-// The organisation responsible for BSC Lab, SSTIM, Patch Studio and BioSynCare
-// (implementations.ttl records it as the dct:contributor of all of them).
+// Historical contributor and steward of the BSC/BioSynCare implementation
+// records. This does not make BioSynCare the identity or owner of SSTIM.
 export const AETERNI_URL = 'https://aeterni.github.io/'
 
 // Generated reference documentation — WIDOCO for the OWL core, pyLODE for the
@@ -37,10 +37,7 @@ export const AETERNI_URL = 'https://aeterni.github.io/'
 export const ONTOLOGY_DOCS_URL = applicationAsset('/ontology/docs/')
 export const VOCAB_DOCS_URL = applicationAsset('/ontology/docs/vocab/')
 
-// One-page overview of the whole ecosystem — SSTIM, BSC Lab, BioSynCare, the
-// W3C group, and how they connect. It is here because the three-layer structure
-// is the hardest thing about this project to grasp from any single surface, and
-// a reader who has not grasped it cannot tell which door is theirs. Served from
-// `static/docs/`; the authoring copy lives in the gitignored `docs/funding/`
-// tree, so update both together or the published version silently goes stale.
+// Immutable historical collateral retained for provenance. It is intentionally
+// no longer linked as current project architecture; docs/funding/documents/
+// records that the binary must not be rewritten in place.
 export const ECOSYSTEM_BRIEF_URL = applicationAsset('/docs/BioSynCare_Ecosystem_Brief_EN.pdf')

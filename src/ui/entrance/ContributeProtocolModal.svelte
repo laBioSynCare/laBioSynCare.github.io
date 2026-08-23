@@ -40,7 +40,7 @@
       `## Protocol name\n\n${name.trim()}\n\n` +
       `## What is it?\n\n${description.trim()}\n\n` +
       (contact.trim() ? `## Contact\n\n${contact.trim()}\n\n` : '') +
-      `---\n_Submitted via the BSC Lab "Contribute a protocol" form._`
+      `---\n_Submitted via the SSTIM Workbench "Contribute a protocol" form._`
     const params = new URLSearchParams({ title, body })
     return `${ISSUE_BASE}?${params.toString()}`
   }

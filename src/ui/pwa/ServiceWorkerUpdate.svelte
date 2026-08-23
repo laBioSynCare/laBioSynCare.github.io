@@ -96,7 +96,7 @@
 
 {#if updateReady}
   <div class="sw-update" role="status" aria-live="polite">
-    <span class="sw-update-text">A new version of BSC Lab is ready.</span>
+    <span class="sw-update-text">A new version of SSTIM Workbench is ready.</span>
     <div class="sw-update-actions">
       <button type="button" class="sw-update-reload" onclick={applyUpdate}>Reload</button>
       <button type="button" class="sw-update-later" onclick={dismiss}>Later</button>

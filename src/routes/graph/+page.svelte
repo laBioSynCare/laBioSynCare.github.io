@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-  <title>Graph | BSC Lab</title>
+  <title>Graph Navigator | SSTIM Workbench</title>
 </svelte:head>
 
 {#if loading}

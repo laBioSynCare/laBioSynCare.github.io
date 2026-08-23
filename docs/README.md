@@ -1,4 +1,4 @@
-# docs — BSC Lab Reference Documents
+# docs — SSTIM Reference Documents
 
 Narrative and technical specifications. The ontology's machine-readable form
 lives in [`../static/ontology/`](../static/ontology/); this directory holds the
@@ -12,7 +12,7 @@ the two disagree, the code and the as-built docs win.
 
 - [`SENSORY_STIMULATION.md`](concept/SENSORY_STIMULATION.md) — defines the term
   and grounds the first ontology classes.
-- [`SCOPE.md`](concept/SCOPE.md) — what BSC Lab claims and does not. Load-bearing
+- [`SCOPE.md`](concept/SCOPE.md) — what SSTIM Workbench claims and does not. Load-bearing
   for every user-facing string; see `CLAUDE.md` §3.5.
 - [`NON_SCOPE.md`](concept/NON_SCOPE.md) — what is out of scope for the project
   and the W3C Community Group.
@@ -90,13 +90,13 @@ Ontology design itself is documented at
 
 ## `gallery/` — selected captures
 
-[`gallery/README.md`](gallery/README.md) collects original captures of BSC Lab
+[`gallery/README.md`](gallery/README.md) collects original captures of the BSC Lab
 instruments and authored patches. Images stay beside their captions in the
 gallery rather than entering the PWA's precached `static/` asset set.
 
 ## `brand/` — the isotype, and how it was derived
 
-[`brand/README.md`](brand/README.md) holds the BSC Lab isotype exploration: the
+[`brand/README.md`](brand/README.md) holds the historical BSC Lab isotype exploration: the
 parent mark measured off its artwork, the generator that builds every candidate
 from those constants, a WCAG audit of the BSC colour system, and a link to the
 full development history. The adopted mark (`marks/merge-d.svg`) is the source

@@ -11,7 +11,6 @@
   import Isotype from '../../ui/brand/Isotype.svelte'
   import {
     BIOSYNCARE_URL,
-    ECOSYSTEM_BRIEF_URL,
     GITHUB_URL,
     ONTOLOGY_DOCS_URL,
     VOCAB_DOCS_URL,
@@ -22,8 +21,8 @@
   const screens = [
     {
       href: applicationRoute('/graph/'),
-      label: 'Graph',
-      role: 'Knowledge browser',
+      label: 'Graph Navigator',
+      role: 'Semantic exploration',
       emoji: '🕸️',
       color: 'var(--app-accent)',
       action: 'Explore the graph',
@@ -113,60 +112,45 @@
     },
   ]
 
-  // Who is responsible for what. Æterni Anima is the organization; the
-  // BioSynCare Ecosystem is the programme it runs, and SSTIM, BSC Lab and the
-  // BioSynCare application are peer components of that programme — SSTIM is
-  // published from BSC Lab's repository but is not a part of it. Keep this in
-  // step with the ecosystem brief and with
-  // static/ontology/instances/programmes/biosyncare-ecosystem.ttl (ADR 0047);
-  // calling the ontology a component of one implementation is the framing the
-  // Community Group work cannot afford.
+  // Public project architecture after the repository migration. Historical
+  // BSC and BioSynCare RDF identities remain real modeled entities; presenting
+  // them here does not make either one the identity or owner of SSTIM.
   const layers = [
     {
-      name: 'Æterni Anima',
-      tag: 'The organization',
+      name: 'W3C Sensory Stimulation Vocabulary Community Group',
+      tag: 'Open community',
       color: 'var(--app-control)',
-      mark: 'aeterni-anima',
       body:
-        'The organization behind all of this — BSC Lab, the SSTIM knowledge graph it ' +
-        'publishes, Patch Studio, and BioSynCare are all its responsibility. It is an ' +
-        'independent initiative rather than an incorporated company: the name the work is ' +
-        'developed, released, and credited under.',
-    },
-    {
-      name: 'BSC',
-      tag: 'The framework',
-      color: 'var(--app-ok)',
-      body:
-        'The framework both platforms build on: audio — Martigli respiratory waves, binaural ' +
-        'beats, Symmetry permutations, soundscapes and colored noises — together with visual ' +
-        'cues matched to the Martigli oscillation. It defines the three techniques it ' +
-        'originated (Martigli, Martigli-Binaural, Symmetry); the generic ones it applies are ' +
-        'incorporated from the SSTIM vocabulary rather than redefined.',
-    },
-    {
-      name: 'BSC Lab',
-      tag: 'Open platform',
-      color: 'var(--app-accent)',
-      mark: 'bsclab',
-      body:
-        'The open-source research and engineering platform you are using now. It hosts and ' +
-        'publishes the SSTIM Turtle sources, and it holds Patch Studio and the surfaces built ' +
-        'around them — Graph, Presets, SPARQL, and Logbook. Software is Apache-2.0; ' +
-        'the ontology, vocabulary, and public reference data are CC BY 4.0.',
+        'The W3C Community Group in which SSTIM is developed. Community Group work is open ' +
+        'technical work; it is not a W3C Recommendation or W3C-endorsed technology.',
     },
     {
       name: 'SSTIM',
-      tag: 'Knowledge graph · vendor-neutral',
+      tag: 'Specification · vocabulary · community project',
       color: 'var(--app-visual)',
       body:
-        'The Sensory Stimulation Ontology — a public RDF knowledge graph of techniques, ' +
-        'modalities, parameters, exposure conditions, safety metadata, evidence-qualified ' +
-        'claims, protocols, presets, and sessions. OWL classes, a multilingual SKOS ' +
-        'vocabulary, and SHACL shapes under the stable namespace w3id.org/sstim. BSC Lab ' +
-        'hosts and publishes it, but it is deliberately broader than BSC — BSC is one ' +
-        'framework inside it — and namespace governance is set to pass to the W3C Community ' +
-        'Group once its charter is ratified.',
+        'The overall open specification, RDF vocabulary, semantic infrastructure, documentation, ' +
+        'interoperability work, reference tooling, and community project. Its canonical ' +
+        'identifiers remain under w3id.org/sstim; this GitHub Pages site is a publication location.',
+    },
+    {
+      name: 'SSTIM Workbench',
+      tag: 'Non-normative reference software',
+      color: 'var(--app-accent)',
+      mark: 'bsclab',
+      body:
+        'The executable environment you are using now. It contains Graph Navigator, Patch Studio, ' +
+        'the SPARQL workbench, presets, and supporting engines. It demonstrates and exercises ' +
+        'SSTIM, but its behavior is not automatically a normative requirement of the specification.',
+    },
+    {
+      name: 'BSC',
+      tag: 'Framework · preserved provenance',
+      color: 'var(--app-ok)',
+      body:
+        'A framework represented within SSTIM and part of the imported development provenance. ' +
+        'Its implementation records, protocols, identifiers, and originated technique identities ' +
+        'remain intact; they are not mechanically renamed to match the Workbench brand.',
     },
     {
       name: 'BioSynCare',
@@ -175,16 +159,16 @@
       mark: 'biosyncare',
       body:
         'A separate, closed-source commercial application in its own repository. Versioned ' +
-        'exports and SSTIM mappings are the intended interoperability boundary; BSC Lab does ' +
-        'not currently feed or publish BioSynCare’s private catalog, and the projects do not ' +
-        'share application code or private data.',
+        'exports and SSTIM mappings are the intended interoperability boundary. BioSynCare is ' +
+        'an ecosystem participant and implementation, not the identity of SSTIM; its private ' +
+        'catalog, application code, and private data are outside this repository.',
     },
   ]
 
   const trustSignals = [
     {
       label: 'Open implementation',
-      value: 'BSC Lab source is Apache-2.0 and inspectable on GitHub.',
+      value: 'Imported Workbench software retains Apache-2.0; repository contribution terms are artifact-specific.',
     },
     {
       label: 'Citable knowledge',
@@ -201,16 +185,12 @@
   ]
 
   const links = [
-    // First, deliberately: it is the only artifact that shows all four layers
-    // of the page above on one page, which is what a reader arriving confused
-    // actually needs.
-    { label: 'Ecosystem brief (one page, PDF)', href: ECOSYSTEM_BRIEF_URL },
     { label: 'Source repository', href: GITHUB_URL, external: true },
     { label: 'Ontology reference docs', href: ONTOLOGY_DOCS_URL, external: true },
     { label: 'Vocabulary docs', href: VOCAB_DOCS_URL, external: true },
     { label: 'Ontology DOI (all versions)', href: doiUrl(CONCEPT_DOI), external: true },
     { label: 'W3C Community Group', href: W3C_GROUP_URL, external: true },
-    { label: 'Governance & charter', href: ghBlob('CONTRIBUTING.md#8-governance'), external: true },
+    { label: 'Governance & contribution terms', href: ghBlob('CONTRIBUTING.md#8-governance-and-licensing-during-migration'), external: true },
     { label: 'HED / BIDS interoperability', href: ghBlob('docs/ecosystem/HED_BIDS_INTEROP.md'), external: true },
     { label: 'Ecosystem working plan', href: ghBlob('docs/ecosystem/ECOSYSTEM_INTEGRATION.md'), external: true },
     // The page above describes BioSynCare in a card of its own; until now it
@@ -220,10 +200,10 @@
 </script>
 
 <svelte:head>
-  <title>About | BSC Lab</title>
+  <title>About | SSTIM Workbench</title>
   <meta
     name="description"
-    content="What BSC Lab is — the open sensory-stimulation platform, the SSTIM knowledge graph, Patch Studio, annotation, and its relationship to BioSynCare — and how to use each screen."
+    content="How SSTIM, SSTIM Workbench, Graph Navigator, Patch Studio, preserved BSC provenance, and the separate BioSynCare implementation relate."
   />
 </svelte:head>
 
@@ -231,23 +211,23 @@
   <header class="hero" id="overview">
     <div class="hero-copy">
       <div class="brand-lockup">
-        <Isotype name="bsclab" size={52} title="BSC Lab isotype" />
+        <Isotype name="bsclab" size={52} title="SSTIM Workbench mark" />
         <div>
           <p class="eyebrow">Open research &amp; engineering platform</p>
-          <h1>BSC Lab</h1>
+          <h1>SSTIM Workbench</h1>
         </div>
       </div>
       <p class="lede">
-        Build sensory-stimulation patches and examine the knowledge behind them. BSC Lab
-        brings <strong>Patch Studio</strong> together with <strong>SSTIM</strong>, a public RDF
+        Build sensory-stimulation patches and examine the knowledge behind them. SSTIM Workbench
+        brings <strong>Patch Studio</strong> and <strong>Graph Navigator</strong> together with <strong>SSTIM</strong>, a public RDF
         knowledge graph for techniques, parameters, exposure, safety metadata, and evidence.
       </p>
-      <div class="hero-actions" aria-label="Start using BSC Lab">
+      <div class="hero-actions" aria-label="Start using SSTIM Workbench">
         <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio</a>
         <a class="secondary-action" href={applicationRoute('/graph/')}>Explore SSTIM</a>
       </div>
       <p class="scope-note">
-        <strong>Non-clinical scope.</strong> BSC Lab supports exploration and authoring. It
+        <strong>Non-clinical scope.</strong> SSTIM Workbench supports exploration and authoring. It
         does not diagnose, treat, cure, or prevent any condition, and makes no claim of
         clinical efficacy. <a href={ghBlob('docs/concept/SCOPE.md')} rel="external">Read the scope</a>.
       </p>
@@ -277,22 +257,20 @@
   <section class="block" id="ecosystem">
     <h2>How the pieces fit</h2>
     <p class="section-intro">
-      Æterni Anima is the organization responsible for everything here. It runs the
-      BioSynCare Ecosystem, a programme whose components are SSTIM, BSC Lab (which hosts and
-      publishes SSTIM, and holds Patch Studio) and the BioSynCare application, with BSC as
-      the framework both platforms build on. Knowing which is which makes the rest of the
-      app easier to read.
+      SSTIM is the Community Group's overall open project. SSTIM Workbench is its executable
+      reference environment; Graph Navigator and Patch Studio are Workbench components.
+      BSC identities remain as real framework and implementation provenance, while BioSynCare
+      remains a separate commercial implementation and ecosystem participant.
     </p>
-    <div class="ecosystem-map" aria-label="Relationship between Æterni Anima, BSC, BSC Lab, SSTIM, Patch Studio, and BioSynCare">
+    <div class="ecosystem-map" aria-label="Relationship between the W3C Community Group, SSTIM, SSTIM Workbench, BSC, and BioSynCare">
       <div class="map-owner">
-        <Isotype name="aeterni-anima" size={34} title="Æterni Anima isotype" />
-        <div><strong>Æterni Anima</strong><span>Organization behind the BioSynCare Ecosystem</span></div>
+        <div><strong>W3C Sensory Stimulation Vocabulary Community Group</strong><span>Open community developing SSTIM</span></div>
       </div>
       <div class="map-branches">
         <article>
-          <span class="map-label">Open platform</span>
-          <strong>BSC Lab</strong>
-          <span>Publishes SSTIM; holds Patch Studio and this application</span>
+          <span class="map-label">Overall open project</span>
+          <strong>SSTIM</strong>
+          <span>Specification, vocabulary, documentation, Graph Navigator, and SSTIM Workbench with Patch Studio</span>
         </article>
         <article>
           <span class="map-label">Separate application</span>
@@ -300,7 +278,7 @@
           <span>Closed-source product; no shared private catalog or application code</span>
         </article>
       </div>
-      <p class="map-foundation"><strong>BSC framework</strong> informs both platforms; it is not a data store or a third application.</p>
+      <p class="map-foundation"><strong>BSC framework and BSC Lab records</strong> remain preserved implementation provenance inside the knowledge base; they are not SSTIM's public identity.</p>
     </div>
     <div class="layer-grid">
       {#each layers as layer}
@@ -448,8 +426,9 @@
       {/each}
     </ul>
     <p class="license-note">
-      Software is licensed under Apache-2.0; the ontology, vocabulary, documentation, and
-      public reference data under CC BY 4.0. Maintained by Renato Fabbri
+      Imported software retains Apache-2.0; imported ontology, vocabulary, documentation, and
+      public reference data retain CC BY 4.0. W3C Community Group contribution terms are
+      recorded separately in <a href={ghBlob('LICENSE.md')} rel="external">LICENSE.md</a> and do not retroactively relicense history. Initial technical baseline by Renato Fabbri
       (<a href="https://orcid.org/0000-0002-9699-629X" rel="external">ORCID 0000-0002-9699-629X</a>).
     </p>
   </footer>

@@ -455,7 +455,7 @@ export async function parseInstanceExport(text) {
     throw new Error('The file is empty.')
   }
   if (text.length > INSTANCE_EXPORT_MAX_BYTES) {
-    throw new Error('That file is too large to be a BSC Lab export.')
+    throw new Error('That file is too large to be an SSTIM Workbench export.')
   }
 
   let parsed
@@ -471,7 +471,7 @@ export async function parseInstanceExport(text) {
     throw new Error(
       parsed.model
         ? `Unsupported export model: ${parsed.model}`
-        : 'That file is missing a "model" field — it is not a BSC Lab export.',
+        : 'That file is missing a "model" field — it is not an SSTIM Workbench export.',
     )
   }
   const payload = validateInstancePayload(parsed.payload)

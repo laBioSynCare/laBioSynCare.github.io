@@ -2,7 +2,7 @@
 
 **Status:** current baseline and proposed architecture · last verified 2026-07-30
 
-BSC Lab is intended to be runnable by any institution or community, not only by its
+SSTIM Workbench is intended to be runnable by any institution or community, not only by its
 maintainers. This document records exactly how far that is true today, where it
 stops, and what the remaining work is — with an acceptance criterion for each item
 so progress is testable rather than asserted.
@@ -51,6 +51,15 @@ assets from `static/ontology/`.
 
 Consequence: **the core application is already hostable on any static file server**,
 with no application server, database or runtime dependency.
+
+The canonical W3C GitHub Pages build sets `SSTIM_BASE_PATH=/sstim`; a root-hosted
+deployment leaves it empty. [`deployment.config.js`](../../deployment.config.js)
+validates that single setting, and SvelteKit routes, assets, RDF loads,
+AudioWorklet/WASM URLs, PWA registration, and the service-worker boundary all
+derive from it. Do not distribute literal `/sstim` prefixes through application
+code. GitHub Pages projects share one origin, so local storage and any
+same-origin credentials remain an operator/security decision rather than being
+isolated merely by the path.
 
 ### 1.2 Firebase is genuinely optional, and the boundary is explicit
 
@@ -137,7 +146,7 @@ for ordinary builds, obtained here structurally rather than by convention.
 
 ### 1.5 Instance export and import
 
-`Settings → Your data` exports everything BSC Lab holds locally as one versioned,
+`Settings → Your data` exports everything SSTIM Workbench holds locally as one versioned,
 checksummed file, and imports it back — on any instance, with **no account and no
 Firebase**. Implementation in `src/portability/instanceExport.js`.
 
@@ -150,7 +159,7 @@ Firebase**. Implementation in `src/portability/instanceExport.js`.
 | Lossless | Export → import → export is a fixed point, verified by checksum, so repeated migration cannot drift the data |
 | Confirmed before overwriting | Import parses and verifies first, shows what would land, and asks |
 
-**Covered today:** everything BSC Lab keeps on the device — logbooks and their
+**Covered today:** everything SSTIM Workbench keeps on the device — logbooks and their
 entries, local annotations, local profile, **locally saved patches**, unmigrated
 v1 entries, and the appearance preference. **Not covered:** records held in
 Firestore for a signed-in account. Individual patches remain separately portable
@@ -196,7 +205,7 @@ real backend.
 
 ### 1.6b Deployment paths, and one conformance contract
 
-Three ways to run BSC Lab, all from the same derivation — the application is
+Three ways to run SSTIM Workbench, all from the same derivation — the application is
 never rebuilt for a different path, so they cannot drift:
 
 | Path | Command | Verified by |
@@ -337,7 +346,7 @@ Stated plainly, with no partial credit.
 | ~~G4~~ | ~~No backend adapter interface~~ | ✅ **Closed for both seams.** Storage 2026-07-31: patches, annotations and profile each have local and Firestore implementations behind a shared contract. Identity followed: `src/identity/` normalizes who is signed in behind `IdentityProvider`, with anonymous and Firebase implementations and a conformance suite, and nine consumers now import `identityState` rather than `authState`. What remains is not the seam but a second *real* provider — [ADR 0038](../decisions/0038-identity-providers-and-the-two-seam-adapter.md) argues Mastodon OAuth and IndieAuth are what prove it is an interface rather than a swap |
 | ~~G5~~ | ~~No self-hosted alternative to Firebase~~ | ⚠️ **Largely closed 2026-07-31, and deliberately bounded.** Patches, annotations and profile all work with no account and no Firebase. Per [ADR 0039](../decisions/0039-sharing-model-and-the-shared-backend-question.md) the gap splits: *sync my own data across devices* stays open work, gated on a second identity provider; *a multi-user backend hosting one person's content for others* is **declined**, and sharing is met by publication instead |
 | ~~G6~~ | ~~Firebase config is build-time only~~ | ✅ **Closed 2026-07-31.** `runtime-config.json` beside the artifact selects instance identity and providers; the NixOS module generates it declaratively and the container mounts it read-only. One package, two configurations, verified in the VM test and against two containers (ADR 0041 §2) |
-| ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything BSC Lab keeps on the device. Firestore-held records for a signed-in account remain outside |
+| ~~G7~~ | ~~No complete export package~~ | ✅ **Closed for local data 2026-07-31.** The versioned, checksummed export carries logbooks, annotations, profile, **saved patches**, unmigrated v1 entries and preferences — everything SSTIM Workbench keeps on the device. Firestore-held records for a signed-in account remain outside |
 | ~~G8~~ | ~~No backup or restore~~ | ⚠️ **Partly closed 2026-07-31.** Export is the backup and import is the restore for all local data; scheduling and retention orchestration are absent |
 | ~~G9~~ | ~~No cross-instance migration~~ | ✅ **Closed for local data 2026-07-31.** `make migrate-test` moves everything between two genuinely separate origins and proves the re-export matches byte-for-byte |
 | ~~G10~~ | ~~Patch export is a dead end~~ | ⚠️ **Largely closed 2026-07-31.** A checksummed session package carries the lossless patch plus a partial SSTIM projection and a mapping report; `make session-conformance` proves Level 1 + Level 2 equivalence across two origins ([SESSION_PACKAGE.md](SESSION_PACKAGE.md)). Producer-adjacent SHACL validation and the gated *catalog preset* conversion of ADR 0026 remain open |
@@ -367,7 +376,7 @@ and leaves no citable artifact.
 
 ## 3. Proposed architecture
 
-The intent is that the outputs are **reusable beyond BSC Lab**. A static
+The intent is that the outputs are **reusable beyond SSTIM Workbench**. A static
 single-page application with optional cloud services is a common shape; the
 patterns below should serve any project with that shape.
 
@@ -488,7 +497,7 @@ code exists.
 
 ## 5. Non-goals
 
-- **Becoming a general hosting platform.** BSC Lab is a research workbench. It is a
+- **Becoming a general hosting platform.** SSTIM Workbench is a research workbench. It is a
   demanding *workload* for these patterns, not a stack that hosts other things.
 - **Mandatory accounts.** The default deployment requires no authentication and no
   cloud service, and that must remain true.

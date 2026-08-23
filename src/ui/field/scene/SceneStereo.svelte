@@ -83,7 +83,7 @@
 </script>
 
 <svelte:head>
-  <title>{title} | BSC Lab</title>
+  <title>{title} | SSTIM Workbench</title>
 </svelte:head>
 
 <main class="container scene-page">

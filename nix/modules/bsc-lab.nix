@@ -1,4 +1,4 @@
-# NixOS service module: serve BSC Lab from the reproducible package.
+# NixOS service module: serve SSTIM Workbench from the reproducible package.
 #
 # The application is a static site, so this is deliberately nginx plus a root
 # directory and nothing else — no application server, no database, no runtime
@@ -33,11 +33,11 @@ let
 in
 {
   options.services.bsc-lab = {
-    enable = lib.mkEnableOption "the BSC Lab static sensory-stimulation workbench";
+    enable = lib.mkEnableOption "the SSTIM Workbench static sensory-stimulation environment";
 
     package = lib.mkOption {
       type = lib.types.package;
-      description = "The BSC Lab package; its site is served from share/bsc-lab.";
+      description = "The SSTIM Workbench package; its compatibility path is share/bsc-lab.";
     };
 
     hostName = lib.mkOption {

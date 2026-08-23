@@ -1,6 +1,6 @@
 /// <reference types="@sveltejs/kit" />
 //
-// BSC Lab service worker. Compiled by SvelteKit/Vite via the `$service-worker`
+// SSTIM Workbench service worker. Compiled by SvelteKit/Vite via the `$service-worker`
 // virtual module. As-built spec: docs/technical/PWA_SERVICE_WORKER.md.
 // Decision + rationale: docs/decisions/0009-pwa.md.
 //
@@ -34,8 +34,8 @@ const CACHE = `${CACHE_PREFIX}${version}`
 // The worklet + WASM kernel (~40 KB) is required for any session, so it is
 // precached. The ambient *.wav and ontology *.ttl are NOT — they are
 // runtime-cached on first use by the fetch handler below.
-// Matched base-path-independently (the app is root-hosted today, but these
-// `files` paths carry the SvelteKit `base` prefix, so don't anchor with `^/`).
+// Matched base-path-independently because `files` paths carry the SvelteKit
+// `base` prefix, so don't anchor with `^/`.
 const PRECACHE_STATIC = files.filter(
   (path) =>
     path.includes('/worklets/') ||

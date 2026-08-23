@@ -12,7 +12,7 @@
 > [`../docs/technical/PORTABLE_DEPLOYMENT.md`](../docs/technical/PORTABLE_DEPLOYMENT.md)
 > for the deployment and portability baseline.
 
-This directory contains the BSC Lab application: a multi-engine audiovisual
+This directory contains SSTIM Workbench: a multi-engine audiovisual
 stimulation platform with an integrated RDF knowledge graph browser, SPARQL
 interface, and annotation system.
 
@@ -56,7 +56,7 @@ Tests live beside the code they cover (`*.test.js`, `*.test.mjs`) and run under
 
 ## Architecture overview
 
-BSC Lab has two largely independent subsystems that share the preset data model:
+SSTIM Workbench has two largely independent subsystems that share the preset data model:
 
 ### Stimulation subsystem
 
@@ -106,7 +106,7 @@ Pages remains the canonical citable copy.
 ## Shared data contract
 
 The preset JSON format (`docs/technical/PRESET_FORMAT.md`) is the interface
-between the two BSC Lab subsystems and is coordinated with BioSynCare as a
+between the two Workbench subsystems and is coordinated with BioSynCare as a
 *format* contract, not a shared catalog. The private BioSynCare/BSC catalog stays
 outside this repository and is not converted to Turtle here. The knowledge
 subsystem reads the RDF ontology files and public BSC Lab reference instances.
@@ -202,7 +202,7 @@ const { QueryEngine } = await import('@comunica/query-sparql-rdfjs')
 ## Deployment
 
 ```
-labiosyncare.github.io  GitHub Pages — static app and citable ontology .ttl files
+w3c-cg.github.io/sstim  GitHub Pages project site — Workbench and publication artifacts
 lab.biosyncare.com      deferred custom host — only when headers/backend justify it
 ```
 

@@ -212,7 +212,7 @@
       return
     }
     if (file.size > INSTANCE_EXPORT_MAX_BYTES) {
-      dataNote = 'Import failed: that file is too large to be a BSC Lab export.'
+      dataNote = 'Import failed: that file is too large to be an SSTIM Workbench export.'
       announce(dataNote, 'warn')
       return
     }
@@ -411,10 +411,10 @@
 </script>
 
 <svelte:head>
-  <title>Settings | BSC Lab</title>
+  <title>Settings | SSTIM Workbench</title>
   <meta
     name="description"
-    content="Manage BSC Lab appearance, playback, visual output, portable local data, and instance information."
+    content="Manage SSTIM Workbench appearance, playback, visual output, portable local data, and instance information."
   />
 </svelte:head>
 
@@ -426,7 +426,7 @@
       <p class="eyebrow">This browser · this instance</p>
       <h1>Settings</h1>
       <p class="hero-lede">
-        Choose how BSC Lab looks and runs here, review visual-output controls,
+        Choose how SSTIM Workbench looks and runs here, review visual-output controls,
         and manage the portable data held by this browser.
       </p>
     </div>
@@ -517,7 +517,7 @@
           <div>
             <p class="section-kicker">Experience</p>
             <h2 id="appearance-heading">Appearance</h2>
-            <p>Preview a complete interface skin. The change applies immediately across BSC Lab.</p>
+            <p>Preview a complete interface skin. The change applies immediately across SSTIM Workbench.</p>
           </div>
         </header>
 
@@ -736,7 +736,7 @@
             <h2 id="data-heading">Data &amp; privacy</h2>
             <p>
               Build a portable JSON file from data available in this browser, or review and restore
-              a compatible BSC Lab export. No signed-in account is required; controls wait until the
+              a compatible SSTIM Workbench export. No signed-in account is required; controls wait until the
               identity provider has resolved so the intended browser scope cannot change mid-action.
             </p>
           </div>
@@ -747,7 +747,7 @@
           <div>
             <strong>The export is assembled locally.</strong>
             <p>
-              Clicking export creates a download in this browser; BSC Lab does not upload the file.
+              Clicking export creates a download in this browser; SSTIM Workbench does not upload the file.
               Its checksum detects accidental editing or truncation during a later import; it does
               not prove who created the file.
             </p>
@@ -902,7 +902,7 @@
             </p>
             <p class="merge-note">
               <strong>Reviewed destination:</strong> {pendingImport.reviewedScope}.
-              If the sign-in state changes before confirmation, BSC Lab cancels the restore and asks you
+              If the sign-in state changes before confirmation, SSTIM Workbench cancels the restore and asks you
               to review the file again.
             </p>
             <div class="restore-actions">
@@ -933,7 +933,7 @@
             <p class="section-kicker">Deployment</p>
             <h2 id="instance-heading">This instance</h2>
             <p>
-              Runtime configuration chosen by whoever deployed this copy of BSC Lab.
+              Runtime configuration chosen by whoever deployed this copy of SSTIM Workbench.
               These facts describe available services; they are not personal settings.
             </p>
           </div>
@@ -970,7 +970,7 @@
         <div class="network-note">
           <strong>Where network access can occur</strong>
           <p>
-            Opening and navigating BSC Lab can request application assets, public RDF, and documentation
+            Opening and navigating SSTIM Workbench can request application assets, public RDF, and documentation
             from this deployment’s origin. Sign-in and account-backed storage can contact the configured
             Firebase services. Enabling the optional live ecosystem in Graph or SPARQL fetches its stated
             external source. Export generation and import review run in this browser and do not upload the
@@ -982,7 +982,7 @@
           <div class="deployment-problems" role="status">
             <p>
               <strong>Some deployment configuration was not applied.</strong>
-              BSC Lab used local-capable defaults for the affected services:
+              SSTIM Workbench used local-capable defaults for the affected services:
             </p>
             <ul>
               {#each deploymentProblems as problem (problem)}<li>{problem}</li>{/each}

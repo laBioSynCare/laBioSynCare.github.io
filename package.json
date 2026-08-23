@@ -1,7 +1,7 @@
 {
   "name": "bsc-lab",
   "version": "0.1.0",
-  "description": "BSC Lab — open sensory stimulation platform and RDF knowledge graph browser",
+  "description": "SSTIM Workbench — open sensory-stimulation reference environment and Graph Navigator",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

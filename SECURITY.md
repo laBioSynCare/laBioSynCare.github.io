@@ -1,6 +1,6 @@
 # Security Policy
 
-BSC Lab is a client-side research workbench. It has no application server of its
+SSTIM Workbench is a client-side research workbench. It has no application server of its
 own, and a default deployment requires no accounts and no cloud services. That
 shape removes whole classes of risk, but it does not remove all of them — and the
 project handles two things that deserve care: **personal reflective records** and

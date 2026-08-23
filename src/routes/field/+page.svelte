@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>Sensory Field compatibility link | BSC Lab</title>
+  <title>Sensory Field compatibility link | SSTIM Workbench</title>
 </svelte:head>
 
 <main>

@@ -1,12 +1,20 @@
-# BSC Lab
+# SSTIM
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
 
-BSC Lab is an open sensory-stimulation research and engineering platform paired
-with **SSTIM**, a public RDF knowledge graph for describing techniques,
-modalities, stimulus parameters, exposure boundaries, evidence claims,
-protocols, presets, and sessions. The repository contains both the reusable
-ontology and a SvelteKit reference implementation that exercises it.
+**SSTIM** is the overall open specification, RDF vocabulary, semantic
+infrastructure, documentation, interoperability work, reference tooling, and
+community project for describing sensory-stimulation techniques, modalities,
+stimulus parameters, exposure boundaries, evidence claims, protocols, presets,
+and sessions. This repository also contains **SSTIM Workbench**, the
+non-normative executable reference environment; **Graph Navigator** and
+**Patch Studio** are Workbench components.
+
+SSTIM and its accompanying open reference tooling were contributed as the
+initial technical baseline of the W3C Sensory Stimulation Vocabulary Community
+Group. Historical development provenance is preserved in the repository
+history. Community Group work is not a W3C Recommendation or W3C-endorsed
+technology.
 
 The work is non-clinical. It does not prescribe treatment, certify efficacy, or
 claim that a protocol treats, prevents, cures, or diagnoses a condition. Start
@@ -71,8 +79,8 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
 
 Browsers at the ontology IRI get the interactive application; reference
 documentation is regenerated on every deploy (ADRs 0023 and 0043) —
-[WIDOCO](https://labiosyncare.github.io/ontology/docs/) for the Full OWL profile and
-[pyLODE](https://labiosyncare.github.io/ontology/docs/vocab/) for the SKOS
+[WIDOCO](https://w3c-cg.github.io/sstim/ontology/docs/) for the Full OWL profile and
+[pyLODE](https://w3c-cg.github.io/sstim/ontology/docs/vocab/) for the SKOS
 vocabulary. Real participant session data, the private BioSynCare catalog,
 clinical protocols, and clinical claims are not published here.
 
@@ -126,12 +134,12 @@ dual-typed OWL individuals and SKOS concepts. See the
 [ontology source guide](static/ontology/README.md), and
 [ADR index](docs/decisions/README.md).
 
-## Application
+## SSTIM Workbench
 
 The first screen is the working application, not a marketing site. Its main
 surfaces are:
 
-- **Knowledge browser:** Cytoscape graph navigation over named RDF graphs.
+- **Graph Navigator:** Cytoscape graph navigation over named RDF graphs.
 - **SPARQL workbench:** Comunica queries over ontology and public instance data.
 - **Presets:** public BSC Lab reference presets and their evidence links.
 - **Patch Studio:** real-time audio/visual authoring with Web Audio,
@@ -152,7 +160,7 @@ Architecture details are in [src/README.md](src/README.md),
 
 ## Deployment And Portability
 
-BSC Lab builds as a static SvelteKit application. The knowledge browser, SPARQL
+SSTIM Workbench builds as a static SvelteKit application. Graph Navigator, SPARQL
 workbench, Patch Studio, legacy Field redirects and reference data all operate
 client-side, so the core application is hostable on any static file server. Firebase is
 optional: configuration comes from build-time `VITE_FIREBASE_*` variables, and a
@@ -163,7 +171,8 @@ profile are kept on the device instead of an account.
 The pinned Nix flake reproduces the **development, build and validation**
 toolchain, and CI runs inside it. `nix build` (or `make package`) additionally
 produces the static site as an immutable, **bit-reproducible** package at
-`result/share/bsc-lab`, servable by any static web server — `nix build --rebuild`
+`result/share/bsc-lab`, a compatibility path retained from the imported baseline,
+servable by any static web server — `nix build --rebuild`
 yields an identical output, and `nix flake check` builds it.
 
 That same package deploys three ways from one source: a **NixOS module**
@@ -326,20 +335,22 @@ belong in separate named graphs. The repository includes only a clearly marked
 synthetic session fixture; real user records remain user-owned and are not
 committed.
 
-## Relationship To BioSynCare
+## Preserved BSC provenance and BioSynCare
 
-BSC Lab is the open research and reference implementation. BioSynCare is a
-separate closed-source commercial application. They may coordinate on the
-preset format and SSTIM vocabulary, but neither repository imports the other's
-private data. BSC is a framework; BSC Lab and BioSynCare are implementations;
-protocols, presets, and session executions are separate modeled levels.
+The former BSC Lab public application is now presented as **SSTIM Workbench**.
+This branding change does not rename the real BSC framework, BSC Lab
+implementation records, protocols, provenance, persistent instance IRIs,
+storage formats, or historical releases represented in SSTIM.
+
+BioSynCare remains a separate closed-source commercial application and
+ecosystem participant, not the identity of SSTIM. Versioned exports and SSTIM
+mappings are the intended interoperability boundary; this repository does not
+contain BioSynCare's private data or application code.
 
 ## W3C Community Group
 
-This repository is the technical anchor for the vendor-neutral Sensory
-Stimulation Vocabulary Community Group. The group is **launched**; its charter is
-not yet ratified, and until it is, editorial control of the SSTIM namespace stays
-with the maintainer. Its work covers shared terms, semantic models, JSON-LD
+This is a work repository of the W3C Sensory Stimulation Vocabulary Community
+Group. Its work covers shared terms, semantic models, JSON-LD
 contexts, SHACL profiles, safety metadata, evidence annotations, and
 implementation guidance. It does not define clinical practice or certify
 products, and Community Group work is not a W3C Standard.
@@ -355,7 +366,7 @@ products, and Community Group work is not a W3C Standard.
 The most useful thing an outside contributor can do right now needs a language
 and domain sense, not knowledge of this repository.
 
-**[Review the translations](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/15).**
+**[Review the translations](https://github.com/w3c-cg/sstim/issues/new).**
 SSTIM publishes in English, Italian, Portuguese and Spanish, and as of
 2026-08-19 all 551 concepts carry all four — but 282 of those labels were
 written by the maintainers and have had no native review. If you speak one
@@ -366,7 +377,7 @@ a defensible rendering. `make language-coverage` verifies coverage; it cannot
 verify that a translation is *good*.
 
 **Propose a term.** If SSTIM is missing a concept you need, open a
-[term proposal](https://github.com/laBioSynCare/laBioSynCare.github.io/issues/new?template=term-proposal.md).
+[term proposal](https://github.com/w3c-cg/sstim/issues/new?template=term-proposal.md).
 Grep [`docs/ontology/TERM_INDEX.md`](docs/ontology/TERM_INDEX.md) first — it is
 generated from the 18 modules and CI-checked, and 18 modules is more than anyone
 searches reliably by hand. A proposal does not require a pull request; describing
@@ -385,8 +396,10 @@ repository*. Use the
 [concept DOI](https://doi.org/10.5281/zenodo.21286974) when referring to SSTIM
 across releases.
 
-- Software: [Apache License 2.0](LICENSE).
-- Ontology, vocabulary, documentation, and public reference data:
+- Imported software: [Apache License 2.0](LICENSE).
+- Imported ontology, vocabulary, documentation, and public reference data:
   [CC BY 4.0](LICENSE-ontology).
+- W3C Community Group contribution terms: [LICENSE.md](LICENSE.md). These
+  artifact-specific terms do not retroactively relicense imported history.
 - Maintainer: Renato Fabbri,
   [ORCID 0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X).

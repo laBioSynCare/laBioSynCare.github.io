@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>Abstraction compatibility link | BSC Lab</title>
+  <title>Abstraction compatibility link | SSTIM Workbench</title>
 </svelte:head>
 
 <main>

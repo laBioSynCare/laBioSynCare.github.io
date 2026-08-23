@@ -170,7 +170,7 @@
 </script>
 
 <svelte:head>
-  <title>Preset catalog | BSC Lab</title>
+  <title>Preset catalog | SSTIM Workbench</title>
   <meta
     name="description"
     content="Browse versioned, non-clinical BSC Lab reference presets with their configuration, provenance, safety cautions, and linked evidence assessments."

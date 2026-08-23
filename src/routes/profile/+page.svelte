@@ -80,7 +80,7 @@
 </script>
 
 <svelte:head>
-  <title>Profile · BSC Lab</title>
+  <title>Profile · SSTIM Workbench</title>
 </svelte:head>
 
 <main class="profile-page">

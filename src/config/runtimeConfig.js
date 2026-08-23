@@ -41,7 +41,7 @@ const OPTIONAL_FIREBASE_KEYS = ['storageBucket', 'messagingSenderId', 'measureme
 export function defaultRuntimeConfig() {
   return {
     model: RUNTIME_CONFIG_MODEL,
-    instance: { id: null, name: 'BSC Lab' },
+    instance: { id: null, name: 'SSTIM Workbench' },
     identity: { provider: 'anonymous' },
     storage: { provider: 'local' },
     firebase: null,

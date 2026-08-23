@@ -36,7 +36,7 @@ head_of() {
 echo "smoke-http: asserting $BASE"
 
 # 1. The application is served.
-if fetch "/" && grep -qc 'BSC Lab' "$TMP/body" 2>/dev/null; then
+if fetch "/" && grep -qc 'SSTIM' "$TMP/body" 2>/dev/null; then
   ok "GET / serves the application"
 else
   bad "GET /" "did not serve the application"

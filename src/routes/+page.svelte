@@ -10,9 +10,7 @@
   // pinned release — see src/ui/entrance/releaseMetadata.js.
   import { CONCEPT_DOI, doiUrl } from '../ui/entrance/releaseMetadata.js'
   import {
-    AETERNI_URL,
     BIOSYNCARE_URL,
-    ECOSYSTEM_BRIEF_URL,
     GITHUB_URL,
     ONTOLOGY_DOCS_URL,
     W3C_GROUP_URL,
@@ -90,7 +88,7 @@
         { label: 'Contribute a protocol', action: 'contribute' },
       ],
       // Back to one secondary link. The ecosystem brief was tried here and
-      // moved to the hero: a reader who cannot yet place SSTIM against BSC Lab
+      // moved to the hero: a reader who cannot yet place SSTIM Workbench
       // against BioSynCare will not scroll to the fourth card to find that
       // out. The internal integration tracker was tried here too and is the
       // wrong artifact for a visitor — 500 lines of open workstreams and
@@ -127,7 +125,7 @@
 </script>
 
 <svelte:head>
-  <title>BSC Lab · Sensory stimulation, made open and reproducible</title>
+  <title>SSTIM · Sensory stimulation, made open and reproducible</title>
   <!-- No `name="description"` here: svelte:head appends rather than replaces,
        so this page used to emit two conflicting description tags with the
        shell's weaker one first. app.html now carries SHARE_DESCRIPTION as the
@@ -136,12 +134,12 @@
        A shared link previewed off that shell text, which is the one place it
        costs us the visitor. No og:url and no og:image: both must be absolute,
        and this artifact is deployed by other operators under their own origin
-       (PORTABLE_DEPLOYMENT §1.6d), so a hardcoded labiosyncare.github.io would
+       (PORTABLE_DEPLOYMENT §1.6d), so a hardcoded publication origin would
        be wrong on every self-hosted instance, and a crawler never runs the
        script that could read the origin back. Title and description are
        origin-independent and carry the summary card on their own. -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="BSC Lab" />
+  <meta property="og:site_name" content="SSTIM" />
   <meta property="og:title" content={SHARE_TITLE} />
   <meta property="og:description" content={SHARE_DESCRIPTION} />
   <meta name="twitter:card" content="summary" />
@@ -151,20 +149,20 @@
 
 <main class="entrance">
   <header class="hero" id="hero" bind:this={heroEl}>
-    <!-- The site's own mark, at the one place a visitor arrives. Everywhere
-         else BSC Lab is a text brand in the top bar. -->
-    <Isotype name="bsclab" size={56} title="BSC Lab" />
+    <!-- Keep the contributed mark during migration; the internal asset key is
+         historical and is not an RDF or public-project identity. -->
+    <Isotype name="bsclab" size={56} title="SSTIM Workbench" />
     <!-- The full stop lives here, not in SHARE_TITLE: the hero reads as a
          sentence, the <title> and og:title as labels. -->
     <h1>{SHARE_TITLE}.</h1>
     <p class="subhead">{SHARE_DESCRIPTION}</p>
-    <!-- The one thing the four doors cannot do: place the three layers against
-         each other. A visitor who does not yet know how SSTIM, BSC Lab and
+    <!-- The one thing the four doors cannot do: place the project layers against
+         each other. A visitor who does not yet know how SSTIM Workbench and
          BioSynCare relate cannot tell which door is theirs, so the overview
          sits above them rather than behind door ④. One line, no button — the
          hero stays a hero. -->
     <p class="hero-orientation">
-      New here? <a href={ECOSYSTEM_BRIEF_URL}>One-page ecosystem brief</a> — how
+      New here? <a href={applicationRoute('/about/#ecosystem')}>See how the pieces fit</a> — how
       the knowledge graph, this platform, and the applications fit together.
     </p>
   </header>
@@ -204,12 +202,12 @@
 
   <footer class="entrance-footer">
     <p class="one-liner">
-      <Isotype name="aeterni-anima" size={21} title="Æterni Anima" />
-      <span
-        >Open standards and reference infrastructure for responsible sensory
-        stimulation and sensory neurotechnology — an
-        <a href={AETERNI_URL} rel="external">Æterni Anima</a> initiative.</span
-      >
+      <span>
+        SSTIM is work of the
+        <a href={W3C_GROUP_URL} rel="external">W3C Sensory Stimulation Vocabulary Community Group</a>.
+        Its open specification and reference tooling were contributed as the group's initial
+        technical baseline; historical development provenance is preserved in Git.
+      </span>
     </p>
     <p class="footer-links">
       <!-- Qualified like its DOI neighbour, because it is an identifier rather

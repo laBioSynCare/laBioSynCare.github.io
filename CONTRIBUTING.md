@@ -339,7 +339,7 @@ mechanisms, etc.) should follow the vocabulary term process in Section 4.
 ### Security issues
 
 Do not open public Issues for security vulnerabilities. Email
-`renato@junto.space` directly. BSC Lab does not store user health data
+`renato@junto.space` directly. SSTIM Workbench does not store user health data
 (session data is local by default; cloud sync is opt-in). The primary
 security surface is the preset catalog export pipeline.
 

@@ -101,7 +101,7 @@
 </script>
 
 <svelte:head>
-  <title>Stereoscopic Tree | BSC Lab</title>
+  <title>Stereoscopic Tree | SSTIM Workbench</title>
 </svelte:head>
 
 <main class="container tree-page">

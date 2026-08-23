@@ -1,4 +1,4 @@
-# CLAUDE.md — BSC Lab AI Agent Directive
+# CLAUDE.md — SSTIM AI Agent Directive
 
 > **Read this file completely before touching any other file in this repository.**
 > It is the directive for every AI coding agent working here. Only Claude Code
@@ -13,7 +13,10 @@
 
 ## 1. What This Project Is
 
-**BSC Lab** is an open-source sensory stimulation platform with two integrated layers:
+**SSTIM** is the overall open specification, RDF vocabulary, semantic
+infrastructure, reference tooling, and Community Group project. Its executable
+reference environment is **SSTIM Workbench** (formerly presented publicly as
+BSC Lab), with two integrated layers:
 
 1. **Stimulation layer** — a precision multi-engine audiovisual stimulation application
    (Web Audio API, PixiJS, haptics) that delivers sensory entrainment sessions
@@ -23,9 +26,12 @@
    query interface for the BSC ontology: OWL class hierarchy, SKOS vocabulary,
    SHACL validation shapes, and linked evidence chains.
 
-BSC Lab is the open scientific and technical infrastructure. The related commercial
-application is **BioSynCare** (separate repository, React Native, closed source).
-BSC Lab does **not currently feed** BioSynCare: the documented preset JSON format
+SSTIM Workbench is non-normative reference software; co-location does not make
+its behavior part of the SSTIM specification. Existing BSC/BSC Lab RDF
+identities, historical records, `bsclab-*` formats, and provenance remain real
+and must not be mechanically renamed. The related commercial application is
+**BioSynCare** (separate repository, React Native, closed source). SSTIM
+Workbench does **not currently feed** BioSynCare: the documented preset JSON format
 is the intended narrow interface, but no Patch Studio→catalog converter or
 `dist/presets.json` pipeline exists. A future adapter is optional,
 version-pinned, and must not make BioSynCare requirements part of SSTIM or the
@@ -65,8 +71,8 @@ are chosen but not yet installed — do not describe them as how the app works.
 | Visual engine (default) | PixiJS | v8.x | **(planned — not installed.)** Auto WebGPU/WebGL, unified renderer API. Visuals today are CSS/DOM in the Patch Studio |
 | Audio engine (default) | Vanilla Web Audio API | browser native | Direct AudioContext control, no abstraction overhead |
 | Haptic engine (default) | Web Vibration API | browser native | **(planned.)** NullHapticEngine fallback for unsupported platforms; the studio shows a haptic preview only |
-| App hosting | GitHub Pages | current | Client-only static app and `/ontology/*.ttl` artifacts; custom hosting deferred until headers or backend services are needed |
-| Ontology artifacts | GitHub Pages | current | Stable citable URLs for `.ttl` files; w3id.org redirects point here |
+| App hosting | GitHub Pages | current | Client-only project site at `/sstim/`; `SSTIM_BASE_PATH` is the one build-time mount setting. Custom hosting remains possible. |
+| Ontology artifacts | GitHub Pages | current | Candidate artifacts live under `/sstim/ontology/`; production w3id.org routing remains on the legacy deployment until an explicit cutover. |
 | Ontology docs | WIDOCO + pyLODE | 1.4.25 / 2.13.2 (flake-pinned) | HTML reference docs generated in `pages.yml`, artifact only, never committed (ADR 0023): WIDOCO (`make ontology-docs` → `/ontology/docs/`) for the OWL core; pyLODE `vocpub` (`make vocab-docs` → `/ontology/docs/vocab/`) for the SKOS vocabulary. Browser target at w3id stays the knowledge browser |
 | CSS | Pico.css | current | Semantic HTML-first, no utility class noise |
 | PWA / offline | SvelteKit native service worker | built-in | Installable, offline-capable from the same static `dist/`. No `vite-plugin-pwa`. Three binding constraints — see ADR 0009 + `docs/technical/PWA_SERVICE_WORKER.md` |

@@ -1860,7 +1860,7 @@
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
       <button class="act-btn" onclick={copyLink} disabled={hasErrors} title="Copy a link that carries this patch. Nothing is uploaded — the patch travels inside the link itself.">Share link</button>
-      <button class="act-btn" onclick={pickImportFile} title="Load a patch JSON file exported from any BSC Lab instance">Import</button>
+      <button class="act-btn" onclick={pickImportFile} title="Load a patch JSON file exported from any SSTIM Workbench instance">Import</button>
       <input
         bind:this={importInput}
         type="file"

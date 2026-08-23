@@ -34,7 +34,7 @@ Optional. Links, citations, or "based on my own experimentation."
 ## Non-scope concerns
 
 Any clinical, regulatory, or therapeutic boundary this should stay clear of.
-(See `docs/concept/SCOPE.md` — BSC Lab uses conservative wellness framing
+(See `docs/concept/SCOPE.md` — SSTIM Workbench uses conservative wellness framing
 only; no treat/cure/diagnose language.)
 
 ## Contact (optional)

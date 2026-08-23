@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>Stereoscopic Tree compatibility link | BSC Lab</title>
+  <title>Stereoscopic Tree compatibility link | SSTIM Workbench</title>
 </svelte:head>
 
 <main>

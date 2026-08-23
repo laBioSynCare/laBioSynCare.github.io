@@ -33,15 +33,14 @@ front door.
   framing isn't lost — it's stated properly, with the actual boundary, in
   the About page's scope note and `SCOPE.md`; the hero doesn't need to
   carry a compliance clause that says nothing concrete.)
-- **Institutional one-liner** (footer):
-  *"Open standards and reference infrastructure for responsible sensory
-  stimulation and sensory neurotechnology."*
-  (Trimmed 2026-07-18: cut the trailing "— with BioSynCare as one separate
-  commercial implementation" clause on review — the About page, one link
-  away in the same footer, already draws that distinction properly, with
-  room to explain it instead of a dangling clause. Decks/external contexts
-  without an adjacent About link may still want the fuller sentence; that's
-  a per-context call, not a change to this shared string.)
+- **Project/provenance one-liner** (footer):
+  *"SSTIM is work of the W3C Sensory Stimulation Vocabulary Community Group.
+  Its open specification and reference tooling were contributed as the group's
+  initial technical baseline; historical development provenance is preserved
+  in Git."*
+  (Migration revision 2026-08-23: this replaces the earlier institutional
+  one-liner. The About page carries the BSC/BioSynCare distinction without
+  conflating those implementations with SSTIM.)
 
 All copy uses permitted wellness verbs only (support, facilitate, encourage,
 explore, guide, invite); no "treat/cure/proven" (`CLAUDE.md` §3.5,
@@ -94,7 +93,7 @@ place. The eyebrow labels were also cut to a single word each (`UNDERSTAND`,
   (**Revised 2026-08-07:** the earlier subcopy ended "…and encode a protocol
   across BIDS/HED", which promised a capability that does not exist.
   [`../ecosystem/HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) opens
-  with *"revised design target, not as-built … no current BSC Lab exporter
+  with *"revised design target, not as-built … no current SSTIM Workbench exporter
   should be described as implementing this profile"* — and this door was the
   only place in the repository describing it as one. The replacement clause
   names something a visitor can actually do: **Evidence & claims** is a
@@ -201,7 +200,7 @@ Pico.css `<article>` elements in a two-column CSS grid.
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│ BSC Lab   Graph · Patch Studio · Presets · SPARQL · …          ◐   │ ← existing nav
+│ SSTIM Workbench   Graph · Patch Studio · Presets · SPARQL · …  ◐   │ ← existing nav
 ├────────────────────────────────────────────────────────────────────┤
 │                                                                    │
 │        Sensory stimulation, made open and reproducible.            │ ← hero H1
@@ -319,23 +318,21 @@ above for why they're no longer also duplicated in a hero/footer bar.
   clause; About covers it (see "Hero" above).
 - **Door ① primary CTA — REVISED 2026-07-18:** Patch Studio, not Sensory
   Field (see door ① above).
-- **Hero orientation line — ADDED 2026-08-08.** One plain line under the
-  subhead: *"New here? One-page ecosystem brief — how the knowledge graph, this
-  platform, and the applications fit together."* → `/docs/BioSynCare_Ecosystem_Brief_EN.pdf`.
+- **Hero orientation line — ADDED 2026-08-08, RETARGETED 2026-08-23.** One
+  plain line under the subhead now points to `/about/#ecosystem`, where the
+  migrated SSTIM/SSTIM Workbench architecture is maintained with the UI.
   This is the one thing four doors cannot do. Each door answers "what can I do
-  here"; none places SSTIM against BSC Lab against BioSynCare, and a visitor who
+  here"; none places SSTIM Workbench against BioSynCare, and a visitor who
   cannot make that distinction cannot tell which door is theirs — the most
   common report about this project is that it is hard to grasp as a whole. The
   brief was first placed in door ④ and moved: a reader who is still orienting
   does not scroll to the fourth card to find the overview. It is a line of text,
   not a button, so the hero keeps its no-CTA shape (see "Wireframe"). Also
   linked first in About's Links & licensing list.
-  - **The PDF is served from `static/docs/`, and its authoring copy lives in the
-    gitignored `docs/funding/documents/` tree.** Two copies, so a revision has
-    to be copied forward or the published brief silently goes stale — the same
-    failure mode as the release identifiers, without a derived-facts fix
-    available (a PDF has nothing to derive from). `src/ui/externalLinks.js`
-    holds the URL and says so.
+  - **The former PDF remains an immutable historical collateral snapshot.** Its
+    manifest says not to rewrite or reuse it as current collateral, and it
+    contains pre-migration architecture and URLs. The migration preserves its
+    bytes but removes it from current navigation.
   - **What replacing the tracker fixed:** the 2026-08-07 pass had put
     `ECOSYSTEM_INTEGRATION.md` in door ④. Wrong artifact for a visitor — 500
     lines of open workstreams, KPIs and outreach notes answer "how is this
@@ -351,7 +348,7 @@ above for why they're no longer also duplicated in a hero/footer bar.
   shell description. **Deliberately no `og:image` or `og:url`:** both must be
   absolute, and other operators deploy this same artifact under their own
   origin ([`PORTABLE_DEPLOYMENT.md`](PORTABLE_DEPLOYMENT.md) §1.6d) — a
-  hardcoded `labiosyncare.github.io` would be wrong on every self-hosted
+  hardcoded publication origin would be wrong on every self-hosted
   instance, and the origin cannot be recovered at runtime because crawlers do
   not run the script that reads `runtime-config.json`. A `summary` card
   carries title and description without an image.

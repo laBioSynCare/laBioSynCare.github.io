@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-  <title>Patch Studio | BSC Lab</title>
+  <title>Patch Studio | SSTIM Workbench</title>
 </svelte:head>
 
 <PresetCreator />

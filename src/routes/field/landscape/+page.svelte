@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-  <title>3D Landscape compatibility link | BSC Lab</title>
+  <title>3D Landscape compatibility link | SSTIM Workbench</title>
 </svelte:head>
 
 <main>

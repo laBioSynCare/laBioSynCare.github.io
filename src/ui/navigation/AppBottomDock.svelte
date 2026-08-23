@@ -21,7 +21,7 @@
   }
 </script>
 
-<nav class="app-bottom-dock" aria-label="BSC Lab screens">
+<nav class="app-bottom-dock" aria-label="SSTIM Workbench screens">
   {#each items as item}
     <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
       <span>{item.label}</span>

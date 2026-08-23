@@ -1,4 +1,4 @@
-# GEMINI.md — BSC Lab
+# GEMINI.md — SSTIM
 
 > **Read [`CLAUDE.md`](CLAUDE.md) completely before changing anything in this
 > repository.** It is the full directive: architecture, invariants, preset and
@@ -11,14 +11,16 @@
 
 ## What this project is
 
-**BSC Lab** is an open-source sensory stimulation platform with two layers: a
-precision multi-engine audiovisual stimulation application, and an RDF knowledge
-graph browser, annotator and SPARQL interface over the SSTIM ontology (OWL
-classes, SKOS vocabulary, SHACL shapes, linked evidence).
+**SSTIM** is the overall open specification, vocabulary, semantic
+infrastructure, reference tooling, and Community Group project. **SSTIM
+Workbench** is its non-normative executable environment, with a precision
+multi-engine audiovisual application plus Graph Navigator, annotation, and a
+SPARQL interface over the SSTIM ontology.
 
-SSTIM is a universal standard; **BioSynCare** is a separate closed-source
-commercial application, and BSC Lab does not feed it today. Do not conflate
-them, and do not add BioSynCare-specific logic to SSTIM or the native model.
+Existing BSC/BSC Lab semantic identities and compatibility formats are preserved
+provenance, not the public project brand. **BioSynCare** is a separate
+closed-source commercial application, and SSTIM Workbench does not feed it
+today. Do not conflate them or add BioSynCare-specific logic to SSTIM.
 
 ## The invariants, in short
 

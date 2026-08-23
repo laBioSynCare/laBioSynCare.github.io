@@ -86,7 +86,7 @@ async function main() {
   try {
     // 1. Every primary route serves its own prerendered HTML.
     const routes = [
-      ['/', 'BSC Lab'],
+      ['/', 'SSTIM'],
       ['/graph/', 'Graph'],
       ['/creator/', 'Patch Studio'],
       ['/sparql/', 'SPARQL'],

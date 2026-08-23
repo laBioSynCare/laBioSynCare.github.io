@@ -492,7 +492,7 @@
 </script>
 
 <svelte:head>
-  <title>Logbook | BSC Lab</title>
+  <title>Logbook | SSTIM Workbench</title>
 </svelte:head>
 
 <!-- ── Loading state ──────────────────────────────────────────────────── -->

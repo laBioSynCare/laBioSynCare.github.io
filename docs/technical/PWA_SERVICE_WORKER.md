@@ -1,7 +1,7 @@
 # PWA & Service Worker
 
 > **For AI agents:** This document describes the **as-built** Progressive Web
-> App layer of BSC Lab: the web app manifest, the service worker, its caching
+> App layer of SSTIM Workbench: the web app manifest, the service worker, its caching
 > strategy, and the session-safe update flow. It is the source of truth for
 > anything that touches installability or offline behaviour. The decision and
 > its rationale are in [`../decisions/0009-pwa.md`](../decisions/0009-pwa.md);
@@ -32,12 +32,13 @@ caching* change, nothing more.
 
 ## 1. Why this is small
 
-BSC Lab is already a client-only static app served from GitHub Pages
-(`CLAUDE.md` §2), built with `@sveltejs/adapter-static`. The output in `dist/`
-is exactly what a service worker precaches well, and the app is served from the
-**root** of `labiosyncare.github.io`, so the service-worker scope is a clean `/`
-with no base-path juggling. Making it installable and offline-capable is an
-afternoon of work. The care goes entirely into the three traps in §4.
+SSTIM Workbench is a client-only static app built with
+`@sveltejs/adapter-static`. The canonical GitHub Pages deployment is a project
+site at `/sstim/`, while portable deployments may use `/`. The SvelteKit base,
+asset URLs, worker registration, cache ownership, fetch boundary, and offline
+fallback all derive from the single `SSTIM_BASE_PATH` build setting. A worker
+mounted at `/sstim/` must never control or delete caches belonging to another
+project on the shared `w3c-cg.github.io` origin.
 
 ---
 
@@ -48,7 +49,7 @@ plain static asset (served same-origin, like the ontology Turtle). Key fields:
 
 | Field | Value | Why |
 |---|---|---|
-| `id`, `start_url`, `scope` | `/` | Root-hosted; one app, one scope. |
+| `id`, `start_url`, `scope` | `./` | Resolves to the deployment mount (`/sstim/` on the W3C project site, `/` on a root host). |
 | `display` | `standalone` | Launches without browser chrome. |
 | `theme_color` / `background_color` | paper-skin `#f7f3ea` | Matches the default skin set pre-paint in `app.html`. |
 | `icons` | 192, 512, 512 `maskable`, + `favicon.svg` `any` | Installability + adaptive icon shapes. |
@@ -64,9 +65,9 @@ them with `rsvg-convert` (see the comment block at the top of `icon.svg`).
 `app.html` carries the three head tags the manifest cannot supply itself:
 
 ```html
-<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
 <meta name="theme-color" content="#f7f3ea" />
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon-180.png" />
+<link rel="apple-touch-icon" href="%sveltekit.assets%/icons/apple-touch-icon-180.png" />
 ```
 
 > **Known limitation — static `theme_color`.** The manifest and the
@@ -110,7 +111,8 @@ reloads indefinitely).
 
 ### 3.2 The precache set (Trap 3)
 
-One versioned cache, `bsc-lab-${version}`. Precached on install:
+One versioned, mount-owned cache,
+`sstim-workbench:${base || '/'}:${version}`. Precached on install:
 
 - `build` — the app's own hashed chunks. This **includes** the lazily-imported
   Comunica (~500 KB) and Cytoscape chunks, so SPARQL and the graph view work
@@ -124,9 +126,9 @@ One versioned cache, `bsc-lab-${version}`. Precached on install:
 ```js
 const PRECACHE_STATIC = files.filter(
   (f) =>
-    f.startsWith('/worklets/') ||
-    f === '/favicon.svg' ||
-    f === '/manifest.webmanifest',
+    f.includes('/worklets/') ||
+    f.endsWith('/favicon.svg') ||
+    f.endsWith('/manifest.webmanifest'),
 )
 ```
 
@@ -146,6 +148,7 @@ if request has a Range header               → ignore (don't break media seekin
 if url.origin !== self.location.origin      → ignore  ← Trap 2: Firebase, Google
                                                           sign-in, any CDN, never
                                                           touched by the worker
+if pathname is outside the deployment base → ignore  ← sibling Pages projects
 otherwise → respondWith(strategy(request))
 ```
 
@@ -167,7 +170,8 @@ Same-origin `GET` strategy:
   populate the cache on a successful, non-opaque (`response.type === 'basic'`)
   `GET`. Fresh when online; available offline after first fetch; never caches
   an opaque cross-origin response (those are already bypassed anyway).
-- Offline navigation with no cached match falls back to the cached root shell.
+- Offline navigation with no cached match falls back to the cached shell at
+  `${base}/`.
 
 ### 3.4 Why network-first for pages
 
@@ -208,7 +212,8 @@ owns both registration and the update prompt. It is Svelte 5 runes (`$state`,
 `onclick`) — no Svelte 4 syntax (`CLAUDE.md` §9).
 
 1. **Registration (production only).** On mount, if `!dev` and
-   `'serviceWorker' in navigator`, it registers `/service-worker.js`. SvelteKit's
+   `'serviceWorker' in navigator`, it registers the base-aware worker asset and
+   explicitly scopes it to the base-aware application root. SvelteKit's
    automatic registration is turned off in `svelte.config.js`
    (`kit.serviceWorker.register = false`) so the worker never runs under
    `make dev`, where a precaching worker would serve stale assets and fight HMR.
@@ -225,7 +230,7 @@ owns both registration and the update prompt. It is Svelte 5 runes (`$state`,
    found update still only surfaces the banner, never an auto-reload (Trap 1).
 
 3. **The banner.** A small, dismissible, `role="status"` strip: *"A new version
-   of BSC Lab is ready."* with **Reload** and **Later**. Copy is neutral — no
+   of SSTIM Workbench is ready."* with **Reload** and **Later**. Copy is neutral — no
    medical/health claims (`CLAUDE.md` §3.5). It does not steal focus and never
    blocks the session.
 
@@ -263,13 +268,15 @@ owns both registration and the update prompt. It is Svelte 5 runes (`$state`,
 A production build is required — the worker is registered only when `!dev`:
 
 ```bash
-make build && make preview      # http://127.0.0.1:4174/
+SSTIM_BASE_PATH=/sstim make build
+SSTIM_BASE_PATH=/sstim make preview  # http://127.0.0.1:4174/sstim/
 ```
 
 Then, in the browser devtools:
 
 - **Application → Manifest** — installable, icons resolve, no errors.
-- **Application → Service Workers** — `bsc-lab-${version}` activates; on a
+- **Application → Service Workers** — the worker scope is exactly `/sstim/`
+  and `sstim-workbench:/sstim:${version}` activates; on a
   rebuilt deploy a new worker appears as *waiting* (not auto-activated).
 - **Application → Cache Storage** — after a session and a browse, `/worklets/*`
   is present from install; `/audio/*.wav` and `/ontology/*.ttl` appear only
@@ -291,7 +298,7 @@ assets are. See §8 for what that adds up to in compliance terms.
 
 ## 8. PWA compliance matrix
 
-"PWA compliance" is not a single switch; it is a set of bars. BSC Lab meets the
+"PWA compliance" is not a single switch; it is a set of bars. SSTIM Workbench meets the
 core installability and baseline bars in full, and treats the rest as either
 deliberate enhancements or architecture-level exclusions. This section is the
 canonical statement of *how far* the compliance goes.
@@ -306,10 +313,10 @@ app is installable on Android and desktop Chromium.
 | Served over HTTPS (or `localhost`) | ✅ | GitHub Pages is HTTPS; `localhost` for preview |
 | Linked web app manifest | ✅ | `app.html` → `manifest.webmanifest` |
 | `name` and/or `short_name` | ✅ | both present |
-| `start_url` (same-origin) | ✅ | `/` |
+| `start_url` (same-origin) | ✅ | `./`, resolved inside the deployment mount |
 | `display` is `standalone`/`fullscreen`/`minimal-ui` | ✅ | `standalone` |
 | 192px **and** 512px PNG icons | ✅ | plus a 512 `maskable` and an SVG `any` |
-| Registered service worker controlling `start_url`, with a `fetch` handler | ✅ | `src/service-worker.js`, scope `/` |
+| Registered service worker controlling `start_url`, with a `fetch` handler | ✅ | `src/service-worker.js`, scope `/sstim/` on the W3C project site |
 
 ### 8.2 Baseline PWA checklist (the former Lighthouse PWA audits) — fully met
 
@@ -352,7 +359,7 @@ future contributor does not "add them for completeness."
 
 | Capability | Why excluded |
 |---|---|
-| Push notifications | Requires a permanent push backend; BSC Lab is client-first and static-hosted. Same posture as [ADR 0008](../decisions/0008-activitypub.md). |
+| Push notifications | Requires a permanent push backend; SSTIM Workbench is client-first and static-hosted. Same posture as [ADR 0008](../decisions/0008-activitypub.md). |
 | Background Sync / Periodic Background Sync | No backend to sync against. |
 | `SharedArrayBuffer` / threaded WASM audio | Needs COOP/COEP headers GitHub Pages cannot send; the COEP-injecting service-worker route was **declined** because it re-breaks Firebase (Trap 2). See [ADR 0009](../decisions/0009-pwa.md) "Alternatives" and `CLAUDE.md` §9. |
 
@@ -365,12 +372,12 @@ manifest's strings surface in OS install dialogs and app listings:
 - `name`, `short_name`, and `description` use conservative wellness framing — no
   medical or treatment claims.
 - `categories` deliberately avoid the `health` and `medical` values (which would
-  nudge store categorisation toward a medical framing); BSC Lab declares
+  nudge store categorisation toward a medical framing); SSTIM Workbench declares
   `education`, `lifestyle`, `productivity` instead.
 
 ### 8.6 Net assessment
 
-BSC Lab is a **fully installable, offline-capable, cross-platform PWA**
+SSTIM Workbench is a **fully installable, offline-capable, cross-platform PWA**
 (Android + desktop install, iOS Add-to-Home-Screen standalone). It meets the
 core installability bar and the full baseline checklist. Everything beyond that
 is either an optional enhancement consciously deferred (§8.3) or a capability

@@ -1,5 +1,12 @@
 # Brand marks — the BSC Lab isotype, and how it was derived
 
+> **Migration note.** The imported BSC Lab isotype is temporarily retained as
+> the visual mark used by SSTIM Workbench so the repository move does not become
+> an unrelated identity redesign. File/component keys such as `bsclab` preserve
+> historical compatibility; they do not make BSC Lab the public identity of
+> SSTIM. A future Community Group visual-identity decision should be handled as
+> a separate, reviewed change.
+
 > **Status: adopted 2026-08-08 — `marks/merge-d.svg`.** It is now
 > `static/favicon.svg`, `static/icons/icon.svg` and, scaled into the safe zone,
 > `static/icons/icon-maskable.svg`; the four PNGs are rasterised from those two.

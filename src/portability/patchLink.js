@@ -194,7 +194,7 @@ export async function decodePatchLink(value) {
   const version = Number(value.slice(0, separator))
   if (version !== PATCH_LINK_VERSION) {
     throw new Error(
-      `This link was made by a newer version of BSC Lab (format ${value.slice(0, separator)}).`,
+      `This link was made by a newer version of SSTIM Workbench (format ${value.slice(0, separator)}).`,
     )
   }
 

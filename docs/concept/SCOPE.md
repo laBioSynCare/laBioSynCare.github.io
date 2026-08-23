@@ -6,8 +6,10 @@ This document covers two related but distinct scopes:
    Community Group anchored in this repository. It is **launched**; its charter
    is not yet ratified. [`../../CHARTER.md`](../../CHARTER.md) is the normative
    instrument, and this part is the working elaboration of its Scope section.
-2. The **BSC Lab** scope — what BSC Lab itself does and explicitly does not
-   claim, with regulatory and language guidance for contributors.
+2. The **SSTIM Workbench** scope — the non-clinical boundary inherited from the
+   application formerly presented as BSC Lab. Historical "BSC Lab" wording in
+   Part 2 is retained so this migration does not silently rewrite a regulatory
+   source text; every such boundary applies unchanged to SSTIM Workbench.
 
 See also [`NON_SCOPE.md`](./NON_SCOPE.md) for an explicit list of items that
 fall outside the Community Group's remit.

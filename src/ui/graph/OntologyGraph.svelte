@@ -1467,7 +1467,7 @@
       if (match) return match.data.id
     }
     if (candidates.length > 1) {
-      console.warn('[BSC Lab] Hash matches multiple nodes; using first', {
+      console.warn('[SSTIM Workbench] Hash matches multiple nodes; using first', {
         hash: rawHash,
         candidates: candidates.map((c) => c.data.iri),
       })

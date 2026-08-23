@@ -250,7 +250,7 @@
 </script>
 
 <svelte:head>
-  <title>Sensory Field | BSC Lab</title>
+  <title>Sensory Field | SSTIM Workbench</title>
 </svelte:head>
 
 <main class="container field-page">
