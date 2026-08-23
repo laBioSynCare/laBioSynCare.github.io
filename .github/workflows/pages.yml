@@ -19,13 +19,34 @@ jobs:
   build:
     name: Build static site
     runs-on: ubuntu-latest
-    env:
-      # w3c-cg/sstim is a GitHub project site. This single build-time mount is
-      # consumed by SvelteKit and every application URL resolver; no runtime
-      # code may scatter a literal `/sstim` prefix.
-      SSTIM_BASE_PATH: /sstim
-
+    outputs:
+      production: ${{ steps.base.outputs.production }}
     steps:
+      # Dual publication: the identical commit is published to both
+      # `laBioSynCare/laBioSynCare.github.io` (an owner site, served at the
+      # origin root) and `w3c-cg/sstim` (a project site, served under
+      # `/sstim/`). Hard-coding the mount here would have made the two
+      # deployments need two different workflow files, which is precisely the
+      # drift the migration plan forbids. So the mount is derived from the
+      # repository's own identity instead: an owner site is `<owner>.github.io`
+      # and takes an empty base; anything else is a project site and takes
+      # `/<repo>`. One build-time mount, consumed by SvelteKit and every
+      # application URL resolver; no runtime code may scatter a literal prefix.
+      - name: Resolve the deployment base for this repository
+        id: base
+        run: |
+          owner_site="$(printf '%s' "${{ github.repository_owner }}.github.io" | tr '[:upper:]' '[:lower:]')"
+          repo_name="$(printf '%s' "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')"
+          if [ "$repo_name" = "$owner_site" ]; then
+            echo "SSTIM_BASE_PATH=" >> "$GITHUB_ENV"
+            echo "production=true" >> "$GITHUB_OUTPUT"
+            echo "Owner site: building at the origin root."
+          else
+            echo "SSTIM_BASE_PATH=/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+            echo "production=false" >> "$GITHUB_OUTPUT"
+            echo "Project site: building at /${{ github.event.repository.name }}."
+          fi
+
       # fetch-tags because the build runs truth-audit, which resolves every
       # CHANGELOG release link against its tag; a tagless checkout makes that
       # gate report absence it cannot actually observe.
@@ -164,12 +185,13 @@ jobs:
       - name: Generate merged OWL bundle for BioPortal
         run: nix develop --command make bioportal-bundle BIOPORTAL_OUT=dist/ontology/sstim-full.owl
 
-      # Serve the finished artifact at the exact GitHub project mount. This runs
-      # after RDF exports and both documentation generators, and also asserts
-      # that app routes, ontology sources, PWA files, worklets, WASM, and audio
-      # do not depend on an accidental origin-root deployment.
-      - name: Verify the complete artifact under /sstim
-        run: nix develop --command node scripts/smoke-static.mjs dist /sstim --complete
+      # Serve the finished artifact at the exact mount this repository deploys
+      # to. This runs after RDF exports and both documentation generators, and
+      # asserts that app routes, ontology sources, PWA files, worklets, WASM and
+      # audio all resolve against that mount rather than against an assumed
+      # origin root.
+      - name: Verify the complete artifact at the deployment mount
+        run: nix develop --command node scripts/smoke-static.mjs dist "$SSTIM_BASE_PATH" --complete
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
@@ -208,5 +230,11 @@ jobs:
       # committed production rules in memory with only their Pages locations
       # overlaid, then prove every representative candidate target is live.
       # This does not write or publish a replacement .htaccess.
+      #
+      # Skipped on the production origin itself, and not as a convenience: the
+      # staged overlay refuses a candidate base equal to the production
+      # deployment, because "staged" means somewhere the production rules do not
+      # already point. Running it there would assert nothing and fail.
       - name: Verify staged W3ID resolution targets
+        if: needs.build.outputs.production != 'true'
         run: node scripts/w3id-staged-smoke.mjs "${{ steps.deployment.outputs.page_url }}"
