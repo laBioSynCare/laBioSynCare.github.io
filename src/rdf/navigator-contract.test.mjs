@@ -35,7 +35,7 @@ describe('unified navigator source boundary', () => {
     expect(Object.keys(ONTOLOGY_URLS)).toEqual(expectedKeys)
     expect(Object.keys(ONTOLOGY_SOURCES)).toEqual(expectedKeys)
     expect(ONTOLOGY_URLS).toEqual(Object.fromEntries(
-      fullProfileModules.map(module => [sourceKey(module.id), applicationAsset(module.runtime.url)]),
+      fullProfileModules.map(module => [sourceKey(module.id), applicationAsset(`/ontology/${module.runtime.url}`)]),
     ))
 
     expect(Object.values(ONTOLOGY_SOURCES).map(source => ({
@@ -49,7 +49,7 @@ describe('unified navigator source boundary', () => {
       id: module.id,
       title: module.title,
       roles: module.roles,
-      url: applicationAsset(module.runtime.url),
+      url: applicationAsset(`/ontology/${module.runtime.url}`),
       graph: module.runtime.graphIri,
       persistentUrl: module.publication.persistentUrl,
     })))

@@ -523,8 +523,8 @@ function validateModules(manifest, errors, { verifyChecksums }) {
     if (!isRecord(module.runtime)) {
       errors.push(`${at}.runtime: expected an object`)
     } else {
-      if (!/^\/ontology\/sstim-[a-z0-9-]+\.ttl$/.test(module.runtime.url ?? '')) {
-        errors.push(`${at}.runtime.url: expected an /ontology/*.ttl URL`)
+      if (!/^sstim-[a-z0-9-]+\.ttl$/.test(module.runtime.url ?? '')) {
+        errors.push(`${at}.runtime.url: expected a manifest-relative *.ttl reference`)
       }
       if (!isHttpsUrl(module.runtime.graphIri)) {
         errors.push(`${at}.runtime.graphIri: expected an HTTPS IRI`)
@@ -560,7 +560,7 @@ function validateModules(manifest, errors, { verifyChecksums }) {
       const filename = `sstim-${module.id}.ttl`
       const expected = {
         sourcePath: `static/ontology/${filename}`,
-        runtimeUrl: `/ontology/${filename}`,
+        runtimeUrl: filename,
         graphIri: `https://w3id.org/sstim/graph/${module.id}`,
         distributionUrl: `https://labiosyncare.github.io/ontology/${filename}`,
         persistentUrl: module.id === 'core'
@@ -665,9 +665,9 @@ function validateNamespaceDocuments(manifest, moduleById, errors) {
       ? 'sstim-namespace'
       : `sstim-${document.id}-namespace`
     const expectedRuntime = {
-      turtleUrl: `/ontology/${stem}.ttl`,
-      jsonLdUrl: `/ontology/${stem}.jsonld`,
-      rdfXmlUrl: `/ontology/${stem}.rdf`,
+      turtleUrl: `${stem}.ttl`,
+      jsonLdUrl: `${stem}.jsonld`,
+      rdfXmlUrl: `${stem}.rdf`,
     }
     if (!isRecord(document.runtime)) {
       errors.push(`${at}.runtime: expected an object`)
@@ -756,8 +756,8 @@ function validateProfiles(manifest, moduleById, errors, { verifyChecksums }) {
         errors.push(`${at}.source.sha256: expected a lowercase SHA-256 digest`)
       }
     }
-    if (!isRecord(profile.runtime) || !/^\/ontology\/sstim-[a-z0-9-]+-profile\.ttl$/.test(profile.runtime?.url ?? '')) {
-      errors.push(`${at}.runtime.url: expected an /ontology/*-profile.ttl URL`)
+    if (!isRecord(profile.runtime) || !/^sstim-[a-z0-9-]+-profile\.ttl$/.test(profile.runtime?.url ?? '')) {
+      errors.push(`${at}.runtime.url: expected a manifest-relative *-profile.ttl reference`)
     }
     if (!isRecord(profile.publication)) {
       errors.push(`${at}.publication: expected an object`)
@@ -852,7 +852,7 @@ function validateProfiles(manifest, moduleById, errors, { verifyChecksums }) {
     if (MODULE_ID_PATTERN.test(profile.id ?? '')) {
       const filename = `sstim-${profile.id}-profile.ttl`
       const expectedSourcePath = `static/ontology/${filename}`
-      const expectedRuntimeUrl = `/ontology/${filename}`
+      const expectedRuntimeUrl = filename
       const expectedDistributionUrl = `https://labiosyncare.github.io/ontology/${filename}`
       const expectedVersionedUrl = `${VERSIONED_BASE}${manifest.suite?.version}/${filename}`
       if (profile.source?.path !== expectedSourcePath) {

@@ -537,15 +537,15 @@
           "properties": {
             "turtleUrl": {
               "type": "string",
-              "pattern": "^/ontology/sstim-[a-z0-9-]+\\.ttl$"
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.ttl$"
             },
             "jsonLdUrl": {
               "type": "string",
-              "pattern": "^/ontology/sstim-[a-z0-9-]+\\.jsonld$"
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.jsonld$"
             },
             "rdfXmlUrl": {
               "type": "string",
-              "pattern": "^/ontology/sstim-[a-z0-9-]+\\.rdf$"
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.rdf$"
             }
           }
         },
@@ -659,7 +659,7 @@
           "properties": {
             "url": {
               "type": "string",
-              "pattern": "^/ontology/sstim-[a-z0-9-]+\\.ttl$"
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.ttl$"
             },
             "graphIri": {
               "$ref": "#/$defs/httpsUrl"
@@ -776,7 +776,7 @@
           "properties": {
             "url": {
               "type": "string",
-              "pattern": "^/ontology/sstim-[a-z0-9-]+-profile\\.ttl$"
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+-profile\\.ttl$"
             }
           }
         },

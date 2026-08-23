@@ -1,6 +1,18 @@
 import { DataFactory, Parser, Store } from 'n3'
 import ontologyManifest from '../../static/ontology/manifest.json' with { type: 'json' }
 import { applicationAsset } from '../config/applicationUrls.js'
+
+/**
+ * Resolve a manifest runtime reference to a fetchable application URL.
+ *
+ * The manifest states its runtime references relative to itself
+ * (`sstim-core.ttl`, not `/ontology/sstim-core.ttl`), so that a consumer who
+ * fetches the manifest from any deployment resolves them against the manifest's
+ * own location rather than against an origin root the deployment may not own.
+ * The manifest lives at `/ontology/manifest.json`, so its neighbours are under
+ * `/ontology/`; this restores that one piece of context the reference omits.
+ */
+const ontologyRuntimeAsset = (reference) => applicationAsset(`/ontology/${reference}`)
 import {
   ECOSYSTEM_AGENTS_GRAPH_IRI,
   ECOSYSTEM_FIXTURE_GRAPH_IRI,
@@ -139,7 +151,7 @@ const fullProfileModules = fullProfileModuleIds.map((id) => {
 export const ONTOLOGY_URLS = Object.freeze(Object.fromEntries(
   fullProfileModules.map(module => [
     ontologySourceKey(module.id),
-    applicationAsset(module.runtime.url),
+    ontologyRuntimeAsset(module.runtime.url),
   ]),
 ))
 
@@ -154,7 +166,7 @@ export const ONTOLOGY_SOURCES = Object.freeze(Object.fromEntries(
       id: module.id,
       title: module.title,
       roles: Object.freeze([...module.roles]),
-      url: applicationAsset(module.runtime.url),
+      url: ontologyRuntimeAsset(module.runtime.url),
       graph: module.runtime.graphIri,
       persistentUrl: module.publication.persistentUrl,
     }),

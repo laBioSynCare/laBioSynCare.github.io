@@ -47,9 +47,9 @@
         "alignments"
       ],
       "runtime": {
-        "turtleUrl": "/ontology/sstim-namespace.ttl",
-        "jsonLdUrl": "/ontology/sstim-namespace.jsonld",
-        "rdfXmlUrl": "/ontology/sstim-namespace.rdf"
+        "turtleUrl": "sstim-namespace.ttl",
+        "jsonLdUrl": "sstim-namespace.jsonld",
+        "rdfXmlUrl": "sstim-namespace.rdf"
       },
       "publication": {
         "persistentUrl": "https://w3id.org/sstim"
@@ -63,9 +63,9 @@
         "exposure"
       ],
       "runtime": {
-        "turtleUrl": "/ontology/sstim-exposure-namespace.ttl",
-        "jsonLdUrl": "/ontology/sstim-exposure-namespace.jsonld",
-        "rdfXmlUrl": "/ontology/sstim-exposure-namespace.rdf"
+        "turtleUrl": "sstim-exposure-namespace.ttl",
+        "jsonLdUrl": "sstim-exposure-namespace.jsonld",
+        "rdfXmlUrl": "sstim-exposure-namespace.rdf"
       },
       "publication": {
         "persistentUrl": "https://w3id.org/sstim/exposure"
@@ -88,7 +88,7 @@
         "sha256": "7f08d06c4f709c587176eb53784404f3a7a6ed2a64a8c1ce231bec12afcf1b42"
       },
       "runtime": {
-        "url": "/ontology/sstim-core.ttl",
+        "url": "sstim-core.ttl",
         "graphIri": "https://w3id.org/sstim/graph/core"
       },
       "requires": [],
@@ -119,7 +119,7 @@
         "sha256": "4d2c15e991ef9c092081c9fd092348f1be77ded22ed367bd6b9a75b4e0044f18"
       },
       "runtime": {
-        "url": "/ontology/sstim-stimulus.ttl",
+        "url": "sstim-stimulus.ttl",
         "graphIri": "https://w3id.org/sstim/graph/stimulus"
       },
       "requires": [
@@ -152,7 +152,7 @@
         "sha256": "66842bc9c2397f1e4e01cde1190d2aa9f8f73a3b2c921be30081497c8bb1fbf9"
       },
       "runtime": {
-        "url": "/ontology/sstim-core-shapes.ttl",
+        "url": "sstim-core-shapes.ttl",
         "graphIri": "https://w3id.org/sstim/graph/core-shapes"
       },
       "requires": [
@@ -186,7 +186,7 @@
         "sha256": "789480fb268ac435aaa9bdb3f6fb80482472f9f47d05c0523a8466e8a1f3ff84"
       },
       "runtime": {
-        "url": "/ontology/sstim-common.ttl",
+        "url": "sstim-common.ttl",
         "graphIri": "https://w3id.org/sstim/graph/common"
       },
       "requires": [
@@ -218,7 +218,7 @@
         "sha256": "c5a09543c71e864e87d02ce6b27bde48a52da706dfd7937c9bf0a7f71f3cafb6"
       },
       "runtime": {
-        "url": "/ontology/sstim-technique.ttl",
+        "url": "sstim-technique.ttl",
         "graphIri": "https://w3id.org/sstim/graph/technique"
       },
       "requires": [
@@ -250,7 +250,7 @@
         "sha256": "1d95d402250b660f780f752c77319e672d0b1364ebf80c775d03de602965fad0"
       },
       "runtime": {
-        "url": "/ontology/sstim-configuration.ttl",
+        "url": "sstim-configuration.ttl",
         "graphIri": "https://w3id.org/sstim/graph/configuration"
       },
       "requires": [
@@ -284,7 +284,7 @@
         "sha256": "bc9b8f7e4a3f13961fc741919cfe820c89b47ab1311c1ed9a82ce29aee5d7fd8"
       },
       "runtime": {
-        "url": "/ontology/sstim-session.ttl",
+        "url": "sstim-session.ttl",
         "graphIri": "https://w3id.org/sstim/graph/session"
       },
       "requires": [
@@ -319,7 +319,7 @@
         "sha256": "6c5f892ebfb9474996956087737c0dc6d5e16c9604e7f968238363253b0a32e7"
       },
       "runtime": {
-        "url": "/ontology/sstim-evidence.ttl",
+        "url": "sstim-evidence.ttl",
         "graphIri": "https://w3id.org/sstim/graph/evidence"
       },
       "requires": [
@@ -353,7 +353,7 @@
         "sha256": "598d965d04e70a709337ac5af6c6e660ab883374675b9a51715654b06b73b78f"
       },
       "runtime": {
-        "url": "/ontology/sstim-neuromodulation.ttl",
+        "url": "sstim-neuromodulation.ttl",
         "graphIri": "https://w3id.org/sstim/graph/neuromodulation"
       },
       "requires": [
@@ -389,7 +389,7 @@
         "sha256": "09577607110228581a78b16addd3de632959e4a7781b3ed0ba8e5e86efa38aa1"
       },
       "runtime": {
-        "url": "/ontology/sstim-patch-studio.ttl",
+        "url": "sstim-patch-studio.ttl",
         "graphIri": "https://w3id.org/sstim/graph/patch-studio"
       },
       "requires": [
@@ -424,7 +424,7 @@
         "sha256": "f48a61317470613c5215bf473212c4ab4398f8798e1644590c7aedae0f700988"
       },
       "runtime": {
-        "url": "/ontology/sstim-vocab.ttl",
+        "url": "sstim-vocab.ttl",
         "graphIri": "https://w3id.org/sstim/graph/vocab"
       },
       "requires": [
@@ -463,7 +463,7 @@
         "sha256": "fcfef1592c671b99435f8d9029748c242b718d1cea349ed315082746314f5904"
       },
       "runtime": {
-        "url": "/ontology/sstim-exposure.ttl",
+        "url": "sstim-exposure.ttl",
         "graphIri": "https://w3id.org/sstim/graph/exposure"
       },
       "requires": [
@@ -500,7 +500,7 @@
         "sha256": "90ebcfd43b963de5eda1e2df3c0f26a41d9af50c57bfc9eddbb97c7a6de8ca79"
       },
       "runtime": {
-        "url": "/ontology/sstim-ecosystem.ttl",
+        "url": "sstim-ecosystem.ttl",
         "graphIri": "https://w3id.org/sstim/graph/ecosystem"
       },
       "requires": [
@@ -533,7 +533,7 @@
         "sha256": "da049be5d88a557a08003757672fb12913a1c949bcb176a519660199e1f212c0"
       },
       "runtime": {
-        "url": "/ontology/sstim-neuromodulation-evidence.ttl",
+        "url": "sstim-neuromodulation-evidence.ttl",
         "graphIri": "https://w3id.org/sstim/graph/neuromodulation-evidence"
       },
       "requires": [
@@ -567,7 +567,7 @@
         "sha256": "c220d395f236f53c52102c39929457f91080f87578b1507951aea8bfdad78b68"
       },
       "runtime": {
-        "url": "/ontology/sstim-evidence-exposure.ttl",
+        "url": "sstim-evidence-exposure.ttl",
         "graphIri": "https://w3id.org/sstim/graph/evidence-exposure"
       },
       "requires": [
@@ -604,7 +604,7 @@
         "sha256": "b5e48b15ecf38db49eb9f0d4e9ff80ce87982fe1f14318cd34a5efaa02ad4875"
       },
       "runtime": {
-        "url": "/ontology/sstim-technique-exposure.ttl",
+        "url": "sstim-technique-exposure.ttl",
         "graphIri": "https://w3id.org/sstim/graph/technique-exposure"
       },
       "requires": [
@@ -639,7 +639,7 @@
         "sha256": "f6a632791ae68386d30c725d8e92d03ff2217894bec037c9238b07877d7379bd"
       },
       "runtime": {
-        "url": "/ontology/sstim-alignments.ttl",
+        "url": "sstim-alignments.ttl",
         "graphIri": "https://w3id.org/sstim/graph/alignments"
       },
       "requires": [
@@ -674,7 +674,7 @@
         "sha256": "8a4d4f7492f82d3b751bbc784267abaf082a04970ba311ff016fa94eebb93c01"
       },
       "runtime": {
-        "url": "/ontology/sstim-shapes.ttl",
+        "url": "sstim-shapes.ttl",
         "graphIri": "https://w3id.org/sstim/graph/shapes"
       },
       "requires": [
@@ -718,7 +718,7 @@
         "sha256": "7ab2223f3aba320d6c5e4e1fb950dc758236a28add388966a8564bed6d25ba02"
       },
       "runtime": {
-        "url": "/ontology/sstim-kernel-profile.ttl"
+        "url": "sstim-kernel-profile.ttl"
       },
       "publication": {
         "public": true,
@@ -758,7 +758,7 @@
         "sha256": "b045336c41e018e5da8b546502ec781216262919dda981d628f87802124b42c9"
       },
       "runtime": {
-        "url": "/ontology/sstim-core-profile.ttl"
+        "url": "sstim-core-profile.ttl"
       },
       "publication": {
         "public": true,
@@ -807,7 +807,7 @@
         "sha256": "69bfcddf2a4a7c17d48910a4fb9d30d70e6a061eee2d336683f489abe8e5fdef"
       },
       "runtime": {
-        "url": "/ontology/sstim-core-plus-profile.ttl"
+        "url": "sstim-core-plus-profile.ttl"
       },
       "publication": {
         "public": true,
@@ -855,7 +855,7 @@
         "sha256": "72fd312e22b20c704647eb03df5c9dee06527bcf667a88bd0daa7e5b7a870351"
       },
       "runtime": {
-        "url": "/ontology/sstim-full-profile.ttl"
+        "url": "sstim-full-profile.ttl"
       },
       "publication": {
         "public": true,
