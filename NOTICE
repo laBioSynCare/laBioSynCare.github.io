@@ -14,7 +14,8 @@ specific language governing permissions and limitations under the License.
 
 ---
 
-This repository is dual-licensed, and the split is deliberate:
+This repository uses a deliberate, path-based license split. See LICENSING.md
+for the artifact and contribution scope:
 
   * Software — application source, build tooling, scripts, tests:
     Apache License 2.0, as above (see LICENSE).
@@ -26,10 +27,11 @@ This repository is dual-licensed, and the split is deliberate:
     which is what registries and downstream consumers read.
 
   * The three defensive publications in docs/technical/ — BREATHING_MODEL.md,
-    SYMMETRY_SYSTEM.md and MARTIGLI_BINAURAL.md — are CC BY 4.0 with the
-    additional constraint that they must not be modified: they are timestamped
-    prior-art records, and altering them after first publication undermines
-    their legal function.
+    SYMMETRY_SYSTEM.md and MARTIGLI_BINAURAL.md — are CC BY 4.0. Their canonical
+    copies in this repository are maintained as immutable timestamped prior-art
+    records. That repository maintenance policy does not restrict downstream
+    copying or adaptation permitted by CC BY 4.0, subject to its attribution and
+    change-notice requirements.
 
 Cite the ontology by its concept DOI, https://doi.org/10.5281/zenodo.21286974,
 which resolves to the latest version.

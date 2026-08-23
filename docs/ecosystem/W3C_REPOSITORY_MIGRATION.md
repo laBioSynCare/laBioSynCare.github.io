@@ -1,9 +1,12 @@
 # Decision and staged migration plan: SSTIM to `w3c-cg/sstim`
 
-- **Status:** proposed decision and execution plan
+- **Status:** approved migration; staged execution in progress
 - **Proposal/document date:** 2026-08-23
-- **Decision authority and approval date:** pending
-- **Gate G0 disposition:** pending
+- **Decision authority and approval date:** Community Group migration approval,
+  including the complete history, existing licenses, SSTIM, and the complete
+  Workbench, confirmed by the repository rights-holder/maintainer on 2026-08-23
+- **Gate G0 disposition:** passed on 2026-08-23; see
+  [the licensing and contribution scope](../../LICENSING.md)
 - **Scope:** repository stewardship and publication-host migration
 - **Not authorized by this document:** production W3ID cutover, ontology
   redesign, relicensing, DOI changes, or archival of the existing repository
@@ -20,7 +23,7 @@ This is a **conditional recommendation in favour** of migration:
 
 | Decision | Recommendation |
 |---|---|
-| Make `w3c-cg/sstim` the long-term repository home | Yes, after the licensing and contribution-history disposition is recorded |
+| Make `w3c-cg/sstim` the long-term repository home | Yes; the licensing and contribution-history disposition was recorded on 2026-08-23 |
 | Import the complete specification, vocabulary, documentation, and open reference tooling | Yes; keep one repository and distinguish specification/conformance material, informative material, and reference software. Normative status exists only where CG governance explicitly designates it |
 | Publish a working project site at `/sstim/` | Yes, after base-path, service-worker, and shared-origin data risks pass acceptance |
 | Rename the public application from BSC Lab to SSTIM Workbench | Yes, narrowly at the project/UI layer and after the imported build works |
@@ -52,8 +55,9 @@ public repository should move to a community-neutral GitHub organization once
 the group is approved. The W3C Community Group repository now exists, its
 initial history is small and preservable, and the inspecting maintainer has
 `MAINTAIN` permission. This creates the technical path for the anticipated
-transition; Gate G0 must establish that the governance/editorial transfer is in
-force before the move is described as complete.
+transition. Gate G0 now records that approval for the complete history, existing
+license split, SSTIM, and the complete non-normative Workbench. Operational
+administration and production cutover remain separate later gates.
 
 The [official group page](https://www.w3.org/groups/cg/sstim/) describes the
 same vendor-neutral vocabulary/ontology scope. W3C's
@@ -299,19 +303,24 @@ classified before it changes.
 
 ### Gate G0 — repository-import governance, license, and contribution history
 
-Obtain a written answer from the CG chair/W3C contact covering:
+**Disposition: PASSED, 2026-08-23.** The repository rights-holder/maintainer
+confirmed that Community Group approval covers:
 
-- how Apache-2.0 software, CC BY 4.0 ontology/documentation, the target's W3C
-  `LICENSE.md`, and the Community Contributor License Agreement coexist;
-- how the imported pre-CG history is labelled without implying retroactive CLA
-  assent or relicensing;
-- which future files are CG Reports, software, test suites, or supporting
-  material, and which contribution terms apply to each;
-- whether the complete Workbench belongs in this `cg-report` repository as
-  non-normative reference software;
-- whether the charter is ratified and repository/editorial authority has
-  formally transferred; and
-- the contribution check/notice required on future pull requests.
+- importing the complete source history while retaining the target scaffold
+  history;
+- retaining Apache-2.0 for software and CC BY 4.0 for the ontology,
+  vocabulary, documentation, and other already designated material;
+- importing SSTIM and the complete Workbench into the same repository; and
+- presenting the Workbench, Graph Navigator, and Patch Studio as
+  non-normative reference software rather than automatically making them CG
+  Reports or normative specification components.
+
+The implemented path/artifact matrix and contribution boundary are recorded in
+[LICENSING.md](../../LICENSING.md). It preserves the imported grants and
+attribution, does not claim retroactive CLA assent, and explains how future W3C
+CG contributions coexist with the historical baseline. The target's
+`LICENSE.md` remains as governance/category guidance, not a blanket relicensing
+of imported work.
 
 Also review `CITATION.cff` and `.zenodo.json`: both currently classify the
 combined artifact as software while naming only CC BY 4.0, and `.zenodo.json`
@@ -319,21 +328,16 @@ names the old repository as `isSupplementTo`. Record the intended
 citation/license/repository presentation rather than mechanically changing
 either file during the import.
 
-The required output is an approved path/scope matrix: repository path or
-artifact class, pre-CG license, future-contribution terms, required notice, CG
-deliverable status, and responsible reviewer. Implement that matrix in the
-integration branch before merge. Merely placing Apache, CC BY, and W3C license
-files beside one another does not tell contributors or reusers which terms
-apply.
+`CITATION.cff` and `.zenodo.json` remain byte-for-byte unchanged during import.
+Their combined-artifact presentation and the existing Zenodo relationship need
+review before a future target Release, but do not block a source branch, tags,
+or history-only archival refs. No GitHub Release or DOI event is part of this
+gate.
 
-Until this answer exists, base-path work may proceed on a migration branch in
-the source repository, but the source history should not be pushed into the W3C
-repository. Do not “resolve” the question by replacing either repository's
-license file.
-
-**Gate classification:** blocks the first push of imported source history and
-the import merge. Exit requires the written authority decision plus the approved
-and implementable path/scope matrix.
+**Gate classification:** passed for publishing the source-bearing integration
+branch, annotated historical tags, and namespaced archival refs. It does not
+authorize production W3ID changes, registry edits, GitHub Release recreation,
+DOI changes, or archival of the old repository.
 
 ### Gate G1 — public Workbench shared-origin deployment decision
 
@@ -965,7 +969,7 @@ changes at breakpoints.
 | Complete source tree imported | File/mode/symlink parity against frozen source, with only scaffold reconciliation and reviewed migration commits in the exception ledger | Not yet migrated |
 | Tags preserved | Fresh clone exact tag name, annotated-object-ID, and peeled-commit-ID comparison | Not yet migrated |
 | GitHub Release/Zenodo disposition | All 14 Release records have the complete ledger; target recreation is deferred or explicitly approved; no webhook/deposit/DOI event fired | Admin integration audit pending |
-| Governance/license boundary | G0 authority recorded and approved path/license/contribution notices implemented without retroactive-CLA claims | **Import blocker; pending** |
+| Governance/license boundary | G0 authority recorded and approved path/license/contribution notices implemented without retroactive-CLA claims | **Passed; decision recorded in `LICENSING.md`** |
 | Full-history credential scan | Every imported ref/object scanned without disclosing values; any finding rotated/remediated before push | Not run |
 | Target ref security | Required checks/PRs enabled; force update/deletion prohibited on `main`, archival branches, and imported tags; merge-commit method available | Target currently unprotected; W3C admin required |
 | W3C status wording | CG/W3C contact approves accurate non-endorsement/status and provenance text | Pending |
@@ -1094,25 +1098,18 @@ cutover must not be bundled with the repository move.
 
 ## Questions for Pierre-Antoine Champin or W3C staff
 
-1. Is the CG charter now ratified, and has repository/namespace editorial
-   authority formally transferred?
-2. What is the approved treatment of pre-CG Apache-2.0 and CC BY 4.0 history
-   imported beside the target's W3C `LICENSE.md` and under the CG CLA process?
-3. Should the specification-facing artifacts, reference software, and test
-   suites carry distinct directory-level notices or contribution labels?
-4. Is the complete non-normative Workbench appropriate in a repository whose
-   `w3c.json` currently declares `cg-report`, and how should its status be shown?
-5. Must contributors to non-specification Workbench code join the CG, or does a
-   different contribution path apply?
-6. What status sentence and W3C/CG visual attribution are approved for the site?
-7. Which W3C organization Pages, Actions, environment, branch-protection, and
+1. Does W3C want an additional machine-readable or directory-level marker for
+   Apache-2.0 Workbench software and any future formally designated W3C Test
+   Suite beyond the scope already recorded in `LICENSING.md`?
+2. What status sentence and W3C/CG visual attribution are approved for the site?
+3. Which W3C organization Pages, Actions, environment, branch-protection, and
    release permissions will be available to maintainers?
-8. Is a dedicated origin recommended or available for a Workbench with private
+4. Is a dedicated origin recommended or available for a Workbench with private
    browser storage and optional Firebase authentication, while keeping the
    public CG site at `/sstim/`?
-9. How should the existing GitHub Releases and Zenodo/concept-DOI relationship
+5. How should the existing GitHub Releases and Zenodo/concept-DOI relationship
    move without minting or changing identifiers unintentionally?
-10. What review/authorization is expected before the production W3ID target PR?
+6. What review/authorization is expected before the production W3ID target PR?
 
 ## Required final migration report
 

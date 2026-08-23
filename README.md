@@ -401,5 +401,6 @@ across releases.
   [CC BY 4.0](LICENSE-ontology).
 - W3C Community Group contribution terms: [LICENSE.md](LICENSE.md). These
   artifact-specific terms do not retroactively relicense imported history.
+- Complete path, artifact, and contribution scope: [LICENSING.md](LICENSING.md).
 - Maintainer: Renato Fabbri,
   [ORCID 0000-0002-9699-629X](https://orcid.org/0000-0002-9699-629X).

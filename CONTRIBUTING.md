@@ -350,10 +350,14 @@ security surface is the preset catalog export pipeline.
 The W3C Community Group contribution instructions at the top of this document
 govern new substantive contributions. The imported baseline retains its
 Apache-2.0 software license, CC BY 4.0 ontology/documentation license, file-level
-notices, attribution, and complete development history. The Community Group
-must record a written scope-and-license disposition before the imported history
-is pushed to this repository; this document does not invent that legal result.
+notices, attribution, and complete development history. On 2026-08-23 the
+repository rights-holder/maintainer confirmed that the Community Group migration
+approval covers the complete history, preservation of those licenses, SSTIM and
+the complete non-normative SSTIM Workbench. The approved path and contribution
+scope is recorded in `LICENSING.md`.
 
 The three timestamped defensive publications named in `CLAUDE.md` remain
 immutable. See `LICENSE`, `LICENSE-ontology`, `LICENSE.md`, `NOTICE`, and the
 migration runbook for the distinct historical and W3C contribution contexts.
+Repository immutability protects the canonical provenance record; it does not
+restrict downstream adaptations permitted by CC BY 4.0.

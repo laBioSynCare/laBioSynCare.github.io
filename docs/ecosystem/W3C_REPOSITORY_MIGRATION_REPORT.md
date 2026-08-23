@@ -4,8 +4,8 @@
 - **Migration source:** `laBioSynCare/laBioSynCare.github.io`
 - **Migration target:** `w3c-cg/sstim`
 - **Candidate site:** `https://w3c-cg.github.io/sstim/`
-- **Status:** integration candidate complete locally; public import and target
-  deployment blocked at Gate G0
+- **Status:** Gate G0 approved; source publication and target validation in
+  progress
 - **Production W3ID cutover:** not performed
 - **Old repository archival:** not performed
 
@@ -16,15 +16,18 @@ dual-default-history integration candidate has been built and validated. It
 keeps the W3C repository's initial history, imports the current complete source
 tree and source-main history, makes the application work at `/sstim/`,
 establishes SSTIM Workbench branding, and stages the W3ID resolution contract
-without changing production rules. The separately named preservation refs for
-nine pull-request-only commits remain a post-G0 publication step.
+without changing production rules. On 2026-08-23, the repository
+rights-holder/maintainer confirmed that Community Group migration approval
+covers the complete history, the existing Apache-2.0/CC BY 4.0 license split,
+SSTIM, and the complete non-normative Workbench. Gate G0 is therefore passed;
+the implemented scope and future-contribution boundary are recorded in
+[`LICENSING.md`](../../LICENSING.md).
 
-The candidate is not yet published to a source-bearing target branch. That is
-deliberate. The target's W3C contribution terms and the imported repository's
-Apache-2.0, CC BY 4.0, and pre-Community-Group history need a written
-classification and acceptance from the appropriate W3C/Community Group
-authority. Publishing the imported history under `w3c-cg` before that decision
-would be a governance and licensing action, even if the branch were not merged.
+The candidate is ready for publication to a source-bearing target branch with
+the 14 annotated historical tags and namespaced archival refs for the nine
+pull-request-only commits. GitHub Releases, Zenodo/DOI actions, production W3ID,
+external registries, target `main`, and the old deployment remain outside this
+checkpoint.
 
 The following remote-safe work is complete:
 
@@ -83,10 +86,8 @@ rebase, archive copy, or replacement history.
 
 Nine additional source commits are reachable only through historical pull
 request refs, not source `main` or the surviving branch heads. They are retained
-in the audited source mirror. After G0, preserve them on the target under
-explicit archival names such as `archive/source-pr-*`; GitHub's reserved
-`refs/pull/*` must not be pushed. This is the one remaining Git-history
-publication step.
+in the audited source mirror and are to be published under explicit namespaced
+archival branches; GitHub's reserved `refs/pull/*` must not be pushed.
 
 The migration commits after the two-parent import are small, coherent stages:
 
@@ -180,13 +181,13 @@ The current UI no longer uses BSC Lab as the repository-wide public identity.
 
 ## Acceptance evidence
 
-All local checks below use the composed target-plus-source history. The live
-target entries remain pending because publishing the source-bearing branch is
-blocked at G0.
+All local checks below use the composed target-plus-source history. Gate G0 has
+passed; live target entries remain pending until the source-bearing branch and
+its pull request are published and checked.
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| Git history preserved | **PASS for both default histories; archival publication pending** | two-parent merge, both roots/ancestry and `git fsck` pass; nine PR-only commits remain safe in the offline mirror until namespaced refs can be published after G0 |
+| Git history preserved | **PASS for both default histories; archival publication in progress** | two-parent merge, both roots/ancestry and `git fsck` pass; nine PR-only commits are mapped to namespaced archival target refs |
 | Existing W3C repository history preserved | **PASS locally** | all five original target commits remain ancestors |
 | New GitHub Pages deployment healthy | **PENDING / cutover blocker** | target still intentionally serves its scaffold; local complete Pages artifact passes |
 | `/sstim/` routing works | **PASS locally** | mounted build and complete HTTP smoke pass; origin-root routes are not required |
@@ -228,13 +229,13 @@ Additional final results:
 
 | Finding | Cause | Severity | Blocks cutover? | Recommended action |
 |---|---|---:|---|---|
-| Gate G0 unresolved | Target W3C contribution/report terms and imported Apache-2.0, CC BY 4.0 and pre-CG contributions need an authoritative disposition | **High** | **Yes; blocks source-bearing target push** | Record written W3C/CG classification, continued license treatment, attribution and future contribution pathway |
+| Gate G0 | Community Group migration approval was confirmed for the complete history, existing licenses, SSTIM and complete Workbench; the path/contribution scope is recorded in `LICENSING.md` | **Resolved** | No | Preserve the recorded scope; do not infer retroactive CLA assent or relicensing |
 | Target Pages is still legacy `main`/root | The scaffold is already published directly from target `main` | **High** | **Yes** | Preserve recovery branch, switch Pages to Actions, configure the `github-pages` environment, and validate the draft branch before any merge to `main` |
 | Target `main` lacks protection | No protection/ruleset was visible; Maintain cannot configure it | **High** | **Yes for safe stewardship** | Admin establishes required reviews/status checks, blocks force pushes/deletion, and requires merge commits for the import |
-| Target integration inventory incomplete | Maintain cannot inspect Actions policy, hooks, deploy keys, installed Apps or all environment/org settings | **High for releases** | **Yes for tag/Release operations** | Admin/organization owner audits integrations, especially any release webhook/Zenodo app, before tags or Releases are recreated |
+| Target integration inventory incomplete | Maintain cannot inspect Actions policy, hooks, deploy keys, installed Apps or all environment/org settings | **High for releases** | **No for historical tag/archive publication; yes for GitHub Release recreation** | Admin/organization owner audits integrations, especially any release webhook/Zenodo app, before Releases are recreated |
 | Shared GitHub Pages origin | Browser storage and same-origin script access are origin-scoped, not path-scoped | **High for private/authenticated Workbench state** | **Yes for promises of private/stateful hosting; no for public spec/Graph deployment** | Obtain explicit threat-model acceptance or use a dedicated origin for stateful/authenticated Workbench features; keep target build credential-free meanwhile |
-| Nine PR-only commits not yet published on target | GitHub pull-request refs cannot be mirrored to reserved target refs and G0 prevents source publication | **Medium** | **Yes for declaring complete remote history** | After G0, push audited commits under namespaced archival branches and record their mapping |
-| Live target acceptance unavailable | Imported branch was intentionally not pushed/deployed | **High** | **Yes** | After G0/Admin preparation, push a draft integration branch and run CI plus live staged W3ID/browser acceptance |
+| Nine PR-only commits not yet published on target | GitHub pull-request refs cannot be mirrored to reserved target refs | **Medium** | **Yes for declaring complete remote history** | Push the audited commits under namespaced archival branches and record their mapping |
+| Live target acceptance unavailable | Imported branch has not yet been deployed; the current Pages environment permits only `main` | **High** | **Yes** | Push a draft integration branch and run PR CI; an Admin must authorize that branch in the Pages environment before live preview deployment |
 | WIDOCO changelog uses the network | WIDOCO downloads immutable v0.16.0 from production when creating its changelog; its Nix package also warns about a missing default config file | **Medium** | No for current artifact; should be fixed for fully offline reproducibility | Vendor or explicitly supply the prior release input and remove the implicit network dependency in follow-up work |
 | Optional `runtime-config.json` returns 404 in a credential-free build | Runtime configuration is deliberately optional and the target build contains no Firebase variables | **Informational** | No | Keep documented optional behavior; add a public config only after the shared-origin/security decision |
 | Large JavaScript chunk warning | Current application graph produces bundles above Vite's warning threshold | **Low** | No | Track performance/code splitting separately; do not mix it into migration |
@@ -290,7 +291,8 @@ Apply these distinctions:
   cosmetic link edit.
 - **BARTOC:** update mutable URL/repository fields after target acceptance;
   preserve BARTOC node `21154` and `https://w3id.org/sstim`. Change publisher or
-  steward only after G0 records the governance transfer.
+  steward only after the governance transfer is reflected in an accepted target
+  deployment and the record owner confirms the intended publisher label.
 - **Other registries:** preserve the `sstim` prefix, BioPortal ontology
   identity/acronym, FAIRsharing record `8494`, DOI identities, immutable release
   URLs/hashes and canonical SSTIM IRIs. Update only mutable location/contact
@@ -302,51 +304,46 @@ No registry was modified during this checkpoint.
 
 ## Exact remaining sequence before W3ID cutover
 
-1. Obtain written Gate G0 disposition for the pre-CG history, existing license
-   split, W3C CG contribution pathway and non-normative Workbench classification.
-2. Have a target Admin/organization owner protect `main`, configure Actions and
+1. Have a target Admin/organization owner protect `main`, configure Actions and
    the `github-pages` environment, and audit hooks, Apps, deploy keys and Zenodo.
-3. Decide whether stateful/authenticated Workbench features are acceptable on
+2. Decide whether stateful/authenticated Workbench features are acceptable on
    the shared `w3c-cg.github.io` origin. Keep the public deployment local-only
    and credential-free unless/until that decision says otherwise.
-4. Push the integration candidate as a non-main branch, plus audited namespaced
+3. Push the integration candidate as a non-main branch, plus audited namespaced
    archival refs and tags. Do not recreate Releases yet.
-5. Open a draft pull request and require the full CI/build/validation matrix.
-6. Deploy the branch through Actions at `/sstim/`, without changing production
+4. Open a draft pull request and require the full CI/build/validation matrix.
+5. Deploy the branch through Actions at `/sstim/`, without changing production
    W3ID or the old repository.
-7. Run the live acceptance matrix: routes/assets, Graph term links, Patch Studio,
+6. Run the live acceptance matrix: routes/assets, Graph term links, Patch Studio,
    worklet/WASM, PWA scope/cache containment, SPARQL, generated docs, all RDF
    representations, contexts/profiles/schemas, immutable releases and staged
    W3ID rules.
-8. Compare target artifacts and behavior with the old production deployment;
+7. Compare target artifacts and behavior with the old production deployment;
    resolve every cutover-blocking difference.
-9. Merge with a merge commit only after review. Confirm the target Pages build
+8. Merge with a merge commit only after review. Confirm the target Pages build
    identifies the accepted commit.
-10. Update mutable repository/home/documentation links in external registries.
+9. Update mutable repository/home/documentation links in external registries.
     Move machine-ingest URLs only after their frozen artifacts are accepted.
-11. Obtain a separate explicit authorization for production W3ID cutover; open
+10. Obtain a separate explicit authorization for production W3ID cutover; open
     the `perma-id/w3id.org` pull request and require its authoritative tests.
-12. Monitor HTML and RDF content negotiation after merge. Keep old production
+11. Monitor HTML and RDF content negotiation after merge. Keep old production
     operational as rollback/fallback. Archive or redirect it only through a
     later explicit decision.
 
 ## Questions for Pierre-Antoine Champin / W3C staff
 
-1. How should the complete pre-Community-Group Git history be recorded under
-   `w3c-cg/sstim` while preserving its existing Apache-2.0/CC BY 4.0 licensing
-   and attribution alongside future W3C CG contributions?
-2. Is the complete non-normative SSTIM Workbench—including audiovisual engines,
-   Graph Navigator and Patch Studio—accepted in the CG repository's `cg-report`
-   scope, or should any W3C repository classification metadata distinguish it?
-3. Who should be listed as publisher/steward in BARTOC, BioPortal and related
+1. Does W3C want any additional machine-readable classification beyond
+   `LICENSING.md` for the Apache-2.0 Workbench and any future formally
+   designated W3C Test Suite?
+2. Who should be listed as publisher/steward in BARTOC, BioPortal and related
    registries after the governance move, without implying Recommendation status?
-4. Which target administrator or organization owner can configure repository
+3. Which target administrator or organization owner can configure repository
    rules, Actions policy, the Pages environment and the required GitHub App/
    webhook audit?
-5. Is a stateful/authenticated application considered acceptable on the shared
+4. Is a stateful/authenticated application considered acceptable on the shared
    `w3c-cg.github.io` origin, or should the Workbench use a dedicated origin
    while the specification and Graph Navigator remain on W3C Pages?
-6. Should the historical Zenodo concept/version DOI relationship remain managed
+5. Should the historical Zenodo concept/version DOI relationship remain managed
    through the existing repository integration, be reconnected to
    `w3c-cg/sstim`, or be left frozen until a future CG release policy is agreed?
 
