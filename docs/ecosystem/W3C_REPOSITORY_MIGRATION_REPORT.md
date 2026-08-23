@@ -35,6 +35,9 @@ The following remote-safe work is complete:
   `pages/pre-migration-scaffold` at
   `7d4a4a76a9d6eb8b6a49c7d5525bce5223c7b433`. This branch contains no imported
   source and is a recovery point, not a Pages source.
+- The committed integration candidate is durably preserved on the old
+  repository's non-production `migration/w3c-integration` branch. This does not
+  change source `main`, its Pages deployment, or target repository state.
 - Target `main` and its live scaffold Pages deployment remain unchanged.
 
 ## What was migrated in the local integration candidate
@@ -351,6 +354,7 @@ No registry was modified during this checkpoint.
 
 The migration can stop here without affecting production. The source has the
 reviewed decision/runbook, both repositories have backups, the W3C scaffold has
-a recovery branch, the integration candidate is committed locally, target
-`main` still serves its original scaffold, old production is healthy, and
-production W3ID continues to resolve through the old deployment.
+a recovery branch, the integration candidate is committed and remotely
+preserved on the source staging branch, target `main` still serves its original
+scaffold, old production is healthy, and production W3ID continues to resolve
+through the old deployment.
