@@ -7,6 +7,9 @@
   Workbench, confirmed by the repository rights-holder/maintainer on 2026-08-23
 - **Gate G0 disposition:** passed on 2026-08-23; see
   [the licensing and contribution scope](../../LICENSING.md)
+- **Gate G1 disposition:** passed on 2026-08-23; the shared-origin threat model
+  is accepted for the public Workbench deployment (option 3), recorded in the
+  Gate G1 section below
 - **Scope:** repository stewardship and publication-host migration
 - **Not authorized by this document:** production W3ID cutover, ontology
   redesign, relicensing, DOI changes, or archival of the existing repository
@@ -371,6 +374,32 @@ Firebase browser tokens.
 publishing the stateful Workbench at the shared origin. Its exit evidence is the
 approved option, the implemented feature/copy matrix, and browser tests of the
 resulting storage/authentication posture.
+
+**Disposition, recorded 2026-08-23.** Option 3: the shared-origin threat model
+is accepted for the public Workbench at `https://w3c-cg.github.io/sstim/`,
+confirmed by the repository rights-holder and maintainer. What the acceptance
+does and does not cover, stated here so nobody has to reconstruct it later:
+
+- The two isolation defects this gate named are **fixed in code, not waived**.
+  `src/service-worker.js` derives its cache names from a prefix carrying the
+  deployment mount and retires only caches under that exact prefix, and its
+  `fetch` handler returns early for any same-origin path outside the deployment.
+  A request from an SSTIM client to a sibling project path is therefore neither
+  handled nor cached by the SSTIM worker.
+- What is **accepted rather than fixed** is Web Storage and IndexedDB. The
+  platform scopes both to the origin, so annotations, logbooks and Settings
+  written by the Workbench are readable by any other page published under
+  `w3c-cg.github.io`. The "private" visibility chip in the annotation panel
+  means "not published to the ecosystem graph", never "isolated from other pages
+  on this origin".
+- The deployed build carries **no Firebase configuration and no authentication
+  surface**, so no credential or browser token is exposed by this acceptance.
+  Enabling authentication later reopens this gate; it does not inherit this
+  answer.
+- If the posture is later rejected, the remedy is a dedicated application origin
+  (option 2). That changes the deployment target, not the repository layout, and
+  the central base strategy from Checkpoint 3 is what keeps it a configuration
+  change.
 
 ### Gate G2 — checkpoint owners and operational authority
 
@@ -984,9 +1013,9 @@ changes at breakpoints.
 | Worklet/WASM | Network 200 from `/sstim/`, processor registration, audible/rendered session behavior | Fails by inspection with current root URLs |
 | Pages WASM posture | Real Pages MIME/compile test passes for current non-threaded WASM; site does not claim COOP/COEP or threaded-WASM support | Not tested |
 | PWA install/scope | Manifest valid; scope `/sstim/`; install/offline/update passes | Fails by inspection with current manifest/SW |
-| Cache isolation | Only SSTIM-owned caches deleted across an update | **Target Workbench deployment blocker** |
-| Fetch isolation | A request from an SSTIM client to a sibling project path is neither handled nor cached by the SSTIM worker | **Target Workbench deployment blocker** |
-| Browser-data posture | Gate G1 option and its feature/copy matrix are implemented and browser-verified | **Unresolved** |
+| Cache isolation | Only SSTIM-owned caches deleted across an update | Implemented: mount-scoped cache prefix, only owned caches retired |
+| Fetch isolation | A request from an SSTIM client to a sibling project path is neither handled nor cached by the SSTIM worker | Implemented: `fetch` returns early outside the deployment mount |
+| Browser-data posture | Gate G1 option and its feature/copy matrix are implemented and browser-verified | **Resolved: option 3 accepted 2026-08-23** |
 | User state transition | Automated two-origin gate plus old Settings export/new Settings import with synthetic data; PWA reinstall instructions | Not tested |
 | Build/unit checks | `make test` and `make check` (plus project-base browser tests) | Must rerun on migration commit |
 | Reproducible/self-hosted deployment | Existing NixOS VM, non-root OCI, static smoke, and two-origin migration gates remain green | Must rerun on migration commit |
