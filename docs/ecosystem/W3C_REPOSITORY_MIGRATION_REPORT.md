@@ -70,10 +70,19 @@ public Workbench. That decision and the distinction it rests on (cache and fetch
 isolation fixed in code; Web Storage and IndexedDB accepted as origin-scoped)
 are recorded in the plan's Gate G1 section.
 
-One correction to an inherited number, made by measurement rather than by
-repeating the plan: the plan says 28 manifest runtime values. Extracting `"url"`
-from the live `static/ontology/manifest.json` gives **22**, and all 22 return 200
-from the project path. 22 is the measurement.
+A correction, and then a correction of the correction, both kept because the
+second is the more useful lesson. This report first said the plan's "28 manifest
+runtime values" was an unmeasured inherited number and that the true count was
+22. That was wrong. The extractor behind the 22 matched only keys literally named
+`url`, so it saw 18 modules and 4 profiles and silently missed the six
+namespace-document URLs, which are named `turtleUrl`, `jsonLdUrl` and
+`rdfXmlUrl`. 18 + 4 + 6 = **28**, the plan's number was right, and all 28 return
+200 from the project path.
+
+The failure is exactly the one `CLAUDE.md` §3.6 describes, committed while
+invoking it: an instrument was named, but nobody checked it could see everywhere
+the thing lives. A grep for one key name is not a census of a schema with three
+more.
 
 ### Fresh-clone preservation proof
 
@@ -345,7 +354,7 @@ Additional final results:
 |---|---|---|
 | Deployed commit identity | `verify-deploy.mjs` in the deploy job | **PASS**: serves `773d64cd`, app 0.1.0, SSTIM 0.17.0-dev |
 | Prerendered routes at `/sstim/` | `curl` on each route | **PASS**: 13 of 13 return 200 on direct hit |
-| Manifest runtime endpoints | `curl` over `"url"` values extracted from the live manifest | **PASS**: 22 of 22 |
+| Manifest runtime endpoints | `curl` over every runtime URL in the live manifest: `url` on modules and profiles, `turtleUrl`/`jsonLdUrl`/`rdfXmlUrl` on namespace documents | **PASS**: 28 of 28 |
 | Local instance endpoints | `curl` over `INSTANCE_URLS` | **PASS**: 21 of 21 |
 | External ecosystem store | `curl` | **PASS**: 200, unchanged |
 | Generated documentation | `curl` on WIDOCO and pyLODE indexes plus their local assets | **PASS** with two pre-existing broken links, M-02 and M-03 |

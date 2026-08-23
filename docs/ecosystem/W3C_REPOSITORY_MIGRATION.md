@@ -1025,7 +1025,7 @@ changes at breakpoints.
 | Interoperability | Existing HED/BIDS/crosswalk and session-conformance gates remain green | **PASS**: inside the same run |
 | WIDOCO | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-02 (pre-existing OOPS link 404) |
 | pyLODE | Clean generation and `/sstim/` link/assets check | **PASS** with ledger entry M-03 (pre-existing sibling `.ttl` 404) |
-| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all runtime, local instance, and external values pass | Endpoints **PASS** (22 measured runtime, not 28; 21 local; 1 external). **Path semantics unresolved: ledger M-01** |
+| Context/profile/schema/manifest | Every live endpoint/media type works; manifest path semantics approved; all 28 runtime, 21 local instance, and one external values pass | Endpoints **PASS** (28 of 28 runtime, 21 of 21 local, 1 external). **Path semantics: ledger M-01, authorized for repair 2026-08-23** |
 | Immutable releases | Before/after hash manifests identical; target returns identical bodies | **PASS**: 7 of 7 sampled artifacts byte-identical across origins |
 | DOI/VoID/DCAT | Concept DOI `10.5281/zenodo.21286974` and v0.16.0 DOI `10.5281/zenodo.22003777` resolve to the same records; no deposit/concept DOI was created; frozen DOI-bearing metadata is identical | **PASS**: both resolve to record 22003777; `CITATION.cff` and `.zenodo.json` unchanged |
 | External registries | Network-capable verification records each registry result without changing records | 3 verified, 1 unreachable (LOV, M-05), 1 wrong (Archivo 406, M-04, independent of this migration) |
