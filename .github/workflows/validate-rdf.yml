@@ -1,19 +1,14 @@
 name: Validate RDF
 
+# No `paths:` filter on pull_request, deliberately. `RDF validation (Nix)` is a
+# required status check on a protected `main`, and GitHub blocks a pull request
+# whose required check never reports, which is exactly what a path filter causes
+# on a documentation-only change. The filter moved inside the job instead: the
+# relevance step below decides whether to run the validators or finish early, so
+# the check always reports and a docs PR still costs seconds rather than twelve
+# minutes. Push keeps its filter; nothing requires the check there.
 on:
   pull_request:
-    paths:
-      - 'static/ontology/**'
-      - 'test/**'
-      - 'src/rdf/**'
-      - 'scripts/sstim-*.py'
-      - 'scripts/sstim-*.mjs'
-      - 'scripts/export-ontology.py'
-      - 'docs/ecosystem/w3id/**'
-      - 'Makefile'
-      - 'flake.nix'
-      - 'flake.lock'
-      - '.github/workflows/validate-rdf.yml'
   push:
     branches:
       - main
@@ -47,9 +42,42 @@ jobs:
           fetch-tags: true
           fetch-depth: 0
 
+      # The path filter that used to live under `on:`. Same list, evaluated here
+      # so the required check still reports on a change that touches none of it.
+      - name: Decide whether this change can affect RDF
+        id: relevant
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Fail open. If the base cannot be resolved, run the validators rather
+          # than let an unmeasurable diff read as "nothing to check".
+          if ! git fetch --quiet --depth=1 origin "${{ github.base_ref }}"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Could not fetch the base ref; running the validators."
+            exit 0
+          fi
+          base="$(git merge-base FETCH_HEAD HEAD 2>/dev/null || true)"
+          if [ -z "$base" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Could not find a merge base; running the validators."
+            exit 0
+          fi
+          changed="$(git diff --name-only "$base" HEAD)"
+          echo "Changed files:"; printf '%s\n' "$changed"
+          if printf '%s\n' "$changed" | grep -qE \
+            '^(static/ontology/|test/|src/rdf/|docs/ecosystem/w3id/|Makefile$|flake\.(nix|lock)$|\.github/workflows/validate-rdf\.yml$|scripts/(sstim-.*\.(py|mjs)|export-ontology\.py)$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No RDF-relevant path changed; the validators have nothing to see."
+          fi
+
       # Toolchain (python3.12 + pyshacl + ROBOT) comes from the pinned flake
       # devShell, so local `make validate` and CI run the same validators.
       - name: Install Nix
+        if: steps.relevant.outputs.run == 'true'
         uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -57,6 +85,7 @@ jobs:
 
       # Nix pins the toolchain; this caches the npm package downloads only.
       - name: Cache npm downloads
+        if: steps.relevant.outputs.run == 'true'
         uses: actions/cache@v5
         with:
           path: ~/.npm
@@ -66,6 +95,7 @@ jobs:
       # `make validate` runs the SPARQL sanity and ecosystem runtime contract
       # suites, which import N3, Comunica, Vitest, and rdf-validate-shacl.
       - name: Install dependencies
+        if: steps.relevant.outputs.run == 'true'
         run: nix develop --command npm ci
 
       # -j4 because validate's prerequisites are independent scripts working in
@@ -84,4 +114,5 @@ jobs:
       # small to claim anything. Collect samples before tuning -j further, and
       # drop to plain `make validate` when bisecting a flaky gate.
       - name: Run RDF, SHACL, OWL, quality, query, and export validation
+        if: steps.relevant.outputs.run == 'true'
         run: nix develop --command make -j4 -Otarget validate
