@@ -71,13 +71,16 @@ CURL_NOTES = {
 }
 
 
-def fetch(url: str, timeout: int) -> tuple[int | None, str, str]:
+def fetch(url: str, timeout: int, accept: str | None = None) -> tuple[int | None, str, str]:
     """(status, body, note). status None means the instrument could not reach it."""
     if shutil.which("curl") is None:
         return None, "", "curl not installed"
+    headers = ["-H", UA["User-Agent"] and f"User-Agent: {UA['User-Agent']}"]
+    if accept:
+        headers += ["-H", f"Accept: {accept}"]
     result = subprocess.run(
         ["curl", "-sSL", "--max-time", str(timeout), "-w", "\n%{http_code}",
-         "-H", UA["User-Agent"] and f"User-Agent: {UA['User-Agent']}", url],
+         *headers, url],
         capture_output=True, text=True,
     )
     if result.returncode != 0:
@@ -122,13 +125,21 @@ def main() -> int:
             )
 
     # ── presence checks: a URL that must answer 200 ──────────────────────────
+    # The Accept column is not decoration. Archivo's revived `/info` endpoint
+    # answers 200 to `Accept: text/html`, 307 to `text/turtle`, and **406 to
+    # `*/*` and to a request with no Accept header at all** (measured
+    # 2026-08-24). Both of those mean "any media type is acceptable" under
+    # RFC 9110, so 406 is wrong and it breaks every plain client, this checker
+    # included. Asking for HTML is also what this check actually means: the
+    # human-readable record page answers. Drop the header only once upstream
+    # stops 406-ing `*/*`; see docs/ontology/REGISTRY_SUBMISSIONS.md.
     presence = [
-        ("BARTOC node 21154", "https://bartoc.org/en/node/21154"),
-        ("FAIRsharing 8494", "https://fairsharing.org/8494"),
-        ("Archivo record", "https://archivo.dbpedia.org/info?o=https://w3id.org/sstim"),
+        ("BARTOC node 21154", "https://bartoc.org/en/node/21154", None),
+        ("FAIRsharing 8494", "https://fairsharing.org/8494", None),
+        ("Archivo record", "https://archivo.dbpedia.org/info?o=https://w3id.org/sstim", "text/html"),
     ]
-    for name, url in presence:
-        status, _body, note = fetch(url, args.timeout)
+    for name, url, accept in presence:
+        status, _body, note = fetch(url, args.timeout, accept)
         if status is None:
             incomplete.append(f"{name} unreachable ({note})")
         elif status == 200:

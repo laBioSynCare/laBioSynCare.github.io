@@ -91,7 +91,7 @@ and schema must be deployed and the perma-id matrix verified first.
 > | prefix.cc | **was wrong** — slash where the ontology has a hash; corrected the same day, see below |
 > | BARTOC · FAIRsharing | verified 200 |
 > | LOV | absent, confirmed against a `skos` control that answered 200 |
-> | OLS4 #1351 · KG Catalog #46 | both still **open**, no maintainer response yet |
+> | OLS4 #1351 · KG Catalog #46 | both still **open**, no maintainer response yet (both answered since: OLS4 on 2026-08-20, KG Catalog listed 2026-08-24) |
 > | DBpedia Archivo | **INCOMPLETE** — timed out; `dbpedia.org` itself also failed to answer, so this is their infrastructure and says nothing about our record |
 > | BioPortal | **INCOMPLETE** — the web UI answers 403 to a plain client and the REST API 401 without an API key, so neither confirms nor denies the entry below |
 
@@ -102,10 +102,10 @@ and schema must be deployed and the perma-id matrix verified first.
 | LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
 | BioPortal | ⚠️ **live but had been ingesting development lines** — the nightly pull URL served whatever was on `main`, so submissions read 0.15.0-dev, 0.16.0-dev, 0.17.0-dev. Fixed at source 2026-08-19: the URL now serves the frozen release. The portal keeps a stale `Version IRI` of 0.14.0 from the last submission that carried one and needs one clean pull of 0.16.0 to correct itself. Observed on the public page 2026-08-19; the REST API needs a key | account ✓ (@rfabbri) | **watch the next nightly** |
-| FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06, DOI still pending | yes | — |
+| FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06. **DOI assigned 2026-08-24**: [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4), which resolves to the FAIRsharing record (verified 2026-08-24). It identifies the *record*, not a release, so it does not belong beside the Zenodo version DOIs in `CITATION.cff` or `void.ttl` | yes | — |
 | OLS4 | 🕓 **PR open, under review** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. A collaborator (@haideriqbal) asked on 2026-08-20 for the biomedical use case, the developing group or institute, and the long-term maintenance plan; **answered 2026-08-21**, including an offer to bump `ontology_purl` to the shipped 0.16.0 or switch to a rolling URL | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
-| DBpedia KG Catalog | 🕓 **submitted** — [issue #46](https://github.com/m1ci/lod-next-gen/issues/46); awaiting the `new-kg` label, which a non-collaborator cannot set, so their validation has not run. Re-checked 2026-08-18 via `gh`: open, **still no labels**, one comment and it is ours | yes (GitHub) | watch |
+| DBpedia KG Catalog | ✅ **listed 2026-08-24** — [kg-catalog](https://kg-catalog.dbpedia.org/kg.html?id=sstim) and [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), both 200. @m1ci (Milan Dojčinovski) applied the `new-kg` label, triggered the workflow by hand and fixed a bug in it; metadata validation passed. Record content verified against the frozen snapshot the same day: 545 SKOS concepts and 67 schemes are exactly what `0.15.0` holds. **It is pinned to `0.15.0` / artifact `2026.08.17`**, one release behind the shipped `0.16.0`, and whether it re-crawls or needs a per-release resubmission is unanswered. [Issue #46](https://github.com/m1ci/lod-next-gen/issues/46) still open | yes (GitHub) | ask about refresh |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
 ---
@@ -485,6 +485,39 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     updater date and the download 500 once he reports the
                     Databus fixed**; do not assume this document's numbers still
                     hold after that.
+
+                    **Re-measured 2026-08-24, and the revival did not restart the
+                    updater.** `archivo.dbpedia.org/list` answers and serves 2010
+                    ontologies, but exactly one of them has any activity later
+                    than 2026-02-23, and it is our own row, which the listing
+                    flags `user-suggestion` (`2026.08.17-195305`). The gap
+                    between 2026-02-23 and that date is empty. Consistent with
+                    @Vehnem's own diagnosis rather than a new fault: a revived
+                    frontend over a broken Databus backend looks exactly like
+                    this. Note the trap, since the naive reading is the wrong
+                    one: the newest stamp on the listing is 2026-08-17, which
+                    looks like a resumed crawl, but it is our manual submission
+                    and a row carries two date columns, so a stamp count reports
+                    it twice.
+
+                    **A second regression the revival introduced, found by
+                    `make registry-verify` on 2026-08-24.** The record page
+                    `archivo.dbpedia.org/info?o=https://w3id.org/sstim` now
+                    negotiates like this:
+
+                      Accept: text/html    ->  200
+                      Accept: text/turtle  ->  307
+                      Accept: */*          ->  406
+                      (no Accept header)   ->  406
+
+                    Under RFC 9110 both `*/*` and an absent Accept header mean
+                    any media type is acceptable, so 406 is wrong for both, and
+                    it breaks every plain client: `curl` with no header, most
+                    scripts, and this repository's own registry gate, which is
+                    how it surfaced. The gate now sends `Accept: text/html`,
+                    which is what the check means anyway, with the reason
+                    recorded at the call site. Remove that header once upstream
+                    stops 406-ing `*/*`. Not yet reported to dbpedia/archivo.
 
                     #59 also drew a first-time contributor, @Vansh1419, who
                     opened
