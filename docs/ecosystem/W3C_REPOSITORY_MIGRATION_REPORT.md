@@ -544,6 +544,36 @@ What remains:
 5. **Decide the GitHub Release and Zenodo relationship** for the target before
    any first tag operation there. Nothing has been minted or moved, and the
    organization integration audit (hooks, Apps, deploy keys) is still owed.
+
+   **Enquiry open with Zenodo: Ticket #3326190**, "GitHub repository migration:
+   preserve existing Zenodo DOI series", sent 2026-08-23 03:29 and
+   auto-acknowledged the same minute by `support@zenodo.org`. No substantive
+   reply as of 2026-08-24. Do not re-open the question while it is pending, and
+   record the answer here when it arrives.
+
+   The ask is to keep the existing concept DOI `10.5281/zenodo.21286974` and go
+   on depositing new versions into it, so the repository move stays invisible to
+   the citation record. That is the outcome to prefer, because the alternative
+   costs more than it appears to: a new concept DOI leaves every existing
+   citation pointing at a series that silently stops advancing at 0.16.0, splits
+   the version chain and the metrics, and touches the twelve files that carry
+   the DOI, several of which `make truth-audit` cross-checks. Zenodo's
+   `relatedIdentifiers` (`IsContinuedBy` / `Continues`) can signpost between two
+   series but cannot merge them: concept DOI A would still resolve only to A's
+   last version.
+
+   Worth putting to them as a narrower fallback if a transfer is refused: the
+   concept DOI belongs to the Zenodo *record*, not to the GitHub repository, and
+   the webhook is a convenience rather than the only path. Publishing a new
+   version into the existing record from the Zenodo UI or API, sourced from
+   whichever repository, would preserve one continuous series without needing
+   anything transferred.
+
+   **Binding regardless of the answer: connect Zenodo to exactly one
+   repository.** Both repositories now carry identical commits, so the next
+   release tag will exist in both. Two connected repositories would mint two
+   deposits and two DOIs for one artifact, which is worse than either option
+   above. Decide which repository owns deposits before the next tag is cut.
 6. **Publish user transition instructions**, and keep both origins reachable
    through the transition window. Tracked in `TODO.md`. The data path is proven
    across both origins; the installed app is not transferable at all, because a
