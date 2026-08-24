@@ -21,8 +21,8 @@
   // cannot leave the social preview quoting the old one.
   const SHARE_TITLE = 'Sensory stimulation, made open and reproducible'
   const SHARE_DESCRIPTION =
-    'An open knowledge graph, an executable lab, and a community for designing ' +
-    'and describing auditory, visual, and cross-modal stimulation.'
+    'An open formalized knowledge standard, its reference Workbench, and a community ' +
+    'for describing and building auditory, visual, and cross-modal stimulation.'
 
   // Display order decided 2026-07-13: Understand leads (PUBLIC_ENTRANCE.md).
   // Join/Contribute live once, inline in door ④ — not repeated in a hero or
@@ -87,10 +87,10 @@
         { label: 'Join the W3C group', href: W3C_GROUP_URL, external: true },
         { label: 'Contribute a protocol', action: 'contribute' },
       ],
-      // Back to one secondary link. The ecosystem brief was tried here and
-      // moved to the hero: a reader who cannot yet place SSTIM Workbench
-      // against BioSynCare will not scroll to the fourth card to find that
-      // out. The internal integration tracker was tried here too and is the
+      // Back to one secondary link. The ecosystem architecture was tried here
+      // and moved to the hero: a reader who cannot yet place SSTIM Workbench
+      // against BioSynCare will not scroll to the fourth card to find it. The
+      // internal integration tracker was tried here too and is the
       // wrong artifact for a visitor — 500 lines of open workstreams and
       // outreach notes; it stays linked from About.
       secondary: [
@@ -125,7 +125,7 @@
 </script>
 
 <svelte:head>
-  <title>SSTIM · Sensory stimulation, made open and reproducible</title>
+  <title>SSTIM Workbench · Sensory stimulation, made open and reproducible</title>
   <!-- No `name="description"` here: svelte:head appends rather than replaces,
        so this page used to emit two conflicting description tags with the
        shell's weaker one first. app.html now carries SHARE_DESCRIPTION as the
@@ -139,7 +139,7 @@
        script that could read the origin back. Title and description are
        origin-independent and carry the summary card on their own. -->
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="SSTIM" />
+  <meta property="og:site_name" content="SSTIM Workbench" />
   <meta property="og:title" content={SHARE_TITLE} />
   <meta property="og:description" content={SHARE_DESCRIPTION} />
   <meta name="twitter:card" content="summary" />
@@ -156,14 +156,12 @@
          sentence, the <title> and og:title as labels. -->
     <h1>{SHARE_TITLE}.</h1>
     <p class="subhead">{SHARE_DESCRIPTION}</p>
-    <!-- The one thing the four doors cannot do: place the project layers against
-         each other. A visitor who does not yet know how SSTIM Workbench and
-         BioSynCare relate cannot tell which door is theirs, so the overview
-         sits above them rather than behind door ④. One line, no button — the
-         hero stays a hero. -->
+    <!-- The four doors answer what a visitor can do, while the dedicated page
+         explains what belongs to the ecosystem and how its relationships are
+         classified. One line, no button — the hero stays a hero. -->
     <p class="hero-orientation">
-      New here? <a href={applicationRoute('/about/#ecosystem')}>See how the pieces fit</a> — how
-      the knowledge graph, this platform, and the applications fit together.
+      New here? <a href={applicationRoute('/ecosystem/')}>Explore the SSTIM ecosystem</a> — how
+      the standard, Workbench, community, and separate applications relate.
     </p>
   </header>
 
@@ -203,10 +201,10 @@
   <footer class="entrance-footer">
     <p class="one-liner">
       <span>
-        SSTIM is work of the
+        SSTIM is developed through the
         <a href={W3C_GROUP_URL} rel="external">W3C Sensory Stimulation Vocabulary Community Group</a>.
-        Its open specification and reference tooling were contributed as the group's initial
-        technical baseline; historical development provenance is preserved in Git.
+        SSTIM Workbench is SSTIM's non-normative reference environment; historical development
+        provenance is preserved in Git.
       </span>
     </p>
     <p class="footer-links">
@@ -222,10 +220,12 @@
       <span aria-hidden="true"> · </span>
       <a href={GITHUB_URL} rel="external">GitHub</a>
       <span aria-hidden="true"> · </span>
+      <a href={applicationRoute('/ecosystem/')}>Ecosystem</a>
+      <span aria-hidden="true"> · </span>
       <!-- The separate commercial application, named as such: an unqualified
            "BioSynCare" in the footer of the open platform is exactly the
-           conflation CLAUDE.md §11 exists to prevent. About explains the
-           relationship in full, one link along. -->
+           conflation CLAUDE.md §11 exists to prevent. The Ecosystem page
+           explains the relationship in full. -->
       <a class="with-mark" href={BIOSYNCARE_URL} rel="external"
         ><Isotype name="biosyncare" size={17} />BioSynCare (commercial app)</a
       >

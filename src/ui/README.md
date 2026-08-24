@@ -117,7 +117,7 @@ optional Firebase sign-in.
 ## `navigation/`, `theme/`, `safety/`, `auth/`
 
 - **navigation/** — `AppTopBar.svelte` (graph scope/search/fit + keyboard help +
-  the global `+` menu), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
+  the global `+` menu, including the Ecosystem architecture page), `AppBottomDock.svelte` (Graph · Patch Studio · Presets ·
   SPARQL · Logbook · Settings · About), `ProfileControl.svelte`,
   `graphNavigation.js`. Sensory Field is discoverable through Studio's starter
   palette rather than represented as another application screen.

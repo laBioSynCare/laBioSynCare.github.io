@@ -13,17 +13,20 @@
 
 ## 1. What This Project Is
 
-**SSTIM** is the overall open specification, RDF vocabulary, semantic
-infrastructure, reference tooling, and Community Group project. Its executable
-reference environment is **SSTIM Workbench** (formerly presented publicly as
-BSC Lab), with two integrated layers:
+**SSTIM** is the open formalized knowledge standard: its specification, RDF
+vocabulary, semantic infrastructure, documentation, interoperability work, and
+shared identifiers. The **SSTIM ecosystem** is broader: SSTIM, its reference
+tooling and community, plus sensory-stimulation applications and initiatives
+whether they adopt SSTIM, contribute to or support it, or are related through
+documented domain relevance. Its executable reference environment is **SSTIM
+Workbench** (formerly presented publicly as BSC Lab), with two integrated layers:
 
 1. **Stimulation layer** — a precision multi-engine audiovisual stimulation application
    (Web Audio API, PixiJS, haptics) that delivers sensory entrainment sessions
    via configurable preset parameter sets.
 
 2. **Knowledge layer** — an RDF knowledge graph browser, annotator, and SPARQL
-   query interface for the BSC ontology: OWL class hierarchy, SKOS vocabulary,
+   query interface for the SSTIM ontology: OWL class hierarchy, SKOS vocabulary,
    SHACL validation shapes, and linked evidence chains.
 
 SSTIM Workbench is non-normative reference software; co-location does not make
@@ -36,6 +39,18 @@ is the intended narrow interface, but no Patch Studio→catalog converter or
 `dist/presets.json` pipeline exists. A future adapter is optional,
 version-pinned, and must not make BioSynCare requirements part of SSTIM or the
 native Studio model. Do not conflate the projects.
+
+**Public ecosystem architecture.** BioSynCare adopts and contributes to SSTIM,
+participates in the SSTIM ecosystem, and is the center of its own overlapping
+application ecosystem. Ecosystem inclusion is relational: it never implies
+ownership, affiliation, endorsement, transitive component membership, or
+application-wide conformance. The W3C Community Group belongs to the SSTIM
+ecosystem and is connected to the BioSynCare application ecosystem through
+SSTIM, while remaining independent. Do not confuse this broad relationship
+sense with the narrower production-membership record at
+`https://w3id.org/sstim/ecosystem/biosyncare` (ADR 0047), in which the Community
+Group is not a programme component. The canonical public explanation and
+applications/initiatives directory are at `/ecosystem/` inside the Workbench.
 
 **Maintained by:** Renato Fabbri (PhD physics, musical composition, creator of the
 `music` Python package on PyPI). Scientific advisor: Juliana Braga de Salles Andrade
@@ -756,7 +771,8 @@ mirror automatically — fix violations rather than passing `--no-verify`.
 ## 11. Relationship to BioSynCare
 
 BioSynCare is the commercial application (React Native, separate repository).
-BSC Lab is the open-source research and development platform.
+SSTIM Workbench is SSTIM's non-normative open reference environment; BSC Lab is
+its preserved historical public identity and remains in stable records and IRIs.
 
 The intended interface between them is the documented preset JSON format. The
 converter, JSON Schema, `dist/presets.json` export, and consumer contract are
@@ -765,14 +781,15 @@ named catalog version, report unsupported/lossy mappings, validate before
 exchange, and coordinate schema changes with the BioSynCare repository. See
 `docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`.
 
-BSC Lab code does not import from BioSynCare. BioSynCare code does not import from
-BSC Lab. Any future exchange is validated preset JSON through the explicit
-adapter—not code, RDF dependencies, private catalog data, or backend logic.
+SSTIM Workbench code does not import from BioSynCare. BioSynCare code does not
+import from SSTIM Workbench. Any future exchange is validated preset JSON
+through the explicit adapter—not code, RDF dependencies, private catalog data,
+or backend logic.
 
-Do not add BioSynCare-specific logic to BSC Lab's native model, runtime, SSTIM
-terms, or generic UI. If approved, product-specific conversion is confined to
-the optional adapter boundary; private acceptance/publication logic remains in
-BioSynCare. Do not add BSC Lab RDF dependencies to BioSynCare.
+Do not add BioSynCare-specific logic to SSTIM Workbench's native model, runtime,
+SSTIM terms, or generic UI. If approved, product-specific conversion is confined
+to the optional adapter boundary; private acceptance/publication logic remains
+in BioSynCare. Do not add SSTIM Workbench RDF dependencies to BioSynCare.
 
 ---
 

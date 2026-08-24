@@ -571,7 +571,7 @@ export async function buildGraphElements(store, { onProgress = null } = {}) {
     addNode(id, {
       kind: isPerson ? 'ecosystemPerson' : 'ecosystemOrganization',
       layer: 'ecosystem',
-      sourceLabel: 'Live public ecosystem',
+      sourceLabel: 'Live stakeholder network',
       label,
       aliases,
       definition: literalFor(store, id, [DCT + 'description']),
@@ -670,7 +670,7 @@ export async function buildGraphElements(store, { onProgress = null } = {}) {
       addNode(target, {
         kind: 'ecosystemTarget',
         layer: 'ecosystem',
-        sourceLabel: 'Live public ecosystem',
+        sourceLabel: 'Live stakeholder network',
         label: targetLabel,
         aliases: targetAliases,
         definition: literalFor(store, target, [DCT + 'description', SKOS + 'definition']),

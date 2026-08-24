@@ -97,6 +97,7 @@ async function main() {
       ['/sparql/', 'SPARQL'],
       ['/presets/', 'Presets'],
       ['/logbook/', 'Logbook'],
+      ['/ecosystem/', 'SSTIM ecosystem'],
       ['/about/', 'About'],
       ['/settings/', 'Settings'],
     ]

@@ -388,8 +388,8 @@ export async function loadLiveEcosystem() {
         quadCount: store.size,
         fetchedAt,
         message: store.size
-          ? 'Current public ecosystem projection loaded.'
-          : 'The public ecosystem projection is valid but empty.',
+          ? 'Live stakeholder network loaded.'
+          : 'The live stakeholder network is valid but empty.',
       },
     }
   } catch (error) {
@@ -422,7 +422,7 @@ export async function loadNavigatorGraph(options = {}) {
             source: INSTANCE_URLS.ecosystem[0],
             quadCount: 0,
             fetchedAt: null,
-            message: 'Live ecosystem loading is disabled.',
+            message: 'Live stakeholder loading is disabled.',
           },
         }),
   ])

@@ -1,7 +1,7 @@
 {
   "name": "SSTIM Workbench — Sensory Stimulation & Knowledge Browser",
   "short_name": "SSTIM Workbench",
-  "description": "Open sensory-stimulation platform and RDF knowledge-graph browser. Configurable audiovisual stimulation sessions and a SPARQL/graph browser for the SSTIM ontology.",
+  "description": "SSTIM Workbench is the non-normative open reference environment for SSTIM, combining sensory-stimulation authoring with RDF graph and SPARQL exploration.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

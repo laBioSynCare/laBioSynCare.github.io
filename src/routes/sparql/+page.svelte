@@ -86,7 +86,7 @@ LIMIT 100`
   let liveStatus = $state({
     state: 'disabled',
     source: LIVE_SOURCE_URL,
-    message: 'Live public ecosystem data is off.',
+    message: 'Live stakeholder data is off.',
   })
   let staticDatasetStats = $state({ quadCount: 0, namedGraphCount: 0 })
   let currentDatasetStats = $state({ quadCount: 0, namedGraphCount: 0 })
@@ -136,7 +136,7 @@ LIMIT 100`
       liveStatus = {
         state: 'disabled',
         source: LIVE_SOURCE_URL,
-        message: 'Live public ecosystem data is off.',
+        message: 'Live stakeholder data is off.',
       }
       clearOutcome()
       return
@@ -146,7 +146,7 @@ LIMIT 100`
     liveStatus = {
       state: 'loading',
       source: LIVE_SOURCE_URL,
-      message: 'Fetching the current public ecosystem projection…',
+      message: 'Fetching the live stakeholder network…',
     }
     const live = await loadLiveEcosystem()
     liveStatus = live.status
@@ -206,7 +206,7 @@ LIMIT 100`
     const runContext = createQueryRunContext(
       query,
       datasetRevision,
-      liveStatus.state === 'available' ? 'Static + live public ecosystem' : 'Static repository dataset',
+      liveStatus.state === 'available' ? 'Static + live stakeholder network' : 'Static repository dataset',
     )
     const kind = detectQueryKind(runContext.query)
     // Only reject query forms we can identify with certainty. Unknown syntax is
@@ -633,7 +633,7 @@ LIMIT 100`
                 disabled={loading || loadingLive || running}
                 aria-describedby="live-help live-status"
               />
-              Include live public ecosystem
+              Include live stakeholders
             </label>
             <p id="live-help">Optional external data about public people and organizations. Mutable and not part of a citable SSTIM release.</p>
             <div

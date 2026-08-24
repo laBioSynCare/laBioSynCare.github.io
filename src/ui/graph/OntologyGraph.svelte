@@ -88,8 +88,8 @@
       about: 'The released term space: every OWL class and SKOS concept of the SSTIM ontology and vocabulary. This is the default on its own so that published terms — not example data — define the shape of the graph.' },
     { value: 'catalog', label: 'Catalog · versioned', layers: ['catalog'],
       about: 'Versioned public reference instances — frameworks, implementations and their components, techniques, presets, and evidence records. Citable and frozen per release.' },
-    { value: 'ecosystem', label: 'Ecosystem · live', layers: ['ecosystem'],
-      about: 'The live projection of people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
+    { value: 'ecosystem', label: 'Stakeholders · live', layers: ['ecosystem'],
+      about: 'The live stakeholder network: people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
   ]
 
   const GRAPH_CONCERNS = [
@@ -284,9 +284,9 @@
     catalogTechnique: 'Technique · versioned catalog',
     catalogPreset: 'Preset · versioned catalog',
     catalogReference: 'Reference · versioned catalog',
-    ecosystemPerson: 'Person · live ecosystem',
-    ecosystemOrganization: 'Organization · live ecosystem',
-    ecosystemTarget: 'Target · live ecosystem',
+    ecosystemPerson: 'Person · live stakeholder network',
+    ecosystemOrganization: 'Organization · live stakeholder network',
+    ecosystemTarget: 'Target · live stakeholder relationship',
     objProp: 'Object property',
     dataProp: 'Datatype property',
   }
@@ -310,7 +310,7 @@
     related: 'related',
     instanceOf: 'type',
     catalogRelation: 'catalog relation',
-    ecosystemRelationship: 'ecosystem relationship',
+    ecosystemRelationship: 'stakeholder relationship',
   }
 
   const COLORS = {
@@ -450,9 +450,10 @@
       'Versioned public reference instances of frameworks, ' +
       'implementations and components, presets, and evidence records.',
     ecosystem:
-      'Live projection of people, organizations, and reviewed relationships. ' +
+      'Live stakeholder network of people, organizations, and reviewed relationships. ' +
       'Fetched at runtime, separately approved and sourced per record, ' +
-      'retractable, and excluded from citable releases.',
+      'retractable, and excluded from citable releases. This is one relationship ' +
+      'layer, not the complete SSTIM ecosystem directory.',
   }
 
   function nodeColor(data) {
@@ -2104,7 +2105,7 @@
     // 'instanceOf'; only the human-facing label is unified here.
     { key: 'showInstanceOf', label: 'type',         color: COLORS.instanceOf },
     { key: 'showCatalogRelation', label: 'catalog relation', color: COLORS.catalogRelation },
-    { key: 'showEcosystemRelationship', label: 'ecosystem relation', color: COLORS.ecosystemRelationship },
+    { key: 'showEcosystemRelationship', label: 'stakeholder relation', color: COLORS.ecosystemRelationship },
   ]
 
   const toggles = {
@@ -2163,8 +2164,8 @@
             class="icon-btn"
             onclick={onRefreshLive}
             disabled={liveStatus?.state === 'loading'}
-            title="Refresh the live ecosystem layer"
-            aria-label="Refresh live ecosystem"
+            title="Refresh the live stakeholder network"
+            aria-label="Refresh live stakeholders"
           >
             <svg viewBox="0 0 16 16" aria-hidden="true" class:spinning={liveStatus?.state === 'loading'}>
               <path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13 2v3h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2193,7 +2194,7 @@
       </li>
       <li title={liveStatus?.message ?? SOURCE_NOTES.ecosystem}>
         <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>
-        <span class="source-name">Ecosystem</span>
+        <span class="source-name">Stakeholders</span>
         <span class="source-state">{liveStatusLabel(liveStatus?.state)}</span>
       </li>
     </ul>
@@ -2455,7 +2456,7 @@
                     <div class="meta-row">
                       <dt>Layer</dt>
                       <dd>{selected.layer === 'ecosystem'
-                        ? 'Live public ecosystem'
+                        ? 'Live stakeholder network'
                         : selected.layer === 'catalog'
                           ? 'Versioned catalog'
                           : selected.sourceLabel ?? selected.layer}</dd>
@@ -2734,7 +2735,7 @@
     </div>
     <div>
       <dt>
-        <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>Ecosystem
+        <span class="source-dot live {liveStatus?.state ?? 'unknown'}"></span>Live stakeholders
         <span class="guide-tag live">{liveStatusLabel(liveStatus?.state)}</span>
       </dt>
       <dd>
@@ -2749,7 +2750,7 @@
       </dd>
     </div>
   </dl>
-  <p class="guide-footer">See <a href={applicationRoute('/about/')}>About</a> for the full picture.</p>
+  <p class="guide-footer">See the <a href={applicationRoute('/ecosystem/')}>SSTIM ecosystem</a> for the full picture.</p>
 </InfoModal>
 
 <style>

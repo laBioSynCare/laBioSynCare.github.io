@@ -173,7 +173,7 @@
   <title>Preset catalog | SSTIM Workbench</title>
   <meta
     name="description"
-    content="Browse versioned, non-clinical BSC Lab reference presets with their configuration, provenance, safety cautions, and linked evidence assessments."
+    content="Browse versioned, non-clinical SSTIM Workbench reference presets with their configuration, preserved provenance, safety cautions, and linked evidence assessments."
   />
 </svelte:head>
 
@@ -203,9 +203,9 @@
           published catalog—not that evidence exists or does not exist elsewhere.
         </p>
         <p>
-          This page reads the public SSTIM/BSC Lab implementation reference catalog
-          bundled with this site. It is not an inventory of BioSynCare private,
-          production, or partner presets.
+          This page reads the SSTIM Workbench reference catalog bundled with this site.
+          Its records retain stable BSC Lab implementation identifiers as provenance. It
+          is not an inventory of BioSynCare private, production, or partner presets.
         </p>
       </div>
     </aside>

@@ -83,10 +83,10 @@ ORDER BY ?presetLabel`,
   },
   {
     id: 'ecosystem-live',
-    category: 'Ecosystem',
-    title: 'Live ecosystem — people & organizations',
+    category: 'Stakeholders',
+    title: 'Live stakeholders — people & organizations',
     description:
-      'The current public ecosystem projection (people, organizations, and their relationships) — mutable, fetched at runtime from biosyncare-lab.web.app, and excluded from citable releases. Requires "Include live public ecosystem" below; selecting this example turns it on for you.',
+      'The live stakeholder network (people, organizations, and their relationships) — mutable, fetched at runtime from biosyncare-lab.web.app, and excluded from citable releases. Requires "Include live stakeholders" below; selecting this example turns it on for you.',
     requiresLive: true,
     sparql: `PREFIX sstim-eco: <https://w3id.org/sstim/ecosystem#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -129,7 +129,7 @@ ORDER BY ?claimLabel`,
     category: 'Exposure & delivery',
     title: 'Exposure profiles — stimulus channels',
     description:
-      'sstim-ex:ExposureProfile instances (from BSC Lab experiments, including the Sensory Field reference profile) and their stimulus channels — delivery medium and perceived modality per channel.',
+      'sstim-ex:ExposureProfile instances from SSTIM Workbench reference experiments, published under preserved BSC Lab identifiers, and their stimulus channels — delivery medium and perceived modality per channel.',
     requiresLive: false,
     sparql: `PREFIX sstim-ex: <https://w3id.org/sstim/exposure#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

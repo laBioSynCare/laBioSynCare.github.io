@@ -718,7 +718,7 @@ The minimum mounted-base browser matrix directly loads and navigates among:
 
 - `/sstim/`, `/sstim/graph/`, `/sstim/creator/`, `/sstim/sparql/`,
   `/sstim/presets/`, `/sstim/logbook/`, `/sstim/profile/`, `/sstim/settings/`,
-  and `/sstim/about/`;
+  `/sstim/ecosystem/`, and `/sstim/about/`;
 - the four `/sstim/field/...` compatibility routes and their Patch Studio
   destinations;
 - `/sstim/creator/?starter=field`, `tree`, `abstract`, and `landscape` variants;

@@ -172,7 +172,7 @@ export function fieldStateToQuads(state, opts = {}) {
   // ── Protocol + profile ──────────────────────────────────────────────────────
   add(protocol, a, SSTIM_EX('ExploratoryProtocol'))
   add(protocol, RDFS('label'), en('Sensory Field exposure'))
-  add(protocol, DCT('description'), en('A Sensory Field configuration exported from BSC Lab: a full-screen color field with an independent per-ear tone. Non-clinical; no physiological benefit is asserted.'))
+  add(protocol, DCT('description'), en('A Sensory Field configuration exported from SSTIM Workbench under the preserved BSC Lab implementation identity: a full-screen color field with an independent per-ear tone. Non-clinical; no physiological benefit is asserted.'))
   add(protocol, DCT('created'), literal(now, XSD('dateTime')))
   add(protocol, SSTIM('definedByFramework'), namedNode('https://w3id.org/sstim/framework/bsc'))
   for (const t of techniques) add(protocol, SSTIM('usesTechnique'), SSTIM_V(t))

@@ -11,16 +11,20 @@
 
 ## What this project is
 
-**SSTIM** is the overall open specification, vocabulary, semantic
-infrastructure, reference tooling, and Community Group project. **SSTIM
-Workbench** is its non-normative executable environment, with a precision
-multi-engine audiovisual application plus Graph Navigator, annotation, and a
-SPARQL interface over the SSTIM ontology.
+**SSTIM** is the open formalized knowledge standard: specification, RDF
+vocabulary, semantic infrastructure, documentation, interoperability work, and
+shared identifiers. The broader **SSTIM ecosystem** adds its reference tooling
+and community, plus sensory-stimulation applications and initiatives related by
+adoption, contribution, support, or documented domain relevance. **SSTIM
+Workbench** is SSTIM's non-normative executable reference environment, with a
+precision multi-engine audiovisual application plus Graph Navigator, annotation,
+and a SPARQL interface over the SSTIM ontology.
 
 Existing BSC/BSC Lab semantic identities and compatibility formats are preserved
 provenance, not the public project brand. **BioSynCare** is a separate
-closed-source commercial application, and SSTIM Workbench does not feed it
-today. Do not conflate them or add BioSynCare-specific logic to SSTIM.
+closed-source commercial application that adopts and contributes to SSTIM; SSTIM
+Workbench does not feed it today. Do not conflate them or add BioSynCare-specific
+logic to SSTIM.
 
 ## The invariants, in short
 

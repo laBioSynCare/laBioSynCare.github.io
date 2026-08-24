@@ -78,7 +78,7 @@ annotations, patches and profile are kept on the device instead of an account
 
 **This is verified on every commit, not asserted.** `make smoke-static` rebuilds
 with no configuration, serves `dist-smoke/` over plain HTTP from a dependency-free
-Node server, and checks that all eight primary routes return their own prerendered
+Node server, and checks that all nine primary routes return their own prerendered
 HTML, that all four legacy `/field/*` artifacts point at their exact Studio
 starter intents, that an unknown path returns 404 (so a fallback-everything host
 cannot make the other assertions vacuous), that the ontology Turtle is served

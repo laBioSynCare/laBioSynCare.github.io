@@ -10,6 +10,10 @@
   } from '../../ui/entrance/releaseMetadata.js'
   import Isotype from '../../ui/brand/Isotype.svelte'
   import {
+    ARCHITECTURE_ENTITIES,
+    SSTIM_ECOSYSTEM_DEFINITION,
+  } from '../../ui/ecosystem/architecture.js'
+  import {
     BIOSYNCARE_URL,
     GITHUB_URL,
     ONTOLOGY_DOCS_URL,
@@ -61,8 +65,8 @@
         'provenance, and evidence assessments kept visible rather than flattened into a score.',
       how:
         'Search and filter the catalog, inspect how each record is described, then follow its ' +
-        'source and evidence links. These are BSC Lab reference records, not the private ' +
-        'BioSynCare catalog and not recommendations for treatment.',
+        'source and evidence links. These are SSTIM Workbench reference records published ' +
+        'under preserved BSC Lab identifiers—not the private BioSynCare catalog and not treatment recommendations.',
     },
     {
       href: applicationRoute('/sparql/'),
@@ -112,59 +116,6 @@
     },
   ]
 
-  // Public project architecture after the repository migration. Historical
-  // BSC and BioSynCare RDF identities remain real modeled entities; presenting
-  // them here does not make either one the identity or owner of SSTIM.
-  const layers = [
-    {
-      name: 'W3C Sensory Stimulation Vocabulary Community Group',
-      tag: 'Open community',
-      color: 'var(--app-control)',
-      body:
-        'The W3C Community Group in which SSTIM is developed. Community Group work is open ' +
-        'technical work; it is not a W3C Recommendation or W3C-endorsed technology.',
-    },
-    {
-      name: 'SSTIM',
-      tag: 'Specification · vocabulary · community project',
-      color: 'var(--app-visual)',
-      body:
-        'The overall open specification, RDF vocabulary, semantic infrastructure, documentation, ' +
-        'interoperability work, reference tooling, and community project. Its canonical ' +
-        'identifiers remain under w3id.org/sstim; this GitHub Pages site is a publication location.',
-    },
-    {
-      name: 'SSTIM Workbench',
-      tag: 'Non-normative reference software',
-      color: 'var(--app-accent)',
-      mark: 'bsclab',
-      body:
-        'The executable environment you are using now. It contains Graph Navigator, Patch Studio, ' +
-        'the SPARQL workbench, presets, and supporting engines. It demonstrates and exercises ' +
-        'SSTIM, but its behavior is not automatically a normative requirement of the specification.',
-    },
-    {
-      name: 'BSC',
-      tag: 'Framework · preserved provenance',
-      color: 'var(--app-ok)',
-      body:
-        'A framework represented within SSTIM and part of the imported development provenance. ' +
-        'Its implementation records, protocols, identifiers, and originated technique identities ' +
-        'remain intact; they are not mechanically renamed to match the Workbench brand.',
-    },
-    {
-      name: 'BioSynCare',
-      tag: 'Commercial application',
-      color: 'var(--app-haptic)',
-      mark: 'biosyncare',
-      body:
-        'A separate, closed-source commercial application in its own repository. Versioned ' +
-        'exports and SSTIM mappings are the intended interoperability boundary. BioSynCare is ' +
-        'an ecosystem participant and implementation, not the identity of SSTIM; its private ' +
-        'catalog, application code, and private data are outside this repository.',
-    },
-  ]
-
   const trustSignals = [
     {
       label: 'Open implementation',
@@ -185,6 +136,7 @@
   ]
 
   const links = [
+    { label: 'SSTIM ecosystem architecture', href: applicationRoute('/ecosystem/') },
     { label: 'Source repository', href: GITHUB_URL, external: true },
     { label: 'Ontology reference docs', href: ONTOLOGY_DOCS_URL, external: true },
     { label: 'Vocabulary docs', href: VOCAB_DOCS_URL, external: true },
@@ -192,9 +144,6 @@
     { label: 'W3C Community Group', href: W3C_GROUP_URL, external: true },
     { label: 'Governance & contribution terms', href: ghBlob('CONTRIBUTING.md#8-governance-and-licensing-during-migration'), external: true },
     { label: 'HED / BIDS interoperability', href: ghBlob('docs/ecosystem/HED_BIDS_INTEROP.md'), external: true },
-    { label: 'Ecosystem working plan', href: ghBlob('docs/ecosystem/ECOSYSTEM_INTEGRATION.md'), external: true },
-    // The page above describes BioSynCare in a card of its own; until now it
-    // was the only one of the four layers a reader could not go and look at.
     { label: 'BioSynCare (commercial app)', href: BIOSYNCARE_URL, external: true },
   ]
 </script>
@@ -203,7 +152,7 @@
   <title>About | SSTIM Workbench</title>
   <meta
     name="description"
-    content="How SSTIM, SSTIM Workbench, Graph Navigator, Patch Studio, preserved BSC provenance, and the separate BioSynCare implementation relate."
+    content="What SSTIM Workbench is, how it relates to the SSTIM ecosystem, and what its Graph Navigator, Patch Studio, and other screens do."
   />
 </svelte:head>
 
@@ -213,14 +162,14 @@
       <div class="brand-lockup">
         <Isotype name="bsclab" size={52} title="SSTIM Workbench mark" />
         <div>
-          <p class="eyebrow">Open research &amp; engineering platform</p>
+          <p class="eyebrow">Non-normative reference software</p>
           <h1>SSTIM Workbench</h1>
         </div>
       </div>
       <p class="lede">
         Build sensory-stimulation patches and examine the knowledge behind them. SSTIM Workbench
-        brings <strong>Patch Studio</strong> and <strong>Graph Navigator</strong> together with <strong>SSTIM</strong>, a public RDF
-        knowledge graph for techniques, parameters, exposure, safety metadata, and evidence.
+        brings <strong>Patch Studio</strong> and <strong>Graph Navigator</strong> together with <strong>SSTIM</strong>, the open
+        formalized knowledge standard for techniques, parameters, exposure, safety metadata, and evidence.
       </p>
       <div class="hero-actions" aria-label="Start using SSTIM Workbench">
         <a class="primary-action" href={applicationRoute('/creator/')}>Open Patch Studio</a>
@@ -255,33 +204,13 @@
   </nav>
 
   <section class="block" id="ecosystem">
-    <h2>How the pieces fit</h2>
+    <h2>Where the Workbench fits</h2>
     <p class="section-intro">
-      SSTIM is the Community Group's overall open project. SSTIM Workbench is its executable
-      reference environment; Graph Navigator and Patch Studio are Workbench components.
-      BSC identities remain as real framework and implementation provenance, while BioSynCare
-      remains a separate commercial implementation and ecosystem participant.
+      {SSTIM_ECOSYSTEM_DEFINITION} BioSynCare is a separate commercial application in that
+      ecosystem and the center of its own overlapping application ecosystem.
     </p>
-    <div class="ecosystem-map" aria-label="Relationship between the W3C Community Group, SSTIM, SSTIM Workbench, BSC, and BioSynCare">
-      <div class="map-owner">
-        <div><strong>W3C Sensory Stimulation Vocabulary Community Group</strong><span>Open community developing SSTIM</span></div>
-      </div>
-      <div class="map-branches">
-        <article>
-          <span class="map-label">Overall open project</span>
-          <strong>SSTIM</strong>
-          <span>Specification, vocabulary, documentation, Graph Navigator, and SSTIM Workbench with Patch Studio</span>
-        </article>
-        <article>
-          <span class="map-label">Separate application</span>
-          <strong>BioSynCare</strong>
-          <span>Closed-source product; no shared private catalog or application code</span>
-        </article>
-      </div>
-      <p class="map-foundation"><strong>BSC framework and BSC Lab records</strong> remain preserved implementation provenance inside the knowledge base; they are not SSTIM's public identity.</p>
-    </div>
     <div class="layer-grid">
-      {#each layers as layer}
+      {#each ARCHITECTURE_ENTITIES as layer}
         <article class="layer-card" style="--card-color: {layer.color}">
           <span class="layer-tag">{layer.tag}</span>
           <div class="layer-head">
@@ -294,6 +223,20 @@
         </article>
       {/each}
     </div>
+    <div class="ecosystem-actions">
+      <p>
+        Ecosystem inclusion records a relationship; it does not imply ownership, affiliation,
+        endorsement, or application-wide conformance.
+      </p>
+      <a class="card-action" href={applicationRoute('/ecosystem/')}>
+        Explore the complete architecture and directory<span aria-hidden="true"> →</span>
+      </a>
+    </div>
+    <p class="provenance-note">
+      <strong>Preserved provenance:</strong> BSC and BSC Lab still appear where they identify
+      historical frameworks, implementation records, protocols, citations, or stable IRIs.
+      They are not peer brands in the current public architecture and are not mechanically renamed.
+    </p>
   </section>
 
   <section class="block" id="surfaces">
@@ -346,9 +289,9 @@
   <section class="block" id="sstim">
     <h2>SSTIM and its data boundaries</h2>
     <p class="section-intro">
-      SSTIM is a modular ontology suite rather than one opaque data file. Its manifest defines
-      dependency closures and adoption profiles; SHACL, OWL reasoning, link checks, snapshots,
-      and release rehearsal are automated repository gates.
+      SSTIM's current formalized knowledge is published as a modular ontology suite rather than
+      one opaque data file. Its manifest defines dependency closures and adoption profiles; SHACL,
+      OWL reasoning, link checks, snapshots, and release rehearsal are automated repository gates.
     </p>
     <aside class="release-note">
       <span aria-hidden="true">✓</span>
@@ -364,7 +307,7 @@
       <li><strong>Sessions &amp; exposure</strong> — plans, executions, overrides, delivery, perception, devices, placement, and limits.</li>
       <li><strong>Evidence</strong> — immutable assessment claims with an explicit proposition, qualified basis, direction, tier, agent, and date.</li>
       <li><strong>Controlled vocabulary</strong> — multilingual SKOS values for bands, modalities, mechanisms, techniques, evidence, and cautions.</li>
-      <li><strong>Application &amp; ecosystem</strong> — Patch Studio parameter mappings plus neutral, consent-aware agent relationships.</li>
+      <li><strong>Application mappings &amp; stakeholder relationships</strong> — Patch Studio mappings plus neutral, consent-aware records about people and organizations.</li>
       <li><strong>Validation &amp; alignment</strong> — reusable SHACL contracts and conservative external links.</li>
     </ul>
     <p class="section-intro">
@@ -400,8 +343,8 @@
       </article>
       <article>
         <span class="data-kind live">Live &amp; retractable</span>
-        <h3>Ecosystem projection</h3>
-        <p>Reviewed relationships among people and organizations, fetched at runtime and deliberately excluded from citable archives.</p>
+        <h3>Live stakeholders</h3>
+        <p>Reviewed relationships among people and organizations, fetched at runtime and deliberately excluded from citable archives. This is one data layer, not the complete SSTIM ecosystem.</p>
       </article>
       <article>
         <span class="data-kind personal">Personal</span>
@@ -627,65 +570,7 @@
     max-width: 70ch;
   }
 
-  .ecosystem-map {
-    margin: 0 0 1rem;
-    padding: 1rem;
-    border: var(--app-border-width) solid var(--app-border);
-    border-radius: var(--app-radius);
-    background: var(--app-surface-2);
-  }
-
-  .map-owner {
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    margin: 0 auto 0.8rem;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid color-mix(in srgb, var(--app-control) 45%, var(--app-border));
-    border-radius: var(--app-radius);
-    background: var(--app-surface);
-  }
-  .map-owner div { display: grid; gap: 0.1rem; }
-  .map-owner strong { color: var(--app-text-strong); font-size: 0.88rem; }
-  .map-owner span { color: var(--app-muted); font-size: 0.7rem; }
-
-  .map-branches {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    position: relative;
-  }
-
-  .map-branches article {
-    display: grid;
-    gap: 0.2rem;
-    padding: 0.8rem;
-    border: var(--app-border-width) solid var(--app-border);
-    border-radius: var(--app-radius);
-    background: var(--app-surface);
-  }
-  .map-branches strong { color: var(--app-text-strong); font-size: 0.9rem; }
-  .map-branches span:not(.map-label) { color: var(--app-muted); font-size: 0.74rem; line-height: 1.45; }
-  .map-label {
-    color: var(--app-accent);
-    font-size: 0.62rem;
-    font-weight: 750;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .map-foundation {
-    margin: 0.75rem 0 0;
-    color: var(--app-text);
-    font-size: 0.73rem;
-    text-align: center;
-  }
-
-  /* ── Three-layer cards ────────────────────────────────────────────────── */
-  /* 280px min fits three across at the 960px page width, so the five cards
-     land as a balanced 3 + 2 rather than 2 + 2 + 1 with a lone orphan. The
-     card order also keeps the two green-ish borders (BSC, BioSynCare) off the
-     same row. */
+  /* ── Architecture cards ───────────────────────────────────────────────── */
   .layer-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -738,6 +623,38 @@
     line-height: 1.55;
     color: var(--app-text);
     margin: 0;
+  }
+
+  .ecosystem-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+    padding: 0.85rem 0.95rem;
+    border: var(--app-border-width) solid var(--app-border);
+    border-radius: var(--app-radius);
+    background: var(--app-surface-2);
+  }
+
+  .ecosystem-actions p {
+    max-width: 62ch;
+    margin: 0;
+    color: var(--app-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .ecosystem-actions .card-action { flex-shrink: 0; }
+
+  .provenance-note {
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 0.9rem;
+    border-left: 3px solid var(--app-ok);
+    color: var(--app-muted);
+    background: color-mix(in srgb, var(--app-ok) 6%, var(--app-surface));
+    font-size: 0.76rem;
+    line-height: 1.5;
   }
 
   /* ── Screen cards ─────────────────────────────────────────────────────── */
@@ -1001,7 +918,6 @@
     .about-page { padding: 1.5rem 1rem 6rem; }
     .screen-grid,
     .layer-grid,
-    .map-branches,
     .data-grid { grid-template-columns: 1fr; }
     .hero { padding: 1.05rem; }
     .brand-lockup { align-items: flex-start; }
@@ -1009,6 +925,8 @@
     .section-nav { overflow-x: auto; flex-wrap: nowrap; }
     .section-nav a { flex: 0 0 auto; }
     .callout { flex-direction: column; gap: 0.5rem; }
+    .ecosystem-actions { align-items: stretch; flex-direction: column; }
+    .ecosystem-actions .card-action { width: 100%; }
   }
 
   @media (prefers-reduced-motion: reduce) {

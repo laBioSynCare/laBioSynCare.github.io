@@ -2,16 +2,20 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21286974.svg)](https://doi.org/10.5281/zenodo.21286974)
 
-**SSTIM** is the overall open specification, RDF vocabulary, semantic
-infrastructure, documentation, interoperability work, reference tooling, and
-community project for describing sensory-stimulation techniques, modalities,
-stimulus parameters, exposure boundaries, evidence claims, protocols, presets,
-and sessions. This repository also contains **SSTIM Workbench**, the
-non-normative executable reference environment; **Graph Navigator** and
-**Patch Studio** are Workbench components.
+**SSTIM** is the open formalized knowledge standard for describing
+sensory-stimulation techniques, modalities, stimulus parameters, exposure
+boundaries, evidence claims, protocols, presets, and sessions. It comprises the
+specification, RDF vocabulary, semantic infrastructure, documentation,
+interoperability work, and shared identifiers.
 
-SSTIM and its accompanying open reference tooling were contributed as the
-initial technical baseline of the W3C Sensory Stimulation Vocabulary Community
+The **SSTIM ecosystem** is broader than the standard itself. It includes SSTIM,
+its reference tooling and community, and the wider field of sensory-stimulation
+applications and initiatives whether they adopt SSTIM, contribute to it, support
+it, or are related through documented domain relevance. This repository also
+contains **SSTIM Workbench**, SSTIM's non-normative executable reference
+environment; **Graph Navigator** and **Patch Studio** are Workbench components.
+
+SSTIM is developed through the W3C Sensory Stimulation Vocabulary Community
 Group. Historical development provenance is preserved in the repository
 history. Community Group work is not a W3C Recommendation or W3C-endorsed
 technology.
@@ -141,7 +145,8 @@ surfaces are:
 
 - **Graph Navigator:** Cytoscape graph navigation over named RDF graphs.
 - **SPARQL workbench:** Comunica queries over ontology and public instance data.
-- **Presets:** public BSC Lab reference presets and their evidence links.
+- **Presets:** SSTIM Workbench reference presets, their preserved BSC Lab
+  implementation identifiers, and their evidence links.
 - **Patch Studio:** real-time audio/visual authoring with Web Audio,
   AudioWorklet/WASM options, modulation, photosensitivity safeguards, and
   first-class colour-field and stereoscopic scene tracks. Its built-in Sensory
@@ -154,7 +159,8 @@ surfaces are:
   default, with no account required. Signing in (when Firebase is configured)
   keeps them with your account instead so they follow you between devices.
 
-Architecture details are in [src/README.md](src/README.md),
+Ecosystem architecture is maintained in the Workbench's `/ecosystem/` page.
+Software architecture details are in [src/README.md](src/README.md),
 [Patch Studio](docs/technical/PATCH_STUDIO.md), and the
 [Session Model](docs/technical/SESSION_MODEL.md).
 
@@ -342,10 +348,12 @@ This branding change does not rename the real BSC framework, BSC Lab
 implementation records, protocols, provenance, persistent instance IRIs,
 storage formats, or historical releases represented in SSTIM.
 
-BioSynCare remains a separate closed-source commercial application and
-ecosystem participant, not the identity of SSTIM. Versioned exports and SSTIM
-mappings are the intended interoperability boundary; this repository does not
-contain BioSynCare's private data or application code.
+BioSynCare remains a separate closed-source commercial application. It adopts
+and contributes to SSTIM, participates in the SSTIM ecosystem, and is the center
+of its own overlapping application ecosystem; this does not make it the identity
+or owner of SSTIM. Versioned exports and SSTIM mappings are the intended
+interoperability boundary; this repository does not contain BioSynCare's private
+data or application code.
 
 ## W3C Community Group
 

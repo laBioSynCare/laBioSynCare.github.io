@@ -972,7 +972,7 @@
           <p>
             Opening and navigating SSTIM Workbench can request application assets, public RDF, and documentation
             from this deployment’s origin. Sign-in and account-backed storage can contact the configured
-            Firebase services. Enabling the optional live ecosystem in Graph or SPARQL fetches its stated
+            Firebase services. Enabling the optional live stakeholder network in Graph or SPARQL fetches its stated
             external source. Export generation and import review run in this browser and do not upload the
             chosen file; following an external link contacts that link’s site.
           </p>

@@ -25,8 +25,9 @@ front door.
 ## Hero
 
 - **Headline:** *Sensory stimulation, made open and reproducible.*
-- **Subhead:** *An open knowledge graph, an executable lab, and a community for
-  designing and describing auditory, visual, and cross-modal stimulation.*
+- **Subhead:** *An open formalized knowledge standard, its reference Workbench,
+  and a community for describing and building auditory, visual, and cross-modal
+  stimulation.*
   (Trimmed 2026-07-18: the earlier draft's trailing "— for research,
   education, and conservative non-clinical use" was cut on review as
   boilerplate that didn't inform or persuade. The non-clinical/wellness
@@ -34,13 +35,12 @@ front door.
   the About page's scope note and `SCOPE.md`; the hero doesn't need to
   carry a compliance clause that says nothing concrete.)
 - **Project/provenance one-liner** (footer):
-  *"SSTIM is work of the W3C Sensory Stimulation Vocabulary Community Group.
-  Its open specification and reference tooling were contributed as the group's
-  initial technical baseline; historical development provenance is preserved
-  in Git."*
-  (Migration revision 2026-08-23: this replaces the earlier institutional
-  one-liner. The About page carries the BSC/BioSynCare distinction without
-  conflating those implementations with SSTIM.)
+  *"SSTIM is developed through the W3C Sensory Stimulation Vocabulary Community
+  Group. SSTIM Workbench is SSTIM's non-normative reference environment; historical
+  development provenance is preserved in Git."*
+  (Architecture revision 2026-08-24: the dedicated Ecosystem page carries the
+  SSTIM/BioSynCare relationship without conflating either application or
+  ecosystem with ownership or W3C endorsement.)
 
 All copy uses permitted wellness verbs only (support, facilitate, encourage,
 explore, guide, invite); no "treat/cure/proven" (`CLAUDE.md` §3.5,
@@ -204,11 +204,11 @@ Pico.css `<article>` elements in a two-column CSS grid.
 ├────────────────────────────────────────────────────────────────────┤
 │                                                                    │
 │        Sensory stimulation, made open and reproducible.            │ ← hero H1
-│    An open knowledge graph, an executable lab, and a community     │ ← subhead
-│    for designing and describing auditory, visual, and              │
-│    cross-modal stimulation.                                        │
-│    New here? One-page ecosystem brief — how the knowledge graph,   │ ← orientation
-│    this platform, and the applications fit together.               │
+│    An open formalized knowledge standard, its reference            │ ← subhead
+│    Workbench, and a community for describing and building          │
+│    auditory, visual, and cross-modal stimulation.                   │
+│    New here? Explore the SSTIM ecosystem — how the standard,        │ ← orientation
+│    Workbench, community, and separate applications relate.         │
 │                                                                    │
 ├────────────────────────────────────────────────────────────────────┤
 │ ┌──────────────────────────────┐ ┌──────────────────────────────┐  │
@@ -228,7 +228,8 @@ Pico.css `<article>` elements in a two-column CSS grid.
 │ │ Architecture · Audio engines │ │ Consortium                   │  │
 │ └──────────────────────────────┘ └──────────────────────────────┘  │
 ├────────────────────────────────────────────────────────────────────┤
-│ footer: one-liner · Namespace + DOI · GitHub · BioSynCare · About  │
+│ footer: one-liner · Namespace + DOI · GitHub · Ecosystem ·         │
+│         BioSynCare · About                                         │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -318,9 +319,10 @@ above for why they're no longer also duplicated in a hero/footer bar.
   clause; About covers it (see "Hero" above).
 - **Door ① primary CTA — REVISED 2026-07-18:** Patch Studio, not Sensory
   Field (see door ① above).
-- **Hero orientation line — ADDED 2026-08-08, RETARGETED 2026-08-23.** One
-  plain line under the subhead now points to `/about/#ecosystem`, where the
-  migrated SSTIM/SSTIM Workbench architecture is maintained with the UI.
+- **Hero orientation line — ADDED 2026-08-08, RETARGETED 2026-08-23 AND
+  2026-08-24.** One plain line under the subhead now points to `/ecosystem/`,
+  the canonical architecture and applications/initiatives directory. About
+  retains a concise Workbench-oriented summary and links to the canonical page.
   This is the one thing four doors cannot do. Each door answers "what can I do
   here"; none places SSTIM Workbench against BioSynCare, and a visitor who
   cannot make that distinction cannot tell which door is theirs — the most
@@ -336,7 +338,8 @@ above for why they're no longer also duplicated in a hero/footer bar.
   - **What replacing the tracker fixed:** the 2026-08-07 pass had put
     `ECOSYSTEM_INTEGRATION.md` in door ④. Wrong artifact for a visitor — 500
     lines of open workstreams, KPIs and outreach notes answer "how is this
-    project being run", not "what is this project". It stays linked from About.
+    project being run", not "what is this project". It remains an internal
+    working document rather than current visitor architecture.
 - **Door ② subcopy — CORRECTED 2026-08-07:** dropped the BIDS/HED encoding
   claim, which described an unbuilt exporter; added the generated reference
   docs as door ②'s second secondary link (see door ② above).
@@ -352,8 +355,8 @@ above for why they're no longer also duplicated in a hero/footer bar.
   instance, and the origin cannot be recovered at runtime because crawlers do
   not run the script that reads `runtime-config.json`. A `summary` card
   carries title and description without an image.
-- **Footer — EXTENDED 2026-08-08:** the row is now *Namespace w3id.org/sstim ·
-  DOI … · GitHub · BioSynCare (commercial app) · About*.
+- **Footer — EXTENDED 2026-08-08 AND 2026-08-24:** the row is now *Namespace
+  w3id.org/sstim · DOI … · GitHub · Ecosystem · BioSynCare (commercial app) · About*.
   - **BioSynCare** was the one layer of the four-layer model a reader could not
     go and look at; About describes it and now links it too. The label says
     *commercial app* because an unqualified "BioSynCare" in the open platform's

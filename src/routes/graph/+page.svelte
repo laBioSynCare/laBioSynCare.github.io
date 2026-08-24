@@ -7,11 +7,11 @@
   let store = $state(null)
   let error = $state(null)
   let loading = $state(true)
-  let liveStatus = $state({ state: 'loading', message: 'Loading current public ecosystem projection.' })
+  let liveStatus = $state({ state: 'loading', message: 'Loading the live stakeholder network.' })
 
   async function loadGraph({ refresh = false } = {}) {
     if (refresh) {
-      liveStatus = { ...liveStatus, state: 'loading', message: 'Refreshing current public ecosystem projection.' }
+      liveStatus = { ...liveStatus, state: 'loading', message: 'Refreshing the live stakeholder network.' }
     }
     try {
       const result = await loadNavigatorGraph()
@@ -39,7 +39,7 @@
     <LoadingPanel
       title="Building the knowledge graph"
       phase="Fetching the ontology"
-      detail="Turtle modules, the public catalog, and the live ecosystem projection"
+      detail="Turtle modules, the public catalog, and the live stakeholder network"
     />
   </div>
 {:else if error}

@@ -293,6 +293,7 @@
       <a href={applicationRoute('/sparql/')}>SPARQL</a>
       <a href={applicationRoute('/logbook/')}>Logbook</a>
       <a href={applicationRoute('/settings/')}>Settings</a>
+      <a href={applicationRoute('/ecosystem/')}>Ecosystem</a>
       <a href={applicationRoute('/about/')}>About</a>
       <!-- Generated docs (WIDOCO for OWL core, pyLODE for the SKOS vocabulary)
            exist only in the deployed artifact; rel="external" keeps the

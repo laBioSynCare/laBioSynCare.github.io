@@ -47,7 +47,7 @@ the rule it carries. Only non-obvious entries are listed.
 | `ui/safety/` | Photosensitivity advisory + visual-stimulation policy. Gates all flashing output. |
 | `ui/pwa/` | Service-worker registration and the session-safe update banner. |
 | `ui/navigation/`, `ui/theme/`, `ui/auth/` | Chrome, skins, sign-in form. |
-| `routes/` | `/` entrance, `/graph`, `/creator`, `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/about`, plus four `/field/*` compatibility redirects into Studio starters. |
+| `routes/` | `/` entrance, `/graph`, `/creator`, `/presets`, `/sparql`, `/logbook`, `/profile`, `/settings`, `/ecosystem`, `/about`, plus four `/field/*` compatibility redirects into Studio starters. |
 
 Tests live beside the code they cover (`*.test.js`, `*.test.mjs`) and run under
 `make test`.
