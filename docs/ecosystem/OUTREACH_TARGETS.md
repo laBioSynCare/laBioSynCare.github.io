@@ -30,7 +30,7 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
 
 | Circle | Target | The ask | Status |
 |---|---|---|---|
-| Standards | **HED Working Group** (INCF-endorsed) | Review one SSTIM–HED/BIDS worked example | contacted 2026-08-20 — [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) (5 encoding questions), [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836) (validator crash); awaiting reply |
+| Standards | **HED Working Group** (INCF-endorsed) | Review one SSTIM–HED/BIDS worked example | contacted 2026-08-20 — [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) (5 encoding questions), [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836) (validator crash). **Engaged**: three maintainers replied inside 48 h; item 2 settled, item 1 half settled, item 6 fixed upstream in [bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442); meeting requested via `hed-maintainers@gmail.com`, sending 2026-08-24. Open: the definition-shape question and items 3, 4, 5. See [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md) |
 | Research | **IIT U-VIP lab** (Monica Gori, Genoa) | Nominate one protocol to encode across BIDS/HED/SSTIM | not-contacted |
 | Research | **UniGe–San Martino–IIT ANTARES Joint Lab** | Nominate one protocol to encode | not-contacted |
 | Research | **IMRF** (Intl. Multisensory Research Forum; 2026 meeting) | Present the interoperability / reproducibility result | not-contacted |

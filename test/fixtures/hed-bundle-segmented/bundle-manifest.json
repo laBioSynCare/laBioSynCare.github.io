@@ -53,7 +53,7 @@
   ],
   "declaredLoss": {
     "eventParameterChanged": "HED carries the parameter kind and the new value but not the unit, which follows from the kind and the channel in SSTIM, nor the previous value in sstim:parameterValueBefore.",
-    "eventSafetyLimitApplied": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did.",
+    "eventSafetyLimitApplied": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did. Confirmed upstream on 2026-08-20: @yarikoptic's answer on hed-schemas#416 is that HED carries the factual delivered value and not the protective intent, which belongs with the higher-level description of the paradigm. This loss is deliberate and correct, not a gap to close by asking HED for a Safety or Threshold tag.",
     "eventSessionComplete": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
   },
   "validated": [

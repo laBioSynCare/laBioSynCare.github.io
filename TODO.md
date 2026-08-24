@@ -264,6 +264,13 @@ indexed, examiner-searchable records.
       module-coupling decision, not a term, and it is recorded honestly in the
       crosswalk meanwhile: the boundary identity is held by neither side.*
 
+      *Half of this is now settled upstream (2026-08-20). @yarikoptic's answer on
+      hed-schemas#416 is that HED should carry the factual delivered value and
+      not the protective intent, so the HED side of the question is closed: the
+      boundary identity is correctly absent there and the crosswalk's declared
+      loss is deliberate, not a gap. What stays open is only the SSTIM side, the
+      module-coupling decision above.*
+
 - [ ] Emit the BIDS Behavioral binding of ADR 0025 decision 3 `P3`
       *Evaluated 2026-08-18 rather than assumed, and it is reachable: wrapped in
       a minimal behavioral dataset, all three demonstrator bundles validate with*
@@ -271,6 +278,15 @@ indexed, examiner-searchable records.
       `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED` column, because any
       sidecar entry named `HED` crashes the validator's HED parser; that is
       question 6 to the HED Working Group.*
+
+      ***Question 6 is answered and this warning no longer exists.** Retested on
+      `bids-validator` 3.0.1 (2026-08-20): a top-level `HED` sidecar key is
+      illegal rather than awkward, and `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` is
+      gone from 3.x, so the layout we ship validates with zero errors and no
+      warnings. The sentence above is kept because it is what the decision was
+      taken on, but do not requote it as current. The residue was a silent
+      no-validation path in the validator, fixed upstream in
+      [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442).*
 
       *Two of the four warnings are the wrapper's, not ours, and go away with a
       real dataset: set `HEDVersion` in `dataset_description.json` — BIDS warns
@@ -295,6 +311,29 @@ indexed, examiner-searchable records.
       engines looks like an implementation concern that a universal standard
       should not carry, but the reproducibility argument for recording it is
       real, since two engines are not sample-identical. Decide deliberately.*
+
+- [!] Decide the shape of generated HED definition bodies `P3`
+      *Blocked on the HED Working Group, asked 2026-08-21 on
+      [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
+      unanswered as of 2026-08-23 and bound to a requested meeting.*
+
+      *@VisLab's critique, which we accept: the definitions we generate are event
+      codes wearing a definition's clothes.*
+      `(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))`
+      *says little the event type did not. The ontology already holds modality,
+      technique, frequencies and level, so a descriptive body is generatable and
+      validates against 8.4.0:*
+      `(Definition/Sstim-delivery-binaural, (Sensory-event, Experimental-stimulus, Auditory-presentation, Tone, Frequency/440 Hz, Repetitive, Temporal-rate/10 Hz))`
+
+      *The decision is which HED intends: definitions that describe the actual
+      stimulus, making each dataset self describing at the cost of
+      `Def/Sstim-delivery` denoting something different in every one, or
+      definitions that stay stable across datasets with the varying description
+      carried on the events. Our instinct is the first for whatever is constant
+      within a session and the second for whatever changes during it, but that is
+      a guess, and it runs into the comparability point VisLab raised. Do not
+      regenerate the definitions until this is answered. Recorded in
+      [ADR 0025](docs/decisions/0025-hed-bids-interoperability-crosswalk.md).*
 
 ### Ontology namespace
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC

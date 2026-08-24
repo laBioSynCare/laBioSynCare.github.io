@@ -21,7 +21,27 @@ warning no longer exists in 3.x. Two new findings were reported back on the
 thread: 3.0.1 catches the illegal key only when another entry also carries an
 `HED` sub-key, so a lone one silently skips validation of the whole column; and
 our own sidecar was redefining the BIDS-required `duration` column, now fixed.
-Questions 1-5 are unanswered as of this writing.
+
+**Answers, 2026-08-20 to 2026-08-23.** @VisLab, @neuromechanist and
+@yarikoptic all replied. Question 2 is **settled**: HED carries the factual
+delivered value, not the protective intent, which belongs with the higher-level
+description of the paradigm; data quality does not belong under HED either. Our
+declared loss for it was already correct, so nothing in the mapping changes.
+Question 1 is **half settled**: `scans.tsv` is BIDS's place for whether a
+recording completed (verified against 3.0.1), but HED 8.4.0 has no tag meaning
+completed versus interrupted, so the vocabulary gap stands and a library schema
+was raised as a possible home. Question 6 is **fixed upstream** in
+[bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442),
+whose type error we diagnosed on 2026-08-23; hed-javascript#836 stays open until
+it merges. Questions 3, 4 and 5 are still open.
+
+The most consequential reply was not an answer to any of the six. @VisLab's
+point is that our definitions are event codes wearing a definition's clothes,
+and that richer bodies would let a consumer distinguish situations across
+datasets instead of matching opaque names. We accept it. The open question it
+raises, whether definitions should describe the actual stimulus or stay stable
+across datasets, decides the shape of the generator, and is the anchor of a
+meeting requested via `hed-maintainers@gmail.com` (sending 2026-08-24).
 
 See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
 

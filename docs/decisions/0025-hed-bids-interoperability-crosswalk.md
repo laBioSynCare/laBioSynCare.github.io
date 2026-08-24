@@ -467,6 +467,31 @@ but it is the prerequisite for everything after.
      The entry is gone, its rationale moved to a non-column
      `SstimDurationConvention` key, and all three bundles are 0 errors on 3.0.1.
 
+   **Fixed upstream, and the defect was `bids-validator`'s, not HED's (2026-08-21
+   to 2026-08-23).** @happy5214 traced the silent skip to a non-functional column
+   check and opened
+   [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442).
+   We rebuilt all six probe datasets and tested his branch rather than trusting
+   the previous day's run: the three arrangements that used to pass silently now
+   report `SIDECAR_INVALID`, and probe 1, the layout we ship, stays at 0 errors.
+   The PR then stalled on a type error, which we diagnosed on 2026-08-23.
+   `BIDSContext` declares the field as `Record<string, string[]>`
+   (`src/schema/context.ts:135`) while the runtime object is a `ColumnsMap`
+   proxy, so `context.columns.has(...)` resolves through the index signature to
+   `string[]` and fails to compile (`TS2349`) even though it works at runtime.
+   The defect underneath is the proxy's `has` trap: it calls `Reflect.has`, which
+   inspects properties of the `Map` object while column data lives in Map
+   *entries*. So `'HED' in context.columns` is false for every real column and
+   true for names like `has` and `forEach` that are not columns at all. Both the
+   call-site fix and the trap fix are on the PR, with the reproduction.
+
+   **None of this was ours to change.** The layout we ship was correct
+   throughout and never moved. What the exchange bought is that a silent
+   no-validation path, in the tool decision 7 would gate a published binding on,
+   is now reported instead of passing green. Question 6 closes when #442 merges;
+   hed-javascript#836 stays open until then, since it is the only public record
+   linking the bug to its fix.
+
    **The full BIDS Behavioral binding of decision 3 is still not emitted, and the
    reason is now evidence rather than inertia.** It is achievable — the hard part,
    the events table and its HED, validates clean. What is not achievable cheaply
@@ -505,6 +530,106 @@ but it is the prerequisite for everything after.
 4. **Do not describe the bridge as existing** until the bundle passes the
    validators in decision 7. Gate 4 is a standing restraint, not a milestone
    that acceptance retires.
+
+## Upstream answers from the HED Working Group, 2026-08-20 to 2026-08-23
+
+The six questions went upstream on 2026-08-20 under decision 9's ask, encode and
+reproduce, never endorse
+([write-up](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
+[hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
+[hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836)).
+Three maintainers replied inside 48 hours. This section records what they
+settled, what it changes here, and what is still open, so that a GitHub thread is
+not the only place any of it lives.
+
+### Settled
+
+**Item 2, safety-constrained delivery: HED carries the delivered value, not the
+protective intent.** @yarikoptic separated the two. The factual measurement (a
+flash rate delivered at 10 Hz where 20 Hz was requested) is already expressible;
+"this was capped for photosensitivity" is not, and belongs with the higher-level
+description of the paradigm, alongside work such as cognitiveatlas. He also said
+plainly that data quality does not belong under HED at all, which answers a
+framing we had put badly: item 2 was filed next to quality questions and is not
+one, it is participant safety.
+
+*Consequence: none to the mapping, and that is the finding.* The
+`eventSafetyLimitApplied` entry in
+[`static/schemas/sstim-hed-event-map.json`](../../static/schemas/sstim-hed-event-map.json)
+already emits `(Experiment-control, Constrained)` as a factual statement that a
+constraint was applied, carries the delivered value in the detail template, and
+its `lossyBecause` already declares that a HED consumer cannot tell a protective
+constraint from an ordinary adjustment, with the requested value staying in
+`sstim:parameterValueBefore`. Upstream has now confirmed that this split is the
+one HED intends. The declared loss is therefore **correct and deliberate, not a
+gap awaiting a tag**, and the entry is annotated to say so. Anyone tempted to
+close it by asking HED for a `Safety` or `Threshold` tag should read this first.
+
+**Item 1, session completion: placement solved, vocabulary not.** @neuromechanist
+pointed at `scans.tsv`, which is BIDS's place for whether a recording completed,
+and is upstream of HED rather than inside it. Verified 2026-08-21: a
+`session_completion` column with HED levels in `sub-01_scans.json` validates
+under `bids-validator` 3.0.1, and a deliberately bogus tag there is caught, so
+the checking is real. What it does not settle is which tag goes in the level.
+Searching HED 8.4.0 for `complet`, `abort`, `terminat`, `interrupt`, `partial`
+and `cancel` returns nothing that means this, so the level carries a
+`Description` and no tag. Half answered: the placement moves, the vocabulary gap
+stands, and @neuromechanist raised a library schema as a possible home.
+
+**Item 6.** Closed pending the merge of bids-standard/bids-validator#442. See the
+item 6 block above.
+
+### Open, and one of them is structural
+
+**VisLab's critique, which we accept.** The definitions we generate are event
+codes wearing a definition's clothes:
+
+```
+(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus,
+    Sensory-presentation))
+```
+
+This says little that the event type did not already say. His point is
+comparability: if similar HED annotations were applied across datasets, richer
+definition bodies would let a consumer distinguish situations instead of matching
+opaque names. The ontology already holds modality, technique, frequencies and
+level, so we can generate something descriptive, and this validates against
+8.4.0:
+
+```
+(Definition/Sstim-delivery-binaural, (Sensory-event, Experimental-stimulus,
+    Auditory-presentation, Tone, Frequency/440 Hz, Repetitive,
+    Temporal-rate/10 Hz))
+```
+
+**The unresolved question decides the shape of the generator**, which is why it
+is recorded here rather than left in a thread: should a definition body describe
+the actual stimulus, making each dataset self describing at the cost of
+`Def/Sstim-delivery` denoting something different in every one, or should
+definitions stay stable across datasets with the varying description carried on
+the events? Our instinct is the first for whatever is constant within a session
+and the second for whatever changes during it, but that is a guess about HED's
+intent, and it runs directly into VisLab's comparability point. Asked on the
+thread 2026-08-21, unanswered as of 2026-08-23.
+
+**Items 3 and 4** (is `Inset` right for resuming delivery, and does HED want
+vocabulary for the software producing a stimulus) are small yes/no questions,
+unanswered, and staying in the thread.
+
+**Item 5** (a continuously varying parameter as a linked trace or as piecewise
+placeholder-`Def/` marks, and whether `Experiment-control` + `Modify` +
+`Parameter-label`/`Parameter-value` or `Control-variable` is canonical) is open.
+@neuromechanist's assessment is that it needs a call rather than a thread, so it
+is bound to the meeting below rather than expected back in writing.
+
+### Meeting requested
+
+VisLab invited a meeting via `hed-maintainers@gmail.com`; @neuromechanist offers
+office hours as a second route. The request is scheduled to send 2026-08-24 08:00
+UTC+2, with the agenda anchored on the definition shape and item 5, and items 1,
+3 and 4 left to the thread. The final agenda depends on what the thread closes
+first, so it goes a couple of days before the call rather than with the request.
+
 
 ## See also
 

@@ -470,6 +470,45 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                       200 while the download path returns 500, so it looks like
                       one API path rather than the whole service.
 
+                    **Upstream response, 2026-08-20 to 2026-08-23.** A
+                    maintainer (@Vehnem) answered on #59, and the answer bears
+                    on all three reports above. He revived the official
+                    `archivo.dbpedia.org` deployment "about two weeks ago" but
+                    the Databus backend is still broken; the server had been
+                    running with a full disk for some time and he is still
+                    cleaning up and restoring. The deployed Archivo is also, in
+                    his words, quite old. His estimate for the official
+                    deployment is "the next days or weeks", and the project is
+                    short of manpower. So the frozen rating stands, but for a
+                    reason that is now upstream-confirmed and time-bounded
+                    rather than inferred from a silent listing. **Re-measure the
+                    updater date and the download 500 once he reports the
+                    Databus fixed**; do not assume this document's numbers still
+                    hold after that.
+
+                    #59 also drew a first-time contributor, @Vansh1419, who
+                    opened
+                    [dbpedia/archivo#60](https://github.com/dbpedia/archivo/pull/60)
+                    with exactly the one-line fix the issue proposed. Reviewed
+                    2026-08-23 and it is correct and complete for
+                    `__run_consistency_checks`.
+
+                    **A second instance of the same bug, found in that review
+                    and not covered by #60.** `__run_pellet_info`, further down
+                    the same file, has the identical hardcode: it loops
+                    `for ignore_imports in [True, False]`, uses the loop variable
+                    for the `imports_cv` content variant, and then calls
+                    `get_pellet_info(ontology_url=url, ignore_imports=False)`.
+                    `get_pellet_info` appends `--ignore-imports` exactly as
+                    `get_consistency` does, so both iterations run Pellet with
+                    imports. This one cannot produce a false inconsistency,
+                    because `check_if_consistent` never reads `pelletInfo`, but
+                    it publishes a Databus artifact labelled `imports=NONE` whose
+                    content is the `FULL` run, and it spends a second Pellet run
+                    on identical input. Raised on #60 on 2026-08-23, leaving the
+                    choice of folding it in or taking it separately to the
+                    contributor and the maintainer.
+
                     Plan on the rating staying frozen regardless. Do not hold a
                     release for it, and do not cite the Archivo stars anywhere
                     until they reflect a crawl of the current graph.

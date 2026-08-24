@@ -136,7 +136,7 @@ projection.
       HED mapping needs. The projection still reports what it withholds.*
 - [ ] Generate a version-pinned HED mapping and synthetic core bundle.
 - [ ] Add and validate the optional complete BIDS Behavioral binding.
-- [x] Request HED Working Group review. Sent 2026-08-20 as six questions split by owning repository: [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) and [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836). Awaiting reply.
+- [x] Request HED Working Group review. Sent 2026-08-20 as six questions split by owning repository: [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) and [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836). **Answered 2026-08-20 to 2026-08-23** by @VisLab, @neuromechanist and @yarikoptic: item 2 settled (HED carries the delivered value, not the protective intent), item 1 half settled (`scans.tsv` is the placement, the vocabulary gap stands), item 6 fixed upstream. Items 3, 4 and 5 are open, as is VisLab's definition-shape critique, which a requested meeting will take. Recorded in [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md#upstream-answers-from-the-hed-working-group-2026-08-20-to-2026-08-23).
 
 **Reference (for §"what are these", so we don't re-look-up):**
 - **HED** — Hierarchical Event Descriptors: controlled vocabulary for *what occurred*
