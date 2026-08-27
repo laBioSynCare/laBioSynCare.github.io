@@ -11,7 +11,17 @@ import {
 } from './semantic.js'
 import { FIELD_SEMANTICS, fieldGraphHref } from '../field/fieldSemantic.js'
 import { applicationRoute } from '../../config/applicationUrls.js'
-import { AUDIO_TRACK_TYPES, VISUAL_TRACK_TYPES } from './presetDraft.js'
+import {
+  AUDIO_TRACK_TYPES,
+  HAPTIC_PARAMS,
+  MARTIGLI_PARAMS,
+  SINUSOID_PARAMS,
+  SPATIAL_VISUAL_PARAMS,
+  SYMMETRY_PARAMS,
+  VISUAL_TRACK_TYPES,
+  VISUAL_VOICE_PARAMS,
+  VOICE_PARAMS,
+} from './presetDraft.js'
 import { SSTIM } from '../../rdf/namespaces.js'
 
 // Mapping-registry golden test (improvement plan phase 0.3; audit finding
@@ -57,6 +67,21 @@ describe('semantic mapping registries (KR-17)', () => {
     for (const [key, info] of Object.entries(FIELD_SEMANTICS)) {
       expect(declared.has(info.uri), `${key} -> ${info.uri}`).toBe(true)
     }
+  })
+
+  // Falling through to the generic branch is how eight spatial and colour
+  // parameters stayed invisible to the panel: it yields the raw key as a label
+  // and a placeholder description. An entry with a null IRI is the way to say
+  // "no term yet"; absence is not.
+  it('every knob parameter has an explicit registry entry', () => {
+    const knobParams = [...new Set([
+      ...MARTIGLI_PARAMS, ...SYMMETRY_PARAMS, ...SINUSOID_PARAMS,
+      ...Object.values(VOICE_PARAMS).flat(),
+      ...Object.values(VISUAL_VOICE_PARAMS).flat(),
+      ...SPATIAL_VISUAL_PARAMS, ...HAPTIC_PARAMS,
+    ])]
+    const missing = knobParams.filter(p => !KNOWN_PARAMETERS.includes(p))
+    expect(missing, `parameters with no registry entry: ${missing.join(', ')}`).toEqual([])
   })
 
   it('an unknown parameter is explicitly unmapped, never a minted IRI', () => {

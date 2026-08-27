@@ -181,6 +181,22 @@ const PARAM_SEMANTICS = {
   blinkRate: ['Blink rate', 'Visual parameter', SSTIM_EX('hasFlickerRateHz').value, 'Photic flicker rate in Hz for a blinking visual.'],
   duty: ['Duty cycle', 'Visual parameter', SSTIM_EX('hasDutyCycle').value, 'On-fraction of each blink cycle.'],
   oscRate: ['Oscillation rate', 'Visual parameter', null, 'Rate in Hz of a smooth visual oscillation.'],
+  // ADR 0046 spatial and colour-field controls. sstim-v:RenderableParameterScheme
+  // already names the categories a signal can be rendered onto, so these map to
+  // genuine declared terms rather than staying invisible to the panel.
+  x: ['X position', 'Spatial parameter', SSTIM_V('paramSpatialPosition').value, 'Horizontal placement of a source in camera-space, applied after stage yaw.'],
+  y: ['Y position', 'Spatial parameter', SSTIM_V('paramSpatialPosition').value, 'Vertical placement of a source in camera-space, applied after stage yaw.'],
+  z: ['Z position', 'Spatial parameter', SSTIM_V('paramSpatialPosition').value, 'Depth placement of a source in camera-space, driving the stereoscopic disparity.'],
+  scale: ['Scale', 'Visual parameter', SSTIM_V('paramSize').value, 'Rendered extent of a flat visual source.'],
+  spatialScale: ['Spatial scale', 'Spatial parameter', SSTIM_V('paramSize').value, 'Rendered extent of a source in scene space, before the stage projects it.'],
+  phaseRad: ['Phase offset', 'Timing parameter', SSTIM_EX('hasPhaseOffset').value, 'Starting phase of a sinusoid control, offsetting it against the other controls. The studio expresses this in radians; the ontology term is defined as a fraction of a cycle.'],
+  // Deliberately unmapped, and listed rather than left to fall through, so the
+  // panel gives a real label and the decision is visible here:
+  // - opacity is not sstim-v:paramLuminance. An opaque dark layer is opaque and
+  //   dim at once, so equating the two would be wrong, not merely imprecise.
+  // - the scheme has no colour or hue concept yet.
+  opacity: ['Opacity', 'Visual parameter', null, 'Blend weight of a visual layer. Distinct from luminance, which the ontology does name, so no term is claimed.'],
+  hue: ['Hue', 'Visual parameter', null, 'Colour angle of a visual layer. RenderableParameterScheme names no colour category yet.'],
   intensity: ['Intensity', 'Haptic parameter', SSTIM('stimulationIntensity').value, 'Strength of haptic or sensory output.'],
   pattern: ['Pattern', 'Haptic parameter', SSTIM('hapticPattern').value, 'Pattern index or selector for haptic delivery.'],
 }

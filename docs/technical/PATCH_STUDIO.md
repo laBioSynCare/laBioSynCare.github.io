@@ -391,7 +391,7 @@ holds the matching one for Sensory Field exposure terms:
 | Registry | Entries | Keyed by | Resolves to |
 |---|---|---|---|
 | `TRACK_SEMANTICS` | 23 | track type (plus `LFO`, `Permutation`, `Vibration`) | an OWL class or a `sstim-v:` modality concept |
-| `PARAM_SEMANTICS` | 27, of which 23 carry an IRI | parameter name | an SSTIM property |
+| `PARAM_SEMANTICS` | 35, of which 29 carry an IRI | parameter name | an SSTIM property or renderable-parameter concept |
 | `FIELD_SEMANTICS` | Sensory Field exposure terms | field concept | an `sstim-ex:` term |
 
 Counts drift; `KNOWN_TRACK_TYPES` and `KNOWN_PARAMETERS` are exported from
@@ -454,12 +454,17 @@ Three limits, so nobody reads more into it than is there:
   patch, and clicking through does not put the patch in the graph. Projecting a
   patch into RDF is a separate path, `src/portability/patchProjection.js` (§8).
 - **Coverage is partial, and honestly so.** Of the 31 knob parameters reachable
-  in the UI, 19 resolve to an ontology term. Four registry entries are mapped
-  but deliberately IRI-less because no genuine term exists yet (`cutoff`,
-  `resonance`, `detune`, `oscRate`), and eight visual/spatial parameters
-  (`opacity`, `scale`, `hue`, `phaseRad`, `x`, `y`, `z`, `spatialScale`) are
-  absent from the registry altogether and fall through to the unmapped branch.
-  All 20 addable track types now resolve.
+  in the UI, 25 resolve to an ontology term, and all 20 addable track types do.
+  The remaining six carry an explicit registry entry with a null IRI, which is
+  how this codebase says *no term yet*: `cutoff`, `resonance`, `detune` and
+  `oscRate` have no counterpart in the modules, `opacity` is deliberately not
+  equated with `sstim-v:paramLuminance` (an opaque dark layer is opaque and dim
+  at once, so the two are different things), and `hue` has no colour category in
+  `sstim-v:RenderableParameterScheme`. **Absence from the registry is not a way
+  to say "unmapped"**: it yields the raw key as a label and a placeholder
+  description, which is how the eight spatial and colour parameters stayed
+  invisible to the panel. A test now requires an entry for every knob
+  parameter.
 
 ---
 
