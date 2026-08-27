@@ -241,6 +241,18 @@ owns both registration and the update prompt. It is Svelte 5 runes (`$state`,
    dismisses the banner; the update applies on the next natural reload or when
    all tabs close.
 
+   **`controllerchange` is not only an update signal.** It also fires on the
+   very first install, when `activate`'s `clients.claim()` takes control of a
+   page that had no controller. The handler used to reload there too, so every
+   first visit quietly reloaded itself a few seconds in. That is Trap 1
+   happening without any deploy at all: it discarded unsaved Patch Studio work
+   and would have ended an in-progress session, and it was found because it
+   silently dropped the `?add=` track the Graph Navigator had just requested
+   (`PATCH_STUDIO.md` §10.5). The reload is therefore gated on a flag that only
+   `applyUpdate()` sets, so the user's click is what makes it happen.
+   `make studio-browser-check` asserts the page survives the worker taking
+   control, and the assertion was mutation-tested against the old behaviour.
+
 > **Future enhancement — suppress the banner during playback.** Today the banner
 > may appear while a session is playing; it is passive and the user controls the
 > reload, so a session is never interrupted. Once a global "is a session

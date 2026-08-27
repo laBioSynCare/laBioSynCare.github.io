@@ -18,17 +18,30 @@
 
   let updateReady = $state(false)
   let waitingWorker = null
+  // Set only by applyUpdate(), so a controllerchange nobody asked for cannot
+  // reload the page. Deliberately not $state: nothing renders from it.
+  let reloadRequested = false
 
   onMount(() => {
     if (dev || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
       return
     }
 
-    // Reload exactly once when the new worker takes control (guards against the
-    // double-fire that `controllerchange` can otherwise cause).
+    // Reload exactly once when the new worker takes control, and only when the
+    // visitor asked for it.
+    //
+    // Trap 1 (ADR 0009) is not only about updates. `controllerchange` also
+    // fires on FIRST install, when the worker's activate handler calls
+    // clients.claim() and takes control of a page that had no controller. This
+    // listener reloaded there too, so every first visit silently reloaded a few
+    // seconds in: it discarded unsaved Patch Studio work, would have ended an
+    // in-progress stimulation session, and dropped the ?add= track the Graph
+    // Navigator had just requested, which is how it was found. Gating on the
+    // user's click is what makes the reload the deliberate act the ADR
+    // describes; `reloading` still guards the double-fire.
     let reloading = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (reloading) return
+      if (!reloadRequested || reloading) return
       reloading = true
       location.reload()
     })
@@ -85,6 +98,7 @@
     // The user chose to reload. Promote the waiting worker; the
     // `controllerchange` handler above performs the single reload.
     updateReady = false
+    reloadRequested = true
     waitingWorker?.postMessage({ type: 'SKIP_WAITING' })
   }
 
