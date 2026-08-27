@@ -443,8 +443,8 @@ indexed, examiner-searchable records.
 
 - [~] Cut the production w3id routes over from `labiosyncare.github.io` to
       `w3c-cg.github.io/sstim` `P1`
-      ***Authorised and prepared 2026-08-27; the upstream pull request is what
-      remains.*** *All 58 targets in the repository mirror now point at the
+      ***Authorised 2026-08-27; [w3id PR #6609](https://github.com/perma-id/w3id.org/pull/6609)
+      is open and awaiting review.*** *All 58 targets in the repository mirror now point at the
       project site, the four gates pass, and the nine target families were
       confirmed 200 on the new origin. One rule was added rather than moved: the
       frozen manifests for 0.13.0 through 0.16.0 state root-absolute paths and
@@ -452,6 +452,13 @@ indexed, examiner-searchable records.
       so a future regression pins itself. The staged-route harness swapped
       direction, so it now rehearses the rollback, which is the remaining half of
       the Pages-rollback proof the migration report left open.*
+
+      *The upstream README change was kept minimal on purpose. The repository
+      mirror has grown to 177 lines against upstream's 86, and the w3id checklist
+      asks that commits carry redirects and basic information rather than full
+      documentation, so only the project, target and exception lines were sent.
+      The `.htaccess` remains byte-identical to the mirror, which is what
+      `make w3id-routes` pins.*
 
       *Recorded 2026-08-25: Renato intends to consider this shortly. Nothing
       tracked it before, because
