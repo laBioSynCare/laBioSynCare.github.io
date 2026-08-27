@@ -20,6 +20,7 @@
     requiresFlashAcknowledgement,
   } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
+  import { paramLabel } from './paramLabels.js'
   import {
     FIELD_REPORT_SECTIONS,
     FIELD_STARTERS,
@@ -1496,40 +1497,6 @@
       sum += (Number(m.amount) || 0) * (controlStates[m.controlId]?.value ?? 0)
     }
     return Math.max(pmin, Math.min(pmax, sum))
-  }
-
-  // Knob captions sit in the 56px column set by Knob.svelte's `.knob-label`,
-  // which shows about eight lowercase characters before the ellipsis takes
-  // over. Raw parameter keys overflowed it into misreadings: `inhaleRatio`
-  // rendered as "inhaler", a word this project must never appear to use. These
-  // are display abbreviations only; the full name and its ontology term stay
-  // one click away in the semantic panel, and `labelTitle` carries the full
-  // name on hover. Keys not listed here already fit.
-  const PARAM_SHORT_LABELS = {
-    amplitude: 'amp',
-    beatFreq: 'beat',
-    blinkRate: 'rate',
-    centerFreq: 'center',
-    frequency: 'freq',
-    inhaleRatio: 'inhale',
-    intensity: 'level',
-    leftFreq: 'left',
-    nnotes: 'notes',
-    noctaves: 'octaves',
-    noteDurationFrac: 'note%',
-    oscRate: 'rate',
-    periodSec: 'period',
-    phaseRad: 'phase',
-    pulseRate: 'pulse',
-    resonance: 'res',
-    rightFreq: 'right',
-    rotationSpeed: 'spin',
-    spatialScale: 'sp.scale',
-    targetPeriodSec: 'target',
-  }
-
-  function paramLabel(name) {
-    return PARAM_SHORT_LABELS[name] ?? name
   }
 
   // Hover text spells the abbreviation back out. The ontology registry already
