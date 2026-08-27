@@ -20,7 +20,7 @@ jobs:
     name: Build static site
     runs-on: ubuntu-latest
     outputs:
-      production: ${{ steps.base.outputs.production }}
+      production: ${{ steps.role.outputs.production }}
     steps:
       # Dual publication: the identical commit is published to both
       # `laBioSynCare/laBioSynCare.github.io` (an owner site, served at the
@@ -39,11 +39,9 @@ jobs:
           repo_name="$(printf '%s' "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')"
           if [ "$repo_name" = "$owner_site" ]; then
             echo "SSTIM_BASE_PATH=" >> "$GITHUB_ENV"
-            echo "production=true" >> "$GITHUB_OUTPUT"
             echo "Owner site: building at the origin root."
           else
             echo "SSTIM_BASE_PATH=/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
-            echo "production=false" >> "$GITHUB_OUTPUT"
             echo "Project site: building at /${{ github.event.repository.name }}."
           fi
 
@@ -55,6 +53,32 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
+
+      # Which of the two deployments is production is a W3ID fact, not a GitHub
+      # one, and the roles swapped at the cutover: the owner site used to be
+      # production and is now the legacy origin. Deriving it from
+      # `<owner>.github.io` therefore inverted the answer, which ran the staged
+      # overlay against the very base it is defined to differ from and failed
+      # every Community Group deploy. Read it from the constant the route
+      # tooling already uses, so the next move updates one file.
+      - name: Identify the production deployment
+        id: role
+        run: |
+          site="https://$(printf '%s' "${{ github.repository_owner }}.github.io" | tr '[:upper:]' '[:lower:]')${SSTIM_BASE_PATH}/"
+          expected="$(node --input-type=module -e "import { PRODUCTION_APPLICATION_BASE } from './scripts/w3id-staged-routes.mjs'; process.stdout.write(PRODUCTION_APPLICATION_BASE)")"
+          # An empty read must not quietly mean "not production": on the
+          # Community Group site that is the failure this step exists to avoid.
+          if [ -z "$expected" ]; then
+            echo "Could not read PRODUCTION_APPLICATION_BASE from scripts/w3id-staged-routes.mjs" >&2
+            exit 1
+          fi
+          if [ "$site" = "$expected" ]; then
+            echo "production=true" >> "$GITHUB_OUTPUT"
+            echo "This deployment ($site) is the production application base."
+          else
+            echo "production=false" >> "$GITHUB_OUTPUT"
+            echo "This deployment ($site) is not production ($expected)."
+          fi
 
       # Build the deployed artifact with the same pinned flake toolchain as
       # local dev and the lint/validate workflows — one source of truth.
