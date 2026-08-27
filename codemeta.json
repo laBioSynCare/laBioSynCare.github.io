@@ -11,8 +11,8 @@
     "https://spdx.org/licenses/Apache-2.0",
     "https://spdx.org/licenses/CC-BY-4.0"
   ],
-  "codeRepository": "https://github.com/laBioSynCare/laBioSynCare.github.io",
-  "url": "https://labiosyncare.github.io/",
+  "codeRepository": "https://github.com/w3c-cg/sstim",
+  "url": "https://w3c-cg.github.io/sstim/",
   "issueTracker": "https://github.com/w3c-cg/sstim/issues",
   "readme": "https://github.com/w3c-cg/sstim/blob/main/README.md",
   "author": [

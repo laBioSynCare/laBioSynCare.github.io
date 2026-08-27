@@ -21,8 +21,8 @@ authors:
     given-names: Renato
     email: renato.fabbri@gmail.com
     orcid: "https://orcid.org/0000-0002-9699-629X"
-repository-code: "https://github.com/laBioSynCare/laBioSynCare.github.io"
-url: "https://labiosyncare.github.io/"
+repository-code: "https://github.com/w3c-cg/sstim"
+url: "https://w3c-cg.github.io/sstim/"
 license: CC-BY-4.0
 keywords:
   - sensory stimulation
