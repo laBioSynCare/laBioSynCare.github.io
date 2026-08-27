@@ -13,11 +13,17 @@
 // forgets to update it fails `make validate`.
 //
 // Authority is CITATION.cff at the repo root. On every release, update these
-// four fields together with CITATION.cff, README.md, and CHANGELOG.md.
+// fields together with CITATION.cff, README.md, and CHANGELOG.md.
 //
 // Concept versus version DOI: the concept DOI resolves to the latest release
 // and is what general references to SSTIM should use. The version DOI pins one
 // immutable release and belongs in a bibliography entry that names a version.
+
+// The citation title, which the modal used to hard-code twice — once in the
+// APA form and once in the BibTeX entry. Renaming BSC Lab to SSTIM Workbench
+// meant editing three files that each held their own copy; truth-audit now
+// compares this against CITATION.cff so the next rename cannot half-apply.
+export const RELEASE_TITLE = 'SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology'
 
 export const RELEASE_VERSION = '0.16.0'
 export const RELEASE_DATE = '2026-08-18'

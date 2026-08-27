@@ -1,6 +1,6 @@
 {
-  "title": "BSC Lab — Sensory Stimulation Ontology (SSTIM) and open stimulation platform",
-  "description": "BSC Lab is an open-source sensory stimulation platform with two integrated layers: a precision multi-engine audiovisual stimulation application, and a knowledge layer built on the SSTIM ontology (OWL class hierarchy, multilingual SKOS vocabulary, SHACL validation shapes, qualified evidence governance, exposure and ecosystem term modules, and external alignments) published at https://w3id.org/sstim under CC BY 4.0. Ecosystem fixtures in the release are synthetic; real live-only agent records must remain outside this archive. Each tagged release is archived here for citation.",
+  "title": "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology",
+  "description": "SSTIM Workbench, previously developed as BSC Lab, is the open reference environment for SSTIM, the Sensory Stimulation Vocabulary developed through the W3C Sensory Stimulation Vocabulary Community Group. It has two integrated layers: a precision multi-engine audiovisual stimulation application, and a knowledge layer built on the SSTIM ontology (OWL class hierarchy, multilingual SKOS vocabulary, SHACL validation shapes, qualified evidence governance, exposure and ecosystem term modules, and external alignments) published at https://w3id.org/sstim under CC BY 4.0. Community Group work is not a W3C Recommendation and is not W3C-endorsed technology. Ecosystem fixtures in the release are synthetic; real live-only agent records must remain outside this archive. Each tagged release is archived here for citation.",
   "upload_type": "software",
   "access_right": "open",
   "license": "CC-BY-4.0",
@@ -34,7 +34,7 @@
     },
     {
       "relation": "isSupplementTo",
-      "identifier": "https://github.com/laBioSynCare/laBioSynCare.github.io",
+      "identifier": "https://github.com/w3c-cg/sstim",
       "scheme": "url"
     }
   ]

@@ -8,6 +8,7 @@
     CONCEPT_DOI,
     NAMESPACE_IRI,
     RELEASE_DATE,
+    RELEASE_TITLE as TITLE,
     RELEASE_VERSION as VERSION,
     VERSION_DOI,
     VERSION_IRI,
@@ -19,13 +20,13 @@
   const README_CITATION_URL = `${GITHUB_URL}#citation-and-license`
 
   const PLAIN_CITATION =
-    `Fabbri, R. (2026). BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology ` +
+    `Fabbri, R. (2026). ${TITLE} ` +
     `(Version ${VERSION}) [Software]. https://doi.org/${VERSION_DOI}`
 
   const BIBTEX =
-    `@software{fabbri_bsclab_sstim,\n` +
+    `@software{fabbri_sstim_workbench,\n` +
     `  author  = {Fabbri, Renato},\n` +
-    `  title   = {{BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology}},\n` +
+    `  title   = {{${TITLE}}},\n` +
     `  version = {${VERSION}},\n` +
     `  date    = {${RELEASE_DATE}},\n` +
     `  doi     = {${VERSION_DOI}},\n` +

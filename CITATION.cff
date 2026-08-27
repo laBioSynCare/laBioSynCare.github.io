@@ -1,16 +1,17 @@
 cff-version: 1.2.0
 message: >-
-  If you use BSC Lab, the SSTIM ontology, or any of its documents in
-  research or derivative work, please cite as follows.
-title: "BSC Lab: Open Sensory Stimulation Platform and SSTIM Ontology"
+  If you use SSTIM Workbench, the SSTIM ontology, or any of its documents
+  in research or derivative work, please cite as follows.
+title: "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology"
 abstract: >-
-  BSC Lab is the open-source scientific and technical foundation for
-  sensory stimulation. It pairs a precision multi-engine audiovisual
-  stimulation platform (Web Audio, AudioWorklets, PixiJS, haptics) with
-  an open RDF knowledge graph — OWL classes, SKOS vocabulary, SHACL
-  shapes, and linked evidence chains — describing stimulation
-  protocols, parameters, qualified evidence assessments, and ecosystem
-  relationships. Committed ecosystem-agent fixtures are synthetic.
+  SSTIM Workbench, previously developed as BSC Lab, is the open-source
+  scientific and technical foundation for sensory stimulation. It pairs
+  a precision multi-engine audiovisual stimulation platform (Web Audio,
+  AudioWorklets, PixiJS, haptics) with an open RDF knowledge graph — OWL
+  classes, SKOS vocabulary, SHACL shapes, and linked evidence chains —
+  describing stimulation protocols, parameters, qualified evidence
+  assessments, and ecosystem relationships. Committed ecosystem-agent
+  fixtures are synthetic.
 type: software
 version: 0.16.0
 date-released: 2026-08-18

@@ -79,11 +79,16 @@ if (releaseMeta) {
   const field = (name) => releaseMeta.match(new RegExp(`^export const ${name} = '([^']+)'`, 'm'))?.[1]
   const conceptDoi = core?.match(/dct:identifier\s+"([^"]+)"/)?.[1]
   const citationDate = citation?.match(/^date-released:\s*(.+)$/m)?.[1]?.trim()
+  // The citation title lived in three files at once, and the BSC Lab → SSTIM
+  // Workbench rename had to touch all three. The modal now imports it, so this
+  // is the one comparison that keeps the next rename from half-applying.
+  const citationTitle = citation?.match(/^title:\s*"(.+)"\s*$/m)?.[1]?.trim()
   const expected = [
     ['RELEASE_VERSION', field('RELEASE_VERSION'), RELEASE_VERSION, 'void.ttl'],
     ['VERSION_DOI', field('VERSION_DOI'), DOI, 'void.ttl'],
     ['CONCEPT_DOI', field('CONCEPT_DOI'), conceptDoi, 'sstim-core.ttl'],
     ['RELEASE_DATE', field('RELEASE_DATE'), citationDate, 'CITATION.cff'],
+    ['RELEASE_TITLE', field('RELEASE_TITLE'), citationTitle, 'CITATION.cff'],
   ]
   for (const [name, actual, want, source] of expected) {
     if (!want) continue
