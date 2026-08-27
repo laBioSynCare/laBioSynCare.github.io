@@ -186,6 +186,32 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Registries
+- [ ] **Automate the DBpedia KG Catalog release refresh** `P3`
+      *Asked @m1ci on [lod-next-gen#46](https://github.com/m1ci/lod-next-gen/issues/46)
+      how the catalog tracks new releases; answered 2026-08-25 with two options.
+      Option 1 is a manual PR per release editing `metadata.yaml`. Option 2 is a
+      Python script referenced from `metadata.yaml` as
+      `check-new-release: script-name.py`, which their workflow runs daily.
+      He recommends option 2 for frequent releases, and ours are frequent:
+      0.14.0, 0.15.0 and 0.16.0 landed within days. **Take option 2.***
+
+      *Feasible with what is already public, checked 2026-08-25: new versions
+      come from the GitHub tags API (`v0.16.0`), the artifact is
+      `https://labiosyncare.github.io/ontology/<version>/sstim-namespace.ttl`
+      (answers 200), and `sha256` plus `size` are computed from that file. Model
+      it on `knowledge-graphs/dblp/dblp_release_auto_update.py` in their repo:
+      read the last entry under `artifacts[0].versions`, append a new one, set
+      every distribution to `status: pending` so their system picks it up.*
+
+      *One design choice to make, not yet made. The existing version description
+      embeds per-release counts ("163 OWL classes, 545 SKOS concepts across 67
+      concept schemes"). Either the script parses the released graph to compute
+      them, or the description drops to a generic sentence. Parsing keeps the
+      catalog as accurate as it is today, which is the reason to prefer it.*
+
+      *Until this ships the catalog stays pinned at `0.15.0` / artifact
+      `2026.08.17`. Not urgent: the record is correct for the release it names.*
+
 - [x] **Correct the prefix.cc registration** — **done 2026-08-18**, hours after it
       was found. All four serialisations now serve `https://w3id.org/sstim#`,
       verified by `make registry-verify`. The hash URI was added as an
@@ -221,6 +247,38 @@ indexed, examiner-searchable records.
       label that is simply wrong without colliding with anything.*
 
 ### Session model
+- [ ] Add the minimum event bridge that lets a session timeline name what was
+      presented `P2`
+      *Measured 2026-08-22 and recorded in
+      [`docs/ecosystem/HED_BIDS_INTEROP.md`](docs/ecosystem/HED_BIDS_INTEROP.md):
+      every concept in `sstim-v:SessionEventTypeScheme` is a system, transport or
+      session-lifecycle event, and `sstim:SessionEvent` carries four properties
+      (`hasEventType`, `hasChangedParameter`, `parameterValueBefore`,
+      `parameterValueAfter`), none of which can reference a stimulus, a channel
+      or a specification. Of the four event families a HED projection needs,
+      SSTIM has one: device and system. Stimulus-presentation,
+      participant-response and contextual events are absent.
+      `eventPlaybackStart` is transport control, not stimulus onset, and HED
+      annotates occurrences of stimuli. This, not the timeline or the clock, is
+      what blocks the crosswalk.*
+
+      *The fix is deliberately **not** an event vocabulary. HED owns "what kind of
+      occurrence was this", and duplicating the standard SSTIM chose in order to
+      avoid duplicating it is the failure mode ADR 0025 names. The minimum is a
+      relation from a `SessionEvent` to the thing presented, plus enough event
+      types to discriminate a presentation from a participant response from a
+      system occurrence. SSTIM supplies that something was presented, at time t,
+      per this specification; HED supplies what kind of thing it was. Roughly two
+      relations and a handful of types.*
+
+      *Write the ADR before the terms. This changes published session semantics
+      in a module that already ships with SHACL and a JSON-LD context, and three
+      open questions below sit downstream of the same decision: the safety-event
+      exposure boundary (module coupling), engine identity, and the shape of
+      generated HED definition bodies, which is with the HED Working Group. Do
+      not mint terms while that thread is open. Protected files under
+      CLAUDE.md §3.4.*
+
 - [x] Decide whether SSTIM needs a parameter-change session event type — **yes,
       shipped 2026-08-18**, the same day it was raised `P2`
       *`sstim-v:eventParameterChanged`, `sstim:StimulationParameterKind` with its
@@ -336,6 +394,75 @@ indexed, examiner-searchable records.
       [ADR 0025](docs/decisions/0025-hed-bids-interoperability-crosswalk.md).*
 
 ### Ontology namespace
+- [?] Decide whether the `implementation/bsclab/` IRI family stays as it is `P2`
+      ***Disposition 2026-08-27: leave it as is for now.*** *Renato decided this
+      after the measurements below. Nothing changes: no IRI moves, no route is
+      retargeted, no prefix is retired. What stays open is only the narrow
+      question at the end, whether records minted later should use a
+      Workbench-scoped path, and it does not need answering until something is
+      actually minted under a new family.*
+
+      *Raised 2026-08-25, when the citation title was renamed from BSC Lab to
+      SSTIM Workbench. That rename was scoped to the public application name and
+      deliberately touched no identifier, which leaves a question rather than a
+      decision: the published data sits under
+      `https://w3id.org/sstim/implementation/bsclab/{preset,experiment,evidence,session,annotation,component}/...`
+      while the software that produces it is now presented as SSTIM Workbench.*
+
+      *Measured 2026-08-25 with `make locate` rather than one grep, because this
+      family lives in five places and no single search sees more than two of
+      them:*
+      - *committed instance data under `static/ontology/instances/**`, roughly
+        300 `evidence` local names, 20 `experiment`, 6 `preset`, 5 `protocol`,
+        4 `component`, 2 `session`;*
+      - *`src/rdf/namespaces.js`, which exports seven `BSCLAB*` namespaces and
+        the `bsclab`, `bsclab-preset` and `bsclab-evidence` prefixes;*
+      - *live w3id routes for `/sstim/implementation/bsclab`,
+        `.../component/patch-studio` and the two seed presets, live since
+        2026-08-17 (PR #6561);*
+      - *the live ecosystem store, which answers for these IRIs too, so this is
+        published data and not merely a repository fact;*
+      - ***eleven frozen snapshots**, 0.6.0 through 0.16.0, which carry
+        `bsclab-evidence:...` CURIEs inside `skos:editorialNote` prose. Those
+        releases are immutable. Renaming without keeping the old routes
+        resolvable would strand pointers inside eleven citable releases.*
+
+      *The default answer is **keep**, and the burden is on any argument to
+      change it. CLAUDE.md §1 and the migration decision both say existing
+      BSC/BSC Lab RDF identities are not mechanically renamed, and persistence
+      beats prettiness: `bsclab` names the implementation that produced the
+      records, which stays true after the application is presented under a new
+      name. The only part genuinely worth deciding is whether records minted
+      **from here on** should go under a Workbench-scoped path, which buys
+      cosmetic consistency and costs two families to route, explain and keep
+      resolvable forever.*
+
+      *Do not settle this inside the origin cutover below. That change moves
+      where the routes point; this one would change what the IRIs are. Doing
+      both at once makes a failed redirect impossible to attribute.*
+
+- [ ] Cut the production w3id routes over from `labiosyncare.github.io` to
+      `w3c-cg.github.io/sstim` `P1`
+      *Recorded 2026-08-25: Renato intends to consider this shortly. Nothing
+      tracked it before, because
+      [`W3C_REPOSITORY_MIGRATION.md`](docs/ecosystem/W3C_REPOSITORY_MIGRATION.md)
+      deliberately excluded the production W3ID cutover from what it authorised.
+      It is a separate, explicit production change and must come last, after the
+      repository move and the parallel publication site, both of which are done.*
+
+      *Surface, measured 2026-08-25: 58 target URLs in
+      `docs/ecosystem/w3id/sstim/.htaccess`, plus `SITE_PREFIX` in
+      `scripts/check-w3id-route-targets.mjs`. The repository mirror is the source
+      and a test pins every target (w3id PR #6517), so the edit is mechanical and
+      `make w3id-routes` proves it before the upstream PR. Upstream PRs must use
+      the w3id.org pull-request template.*
+
+      *Two things are not mechanical. The mount changes: targets move from an
+      origin root to `/sstim`, so every path gains a segment and a missed one
+      404s silently. And browser-stored data is per-origin, so the transition
+      instructions tracked below should be published before the redirect moves,
+      not after.*
+
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
       `/implementation/bsclab/{preset,session,annotation,evidence}/...`, and

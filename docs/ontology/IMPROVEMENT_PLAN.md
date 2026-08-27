@@ -508,6 +508,14 @@ this phase.
 
 #### 3.1 HED event-semantic profile
 
+- **Open prerequisite.** The native event types this mapping consumes do not all
+  exist. Measured 2026-08-22: the shipped `SessionEventTypeScheme` is system,
+  transport and session-lifecycle only, and `sstim:SessionEvent` cannot reference
+  a stimulus, a channel or a specification, so the stimulus-presentation,
+  participant-response and contextual events named below have nothing to map
+  from. Close the minimum bridge described in
+  [`HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) before generating
+  annotations from this list, and record the model change in an ADR first.
 - Map stable native event types—not ad hoc strings—to a pinned released HED
   schema. Initial events include session start/end, stimulus block start/end,
   parameter/configuration change, pause/resume/interruption, report prompt and
