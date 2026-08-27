@@ -578,8 +578,26 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
 9. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.
-10. Tag and publish the GitHub release so Zenodo archives the same commit.
-11. Add the resulting version DOI without rewriting a published snapshot.
+10. Tag and publish the GitHub release. **This no longer archives anything by
+    itself.** Zenodo's GitHub integration is disconnected from both repositories
+    on purpose: the webhook binds deposits to one repository, the repository
+    moved to `w3c-cg/sstim`, and two connected repositories would mint two DOI
+    series for one artifact. Deposit over the API instead:
+
+    ```bash
+    make zenodo-deposit VERSION=X.Y.Z                      # dry run, always first
+    ZENODO_TOKEN=... make zenodo-deposit VERSION=X.Y.Z PUBLISH=1
+    ```
+
+    The script deposits a new version into the existing record, so the concept
+    DOI keeps naming one continuous series whatever repository the tag came
+    from. Its preflight refuses a missing tag, a dirty tree, or a version the
+    record already publishes; the archive is built from the tag rather than the
+    working tree. Do not re-enable the webhook on either repository.
+11. Carry the resulting version DOI into the three files that name it —
+    `void.ttl`, `CITATION.cff` and `src/ui/entrance/releaseMetadata.js` — and run
+    `make truth-audit`, which fails until all three agree. Never rewrite a
+    published snapshot to add it.
 12. **Reopen the mutable line the same day:**
     `node scripts/release-open-dev.mjs X.Y+1.0-dev`, then sync checksums and
     validate. Until this runs, the live sources claim `mod:status "released"` at

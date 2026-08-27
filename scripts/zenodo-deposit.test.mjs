@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 import { expect, test } from 'vitest'
 
-import { archiveName, depositMetadata, parentRecordId } from './zenodo-deposit.mjs'
+import { archiveName, depositMetadata, parentRecordId, preflight } from './zenodo-deposit.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8')
@@ -43,4 +43,15 @@ test('the archive is named for the release, not for a repository', () => {
   // The webhook named it after the GitHub repository, which is the thing that
   // is moving. This name survives the move.
   expect(archiveName('0.17.0')).toBe('sstim-v0.17.0.zip')
+})
+
+test('preflight refuses the three deposits that cannot be taken back', () => {
+  const clean = { version: '0.17.0', parentVersion: '0.16.0', tagExists: true, treeClean: true }
+  expect(preflight(clean)).toEqual([])
+
+  // A Zenodo version cannot be unpublished, only superseded, so each of these
+  // is worth a refusal rather than a warning.
+  expect(preflight({ ...clean, tagExists: false })[0]).toMatch(/no tag v0\.17\.0/)
+  expect(preflight({ ...clean, treeClean: false })[0]).toMatch(/dirty/)
+  expect(preflight({ ...clean, parentVersion: '0.17.0' })[0]).toMatch(/already publishes/)
 })

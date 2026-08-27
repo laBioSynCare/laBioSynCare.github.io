@@ -321,5 +321,12 @@ console.log('  HED demonstrator bundles regenerated for the release version')
 console.log(`  ${changes.length} files changed`)
 console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`, `make validate`, commit,')
 console.log(`        then \`make snapshot VERSION=${version} RELEASE_DATE=${releaseDate}\` — the snapshot`)
-console.log('        defaults to today and refuses a module set dated otherwise — and after the tag and DOI,')
-console.log(`        \`node scripts/release-open-dev.mjs\` to reopen the mutable line`)
+console.log('        defaults to today and refuses a module set dated otherwise.')
+// Zenodo no longer archives a tag by itself: the webhook is disconnected from
+// both repositories so the move cannot mint two DOI series. Naming the command
+// here matters because "after the tag and DOI" used to stand in for a step that
+// happened without anyone doing it.
+console.log(`        Then tag, and deposit: \`make zenodo-deposit VERSION=${version}\` to see the`)
+console.log('        plan, then again with PUBLISH=1 and ZENODO_TOKEN set. Carry the DOI it')
+console.log('        prints into void.ttl, CITATION.cff and releaseMetadata.js, `make truth-audit`,')
+console.log(`        and finally \`node scripts/release-open-dev.mjs\` to reopen the mutable line.`)

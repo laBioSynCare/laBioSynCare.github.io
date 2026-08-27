@@ -60,6 +60,30 @@ export function depositMetadata({ zenodoJson, version, publicationDate }) {
 /** What the webhook used to name the archive, kept stable across the move. */
 export const archiveName = (version) => `sstim-v${version}.zip`
 
+/**
+ * Refuse a deposit that would be wrong, before touching the network.
+ *
+ * Publishing is not reversible: a Zenodo version cannot be unpublished, only
+ * superseded. These are the three ways the release procedure in
+ * static/ontology/README.md can reach this script in a state worth stopping.
+ */
+export function preflight({ version, parentVersion, tagExists, treeClean }) {
+  const problems = []
+  if (!tagExists) {
+    problems.push(`no tag v${version}: the archive is built from the tag, not the working tree`)
+  }
+  if (!treeClean) {
+    problems.push('the working tree is dirty: commit or stash before depositing')
+  }
+  if (parentVersion && parentVersion === version) {
+    problems.push(
+      `the record already publishes ${version}: depositing again would add a second ` +
+        'version with the same number, not correct the first',
+    )
+  }
+  return problems
+}
+
 /** Build the archive from the tag, not the working tree. */
 export function buildArchive(version, outDir) {
   const tag = `v${version}`
@@ -123,13 +147,36 @@ async function main() {
   console.log(`  archive        ${archiveName(version)}`)
   console.log(`  supplement to  ${zenodoJson.related_identifiers?.find((r) => r.relation === 'isSupplementTo')?.identifier}`)
 
+  const tagExists = (() => {
+    try {
+      execFileSync('git', ['rev-parse', '--verify', `refs/tags/v${version}`], {
+        cwd: ROOT,
+        stdio: 'ignore',
+      })
+      return true
+    } catch {
+      return false
+    }
+  })()
+  const treeClean =
+    execFileSync('git', ['status', '--porcelain'], { cwd: ROOT, encoding: 'utf8' }).trim() === ''
+  const parentVersion = read('static/ontology/void.ttl').match(/dcat:version\s+"([^"]+)"/)?.[1]
+  const problems = preflight({ version, parentVersion, tagExists, treeClean })
+
   if (!publish) {
     console.log('\n  DRY RUN. Would issue, in order:')
     for (const [method, path, note] of PLAN) console.log(`    ${method.padEnd(6)} ${path}\n           ${note}`)
+    console.log('\n  Preflight:')
+    if (problems.length === 0) console.log('    ok, nothing blocks a deposit')
+    else for (const problem of problems) console.log(`    BLOCKED ${problem}`)
     console.log('\n  Re-run with --publish and ZENODO_TOKEN set to execute.')
-    console.log('  Check first that the tag exists and that no GitHub webhook is')
-    console.log('  still connected to either repository, or the release mints twice.')
+    console.log('  Check also that no GitHub webhook is still connected to either')
+    console.log('  repository, or the release mints twice.')
     return
+  }
+
+  if (problems.length > 0) {
+    throw new Error(`zenodo-deposit: refusing to publish\n  - ${problems.join('\n  - ')}`)
   }
 
   const token = process.env.ZENODO_TOKEN
@@ -169,7 +216,12 @@ async function main() {
     method: 'POST',
   })
   console.log(`\n  published ${published.doi}`)
-  console.log('  Update void.ttl, CITATION.cff, releaseMetadata.js, then `make truth-audit`.')
+  console.log('\n  Now carry the DOI into the three files that name it, in this order:')
+  console.log(`    void.ttl                          dct:hasVersion <https://doi.org/${published.doi}>`)
+  console.log(`    CITATION.cff                      doi: ${published.doi}`)
+  console.log(`    src/ui/entrance/releaseMetadata.js VERSION_DOI = '${published.doi}'`)
+  console.log('  then `make truth-audit`, which fails until all three agree, and')
+  console.log(`  \`node scripts/release-open-dev.mjs\` to reopen the mutable line.`)
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
