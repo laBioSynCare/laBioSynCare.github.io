@@ -1,0 +1,70 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "https://doi.org/10.5281/zenodo.21286974",
+  "name": "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology",
+  "description": "SSTIM Workbench, previously developed as BSC Lab, is the open-source scientific and technical foundation for sensory stimulation. It pairs a precision multi-engine audiovisual stimulation platform (Web Audio, AudioWorklets, PixiJS, haptics) with an open RDF knowledge graph — OWL classes, SKOS vocabulary, SHACL shapes, and linked evidence chains — describing stimulation protocols, parameters, qualified evidence assessments, and ecosystem relationships. Committed ecosystem-agent fixtures are synthetic.",
+  "version": "0.16.0",
+  "softwareVersion": "0.16.0",
+  "datePublished": "2026-08-18",
+  "license": [
+    "https://spdx.org/licenses/Apache-2.0",
+    "https://spdx.org/licenses/CC-BY-4.0"
+  ],
+  "codeRepository": "https://github.com/laBioSynCare/laBioSynCare.github.io",
+  "url": "https://labiosyncare.github.io/",
+  "issueTracker": "https://github.com/w3c-cg/sstim/issues",
+  "readme": "https://github.com/w3c-cg/sstim/blob/main/README.md",
+  "author": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0002-9699-629X",
+      "givenName": "Renato",
+      "familyName": "Fabbri",
+      "email": "renato.fabbri@gmail.com"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0002-9699-629X",
+      "givenName": "Renato",
+      "familyName": "Fabbri",
+      "email": "renato.fabbri@gmail.com"
+    }
+  ],
+  "producer": {
+    "@type": "Organization",
+    "name": "W3C Sensory Stimulation Vocabulary Community Group",
+    "url": "https://www.w3.org/groups/cg/sstim/"
+  },
+  "keywords": [
+    "sensory stimulation",
+    "ontology",
+    "OWL",
+    "SKOS",
+    "SHACL",
+    "audio entrainment",
+    "binaural beats",
+    "isochronic",
+    "Martigli",
+    "knowledge graph",
+    "semantic web"
+  ],
+  "programmingLanguage": [
+    "JavaScript",
+    "Svelte",
+    "Python"
+  ],
+  "runtimePlatform": [
+    "Node.js",
+    "Web browser"
+  ],
+  "applicationCategory": "Semantic Web",
+  "developmentStatus": "active",
+  "relatedLink": [
+    "https://w3id.org/sstim",
+    "https://www.w3.org/groups/cg/sstim/",
+    "https://doi.org/10.5281/zenodo.22003777"
+  ]
+}

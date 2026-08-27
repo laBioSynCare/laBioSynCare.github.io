@@ -525,6 +525,16 @@ term-index:
 term-index-check:
 	$(PYTHON) scripts/generate-term-index.py --check
 
+## Regenerate codemeta.json from CITATION.cff, void.ttl and the canonical link
+## module. Software registries and harvesters read CodeMeta and will not parse
+## CITATION.cff; deriving it keeps the two from disagreeing.
+codemeta:
+	node scripts/gen-codemeta.mjs
+
+## Fail if the committed codemeta.json no longer matches its sources.
+codemeta-check:
+	node scripts/gen-codemeta.mjs --check
+
 ## Assert the ADR index matches the ADR files: every file has a row, every row a
 ## file, statuses agree, and a superseded decision is marked superseded so the
 ## index never recommends one that no longer holds.
@@ -643,7 +653,7 @@ validate-status:
 		echo "validate-status: the tree has changed since; re-run make validate"; \
 	fi
 
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer w3id-routes release-dryrun truth-audit validate-stamp
+validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer w3id-routes release-dryrun truth-audit validate-stamp
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
