@@ -3,7 +3,7 @@
 // passed in, so these functions are unit-testable. The component keeps thin
 // wrappers that own the liveValues cache, the writeAudio side effect, and the
 // reactive bpmEnabled() read, and delegate the arithmetic here.
-// See docs/technical/PATCH_STUDIO.md §10.2–§10.3.
+// See docs/technical/PATCH_STUDIO.md §11.2–§11.3.
 import { clamp, tempoValueFromSync } from './tempo.js'
 
 function num(value, fallback = 0) {

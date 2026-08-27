@@ -1,7 +1,7 @@
 // Pure SVG-geometry helpers for the Patch Studio track "scope" previews,
 // extracted from PresetCreator.svelte. No component / reactive state — inputs
 // are plain numbers and envelope specs — so these are unit-testable.
-// See docs/technical/PATCH_STUDIO.md §10.2.
+// See docs/technical/PATCH_STUDIO.md §11.2.
 import { envelopeValueAt } from '../../engines/audio/VanillaWebAudioEngine.js'
 import { ISO_ENVELOPE_DEFAULTS } from './presetDraft.js'
 

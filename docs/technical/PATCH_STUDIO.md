@@ -20,7 +20,10 @@
 > optional depth-to-size state. Model 2 remains the historical first spatial
 > schema. The lossless session package and partial SSTIM RDF projection are
 > implemented;
-> the one-way catalog JSON adapter is still future work. The adopted plan to
+> the one-way catalog JSON adapter is still future work. The link into the
+> knowledge layer (the semantic panel and its deep link into the Graph
+> Navigator) is implemented and specified in §10, including what it
+> deliberately does not do. The adopted plan to
 > absorb Sensory Field is partially implemented: ordinary first-class
 > colour-field and spatial visual tracks, Field starters/routes, and one shared
 > visual projection stage have shipped. Disabled sources remain inactive tracks,
@@ -36,7 +39,8 @@ and [`src/ui/creator/PresetCreator.svelte`](../../src/ui/creator/PresetCreator.s
 [`visualTrackModel.js`](../../src/ui/creator/visualTrackModel.js),
 [`fieldTrackAdapter.js`](../../src/ui/creator/fieldTrackAdapter.js),
 [`fieldStarters.js`](../../src/ui/creator/fieldStarters.js),
-[`spatialScene.js`](../../src/ui/creator/spatialScene.js), and the
+[`spatialScene.js`](../../src/ui/creator/spatialScene.js), the ontology bridge
+in [`semantic.js`](../../src/ui/creator/semantic.js) (§10), and the
 [`StudioVisualStage.svelte`](../../src/ui/creator/StudioVisualStage.svelte),
 [`VisualStageControls.svelte`](../../src/ui/creator/VisualStageControls.svelte),
 and [`SpatialTrackInspector.svelte`](../../src/ui/creator/SpatialTrackInspector.svelte)
@@ -369,15 +373,105 @@ boundaries.
 
 ---
 
-## 10. Known gaps and planned improvements
+## 10. The knowledge-graph bridge
 
-> **Forward-looking, not as-built.** §1–§9 mirror the code. This section records
+Every knob caption and every track header in the studio is a link into the SSTIM
+ontology. Clicking a knob's caption, or a track card's ⌇ button, opens the
+semantic panel: the term's human label, its kind, a prose description, its CURIE
+and full IRI, and an **Open in graph** link that deep-links the Graph Navigator
+straight to that node. This is the only place the authoring surface and the
+knowledge layer meet in the UI.
+
+### 10.1 Where the mapping lives
+
+[`src/ui/creator/semantic.js`](../../src/ui/creator/semantic.js) holds two closed
+registries, and [`src/ui/field/fieldSemantic.js`](../../src/ui/field/fieldSemantic.js)
+holds the matching one for Sensory Field exposure terms:
+
+| Registry | Entries | Keyed by | Resolves to |
+|---|---|---|---|
+| `TRACK_SEMANTICS` | 23 | track type (plus `LFO`, `Permutation`, `Vibration`) | an OWL class or a `sstim-v:` modality concept |
+| `PARAM_SEMANTICS` | 27, of which 23 carry an IRI | parameter name | an SSTIM property |
+| `FIELD_SEMANTICS` | Sensory Field exposure terms | field concept | an `sstim-ex:` term |
+
+Counts drift; `KNOWN_TRACK_TYPES` and `KNOWN_PARAMETERS` are exported from
+`semantic.js` for exactly this reason, and the test below recomputes them.
+
+### 10.2 The rules the bridge is held to (KR-17)
+
+`semantic.test.js` parses every module in the manifest's `full` profile and
+enforces all of this:
+
+- **Never derive an IRI from a name.** An unmapped parameter returns
+  `uri: null`; the panel says *"Not yet mapped to an SSTIM ontology term"* and
+  renders no link. Minting `sstim:mysteryKnob` from a knob called `mysteryKnob`
+  is the failure this rule exists to prevent.
+- **Every non-null IRI must be declared** in the live ontology modules.
+- **Every track type the studio can add must be mapped explicitly**, and a
+  visual track must never resolve to an audio class. The generic fallback
+  (`sstim:Voice`) exists only for a type that does not exist yet; it is not a
+  resting place. The five ADR 0046 colour and spatial types
+  (`ColorField`, `DepthMarkers`, `TreeScene`, `AbstractScene`, `LandscapeScene`)
+  did rest there and reported `sstim:Voice` in the panel and in the graph link
+  until they were mapped to `sstim-v:modalityVisual`. The older test proved the
+  fallback *was declared*, which is not the same claim as its being *right*.
+- **Control tracks point at `sstim:ControlTrack`**, never at `sstim:MartigliVoice`
+  or `sstim:SymmetryVoice`. A control track is silent and modulates other tracks;
+  those two are audible catalog voices. See ADR 0041.
+
+### 10.3 The link itself
+
+```js
+semanticGraphHref(info) === `${applicationRoute('/graph/')}#${localName}`
+```
+
+`fieldGraphHref()` builds the same shape. Two properties matter and both are
+pinned by tests:
+
+- **It names `/graph/` directly.** The earlier `/#term` form worked only because
+  the entrance page forwards a stray hash to the browser, which costs a redirect
+  hop and a flash of the wrong page.
+- **It goes through `applicationRoute()`.** Under a project-page mount
+  (`SSTIM_BASE_PATH=/sstim`, which is what the w3id production cutover deploys),
+  a root-relative `/#term` leaves the deployment entirely and lands on the
+  owner site. See [`PORTABLE_DEPLOYMENT.md`](PORTABLE_DEPLOYMENT.md).
+
+On arrival `OntologyGraph.resolveHashToNodeId` accepts either a CURIE
+(`sstim:BinauralVoice`, and a bare `prefix:` addresses the namespace root) or a
+bare local name, widens the visible scope to contain the node, selects it, and
+pulses it so the reader can see where the link landed.
+
+### 10.4 What the bridge deliberately does not do
+
+Three limits, so nobody reads more into it than is there:
+
+- **It is one-directional.** Nothing in the Graph Navigator links back into the
+  Patch Studio: there is no "patches using this term" affordance, and no
+  reference to the studio anywhere in `OntologyGraph.svelte`. A reader can go
+  from a knob to a term, never from a term to a knob.
+- **It is type-level, not instance-level.** The panel names the class or
+  property a track or parameter *is an instance of*. It does not publish the
+  patch, and clicking through does not put the patch in the graph. Projecting a
+  patch into RDF is a separate path, `src/portability/patchProjection.js` (§8).
+- **Coverage is partial, and honestly so.** Of the 31 knob parameters reachable
+  in the UI, 19 resolve to an ontology term. Four registry entries are mapped
+  but deliberately IRI-less because no genuine term exists yet (`cutoff`,
+  `resonance`, `detune`, `oscRate`), and eight visual/spatial parameters
+  (`opacity`, `scale`, `hue`, `phaseRad`, `x`, `y`, `z`, `spatialScale`) are
+  absent from the registry altogether and fall through to the unmapped branch.
+  All 20 addable track types now resolve.
+
+---
+
+## 11. Known gaps and planned improvements
+
+> **Forward-looking, not as-built.** §1–§10 mirror the code. This section records
 > the gaps identified for the planned Patch Studio improvement work and is the
 > shared reference for that effort. Each item is grounded in the current code so
 > the work can proceed against repo truth. Tracked as checkboxes in
 > [`../../TODO.md`](../../TODO.md) ("Software — Phase 2 → UI — Patch Studio").
 
-### 10.1 The export reaches RDF, but not the catalog
+### 11.1 The export reaches RDF, but not the catalog
 
 `buildPatchExport()` produces a `patch-studio-model-3` object (§8). The lossless
 native/package path exists, the semantic projection is partial, and the catalog
@@ -425,7 +519,7 @@ Consequences that must be decided before implementing the catalog half:
   `static/ontology/instances/presets/`), SHACL-validated per `CLAUDE.md` §5.4
   before it is emitted. The private BioSynCare/BSC catalog stays out of this repo.
 
-### 10.2 `PresetCreator.svelte` is a monolith
+### 11.2 `PresetCreator.svelte` is a monolith
 
 The component is **well over four thousand lines** — check with `wc -l`, since a
 number written here drifts with every commit — mixing transport, engine lifecycle,
@@ -456,9 +550,9 @@ Decomposition (extract, do not rewrite behaviour):
   overlays, cloud-patches menu, help overlay, semantic-info panel, and general
   per-track cards remain in `PresetCreator.svelte`.
 
-### 10.3 Hard-logic coverage is partial
+### 11.3 Hard-logic coverage is partial
 
-✅ **Addressed for the §10.2 extractions.** The modulation formula, tempo-sync
+✅ **Addressed for the §11.2 extractions.** The modulation formula, tempo-sync
 resolution, binaural center/beat split, and scope geometry now have unit
 coverage in `src/ui/creator/modulation.test.js` and `waveformPaths.test.js`
 (creator suite): base + Σ amount·control, clamp, mute→gain 0, tempo-sync
@@ -472,7 +566,7 @@ untested orchestration still lives in the component `<script>`: transport,
 `rafTick`, full starter/report lifecycle, fullscreen, and cloud UI behavior.
 Production browser/offline route coverage is also still open.
 
-### 10.4 Visual rendering is split; haptic remains a preview
+### 11.4 Visual rendering is split; haptic remains a preview
 
 Per §5 and §6, the nine flat visual types still render as CSS/DOM previews,
 while `ColorField` and the four spatial types now use the shared
@@ -486,9 +580,43 @@ production-browser regression, and the general visual engine boundary are still
 roadmapped Phase-2 work
 ([`ROADMAP.md`](../../ROADMAP.md)).
 
-### 10.5 Minor
+### 11.5 Usability and discoverability
+
+The studio is dense by design: it is an authoring surface, not a player. Two
+defects of that density were fixed rather than documented, and both left a
+standing trap behind:
+
+- **Knob captions are abbreviated on purpose.** `Knob.svelte`'s `.knob-label`
+  is a 56px column showing roughly eight lowercase characters before the
+  ellipsis takes over. Raw parameter keys overflowed it into misreadings
+  (`inhaleRatio` rendered as "inhaler"). `PARAM_SHORT_LABELS` in
+  `PresetCreator.svelte` now supplies a fitting caption and `labelTitle` carries
+  the full ontology label on hover. **The trap:** a new parameter longer than
+  about eight characters truncates silently unless it is added to that map.
+  Nothing fails a build over it.
+- **Add-button rows wrap; they used to scroll.** `.col-adds` was
+  `overflow-x: auto` with the scrollbar hidden, so on a 1440px window the
+  Visual column's fourteen buttons overflowed and the `Mix` button (a primary
+  action) was both off-screen and unhinted. The row wraps now.
+
+Open, and not yet decided:
+
+- The header meta (`1c · 1a · 0v · 0h · 0m`, the per-column track counts) is
+  unexplained anywhere in the UI.
+- The top toolbar presents eleven controls at one visual weight, with transport,
+  export, persistence, and destructive actions (`Clear`, `Reset`) undifferentiated.
+- The semantic panel is reachable only by clicking a knob caption. The affordance
+  is `cursor: help` plus a hover underline, so at rest there is nothing to
+  suggest the captions are interactive, and the whole graph bridge (§10) is
+  correspondingly easy to miss.
+- Unused Visual and Haptic columns still occupy half the viewport.
+- None of this is covered by an automated check. Per §11.3, production
+  browser/offline route coverage is still open, so every claim about how the
+  studio *looks and behaves* rests on manual inspection.
+
+### 11.6 Minor
 
 `rafTick` allocates a `new Map()` per frame for control values. Harmless on the
 main thread (this is the rAF loop, **not** the worklet `process()` — `CLAUDE.md`
 §3.3 does not apply), but trivially hoistable if that loop is touched during
-§10.2.
+§11.2.

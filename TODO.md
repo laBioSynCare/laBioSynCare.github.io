@@ -903,7 +903,7 @@ The improvement backlog below is grounded in that spec's §10 and gated by
       compatibility window and the preceding fidelity/lifecycle gates pass `P2`
 
 **Optional catalog compatibility (after the merge and neutrality decision gate —
-PATCH_STUDIO.md §10.1, ADR 0026)**
+PATCH_STUDIO.md §11.1, ADR 0026)**
 - [ ] Define the generic export-adapter result and reconcile a version-pinned BSC
       catalog contract; proceed only under
       [`PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md`](docs/ecosystem/PATCH_STUDIO_CONFORMANCE_AND_NEUTRALITY.md)
@@ -922,7 +922,7 @@ PATCH_STUDIO.md §10.1, ADR 0026)**
       separate public-data approval—emit any BSC Lab reference preset/RDF
       instance; private catalog data stays outside this repository `P2`
 
-**Decompose the monolith (PATCH_STUDIO.md §10.2)**
+**Decompose the monolith (PATCH_STUDIO.md §11.2)**
 - [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
       preserving the `AudioContext.currentTime` clock authority); required by
       integration Milestone 1 `P2`
@@ -933,7 +933,7 @@ PATCH_STUDIO.md §10.1, ADR 0026)**
 - [ ] Split out Patch Studio subcomponents (cloud menu, help overlay,
       semantic-info panel, mix stage, track card) `P2`
 
-**Tests (PATCH_STUDIO.md §10.3)**
+**Tests (PATCH_STUDIO.md §11.3)**
 
 ### RDF pipeline
 - [ ] `src/rdf/export.js` — optionally generate a public BSC Lab preset JSON
