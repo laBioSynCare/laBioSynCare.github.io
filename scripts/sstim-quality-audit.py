@@ -68,30 +68,38 @@ ECOSYSTEM_FIXTURE_GRAPH = URIRef("https://w3id.org/sstim/graph/ecosystem-fixture
 ECOSYSTEM_PUBLIC_DUMP = URIRef(
     "https://biosyncare-lab.web.app/current.ttl"
 )
+# Where the w3id routes send readers. Production moved to the Community Group
+# project site (w3id PR #6609); the origin root stays live and keeps exactly one
+# route, the pin below, because four frozen manifests state root-absolute paths
+# and are immutable. Kept as constants because the pin check has to name both.
+APPLICATION_SITE = "https://w3c-cg.github.io/sstim/"
+ONTOLOGY_SITE = f"{APPLICATION_SITE}ontology/"
+PINNED_ROOT_ONTOLOGY = "https://labiosyncare.github.io/ontology/"
+
 CATALOG_PUBLIC_ROUTES = {
     "ecosystem/biosyncare": (
-        "https://labiosyncare.github.io/ontology/instances/programmes/biosyncare-ecosystem.ttl"
+        "https://w3c-cg.github.io/sstim/ontology/instances/programmes/biosyncare-ecosystem.ttl"
     ),
     "framework/bsc": (
-        "https://labiosyncare.github.io/ontology/instances/frameworks/bsc.ttl"
+        "https://w3c-cg.github.io/sstim/ontology/instances/frameworks/bsc.ttl"
     ),
     "implementation/bsclab": (
-        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+        "https://w3c-cg.github.io/sstim/ontology/instances/implementations/implementations.ttl"
     ),
     "implementation/biosyncare": (
-        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+        "https://w3c-cg.github.io/sstim/ontology/instances/implementations/implementations.ttl"
     ),
     "implementation/bsclab/component/patch-studio": (
-        "https://labiosyncare.github.io/ontology/instances/implementations/implementations.ttl"
+        "https://w3c-cg.github.io/sstim/ontology/instances/implementations/implementations.ttl"
     ),
 }
 CATALOG_HTML_ROUTES = {
-    "ecosystem/biosyncare": "https://labiosyncare.github.io/graph/#sstim-ecosystem:biosyncare",
-    "framework/bsc": "https://labiosyncare.github.io/graph/#bsc-fw:",
-    "implementation/bsclab": "https://labiosyncare.github.io/graph/#bsclab:",
-    "implementation/biosyncare": "https://labiosyncare.github.io/graph/#biosyncare:",
+    "ecosystem/biosyncare": "https://w3c-cg.github.io/sstim/graph/#sstim-ecosystem:biosyncare",
+    "framework/bsc": "https://w3c-cg.github.io/sstim/graph/#bsc-fw:",
+    "implementation/bsclab": "https://w3c-cg.github.io/sstim/graph/#bsclab:",
+    "implementation/biosyncare": "https://w3c-cg.github.io/sstim/graph/#biosyncare:",
     "implementation/bsclab/component/patch-studio": (
-        "https://labiosyncare.github.io/graph/#bsclab:component/patch-studio"
+        "https://w3c-cg.github.io/sstim/graph/#bsclab:component/patch-studio"
     ),
 }
 # BSC framework technique identities (ADR 0033). The three BSC originated
@@ -100,9 +108,9 @@ CATALOG_HTML_ROUTES = {
 # fail-closed and exactly, like the catalog block, so a retired slug can never
 # silently start resolving to the framework file as if it were still current.
 BSC_FRAMEWORK_DUMP = (
-    "https://labiosyncare.github.io/ontology/instances/frameworks/bsc.ttl"
+    "https://w3c-cg.github.io/sstim/ontology/instances/frameworks/bsc.ttl"
 )
-VOCAB_DUMP = "https://labiosyncare.github.io/ontology/sstim-vocab.ttl"
+VOCAB_DUMP = "https://w3c-cg.github.io/sstim/ontology/sstim-vocab.ttl"
 TECHNIQUE_PUBLIC_ROUTES = {
     "framework/bsc/technique/martigli-breathing-oscillation": BSC_FRAMEWORK_DUMP,
     "framework/bsc/technique/martigli-binaural-hybrid": BSC_FRAMEWORK_DUMP,
@@ -114,27 +122,27 @@ TECHNIQUE_PUBLIC_ROUTES = {
 }
 TECHNIQUE_HTML_ROUTES = {
     "framework/bsc/technique/martigli-breathing-oscillation": (
-        "https://labiosyncare.github.io/graph/"
+        "https://w3c-cg.github.io/sstim/graph/"
         "#bsc-fw-tech:martigli-breathing-oscillation"
     ),
     "framework/bsc/technique/martigli-binaural-hybrid": (
-        "https://labiosyncare.github.io/graph/#bsc-fw-tech:martigli-binaural-hybrid"
+        "https://w3c-cg.github.io/sstim/graph/#bsc-fw-tech:martigli-binaural-hybrid"
     ),
     "framework/bsc/technique/symmetry-permutation-entrainment": (
-        "https://labiosyncare.github.io/graph/"
+        "https://w3c-cg.github.io/sstim/graph/"
         "#bsc-fw-tech:symmetry-permutation-entrainment"
     ),
     "framework/bsc/technique/binaural-beat-stimulation": (
-        "https://labiosyncare.github.io/graph/#techBinauralBeats"
+        "https://w3c-cg.github.io/sstim/graph/#techBinauralBeats"
     ),
     "framework/bsc/technique/photic-rhythm-stimulation": (
-        "https://labiosyncare.github.io/graph/#techPhoticDriving"
+        "https://w3c-cg.github.io/sstim/graph/#techPhoticDriving"
     ),
     "framework/bsc/technique/audiovisual-rhythm-coordination": (
-        "https://labiosyncare.github.io/graph/#techAudiovisualEntrainment"
+        "https://w3c-cg.github.io/sstim/graph/#techAudiovisualEntrainment"
     ),
     "framework/bsc/technique/vibrotactile-rhythm-stimulation": (
-        "https://labiosyncare.github.io/graph/#techVibrotactileEntrainment"
+        "https://w3c-cg.github.io/sstim/graph/#techVibrotactileEntrainment"
     ),
 }
 
@@ -1152,56 +1160,56 @@ else:
     # so cannot be the destination for a term IRI.
     documentation_overrides = (
         HTML_ACCEPT,
-        "RewriteRule ^(vocab|ecosystem)$ https://labiosyncare.github.io/ [R=303,L]",
+        "RewriteRule ^(vocab|ecosystem)$ https://w3c-cg.github.io/sstim/ [R=303,L]",
     )
     expected_manifest_directives = (
-        "RewriteRule ^manifest$ https://labiosyncare.github.io/ontology/manifest.json [R=303,L]",
-        "RewriteRule ^manifest-schema/1$ https://labiosyncare.github.io/ontology/manifest.schema.json [R=303,L]",
+        "RewriteRule ^manifest$ https://w3c-cg.github.io/sstim/ontology/manifest.json [R=303,L]",
+        "RewriteRule ^manifest-schema/1$ https://w3c-cg.github.io/sstim/ontology/manifest.schema.json [R=303,L]",
         *negotiated_directives(
             profile_pattern,
-            json_ld="https://labiosyncare.github.io/ontology/sstim-$1-profile.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-$1-profile.rdf",
-            html="https://labiosyncare.github.io/ontology/docs/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-$1-profile.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.rdf",
+            html="https://w3c-cg.github.io/sstim/ontology/docs/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.ttl",
         ),
         *negotiated_directives(
             "^kernel$",
-            json_ld="https://labiosyncare.github.io/ontology/sstim-core.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-core.rdf",
-            html="https://labiosyncare.github.io/ontology/docs/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-core.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-core.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-core.rdf",
+            html="https://w3c-cg.github.io/sstim/ontology/docs/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl",
         ),
         *negotiated_directives(
             "^exposure$",
-            json_ld="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.rdf",
             # Both namespace catalogs (this and `^$`) send HTML to the
             # application: only it can honour a term fragment, which a server
             # never sees and a generated index cannot anchor.
-            html="https://labiosyncare.github.io/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-exposure-namespace.ttl",
+            html="https://w3c-cg.github.io/sstim/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.ttl",
         ),
         *negotiated_directives(
             "^module/exposure$",
-            json_ld="https://labiosyncare.github.io/ontology/sstim-exposure.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-exposure.rdf",
-            html="https://labiosyncare.github.io/ontology/docs/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-exposure.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.rdf",
+            html="https://w3c-cg.github.io/sstim/ontology/docs/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.ttl",
         ),
         *documentation_overrides,
         *negotiated_directives(
             module_pattern,
-            json_ld="https://labiosyncare.github.io/ontology/sstim-$1.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-$1.rdf",
-            html="https://labiosyncare.github.io/ontology/docs/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-$1.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-$1.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-$1.rdf",
+            html="https://w3c-cg.github.io/sstim/ontology/docs/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-$1.ttl",
         ),
         *negotiated_directives(
             "^$",
-            json_ld="https://labiosyncare.github.io/ontology/sstim-namespace.jsonld",
-            rdf_xml="https://labiosyncare.github.io/ontology/sstim-namespace.rdf",
-            html="https://labiosyncare.github.io/",
-            turtle="https://labiosyncare.github.io/ontology/sstim-namespace.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.rdf",
+            html="https://w3c-cg.github.io/sstim/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.ttl",
         ),
     )
     if directive_lines(manifest_route_block) != expected_manifest_directives:
@@ -1300,7 +1308,7 @@ else:
     snapshot_route_block = w3id_text.split(snapshot_route_start, 1)[1].split(
         snapshot_route_end, 1
     )[0]
-    site = "https://labiosyncare.github.io/ontology/"
+    site = ONTOLOGY_SITE
     required_patterns = (
         rf"RewriteRule ^(\d+\.\d+\.\d+)/(sstim-[a-z0-9-]+\.ttl)$ {site}$1/$2 [R=302,L]",
         rf"RewriteRule ^(\d+\.\d+\.\d+)/manifest$ {site}$1/manifest.json [R=302,L]",
@@ -1311,6 +1319,51 @@ else:
     for required in required_patterns:
         if required not in directives:
             fail(f"w3id staging: snapshot route region is missing {required!r}")
+    # The one route that must not follow the rest to the project site. A frozen
+    # manifest stating root-absolute paths resolves them against whatever URL it
+    # was fetched from, so under the /sstim mount its own references escape to
+    # w3c-cg.github.io/ontology/... and answer 404. Those manifests are
+    # immutable, so the exception has to live in the route. Nothing audited it
+    # until now: the cutover could have silently taken it along.
+    # Mirrors rootAbsoluteManifestVersions() in sstim-w3id-snapshot-routes.mjs.
+    pinned = {
+        path.name
+        for path in ONTOLOGY_DIR.iterdir()
+        if path.is_dir()
+        and re.fullmatch(r"\d+\.\d+\.\d+", path.name)
+        and (path / "manifest.json").is_file()
+        and re.search(
+            r'"[a-zA-Z]*[Uu]rl":\s*"/ontology/',
+            (path / "manifest.json").read_text(encoding="utf-8"),
+        )
+    }
+    pin_rules = [
+        line
+        for line in directives
+        if line.startswith("RewriteRule ^(") and "/manifest$ " in line and PINNED_ROOT_ONTOLOGY in line
+    ]
+    if not pinned:
+        if pin_rules:
+            fail("w3id staging: an origin-root manifest pin survives no root-absolute snapshot")
+    elif len(pin_rules) != 1:
+        fail(
+            "w3id staging: expected exactly one origin-root manifest pin for "
+            f"{sorted(pinned)}, found {len(pin_rules)}"
+        )
+    else:
+        alternation = pin_rules[0].split("^(", 1)[1].split(")/manifest$", 1)[0]
+        routed = {part.replace(chr(92), "") for part in alternation.split("|")}
+        if routed != pinned:
+            fail(
+                "w3id staging: the origin-root manifest pin does not cover exactly the "
+                f"root-absolute snapshots (pins {sorted(routed)}, needs {sorted(pinned)})"
+            )
+        expected_pin = (
+            f"RewriteRule ^({alternation})/manifest$ "
+            f"{PINNED_ROOT_ONTOLOGY}$1/manifest.json [R=302,L]"
+        )
+        if pin_rules[0] != expected_pin:
+            fail(f"w3id staging: origin-root manifest pin has drifted from {expected_pin!r}")
     # Pre-modular snapshots are a closed set whose version IRI must still answer
     # with the Kernel file that was the whole ontology when they were frozen.
     legacy = sorted(
@@ -1356,10 +1409,10 @@ else:
     )[0]
     expected_void_directives = (
         HTML_ACCEPT,
-        "RewriteRule ^void$ https://labiosyncare.github.io/ [R=303,L]",
+        "RewriteRule ^void$ https://w3c-cg.github.io/sstim/ [R=303,L]",
         EMPTY_ACCEPT,
         TURTLE_ACCEPT,
-        "RewriteRule ^void$ https://labiosyncare.github.io/ontology/void.ttl [R=303,L]",
+        "RewriteRule ^void$ https://w3c-cg.github.io/sstim/ontology/void.ttl [R=303,L]",
         "RewriteRule ^void$ - [R=406,L]",
     )
     if directive_lines(void_route_block) != expected_void_directives:
@@ -1448,11 +1501,11 @@ else:
     expected_live_directives = (
         HTML_ACCEPT,
         r"RewriteRule ^(specialist|organization)/((?!synthetic-)"
-        r"[A-Za-z0-9._~-]+)/?$ https://labiosyncare.github.io/graph/"
+        r"[A-Za-z0-9._~-]+)/?$ https://w3c-cg.github.io/sstim/graph/"
         r"#sstim-$1:$2 [R=303,L,NE]",
         HTML_ACCEPT,
         r"RewriteRule ^ecosystem-record/(relationship|activity|role)/"
-        r"((?!synthetic-)[A-Za-z0-9._~-]+)/?$ https://labiosyncare.github.io/"
+        r"((?!synthetic-)[A-Za-z0-9._~-]+)/?$ https://w3c-cg.github.io/sstim/"
         r"graph/#sstim-ecosystem-record:$1/$2 [R=303,L,NE]",
         EMPTY_ACCEPT,
         TURTLE_ACCEPT,
