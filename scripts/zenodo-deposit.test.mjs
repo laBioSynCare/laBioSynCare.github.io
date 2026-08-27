@@ -1,0 +1,46 @@
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { expect, test } from 'vitest'
+
+import { archiveName, depositMetadata, parentRecordId } from './zenodo-deposit.mjs'
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const read = (p) => readFileSync(resolve(ROOT, p), 'utf8')
+
+test('the parent record is derived from void.ttl, never carried as a constant', () => {
+  const { id, doi } = parentRecordId(read('static/ontology/void.ttl'))
+  expect(doi).toMatch(/^10\.5281\/zenodo\.\d+$/)
+  expect(id).toMatch(/^\d+$/)
+  expect(doi).toContain(id)
+})
+
+test('a void.ttl with no version DOI fails loudly rather than depositing somewhere', () => {
+  expect(() => parentRecordId(':a :b :c .')).toThrow(/no Zenodo version DOI/)
+})
+
+test('the deposit payload is .zenodo.json plus the release identity', () => {
+  const zenodoJson = JSON.parse(read('.zenodo.json'))
+  const payload = depositMetadata({ zenodoJson, version: '9.9.9', publicationDate: '2026-01-01' })
+
+  expect(payload.metadata.version).toBe('9.9.9')
+  expect(payload.metadata.publication_date).toBe('2026-01-01')
+  expect(payload.metadata.title).toBe(zenodoJson.title)
+  expect(payload.metadata.upload_type).toBe('software')
+})
+
+test('the deposit title matches the citation title', () => {
+  // Zenodo's GitHub integration reads .zenodo.json and ignores CITATION.cff
+  // entirely, so these two drifted apart silently once already: the published
+  // record still said "BSC Lab" after CITATION.cff was renamed.
+  const zenodoTitle = JSON.parse(read('.zenodo.json')).title
+  const citationTitle = read('CITATION.cff').match(/^title:\s*"(.+)"\s*$/m)?.[1]
+  expect(zenodoTitle).toBe(citationTitle)
+})
+
+test('the archive is named for the release, not for a repository', () => {
+  // The webhook named it after the GitHub repository, which is the thing that
+  // is moving. This name survives the move.
+  expect(archiveName('0.17.0')).toBe('sstim-v0.17.0.zip')
+})

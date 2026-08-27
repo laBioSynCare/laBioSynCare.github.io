@@ -535,6 +535,12 @@ codemeta:
 codemeta-check:
 	node scripts/gen-codemeta.mjs --check
 
+## Deposit a tagged release into the existing Zenodo record, preserving the
+## concept DOI across the repository move. Dry run by default; pass PUBLISH=1
+## with ZENODO_TOKEN set to execute. See scripts/zenodo-deposit.mjs.
+zenodo-deposit:
+	node scripts/zenodo-deposit.mjs $(if $(VERSION),--version $(VERSION),) $(if $(PUBLISH),--publish,)
+
 ## Assert the ADR index matches the ADR files: every file has a row, every row a
 ## file, statuses agree, and a superseded decision is marked superseded so the
 ## index never recommends one that no longer holds.
