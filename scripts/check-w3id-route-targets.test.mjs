@@ -22,13 +22,13 @@ test('audited public preset and reference routes target their owning Turtle file
   const targets = new Set(routeTargets(htaccess))
 
   expect(targets).toContain(
-    'https://labiosyncare.github.io/ontology/instances/presets/heal-theta-breathing-seed.ttl',
+    'https://w3c-cg.github.io/sstim/ontology/instances/presets/heal-theta-breathing-seed.ttl',
   )
   expect(targets).toContain(
-    'https://labiosyncare.github.io/ontology/instances/presets/perform-alpha-10-seed.ttl',
+    'https://w3c-cg.github.io/sstim/ontology/instances/presets/perform-alpha-10-seed.ttl',
   )
   expect(targets).toContain(
-    'https://labiosyncare.github.io/ontology/instances/references/references.ttl',
+    'https://w3c-cg.github.io/sstim/ontology/instances/references/references.ttl',
   )
 })
 

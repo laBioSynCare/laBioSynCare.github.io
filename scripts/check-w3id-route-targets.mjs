@@ -23,7 +23,16 @@ const ontologyDir = join(repoRoot, 'static', 'ontology')
 const htaccessPath = join(repoRoot, 'docs', 'ecosystem', 'w3id', 'sstim', '.htaccess')
 const manifestPath = join(ontologyDir, 'manifest.json')
 
-const SITE_PREFIX = 'https://labiosyncare.github.io/ontology/'
+// Two, not one: the live line moved to the Community Group project site, while
+// four frozen manifests keep a route to the origin-root deployment because their
+// own contents state root-absolute paths (ledger M-01). Both publish the same
+// static/ontology tree, so a target under either prefix is checked identically.
+const SITE_PREFIXES = [
+  'https://w3c-cg.github.io/sstim/ontology/',
+  'https://labiosyncare.github.io/ontology/',
+]
+
+const sitePrefixOf = (target) => SITE_PREFIXES.find((prefix) => target.startsWith(prefix))
 // Directory indexes produced by WIDOCO and pyLODE in the Pages workflow.
 const GENERATED_DIRECTORIES = new Set(['', 'docs/', 'docs/vocab/'])
 const EXPORT_EXTENSIONS = ['.jsonld', '.rdf']
@@ -88,8 +97,9 @@ export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontolo
   const generated = publishableArtifacts(manifest)
   const problems = []
   for (const target of new Set(routeTargets(htaccess))) {
-    if (!target.startsWith(SITE_PREFIX)) continue
-    const relative = target.slice(SITE_PREFIX.length)
+    const prefix = sitePrefixOf(target)
+    if (!prefix) continue
+    const relative = target.slice(prefix.length)
     if (GENERATED_DIRECTORIES.has(relative)) continue
     if (generated.has(relative)) continue
     const committed = join(ontologyRoot, relative)
@@ -111,9 +121,7 @@ function main() {
     for (const problem of problems) console.error(`  - ${problem}`)
     process.exit(1)
   }
-  const total = new Set(
-    routeTargets(htaccess).filter((target) => target.startsWith(SITE_PREFIX)),
-  ).size
+  const total = new Set(routeTargets(htaccess).filter(sitePrefixOf)).size
   console.log(`check-w3id-route-targets: PASS (${total} distinct /ontology/ targets publishable)`)
 }
 

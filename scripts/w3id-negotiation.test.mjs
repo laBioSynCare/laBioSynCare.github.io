@@ -20,9 +20,9 @@ import {
 } from '../src/rdf/loader.js'
 
 const rules = loadRules()
-const ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
+const ONTOLOGY = 'https://w3c-cg.github.io/sstim/ontology/'
 // The application entrance, where a namespace catalog sends HTML.
-const APPLICATION = 'https://labiosyncare.github.io/'
+const APPLICATION = 'https://w3c-cg.github.io/sstim/'
 const BROWSER = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
@@ -176,8 +176,8 @@ test('shape namespaces stay on the reference index', () => {
 test('a browser reaches human documentation, not RDF', () => {
   // The root is the one HTML target outside /ontology/: a person typing
   // w3id.org/sstim wants the project, not a generated reference page.
-  expect(go('', BROWSER).doc).toBe('https://labiosyncare.github.io/')
-  expect(go('', 'text/html').doc).toBe('https://labiosyncare.github.io/')
+  expect(go('', BROWSER).doc).toBe('https://w3c-cg.github.io/sstim/')
+  expect(go('', 'text/html').doc).toBe('https://w3c-cg.github.io/sstim/')
   expect(go('kernel', BROWSER).doc).toBe('docs/')
   expect(go('profile/core', BROWSER).doc).toBe('docs/')
 })
@@ -206,7 +206,7 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   // nothing here described the intent. An entity IRI answering a browser with a
   // landing page is the classic linked-data failure: the reader learns that the
   // project exists and nothing about the thing they asked for.
-  const APP = 'https://labiosyncare.github.io/'
+  const APP = 'https://w3c-cg.github.io/sstim/'
   const graph = (path) => go(path, BROWSER).doc?.replace(APP + 'graph/', '')
 
   expect(graph('ecosystem/biosyncare')).toBe('#sstim-ecosystem:biosyncare')
@@ -276,7 +276,7 @@ test('every committed public preset and reference has an exact entity route', ()
 
     expect(html.status, `${iri} has no browser route`).toBe(303)
     expect(html.doc, `${iri} does not deep-link to its graph node`)
-      .toBe(`https://labiosyncare.github.io/graph/#${toCurie(iri)}`)
+      .toBe(`https://w3c-cg.github.io/sstim/graph/#${toCurie(iri)}`)
     expect(go(path, 'text/turtle').doc, `${iri} does not return its owning Turtle`)
       .toBe(sourceDoc)
     expect(go(path, '').doc, `${iri} does not default to its owning Turtle`)

@@ -13,9 +13,19 @@ import { fileURLToPath } from 'node:url'
 
 import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
 
-export const PRODUCTION_APPLICATION_BASE = 'https://labiosyncare.github.io/'
-export const STAGED_APPLICATION_BASE = 'https://w3c-cg.github.io/sstim/'
+// The roles swapped at the W3ID cutover. Production is the Community Group
+// project site; the origin-root deployment is what a rollback rehearsal
+// retargets to, which is the remaining half of the rollback proof the migration
+// report leaves open under its Pages-rollback step.
+export const PRODUCTION_APPLICATION_BASE = 'https://w3c-cg.github.io/sstim/'
+export const STAGED_APPLICATION_BASE = 'https://labiosyncare.github.io/'
 export const LIVE_ECOSYSTEM_TARGET = 'https://biosyncare-lab.web.app/current.ttl'
+
+// Four frozen manifests state root-absolute paths and therefore keep a route to
+// the origin-root deployment whatever the live line does (ledger M-01). They are
+// pinned, not merely un-migrated: a rehearsal must leave them where they are in
+// both directions, or it would prove the wrong thing.
+export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 
 // A deliberate tripwire. Adding a W3ID rule is a public-contract change, so a
 // changed category count should require someone to inspect and update this
@@ -29,9 +39,15 @@ export const LIVE_ECOSYSTEM_TARGET = 'https://biosyncare-lab.web.app/current.ttl
 // shapes and core-shapes stay on the reference index: their terms are not
 // drawable in the knowledge browser, so sending them there would select
 // nothing.
+// 2026-08-27, the W3ID cutover: every location moved from the origin-root
+// deployment to the Community Group project site, and one rule was added to keep
+// the four root-absolute frozen manifests resolvable where they are. Total
+// 75 -> 76, with the new rule counted separately so that a second one could not
+// appear unnoticed.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 75,
+  total: 76,
   ontology: 37,
+  pinnedOntology: 1,
   graph: 16,
   application: 4,
   external: 2,
@@ -225,6 +241,7 @@ export const STAGED_TARGETS = targetProfile(STAGED_APPLICATION_BASE)
 /** Identify every target class; unfamiliar external locations fail closed. */
 export function classifyTarget(target) {
   if (target === '-') return 'statusOnly'
+  if (target.startsWith(PINNED_ROOT_ONTOLOGY)) return 'pinnedOntology'
   if (target.startsWith(PRODUCTION_TARGETS.ontology)) return 'ontology'
   if (target.startsWith(PRODUCTION_TARGETS.graph)) return 'graph'
   if (target.startsWith(PRODUCTION_TARGETS.application)) return 'application'
@@ -235,7 +252,7 @@ export function classifyTarget(target) {
 /** Retarget one production location without parsing or reserializing its suffix. */
 export function retargetTarget(target, candidateBase = STAGED_APPLICATION_BASE) {
   const kind = classifyTarget(target)
-  if (kind === 'statusOnly' || kind === 'external') return target
+  if (kind === 'statusOnly' || kind === 'external' || kind === 'pinnedOntology') return target
 
   const staged = targetProfile(candidateBase)
   const sourcePrefix = PRODUCTION_TARGETS[kind]
@@ -252,7 +269,7 @@ export function retargetRules(rules, candidateBase = STAGED_APPLICATION_BASE) {
 }
 
 export function ruleCounts(rules) {
-  const counts = { total: rules.length, ontology: 0, graph: 0, application: 0, external: 0, statusOnly: 0 }
+  const counts = { total: rules.length, ontology: 0, pinnedOntology: 0, graph: 0, application: 0, external: 0, statusOnly: 0 }
   for (const rule of rules) counts[classifyTarget(rule.target)] += 1
   return counts
 }

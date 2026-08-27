@@ -36,8 +36,13 @@ test('the staged profile is an in-memory overlay over the production rules', () 
   expect(candidate).toEqual(STAGED_TARGETS)
   expect(stagedRules).toHaveLength(productionRules.length)
   // The proposed location must never be copied into the production registry
-  // source merely to make a staging test possible.
-  expect(htaccess).not.toContain(STAGED_APPLICATION_BASE)
+  // source merely to make a staging test possible. Since the cutover the
+  // rollback base does appear, but only as the deliberate pin for the four
+  // frozen manifests that state root-absolute paths — so assert the count, not
+  // its absence, or the guard would have to be deleted to accommodate them.
+  const rollbackOccurrences = htaccess.split(STAGED_APPLICATION_BASE).length - 1
+  expect(rollbackOccurrences).toBe(1)
+  expect(htaccess).toContain(`${STAGED_APPLICATION_BASE}ontology/$1/manifest.json`)
 
   for (let index = 0; index < productionRules.length; index += 1) {
     const production = productionRules[index]
@@ -52,11 +57,12 @@ test('the staged profile is an in-memory overlay over the production rules', () 
 
 test('every production target belongs to an explicit reviewed category', () => {
   expect(ruleCounts(productionRules)).toEqual({
-    total: 75,
+    total: 76,
     ontology: 37,
     graph: 16,
     application: 4,
     external: 2,
+    pinnedOntology: 1,
     statusOnly: 16,
   })
   expect(productionRules.filter(({ target }) => classifyTarget(target) === 'external'))
@@ -68,21 +74,21 @@ test('every production target belongs to an explicit reviewed category', () => {
 })
 
 test('publication, graph and project targets keep their exact suffix', () => {
-  expect(retargetTarget('https://labiosyncare.github.io/'))
-    .toBe('https://w3c-cg.github.io/sstim/')
-  expect(retargetTarget('https://labiosyncare.github.io/ontology/sstim-$1-profile.rdf'))
-    .toBe('https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.rdf')
-  expect(retargetTarget('https://labiosyncare.github.io/graph/#sstim-$1:$2'))
-    .toBe('https://w3c-cg.github.io/sstim/graph/#sstim-$1:$2')
+  expect(retargetTarget('https://w3c-cg.github.io/sstim/'))
+    .toBe('https://labiosyncare.github.io/')
+  expect(retargetTarget('https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.rdf'))
+    .toBe('https://labiosyncare.github.io/ontology/sstim-$1-profile.rdf')
+  expect(retargetTarget('https://w3c-cg.github.io/sstim/graph/#sstim-$1:$2'))
+    .toBe('https://labiosyncare.github.io/graph/#sstim-$1:$2')
   expect(retargetTarget(LIVE_ECOSYSTEM_TARGET)).toBe(LIVE_ECOSYSTEM_TARGET)
   expect(retargetTarget('-')).toBe('-')
 })
 
 test('the candidate base is normalized once and unsafe URL state is rejected', () => {
-  expect(normalizeApplicationBase('https://w3c-cg.github.io/sstim'))
+  expect(normalizeApplicationBase('https://labiosyncare.github.io'))
     .toBe(STAGED_APPLICATION_BASE)
   expect(retargetTarget(
-    'https://labiosyncare.github.io/ontology/sstim-core.ttl',
+    'https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl',
     'http://127.0.0.1:4173/sstim',
   )).toBe('http://127.0.0.1:4173/sstim/ontology/sstim-core.ttl')
   expect(() => normalizeApplicationBase('/sstim/')).toThrow(/absolute URL/)
@@ -120,9 +126,9 @@ test('the full staged request matrix is resolution-equivalent to production', ()
   }
 
   expect(resolveRoute('specialist/renato-fabbri', 'text/html', stagedRules).location)
-    .toBe('https://w3c-cg.github.io/sstim/graph/#sstim-specialist:renato-fabbri')
+    .toBe('https://labiosyncare.github.io/graph/#sstim-specialist:renato-fabbri')
   expect(resolveRoute('ecosystem-record/role/curator-2026', 'text/html', stagedRules).location)
-    .toBe('https://w3c-cg.github.io/sstim/graph/#sstim-ecosystem-record:role/curator-2026')
+    .toBe('https://labiosyncare.github.io/graph/#sstim-ecosystem-record:role/curator-2026')
 })
 
 test('every frozen release path is retargeted without changing snapshot semantics', () => {
@@ -181,7 +187,7 @@ test('the live smoke checks candidate targets while skipping the external projec
   const fetchImpl = async (input) => {
     const url = new URL(input)
     fetched.push(url)
-    if (url.pathname.endsWith('/sstim/ontology/0.99.0/sstim-nonexistent.ttl')) {
+    if (url.pathname.endsWith('/ontology/0.99.0/sstim-nonexistent.ttl')) {
       return {
         status: 404,
         url: url.href,
@@ -203,6 +209,8 @@ test('the live smoke checks candidate targets while skipping the external projec
   expect(result.checked).toBe(3)
   expect(result.externalSkipped).toBe(1)
   expect(result.fragments).toBe(1)
-  expect(fetched.every((url) => url.pathname.startsWith('/sstim/'))).toBe(true)
+  // The candidate is now the origin-root rollback deployment, so the assertion
+  // is on the host rather than on a mount prefix the rollback does not have.
+  expect(fetched.every((url) => `${url.origin}/` === STAGED_APPLICATION_BASE)).toBe(true)
   expect(fetched.every((url) => url.searchParams.has('w3id-stage-check'))).toBe(true)
 })

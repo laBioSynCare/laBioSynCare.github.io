@@ -33,7 +33,17 @@ const htaccessPath = join(repoRoot, 'docs', 'ecosystem', 'w3id', 'sstim', '.htac
 export const START = '# BEGIN generated SSTIM snapshot routes'
 export const END = '# END generated SSTIM snapshot routes'
 
-export const SITE = 'https://labiosyncare.github.io/ontology/'
+// Where the live line is published after the repository move to `w3c-cg/sstim`.
+export const SITE = 'https://w3c-cg.github.io/sstim/ontology/'
+
+// The origin-root publication, which some frozen snapshots still need. A
+// manifest that states root-absolute paths resolves them against whatever URL it
+// was fetched from, so served under the `/sstim` mount its own references escape
+// to `w3c-cg.github.io/ontology/...` and answer 404. Measured, not assumed:
+// `/sstim/ontology/0.16.0/manifest.json` serves 200, the `/ontology/...` inside
+// it answers 404 there and 200 here. Those manifests are immutable, so the fix
+// cannot be in them. Ledger entry M-01 in the migration report.
+export const ROOT_SITE = 'https://labiosyncare.github.io/ontology/'
 
 const VERSION_RE = /^\d+\.\d+\.\d+$/
 
@@ -96,6 +106,35 @@ export function legacyVersions(inventory = snapshotInventory()) {
   return inventory.filter((snapshot) => !snapshot.manifest).map((snapshot) => snapshot.version)
 }
 
+/**
+ * Snapshots whose frozen manifest states root-absolute paths, and whose manifest
+ * route must therefore stay on an origin-root deployment.
+ *
+ * Derived by reading the frozen files rather than listing versions, for the
+ * reason `legacyVersions` gives one function up: a hand-written list would not
+ * notice a future release that regressed, and this one pins it automatically and
+ * proves it in the same check.
+ */
+export function rootAbsoluteManifestVersions(inventory = snapshotInventory(), directory = ontologyDir) {
+  return inventory
+    .filter((snapshot) => snapshot.manifest)
+    .filter((snapshot) => {
+      // A snapshot whose manifest cannot be read is not pinned. That covers the
+      // synthetic inventories the tests build to prove the rule count does not
+      // grow with releases, and it fails in the safe direction: an unreadable
+      // manifest routes with everything else rather than acquiring an exception
+      // nothing can verify.
+      let text
+      try {
+        text = readFileSync(join(directory, snapshot.version, 'manifest.json'), 'utf8')
+      } catch {
+        return false
+      }
+      return /"[a-zA-Z]*[Uu]rl":\s*"\/ontology\//.test(text)
+    })
+    .map((snapshot) => snapshot.version)
+}
+
 /** Assert the invariants the enumerated region used to enforce by construction. */
 function assertSnapshotShape(snapshot) {
   if (!snapshot.turtle.includes(LEGACY_ROOT_ARTIFACT)) {
@@ -124,6 +163,16 @@ export function generatedRegion(inventory = snapshotInventory()) {
       '# Pre-modular snapshots, a closed set: their version IRI resolves to the',
       '# Kernel file, which was the whole ontology before ADR 0043 split it.',
       `RewriteRule ^(${legacy})/?$ ${SITE}$1/${LEGACY_ROOT_ARTIFACT} [R=302,L]`,
+    )
+  }
+  const rootAbsolute = rootAbsoluteManifestVersions(inventory).map(regexLiteral).join('|')
+  if (rootAbsolute) {
+    lines.push(
+      '# These frozen manifests state root-absolute paths, so they only resolve',
+      '# their own references from an origin-root deployment. They are immutable;',
+      '# the route carries the exception rather than the file. Derived from the',
+      '# snapshots, so a future release that regressed would be pinned too.',
+      `RewriteRule ^(${rootAbsolute})/manifest$ ${ROOT_SITE}$1/manifest.json [R=302,L]`,
     )
   }
   lines.push(
@@ -174,12 +223,18 @@ export function simulate(inventory = snapshotInventory(), region = generatedRegi
   if (rules.length < 4) throw new Error(`parsed only ${rules.length} rules from the region`)
   const failures = []
   let checked = 0
+  // A manifest that states root-absolute paths is expected on the origin-root
+  // deployment, everything else on the project site. The expectation is derived
+  // from the same frozen files the rule is, so the two cannot disagree by
+  // someone updating one of them.
+  const pinned = new Set(rootAbsoluteManifestVersions(inventory))
 
   for (const snapshot of inventory) {
     const rootArtifact = assertSnapshotShape(snapshot)
     const expectations = snapshot.turtle.map((file) => [`${snapshot.version}/${file}`, `${SITE}${snapshot.version}/${file}`])
     if (snapshot.manifest) {
-      expectations.push([`${snapshot.version}/manifest`, `${SITE}${snapshot.version}/manifest.json`])
+      const manifestSite = pinned.has(snapshot.version) ? ROOT_SITE : SITE
+      expectations.push([`${snapshot.version}/manifest`, `${manifestSite}${snapshot.version}/manifest.json`])
     }
     if (snapshot.schema) {
       expectations.push([

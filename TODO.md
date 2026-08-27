@@ -441,8 +441,18 @@ indexed, examiner-searchable records.
       where the routes point; this one would change what the IRIs are. Doing
       both at once makes a failed redirect impossible to attribute.*
 
-- [ ] Cut the production w3id routes over from `labiosyncare.github.io` to
+- [~] Cut the production w3id routes over from `labiosyncare.github.io` to
       `w3c-cg.github.io/sstim` `P1`
+      ***Authorised and prepared 2026-08-27; the upstream pull request is what
+      remains.*** *All 58 targets in the repository mirror now point at the
+      project site, the four gates pass, and the nine target families were
+      confirmed 200 on the new origin. One rule was added rather than moved: the
+      frozen manifests for 0.13.0 through 0.16.0 state root-absolute paths and
+      stay on the origin-root deployment, derived from the snapshots themselves
+      so a future regression pins itself. The staged-route harness swapped
+      direction, so it now rehearses the rollback, which is the remaining half of
+      the Pages-rollback proof the migration report left open.*
+
       *Recorded 2026-08-25: Renato intends to consider this shortly. Nothing
       tracked it before, because
       [`W3C_REPOSITORY_MIGRATION.md`](docs/ecosystem/W3C_REPOSITORY_MIGRATION.md)

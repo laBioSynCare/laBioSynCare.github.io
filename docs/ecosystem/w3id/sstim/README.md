@@ -3,11 +3,20 @@
 Persistent identifiers for **SSTIM**, an OWL ontology with a companion
 SKOS vocabulary and SHACL validation shapes describing sensory
 stimulation protocols (auditory, visual, haptic), their parameters, and
-evidence chains. Developed in the open-source
-[BSC Lab](https://github.com/laBioSynCare/laBioSynCare.github.io) project.
+evidence chains. Developed through the
+[W3C Sensory Stimulation Vocabulary Community Group](https://www.w3.org/groups/cg/sstim/)
+in the open-source [SSTIM](https://github.com/w3c-cg/sstim) repository, and
+previously published from the BSC Lab project. Community Group work is not a W3C
+Recommendation and is not W3C-endorsed technology.
 
 - **Base PID:** <https://w3id.org/sstim>
-- **Target:** <https://labiosyncare.github.io/ontology/>
+- **Target:** <https://w3c-cg.github.io/sstim/ontology/>
+- **Exception:** the frozen manifests for 0.13.0 through 0.16.0 keep a target at
+  <https://labiosyncare.github.io/ontology/>. Those four files state
+  root-absolute paths and are immutable, so served under a mount their own
+  references escape the mount and 404. Measured on both origins rather than
+  assumed. Every other route, including every other artifact in those same
+  snapshots, moved.
 
 ## Maintainer
 
@@ -123,8 +132,12 @@ schema—must be generated, deployed, and tested before the corresponding
 `Accept` matrix and the `Vary: Accept` response header.
 
 This gate was satisfied on 2026-08-02: every target named above was confirmed
-to return `200` from `https://labiosyncare.github.io/ontology/` in Turtle,
-JSON-LD, and RDF/XML before the perma-id update was opened. The negotiation
+to return `200` from the then-current publication origin in Turtle, JSON-LD, and
+RDF/XML before the perma-id update was opened. It was satisfied again on
+2026-08-27 for the move to `https://w3c-cg.github.io/sstim/ontology/`, across the
+project HTML, the Graph Navigator, Kernel Turtle, the manifest, generated
+reference documentation, a public preset instance, a frozen snapshot catalogue,
+and the generated JSON-LD and RDF/XML serializations. The negotiation
 matrix and `Vary: Accept` can only be checked once the registry rules are
 merged, since w3id.org performs the negotiation; that verification belongs to
 the merge, not to this repository.

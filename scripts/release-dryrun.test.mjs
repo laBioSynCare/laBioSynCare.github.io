@@ -5,7 +5,7 @@ import {
   loadManifest,
   validateManifest,
 } from './sstim-manifest.mjs'
-import { generatedRegion, parseRules, resolvePath } from './sstim-w3id-snapshot-routes.mjs'
+import { SITE, generatedRegion, parseRules, resolvePath } from './sstim-w3id-snapshot-routes.mjs'
 import {
   modelSnapshotInventory,
   nextVersion,
@@ -46,7 +46,10 @@ test('the modelled snapshot freezes a whole-ontology artifact for the version IR
   // assertion runs them instead of reading them. Same guarantee, one layer
   // closer to what a client actually receives.
   const rules = parseRules(generatedRegion([inventory]))
-  const site = 'https://labiosyncare.github.io/ontology/'
+  // Imported rather than restated: this line was the one place the cutover had
+  // to be typed a second time, and it is the reason this test broke instead of
+  // the routing.
+  const site = SITE
   // The bare version route resolves owl:versionIRI, so it must answer with the
   // release. sstim-core.ttl is the two-class Kernel and would be a wrong answer.
   expect(resolvePath(NEXT, rules)).toBe(`${site}${NEXT}/sstim-namespace.ttl`)

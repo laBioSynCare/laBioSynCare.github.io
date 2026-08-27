@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 
 import {
   END,
+  ROOT_SITE,
   SITE,
   START,
   generatedRegion,
@@ -53,8 +54,15 @@ test('a modular version IRI resolves to the whole ontology, not the Kernel', () 
 test('a release not yet cut already has working routes', () => {
   const rules = parseRules(generatedRegion())
   expect(resolvePath('0.16.0/sstim-vocab.ttl', rules)).toBe(`${SITE}0.16.0/sstim-vocab.ttl`)
-  expect(resolvePath('0.16.0/manifest', rules)).toBe(`${SITE}0.16.0/manifest.json`)
+  // 0.16.0's frozen manifest states root-absolute paths, so its manifest route
+  // stays on the origin-root deployment while its Turtle moves with everything
+  // else. Verified against both live origins before the rule was written: the
+  // paths inside it answer 404 under the project mount and 200 at the root.
+  expect(resolvePath('0.16.0/manifest', rules)).toBe(`${ROOT_SITE}0.16.0/manifest.json`)
   expect(resolvePath('9.9.9', rules)).toBe(`${SITE}9.9.9/sstim-namespace.ttl`)
+  // A release not yet cut has frozen no manifest, so nothing pins it and it
+  // routes with the live line.
+  expect(resolvePath('9.9.9/manifest', rules)).toBe(`${SITE}9.9.9/manifest.json`)
 })
 
 test('hyphenated module names route, which the character class must allow', () => {
