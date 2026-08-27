@@ -9,7 +9,10 @@ import {
   semanticForTrackType,
   semanticGraphHref,
 } from './semantic.js'
-import { FIELD_SEMANTICS } from '../field/fieldSemantic.js'
+import { FIELD_SEMANTICS, fieldGraphHref } from '../field/fieldSemantic.js'
+import { applicationRoute } from '../../config/applicationUrls.js'
+import { AUDIO_TRACK_TYPES, VISUAL_TRACK_TYPES } from './presetDraft.js'
+import { SSTIM } from '../../rdf/namespaces.js'
 
 // Mapping-registry golden test (improvement plan phase 0.3; audit finding
 // KR-17): every ontology IRI the semantic bridges can emit must be declared
@@ -61,7 +64,42 @@ describe('semantic mapping registries (KR-17)', () => {
     expect(info.uri).toBeNull()
     expect(info.label).toBe('mysteryKnob')
     expect(localSemanticName(info.uri)).toBe('')
-    expect(semanticGraphHref(info)).toBe('/')
+    expect(semanticGraphHref(info)).toBe(applicationRoute('/graph/'))
+  })
+
+  // Regression: both bridges used to emit `/#Term`, which reached the browser
+  // only because the entrance forwards a stray hash, and which escapes the
+  // deployment entirely under a project-page mount. The link must name /graph/
+  // itself and must carry the configured base.
+  it('a mapped term deep-links into the graph route, not the origin root', () => {
+    const info = semanticForParameter(null, 'beatFreq')
+    const href = semanticGraphHref(info)
+    expect(href).toBe(`${applicationRoute('/graph/')}#beatHz`)
+    expect(href.startsWith(applicationRoute('/graph/'))).toBe(true)
+  })
+
+  it('the Sensory Field bridge builds the same graph href shape', () => {
+    const [info] = Object.values(FIELD_SEMANTICS)
+    expect(fieldGraphHref(info)).toBe(
+      `${applicationRoute('/graph/')}#${encodeURIComponent(localSemanticName(info.uri))}`,
+    )
+  })
+
+  // The fallback test below proves the *fallback* is declared, not that it is
+  // right. Five ADR 0046 visual types reached it and reported sstim:Voice, an
+  // audio class. Every type the studio can actually add needs its own entry.
+  it('every track type the studio can add is explicitly mapped', () => {
+    const addable = [...new Set([...AUDIO_TRACK_TYPES, ...VISUAL_TRACK_TYPES])]
+    const missing = addable.filter(type => !KNOWN_TRACK_TYPES.includes(type))
+    expect(missing, `unmapped track types: ${missing.join(', ')}`).toEqual([])
+  })
+
+  it('a visual track never reports an audio class', () => {
+    for (const type of VISUAL_TRACK_TYPES) {
+      const { kind, uri } = semanticForTrackType(type)
+      expect(kind, type).toBe('Visual track type')
+      expect(uri, type).not.toBe(SSTIM('Voice').value)
+    }
   })
 
   it('an unknown track type falls back to the declared generic Voice class', () => {

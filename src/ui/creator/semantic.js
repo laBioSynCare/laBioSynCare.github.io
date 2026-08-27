@@ -1,4 +1,5 @@
 import { SSTIM, SSTIM_EX, SSTIM_V } from '../../rdf/namespaces.js'
+import { applicationRoute } from '../../config/applicationUrls.js'
 
 const TRACK_SEMANTICS = {
   BinauralBeat: {
@@ -108,6 +109,40 @@ const TRACK_SEMANTICS = {
     uri: SSTIM_V('modalityVisual').value,
     description: 'Symmetric overlaid polygons that rotate, pairing naturally with the Symmetry control.',
   },
+  // ADR 0046 colour and spatial sources. They are visual tracks like the nine
+  // above; without explicit entries they fell through semanticForTrackType's
+  // generic fallback and reported sstim:Voice, an *audio* class, in the
+  // semantic panel and in the graph deep link it builds.
+  ColorField: {
+    label: 'Colour Field',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A full-stage colour wash of authored on/off colours, optionally alternating at a safety-clamped blink rate.',
+  },
+  DepthMarkers: {
+    label: 'Depth Markers',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A marker and grid recipe placed in neutral 3D scene space, used to make stereoscopic depth legible.',
+  },
+  TreeScene: {
+    label: 'Tree Scene',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A deterministic branching-tree recipe feeding the shared stereoscopic scene contract.',
+  },
+  AbstractScene: {
+    label: 'Abstract Scene',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A deterministic abstract composition (Miro, Kandinsky, or Klee styling) feeding the shared stereoscopic scene contract.',
+  },
+  LandscapeScene: {
+    label: 'Landscape Scene',
+    kind: 'Visual track type',
+    uri: SSTIM_V('modalityVisual').value,
+    description: 'A deterministic landscape recipe with day, dusk, or night palette, feeding the shared stereoscopic scene contract.',
+  },
   Vibration: {
     label: 'Vibration',
     kind: 'Haptic track type',
@@ -182,7 +217,13 @@ export function localSemanticName(uri) {
   return uri?.split(/[#/]/).pop() ?? ''
 }
 
+// The knowledge browser lives at /graph/ and resolves the fragment on arrival
+// (OntologyGraph.resolveHashToNodeId). Point straight at it. The older `/#term`
+// form only worked because the entrance forwards a stray hash, which costs a
+// redirect hop at the origin root and leaves the deployment entirely under a
+// project-page mount, where `/` belongs to the owner site rather than to us.
 export function semanticGraphHref(info) {
   const local = localSemanticName(info?.uri)
-  return local ? `/#${encodeURIComponent(local)}` : '/'
+  const route = applicationRoute('/graph/')
+  return local ? `${route}#${encodeURIComponent(local)}` : route
 }

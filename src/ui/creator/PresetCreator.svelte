@@ -1498,10 +1498,46 @@
     return Math.max(pmin, Math.min(pmax, sum))
   }
 
+  // Knob captions sit in the 56px column set by Knob.svelte's `.knob-label`,
+  // which shows about eight lowercase characters before the ellipsis takes
+  // over. Raw parameter keys overflowed it into misreadings: `inhaleRatio`
+  // rendered as "inhaler", a word this project must never appear to use. These
+  // are display abbreviations only; the full name and its ontology term stay
+  // one click away in the semantic panel, and `labelTitle` carries the full
+  // name on hover. Keys not listed here already fit.
+  const PARAM_SHORT_LABELS = {
+    amplitude: 'amp',
+    beatFreq: 'beat',
+    blinkRate: 'rate',
+    centerFreq: 'center',
+    frequency: 'freq',
+    inhaleRatio: 'inhale',
+    intensity: 'level',
+    leftFreq: 'left',
+    nnotes: 'notes',
+    noctaves: 'octaves',
+    noteDurationFrac: 'note%',
+    oscRate: 'rate',
+    periodSec: 'period',
+    phaseRad: 'phase',
+    pulseRate: 'pulse',
+    resonance: 'res',
+    rightFreq: 'right',
+    rotationSpeed: 'spin',
+    spatialScale: 'sp.scale',
+    targetPeriodSec: 'target',
+  }
+
   function paramLabel(name) {
-    if (name === 'noteDurationFrac') return 'note%'
-    if (name === 'blinkRate' || name === 'oscRate') return 'rate'
-    return name
+    return PARAM_SHORT_LABELS[name] ?? name
+  }
+
+  // Hover text spells the abbreviation back out. The ontology registry already
+  // holds a human name for every mapped parameter, so prefer it and fall back
+  // to the raw key for the ones with no term yet.
+  function paramLabelTitle(track, name) {
+    const full = semanticForParameter(track, name).label
+    return `${full} (semantic info)`
   }
 
   function audioSubtitleFor(track, aFreq, aPulse, leftF, rightF, centerF, beatF, isoEnv) {
@@ -1628,7 +1664,7 @@
           step={pstep}
           label={paramLabel(pname)}
           onlabel={() => showParamInfo({ id: trackId }, pname)}
-          labelTitle={`${paramLabel(pname)} semantic info`}
+          labelTitle={paramLabelTitle({ id: trackId }, pname)}
           modAvailable={allowMods}
           modActive={allowMods && (param.mods.length > 0 || isOpen)}
           onmod={() => toggleModKey(rowKey)}
@@ -3635,7 +3671,9 @@
   /* Column header: two rows, each exactly 26px, always the same across columns */
   .col-head {
     display: grid;
-    grid-template-rows: 30px 32px;
+    /* The add row wraps rather than scrolls (see .col-adds), so its track has
+       to size to content instead of being pinned to one 32px line. */
+    grid-template-rows: 30px auto;
     flex-shrink: 0;
     border-bottom: 1px solid var(--bdr);
     background: color-mix(in srgb, var(--sur2) 82%, var(--bg));
@@ -3656,15 +3694,19 @@
   .col-visual .col-title { color: var(--vc); }
   .col-haptic .col-title { color: var(--hc); }
 
+  /* Visual carries ten track types plus Mix, which overflows this row at common
+     window widths. It used to scroll horizontally with the scrollbar hidden, so
+     the overflowing buttons (Mix among them, a primary action) were both
+     invisible and unhinted. Wrapping keeps every add button on screen; the
+     other three columns are short enough that they never wrap. */
   .col-adds {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
-    padding: 0 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    min-height: 32px;
+    padding: 0 10px 4px;
   }
-  .col-adds::-webkit-scrollbar { display: none; }
 
   .add-btn {
     background: transparent;

@@ -1,4 +1,5 @@
 import { SSTIM_EX } from '../../rdf/namespaces.js'
+import { applicationRoute } from '../../config/applicationUrls.js'
 
 // Maps Sensory Field UI concepts to the exposure ontology terms they emit,
 // for inline "what this means in the ontology" links. Mirrors the Patch Studio
@@ -105,5 +106,6 @@ export function localSemanticName(uri) {
 /** Link to the graph view focused on a term, matching semanticGraphHref(). */
 export function fieldGraphHref(info) {
   const local = localSemanticName(info?.uri)
-  return local ? `/#${encodeURIComponent(local)}` : '/'
+  const route = applicationRoute('/graph/')
+  return local ? `${route}#${encodeURIComponent(local)}` : route
 }
