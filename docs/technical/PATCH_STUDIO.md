@@ -587,33 +587,38 @@ roadmapped Phase-2 work
 
 ### 11.5 Usability and discoverability
 
-The studio is dense by design: it is an authoring surface, not a player. Two
-defects of that density were fixed rather than documented, and both left a
-standing trap behind:
+The studio is dense by design: it is an authoring surface, not a player. Density
+is not the defect; density that hides a control or destroys work is. Five such
+defects were found and fixed:
 
 - **Knob captions are abbreviated on purpose.** `Knob.svelte`'s `.knob-label`
   is a 56px column showing roughly eight lowercase characters before the
   ellipsis takes over. Raw parameter keys overflowed it into misreadings
-  (`inhaleRatio` rendered as "inhaler"). `PARAM_SHORT_LABELS` in
-  `PresetCreator.svelte` now supplies a fitting caption and `labelTitle` carries
-  the full ontology label on hover. **The trap:** a new parameter longer than
-  about eight characters truncates silently unless it is added to that map.
-  Nothing fails a build over it.
+  (`inhaleRatio` rendered as "inhaler"). `paramLabels.js` supplies a fitting
+  caption, `labelTitle` carries the full ontology label on hover, and
+  `paramLabels.test.js` holds every caption to `KNOB_LABEL_MAX_CHARS`, so a
+  long new parameter fails a test rather than truncating silently in the UI.
 - **Add-button rows wrap; they used to scroll.** `.col-adds` was
   `overflow-x: auto` with the scrollbar hidden, so on a 1440px window the
   Visual column's fourteen buttons overflowed and the `Mix` button (a primary
   action) was both off-screen and unhinted. The row wraps now.
+- **`Reset` asks before discarding.** It rebuilt the draft from `createDraft()`
+  on a single click, while `Clear`, its neighbour in the toolbar and its visual
+  twin, confirmed first. Both destroy unsaved work; both now confirm.
+- **The two destructive actions are marked.** `Clear` and `Reset` carry a
+  `danger` variant that resolves on hover and focus, so the distinction is
+  legible on approach without shouting from the resting toolbar.
+- **Knob captions show they are interactive at rest.** The caption is the only
+  route into the semantic panel, and through it into the knowledge graph (§10).
+  Its affordance was `cursor: help` plus a hover underline, so the whole bridge
+  was invisible to anyone not already sweeping the mouse across it. A dotted
+  underline now marks it at rest.
 
 Open, and not yet decided:
 
-- The header meta (`1c · 1a · 0v · 0h · 0m`, the per-column track counts) is
-  unexplained anywhere in the UI.
-- The top toolbar presents eleven controls at one visual weight, with transport,
-  export, persistence, and destructive actions (`Clear`, `Reset`) undifferentiated.
-- The semantic panel is reachable only by clicking a knob caption. The affordance
-  is `cursor: help` plus a hover underline, so at rest there is nothing to
-  suggest the captions are interactive, and the whole graph bridge (§10) is
-  correspondingly easy to miss.
+- The header meta (`1c · 1a · 0v · 0h · 0m`) now explains itself on hover, but
+  it is still a pill of abbreviations at rest, and it truncates under about
+  1000px.
 - Unused Visual and Haptic columns still occupy half the viewport.
 - None of this is covered by an automated check. Per §11.3, production
   browser/offline route coverage is still open, so every claim about how the

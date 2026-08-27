@@ -286,13 +286,23 @@
     font-family: inherit;
   }
 
+  /* The caption is the only way into the semantic panel, and through it into
+     the knowledge graph. With an affordance that appeared only on hover, the
+     whole bridge was invisible to anyone not already sweeping the mouse across
+     it. A dotted rule is the conventional "there is an explanation here" mark
+     and costs no layout in a 56px column. */
   .knob-label-button {
     cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+    text-underline-offset: 2px;
   }
 
-  .knob-label-button:hover {
+  .knob-label-button:hover,
+  .knob-label-button:focus-visible {
     color: var(--acc, var(--app-accent, #3b9eff));
     text-decoration: underline;
+    text-decoration-color: currentColor;
     text-underline-offset: 2px;
   }
 

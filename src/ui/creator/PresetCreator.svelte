@@ -1276,7 +1276,10 @@
     }
   }
 
+  // Both of these destroy unsaved work. Reset used to do it on a single click
+  // while Clear, its neighbour in the toolbar and its visual twin, asked first.
   function reset() {
+    if (!confirm('Reset the patch studio to the default patch? Unsaved changes will be lost.')) return
     resetLiveDraftState(createDraft())
     currentPatchId = null
     currentPatchName = null
@@ -1770,7 +1773,10 @@
   <header class="hdr">
     <div class="hdr-name">
       <input class="patch-name" bind:value={draft.patchName} placeholder="Patch name" />
-      <span class="pill">{summary.controlCount}c · {summary.audioCount}a · {summary.visualCount}v · {summary.hapticCount}h · {summary.modLinks}m</span>
+      <span
+        class="pill"
+        title={`${summary.controlCount} control, ${summary.audioCount} audio, ${summary.visualCount} visual, ${summary.hapticCount} haptic ${summary.audioCount + summary.visualCount + summary.hapticCount === 1 ? 'track' : 'tracks'}, ${summary.modLinks} modulation ${summary.modLinks === 1 ? 'link' : 'links'}`}
+      >{summary.controlCount}c · {summary.audioCount}a · {summary.visualCount}v · {summary.hapticCount}h · {summary.modLinks}m</span>
     </div>
 
     <div class="hdr-transport">
@@ -1954,8 +1960,8 @@
           {/if}
         </div>
       </details>
-      <button class="act-btn" onclick={clearStudio}>Clear</button>
-      <button class="act-btn" onclick={reset}>Reset</button>
+      <button class="act-btn danger" onclick={clearStudio} title="Empty the studio. Unsaved changes are lost.">Clear</button>
+      <button class="act-btn danger" onclick={reset} title="Return to the default patch. Unsaved changes are lost.">Reset</button>
       <button
         type="button"
         class="hdr-icon"
@@ -3135,6 +3141,11 @@
   }
   .act-btn:hover { color: var(--txt); border-color: var(--acc); }
   .act-btn:disabled { opacity: .3; cursor: default; }
+  /* Ten toolbar buttons at one visual weight, two of which discard unsaved
+     work. The distinction only needs to be legible on approach, so it lives
+     in the hover and focus states rather than shouting from the resting bar. */
+  .act-btn.danger:hover,
+  .act-btn.danger:focus-visible { color: var(--err); border-color: var(--err); }
 
   .store-target {
     margin-bottom: 0.5rem;
