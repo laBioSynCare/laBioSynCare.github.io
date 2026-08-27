@@ -26,6 +26,13 @@
       }
     </style>
   </head>
+  <!--
+    Links here are relative on purpose. This page is a plain static asset, so it
+    cannot call applicationRoute(); a root-absolute href leaves the deployment
+    entirely under a project-page mount (SSTIM_BASE_PATH=/sstim), landing on the
+    owner site. Relative hrefs resolve against this directory and are therefore
+    correct at every mount. `make smoke-static dist <base>` checks this.
+  -->
   <body>
     <h1>SSTIM reference documentation is generated at deploy time</h1>
     <p>
@@ -51,8 +58,8 @@ npm run preview -- --host 127.0.0.1 --port 4174</code></pre>
     </p>
     <p>
       The Turtle sources themselves are served here as static assets and need no build:
-      <a href="/ontology/manifest.json">manifest.json</a> lists every module, and the
-      <a href="/graph/">knowledge browser</a> reads them directly. The published
+      <a href="../manifest.json">manifest.json</a> lists every module, and the
+      <a href="../../graph/">knowledge browser</a> reads them directly. The published
       documentation is at
       <a href="https://labiosyncare.github.io/ontology/docs/"
         >labiosyncare.github.io/ontology/docs/</a

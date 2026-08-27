@@ -24,12 +24,17 @@
       }
     </style>
   </head>
+  <!--
+    Relative on purpose: a plain static asset cannot call applicationRoute(), and
+    a root-absolute href escapes a project-page mount. See the sibling note in
+    ../index.html.
+  -->
   <body>
     <h1>SSTIM vocabulary documentation is generated at deploy time</h1>
     <p>
       The SKOS concept schemes are documented by pyLODE (<code>vocpub</code> profile) in the
       Pages workflow, into the deployed artifact only — WIDOCO, which produces
-      <a href="/ontology/docs/">the OWL reference</a>, is OWL-centric and does not cover
+      <a href="../">the OWL reference</a>, is OWL-centric and does not cover
       them. Neither is committed (ADR 0023), so this placeholder stands in during local
       development and deployment overwrites it.
     </p>
@@ -41,7 +46,7 @@ npm run preview -- --host 127.0.0.1 --port 4174</code></pre>
       <a href="https://labiosyncare.github.io/ontology/docs/vocab/"
         >labiosyncare.github.io/ontology/docs/vocab/</a
       >. The vocabulary Turtle is served here as a static asset, and every concept is
-      browsable in the <a href="/graph/">knowledge browser</a>.
+      browsable in the <a href="../../../graph/">knowledge browser</a>.
     </p>
   </body>
 </html>
