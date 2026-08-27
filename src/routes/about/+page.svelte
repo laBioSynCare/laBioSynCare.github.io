@@ -137,6 +137,7 @@
 
   const links = [
     { label: 'SSTIM ecosystem architecture', href: applicationRoute('/ecosystem/') },
+    { label: 'Moving between SSTIM Workbench sites', href: applicationRoute('/transition/') },
     { label: 'Source repository', href: GITHUB_URL, external: true },
     { label: 'Ontology reference docs', href: ONTOLOGY_DOCS_URL, external: true },
     { label: 'Vocabulary docs', href: VOCAB_DOCS_URL, external: true },

@@ -482,8 +482,17 @@ indexed, examiner-searchable records.
       `/implementation/{id}/`, `/organization/{id}/`, and `/specialist/{id}/`
       data under SSTIM. Do not publish or route the private BioSynCare/BSC
       catalog from BSC Lab.*
-- [ ] Publish user transition instructions for the two published origins `P1`
-      *Do this as soon as the migration settles, and before any redirect or
+- [x] Publish user transition instructions for the two published origins —
+      **shipped 2026-08-27** at `/transition/` `P1`
+      *`src/routes/transition/+page.svelte`, linked from Settings beside the
+      export buttons and from the About page's link list. It names both
+      addresses, gives the export/restore steps, separates what travels from
+      what does not, and says plainly that an installed app belongs to the
+      address it was installed from and no export can include it. The
+      appearance-preference uncertainty below is handled without exposing it:
+      the page says to set it again if it does not come across.*
+
+      *Original note kept below. Do this before any redirect or
       archival of the old origin. Browser-stored data is keyed to the origin, so
       `labiosyncare.github.io` and `w3c-cg.github.io` hold separate copies of
       every logbook, annotation, patch, profile and preference. Nothing moves on

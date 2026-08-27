@@ -1,6 +1,7 @@
 <script>
   import { onMount, tick } from 'svelte'
   import { version as appVersion } from '$app/environment'
+  import { applicationRoute } from '../../config/applicationUrls.js'
   import {
     DEFAULT_SKIN_ID,
     activeSkin,
@@ -792,6 +793,12 @@
             The export uses the anonymous browser scope.
           {/if}
           The file can contain personal writing and authored patches; protect it accordingly.
+        </p>
+
+        <p class="scope-note">
+          Moving between the two SSTIM Workbench addresses? Browser storage is separate per
+          address, so each holds its own copy of everything.
+          <a href={applicationRoute('/transition/')}>How to carry your data across</a>.
         </p>
 
         <div class="data-actions">
