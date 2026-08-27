@@ -526,10 +526,18 @@ indexed, examiner-searchable records.
       instruction is to install again from the new origin and then export and
       import the data, which does carry across. Say that plainly rather than
       implying the installation follows.*
-      *One field is not yet proven to survive: the `skin` preference travels in
-      the envelope, but the application normalises the stored value on load, so
-      the 2026-08-23 test could not isolate whether the import wrote it. Verify
-      that before publishing the instructions.*
+      *~~One field is not yet proven to survive: the `skin` preference.~~
+      **Resolved 2026-08-27 by reading both ends rather than re-running the
+      browser test.** `applyInstanceExport` writes `bsclab.skin` into the target
+      storage, proven by the cross-instance round trip in
+      `src/portability/instanceExport.test.js`; `initSkin` reads that key and
+      `normalizeSkinId` keeps any id the build knows
+      (`src/ui/theme/skins.js`). So a restored known skin is applied on the next
+      load. What the 2026-08-23 browser test could not isolate was the read, not
+      the write, and the read is unconditional. The one case that does normalise
+      away is an id this build does not have, which is correct rather than a
+      defect: the import validates that `skin` is a non-empty string, not that it
+      names a skin that exists here.*
 - [ ] Generate namespace catalogs for `vocab#` and `ecosystem#`, and point their
       RDF representations at them `P1`
       *A namespace that spans modules needs a generated catalog; that is why
