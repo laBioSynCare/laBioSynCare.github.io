@@ -1013,6 +1013,10 @@
     syncCreatorSession()
     // A patch may have arrived in the URL fragment. Offered, never applied.
     readIncomingLink()
+    // ...and a single track may have arrived in ?add=, from the Graph
+    // Navigator's Patch Studio row. Applied rather than offered, because
+    // appending one track destroys nothing.
+    applyIncomingTrackRequest()
     rafId = requestAnimationFrame(rafTick)
     window.addEventListener('keydown', handleWindowKeydown)
     document.addEventListener('fullscreenchange', handleFullscreenChange)
@@ -1126,6 +1130,22 @@
       tip(`That patch link could not be opened: ${e.message}`)
       clearLinkFragment()
     }
+  }
+
+  // The return leg of the semantic bridge: the graph links here with the track
+  // type that realises the term the reader was looking at. Only a track type
+  // the studio actually knows is honoured, and the query is stripped either
+  // way so a reload does not add the track twice.
+  function applyIncomingTrackRequest() {
+    const requested = new URLSearchParams(window.location.search).get('add')
+    if (!requested) return
+    history.replaceState(null, '', window.location.pathname + window.location.hash)
+
+    if (AUDIO_TRACK_TYPES.includes(requested)) addAudio(requested)
+    else if (VISUAL_TRACK_TYPES.includes(requested)) addVisual(requested)
+    else if (HAPTIC_TRACK_TYPES.includes(requested)) addHaptic(requested)
+    else if (CONTROL_TYPES.includes(requested)) addControl(requested)
+    else tip(`Patch Studio has no track type called "${requested}".`)
   }
 
   function clearLinkFragment() {

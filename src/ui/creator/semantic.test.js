@@ -8,12 +8,15 @@ import {
   semanticForParameter,
   semanticForTrackType,
   semanticGraphHref,
+  studioAffordanceForIri,
 } from './semantic.js'
 import { FIELD_SEMANTICS, fieldGraphHref } from '../field/fieldSemantic.js'
 import { applicationRoute } from '../../config/applicationUrls.js'
 import {
   AUDIO_TRACK_TYPES,
+  CONTROL_TYPES,
   HAPTIC_PARAMS,
+  HAPTIC_TRACK_TYPES,
   MARTIGLI_PARAMS,
   SINUSOID_PARAMS,
   SPATIAL_VISUAL_PARAMS,
@@ -125,6 +128,57 @@ describe('semantic mapping registries (KR-17)', () => {
       expect(kind, type).toBe('Visual track type')
       expect(uri, type).not.toBe(SSTIM('Voice').value)
     }
+  })
+
+  // The bridge used to run one way only. These pin the return leg.
+  describe('the return leg into Patch Studio', () => {
+    it('offers the studio for every term a track type realises', () => {
+      for (const type of KNOWN_TRACK_TYPES) {
+        const { uri } = semanticForTrackType(type)
+        expect(studioAffordanceForIri(uri), type).not.toBeNull()
+      }
+    })
+
+    it('offers the studio for every mapped parameter term', () => {
+      for (const name of KNOWN_PARAMETERS) {
+        const { uri } = semanticForParameter(null, name)
+        if (uri) expect(studioAffordanceForIri(uri), name).not.toBeNull()
+      }
+    })
+
+    it('deep-links a term that exactly one track type realises', () => {
+      const affordance = studioAffordanceForIri(semanticForTrackType('BinauralBeat').uri)
+      expect(affordance.href).toBe(`${applicationRoute('/creator/')}?add=BinauralBeat`)
+      expect(affordance.label).toBe('Add a Binaural Beat track')
+    })
+
+    // The four lists here must stay the four that applyIncomingTrackRequest in
+    // PresetCreator.svelte dispatches on, or a deep link lands on a tip saying
+    // the type does not exist.
+    it('names a track type the studio can actually add', () => {
+      const addable = [...new Set([
+        ...AUDIO_TRACK_TYPES, ...VISUAL_TRACK_TYPES,
+        ...HAPTIC_TRACK_TYPES, ...CONTROL_TYPES,
+      ])]
+      for (const type of KNOWN_TRACK_TYPES) {
+        const { href } = studioAffordanceForIri(semanticForTrackType(type).uri)
+        const requested = new URL(href, 'https://example.test').searchParams.get('add')
+        if (requested) expect(addable.includes(requested), `${type} -> ${requested}`).toBe(true)
+      }
+    })
+
+    it('declines to deep-link a term many types share', () => {
+      // sstim:Voice covers four audio types; fourteen "add" links would be
+      // noise, not an affordance.
+      const affordance = studioAffordanceForIri(SSTIM('Voice').value)
+      expect(affordance.href).toBe(applicationRoute('/creator/'))
+      expect(affordance.title).toMatch(/4 track types/)
+    })
+
+    it('offers nothing for a term the studio does not realise', () => {
+      expect(studioAffordanceForIri(SSTIM('Preset').value)).toBeNull()
+      expect(studioAffordanceForIri(null)).toBeNull()
+    })
   })
 
   it('an unknown track type falls back to the declared generic Voice class', () => {

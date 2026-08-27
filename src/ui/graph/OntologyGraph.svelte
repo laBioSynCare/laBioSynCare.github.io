@@ -17,6 +17,7 @@
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
   import InfoModal from '../navigation/InfoModal.svelte'
   import { activeSkin } from '../theme/skins.js'
+  import { studioAffordanceForIri } from '../creator/semantic.js'
 
   const { store, liveStatus = null, onRefreshLive = null } = $props()
 
@@ -2417,6 +2418,16 @@
                         <dd>
                           <a href={docsUrl} target="_blank" rel="noreferrer" title="WIDOCO reference documentation for this term">Reference entry</a>
                         </dd>
+                      </div>
+                    {/if}
+                    <!-- The return leg of the Patch Studio bridge. Until this
+                         row existed a reader could go from a knob to its term
+                         and never back: see PATCH_STUDIO.md §10.4. -->
+                    {@const studio = studioAffordanceForIri(selected.iri)}
+                    {#if studio}
+                      <div class="meta-row">
+                        <dt>Patch Studio</dt>
+                        <dd><a href={studio.href} title={studio.title}>{studio.label}</a></dd>
                       </div>
                     {/if}
                   {/if}

@@ -379,8 +379,9 @@ Every knob caption and every track header in the studio is a link into the SSTIM
 ontology. Clicking a knob's caption, or a track card's ⌇ button, opens the
 semantic panel: the term's human label, its kind, a prose description, its CURIE
 and full IRI, and an **Open in graph** link that deep-links the Graph Navigator
-straight to that node. This is the only place the authoring surface and the
-knowledge layer meet in the UI.
+straight to that node. The Navigator carries the matching link back (§10.5).
+This is the only place the authoring surface and the knowledge layer meet in
+the UI.
 
 ### 10.1 Where the mapping lives
 
@@ -443,12 +444,8 @@ pulses it so the reader can see where the link landed.
 
 ### 10.4 What the bridge deliberately does not do
 
-Three limits, so nobody reads more into it than is there:
+Two limits, so nobody reads more into it than is there:
 
-- **It is one-directional.** Nothing in the Graph Navigator links back into the
-  Patch Studio: there is no "patches using this term" affordance, and no
-  reference to the studio anywhere in `OntologyGraph.svelte`. A reader can go
-  from a knob to a term, never from a term to a knob.
 - **It is type-level, not instance-level.** The panel names the class or
   property a track or parameter *is an instance of*. It does not publish the
   patch, and clicking through does not put the patch in the graph. Projecting a
@@ -465,6 +462,39 @@ Three limits, so nobody reads more into it than is there:
   description, which is how the eight spatial and colour parameters stayed
   invisible to the panel. A test now requires an entry for every knob
   parameter.
+
+### 10.5 The return leg
+
+For as long as the bridge existed it ran one way: a knob could reach its term,
+and nothing in the Graph Navigator mentioned the studio that authors it. The
+selected-node detail panel now carries a **Patch Studio** row whenever
+`studioAffordanceForIri()` finds the term in either registry.
+
+```js
+studioAffordanceForIri(iri) // -> { label, href, title } | null
+```
+
+It reads the same two registries as the forward direction, so a term cannot be
+authorable in one direction and not the other, and the shape of the offer
+follows the coverage:
+
+| Term realised by | Offer |
+|---|---|
+| exactly one track type | `Add a Binaural Beat track`, deep-linking `/creator/?add=BinauralBeat` |
+| several track types, or parameters | `Open Patch Studio`, with the coverage named in the tooltip |
+| nothing in either registry | no row |
+
+The threshold is deliberate. `sstim:Voice` is realised by four audio types and
+`sstim-v:modalityVisual` by fourteen visual ones; fourteen "add" links in a
+detail panel is not an affordance, it is noise.
+
+`applyIncomingTrackRequest()` handles the arriving `?add=` on mount. It honours
+only a type in one of the four track-type lists, strips the query either way so
+a reload cannot add the track twice, and **appends** rather than replaces, which
+is why it applies directly instead of asking the way an incoming patch link
+does: appending one track destroys nothing. A test holds the deep link to types
+the studio can actually add, which is what caught `Vibration` being reachable
+from the graph while the test's own list of addable types omitted haptics.
 
 ---
 

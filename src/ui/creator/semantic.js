@@ -243,3 +243,61 @@ export function semanticGraphHref(info) {
   const route = applicationRoute('/graph/')
   return local ? `${route}#${encodeURIComponent(local)}` : route
 }
+
+// ---------------------------------------------------------------------------
+// The reverse direction.
+//
+// The bridge ran one way for as long as it existed: a knob could reach its
+// term, but a term in the Graph Navigator said nothing about the studio that
+// authors it. These two functions close that loop. They are the only reverse
+// lookup, and they read the same registries as the forward one, so a term
+// cannot appear authorable in one direction and not the other.
+
+/** Track types whose semantic mapping resolves to `iri`. */
+export function trackTypesForIri(iri) {
+  if (!iri) return []
+  return KNOWN_TRACK_TYPES.filter(type => TRACK_SEMANTICS[type].uri === iri)
+}
+
+/** Parameters whose semantic mapping resolves to `iri`. */
+export function parametersForIri(iri) {
+  if (!iri) return []
+  return KNOWN_PARAMETERS.filter(name => PARAM_SEMANTICS[name][2] === iri)
+}
+
+/**
+ * What the Patch Studio can do with the term at `iri`, or null when the studio
+ * has nothing to offer for it.
+ *
+ * A term that exactly one track type realises gets a deep link that adds that
+ * track. Anything broader (sstim:Voice covers four audio types,
+ * sstim-v:modalityVisual covers fourteen visual ones) gets a plain link and
+ * names the coverage in the tooltip instead, because fourteen "add" links in a
+ * detail panel is not an affordance, it is noise.
+ */
+export function studioAffordanceForIri(iri) {
+  const types = trackTypesForIri(iri)
+  const params = parametersForIri(iri)
+  if (types.length === 0 && params.length === 0) return null
+
+  if (types.length === 1) {
+    const [type] = types
+    const { label } = TRACK_SEMANTICS[type]
+    return {
+      label: `Add a ${label} track`,
+      href: `${applicationRoute('/creator/')}?add=${encodeURIComponent(type)}`,
+      title: `Open Patch Studio and add a ${label} track`,
+    }
+  }
+
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`
+  const covers = [
+    types.length ? plural(types.length, 'track type', 'track types') : null,
+    params.length ? plural(params.length, 'parameter', 'parameters') : null,
+  ].filter(Boolean).join(' and ')
+  return {
+    label: 'Open Patch Studio',
+    href: applicationRoute('/creator/'),
+    title: `Patch Studio realises this term as ${covers}`,
+  }
+}
