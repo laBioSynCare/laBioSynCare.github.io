@@ -4,25 +4,34 @@
     "Units": "s"
   },
   "event_id": {
-    "Description": "Local name of the sstim:SessionEvent this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6."
-  },
-  "event_type": {
     "Description": "SSTIM session event type, the authoritative value.",
     "TermURL": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "Levels": {
-      "eventSessionOpen": "Session opened",
-      "eventPlaybackStart": "Playback started",
-      "eventPlaybackPause": "Playback paused",
-      "eventPlaybackResume": "Playback resumed",
-      "eventSessionInterrupt": "Session interrupted"
+      "session-open": "Session opened",
+      "event-start": "Playback started",
+      "event-pause": "Playback paused",
+      "event-resume": "Playback resumed",
+      "session-close": "Session closed"
+    },
+    "HED": {
+      "session-open": "(Def/Sstim-session, Onset)",
+      "event-start": "(Def/Sstim-delivery, ({mod_frequency}), Onset)",
+      "event-pause": "(Def/Sstim-delivery, Pause)",
+      "event-resume": "(Def/Sstim-delivery, Inset)",
+      "session-close": "(Def/Sstim-session, Offset)"
     }
   },
   "sstim_hed_definitions": {
     "Description": "HED definitions the HED column references. Not a column of events.tsv. Onset, Offset, Pause and Inset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
     "HED": {
       "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
-      "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
+      "Sstim-delivery": "(Definition/Sstim-delivery)"
     }
+  },
+  "mod_frequency": {
+    "Description": "Modified frequency of the breath in hertz. This is a native column, not a BIDS-required duration column. The BIDS-required duration column is always n/a for this bundle.",
+    "Units": "Hz",
+    "HED": "Sensory-event, Experimental-stimulus, Auditory-presentation, Frequency/# Hz"
   },
   "SstimDurationConvention": {
     "Description": "duration is always n/a in this bundle. SSTIM session events are instantaneous timeline marks, and inventing a duration would assert a span the native record does not contain. This is a note, not a redefinition of the BIDS-required duration column."
