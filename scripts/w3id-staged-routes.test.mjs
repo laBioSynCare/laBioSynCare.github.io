@@ -56,11 +56,15 @@ test('the staged profile is an in-memory overlay over the production rules', () 
 })
 
 test('every production target belongs to an explicit reviewed category', () => {
+  // Deliberately a second copy of EXPECTED_RULE_COUNTS rather than an import:
+  // adding a W3ID rule is a public-contract change, and having to update the
+  // number in two places is the point. +2 application routes on 2026-08-27 for
+  // the preset and session JSON Schema `$id` values.
   expect(ruleCounts(productionRules)).toEqual({
-    total: 76,
+    total: 78,
     ontology: 37,
     graph: 16,
-    application: 4,
+    application: 6,
     external: 2,
     pinnedOntology: 1,
     statusOnly: 16,

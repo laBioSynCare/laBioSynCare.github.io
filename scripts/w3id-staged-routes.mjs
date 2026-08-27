@@ -44,12 +44,19 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 // the four root-absolute frozen manifests resolvable where they are. Total
 // 75 -> 76, with the new rule counted separately so that a second one could not
 // appear unnoticed.
+//
+// 2026-08-27, the JSON Schema contracts: two application routes added for
+// static/schemas/{preset,session}.schema.json, which carry those schemas' `$id`.
+// A `$id` is an identity with no concrete counterpart (unlike a
+// dcat:downloadURL, which pairs with an accessURL PURL beside it), so it is the
+// one place a persistent URI replaces rather than duplicates. Total 76 -> 78,
+// application 4 -> 6.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 76,
+  total: 78,
   ontology: 37,
   pinnedOntology: 1,
   graph: 16,
-  application: 4,
+  application: 6,
   external: 2,
   statusOnly: 16,
 })

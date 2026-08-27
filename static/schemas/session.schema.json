@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://labiosyncare.github.io/schemas/session.schema.json",
+  "$id": "https://w3id.org/sstim/schemas/session.schema.json",
   "title": "BSC Lab native session bundle",
   "description": "The one authoritative contract for a recorded BSC Lab session: specification, instance, event timeline, phase-qualified reports, and the privacy profile that governs all of them. Improvement plan 0.2 and 2.1-2.2; audit findings KR-02 and KR-03. The RDF projection is derived from this document, never the other way round.",
   "type": "object",

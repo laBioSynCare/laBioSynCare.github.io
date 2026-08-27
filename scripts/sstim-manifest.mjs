@@ -562,7 +562,7 @@ function validateModules(manifest, errors, { verifyChecksums }) {
         sourcePath: `static/ontology/${filename}`,
         runtimeUrl: filename,
         graphIri: `https://w3id.org/sstim/graph/${module.id}`,
-        distributionUrl: `https://labiosyncare.github.io/ontology/${filename}`,
+        distributionUrl: `https://w3c-cg.github.io/sstim/ontology/${filename}`,
         persistentUrl: module.id === 'core'
           ? 'https://w3id.org/sstim/kernel'
           : module.id === 'exposure'
@@ -853,7 +853,7 @@ function validateProfiles(manifest, moduleById, errors, { verifyChecksums }) {
       const filename = `sstim-${profile.id}-profile.ttl`
       const expectedSourcePath = `static/ontology/${filename}`
       const expectedRuntimeUrl = filename
-      const expectedDistributionUrl = `https://labiosyncare.github.io/ontology/${filename}`
+      const expectedDistributionUrl = `https://w3c-cg.github.io/sstim/ontology/${filename}`
       const expectedVersionedUrl = `${VERSIONED_BASE}${manifest.suite?.version}/${filename}`
       if (profile.source?.path !== expectedSourcePath) {
         errors.push(`${at}.source.path: expected ${JSON.stringify(expectedSourcePath)} for profile id`)

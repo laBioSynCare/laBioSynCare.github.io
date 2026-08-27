@@ -74,6 +74,8 @@ ECOSYSTEM_PUBLIC_DUMP = URIRef(
 # and are immutable. Kept as constants because the pin check has to name both.
 APPLICATION_SITE = "https://w3c-cg.github.io/sstim/"
 ONTOLOGY_SITE = f"{APPLICATION_SITE}ontology/"
+# Stays at the origin root on purpose: this is the pin itself, the one
+# route the frozen root-absolute manifests keep off the project site.
 PINNED_ROOT_ONTOLOGY = "https://labiosyncare.github.io/ontology/"
 
 CATALOG_PUBLIC_ROUTES = {
@@ -379,7 +381,7 @@ else:
 
 def published_instance_url(path: Path) -> URIRef:
     relative = path.relative_to(ONTOLOGY_DIR).as_posix()
-    return URIRef(f"https://labiosyncare.github.io/ontology/{relative}")
+    return URIRef(f"https://w3c-cg.github.io/sstim/ontology/{relative}")
 
 
 expected_ecosystem_dumps = {ECOSYSTEM_PUBLIC_DUMP}
