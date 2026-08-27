@@ -224,6 +224,16 @@ jobs:
           SSTIM_EXPECT_FIREBASE: ${{ vars.VITE_FIREBASE_API_KEY != '' }}
         run: nix develop --command node scripts/smoke-static.mjs dist "$SSTIM_BASE_PATH" --complete
 
+      # The artifact is served and clicked, not just fetched. Three defects
+      # shipped that no unit test could see, because none was a wrong value:
+      # a caption clipped into a different word, a primary action scrolled out
+      # of reach behind a hidden scrollbar, and a link that resolved at the
+      # origin root and escaped the deployment under this very mount. The graph
+      # round trip is left out here: it needs several minutes in a production
+      # build, and its wiring is covered by semantic.test.js.
+      - name: Drive the built studio in a browser
+        run: nix develop --command node scripts/studio-browser-check.mjs dist "$SSTIM_BASE_PATH"
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v6
 

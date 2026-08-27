@@ -599,7 +599,32 @@ export/import fixed points, disabled-source retention, stage policies, vector
 spatial blend, static clock gating, and the 8-fps SIRDS cadence. Remaining
 untested orchestration still lives in the component `<script>`: transport,
 `rafTick`, full starter/report lifecycle, fullscreen, and cloud UI behavior.
-Production browser/offline route coverage is also still open.
+
+**Production browser coverage now exists** for the surface §11.5 is about.
+`make studio-browser-check` builds at a project-page mount, serves the result
+through the same static host `smoke-static` uses, and drives it over the
+DevTools Protocol (`scripts/chrome-session.mjs`; Playwright remains a
+non-dependency). It asserts that the studio hydrates, that no knob caption is
+clipped by its 56px column, that no add button sits outside its row, that the
+page does not scroll sideways, that a caption opens the semantic panel, that
+the graph deep link stays inside the mount, and that the service worker does
+not reload the page out from under the visitor. `WITH_GRAPH=1` adds the round
+trip through the Navigator and back.
+
+That last assertion found a live defect rather than guarding a fixed one: on a
+first visit the worker's `clients.claim()` fired `controllerchange`, the update
+handler reloaded unconditionally, and the studio silently lost whatever was in
+it a few seconds after load, including a `?add=` track. See
+[`PWA_SERVICE_WORKER.md`](PWA_SERVICE_WORKER.md) §4 and ADR 0009 Trap 1.
+
+The mount is the point. A root-absolute `/graph/#term` works perfectly at the
+origin root and leaves the deployment entirely under `/sstim`, so a check that
+only ever ran against a local root build could not see it. Each assertion was
+mutation-tested against the defect it exists to catch: restoring the raw knob
+key fails naming `inhaleRatio`, restoring `overflow-x: auto` on `.col-adds`
+fails naming all six hidden buttons including `Mix`, and reverting
+`semanticGraphHref` fails on the escaped mount. Offline/service-worker route
+coverage is still open.
 
 ### 11.4 Visual rendering is split; haptic remains a preview
 
@@ -650,9 +675,15 @@ Open, and not yet decided:
   it is still a pill of abbreviations at rest, and it truncates under about
   1000px.
 - Unused Visual and Haptic columns still occupy half the viewport.
-- None of this is covered by an automated check. Per §11.3, production
-  browser/offline route coverage is still open, so every claim about how the
-  studio *looks and behaves* rests on manual inspection.
+- The graph route blocks for roughly three and a half minutes in a production
+  build before a `#term` selection resolves, measured while building the browser
+  checks. The loading panel is shown throughout, so nothing appears broken, but
+  it is why the graph round trip sits behind `WITH_GRAPH=1` rather than running
+  on every push. Worth reading against the `await` pitfall in `CLAUDE.md` §9.
+- The geometry and reachability claims above **are** now covered by
+  `make studio-browser-check` (§11.3). What remains uncovered by any automated
+  check is the subjective half: whether the density is *readable*, and whether
+  the two open items above are the right calls.
 
 ### 11.6 Minor
 

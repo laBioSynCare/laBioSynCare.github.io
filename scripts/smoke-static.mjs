@@ -9,11 +9,11 @@
 // Deliberately dependency-free: Node's own http/fs only, so it runs anywhere the
 // pinned toolchain runs and adds nothing to the supply chain.
 
-import { createServer } from 'node:http'
-import { readFile, readdir, stat } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { extname, join, normalize, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 import { normalizeDeploymentBase } from '../deployment.config.js'
+import { serveDist } from './static-host.mjs'
 
 const DIST = resolve(process.argv[2] ?? 'dist')
 const MOUNT = normalizeDeploymentBase(process.argv[3] ?? '')
@@ -24,49 +24,9 @@ const COMPLETE_ARTIFACT = process.argv.includes('--complete')
 // was fetched from, which is /ontology/.
 const ontologyRef = (reference) => `/ontology/${reference}`
 
-const TYPES = {
-  '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
-  '.json': 'application/json', '.ttl': 'text/turtle', '.svg': 'image/svg+xml',
-  '.jsonld': 'application/ld+json', '.rdf': 'application/rdf+xml',
-  '.owl': 'application/rdf+xml',
-  '.png': 'image/png', '.wav': 'audio/wav', '.wasm': 'application/wasm',
-  '.webmanifest': 'application/manifest+json',
-}
-
 let failures = 0
 const ok = (msg, detail = '') => console.log(`  ok   ${msg}${detail ? ` — ${detail}` : ''}`)
 const bad = (msg, detail = '') => { failures++; console.log(`  FAIL ${msg}${detail ? ` — ${detail}` : ''}`) }
-
-// A deliberately plain static host: no SPA rewrite, no fallback. If a route only
-// works because everything returns index.html, that is not a static deployment.
-function serve(port) {
-  return new Promise((res) => {
-    const server = createServer(async (req, response) => {
-      const url = new URL(req.url, 'http://localhost')
-      let path = normalize(decodeURIComponent(url.pathname)).replace(/^(\.\.[/\\])+/, '')
-      if (MOUNT && path !== MOUNT && !path.startsWith(`${MOUNT}/`)) {
-        response.writeHead(404).end('outside deployment mount')
-        return
-      }
-      if (MOUNT) path = path.slice(MOUNT.length) || '/'
-      let file = join(DIST, path)
-      try {
-        if ((await stat(file)).isDirectory()) file = join(file, 'index.html')
-      } catch {
-        response.writeHead(404).end('not found')
-        return
-      }
-      try {
-        const body = await readFile(file)
-        response.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' })
-        response.end(body)
-      } catch {
-        response.writeHead(404).end('not found')
-      }
-    })
-    server.listen(port, '127.0.0.1', () => res(server))
-  })
-}
 
 async function main() {
   if (!existsSync(DIST)) {
@@ -83,7 +43,7 @@ async function main() {
   const BAD_PORTS = new Set([4190])
   let port = 4179 + Math.floor(Math.random() * 200)
   while (BAD_PORTS.has(port)) port = 4179 + Math.floor(Math.random() * 200)
-  const server = await serve(port)
+  const server = await serveDist(DIST, MOUNT, port)
   const origin = `http://127.0.0.1:${port}`
   const base = `${origin}${MOUNT}`
   console.log(`smoke-static: serving ${DIST} at ${base || origin}\n`)

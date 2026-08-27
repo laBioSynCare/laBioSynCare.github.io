@@ -75,7 +75,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -141,6 +141,16 @@ smoke-static:
 		[ $$status -eq 0 ] || exit $$status
 	@mv dist dist-smoke
 	@node scripts/smoke-static.mjs dist-smoke
+
+## Drive the built Patch Studio in a real browser at a project-page mount.
+## Catches what unit tests cannot see: clipped captions, controls scrolled out
+## of reach, and links that escape the deployment. Add WITH_GRAPH=1 for the
+## graph round trip, which needs several minutes.
+studio-browser-check:
+	@rm -rf dist-browser
+	@SSTIM_BASE_PATH=/sstim npm run build >/dev/null
+	@mv dist dist-browser
+	@node scripts/studio-browser-check.mjs dist-browser /sstim $(if $(WITH_GRAPH),--with-graph,)
 
 ## Start the local Vite dev server on the standard host/port
 dev:
