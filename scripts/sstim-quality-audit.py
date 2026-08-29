@@ -1185,9 +1185,11 @@ else:
             "^exposure$",
             json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.jsonld",
             rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.rdf",
-            # Both namespace catalogs (this and `^$`) send HTML to the
-            # application: only it can honour a term fragment, which a server
-            # never sees and a generated index cannot anchor.
+            # Both namespace catalogs send HTML somewhere that can honour a term
+            # fragment, which a server never sees and a generated index cannot
+            # anchor. This one goes to the application directly; `^$` goes to the
+            # namespace page, which forwards the fragment to the same place
+            # (ADR 0055).
             html="https://w3c-cg.github.io/sstim/",
             turtle="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.ttl",
         ),
@@ -1206,12 +1208,19 @@ else:
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
             turtle="https://w3c-cg.github.io/sstim/ontology/sstim-$1.ttl",
         ),
+        # The bare ontology IRI is the one route that does not serve the working
+        # tree. RDF comes from `latest/`, the newest frozen release, so what
+        # dereferencing https://w3id.org/sstim returns carries an owl:versionIRI
+        # and a released status instead of the "0.17.0-dev" / "under development"
+        # graph it used to hand out (ADR 0055). `latest/` is a stable path
+        # written on every deploy, which is what keeps a release from costing a
+        # pull request against perma-id/w3id.org (ADR 0053).
         *negotiated_directives(
             "^$",
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.rdf",
-            html="https://w3c-cg.github.io/sstim/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-namespace.ttl",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.rdf",
+            html="https://w3c-cg.github.io/sstim/namespace/",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.ttl",
         ),
     )
     if directive_lines(manifest_route_block) != expected_manifest_directives:

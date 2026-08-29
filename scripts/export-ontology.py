@@ -2,7 +2,7 @@
 """export-ontology.py — generate JSON-LD and RDF/XML serializations of the
 SSTIM ontology modules from their Turtle masters.
 
-    python3 scripts/export-ontology.py [output_dir]
+    python3 scripts/export-ontology.py [output_dir] [--source-dir DIR]
 
 For each manifest-owned module and profile entrypoint, this writes a
 graph-faithful re-serialization to `<output_dir>/<module>.jsonld` and
@@ -22,6 +22,13 @@ These are dereferencing catalogs, not additional term-owning source modules.
 copies the Turtle files, so the exports sit beside them in the deployed site.
 Instances under static/ontology/instances/ are implementation data, not part of
 the versioned ontology, so — like `make snapshot` — they are not exported here.
+
+`--source-dir DIR` reads the manifest and the Turtle masters from a frozen
+snapshot instead of the working tree, resolving each declared source by its file
+name inside DIR (a snapshot manifest keeps the working-tree `source.path` it was
+cut from). This is what gives the published `latest/` release the JSON-LD and
+RDF/XML its content-negotiated routes promise, without freezing derived bytes
+into git: ADR 0055, and the same artifact-only posture as ADR 0023.
 
 Requires rdflib (provided by the Nix devShell's Python; `pip install rdflib`
 otherwise). Turtle remains the source of truth; rerun after any ontology edit.
@@ -46,11 +53,27 @@ ONTOLOGY_DIR = REPO_ROOT / "static" / "ontology"
 MANIFEST_PATH = ONTOLOGY_DIR / "manifest.json"
 
 
-def export_sources() -> list[Path]:
+def manifest_path(source_dir: Path | None) -> Path:
+    return MANIFEST_PATH if source_dir is None else source_dir / "manifest.json"
+
+
+def resolve_source(path_str: str, source_dir: Path | None) -> Path:
+    """Locate a manifest-declared Turtle master.
+
+    A frozen snapshot flattens every module into one directory but keeps the
+    working-tree `source.path` it was cut from, so the file name is the only
+    part of that path that still means anything there.
+    """
+    if source_dir is None:
+        return REPO_ROOT / path_str
+    return source_dir / Path(path_str).name
+
+
+def export_sources(source_dir: Path | None) -> list[Path]:
     """Return every manifest-declared export source, in manifest order."""
-    manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    manifest = load_manifest(source_dir)
     sources = [
-        REPO_ROOT / module["source"]["path"]
+        resolve_source(module["source"]["path"], source_dir)
         for module in manifest["modules"]
         if module["release"]["export"]
     ]
@@ -58,12 +81,12 @@ def export_sources() -> list[Path]:
         source = profile.get("source")
         release = profile.get("release", {})
         if source and release.get("export"):
-            sources.append(REPO_ROOT / source["path"])
+            sources.append(resolve_source(source["path"], source_dir))
     return sources
 
 
-def load_manifest() -> dict:
-    return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+def load_manifest(source_dir: Path | None = None) -> dict:
+    return json.loads(manifest_path(source_dir).read_text(encoding="utf-8"))
 
 # rdflib serializer name -> output extension. The flat "xml" writer (not
 # "pretty-xml") round-trips RDF collections — owl:unionOf, owl:AllDisjointClasses
@@ -98,15 +121,49 @@ def serialize_and_verify(
     return True
 
 
+def describe(path: Path) -> str:
+    """A path relative to the repository when it is inside one, else absolute."""
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
 def main() -> int:
-    out_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else REPO_ROOT / "dist" / "ontology"
+    argv = sys.argv[1:]
+    source_dir: Path | None = None
+    positional: list[str] = []
+    index = 0
+    while index < len(argv):
+        arg = argv[index]
+        if arg == "--source-dir":
+            index += 1
+            if index >= len(argv):
+                print("export-ontology: --source-dir needs a directory", file=sys.stderr)
+                return 1
+            source_dir = Path(argv[index]).resolve()
+        elif arg.startswith("--source-dir="):
+            source_dir = Path(arg.split("=", 1)[1]).resolve()
+        else:
+            positional.append(arg)
+        index += 1
+
+    if source_dir is not None and not manifest_path(source_dir).is_file():
+        print(
+            f"export-ontology: ERROR {describe(source_dir)} has no manifest.json, "
+            "so it is not a modular snapshot this can export",
+            file=sys.stderr,
+        )
+        return 1
+
+    out_dir = Path(positional[0]) if positional else REPO_ROOT / "dist" / "ontology"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     written = 0
-    for src in export_sources():
+    for src in export_sources(source_dir):
         if not src.exists():
             print(
-                f"export-ontology: ERROR missing manifest source {src.relative_to(REPO_ROOT)}",
+                f"export-ontology: ERROR missing manifest source {describe(src)}",
                 file=sys.stderr,
             )
             return 1
@@ -117,13 +174,13 @@ def main() -> int:
             dest = out_dir / f"{stem}.{ext}"
             if not serialize_and_verify(graph, dest, fmt):
                 print(
-                    f"export-ontology: source was {src.relative_to(REPO_ROOT)}",
+                    f"export-ontology: source was {describe(src)}",
                     file=sys.stderr,
                 )
                 return 1
             written += 1
 
-    manifest = load_manifest()
+    manifest = load_manifest(source_dir)
     module_by_id = {module["id"]: module for module in manifest["modules"]}
     for namespace_document in manifest["namespaceDocuments"]:
         graph = Graph()
@@ -137,7 +194,7 @@ def main() -> int:
                     file=sys.stderr,
                 )
                 return 1
-            source_path = REPO_ROOT / module["source"]["path"]
+            source_path = resolve_source(module["source"]["path"], source_dir)
             source_paths.append(source_path)
             graph.parse(source_path, format="turtle")
 

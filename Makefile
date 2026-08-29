@@ -75,7 +75,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -676,6 +676,15 @@ validate: manifest-check module-boundaries core-profile-contract full-equivalenc
 export:
 	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)
 
+## Publish the newest frozen release at the stable path https://w3id.org/sstim
+## resolves to, in all three serializations (ADR 0055). Deploy artifact only,
+## never committed: deriving it every build is what stops latest/ drifting from
+## the snapshot it claims to be. Override EXPORT_DIR= to point at another dist.
+publish-latest:
+	node scripts/publish-latest-ontology.mjs $(EXPORT_DIR)
+	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)/latest --source-dir $(EXPORT_DIR)/latest
+	node scripts/publish-latest-ontology.mjs $(EXPORT_DIR) --verify
+
 ## Merge the manifest-defined Full semantic profile (excluding SHACL shapes)
 ## into one RDF/XML OWL file for BioPortal ingest.
 ## Generated into dist/ (deploy artifact only), never committed; override BIOPORTAL_OUT=.
@@ -780,6 +789,7 @@ help:
 	@echo "  make full-equivalence Prove Full compatibility outside recorded migrations"
 	@echo "  make export           Write JSON-LD + RDF/XML exports to $(EXPORT_DIR) (EXPORT_DIR=)"
 	@echo "  make export-check     Verify generated serializations round-trip isomorphically"
+	@echo "  make publish-latest   Publish the newest release at latest/ in all three formats"
 	@echo "  make context-roundtrip Verify context.jsonld round-trips every ontology + instance document"
 	@echo "  make verify-snapshots Verify recorded ontology snapshots match their checksum ledger"
 	@echo "  make w3id-routes      Verify w3id snapshot routes are current and every target is published"

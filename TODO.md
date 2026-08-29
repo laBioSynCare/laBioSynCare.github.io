@@ -394,6 +394,77 @@ indexed, examiner-searchable records.
       [ADR 0025](docs/decisions/0025-hed-bids-interoperability-crosswalk.md).*
 
 ### Ontology namespace
+- [~] **Make `https://w3id.org/sstim` resolve to a release, and legible to a person** `P1`
+      *[ADR 0055](docs/decisions/0055-namespace-iri-resolves-to-a-release.md),
+      accepted 2026-08-29. Six items. The order below is normative: the w3id
+      change comes last because it is the only production-visible step and it
+      depends on both the namespace page and `latest/` already being deployed.*
+
+      *Measured 2026-08-29 against the live routes, after the `w3c-cg` cutover.
+      `Accept: text/turtle` on `/sstim` serves `sstim-namespace.ttl` built from
+      the working tree: `owl:versionInfo "0.17.0-dev"`, `mod:status "under
+      development"`, and no `owl:versionIRI` at all, where frozen `/sstim/0.16.0`
+      has one. `Accept: text/html` serves the four-door entrance, which never
+      says the visitor followed a namespace IRI. Both WIDOCO (`/ontology/docs/`)
+      and pyLODE (`/ontology/docs/vocab/`) answer 200 and neither is linked from
+      the landing.*
+
+      - [x] 1. Add an "About this graph" section to the graph `?` dialog
+            (`src/ui/navigation/AppTopBar.svelte`, currently eight keyboard
+            shortcuts and nothing else): what the graph is, that node IRIs are
+            dereferenceable persistent identifiers, the namespace, how to fetch
+            Turtle or JSON-LD, links to WIDOCO, pyLODE and SPARQL.
+      - [x] 2. In the graph node panel, relabel the Docs row so it names its
+            source ("Reference entry (WIDOCO)", "Vocabulary entry (pyLODE)") and
+            add a sibling link to the Turtle module that defines the term.
+            `docsUrlForIri` and the panel are
+            `src/ui/graph/OntologyGraph.svelte:1532` and `:2419`. An RDF browser
+            that offers HTML documentation and no RDF is the gap being closed.
+      - [x] 3. Add the arrival banner, in two stages, the first rendering
+            **beside the loading panel** rather than after it (Renato,
+            2026-08-29: building the graph is several seconds of uninterruptible
+            force layout, so the loader is exactly when the visitor needs the
+            explanation). Stage one is a pure `PREFIXES` lookup and is available
+            on arrival; stage two waits for the graph, because
+            `resolveHashToNodeId` returns null until `allElements` is populated
+            (`OntologyGraph.svelte:1440`). If the fragment does not resolve, say
+            so rather than hiding the banner.
+      - [x] 4. Add the `/namespace/` route: namespace and current release, the
+            content negotiation table with real URLs, the IRI families that
+            belong to SSTIM, links to WIDOCO, pyLODE, snapshots and the browser,
+            and the same non-door fragment forward to `/graph/` that
+            `src/routes/+page.svelte:111-113` already does. Not `/ontology/`,
+            which collides with the static Turtle directory and WIDOCO.
+      - [x] 5. Publish the newest snapshot at `latest/` and export its JSON-LD
+            and RDF/XML there. `make publish-latest`, run from `pages.yml` after
+            `make export`: `scripts/publish-latest-ontology.mjs` copies,
+            `scripts/export-ontology.py --source-dir` exports, and a `--verify`
+            pass checks the Turtle came through byte-identical.
+            *Built into `dist/` only, not `static/`, which is a change from what
+            the ADR first said. A committed copy can drift from the snapshot it
+            claims to mirror; deriving it every build removes that failure mode
+            instead of adding a `truth-audit` gate to catch it. The ADR was
+            updated to match. Two guards remain because both failures are silent:
+            the publish refuses if the newest snapshot and `releaseMetadata.js`
+            name different versions, and the verify pass catches the export's
+            catalogue concatenation drifting from `make snapshot`'s (measured
+            2026-08-29: byte-identical today).*
+            *Exports stay generated, never committed: `make export-check` already
+            proves them isomorphic to the Turtle, so freezing them would triple
+            every snapshot forever for derivable bytes. Verified 2026-08-29 that
+            snapshots are Turtle only (`/ontology/0.16.0/sstim-namespace.jsonld`
+            answers 404).*
+      - [x] 6. Repoint the four `^$` rules in
+            `docs/ecosystem/w3id/sstim/.htaccess` at `latest/` for Turtle,
+            JSON-LD and RDF/XML and at `/namespace/` for HTML, update
+            `scripts/w3id-negotiation.test.mjs`, run `make w3id-routes`, then one
+            upstream pull request using the w3id template. A stable `latest/`
+            path rather than a versioned one, so this stays a one-off and a
+            release still costs no w3id PR (ADR 0053).
+            ***The repository mirror, its three gates and the negotiation test are
+            done. The upstream PR against `perma-id/w3id.org` is the one step
+            left, and must not go up until the deploy carrying `/namespace/` and
+            `latest/` is live: the rules point at both.***
 - [?] Decide whether the `implementation/bsclab/` IRI family stays as it is `P2`
       ***Disposition 2026-08-27: leave it as is for now.*** *Renato decided this
       after the measurements below. Nothing changes: no IRI moves, no route is

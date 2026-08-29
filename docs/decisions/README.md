@@ -78,6 +78,7 @@ annotations lives here.
 | [0052](0052-abstract-signals-and-sensory-renderings.md) | One signal, several sensory renderings: carrier and modulator are an audio rendering, not the universal structure | Accepted |
 | [0053](0053-wildcard-snapshot-routes.md) | Snapshot routes are patterns, not an enumeration — a release no longer costs the w3id maintainer a pull request | Accepted |
 | [0054](0054-owl-dl-conformance-and-the-duration-datatype.md) | OWL 2 DL conformance: declare every external term, declare `xsd:date`, and remove `xsd:duration` because declaring it does not work | Accepted |
+| [0055](0055-namespace-iri-resolves-to-a-release.md) | `https://w3id.org/sstim` resolves to the latest release rather than the working tree, and tells a person in a browser what they just dereferenced | Accepted |
 
 ## ADR lifecycle and revision policy
 

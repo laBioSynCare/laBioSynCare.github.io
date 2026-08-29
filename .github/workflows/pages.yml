@@ -191,6 +191,15 @@ jobs:
       - name: Export ontology serializations (JSON-LD + RDF/XML)
         run: nix develop --command make export EXPORT_DIR=dist/ontology
 
+      # https://w3id.org/sstim is the ontology IRI, so what it hands an RDF
+      # client has to be a citable release rather than the working tree it used
+      # to serve (ADR 0055). This copies the newest frozen snapshot to the stable
+      # latest/ path the w3id rules point at, exports its JSON-LD and RDF/XML,
+      # and then checks the Turtle came through byte-identical. Derived on every
+      # build and never committed, so latest/ cannot drift from its snapshot.
+      - name: Publish the latest release at a stable path
+        run: nix develop --command make publish-latest EXPORT_DIR=dist/ontology
+
       # WIDOCO reference documentation is generated into the artifact only —
       # never committed to main (ADR 0023). It owns /ontology/docs/; the app
       # keeps the site root and all existing routes.

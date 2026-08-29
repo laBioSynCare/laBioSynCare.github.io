@@ -69,10 +69,30 @@ test('a serialization stops being publishable when its module drops the export f
 })
 
 test('a renamed namespace document is caught', () => {
+  // The exposure catalogue, because it is the one still served from the working
+  // tree. Its route names a generated artifact that exists only after
+  // `make export`, so a rename here is exactly the silent 404 this file exists
+  // to prevent.
   const renamed = structuredClone(manifest)
-  renamed.namespaceDocuments[0].runtime.turtleUrl = '/ontology/sstim-catalogue.ttl'
+  const exposure = renamed.namespaceDocuments.find((document) => document.id === 'exposure')
+  exposure.runtime.turtleUrl = '/ontology/sstim-exposure-catalogue.ttl'
 
   const problems = unpublishableTargets({ htaccess, manifest: renamed })
 
-  expect(problems.some((problem) => problem.includes('sstim-namespace.ttl'))).toBe(true)
+  expect(problems.some((problem) => problem.includes('sstim-exposure-namespace.ttl'))).toBe(true)
+})
+
+test('renaming the sstim catalogue cannot break the bare ontology IRI', () => {
+  // Not an oversight, and worth pinning so it is not "fixed" back: since ADR
+  // 0055 the `^$` rules resolve through latest/, which is a copy of a frozen
+  // release. Its files are that snapshot's committed bytes, so a rename in the
+  // working manifest genuinely does not reach them. The route is still checked,
+  // against the release it will actually be built from.
+  const renamed = structuredClone(manifest)
+  const sstim = renamed.namespaceDocuments.find((document) => document.id === 'sstim')
+  sstim.runtime.turtleUrl = '/ontology/sstim-catalogue.ttl'
+
+  const problems = unpublishableTargets({ htaccess, manifest: renamed })
+
+  expect(problems.some((problem) => problem.includes('latest/'))).toBe(false)
 })

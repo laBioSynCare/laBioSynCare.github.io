@@ -200,6 +200,22 @@ export const MODULE_ID_BY_GRAPH_IRI = Object.freeze(Object.fromEntries(
 ))
 
 /**
+ * Manifest module id → the Turtle document that declares its terms: the
+ * same-origin runtime copy the browser already fetched, and the persistent
+ * w3id IRI to cite or share.
+ *
+ * The node inspector offers both (ADR 0055 §5). Before it did, an RDF browser
+ * handed a reader generated HTML documentation for a term and no way at all to
+ * reach the RDF that documentation was generated from.
+ */
+export const MODULE_DOCUMENTS = Object.freeze(Object.fromEntries(
+  fullProfileModules.map(module => [module.id, Object.freeze({
+    url: ontologyRuntimeAsset(module.runtime.url),
+    persistentUrl: module.publication.persistentUrl,
+  })]),
+))
+
+/**
  * The published conformance profiles and their exact closures.
  *
  * `modules` is the manifest closure verbatim, including modules the navigator

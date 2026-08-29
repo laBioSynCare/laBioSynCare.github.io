@@ -17,6 +17,8 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { releaseDirectories } from './publish-latest-ontology.mjs'
+
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
 const ontologyDir = join(repoRoot, 'static', 'ontology')
@@ -36,6 +38,14 @@ const sitePrefixOf = (target) => SITE_PREFIXES.find((prefix) => target.startsWit
 // Directory indexes produced by WIDOCO and pyLODE in the Pages workflow.
 const GENERATED_DIRECTORIES = new Set(['', 'docs/', 'docs/vocab/'])
 const EXPORT_EXTENSIONS = ['.jsonld', '.rdf']
+
+// `latest/` is the stable path the bare ontology IRI resolves to (ADR 0055). It
+// holds no committed bytes: `make publish-latest` copies the newest frozen
+// snapshot there on every deploy and exports its JSON-LD and RDF/XML beside it.
+// So a target under it is publishable exactly when the newest snapshot could
+// produce it, which is what this checks — and a route naming a file that release
+// does not contain still fails, as it should.
+const LATEST_PREFIX = 'latest/'
 
 function unescapeRegex(value) {
   return value.replace(/\\(.)/g, '$1')
@@ -95,12 +105,26 @@ function publishableArtifacts(manifest) {
 
 export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontologyDir }) {
   const generated = publishableArtifacts(manifest)
+  const newestRelease = releaseDirectories(ontologyRoot)[0] ?? null
   const problems = []
   for (const target of new Set(routeTargets(htaccess))) {
     const prefix = sitePrefixOf(target)
     if (!prefix) continue
-    const relative = target.slice(prefix.length)
+    let relative = target.slice(prefix.length)
     if (GENERATED_DIRECTORIES.has(relative)) continue
+
+    // Resolve latest/ against the release it will be built from, then fall
+    // through to the ordinary checks so nothing gets a weaker test for sitting
+    // behind the alias.
+    if (relative.startsWith(LATEST_PREFIX)) {
+      if (!newestRelease) {
+        problems.push(`${target} routes to latest/ but no frozen release exists to publish there`)
+        continue
+      }
+      relative = join(newestRelease, relative.slice(LATEST_PREFIX.length))
+    }
+
+    if (generated.has(relative.split('/').pop()) && relative.startsWith(`${newestRelease}/`)) continue
     if (generated.has(relative)) continue
     const committed = join(ontologyRoot, relative)
     if (existsSync(committed) && statSync(committed).isFile()) continue

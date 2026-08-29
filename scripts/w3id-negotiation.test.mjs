@@ -101,9 +101,9 @@ async function buildLocalCatalogGraph(sourceUrls) {
 }
 
 test('each namespace and module route serves the document it advertises', () => {
-  expect(go('', 'text/turtle').doc).toBe('sstim-namespace.ttl')
-  expect(go('', 'application/ld+json').doc).toBe('sstim-namespace.jsonld')
-  expect(go('', 'application/rdf+xml').doc).toBe('sstim-namespace.rdf')
+  expect(go('', 'text/turtle').doc).toBe('latest/sstim-namespace.ttl')
+  expect(go('', 'application/ld+json').doc).toBe('latest/sstim-namespace.jsonld')
+  expect(go('', 'application/rdf+xml').doc).toBe('latest/sstim-namespace.rdf')
 
   // The two endpoints whose namespace IRI is occupied by a multi-module
   // catalogue. Confusing these is the mistake the split makes easy.
@@ -119,8 +119,8 @@ test('each namespace and module route serves the document it advertises', () => 
 })
 
 test('Turtle is the default, including for an absent or wildcard Accept', () => {
-  expect(go('', '').doc).toBe('sstim-namespace.ttl')
-  expect(go('', '*/*').doc).toBe('sstim-namespace.ttl')
+  expect(go('', '').doc).toBe('latest/sstim-namespace.ttl')
+  expect(go('', '*/*').doc).toBe('latest/sstim-namespace.ttl')
 })
 
 test('q=0 makes a type unacceptable without poisoning the others', () => {
@@ -129,7 +129,7 @@ test('q=0 makes a type unacceptable without poisoning the others', () => {
   expect(go('', 'application/n-triples').status).toBe(406)
 
   // q=0 on a different type must not suppress the one actually requested.
-  expect(go('', 'application/ld+json, text/html;q=0').doc).toBe('sstim-namespace.jsonld')
+  expect(go('', 'application/ld+json, text/html;q=0').doc).toBe('latest/sstim-namespace.jsonld')
 })
 
 test('a namespace catalog sends HTML to the application, so a term fragment resolves', () => {
@@ -138,9 +138,12 @@ test('a namespace catalog sends HTML to the application, so a term fragment reso
   // has to serve both. The generated index cannot serve the second: measured
   // 2026-08-23, WIDOCO anchors by full IRI while the browser carries the bare
   // local name, so nothing matched and the reader landed at the top of the page.
-  // Both namespace catalogs therefore point at the application, which reads the
-  // fragment client-side and selects the term.
-  expect(go('', BROWSER).doc).toBe(APPLICATION)
+  // Both namespace catalogs therefore point at a surface that reads the fragment
+  // client-side: /sstim/exposure at the application directly, and /sstim at the
+  // namespace page, which forwards any fragment to the same knowledge browser
+  // (ADR 0055). What matters to this test is that neither sends a term IRI to a
+  // generated index that cannot anchor it.
+  expect(go('', BROWSER).doc).toBe(`${APPLICATION}namespace/`)
   expect(go('exposure', BROWSER).doc).toBe(APPLICATION)
   expect(go('exposure', 'text/html').doc).toBe(APPLICATION)
   // Only HTML changes. Every RDF representation still serves the catalog.
@@ -174,12 +177,32 @@ test('shape namespaces stay on the reference index', () => {
 })
 
 test('a browser reaches human documentation, not RDF', () => {
-  // The root is the one HTML target outside /ontology/: a person typing
-  // w3id.org/sstim wants the project, not a generated reference page.
-  expect(go('', BROWSER).doc).toBe('https://w3c-cg.github.io/sstim/')
-  expect(go('', 'text/html').doc).toBe('https://w3c-cg.github.io/sstim/')
+  // The root is the one HTML target outside /ontology/. It used to be the
+  // application entrance, a four-door product page that never told a visitor
+  // they had followed a namespace IRI; ADR 0055 gave it a page that says what
+  // this identifier is and which IRIs belong to it, and that hands any fragment
+  // to the knowledge browser the way the entrance did.
+  expect(go('', BROWSER).doc).toBe('https://w3c-cg.github.io/sstim/namespace/')
+  expect(go('', 'text/html').doc).toBe('https://w3c-cg.github.io/sstim/namespace/')
   expect(go('kernel', BROWSER).doc).toBe('docs/')
   expect(go('profile/core', BROWSER).doc).toBe('docs/')
+})
+
+test('the bare ontology IRI serves a release, never the working tree', () => {
+  // The defect ADR 0055 closed, pinned so it cannot come back: /sstim answered
+  // RDF clients from the deployment's top-level build, which declared
+  // owl:versionInfo "0.17.0-dev", mod:status "under development" and no
+  // owl:versionIRI at all. An ontology IRI returning a graph nobody can pin or
+  // cite is what LOV and Archivo would have harvested as SSTIM.
+  //
+  // `latest/` rather than a version-shaped path is deliberate: a versioned
+  // target would cost a pull request against perma-id/w3id.org on every release,
+  // which is exactly what ADR 0053 removed at the maintainer's request.
+  for (const accept of ['text/turtle', 'application/ld+json', 'application/rdf+xml', '*/*', '']) {
+    const doc = go('', accept).doc
+    expect(doc.startsWith('latest/')).toBe(true)
+    expect(doc).not.toMatch(/^sstim-namespace\./)
+  }
 })
 
 test('the SKOS vocabulary keeps its own documentation page, one link away', () => {

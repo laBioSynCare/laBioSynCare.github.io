@@ -58,6 +58,10 @@ async function main() {
       ['/presets/', 'Presets'],
       ['/logbook/', 'Logbook'],
       ['/ecosystem/', 'SSTIM ecosystem'],
+      // What https://w3id.org/sstim answers a browser (ADR 0055). It is a
+      // published persistent-identifier target, so a build that stopped emitting
+      // it would break the namespace IRI itself, not merely a menu entry.
+      ['/namespace/', 'Linked-data namespace'],
       ['/about/', 'About'],
       ['/settings/', 'Settings'],
     ]

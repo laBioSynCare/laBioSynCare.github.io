@@ -3,7 +3,7 @@
   import { replaceState } from '$app/navigation'
   import { applicationAsset, applicationRoute } from '../../config/applicationUrls.js'
   import { buildGraphElements } from '../../rdf/graph.js'
-  import { ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
+  import { MODULE_DOCUMENTS, ONTOLOGY_MODULES, ONTOLOGY_PROFILES } from '../../rdf/loader.js'
   import { toCurie, PREFIXES } from '../../rdf/namespaces.js'
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
@@ -1430,12 +1430,59 @@
     return [...seen.values()].sort((a, b) => a.label.localeCompare(b.label))
   }
 
-  const SSTIM_BASE   = 'https://w3id.org/sstim#'
-  const SSTIM_V_BASE = 'https://w3id.org/sstim/vocab#'
+  const SSTIM_BASE   = PREFIXES.sstim
+  const SSTIM_V_BASE = PREFIXES['sstim-v']
   const HASH_PREFER_BASES = [SSTIM_BASE, SSTIM_V_BASE]
 
   let setupReady = false
   let unsubscribeSkin = null
+
+  // Arrival banner state (ADR 0055 §4). `arrivalIri` is fixed at construction
+  // from the hash we were opened with, so it keeps naming what the visitor
+  // dereferenced even after they browse on and the hash is rewritten.
+  const arrivalIri = iriForHash(initialUrlHash)
+  let arrivalStatus = $state('pending')   // 'pending' | 'resolved' | 'missing'
+  let arrivalLabel = $state('')
+  let arrivalNodeIri = $state('')
+  let arrivalDismissed = $state(false)
+  const arrivalDoc = $derived(arrivalNodeIri ? docsUrlForIri(arrivalNodeIri) : null)
+
+  // The banner explains one arrival. The moment the reader selects something
+  // else it is captioning a node that is no longer the subject, so it retires
+  // itself rather than sitting there contradicting the panel beside it.
+  $effect(() => {
+    if (arrivalStatus !== 'resolved') return
+    const current = selected?.iri
+    if (current && current !== arrivalNodeIri) arrivalDismissed = true
+  })
+
+  // The IRI a fragment names, without needing the graph.
+  //
+  // `resolveHashToNodeId` cannot answer until `allElements` is populated, which
+  // is several seconds of uninterruptible force layout away. Expansion is only a
+  // prefix-table lookup, so it can answer immediately, which is what lets the
+  // arrival banner speak while the loader is still running (ADR 0055 §4).
+  //
+  // A bare local name is reconstructed against the sstim# namespace: a visitor
+  // who arrives with `#Preset` got here by dereferencing
+  // `https://w3id.org/sstim#Preset`, which is that namespace by construction.
+  // Should the graph then resolve it elsewhere, stage two replaces the guess
+  // with the node's own IRI.
+  function iriForHash(rawHash) {
+    if (!rawHash) return null
+    let value = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash
+    try { value = decodeURIComponent(value) } catch { /* keep raw */ }
+    if (!value) return null
+
+    if (value.includes(':')) {
+      const colon = value.indexOf(':')
+      const base = PREFIXES[value.slice(0, colon)]
+      const local = value.slice(colon + 1)
+      if (base) return local ? base + local : base.slice(0, -1)
+      return null
+    }
+    return SSTIM_BASE + value
+  }
 
   function resolveHashToNodeId(rawHash) {
     if (!rawHash || !allElements.length) return null
@@ -1536,10 +1583,27 @@
   function docsUrlForIri(iri) {
     if (!iri) return null
     if (iri.startsWith(SSTIM_BASE)) {
-      return applicationAsset('/ontology/docs/#' + iri.slice(SSTIM_BASE.length))
+      return {
+        href: applicationAsset('/ontology/docs/#' + iri.slice(SSTIM_BASE.length)),
+        label: 'Reference entry (WIDOCO)',
+        title: 'Generated OWL reference documentation for this term',
+      }
     }
-    if (iri.startsWith(SSTIM_V_BASE)) return applicationAsset('/ontology/docs/vocab/')
+    if (iri.startsWith(SSTIM_V_BASE)) {
+      return {
+        href: applicationAsset('/ontology/docs/vocab/'),
+        label: 'Vocabulary entry (pyLODE)',
+        title: 'Generated SKOS vocabulary documentation',
+      }
+    }
     return null
+  }
+
+  // The RDF a term actually came from. `module` is the manifest id graph.js
+  // attributes from the declaring quad's named graph, so this is the owning
+  // document rather than a guess from the IRI shape.
+  function sourceDocForModule(moduleId) {
+    return moduleId ? MODULE_DOCUMENTS[moduleId] ?? null : null
   }
 
   function writeHashForSelected() {
@@ -2046,6 +2110,22 @@
       }
       setupReady = true
 
+      // Stage two of the arrival banner: say whether the identifier actually
+      // named something here. An unresolved fragment is reported rather than
+      // hidden, because a banner that vanishes reads as a page that lost the link.
+      if (arrivalIri) {
+        const node = deepLinkId
+          ? allElements.find((el) => !el.data?.source && el.data?.id === deepLinkId)
+          : null
+        if (node) {
+          arrivalStatus = 'resolved'
+          arrivalLabel = node.data.label ?? ''
+          arrivalNodeIri = node.data.iri ?? arrivalIri
+        } else {
+          arrivalStatus = 'missing'
+        }
+      }
+
       // Camera last, and only after the pending effects have run: selecting a
       // node and entering focus both schedule a re-fit, and the link's own
       // framing has to be what survives.
@@ -2319,6 +2399,37 @@
   </aside>
 
   <section class="graph-workspace">
+    <!-- ADR 0055 §4. A visitor who dereferenced a term IRI used to get a
+         spinner and then a highlighted node, with nothing anywhere saying an
+         RDF identifier had resolved. This speaks from first paint, beside the
+         loader, because that is when the question is live. -->
+    {#if arrivalIri && !arrivalDismissed}
+      <div class="arrival" class:missing={arrivalStatus === 'missing'} role="status">
+        <span class="arrival-tag">Resolved IRI</span>
+        <code class="arrival-iri">{arrivalNodeIri || arrivalIri}</code>
+        <span class="arrival-said">
+          {#if arrivalStatus === 'pending'}
+            a SSTIM term, being located in the graph
+          {:else if arrivalStatus === 'resolved'}
+            {arrivalLabel ? `“${arrivalLabel}”, selected below` : 'selected below'}
+          {:else}
+            not a node in this graph. It may be a shape, a retired term, or a typo.
+          {/if}
+        </span>
+        {#if arrivalStatus === 'resolved' && arrivalDoc}
+          <a class="arrival-link" href={arrivalDoc.href} target="_blank" rel="noreferrer">{arrivalDoc.label}</a>
+        {/if}
+        {#if arrivalStatus === 'missing'}
+          <a class="arrival-link" href={applicationRoute('/namespace/')}>What resolves where</a>
+        {/if}
+        <button
+          type="button"
+          class="arrival-close"
+          aria-label="Dismiss"
+          onclick={() => { arrivalDismissed = true }}
+        >✕</button>
+      </div>
+    {/if}
     <div class="graph-body">
       <!-- Graph canvas -->
       <div class="canvas" bind:this={container}>
@@ -2416,7 +2527,20 @@
                       <div class="meta-row">
                         <dt>Docs</dt>
                         <dd>
-                          <a href={docsUrl} target="_blank" rel="noreferrer" title="WIDOCO reference documentation for this term">Reference entry</a>
+                          <a href={docsUrl.href} target="_blank" rel="noreferrer" title={docsUrl.title}>{docsUrl.label}</a>
+                        </dd>
+                      </div>
+                    {/if}
+                    <!-- ADR 0055 §5: an RDF browser that offers only generated
+                         HTML leaves a reader with no route to the triples. -->
+                    {@const sourceDoc = sourceDocForModule(selected.module)}
+                    {#if sourceDoc}
+                      <div class="meta-row">
+                        <dt>Source</dt>
+                        <dd>
+                          <a href={sourceDoc.url} target="_blank" rel="noreferrer" title="The Turtle module that declares this term">Turtle</a>
+                          <span class="meta-sep">·</span>
+                          <a href={sourceDoc.persistentUrl} target="_blank" rel="noreferrer" title="Persistent identifier for that module">persistent IRI</a>
                         </dd>
                       </div>
                     {/if}
@@ -3253,6 +3377,61 @@
   .meta-row dd {
     margin: 0;
     word-break: break-word;
+  }
+
+  .arrival {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.6rem;
+    padding: 0.45rem 0.7rem;
+    border-bottom: var(--app-border-width) solid var(--app-border);
+    background: var(--app-accent-soft);
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  /* An identifier that named nothing is still news, so the strip stays; the
+     rail is what marks it as the unhappy case. */
+  .arrival.missing { box-shadow: inset 0.2rem 0 0 var(--app-warn); }
+
+  .arrival-tag {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  .arrival-iri {
+    font-family: var(--app-font-mono);
+    font-size: 0.74rem;
+    overflow-wrap: anywhere;
+  }
+
+  .arrival-said { opacity: 0.85; }
+
+  .arrival-link { margin-left: auto; white-space: nowrap; }
+
+  .arrival-close {
+    width: 1.3rem;
+    height: 1.3rem;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.6;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .arrival-close:hover { opacity: 1; }
+
+  .meta-sep {
+    opacity: 0.45;
+    padding: 0 0.15rem;
   }
 
   .status-chip {

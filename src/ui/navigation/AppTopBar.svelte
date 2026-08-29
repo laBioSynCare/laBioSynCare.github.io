@@ -5,6 +5,7 @@
   import InfoModal from './InfoModal.svelte'
   import { graphNavigation } from './graphNavigation.js'
   import { ONTOLOGY_DOCS_URL, VOCAB_DOCS_URL } from '../externalLinks.js'
+  import { PREFIXES } from '../../rdf/namespaces.js'
 
   let searchInput = $state(null)
   let helpOpen = $state(false)
@@ -277,9 +278,9 @@
   <button
     type="button"
     class="help-toggle"
-    aria-label={$graphNavigation.available ? 'Show keyboard shortcuts' : 'Show help'}
+    aria-label={$graphNavigation.available ? 'About this graph, and keyboard shortcuts' : 'Show help'}
     aria-expanded={helpOpen}
-    title={$graphNavigation.available ? 'Keyboard shortcuts (h)' : 'Help (h)'}
+    title={$graphNavigation.available ? 'About this graph (h)' : 'Help (h)'}
     onclick={toggleHelp}
   >?</button>
 
@@ -314,14 +315,37 @@
     <div
       class="help-card"
       role="dialog"
-      aria-label={$graphNavigation.available ? 'Keyboard shortcuts' : 'Help'}
+      aria-label={$graphNavigation.available ? 'About this graph' : 'Help'}
       aria-modal="true"
     >
       <header class="help-header">
-        <h3>{$graphNavigation.available ? 'Keyboard shortcuts' : 'Explore'}</h3>
+        <h3>{$graphNavigation.available ? 'About this graph' : 'Explore'}</h3>
         <button type="button" class="help-close" aria-label="Close help" onclick={closeHelp}>✕</button>
       </header>
       {#if $graphNavigation.available}
+        <!-- Orientation before mechanics (ADR 0055 §6). This dialog used to be
+             eight keyboard shortcuts and nothing else, which left a visitor who
+             arrived by dereferencing a term IRI with no way to learn that the
+             canvas is RDF and that its nodes are persistent identifiers. -->
+        <section class="help-about">
+          <p>
+            One RDF knowledge graph, not a diagram: the SSTIM ontology and its
+            SKOS vocabulary, together with the catalog and ecosystem records.
+          </p>
+          <p>
+            Every node is a persistent identifier under
+            <code>{PREFIXES.sstim}</code>. They dereference. Open one and you get
+            this view with the term selected, or Turtle and JSON-LD if you ask
+            for those instead.
+          </p>
+          <p class="help-links">
+            <a href={applicationRoute('/namespace/')}>What resolves where</a>
+            <a href={ONTOLOGY_DOCS_URL} rel="external">Reference docs</a>
+            <a href={VOCAB_DOCS_URL} rel="external">Vocabulary</a>
+            <a href={applicationRoute('/sparql/')}>SPARQL</a>
+          </p>
+        </section>
+        <h4 class="help-subhead">Keyboard shortcuts</h4>
         <dl class="help-list">
           {#each SHORTCUTS as shortcut}
             <div>
@@ -725,7 +749,9 @@
   }
 
   .help-card {
-    width: min(28rem, 100%);
+    width: min(32rem, 100%);
+    max-height: min(38rem, 88vh);
+    overflow-y: auto;
     padding: 1rem 1.25rem 1.1rem;
     background: var(--app-surface);
     border: var(--app-border-width) solid var(--app-border);
@@ -762,6 +788,37 @@
     line-height: 1;
   }
   .help-close:hover { background: var(--app-accent-soft); border-color: var(--app-accent); }
+
+  .help-about {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .help-about p {
+    margin: 0;
+    font-size: 0.83rem;
+    line-height: 1.55;
+  }
+
+  .help-about code {
+    font-size: 0.95em;
+    overflow-wrap: anywhere;
+  }
+
+  .help-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.9rem;
+  }
+
+  .help-subhead {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    opacity: 0.75;
+  }
 
   .help-fallback {
     margin: 0;
