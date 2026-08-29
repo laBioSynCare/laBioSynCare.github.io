@@ -1,0 +1,6 @@
+onset	duration	event_id	mod_frequency
+0.000	n/a	session-open	n/a
+0.300	n/a	event-start	10
+190.000	n/a	event-stop	n/a
+250.000	n/a	event-start	20
+400.000	n/a	session-close	n/a

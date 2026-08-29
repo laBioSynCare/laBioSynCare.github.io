@@ -1,6 +1,6 @@
-onset	duration	event_id    mod_frequency
-0.000	n/a	session-open    'n/a'
-0.300	n/a	event-start     10
-190.000	n/a	event-stop      'n/a'
-250.000	n/a	event-start     20
-400.000	n/a	session-close   'n/a'
+onset	duration	event_id	event_type	HED
+0.000	n/a	event-open	eventSessionOpen	(Def/Sstim-session, Onset)
+0.300	n/a	event-start	eventPlaybackStart	(Def/Sstim-delivery, Onset)
+190.000	n/a	event-pause	eventPlaybackPause	(Def/Sstim-delivery, Pause)
+250.000	n/a	event-resume	eventPlaybackResume	(Def/Sstim-delivery, Inset)
+400.000	n/a	event-interrupt	eventSessionInterrupt	(Def/Sstim-session, Offset)
