@@ -312,9 +312,10 @@ These are tracked in the
 1. **Done for the bounded profile:** validate the three native+HED synthetic
    bundles locally.
 2. **In progress:** the HED Working Group reviewed the profile in a public
-   thread and a 2026-08-25 meeting. Question 3 is answered; questions 4 and 5
-   and the definition-body shape remain open. The requested follow-up message
-   is drafted, not sent.
+   thread and a 2026-08-25 meeting. Renato sent the requested 11-event follow-up
+   on 2026-08-28. Question 3 is answered; questions 4 and 5 and the
+   definition-body shape remain open, and the generated mapping 0.5.0 artifacts
+   have not separately been returned for review.
 3. Validate and publish the optional BIDS Behavioral binding when a consented
    research use case exists.
 4. Ask external labs to nominate a protocol/session pattern to encode and

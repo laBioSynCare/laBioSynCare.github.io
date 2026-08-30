@@ -570,11 +570,12 @@ supported HED extension; pass NWB Inspector and HED checks. NWB is not an
 ordinary-session storage requirement.
 
 **Phase 3 gate:** the bounded native+HED demonstrators are validator-clean and
-implement the sidecar design reviewed on 2026-08-25. The regenerated artifacts
-have not yet been returned for follow-up review: the revised message remains
-drafted and unsent. The complete profile remains partial until the native event
-bridge and an end-to-end demonstrator exist. Each optional binding has its own
-conformance test and never becomes the round-trip authority.
+implement the sidecar design reviewed on 2026-08-25. An 11-event hand-authored
+pair was returned by email on 2026-08-28; the later generated mapping 0.5.0
+artifacts have not separately been returned for follow-up review. The complete
+profile remains partial until the native event bridge and an end-to-end
+demonstrator exist. Each optional binding has its own conformance test and never
+becomes the round-trip authority.
 
 ### Phase 4 — domain depth, quantities, and publication maturity
 

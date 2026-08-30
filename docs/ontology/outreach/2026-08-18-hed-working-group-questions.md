@@ -45,11 +45,13 @@ The most consequential reply was not an answer to any of the six. @VisLab's
 point is that our definitions are event codes wearing a definition's clothes,
 and that richer bodies would let a consumer distinguish situations across
 datasets instead of matching opaque names. We accept it. The 2026-08-25 meeting
-answered question 3 and produced the four rulings recorded in the
-[follow-up draft](2026-08-27-kay-robbins-revised-events-bundle.md), but no
-recorded ruling settled whether definitions should describe the actual stimulus
-or stay stable across datasets. That definition-shape question, and question 5,
-remain open. The follow-up message and attachment are still drafted, not sent.
+answered question 3 and produced the four rulings. Renato sent the requested
+11-event follow-up on 2026-08-28, recorded in the privacy-safe
+[sent record](2026-08-28-kay-robbins-sent-record.md). The separately versioned
+[30-event expanded alternate](2026-08-27-kay-robbins-revised-events-bundle.md)
+was not sent. No recorded ruling settled whether definitions should describe
+the actual stimulus or stay stable across datasets. That definition-shape
+question, and question 5, remain open.
 
 See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
 

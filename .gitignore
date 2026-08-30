@@ -16,6 +16,11 @@ result-*
 docs/credentials/
 docs/funding/
 
+# Access-limited local correspondence evidence. Public records contain only
+# approved summaries and hashes; raw messages, headers, screenshots, contact
+# channels, and exact sent attachments stay here and out of Git (ADR 0031).
+.private/
+
 .playwright-cli/
 
 # Local Python validation bytecode

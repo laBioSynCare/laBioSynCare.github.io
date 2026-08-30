@@ -1,14 +1,17 @@
-# Kay Robbins: revised events pair after the 25 August meeting
+# Kay Robbins: unsent 30-event expanded alternate
 
-**Status.** Drafted 2026-08-27, to be sent by Renato. The attachments are in
+**Status: unsent technical alternate.** Prepared 2026-08-27, this is not the
+11-event pair Renato emailed on 2026-08-28. The actual correspondence is
+represented by a privacy-safe [sent record](2026-08-28-kay-robbins-sent-record.md).
+The 30-event alternate files are in
 [`2026-08-27-kay-robbins-revised-events-bundle/`](2026-08-27-kay-robbins-revised-events-bundle/).
 
 Prof. Kay Robbins (HED Working Group) met with Renato on 2026-08-25 at 16:00
 CEST, the meeting ADR 0025 records as requested. She reviewed
 `test/fixtures/hed-bundle/events.tsv` and `events.json` live and asked for a
 revised pair by email: better `event_id` descriptions, a longer list of events,
-and a pause built from offset and onset. This file is that message; the
-directory beside it is what goes with it.
+and a pause built from offset and onset. This file documents a larger alternate
+prepared around that follow-up; the directory beside it was not sent.
 
 
 ## What she ruled
@@ -39,7 +42,7 @@ She also suggested HED's UUID tag
 where that landed.
 
 
-## What changed in the attached pair
+## What changed in the alternate pair
 
 Thirty events instead of five, over 1740.5 s, covering ten of SSTIM's eleven
 session event types: `session-open`, `playback-start`, `playback-pause`,
@@ -139,11 +142,11 @@ sidecar issues and zero events issues. Run inside `nix develop`, which pins
 
 ## What this pair is not
 
-Hand authored correspondence, not a generated bundle. `make hed-bundle-check`
-does not see this directory, and these files are not the ADR 0025 demonstrator.
-They are the version prepared for Kay, kept so the wording and the shape can be
-compared against what the generator now produces after the crosswalk absorbed
-her rulings.
+Hand authored technical material, not a generated bundle and not the attachments
+sent on 2026-08-28. `make hed-bundle-check` does not see this directory, and
+these files are not the ADR 0025 demonstrator. They are kept so the expanded
+shape can be compared against what the generator now produces after the
+crosswalk absorbed Kay's rulings.
 
 ## Repository implementation status
 
@@ -168,15 +171,14 @@ appropriate change was confined to the projection and its container recipe.
 
 Still open are the delivery-definition body shape, question 4's software-engine
 vocabulary, question 5's continuous-parameter convention, and the two questions
-in the message below. This message and attachment remain drafted for Renato to
-send; implementing the reviewed rulings does not imply that correspondence was
-sent.
+in the alternate draft below. The smaller 11-event follow-up was sent on
+2026-08-28; this 30-event message and pair were not.
 
 The generated demonstrator fixture that had been hand edited during the meeting
 was restored to generator output in `c16acbf` before this revision.
 
 
-## Message
+## Unsent alternate message draft
 
 > Subject: SSTIM events.tsv and events.json, revised after our 25 Aug call
 >

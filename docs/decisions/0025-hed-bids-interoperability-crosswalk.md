@@ -688,9 +688,13 @@ Direction 3 confirms the existing one-way crosswalk boundary and requires no
 ontology module. Direction 4 is follow-up work; the STIM BIDS proposal remains a
 draft and does not settle item 4, item 5, or the open definition-body question.
 
-The [revised 30-event pair and message](../ontology/outreach/2026-08-27-kay-robbins-revised-events-bundle.md)
-remain drafted for Renato to send. Their unsent status is intentionally separate
-from the implementation recorded here.
+Renato sent the requested 11-event pair by email on 2026-08-28; the public
+[sent record](../ontology/outreach/2026-08-28-kay-robbins-sent-record.md)
+retains its technical summary and attachment hashes while raw correspondence
+evidence remains private under ADR 0031. The separately versioned
+[30-event expanded alternate](../ontology/outreach/2026-08-27-kay-robbins-revised-events-bundle.md)
+was not sent. Neither correspondence artifact is the generated mapping 0.5.0
+demonstrator recorded here.
 
 
 ## See also

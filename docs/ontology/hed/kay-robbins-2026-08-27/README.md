@@ -2,7 +2,7 @@
 
 **Status: historical intermediate artifact.** This five-event pair is
 superseded for correspondence by the
-[30-event revised pair](../../outreach/2026-08-27-kay-robbins-revised-events-bundle.md).
+[11-event pair sent on 2026-08-28](../../outreach/2026-08-28-kay-robbins-sent-record.md).
 It remains here as a record of the meeting edit and its mechanical repairs; it
 is not the current attachment or implementation target.
 
@@ -67,6 +67,7 @@ event_type`) and the checks that read its output: `hed-roundtrip` required an
 `event_type` column and failed without one. Mapping 0.5 subsequently adopted
 the sidecar shape broadly: generated bundles now use the SKOS notation in
 `event_id`, retain the unique source occurrence in `sstim_event_id`, and carry
-no materialised `event_type` or `HED` column. The revised correspondence linked
-above records the later 30-event design; this five-event pair remains frozen as
-the historical intermediate artifact.
+no materialised `event_type` or `HED` column. A separately versioned
+[30-event expanded alternate](../../outreach/2026-08-27-kay-robbins-revised-events-bundle.md)
+was not sent; this five-event pair remains frozen as the historical intermediate
+artifact.

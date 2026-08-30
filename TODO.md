@@ -382,7 +382,8 @@ indexed, examiner-searchable records.
       [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
       and still unanswered after the 2026-08-25 meeting. That meeting settled
       pause/resume and the sidecar shape but recorded no ruling on definition
-      bodies. The revised follow-up is drafted, not sent.*
+      bodies. The 11-event follow-up was sent on 2026-08-28, but it did not ask
+      the definition-body question, which remains open on the existing thread.*
 
       *@VisLab's critique, which we accept: the definitions we generate are event
       codes wearing a definition's clothes.*
