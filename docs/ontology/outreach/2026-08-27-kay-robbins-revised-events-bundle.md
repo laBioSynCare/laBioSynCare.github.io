@@ -141,7 +141,7 @@ sidecar issues and zero events issues. Run inside `nix develop`, which pins
 
 Hand authored correspondence, not a generated bundle. `make hed-bundle-check`
 does not see this directory, and these files are not the ADR 0025 demonstrator.
-They are the version Kay was sent, kept so the wording and the shape can be
+They are the version prepared for Kay, kept so the wording and the shape can be
 compared against whatever the generator produces once the crosswalk absorbs her
 rulings.
 
@@ -150,17 +150,18 @@ as this message:
 
 - `static/schemas/sstim-hed-event-map.json` is at mapping 0.4.0 and still maps
   `eventPlaybackPause` to `Pause` and `eventPlaybackResume` to `Inset`, which
-  contradicts ruling 1. Fixing it is a 0.5.0 bump plus two new `lossyBecause`
-  statements: pause and stop then emit identical HED, as do resume and start.
+  contradicts ruling 1. Fixing it is a 0.5.0 bump plus explicit loss
+  declarations on all four entries in the two collision pairs: pause and stop
+  then emit identical HED, as do resume and start.
 - `scripts/generate-hed-bundle.py` still emits a materialised `HED` column and
   an `event_type` column, which contradicts ruling 2.
-- `test/fixtures/hed-bundle/events.tsv` was hand edited during the meeting and
-  committed in `6dd8224` with spaces where the delimiter should be a tab and a
-  quoted `'n/a'`, so it is not a valid five column TSV and
-  `make hed-bundle-check` fails on `main`. The fixtures are generated, so the
-  repair is the generator, not the file.
 - ADR 0025's "Meeting requested" section still reads as though the meeting is
-  ahead of us, and its open items 3 and 4 are answered.
+  ahead of us. Its item 3 now has the answer recorded above; item 4 remains
+  unanswered.
+
+**Resolved before sending.** The generated demonstrator fixture that had been
+hand edited during the meeting was restored to generator output in `c16acbf`.
+`make hed-bundle-check` now passes on `main`.
 
 
 ## Message

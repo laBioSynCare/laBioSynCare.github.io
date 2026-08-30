@@ -1,4 +1,10 @@
-# HED event bundle as edited with Kay Robbins, 2026-08-27
+# Historical HED event bundle edited with Kay Robbins, 2026-08-27
+
+**Status: historical intermediate artifact.** This five-event pair is
+superseded for correspondence by the
+[30-event revised pair](../../outreach/2026-08-27-kay-robbins-revised-events-bundle.md).
+It remains here as a record of the meeting edit and its mechanical repairs; it
+is not the current attachment or implementation target.
 
 Reference copy of the `events.tsv` / `events.json` pair worked through in a
 meeting with Prof. Kay Robbins. It is kept here, and not under
@@ -53,10 +59,10 @@ describes "the events.tsv column named HED", which this redesign removes. That
 is prose about intent rather than malformation, so it is the meeting's to
 settle.
 
-## Still open
+## State recorded at the time
 
-Adopting this shape means changing `generate-hed-bundle.py` (its `columns` list
-still starts `onset, duration, event_id, event_type`) and the checks that read
-its output: `hed-roundtrip` requires an `event_type` column and fails without
-one. Until that happens the generated fixtures keep the old shape, and this
-directory is the record of where the format is going.
+At the time of this artifact, adopting this shape meant changing
+`generate-hed-bundle.py` (its `columns` list started `onset, duration, event_id,
+event_type`) and the checks that read its output: `hed-roundtrip` required an
+`event_type` column and failed without one. The revised correspondence linked
+above records the later 30-event design and the remaining implementation work.
