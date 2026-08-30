@@ -88,11 +88,11 @@ facts, and copy that collapses them is wrong in one direction or the other.
 
 ## Workstream 2 — SSTIM ↔ HED event profile and research bindings
 
-**`[~] Revised 2026-08-13 — the native session/event/report contract is implemented and gated; the HED mapping, the worked example, and the BIDS binding remain.**
+**`[~] Revised 2026-08-30 — the native session/event/report contract and the bounded HED mapping with three synthetic demonstrators are implemented and gated; the fuller event bridge and optional BIDS binding remain.**
 
 **Artifacts:** [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md) (event profile and
 binding contract), [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)
-(Proposed), and the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
+(Accepted), and the [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
 **Posture:** SSTIM is canonical for native sessions; HED is the generated event-
 semantic profile; BIDS Behavioral is the first optional research-container
@@ -105,7 +105,7 @@ governing home.
 | Function | Representation | Current state |
 |---|---|---|
 | IDs, onset/duration, execution state | Native session/event bundle | **Shipped 2026-08-13** — versioned schema, recorder, engine-clock event timeline, gated by `make session-contract` |
-| Experimental event meaning | Generated HED annotations | Mapping/validator not implemented — but its input now exists, natively and in RDF |
+| Experimental event meaning | Generated HED annotations | **Shipped and gated.** Mapping 0.5.0 covers all eleven native event types; three synthetic bundles assemble HED from categorical `event_id` levels while `sstim_event_id` preserves occurrence identity. This is the bounded system/transport profile, not the fuller stimulus-presentation bridge below. |
 | Stimulus, exposure, reports, provenance | SSTIM RDF/JSON-LD | Complete in both forms as of ADR 0048, except the privacy profile, which is native-only by choice |
 | Executable stimulus | BSC Lab patch/configuration + hashes | Patch export exists; the session bundle now records the configuration IRI and its content hash, so provenance closes from the session side |
 | Optional research packaging | Complete BIDS Behavioral binding | Not implemented |
@@ -116,14 +116,17 @@ conformance before the HED and BIDS adapters. **The first of those is done.**
 HED describes what occurred and when; until 2026-08-13 SSTIM could not say that
 anything occurred at all, and now the native bundle carries an ordered,
 engine-clock event timeline. **Revised 2026-08-22:** an earlier version of this
-paragraph said a HED mapping could be generated from it, which was premature. The
-clock and the ordering are there; the event *vocabulary* covers device and system
-occurrences only, and `sstim:SessionEvent` cannot reference a stimulus. Stimulus
-presentation, participant response, and contextual events are all absent. See the
-measurement in [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md). The
-mapping itself is the next piece of work, and it does not need the ontology
-terms — HED annotations are generated from the native bundle, not from the RDF
-projection.
+paragraph said the timeline was already sufficient for the complete HED bridge,
+which was premature. The event *vocabulary* covers device and system occurrences
+only, and `sstim:SessionEvent` cannot reference a stimulus. Stimulus-presentation,
+participant-response and contextual events are all absent. See the measurement in
+[`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md). **Revised 2026-08-30:** the bounded
+mapping and three generated demonstrators now exist without pretending that gap
+closed. Mapping 0.5.0 projects the eleven existing native event types; categorical
+`event_id` sidecar levels assemble HED, and `sstim_event_id` keeps the occurrence
+join to the source graph. A fuller profile still needs the minimum event-model
+bridge above. HED annotations remain generated from the native bundle, not from
+the RDF projection.
 
 **Next actions:**
 - [x] Revise the event/binding profile and Proposed ADR.
@@ -134,9 +137,13 @@ projection.
       [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md),
       so the event timeline exists in RDF as well as natively — which is what the
       HED mapping needs. The projection still reports what it withholds.*
-- [ ] Generate a version-pinned HED mapping and synthetic core bundle.
+- [x] Generate a version-pinned HED mapping and synthetic core bundle.
+      *Mapping 0.5.0 and three generated fixtures cover fixed, explicitly
+      segmented and continuously modulated stimuli. `make hed-crosswalk`,
+      `make hed-bundle-check` and `make hed-roundtrip` gate the mapping,
+      sidecar-assembled annotations, source occurrence IDs and declared loss.*
 - [ ] Add and validate the optional complete BIDS Behavioral binding.
-- [x] Request HED Working Group review. Sent 2026-08-20 as six questions split by owning repository: [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) and [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836). **Answered 2026-08-20 to 2026-08-23** by @VisLab, @neuromechanist and @yarikoptic: item 2 settled (HED carries the delivered value, not the protective intent), item 1 half settled (`scans.tsv` is the placement, the vocabulary gap stands), item 6 fixed upstream. Items 3, 4 and 5 are open, as is VisLab's definition-shape critique, which a requested meeting will take. Recorded in [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md#upstream-answers-from-the-hed-working-group-2026-08-20-to-2026-08-23).
+- [x] Request HED Working Group review. Sent 2026-08-20 as six questions split by owning repository: [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416) and [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836). @VisLab, @neuromechanist and @yarikoptic replied; Kay Robbins then met with Renato on 2026-08-25. Item 2 is settled, item 1 half settled, and item 3 answered by the meeting. Items 4 and 5 and VisLab's definition-shape question remain open. The item 6 fix [bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442) merged 2026-08-27 and passed re-test; #836 remains open for residual error presentation. The revised message and attachment requested at the meeting are drafted but not sent. Recorded in [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md#hed-working-group-answers-and-review-2026-08-20-to-2026-08-28).
 
 **Reference (for §"what are these", so we don't re-look-up):**
 - **HED** — Hierarchical Event Descriptors: controlled vocabulary for *what occurred*

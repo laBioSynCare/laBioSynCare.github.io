@@ -4,21 +4,67 @@
     "Units": "s"
   },
   "event_id": {
-    "Description": "Local name of the sstim:SessionEvent this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6."
-  },
-  "event_type": {
-    "Description": "SSTIM session event type, the authoritative value.",
+    "LongName": "SSTIM session event type",
+    "Description": "SKOS notation of the authoritative SSTIM session event type. Categorical: a value repeats whenever the same kind of occurrence happens again. Levels link each code to its SSTIM definition, and the HED map generates the interoperable annotation.",
     "TermURL": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "Levels": {
-      "eventSessionOpen": "Session opened",
-      "eventPlaybackStart": "Playback started",
-      "eventPlaybackPause": "Playback paused",
-      "eventPlaybackResume": "Playback resumed",
-      "eventSessionInterrupt": "Session interrupted"
+      "session-open": {
+        "Description": "Opens the session scope defined as Sstim-session.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventSessionOpen"
+      },
+      "playback-start": {
+        "Description": "Opens the delivery scope defined as Sstim-delivery.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventPlaybackStart"
+      },
+      "playback-pause": {
+        "Description": "Closes the delivery scope without closing the session scope; elapsed session time continues while delivered time stops.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventPlaybackPause"
+      },
+      "playback-resume": {
+        "Description": "Reopens the delivery scope after a pause while the session scope remains open.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventPlaybackResume"
+      },
+      "session-interrupt": {
+        "Description": "Closes the session scope early.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventSessionInterrupt"
+      }
+    },
+    "HED": {
+      "session-open": "(Def/Sstim-session, Onset)",
+      "playback-start": "(Def/Sstim-delivery, Onset)",
+      "playback-pause": "(Def/Sstim-delivery, Offset)",
+      "playback-resume": "(Def/Sstim-delivery, Onset)",
+      "session-interrupt": "(Def/Sstim-session, Offset)"
+    }
+  },
+  "sstim_event_id": {
+    "LongName": "SSTIM session event occurrence identifier",
+    "Description": "Local name of the sstim:SessionEvent occurrence this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6.",
+    "Levels": {
+      "event-open": {
+        "Description": "The session-open occurrence at 0.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/session-fixture/event-open"
+      },
+      "event-start": {
+        "Description": "The playback-start occurrence at 0.300 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/session-fixture/event-start"
+      },
+      "event-pause": {
+        "Description": "The playback-pause occurrence at 190.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/session-fixture/event-pause"
+      },
+      "event-resume": {
+        "Description": "The playback-resume occurrence at 250.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/session-fixture/event-resume"
+      },
+      "event-interrupt": {
+        "Description": "The session-interrupt occurrence at 400.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/session-fixture/event-interrupt"
+      }
     }
   },
   "sstim_hed_definitions": {
-    "Description": "HED definitions the HED column references. Not a column of events.tsv. Onset, Offset, Pause and Inset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
+    "Description": "HED definitions the event_id annotations reference. Not a column of events.tsv. Onset and Offset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
     "HED": {
       "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
       "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
@@ -27,7 +73,10 @@
   "SstimDurationConvention": {
     "Description": "duration is always n/a in this bundle. SSTIM session events are instantaneous timeline marks, and inventing a duration would assert a span the native record does not contain. This is a note, not a redefinition of the BIDS-required duration column."
   },
-  "GeneratedHedColumn": {
-    "Description": "The events.tsv column named HED is generated from the native columns by the crosswalk, HED 8.4.0. Where an event changes a parameter, its Parameter-label and Parameter-value tags come from parameter_kind and value_after. SSTIM is canonical and HED is derived, so the native columns are the ones to read."
+  "SstimEndOfRecordingConvention": {
+    "Description": "The final session-complete or session-interrupt row is also the end of this recording. HED temporal processing keeps an Onset active through end-of-file when no later matching Offset exists. If delivery is still open, its Sstim-delivery scope therefore ends with the recording; no playback-stop row is invented because the native SSTIM timeline contains none."
+  },
+  "SstimGeneratedAnnotationNote": {
+    "Description": "HED 8.4.0 annotations are assembled from the event_id HED level map rather than materialised in events.tsv. SSTIM is canonical and HED is derived, so the native columns are the ones to read."
   }
 }

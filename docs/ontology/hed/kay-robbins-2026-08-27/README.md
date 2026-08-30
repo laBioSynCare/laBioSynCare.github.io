@@ -13,14 +13,14 @@ meeting with Prof. Kay Robbins. It is kept here, and not under
 [`scripts/generate-hed-bundle.py`](../../../../scripts/generate-hed-bundle.py)
 and would overwrite it. Nothing generates this directory.
 
-## What the redesign does
+## What the redesign did
 
-The shape differs from what the generator emits today, and the difference is
-the point of the meeting:
+The shape differed from what the generator emitted at the time, and the
+difference was the point of the meeting:
 
 - **`event_type` is folded into `event_id`.** One categorical column carries the
   SSTIM session event type, and the sidecar annotates its `Levels`. The
-  generator still emits `event_type` as a separate column.
+  generator then still emitted `event_type` as a separate column.
 - **There is no `HED` column.** The per-level `HED` map in the sidecar replaces
   it, which is the ordinary BIDS pattern: annotate the categories once rather
   than repeating an assembled string on every row.
@@ -64,5 +64,9 @@ settle.
 At the time of this artifact, adopting this shape meant changing
 `generate-hed-bundle.py` (its `columns` list started `onset, duration, event_id,
 event_type`) and the checks that read its output: `hed-roundtrip` required an
-`event_type` column and failed without one. The revised correspondence linked
-above records the later 30-event design and the remaining implementation work.
+`event_type` column and failed without one. Mapping 0.5 subsequently adopted
+the sidecar shape broadly: generated bundles now use the SKOS notation in
+`event_id`, retain the unique source occurrence in `sstim_event_id`, and carry
+no materialised `event_type` or `HED` column. The revised correspondence linked
+above records the later 30-event design; this five-event pair remains frozen as
+the historical intermediate artifact.

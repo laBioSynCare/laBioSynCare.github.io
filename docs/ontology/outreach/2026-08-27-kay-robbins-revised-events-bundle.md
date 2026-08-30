@@ -142,26 +142,38 @@ sidecar issues and zero events issues. Run inside `nix develop`, which pins
 Hand authored correspondence, not a generated bundle. `make hed-bundle-check`
 does not see this directory, and these files are not the ADR 0025 demonstrator.
 They are the version prepared for Kay, kept so the wording and the shape can be
-compared against whatever the generator produces once the crosswalk absorbs her
-rulings.
+compared against what the generator now produces after the crosswalk absorbed
+her rulings.
 
-**Still outstanding in the repo**, and deliberately not done in the same change
-as this message:
+## Repository implementation status
 
-- `static/schemas/sstim-hed-event-map.json` is at mapping 0.4.0 and still maps
-  `eventPlaybackPause` to `Pause` and `eventPlaybackResume` to `Inset`, which
-  contradicts ruling 1. Fixing it is a 0.5.0 bump plus explicit loss
-  declarations on all four entries in the two collision pairs: pause and stop
-  then emit identical HED, as do resume and start.
-- `scripts/generate-hed-bundle.py` still emits a materialised `HED` column and
-  an `event_type` column, which contradicts ruling 2.
-- ADR 0025's "Meeting requested" section still reads as though the meeting is
-  ahead of us. Its item 3 now has the answer recorded above; item 4 remains
-  unanswered.
+The rulings are now absorbed without changing the SSTIM ontology:
 
-**Resolved before sending.** The generated demonstrator fixture that had been
-hand edited during the meeting was restored to generator output in `c16acbf`.
-`make hed-bundle-check` now passes on `main`.
+- mapping 0.5.0 maps pause to delivery `Offset` and resume to `Onset`, and all
+  four members of the pause/stop and resume/start collision pairs declare the
+  loss;
+- each generated `event_id` is the event type's checked SSTIM SKOS notation;
+  `sstim_event_id` preserves the per-occurrence join to the source session;
+- generated tables contain neither `event_type` nor materialised `HED`; the
+  sidecar assembles HED from `event_id`, `parameter_kind`, and `value_after`;
+- `make hed-crosswalk`, `make hed-bundle-check`, and `make hed-roundtrip` verify
+  all three demonstrators, including row-for-row assembly, source identifiers,
+  and every declared collision; and
+- ADR 0025 records the meeting as held and item 3 as answered.
+
+The ontology instrument was `docs/ontology/TERM_INDEX.md` plus
+`scripts/locate-iri.py` over the event and parameter-change identifiers. The
+native terms already exist with the required HED-independent semantics, so the
+appropriate change was confined to the projection and its container recipe.
+
+Still open are the delivery-definition body shape, question 4's software-engine
+vocabulary, question 5's continuous-parameter convention, and the two questions
+in the message below. This message and attachment remain drafted for Renato to
+send; implementing the reviewed rulings does not imply that correspondence was
+sent.
+
+The generated demonstrator fixture that had been hand edited during the meeting
+was restored to generator output in `c16acbf` before this revision.
 
 
 ## Message

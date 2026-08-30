@@ -8,7 +8,7 @@
     "sstim": "0.17.0-dev",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
-    "mapping": "0.4.0",
+    "mapping": "0.5.0",
     "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
   },
@@ -23,7 +23,7 @@
     "eventCount": 5
   },
   "crossArtifactIds": {
-    "column": "event_id",
+    "column": "sstim_event_id",
     "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
     "ids": {
       "event-open": "https://example.org/sstim/session-fixture/event-open",
@@ -42,22 +42,26 @@
   "artifacts": [
     {
       "file": "events.tsv",
-      "sha256": "8f61d9f25b8920c180a84bf14b93a94a4726e88e5a7249c5adaed43b3346cca8"
+      "sha256": "e496c1501868f089bcdbaa8f369ea5e2a69f579a5d343cfa84e3b97678184ed0"
     },
     {
       "file": "events.json",
-      "sha256": "c31e3ec0a3a42b7463aa843620c161e913eb8116d9bc4d691811dd9ee55be053"
+      "sha256": "318d66ac66342e2cd2c98be66cecc4a8f03f352cb4881e824c7ea1472f6854a0"
     }
   ],
   "declaredLoss": {
+    "eventPlaybackStart": "Identical HED to eventPlaybackResume. HED records that delivery opened but not whether this was the first start, a restart after a stop, or a resume after a pause; SSTIM keeps that distinction in the event type.",
+    "eventPlaybackPause": "Identical HED to eventPlaybackStop. HED records that delivery closed but not whether the closure was the start of a pause or a full stop; SSTIM keeps that distinction in the event type.",
+    "eventPlaybackResume": "Identical HED to eventPlaybackStart. HED records that delivery opened but not whether this was a resume after a pause, the first start, or a restart after a stop; SSTIM keeps that distinction in the event type.",
     "eventSessionInterrupt": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
   },
   "validated": [
-    "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+    "Every HED annotation assembled from the event_id sidecar map and native parameter columns validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`; events.tsv contains no materialised HED column.",
     "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
     "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
     "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
-    "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes."
+    "Every sstim_event_id resolves to a sstim:SessionEvent in source.file, every event_id is the checked SKOS notation of its type, and the source graph conforms to the SSTIM Full profile shapes.",
+    "Each generated row agrees with that exact source event's type, onset, and IRI. The final row is session completion or interruption, so an open HED delivery scope and the delivered-time trace end with the recording without inventing a playback-stop event."
   ],
   "notValidated": [
     "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",

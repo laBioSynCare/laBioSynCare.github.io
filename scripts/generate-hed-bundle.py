@@ -7,34 +7,39 @@ writes are the demonstrator the ADR asks for: coordinated, versioned artifacts a
 reviewer can validate rather than a prose claim that a bridge exists.
 
 It reads an SSTIM session graph, walks the event timeline on the session clock,
-and emits a BIDS-style tab-separated events table with a `HED` column, beside a
-manifest recording every artifact hash, every pinned version, the clock
-assumption, the cross-artifact identifiers, and — the part that matters most —
-what the HED column cannot carry.
+and emits a BIDS-style tab-separated events table whose sidecar assembles HED
+from the categorical `event_id` and native parameter columns. The table carries
+no materialised `HED` or duplicate `event_type` column. A manifest records every
+artifact hash, every pinned version, the clock assumption, the cross-artifact
+identifiers, and — the part that matters most — what the HED projection cannot
+carry.
 
-**Loss is a first-class output.** Five of the eleven event mappings lose
+**Loss is a first-class output.** Nine of the eleven event mappings lose
 information, and each manifest names every one that its own events actually use;
 `declaredLoss` is keyed on the rows emitted, not on the whole crosswalk, so it
 stays a statement about those artifacts. `eventSessionComplete` and
 `eventSessionInterrupt` emit identical HED because HED 8.4.0 has no Incomplete,
 Abort or Terminate tag, so a consumer reading the events table alone cannot tell
 a finished session from an abandoned one. That is a real limitation of the
-crosswalk, and publishing it beside the bundle is the difference between an
-interoperability profile and an interoperability claim.
+crosswalk. Pause also collides with stop, and resume with start, after the
+2026-08-25 HED review established that a delivery pause is Offset followed by
+Onset rather than the HED Pause and Inset tags. Publishing those losses beside
+the bundle is the difference between an interoperability profile and an
+interoperability claim.
 
-**Two bundles, because one of them cannot test the harder half of decision 5.**
+**Three bundles, one for each stimulus shape in decision 5.**
 
     fixed       a constant stimulus. Events are the whole story.
+    segmented   discrete parameter changes carried as piecewise events.
     modulated   a Martigli voice whose breathing period glides from mp0 to mp1.
 
 Decision 5 says a time-varying stimulus "requires either piecewise events or a
 linked trace; it must not be flattened into a misleading single row". SSTIM has
-no event type for a parameter change — `sstim-v:SessionEventTypeScheme` holds ten
-lifecycle, safety and observation types and none of them is one — so piecewise
-events are not available without minting terms, and the linked trace is the
-representation this generator produces. `emit_trace` below is therefore not a
-feature of the modulated bundle; it is the condition on which that bundle is
-allowed to exist at all, enforced in `build`.
+an explicit parameter-change event for discrete steps. A modulation already
+declared continuously by its specification stays declarative and uses a linked
+trace, because inventing sampled events would create a second source able to
+disagree with the first. Trace emission is therefore the condition on which the
+modulated bundle is allowed to exist at all, enforced in `build`.
 
 **The trace runs on delivered time, not session time.** The breathing arc
 advances only while audio is playing, so a pause displaces every later sample on
@@ -46,8 +51,8 @@ consistency decision 7 asks for.
 
 Run with --check to verify the committed bundles are current *and* correct,
 which is how CI uses it: each bundle is regenerated into a temporary directory
-and compared, the emitted HED is revalidated, identifiers are resolved against
-the source graph, and the traces are checked against the events. Pass
+and compared, the sidecar-assembled HED is revalidated, identifiers are resolved
+against the source graph, and the traces are checked against the events. Pass
 --no-shacl to skip the SSTIM SHACL pass when iterating locally.
 """
 
@@ -133,6 +138,21 @@ def fill_detail(spec: dict, entry: dict, row: dict) -> str:
     return f"{entry['hed'][:-1]}, {detail})"
 
 
+def sidecar_hed(entry: dict) -> str:
+    """Return the event-level HED stored in the sidecar.
+
+    A base mapping is categorical and can be stored verbatim. A mapping with a
+    detailTemplate references the native parameter columns instead: the
+    parameter_kind level supplies `Parameter-label/...`, and value_after
+    supplies `Parameter-value/#`. `inspect_bundle` assembles the sidecar and
+    compares every row with `fill_detail`, so these two representations cannot
+    drift silently.
+    """
+    if "detailTemplate" not in entry:
+        return entry["hed"]
+    return f"{entry['hed'][:-1]}, {{parameter_kind}}, {{value_after}})"
+
+
 # ── reading the session ──────────────────────────────────────────────────────
 
 
@@ -156,6 +176,7 @@ def read_events(graph: Graph, spec: dict) -> list[dict]:
             "event_id": local(event),
             "iri": str(event),
             "type": name,
+            "event_level": entry["notation"],
             "kind": local(kind) if kind is not None else None,
             "before": f"{float(before):g}" if before is not None else None,
             "after": f"{float(after):g}" if after is not None else None,
@@ -258,21 +279,38 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
     emitted — they appear only when some event in this bundle changes one, so a
     fixed-stimulus table is not padded with three columns of n/a."""
     parametric = any(r["kind"] for r in rows)
-    columns = ["onset", "duration", "event_id", "event_type"]
+    columns = ["onset", "duration", "event_id", "sstim_event_id"]
     if parametric:
         columns += ["parameter_kind", "value_before", "value_after"]
-    columns.append("HED")
 
     lines = ["\t".join(columns)]
     # duration is n/a: SSTIM records instantaneous timeline events, and inventing
     # a duration would assert a span the native record does not contain.
     for r in rows:
-        cells = [f"{r['onset']:.3f}", "n/a", r["event_id"], r["type"]]
+        cells = [
+            f"{r['onset']:.3f}",
+            "n/a",
+            r["event_level"],
+            r["event_id"],
+        ]
         if parametric:
             cells += [r["kind"] or "n/a", r["before"] or "n/a", r["after"] or "n/a"]
-        cells.append(r["hed"])
         lines.append("\t".join(cells))
     (out / "events.tsv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    event_namespace = spec["sstimEventScheme"].split("#", 1)[0] + "#"
+    event_levels = {}
+    event_hed = {}
+    for row in rows:
+        level = row["event_level"]
+        if level in event_levels:
+            continue
+        entry = spec["events"][row["type"]]
+        event_levels[level] = {
+            "Description": entry["rationale"],
+            "TermURL": event_namespace + row["type"],
+        }
+        event_hed[level] = sidecar_hed(entry)
 
     sidecar = {
         "onset": {"Description": "Seconds from the session clock origin.", "Units": "s"},
@@ -284,49 +322,40 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
         # else. The convention it documented now lives in SstimDurationConvention
         # below, which is not a column and so is not a redefinition.
         "event_id": {
+            "LongName": "SSTIM session event type",
             "Description": (
-                "Local name of the sstim:SessionEvent this row was generated from. "
-                "Joins the row to the source graph and to the manifest's "
-                "crossArtifactIds; ADR 0025 decision 6."
-            )
-        },
-        "event_type": {
-            "Description": "SSTIM session event type, the authoritative value.",
+                "SKOS notation of the authoritative SSTIM session event type. "
+                "Categorical: a value repeats whenever the same kind of occurrence "
+                "happens again. Levels link each code to its SSTIM definition, and "
+                "the HED map generates the interoperable annotation."
+            ),
             "TermURL": spec["sstimEventScheme"],
-            "Levels": {r["type"]: spec["events"][r["type"]]["label"] for r in rows},
+            "Levels": event_levels,
+            "HED": event_hed,
         },
-        # NOT a key named "HED". In a BIDS sidecar, `HED` inside an entry is
-        # reserved for that column's HED annotations, so a `"HED": {...}` entry
-        # holding prose and a Definitions array is read as HED and is not.
-        # bids-validator 1.15.0 crashes on it in BidsSidecar._filterHedStrings and
-        # reports "INTERNAL ERROR. SOME VALIDATION STEPS MAY NOT HAVE OCCURRED" —
-        # which is not a failed validation, it is no validation at all. Measured
-        # 2026-08-18: with this entry shaped as it was, that error; with the
-        # definitions moved below, the dataset validates with zero errors.
-        #
-        # Re-measured 2026-08-20 on bids-validator 3.0.1, which answers the
-        # question and does not change the layout. The crash is gone: a top-level
-        # "HED" key now reports SIDECAR_INVALID, "The string 'HED' or 'n/a' was
-        # illegally used as a top-level sidecar key" — so this entry is not
-        # merely awkward, it is illegal, and CUSTOM_COLUMN_WITHOUT_DESCRIPTION no
-        # longer exists in 3.x. But 3.0.1 only reports it when another entry also
-        # carries an HED sub-key; a lone top-level "HED" key is silently ignored
-        # and the events column then goes unvalidated, which a deliberately bogus
-        # tag confirmed. Reported as hed-standard/hed-javascript#836.
-        #
-        # Note the distribution split before pinning a version anywhere: npm's
-        # `bids-validator` is still latest 1.15.0 with no 2.x/3.x published; 3.0.1
-        # ships only via Deno/JSR (deno run -A jsr:@bids/validator@3.0.1).
-        #
-        # A column literally named HED in events.tsv needs no sidecar entry; BIDS
-        # assembles it directly. So the column is described here for a human and
-        # the definitions live in their own non-column entry, which is where
-        # BIDS-HED expects definitions to be declared.
+        "sstim_event_id": {
+            "LongName": "SSTIM session event occurrence identifier",
+            "Description": (
+                "Local name of the sstim:SessionEvent occurrence this row was "
+                "generated from. Joins the row to the source graph and to the "
+                "manifest's crossArtifactIds; ADR 0025 decision 6."
+            ),
+            "Levels": {
+                r["event_id"]: {
+                    "Description": (
+                        f"The {r['event_level']} occurrence at {r['onset']:.3f} "
+                        "seconds on the session clock."
+                    ),
+                    "TermURL": r["iri"],
+                }
+                for r in rows
+            },
+        },
         "sstim_hed_definitions": {
             "Description": (
-                "HED definitions the HED column references. Not a column of events.tsv. "
-                "Onset, Offset, Pause and Inset are scope tags requiring exactly one "
-                "paired Def/, so the events do not validate without these in scope."
+                "HED definitions the event_id annotations reference. Not a column "
+                "of events.tsv. Onset and Offset are scope tags requiring exactly "
+                "one paired Def/, so the events do not validate without these in scope."
             ),
             "HED": {
                 name: value
@@ -342,26 +371,51 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
                 "redefinition of the BIDS-required duration column."
             )
         },
-        "GeneratedHedColumn": {
+        "SstimEndOfRecordingConvention": {
             "Description": (
-                f"The events.tsv column named HED is generated from the native columns by "
-                f"the crosswalk, HED {spec['hedSchema']['version']}. Where an event changes "
-                f"a parameter, its Parameter-label and Parameter-value tags come from "
-                f"parameter_kind and value_after. SSTIM is canonical and HED is derived, so "
-                f"the native columns are the ones to read."
+                "The final session-complete or session-interrupt row is also the "
+                "end of this recording. HED temporal processing keeps an Onset "
+                "active through end-of-file when no later matching Offset exists. "
+                "If delivery is still open, its Sstim-delivery scope therefore ends "
+                "with the recording; no playback-stop row is invented because the "
+                "native SSTIM timeline contains none."
+            )
+        },
+        "SstimGeneratedAnnotationNote": {
+            "Description": (
+                f"HED {spec['hedSchema']['version']} annotations are assembled from "
+                "the event_id HED level map rather than materialised in events.tsv. "
+                + (
+                    "Where an event changes a parameter, the annotation splices "
+                    "parameter_kind and value_after. "
+                    if parametric
+                    else ""
+                )
+                + "SSTIM is canonical and HED is "
+                "derived, so the native columns are the ones to read."
             )
         },
     }
     if parametric:
+        kind_namespace = spec["sstimParameterKindScheme"].split("#", 1)[0] + "#"
+        used_kinds = sorted({r["kind"] for r in rows if r["kind"]})
         sidecar["parameter_kind"] = {
             "Description": (
                 "Local name of the sstim:StimulationParameterKind this event changed, or "
                 "n/a. Modality-neutral by design: the kind names the quantity, not one "
                 "application's field."
             ),
-            "TermURL": "https://w3id.org/sstim/vocab#StimulationParameterKindScheme",
+            "TermURL": spec["sstimParameterKindScheme"],
             "Levels": {
-                r["kind"]: r["kind"] for r in rows if r["kind"]
+                kind: {
+                    "Description": f"SSTIM parameter kind {kind}.",
+                    "TermURL": kind_namespace + kind,
+                }
+                for kind in used_kinds
+            },
+            "HED": {
+                kind: f"Parameter-label/{spec['parameterKinds'][kind]}"
+                for kind in used_kinds
             },
         }
         sidecar["value_before"] = {
@@ -375,7 +429,8 @@ def write_events(out: Path, rows: list[dict], spec: dict) -> bool:
                 "The value the parameter held immediately after the event, or n/a. On a "
                 "safety-limit event this is the value actually delivered. The unit follows "
                 "from the parameter kind and is deliberately not repeated per row."
-            )
+            ),
+            "HED": "Parameter-value/#",
         }
     (out / "events.json").write_text(
         json.dumps(sidecar, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -496,10 +551,10 @@ def build(bundle: dict, out: Path) -> dict:
             "representation": "linked trace",
             "why": (
                 "ADR 0025 decision 5 allows piecewise events or a linked trace. The "
-                "trace is used because sstim-v:SessionEventTypeScheme has no "
-                "parameter-change event type to attach breakpoints to, and minting "
-                "one is an ontology decision under ADR 0004. The constraint is "
-                "SSTIM's, not HED's: a placeholder definition such as "
+                "trace is used because the source specification already declares "
+                "the continuous modulation in full; synthesising breakpoint events "
+                "would create a second source able to disagree with it. The constraint "
+                "is SSTIM's, not HED's: a placeholder definition such as "
                 "(Definition/Sstim-breath-period/#, (Time-interval/# s)) used as "
                 "(Def/Sstim-breath-period/7.774, Inset) validates against 8.4.0."
             ),
@@ -543,7 +598,7 @@ def build(bundle: dict, out: Path) -> dict:
             "eventCount": len(events),
         },
         "crossArtifactIds": {
-            "column": "event_id",
+            "column": "sstim_event_id",
             "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
             "ids": {r["event_id"]: r["iri"] for r in events},
         },
@@ -557,11 +612,12 @@ def build(bundle: dict, out: Path) -> dict:
             if "lossyBecause" in spec["events"][r["type"]]
         },
         "validated": [
-            "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+            "Every HED annotation assembled from the event_id sidecar map and native parameter columns validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`; events.tsv contains no materialised HED column.",
             "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
             "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
             "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
-            "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes.",
+            "Every sstim_event_id resolves to a sstim:SessionEvent in source.file, every event_id is the checked SKOS notation of its type, and the source graph conforms to the SSTIM Full profile shapes.",
+            "Each generated row agrees with that exact source event's type, onset, and IRI. The final row is session completion or interruption, so an open HED delivery scope and the delivered-time trace end with the recording without inventing a playback-stop event.",
         ],
         "notValidated": [
             "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",
@@ -624,44 +680,189 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
     """Everything that must hold of a bundle's content, staleness aside."""
     problems: list[str] = []
     manifest = json.loads((out / "bundle-manifest.json").read_text(encoding="utf-8"))
+    sidecar_doc = json.loads((out / "events.json").read_text(encoding="utf-8"))
     spec = json.loads(MAP_PATH.read_text(encoding="utf-8"))
-    # By header, not by position. The table has grown a column twice now — the
-    # event_id of decision 6, then the parameter columns — and a positional
-    # unpack broke on each.
+    # By header, not by position. event_id is the categorical SSTIM notation;
+    # sstim_event_id is the occurrence join required by decision 6.
     lines = (out / "events.tsv").read_text(encoding="utf-8").splitlines()
     header = lines[0].split("\t")
     rows = [dict(zip(header, line.split("\t"))) for line in lines[1:]]
 
-    # Emitted HED must validate. Decision 7 makes validation a publication gate,
-    # and a bundle can be perfectly current and still wrong — this runs on the
-    # freshly generated copy, so it is checking the generator, not the commit.
+    for required in ("onset", "duration", "event_id", "sstim_event_id"):
+        if required not in header:
+            problems.append(f"{tag}: events.tsv has no required {required} column")
+    for removed in ("event_type", "HED"):
+        if removed in header:
+            problems.append(
+                f"{tag}: events.tsv still materialises removed {removed} column"
+            )
+
+    notation_to_type: dict[str, str] = {}
+    for event_type, entry in spec["events"].items():
+        notation = entry["notation"]
+        if notation in notation_to_type:
+            problems.append(
+                f"{tag}: event notation {notation!r} maps to both "
+                f"{notation_to_type[notation]} and {event_type}"
+            )
+        notation_to_type[notation] = event_type
+
+    published = []
+    resolved_types: list[str | None] = []
+    for row in rows:
+        event_type = notation_to_type.get(row.get("event_id"))
+        resolved_types.append(event_type)
+        if event_type is None:
+            problems.append(
+                f"{tag}: event_id {row.get('event_id')!r} is not a mapped SSTIM notation"
+            )
+        else:
+            published.append({"onset": float(row["onset"]), "type": event_type})
+
+    # Sidecar-assembled HED must validate and equal the mapping contract row by
+    # row. Decision 7 makes validation a publication gate, and a bundle can be
+    # perfectly current and still wrong — this runs on the freshly generated
+    # copy, so it is checking the generator, not the commit.
     from hed import load_schema_version
-    from hed.models import DefinitionDict, HedString
+    from hed.errors import ErrorHandler, get_printable_issue_string
+    from hed.models import Sidecar, TabularInput
 
     schema = load_schema_version(spec["hedSchema"]["version"])
-    defs = DefinitionDict(
-        [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")],
-        schema,
+    sidecar = Sidecar([str(out / "events.json")])
+    table = TabularInput(str(out / "events.tsv"), sidecar=sidecar)
+    issues = sidecar.validate(
+        schema, error_handler=ErrorHandler(check_for_warnings=True)
     )
-    for row in rows:
-        if HedString(row["HED"], schema, def_dict=defs).validate(schema):
+    issues += table.validate(
+        schema, error_handler=ErrorHandler(check_for_warnings=True)
+    )
+    if issues:
+        rendered = get_printable_issue_string(issues, show_details=True).strip()
+        problems.append(f"{tag}: sidecar/tabular HED validation failed\n{rendered}")
+    else:
+        assembled = table.assemble()
+        if "event_id" not in assembled.columns:
+            problems.append(f"{tag}: sidecar assembled no event_id annotation")
+        elif len(assembled) != len(rows):
             problems.append(
-                f"{tag}: invalid HED at t={row['onset']} ({row['event_type']}): {row['HED']}"
+                f"{tag}: sidecar assembled {len(assembled)} rows for {len(rows)} events"
             )
+        else:
+            for index, row in enumerate(rows):
+                event_type = notation_to_type.get(row["event_id"])
+                if event_type is None:
+                    continue
+                entry = spec["events"][event_type]
+                expected_row = {
+                    "kind": None
+                    if row.get("parameter_kind") in (None, "n/a")
+                    else row["parameter_kind"],
+                    "before": None
+                    if row.get("value_before") in (None, "n/a")
+                    else row["value_before"],
+                    "after": None
+                    if row.get("value_after") in (None, "n/a")
+                    else row["value_after"],
+                }
+                if (
+                    "detailTemplate" in entry
+                    and expected_row["kind"]
+                    and expected_row["after"] is not None
+                ):
+                    expected = fill_detail(spec, entry, expected_row)
+                else:
+                    expected = entry["hed"]
+                actual = str(assembled.iloc[index]["event_id"])
+                if actual != expected:
+                    problems.append(
+                        f"{tag}: assembled HED at t={row['onset']} ({event_type}) "
+                        f"is {actual!r}, mapping requires {expected!r}"
+                    )
 
-    # Identifier consistency (decision 7). The manifest's id map and the table's
-    # event_id column must both resolve in the source graph — a hash proves the
-    # bytes did not change, not that the identifiers mean anything.
+    # Source-row identity consistency (decision 7). Existence is not enough: a
+    # valid occurrence ID paired with another event's type or onset would still
+    # produce plausible HED. Prove every row against that exact source subject,
+    # and prove both published IRI maps rather than comparing their keys alone.
     graph = Graph()
     graph.parse(ROOT / bundle["source"], format="turtle")
-    subjects = {local(s) for s in graph.subjects(RDF.type, S("SessionEvent"))}
-    for row in rows:
-        if row["event_id"] not in subjects:
+    source_events: dict[str, dict] = {}
+    for subject in graph.subjects(RDF.type, S("SessionEvent")):
+        occurrence_id = local(subject)
+        event_types = list(graph.objects(subject, S("hasEventType")))
+        onsets = list(graph.objects(subject, S("sessionClockOffsetSeconds")))
+        if occurrence_id in source_events:
             problems.append(
-                f"{tag}: event_id '{row['event_id']}' resolves to no sstim:SessionEvent"
+                f"{tag}: source has more than one SessionEvent named {occurrence_id!r}"
             )
-    if set(manifest["crossArtifactIds"]["ids"]) != {r["event_id"] for r in rows}:
-        problems.append(f"{tag}: manifest crossArtifactIds do not match the events table")
+            continue
+        if len(event_types) != 1 or len(onsets) != 1:
+            problems.append(
+                f"{tag}: source event {occurrence_id!r} has {len(event_types)} types "
+                f"and {len(onsets)} onsets; exactly one of each is required"
+            )
+            continue
+        source_events[occurrence_id] = {
+            "iri": str(subject),
+            "type": local(event_types[0]),
+            "onset": f"{float(onsets[0]):.3f}",
+        }
+
+    row_ids = {row.get("sstim_event_id") for row in rows}
+    for row, event_type in zip(rows, resolved_types):
+        occurrence_id = row.get("sstim_event_id")
+        source_event = source_events.get(occurrence_id)
+        if source_event is None:
+            problems.append(
+                f"{tag}: sstim_event_id {occurrence_id!r} resolves to no "
+                "sstim:SessionEvent"
+            )
+            continue
+        if event_type is not None and source_event["type"] != event_type:
+            problems.append(
+                f"{tag}: {occurrence_id} has event_id type {event_type}, but the "
+                f"source event has type {source_event['type']}"
+            )
+        if row.get("onset") != source_event["onset"]:
+            problems.append(
+                f"{tag}: {occurrence_id} has onset {row.get('onset')!r}, but the "
+                f"source event has onset {source_event['onset']!r}"
+            )
+
+    if row_ids != set(source_events) or len(rows) != len(source_events):
+        problems.append(
+            f"{tag}: events.tsv occurrence IDs do not cover the source SessionEvents exactly"
+        )
+    if manifest.get("source", {}).get("eventCount") != len(source_events):
+        problems.append(f"{tag}: manifest source.eventCount does not match the source graph")
+    if not resolved_types or resolved_types[-1] not in {
+        "eventSessionComplete",
+        "eventSessionInterrupt",
+    }:
+        problems.append(
+            f"{tag}: final row must end the recording with session completion or interruption"
+        )
+
+    if manifest["crossArtifactIds"].get("column") != "sstim_event_id":
+        problems.append(f"{tag}: manifest crossArtifactIds names the wrong column")
+    expected_ids = {
+        occurrence_id: source_events[occurrence_id]["iri"]
+        for occurrence_id in row_ids
+        if occurrence_id in source_events
+    }
+    if manifest["crossArtifactIds"].get("ids") != expected_ids:
+        problems.append(
+            f"{tag}: manifest crossArtifactIds do not match the source event IRIs"
+        )
+    occurrence_levels = sidecar_doc.get("sstim_event_id", {}).get("Levels", {})
+    sidecar_ids = {
+        occurrence_id: details.get("TermURL")
+        for occurrence_id, details in occurrence_levels.items()
+        if isinstance(details, dict)
+    }
+    if sidecar_ids != expected_ids:
+        problems.append(
+            f"{tag}: sidecar sstim_event_id levels do not match the source event IRIs"
+        )
 
     # The trace, and the property the ADR actually cares about.
     sweep = read_sweep(graph)
@@ -694,9 +895,6 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
             # It does not, and cannot, catch a delivery_spans() that is wrong in
             # the same way on both sides — that is what the committed fixture and
             # its reviewed values are for.
-            published = [
-                {"onset": float(r["onset"]), "type": r["event_type"]} for r in rows
-            ]
             spans = delivery_spans(published)
             for index, (period, _rate) in enumerate(trace):
                 at = index / TRACE_HZ
@@ -812,7 +1010,7 @@ def main() -> int:
         shapes.append(manifest["modulation"]["shape"])
     print(
         f"hed-bundle: {len(BUNDLES)} bundles current and valid "
-        f"({total_events} events validate as HED, every event_id resolves, "
+        f"({total_events} events validate as HED, every sstim_event_id resolves, "
         f"{total_loss} declaring information loss; "
         f"shapes: {', '.join(sorted(shapes))})"
     )

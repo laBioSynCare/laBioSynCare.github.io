@@ -155,7 +155,7 @@ That rating is deliberately split from enthusiasm about individual parts:
 | Repository and release engineering | Excellent | Immutable snapshots, persistent identifiers, manifest-driven modules, profile contracts, SHACL, reasoning, round-trip checks, release rehearsal, and truth audits form an unusually strong gate |
 | Knowledge representation | Great | The process/stimulus/configuration/execution layers, scoped evidence model, controlled values, privacy boundaries, and explicit optional concerns are coherent and useful |
 | Documentation and epistemic discipline | Great | Decisions and limitations are unusually explicit, effect language is conservative, and historical audits are preserved; active guidance has nevertheless drifted and still needs consolidation |
-| Interoperability readiness | Great for bounded SSTIM exchange; good beyond it | Stable IRIs, profiles, RDF serializations, SHACL and SPARQL support reuse, but HED/BIDS/NWB adapters, concern-specific packages, mapping provenance and some semantic splits remain unfinished |
+| Interoperability readiness | Great for bounded SSTIM exchange; good beyond it | Stable IRIs, profiles, RDF serializations, SHACL and SPARQL support reuse; a bounded, gated HED event profile now exists, while the complete event bridge, BIDS/NWB bindings, concern-specific packages, mapping provenance and some semantic splits remain unfinished |
 | Community maturity | Good | The W3C Community Group and publication infrastructure exist, but independent review, third-party implementations, external citations and shared maintainership are not yet demonstrated at the level expected of a mature standard |
 
 It is more than **good** because it is not merely a plausible vocabulary: it has

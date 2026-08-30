@@ -508,29 +508,37 @@ this phase.
 
 #### 3.1 HED event-semantic profile
 
-- **Open prerequisite.** The native event types this mapping consumes do not all
-  exist. Measured 2026-08-22: the shipped `SessionEventTypeScheme` is system,
-  transport and session-lifecycle only, and `sstim:SessionEvent` cannot reference
-  a stimulus, a channel or a specification, so the stimulus-presentation,
-  participant-response and contextual events named below have nothing to map
-  from. Close the minimum bridge described in
-  [`HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) before generating
-  annotations from this list, and record the model change in an ADR first.
-- Map stable native event types—not ad hoc strings—to a pinned released HED
-  schema. Initial events include session start/end, stimulus block start/end,
-  parameter/configuration change, pause/resume/interruption, report prompt and
-  capture, participant action, and unwanted-experience report.
-- Generate HED annotations from a versioned mapping; do not make HED strings a
-  runtime storage dependency.
-- Preserve event IDs, definition IDs, temporal scope, units, and mapping version.
-- Validate every generated HED annotation and sidecar. Seek HED Working Group
-  review before claiming interoperability.
+- **Bounded profile complete, 2026-08-30.** Mapping 0.5.0 projects all eleven
+  current native event types to pinned HED 8.4.0. Three synthetic bundles cover
+  fixed, explicitly segmented and continuously modulated stimuli. Their sidecars
+  assemble HED from categorical `event_id` levels and native parameter columns;
+  `sstim_event_id` preserves the source occurrence join. `make hed-crosswalk`,
+  `make hed-bundle-check` and `make hed-roundtrip` gate exact coverage, HED
+  validation, identifiers and declared loss.
+- **Open prerequisite for the complete profile.** Measured 2026-08-22: the
+  shipped `SessionEventTypeScheme` is system, transport and session-lifecycle
+  only, and `sstim:SessionEvent` cannot reference a stimulus, a channel or a
+  specification. Stimulus-presentation, participant-response and contextual
+  events therefore have nothing native to map from. Close the minimum bridge
+  described in [`HED_BIDS_INTEROP.md`](../ecosystem/HED_BIDS_INTEROP.md) under a
+  separate ADR before claiming the fuller bridge; do not hold the bounded
+  projection hostage to concepts it does not claim to cover.
+- Continue to map stable native event types—not ad hoc strings—to a pinned
+  released HED schema, and keep HED generated rather than a runtime storage
+  dependency.
+- Preserve categorical type codes, source occurrence IDs, definition IDs,
+  temporal scope, units and mapping version.
+- Keep every generated annotation and sidecar under validator gates. Working
+  Group review began publicly in August 2026 and included the 2026-08-25 meeting;
+  remaining questions are recorded in ADR 0025.
 - Do not create a HED library until standard-schema gaps recur across external
-  use cases and a partnered design is justified.
+  use cases and a partnered design is justified. The meeting explicitly advised
+  against an SSTIM HED schema at the present scale.
 
 #### 3.2 Native demonstrator
 
-Publish a synthetic, non-personal ordinary session containing:
+The three bounded, synthetic, non-personal HED demonstrators are published and
+gated. A fuller end-to-end demonstrator should contain:
 
 - the native versioned session bundle and event table;
 - SSTIM RDF/JSON-LD for specification, execution, exposure, reports, and
@@ -561,9 +569,12 @@ continuous behavior, or stimulus streams. Use NWB tables/time series and the
 supported HED extension; pass NWB Inspector and HED checks. NWB is not an
 ordinary-session storage requirement.
 
-**Phase 3 gate:** the native+HED demonstrator is validator-clean and reviewed.
-Each optional binding has its own conformance test and never becomes the
-round-trip authority.
+**Phase 3 gate:** the bounded native+HED demonstrators are validator-clean and
+implement the sidecar design reviewed on 2026-08-25. The regenerated artifacts
+have not yet been returned for follow-up review: the revised message remains
+drafted and unsent. The complete profile remains partial until the native event
+bridge and an end-to-end demonstrator exist. Each optional binding has its own
+conformance test and never becomes the round-trip authority.
 
 ### Phase 4 — domain depth, quantities, and publication maturity
 

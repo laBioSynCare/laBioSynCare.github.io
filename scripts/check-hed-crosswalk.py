@@ -7,7 +7,8 @@ one-way, loss-declaring adapter. This checks the adapter's mapping table, which
 is the part that silently rots — a HED tag that never existed, or that a schema
 release removed, produces annotations that look fine and validate nowhere.
 
-Five things are checked, and the first is the one that motivated the script.
+Four groups of properties are checked, and the first is the one that motivated
+the script.
 
 1. **Every mapped string is valid HED against the pinned schema**, which
    subsumes the weaker property that each tag exists. Writing this map by hand
@@ -19,6 +20,8 @@ Five things are checked, and the first is the one that motivated the script.
 2. **The mapping covers `sstim-v:SessionEventTypeScheme` exactly.** A new event
    type with no HED mapping would silently produce an incomplete profile, and a
    mapping for a retired event type is dead weight that reads as coverage.
+   Each entry's BIDS categorical notation is also checked against the concept's
+   one `skos:notation`, so `event_id` cannot silently drift from the ontology.
 
    The same holds for `sstim-v:StimulationParameterKindScheme` and the
    `parameterKinds` table. That table was written into the generator as a Python
@@ -262,6 +265,35 @@ def main() -> int:
         failures.append(f"{missing} is in the scheme with no HED mapping")
     for extra in sorted(mapped - concepts):
         failures.append(f"{extra} is mapped but is not in the scheme")
+
+    # The generated BIDS-style table carries the event type's SKOS notation in
+    # event_id. Keep that lexical projection in the mapping contract, where the
+    # same exact-coverage gate can prove it still agrees with the ontology.
+    # Reading notation from the source graph here is deliberate: checking only
+    # that mapping values are unique would let an internally consistent typo
+    # become the public categorical code.
+    seen_notations: dict[str, str] = {}
+    for concept in sorted(graph.subjects(SKOS.inScheme, SCHEME), key=str):
+        name = str(concept).split("#")[-1]
+        values = [str(value) for value in graph.objects(concept, SKOS.notation)]
+        if len(values) != 1:
+            failures.append(
+                f"{name} has {len(values)} skos:notation values; exactly one is required"
+            )
+            continue
+        expected = values[0]
+        declared = spec["events"].get(name, {}).get("notation")
+        if declared != expected:
+            failures.append(
+                f"{name} maps notation {declared!r}, ontology declares {expected!r}"
+            )
+        other = seen_notations.get(expected)
+        if other is not None:
+            failures.append(
+                f"{name} and {other} share skos:notation {expected!r}"
+            )
+        else:
+            seen_notations[expected] = name
 
     # 2b. and so does the parameter-kind map, for exactly the same reason. This
     # table lived in the generator with nothing checking it, so a sixth kind

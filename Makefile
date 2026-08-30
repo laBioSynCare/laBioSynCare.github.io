@@ -260,7 +260,7 @@ band-scope-notes:
 	$(PYTHON) scripts/check-band-scope-notes.py
 
 ## Test that the declared loss in the HED bundles is real and exactly as
-## declared (ADR 0025 decision 7). Both bundles are reversed — an artifact
+## declared (ADR 0025 decision 7). All three bundles are reversed — an artifact
 ## nobody round-tripped is the unexercised case this gate exists to prevent. Documenting loss in a manifest is not a test:
 ## a manifest can claim loss that does not exist, or miss loss that does, and a
 ## consumer then trusts a sentence rather than a property. Reverses every emitted
@@ -270,14 +270,13 @@ band-scope-notes:
 hed-roundtrip:
 	$(PYTHON) scripts/check-hed-roundtrip.py
 
-## Generate the ADR 0025 demonstrators: two synthetic native+HED conformance
+## Generate the ADR 0025 demonstrators: three synthetic native+HED conformance
 ## bundles. Each reads a session fixture, walks its event timeline on the session
-## clock, and emits a BIDS-style events.tsv with a HED column, its sidecar, and a
-## manifest carrying artifact hashes, pinned versions, cross-artifact ids, the
-## clock assumption, and what the HED column cannot carry. Loss is a first-class
-## output: eventSessionComplete and eventSessionInterrupt emit identical HED
-## because 8.4.0 has no Incomplete tag, so the manifest says a consumer reading
-## the table alone cannot tell a finished session from an abandoned one.
+## clock, and emits a BIDS-style events.tsv whose sidecar assembles HED from the
+## categorical event_id and parameter columns. sstim_event_id preserves the
+## per-occurrence source join; no event_type or materialised HED column is
+## emitted. The manifest carries artifact hashes, pinned versions, cross-artifact
+## ids, the clock assumption, and what the HED projection cannot carry.
 ##
 ## One bundle per stimulus shape decision 5 names, because one bundle could only
 ## ever test the easiest of them:
@@ -306,10 +305,11 @@ hed-bundle:
 
 ## Assert the committed bundles match what the generator produces now, and are
 ## correct as well as current. Same regenerate-and-compare pattern as
-## term-index-check, plus the content checks decision 7 asks for: emitted HED
-## revalidates, every event_id resolves to a sstim:SessionEvent in the source
-## graph, each source conforms to the Full-profile shapes, and each trace agrees
-## with its own events.tsv about when delivery was open.
+## term-index-check, plus the content checks decision 7 asks for: sidecar-assembled
+## HED revalidates and agrees row-for-row with the crosswalk, every sstim_event_id
+## resolves to a sstim:SessionEvent in the source graph, each source conforms to
+## the Full-profile shapes, and each trace agrees with its own events.tsv about
+## when delivery was open.
 ##
 ## Staleness and correctness are checked independently, against the freshly
 ## regenerated copy. They were not at first, and the semantic checks sat behind
@@ -341,9 +341,10 @@ hed-bundle-check:
 ##
 ## Finally it checks the prose that restates these counts. Crosswalk 0.2.0 took
 ## the lossy count from six to five and three sentences kept saying six, so the
-## numbers the ADR and the generator quote are now compared against the map. A
-## pattern that matches nothing fails too — a check that stopped looking is not
-## a check that passed.
+## numbers the ADR and the generator quote are now compared against the map;
+## crosswalk 0.5.0 takes the current count to nine after the two new collision
+## pairs. A pattern that matches nothing fails too — a check that stopped looking
+## is not a check that passed.
 hed-crosswalk:
 	$(PYTHON) scripts/check-hed-crosswalk.py
 

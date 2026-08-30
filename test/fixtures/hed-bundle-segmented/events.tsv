@@ -1,7 +1,7 @@
-onset	duration	event_id	event_type	parameter_kind	value_before	value_after	HED
-0.000	n/a	event-open	eventSessionOpen	n/a	n/a	n/a	(Def/Sstim-session, Onset)
-0.300	n/a	event-start	eventPlaybackStart	n/a	n/a	n/a	(Def/Sstim-delivery, Onset)
-120.000	n/a	event-step-theta	eventParameterChanged	paramModulationFrequency	10	14	(Experiment-control, Modify, Parameter-label/Modulation-frequency, Parameter-value/14)
-240.000	n/a	event-step-gamma	eventParameterChanged	paramModulationFrequency	14	40	(Experiment-control, Modify, Parameter-label/Modulation-frequency, Parameter-value/40)
-300.000	n/a	event-safety	eventSafetyLimitApplied	paramLevel	0.35	0.3	(Experiment-control, Constrained, Parameter-label/Level, Parameter-value/0.3)
-600.000	n/a	event-complete	eventSessionComplete	n/a	n/a	n/a	(Def/Sstim-session, Offset)
+onset	duration	event_id	sstim_event_id	parameter_kind	value_before	value_after
+0.000	n/a	session-open	event-open	n/a	n/a	n/a
+0.300	n/a	playback-start	event-start	n/a	n/a	n/a
+120.000	n/a	parameter-changed	event-step-theta	paramModulationFrequency	10	14
+240.000	n/a	parameter-changed	event-step-gamma	paramModulationFrequency	14	40
+300.000	n/a	safety-limit-applied	event-safety	paramLevel	0.35	0.3
+600.000	n/a	session-complete	event-complete	n/a	n/a	n/a

@@ -30,18 +30,26 @@ declared loss for it was already correct, so nothing in the mapping changes.
 Question 1 is **half settled**: `scans.tsv` is BIDS's place for whether a
 recording completed (verified against 3.0.1), but HED 8.4.0 has no tag meaning
 completed versus interrupted, so the vocabulary gap stands and a library schema
-was raised as a possible home. Question 6 is **fixed upstream** in
+was raised as a possible home. Question 3 was **answered in the 2026-08-25
+meeting**: a delivery pause closes its scope with `Offset`, and resume reopens it
+with `Onset`; the HED `Pause` and `Inset` tags are not the idiom for this use.
+Questions 4 and 5 remain open. Question 6's silent no-validation path was
+**fixed upstream** in
 [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442),
-whose type error we diagnosed on 2026-08-23; hed-javascript#836 stays open until
-it merges. Questions 3, 4 and 5 are still open.
+merged 2026-08-27 and re-tested successfully on merged `main` the next day.
+[hed-standard/hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836)
+remains open for the residual `IssueError` / `INTERNAL_ERROR` presentation of
+the now-detected illegal-key case, not for the silent skip.
 
 The most consequential reply was not an answer to any of the six. @VisLab's
 point is that our definitions are event codes wearing a definition's clothes,
 and that richer bodies would let a consumer distinguish situations across
-datasets instead of matching opaque names. We accept it. The open question it
-raises, whether definitions should describe the actual stimulus or stay stable
-across datasets, decides the shape of the generator, and is the anchor of a
-meeting requested via `hed-maintainers@gmail.com` (sending 2026-08-24).
+datasets instead of matching opaque names. We accept it. The 2026-08-25 meeting
+answered question 3 and produced the four rulings recorded in the
+[follow-up draft](2026-08-27-kay-robbins-revised-events-bundle.md), but no
+recorded ruling settled whether definitions should describe the actual stimulus
+or stay stable across datasets. That definition-shape question, and question 5,
+remain open. The follow-up message and attachment are still drafted, not sent.
 
 See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
 
@@ -49,9 +57,10 @@ These came out of implementing a crosswalk, not out of reading the specification
 which is why they are concrete. The artifacts are in this repository and can be
 run: [`static/schemas/sstim-hed-event-map.json`](../../../static/schemas/sstim-hed-event-map.json)
 is the mapping, `make hed-crosswalk` validates it with `hedtools` against HED
-8.4.0, and [`test/fixtures/hed-bundle/`](../../../test/fixtures/hed-bundle/) and
-[`test/fixtures/hed-bundle-modulated/`](../../../test/fixtures/hed-bundle-modulated/)
-are generated synthetic bundles — a fixed stimulus and a time-varying one.
+8.4.0, and three generated synthetic bundles cover each stimulus shape in ADR
+0025 decision 5: a [fixed stimulus](../../../test/fixtures/hed-bundle/), an
+[explicitly segmented stimulus](../../../test/fixtures/hed-bundle-segmented/),
+and a [continuously modulated stimulus](../../../test/fixtures/hed-bundle-modulated/).
 
 The ask is the one ADR 0025 decision 9 sets: **encode and reproduce, never
 endorse.** We are not asking anyone to validate BSC Lab or agree with a health
@@ -117,6 +126,12 @@ only for marking an intermediate point of interest? If a pause should instead
 close and reopen the scope, we would rather change the mapping than rely on a
 reading of `Inset` the group did not intend.
 
+**Answered 2026-08-25.** Kay Robbins confirmed in the meeting that a delivery
+pause is an `Offset` and resume is a new `Onset`; the HED `Pause` tag concerns a
+recording suspension, and `Inset` goes with that convention. Mapping 0.5.0
+implements the answer. The question above is preserved as the text that was
+sent.
+
 ## 4. Software engine identity
 
 `eventEngineFallback` records that delivery moved between engine implementations
@@ -127,6 +142,13 @@ which is weak; the engine identities themselves stay in the SSTIM record.
 **Question.** Does HED have, or want, vocabulary for the software actually
 producing a stimulus? Our reading is no, and that this belongs in the native
 record — confirmation would let us stop looking.
+
+**Correction 2026-08-30.** The sent wording overstates the native record:
+`sstim:SessionEvent` currently carries no engine identities, so the unique
+engine-fallback HED mapping drops no engine pair that SSTIM actually recorded.
+The question remains open as a deliberate model decision — whether SSTIM or HED
+should name engine implementations — and no ontology term has been added merely
+to make the projection appear richer.
 
 ## 5. A continuously varying stimulus parameter — trace, or piecewise `Def/`?
 

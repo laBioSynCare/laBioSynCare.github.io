@@ -1,6 +1,6 @@
 {
-  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset, Offset, Pause and Inset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. An event type may also carry a detailTemplate, whose tags are appended when the event record holds the values they need. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
-  "mappingVersion": "0.4.0",
+  "$comment": "SSTIM -> HED event-semantic crosswalk (ADR 0025 decision 2). One-way and versioned: SSTIM event types are the source of truth, HED is generated. Temporal scope uses HED definitions: Onset and Offset are scope tags that HED requires to be paired with exactly one Def/ tag, so the session and the delivery are each defined once below and referenced by the events. An event type may also carry a detailTemplate, whose tags are appended when the event record holds the values they need. Validated by hedtools against the pinned schema in `make hed-crosswalk`.",
+  "mappingVersion": "0.5.0",
   "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
   "hedSchema": {
     "name": "HED standard schema",
@@ -13,48 +13,61 @@
     "These are profile mappings, not concept equivalences. No skos:exactMatch is asserted between an SSTIM event type and a HED tag, per ADR 0025 decision 6.",
     "Version 0.1.0 of this map wrote scope tags bare, as (Experiment-structure, Time-block, Onset). That is invalid HED: a scope tag requires exactly one paired Def/. The tag-existence check passed it because every tag existed; only hedtools caught it. That is the whole argument for decision 7 requiring a real validator.",
     "Where SSTIM distinguishes something HED does not, the difference is recorded in `lossyBecause` rather than forced into a tag.",
-    "Version 0.3.0 added detailTemplate. `hed` remains the part determined by the event type alone and is what a reverse lookup matches after detail tags are stripped; the template carries per-event values HED can express and the type cannot. It exists because two lossyBecause statements were false: they told a consumer that the safety boundary values and the engine identities were 'SSTIM-only', when a sstim:SessionEvent could carry nothing but its type and its clock offset. ADR 0025 decision 5's terms fixed the first; the second was an overclaim and is withdrawn."
+    "Version 0.3.0 added detailTemplate. `hed` remains the part determined by the event type alone and is what a reverse lookup matches after detail tags are stripped; the template carries per-event values HED can express and the type cannot. It exists because two lossyBecause statements were false: they told a consumer that the safety boundary values and the engine identities were 'SSTIM-only', when a sstim:SessionEvent could carry nothing but its type and its clock offset. ADR 0025 decision 5's terms fixed the first; the second was an overclaim and is withdrawn.",
+    "Version 0.5.0 applies Kay Robbins's 2026-08-25 ruling that a delivery pause is Offset and a resume is Onset, not the HED Pause and Inset tags. Pause now collides with stop and resume with start, so every member of both collision pairs declares the information a HED-only reader cannot recover. Each event entry also records the SSTIM SKOS notation used as the categorical event_id level in generated sidecars; make hed-crosswalk verifies those notations against the ontology."
   ],
   "events": {
     "eventSessionOpen": {
       "label": "Session opened",
+      "notation": "session-open",
       "hed": "(Def/Sstim-session, Onset)",
       "rationale": "Opens the session scope defined as Sstim-session."
     },
     "eventSessionComplete": {
       "label": "Session completed",
+      "notation": "session-complete",
       "hed": "(Def/Sstim-session, Offset)",
       "rationale": "Closes the session scope after the intended duration was delivered.",
       "lossyBecause": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
     },
     "eventSessionInterrupt": {
       "label": "Session interrupted",
+      "notation": "session-interrupt",
       "hed": "(Def/Sstim-session, Offset)",
       "rationale": "Closes the session scope early.",
       "lossyBecause": "Identical HED to eventSessionComplete. HED 8.4.0 has no Incomplete, Abort or Terminate tag, so completion status is SSTIM-only."
     },
     "eventPlaybackStart": {
       "label": "Playback started",
+      "notation": "playback-start",
       "hed": "(Def/Sstim-delivery, Onset)",
-      "rationale": "Opens the delivery scope defined as Sstim-delivery."
+      "rationale": "Opens the delivery scope defined as Sstim-delivery.",
+      "lossyBecause": "Identical HED to eventPlaybackResume. HED records that delivery opened but not whether this was the first start, a restart after a stop, or a resume after a pause; SSTIM keeps that distinction in the event type."
     },
     "eventPlaybackStop": {
       "label": "Playback stopped",
+      "notation": "playback-stop",
       "hed": "(Def/Sstim-delivery, Offset)",
-      "rationale": "Closes the delivery scope."
+      "rationale": "Closes the delivery scope.",
+      "lossyBecause": "Identical HED to eventPlaybackPause. HED records that delivery closed but not whether the closure was a full stop or the start of a pause; SSTIM keeps that distinction in the event type."
     },
     "eventPlaybackPause": {
       "label": "Playback paused",
-      "hed": "(Def/Sstim-delivery, Pause)",
-      "rationale": "Suspends delivery without closing the session scope."
+      "notation": "playback-pause",
+      "hed": "(Def/Sstim-delivery, Offset)",
+      "rationale": "Closes the delivery scope without closing the session scope; elapsed session time continues while delivered time stops.",
+      "lossyBecause": "Identical HED to eventPlaybackStop. HED records that delivery closed but not whether the closure was the start of a pause or a full stop; SSTIM keeps that distinction in the event type."
     },
     "eventPlaybackResume": {
       "label": "Playback resumed",
-      "hed": "(Def/Sstim-delivery, Inset)",
-      "rationale": "Delivery restarts inside the still-open delivery scope. Inset marks an intermediate point within a scope, which is exactly a resume."
+      "notation": "playback-resume",
+      "hed": "(Def/Sstim-delivery, Onset)",
+      "rationale": "Reopens the delivery scope after a pause while the session scope remains open.",
+      "lossyBecause": "Identical HED to eventPlaybackStart. HED records that delivery opened but not whether this was a resume after a pause, the first start, or a restart after a stop; SSTIM keeps that distinction in the event type."
     },
     "eventSafetyLimitApplied": {
       "label": "Safety limit applied",
+      "notation": "safety-limit-applied",
       "hed": "(Experiment-control, Constrained)",
       "rationale": "A delivery parameter was constrained by a safety boundary. Constrained names the constraining; the detail tags name the parameter and the value actually delivered.",
       "lossyBecause": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did. Confirmed upstream on 2026-08-20: @yarikoptic's answer on hed-schemas#416 is that HED carries the factual delivered value and not the protective intent, which belongs with the higher-level description of the paradigm. This loss is deliberate and correct, not a gap to close by asking HED for a Safety or Threshold tag.",
@@ -62,18 +75,21 @@
     },
     "eventEngineFallback": {
       "label": "Engine fallback",
+      "notation": "engine-fallback",
       "hed": "(Experiment-control, Computational-evidence)",
       "rationale": "Delivery moved to a different engine implementation; the change is computational rather than sensory. The mapping is unique, so the event type reverses exactly.",
       "note": "No lossyBecause. This previously said the engine pair was 'SSTIM-only', which was false: SSTIM has no engine-identity term, so nothing is lost relative to a record that never held it. Naming software engines is an implementation concern and a separate ontology decision, not something to assert here so that a loss statement reads well."
     },
     "eventObservationCollected": {
       "label": "Observation collected",
+      "notation": "observation-collected",
       "hed": "(Experiment-procedure, Participant-response)",
       "rationale": "A phase-qualified report was collected from the participant.",
       "lossyBecause": "The instrument, its version, the response state and any unwanted-experience structure are SSTIM-only. HED records that a response occurred, not what it asserted."
     },
     "eventParameterChanged": {
       "label": "Parameter changed",
+      "notation": "parameter-changed",
       "hed": "(Experiment-control, Modify)",
       "detailTemplate": "Parameter-label/{parameterKind}, Parameter-value/{valueAfter}",
       "rationale": "A delivery quantity was set to a new value part-way through the session. Experiment-control places it as a control action rather than a stimulus, Modify names the act, and the detail tags carry which parameter and what it became — which is what makes a segmented stimulus recoverable from the events table.",

@@ -8,7 +8,7 @@
     "sstim": "0.17.0-dev",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
-    "mapping": "0.4.0",
+    "mapping": "0.5.0",
     "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
   },
@@ -23,7 +23,7 @@
     "eventCount": 6
   },
   "crossArtifactIds": {
-    "column": "event_id",
+    "column": "sstim_event_id",
     "resolvesTo": "the local name of a sstim:SessionEvent in source.file",
     "ids": {
       "event-open": "https://example.org/sstim/hed-segmented/event-open",
@@ -44,24 +44,26 @@
   "artifacts": [
     {
       "file": "events.tsv",
-      "sha256": "f3e61e41aeb210afe03c058cf93e41a00a362c835c00e69d706f917c4c192c2f"
+      "sha256": "2799512fee14eabc02f4914d4c16fbf66d068d2bca608ca802c6a9e856c8b17e"
     },
     {
       "file": "events.json",
-      "sha256": "bbb1b883add4c131bda195ab26d031bf21edf9b96bb5da0f137813e6044950a2"
+      "sha256": "c713113333e6eb9f4775e28915699e0348cdbfd7c4fd11315c987f346bd67700"
     }
   ],
   "declaredLoss": {
+    "eventPlaybackStart": "Identical HED to eventPlaybackResume. HED records that delivery opened but not whether this was the first start, a restart after a stop, or a resume after a pause; SSTIM keeps that distinction in the event type.",
     "eventParameterChanged": "HED carries the parameter kind and the new value but not the unit, which follows from the kind and the channel in SSTIM, nor the previous value in sstim:parameterValueBefore.",
     "eventSafetyLimitApplied": "HED 8.4.0 has no Safety or Threshold tag, so a HED consumer reads that a parameter was constrained but not that the constraint was protective rather than an ordinary adjustment. The parameter kind and the delivered value travel in the detail tags; the requested value stays in sstim:parameterValueBefore. Which named exposure boundary applied is held by neither side — SSTIM has no term for it either, and this sentence used to claim it did. Confirmed upstream on 2026-08-20: @yarikoptic's answer on hed-schemas#416 is that HED carries the factual delivered value and not the protective intent, which belongs with the higher-level description of the paradigm. This loss is deliberate and correct, not a gap to close by asking HED for a Safety or Threshold tag.",
     "eventSessionComplete": "HED has no tag distinguishing a completed block from an interrupted one; SSTIM keeps that distinction in the event type, and a consumer reading HED alone cannot recover it."
   },
   "validated": [
-    "Every HED string in events.tsv validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`.",
+    "Every HED annotation assembled from the event_id sidecar map and native parameter columns validates against the pinned schema via hedtools, with the sidecar Definitions in scope. Checked by `make hed-bundle-check`; events.tsv contains no materialised HED column.",
     "The crosswalk itself validates, covers the SSTIM event scheme exactly, and declares loss wherever two event types collide. Checked by `make hed-crosswalk`.",
     "The artifacts are regenerated and compared, so a crosswalk edit that does not reach them fails.",
     "Declared loss is tested, not merely documented, by `make hed-roundtrip` — in both directions, so loss that is claimed but does not exist fails too.",
-    "Every event_id resolves to a sstim:SessionEvent in source.file, and the source graph conforms to the SSTIM Full profile shapes."
+    "Every sstim_event_id resolves to a sstim:SessionEvent in source.file, every event_id is the checked SKOS notation of its type, and the source graph conforms to the SSTIM Full profile shapes.",
+    "Each generated row agrees with that exact source event's type, onset, and IRI. The final row is session completion or interruption, so an open HED delivery scope and the delivered-time trace end with the recording without inventing a playback-stop event."
   ],
   "notValidated": [
     "No BIDS dataset is emitted. BIDS Behavioral is an optional binding under ADR 0025 decision 3 and is not part of the minimum semantic authority chain. These files are BIDS-*style*: a real BIDS continuous recording would be gzipped, named by entity, and sit inside a validator-clean dataset.",

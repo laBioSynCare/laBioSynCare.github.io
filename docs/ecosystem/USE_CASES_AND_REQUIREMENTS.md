@@ -208,7 +208,7 @@ group to disagree with.
 | R-11 | Conformance is checkable against a stated profile without adopting everything | UC-14 | Satisfied |
 | R-12 | One coherent modality list | UC-03, UC-08, UC-11 | **Open.** Two divergent lists exist: `sstim:SensoryModality` (6) and `sstim-ex:PerceivedModality` (12). Known problem P5.5 |
 | R-13 | Recognized named methods and schools are representable | (absent from every encoded example) | **Open.** [ADR 0030](../decisions/0030-named-methods-and-schools.md) is Proposed and undecided |
-| R-14 | A session description can be projected onto external event semantics | UC-04 | **Partial.** The native timeline exists; the HED mapping does not ([ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)) |
+| R-14 | A session description can be projected onto external event semantics | UC-04 | **Partial.** Mapping 0.5.0 and three generated, validator-gated HED demonstrators project all eleven current native event types. The complete bridge remains open because the native model still cannot connect an occurrence to the presented stimulus, and no runtime or full BIDS exporter exists ([ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)) |
 | R-15 | Techniques exist for every modality the vocabulary declares | UC-11 | **Open.** Three of six declared modalities have no technique: vestibular, olfactory, interoceptive |
 | R-16 | Descriptions come from more than one author | all | **Open, and the most important one.** Every encoded example above has a single `dct:creator` |
 

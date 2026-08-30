@@ -1,10 +1,12 @@
 # SSTIM ↔ HED Event Profile and Research Bindings
 
-> **Status: revised design target, not as-built.** The architecture is proposed
-> in [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md).
-> Dependencies and gates are in the
-> [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md). No current BSC Lab
-> exporter should be described as implementing this profile.
+> **Status: bounded generated profile as built; complete bindings remain a
+> design target.** [ADR 0025](../decisions/0025-hed-bids-interoperability-crosswalk.md)
+> is accepted. Mapping 0.5.0 and three synthetic bundles generate and validate
+> HED for all eleven current native event types. They are offline conformance
+> artifacts, not a Workbench runtime exporter or a complete BIDS/NWB binding.
+> The remaining dependencies and gates are in the
+> [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md).
 
 ## Recommendation in one paragraph
 
@@ -48,8 +50,8 @@ sources of event meaning.
 
 ## Native event and report prerequisites
 
-The profile cannot be built reliably from start/end timestamps alone. The native
-record needs:
+The complete profile cannot be built reliably from start/end timestamps alone.
+The native record needs:
 
 - stable `session_id`, `specification_id`, and `event_id` values;
 - a clock origin plus monotonic onset/duration values and optional wall-clock
@@ -200,8 +202,14 @@ not `skos:exactMatch` or `skos:closeMatch` triples.
 
 ## Core demonstrator
 
-Use one synthetic, non-personal ordinary session with a conservative fixed or
-explicitly segmented stimulus. Include:
+The bounded demonstrator is built as three synthetic bundles, one each for a
+fixed, explicitly segmented and continuously modulated stimulus. Mapping 0.5.0
+uses categorical `event_id` values with HED assembled from the sidecar, while
+`sstim_event_id` preserves the join to each source `sstim:SessionEvent`.
+`make hed-crosswalk`, `make hed-bundle-check` and `make hed-roundtrip` gate the
+mapping, assembled annotations, source IDs and declared loss.
+
+The fuller end-to-end demonstrator should include:
 
 1. a native session bundle and normalized event table;
 2. an SSTIM RDF/JSON-LD projection with specification, instance, exposure,
@@ -276,21 +284,24 @@ when that loss is explicit and tested.
 
 ## Current blockers
 
-- SessionRecorder and the versioned native session JSON Schema are not present.
-- The documented session RDF conflicts with the live ontology/context in several
-  datatypes and properties.
-- The current self-report model lacks direct helpfulness, repeatable structured
-  unwanted experiences, missingness states, and enforceable privacy provenance.
-- The Sensory Field exposure export now passes its applicable SSTIM SHACL
-  contract, but it remains an exposure/configuration summary rather than the
-  native executed-session and event contract required by this profile.
-- Browser-side RDF validation and HED/BIDS/NWB adapters do not exist.
+- The offline mapping and demonstrators are built; integrating this profile into
+  a Workbench runtime/export flow remains separate work.
+- The generated files are BIDS-style conformance artifacts, not a complete BIDS
+  Behavioral dataset. The optional BIDS and NWB bindings remain unimplemented.
 - The shipped session event vocabulary covers device and system occurrences only.
   Stimulus-presentation, participant-response, and contextual events are absent,
   and `sstim:SessionEvent` cannot reference a stimulus. See the measurement above:
-  this, not the timeline itself, is what blocks the mapping.
+  this, not the timeline itself, is what blocks the fuller bridge.
 - No property relates a `SensoryStimulationProtocol` to the process that realizes
   it.
+- HED questions 4 and 5 and the definition-body shape remain open. Question 3
+  was answered in the 2026-08-25 meeting and is implemented by mapping 0.5.0.
+
+Repository file inventory re-measured 2026-08-30 before writing this list:
+`static/schemas/session.schema.json`, `src/session/sessionRecorder.js`, the
+session RDF projection and its tests, and the three generated HED fixtures are
+present. The missing-runtime/full-binding statements above are therefore scoped
+to those surfaces rather than inherited from the superseded pre-ADR-0048 list.
 
 These are tracked in the
 [RDF improvement plan](../ontology/IMPROVEMENT_PLAN.md) and documented in the
@@ -298,10 +309,14 @@ These are tracked in the
 
 ## External review path
 
-1. Validate the native+HED synthetic bundle locally.
-2. Ask the HED Working Group to review event definitions, temporal scope, schema
-   selection, and whether any genuine schema gap exists.
-3. Validate and publish the optional BIDS Behavioral binding.
+1. **Done for the bounded profile:** validate the three native+HED synthetic
+   bundles locally.
+2. **In progress:** the HED Working Group reviewed the profile in a public
+   thread and a 2026-08-25 meeting. Question 3 is answered; questions 4 and 5
+   and the definition-body shape remain open. The requested follow-up message
+   is drafted, not sent.
+3. Validate and publish the optional BIDS Behavioral binding when a consented
+   research use case exists.
 4. Ask external labs to nominate a protocol/session pattern to encode and
    reproduce—not to endorse BSC Lab or any health claim.
 5. Add NWB review only when a synchronized-data partner use case exists.

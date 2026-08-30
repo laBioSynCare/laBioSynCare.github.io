@@ -4,21 +4,71 @@
     "Units": "s"
   },
   "event_id": {
-    "Description": "Local name of the sstim:SessionEvent this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6."
-  },
-  "event_type": {
-    "Description": "SSTIM session event type, the authoritative value.",
+    "LongName": "SSTIM session event type",
+    "Description": "SKOS notation of the authoritative SSTIM session event type. Categorical: a value repeats whenever the same kind of occurrence happens again. Levels link each code to its SSTIM definition, and the HED map generates the interoperable annotation.",
     "TermURL": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "Levels": {
-      "eventSessionOpen": "Session opened",
-      "eventPlaybackStart": "Playback started",
-      "eventParameterChanged": "Parameter changed",
-      "eventSafetyLimitApplied": "Safety limit applied",
-      "eventSessionComplete": "Session completed"
+      "session-open": {
+        "Description": "Opens the session scope defined as Sstim-session.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventSessionOpen"
+      },
+      "playback-start": {
+        "Description": "Opens the delivery scope defined as Sstim-delivery.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventPlaybackStart"
+      },
+      "parameter-changed": {
+        "Description": "A delivery quantity was set to a new value part-way through the session. Experiment-control places it as a control action rather than a stimulus, Modify names the act, and the detail tags carry which parameter and what it became — which is what makes a segmented stimulus recoverable from the events table.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventParameterChanged"
+      },
+      "safety-limit-applied": {
+        "Description": "A delivery parameter was constrained by a safety boundary. Constrained names the constraining; the detail tags name the parameter and the value actually delivered.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventSafetyLimitApplied"
+      },
+      "session-complete": {
+        "Description": "Closes the session scope after the intended duration was delivered.",
+        "TermURL": "https://w3id.org/sstim/vocab#eventSessionComplete"
+      }
+    },
+    "HED": {
+      "session-open": "(Def/Sstim-session, Onset)",
+      "playback-start": "(Def/Sstim-delivery, Onset)",
+      "parameter-changed": "(Experiment-control, Modify, {parameter_kind}, {value_after})",
+      "safety-limit-applied": "(Experiment-control, Constrained, {parameter_kind}, {value_after})",
+      "session-complete": "(Def/Sstim-session, Offset)"
+    }
+  },
+  "sstim_event_id": {
+    "LongName": "SSTIM session event occurrence identifier",
+    "Description": "Local name of the sstim:SessionEvent occurrence this row was generated from. Joins the row to the source graph and to the manifest's crossArtifactIds; ADR 0025 decision 6.",
+    "Levels": {
+      "event-open": {
+        "Description": "The session-open occurrence at 0.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-open"
+      },
+      "event-start": {
+        "Description": "The playback-start occurrence at 0.300 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-start"
+      },
+      "event-step-theta": {
+        "Description": "The parameter-changed occurrence at 120.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-step-theta"
+      },
+      "event-step-gamma": {
+        "Description": "The parameter-changed occurrence at 240.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-step-gamma"
+      },
+      "event-safety": {
+        "Description": "The safety-limit-applied occurrence at 300.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-safety"
+      },
+      "event-complete": {
+        "Description": "The session-complete occurrence at 600.000 seconds on the session clock.",
+        "TermURL": "https://example.org/sstim/hed-segmented/event-complete"
+      }
     }
   },
   "sstim_hed_definitions": {
-    "Description": "HED definitions the HED column references. Not a column of events.tsv. Onset, Offset, Pause and Inset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
+    "Description": "HED definitions the event_id annotations reference. Not a column of events.tsv. Onset and Offset are scope tags requiring exactly one paired Def/, so the events do not validate without these in scope.",
     "HED": {
       "Sstim-session": "(Definition/Sstim-session, (Experiment-structure, Time-block))",
       "Sstim-delivery": "(Definition/Sstim-delivery, (Sensory-event, Experimental-stimulus, Sensory-presentation))"
@@ -27,21 +77,35 @@
   "SstimDurationConvention": {
     "Description": "duration is always n/a in this bundle. SSTIM session events are instantaneous timeline marks, and inventing a duration would assert a span the native record does not contain. This is a note, not a redefinition of the BIDS-required duration column."
   },
-  "GeneratedHedColumn": {
-    "Description": "The events.tsv column named HED is generated from the native columns by the crosswalk, HED 8.4.0. Where an event changes a parameter, its Parameter-label and Parameter-value tags come from parameter_kind and value_after. SSTIM is canonical and HED is derived, so the native columns are the ones to read."
+  "SstimEndOfRecordingConvention": {
+    "Description": "The final session-complete or session-interrupt row is also the end of this recording. HED temporal processing keeps an Onset active through end-of-file when no later matching Offset exists. If delivery is still open, its Sstim-delivery scope therefore ends with the recording; no playback-stop row is invented because the native SSTIM timeline contains none."
+  },
+  "SstimGeneratedAnnotationNote": {
+    "Description": "HED 8.4.0 annotations are assembled from the event_id HED level map rather than materialised in events.tsv. Where an event changes a parameter, the annotation splices parameter_kind and value_after. SSTIM is canonical and HED is derived, so the native columns are the ones to read."
   },
   "parameter_kind": {
     "Description": "Local name of the sstim:StimulationParameterKind this event changed, or n/a. Modality-neutral by design: the kind names the quantity, not one application's field.",
     "TermURL": "https://w3id.org/sstim/vocab#StimulationParameterKindScheme",
     "Levels": {
-      "paramModulationFrequency": "paramModulationFrequency",
-      "paramLevel": "paramLevel"
+      "paramLevel": {
+        "Description": "SSTIM parameter kind paramLevel.",
+        "TermURL": "https://w3id.org/sstim/vocab#paramLevel"
+      },
+      "paramModulationFrequency": {
+        "Description": "SSTIM parameter kind paramModulationFrequency.",
+        "TermURL": "https://w3id.org/sstim/vocab#paramModulationFrequency"
+      }
+    },
+    "HED": {
+      "paramLevel": "Parameter-label/Level",
+      "paramModulationFrequency": "Parameter-label/Modulation-frequency"
     }
   },
   "value_before": {
     "Description": "The value the parameter held immediately before the event, or n/a. On a safety-limit event this is the value that was requested."
   },
   "value_after": {
-    "Description": "The value the parameter held immediately after the event, or n/a. On a safety-limit event this is the value actually delivered. The unit follows from the parameter kind and is deliberately not repeated per row."
+    "Description": "The value the parameter held immediately after the event, or n/a. On a safety-limit event this is the value actually delivered. The unit follows from the parameter kind and is deliberately not repeated per row.",
+    "HED": "Parameter-value/#"
   }
 }

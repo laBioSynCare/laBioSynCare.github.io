@@ -260,7 +260,9 @@ indexed, examiner-searchable records.
       participant-response and contextual events are absent.
       `eventPlaybackStart` is transport control, not stimulus onset, and HED
       annotates occurrences of stimuli. This, not the timeline or the clock, is
-      what blocks the crosswalk.*
+      what blocks the **complete** event bridge. Mapping 0.5.0 now projects the
+      eleven existing native event types and gates three synthetic bundles; it
+      deliberately does not pretend this prerequisite is closed.*
 
       *The fix is deliberately **not** an event vocabulary. HED owns "what kind of
       occurrence was this", and duplicating the standard SSTIM chose in order to
@@ -330,21 +332,24 @@ indexed, examiner-searchable records.
       module-coupling decision above.*
 
 - [ ] Emit the BIDS Behavioral binding of ADR 0025 decision 3 `P3`
-      *Evaluated 2026-08-18 rather than assumed, and it is reachable: wrapped in
+      *Historical measurement, 2026-08-18: wrapped in
       a minimal behavioral dataset, all three demonstrator bundles validate with*
       **zero errors** *under `bids-validator` 1.15.0. One warning is unfixable —
       `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED` column, because any
       sidecar entry named `HED` crashes the validator's HED parser; that is
-      question 6 to the HED Working Group.*
+      question 6 to the HED Working Group. Mapping 0.5.0 later removed the
+      materialised `HED` column under the reviewed sidecar design, so this is not
+      the layout currently generated.*
 
       ***Question 6 is answered and this warning no longer exists.** Retested on
       `bids-validator` 3.0.1 (2026-08-20): a top-level `HED` sidecar key is
       illegal rather than awkward, and `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` is
-      gone from 3.x, so the layout we ship validates with zero errors and no
+      gone from 3.x, so the layout then under test validated with zero errors and no
       warnings. The sentence above is kept because it is what the decision was
       taken on, but do not requote it as current. The residue was a silent
       no-validation path in the validator, fixed upstream in
-      [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442).*
+      [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442),
+      merged 2026-08-27 and re-tested on merged `main` 2026-08-28.*
 
       *Two of the four warnings are the wrapper's, not ours, and go away with a
       real dataset: set `HEDVersion` in `dataset_description.json` — BIDS warns
@@ -368,12 +373,16 @@ indexed, examiner-searchable records.
       that claim is now withdrawn rather than made true — enumerating software
       engines looks like an implementation concern that a universal standard
       should not carry, but the reproducibility argument for recording it is
-      real, since two engines are not sample-identical. Decide deliberately.*
+      real, since two engines are not sample-identical. HED question 4 remains
+      open after the 2026-08-25 review; no ontology term was added merely to make
+      the projection richer. Decide deliberately.*
 
 - [!] Decide the shape of generated HED definition bodies `P3`
       *Blocked on the HED Working Group, asked 2026-08-21 on
       [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
-      unanswered as of 2026-08-23 and bound to a requested meeting.*
+      and still unanswered after the 2026-08-25 meeting. That meeting settled
+      pause/resume and the sidecar shape but recorded no ruling on definition
+      bodies. The revised follow-up is drafted, not sent.*
 
       *@VisLab's critique, which we accept: the definitions we generate are event
       codes wearing a definition's clothes.*

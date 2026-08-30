@@ -6,11 +6,13 @@ loss in a manifest is not a test: a manifest can claim loss that does not exist,
 or miss loss that does, and either way a consumer trusts a sentence rather than a
 property. This asserts the property.
 
-The round trip is HED back to SSTIM. Each emitted HED string has its detail tags
-stripped — `Parameter-label` and `Parameter-value` carry an event's values, not
-its identity — and the remainder is looked up in a reverse index of the
-crosswalk, giving the set of SSTIM event types that could have produced it. Four things then have to hold, and the third is what makes
-this a test of the declaration rather than of the mapping:
+The round trip is HED back to SSTIM. Each HED string is first assembled from the
+categorical `event_id` and native parameter columns through the sidecar, then has
+its detail tags stripped — `Parameter-label` and `Parameter-value` carry an
+event's values, not its identity. The remainder is looked up in a reverse index
+of the crosswalk, giving the set of SSTIM event types that could have produced
+it. Four things then have to hold, and the third is what makes this a test of the
+declaration rather than of the mapping:
 
 1. **Soundness.** The originating event type is always among the candidates.
    A reverse lookup that cannot recover the truth at all is a broken mapping, not
@@ -18,10 +20,9 @@ this a test of the declaration rather than of the mapping:
 
 2. **Ambiguity is declared.** Any row whose HED could have come from more than
    one SSTIM event type must have `lossyBecause` on every candidate. This is the
-   `eventSessionComplete` / `eventSessionInterrupt` pair: both emit
-   `(Def/Sstim-session, Offset)` because HED 8.4.0 has no Incomplete, Abort or
-   Terminate tag, so a HED-only consumer cannot tell a finished session from an
-   abandoned one.
+   session completion pair, the pause/stop pair, and the resume/start pair:
+   all emit identical HED within their pair, so a HED-only consumer cannot
+   recover the native distinction.
 
 3. **Declared loss is not overclaimed.** An event type whose HED is unique, and
    whose `lossyBecause` asserts that it collides with another, is lying in the
@@ -32,15 +33,14 @@ this a test of the declaration rather than of the mapping:
    bundle rather than against the pooled set, so a bundle cannot inherit a
    declaration it never earned.
 
-Detail loss — that HED carries no engine identity, no safety boundary, no
-instrument version — is not ambiguity and is asserted separately: those mappings
-must be unique *and* declare loss, which is the signature of information dropped
-rather than confused.
+Detail loss — such as protective intent, observation structure, or a parameter's
+previous value and unit — is not ambiguity and is asserted separately: those
+mappings must be unique *and* declare loss, which is the signature of information
+dropped rather than confused.
 
-Every bundle listed in `BUNDLES` is reversed. There are two: the fixed-stimulus
-demonstrator and the modulated one ADR 0025 decision 5 requires, and a second
-bundle that nobody round-tripped would be precisely the unexercised artifact this
-gate exists to prevent.
+Every bundle listed in `BUNDLES` is reversed: fixed, segmented, and continuously
+modulated. A bundle that nobody round-tripped would be precisely the unexercised
+artifact this gate exists to prevent.
 """
 
 from __future__ import annotations
@@ -68,25 +68,48 @@ BUNDLES = (
 )
 
 
-def read_rows(bundle: Path) -> list[tuple[str, str, str]]:
-    """(onset, event_type, hed) from a bundle's events table, read by column
-    name rather than by position — the table gained an event_id column when
-    ADR 0025 decision 6's cross-artifact identifiers landed, and a positional
-    unpack broke on it."""
+def read_rows(bundle: Path, spec: dict) -> list[tuple[str, str, str]]:
+    """(onset, event_type, assembled HED) from one generated bundle.
+
+    event_id carries the event type's SKOS notation; sstim_event_id is the
+    occurrence join. HED is assembled from the sidecar rather than materialised
+    in the TSV, which is the shape reviewed with Kay Robbins.
+    """
+    from hed.models import Sidecar, TabularInput
+
     lines = (bundle / "events.tsv").read_text(encoding="utf-8").splitlines()
     header = lines[0].split("\t")
     index = {name: position for position, name in enumerate(header)}
-    for required in ("onset", "event_type", "HED"):
+    for required in ("onset", "event_id", "sstim_event_id"):
         if required not in index:
             raise SystemExit(f"hed-roundtrip: {bundle.name}/events.tsv has no {required} column")
+
+    notation_to_type = {
+        entry["notation"]: name for name, entry in spec["events"].items()
+    }
+    sidecar = Sidecar([str(bundle / "events.json")])
+    table = TabularInput(str(bundle / "events.tsv"), sidecar=sidecar)
+    assembled = table.assemble()
+    if "event_id" not in assembled.columns or len(assembled) != len(lines) - 1:
+        raise SystemExit(
+            f"hed-roundtrip: {bundle.name} sidecar did not assemble one event_id "
+            "annotation per row"
+        )
+
     rows = []
-    for line in lines[1:]:
+    for row_index, line in enumerate(lines[1:]):
         cells = line.split("\t")
+        level = cells[index["event_id"]]
+        event_type = notation_to_type.get(level)
+        if event_type is None:
+            raise SystemExit(
+                f"hed-roundtrip: {bundle.name} event_id {level!r} is not a mapped notation"
+            )
         rows.append(
             (
                 cells[index["onset"]],
-                cells[index["event_type"]],
-                DETAIL_TAG.sub("", cells[index["HED"]]),
+                event_type,
+                DETAIL_TAG.sub("", str(assembled.iloc[row_index]["event_id"])),
             )
         )
     return rows
@@ -108,7 +131,7 @@ def main() -> int:
         manifests.append(
             (bundle, json.loads((bundle / "bundle-manifest.json").read_text(encoding="utf-8")))
         )
-        rows += read_rows(bundle)
+        rows += read_rows(bundle, spec)
 
     # 1. soundness — the truth is always among the candidates
     ambiguous_rows = 0
@@ -155,7 +178,7 @@ def main() -> int:
     # about one set of artifacts, and pooling them would let a bundle inherit a
     # declaration it never earned.
     for bundle, manifest in manifests:
-        used = {event_type for _, event_type, _ in read_rows(bundle)}
+        used = {event_type for _, event_type, _ in read_rows(bundle, spec)}
         expected = {n for n in used if "lossyBecause" in events[n]}
         declared = set(manifest.get("declaredLoss", {}))
         for missing in sorted(expected - declared):

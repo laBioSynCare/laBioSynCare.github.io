@@ -263,7 +263,7 @@ but it is the prerequisite for everything after.
    *Started 2026-08-18: the mapping contract exists.*
    [`static/schemas/sstim-hed-event-map.json`](../../static/schemas/sstim-hed-event-map.json)
    maps all eleven `sstim-v:SessionEventTypeScheme` types to HED 8.4.0 annotations,
-   one-way and versioned, with `lossyBecause` on the five mappings that lose
+   one-way and versioned, with `lossyBecause` on the nine mappings that lose
    information — including the pair `eventSessionComplete` and
    `eventSessionInterrupt`, which emit identical HED because 8.4.0 has no
    Incomplete, Abort or Terminate tag, so completion status is SSTIM-only.
@@ -276,9 +276,12 @@ but it is the prerequisite for everything after.
    *The generated table and manifest exist too.* `make hed-bundle` reads the
    recorded-session fixture, walks its event timeline on the session clock, and
    writes [`test/fixtures/hed-bundle/`](../../test/fixtures/hed-bundle/): a
-   BIDS-style `events.tsv` with a `HED` column, its `events.json` sidecar, and
-   `bundle-manifest.json` carrying artifact hashes, the pinned HED and mapping
-   versions, the clock assumption, and a `declaredLoss` map. `make
+   BIDS-style `events.tsv` whose categorical `event_id` carries the SSTIM SKOS
+   notation and whose `sstim_event_id` preserves the per-occurrence source join.
+   Its `events.json` sidecar assembles HED from `event_id` and any native
+   parameter columns; there is no duplicate `event_type` or materialised `HED`
+   column. `bundle-manifest.json` carries artifact hashes, the pinned HED and
+   mapping versions, the clock assumption, and a `declaredLoss` map. `make
    hed-bundle-check` regenerates and compares, so a crosswalk edit not reflected
    in the artifacts fails rather than drifting.
 
@@ -289,10 +292,11 @@ but it is the prerequisite for everything after.
    *Decision 7's publication gate is met as of 2026-08-18.* `hedtools` is
    vendored into the flake, and `make hed-crosswalk` validates every mapping and
    definition against the pinned schema with it. `make hed-bundle-check`
-   regenerates the artifacts, compares them, and validates the emitted table's
-   own HED — a bundle can be current and still wrong. `make hed-roundtrip`
-   reverses every emitted string through the crosswalk and asserts that declared
-   loss is real, complete, and not overclaimed.
+   regenerates the artifacts, compares them, validates the sidecar and table,
+   and proves each assembled annotation equals the crosswalk output — a bundle
+   can be current and still wrong. `make hed-roundtrip` reverses every assembled
+   string through the crosswalk and asserts that declared loss is real, complete,
+   and not overclaimed.
 
    **The validator earned its place immediately, and the way it did is the
    argument for decision 7.** Every temporal mapping in crosswalk 0.1.0 was
@@ -300,10 +304,12 @@ but it is the prerequisite for everything after.
    require exactly one paired `Def/`, and the map wrote them bare, as
    `(Experiment-structure, Time-block, Onset)`. Every tag in that string exists
    in the schema, so the tag-existence check that stood in for a validator passed
-   it, and it would never have validated anywhere. Crosswalk 0.2.0 defines
-   `Sstim-session` and `Sstim-delivery` and references them. One mapping stopped
-   being lossy in the process: `Inset` expresses "resume inside an open scope"
-   exactly, so `eventPlaybackResume` no longer declares loss.
+   it, and it would never have validated anywhere. Crosswalk 0.2.0 defined
+   `Sstim-session` and `Sstim-delivery` and referenced them. At that stage the
+   map treated `Inset` as an exact resume and removed its loss declaration. The
+   2026-08-25 review with Kay Robbins superseded that interpretation: a delivery
+   pause is `Offset` followed by `Onset`, so mapping 0.5.0 restores explicit loss
+   for resume/start and adds the pause/stop collision too.
 
    **The time-varying half of decision 5 is built, 2026-08-18.** The paragraph
    above described one bundle, and one bundle could not test the sentence in
@@ -415,21 +421,48 @@ but it is the prerequisite for everything after.
    both schemes to exact coverage and validates each template filled with every
    real kind rather than one invented sample.
 
-   **Decision 6 and 7 gaps closed with it.** Decision 6 asks for cross-artifact
-   IDs, which were absent: `events.tsv` now carries an `event_id` column and the
-   manifest a `crossArtifactIds` map, and `--check` resolves every one against a
-   `sstim:SessionEvent` in the source graph — decision 7's "identifier
-   consistency", which a file hash does not provide. The manifests also carry the
-   SSTIM suite and application versions, which decision 6 lists and they did not.
-   Decision 7's "SSTIM SHACL" is now run over both sources against the
-   Full-profile shapes; the modulated source is not a manifest-declared profile
-   fixture, so this gate is the only place it is validated.
+   **Mapping 0.5.0 absorbs the 2026-08-25 review.** Kay Robbins ruled that a
+   delivery pause is `Offset` and a resume is `Onset`, not HED `Pause` and
+   `Inset`. Pause therefore emits the same HED as stop, and resume the same HED
+   as start; all four entries declare that loss. The same revision adopts the
+   reviewed container shape: categorical SSTIM notations in `event_id`, HED in
+   its sidecar `Levels`/`HED` map, and no materialised `event_type` or `HED`
+   column. `sstim_event_id` keeps the per-occurrence source join, so adopting the
+   categorical convention does not weaken decision 6. The checker verifies each
+   mapping notation against the ontology's one `skos:notation`, and bundle
+   validation assembles the sidecar with hedtools and compares every result with
+   the mapping contract.
 
-   **The sidecar was not BIDS-conformant, and running the real validator is how
-   that was found.** The bundles have been described as "BIDS-style" throughout,
-   which was doing a lot of work: nothing had ever handed one to a BIDS tool. On
-   2026-08-18 that was measured, with `bids-validator` 1.15.0 on a minimal
-   behavioral dataset wrapped around each bundle's `events.tsv` and sidecar.
+   **End-of-recording is an intentional temporal boundary, not a synthetic
+   stop.** Each demonstrator's final native event is session completion or
+   interruption. When delivery is still open, its HED `Onset` remains active
+   through end-of-file, which is the HED convention for a scope with no later
+   matching `Offset`; the delivered-time trace ends at that same session event.
+   The generator does not invent a playback-stop occurrence the SSTIM record
+   never asserted. `make hed-bundle-check` now proves that the final lifecycle
+   row is present and that every row's type, onset and IRI agree with its exact
+   source event, closing a gap where merely resolving the occurrence name was
+   too weak. See HED's
+   [conditions and design-matrix guidance](https://www.hedtags.org/hed-resources/HedConditionsAndDesignMatrices.html).
+
+   **Decision 6 and 7 gaps closed with it.** Decision 6 asks for cross-artifact
+   IDs, which were absent: the first implementation used `event_id`; mapping
+   0.5.0 names the occurrence join `sstim_event_id` so `event_id` can carry the
+   categorical event type. The manifest has a `crossArtifactIds` map, and
+   `--check` resolves every occurrence ID against a `sstim:SessionEvent` in the
+   source graph — decision 7's "identifier consistency", which a file hash does
+   not provide. The manifests also carry the SSTIM suite and application
+   versions, which decision 6 lists and they did not. Decision 7's "SSTIM SHACL"
+   is run over all three sources against the Full-profile shapes; the segmented
+   and modulated sources are not manifest-declared profile fixtures, so this gate
+   is the only place they are validated.
+
+   **Historical materialised-HED layout.** Before mapping 0.5.0, the sidecar was
+   not BIDS-conformant, and running the real validator is how that was found. The
+   bundles had been described as "BIDS-style" throughout, which was doing a lot
+   of work: nothing had ever handed one to a BIDS tool. On 2026-08-18 that was
+   measured, with `bids-validator` 1.15.0 on a minimal behavioral dataset wrapped
+   around each bundle's `events.tsv` and sidecar.
 
    The first run returned `INTERNAL ERROR. SOME VALIDATION STEPS MAY NOT HAVE
    OCCURRED` — which is not a failed validation but no validation, the same class
@@ -441,11 +474,12 @@ but it is the prerequisite for everything after.
 
    Definitions now live in their own non-column entry, `sstim_hed_definitions`,
    with the definitions under its `HED` key — where BIDS-HED expects them. With
-   that change **all three bundles validate with zero errors.** One warning
-   remains and is unfixable: `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the `HED`
-   column itself, because every way of describing it reintroduces the crash. That
-   is [question 6 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
-   with the reproduction table.
+   that change **all three bundles validated with zero errors.** At that stage one
+   warning remained: `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the materialised
+   `HED` column itself, because every attempted description reintroduced the
+   crash. That became [question 6 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
+   with the reproduction table. Mapping 0.5.0 later removed the materialised
+   column for the independent reason established in the 2026-08-25 review.
 
    **Answered, and re-measured on 3.0.1 (2026-08-20).** A maintainer asked us to
    retest on the current major line, and the answer arrived with it: a top-level
@@ -453,7 +487,7 @@ but it is the prerequisite for everything after.
    `SIDECAR_INVALID`, "The string 'HED' or 'n/a' was illegally used as a
    top-level sidecar key", where 1.15.0 crashed.
    `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` no longer exists in 3.x, so the warning
-   that prompted the question is gone and the layout we ship validates with
+   that prompted the question was gone and the then-current layout validated with
    **0 errors** unchanged. Two findings came out of the retest, both in
    [hed-standard/hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836):
 
@@ -468,12 +502,13 @@ but it is the prerequisite for everything after.
      `SstimDurationConvention` key, and all three bundles are 0 errors on 3.0.1.
 
    **Fixed upstream, and the defect was `bids-validator`'s, not HED's (2026-08-21
-   to 2026-08-23).** @happy5214 traced the silent skip to a non-functional column
+   to 2026-08-27).** @happy5214 traced the silent skip to a non-functional column
    check and opened
    [bids-standard/bids-validator#442](https://github.com/bids-standard/bids-validator/pull/442).
    We rebuilt all six probe datasets and tested his branch rather than trusting
    the previous day's run: the three arrangements that used to pass silently now
-   report `SIDECAR_INVALID`, and probe 1, the layout we ship, stays at 0 errors.
+   report `SIDECAR_INVALID`, and probe 1, the legal layout then under test, stays
+   at 0 errors.
    The PR then stalled on a type error, which we diagnosed on 2026-08-23.
    `BIDSContext` declares the field as `Record<string, string[]>`
    (`src/schema/context.ts:135`) while the runtime object is a `ColumnsMap`
@@ -483,14 +518,18 @@ but it is the prerequisite for everything after.
    inspects properties of the `Map` object while column data lives in Map
    *entries*. So `'HED' in context.columns` is false for every real column and
    true for names like `has` and `forEach` that are not columns at all. Both the
-   call-site fix and the trap fix are on the PR, with the reproduction.
+   call-site fix and the trap fix are on the PR, with the reproduction. The PR
+   merged on 2026-08-27; @ttm re-tested merged `main` on 2026-08-28, and all
+   three formerly silent arrangements now report `SIDECAR_INVALID` while the
+   legal probe layouts remain at zero errors.
 
-   **None of this was ours to change.** The layout we ship was correct
-   throughout and never moved. What the exchange bought is that a silent
+   **None of that validator defect was ours to change.** The then-current legal
+   layout remained valid while upstream fixed the silent path. What the exchange
+   bought is that a silent
    no-validation path, in the tool decision 7 would gate a published binding on,
-   is now reported instead of passing green. Question 6 closes when #442 merges;
-   hed-javascript#836 stays open until then, since it is the only public record
-   linking the bug to its fix.
+   is now reported instead of passing green. Question 6's functional defect is
+   closed; hed-javascript#836 remains open for the residual IssueError/internal-
+   error presentation path and as the public record linking the bug to its fix.
 
    **The full BIDS Behavioral binding of decision 3 is still not emitted, and the
    reason is now evidence rather than inertia.** It is achievable — the hard part,
@@ -513,13 +552,13 @@ but it is the prerequisite for everything after.
    dataset is decision 3's first optional binding and is explicitly not part of
    the minimum semantic authority chain; NWB is later still. These files are
    BIDS-*style* and the manifests say so: a real continuous recording would be
-   gzipped, entity-named, and inside a validator-clean dataset. Two synthetic
+   gzipped, entity-named, and inside a validator-clean dataset. Three synthetic
    sessions are still not a family of them, the trace carries the breathing
    period rather than the instantaneous carrier frequency, and the
    trace-versus-events check cannot catch a `delivery_spans()` that is wrong the
    same way on both sides. None of this blocks decision 7, and none of it
    licenses describing the bridge as finished — what exists is a validated
-   crosswalk and two validated demonstrators.
+   crosswalk and three validated demonstrators.
 2. **Take it to the HED Working Group** with the ask of decision 9: encode and
    reproduce, never endorse. This is also the most credible inbound-link path
    SSTIM has — HED annotations live in real published EEG datasets, and a
@@ -531,7 +570,7 @@ but it is the prerequisite for everything after.
    validators in decision 7. Gate 4 is a standing restraint, not a milestone
    that acceptance retires.
 
-## Upstream answers from the HED Working Group, 2026-08-20 to 2026-08-23
+## HED Working Group answers and review, 2026-08-20 to 2026-08-28
 
 The six questions went upstream on 2026-08-20 under decision 9's ask, encode and
 reproduce, never endorse
@@ -576,8 +615,17 @@ and `cancel` returns nothing that means this, so the level carries a
 `Description` and no tag. Half answered: the placement moves, the vocabulary gap
 stands, and @neuromechanist raised a library schema as a possible home.
 
-**Item 6.** Closed pending the merge of bids-standard/bids-validator#442. See the
-item 6 block above.
+**Item 3, delivery pause/resume.** Answered in the 2026-08-25 meeting with Kay
+Robbins: a pause is `Offset` on the delivery scope and a resume is `Onset`, not
+HED `Pause` and `Inset`. Mapping 0.5.0 implements that ruling and declares the
+resulting pause/stop and resume/start collisions on every mapping involved.
+
+**Item 6.** The functional defect is closed. bids-standard/bids-validator#442
+merged on 2026-08-27 and the merged branch was re-tested on 2026-08-28: all
+three formerly silent illegal arrangements report `SIDECAR_INVALID`, and legal
+layouts remain at zero errors. hed-javascript#836 stays open for the residual
+error-wrapping presentation and as the public issue record. See the item 6 block
+above.
 
 ### Open, and one of them is structural
 
@@ -612,9 +660,9 @@ and the second for whatever changes during it, but that is a guess about HED's
 intent, and it runs directly into VisLab's comparability point. Asked on the
 thread 2026-08-21, unanswered as of 2026-08-23.
 
-**Items 3 and 4** (is `Inset` right for resuming delivery, and does HED want
-vocabulary for the software producing a stimulus) are small yes/no questions,
-unanswered, and staying in the thread.
+**Item 4** (does HED want vocabulary for the software producing a stimulus)
+remains unanswered. The meeting's recommendation against an SSTIM HED schema
+does not answer whether HED itself wants software-engine vocabulary.
 
 **Item 5** (a continuously varying parameter as a linked trace or as piecewise
 placeholder-`Def/` marks, and whether `Experiment-control` + `Modify` +
@@ -622,13 +670,27 @@ placeholder-`Def/` marks, and whether `Experiment-control` + `Modify` +
 @neuromechanist's assessment is that it needs a call rather than a thread, so it
 is bound to the meeting below rather than expected back in writing.
 
-### Meeting requested
+### Meeting held, 2026-08-25
 
-VisLab invited a meeting via `hed-maintainers@gmail.com`; @neuromechanist offers
-office hours as a second route. The request is scheduled to send 2026-08-24 08:00
-UTC+2, with the agenda anchored on the definition shape and item 5, and items 1,
-3 and 4 left to the thread. The final agenda depends on what the thread closes
-first, so it goes a couple of days before the call rather than with the request.
+Renato met Prof. Kay Robbins at 16:00 CEST and worked through the generated
+`events.tsv` and `events.json` pair. She established four concrete directions:
+
+1. represent a delivery pause as `Offset` followed by `Onset`, never HED
+   `Pause`/`Inset`;
+2. carry the SSTIM event category in `event_id` and assemble HED through the
+   sidecar rather than materialising duplicate `event_type` and `HED` columns;
+3. do not create an SSTIM HED schema for a vocabulary of this scale; and
+4. examine STIM BIDS as the closer path to both communities.
+
+Mapping 0.5.0 and the three generated demonstrators implement directions 1 and
+2 while preserving decision 6's occurrence identity in `sstim_event_id`.
+Direction 3 confirms the existing one-way crosswalk boundary and requires no
+ontology module. Direction 4 is follow-up work; the STIM BIDS proposal remains a
+draft and does not settle item 4, item 5, or the open definition-body question.
+
+The [revised 30-event pair and message](../ontology/outreach/2026-08-27-kay-robbins-revised-events-bundle.md)
+remain drafted for Renato to send. Their unsent status is intentionally separate
+from the implementation recorded here.
 
 
 ## See also
