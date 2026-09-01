@@ -529,12 +529,19 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    positive, out-of-scope, and adversarial fixture sets and at least one
    competency query. Every listed contract path must already name an existing
    repository file. Bump **`dct:issued`** and `dct:modified` to the release
-   date; leave `dct:created` alone. This matters more than it looks: `dct:issued`
-   is what registries read as the version's release date — BioPortal's
-   **Released** column, and the same in Archivo and OLS — so leaving it at the
-   ontology's first issue date makes every version look like it shipped that day.
-   That is exactly what happened to SSTIM submissions 1–8 (all showing
-   `2026-04-12`, corrected by hand on 2026-07-27).
+   date; leave `dct:created` alone. `dct:issued` is the RDF statement of the
+   version's formal release date. BioPortal's current implementation instead
+   populates its **Released** field by checking `dct:created` before
+   `dct:issued`, so SSTIM keeps the
+   truthful 2026-04-12 creation date in the graph and, prospectively, corrects
+   BioPortal's per-submission field after a stable release is ingested. See the
+   measured behavior and numbered post-deploy procedure in
+   [`REGISTRY_SUBMISSIONS.md`](../../docs/ontology/REGISTRY_SUBMISSIONS.md#bioportal--ready-now-account-created-rfabbri).
+   After release preparation and checksum synchronization, run
+   `make validate-release-source`. Do **not** substitute `make validate` here:
+   `void.ttl` now selects a snapshot that deliberately does not exist until step
+   6, so snapshot-dependent gates cannot run yet. Commit the validated prepared
+   sources before creating that snapshot.
 4. Give every snapshotted module and profile its exact immutable
    `publication.versionedUrl`; add the manifest's immutable base, manifest, and
    schema URLs; point the released `$schema` at the frozen schema sibling; and
@@ -566,7 +573,23 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    because `sstim-core.ttl` is the Kernel rather than the release. Nothing to do
    by hand, but do not delete these files: the route generator refuses to emit
    the bare-version route for a snapshot that lacks `sstim-namespace.ttl`.
-8. **Nothing to do for w3id routes.** Since
+8. Freeze the generated BioPortal distribution too. Run the explicit
+   `make bioportal-bundle-candidate` target against the new snapshot. It verifies
+   the ordered source-closure digest and an OWL-aware source/bundle delta before
+   printing the candidate artifact SHA-256, canonical graph SHA-256, byte count,
+   and triple count. Append that new record to
+   `scripts/bioportal-release-integrity.json`, then run
+   `make bioportal-ledger-check`, `make bioportal-reproducible`, and the final
+   `make validate`. Existing
+   release entries are immutable:
+   changing one would authorize different bytes under the same released version.
+   Commit the new entry with the snapshot before tagging. The exact commands and
+   review rules are in
+   [`scripts/BIOPORTAL_RELEASE_INTEGRITY.md`](../../scripts/BIOPORTAL_RELEASE_INTEGRITY.md).
+   This generated-distribution ledger is separate from
+   `static/ontology/snapshot-checksums.json`, which protects the frozen source
+   files themselves.
+9. **Nothing to do for w3id routes.** Since
    [ADR 0053](../../docs/decisions/0053-wildcard-snapshot-routes.md) the
    snapshot region is four patterns covering every version, so a new release
    acquires its persistent routes without an edit here or a pull request against
@@ -575,10 +598,10 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    in every frozen snapshot rather than by regenerating their text. If it fails
    after a release, the snapshot is missing an artifact the routes promise —
    most likely `sstim-namespace.ttl`, which the version IRI resolves to.
-9. Audit the entire tagged repository state—not only
+10. Audit the entire tagged repository state—not only
    `static/ontology/<version>/`—and confirm that it contains no private ledger
    and no real live-only ecosystem records.
-10. Tag and publish the GitHub release. **This no longer archives anything by
+11. Tag and publish the GitHub release. **This no longer archives anything by
     itself.** Zenodo's GitHub integration is disconnected from both repositories
     on purpose: the webhook binds deposits to one repository, the repository
     moved to `w3c-cg/sstim`, and two connected repositories would mint two DOI
@@ -594,11 +617,11 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
     from. Its preflight refuses a missing tag, a dirty tree, or a version the
     record already publishes; the archive is built from the tag rather than the
     working tree. Do not re-enable the webhook on either repository.
-11. Carry the resulting version DOI into the three files that name it —
+12. Carry the resulting version DOI into the three files that name it —
     `void.ttl`, `CITATION.cff` and `src/ui/entrance/releaseMetadata.js` — and run
     `make truth-audit`, which fails until all three agree. Never rewrite a
     published snapshot to add it.
-12. **Reopen the mutable line the same day:**
+13. **Reopen the mutable line the same day:**
     `node scripts/release-open-dev.mjs X.Y+1.0-dev`, then sync checksums and
     validate. Until this runs, the live sources claim `mod:status "released"` at
     the version just frozen, so the next ontology edit silently makes a released

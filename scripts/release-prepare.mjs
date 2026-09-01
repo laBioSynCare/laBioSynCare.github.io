@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Turn the development line into the release the snapshot will freeze.
 //
-// Steps 3 and 4 of the procedure in static/ontology/README.md, which were a
+// Steps 3–5 of the procedure in static/ontology/README.md, which were a
 // hand edit across eighteen modules and four profile entry points. The README
 // records that cutting 0.13.0 was blocked three times by gates that had been
 // wrong for weeks; a hand edit at this scale is the other way a release goes
@@ -16,21 +16,21 @@
 //   manifest.json     via prepareReleaseManifest, the same function
 //                     release-dryrun has been rehearsing against all along
 //
-// `dct:created` is deliberately untouched. `dct:issued` is what registries read
-// as the version's release date — BioPortal's Released column, and the same in
-// Archivo and OLS — so it moves with every release while the creation date does
-// not. SSTIM submissions 1–8 all showed 2026-04-12 because that distinction was
-// missed once already.
+// `dct:created` is deliberately untouched. `dct:issued` is the version's formal
+// release date, so it moves with every release while the creation date does not.
+// BioPortal's current mapping checks `dct:created` before `dct:issued`; its
+// misleading Released field is corrected on the stable submission rather than
+// by falsifying SSTIM's creation provenance.
 //
 // Beyond the ontology itself it carries the release into the four places that
 // describe it: the changelog section, CITATION.cff, the entrance metadata, and
 // void.ttl's version and counts. It also regenerates the ADR 0025 HED bundles,
-// which embed the suite version and therefore go stale on every release. Every one of those was a hand edit for 0.14.0,
-// and every one was caught by a gate failing afterwards rather than by being
-// done — which works, but costs a full validate cycle each time and leaves the
+// which embed the suite version and therefore go stale on every release. Each
+// was previously a hand edit, and each mistake was caught by a later gate rather
+// than prevented — which works, but costs a full validation cycle and leaves the
 // release half-cut in between.
 //
-// Usage:  node scripts/release-prepare.mjs 0.14.0 [--date YYYY-MM-DD]
+// Usage:  node scripts/release-prepare.mjs X.Y.Z [--date YYYY-MM-DD]
 
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -43,7 +43,7 @@ const ONTOLOGY = join(ROOT, 'static/ontology')
 const MANIFEST_PATH = join(ONTOLOGY, 'manifest.json')
 
 const version = process.argv[2]
-if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
+if (!version || !/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/.test(version)) {
   console.error('usage: node scripts/release-prepare.mjs X.Y.Z [--date YYYY-MM-DD]')
   process.exit(2)
 }
@@ -319,9 +319,13 @@ execFileSync('python3', [join(ROOT, 'scripts/generate-hed-bundle.py')], { cwd: R
 console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
 console.log('  HED demonstrator bundles regenerated for the release version')
 console.log(`  ${changes.length} files changed`)
-console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`, `make validate`, commit,')
-console.log(`        then \`make snapshot VERSION=${version} RELEASE_DATE=${releaseDate}\` — the snapshot`)
-console.log('        defaults to today and refuses a module set dated otherwise.')
+console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`,')
+console.log('        `make validate-release-source`, then commit the release-prepared sources.')
+console.log(`        Run \`make snapshot VERSION=${version} RELEASE_DATE=${releaseDate}\`; it defaults`)
+console.log('        to today and refuses a module set dated otherwise. Build the explicit')
+console.log('        `make bioportal-bundle-candidate`, append its reviewed new ledger record,')
+console.log('        then run `make bioportal-ledger-check`, `make bioportal-reproducible`,')
+console.log('        and the final `make validate`. Commit snapshot + ledger before tagging.')
 // Zenodo no longer archives a tag by itself: the webhook is disconnected from
 // both repositories so the move cannot mint two DOI series. Naming the command
 // here matters because "after the tag and DOI" used to stand in for a step that

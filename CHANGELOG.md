@@ -28,7 +28,7 @@ file is the human-readable summary.
   now does, matching only present-tense totals — "all N", "of the N" — so a
   historical measurement like "269 of 545 carried all four" stays true and
   unflagged.
-- **The registry bundle asserted sixteen titles, sixteen descriptions and six
+- **The registry bundle asserted nineteen titles, sixteen descriptions and six
   creation dates about one ontology.** `robot merge` unions every module header
   onto a single ontology node, so a registry got the whole module set's metadata
   as claims about SSTIM itself and picked from it arbitrarily. BioPortal chose
@@ -40,24 +40,38 @@ file is the human-readable summary.
   `make bioportal-bundle` now collapses those three to the Kernel's own values,
   the Kernel being the file that carries `https://w3id.org/sstim` itself. Its
   *set*, not a single value: the title is legitimately four, one per published
-  language — what it is not is sixteen. `dct:requires`, `rdfs:seeAlso`,
+  language — what it is not is nineteen. `dct:requires`, `rdfs:seeAlso`,
   `dct:hasPart` and `skos:historyNote` stay many-valued, because they are.
   Verified the result still loads under the OWL API and is still OWL 2 DL.
 - **The registry pull URL served the development line, so BioPortal had been
   ingesting `-dev` snapshots nightly.**
-  `https://labiosyncare.github.io/ontology/sstim-full.owl` is BioPortal's and
-  OLS4's "load from URL" target, and CI regenerates it on every push to `main` —
-  built, until now, from the working sources. BioPortal's submission history is
-  the result: 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, each parsed and indexed, its
-  "Version information" naming a mutable line nobody can cite, and its Version
-  IRI stuck at 0.14.0 because a `-dev` bundle correctly carries none and the
-  portal kept the last one it had seen.
+  `https://labiosyncare.github.io/ontology/sstim-full.owl` is BioPortal's
+  "load from URL" target. At the time, CI regenerated it on every push to
+  `main` and built it from the working sources. BioPortal's submission history
+  is the result: 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, each parsed and indexed,
+  its "Version information" naming a mutable line nobody can cite, and its
+  Version IRI stuck at 0.14.0 because a `-dev` bundle correctly carries none and
+  the portal kept the last one it had seen.
 
   A stable URL a registry polls is a promise about the current *release*.
   `make bioportal-bundle` now reads the released version from `void.ttl` and
-  builds from that version's frozen directory, so the artifact changes only when
-  a release is cut, always carries its `owl:versionIRI`, and fails outright if a
-  `-dev` line ever reaches it.
+  builds from that version's frozen directory, always carries its
+  `owl:versionIRI`, and fails outright if a `-dev` line ever reaches it.
+
+  **Correction begun 2026-08-31:** selecting frozen modules did not by itself
+  make the artifact byte-stable. The metadata collapse reparsed and reserialized
+  the RDF/XML with fresh blank-node identifiers and ordering, so BioPortal saw
+  many byte-distinct 0.16.0 submissions for isomorphic graphs. The collapse now
+  receives the frozen Kernel and preserves ROBOT's XML structure.
+
+  **Strengthened 2026-09-01:** one fail-closed resolver now requires the direct
+  frozen snapshot, released Kernel and Full profile, and every manifest source
+  hash. An OWL-aware diff admits only the documented header transform. Two
+  independent builds must match, and a first-parent-history-anchored integrity
+  ledger pins the source closure, exact artifact SHA-256, canonical graph, byte
+  count, and triple count. The Actions cache is keyed by that identity; hits are
+  fully verified and misses must reproduce it, so caching is an optimization,
+  not the invariant.
 
 ## [0.16.0] - 2026-08-18
 
@@ -720,6 +734,14 @@ architecture is now frozen, citable, and served from the persistent namespace.
   across all eight SSTIM submissions, corrected there by hand on 2026-07-27.
   Metadata and tooling only; no term changed. See
   [`static/ontology/README.md`](static/ontology/README.md#versioning-and-publication).
+
+  **Correction recorded 2026-08-31:** the display and manual corrections above
+  are historical facts, but attributing BioPortal's value to `dct:issued` was
+  not justified. Those submissions carried the same 2026-04-12 value for
+  `dct:created` and `dct:issued`, so they could not reveal which predicate won.
+  The current NCBO mapping and later 0.16.0 submissions establish that BioPortal
+  prefers `dct:created`. The release gate remains necessary because
+  `dct:issued` is still SSTIM's formal version date.
 
 ## [0.12.0] - 2026-07-31
 

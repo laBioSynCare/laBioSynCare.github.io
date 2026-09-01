@@ -28,11 +28,11 @@
 //
 // Release dates (2026-07-27): every module header must also carry
 // `dct:issued` = `dct:modified` = the release date (today, or --release-date).
-// `dct:issued` is what registries read as the version's release date —
-// BioPortal's "Released" column, DBpedia Archivo, OLS — so a stale value makes
-// every published version look like it shipped on the ontology's first issue
-// date. `dct:created` stays the module's original creation date and only has
-// to be no later than the release.
+// `dct:issued` is the version's formal release date, so a stale value misstates
+// SSTIM's own publication provenance. BioPortal currently prefers `dct:created`
+// for its misleading "Released" field; that external field is corrected
+// separately after a stable submission. `dct:created` stays the module's
+// original creation date and only has to be no later than the release.
 //
 // Every successful snapshot also records its files' checksums into
 // static/ontology/snapshot-checksums.json (RDF-03/RDF-12, 2026-07-24 audit),
@@ -203,7 +203,7 @@ export function releaseProblems({
     if (!issued) {
       problems.push(`${file}: missing dct:issued "${releaseDate}"^^xsd:date in the ontology header`)
     } else if (issued !== releaseDate) {
-      problems.push(`${file}: dct:issued "${issued}" is not the release date "${releaseDate}" — bump it in every module when cutting a release (registries read it as the version's release date)`)
+      problems.push(`${file}: dct:issued "${issued}" is not the release date "${releaseDate}" — bump it in every module when cutting a release`)
     }
     if (!modified) {
       problems.push(`${file}: missing dct:modified "${releaseDate}"^^xsd:date in the ontology header`)

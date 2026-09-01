@@ -98,6 +98,85 @@ jobs:
       - name: Install dependencies
         run: nix develop --command npm ci
 
+      # Existing release records are publication history, not mutable build
+      # configuration. Compare the checked-out ledger with the whole push base
+      # (or the preceding commit for a manual run) before trusting its hashes.
+      - name: Enforce append-only BioPortal release records
+        env:
+          PUSH_BASE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          baseline="$PUSH_BASE"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ github.ref }}" != "refs/heads/${{ github.event.repository.default_branch }}" ]; then
+              echo "Manual Pages deployments are restricted to the default branch." >&2
+              exit 1
+            fi
+            baseline="$(git rev-parse HEAD^)"
+          fi
+          if [ -z "$baseline" ] || [ "$baseline" = "0000000000000000000000000000000000000000" ]; then
+            echo "Cannot establish a BioPortal ledger baseline." >&2
+            exit 1
+          fi
+          nix develop --command python3 scripts/check-bioportal-release-integrity.py --baseline-ref "$baseline"
+
+      # Resolve through the same fail-closed boundary as Make. It requires a
+      # stable SemVer, direct frozen snapshot, released Full profile and Kernel,
+      # and manifest-matching source hashes before exposing a cache key.
+      - name: Resolve the frozen BioPortal release
+        id: bioportal-release
+        run: nix develop --command python3 scripts/bioportal-release.py --github-output "$GITHUB_OUTPUT"
+
+      # Restore only the exact bytes approved for this release. No restore key
+      # can substitute an older release or generator result.
+      - name: Restore frozen BioPortal bundle
+        id: bioportal-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/sstim-bioportal/sstim-full.owl
+          key: bioportal-rdfxml-v4-${{ runner.os }}-${{ steps.bioportal-release.outputs.release }}-${{ steps.bioportal-release.outputs.sha256 }}
+
+      # Cache data is untrusted. A valid hit avoids ROBOT entirely; a miss,
+      # restore failure, or invalid hit falls back to one deterministic build,
+      # which must reproduce the immutable ledger before publication proceeds.
+      - name: Ensure the exact BioPortal bundle
+        run: |
+          set -euo pipefail
+          artifact_dir="$RUNNER_TEMP/sstim-bioportal"
+          artifact="$artifact_dir/sstim-full.owl"
+          if [ "${{ steps.bioportal-cache.outcome }}" = "success" ] \
+             && [ "${{ steps.bioportal-cache.outputs.cache-hit }}" = "true" ]; then
+            if [ ! -L "$artifact_dir" ] && [ ! -L "$artifact" ] \
+               && nix develop --command make bioportal-bundle-verify BIOPORTAL_OUT="$artifact"; then
+              echo "Verified exact cached BioPortal artifact; ROBOT merge skipped."
+              exit 0
+            fi
+            echo "Cached artifact failed verification; rebuilding from frozen sources." >&2
+            echo "Delete the occupied cache entry or bump its schema prefix to restore cache efficiency." >&2
+          fi
+          build_dir="$(mktemp -d "$RUNNER_TEMP/sstim-bioportal-build.XXXXXX")"
+          trap 'rm -rf "$build_dir"' EXIT
+          built="$build_dir/sstim-full.owl"
+          nix develop --command make bioportal-bundle BIOPORTAL_OUT="$built"
+          nix develop --command make bioportal-bundle-verify BIOPORTAL_OUT="$built"
+          rm -rf "$artifact_dir"
+          mkdir -p "$artifact_dir"
+          mv "$built" "$artifact"
+
+      # Save immediately after verification rather than in a post-job hook:
+      # later browser/smoke failures must not discard good immutable work, and
+      # later steps cannot mutate what was archived. Exact-key caches cannot be
+      # overwritten, so a corrupt hit is rebuilt for this deployment but skipped
+      # here until its occupied entry is deleted or the v4 prefix is advanced.
+      - name: Save verified BioPortal bundle
+        if: steps.bioportal-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.temp }}/sstim-bioportal/sstim-full.owl
+          key: bioportal-rdfxml-v4-${{ runner.os }}-${{ steps.bioportal-release.outputs.release }}-${{ steps.bioportal-release.outputs.sha256 }}
+
       # Does this push touch anything the RDF contract is derived from? If not,
       # the contract is byte-identical to the one already validated when it last
       # changed, and re-proving it before publication establishes nothing while
@@ -125,8 +204,10 @@ jobs:
             echo "No usable base commit — validating everything."
             exit 0
           fi
-          if git diff --name-only "$base" "${{ github.sha }}" | grep -qE \
-              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|docs/ontology/|docs/decisions/|docs/technical/|docs/ecosystem/w3id/|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)'; then
+          changed="$(git diff --name-only "$base" "${{ github.sha }}")"
+          if grep -qE \
+              '^(static/ontology/|static/schemas/|test/|src/rdf/|scripts/|docs/ontology/|docs/decisions/|docs/technical/|docs/ecosystem/w3id/|Makefile$|flake\.nix$|flake\.lock$|\.github/workflows/pages\.yml$)' \
+              <<< "$changed"; then
             echo "full=true" >> "$GITHUB_OUTPUT"
             echo "RDF-relevant paths changed — running the full contract."
           else
@@ -212,11 +293,14 @@ jobs:
       - name: Generate SKOS vocabulary documentation (pyLODE)
         run: nix develop --command make vocab-docs VOCAB_DOCS_DIR=dist/ontology/docs/vocab
 
-      # Merged single-file OWL bundle for BioPortal (which does not follow
-      # dct:isPartOf). Generated into the artifact only, never committed.
-      # Served at /ontology/sstim-full.owl.
-      - name: Generate merged OWL bundle for BioPortal
-        run: nix develop --command make bioportal-bundle BIOPORTAL_OUT=dist/ontology/sstim-full.owl
+      # Re-check immediately before installation in case a later build tool
+      # accidentally touched the temporary path. This parses and hashes the
+      # existing file but never invokes ROBOT.
+      - name: Install the verified BioPortal bundle
+        run: |
+          nix develop --command make bioportal-bundle-verify BIOPORTAL_OUT="$RUNNER_TEMP/sstim-bioportal/sstim-full.owl"
+          mkdir -p dist/ontology
+          cp "$RUNNER_TEMP/sstim-bioportal/sstim-full.owl" dist/ontology/sstim-full.owl
 
       # Serve the finished artifact at the exact mount this repository deploys
       # to. This runs after RDF exports and both documentation generators, and

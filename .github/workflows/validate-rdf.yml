@@ -19,10 +19,19 @@ on:
       - 'scripts/sstim-*.py'
       - 'scripts/sstim-*.mjs'
       - 'scripts/export-ontology.py'
+      - 'scripts/collapse-bundle-metadata*.py'
+      - 'scripts/bioportal-release.py'
+      - 'scripts/bioportal-guards.test.py'
+      - 'scripts/check-bioportal-release-integrity.py'
+      - 'scripts/verify-bioportal-closure.py'
+      - 'scripts/working-tree-hash.py'
+      - 'scripts/bioportal-release-integrity.json'
+      - 'scripts/BIOPORTAL_RELEASE_INTEGRITY.md'
       - 'docs/ecosystem/w3id/**'
       - 'Makefile'
       - 'flake.nix'
       - 'flake.lock'
+      - '.github/workflows/pages.yml'
       - '.github/workflows/validate-rdf.yml'
 
 jobs:
@@ -47,31 +56,43 @@ jobs:
       - name: Decide whether this change can affect RDF
         id: relevant
         run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
           fi
-          # Fail open. If the base cannot be resolved, run the validators rather
-          # than let an unmeasurable diff read as "nothing to check".
-          if ! git fetch --quiet --depth=1 origin "${{ github.base_ref }}"; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Could not fetch the base ref; running the validators."
-            exit 0
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="$(git rev-parse HEAD^ 2>/dev/null || true)"
           fi
-          base="$(git merge-base FETCH_HEAD HEAD 2>/dev/null || true)"
           if [ -z "$base" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Could not find a merge base; running the validators."
-            exit 0
+            echo "Could not establish a validation/ledger baseline." >&2
+            exit 1
           fi
+          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            git fetch --quiet --depth=1 origin "$base"
+          fi
+          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            echo "Could not resolve baseline commit $base." >&2
+            exit 1
+          fi
+          echo "baseline=$base" >> "$GITHUB_OUTPUT"
           changed="$(git diff --name-only "$base" HEAD)"
           echo "Changed files:"; printf '%s\n' "$changed"
-          if printf '%s\n' "$changed" | grep -qE \
-            '^(static/ontology/|test/|src/rdf/|docs/ecosystem/w3id/|Makefile$|flake\.(nix|lock)$|\.github/workflows/validate-rdf\.yml$|scripts/(sstim-.*\.(py|mjs)|export-ontology\.py)$)'; then
+          if grep -qE \
+            '^(static/ontology/|test/|src/rdf/|docs/ecosystem/w3id/|Makefile$|flake\.(nix|lock)$|\.github/workflows/(pages|validate-rdf)\.yml$|scripts/(sstim-.*\.(py|mjs)|export-ontology\.py|collapse-bundle-metadata[^/]*\.py|bioportal-release\.py|bioportal-guards\.test\.py|check-bioportal-release-integrity\.py|verify-bioportal-closure\.py|working-tree-hash\.py|bioportal-release-integrity\.json|BIOPORTAL_RELEASE_INTEGRITY\.md)$)' \
+            <<< "$changed"; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "No RDF-relevant path changed; the validators have nothing to see."
+          fi
+          if grep -qE \
+            '^(static/ontology/void\.ttl$|static/ontology/[0-9]+\.[0-9]+\.[0-9]+/|Makefile$|flake\.(nix|lock)$|scripts/(collapse-bundle-metadata[^/]*\.py|bioportal-release\.py|verify-bioportal-closure\.py|bioportal-release-integrity\.json)$)' \
+            <<< "$changed"; then
+            echo "bioportal=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "bioportal=false" >> "$GITHUB_OUTPUT"
           fi
 
       # Toolchain (python3.12 + pyshacl + ROBOT) comes from the pinned flake
@@ -82,6 +103,10 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+
+      - name: Enforce append-only BioPortal release records
+        if: steps.relevant.outputs.run == 'true'
+        run: nix develop --command python3 scripts/check-bioportal-release-integrity.py --baseline-ref "${{ steps.relevant.outputs.baseline }}"
 
       # Nix pins the toolchain; this caches the npm package downloads only.
       - name: Cache npm downloads
@@ -116,3 +141,10 @@ jobs:
       - name: Run RDF, SHACL, OWL, quality, query, and export validation
         if: steps.relevant.outputs.run == 'true'
         run: nix develop --command make -j4 -Otarget validate
+
+      # The generic suite never rebuilds a frozen distribution. Exercise the
+      # expensive two-build byte invariant only when the selector, frozen
+      # closure, generator, ledger, or pinned toolchain actually changed.
+      - name: Reproduce the BioPortal bundle when its inputs changed
+        if: steps.relevant.outputs.run == 'true' && steps.relevant.outputs.bioportal == 'true'
+        run: nix develop --command make bioportal-reproducible

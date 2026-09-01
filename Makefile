@@ -43,10 +43,11 @@ ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
 # (validation constraints, not browsable terms). The RDF closure is unioned
 # before OWL translation, and the bundle is explicitly assigned the root IRI.
 #
-# **Built from the frozen release, not from the live line.** BioPortal and OLS4
-# pull https://labiosyncare.github.io/ontology/sstim-full.owl nightly, and CI
-# regenerates it on every push to main — so building it from the working sources
-# fed the registries a development snapshot every night. BioPortal's submission
+# **Built from the frozen release, not from the live line.** BioPortal pulls
+# https://labiosyncare.github.io/ontology/sstim-full.owl nightly. CI historically
+# regenerated it on every push to main, so building from the working sources fed
+# BioPortal a development snapshot every night. (The pending OLS4 configuration
+# is separately pinned to a versioned snapshot URL.) BioPortal's submission
 # history is a list of them: 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, each parsed and
 # indexed, its "Version information" reading a mutable line that no one can cite,
 # and its Version IRI stuck at 0.14.0 because a -dev bundle correctly carries
@@ -58,14 +59,21 @@ ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
 # artifact changes only when a release is cut.
 #
 # The merge is then post-processed: `robot merge` unions sixteen module headers
-# onto one ontology node, so the bundle asserted sixteen titles, sixteen
+# onto one ontology node, so the bundle asserted nineteen titles, sixteen
 # descriptions and six creation dates about one ontology. BioPortal picked
 # "August 1, 2026" — the day the ADR 0043 split created eight module files —
 # over the 2026-04-12 the Kernel states, and rendered the description as every
 # module blurb joined by commas.
-BIOPORTAL_RELEASE := $(shell $(PYTHON) -c "import re,pathlib;print(re.search(r'dcat:version\s+\"([^\"]+)\"',pathlib.Path('static/ontology/void.ttl').read_text()).group(1))")
-BIOPORTAL_SNAPSHOT := static/ontology/$(BIOPORTAL_RELEASE)
-BIOPORTAL_MODULES := $(shell node -e 'const m=require("./$(BIOPORTAL_SNAPSHOT)/manifest.json");const p=m.profiles.find(x=>x.id==="full");const by=Object.fromEntries(m.modules.map(x=>[x.id,x.source.path.split("/").pop()]));process.stdout.write(p.modules.map(id=>"$(BIOPORTAL_SNAPSHOT)/"+by[id]).join(" "))')
+BIOPORTAL_CONTEXT = $(PYTHON) scripts/bioportal-release.py
+# Recursively expanded on purpose: ordinary source validation during the
+# pre-snapshot release phase must not try to resolve a frozen distribution that
+# does not exist yet. BioPortal targets call the fail-closed resolver first;
+# these fields can therefore never fall back to mutable top-level sources.
+BIOPORTAL_RELEASE = $(shell $(BIOPORTAL_CONTEXT) --field release 2>/dev/null)
+BIOPORTAL_KERNEL = $(shell $(BIOPORTAL_CONTEXT) --field kernel 2>/dev/null)
+BIOPORTAL_MODULE_COUNT = $(shell $(BIOPORTAL_CONTEXT) --field module-count 2>/dev/null)
+BIOPORTAL_SOURCE_CLOSURE = $(shell $(BIOPORTAL_CONTEXT) --field source-closure-sha256 2>/dev/null)
+BIOPORTAL_INTEGRITY_LEDGER := scripts/bioportal-release-integrity.json
 BIOPORTAL_OUT ?= dist/ontology/sstim-full.owl
 INSTANCE_ROOT := static/ontology/instances
 INSTANCE_FILES := $(sort $(wildcard $(INSTANCE_ROOT)/*/*.ttl) $(wildcard $(INSTANCE_ROOT)/*/*/*.ttl))
@@ -75,7 +83,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -641,21 +649,11 @@ release-dryrun:
 ## seen. That is precisely the failure the stamp exists to prevent, and it was
 ## live while the pending session-module edit sat in the tree.
 ##
-## `git stash create` writes a commit for the dirty state and prints nothing at
-## all when the tree is clean, so the fallback to HEAD is the clean case. It does
-## not cover untracked files; a new module that is not yet added is invisible
-## here and caught by manifest-check instead, which scans the inventory directory
-## rather than the index.
-TREE_HASH = tree="$$(git stash create 2>/dev/null)"; \
-	git rev-parse "$${tree:-HEAD}^{tree}" 2>/dev/null || echo none
-.PHONY: validate-stamp validate-status
-validate-stamp:
-	@printf '%s  commit=%s  tree=%s  suite=passed\n' \
-		"$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-		"$$(git rev-parse --short HEAD 2>/dev/null || echo none)" \
-		"$$($(TREE_HASH))" \
-		>> .validation.log
-	@echo "validate: recorded in .validation.log"
+## Hash what the gates can actually read: tracked working-tree content plus all
+## non-ignored untracked files. `git stash create` omitted the latter, which let
+## a validation stamp claim an untested new script or ledger was covered.
+TREE_HASH = $(PYTHON) scripts/working-tree-hash.py
+.PHONY: validate-status
 
 ## When did the full suite last pass, and is this tree still the one it passed on?
 validate-status:
@@ -663,14 +661,52 @@ validate-status:
 	@last="$$(tail -1 .validation.log)"; \
 	echo "last passing run: $$last"; \
 	stamped="$$(echo "$$last" | sed -n 's/.*tree=\([0-9a-f]*\).*/\1/p')"; \
-	current="$$($(TREE_HASH))"; \
+	if ! printf '%s\n' "$$stamped" | grep -Eq '^[0-9a-f]{64}$$'; then \
+		echo "validate-status: recorded tree hash is missing or malformed" >&2; \
+		exit 1; \
+	fi; \
+	if ! current="$$($(TREE_HASH))"; then \
+		echo "validate-status: could not hash the current working tree" >&2; \
+		exit 1; \
+	fi; \
+	if ! printf '%s\n' "$$current" | grep -Eq '^[0-9a-f]{64}$$'; then \
+		echo "validate-status: current tree hash is malformed" >&2; \
+		exit 1; \
+	fi; \
 	if [ "$$stamped" = "$$current" ]; then \
 		echo "validate-status: this tree is the one that passed — no need to re-run"; \
 	else \
 		echo "validate-status: the tree has changed since; re-run make validate"; \
 	fi
 
-validate: manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract quality-audit reason sparql-sanity export-check context-roundtrip verify-snapshots session-contract preset-contract term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer w3id-routes release-dryrun truth-audit validate-stamp
+## Gates that operate on the mutable/release-prepared source set and do not
+## require `void.ttl`'s selected frozen directory to exist yet. This explicit
+## phase is used after release-prepare and before `make snapshot`; the complete
+## `validate` target remains the post-snapshot gate.
+RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
+
+validate-release-source: $(RELEASE_SOURCE_VALIDATION_TARGETS)
+	@echo "validate-release-source: release-prepared semantic sources passed; snapshot-dependent gates remain"
+
+## Generic validation deliberately does not rebuild an already-frozen
+## BioPortal distribution. The required RDF workflow runs the two-build
+## reproducibility gate only when its actual inputs changed; Pages restores or
+## builds one exact ledger-bound artifact and verifies it independently.
+validate: $(RELEASE_SOURCE_VALIDATION_TARGETS) quality-audit verify-snapshots w3id-routes truth-audit
+	@tree="$$($(TREE_HASH))" || { \
+		echo "validate: could not hash the passing working tree" >&2; \
+		exit 1; \
+	}; \
+	if ! printf '%s\n' "$$tree" | grep -Eq '^[0-9a-f]{64}$$'; then \
+		echo "validate: working-tree hash is malformed" >&2; \
+		exit 1; \
+	fi; \
+	printf '%s  commit=%s  tree=%s  suite=passed\n' \
+		"$$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+		"$$(git rev-parse --short HEAD 2>/dev/null || echo none)" \
+		"$$tree" \
+		>> .validation.log
+	@echo "validate: all prerequisites passed; recorded exact working tree in .validation.log"
 
 ## Generate JSON-LD + RDF/XML serializations of the ontology modules
 ## (default into dist/ontology/ beside the Turtle masters; override EXPORT_DIR=)
@@ -690,26 +726,27 @@ publish-latest:
 ## into one RDF/XML OWL file for BioPortal ingest.
 ## Generated into dist/ (deploy artifact only), never committed; override BIOPORTAL_OUT=.
 ##
-## Carries owl:versionIRI only on a released line. `robot annotate --ontology-iri`
-## sets the ontology IRI and does not carry the Kernel's version IRI through the
-## merge, so every submission since the first has been unversioned — registries
-## saw a stream of same-IRI uploads with no immutable version to cite. A -dev
-## line still gets none, for the reason ADR 0020 gives: a version IRI names an
-## immutable version, and a development line is not one.
-bioportal-bundle:
+## The raw ROBOT merge is byte-reproducible. The metadata collapse must preserve
+## that property because BioPortal compares raw-file MD5 values, not RDF graph
+## equivalence. The fail-closed resolver supplies the frozen Kernel and exact
+## manifest Full closure; no missing selector can degrade into live sources.
+## `bioportal-bundle` is permanently ledger-strict. The separately named
+## candidate target only accepts a version absent from the append-only ledger.
+bioportal-bundle bioportal-bundle-candidate:
 	@set -e; \
+	$(BIOPORTAL_CONTEXT); \
 	mkdir -p $(dir $(BIOPORTAL_OUT)); \
 	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
-	if [ $(words $(BIOPORTAL_MODULES)) -eq 0 ]; then \
-		echo "bioportal-bundle: no modules — the manifest query failed, and a bundle built from nothing still writes a valid, empty ontology" >&2; \
+	if [ "$(BIOPORTAL_MODULE_COUNT)" -le 0 ]; then \
+		echo "bioportal-bundle: frozen Full profile resolved no modules" >&2; \
 		exit 1; \
 	fi; \
-	cat $(BIOPORTAL_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	$(BIOPORTAL_CONTEXT) --write-source "$$tmpdir/sstim-full.ttl"; \
 	version_iri="https://w3id.org/sstim/$(BIOPORTAL_RELEASE)"; \
 	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
 		annotate --ontology-iri https://w3id.org/sstim --version-iri "$$version_iri" \
-		--output $(BIOPORTAL_OUT) > "$$tmpdir/robot.log" 2>&1; then \
+		--output "$(BIOPORTAL_OUT)" > "$$tmpdir/robot.log" 2>&1; then \
 		cat "$$tmpdir/robot.log"; \
 		exit 1; \
 	fi; \
@@ -718,17 +755,69 @@ bioportal-bundle:
 		echo "bioportal-bundle: ROBOT discarded input triples" >&2; \
 		exit 1; \
 	fi; \
-	test -s $(BIOPORTAL_OUT); \
-	$(PYTHON) scripts/collapse-bundle-metadata.py $(BIOPORTAL_OUT); \
-	if ! grep -q "versionIRI" $(BIOPORTAL_OUT); then \
+	test -s "$(BIOPORTAL_OUT)"; \
+	if [ "$@" = "bioportal-bundle-candidate" ]; then \
+		$(PYTHON) scripts/collapse-bundle-metadata.py "$(BIOPORTAL_OUT)" "$(BIOPORTAL_KERNEL)" \
+			--ledger "$(BIOPORTAL_INTEGRITY_LEDGER)" \
+			--source-closure-sha256 "$(BIOPORTAL_SOURCE_CLOSURE)" \
+			--propose-ledger-entry > "$$tmpdir/proposal.json"; \
+	else \
+		$(PYTHON) scripts/collapse-bundle-metadata.py "$(BIOPORTAL_OUT)" "$(BIOPORTAL_KERNEL)" \
+			--ledger "$(BIOPORTAL_INTEGRITY_LEDGER)" \
+			--source-closure-sha256 "$(BIOPORTAL_SOURCE_CLOSURE)"; \
+	fi; \
+	if ! $(ROBOT) diff --left "$$tmpdir/sstim-full.ttl" --right "$(BIOPORTAL_OUT)" \
+		--format plain --output "$$tmpdir/closure.diff" > "$$tmpdir/diff.log" 2>&1; then \
+		cat "$$tmpdir/diff.log"; \
+		exit 1; \
+	fi; \
+	if grep -Eq 'ERROR org\.|could not be parsed|Entity not properly recognized' "$$tmpdir/diff.log"; then \
+		cat "$$tmpdir/diff.log"; \
+		echo "bioportal-bundle: OWL-aware source-closure diff was incomplete" >&2; \
+		exit 1; \
+	fi; \
+	$(PYTHON) scripts/verify-bioportal-closure.py "$$tmpdir/closure.diff" "$(BIOPORTAL_RELEASE)" "$$tmpdir/sstim-full.ttl"; \
+	if [ "$@" = "bioportal-bundle-candidate" ]; then cat "$$tmpdir/proposal.json"; fi; \
+	if ! grep -q "versionIRI" "$(BIOPORTAL_OUT)"; then \
 		echo "bioportal-bundle: the bundle carries no owl:versionIRI" >&2; \
 		exit 1; \
 	fi; \
-	if grep -q "$(BIOPORTAL_RELEASE)-dev\|-dev</owl:versionInfo>" $(BIOPORTAL_OUT); then \
+	if grep -q "$(BIOPORTAL_RELEASE)-dev\|-dev</owl:versionInfo>" "$(BIOPORTAL_OUT)"; then \
 		echo "bioportal-bundle: a development line reached the artifact registries pull" >&2; \
 		exit 1; \
 	fi; \
-	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(words $(BIOPORTAL_MODULES)) frozen $(BIOPORTAL_RELEASE) modules at $$version_iri"
+	echo "bioportal-bundle: wrote $(BIOPORTAL_OUT) from $(BIOPORTAL_MODULE_COUNT) frozen $(BIOPORTAL_RELEASE) modules at $$version_iri"
+
+## Verify a generated or exactly cached bundle without rebuilding it.
+bioportal-bundle-verify:
+	$(BIOPORTAL_CONTEXT)
+	@test -s "$(BIOPORTAL_OUT)"
+	$(PYTHON) scripts/collapse-bundle-metadata.py "$(BIOPORTAL_OUT)" "$(BIOPORTAL_KERNEL)" --check-only --ledger "$(BIOPORTAL_INTEGRITY_LEDGER)" --source-closure-sha256 "$(BIOPORTAL_SOURCE_CLOSURE)"
+
+## Validate ledger structure and its immutable first-parent history anchors.
+bioportal-ledger-check:
+	$(PYTHON) scripts/check-bioportal-release-integrity.py
+
+## Exercise deterministic metadata collapse without the full ROBOT merge.
+bioportal-metadata-test:
+	$(PYTHON) scripts/collapse-bundle-metadata.test.py
+	$(PYTHON) scripts/bioportal-guards.test.py
+
+## A semantic-equivalence test would miss the production failure this guards:
+## BioPortal creates a new submission when raw bytes change. Build twice in
+## independent temporary paths and require exact identity.
+bioportal-reproducible:
+	@set -e; \
+	tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	$(MAKE) --no-print-directory bioportal-bundle BIOPORTAL_OUT="$$tmpdir/first.owl"; \
+	$(MAKE) --no-print-directory bioportal-bundle BIOPORTAL_OUT="$$tmpdir/second.owl"; \
+	if ! cmp -s "$$tmpdir/first.owl" "$$tmpdir/second.owl"; then \
+		echo "bioportal-reproducible: identical frozen inputs produced different bytes" >&2; \
+		sha256sum "$$tmpdir/first.owl" "$$tmpdir/second.owl" >&2; \
+		exit 1; \
+	fi; \
+	echo "bioportal-reproducible: byte-identical ($$(wc -c < "$$tmpdir/first.owl") bytes)"
 
 ## Generate WIDOCO HTML reference documentation from the Full semantic profile
 ## (default into dist/ontology/docs/ for the Pages artifact; override DOCS_DIR=).
@@ -784,6 +873,7 @@ help:
 	@echo "  make test             Run Vitest"
 	@echo "  make audio-verify     Measure the audio engines in a browser (BROWSER=chrome|firefox|all)"
 	@echo "  make validate         Run the current ontology validation suite"
+	@echo "  make validate-release-source Validate release-prepared sources before snapshot creation"
 	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"
 	@echo "  make module-boundaries Prove unique resource sources and honest direct dependencies"
 	@echo "  make core-profile-contract Validate Core shapes, fixture, and competency queries"
@@ -798,6 +888,10 @@ help:
 	@echo "  make ontology-docs    Generate WIDOCO HTML docs into $(DOCS_DIR) (DOCS_DIR=)"
 	@echo "  make vocab-docs       Generate pyLODE SKOS docs into $(VOCAB_DOCS_DIR)"
 	@echo "  make bioportal-bundle Merge term modules into $(BIOPORTAL_OUT) for BioPortal"
+	@echo "  make bioportal-bundle-candidate Build and print a new release integrity proposal"
+	@echo "  make bioportal-bundle-verify Verify an existing/cached BioPortal artifact without ROBOT merge"
+	@echo "  make bioportal-ledger-check Enforce strict append-only release integrity records"
+	@echo "  make bioportal-reproducible Build the BioPortal bundle twice and require identical bytes"
 	@echo "  make wasm             Recompile $(WASM_OUT) from $(WASM_WAT)"
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"

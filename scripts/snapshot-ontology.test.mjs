@@ -20,9 +20,8 @@ import {
 
 // Release-readiness dry-run checks (improvement plan 0.3, Gate P0-C; audit
 // finding KR-14): a snapshot must be refused for development versions,
-// diverging module versions, or missing release metadata — including release
-// dates, which registries (BioPortal "Released", Archivo, OLS) read off
-// dct:issued.
+// diverging module versions, or missing release metadata — including the
+// formal version date represented by dct:issued.
 
 // Imported, not restated. A private copy silently diverged when
 // sstim-stimulus.ttl was added (ADR 0042): the fixture stopped building a
@@ -103,10 +102,11 @@ ${dates()}
   })
 })
 
-// Release dates. A stale dct:issued is invisible in the repo but surfaces in
-// every registry: BioPortal showed all eight SSTIM submissions as "Released
-// 04/12/2026", the ontology's first issue date, because dct:issued had never
-// been bumped past it.
+// Release dates. A stale dct:issued breaks the release's own provenance.
+// BioPortal also showed the first eight submissions as "Released 04/12/2026",
+// but those rows did not distinguish the then-equal dct:created and dct:issued
+// values; its current mapping is known to prefer dct:created and is corrected
+// separately.
 describe('release dates', () => {
   it('rejects a dct:issued left at a previous release date', () => {
     const files = releaseSet('0.7.0', {

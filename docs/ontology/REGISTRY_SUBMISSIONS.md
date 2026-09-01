@@ -101,7 +101,7 @@ and schema must be deployed and the perma-id matrix verified first.
 | DBpedia Archivo | ✅ **indexed 2026-08-17** (not re-confirmable 2026-08-18 — the host timed out, and so did `dbpedia.org`) — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
 | LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
 | BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
-| BioPortal | ⚠️ **live but had been ingesting development lines** — the nightly pull URL served whatever was on `main`, so submissions read 0.15.0-dev, 0.16.0-dev, 0.17.0-dev. Fixed at source 2026-08-19: the URL now serves the frozen release. The portal keeps a stale `Version IRI` of 0.14.0 from the last submission that carried one and needs one clean pull of 0.16.0 to correct itself. Observed on the public page 2026-08-19; the REST API needs a key | account ✓ (@rfabbri) | **watch the next nightly** |
+| BioPortal | ⚠️ **live; source fix implemented locally, not yet deployed or observed** — serving the frozen release ended the `-dev` ingests, but nondeterministic RDF/XML rewriting then produced many byte-distinct `0.16.0` submissions from the same RDF graph. The revised 2026-09-01 fix resolves only a manifest-verified frozen Full closure, proves its OWL-aware output delta, makes two builds byte-identical, and enforces existing integrity records against the Git baseline. Pages verifies an exact SHA-keyed cache hit or rebuilds once and must reproduce the approved bytes. Deploy it (expect one final transition row), confirm the following unchanged nightly pull creates none, then correct the latest/current submission's displayed date manually; archived duplicates remain | account ✓ (@rfabbri) | **deploy, observe, patch date** |
 | FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06. **DOI assigned 2026-08-24**: [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4), which resolves to the FAIRsharing record (verified 2026-08-24). It identifies the *record*, not a release, so it does not belong beside the Zenodo version DOIs in `CITATION.cff` or `void.ttl` | yes | — |
 | OLS4 | 🕓 **PR open, under review** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. A collaborator (@haideriqbal) asked on 2026-08-20 for the biomedical use case, the developing group or institute, and the long-term maintenance plan; **answered 2026-08-21**, including an offer to bump `ontology_purl` to the shipped 0.16.0 or switch to a rolling URL | yes (GitHub) | watch |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
@@ -788,16 +788,29 @@ Biomedical browsing, APIs, and candidate-mapping discovery. **Account created
 `docs/credentials/bioportal.md`, never committed).
 
 **Ingest artifact — merged bundle.** BioPortal ingests one root file and does
-**not** follow `dct:isPartOf`, so pointing it at `sstim-core` would miss the
-295-concept SKOS vocabulary. A merged OWL file is generated in CI
-(`make bioportal-bundle`; ADR-style: artifact only, never committed):
-**core + vocab + alignments + exposure + patch-studio**, excluding SHACL shapes.
-One clean ontology IRI `https://w3id.org/sstim`; 73 classes + 329 SKOS concepts;
-HermiT-consistent. Served at
+**not** follow `dct:isPartOf`, so pointing it at `sstim-core` would miss most of
+the vocabulary and semantic modules. A merged OWL file is generated in CI
+(`make bioportal-bundle`; ADR-style: artifact only, never committed) from the
+manifest-defined **Full semantic profile: 16 modules, excluding SHACL shapes**.
+The ledger-matching 0.16.0 artifact has one ontology IRI
+`https://w3id.org/sstim`, 11,389 triples, 234 `owl:Class` declarations, and 551
+SKOS concepts; the validated source profile is HermiT-consistent. Its publication
+target is
 **`https://labiosyncare.github.io/ontology/sstim-full.owl`** (RDF/XML).
 
 - **Entry point:** `https://bioportal.bioontology.org/ontologies/new` (log in).
-- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl` — **serves the latest frozen release since 2026-08-19**, not the working line. It had served whatever was on `main`, and CI regenerates it on every push, so BioPortal's nightly pull ingested a development snapshot each night: its submission history reads 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, all parsed and indexed, with "Version information" naming a mutable line nobody can cite and the Version IRI stuck at 0.14.0 — a `-dev` bundle correctly carries none, so BioPortal kept the last one it had seen. `make bioportal-bundle` now builds from `static/ontology/<release>/` and refuses to emit a `-dev` line at all.
+- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl` — **serves the latest frozen release since 2026-08-19**, not the working line. It had served whatever was on `main`, and CI then regenerated it on every push, so BioPortal's nightly pull ingested a development snapshot each night: its submission history reads 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, all parsed and indexed, with "Version information" naming a mutable line nobody can cite and the Version IRI stuck at 0.14.0 — a `-dev` bundle correctly carries none, so BioPortal kept the last one it had seen. `make bioportal-bundle` now builds from `static/ontology/<release>/` and refuses to emit a `-dev` line at all.
+
+  **Local source fix revised 2026-09-01; not yet deployed or observed:** one
+  fail-closed resolver requires the selected direct snapshot, released Kernel
+  and Full profile, and every manifest source hash. The collapse edits ROBOT's
+  XML deterministically; an OWL-aware diff then permits only the documented
+  header transformation. `make bioportal-reproducible` requires two independent
+  builds to match the baseline-protected integrity ledger, including source
+  closure, bytes, canonical graph, and counts. Pages uses an exact release/SHA
+  cache with no fallback key, verifies hits before parsing/use, rebuilds an
+  invalid hit or miss once, and saves verified misses immediately. The cache is
+  an optimization, not the stability mechanism.
 
 **Form fields:**
 
@@ -808,7 +821,7 @@ HermiT-consistent. Served at
 | Location | **Load from URL** (NOT upload) → `https://labiosyncare.github.io/ontology/sstim-full.owl` — "loaded nightly", so Pages deploys flow in |
 | Representation language | **OWL** (RDF/XML) |
 | Status | **`beta`** while pre-1.0. BioPortal's vocabulary is `alpha` / `beta` / `production` / `retired` / `under development` — there is no `released`, so this is *not* the same field as the ontology's own `mod:status`, which says `under development` on the working line and `released` on a frozen one and describes which line you are on rather than how mature it is. Do not copy one into the other. `under development` understates 16 releases with DOIs, SHACL and OWL 2 DL conformance; `production` overstates an ontology that is pre-1.0, has never had an independent review ([ADR 0022](../decisions/0022-0.6-release-review-posture.md)) and carries 282 labels no native speaker has read. Revisit at 1.0. |
-| Version IRI | Extracted from the bundle; leave it alone once the pull is correct. It read `https://w3id.org/sstim/0.14.0` until 2026-08-19 — the last submission that carried one, since every bundle after it was a `-dev` line and correctly carried none. The release bundle now carries `https://w3id.org/sstim/0.16.0`, verified locally, so the next nightly pull should replace it. If it does not, the field is stored rather than re-extracted and needs one manual correction. |
+| Version IRI | Extracted from the bundle; leave it alone once the pull is correct. It read `https://w3id.org/sstim/0.14.0` until 2026-08-19 — the last submission that carried one, since every bundle after it was a `-dev` line and correctly carried none. BioPortal has since ingested multiple released `0.16.0` bundles, so the old instruction to await the next pull is obsolete. The deterministic bundle carries `https://w3id.org/sstim/0.16.0`; confirm the portal field after deployment and correct it manually only if it remains stale. |
 | Contact | Renato Fabbri — `renato.fabbri@gmail.com` |
 | Homepage | `https://labiosyncare.github.io/ontology/docs/` |
 | Documentation | `https://labiosyncare.github.io/ontology/docs/` |
@@ -838,10 +851,32 @@ Status:             PARSED OK 2026-07-12 — live at ontologies/SSTIM. Metrics:
                     67 classes, 334 individuals (= the SKOS concepts, dual-typed),
                     121 properties. Full class hierarchy + vocabulary ingested
                     (merged bundle worked; core-only would show ~0 individuals).
-Required follow-up: Optional polish via the ontology Edit form — add documentation
-                    URL + Zenodo DOI (as publication) if not auto-extracted.
-                    Nightly re-pull means Pages deploys flow in automatically.
+Required follow-up: Deploy the pinned artifact; its transition from the currently
+                    served bytes is expected to create one final 0.16.0 row.
+                    Confirm the following unchanged nightly pull creates none,
+                    then PATCH the latest/current row's Released field to
+                    2026-08-18. Historical archived duplicates remain. Optional
+                    polish: add the documentation URL and Zenodo DOI if absent.
 ```
+
+**Post-deploy stability and date procedure (0.16.0 and future releases):**
+
+1. Before deployment, record BioPortal's latest/current submission ID and row
+   count.
+2. Deploy, then verify that the bytes served at the pull URL have the exact
+   ledger SHA-256.
+3. Let the first nightly pull finish. Capture the new latest/current submission
+   ID and row count, and require that the row parses. For the first deterministic
+   deployment, one final `0.16.0` transition row is expected because its pinned
+   bytes differ from the artifact previously served.
+4. Without another deployment, wait through one more nightly pull. Require that
+   the ID captured in step 3 and the row count remain unchanged; this observation
+   proves byte stability.
+5. PATCH **the ID captured in step 3**, not an older archived duplicate, to the
+   release's truthful `dct:issued` date. Reload the API and UI and verify the
+   displayed **Released** value.
+6. Preserve the older archived rows as history. Repeat steps 1–5 only for a
+   genuinely new release/artifact, not for unrelated site deployments.
 
 **Submission 14 (0.14.0) failed to parse — `ERROR_RDF`, 2026-08-14 01:14 UTC.**
 The first parse failure in fourteen submissions; 13 (2026-08-08) completed the
@@ -861,23 +896,38 @@ carried no `owl:versionIRI`**, because `robot annotate --ontology-iri` does not
 carry the Kernel's version IRI through the merge. Every submission since the
 first was therefore an unversioned upload at the same ontology IRI, with no
 immutable version for a registry to cite. Fixed in `make bioportal-bundle`, which
-now passes `--version-iri` on a released line, omits it on a `-dev` line (ADR
-0020: a version IRI names an immutable version, and a development line is not
-one), and fails if either invariant is broken. The same pass added a guard for an
-empty module list, which previously produced a valid, empty bundle rather than an
-error.
+initially passed `--version-iri` on a released line, omitted it on a `-dev` line
+(ADR 0020: a version IRI names an immutable version, and a development line is
+not one), and failed if either invariant was broken. The same pass added a guard
+for an empty module list, which previously produced a valid, empty bundle rather
+than an error. The current resolver is stricter: it rejects a development
+selector before ROBOT runs, and every emitted bundle must carry the stable
+frozen release's exact version IRI.
 
-**Release dates — BioPortal reads `dct:issued`.** The submission list's
-**Released** column is populated from the root ontology's `dct:issued`, not from
-the upload date. Because `dct:issued` had never been bumped past the ontology's
-first issue date, all eight submissions (0.6.0 → 0.11.0) reported
-`Released 2026-04-12`. Corrected 2026-07-27 by patching each submission:
+**Release dates — BioPortal currently prefers `dct:created`.** Re-measured from
+the public submission list on 2026-08-31 and checked against the
+[current NCBO mapping source](https://github.com/ncbo/ontologies_linked_data/blob/59f630f4bca589031244fde3995079c674e51aee/config/schemes/ontology_submission.yml#L451-L468):
+BioPortal's metadata schema maps its `released` field from
+`dct:created`, then `dct:date`, then `dct:issued`; the
+[extractor stops after the first populated mapping](https://github.com/ncbo/ontologies_linked_data/blob/59f630f4bca589031244fde3995079c674e51aee/lib/ontologies_linked_data/services/submission_process/operations/submission_extract_metadata.rb#L104-L123).
+The UI labels that field **Released**, but a normal SSTIM bundle therefore
+supplies the ontology's original creation date, not the version's formal issue
+date. The post-collapse `0.16.0` rows show 2026-04-12 while their graph declares
+`dct:issued 2026-08-18`, confirming the precedence.
+
+The older 0.6.0–0.11.0 rows were corrected manually on 2026-07-27. The
+byte-reproducibility fix was revised locally on 2026-09-01 but has not yet been
+deployed or observed by BioPortal. Its first deployment is expected to create
+one final transition row because the pinned bytes differ from those currently
+served. Follow the numbered procedure above: capture the transition row after
+the first pull, prove its ID and row count remain unchanged after a second pull,
+then PATCH that captured 0.16.0 submission to 2026-08-18:
 
 ```bash
 curl -X PATCH "https://data.bioontology.org/ontologies/SSTIM/submissions/<id>" \
   -H "Authorization: apikey token=$BIOPORTAL_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"released":"2026-07-24T00:00:00+00:00"}'      # HTTP 204 on success
+  -d '{"released":"2026-08-18T00:00:00+00:00"}'      # HTTP 204 on success
 ```
 
 | Submission | Version | Released |
@@ -889,17 +939,23 @@ curl -X PATCH "https://data.bioontology.org/ontologies/SSTIM/submissions/<id>" \
 | 3, 2 | 0.7.0-dev | 2026-07-14, 2026-07-13 |
 | 1 | 0.6.0 | 2026-07-11 |
 
-Patched submissions keep their corrected date, but **each new nightly pull
-creates a submission carrying whatever `dct:issued` the deployed file declares**
-— so the durable fix is bumping `dct:issued` at release time, now enforced by
-the `make snapshot` release gate (see
-[`static/ontology/README.md`](../../static/ontology/README.md#versioning-and-publication)).
+Patched submissions keep their corrected date, but every genuinely changed pull
+creates a new submission whose extracted `released` value again prefers
+`dct:created`. SSTIM must still bump `dct:issued` at release time because that is
+the correct formal version provenance; BioPortal needs an explicit post-release
+correction unless its mapping changes. Keep
+`dct:created 2026-04-12` in SSTIM rather than falsifying the ontology's own
+provenance to accommodate one registry field.
 
-Two further observations from the same historical submission list, neither
-harmful: 0.10.0 has **no** submission (it and 0.11.0 both deployed on 2026-07-24
-and the daily pull sampled once); and 0.7.0 and the dev line prior to it each
-produced **two** submissions, because the pull creates one whenever the deployed
-bytes change even if `owl:versionInfo` did not move.
+Two further observations from the same historical submission list: 0.10.0 has
+**no** submission (it and 0.11.0 both deployed on 2026-07-24 and the daily pull
+sampled once); and repeated version labels mean the pulled bytes changed, not
+that BioPortal blindly submitted the same file again. Its
+[cron compares the raw download MD5 with the previous upload](https://github.com/ncbo/ncbo_cron/blob/d85ca28664e4a263fd82ae79d5aa3d1c4450cb63/lib/ncbo_cron/ontology_helper.rb#L165-L179)
+and creates a submission only when they differ. That makes byte-reproducible
+serialization a publication invariant:
+whitespace, statement order, or fresh blank-node identifiers are enough to
+produce another row even when the RDF graphs are isomorphic.
 
 ### FAIRsharing — ready now (account required)
 
@@ -1174,10 +1230,10 @@ recent entries:
     definition_property[], synonym_property[], hierarchical_property[],
     base_uri, reasoner, oboSlims, ontology_purl
 
-**We already publish the artifact it needs.** OLS ingests one file;
-`https://labiosyncare.github.io/ontology/sstim-full.owl` is live, 1160658 bytes,
-`application/rdf+xml` — the merged OWL bundle CI generates for BioPortal, which
-serves this purpose too. No new build step is required.
+**The submitted entry pins a frozen release artifact.** Its historical submitted `ontology_purl` is `https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl`,
+matching the version reviewed in PR #1351. It does not consume BioPortal's generated
+`sstim-full.owl`. The follow-up below deliberately leaves this pinned while the
+reviewer decides whether to accept a 0.16.0 bump or a rolling URL.
 
 Note SSTIM's SKOS layer is a good fit for the `definition_property` and
 `synonym_property` fields, which recent entries point at `skos:definition` and

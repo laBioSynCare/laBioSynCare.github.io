@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "description": "Immutable source-closure, byte, and canonical-RDF identities for the frozen SSTIM bundle served to BioPortal. Never change an existing release record; append one reviewed make bioportal-bundle-candidate result for each new release.",
+  "documentation": "scripts/BIOPORTAL_RELEASE_INTEGRITY.md",
+  "releases": {
+    "0.16.0": {
+      "sha256": "7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11",
+      "canonicalGraphSha256": "cace41c23880382449a17fff755beb417d6c760e98b2b6f0e93a17bdc15aca66",
+      "sourceClosureSha256": "8d9301072f751bd04db63fc7e3160d2cec5465e7d073e843a50d88ea55f17d43",
+      "bytes": 1239332,
+      "triples": 11389
+    }
+  }
+}

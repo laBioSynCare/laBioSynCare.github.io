@@ -186,6 +186,22 @@ what a working task list cannot.
       *Publication path decided (ADR 0023): `pages.yml` generates into
       `dist/ontology/docs/` — deployed artifact only, never committed to
       `main`. First deploy verified live 2026-07-11.*
+- [x] Keep the BioPortal bundle deterministic and wholly inside the frozen
+      release boundary `P1`
+      *Completed 2026-08-31 after repeated `0.16.0` submissions exposed two
+      independent leaks. The metadata collapse no longer reparses and
+      reserializes the RDF graph with fresh blank-node identifiers; it edits
+      ROBOT's stable XML structure and takes title, description, and creation
+      date from the manifest-selected frozen Kernel rather than the live line.
+      Strengthened 2026-09-01: a fail-closed shared resolver verifies the direct
+      snapshot, released Full profile, Kernel, and every source hash; an
+      OWL-aware diff proves the generated distribution preserves that closure.
+      Focused semantic/idempotency coverage and two byte-identical full builds
+      gate the result. CI anchors each ledger record to its first valid state on
+      the default branch's first-parent history.
+      Pages keys its cache by the approved byte SHA-256, verifies hits before
+      use, rebuilds invalid hits or misses once, and saves verified misses
+      immediately; generic validation does not rebuild the frozen artifact.*
 - [x] Publish ontology at `https://w3id.org/sstim` with content
       negotiation (Turtle for `Accept: text/turtle`, HTML for browsers) `P1`
       *Done 2026-07-11: perma-id PR #6337 merged. Full route × representation

@@ -186,6 +186,31 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Registries
+- [ ] **Correct BioPortal's displayed release date after bundle stability lands** `P1`
+      *The public submission list shows `0.16.0` as Released 2026-04-12 even
+      though the frozen release declares `dct:issued 2026-08-18`. BioPortal's
+      current metadata schema maps its `released` field from `dct:created` before
+      `dct:issued`, and its extractor stops at the first populated mapping, so the
+      column is showing SSTIM's truthful ontology creation date rather than the
+      version's issue date. Deploying the newly pinned bytes is expected to
+      create one final transition row. Capture that new latest/current submission
+      ID, wait through the following unchanged nightly pull, and confirm its ID
+      and the row count do not change. Historical archived duplicates will
+      remain. Then PATCH that captured `0.16.0` submission to 2026-08-18 and
+      verify the displayed value;
+      repeat the numbered post-deploy procedure in `REGISTRY_SUBMISSIONS.md` for
+      each genuine release while preserving `dct:created` in SSTIM's metadata.*
+
+- [ ] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
+      *The portal historically retained `https://w3id.org/sstim/0.14.0` after
+      development bundles correctly omitted a version IRI. The deterministic
+      frozen `0.16.0` artifact carries exactly
+      `https://w3id.org/sstim/0.16.0`. After the transition pull and subsequent
+      unchanged-pull stability check, inspect the latest/current submission in
+      the API and UI. If the field remains stale, correct that current row only,
+      verify the displayed/resolved value, and preserve archived submissions as
+      history. Repeat this check for each genuine release.*
+
 - [ ] **Automate the DBpedia KG Catalog release refresh** `P3`
       *Asked @m1ci on [lod-next-gen#46](https://github.com/m1ci/lod-next-gen/issues/46)
       how the catalog tracks new releases; answered 2026-08-25 with two options.
