@@ -6,6 +6,8 @@ Owner: Renato Fabbri
 
 Created: 2026-07-11
 
+Last audited: 2026-09-01 (W3C Community Group migration pass)
+
 This file operationalizes the **Registry Strategy** of
 [PUBLICATION_AND_INTERLINKING_PLAN.md](PUBLICATION_AND_INTERLINKING_PLAN.md).
 It holds (1) a reusable metadata kit every registry asks for, filled once, and
@@ -15,8 +17,9 @@ pre-filled values, and a status slot to complete after submitting.
 > **Verify the intake mechanism at submission time.** Registry submission forms,
 > endpoints, and account requirements change. The entry points below are the
 > known ones; confirm each is current before submitting rather than trusting
-> this file. Do not record a registry as submitted here until it is actually
-> accepted and live (the plan's rule against claiming a registration early).
+> this file. Record a genuine submission as submitted, but never mark it
+> accepted or live until the public record proves that state (the plan's rule
+> against claiming a registration early).
 
 ---
 
@@ -46,15 +49,17 @@ node scripts/truth-audit.mjs      # prints citable release, version DOI, module 
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
-| Publisher | `https://github.com/laBioSynCare` |
+| Publisher declared by the 0.16.0 RDF | `https://github.com/laBioSynCare` — preserve until the publisher/steward governance question is resolved; a repository move is not authority to rewrite ontology provenance |
 | First released | 2026-04-12 |
-| Source repository | `https://github.com/laBioSynCare/laBioSynCare.github.io` |
-| HTML documentation | `https://labiosyncare.github.io/ontology/docs/` |
+| Source repository | `https://github.com/w3c-cg/sstim` |
+| Issue tracker | `https://github.com/w3c-cg/sstim/issues` |
+| Project / browser | `https://w3c-cg.github.io/sstim/` |
+| HTML documentation | `https://w3c-cg.github.io/sstim/ontology/docs/` |
 | Frozen whole-set entry point | `https://w3id.org/sstim/<version>` (namespace catalogue) |
 | Frozen Kernel Turtle | `https://w3id.org/sstim/<version>/sstim-core.ttl` |
 | JSON-LD (content negotiated) | `https://w3id.org/sstim` with `Accept: application/ld+json` |
 | RDF/XML (content negotiated) | `https://w3id.org/sstim` with `Accept: application/rdf+xml` |
-| VoID/DCAT | `https://labiosyncare.github.io/ontology/void.ttl` |
+| VoID/DCAT | `https://w3c-cg.github.io/sstim/ontology/void.ttl` |
 
 **Short description (≤ 300 chars).**
 > SSTIM is an OWL 2 ontology with a multilingual SKOS vocabulary and SHACL
@@ -75,11 +80,40 @@ breathing, multisensory integration, SKOS vocabulary, SHACL, evidence tiers.
 ## 2. Readiness at a glance
 
 The released ontology URI dereferences through w3id to Turtle/JSON-LD/RDF-XML,
-and the WIDOCO HTML is live. Perma-id PRs #6337 (pre-modular, 2026-07-11) and
-#6480 (modular, 2026-08-04) are both merged. Existing registry records for the
-released line remain valid. **Never present a mutable `-dev` line as a release**:
+and the WIDOCO HTML is live. Perma-id PRs #6337 (pre-modular, 2026-07-11),
+#6480 (modular, 2026-08-04), and the W3C-CG target cutover
+[#6609](https://github.com/perma-id/w3id.org/pull/6609) (merged 2026-08-27)
+are complete. Existing registry identities remain valid because the canonical
+ontology URI, namespace, prefix, concept DOI, and version IRIs did not change.
+**Never present a mutable `-dev` line as a release**:
 its generated namespace catalogues, Kernel/module endpoints, profiles, manifest,
 and schema must be deployed and the perma-id matrix verified first.
+
+### W3C-CG registry migration pass — 2026-09-01
+
+The mutable location fields were audited only after W3ID, W3C Pages, and the
+frozen artifacts were live. The W3C and preserved legacy publications of the
+0.16.0 whole-set Turtle and BioPortal RDF/XML bundle were measured byte-identical.
+Stable record identities were preserved; no registry was resubmitted under a
+new identity.
+
+| Registry | Action | Outcome |
+|---|---|---|
+| W3ID | Retarget stable routes to the W3C-CG publication | **Live.** HTML and RDF negotiation now resolve under `w3c-cg.github.io/sstim`; canonical SSTIM IRIs are unchanged. |
+| prefix.cc | Check whether repository migration changes the prefix record | **No change required.** It records `https://w3id.org/sstim#`, not a Pages host. |
+| DBpedia Archivo | Check the indexed record and updater | **No resubmission.** The record is keyed only by `https://w3id.org/sstim`, so W3ID carries the host migration. Archivo exposes no mutable source-location field and its updater remains stale. |
+| LOV | Check accepted record and intake state | **No record to edit.** SSTIM remains absent after the 2026-07-10 suggestion; the submitted namespace is still correct. A second suggestion would duplicate the untracked intake request rather than migrate a host field. |
+| BARTOC | Request changes to mutable URL/repository fields and stale extent | **Requested from the curator** in [issue #319](https://github.com/gbv/bartoc.org/issues/319#issuecomment-5497720588); node `21154`, the SSTIM identifier, DOI, and publisher were explicitly preserved. |
+| BioPortal | Patch the current ontology submission metadata | **Applied and verified through the authenticated API.** Submission `28` now pulls the W3C deterministic bundle and carries the W3C homepage, repository, source, documentation, and issue tracker. Await the two-night stability observation before correcting its successor's display date. |
+| FAIRsharing | Audit record `8494` and prepare the mutable-link edit | **Signed-in edit still required.** The public record still exposes the legacy homepage. The browser runtime available to this audit could not start, and FAIRsharing's write API requires authentication; exact replacement values are recorded below. |
+| OLS4 | Update the open submission rather than creating another | **Applied.** PR [#1351](https://github.com/EBISPOT/ols4/pull/1351) commit `258c2a51` now uses the W3C homepage and frozen 0.16.0 Turtle; the reviewer was notified. |
+| DBpedia KG Catalog | Refresh the live record and automate later releases | **Submitted.** PR [#53](https://github.com/dbpedia/kg-catalog/pull/53) adds frozen 0.16.0 from W3C-CG plus a fail-closed daily release updater; issue [#46](https://github.com/dbpedia/kg-catalog/issues/46#issuecomment-5497847636) links the change. |
+
+The read-only `make registry-verify` probe on 2026-09-01 reached all five public
+surfaces it covers: prefix.cc mapping, BARTOC node, FAIRsharing record, Archivo
+record, and LOV absence with a positive control. It reported **5 verified, 0
+unreachable, 0 wrong**. This proves reachability/identity, not that the pending
+BARTOC or FAIRsharing field edits have already landed.
 
 > **Measured 2026-08-18** with `make registry-verify` and `gh`, not inherited.
 > Three states, because two would lie: **verified**, **wrong**, and
@@ -95,17 +129,17 @@ and schema must be deployed and the perma-id matrix verified first.
 > | DBpedia Archivo | **INCOMPLETE** — timed out; `dbpedia.org` itself also failed to answer, so this is their infrastructure and says nothing about our record |
 > | BioPortal | **INCOMPLETE** — the web UI answers 403 to a plain client and the REST API 401 without an API key, so neither confirms nor denies the entry below |
 
-| Registry | Can submit now? | Account? | Priority |
+| Registry | Current state | Account? | Follow-up |
 |---|---|---|---|
 | prefix.cc | ✅ **corrected 2026-08-18** — now serves `sstim` → `https://w3id.org/sstim#` in all four serialisations (`txt`, `json`, `ttl`, `sparql`), verified by `make registry-verify`. It had served the slash form since before 2026-07-11; the hash entry was added and voted above it, and the slash form remains listed but outranked. Its TLS certificate expired 2025-12-31, so `https://` still fails certificate validation and plain `http://` is the only way to read it | yes | — |
-| DBpedia Archivo | ✅ **indexed 2026-08-17** (not re-confirmable 2026-08-18 — the host timed out, and so did `dbpedia.org`) — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), 10441 triples, owl/ttl/nt. Rated ★☆☆☆ and **frozen**: the rating reflects the graph at submission, and Archivo's updater has not run since 2026-02-23, so the deployed licence fix will not be seen | no | report upstream |
-| LOV | 🕓 **submitted 2026-07-10; slow queue, not dormant** — LOV inserted `gist` 2026-07-05, `rml-lv` 2026-06-12; absence re-verified 2026-08-18 against the live site (`/vocabs/sstim` 404 vs `/vocabs/skos` 200), since the SPARQL endpoint serves a stale pre-submission dump | no | escalate |
-| BARTOC | ✅ **live** — [node 21154](https://bartoc.org/en/node/21154), created 2026-07-27 by editor Jakob Voß; anonymous 200 + JSKOS API + top public search hit (verified 2026-08-17) | yes (GitHub) | — |
-| BioPortal | ⚠️ **live; source fix implemented locally, not yet deployed or observed** — serving the frozen release ended the `-dev` ingests, but nondeterministic RDF/XML rewriting then produced many byte-distinct `0.16.0` submissions from the same RDF graph. The revised 2026-09-01 fix resolves only a manifest-verified frozen Full closure, proves its OWL-aware output delta, makes two builds byte-identical, and enforces existing integrity records against the Git baseline. Pages verifies an exact SHA-keyed cache hit or rebuilds once and must reproduce the approved bytes. Deploy it (expect one final transition row), confirm the following unchanged nightly pull creates none, then correct the latest/current submission's displayed date manually; archived duplicates remain | account ✓ (@rfabbri) | **deploy, observe, patch date** |
-| FAIRsharing | ✅ **record [8494](https://fairsharing.org/8494) public and searchable** (verified logged-out 2026-08-17); curated 2026-08-06. **DOI assigned 2026-08-24**: [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4), which resolves to the FAIRsharing record (verified 2026-08-24). It identifies the *record*, not a release, so it does not belong beside the Zenodo version DOIs in `CITATION.cff` or `void.ttl` | yes | — |
-| OLS4 | 🕓 **PR open, under review** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), one entry in `ebi_ontologies.json` against `dev`, +35/-0. A collaborator (@haideriqbal) asked on 2026-08-20 for the biomedical use case, the developing group or institute, and the long-term maintenance plan; **answered 2026-08-21**, including an offer to bump `ontology_purl` to the shipped 0.16.0 or switch to a rolling URL | yes (GitHub) | watch |
+| DBpedia Archivo | ✅ **indexed 2026-08-17** — [record](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim), keyed by the stable W3ID URI. The W3C host migration requires no record change. Rated ★☆☆☆ and **frozen** because Archivo's public updater has not run since 2026-02-23 | no | report updater upstream; do not duplicate the record |
+| LOV | 🕓 **suggested 2026-07-10, still absent** — `/vocabs/sstim` is 404 while a control record resolves. LOV ingests the unchanged W3ID namespace and auto-extracts locations, so there is no host field to migrate and no accepted record to edit | no | follow up with curators; do not duplicate the suggestion |
+| BARTOC | ⚠️ **live; curator update requested 2026-09-01** — [node 21154](https://bartoc.org/en/node/21154) still has the legacy URL/repository and July extent. Exact W3C and 0.16.0 replacements were posted in [issue #319](https://github.com/gbv/bartoc.org/issues/319#issuecomment-5497720588) | yes (GitHub) | await curator, then verify JSKOS |
+| BioPortal | ⚠️ **live; W3C metadata patched and deterministic bundle deployed 2026-09-01** — authenticated API verification shows submission `28` with W3C pull/home/repository/source/docs/issues and version IRI `https://w3id.org/sstim/0.16.0`. The W3C and legacy bundle URLs serve the ledger bytes (1,239,332 bytes; SHA-256 `7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11`) | account ✓ (@rfabbri) | observe transition pull, then one unchanged pull; patch current date |
+| FAIRsharing | ⚠️ **record [8494](https://fairsharing.org/8494) live, but mutable links still need migration**. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved. The public record still exposes the legacy homepage; write access is through its signed-in SPA | yes | signed-in W3C link edit |
+| OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
 | OpenAIRE | ⛔ after gateway record | yes | deferred |
-| DBpedia KG Catalog | ✅ **listed 2026-08-24** — [kg-catalog](https://kg-catalog.dbpedia.org/kg.html?id=sstim) and [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), both 200. @m1ci (Milan Dojčinovski) applied the `new-kg` label, triggered the workflow by hand and fixed a bug in it; metadata validation passed. Record content verified against the frozen snapshot the same day: 545 SKOS concepts and 67 schemes are exactly what `0.15.0` holds. **It is pinned to `0.15.0` / artifact `2026.08.17`**, one release behind the shipped `0.16.0`, **Answered 2026-08-25**: refresh is either a manual `metadata.yaml` PR per release, or a `check-new-release` Python script their workflow runs daily. @m1ci recommends the script for frequent releases, which ours are, so that is the plan; tracked in `TODO.md`. [Issue #46](https://github.com/m1ci/lod-next-gen/issues/46) still open | yes (GitHub) | automate refresh |
+| DBpedia KG Catalog | ⚠️ **0.15.0 live; 0.16.0 + updater in review** — [catalog record](https://kg-catalog.dbpedia.org/kg.html?id=sstim), [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), and migration PR [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53). The PR preserves historical 0.15.0 bytes and adds verified W3C-CG 0.16.0 as pending | yes (GitHub) | watch PR and first daily updater run |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
 ---
@@ -174,6 +208,14 @@ Required follow-up: none
 
 Submit the ontology URI; Archivo dereferences it, archives every version it can
 resolve, and returns an automated quality-star rating. No account.
+
+**W3C-CG migration disposition (2026-09-01): no registry mutation.** Archivo's
+record identity and crawl source are the single stable URI
+`https://w3id.org/sstim`; it has no separate mutable repository or Pages-host
+field. W3ID now resolves that URI to the W3C publication. Resubmitting would
+create pressure for a duplicate/stale crawl while Archivo's updater and Databus
+remain impaired, so preserve the existing record and report only the upstream
+updater defects below.
 
 - **Entry point:** `https://archivo.tools.dbpedia.org/add`
   — the old `https://archivo.dbpedia.org/add` host is dead (404, bare nginx) as
@@ -547,7 +589,7 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     until they reflect a crawl of the current graph.
 ```
 
-### LOV (Linked Open Vocabularies) — ready now
+### LOV (Linked Open Vocabularies) — SUGGESTED; NO HOST MIGRATION
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://lov.linkeddata.es/dataset/suggest` — no account. LOV's model is: you
@@ -588,8 +630,9 @@ Release DOI submitted: 10.5281/zenodo.21302910
 Date:               2026-07-10 (resubmitted 2026-07-11; both acknowledged)
 Account/maintainer: — (form; confirmation emailed to renato.fabbri@gmail.com)
 External record ID or URL:  none — the suggest form issues no ticket or record id
-Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
-                    Two separate facts, previously collapsed into "slow":
+Status:             SUBMITTED (attested by acknowledgement mail), CURRENTLY
+                    ABSENT FROM THE PUBLIC CATALOG. Two separate facts were
+                    previously collapsed into "slow":
 
                     (1) **We cannot prove the submission from outside.** LOV's
                     suggest form returns no tracking identifier, opens no public
@@ -606,10 +649,10 @@ Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
 
                     LOV's own homepage carries a "Latest insertion" list showing
                     **gist on 2026-07-05, rml-lv on 2026-06-12 and oso on
-                    2026-05-07**. It is still curating. Our submission of
+                    2026-05-07**. It was still curating. Our submission of
                     2026-07-10 arrived five days after the most recent insertion,
-                    so it is in a moving queue, not an abandoned one, and
-                    escalating to the curators is reasonable rather than futile.
+                    but no public queue makes its position or review state
+                    knowable. Curator follow-up is reasonable rather than futile.
 
                     **What the earlier measurement actually measured.** The
                     SPARQL endpoint at `/dataset/lov/sparql` serves a stale dump.
@@ -643,10 +686,10 @@ Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
                             FILTER(STR(?iss) > "2025-11-22") }' \
                         -H 'Accept: application/sparql-results+json'
 
-                    2026-08-17: 1782 snapshots in total, **0** after 2025-11-22.
-                    Our submission arrived 7.5 months into that dormancy, so our
-                    absence says nothing about our vocabulary's quality and the
-                    wait is not a queue position.
+                    2026-08-17: 1782 snapshots in that endpoint's stale dump,
+                    **0** after 2025-11-22. Our submission arrived 7.5 months
+                    into the dump's gap; the public intake exposes no queue, so
+                    SSTIM's absence says nothing about its quality or position.
 
                     Catalog absence separately confirmed the same day: 944
                     vocabularies indexed, zero sstim hits, with a SKOS control
@@ -654,9 +697,10 @@ Status:             SUBMITTED (unverifiable), AND THE QUEUE IS DORMANT.
                     own contents. Note the `api/v2/vocabulary/*` endpoints this
                     file used to cite now 404 for *every* query — they are gone,
                     not empty, so a 404 there is no longer evidence of anything.
-Required follow-up: **Do not wait, and do not resubmit** — the form only
-                    re-acknowledges, and there is no pipeline behind it to
-                    re-enter. A curator email is the only remaining path and may
+Required follow-up: **Do not silently wait, and do not resubmit** — the form
+                    only re-acknowledges and exposes no queue/ticket with which
+                    a duplicate can be reconciled. A curator email is the only
+                    remaining path and may
                     go unanswered; send it to `mpoveda@fi.upm.es` first, the
                     institutional address at the group that hosts LOV. The other
                     two contacts on file (py.vandenbussche@gmail.com,
@@ -664,12 +708,13 @@ Required follow-up: **Do not wait, and do not resubmit** — the form only
                     long-standing project figures and may no longer be current.
 
                     **Do not present LOV as "pending review" in funding or
-                    outreach prose.** Pending implies a queue that is moving.
-                    Say submitted, and note the catalog's dormancy if the claim
-                    carries any weight. On integration, record the LOV vocab URL.
+                    outreach prose.** The supported wording is: submission
+                    acknowledged but untracked; SSTIM absent; LOV has shown
+                    recent curation activity; queue position and review status
+                    unknown. On integration, record the LOV vocab URL.
 ```
 
-### BARTOC — LIVE (node 21154, since 2026-07-27)
+### BARTOC — LIVE; W3C-CG update requested 2026-09-01
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://bartoc.org/edit` — **requires login**; BARTOC's login server supports
@@ -695,7 +740,7 @@ assigns its own node URI on save.
 | Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
 | Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
 | Languages | en, it, pt, es |
-| Size | `56 classes, 124 properties, 295 concepts, 30 concept schemes (2026-07)` |
+| Size | `164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)` |
 
 *Structure:*
 
@@ -712,15 +757,15 @@ assigns its own node URI on save.
 |---|---|
 | Created | `2026` |
 | License | search "CC BY 4.0" → Creative Commons Attribution 4.0 International |
-| URL | `https://labiosyncare.github.io/ontology/docs/` (WIDOCO docs landing) |
-| Additional links | `https://github.com/laBioSynCare/laBioSynCare.github.io` ; `https://w3id.org/sstim` |
+| URL | `https://w3c-cg.github.io/sstim/ontology/docs/` (WIDOCO docs landing) |
+| Additional links | `https://github.com/w3c-cg/sstim` ; `https://w3id.org/sstim` |
 | Formats | search + add **SKOS**, **RDF/XML**, **Turtle**, **JSON-LD**, **OWL** (whatever BARTOC lists) |
 | Access | **freely available** |
-| Publisher — Name | BSC Lab (laBioSynCare) |
+| Publisher — Name | BSC Lab (Æterni Anima) — exact live value; preserve pending the separate governance decision |
 | Publisher — URI | `https://github.com/laBioSynCare` |
 | Address | optional — City: Modena, Country: Italy (or leave blank) |
 | Contact | `renato.fabbri@gmail.com` |
-| Listed In | optionally add **prefix.cc**; skip LOV until it's integrated (still queued) |
+| Listed In | optionally add **prefix.cc**; skip LOV until it is integrated (suggestion acknowledged but untracked) |
 | Vocabulary services (URL + API type) | *(leave empty — SSTIM's SPARQL is client-side Comunica, no hosted endpoint)* |
 
 *Display + concept mapping:*
@@ -775,13 +820,15 @@ Required follow-up: **Refresh the stale `extent`.** The live record reads
                     (2026-07)"; TERM_INDEX.md is at 164 / 304 / 551 with 68 schemes
                     as of 0.16.0, so the public record understates SSTIM roughly
                     threefold and its scheme count by more than twice. Metadata is
-                    community-editable (PDDL), so this is a login-and-edit fix.
-                    Nothing else on the record is version-pinned: `identifier` is
-                    https://w3id.org/sstim, the link is the concept DOI, and the
-                    homepage 200s — all age correctly.
+                    community-editable (PDDL). On 2026-09-01 the exact extent,
+                    W3C documentation URL, and W3C repository replacement were
+                    requested from the curator in issue #319 comment
+                    5497720588. Verify the JSKOS record after it is applied.
+                    The request deliberately preserves the node URI, stable
+                    SSTIM identifier, concept DOI, and publisher field.
 ```
 
-### BioPortal — ready now (account created @rfabbri)
+### BioPortal — LIVE; W3C-CG fields updated 2026-09-01
 
 Biomedical browsing, APIs, and candidate-mapping discovery. **Account created
 2026-07-12** (username `rfabbri`; API key in the gitignored
@@ -796,12 +843,12 @@ The ledger-matching 0.16.0 artifact has one ontology IRI
 `https://w3id.org/sstim`, 11,389 triples, 234 `owl:Class` declarations, and 551
 SKOS concepts; the validated source profile is HermiT-consistent. Its publication
 target is
-**`https://labiosyncare.github.io/ontology/sstim-full.owl`** (RDF/XML).
+**`https://w3c-cg.github.io/sstim/ontology/sstim-full.owl`** (RDF/XML).
 
 - **Entry point:** `https://bioportal.bioontology.org/ontologies/new` (log in).
-- **Pull location (auto-updates):** `https://labiosyncare.github.io/ontology/sstim-full.owl` — **serves the latest frozen release since 2026-08-19**, not the working line. It had served whatever was on `main`, and CI then regenerated it on every push, so BioPortal's nightly pull ingested a development snapshot each night: its submission history reads 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, all parsed and indexed, with "Version information" naming a mutable line nobody can cite and the Version IRI stuck at 0.14.0 — a `-dev` bundle correctly carries none, so BioPortal kept the last one it had seen. `make bioportal-bundle` now builds from `static/ontology/<release>/` and refuses to emit a `-dev` line at all.
+- **Pull location (auto-updates):** `https://w3c-cg.github.io/sstim/ontology/sstim-full.owl` — **serves the latest frozen release**, not the working line. Submission `28` was patched to this URL through the authenticated BioPortal API on 2026-09-01. The preserved legacy URL serves the same bytes but is no longer the registry source. Before 2026-08-19 the URL had served whatever was on `main`, and CI then regenerated it on every push, so BioPortal's nightly pull ingested a development snapshot each night: its submission history reads 0.15.0-dev, 0.16.0-dev, 0.17.0-dev, all parsed and indexed, with "Version information" naming a mutable line nobody can cite and the Version IRI stuck at 0.14.0 — a `-dev` bundle correctly carries none, so BioPortal kept the last one it had seen. `make bioportal-bundle` now builds from `static/ontology/<release>/` and refuses to emit a `-dev` line at all.
 
-  **Local source fix revised 2026-09-01; not yet deployed or observed:** one
+  **Deterministic source fix deployed 2026-09-01; nightly observation pending:** one
   fail-closed resolver requires the selected direct snapshot, released Kernel
   and Full profile, and every manifest source hash. The collapse edits ROBOT's
   XML deterministically; an OWL-aware diff then permits only the documented
@@ -818,13 +865,16 @@ target is
 |---|---|
 | Acronym | `SSTIM` |
 | Name | Sensory Stimulation Ontology |
-| Location | **Load from URL** (NOT upload) → `https://labiosyncare.github.io/ontology/sstim-full.owl` — "loaded nightly", so Pages deploys flow in |
+| Location | **Load from URL** (NOT upload) → `https://w3c-cg.github.io/sstim/ontology/sstim-full.owl` — "loaded nightly", so Pages deploys flow in |
 | Representation language | **OWL** (RDF/XML) |
 | Status | **`beta`** while pre-1.0. BioPortal's vocabulary is `alpha` / `beta` / `production` / `retired` / `under development` — there is no `released`, so this is *not* the same field as the ontology's own `mod:status`, which says `under development` on the working line and `released` on a frozen one and describes which line you are on rather than how mature it is. Do not copy one into the other. `under development` understates 16 releases with DOIs, SHACL and OWL 2 DL conformance; `production` overstates an ontology that is pre-1.0, has never had an independent review ([ADR 0022](../decisions/0022-0.6-release-review-posture.md)) and carries 282 labels no native speaker has read. Revisit at 1.0. |
-| Version IRI | Extracted from the bundle; leave it alone once the pull is correct. It read `https://w3id.org/sstim/0.14.0` until 2026-08-19 — the last submission that carried one, since every bundle after it was a `-dev` line and correctly carried none. BioPortal has since ingested multiple released `0.16.0` bundles, so the old instruction to await the next pull is obsolete. The deterministic bundle carries `https://w3id.org/sstim/0.16.0`; confirm the portal field after deployment and correct it manually only if it remains stale. |
+| Version IRI | Extracted from the bundle; leave it alone once the pull is correct. It read `https://w3id.org/sstim/0.14.0` until 2026-08-19 — the last submission that carried one, since every bundle after it was a `-dev` line and correctly carried none. Authenticated API read-back confirmed `https://w3id.org/sstim/0.16.0` on current submission `28` after the 2026-09-01 patch. Confirm the successor created by the transition pull retains it; correct only that current row if it does not. |
 | Contact | Renato Fabbri — `renato.fabbri@gmail.com` |
-| Homepage | `https://labiosyncare.github.io/ontology/docs/` |
-| Documentation | `https://labiosyncare.github.io/ontology/docs/` |
+| Homepage | `https://w3c-cg.github.io/sstim/ontology/docs/` |
+| Documentation | `https://w3id.org/sstim/manifest` |
+| Repository | `https://github.com/w3c-cg/sstim` |
+| Source | `https://github.com/w3c-cg/sstim/blob/main/docs/concept/SENSORY_STIMULATION.md` |
+| Bug database | `https://github.com/w3c-cg/sstim/issues` |
 | Publications / DOI | `10.5281/zenodo.21286974` |
 | Licence | CC BY 4.0 (`https://creativecommons.org/licenses/by/4.0/`) |
 | Description | *(short description from §1)* |
@@ -842,27 +892,28 @@ target is
 Service:            BioPortal
 Submitted URL:      https://bioportal.bioontology.org/ontologies/new
 Submitted acronym:  SSTIM
-Pull location:      https://labiosyncare.github.io/ontology/sstim-full.owl (Load from URL, nightly)
+Pull location:      https://w3c-cg.github.io/sstim/ontology/sstim-full.owl (Load from URL, nightly)
 Submitted version:  0.6.0
 Date:               2026-07-12
 Account/maintainer: @rfabbri (bioportal.bioontology.org)
 External record ID or URL:  https://bioportal.bioontology.org/ontologies/SSTIM
-Status:             PARSED OK 2026-07-12 — live at ontologies/SSTIM. Metrics:
-                    67 classes, 334 individuals (= the SKOS concepts, dual-typed),
-                    121 properties. Full class hierarchy + vocabulary ingested
-                    (merged bundle worked; core-only would show ~0 individuals).
-Required follow-up: Deploy the pinned artifact; its transition from the currently
-                    served bytes is expected to create one final 0.16.0 row.
+Current submission: 28 — 0.16.0; Version IRI https://w3id.org/sstim/0.16.0
+Status:             LIVE. On 2026-09-01 submission 28 was PATCHed and read back
+                    through the authenticated API with the W3C pull location,
+                    homepage, documentation, repository, source, and issue
+                    tracker above. The deterministic 0.16.0 bundle is deployed
+                    at both origins and matches the integrity ledger exactly.
+Required follow-up: Its transition from the previously served bytes is expected
+                    to create one final 0.16.0 row.
                     Confirm the following unchanged nightly pull creates none,
                     then PATCH the latest/current row's Released field to
-                    2026-08-18. Historical archived duplicates remain. Optional
-                    polish: add the documentation URL and Zenodo DOI if absent.
+                    2026-08-18. Historical archived duplicates remain.
 ```
 
 **Post-deploy stability and date procedure (0.16.0 and future releases):**
 
 1. Before deployment, record BioPortal's latest/current submission ID and row
-   count.
+   count. **Captured at the 2026-09-01 cutover: current ID `28`, 28 rows.**
 2. Deploy, then verify that the bytes served at the pull URL have the exact
    ledger SHA-256.
 3. Let the first nightly pull finish. Capture the new latest/current submission
@@ -916,10 +967,12 @@ date. The post-collapse `0.16.0` rows show 2026-04-12 while their graph declares
 `dct:issued 2026-08-18`, confirming the precedence.
 
 The older 0.6.0–0.11.0 rows were corrected manually on 2026-07-27. The
-byte-reproducibility fix was revised locally on 2026-09-01 but has not yet been
-deployed or observed by BioPortal. Its first deployment is expected to create
-one final transition row because the pinned bytes differ from those currently
-served. Follow the numbered procedure above: capture the transition row after
+byte-reproducibility fix was deployed to both publication origins on 2026-09-01,
+and the W3C URL serves 1,239,332 bytes with SHA-256
+`7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11`.
+BioPortal has not yet made its first nightly pull from that deployment. It is
+expected to create one final transition row because the pinned bytes differ
+from those previously served. Follow the numbered procedure above: capture the transition row after
 the first pull, prove its ID and row count remain unchanged after a second pull,
 then PATCH that captured 0.16.0 submission to 2026-08-18:
 
@@ -957,7 +1010,7 @@ serialization a publication invariant:
 whitespace, statement order, or fresh blank-node identifiers are enough to
 produce another row even when the RDF graphs are isomorphic.
 
-### FAIRsharing — ready now (account required)
+### FAIRsharing — LIVE; signed-in W3C-CG link edit pending
 
 **Submission mechanism (confirmed by screenshots 2026-07-11).** Requires a
 FAIRsharing account (email or ORCID). Flow:
@@ -987,7 +1040,7 @@ autocomplete; the values below are the intended targets.
 | Logo | *(skip, optional)* |
 | Record Name * | Sensory Stimulation Ontology |
 | Abbreviation | SSTIM |
-| Homepage * | `https://labiosyncare.github.io/ontology/docs/` |
+| Homepage * | `https://w3c-cg.github.io/sstim/ontology/docs/` |
 | Year of creation | 2026 |
 | Countries | Italy |
 | **Registry and type *** | **Standard → terminology artifact** |
@@ -1007,19 +1060,19 @@ reviewed until all REQUIRED curation is done** (per the creation email).*
 | Object types | controlled picker — pick the closest to what SSTIM describes (e.g. **protocol**, **study/experimental process**); ≥1 required. If nothing fits, ask curators |
 | Subjects (SRAO) | **psychology**, **neuroscience** (≥1 required) |
 | Taxonomies | **Not applicable** (species irrelevant) |
-| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Add three: (1) **Browse SSTIM** — `https://labiosyncare.github.io/`, read, access_method **User interface**, doc_url `…/ontology/docs/`; (2) **Download citable SSTIM `<version>` (Turtle)** — `https://w3id.org/sstim/<version>/sstim-core.ttl`, read, **Other machine-accessible method**; (3) **Download latest released SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. After the modular release, keep the versioned download and treat top-level `sstim-core.ttl` as Kernel only. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
+| Data processes & conditions | Each entry: url, name, type, access_method. Rule: ≥1 with **type=read** and name containing **Browse/Download/Search**. Keep three: (1) **Browse SSTIM** — `https://w3c-cg.github.io/sstim/`, read, access_method **User interface**, doc_url `https://w3c-cg.github.io/sstim/ontology/docs/`; (2) **Download citable SSTIM `<version>` (Turtle)** — `https://w3id.org/sstim/<version>/sstim-namespace.ttl`, read, **Other machine-accessible method**; (3) **Download latest released SSTIM via w3id (content-negotiated RDF)** — `https://w3id.org/sstim`, read, **Other machine-accessible method**. The versioned `sstim-namespace.ttl` is the frozen whole set; `sstim-core.ttl` is Kernel only. Do NOT pick SPARQL access_method — SSTIM's SPARQL is client-side, no hosted endpoint. |
 
 **RECOMMENDED (add for a strong, approvable record):**
 
 | Field | Value |
 |---|---|
 | Licences | CC BY 4.0 |
-| Organisation links | **maintaining** org = BSC Lab (laBioSynCare), `https://github.com/laBioSynCare`. Funding org: none (independent project) — leave if none |
+| Organisation links | Intended **maintaining** org = BSC Lab (laBioSynCare), `https://github.com/laBioSynCare`; verify whether it saved and add it if absent without changing publisher identity. Funding org: none (independent project) — leave if none |
 | Domains (DRAO) | **sensory perception** (+ auditory/visual perception if offered) |
-| Support links | docs `…/ontology/docs/`; repo `…/laBioSynCare.github.io`; namespace `https://w3id.org/sstim` |
+| Support links | docs `https://w3c-cg.github.io/sstim/ontology/docs/`; repo `https://github.com/w3c-cg/sstim`; issues `https://github.com/w3c-cg/sstim/issues`; namespace `https://w3id.org/sstim` |
 | Record associations | **Done 2026-07-12:** added **BFO, IAO, OBI** with relationship **extends**. **COB is not registered in FAIRsharing** (small/newer OBO layer) — skipped, no gap. |
 | Citation / Publications | **Skip** — recommended-only, and only for a journal paper describing the resource (none exists). The DOI-import hangs on Zenodo DOIs (FAIRsharing import is CrossRef/PubMed; Zenodo is DataCite) — reload to clear the spinner. If a citation is wanted, use "CREATE NEW PUBLICATION" manually. Re-listed as missing by the automated completeness mail on 2026-08-07; decision unchanged until a paper exists. |
-| Cross references / identifiers | Additional Information tab. Portal dropdown lists BioPortal/OLS/OBO Foundry/AgroPortal/re3data/SciCrunch/Other — for a Zenodo DOI use **portal = Other**. Real value: add **BioPortal**/**OLS**/**OBO Foundry** cross-refs once SSTIM is listed there. Optional. |
+| Cross references / identifiers | Additional Information tab. Preserve the Zenodo concept DOI under **portal = Other**. Add the live **BioPortal** record `SSTIM`; add OLS only after PR #1351 is merged and the OLS record resolves. Optional. |
 | Associated tools | **Skip** (optional). The interactive browser is an integrated site feature → belongs under **Data processes** as "Browse", not as a standalone tool — which is exactly the distinction the 2026-08-07 completeness mail draws when it re-lists this field. Decision unchanged. |
 
 ```text
@@ -1034,8 +1087,9 @@ Account/maintainer: @renato.fabbri (FAIRsharing account)
 External record ID or URL:  https://fairsharing.org/8494 — PUBLIC, and findable
                             by searching "sstim" from a logged-out session
                             (checked in a second browser, 2026-08-17)
-Status:             PUBLIC, AWAITING DOI (curator edit 2026-08-06). Completed
-                    2026-07-12: taxonomies set to "Not Applicable" → record left
+Status:             PUBLIC; FAIRsharing DOI assigned 2026-08-24:
+                    https://doi.org/10.25504/FAIRsharing.660ff4.
+History:            2026-07-12: taxonomies set to "Not Applicable" → record left
                     "incomplete" and read "awaiting review by FAIRsharing
                     curators". All required fields done; rich metadata (object
                     types, subjects, domains incl. sensory-perception terms, 3
@@ -1046,10 +1100,17 @@ Status:             PUBLIC, AWAITING DOI (curator edit 2026-08-06). Completed
                     and reviewed the record on 2026-08-06 16:50 (the record's own
                     "Last Edited"/"Last Reviewed" is the authority; this file
                     previously said 08-07, the notification's date), so review has
-                    begun; it asserted neither approval nor a DOI, and the edits
-                    themselves are unread (see the two checks below).
-Required follow-up: The record is already public; what is still outstanding is
-                    only the DOI. Record it when it lands.
+                    begun. The DOI is a record identifier, not an SSTIM release
+                    DOI, so it does not belong in `CITATION.cff` or `void.ttl`.
+Required follow-up: In a signed-in record edit, change the homepage, Browse
+                    SSTIM URL/documentation URL, and support repository/docs/
+                    issues to the W3C-CG values above; change any versioned
+                    whole-set download from `sstim-core.ttl` to
+                    `sstim-namespace.ttl`; preserve record 8494, both DOI
+                    families, and the stable W3ID namespace. Verify whether the
+                    intended BSC Lab maintaining-organisation link exists; if
+                    absent, add it without changing publisher identity. Add the
+                    live BioPortal cross-reference.
 
                     **Public visibility is NOT scriptable from here — check it in
                     a logged-out browser.** Do not try to be clever about this.
@@ -1073,10 +1134,14 @@ Required follow-up: The record is already public; what is still outstanding is
                     instrument can see the place, the answer is INCOMPLETE, not
                     "absent".
 
-                    Two things still needing a login: (1) diff the curator's
+                    The 2026-09-01 public server-rendered record data still
+                    exposed the legacy homepage. The write API requires
+                    authentication, and the available signed-in browser runtime
+                    failed to start, so no edit was claimed. Two things still
+                    need that signed-in session: (1) diff the curator's
                     2026-08-06 edits at `https://fairsharing.org/8494?history=show`
                     against the intended values above; (2) the record was
-                    submitted at 0.6.0 and the current release is 0.15.0 —
+                    submitted at 0.6.0 and the current release is 0.16.0 —
                     confirm no data-process URL pins a stale version. Also note
                     the same-day automated completeness mail listed
                     "Organisation links" as not yet present, which contradicts
@@ -1085,13 +1150,14 @@ Required follow-up: The record is already public; what is still outstanding is
                     roles, but verify the maintainer link actually saved.
 ```
 
-### DBpedia KG Catalog — SUBMITTED (2026-08-18)
+### DBpedia KG Catalog — LIVE; 0.16.0 updater PR open
 
 A new, actively developed DBpedia catalogue (<https://kg-catalog.dbpedia.org/>),
 announced on the DBpedia Slack by Milan Dojchinovski (@m1ci) inviting beta
-testers. Backed by the GitHub repository `m1ci/lod-next-gen`. Worth being early
-in: the maintainer is present and asking for feedback, which is the opposite of
-the two dormant catalogues above.
+testers. Its canonical GitHub repository is now `dbpedia/kg-catalog` (the old
+`m1ci/lod-next-gen` links redirect). Worth being early
+in: the maintainer is present and asking for feedback, unlike Archivo's stalled
+updater and LOV's untracked manual intake.
 
 **Ontologies are in scope**, checked before submitting rather than assumed:
 domain 8, "Linguistics, Social & Digital Knowledge Systems", reads "Includes
@@ -1100,7 +1166,9 @@ Ontology is already catalogued as `cso`.
 
 **Two submission routes.** Option 1 is a guided GitHub issue form, recommended
 by the guide and validated automatically. Option 2 is a YAML pull request
-against `knowledge-graphs/<id>/metadata.yaml`. We used Option 1.
+against `knowledge-graphs/<id>/metadata.yaml`. The initial 0.15.0 record used
+option 1; the W3C-CG migration and automated refresh use option 2 in
+[PR #53](https://github.com/dbpedia/kg-catalog/pull/53).
 
 **No Databus publishing is required.** `cso` sets both `moss-publish` and
 `databus-publish` to `false` and points its distributions at self-hosted files,
@@ -1108,26 +1176,34 @@ which is what we mirrored — so this submission does not depend on the Databus
 that is currently failing for Archivo.
 
 ```text
-Service:            DBpedia KG Catalog (m1ci/lod-next-gen)
-Submitted URL:      https://github.com/m1ci/lod-next-gen/issues/46
-Submitted version:  0.15.0 (artifact version id 2026.08.17)
-Distribution:       https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl
-                    ttl, 727857 bytes,
-                    sha256 838b09a862af283d8a3ace16872f05cb43eb69ee061f3217077e94bc66cc2dfc
-                    Verified live and hashed from the served bytes before posting.
-Date:               2026-08-18
+Service:            DBpedia KG Catalog (dbpedia/kg-catalog)
+Initial submission: https://github.com/dbpedia/kg-catalog/issues/46
+Migration/update:   https://github.com/dbpedia/kg-catalog/pull/53
+Live version:       0.15.0 (artifact version id 2026.08.17)
+Live distribution:  https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl
+                    ttl, 727857 bytes, sha256
+                    838b09a862af283d8a3ace16872f05cb43eb69ee061f3217077e94bc66cc2dfc
+Pending version:    0.16.0 (artifact version id 2026.08.18)
+Pending dist.:      https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl
+                    ttl, 788555 bytes, sha256
+                    522abc802f2366356899ddedc5b2e548d5918368185fd84b178c6004398037b1
+Date:               2026-08-18 initial; 2026-09-01 migration PR
 Account/maintainer: @ttm
-Status:             SUBMITTED — **not yet validated.** The issue form declares a
-                    `new-kg` label and `validate-new-kg.yml` gates on it, but a
-                    non-collaborator cannot set labels through the API, so `gh
-                    issue create --label new-kg` silently dropped it. Recorded as
-                    a comment on the issue, with an offer to re-submit via the
-                    web form or as a PR instead. Submitting through the browser
-                    form would have applied the label automatically.
-Required follow-up: Watch for the label, the automated validation comment, and
-                    the PR their workflow opens. Update the entry to 0.16.0 once
-                    that release is cut — the catalogue models versions, so it is
-                    a metadata addition rather than a resubmission.
+Status:             LIVE since 2026-08-24 at kg.html?id=sstim and the Databus
+                    group. PR #53 preserves the historical 0.15.0 URL/hash,
+                    updates record-level facts to 0.16.0, adds the verified W3C
+                    0.16.0 distribution as `pending`, and sets
+                    `check-new-release: sstim_release_auto_update.py`.
+                    The updater reads stable W3C-CG tags, then fails closed
+                    unless the frozen manifest, `owl:versionInfo`, and one
+                    `dct:issued` date agree before calculating bytes and SHA-256.
+                    Live-run, idempotence, five focused checks, Python compile,
+                    YAML parsing, and the catalog URL-validation script passed.
+Required follow-up: Watch PR #53. After merge, confirm 0.16.0 changes from
+                    pending to active and the first unchanged daily updater run
+                    makes no metadata change. Future stable tags should append
+                    exactly one release at a time; do not manually rewrite
+                    historical distributions.
 
                     **Domain is Life Sciences & Health**, changed by the
                     maintainer's decision on 2026-08-18 and verified live on the
@@ -1198,12 +1274,13 @@ Office decides what goes on *their* instance, so the answer may be a redirect.
 Status: **drafted, not sent.** Send it, then record the reply here before doing
 anything else with this registry.
 
-### OLS4 (EBI Ontology Lookup Service) — ACTIONABLE NOW
+### OLS4 (EBI Ontology Lookup Service) — PR OPEN, UPDATED 2026-09-01
 
 OBO-adjacent browsing without changing SSTIM identifiers. The old note here said
 "confirm the current repository and format" and rated this low priority behind
-Archivo and LOV. Both of those turned out to be dormant, and this one is not, so
-the priority was backwards. Confirmed 2026-08-18:
+Archivo and LOV. Archivo's updater is stalled; LOV shows recent curation but its
+SSTIM suggestion is untracked; OLS is actively reviewed. The priority was
+therefore backwards. Confirmed 2026-08-18:
 
 **Absence measured, not assumed.** `GET /ols4/api/ontologies/sstim` and `/SSTIM`
 both return 404 against 282 indexed ontologies.
@@ -1230,10 +1307,10 @@ recent entries:
     definition_property[], synonym_property[], hierarchical_property[],
     base_uri, reasoner, oboSlims, ontology_purl
 
-**The submitted entry pins a frozen release artifact.** Its historical submitted `ontology_purl` is `https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl`,
-matching the version reviewed in PR #1351. It does not consume BioPortal's generated
-`sstim-full.owl`. The follow-up below deliberately leaves this pinned while the
-reviewer decides whether to accept a 0.16.0 bump or a rolling URL.
+**The submitted entry pins a frozen release artifact.** PR #1351 now uses
+`https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl` and the W3C
+documentation homepage. It does not consume BioPortal's generated
+`sstim-full.owl`. The ontology IRI and all base namespaces are unchanged.
 
 Note SSTIM's SKOS layer is a good fit for the `definition_property` and
 `synonym_property` fields, which recent entries point at `skos:definition` and
@@ -1245,14 +1322,14 @@ not entirely, empty. See `make language-coverage` and the alias note in
 ```text
 Service:            OLS4 (EBI Ontology Lookup Service)
 Submitted URL:      https://github.com/EBISPOT/ols4/pull/1351
-Submitted version:  0.15.0
+Submitted version:  0.16.0 (updated from 0.15.0 on 2026-09-01)
 Date:               2026-08-18
 Account/maintainer: @ttm (fork ttm/ols4, branch add-sstim-ontology)
 External record ID or URL:  https://www.ebi.ac.uk/ols4/ontologies/sstim (on merge)
 Status:             PR OPEN, UNDER REVIEW — one entry appended to
-                    ebi_ontologies.json against the dev branch. 35 insertions,
-                    0 deletions, mergeable. Their recent "Add X ontology" PRs
-                    merged within days.
+                    ebi_ontologies.json against the dev branch. Migration commit
+                    258c2a51 changes its homepage and ontology_purl to W3C-CG /
+                    frozen 0.16.0; reviewer notification posted 2026-09-01.
 
                     2026-08-20: collaborator @haideriqbal asked three questions —
                     the biomedical use case, which group or institute developed
@@ -1272,14 +1349,8 @@ Status:             PR OPEN, UNDER REVIEW — one entry appended to
 Required follow-up: Watch #1351. On merge, confirm the ontology resolves at
                     /ols4/ontologies/sstim and record the URL above.
 
-                    Awaiting their answer on two offers made 2026-08-21: bump
-                    ontology_purl to the shipped 0.16.0 now, or leave it pinned
-                    at the reviewed 0.15.0; and a one-line bump PR per release
-                    versus a rolling URL. Act on whichever they choose rather
-                    than changing the entry under an in-flight review.
-
                     **Bump ontology_purl at every release.** It pins the frozen
-                    0.15.0 snapshot deliberately: the unversioned path
+                    0.16.0 snapshot deliberately: the unversioned path
                     /ontology/sstim-namespace.ttl serves the mutable -dev line,
                     and this file's own rule is never to present that as a
                     release. The cost is a one-line PR per release, and the PR
@@ -1294,11 +1365,14 @@ Required follow-up: Watch #1351. On merge, confirm the ontology resolves at
                     lists four namespaces because SSTIM is modular;
                     `label_property` carries both rdfs:label and skos:prefLabel
                     since classes use one and concepts the other; and
-                    `synonym_property` is declared as skos:altLabel for future
-                    use, stated plainly in the PR as currently empty.
+                    `synonym_property` is declared as skos:altLabel despite its
+                    sparse current coverage (15 labels on eight concepts in
+                    0.16.0).
 
-                    Verified before opening: the ontology_purl returns 200 as
-                    text/turtle, 727857 bytes, parsing to 10437 triples.
+                    Verified before pushing the update: the ontology_purl
+                    returns 200 as Turtle, 788555 bytes, parsing to 11506
+                    triples, SHA-256
+                    522abc802f2366356899ddedc5b2e548d5918368185fd84b178c6004398037b1.
 ```
 
 ### OpenAIRE — deferred

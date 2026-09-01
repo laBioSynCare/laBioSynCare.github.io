@@ -7,8 +7,14 @@
 - **Status:** **executed 2026-08-23.** PR #1 merged into target `main` as
   `773d64cd5fc6b79487334eb011a92ba46ee6eec3`; Pages deployed and accepted;
   target refs protected
-- **Production W3ID cutover:** not performed
+- **Production W3ID cutover:** performed 2026-08-27 in
+  [perma-id/w3id.org#6609](https://github.com/perma-id/w3id.org/pull/6609)
 - **Old repository archival:** not performed
+
+This is an execution report with a preserved 2026-08-23 checkpoint narrative.
+Later production state is recorded in the post-report follow-up below; phrases
+such as “candidate,” “unchanged,” and “remaining before cutover” in the original
+sections describe that dated checkpoint, not the current deployment.
 
 ## Executive result
 
@@ -55,6 +61,24 @@ The following remote-safe work is complete:
 - Draft pull request `w3c-cg/sstim#1` is open and mergeable. Its IPR status
   check passed and its repository CI started successfully.
 - Target `main` and its live scaffold Pages deployment remain unchanged.
+
+## Post-report production follow-up — 2026-09-01
+
+- W3ID PR #6609 merged on 2026-08-27. Live HTML and RDF negotiation now target
+  the W3C-CG project publication without changing any canonical SSTIM IRI.
+- Both repositories again carry the same `main` commit. The deterministic
+  BioPortal publication fix is deployed from `c027cbb`; the corresponding W3C
+  Lint/Build, RDF validation, and Pages workflows passed.
+- The W3C and preserved legacy origins serve byte-identical frozen 0.15.0 and
+  0.16.0 namespace artifacts and byte-identical 0.16.0 BioPortal bundles.
+- Mutable external-registry locations are being moved while record identities,
+  DOIs, prefixes, and immutable historical artifacts remain fixed. BioPortal
+  was patched directly; BARTOC was sent a curator request; the OLS submission
+  was updated in place; and a KG Catalog 0.16.0/updater PR was opened.
+  FAIRsharing still needs a signed-in edit. Archivo, LOV, and prefix.cc require
+  no host migration because they key SSTIM by its unchanged W3ID identity.
+  The exact evidence and follow-ups are in
+  [`REGISTRY_SUBMISSIONS.md`](../ontology/REGISTRY_SUBMISSIONS.md).
 
 ## Post-merge outcome, 2026-08-23
 
@@ -516,9 +540,10 @@ Apply these distinctions:
 - **W3ID:** remains a separate, explicitly approved final cutover. No registry
   update authorizes a production W3ID rule change implicitly.
 
-No registry was modified during this checkpoint.
+No registry was modified during the original 2026-08-23 checkpoint. The later
+2026-09-01 actions are recorded in the post-report follow-up above.
 
-## Exact remaining sequence before W3ID cutover
+## Exact remaining sequence before W3ID cutover (historical 2026-08-23 checkpoint)
 
 Steps 1 to 7 of the original sequence are complete: protection is applied, Gate
 G1 is decided, PR #1 passed the full matrix and was merge-committed, Actions
@@ -609,7 +634,7 @@ What remains:
    through the existing repository integration, be reconnected to
    `w3c-cg/sstim`, or be left frozen until a future CG release policy is agreed?
 
-## Safe stopping point
+## Historical safe stopping point (2026-08-23)
 
 The migration can stop here without affecting production. `w3c-cg/sstim` is the
 history-complete source and an independent reviewer can reproduce that from a
@@ -617,8 +642,8 @@ fresh clone. The Pages artifact serves the SSTIM publication and reference
 environment below `/sstim/`, with its refs protected and its scaffold preserved
 on `pages/pre-migration-scaffold` for rollback.
 
-What is deliberately **not** true, and is not claimed: production W3ID still
-resolves through the old deployment, the manifest portability question (M-01) is
-open, the parallel publication authority is unchosen, and the old repository is
-neither archived nor redirected. Old production is healthy and serving
-`e6b3948`.
+What was deliberately **not** true at that checkpoint: production W3ID still
+resolved through the old deployment, the manifest portability question (M-01)
+was open, the parallel publication authority was unchosen, and the old
+repository was neither archived nor redirected. The current W3ID and registry
+state is the post-report follow-up near the top of this file.

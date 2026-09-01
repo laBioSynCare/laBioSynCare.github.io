@@ -186,14 +186,17 @@ indexed, examiner-searchable records.
       work-for-hire clause or joint ownership declaration.*
 
 ### Registries
-- [ ] **Correct BioPortal's displayed release date after bundle stability lands** `P1`
+- [~] **Correct BioPortal's displayed release date after bundle stability lands** `P1`
       *The public submission list shows `0.16.0` as Released 2026-04-12 even
       though the frozen release declares `dct:issued 2026-08-18`. BioPortal's
       current metadata schema maps its `released` field from `dct:created` before
       `dct:issued`, and its extractor stops at the first populated mapping, so the
       column is showing SSTIM's truthful ontology creation date rather than the
-      version's issue date. Deploying the newly pinned bytes is expected to
-      create one final transition row. Capture that new latest/current submission
+      version's issue date. **The deterministic bytes were deployed and
+      submission 28's pull/home/repository/source/docs/issues fields were moved
+      to W3C-CG on 2026-09-01; the captured baseline is current ID 28 and 28
+      rows.** The first nightly pull is expected to create one final transition
+      row. Capture that new latest/current submission
       ID, wait through the following unchanged nightly pull, and confirm its ID
       and the row count do not change. Historical archived duplicates will
       remain. Then PATCH that captured `0.16.0` submission to 2026-08-18 and
@@ -201,41 +204,54 @@ indexed, examiner-searchable records.
       repeat the numbered post-deploy procedure in `REGISTRY_SUBMISSIONS.md` for
       each genuine release while preserving `dct:created` in SSTIM's metadata.*
 
-- [ ] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
+- [~] **Confirm and, if necessary, correct BioPortal's current Version IRI** `P1`
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
       frozen `0.16.0` artifact carries exactly
-      `https://w3id.org/sstim/0.16.0`. After the transition pull and subsequent
+      `https://w3id.org/sstim/0.16.0`. **Authenticated API read-back confirmed
+      that value on current submission 28 on 2026-09-01.** After the transition
+      pull and subsequent
       unchanged-pull stability check, inspect the latest/current submission in
       the API and UI. If the field remains stale, correct that current row only,
       verify the displayed/resolved value, and preserve archived submissions as
       history. Repeat this check for each genuine release.*
 
-- [ ] **Automate the DBpedia KG Catalog release refresh** `P3`
-      *Asked @m1ci on [lod-next-gen#46](https://github.com/m1ci/lod-next-gen/issues/46)
-      how the catalog tracks new releases; answered 2026-08-25 with two options.
-      Option 1 is a manual PR per release editing `metadata.yaml`. Option 2 is a
-      Python script referenced from `metadata.yaml` as
-      `check-new-release: script-name.py`, which their workflow runs daily.
-      He recommends option 2 for frequent releases, and ours are frequent:
-      0.14.0, 0.15.0 and 0.16.0 landed within days. **Take option 2.***
+- [~] **Automate the DBpedia KG Catalog release refresh** `P3`
+      *Implementation is in [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53),
+      opened 2026-09-01 after @m1ci recommended its `check-new-release` hook in
+      [issue #46](https://github.com/dbpedia/kg-catalog/issues/46). The PR adds
+      the verified frozen W3C-CG 0.16.0 distribution and a daily updater that
+      discovers stable tags and fails closed unless the released manifest,
+      `owl:versionInfo`, and one `dct:issued` date agree. It computes the exact
+      bytes/hash, appends one newer release as pending, and does not backfill or
+      rewrite historical entries. Live discovery, a second idempotent run, five
+      focused checks, Python compilation, YAML parsing, and the catalog's URL
+      validation script passed. The generic per-release description avoids a
+      second count parser; record-level counts are updated explicitly in the
+      same PR.*
 
-      *Feasible with what is already public, checked 2026-08-25: new versions
-      come from the GitHub tags API (`v0.16.0`), the artifact is
-      `https://labiosyncare.github.io/ontology/<version>/sstim-namespace.ttl`
-      (answers 200), and `sha256` plus `size` are computed from that file. Model
-      it on `knowledge-graphs/dblp/dblp_release_auto_update.py` in their repo:
-      read the last entry under `artifacts[0].versions`, append a new one, set
-      every distribution to `status: pending` so their system picks it up.*
+      *Complete this only after the PR merges, 0.16.0 becomes active, and the
+      next unchanged daily updater run leaves `metadata.yaml` untouched.*
 
-      *One design choice to make, not yet made. The existing version description
-      embeds per-release counts ("163 OWL classes, 545 SKOS concepts across 67
-      concept schemes"). Either the script parses the released graph to compute
-      them, or the description drops to a generic sentence. Parsing keeps the
-      catalog as accurate as it is today, which is the reason to prefer it.*
+- [~] **Migrate BARTOC node 21154's mutable links and extent** `P2`
+      *The live JSKOS record still carries the legacy docs/repository and July
+      counts. The exact W3C-CG replacements and 0.16.0 extent were requested in
+      [gbv/bartoc.org#319](https://github.com/gbv/bartoc.org/issues/319#issuecomment-5497720588)
+      on 2026-09-01. The request preserves the node URI, W3ID identifier,
+      concept DOI, and publisher field. Complete after a curator applies it and
+      the public JSKOS API returns the new values.*
 
-      *Until this ships the catalog stays pinned at `0.15.0` / artifact
-      `2026.08.17`. Not urgent: the record is correct for the release it names.*
+- [ ] **Migrate FAIRsharing record 8494's mutable links to W3C-CG** `P2`
+      *The public record still exposes the legacy homepage. FAIRsharing edits
+      require its signed-in SPA/API, and the available in-app browser runtime
+      failed to start on 2026-09-01. In one authenticated edit, replace the
+      homepage, Browse SSTIM URL/doc URL, and support docs/repository/issues;
+      ensure the versioned whole-set download uses `sstim-namespace.ttl`, add
+      the live BioPortal cross-reference, and preserve record 8494, its
+      FAIRsharing DOI, the Zenodo DOI, and W3ID identity. Verify whether the
+      intended BSC Lab maintaining-organisation link exists; if absent, add it
+      without changing publisher identity. Exact values are in
+      `REGISTRY_SUBMISSIONS.md`.*
 
 - [x] **Correct the prefix.cc registration** — **done 2026-08-18**, hours after it
       was found. All four serialisations now serve `https://w3id.org/sstim#`,
@@ -547,44 +563,17 @@ indexed, examiner-searchable records.
       where the routes point; this one would change what the IRIs are. Doing
       both at once makes a failed redirect impossible to attribute.*
 
-- [~] Cut the production w3id routes over from `labiosyncare.github.io` to
-      `w3c-cg.github.io/sstim` `P1`
-      ***Authorised 2026-08-27; [w3id PR #6609](https://github.com/perma-id/w3id.org/pull/6609)
-      is open and awaiting review.*** *All 58 targets in the repository mirror now point at the
-      project site, the four gates pass, and the nine target families were
-      confirmed 200 on the new origin. One rule was added rather than moved: the
-      frozen manifests for 0.13.0 through 0.16.0 state root-absolute paths and
-      stay on the origin-root deployment, derived from the snapshots themselves
-      so a future regression pins itself. The staged-route harness swapped
-      direction, so it now rehearses the rollback, which is the remaining half of
-      the Pages-rollback proof the migration report left open.*
-
-      *The upstream README change was kept minimal on purpose. The repository
-      mirror has grown to 177 lines against upstream's 86, and the w3id checklist
-      asks that commits carry redirects and basic information rather than full
-      documentation, so only the project, target and exception lines were sent.
-      The `.htaccess` remains byte-identical to the mirror, which is what
-      `make w3id-routes` pins.*
-
-      *Recorded 2026-08-25: Renato intends to consider this shortly. Nothing
-      tracked it before, because
-      [`W3C_REPOSITORY_MIGRATION.md`](docs/ecosystem/W3C_REPOSITORY_MIGRATION.md)
-      deliberately excluded the production W3ID cutover from what it authorised.
-      It is a separate, explicit production change and must come last, after the
-      repository move and the parallel publication site, both of which are done.*
-
-      *Surface, measured 2026-08-25: 58 target URLs in
-      `docs/ecosystem/w3id/sstim/.htaccess`, plus `SITE_PREFIX` in
-      `scripts/check-w3id-route-targets.mjs`. The repository mirror is the source
-      and a test pins every target (w3id PR #6517), so the edit is mechanical and
-      `make w3id-routes` proves it before the upstream PR. Upstream PRs must use
-      the w3id.org pull-request template.*
-
-      *Two things are not mechanical. The mount changes: targets move from an
-      origin root to `/sstim`, so every path gains a segment and a missed one
-      404s silently. And browser-stored data is per-origin, so the transition
-      instructions tracked below should be published before the redirect moves,
-      not after.*
+- [x] Cut the production w3id routes over from `labiosyncare.github.io` to
+      `w3c-cg.github.io/sstim` — **done 2026-08-27** `P1`
+      *[w3id PR #6609](https://github.com/perma-id/w3id.org/pull/6609) merged as
+      `e7416b7`. Live HTML and RDF negotiation now target the W3C-CG project
+      publication; the stable ontology URI, namespace, and version IRIs did not
+      change. All route gates passed, the new-origin target families answered,
+      and frozen manifests whose root-absolute paths require the legacy
+      origin-root publication retained their explicit exceptions. The checked-in
+      `.htaccess` remains the repository mirror of the upstream rules, and the
+      reverse staged harness preserves the rollback proof. User origin-transition
+      instructions shipped before the cutover.*
 
 - [~] Extend the existing `https://w3id.org/sstim` namespace rules for the BSC
       framework and implementation instances under `/framework/bsc`,
@@ -742,13 +731,14 @@ Turtle files are listed in section 1. After they exist:
 
 - [~] Watch OLS4 PR #1351, then bump `ontology_purl` at every release `P2`
       *[EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351) adds SSTIM
-      to `ebi_ontologies.json` on `dev` — 35 insertions, no deletions,
-      mergeable. Their recent "Add X ontology" PRs merged within days. On merge,
+      to `ebi_ontologies.json` on `dev`. Commit `258c2a51`, pushed 2026-09-01,
+      moves its homepage to W3C-CG and bumps the frozen ontology from historical 0.15.0 to
+      0.16.0; the reviewer was notified in the PR. On merge,
       confirm <https://www.ebi.ac.uk/ols4/ontologies/sstim> resolves and record
       it in `REGISTRY_SUBMISSIONS.md`.*
 
       ***Then it becomes a per-release chore.*** *The entry pins the frozen
-      snapshot — `…/ontology/0.15.0/sstim-namespace.ttl` — on purpose, because
+      snapshot — `…/ontology/0.16.0/sstim-namespace.ttl` — on purpose, because
       the unversioned path serves the mutable `-dev` line and this project does
       not advertise that as a release. So each release needs a one-line follow-up
       PR bumping the version in that URL, or OLS keeps serving the previous one.
