@@ -634,8 +634,20 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
     is therefore the source of truth for the record's title, description,
     creators, free-text keywords, controlled-vocabulary subjects (MeSH,
     EuroSciVoc and GEMET, resolved against Zenodo's vocabularies at run time),
-    related identifiers and software custom fields. Anything typed into the
-    Zenodo form and not written back here is lost at the next release.
+    related identifiers, licences, communities and software custom fields.
+    Anything typed into the Zenodo form and not written back here is lost at the
+    next release.
+
+    **Run the sync after every deposit, not only after an edit to the file.** A
+    deposit speaks the legacy schema, which has one `license` field and no place
+    for custom fields, so it publishes the record saying CC BY 4.0 alone while
+    the archive is in fact Apache-2.0 software, CC BY 4.0 ontology and
+    documentation, and CC0 audio ([`LICENSING.md`](../../LICENSING.md) is the
+    scope matrix). Only the sync can send the three-licence `rights` list, and
+    `make zenodo-deposit` ends by saying so. The sync also asks the communities
+    named in `.zenodo.json` to include the record; membership is the curators'
+    decision, an inclusion request already pending is not sent twice, and
+    nothing about the record changes until one is accepted.
 12. Carry the resulting version DOI into the three files that name it —
     `void.ttl`, `CITATION.cff` and `src/ui/entrance/releaseMetadata.js` — and run
     `make truth-audit`, which fails until all three agree. Never rewrite a

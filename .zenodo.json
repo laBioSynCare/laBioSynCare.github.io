@@ -1,9 +1,14 @@
 {
   "title": "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology",
-  "description": "<p><strong>SSTIM Workbench</strong>, previously developed as BSC Lab, is the open reference environment for <strong>SSTIM</strong>, the Sensory Stimulation Vocabulary developed through the <a href=\"https://www.w3.org/community/sstim/\">W3C Sensory Stimulation Vocabulary Community Group</a>. It has two integrated layers: a precision multi-engine audiovisual stimulation application, and a knowledge layer over the SSTIM ontology.</p><p>This release freezes SSTIM 0.16.0, published at <a href=\"https://w3id.org/sstim\">https://w3id.org/sstim</a> under CC BY 4.0: 18 modules holding 164 OWL classes, 304 properties and 551 SKOS concepts in English, Italian, Portuguese and Spanish, with SHACL validation shapes, four conformance profiles (Kernel, Core, Core Plus, Full), qualified evidence assessments, exposure and ecosystem term modules, and alignments to BFO, COB, IAO, OBI, PROV-O, W3C ORG, SNOMED CT and Wikidata. The version IRI <a href=\"https://w3id.org/sstim/0.16.0\">https://w3id.org/sstim/0.16.0</a> resolves to the frozen artifacts this archive contains.</p><p>The archive is the whole repository at its release tag: the ontology sources and their frozen snapshot, the Svelte application (Graph Navigator, SPARQL interface, Patch Studio, four selectable audio engines), the validation and release tooling, and the documentation and architecture decision records.</p><p><strong>Licensing is per artifact class</strong>, which the single license field above cannot express. Software, build tooling and JSON contracts are Apache-2.0; the ontology, vocabulary, public RDF data and documentation are CC BY 4.0; synthetic reference audio is CC0 1.0. LICENSING.md in the archive is authoritative.</p><p><strong>Scope.</strong> Sensory stimulation is framed here as wellness, not treatment, and nothing in this release is a medical device or a clinical claim. Community Group work is not a W3C Recommendation and is not W3C-endorsed technology. Ecosystem fixtures in the release are synthetic; real live-only agent records are kept outside this archive by design. Each tagged release is archived here for citation.</p>",
+  "description": "<p><strong>SSTIM Workbench</strong>, previously developed as BSC Lab, is the open reference environment for <strong>SSTIM</strong>, the Sensory Stimulation Vocabulary developed through the <a href=\"https://www.w3.org/community/sstim/\">W3C Sensory Stimulation Vocabulary Community Group</a>. It has two integrated layers: a precision multi-engine audiovisual stimulation application, and a knowledge layer over the SSTIM ontology.</p><p>This release freezes SSTIM 0.16.0, published at <a href=\"https://w3id.org/sstim\">https://w3id.org/sstim</a> under CC BY 4.0: 18 modules holding 164 OWL classes, 304 properties and 551 SKOS concepts in English, Italian, Portuguese and Spanish, with SHACL validation shapes, four conformance profiles (Kernel, Core, Core Plus, Full), qualified evidence assessments, exposure and ecosystem term modules, and alignments to BFO, COB, IAO, OBI, PROV-O, W3C ORG, SNOMED CT and Wikidata. The version IRI <a href=\"https://w3id.org/sstim/0.16.0\">https://w3id.org/sstim/0.16.0</a> resolves to the frozen artifacts this archive contains.</p><p>The archive is the whole repository at its release tag: the ontology sources and their frozen snapshot, the Svelte application (Graph Navigator, SPARQL interface, Patch Studio, four selectable audio engines), the validation and release tooling, and the documentation and architecture decision records.</p><p><strong>Licensing is per artifact class, and the three licences above are not alternatives.</strong> Each governs a different part of this archive: Apache-2.0 the software, build tooling and JSON contracts; CC BY 4.0 the ontology, vocabulary, public RDF data and documentation; CC0 1.0 the synthetic reference audio. A file carrying its own notice is governed by that notice, and LICENSING.md in the archive is the scope matrix.</p><p><strong>Scope.</strong> Sensory stimulation is framed here as wellness, not treatment, and nothing in this release is a medical device or a clinical claim. Community Group work is not a W3C Recommendation and is not W3C-endorsed technology. Ecosystem fixtures in the release are synthetic; real live-only agent records are kept outside this archive by design. Each tagged release is archived here for citation.</p>",
   "upload_type": "software",
   "access_right": "open",
   "license": "CC-BY-4.0",
+  "licenses": [
+    "apache-2.0",
+    "cc-by-4.0",
+    "cc0-1.0"
+  ],
   "language": "eng",
   "creators": [
     {
@@ -334,5 +339,16 @@
     "code:developmentStatus": {
       "id": "active"
     }
-  }
+  },
+  "communities": [
+    {
+      "identifier": "linkeddata"
+    },
+    {
+      "identifier": "semantic-web"
+    },
+    {
+      "identifier": "rse"
+    }
+  ]
 }

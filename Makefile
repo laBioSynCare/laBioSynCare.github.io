@@ -562,10 +562,12 @@ zenodo-deposit:
 
 ## Push .zenodo.json onto the already published record: title, description,
 ## creators, free-text keywords, controlled-vocabulary subjects, related
-## identifiers and the software custom fields. The DOI does not change and no
-## new version appears. Dry run by default; pass PUBLISH=1 with ZENODO_TOKEN set
-## to execute. Run it whenever .zenodo.json changes without a release, which is
-## how the record went on saying "BSC Lab" after the rename.
+## identifiers, the three licences, the software custom fields, and inclusion
+## requests for the named communities. The DOI does not change and no new
+## version appears. Dry run by default; pass PUBLISH=1 with ZENODO_TOKEN set to
+## execute. Run it whenever .zenodo.json changes without a release (which is how
+## the record went on saying "BSC Lab" after the rename) and after every
+## release, because a deposit cannot carry the licences or the custom fields.
 zenodo-sync:
 	node scripts/zenodo-sync.mjs $(if $(RECORD),--record $(RECORD),) $(if $(PUBLISH),--publish,)
 

@@ -4,15 +4,18 @@ import { fileURLToPath } from 'node:url'
 
 import { expect, test } from 'vitest'
 
+import { NOT_LEGACY_METADATA } from './zenodo-deposit.mjs'
 import {
   asHtml,
   asPerson,
   asRelatedIdentifier,
+  derivedSubjectId,
   buildMetadata,
   changelogSection,
   markdownToHtml,
   resolveSubject,
   resolveSubjects,
+  submitToCommunities,
 } from './zenodo-sync.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -207,3 +210,98 @@ test('the linkage keeps both repositories and the registries that carry a record
 function ids() {
   return new Map((config.subjects ?? []).map((s) => [`${s.scheme}\t${s.term}`, 'vocab:1']))
 }
+
+test('the rights list carries every licence the archive actually has', () => {
+  // LICENSING.md is a scope matrix, not one licence: Apache-2.0 software,
+  // CC BY 4.0 ontology and documentation, CC0 audio. The legacy `license` field
+  // beside this one can only say the middle one.
+  const rights = buildMetadata({ config, subjectIds: ids() }).rights
+  expect(rights.map((r) => r.id)).toEqual(['apache-2.0', 'cc-by-4.0', 'cc0-1.0'])
+  expect(config.license).toBe('CC-BY-4.0')
+})
+
+test('a deposit cannot send the licences, so the sync is what restores them', () => {
+  // Named here as well as in the deposit's own test because this is the drift:
+  // every release resets the record to one licence until the sync runs.
+  expect(NOT_LEGACY_METADATA).toContain('licenses')
+})
+
+test('communities already attached are not requested a second time', async () => {
+  const calls = []
+  const result = await submitToCommunities(
+    '1', [{ identifier: 'linkeddata' }, { identifier: 'rse' }], 'token',
+    async (path, options) => {
+      calls.push([options?.method ?? 'GET', path])
+      if ((options?.method ?? 'GET') === 'GET') return { hits: { hits: [{ slug: 'linkeddata' }] } }
+      expect(options.body.communities).toEqual([{ id: 'rse' }])
+      return { processed: [{ id: 'rse' }], errors: [] }
+    },
+  )
+  expect(result.skipped).toEqual(['linkeddata'])
+  expect(result.submitted).toEqual(['rse'])
+  expect(calls.filter(([method]) => method === 'POST')).toHaveLength(1)
+})
+
+test('nothing is posted when every community is already attached', async () => {
+  const result = await submitToCommunities('1', [{ identifier: 'rse' }], 'token', async () => ({
+    hits: { hits: [{ slug: 'rse' }] },
+  }))
+  expect(result.submitted).toEqual([])
+})
+
+test('MeSH and GEMET ids come out of the URI already recorded, with no request', async () => {
+  // Zenodo answers a subject search in ten to thirty seconds on a bad day, and
+  // there are 41 subjects. Only the 8 EuroSciVoc terms actually need asking:
+  // their ids are numeric while the URI that identifies them is a UUID.
+  expect(derivedSubjectId({ scheme: 'MeSH', identifier: 'https://id.nlm.nih.gov/mesh/D000161' }))
+    .toBe('mesh:D000161')
+  expect(derivedSubjectId({
+    scheme: 'GEMET', identifier: 'http://www.eionet.europa.eu/gemet/concept/7842',
+  })).toBe('gemet:concept/7842')
+  expect(derivedSubjectId({
+    scheme: 'EuroSciVoc',
+    identifier: 'http://data.europa.eu/8mn/euroscivoc/aafff649-e02a-496e-b436-284ce76044c4',
+  })).toBeNull()
+
+  let searched = 0
+  await resolveSubjects(config.subjects, async (term) => {
+    searched += 1
+    return [{ id: 'euroscivoc:1', subject: term, scheme: 'EuroSciVoc' }]
+  })
+  expect(searched).toBe(config.subjects.filter((s) => s.scheme === 'EuroSciVoc').length)
+})
+
+test('a request already open is the routine outcome, not a failure', async () => {
+  // The sync runs after every deposit, so most runs ask again for communities
+  // whose curators have not answered yet. Zenodo refuses that with a 400 and a
+  // reason per community; reporting it as failure would make the normal case
+  // look broken.
+  const refusal = Object.assign(new Error('400'), {
+    status: 400,
+    body: {
+      errors: [
+        { community_id: 'linkeddata', message: 'There is already an open inclusion request for this community.' },
+        { community_id: 'rse', message: 'Something else went wrong.' },
+      ],
+    },
+  })
+  const result = await submitToCommunities(
+    '1', [{ identifier: 'linkeddata' }, { identifier: 'rse' }], 'token',
+    async (_path, options) => {
+      if ((options?.method ?? 'GET') === 'GET') return { hits: { hits: [] } }
+      throw refusal
+    },
+  )
+  expect(result.pending).toEqual(['linkeddata'])
+  expect(result.failed).toEqual(['rse: Something else went wrong.'])
+})
+
+test('a refusal that is not about pending requests still stops the run', async () => {
+  const denied = Object.assign(new Error('403'), { status: 403, body: null })
+  await expect(
+    submitToCommunities('1', [{ identifier: 'rse' }], 'token', async (_p, options) => {
+      if ((options?.method ?? 'GET') === 'GET') return { hits: { hits: [] } }
+      throw denied
+    }),
+  ).rejects.toThrow('403')
+})

@@ -53,12 +53,16 @@ export function parentRecordId(voidTtl) {
  * GitHub webhook read exactly this file, so switching to the API changes who
  * sends the metadata and not what the metadata says.
  *
- * One key in the file is not part of that schema. `custom_fields` is a sibling
- * of `metadata` in the newer API, not a key inside it, and the legacy endpoint
- * rejects the whole deposit on any field it does not know rather than ignoring
- * it. `scripts/zenodo-sync.mjs` sends that block; this one drops it.
+ * Two keys in the file are not part of that schema, and the legacy endpoint
+ * rejects a whole deposit on any field it does not know rather than ignoring it.
+ * `custom_fields` is a sibling of `metadata` in the newer API, not a key inside
+ * it. `licenses` is the archive's three licences by artifact class, which only
+ * the newer API's `rights` list can hold; the legacy `license` beside it takes
+ * one id, which is why a deposit alone leaves the record saying CC BY 4.0.
+ * `scripts/zenodo-sync.mjs` sends both, and the deposit prints a reminder to
+ * run it.
  */
-export const NOT_LEGACY_METADATA = ['custom_fields']
+export const NOT_LEGACY_METADATA = ['custom_fields', 'licenses']
 
 export function depositMetadata({ zenodoJson, version, publicationDate }) {
   const metadata = { ...zenodoJson, version, publication_date: publicationDate }
@@ -231,6 +235,9 @@ async function main() {
   console.log(`    src/ui/entrance/releaseMetadata.js VERSION_DOI = '${published.doi}'`)
   console.log('  then `make truth-audit`, which fails until all three agree, and')
   console.log(`  \`node scripts/release-open-dev.mjs\` to reopen the mutable line.`)
+  console.log('\n  Then `make zenodo-sync PUBLISH=1`. This deposit could not send the')
+  console.log('  three-licence rights block or the software custom fields, so the record')
+  console.log('  currently says CC BY 4.0 alone. The sync restores them.')
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {

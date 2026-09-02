@@ -148,6 +148,13 @@ export function buildMetadata({ config, subjectIds, releaseNotes, withDescriptio
       { description: markdownToHtml(releaseNotes), type: { id: 'technical-info' } },
     ]
   }
+  if (config.licenses?.length) {
+    // Zenodo's rights field is a list, and this archive genuinely carries three
+    // licences by artifact class (LICENSING.md is the scope matrix). The legacy
+    // `license` field beside it takes one id and is all a deposit can send, so
+    // after every deposit this sync is what restores the other two.
+    metadata.rights = config.licenses.map((id) => ({ id }))
+  }
   if (config.language) metadata.languages = [{ id: config.language }]
   if (config.related_identifiers?.length) {
     metadata.related_identifiers = config.related_identifiers.map(asRelatedIdentifier)
@@ -281,21 +288,94 @@ export function markdownToHtml(markdown) {
 // Reading and writing the record
 // ---------------------------------------------------------------------------
 
-async function api(path, { token, method = 'GET', body, accept = 'application/json' } = {}) {
+/**
+ * Call the API, retrying a read that failed for a reason worth retrying.
+ *
+ * Zenodo answers 504 often enough under load that a single gateway timeout has
+ * already aborted this script twice: once resolving subjects, once on the POST
+ * that opens the draft. Retried are reads, and the two writes that are
+ * idempotent by construction: opening a draft returns the draft that already
+ * exists rather than a second one, and the metadata PUT replaces the whole
+ * document with the same body. The publish is never retried, because a POST
+ * that may have been applied must not be sent again; re-running the whole
+ * script is the safe way to finish that step. A 4xx is not retried either: it
+ * says the request itself is wrong, so repeating it only waits longer for the
+ * same answer.
+ */
+async function api(
+  path,
+  { token, method = 'GET', body, accept = 'application/json', idempotent = false } = {},
+) {
   const url = path.startsWith('http') ? path : `${API}${path}`
-  const response = await fetch(url, {
-    method,
-    headers: {
-      Accept: accept,
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  })
-  if (!response.ok) {
-    throw new Error(`zenodo-sync: ${method} ${url} → ${response.status} ${await response.text()}`)
+  // Eight, not three: measured on 2026-09-02, Zenodo was answering roughly half
+  // of all requests with a 30-second gateway timeout, and a publish run makes a
+  // dozen calls. Three attempts would have finished it about a third of the time.
+  const attempts = method === 'GET' || idempotent ? 8 : 1
+  let last
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    let response
+    try {
+      response = await fetch(url, {
+        method,
+        headers: {
+          Accept: accept,
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+    } catch (error) {
+      last = new Error(`zenodo-sync: ${method} ${url} → ${error.message}`)
+      await backoff(attempt, attempts)
+      continue
+    }
+    if (response.ok) return response.status === 204 ? null : response.json()
+
+    const text = await response.text()
+    last = new Error(`zenodo-sync: ${method} ${url} → ${response.status} ${text}`)
+    // Callers that can act on a refusal need the refusal itself, not its prose:
+    // an already-pending community request is a 400 with a per-community reason.
+    last.status = response.status
+    try {
+      last.body = JSON.parse(text)
+    } catch {
+      last.body = null
+    }
+    if (response.status < 500) break
+    await backoff(attempt, attempts)
   }
-  return response.status === 204 ? null : response.json()
+  throw last
+}
+
+const backoff = (attempt, attempts) =>
+  attempt < attempts
+    ? new Promise((resolve) => setTimeout(resolve, Math.min(500 * 2 ** (attempt - 1), 8000)))
+    : Promise.resolve()
+
+/**
+ * Zenodo's id for a subject whose vocabulary URI already contains it.
+ *
+ * Zenodo names a MeSH entry `mesh:<descriptor>` and a GEMET one
+ * `gemet:concept/<n>`, and both are the tail of the URI `.zenodo.json` already
+ * records, so those need no lookup at all. That matters: resolving every subject
+ * by search is one request each, and on a slow day Zenodo answers a search in
+ * ten to thirty seconds. Deriving what is derivable takes this from 41 requests
+ * to the 8 EuroSciVoc terms, whose ids are numeric while their URIs are UUIDs.
+ *
+ * A derived id that were wrong would be rejected at publish rather than stored:
+ * Zenodo validates a subject id against its own vocabulary.
+ */
+export function derivedSubjectId({ scheme, identifier = '' }) {
+  if (scheme === 'MeSH') {
+    return identifier.match(/id\.nlm\.nih\.gov\/mesh\/([A-Z0-9]+)$/)?.[1] &&
+      `mesh:${identifier.match(/mesh\/([A-Z0-9]+)$/)[1]}`
+  }
+  if (scheme === 'GEMET') {
+    const concept = identifier.match(/gemet\/concept\/(\d+)$/)?.[1]
+    return concept && `gemet:concept/${concept}`
+  }
+  return null
 }
 
 /**
@@ -321,7 +401,8 @@ const defaultSearch = async (term) =>
 export async function resolveSubjects(subjects = [], search = defaultSearch) {
   const ids = new Map()
   for (const entry of subjects) {
-    ids.set(`${entry.scheme}\t${entry.term}`, await resolveSubject(entry, search))
+    const id = derivedSubjectId(entry) ?? (await resolveSubject(entry, search))
+    ids.set(`${entry.scheme}\t${entry.term}`, id)
   }
   return ids
 }
@@ -352,6 +433,9 @@ export function describe(metadata, { current, customFields } = {}) {
   for (const [key, label] of [['related_identifiers', 'related   '], ['dates', 'dates     '], ['languages', 'languages '], ['references', 'references']]) {
     if (metadata[key]) lines.push(`  ${label}  ${metadata[key].length}`)
   }
+  if (metadata.rights) {
+    lines.push(`  licences    ${metadata.rights.map((r) => r.id).join(', ')}`)
+  }
   if (customFields) lines.push(`  custom      ${Object.keys(customFields).sort().join(', ')}`)
   return lines.join('\n')
 }
@@ -367,7 +451,7 @@ export function describe(metadata, { current, customFields } = {}) {
  */
 export async function sync(recordId, metadata, token, customFields) {
   console.log(`  drafting record ${recordId}`)
-  await api(`/records/${recordId}/draft`, { method: 'POST', token })
+  await api(`/records/${recordId}/draft`, { method: 'POST', token, idempotent: true })
   const draft = await api(`/records/${recordId}/draft`, { token, accept: RDM })
 
   // custom_fields are a sibling of metadata in the payload, not a key inside it,
@@ -378,10 +462,62 @@ export async function sync(recordId, metadata, token, customFields) {
   }
 
   console.log('  writing the metadata')
-  await api(`/records/${recordId}/draft`, { method: 'PUT', body: payload, token, accept: RDM })
+  await api(`/records/${recordId}/draft`, {
+    method: 'PUT',
+    body: payload,
+    token,
+    accept: RDM,
+    idempotent: true,
+  })
 
   console.log('  publishing')
   return api(`/records/${recordId}/draft/actions/publish`, { method: 'POST', token })
+}
+
+/** A refusal that means the request this run wanted to make already exists. */
+const ALREADY_ASKED = /already (?:an? )?(?:open inclusion request|included)/i
+
+/**
+ * Ask each named community to include the record.
+ *
+ * Communities are not part of the metadata: a published record joins one
+ * through an inclusion request that the community's curators accept or decline,
+ * and nothing about the record changes until they do.
+ *
+ * The sync is meant to be run after every deposit, so most runs will find the
+ * requests they would make already open, and Zenodo says so with a 400 and a
+ * reason per community rather than with a success. Reporting that as a failure
+ * would make the routine case look broken, so it is separated out: `pending` is
+ * the expected outcome of asking twice, `failed` is a reason worth reading.
+ */
+export async function submitToCommunities(recordId, communities, token, call = api) {
+  const attached = new Set(
+    (await call(`/records/${recordId}/communities`, { token }))?.hits?.hits?.map((c) => c.slug) ??
+      [],
+  )
+  const wanted = communities.map((c) => c.identifier ?? c).filter((slug) => !attached.has(slug))
+  const result = { submitted: [], skipped: [...attached], pending: [], failed: [] }
+  if (wanted.length === 0) return result
+
+  let response
+  try {
+    response = await call(`/records/${recordId}/communities`, {
+      method: 'POST',
+      body: { communities: wanted.map((slug) => ({ id: slug })) },
+      token,
+    })
+  } catch (error) {
+    if (error.status !== 400 || !error.body?.errors) throw error
+    response = error.body
+  }
+
+  for (const problem of response.errors ?? []) {
+    const who = problem.community_id ?? problem.community ?? '?'
+    if (ALREADY_ASKED.test(problem.message ?? '')) result.pending.push(who)
+    else result.failed.push(`${who}: ${problem.message}`)
+  }
+  result.submitted = (response.processed ?? []).map((p) => p.community_id ?? p.id ?? '?')
+  return result
 }
 
 /** Throw away a draft, leaving the published record exactly as it was. */
@@ -414,6 +550,13 @@ async function main() {
   console.log(`record https://zenodo.org/records/${recordId} (version ${version || 'unnamed'})`)
   console.log(describe(metadata, { current: current.metadata, customFields: config.custom_fields }))
 
+  if (config.communities?.length) {
+    console.log(
+      `  communities ${config.communities.map((c) => c.identifier).join(', ')} ` +
+        '(inclusion requested, curators decide)',
+    )
+  }
+
   if (!publish) {
     console.log('\n  DRY RUN. Nothing was written. Re-run with --publish and ZENODO_TOKEN set.')
     console.log('  The DOI does not change and no new version is created; this edits the record.')
@@ -438,6 +581,22 @@ async function main() {
   }
   console.log(`\n  done ${published.links.self_html}`)
   console.log(`  DOI ${published.doi ?? published.pids?.doi?.identifier} (unchanged)`)
+
+  // The metadata is published by this point, so a community request that fails
+  // is reported rather than thrown: it would otherwise read as though the sync
+  // itself had failed, and re-running is how it gets retried anyway.
+  if (config.communities?.length) {
+    try {
+      const result = await submitToCommunities(recordId, config.communities, token)
+      for (const slug of result.skipped) console.log(`  community ${slug}: already a member`)
+      for (const id of result.submitted) console.log(`  community ${id}: inclusion requested`)
+      for (const id of result.pending) console.log(`  community ${id}: request already open`)
+      for (const problem of result.failed) console.log(`  community ${problem}`)
+    } catch (error) {
+      console.log(`  communities not submitted: ${error.message}`)
+      console.log('  the metadata above is published; re-run to retry the requests')
+    }
+  }
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url))) {
