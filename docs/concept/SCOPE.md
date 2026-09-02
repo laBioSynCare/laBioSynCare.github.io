@@ -218,13 +218,36 @@ into BSC Lab Turtle.
 This document describes three different things, and collapsing them produced
 language that was wrong about the first in order to be careful about the third.
 
-**The field.** Sensory stimulation is used in medicine, and is delivered
-clinically by devices regulated as medical devices. Electroconvulsive therapy,
-transcranial magnetic and electrical stimulation, vagus nerve stimulation,
-photic stimulation in diagnostic EEG, and light therapy are clinical
-procedures, not wellness practices. This is a description of the field rather
-than a caveat about it, and the field is better for having regulated devices in
-it. More of them should exist, and building them is legitimate work.
+**The field.** Sensory and related stimulation is used in medicine, and much of
+what SSTIM already names is clinical practice rather than wellness practice.
+Deep brain stimulation treats Parkinson's disease, essential tremor and
+dystonia. Repetitive transcranial magnetic stimulation is a regulator-cleared
+treatment for major depressive disorder. Vagus nerve stimulation treats
+epilepsy, and reducing seizure frequency is prevention in the ordinary clinical
+sense. Electroconvulsive therapy treats severe and treatment-resistant
+depression. Rhythmic auditory cueing is used in gait rehabilitation. Photic
+driving is used diagnostically, to provoke photosensitive responses under EEG.
+
+Every one of those is a published SSTIM term: `sstim-v:techDBS`,
+`sstim-v:techRepetitiveTMS`, `sstim-v:techVagusNerveStimulation`,
+`sstim-v:techElectroconvulsiveTherapy`, `sstim-v:techRhythmicAuditoryCueing`,
+`sstim-v:techPhoticDriving`. So stimulation treats, and it prevents. The devices
+that deliver it are regulated as medical devices, they exist, more of them
+should, and building them is legitimate work. Stating that is a description of
+the field, not a claim made on behalf of any particular product in it.
+
+One word needs care in the other direction, and the care is owed to the same
+standard of accuracy. **Cure** is rare here, as it is across neuromodulation
+generally: these interventions usually produce remission, symptom control or
+durable functional improvement rather than elimination of disease. Deep brain
+stimulation controls the symptoms of Parkinson's disease without curing it;
+vagus nerve stimulation reduces seizures without curing epilepsy;
+electroconvulsive therapy induces remission that often needs maintenance.
+Overstating this would be the same failure as understating the rest, and it is
+the sentence a reviewer or a regulator would go at first. The evidence tiers,
+`sstim-v:tierSpeculative` through `sstim-v:tierEstablished`, exist precisely so
+that strength is recorded per claim instead of asserted globally in either
+direction.
 
 **The standard.** SSTIM describes that field, so it has to describe treatment,
 clinical protocols, regulated devices, adverse events and preclinical evidence.
@@ -267,6 +290,12 @@ helped with anxiety has not been assessed, screened, or diagnosed.
 No BSC Lab reference preset or BioSynCare/BSC protocol — regardless of its
 evidence tier — is represented as a treatment for any diagnosed or diagnosable
 condition.
+This is a statement about this software's intended purpose and about the
+evidence for its own presets. It is not a claim that sensory stimulation cannot
+treat or prevent. The field section above records that it does both, through
+techniques this same vocabulary names. Two subjects, two true statements, and
+the disclaimer below is not licence to blur them in the other direction
+either.
 The group system (Heal, Support, Perform, Indulge, Transcend) organizes
 sessions by design character and wellness orientation, not by clinical
 indication. A session in the "Heal" group for stress is not treatment for
