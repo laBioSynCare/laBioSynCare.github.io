@@ -36,6 +36,7 @@ Usage:  python3 scripts/verify-registries.py [--timeout SECONDS]
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
@@ -43,6 +44,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CORE = ROOT / "static" / "ontology" / "sstim-core.ttl"
+TERM_INDEX = ROOT / "docs" / "ontology" / "TERM_INDEX.md"
 
 UA = {"User-Agent": "sstim-registry-verify/1.0 (+https://w3id.org/sstim)"}
 
@@ -54,6 +56,23 @@ def canonical_namespace() -> str:
     if not match:
         raise SystemExit("verify-registries: no sstim: prefix in sstim-core.ttl")
     return match.group(1)
+
+
+def term_totals() -> dict[str, str]:
+    """Classes, properties and concepts, read from the generated term index.
+
+    Same rule as the namespace above: derive, do not restate. BARTOC publishes
+    these counts as its `extent`, and an extent is exactly the field that goes
+    quietly stale — it was seven weeks out of date when the 2026-09-01 migration
+    request was raised.
+    """
+    match = re.search(
+        r"(\d+) classes · (\d+) properties · (\d+) concepts",
+        TERM_INDEX.read_text(encoding="utf-8"),
+    )
+    if not match:
+        raise SystemExit("verify-registries: no totals line in TERM_INDEX.md")
+    return dict(zip(("classes", "properties", "concepts"), match.groups()))
 
 
 # curl rather than urllib, and the reason is this script's own subject matter.
@@ -146,6 +165,62 @@ def main() -> int:
             passed.append(f"{name} answers 200")
         else:
             failures.append(f"{name} answers HTTP {status}, expected 200")
+
+    # ── BARTOC: the fields, not just the page ───────────────────────────────
+    # A 200 said nothing about whether the record still pointed at the legacy
+    # host. The curator migrated it on 2026-09-02 (gbv/bartoc.org#319); this is
+    # what would notice if it drifted back, or if a later edit re-staled the
+    # extent. Only the fields the migration request actually covered are
+    # checked: the publisher deliberately still reads `github.com/laBioSynCare`,
+    # a governance question and not a location, so it is left alone here.
+    status, body, note = fetch(
+        "https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154",
+        args.timeout,
+        "application/json",
+    )
+    if status is None:
+        incomplete.append(f"BARTOC JSKOS unreachable ({note})")
+    elif status != 200:
+        incomplete.append(f"BARTOC JSKOS returned HTTP {status}")
+    else:
+        try:
+            record = json.loads(body)
+            record = record[0] if isinstance(record, list) else record
+        except (ValueError, IndexError, KeyError):
+            incomplete.append("BARTOC JSKOS did not parse as a record")
+            record = None
+
+        if record is not None:
+            served_ns = record.get("namespace", "")
+            if served_ns != namespace:
+                failures.append(
+                    f"BARTOC publishes namespace {served_ns!r}, the ontology "
+                    f"declares {namespace!r}"
+                )
+            links = " ".join(entry.get("url", "") for entry in record.get("subjectOf", []))
+            if "github.com/w3c-cg/sstim" not in links:
+                failures.append("BARTOC subjectOf no longer names the W3C-CG repository")
+            elif "laBioSynCare.github.io" in links:
+                failures.append(
+                    "BARTOC subjectOf names the legacy repository again; the "
+                    "2026-09-02 migration has been undone"
+                )
+            else:
+                passed.append("BARTOC points at the W3C-CG repository and the sstim# namespace")
+
+            extent = record.get("extent", "")
+            stale = [
+                f"{count} {noun}"
+                for noun, count in term_totals().items()
+                if not re.search(rf"\b{count}\s+{noun}\b", extent)
+            ]
+            if stale:
+                failures.append(
+                    f"BARTOC extent {extent!r} disagrees with the term index on "
+                    + ", ".join(stale)
+                )
+            else:
+                passed.append("BARTOC extent matches the term index")
 
     # ── LOV: absence, and only with a working control ────────────────────────
     # "Not in LOV" is a claim of absence, so it needs a control proving the
