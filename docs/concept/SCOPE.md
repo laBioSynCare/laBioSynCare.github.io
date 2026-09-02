@@ -213,6 +213,43 @@ into BSC Lab Turtle.
 
 ---
 
+## Three subjects, three postures
+
+This document describes three different things, and collapsing them produced
+language that was wrong about the first in order to be careful about the third.
+
+**The field.** Sensory stimulation is used in medicine, and is delivered
+clinically by devices regulated as medical devices. Electroconvulsive therapy,
+transcranial magnetic and electrical stimulation, vagus nerve stimulation,
+photic stimulation in diagnostic EEG, and light therapy are clinical
+procedures, not wellness practices. This is a description of the field rather
+than a caveat about it, and the field is better for having regulated devices in
+it. More of them should exist, and building them is legitimate work.
+
+**The standard.** SSTIM describes that field, so it has to describe treatment,
+clinical protocols, regulated devices, adverse events and preclinical evidence.
+It already does. `sstim-v:techElectroconvulsiveTherapy`,
+`sstim:InterventionalNeuromodulation`, `sstim:Neurostimulation`,
+`sstim-v:designPreclinicalExperiment`, `sstim-v:modelPreclinicalAnimal` and the
+exposure module's clinical and non-clinical experiment contexts are published
+terms with published definitions. A vocabulary whose scope document called its
+own subject matter "wellness, not treatment" would be describing something
+other than what it models, and the term index is the evidence.
+
+**The implementations.** SSTIM Workbench and BioSynCare are general wellness
+software. They are not medical devices, they carry no diagnostic or treatment
+claim, and their user-facing language is constrained accordingly. That
+constraint follows from these products' intended purpose under MDR 2017/745. It
+says nothing about what sensory stimulation is, and it has never applied to the
+standard's own descriptions of technique and evidence.
+
+Everything under "What BSC and BSC Lab do not claim" and "Regulatory
+positioning" governs the third subject. The first two are descriptive, and are
+held to accuracy. `CLAUDE.md` §3.5 implements the same split for anyone, human
+or agent, writing text in this repository.
+
+---
+
 ## What BSC and BSC Lab do not claim
 
 These exclusions are not hedges or legal boilerplate. They are substantive
@@ -273,6 +310,10 @@ experimental status is disclosed, not hidden.
 
 ## What wellness means here
 
+This section defines the positioning of **the implementations**, not the scope
+of the field. Sensory stimulation reaches well past wellness, and SSTIM models
+that reach; what follows is about where BSC Lab and BioSynCare sit within it.
+
 "Wellness" is used deliberately but not carelessly. In this context,
 wellness means supporting the general functioning of a healthy person —
 reducing subjective stress, facilitating calm focus, supporting sleep
@@ -291,6 +332,13 @@ and the language may become more specific.
 The distinction between a wellness tool and a medical device is not
 purely about humility. It has direct regulatory implications, which
 are addressed below.
+
+It is also not a judgement about which is worth building. A medical device for
+sensory stimulation is a more useful object than a wellness app, and is the
+right destination for a protocol whose evidence supports it. The path from here
+to there is described under "What regulatory change would require": it runs
+through evidence, legal review and a separate regulatory submission, not
+through softer language.
 
 ---
 

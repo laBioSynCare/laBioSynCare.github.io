@@ -43,8 +43,12 @@ and includes the reasoning, which matters more than the rule.
    file.** Everything under `static/ontology/` — `manifest.json` is the
    authoritative inventory — plus the three defensive publications in
    `docs/technical/`, which are timestamped prior-art records.
-5. **No health, medical or treatment claims in user-facing copy.** Wellness
-   framing only. Regulatory, not stylistic. See `docs/concept/SCOPE.md`.
+5. **Product copy is wellness-framed; scientific description is not.** A claim
+   about what the software does for its user stays wellness-framed, which is
+   regulatory and not stylistic. A definition of a technique, an evidence
+   assessment or anything in `docs/` is held to accuracy instead: sensory
+   stimulation is used clinically, and SSTIM publishes terms for it, including
+   `sstim-v:techElectroconvulsiveTherapy`. See `docs/concept/SCOPE.md`.
 6. **Name your instrument before claiming something is missing.** Before writing
    that anything is absent, untested or undone, say what you checked with and
    confirm it could see where the thing lives. Use
@@ -63,7 +67,8 @@ and includes the reasoning, which matters more than the rule.
 | Audio engines, worklets, timing | `../CLAUDE.md` §3.1–3.3 and §6, `src/engines/README.md` |
 | Service worker / PWA | `../CLAUDE.md` §9 and ADR 0009 — never auto-reload, never intercept cross-origin, never precache the heavy assets |
 | Svelte components | `../CLAUDE.md` §2 — runes only |
-| Anything user-facing | `docs/concept/SCOPE.md` — wellness framing, no medical claims |
+| Product copy (UI, presets, store) | `docs/concept/SCOPE.md` — wellness framing, no treatment claims |
+| Term definitions, evidence, docs | `docs/concept/SCOPE.md` — describe clinical use accurately |
 
 ## Before you commit
 

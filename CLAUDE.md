@@ -245,21 +245,48 @@ The three `docs/technical/` files are defensive publications — timestamped pri
 art records. Modifying them after their first commit date undermines their legal
 function.
 
-### 3.5 No health or medical claims in any user-facing copy
+### 3.5 Product claims are wellness-framed; the science is described accurately
 
-All user-facing text (UI strings, descriptions, metadata, web copy) must use
-conservative wellness framing. This is a regulatory requirement, not a style
-preference.
+Two different kinds of text get written here, and one rule was being applied to
+both. Read which one you are writing before you write it.
+
+**A claim about what this software will do for the person using it** is
+regulated speech. Under MDR 2017/745 the deciding criterion is intended
+purpose, so a UI string, a preset description, or store and web copy offering
+diagnosis, prevention, monitoring, treatment or alleviation of disease puts the
+software in scope as a medical device. It is not one, and this is a regulatory
+requirement rather than a style preference.
 
 **Permitted verbs:** support, promote, facilitate, encourage, help, guide, invite.
 
-**Prohibited verbs and constructions:** treat, cure, fix, eliminate, rewire,
-correct pathology, restore diseased function, proven to, clinically proven,
+**Prohibited in product copy:** treat, cure, fix, eliminate, rewire, correct
+pathology, restore diseased function, proven to, clinically proven,
 scientifically proven, guaranteed to, eliminates [condition].
 
-If you are generating any string that will appear in the UI or in a preset's
-`descEng`/`descIta`/`descPrt`/`descEsp` fields, re-read `docs/concept/SCOPE.md`
-before writing it.
+**A description of the field, of a technique, or of the evidence is not a
+product claim, and is held to accuracy rather than to conservatism.** Sensory
+stimulation is used in medicine. Devices that deliver it are regulated as
+medical devices, they exist, and more of them should. SSTIM is a standard for
+describing that entire field, and a standard that cannot write "treatment"
+cannot describe its own subject matter.
+
+The test case is already published: `sstim-v:techElectroconvulsiveTherapy`. ECT
+is a psychiatric treatment delivered by a Class III medical device, and its
+definition has to say so. `sstim:InterventionalNeuromodulation`,
+`sstim:Neurostimulation` and `sstim-v:designPreclinicalExperiment` are the same
+case. Softening any of them to avoid a verb on the list above would make the
+vocabulary wrong about the world, which is a worse failure than the one the list
+exists to prevent.
+
+So the restriction covers UI strings, preset `descEng`/`descIta`/`descPrt`/`descEsp`,
+and store and web copy: anything speaking about what a user will get. It does
+not cover `skos:definition`, `skos:scopeNote` and other ontology annotations,
+evidence assessments, ADRs, `docs/`, or the specification. Those describe what
+is true.
+
+Re-read `docs/concept/SCOPE.md` before writing either kind. Its "Three subjects,
+three postures" section is what keeps them apart, and the regulatory positioning
+that follows it governs the products only.
 
 ### 3.6 A claim that something is missing requires a named instrument
 
@@ -651,7 +678,7 @@ legal, regulatory, or architectural requirements.
 | Use `Date.now()` or `setTimeout()` for AV sync outside the Silent engine's encapsulated clock | Only the active engine timing context is authoritative |
 | Bundle files in `static/worklets/` | AudioWorklets must load as plain static scripts |
 | Allocate inside `AudioWorkletProcessor.process()` | GC in the audio thread causes glitches |
-| Write health, medical, or treatment claims | Regulatory compliance; see `docs/concept/SCOPE.md` |
+| Write a treatment or diagnostic claim **in product copy** | Regulatory compliance (§3.5). Describing a clinical technique accurately in an ontology definition or in `docs/` is required, not prohibited |
 | Use Svelte 4 syntax (`export let`, `$:`, `on:click`) | This project uses Svelte 5 runes only |
 | Add ontology IRIs as hardcoded strings | Use `src/rdf/namespaces.js` exclusively |
 | Write preset group names in lowercase | `Heal`, `Support`, `Perform`, `Indulge`, `Transcend` — always capitalized |
