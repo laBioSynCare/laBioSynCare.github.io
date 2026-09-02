@@ -89,6 +89,21 @@ ontology URI, namespace, prefix, concept DOI, and version IRIs did not change.
 its generated namespace catalogues, Kernel/module endpoints, profiles, manifest,
 and schema must be deployed and the perma-id matrix verified first.
 
+### External-presence review — 2026-09-02
+
+Four rows changed state without a submission. Three closed (OpenAIRE, OntoBee,
+re3data/OpenDOAR) and one opened (Software Heritage), each recorded in section 3
+below. The three closures matter as much as an acceptance: a deferred row with
+no next step resurfaces in every audit and reads as outstanding work forever,
+which is what "⛔ after gateway record" had been doing while OpenAIRE already
+carried the record.
+
+Raised by a review from the agent working the BioSynCare repository, read
+against commit `c457ff1`. Its measurements were re-taken here before anything
+was recorded; its one open question, whether OpenAIRE was already satisfied
+through Zenodo harvesting, it could not answer because `zenodo.org` answers 403
+to that host. It is answered above.
+
 ### W3C-CG registry migration pass — 2026-09-01
 
 The mutable location fields were audited only after W3ID, W3C Pages, and the
@@ -138,7 +153,10 @@ BARTOC or FAIRsharing field edits have already landed.
 | BioPortal | ⚠️ **live; W3C metadata patched and deterministic bundle deployed 2026-09-01** — authenticated API verification shows submission `28` with W3C pull/home/repository/source/docs/issues and version IRI `https://w3id.org/sstim/0.16.0`. The W3C and legacy bundle URLs serve the ledger bytes (1,239,332 bytes; SHA-256 `7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11`) | account ✓ (@rfabbri) | observe transition pull, then one unchanged pull; patch current date |
 | FAIRsharing | ⚠️ **record [8494](https://fairsharing.org/8494) live, but mutable links still need migration**. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved. The public record still exposes the legacy homepage; write access is through its signed-in SPA | yes | signed-in W3C link edit |
 | OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
-| OpenAIRE | ⛔ after gateway record | yes | deferred |
+| OpenAIRE | ✅ **closed 2026-09-02 — no submission needed** — `api.openaire.eu/search/software?doi=10.5281/zenodo.22003777` returns `total=1`: Zenodo is an OpenAIRE-compliant repository and the record is already harvested and indexed as software. OpenAIRE Provide is an intake for repository and aggregator *operators*, which SSTIM is not | n/a | — |
+| Software Heritage | 🕓 **not submitted** — `/api/1/origin/<url>/get/` answers `NotFoundExc` for both origins while a control repository comes back archived, so the absence is measured, not assumed. Save Code Now takes `POST /api/1/origin/save/git/url/<repository-url>/`, anonymously, and yields a snapshot SWHID for the source to sit beside the Zenodo DOI for the release | no | **archival is permanent and public**; secret sweep first, then submit both origins |
+| OntoBee | ✅ **closed 2026-09-02 — not applicable** — OntoBee serves the OBO Foundry library, and [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 rejects OBO Foundry membership on identifier grounds. A non-member ontology has no intake here | n/a | revisit only if a future ADR reopens OBO membership |
+| re3data · OpenDOAR | ✅ **closed 2026-09-02 — not applicable, superseded by FAIRsharing** — re3data indexes research *data repositories* and OpenDOAR open-access *repositories*. SSTIM is a vocabulary, and ADR 0016 §7 names them as alternatives to FAIRsharing, whose record `8494` is live and DOI-assigned | n/a | — |
 | DBpedia KG Catalog | ⚠️ **0.15.0 live; 0.16.0 + updater in review** — [catalog record](https://kg-catalog.dbpedia.org/kg.html?id=sstim), [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), and migration PR [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53). The PR preserves historical 0.15.0 bytes and adds verified W3C-CG 0.16.0 as pending | yes (GitHub) | watch PR and first daily updater run |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
@@ -1375,10 +1393,95 @@ Required follow-up: Watch #1351. On merge, confirm the ontology resolves at
                     522abc802f2366356899ddedc5b2e548d5918368185fd84b178c6004398037b1.
 ```
 
-### OpenAIRE — deferred
+### OpenAIRE — CLOSED 2026-09-02, satisfied without a submission
 
-Submit only after an eligible gateway/aggregator record exists (per the plan).
-Not actionable yet.
+This row said "submit only after an eligible gateway/aggregator record exists".
+Nobody had measured whether a submission was needed at all. It is not:
+
+```text
+$ curl "https://api.openaire.eu/search/software?doi=10.5281/zenodo.22003777"
+<total>1</total>          # the 0.16.0 version DOI
+   SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology
+   https://zenodo.org/records/22003777
+$ ... ?doi=10.5281/zenodo.21286974
+<total>1</total>          # the concept DOI, indexed too
+$ ... ?doi=<a Zenodo DOI that does not exist>
+<total>0</total>          # negative control: the endpoint discriminates
+```
+
+The control is the point. A search API that answered `1` to everything would
+produce exactly the reading above and mean nothing. The control DOI is written
+out rather than quoted here because `truth-audit` reads every DOI in this file
+and cannot tell a deliberate fake from a stale one, which is the correct
+behaviour for that gate.
+
+Zenodo is an OpenAIRE-compliant repository, so depositing there *is* the
+OpenAIRE route: the record is harvested and indexed as software, with no action
+taken here and none available. [OpenAIRE
+Provide](https://provide.openaire.eu) is an intake for the operators of
+repositories and aggregators, which SSTIM is not.
+
+**Closed rather than deferred**, because deferred work resurfaces in every audit
+and this has no next step. Re-measure with the command above if the question
+comes back.
+
+### Software Heritage — NOT SUBMITTED; measured absent 2026-09-02
+
+The reference archive for *source code*. It complements Zenodo rather than
+duplicating it: Zenodo archives a release, Software Heritage archives the
+repository, and returns a persistent SWHID (`swh:1:snp:…`) for it. Nothing in
+this tracker covered it, and the string "Software Heritage" appeared exactly
+once in the repository, in a comment in `scripts/gen-codemeta.mjs`, which is
+also the file that emits the CodeMeta such harvesters read.
+
+**Measured, with a control, so the absence is a finding and not a timeout:**
+
+```text
+$ curl .../api/1/origin/https://github.com/w3c-cg/sstim/get/
+{"exception":"NotFoundExc","reason":"Origin with url ... not found!"}
+$ curl .../api/1/origin/https://github.com/laBioSynCare/laBioSynCare.github.io/get/
+{"exception":"NotFoundExc","reason":"Origin with url ... not found!"}
+$ curl .../api/1/origin/https://github.com/torvalds/linux/get/     # control
+ARCHIVED
+```
+
+- **Intake:** `POST https://archive.softwareheritage.org/api/1/origin/save/git/url/<repository-url>/`.
+  Anonymous requests are accepted; origins on known forges are scheduled
+  promptly. Poll the same path with `GET`, then read the snapshot SWHID from
+  `/api/1/origin/<url>/visit/latest/`.
+- **Both origins:** `https://github.com/w3c-cg/sstim` and
+  `https://github.com/laBioSynCare/laBioSynCare.github.io`.
+
+**Before submitting, and this is the whole reason it is not submitted yet:
+archival is permanent, public, and copies whatever is committed at visit time.
+There is no un-archive.** Sweep for anything that should not be mirrored
+forever. `docs/credentials/` is the obvious candidate and is clear: it is
+ignored at `.gitignore:16` and `git ls-files docs/credentials/` returns nothing,
+verified 2026-09-02. That check is a precondition of every future submission
+here, not a one-time clearance.
+
+### OntoBee — CLOSED 2026-09-02, not applicable
+
+[ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §7 lists
+OntoBee among the registries to work through, and §2 of the same ADR rejects OBO
+Foundry *membership* on identifier grounds while keeping OBO
+*interoperability*. Those two cannot both be acted on: OntoBee serves the OBO
+Foundry library, so an ontology that is deliberately not a member has no intake
+there.
+
+Closed as not applicable. If a future ADR reopens OBO membership, this reopens
+with it and not before.
+
+### re3data and OpenDOAR — CLOSED 2026-09-02, superseded by FAIRsharing
+
+ADR 0016 §7 names these as alternatives to FAIRsharing, not additions to it
+("FAIRsharing (or OpenDOAR / Re3data)"). FAIRsharing record
+[`8494`](https://fairsharing.org/8494) is live with DOI
+`10.25504/FAIRsharing.660ff4` assigned, so the alternative was taken.
+
+They would not fit in any case: re3data indexes research *data repositories* and
+OpenDOAR open-access *repositories*. SSTIM is a vocabulary, published through a
+repository it does not operate.
 
 ### Wikidata — deferred (Phase 4) for *publishing*; contribution is open now
 
