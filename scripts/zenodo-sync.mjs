@@ -107,6 +107,18 @@ export function asRelatedIdentifier(entry) {
 }
 
 /**
+ * The description, as the HTML Zenodo renders.
+ *
+ * Zenodo sanitises rather than escapes this field, so a description written as
+ * markup arrives as markup. `.zenodo.json` carries paragraphs and links, and
+ * wrapping that in another <p> would nest a block inside a paragraph, which the
+ * sanitiser is free to unnest wherever it likes. Plain text still gets its one
+ * paragraph, because Zenodo renders an unwrapped string as a single run.
+ */
+export const asHtml = (description) =>
+  /<[a-z][^>]*>/i.test(description) ? description : `<p>${description}</p>`
+
+/**
  * The metadata payload, from the contents of `.zenodo.json`.
  *
  * `subjectIds` maps a `"scheme\tterm"` key to Zenodo's own identifier for that
@@ -130,7 +142,7 @@ export function buildMetadata({ config, subjectIds, releaseNotes, withDescriptio
   if (config.contributors?.length) {
     metadata.contributors = config.contributors.map((person) => asPerson(person))
   }
-  if (withDescription) metadata.description = `<p>${config.description}</p>`
+  if (withDescription) metadata.description = asHtml(config.description)
   if (releaseNotes) {
     metadata.additional_descriptions = [
       { description: markdownToHtml(releaseNotes), type: { id: 'technical-info' } },

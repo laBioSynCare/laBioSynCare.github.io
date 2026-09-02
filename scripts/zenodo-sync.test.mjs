@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { expect, test } from 'vitest'
 
 import {
+  asHtml,
   asPerson,
   asRelatedIdentifier,
   buildMetadata,
@@ -171,3 +172,38 @@ test('resolveSubjects keys every entry by scheme and term together', async () =>
   expect(ids.size).toBe(2)
   expect(ids.get('GEMET\tSoftware')).toBe('gemet:concept/7842')
 })
+
+test('a description already written as HTML is not wrapped again', () => {
+  // Zenodo sanitises rather than escapes this field. Wrapping markup in another
+  // <p> nests a block inside a paragraph, which the sanitiser may unnest anywhere.
+  expect(asHtml('<p>One.</p><p>Two.</p>')).toBe('<p>One.</p><p>Two.</p>')
+  expect(asHtml('Plain text.')).toBe('<p>Plain text.</p>')
+  expect(buildMetadata({ config, subjectIds: ids() }).description).toBe(config.description)
+})
+
+test('every related identifier names a relation the write API knows', () => {
+  // The id is lowercase and comes from Zenodo's own vocabulary; a typo fails at
+  // publish, after the draft has been created.
+  const known = new Set(['isdocumentedby', 'issupplementto', 'isidenticalto', 'haspart',
+    'ispartof', 'isdescribedby', 'references', 'iscitedby', 'isderivedfrom'])
+  for (const related of buildMetadata({ config, subjectIds: ids() }).related_identifiers) {
+    expect(known).toContain(related.relation_type.id)
+    expect(related.scheme).toMatch(/^(url|doi)$/)
+  }
+})
+
+test('the linkage keeps both repositories and the registries that carry a record', () => {
+  const by = (relation) =>
+    config.related_identifiers.filter((r) => r.relation === relation).map((r) => r.identifier)
+
+  // The legacy origin is not history: it still serves the byte-identical frozen
+  // manifests whose root-absolute paths pin them to it.
+  expect(by('isIdenticalTo')).toContain('https://github.com/laBioSynCare/laBioSynCare.github.io')
+  expect(by('isSupplementTo')).toContain('https://github.com/w3c-cg/sstim')
+  expect(by('isDescribedBy').length).toBeGreaterThanOrEqual(4)
+  expect(by('isDescribedBy')).toContain('10.25504/FAIRsharing.660ff4')
+})
+
+function ids() {
+  return new Map((config.subjects ?? []).map((s) => [`${s.scheme}\t${s.term}`, 'vocab:1']))
+}

@@ -454,6 +454,50 @@ if (!indexCounts) {
   ok(`${claims} prose totals match the term index (${totals.concepts} concepts)`)
 }
 
+// ── 6. the Zenodo description states the release it actually describes ───────
+//
+// `.zenodo.json` is the description of every deposit and of every metadata sync
+// after one, and it names the release and quotes the term totals. Nothing
+// regenerates it, so both go stale at the next release and the archive of record
+// then misdescribes itself to anyone who cites it. This is the only guard: a
+// deposit sends whatever the file says.
+
+{
+  const zenodo = read('.zenodo.json')
+  if (!zenodo) {
+    fail('.zenodo.json', 'missing; the deposit and sync both read it')
+  } else {
+    const description = JSON.parse(zenodo).description ?? ''
+    const stated = { classes: null, properties: null, concepts: null, modules: null }
+    for (const key of Object.keys(stated)) {
+      // The lookbehind is what keeps "CC BY 4.0: 18 modules" from reading the
+      // 0 of the licence version as the module count: the number has to start a
+      // number, and at most two words may stand between it and the noun.
+      const claim = new RegExp(`(?<![\\d.])(\\d+)(?:\\s+[A-Za-z]+){0,2}\\s+${key}\\b`)
+      stated[key] = description.match(claim)?.[1] ?? null
+    }
+    const wanted = {
+      classes: indexCounts?.[1],
+      properties: indexCounts?.[2],
+      concepts: indexCounts?.[3],
+      modules: String(MODULE_COUNT),
+    }
+    for (const [key, value] of Object.entries(stated)) {
+      if (value && value !== wanted[key]) {
+        fail('.zenodo.json', `the description claims ${value} ${key}; the sources say ${wanted[key]}`)
+      }
+    }
+    // A version other than the citable one is the stale-after-release case: the
+    // file still describes the release before the one being deposited.
+    for (const version of description.match(/\b\d+\.\d+\.\d+\b/g) ?? []) {
+      if (version !== RELEASE_VERSION) {
+        fail('.zenodo.json', `the description names ${version}; the citable release is ${RELEASE_VERSION}`)
+      }
+    }
+    ok(`zenodo description describes ${RELEASE_VERSION} with current totals`)
+  }
+}
+
 // ── report ───────────────────────────────────────────────────────────────────
 
 if (VERBOSE || problems.length === 0) {
