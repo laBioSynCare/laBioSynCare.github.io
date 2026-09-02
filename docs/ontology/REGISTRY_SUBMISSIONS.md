@@ -155,6 +155,7 @@ BARTOC or FAIRsharing field edits have already landed.
 | OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
 | OpenAIRE | ✅ **closed 2026-09-02 — no submission needed** — `api.openaire.eu/search/software?doi=10.5281/zenodo.22003777` returns `total=1`: Zenodo is an OpenAIRE-compliant repository and the record is already harvested and indexed as software. OpenAIRE Provide is an intake for repository and aggregator *operators*, which SSTIM is not | n/a | — |
 | Software Heritage | 🕓 **not submitted** — `/api/1/origin/<url>/get/` answers `NotFoundExc` for both origins while a control repository comes back archived, so the absence is measured, not assumed. Save Code Now takes `POST /api/1/origin/save/git/url/<repository-url>/`, anonymously, and yields a snapshot SWHID for the source to sit beside the Zenodo DOI for the release | no | **archival is permanent and public**; secret sweep first, then submit both origins |
+| OBO Foundry (membership) | ⛔ **declined, reaffirmed 2026-09-03 on measurement** — [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 and [ADR 0056](../decisions/0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md). Membership costs the readable IRIs; the biomedical discovery it would buy is already delivered by BioPortal without it. Full reasoning and the reopening trigger in section 3 | n/a | reopen only on the named trigger |
 | OntoBee | ✅ **closed 2026-09-02 — not applicable** — OntoBee serves the OBO Foundry library, and [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 rejects OBO Foundry membership on identifier grounds. A non-member ontology has no intake here | n/a | revisit only if a future ADR reopens OBO membership |
 | re3data · OpenDOAR | ✅ **closed 2026-09-02 — not applicable, superseded by FAIRsharing** — re3data indexes research *data repositories* and OpenDOAR open-access *repositories*. SSTIM is a vocabulary, and ADR 0016 §7 names them as alternatives to FAIRsharing, whose record `8494` is live and DOI-assigned | n/a | — |
 | DBpedia KG Catalog | ⚠️ **0.15.0 live; 0.16.0 + updater in review** — [catalog record](https://kg-catalog.dbpedia.org/kg.html?id=sstim), [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), and migration PR [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53). The PR preserves historical 0.15.0 bytes and adds verified W3C-CG 0.16.0 as pending | yes (GitHub) | watch PR and first daily updater run |
@@ -1459,6 +1460,70 @@ forever. `docs/credentials/` is the obvious candidate and is clear: it is
 ignored at `.gitignore:16` and `git ls-files docs/credentials/` returns nothing,
 verified 2026-09-02. That check is a precondition of every future submission
 here, not a one-time clearance.
+
+### OBO Foundry membership — DECLINED, reaffirmed 2026-09-03 on measurement
+
+[ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2
+declined membership in June on identifier grounds.
+[ADR 0056](../decisions/0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md)
+recorded what that costs. This entry records the question being asked directly,
+"are we losing a lot by not joining", and answered with numbers rather than
+posture. **The answer is no, and the recommendation is not to join.**
+
+**What the biomedical channel is actually delivering, measured 2026-09-03:**
+
+```text
+BioPortal SSTIM   306 visits since listing   (2026-07: 167, 2026-08: 135, 2026-09: 4)
+                  indexed 181 classes, 637 individuals, 301 properties
+Zenodo, all 12    116 views, 25 downloads
+```
+
+BioPortal, entered **without** OBO membership, is the busiest surface SSTIM has,
+by roughly 2.6 times the DOI archive. Two caveats keep that honest: BioPortal's
+analytics do not visibly exclude crawlers, and the July and August figures
+coincide with our own submission and metadata-patching work, so some of that
+traffic is us. The September run rate of about 1.3 visits per day is the sober
+estimate of organic interest, and it is small. The claim being made here is only
+that the channel is open and used, not that it is busy.
+
+**What declining actually costs, ranked honestly:**
+
+1. **Independent ontology review.** The real loss. The OBO Operations Committee
+   reviews against roughly twenty principles, and SSTIM claims no independent
+   human ontology review today. This is a genuine gap and membership would close
+   it.
+2. **Default reuse by biomedical data curators**, who reach for OBO first. Not
+   hypothetical given the HED/BIDS work aims at neuroimaging datasets, but the
+   demand is unmeasured: nobody has yet asked to annotate a dataset with SSTIM
+   terms.
+3. **An OntoBee listing.** Trivial, and covered by BioPortal and OLS4.
+
+**What declining does not cost:** biomedical discovery (BioPortal, live and
+busiest), OLS presence (PR #1351; OLS indexes non-OBO ontologies), OBO
+upper-layer interoperability (BFO, IAO, OBI and COB alignments already carry
+it), and quality assurance (`make validate` runs SHACL, HermiT and competency
+queries, which is heavier than the OBO Dashboard).
+
+**The cheaper substitute for the one real loss.** A Semantic Web Journal
+ontologies-track submission buys independent review more cheaply and more
+relevantly than membership: open review with named reviewers, public reviews,
+and it assesses the whole artifact including the SKOS and SHACL layers rather
+than conformance to twenty identifier and process principles. It also costs no
+identifiers.
+
+**The trigger that reopens this**, and the only one: a dataset, consortium or
+collaborator that wants to annotate with SSTIM terms and requires OBO PURLs to
+do it. That converts an abstract loss into a concrete one. ADR 0056 then governs
+the order of operations, and an IDSPACE request comes before any generation
+step.
+
+**One argument that has grown stronger since June, recorded so the reaffirmation
+is not read as settled forever.** SCOPE.md was corrected on 2026-09-02 to state
+that SSTIM covers clinical use, which it always modelled. That makes the
+biomedical data-curation audience more relevant than ADR 0016 assumed, so loss 2
+above carries more weight now than it did. It does not touch the identifier
+objection, which is what decides this, but it is the direction a real trigger
+would arrive from.
 
 ### OntoBee — CLOSED 2026-09-02, not applicable
 
