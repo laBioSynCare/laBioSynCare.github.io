@@ -4,27 +4,251 @@
   "upload_type": "software",
   "access_right": "open",
   "license": "CC-BY-4.0",
+  "language": "eng",
   "creators": [
     {
       "name": "Fabbri, Renato",
-      "orcid": "0000-0002-9699-629X"
+      "affiliation": "IFSC-USP, ICMC-USP, BioSynCare.com",
+      "orcid": "0000-0002-9699-629X",
+      "affiliations": [
+        {
+          "id": "02f1crb75"
+        },
+        {
+          "id": "036rp1748"
+        },
+        {
+          "name": "ICMC/USP"
+        },
+        {
+          "name": "BioSynCare.com"
+        }
+      ]
     }
   ],
   "keywords": [
     "sensory stimulation",
+    "audiovisual stimulation",
     "ontology",
+    "controlled vocabulary",
+    "terminology",
     "OWL",
     "SKOS",
     "SHACL",
+    "RDF",
+    "SPARQL",
     "knowledge graph",
     "linked data",
+    "semantic web",
+    "FAIR data",
+    "interoperability",
     "PROV-O",
     "W3C ORG",
+    "W3C Community Group",
+    "Hierarchical Event Descriptors",
+    "BIDS",
     "brainwave entrainment",
     "binaural beats",
+    "isochronic tones",
+    "evidence assessment",
+    "Web Audio API",
     "SSTIM",
     "BFO",
     "wellness"
+  ],
+  "subjects": [
+    {
+      "term": "Vocabulary, Controlled",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D018875"
+    },
+    {
+      "term": "Terminology as Topic",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D009626"
+    },
+    {
+      "term": "Semantics",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D012660"
+    },
+    {
+      "term": "Metadata",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000071253"
+    },
+    {
+      "term": "Metadata/standards",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000071253Q000592"
+    },
+    {
+      "term": "Data Curation",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D066289"
+    },
+    {
+      "term": "Knowledge",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D019359"
+    },
+    {
+      "term": "Knowledge Bases",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D051188"
+    },
+    {
+      "term": "Knowledge Management/standards",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D058436Q000592"
+    },
+    {
+      "term": "Biological Ontologies",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D064229"
+    },
+    {
+      "term": "Semantic Web",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000075403"
+    },
+    {
+      "term": "Semantic Web/standards",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000075403Q000592"
+    },
+    {
+      "term": "Software",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D012984"
+    },
+    {
+      "term": "Sense Organs",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D012679"
+    },
+    {
+      "term": "Perception",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D010465"
+    },
+    {
+      "term": "Auditory Perception",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D001307"
+    },
+    {
+      "term": "Acoustic Stimulation",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000161"
+    },
+    {
+      "term": "Acoustic Stimulation/classification",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000161Q000145"
+    },
+    {
+      "term": "Photic Stimulation",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D010775"
+    },
+    {
+      "term": "Brain Waves",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D058256"
+    },
+    {
+      "term": "Alpha Rhythm",
+      "scheme": "MeSH",
+      "identifier": "https://id.nlm.nih.gov/mesh/D000513"
+    },
+    {
+      "term": "Knowledge organization",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/5b42bcd0-ed4d-4991-af0b-70b7465237aa"
+    },
+    {
+      "term": "Knowledge engineering",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/b05801b2-037a-454e-b0d7-3f3cb7a63cfb"
+    },
+    {
+      "term": "Ontology",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/123e5118-1586-4a45-b4da-34583bd74940"
+    },
+    {
+      "term": "Semantic web",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/981a4eb6-f63a-4360-953d-efe0ec861672"
+    },
+    {
+      "term": "Software",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/aafff649-e02a-496e-b436-284ce76044c4"
+    },
+    {
+      "term": "Software applications",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/f025f4c6-13d7-4aed-a7c5-e9b465f72a50"
+    },
+    {
+      "term": "Signal processing",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/c18ce2ec-e8f5-4574-9fb7-5399b425410c"
+    },
+    {
+      "term": "Acoustics",
+      "scheme": "EuroSciVoc",
+      "identifier": "http://data.europa.eu/8mn/euroscivoc/31b37bab-06b5-46e0-a76e-d18c04ddb2b4"
+    },
+    {
+      "term": "Vocabulary",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/8990"
+    },
+    {
+      "term": "Standardisation",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/8048"
+    },
+    {
+      "term": "Documentation",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/2284"
+    },
+    {
+      "term": "Applied science",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/496"
+    },
+    {
+      "term": "Software",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/7842"
+    },
+    {
+      "term": "Acoustics",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/60"
+    },
+    {
+      "term": "Hearing (sense)",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/3887"
+    },
+    {
+      "term": "Loudness",
+      "scheme": "GEMET",
+      "identifier": "http://www.eionet.europa.eu/gemet/concept/4917"
+    }
+  ],
+  "dates": [
+    {
+      "start": "2026-04-10",
+      "type": "Created",
+      "description": "First commit in the repository."
+    }
   ],
   "related_identifiers": [
     {
@@ -37,5 +261,19 @@
       "identifier": "https://github.com/w3c-cg/sstim",
       "scheme": "url"
     }
-  ]
+  ],
+  "custom_fields": {
+    "code:codeRepository": "https://github.com/w3c-cg/sstim",
+    "code:programmingLanguage": [
+      {
+        "id": "javascript"
+      },
+      {
+        "id": "python"
+      }
+    ],
+    "code:developmentStatus": {
+      "id": "active"
+    }
+  }
 }

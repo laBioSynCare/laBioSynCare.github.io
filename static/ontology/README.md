@@ -617,6 +617,25 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
     from. Its preflight refuses a missing tag, a dirty tree, or a version the
     record already publishes; the archive is built from the tag rather than the
     working tree. Do not re-enable the webhook on either repository.
+
+    A deposit is the only thing that sends this metadata, so a published record
+    keeps whatever it was published with. When `.zenodo.json` changes without a
+    release, or when the record was corrected by hand in Zenodo's own interface
+    (where the correction exists nowhere else, and the next deposit would drop
+    it), push the file onto the published record instead:
+
+    ```bash
+    make zenodo-sync                                       # dry run, always first
+    ZENODO_TOKEN=... make zenodo-sync PUBLISH=1
+    ```
+
+    That edits the record in place: same DOI, no new version. It targets the
+    version `void.ttl` names, or `RECORD=<id>` for an older one. `.zenodo.json`
+    is therefore the source of truth for the record's title, description,
+    creators, free-text keywords, controlled-vocabulary subjects (MeSH,
+    EuroSciVoc and GEMET, resolved against Zenodo's vocabularies at run time),
+    related identifiers and software custom fields. Anything typed into the
+    Zenodo form and not written back here is lost at the next release.
 12. Carry the resulting version DOI into the three files that name it —
     `void.ttl`, `CITATION.cff` and `src/ui/entrance/releaseMetadata.js` — and run
     `make truth-audit`, which fails until all three agree. Never rewrite a

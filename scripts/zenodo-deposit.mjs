@@ -52,9 +52,18 @@ export function parentRecordId(voidTtl) {
  * schema, which is why it is the payload rather than a second copy of it: the
  * GitHub webhook read exactly this file, so switching to the API changes who
  * sends the metadata and not what the metadata says.
+ *
+ * One key in the file is not part of that schema. `custom_fields` is a sibling
+ * of `metadata` in the newer API, not a key inside it, and the legacy endpoint
+ * rejects the whole deposit on any field it does not know rather than ignoring
+ * it. `scripts/zenodo-sync.mjs` sends that block; this one drops it.
  */
+export const NOT_LEGACY_METADATA = ['custom_fields']
+
 export function depositMetadata({ zenodoJson, version, publicationDate }) {
-  return { metadata: { ...zenodoJson, version, publication_date: publicationDate } }
+  const metadata = { ...zenodoJson, version, publication_date: publicationDate }
+  for (const key of NOT_LEGACY_METADATA) delete metadata[key]
+  return { metadata }
 }
 
 /** What the webhook used to name the archive, kept stable across the move. */

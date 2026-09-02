@@ -55,3 +55,17 @@ test('preflight refuses the three deposits that cannot be taken back', () => {
   expect(preflight({ ...clean, treeClean: false })[0]).toMatch(/dirty/)
   expect(preflight({ ...clean, parentVersion: '0.17.0' })[0]).toMatch(/already publishes/)
 })
+
+test('the deposit payload drops the keys the legacy endpoint does not know', () => {
+  // `custom_fields` belongs beside `metadata`, not inside it, and the legacy
+  // endpoint refuses a deposit carrying a field it cannot name rather than
+  // ignoring it. scripts/zenodo-sync.mjs is what sends that block.
+  const zenodoJson = JSON.parse(read('.zenodo.json'))
+  expect(zenodoJson.custom_fields).toBeTruthy()
+
+  const payload = depositMetadata({ zenodoJson, version: '9.9.9', publicationDate: '2026-01-01' })
+  expect(payload.metadata.custom_fields).toBeUndefined()
+  // The controlled-vocabulary subjects, by contrast, are legacy fields and must
+  // survive: they are the part of the record that lives in no other file.
+  expect(payload.metadata.subjects.length).toBe(zenodoJson.subjects.length)
+})

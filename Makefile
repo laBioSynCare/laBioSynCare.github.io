@@ -560,6 +560,15 @@ codemeta-check:
 zenodo-deposit:
 	node scripts/zenodo-deposit.mjs $(if $(VERSION),--version $(VERSION),) $(if $(PUBLISH),--publish,)
 
+## Push .zenodo.json onto the already published record: title, description,
+## creators, free-text keywords, controlled-vocabulary subjects, related
+## identifiers and the software custom fields. The DOI does not change and no
+## new version appears. Dry run by default; pass PUBLISH=1 with ZENODO_TOKEN set
+## to execute. Run it whenever .zenodo.json changes without a release, which is
+## how the record went on saying "BSC Lab" after the rename.
+zenodo-sync:
+	node scripts/zenodo-sync.mjs $(if $(RECORD),--record $(RECORD),) $(if $(PUBLISH),--publish,)
+
 ## Assert the ADR index matches the ADR files: every file has a row, every row a
 ## file, statuses agree, and a superseded decision is marked superseded so the
 ## index never recommends one that no longer holds.
