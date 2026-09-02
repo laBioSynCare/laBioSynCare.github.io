@@ -39,7 +39,7 @@ annotations lives here.
 | [0013](0013-evidence-support-relation-range.md) | Evidence `supportsRelation` range | Accepted · property renamed by 0027 |
 | [0014](0014-preset-is-not-a-protocol.md) | A Preset is an information content entity, not a protocol | Accepted |
 | [0015](0015-visual-and-cross-modal-techniques.md) | Visual and cross-modal technique vocabulary | Accepted |
-| [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted |
+| [0016](0016-publication-obo-posture-and-registries.md) | External publication, OBO posture, and registry strategy | Accepted · amended by [0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md) |
 | [0017](0017-reference-pitch-retuning.md) | Reference-pitch retuning (432 Hz) modeling | Accepted |
 | [0018](0018-evidence-integrity-and-public-claim-governance.md) | Evidence integrity and public-claim governance | Accepted · amended by 0027 |
 | [0019](0019-modality-nomenclature-cleanup.md) | Modality nomenclature cleanup (somatosensory / haptic / tactile / vibrotactile) | Accepted |
@@ -79,6 +79,7 @@ annotations lives here.
 | [0053](0053-wildcard-snapshot-routes.md) | Snapshot routes are patterns, not an enumeration — a release no longer costs the w3id maintainer a pull request | Accepted |
 | [0054](0054-owl-dl-conformance-and-the-duration-datatype.md) | OWL 2 DL conformance: declare every external term, declare `xsd:date`, and remove `xsd:duration` because declaring it does not work | Accepted |
 | [0055](0055-namespace-iri-resolves-to-a-release.md) | `https://w3id.org/sstim` resolves to the latest release rather than the working tree, and tells a person in a browser what they just dereferenced | Accepted |
+| [0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md) | What readable IRIs cost, and why the OBO-ID bridge cannot be built before an IDSPACE is allocated | Accepted |
 
 ## ADR lifecycle and revision policy
 

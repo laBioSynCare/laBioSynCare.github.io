@@ -1,6 +1,6 @@
 # ADR 0016 — External publication, OBO posture, and registry strategy
 
-**Status:** Accepted — 2026-06-30
+**Status:** Accepted — 2026-06-30 · amended by [0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md) (2026-09-03: the costs decision 1 accepts, and the IDSPACE allocation decision 3 requires before any `obo:SSTIM_*` IRI may be written)
 
 ## Context
 
@@ -33,6 +33,11 @@ hard to reverse.
    biomedical-grade home later becomes strategically necessary, publish a *dual
    edition*: keep w3id IRIs canonical and generate an OBO-ID layer
    (`sstim:FrequencyBand owl:equivalentClass obo:SSTIM_0000001`). Not done now.
+   **Prerequisite added by [ADR 0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md):**
+   the `SSTIM` IDSPACE is not allocated and `purl.obolibrary.org/obo/SSTIM_0000001`
+   returns 404, so that example is an illustration and not a mintable
+   identifier. No `obo:SSTIM_*` IRI may be generated or published before the
+   Foundry allocates the IDSPACE.
 4. **DBpedia: via DBpedia Archivo, not directly.** DBpedia core is extracted
    from Wikipedia. Submit the dereferenceable ontology URI to Archivo
    (`archivo.dbpedia.org`) and iterate to a 4-star rating.
