@@ -151,7 +151,7 @@ BARTOC or FAIRsharing field edits have already landed.
 | LOV | 🕓 **suggested 2026-07-10, still absent** — `/vocabs/sstim` is 404 while a control record resolves. LOV ingests the unchanged W3ID namespace and auto-extracts locations, so there is no host field to migrate and no accepted record to edit | no | follow up with curators; do not duplicate the suggestion |
 | BARTOC | ✅ **migrated 2026-09-02** — the curator applied every requested change and closed [issue #319](https://github.com/gbv/bartoc.org/issues/319) as completed. JSKOS verified field by field at `https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154` (`modified` 2026-09-02T06:15:49Z): `url` → `https://w3c-cg.github.io/sstim/ontology/docs/`, `subjectOf` → `https://github.com/w3c-cg/sstim` (legacy repository gone; concept DOI and the frozen 0.16.0 namespace document retained), `extent` → "164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)", which matches `TERM_INDEX.md` and a `skos:ConceptScheme` count of the frozen document exactly. Preserved as asked: node URI, `identifier` `https://w3id.org/sstim`, `namespace` `https://w3id.org/sstim#`, and the publisher field | yes (GitHub) | — |
 | BioPortal | ⚠️ **live; W3C metadata patched and deterministic bundle deployed 2026-09-01** — authenticated API verification shows submission `28` with W3C pull/home/repository/source/docs/issues and version IRI `https://w3id.org/sstim/0.16.0`. The W3C and legacy bundle URLs serve the ledger bytes (1,239,332 bytes; SHA-256 `7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11`) | account ✓ (@rfabbri) | observe transition pull, then one unchanged pull; patch current date |
-| FAIRsharing | ⚠️ **record [8494](https://fairsharing.org/8494) live, but mutable links still need migration**. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved. The public record still exposes the legacy homepage; write access is through its signed-in SPA | yes | signed-in W3C link edit |
+| FAIRsharing | ✅ **migrated and enriched 2026-09-04 over the API.** Homepage, support links and the cross-reference DOI corrected; description broadened; `sleep` domain added. Two gaps remain by choice, recorded in section 3: record-to-record relations, and publications/citations. Superseded row text: ⚠️ record live, mutable links still need migration. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved. The public record still exposes the legacy homepage; write access is through its signed-in SPA | yes | signed-in W3C link edit |
 | OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
 | OpenAIRE | ✅ **closed 2026-09-02 — no submission needed** — `api.openaire.eu/search/software?doi=10.5281/zenodo.22003777` returns `total=1`: Zenodo is an OpenAIRE-compliant repository and the record is already harvested and indexed as software. OpenAIRE Provide is an intake for repository and aggregator *operators*, which SSTIM is not | n/a | — |
 | Software Heritage | ✅ **archived 2026-09-03** — both origins, save requests `2462747` and `2462748`, each `succeeded` with a `full` visit. Snapshot SWHIDs `swh:1:snp:4fc9710a…673115` (W3C-CG) and `swh:1:snp:39ba6c81…d45e0b` (legacy origin), both now on the Zenodo record. Superseded row text: 🕓 not submitted — `/api/1/origin/<url>/get/` answers `NotFoundExc` for both origins while a control repository comes back archived, so the absence is measured, not assumed. Save Code Now takes `POST /api/1/origin/save/git/url/<repository-url>/`, anonymously, and yields a snapshot SWHID for the source to sit beside the Zenodo DOI for the release | no | **archival is permanent and public**; secret sweep first, then submit both origins |
@@ -1029,7 +1029,59 @@ serialization a publication invariant:
 whitespace, statement order, or fresh blank-node identifiers are enough to
 produce another row even when the RDF graphs are isomorphic.
 
-### FAIRsharing — LIVE; signed-in W3C-CG link edit pending
+### FAIRsharing — MIGRATED AND ENRICHED 2026-09-04
+
+Done over the REST API with a browser-issued JWT. **API access is gated on the
+user profile having a linked organisation**: without one every call returns 401
+with `Please link your user account with an organisation`, which reads like an
+auth failure and is not one. Linking an organisation on
+`fairsharing.org/profiles/edit` is the prerequisite for any future API work here.
+
+**Corrected.**
+
+| Field | Was | Now |
+|---|---|---|
+| Homepage | `labiosyncare.github.io/ontology/docs/` | `w3c-cg.github.io/sstim/ontology/docs/` |
+| `cross_references` | superseded: the **0.6.0** version DOI `10.5281/zenodo.21302910`, titled "BSC Lab — …" | `10.5281/zenodo.21286974`, the concept DOI, which always resolves to the newest version |
+| `support_links` | 2: the legacy repository, the CG page | 6: W3C-CG repository, issue tracker, CG page, persistent namespace, knowledge browser, and the preserved origin kept as a historical mirror |
+| `description` | claimed "auditory, visual, and tactile modalities" | lists the modalities actually published, adds the four languages, the profiles, the alignment targets, and the CG non-endorsement notice |
+| `domains` | 8 | 9, adding `sleep` |
+
+The cross-reference is the one that mattered most: the record had been pinned to
+the 0.6.0 archive since 2026-07-12 and stayed there through ten releases, so
+anyone following it reached a DOI two months stale under the old project name.
+The concept DOI cannot go stale.
+
+**Deliberately not done, with reasons.**
+
+- **Hearing and vision domains.** FAIRsharing's domain vocabulary holds 571
+  terms and its only two sensory-perception entries are smell (`GO_0007608`) and
+  taste (`GO_0050909`). There is nothing to add for the modalities SSTIM is built
+  around. The existing smell and taste tags are correct and are supported by
+  `sstim-v:modalityOlfactory` and the exposure module's `modalityGustatory`.
+- **`electroencephalography` domain.** Rejected on the term index: SSTIM names no
+  EEG term. The frequency bands are named after EEG rhythms, but the ontology
+  targets them with stimulation rather than measuring them, and a domain tag
+  asserting EEG would overclaim.
+- **Extra user-defined tags.** `user_defined_tags` are a **global** FAIRsharing
+  vocabulary, not per-record, so a new label must be created there and a
+  duplicate raises `PG::UniqueViolation`. `/user_defined_tags` ignores its `q`
+  parameter and returns a truncated first 1000 of at least 1476, so "this tag
+  does not exist yet" cannot be established from it. `fair data` was attached by
+  id; the rest were abandoned rather than guessed at against a partial list.
+- **Record-to-record relations.** The obvious additions have records: HED
+  `4718`, SKOS `1068`, OWL 2 `409`, PROV-O `1271`. The relation vocabulary is not
+  exposed by any API endpoint tried (`/record_associations/relations` and
+  `/maintenance/record_associations` both 404), and the existing three links all
+  use `extends`, which is right for IAO, BFO and OBI and wrong for SKOS and OWL.
+  Adding a link with the wrong relation is worse than not adding it, so this is
+  left for the edit form's **RELATIONS TO OTHER RECORDS** tab, where the
+  relations are a dropdown.
+- **`publications` and `citations`.** Both empty, and both are what FAIRsharing's
+  own "missing recommended field" banner is asking for. They are waiting on the
+  Semantic Web Journal submission rather than on effort.
+
+### FAIRsharing — original submission record
 
 **Submission mechanism (confirmed by screenshots 2026-07-11).** Requires a
 FAIRsharing account (email or ORCID). Flow:
