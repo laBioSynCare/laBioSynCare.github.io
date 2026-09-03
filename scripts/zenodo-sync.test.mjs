@@ -187,8 +187,18 @@ test('a description already written as HTML is not wrapped again', () => {
 test('every related identifier names a relation the write API knows', () => {
   // The id is lowercase and comes from Zenodo's own vocabulary; a typo fails at
   // publish, after the draft has been created.
-  const known = new Set(['isdocumentedby', 'issupplementto', 'isidenticalto', 'haspart',
-    'ispartof', 'isdescribedby', 'references', 'iscitedby', 'isderivedfrom'])
+  // Zenodo's whole relation vocabulary, from /api/vocabularies/relationtypes on
+  // 2026-09-02. The full set rather than the handful in use: a shortlist has to
+  // be edited every time a new relation is added to .zenodo.json, which is a
+  // test that fails for the wrong reason, and it did exactly that when the
+  // Software Heritage snapshots arrived as isvariantformof.
+  const known = new Set(['cites', 'compiles', 'continues', 'describes', 'documents',
+    'hasmetadata', 'haspart', 'hasversion', 'iscitedby', 'iscompiledby', 'iscontinuedby',
+    'isderivedfrom', 'isdescribedby', 'isdocumentedby', 'isidenticalto', 'ismetadatafor',
+    'isnewversionof', 'isobsoletedby', 'isoriginalformof', 'ispartof', 'ispreviousversionof',
+    'ispublishedin', 'isreferencedby', 'isrequiredby', 'isreviewedby', 'issourceof',
+    'issupplementedby', 'issupplementto', 'isvariantformof', 'isversionof', 'obsoletes',
+    'references', 'requires', 'reviews'])
   for (const related of buildMetadata({ config, subjectIds: ids() }).related_identifiers) {
     expect(known).toContain(related.relation_type.id)
     expect(related.scheme).toMatch(/^(url|doi)$/)
