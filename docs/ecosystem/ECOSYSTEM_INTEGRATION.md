@@ -190,14 +190,17 @@ the RDF projection.
 | Community | **NeuroTechX** (30+ chapters) | Join + demonstrate BSC Lab (do not create a new community) |
 
 **⏰ Time-sensitive:** **Brain Innovation Days 2026 Innovation Hall** (Brussels,
-18–19 Nov) — applications open until **1 September 2026**. Today is 2026-07-12
-(~7 weeks). Verify exhibition costs before committing.
+18–19 Nov) — applications open until **15 September 2026**, extended from the
+1 September date this line originally carried. The extension is the maintainer's
+report of 2026-09-03; the organiser's public pages fetched that day state no
+deadline, so confirm it on the application form. Verify exhibition costs before
+committing.
 
 ### 90-day sequence (source-proposed; adapt into `TODO.md` P2/outreach)
 
 1. **HED/BIDS bridge** — publish one end-to-end SSTIM–HED/BIDS example; request HED WG review. *(→ Workstream 2)*
 2. **External research use case** — ask Gori/ANTARES and UCL to nominate one protocol each to encode.
-3. **Brain Innovation Days** — apply before 1 Sept.
+3. **Brain Innovation Days** — apply before 15 Sept (extended; confirm on the form).
 4. **W3C group growth** — recruit from ≥4 constituencies (experimental neuroscience, multisensory HCI, semantic standards, device/software devs).
 5. **Regional commercialization** — Clust-ER Health 30-day BSC pilot; keep commercial-pilot evidence separate from research validation.
 6. **Governance** — preserve SSTIM (vendor-neutral) / BSC Lab (open) / BioSynCare (closed) separation; publish conflicts of interest; seek an independent co-maintainer. *(overlaps Workstream 1)*

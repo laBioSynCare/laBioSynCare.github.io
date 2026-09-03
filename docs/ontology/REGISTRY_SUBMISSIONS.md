@@ -154,7 +154,7 @@ BARTOC or FAIRsharing field edits have already landed.
 | FAIRsharing | ⚠️ **record [8494](https://fairsharing.org/8494) live, but mutable links still need migration**. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved. The public record still exposes the legacy homepage; write access is through its signed-in SPA | yes | signed-in W3C link edit |
 | OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
 | OpenAIRE | ✅ **closed 2026-09-02 — no submission needed** — `api.openaire.eu/search/software?doi=10.5281/zenodo.22003777` returns `total=1`: Zenodo is an OpenAIRE-compliant repository and the record is already harvested and indexed as software. OpenAIRE Provide is an intake for repository and aggregator *operators*, which SSTIM is not | n/a | — |
-| Software Heritage | 🕓 **not submitted** — `/api/1/origin/<url>/get/` answers `NotFoundExc` for both origins while a control repository comes back archived, so the absence is measured, not assumed. Save Code Now takes `POST /api/1/origin/save/git/url/<repository-url>/`, anonymously, and yields a snapshot SWHID for the source to sit beside the Zenodo DOI for the release | no | **archival is permanent and public**; secret sweep first, then submit both origins |
+| Software Heritage | ✅ **archived 2026-09-03** — both origins, save requests `2462747` and `2462748`, each `succeeded` with a `full` visit. Snapshot SWHIDs `swh:1:snp:4fc9710a…673115` (W3C-CG) and `swh:1:snp:39ba6c81…d45e0b` (legacy origin), both now on the Zenodo record. Superseded row text: 🕓 not submitted — `/api/1/origin/<url>/get/` answers `NotFoundExc` for both origins while a control repository comes back archived, so the absence is measured, not assumed. Save Code Now takes `POST /api/1/origin/save/git/url/<repository-url>/`, anonymously, and yields a snapshot SWHID for the source to sit beside the Zenodo DOI for the release | no | **archival is permanent and public**; secret sweep first, then submit both origins |
 | OBO Foundry (membership) | ⛔ **declined, reaffirmed 2026-09-03 on measurement** — [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 and [ADR 0056](../decisions/0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md). Membership costs the readable IRIs; the biomedical discovery it would buy is already delivered by BioPortal without it. Full reasoning and the reopening trigger in section 3 | n/a | reopen only on the named trigger |
 | OntoBee | ✅ **closed 2026-09-02 — not applicable** — OntoBee serves the OBO Foundry library, and [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 rejects OBO Foundry membership on identifier grounds. A non-member ontology has no intake here | n/a | revisit only if a future ADR reopens OBO membership |
 | re3data · OpenDOAR | ✅ **closed 2026-09-02 — not applicable, superseded by FAIRsharing** — re3data indexes research *data repositories* and OpenDOAR open-access *repositories*. SSTIM is a vocabulary, and ADR 0016 §7 names them as alternatives to FAIRsharing, whose record `8494` is live and DOI-assigned | n/a | — |
@@ -1426,7 +1426,7 @@ repositories and aggregators, which SSTIM is not.
 and this has no next step. Re-measure with the command above if the question
 comes back.
 
-### Software Heritage — NOT SUBMITTED; measured absent 2026-09-02
+### Software Heritage — ARCHIVED 2026-09-03
 
 The reference archive for *source code*. It complements Zenodo rather than
 duplicating it: Zenodo archives a release, Software Heritage archives the
@@ -1453,13 +1453,39 @@ ARCHIVED
 - **Both origins:** `https://github.com/w3c-cg/sstim` and
   `https://github.com/laBioSynCare/laBioSynCare.github.io`.
 
-**Before submitting, and this is the whole reason it is not submitted yet:
-archival is permanent, public, and copies whatever is committed at visit time.
-There is no un-archive.** Sweep for anything that should not be mirrored
-forever. `docs/credentials/` is the obvious candidate and is clear: it is
-ignored at `.gitignore:16` and `git ls-files docs/credentials/` returns nothing,
-verified 2026-09-02. That check is a precondition of every future submission
-here, not a one-time clearance.
+**The sweep, run before submitting, because archival is permanent and public
+and copies whatever is committed at visit time. There is no un-archive.**
+Verified 2026-09-03: `docs/credentials/`, `docs/funding/` and `.env` have zero
+tracked files each; the only tracked file whose name suggests a secret is
+`.env.example`, whose every value is empty; and the only token-shaped string in
+the tree is a deliberately fake Google key at
+`src/portability/sessionPackage.test.js:240`, a negative fixture for the
+detector that stops real ones being exported. This sweep is a precondition of
+every future submission here, not a one-time clearance.
+
+**Submitted and archived 2026-09-03.**
+
+```text
+POST /api/1/origin/save/git/url/https://github.com/w3c-cg/sstim/
+  request 2462747 -> accepted -> succeeded, visit full
+  swh:1:snp:4fc9710a79530047911ef7cbb872f73d79673115
+
+POST /api/1/origin/save/git/url/https://github.com/laBioSynCare/laBioSynCare.github.io/
+  request 2462748 -> accepted -> succeeded, visit full
+  swh:1:snp:39ba6c8174f2e4b9636c8d44114ab2de92d45e0b
+```
+
+Both are on the Zenodo record as `isVariantFormOf`, not `isIdenticalTo`: the
+record archives one tag, the snapshot archives the whole history, so they are
+two packagings of the same source rather than the same object.
+
+**Zenodo rejects the `swh` identifier scheme.** Sending the bare SWHID fails the
+publish with `metadata.related_identifiers.N.scheme: Invalid scheme`, so each
+SWHID travels as the resolver URL `https://archive.softwareheritage.org/<swhid>`
+with scheme `url`, both verified 200. Do not "fix" these back to bare SWHIDs.
+
+Re-archival is not automatic. Software Heritage revisits origins on its own
+schedule; a fresh snapshot after a release is the same POST again.
 
 ### OBO Foundry membership — DECLINED, reaffirmed 2026-09-03 on measurement
 

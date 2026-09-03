@@ -67,7 +67,7 @@ already shipped. Release facts are derived from
 [`CHANGELOG.md`](CHANGELOG.md). Cite the concept DOI
 `10.5281/zenodo.21286974` across releases.
 
-**Immediate:** outreach — Brain Innovation Days application by **1 Sept 2026**.
+**Immediate:** outreach — Brain Innovation Days application by **15 Sept 2026** (extended from 1 Sept; extension reported by the maintainer 2026-09-03, not independently confirmed on the organiser's site).
 Registry curation and independent human ontology review continue in parallel.
 
 **Standing state.** The modular ontology architecture shipped, with namespace
@@ -1128,7 +1128,13 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
 > [`docs/ecosystem/OUTREACH_TARGETS.md`](docs/ecosystem/OUTREACH_TARGETS.md) and
 > [`docs/ecosystem/ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md).
 - [ ] ⏰ **Brain Innovation Days 2026 (Brussels, 18–19 Nov) — apply to the
-      Innovation Hall before 1 September 2026** `P1`
+      Innovation Hall before 15 September 2026** `P1`
+      Extended from 1 September. The extension is the maintainer's report
+      (2026-09-03); the organiser's site does not state a deadline in the pages
+      fetched that day, so **confirm the date on the application form before
+      relying on it**. The original 1 September date passed with this item still
+      open and still labelled Immediate, which is the failure the new date should
+      not repeat.
       *Hard external deadline (~7 weeks out as of 2026-07-12). Verify exhibition
       costs before committing. Present SSTIM/BSC Lab, not health claims (§3.5).*
 

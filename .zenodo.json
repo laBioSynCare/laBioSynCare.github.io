@@ -296,6 +296,16 @@
       "scheme": "url"
     },
     {
+      "relation": "isVariantFormOf",
+      "identifier": "https://archive.softwareheritage.org/swh:1:snp:4fc9710a79530047911ef7cbb872f73d79673115",
+      "scheme": "url"
+    },
+    {
+      "relation": "isVariantFormOf",
+      "identifier": "https://archive.softwareheritage.org/swh:1:snp:39ba6c8174f2e4b9636c8d44114ab2de92d45e0b",
+      "scheme": "url"
+    },
+    {
       "relation": "isSupplementTo",
       "identifier": "https://www.w3.org/community/sstim/",
       "scheme": "url"
@@ -309,6 +319,11 @@
       "relation": "isDescribedBy",
       "identifier": "10.25504/FAIRsharing.660ff4",
       "scheme": "doi"
+    },
+    {
+      "relation": "isDescribedBy",
+      "identifier": "https://bioportal.bioontology.org/ontologies/SSTIM",
+      "scheme": "url"
     },
     {
       "relation": "isDescribedBy",
