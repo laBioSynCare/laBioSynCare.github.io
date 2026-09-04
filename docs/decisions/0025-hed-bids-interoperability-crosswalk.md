@@ -433,6 +433,43 @@ but it is the prerequisite for everything after.
    validation assembles the sidecar with hedtools and compares every result with
    the mapping contract.
 
+   **Mapping 0.6.0 absorbs the 2026-09-02 correction, which no gate could
+   have raised.** Kay Robbins attached the bundle we emailed on 2026-08-28 to
+   [hed-schemas#422](https://github.com/hed-standard/hed-schemas/issues/422) as
+   "the general HED annotation strategy", returning `events.tsv` byte identical
+   and rewriting six of its annotations. One rule accounts for all six: **name
+   the agent and nest the action inside it.** The three `Experiment-control`
+   events therefore gain `Controller-agent` for the delivering system, and
+   `eventObservationCollected` gains `Experiment-participant`. The returned pair
+   and the full before-and-after are archived at
+   [`docs/ontology/hed/kay-robbins-2026-09-02/`](../ontology/hed/kay-robbins-2026-09-02/README.md).
+
+   Both versions validate at zero errors against 8.4.0, which is the part worth
+   keeping. `make hed-crosswalk` proves conformance and not idiom, so it would
+   have called the thinner mapping fine indefinitely. A validator cannot tell you
+   that you are describing only the system's half of an event.
+
+   **Two of the six were deliberately not adopted, for different reasons.** Her
+   `observation-collected` uses `Perform/Report`, a tag extension of the kind she
+   recommends for immediate use; it raises `TAG_EXTENDED`, and
+   `generate-hed-bundle.py` validates with warnings enabled and treats any issue
+   as a failure, so `(Perform, Participant-response)` carries the same sense
+   without an extension. Her pause and resume add the participant's physical
+   button press. **SSTIM records no participant action, no input device and no
+   actor for a pause**, so emitting that would invent data the session record
+   does not hold, which is the overclaim version 0.3.0 already withdrew once for
+   engine identities. Whether a participant action should be an SSTIM session
+   event is the open ontology question her ruling really raises, and it is
+   tracked in `TODO.md` rather than answered here by a crosswalk.
+
+   **`Onset` and `Offset` groups are not symmetric**, measured with hedtools
+   while adopting this: `(Def/X, Offset, (anything))` fails `TAG_GROUP_ERROR`
+   because the reserved `Offset` tag admits no non-def-expand subgroup, while
+   `(Def/X, Onset, (anything))` is valid. Anything accompanying an `Offset` must
+   be a separate top-level group. That asymmetry, not inconsistency, is why her
+   pause and resume take different shapes, and it constrains any generator that
+   later emits both.
+
    **End-of-recording is an intentional temporal boundary, not a synthetic
    stop.** Each demonstrator's final native event is session completion or
    interruption. When delivery is still open, its HED `Onset` remains active

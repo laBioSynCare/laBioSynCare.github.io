@@ -452,7 +452,10 @@ indexed, examiner-searchable records.
       open after the 2026-08-25 review; no ontology term was added merely to make
       the projection richer. Decide deliberately.*
 
-- [ ] **Crosswalk 0.6.0: name the agent and nest the action** `P2`
+- [x] **Crosswalk 0.6.0: name the agent and nest the action** — **done 2026-09-04.**
+      Four mappings rewritten, three gates green, two of her six deliberately not
+      adopted with the reasons recorded in the map's own notes and in ADR 0025.
+      `P2`
       *Raised 2026-09-02, from Kay Robbins' rewrite of the sent bundle in
       [hed-schemas#422](https://github.com/hed-standard/hed-schemas/issues/422).
       She returned `events.tsv` byte identical and changed six `HED` strings,
@@ -469,13 +472,20 @@ indexed, examiner-searchable records.
       proves conformance, not idiom, and idiom is what an upstream reader
       corrects.*
 
-      *The work is the mapping table, the generator, the three demonstrator
-      bundles, and `check-hed-roundtrip.py`, whose reverse lookup has never had
-      to handle an annotation with two top level groups. Measured while writing
-      the record: an `Offset` group admits no subgroup at all (`TAG_GROUP_ERROR`
-      on the reserved tag), so the press must sit beside it, while an `Onset`
-      group takes the press inside. Any generator that emits one shape for both
-      will fail on the pause rows.*
+      *Done: `eventParameterChanged`, `eventSafetyLimitApplied` and
+      `eventEngineFallback` gained `Controller-agent`, and
+      `eventObservationCollected` gained `Experiment-participant`. The bundles
+      regenerated and `hed-crosswalk`, `hed-bundle-check` and `hed-roundtrip` all
+      pass; the reverse lookup handled the nested groups without change.*
+
+      *Two of her six were not adopted.* `Perform/Report` *is a tag extension
+      raising `TAG_EXTENDED`, and `generate-hed-bundle.py` validates with
+      warnings on and fails on any issue, so* `(Perform, Participant-response)`
+      *carries the sense without one. And her pause and resume add the
+      participant's button press, which SSTIM cannot support: it records no
+      participant action, no input device and no actor for a pause, so emitting
+      it would invent data. That is the open question below, not a crosswalk
+      task.*
 
 - [ ] Decide whether a participant action is an SSTIM session event `P3`
       *Raised 2026-09-02, and the deeper form of Kay Robbins' pause ruling: the

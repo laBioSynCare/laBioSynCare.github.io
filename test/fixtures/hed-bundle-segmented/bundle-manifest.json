@@ -8,7 +8,7 @@
     "sstim": "0.17.0-dev",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
-    "mapping": "0.5.0",
+    "mapping": "0.6.0",
     "sstimEventScheme": "https://w3id.org/sstim/vocab#SessionEventTypeScheme",
     "binding": "none — BIDS-style artifacts, not a BIDS dataset (decision 3)"
   },
@@ -48,7 +48,7 @@
     },
     {
       "file": "events.json",
-      "sha256": "c713113333e6eb9f4775e28915699e0348cdbfd7c4fd11315c987f346bd67700"
+      "sha256": "d6d25d1a07d9b72bb92f9400b2e492d6cce7328235aa901ddcb1e0a2aff5a83d"
     }
   ],
   "declaredLoss": {

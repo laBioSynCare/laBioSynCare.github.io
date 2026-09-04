@@ -17,11 +17,11 @@
         "TermURL": "https://w3id.org/sstim/vocab#eventPlaybackStart"
       },
       "parameter-changed": {
-        "Description": "A delivery quantity was set to a new value part-way through the session. Experiment-control places it as a control action rather than a stimulus, Modify names the act, and the detail tags carry which parameter and what it became — which is what makes a segmented stimulus recoverable from the events table.",
+        "Description": "A delivery quantity was set to a new value part-way through the session. Experiment-control places it as a control action rather than a stimulus, Controller-agent names the delivering system as the actor, Modify names the act it performed, and the detail tags carry which parameter and what it became — which is what makes a segmented stimulus recoverable from the events table.",
         "TermURL": "https://w3id.org/sstim/vocab#eventParameterChanged"
       },
       "safety-limit-applied": {
-        "Description": "A delivery parameter was constrained by a safety boundary. Constrained names the constraining; the detail tags name the parameter and the value actually delivered.",
+        "Description": "A delivery parameter was constrained by a safety boundary. The delivering system is the actor, the act is a modification, and Constrained names the constraining within it; the detail tags name the parameter and the value actually delivered.",
         "TermURL": "https://w3id.org/sstim/vocab#eventSafetyLimitApplied"
       },
       "session-complete": {
@@ -32,8 +32,8 @@
     "HED": {
       "session-open": "(Def/Sstim-session, Onset)",
       "playback-start": "(Def/Sstim-delivery, Onset)",
-      "parameter-changed": "(Experiment-control, Modify, {parameter_kind}, {value_after})",
-      "safety-limit-applied": "(Experiment-control, Constrained, {parameter_kind}, {value_after})",
+      "parameter-changed": "(Experiment-control, (Controller-agent, Modify), {parameter_kind}, {value_after})",
+      "safety-limit-applied": "(Experiment-control, (Controller-agent, (Modify, Constrained)), {parameter_kind}, {value_after})",
       "session-complete": "(Def/Sstim-session, Offset)"
     }
   },
