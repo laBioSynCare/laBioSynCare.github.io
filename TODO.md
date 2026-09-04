@@ -237,13 +237,18 @@ indexed, examiner-searchable records.
       concept DOI, and publisher field. Complete after a curator applies it and
       the public JSKOS API returns the new values.*
 
-- [ ] **Decide whether to take SNOMED's free Affiliate Licence, and in whose name** `P2`
+- [~] **SNOMED Affiliate Licence: applied 2026-09-04, awaiting approval** `P2`
       *SNOMED International replied on 2026-09-04 offering a no-fee "public good"
       affiliate licence for the two mapping statements in the alignment module,
       applied for through MLDS, with a note to their Chief Digital Information
       Officer so he can process it. Recorded at
       [`docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md`](docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md).
-      Recommendation there: apply, and change no triples.*
+      Recommendation there was to apply and change no triples, and that is what
+      happened: submitted 2026-09-04 in the name of Aeterni Anima (organisation
+      type "Other / Non-formalized"), Public Good agreement, Academic /
+      Development usage, Italy as the sole non-Member country, no hospitals, no
+      practices, no sublicensed institutions. Account standing "Applying".
+      Complete this when the licence is approved.*
 
       *Three things to carry into the decision. The narrow question we asked, on
       whether reference-only IRI use needs a licence at all, was not answered
@@ -254,8 +259,16 @@ indexed, examiner-searchable records.
       neither of which an anonymous download can satisfy; the IRI-only design
       therefore stands regardless of the outcome. And the licence binds a legal
       person, which the Community Group is not, so applying makes an individual
-      the annual reporting party for a community artifact. That is the actual
-      decision.*
+      the annual reporting party for a community artifact. Resolved by filing in
+      Aeterni Anima's name, with the usage text naming SSTIM, the Community Group
+      and the CC BY 4.0 publication so that what the licence covers matches what
+      is actually published.*
+
+      *Implementation Status was declared **Live / Implemented**, and the first
+      reading here said development, which was wrong. The mappings are absent
+      from every frozen release (0.16.0 was tagged four days before they landed),
+      but both public origins serve them today at HTTP 200. Absence from a
+      release is not absence from deployment.*
 
       *Also blocked on this: `static/ontology/sstim-alignments.ttl` still says the
       reply is pending. It is protected under `CLAUDE.md` §3.4, so its comment

@@ -155,9 +155,14 @@ Read what that does and does not settle:
 - **Taking the licence still has a cost, and it is administrative, not
   financial.** Intended use in a non-Member territory must be reported through
   MLDS before it begins, and holders must file an annual Statement of Usage. That
-  is a recurring obligation attached to whichever legal person signs, and who
-  that person is (Renato, or the Community Group, which is not a legal entity)
-  is the open question in the outreach record.
+  is a recurring obligation attached to whichever legal person signs.
+
+**The application was filed the same day**, 2026-09-04, in the name of Aeterni
+Anima, under the Public Good agreement type, declaring the use as Live and
+Implemented, with Italy as the sole non-Member country and no hospitals,
+practices or sublicensed institutions. Account standing is "Applying". The
+declared usage text names SSTIM, the Community Group and the CC BY 4.0
+publication, so what the licence covers matches what is actually published.
 
 Note for whoever handles this: the Qualifying Research Projects fee exemption is
 **not** the route to take. Its published conditions include SNOMED CT-encoded

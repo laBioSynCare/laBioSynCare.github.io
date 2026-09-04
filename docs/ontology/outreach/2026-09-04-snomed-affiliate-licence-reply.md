@@ -1,10 +1,10 @@
 # SNOMED International: a free public good Affiliate Licence is offered
 
-**Status: received 2026-09-04, unanswered, no application filed.** Privacy-safe
-record of a direct reply, not a transcript. The message, its headers, the support
-ticket reference and the sender's contact details stay in the access-limited
-correspondence tree, consistently with
-[ADR 0031](../../decisions/0031-qualified-ecosystem-records.md).
+**Status: reply received and application submitted, both 2026-09-04. Awaiting
+approval.** Privacy-safe record of a direct reply, not a transcript. The message,
+its headers, the support ticket reference, the sender's contact details and the
+MLDS affiliate number stay in the access-limited correspondence tree,
+consistently with [ADR 0031](../../decisions/0031-qualified-ecosystem-records.md).
 
 ## What was asked
 
@@ -67,23 +67,56 @@ in a non-Member territory must be reported through MLDS before it begins, and
 licence holders in non-Member territories file an annual Statement of Usage.
 That is a recurring obligation on whoever signs.
 
-## The open question, which is not technical
+## Who applied, which was the open question
 
-**Who applies.** The Affiliate Licence binds a legal person. The candidates are
-Renato personally, and the W3C Sensory Stimulation Vocabulary Community Group,
-which is not a legal entity and cannot hold a licence. A personal licence
-covering a vocabulary published by a group is workable but should be a decision
-rather than a default, because it makes one individual the reporting party for a
-community artifact, and because the licence would not travel if maintenance ever
-did.
+The Affiliate Licence binds a legal person, and the W3C Sensory Stimulation
+Vocabulary Community Group is not one. The application was filed in the name of
+**Aeterni Anima**, organisation type "Other / Non-formalized", at the Modena
+address, with Renato as the contact. It was submitted on 2026-09-04 and the
+account stands at "Applying".
 
-## Recommendation
+The consequence to keep in view: the licence holder is Aeterni Anima while SSTIM
+is published by the Community Group, so the declared usage text names SSTIM, the
+Community Group and the CC BY 4.0 publication explicitly. What the licence covers
+is what that text describes, which is why it is reproduced below rather than
+summarised.
 
-Apply, and keep the mappings as they are. The licence costs nothing, removes the
-only unresolved legal question hanging over the alignment module, and does not
-require changing a single triple. Do not treat it as a mandate to enrich the
-SNOMED section: the reason that section carries no labels is the CC BY conflict
-above, which the licence does not dissolve.
+## What was declared
+
+| Field | Value |
+|---|---|
+| Type of Agreement | Affiliate, Public Good |
+| Usage Type | Academic, subtype Development |
+| Implementation Status | **Live / Implemented** |
+| Countries in Use | Italy (home, non-Member) |
+| Hospitals, Practices | none, none |
+| Sublicensed Institutions | none |
+| Licence period | 2026-01 to 2026-12 |
+
+**Why Live rather than In Progress / Development**, since the first reading here
+was the other one and it was wrong. The two mapping statements are not in a
+frozen release: 0.16.0 was tagged 2026-08-19 and the mappings landed on
+2026-08-23, so they sit on the 0.17.0-dev line. That was mistaken for
+"not deployed". Both public origins serve them today, measured on 2026-09-04:
+`https://w3c-cg.github.io/sstim/ontology/sstim-alignments.ttl` and the legacy
+`https://labiosyncare.github.io/ontology/sstim-alignments.ttl` each return HTTP
+200 with `snomed:226056003` and `snomed:122545008` present. The use is live and
+publicly retrievable; only the version freeze is pending. Declaring development
+would have understated a deployed use.
+
+**The one declared tension.** "Academic, for internal use within an Organization"
+is the closest available Usage Type, but SSTIM is published openly rather than
+used internally. Rather than pick a category that fits worse, the discrepancy was
+stated plainly in the usage text and raised directly with SNOMED in the reply
+confirming submission, offering to change it if another category fits better.
+
+## Standing recommendation
+
+Keep the mappings exactly as they are. The licence removes the only unresolved
+legal question over the alignment module and required changing no triple. Do not
+treat it as a mandate to enrich the SNOMED section: the reason that section
+carries no labels is the CC BY conflict above, which the licence does not
+dissolve.
 
 ## Draft replacement for the protected alignment comment
 
