@@ -216,22 +216,18 @@ indexed, examiner-searchable records.
       verify the displayed/resolved value, and preserve archived submissions as
       history. Repeat this check for each genuine release.*
 
-- [~] **Automate the DBpedia KG Catalog release refresh** `P3`
-      *Implementation is in [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53),
-      opened 2026-09-01 after @m1ci recommended its `check-new-release` hook in
-      [issue #46](https://github.com/dbpedia/kg-catalog/issues/46). The PR adds
-      the verified frozen W3C-CG 0.16.0 distribution and a daily updater that
-      discovers stable tags and fails closed unless the released manifest,
-      `owl:versionInfo`, and one `dct:issued` date agree. It computes the exact
-      bytes/hash, appends one newer release as pending, and does not backfill or
-      rewrite historical entries. Live discovery, a second idempotent run, five
-      focused checks, Python compilation, YAML parsing, and the catalog's URL
-      validation script passed. The generic per-release description avoids a
-      second count parser; record-level counts are updated explicitly in the
-      same PR.*
-
-      *Complete this only after the PR merges, 0.16.0 becomes active, and the
-      next unchanged daily updater run leaves `metadata.yaml` untouched.*
+- [x] **Automate the DBpedia KG Catalog release refresh** `P3`
+      *[dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53)
+      was merged by @m1ci on 2026-09-03 (merge commit `4a345a03`), and both exit
+      conditions have since been measured. The catalog bot promoted the W3C-CG
+      0.16.0 distribution from `pending` to `active` 23 seconds after the merge
+      (commit `630e960b`), and the Databus version `2026.08.18` now carries that
+      file at 788555 bytes with the PR's sha256. The first scheduled daily run
+      after the merge (`Daily KG Release Check` 33841539799, 2026-09-04) logged
+      "SSTIM KG metadata is current at 0.16.0" and wrote nothing, so the updater
+      is idempotent in production and not only in the pre-merge rehearsal. The
+      catalog now tracks stable tags without a submission; see
+      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
 
 - [~] **Migrate BARTOC node 21154's mutable links and extent** `P2`
       *The live JSKOS record still carries the legacy docs/repository and July

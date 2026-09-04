@@ -122,7 +122,7 @@ new identity.
 | BioPortal | Patch the current ontology submission metadata | **Applied and verified through the authenticated API.** Submission `28` now pulls the W3C deterministic bundle and carries the W3C homepage, repository, source, documentation, and issue tracker. Await the two-night stability observation before correcting its successor's display date. |
 | FAIRsharing | Audit record `8494` and prepare the mutable-link edit | **Signed-in edit still required.** The public record still exposes the legacy homepage. The browser runtime available to this audit could not start, and FAIRsharing's write API requires authentication; exact replacement values are recorded below. |
 | OLS4 | Update the open submission rather than creating another | **Applied.** PR [#1351](https://github.com/EBISPOT/ols4/pull/1351) commit `258c2a51` now uses the W3C homepage and frozen 0.16.0 Turtle; the reviewer was notified. |
-| DBpedia KG Catalog | Refresh the live record and automate later releases | **Submitted.** PR [#53](https://github.com/dbpedia/kg-catalog/pull/53) adds frozen 0.16.0 from W3C-CG plus a fail-closed daily release updater; issue [#46](https://github.com/dbpedia/kg-catalog/issues/46#issuecomment-5497847636) links the change. |
+| DBpedia KG Catalog | Refresh the live record and automate later releases | **Merged and live.** PR [#53](https://github.com/dbpedia/kg-catalog/pull/53) merged by @m1ci on 2026-09-03; the catalog bot promoted the W3C-CG 0.16.0 distribution to `active` 23 seconds later, and the first daily updater run after the merge left `metadata.yaml` untouched. |
 
 The read-only `make registry-verify` probe on 2026-09-01 reached all five public
 surfaces it covers: prefix.cc mapping, BARTOC node, FAIRsharing record, Archivo
@@ -158,7 +158,7 @@ BARTOC or FAIRsharing field edits have already landed.
 | OBO Foundry (membership) | ⛔ **declined, reaffirmed 2026-09-03 on measurement** — [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 and [ADR 0056](../decisions/0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md). Membership costs the readable IRIs; the biomedical discovery it would buy is already delivered by BioPortal without it. Full reasoning and the reopening trigger in section 3 | n/a | reopen only on the named trigger |
 | OntoBee | ✅ **closed 2026-09-02 — not applicable** — OntoBee serves the OBO Foundry library, and [ADR 0016](../decisions/0016-publication-obo-posture-and-registries.md) §2 rejects OBO Foundry membership on identifier grounds. A non-member ontology has no intake here | n/a | revisit only if a future ADR reopens OBO membership |
 | re3data · OpenDOAR | ✅ **closed 2026-09-02 — not applicable, superseded by FAIRsharing** — re3data indexes research *data repositories* and OpenDOAR open-access *repositories*. SSTIM is a vocabulary, and ADR 0016 §7 names them as alternatives to FAIRsharing, whose record `8494` is live and DOI-assigned | n/a | — |
-| DBpedia KG Catalog | ⚠️ **0.15.0 live; 0.16.0 + updater in review** — [catalog record](https://kg-catalog.dbpedia.org/kg.html?id=sstim), [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), and migration PR [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53). The PR preserves historical 0.15.0 bytes and adds verified W3C-CG 0.16.0 as pending | yes (GitHub) | watch PR and first daily updater run |
+| DBpedia KG Catalog | ✅ **0.16.0 live and self-updating since 2026-09-03** — [catalog record](https://kg-catalog.dbpedia.org/kg.html?id=sstim), [Databus group](https://databus.dbpedia.org/knowledge-graph-catalog/sstim), merged PR [dbpedia/kg-catalog#53](https://github.com/dbpedia/kg-catalog/pull/53). Historical 0.15.0 bytes preserved; the Databus version `2026.08.18` carries the W3C-CG file at the exact 788555 bytes and `522abc80…037b1` hash from the PR | yes (GitHub) | none; the daily updater owns future releases |
 | Wikidata | ⛔ Phase 4 (after registries stable) | yes | deferred |
 
 ---
@@ -1221,7 +1221,7 @@ Required follow-up: In a signed-in record edit, change the homepage, Browse
                     roles, but verify the maintainer link actually saved.
 ```
 
-### DBpedia KG Catalog — LIVE; 0.16.0 updater PR open
+### DBpedia KG Catalog — LIVE at 0.16.0; automated updater merged
 
 A new, actively developed DBpedia catalogue (<https://kg-catalog.dbpedia.org/>),
 announced on the DBpedia Slack by Milan Dojchinovski (@m1ci) inviting beta
@@ -1238,8 +1238,8 @@ Ontology is already catalogued as `cso`.
 **Two submission routes.** Option 1 is a guided GitHub issue form, recommended
 by the guide and validated automatically. Option 2 is a YAML pull request
 against `knowledge-graphs/<id>/metadata.yaml`. The initial 0.15.0 record used
-option 1; the W3C-CG migration and automated refresh use option 2 in
-[PR #53](https://github.com/dbpedia/kg-catalog/pull/53).
+option 1; the W3C-CG migration and automated refresh used option 2 in
+[PR #53](https://github.com/dbpedia/kg-catalog/pull/53), merged 2026-09-03.
 
 **No Databus publishing is required.** `cso` sets both `moss-publish` and
 `databus-publish` to `false` and points its distributions at self-hosted files,
@@ -1250,31 +1250,41 @@ that is currently failing for Archivo.
 Service:            DBpedia KG Catalog (dbpedia/kg-catalog)
 Initial submission: https://github.com/dbpedia/kg-catalog/issues/46
 Migration/update:   https://github.com/dbpedia/kg-catalog/pull/53
-Live version:       0.15.0 (artifact version id 2026.08.17)
-Live distribution:  https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl
+Live versions:      0.15.0 (artifact version id 2026.08.17) and
+                    0.16.0 (artifact version id 2026.08.18), both `active`
+0.15.0 distribution: https://labiosyncare.github.io/ontology/0.15.0/sstim-namespace.ttl
                     ttl, 727857 bytes, sha256
                     838b09a862af283d8a3ace16872f05cb43eb69ee061f3217077e94bc66cc2dfc
-Pending version:    0.16.0 (artifact version id 2026.08.18)
-Pending dist.:      https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl
+0.16.0 distribution: https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl
                     ttl, 788555 bytes, sha256
                     522abc802f2366356899ddedc5b2e548d5918368185fd84b178c6004398037b1
-Date:               2026-08-18 initial; 2026-09-01 migration PR
+Date:               2026-08-18 initial; 2026-09-01 migration PR;
+                    2026-09-03 merged
 Account/maintainer: @ttm
 Status:             LIVE since 2026-08-24 at kg.html?id=sstim and the Databus
-                    group. PR #53 preserves the historical 0.15.0 URL/hash,
-                    updates record-level facts to 0.16.0, adds the verified W3C
-                    0.16.0 distribution as `pending`, and sets
+                    group. PR #53 was merged by @m1ci on 2026-09-03T07:06:20Z
+                    (merge commit 4a345a03). It preserved the historical 0.15.0
+                    URL/hash, updated record-level facts to 0.16.0, added the
+                    verified W3C 0.16.0 distribution, and set
                     `check-new-release: sstim_release_auto_update.py`.
                     The updater reads stable W3C-CG tags, then fails closed
                     unless the frozen manifest, `owl:versionInfo`, and one
                     `dct:issued` date agree before calculating bytes and SHA-256.
-                    Live-run, idempotence, five focused checks, Python compile,
-                    YAML parsing, and the catalog URL-validation script passed.
-Required follow-up: Watch PR #53. After merge, confirm 0.16.0 changes from
-                    pending to active and the first unchanged daily updater run
-                    makes no metadata change. Future stable tags should append
-                    exactly one release at a time; do not manually rewrite
-                    historical distributions.
+Post-merge checks:  Both were run on 2026-09-04 and both passed.
+                    (1) Promotion: the LOD Cloud Bot commit 630e960b, 23 seconds
+                    after the merge, flipped the 0.16.0 distribution from
+                    `pending` to `active`; the Databus version 2026.08.18 now
+                    publishes the W3C-CG file with dcat:byteSize 788555 and the
+                    PR's sha256, issued 2026-09-03T07:06:41Z.
+                    (2) Idempotence: the first scheduled `Daily KG Release Check`
+                    after the merge (run 33841539799, 2026-09-04T05:43:26Z)
+                    logged "SSTIM KG metadata is current at 0.16.0" and produced
+                    no commit; `metadata.yaml` on main is still at 630e960b.
+Required follow-up: None while releases stay routine. Future stable tags should
+                    append exactly one release at a time; do not manually rewrite
+                    historical distributions. If a release ever fails to appear,
+                    read the updater's log line in that day's workflow run before
+                    assuming the record is stale.
 
                     **Domain is Life Sciences & Health**, changed by the
                     maintainer's decision on 2026-08-18 and verified live on the
