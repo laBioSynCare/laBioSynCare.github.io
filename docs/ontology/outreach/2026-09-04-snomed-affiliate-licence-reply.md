@@ -1,7 +1,7 @@
 # SNOMED International: a free public good Affiliate Licence is offered
 
-**Status: reply received and application submitted, both 2026-09-04. Awaiting
-approval.** Privacy-safe record of a direct reply, not a transcript. The message,
+**Status: reply received, application submitted, and confirmation sent, all
+2026-09-04. Awaiting approval.** Privacy-safe record of a direct reply, not a transcript. The message,
 its headers, the support ticket reference, the sender's contact details and the
 MLDS affiliate number stay in the access-limited correspondence tree,
 consistently with [ADR 0031](../../decisions/0031-qualified-ecosystem-records.md).
@@ -109,6 +109,22 @@ is the closest available Usage Type, but SSTIM is published openly rather than
 used internally. Rather than pick a category that fits worse, the discrepancy was
 stated plainly in the usage text and raised directly with SNOMED in the reply
 confirming submission, offering to change it if another category fits better.
+
+## Confirmation sent
+
+Renato replied directly on 2026-09-04 at displayed 16:53, as shown in the Gmail
+sent record; the screenshot encodes no timezone and this record does not infer
+one. Three things, and nothing else: that the application was submitted with its
+affiliate number so it can be located; that Usage Type "Academic / Development"
+was selected while SSTIM is published openly under CC BY 4.0 rather than used
+internally, with an offer to change it if another category fits better; and that
+SSTIM references SNOMED CT concept identifiers as IRIs only, reproduces no SNOMED
+CT content in the published file, and intends to keep it that way.
+
+The third point is deliberate. It puts our reading of the scope in writing with
+the licensor before approval, so that "include more content if necessary" is not
+later mistaken, by us or by anyone reading this file, for permission to publish
+SNOMED CT content under CC BY 4.0.
 
 ## Standing recommendation
 
