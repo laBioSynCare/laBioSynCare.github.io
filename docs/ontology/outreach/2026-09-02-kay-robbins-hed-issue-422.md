@@ -1,6 +1,6 @@
 # HED issue 422: our sample published upstream, and six annotations corrected
 
-**Status: received, not yet answered, not yet absorbed.** Public thread, no
+**Status: received, answered 2026-09-04, and absorbed by crosswalk 0.6.0.** Public thread, no
 private correspondence involved.
 [hed-standard/hed-schemas#422](https://github.com/hed-standard/hed-schemas/issues/422)
 was opened on 2026-08-26 by a third party (`@AlmaCollective`) asking how Standard
@@ -71,19 +71,32 @@ second vocabulary rather than an opinion, which is what the thread asked for.
 (ADR 0035 and ADR 0036) already use her preferred word in the neighbouring sense,
 which is worth mentioning only as corroboration, not as the same distinction.
 
+## What happened next
+
+**Crosswalk 0.6.0 shipped the same day.** `eventParameterChanged`,
+`eventSafetyLimitApplied` and `eventEngineFallback` gained `Controller-agent`,
+and `eventObservationCollected` gained `Experiment-participant`; the three
+demonstrator bundles regenerated and all three HED gates pass. Two of her six
+were deliberately not adopted, and the reasons differ: `Perform/Report` raises
+`TAG_EXTENDED` and the generator validates with warnings on, so
+`(Perform, Participant-response)` carries the sense without an extension; and her
+pause and resume add a participant button press that SSTIM cannot support,
+because it records no participant action, no input device and no actor for a
+pause. See [ADR 0025](../../decisions/0025-hed-bids-interoperability-crosswalk.md).
+
+**Answered in the thread on 2026-09-04**
+([comment](https://github.com/hed-standard/hed-schemas/issues/422#issuecomment-5543447130)),
+posted by Renato. It offers the three-value `sstim:ParticipantEngagementMode`
+axis as evidence that a two-valued directed/self-directed distinction may be too
+few, with the caveat stated plainly: SSTIM's axis is a property of a method and
+the thread's question is about a single event, so it is offered as evidence
+rather than as a proposed tag set.
+
 ## What this leaves open
 
-1. **Crosswalk 0.6.0** to absorb the agent grouping, which is tracked in
-   [`../../../TODO.md`](../../../TODO.md). It touches the mapping table, the
-   generator, the three demonstrator bundles and the reverse lookup in
-   `check-hed-roundtrip.py`, since a second top level group is a shape that
-   check has not had to reverse before.
-2. **Whether to reply in the thread**, and in whose voice. The question is a
-   third party's, our material is already in it, and the engagement mode
-   precedent is directly responsive. Not sent, and not to be sent without
-   Renato's decision.
-3. **A participant action event type in SSTIM**, which is the deeper form of her
-   pause ruling. SSTIM's session event types record what the delivering system
-   observed, and the participant's press is currently only implied by
-   `eventPlaybackPause`. Whether that is a modelling gap or a deliberate scope
-   boundary is an ontology decision, not a crosswalk one.
+**A participant action event type in SSTIM**, the deeper form of her pause
+ruling. SSTIM's session event types record what the delivering system observed,
+and the participant's press is currently only implied by
+`eventPlaybackPause`. Whether that is a modelling gap or a deliberate scope
+boundary is an ontology decision, not a crosswalk one, and it is the reason two
+of her six annotations could not be adopted.
