@@ -64,6 +64,10 @@ Describing a protocol or claim does not establish efficacy.
 - [Registry submissions](REGISTRY_SUBMISSIONS.md) — the per-registry record and
   reusable metadata kit. [Wikidata contribution](WIKIDATA_CONTRIBUTION.md) covers
   that one separately, since it is contribution rather than submission.
+- [Alignment candidates, tranche 1](ALIGNMENT_CANDIDATES.md) — proposed external
+  mappings to MeSH, UBERON and Wikidata with the authority's own intension for
+  each, plus the candidates rejected and why. A proposal awaiting review, not a
+  record of what is asserted; `make alignment-verify` reports the latter.
 
 ## Reviews
 

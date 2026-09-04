@@ -83,7 +83,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -371,6 +371,28 @@ hed-crosswalk:
 ## absence, and does not set the exit status (CLAUDE.md §3.6).
 registry-verify:
 	$(PYTHON) scripts/verify-registries.py
+
+## Dereference every external mapping the ontology asserts, at the authority that
+## mints the identifier. NETWORK, opt-in, and not part of `make validate`, for
+## the same reason `registry-verify` is not.
+##
+## Three published mappings here have been wrong: band QIDs that resolved to a
+## Van Halen album and a stock exchange, MeSH D012910 recorded as sensory
+## stimulation when the NLM record is Snake Venoms, and SNOMED 229070002
+## recorded as sensory stimulation when it denotes stretching exercises. Every
+## gate in this repository passed all three, because an external identifier is
+## opaque to Turtle parsing, SHACL and HermiT alike; only the owning service can
+## say what it denotes (CLAUDE.md §3.6).
+##
+## Checks that each target exists, is not obsolete or retired, is a concept
+## rather than a paper about the concept, and carries owl:Axiom provenance with
+## a dct:date. For exactMatch and closeMatch it also reports REVIEW when the
+## authority's label shares no word with SSTIM's, which is the only check that
+## sees the D012910 and 229070002 class of error: both identifiers exist and are
+## active, and only their meaning is wrong. `--offline` runs the structural half
+## with no network. Unreachable is INCOMPLETE and does not set the exit status.
+alignment-verify:
+	$(PYTHON) scripts/verify-alignments.py verify
 
 ## Measure multilingual coverage per scheme and refuse to let it drift. SSTIM
 ## advertises four languages in BARTOC, FAIRsharing and every module title; when
@@ -883,6 +905,7 @@ help:
 	@echo "  make preview          Build and preview on $(PREVIEW_HOST):$(PREVIEW_PORT)"
 	@echo "  make test             Run Vitest"
 	@echo "  make audio-verify     Measure the audio engines in a browser (BROWSER=chrome|firefox|all)"
+	@echo "  make alignment-verify Dereference every external mapping at its own authority (network)"
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make validate-release-source Validate release-prepared sources before snapshot creation"
 	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"

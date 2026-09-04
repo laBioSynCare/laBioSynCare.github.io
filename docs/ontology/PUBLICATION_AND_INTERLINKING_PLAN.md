@@ -308,6 +308,22 @@ BioPortal mapping suggestions may identify candidates, but suggestions are a
 review queue rather than evidence for an RDF assertion. Licensing constraints
 must also be checked before adding mappings.
 
+`make alignment-verify` (`scripts/verify-alignments.py`) dereferences every
+external mapping the ontology asserts at the service that mints the identifier:
+Wikidata, the NLM MeSH endpoints, EBI OLS4 for OBO IRIs, and tx.fhir.org for
+SNOMED CT. It fails on a target that does not exist, is obsolete, is a scholarly
+article or clinical trial rather than the subject itself, or carries no
+`owl:Axiom` provenance with a `dct:date`. It is network-dependent and opt-in for
+the same reason `registry-verify` is, and an unreachable authority is INCOMPLETE
+rather than absence. It is the only instrument in the repository that can see
+this class of defect: a wrong identifier parses, validates and reasons exactly
+like a right one.
+
+Its candidate mode searches the same authorities for concepts that carry no
+mapping. Its output is a review queue on the same footing as BioPortal's
+suggestions. The reviewed first tranche is
+[ALIGNMENT_CANDIDATES.md](ALIGNMENT_CANDIDATES.md).
+
 If OBO membership later becomes strategically important, evaluate a generated
 bridge rather than replacing canonical SSTIM IRIs. Any equivalent-class bridge
 requires an ADR, migration analysis, and external ontology review.

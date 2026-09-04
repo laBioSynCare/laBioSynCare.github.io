@@ -898,6 +898,25 @@ Turtle files are listed in section 1. After they exist:
       *An unverified Music Ontology association and the incorrect MeSH D012910
       candidate were removed in the 0.6 development pass.*
 
+      *Measured 2026-09-05: 13 mapping triples reaching two vocabularies, on 12
+      of 551 concepts and 2 of 164 classes; 3 of the 39 techniques and none of
+      the neural systems, target sites or phenomena. `make alignment-verify`
+      (new, network, opt-in) dereferences all 13 at the service that mints each
+      identifier and reports them correct, not obsolete, not a paper about the
+      subject, and provenance-dated. It is the instrument that would have caught
+      the Van Halen QIDs, MeSH D012910 and SNOMED 229070002, none of which any
+      offline gate can see.*
+
+      *A reviewed tranche of 56 candidate mappings over 30 concepts, against
+      MeSH, UBERON and Wikidata, each carrying the authority's own scope note as evidence, is in
+      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md), with
+      the rejected candidates and the reason for each. Nothing is asserted:
+      `sstim-alignments.ttl` is protected (CLAUDE.md §3.4) and needs an
+      instruction naming it. The reviewer decisions it is waiting on are the
+      predicate for the system and target-site rows (ADR 0021 says these are
+      information categories, so the recommendation is closeMatch throughout and
+      never exactMatch) and the intended sense of `targetCortex`.*
+
 ### Wikidata contribution
 
 *Staged plan with per-stage gates:
@@ -913,6 +932,12 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
+      *Outbound candidates are now checked and tabled in
+      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md); the
+      reciprocal Wikidata statements still wait on stage 1 and on those rows
+      being asserted. That pass also found three techniques with no Wikidata
+      concept item at all (tACS, photic driving, rhythmic auditory stimulation),
+      which is stage 3 work rather than a mapping.*
 - [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of the 551 concepts**, all
       English `P2`
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
