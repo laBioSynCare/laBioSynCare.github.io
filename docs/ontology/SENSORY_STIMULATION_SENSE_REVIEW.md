@@ -108,12 +108,12 @@ definition-versus-scope-note divergence** as the plants case, in a second
 independent term. One instance is an oversight; two on the project's central
 terms is the argument for the drift check.
 
-### Licence position: enquiry sent, reply pending
+### Licence position: a free licence is offered, and the fee risk is gone
 
 SNOMED CT is licensed content and SSTIM is CC BY 4.0. Brazil and Italy are both
-outside the 53 Member territories, and the published licensing FAQ has no
-carve-out for reference-only use, so the position could not be cleared from
-public documents.
+outside the 53 Member territories (re-verified against the published member list
+on 2026-09-04), and the published licensing FAQ has no carve-out for
+reference-only use, so the position could not be cleared from public documents.
 
 Exposure was minimised rather than assumed: the triples assert IRIs under the
 public SNOMED CT URI Standard and carry no SNOMED description, hierarchy,
@@ -122,14 +122,53 @@ children rather than enumerating them, and the alignment file instructs future
 editors not to add labels or child concepts.
 
 **An enquiry went to `info@snomed.org` on 2026-08-23**, asking only whether
-reference-only IRI use requires an Affiliate Licence. Reply pending; do not
-re-open the question until it arrives. The draft and its reasoning are at
-`/Users/renatofabbri/sstim-drafts/snomed-licence-enquiry.md`.
+reference-only IRI use requires an Affiliate Licence. The draft and its reasoning
+are at `/Users/renatofabbri/sstim-drafts/snomed-licence-enquiry.md`.
 
-Note for whoever handles the reply: the Qualifying Research Projects fee
-exemption is **not** the route to take first. Its published conditions include
-SNOMED CT-encoded materials becoming SNOMED International property, which is
-incompatible with CC BY 4.0 publication and would be worse than a fee.
+**SNOMED International replied on 2026-09-04**, through its Chief Digital
+Information Officer, Rory Davidson. The substance, recorded in full at
+[`outreach/2026-09-04-snomed-affiliate-licence-reply.md`](outreach/2026-09-04-snomed-affiliate-licence-reply.md):
+for this use case, described there as inclusion in some mapping statements,
+SNOMED would grant a **public good Affiliate Licence with no fee**, carrying
+permission to include more content later without asking again. The route is an
+application through MLDS, with a note to him so he can process it.
+
+Read what that does and does not settle:
+
+- **The fee risk recorded above is gone** for this use. The World Bank territory
+  band no longer governs anything here.
+- **The narrow question was not answered as asked.** He did not say that
+  reference-only IRI use requires a licence, nor that it does not. He offered a
+  licence that makes the question moot for us. Do not record this as SNOMED
+  confirming that IRI references are licence-free, because it is not what was
+  said, and a later reader would rely on it.
+- **"More content" is not permission to republish SNOMED content under CC BY.**
+  Two published Affiliate terms bear on this and both were checked on
+  2026-09-04. An Affiliate is required to issue sublicences to the organisations
+  or individuals using its products, and a sub-licensee is not permitted to
+  distribute or share SNOMED CT Content or Derivatives. An anonymous download of
+  a CC BY 4.0 Turtle file can satisfy neither condition: there is nobody to
+  sublicence, and CC BY grants every recipient the redistribution right that the
+  sub-licence withholds. So the IRI-only design in the alignment module stays as
+  it is, licence or no licence, and the instruction not to add SNOMED labels or
+  child concepts stands.
+- **Taking the licence still has a cost, and it is administrative, not
+  financial.** Intended use in a non-Member territory must be reported through
+  MLDS before it begins, and holders must file an annual Statement of Usage. That
+  is a recurring obligation attached to whichever legal person signs, and who
+  that person is (Renato, or the Community Group, which is not a legal entity)
+  is the open question in the outreach record.
+
+Note for whoever handles this: the Qualifying Research Projects fee exemption is
+**not** the route to take. Its published conditions include SNOMED CT-encoded
+materials becoming SNOMED International property, which is incompatible with
+CC BY 4.0 publication and would be worse than a fee. That advice predates the
+reply and the reply does not change it; the public good Affiliate Licence is a
+different and better instrument.
+
+The alignment module itself still says the reply is pending. It is a protected
+file under `CLAUDE.md` §3.4, so its comment block is updated only on an explicit
+instruction naming it; the replacement text is drafted in the outreach record.
 
 **Mechanics, recorded because three validation runs failed before one passed.**
 The edits changed the module sha256 and the Full profile rollup, so

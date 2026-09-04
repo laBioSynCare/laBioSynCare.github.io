@@ -237,6 +237,31 @@ indexed, examiner-searchable records.
       concept DOI, and publisher field. Complete after a curator applies it and
       the public JSKOS API returns the new values.*
 
+- [ ] **Decide whether to take SNOMED's free Affiliate Licence, and in whose name** `P2`
+      *SNOMED International replied on 2026-09-04 offering a no-fee "public good"
+      affiliate licence for the two mapping statements in the alignment module,
+      applied for through MLDS, with a note to their Chief Digital Information
+      Officer so he can process it. Recorded at
+      [`docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md`](docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md).
+      Recommendation there: apply, and change no triples.*
+
+      *Three things to carry into the decision. The narrow question we asked, on
+      whether reference-only IRI use needs a licence at all, was not answered
+      either way, and must not be recorded as though it were. The offer of
+      permission to "include more content" does not permit publishing SNOMED
+      content in a CC BY 4.0 artifact, because an Affiliate must sublicence its
+      users and a sub-licensee may not distribute SNOMED Content or Derivatives,
+      neither of which an anonymous download can satisfy; the IRI-only design
+      therefore stands regardless of the outcome. And the licence binds a legal
+      person, which the Community Group is not, so applying makes an individual
+      the annual reporting party for a community artifact. That is the actual
+      decision.*
+
+      *Also blocked on this: `static/ontology/sstim-alignments.ttl` still says the
+      reply is pending. It is protected under `CLAUDE.md` §3.4, so its comment
+      block changes only on an instruction naming the file; the replacement text
+      is drafted in the outreach record.*
+
 - [ ] **Migrate FAIRsharing record 8494's mutable links to W3C-CG** `P2`
       *The public record still exposes the legacy homepage. FAIRsharing edits
       require its signed-in SPA/API, and the available in-app browser runtime
