@@ -414,13 +414,54 @@ indexed, examiner-searchable records.
       open after the 2026-08-25 review; no ontology term was added merely to make
       the projection richer. Decide deliberately.*
 
+- [ ] **Crosswalk 0.6.0: name the agent and nest the action** `P2`
+      *Raised 2026-09-02, from Kay Robbins' rewrite of the sent bundle in
+      [hed-schemas#422](https://github.com/hed-standard/hed-schemas/issues/422).
+      She returned `events.tsv` byte identical and changed six `HED` strings,
+      every one applying the same rule: state who acted and put the act inside
+      that agent's group.* `(Experiment-control, Modify, {level})` *becomes*
+      `(Experiment-control, (Controller-agent, (Modify, ({level}))))`, *and the
+      two playback rows gain the participant's actual button press. The full
+      before and after table, the validation numbers and the reason her pause and
+      resume take different group shapes are in
+      [`docs/ontology/hed/kay-robbins-2026-09-02/`](docs/ontology/hed/kay-robbins-2026-09-02/README.md).*
+
+      *Both versions validate at zero errors against 8.4.0, so no gate we own
+      would have caught this. That is the point worth carrying: `hed-crosswalk`
+      proves conformance, not idiom, and idiom is what an upstream reader
+      corrects.*
+
+      *The work is the mapping table, the generator, the three demonstrator
+      bundles, and `check-hed-roundtrip.py`, whose reverse lookup has never had
+      to handle an annotation with two top level groups. Measured while writing
+      the record: an `Offset` group admits no subgroup at all (`TAG_GROUP_ERROR`
+      on the reserved tag), so the press must sit beside it, while an `Onset`
+      group takes the press inside. Any generator that emits one shape for both
+      will fail on the pause rows.*
+
+- [ ] Decide whether a participant action is an SSTIM session event `P3`
+      *Raised 2026-09-02, and the deeper form of Kay Robbins' pause ruling: the
+      `Pause` tag names the purpose of an action, not the action, and a pause row
+      is really a participant press followed by control actions (stop the player,
+      save state, show the pause display).* `sstim-v:SessionEventTypeScheme`
+      *records what the delivering system observed, so the press is only implied
+      by* `sstim-v:eventPlaybackPause`. *Whether that is a modelling gap or a
+      deliberate scope boundary is an ontology decision. Note that the same
+      thread's original question, from a third party, is precisely about who
+      determined the timing of a participant action, and that
+      `sstim:ParticipantEngagementMode` already answers a method-level version of
+      it with three values where HED is considering two.*
+
 - [!] Decide the shape of generated HED definition bodies `P3`
       *Blocked on the HED Working Group, asked 2026-08-21 on
       [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
       and still unanswered after the 2026-08-25 meeting. That meeting settled
       pause/resume and the sidecar shape but recorded no ruling on definition
       bodies. The 11-event follow-up was sent on 2026-08-28, but it did not ask
-      the definition-body question, which remains open on the existing thread.*
+      the definition-body question, which remains open on the existing thread.
+      Her 2026-09-02 rewrite returned the definition bodies unedited while
+      changing six event annotations around them. That is not a ruling and must
+      not be read as one; it only means she did not raise them again.*
 
       *@VisLab's critique, which we accept: the definitions we generate are event
       codes wearing a definition's clothes.*

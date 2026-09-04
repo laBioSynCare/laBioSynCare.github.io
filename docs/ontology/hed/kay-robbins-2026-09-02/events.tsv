@@ -1,0 +1,12 @@
+onset	duration	event_id	mod_frequency	level
+0.000	n/a	session-open	n/a	n/a
+0.300	n/a	playback-start	10	n/a
+120.000	n/a	observation-collected	n/a	n/a
+240.000	n/a	parameter-changed	n/a	0.35
+240.100	n/a	safety-limit-applied	n/a	0.30
+420.000	n/a	playback-pause	n/a	n/a
+480.000	n/a	playback-resume	10	n/a
+600.000	n/a	engine-fallback	n/a	n/a
+840.000	n/a	observation-collected	n/a	n/a
+900.000	n/a	playback-stop	n/a	n/a
+900.500	n/a	session-complete	n/a	n/a
