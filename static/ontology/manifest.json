@@ -636,7 +636,7 @@
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f6a632791ae68386d30c725d8e92d03ff2217894bec037c9238b07877d7379bd"
+        "sha256": "5076260db04d292335d7cca1b331e905fc3c0e6af65960a906f90af3874a33e8"
       },
       "runtime": {
         "url": "sstim-alignments.ttl",
@@ -903,7 +903,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "7aeaab628f003cea158a256fb7cd6bf475fabbf2cc5dbb40b0a5d57819a3931f"
+      "sha256": "717f6c1c95ea23b00b5388d39866023baa039e727f465d6c8b4c08e999c13cc1"
     }
   ]
 }

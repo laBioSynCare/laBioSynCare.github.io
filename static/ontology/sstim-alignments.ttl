@@ -326,20 +326,37 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 # tx.fhir.org is the working instrument for any future SNOMED lookup.
 #
 # LICENCE, read before extending this section. SNOMED CT is licensed by SNOMED
-# International. Brazil and Italy are both outside the 53 Member territories, so
-# an Affiliate Licence for this project would come from MLDS directly and may be
-# fee-bearing by World Bank territory band; the published licensing FAQ does not
-# address reference-only use. These mappings therefore assert IRIs under the
-# public SNOMED CT URI Standard and deliberately carry no SNOMED description
-# text, hierarchy, definition, or attribute content as data. Do not add SNOMED
-# labels or child concepts here.
+# International. Brazil and Italy are both outside the 53 Member territories.
+# These mappings assert IRIs under the public SNOMED CT URI Standard and
+# deliberately carry no SNOMED description text, hierarchy, definition, or
+# attribute content as data. Do not add SNOMED labels or child concepts here.
 #
 # An enquiry was sent to info@snomed.org on 2026-08-23 asking the narrow
 # question: whether referencing concept identifiers as IRIs in an openly
 # published mapping, without redistributing SNOMED CT content, requires an
-# Affiliate Licence. Awaiting reply. Record the answer here when it arrives, and
-# do not re-open the question in the meantime. Withdrawing these mappings, if
-# the answer requires it, is a one-commit change.
+# Affiliate Licence.
+#
+# SNOMED International replied on 2026-09-04, through its Chief Digital
+# Information Officer: for this use, described as inclusion in some mapping
+# statements, it would grant a no-fee "public good" Affiliate Licence, applied
+# for through MLDS. The application was filed the same day in the name of
+# Aeterni Anima and is awaiting approval, so the fee concern this comment used
+# to carry is resolved.
+#
+# Two things the reply does not do, and both matter more than the fee.
+#
+# It did not rule on whether reference-only IRI use needs a licence at all. It
+# offered one instead. Do not record it as having settled that question.
+#
+# And it does not change what may be published here. An Affiliate must issue
+# sublicences to those using its products, and a sub-licensee may not distribute
+# or share SNOMED CT Content or Derivatives; an anonymous CC BY 4.0 download can
+# satisfy neither. So the rule above is unconditional and survives the licence:
+# no SNOMED content in this file, whatever permission to "include more content"
+# is granted. Withdrawing these mappings, if that ever becomes necessary, is
+# still a one-commit change.
+#
+# Full record: docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md
 #
 # Both relations follow the KR-09 extension/intension test, not label similarity.
 
