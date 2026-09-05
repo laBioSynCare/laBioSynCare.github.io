@@ -275,6 +275,48 @@ indexed, examiner-searchable records.
       block changes only on an instruction naming the file; the replacement text
       is drafted in the outreach record.*
 
+- [ ] **Get one inbound reference from a term-level source** `P1`
+      *The plan, the measurement and every candidate surface are in
+      [`INBOUND_REFERENCES.md`](docs/ontology/INBOUND_REFERENCES.md), created
+      2026-09-05. The asymmetry it records: DataCite carries seven related
+      identifiers naming SSTIM, OpenAlex holds a software record for the deposit,
+      and the registries are live, so the scholarly graph knows SSTIM through its
+      DOI. No term-level source knows it at all: `make wikidata-inbound` reads the
+      claims of all 32 mapped Wikidata items and finds 0 pointing back.*
+
+      *Ordered by reach per unit of effort: the Wikidata batch (blocked only on a
+      credential, see below), a W3C CG report (chairs may publish; the community
+      reports index has no SSTIM entry as of 2026-09-05), the namespace IRI on
+      `w3.org/community/sstim/` (which mentions the repositories and not the
+      namespace), a Bioregistry prefix request, and schema.org markup on our own
+      pages, which the deployed site has none of.*
+
+- [?] **Choose how Wikidata edits get made: bot password or QuickStatements**
+      `P1`
+      *Not a technical question. `Special:BotPasswords` mints a scoped
+      `Rfabbri@<name>` login the Action API accepts, which would let the
+      generated batch and every later tranche be submitted from here; it lives in
+      the gitignored `docs/credentials/wikidata.md`. QuickStatements needs no
+      credential to leave the machine and is a browser paste each time. Detail in
+      [`WIKIDATA_CONTRIBUTION.md`](docs/ontology/WIKIDATA_CONTRIBUTION.md).*
+
+- [ ] **Publish a W3C Community Group report** `P2`
+      *Raised 2026-09-05 while looking for inbound references. `w3c.json` already
+      declares `repo-type: cg-report` and the group page states that chairs, when
+      logged in, may publish draft and final reports, so the mechanism is in
+      place and unused: the W3C community reports index returns nothing for
+      SSTIM. It would put a document citing the namespace on `w3.org`, under
+      W3C's publication process rather than ours, which is the highest-authority
+      inbound reference currently available and the one that most changes how the
+      work reads to an outside reviewer.*
+
+- [ ] **Add schema.org markup to the namespace and entrance pages** `P2`
+      *Measured 2026-09-05: the deployed site emits no `application/ld+json` at
+      all, so Google Dataset Search and every other crawler that reads structured
+      data has nothing to index. A `Dataset` or `DefinedTermSet` block carrying
+      the namespace IRI, licence, concept DOI and distributions is a write on our
+      side whose whole purpose is a reference on theirs.*
+
 - [ ] **Decide whether BioPortal should carry SSTIM's SKOS layer at all** `P2`
       *Measured 2026-09-05 while checking whether the new alignments could be
       pushed to BioPortal as class-to-class mappings. They cannot. The submission

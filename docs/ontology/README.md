@@ -64,6 +64,9 @@ Describing a protocol or claim does not establish efficacy.
 - [Registry submissions](REGISTRY_SUBMISSIONS.md) — the per-registry record and
   reusable metadata kit. [Wikidata contribution](WIKIDATA_CONTRIBUTION.md) covers
   that one separately, since it is contribution rather than submission.
+- [Inbound references](INBOUND_REFERENCES.md) — the other direction: records and
+  items **outside** SSTIM that reference an SSTIM IRI. What already does, where
+  we can write, where we can request, and what each claim was measured with.
 - [Alignment candidates, tranche 1](ALIGNMENT_CANDIDATES.md) — proposed external
   mappings to MeSH, UBERON and Wikidata with the authority's own intension for
   each, plus the candidates rejected and why. A proposal awaiting review, not a

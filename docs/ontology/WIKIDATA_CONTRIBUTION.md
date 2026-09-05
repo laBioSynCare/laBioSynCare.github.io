@@ -115,6 +115,31 @@ ORCID is not one.
 Needs a signed-in human, not further work. Paste it under the named account, as
 section 5 requires.
 
+#### The credential, which is what actually blocks stages 1 and 2
+
+Neither stage is blocked by the account's standing. `Rfabbri` has edited since
+2011 and carries the disclosure section 5 requires. What blocks them is that no
+process on this machine holds a credential, so every batch stops at "paste this
+somewhere signed in".
+
+Two ways out, and they are different in kind.
+
+**A bot password**, minted at `Special:BotPasswords` on wikidata.org. It is a
+scoped login of the form `Rfabbri@<name>` with a generated password, accepted by
+the MediaWiki Action API, and its edits appear in the account's own
+contributions. Tick **Edit existing pages** and **Create, edit, and move pages**;
+the second is what creating the ontology item needs. It belongs in
+`docs/credentials/wikidata.md`, which is gitignored exactly as the BioPortal key
+is. With it, the generated batch can be submitted directly through
+`action=login`, a CSRF token, and `wbeditentity` / `wbcreateclaim`.
+
+**QuickStatements**, authorised once by the account owner in a browser. No
+credential leaves the machine, and the same generated output is pasted in.
+
+The first is faster for 30 statements and for every later tranche; the second
+keeps the credential where it already is. It is a maintainer decision, not a
+technical one, and nothing here depends on which is chosen.
+
 ### Stage 2 — reciprocal term links · **gate: verify each identifier**
 
 `TODO.md` requires identifiers and equivalence checked against the live

@@ -163,6 +163,12 @@ BARTOC or FAIRsharing field edits have already landed.
 
 ---
 
+**The other direction has its own file.** This one records SSTIM's submissions to
+registries. [INBOUND_REFERENCES.md](INBOUND_REFERENCES.md) records what outside
+SSTIM references an SSTIM IRI, which surfaces are writable with a credential we
+hold, and which need a request. The registries below are the largest group of
+inbound references that already exist, so the two files are read together.
+
 ## 3. Per-registry records
 
 ### prefix.cc — was wrong, corrected 2026-08-18
