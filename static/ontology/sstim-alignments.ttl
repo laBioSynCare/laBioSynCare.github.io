@@ -30,6 +30,8 @@
 @prefix prov:  <http://www.w3.org/ns/prov#> .
 @prefix wd:    <http://www.wikidata.org/entity/> .
 @prefix snomed: <http://snomed.info/id/> .
+@prefix mesh:   <http://id.nlm.nih.gov/mesh/> .
+@prefix uberon: <http://purl.obolibrary.org/obo/UBERON_> .
 @prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
 @prefix obi:   <http://purl.obolibrary.org/obo/OBI_> .
 @prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
@@ -50,9 +52,10 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-08-18"^^xsd:date ;
-    dct:modified "2026-08-22"^^xsd:date ;
+    dct:modified "2026-09-05"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
+    skos:historyNote "Tranche 1 of the reviewed external mapping pass, 2026-09-05, adds 57 mappings to MeSH descriptors, UBERON anatomical classes and Wikidata items across techniques, neural phenomena, neural systems and neural target sites, and brings the module from two external vocabularies to four. Every target was dereferenced at its own authority; the evidence, the rejected candidates and the predicate reasoning are in docs/ontology/ALIGNMENT_CANDIDATES.md."@en ;
     skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
 
 
@@ -396,6 +399,674 @@ obi:0000272 rdfs:label "protocol"@en .
 cob:0000082 rdfs:label "planned process"@en .
 iao:0000030 rdfs:label "information content entity"@en .
 
+
+
+###########################################################################
+# MeSH, UBERON and Wikidata alignments — tranche 1 (2026-09-05)
+#
+# Reviewed candidate set from docs/ontology/ALIGNMENT_CANDIDATES.md, which
+# records the evidence per row: the authority's own scope note, the extension or
+# intension divergence, and the candidates rejected and why. Read it before
+# changing a predicate here.
+#
+# Every identifier was dereferenced at the service that mints it on 2026-09-05,
+# and `make alignment-verify` re-runs that check: Wikidata for QIDs, the NLM
+# endpoints for descriptors, EBI OLS4 for OBO IRIs. Label similarity generated
+# the candidates and decided none of them, which is the rule this file has
+# followed since the D012910 rejection.
+#
+# Three rules govern the predicates below.
+#
+# A therapy or indication framing on the external side, which several MeSH
+# descriptors and Wikidata items carry and this vocabulary deliberately does
+# not, is an intension difference, so those rows are closeMatch and not
+# exactMatch.
+#
+# Where the external concept demonstrably contains or is contained by ours, the
+# row says so with broadMatch or narrowMatch rather than flattening it to close.
+#
+# For neural systems and target sites, ADR 0021 holds a controlled value to be
+# an information category rather than the entity it classifies. An anatomical
+# class is that entity, so no row in that group is exactMatch, whatever the
+# labels do.
+#
+# Not mapped, deliberately. sstim-v:targetCortex has no row: UBERON's "cortex"
+# is the outer layer of any organ and subsumes adrenal cortex, while the
+# intended sense here is probably cerebral cortex (UBERON:0000956, mesh
+# D002540) and the definition, "cortical tissue as a stimulation target", does
+# not exclude cerebellar cortex. That is a definition decision, not a mapping
+# one. sstim-v:techUltrasoundNeuromod has none either: MeSH Ultrasonic Therapy
+# and Wikidata's high-intensity focused ultrasound are both ablative, and low
+# intensity focused ultrasound neuromodulation is a different technique wearing
+# the same words.
+###########################################################################
+
+sstim-v:techTDCS skos:closeMatch mesh:D065908 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techTDCS ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D065908 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D065908> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The NLM descriptor is the same technique, constant low current through scalp electrodes, and differs only in framing it as therapy where this vocabulary asserts no therapeutic commitment. That framing difference is why closeMatch rather than exactMatch."@en .
+
+sstim-v:techTDCS skos:closeMatch wd:Q603398 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techTDCS ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q603398 ;
+    dct:source <http://www.wikidata.org/entity/Q603398> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Same technique and the same therapy framing as the MeSH descriptor."@en .
+
+sstim-v:techDBS skos:closeMatch mesh:D046690 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techDBS ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D046690 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D046690> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor is scoped by indication, naming therapy for movement disorders and Parkinson disease, while this concept carries no indication. The two are therefore not interchangeable; narrowMatch would be defensible if that scope note were read as normative rather than as indexing guidance."@en .
+
+sstim-v:techDBS skos:closeMatch wd:Q618076 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techDBS ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q618076 ;
+    dct:source <http://www.wikidata.org/entity/Q618076> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Identical technique, described there as a surgical treatment. Treatment framing again, so close rather than exact."@en .
+
+sstim-v:techElectroconvulsiveTherapy skos:closeMatch mesh:D004565 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techElectroconvulsiveTherapy ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D004565 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D004565> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor names the same procedure and adds its principal indications, severe affective disorders and schizophrenia, which this concept does not carry."@en .
+
+sstim-v:techElectroconvulsiveTherapy skos:closeMatch wd:Q131543 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techElectroconvulsiveTherapy ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q131543 ;
+    dct:source <http://www.wikidata.org/entity/Q131543> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item names the procedure with a thin intension, described only as a medical procedure, so closeMatch is the strongest defensible assertion."@en .
+
+sstim-v:techVagusNerveStimulation skos:closeMatch mesh:D055536 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techVagusNerveStimulation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D055536 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D055536> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor describes an implanted battery and adjunctive treatment of partial epilepsy and refractory depression. This concept covers implanted and transcutaneous delivery alike and names no indication, so it is the wider of the two."@en .
+
+sstim-v:techVagusNerveStimulation skos:closeMatch wd:Q2062293 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techVagusNerveStimulation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2062293 ;
+    dct:source <http://www.wikidata.org/entity/Q2062293> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Described as a medical treatment delivering electrical impulses to the vagus nerve. Same technique, treatment framing."@en .
+
+sstim-v:techRepetitiveTMS skos:broadMatch mesh:D050781 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techRepetitiveTMS ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D050781 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D050781> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor is transcranial magnetic stimulation generally, including the single-pulse probe used to assess cortical excitability. This concept is the repetitive protocol, and its own scope note holds that a single pulse used to measure is not neuromodulation, so the descriptor is strictly broader."@en .
+
+sstim-v:techRepetitiveTMS skos:broadMatch wd:Q263962 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techRepetitiveTMS ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget wd:Q263962 ;
+    dct:source <http://www.wikidata.org/entity/Q263962> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is transcranial magnetic stimulation as a whole, which contains the repetitive protocol this concept names."@en .
+
+sstim-v:techNeurofeedback skos:closeMatch mesh:D058765 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techNeurofeedback ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D058765 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D058765> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor is a technique to self-regulate brain activity presented as feedback, with no therapy framing and no restriction of the measured signal. This concept adds that the signal is typically EEG and that the feedback is rendered sensorily. The closest pair in this tranche; exactMatch is defensible and is not asserted only because the extension test has not been run in both directions."@en .
+
+sstim-v:techNeurofeedback skos:closeMatch wd:Q1306920 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techNeurofeedback ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1306920 ;
+    dct:source <http://www.wikidata.org/entity/Q1306920> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Described as a type of biofeedback, which agrees with the placement here."@en .
+
+sstim-v:techBiofeedback skos:closeMatch wd:Q864329 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techBiofeedback ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q864329 ;
+    dct:source <http://www.wikidata.org/entity/Q864329> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item describes the general practice of instrumented awareness of a physiological function in order to influence it, which matches this concept closely."@en .
+
+sstim-v:techBiofeedback skos:closeMatch mesh:D001676 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techBiofeedback ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D001676 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D001676> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor is Biofeedback, Psychology and is scoped both autonomically and therapeutically, naming conditions such as hypertension and migraine. This concept includes muscle tension and names no condition, so neither concept contains the other, which is what closeMatch is for."@en .
+
+sstim-v:techPhoticDriving skos:broadMatch mesh:D010775 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techPhoticDriving ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D010775 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D010775> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Photic Stimulation covers bright flashes and visual patterns used to elicit brain activity during electroencephalography. This concept is the periodic-flicker subset used to drive a rhythm at the flicker frequency, so the descriptor is broader."@en .
+
+sstim-v:techASMR skos:relatedMatch wd:Q4826866 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techASMR ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q4826866 ;
+    dct:source <http://www.wikidata.org/entity/Q4826866> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is the response phenomenon. This concept is the stimulation technique intended to evoke it, which is the same technique-versus-phenomenon distinction already recorded for the binaural voice."@en .
+
+sstim-v:techAcousticStartle skos:relatedMatch mesh:D013216 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:techAcousticStartle ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget mesh:D013216 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D013216> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor is the startle reflex, that is the elicited response, not the eliciting protocol. A technique is related to the reflex it probes rather than close to it."@en .
+
+sstim-v:phenomenonAuditorySteadyStateResponse skos:closeMatch wd:Q123224658 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:phenomenonAuditorySteadyStateResponse ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q123224658 ;
+    dct:source <http://www.wikidata.org/entity/Q123224658> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is the electrophysiological response to rapid auditory stimuli, which is what this concept names. closeMatch because the item draws no boundary against neighbouring evoked responses."@en .
+
+sstim-v:phenomenonFrequencyFollowingResponse skos:narrowMatch wd:Q5502870 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:phenomenonFrequencyFollowingResponse ;
+    owl:annotatedProperty skos:narrowMatch ;
+    owl:annotatedTarget wd:Q5502870 ;
+    dct:source <http://www.wikidata.org/entity/Q5502870> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is explicitly auditory, an evoked potential generated by periodic or nearly-periodic auditory stimuli, while this concept is modality-neutral and covers any applied periodicity. The Wikidata concept is therefore the narrower of the two, and closeMatch would hide a real difference in extension."@en .
+
+sstim-v:phenomenonAcousticStartleReflex skos:broadMatch mesh:D013216 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:phenomenonAcousticStartleReflex ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D013216 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D013216> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Reflex, Startle is an involuntary response to any unexpected strong stimulus, with no modality restriction. This concept is the acoustic case, so the descriptor is broader."@en .
+
+sstim-v:phenomenonSynapticTransmission skos:relatedMatch mesh:D009435 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:phenomenonSynapticTransmission ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget mesh:D009435 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D009435> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor names the process itself. This concept names a change in that process, a phenomenon category in an evidence model, so the two are not the same kind of thing. Same reasoning as the multisensory-integration mapping above."@en .
+
+sstim-v:systemAuditory skos:closeMatch uberon:0016490 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemAuditory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0016490 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0016490> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the auditory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0016490 auditory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemAuditory skos:closeMatch wd:Q821413 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemAuditory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q821413 ;
+    dct:source <http://www.wikidata.org/entity/Q821413> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the auditory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's auditory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemVisual skos:closeMatch uberon:0002104 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemVisual ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0002104 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0002104> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the visual neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0002104 visual system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemVisual skos:closeMatch wd:Q558363 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemVisual ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q558363 ;
+    dct:source <http://www.wikidata.org/entity/Q558363> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the visual neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's visual system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemSomatosensory skos:closeMatch uberon:0003942 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemSomatosensory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0003942 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0003942> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the somatosensory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0003942 somatosensory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemSomatosensory skos:closeMatch wd:Q328835 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemSomatosensory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q328835 ;
+    dct:source <http://www.wikidata.org/entity/Q328835> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the somatosensory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's somatosensory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemVestibular skos:closeMatch uberon:0004681 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemVestibular ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0004681 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0004681> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the vestibular neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0004681 vestibular system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemVestibular skos:closeMatch wd:Q596832 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemVestibular ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q596832 ;
+    dct:source <http://www.wikidata.org/entity/Q596832> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the vestibular neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's vestibular system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemVestibular skos:closeMatch mesh:D000091282 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemVestibular ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D000091282 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D000091282> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the vestibular neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Vestibular System denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemOlfactory skos:closeMatch uberon:0005725 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemOlfactory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0005725 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0005725> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the olfactory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0005725 olfactory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemOlfactory skos:closeMatch wd:Q1054094 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemOlfactory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1054094 ;
+    dct:source <http://www.wikidata.org/entity/Q1054094> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the olfactory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's olfactory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemGustatory skos:closeMatch uberon:0001033 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemGustatory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0001033 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0001033> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the gustatory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0001033 gustatory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemGustatory skos:closeMatch wd:Q1147588 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemGustatory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1147588 ;
+    dct:source <http://www.wikidata.org/entity/Q1147588> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the gustatory neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's gustatory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemProprioceptive skos:closeMatch uberon:0025533 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemProprioceptive ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0025533 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0025533> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the proprioceptive neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0025533 proprioceptive system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. No Wikidata mapping is asserted: Wikidata has proprioception, which is the sense rather than the system, and would be a different claim."@en .
+
+sstim-v:systemInteroceptive skos:closeMatch uberon:0036255 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemInteroceptive ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0036255 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0036255> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the interoceptive neural system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0036255 interoceptive system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. No Wikidata mapping is asserted, for the same reason as the proprioceptive system: the available item is the sense, not the system."@en .
+
+sstim-v:systemMotor skos:closeMatch uberon:0025525 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemMotor ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0025525 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0025525> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the motor system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0025525 motor system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemMotor skos:closeMatch wd:Q2915553 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemMotor ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2915553 ;
+    dct:source <http://www.wikidata.org/entity/Q2915553> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the motor system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's motor system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemSensory skos:closeMatch uberon:0001032 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemSensory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0001032 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0001032> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the sensory system as a whole as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0001032 sensory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemSensory skos:closeMatch wd:Q56073037 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemSensory ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q56073037 ;
+    dct:source <http://www.wikidata.org/entity/Q56073037> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the sensory system as a whole as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's sensory system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:systemAutonomic skos:closeMatch uberon:0002410 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemAutonomic ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0002410 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0002410> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the autonomic nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0002410 autonomic nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. This concept is labelled autonomic system while every authority says autonomic nervous system; the label difference is ours and carries no difference in extension."@en .
+
+sstim-v:systemAutonomic skos:closeMatch wd:Q171064 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemAutonomic ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q171064 ;
+    dct:source <http://www.wikidata.org/entity/Q171064> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the autonomic nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's autonomic nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. This concept is labelled autonomic system while every authority says autonomic nervous system; the label difference is ours and carries no difference in extension."@en .
+
+sstim-v:systemAutonomic skos:closeMatch mesh:D001341 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:systemAutonomic ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D001341 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D001341> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the autonomic nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Autonomic Nervous System denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. This concept is labelled autonomic system while every authority says autonomic nervous system; the label difference is ours and carries no difference in extension."@en .
+
+sstim-v:targetBrain skos:closeMatch uberon:0000955 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetBrain ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0000955 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0000955> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the brain as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0000955 brain denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetBrain skos:closeMatch wd:Q1073 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetBrain ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1073 ;
+    dct:source <http://www.wikidata.org/entity/Q1073> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the brain as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's brain denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetBrain skos:closeMatch mesh:D001921 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetBrain ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D001921 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D001921> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the brain as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Brain denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetCentralNervousSystem skos:closeMatch uberon:0001017 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetCentralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0001017 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0001017> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the central nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0001017 central nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetCentralNervousSystem skos:closeMatch wd:Q47273 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetCentralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q47273 ;
+    dct:source <http://www.wikidata.org/entity/Q47273> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the central nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's central nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetCentralNervousSystem skos:closeMatch mesh:D002490 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetCentralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D002490 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D002490> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the central nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Central Nervous System denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetPeripheralNervousSystem skos:closeMatch uberon:0000010 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetPeripheralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0000010 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0000010> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the peripheral nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0000010 peripheral nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetPeripheralNervousSystem skos:closeMatch wd:Q169953 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetPeripheralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q169953 ;
+    dct:source <http://www.wikidata.org/entity/Q169953> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the peripheral nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's peripheral nervous system denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetPeripheralNervousSystem skos:closeMatch mesh:D017933 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetPeripheralNervousSystem ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D017933 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D017933> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the peripheral nervous system as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Peripheral Nervous System denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetSpinalCord skos:closeMatch uberon:0002240 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetSpinalCord ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0002240 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0002240> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the spinal cord as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0002240 spinal cord denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetSpinalCord skos:closeMatch wd:Q9606 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetSpinalCord ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q9606 ;
+    dct:source <http://www.wikidata.org/entity/Q9606> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the spinal cord as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while Wikidata's spinal cord denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetSpinalCord skos:closeMatch mesh:D013116 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetSpinalCord ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D013116 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D013116> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming the spinal cord as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Spinal Cord denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted."@en .
+
+sstim-v:targetCranialNerve skos:closeMatch uberon:0001785 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetCranialNerve ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget uberon:0001785 ;
+    dct:source <http://purl.obolibrary.org/obo/UBERON_0001785> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming a cranial nerve as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while UBERON:0001785 cranial nerve denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. No Wikidata mapping is asserted: no item was verified for the class as such in this pass."@en .
+
+sstim-v:targetCranialNerve skos:closeMatch mesh:D003391 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:targetCranialNerve ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D003391 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D003391> ;
+    dct:date "2026-09-05"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "This concept is a controlled value naming a cranial nerve as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Cranial Nerves denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. No Wikidata mapping is asserted: no item was verified for the class as such in this pass."@en .
 
 ###########################################################################
 # Pending alignments (tracked as GitHub Issues)

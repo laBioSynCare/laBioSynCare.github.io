@@ -205,6 +205,7 @@ foaf:logo a owl:AnnotationProperty .
 mod:status a owl:AnnotationProperty .
 skos:altLabel a owl:AnnotationProperty .
 skos:broader a owl:AnnotationProperty .
+skos:broadMatch a owl:AnnotationProperty .
 skos:closeMatch a owl:AnnotationProperty .
 skos:definition a owl:AnnotationProperty .
 skos:editorialNote a owl:AnnotationProperty .

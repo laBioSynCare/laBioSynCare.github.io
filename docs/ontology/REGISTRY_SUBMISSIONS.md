@@ -1029,6 +1029,42 @@ serialization a publication invariant:
 whitespace, statement order, or fresh blank-node identifiers are enough to
 produce another row even when the RDF graphs are isomorphic.
 
+#### BioPortal indexes the classes and not the concepts — measured 2026-09-05
+
+Found while checking whether the new external mappings could be pushed to
+BioPortal as class-to-class mappings, which would make the MeSH and UBERON pages
+there reference SSTIM. They cannot, and the reason is worth recording because it
+affects discovery, not just mappings.
+
+The submission is `hasOntologyLanguage: OWL`, and its metrics read **181 classes,
+301 properties, 637 individuals**. SSTIM's SKOS concepts are dual-typed
+(`skos:Concept` and the relevant OWL class, the Pattern 2 decision in
+`static/ontology/README.md`), so an OWL ingest lands all 551 of them among the
+individuals. BioPortal's class endpoints and its search index do not see them:
+
+| Request | Result |
+|---|---|
+| `search?q=Frequency Band&ontologies=SSTIM` | 2 hits, both `sstim#` classes |
+| `search?q=Preset&ontologies=SSTIM` | 2 hits, both classes |
+| `search?q=Alpha&ontologies=SSTIM` | **0** |
+| `search?q=Transcranial Direct Current&ontologies=SSTIM` | **0** |
+| `GET /ontologies/SSTIM/classes/<techTDCS IRI>` | **404**, "not found in ontology SSTIM submission 29" |
+
+So the whole technique, band, phenomenon and modality vocabulary is unfindable by
+label in the registry chosen for biomedical browsing and candidate-mapping
+discovery, and `POST /mappings`, which is class to class, has nothing on our side
+to attach to for any concept-level row. Only the two class-level SNOMED mappings
+could be expressed there, and SNOMED in BioPortal is licence-gated.
+
+**Not yet established:** whether declaring the vocabulary as a SKOS-format
+submission would index the concepts as browsable terms. BioPortal's submission
+form offers a format choice, but no open SKOS record was found to confirm the
+behaviour in this pass, and AGROVOC, the obvious example, answers 403. Do not
+act on this until it is checked against a working SKOS record. If it holds, the
+question is whether to add a second BioPortal record for `sstim-vocab` beside the
+OWL bundle, which has its own cost: two records for one artifact is exactly the
+kind of duplication this tracker exists to keep honest.
+
 ### FAIRsharing — MIGRATED AND ENRICHED 2026-09-04
 
 Done over the REST API with a browser-issued JWT. **API access is gated on the

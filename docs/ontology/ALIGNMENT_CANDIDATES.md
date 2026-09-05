@@ -1,12 +1,20 @@
 # External alignment candidates, tranche 1
 
-**Status:** proposal for review, created 2026-09-05 by an assisted pass.
-Maintainer decision required before any of it enters RDF.
+**Status:** tranche 1 reviewed and **applied 2026-09-05**, on the maintainer's
+instruction in that session. This document stays as the evidence behind each row
+and as the record of what was deliberately not mapped.
 
-**Nothing here is asserted.** `static/ontology/sstim-alignments.ttl` is protected
-under [ADR 0004](../decisions/0004-protected-ontology-files.md) and `CLAUDE.md`
-§3.4, so it changes only on an instruction naming the file. This document is the
-evidence a reviewer needs in order to give that instruction, row by row.
+Three decisions were taken when it was applied, and they are recorded here rather
+than only in the Turtle. Neural systems and target sites are `closeMatch`
+throughout and no row there is `exactMatch`, for the ADR 0021 reason in section
+4.3. `sstim-v:targetCortex` was **not** mapped, because the rejection in section
+4.4 is a definition question and not a mapping one. `wd:Q1073` brain was added to
+`targetBrain` after the fact: it did not surface in the label search, whose exact
+matches for "Brain" were a journal, a family name, a French commune and a rapper.
+
+`static/ontology/sstim-alignments.ttl` is protected under
+[ADR 0004](../decisions/0004-protected-ontology-files.md) and `CLAUDE.md` §3.4,
+so any further row still needs an instruction naming the file.
 
 The policy these rows are written against is the External Mapping Policy in
 [PUBLICATION_AND_INTERLINKING_PLAN.md](PUBLICATION_AND_INTERLINKING_PLAN.md):
@@ -16,7 +24,7 @@ thematic relationship, and an authoritative source checked for every identifier.
 
 ---
 
-## 1. What the ontology has today
+## 1. What the ontology had before this tranche
 
 Measured 2026-09-05 by loading the 18 manifest-owned modules and counting every
 `skos:*Match`, `owl:equivalentClass`, `owl:equivalentProperty` and `owl:sameAs`
@@ -33,6 +41,10 @@ whose object is outside the SSTIM namespace:
 none is obsolete, none is a paper about the subject rather than the subject, and
 each carries `owl:Axiom` provenance with a `dct:date`. The existing mappings are
 in good order. They are simply few, and they reach two sources.
+
+**After tranche 1:** 70 mapping triples reaching four vocabularies. `make
+alignment-verify` dereferenced all 70 on 2026-09-05 with nothing wrong, nothing
+to review and nothing unreachable.
 
 Per scheme, the three that matter most for interoperability:
 
@@ -85,7 +97,7 @@ those identifiers exist and are active, and only their meaning was wrong. It can
 still only check what is already asserted. Choosing the target is a human
 judgment, which is what the rows below are for.
 
-## 4. Recommended rows
+## 4. The rows, as applied
 
 Each row names the authority's own intension, then says why the predicate is
 what it is. Where a reviewer could reasonably choose differently, the
@@ -152,7 +164,7 @@ decision and needs an ADR rather than a row in a table.
 | `systemMotor` | `UBERON:0025525` motor system | `Q2915553` | |
 | `systemSensory` | `UBERON:0001032` sensory system | `Q56073037` | |
 | `systemAutonomic` | `UBERON:0002410` autonomic nervous system | `Q171064` | `D001341` |
-| `targetBrain` | `UBERON:0000955` brain | | `D001921` |
+| `targetBrain` | `UBERON:0000955` brain | `Q1073` | `D001921` |
 | `targetCentralNervousSystem` | `UBERON:0001017` central nervous system | `Q47273` | `D002490` |
 | `targetPeripheralNervousSystem` | `UBERON:0000010` peripheral nervous system | `Q169953` | `D017933` |
 | `targetSpinalCord` | `UBERON:0002240` spinal cord | `Q9606` | `D013116` |
@@ -177,22 +189,21 @@ senses, not systems, and would be a different mapping).
 | `techRhythmicAuditoryCueing` | any | Wikidata has four clinical trials using rhythmic auditory stimulation and no concept item for the technique. See section 6. |
 | `SensoryModalityScheme` (all six) | UBERON systems | The modality concepts would collide with `NeuralSystemScheme`, which already maps to those classes. Modalities should map to perception concepts (`mesh:D001307` Auditory Perception, `mesh:D014796` Visual Perception, and the corresponding Wikidata senses) if they map at all. That is a scheme-level decision and belongs in its own pass. |
 
-## 5. If the tranche is accepted
+## 5. What applying it involved
 
-Every accepted row needs, in the same commit:
+Done on 2026-09-05, and the same list applies to any later tranche:
 
-1. the mapping triple in `static/ontology/sstim-alignments.ttl`, added only on an
+1. the mapping triples in `static/ontology/sstim-alignments.ttl`, on an
    instruction naming that file;
-2. an `owl:Axiom` provenance block carrying `dct:source`, `dct:date`,
-   `prov:wasAttributedTo` and a `skos:editorialNote` giving the extension or
-   intension reason, following the KR-09 pattern already in the file;
-3. new prefixes for `mesh:` (`http://id.nlm.nih.gov/mesh/`) and `uberon:`
-   (`http://purl.obolibrary.org/obo/UBERON_`), which the module does not yet
-   declare;
-4. `make validate`, then `make alignment-verify` to dereference the new targets.
-
-The counts in section 1 will change, so `make truth-audit` should be run before
-any document restates them.
+2. an `owl:Axiom` provenance block per mapping carrying `dct:source`,
+   `dct:date`, `prov:wasAttributedTo` and a `skos:editorialNote` giving the
+   extension or intension reason, following the KR-09 pattern already there;
+3. the `mesh:` (`http://id.nlm.nih.gov/mesh/`) and `uberon:`
+   (`http://purl.obolibrary.org/obo/UBERON_`) prefixes, in the module and in
+   `context.jsonld`;
+4. `node scripts/sstim-manifest.mjs sync-checksums`, because the manifest pins a
+   SHA-256 per module source and an edited module invalidates it;
+5. `make validate`, then `make alignment-verify` to dereference the new targets.
 
 ## 6. Gaps found in the external record
 

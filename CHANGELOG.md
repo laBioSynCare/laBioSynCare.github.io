@@ -17,6 +17,56 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+### Added
+
+- **57 external mappings, taking the alignment module from two external
+  vocabularies to four.** SSTIM had 13 mapping triples on 12 of its 551 concepts,
+  reaching Wikidata and SNOMED CT: 3 of 39 techniques and none of the neural
+  systems, target sites or phenomena. Tranche 1 adds MeSH descriptors, UBERON
+  anatomical classes and Wikidata items across all four groups, each dereferenced
+  at the authority that mints it. The evidence per row, the predicate reasoning
+  and the rejected candidates are in
+  [`docs/ontology/ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md).
+
+  Three rules decided the predicates. A therapy or indication framing on the
+  external side, which several MeSH descriptors carry and this vocabulary
+  deliberately does not, is an intension difference, so those rows are
+  `closeMatch`. Demonstrable containment is written as `broadMatch` or
+  `narrowMatch` rather than flattened: MeSH Transcranial Magnetic Stimulation
+  contains the repetitive protocol, and Wikidata's frequency-following response
+  is auditory where SSTIM's is modality-neutral. And for neural systems and
+  target sites, ADR 0021 holds a controlled value to be an information category
+  rather than the entity it classifies, so no row there is `exactMatch` however
+  well the labels agree.
+
+  Two label-alike candidates were rejected rather than mapped. MeSH Ultrasonic
+  Therapy and Wikidata's high-intensity focused ultrasound are both ablative,
+  and low-intensity focused ultrasound neuromodulation is a different technique
+  wearing the same words. UBERON's "cortex" is the outer layer of any organ and
+  subsumes adrenal cortex, so `sstim-v:targetCortex` stays unmapped until its own
+  definition says whether it means cerebral cortex.
+
+- **`make alignment-verify`.** Dereferences every external mapping at Wikidata,
+  the NLM MeSH endpoints, EBI OLS4 and tx.fhir.org. Three published mappings
+  here have been wrong (band QIDs resolving to a Van Halen album and a stock
+  exchange, MeSH D012910 recorded as sensory stimulation when it is Snake Venoms,
+  SNOMED 229070002 when it denotes stretching exercises) and every gate passed
+  all three, because an external identifier is opaque to Turtle parsing, SHACL
+  and HermiT alike. Fails on a target that does not exist, is obsolete, or is a
+  scholarly article or clinical trial rather than the subject; flags for review a
+  strong mapping whose target label shares no word with SSTIM's, which is what
+  sees the D012910 case. All 70 mappings pass.
+
+- **`make wikidata-statements` and `make wikidata-inbound`.** Every mapping SSTIM
+  publishes points outward, and measured on 2026-09-05, 0 of the 32 Wikidata
+  items SSTIM maps carry a statement back. The first target derives the
+  QuickStatements batch that fixes that, inverting broad and narrow because
+  containment reads the other way round when written on the Wikidata side; the
+  second measures how many items link back, by reading those items' claims rather
+  than searching for a string. Neither edits Wikidata: the batch is pasted by a
+  signed-in human under the named account and its conflict-of-interest
+  disclosure.
+
 ### Fixed
 
 - **Ten prose totals still said 545 concepts** after ADR 0025's six terms took the

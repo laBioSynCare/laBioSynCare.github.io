@@ -275,6 +275,26 @@ indexed, examiner-searchable records.
       block changes only on an instruction naming the file; the replacement text
       is drafted in the outreach record.*
 
+- [ ] **Decide whether BioPortal should carry SSTIM's SKOS layer at all** `P2`
+      *Measured 2026-09-05 while checking whether the new alignments could be
+      pushed to BioPortal as class-to-class mappings. They cannot. The submission
+      is ingested as OWL, its metrics read 181 classes, 301 properties and 637
+      individuals, and the 551 dual-typed SKOS concepts land among the
+      individuals: `search?q=Alpha&ontologies=SSTIM` returns 0, so does
+      "Transcranial Direct Current", while "Frequency Band" and "Preset" return
+      their `sstim#` classes, and `/classes/<techTDCS IRI>` answers 404. The
+      technique, band, phenomenon and modality vocabulary is therefore unfindable
+      by label in the registry chosen for biomedical browsing, and `POST
+      /mappings` has nothing on our side to attach a concept-level row to.*
+
+      *Unverified and needed before acting: whether a SKOS-format submission
+      would index the concepts as browsable terms. No open SKOS record was found
+      to confirm the behaviour, and AGROVOC answers 403. If it holds, the
+      question is a second BioPortal record for the vocabulary beside the OWL
+      bundle, and whether two records for one artifact is worth the
+      discoverability. Full measurement in
+      [`REGISTRY_SUBMISSIONS.md`](docs/ontology/REGISTRY_SUBMISSIONS.md).*
+
 - [ ] **Migrate FAIRsharing record 8494's mutable links to W3C-CG** `P2`
       *The public record still exposes the legacy homepage. FAIRsharing edits
       require its signed-in SPA/API, and the available in-app browser runtime
@@ -907,15 +927,24 @@ Turtle files are listed in section 1. After they exist:
       the Van Halen QIDs, MeSH D012910 and SNOMED 229070002, none of which any
       offline gate can see.*
 
-      *A reviewed tranche of 56 candidate mappings over 30 concepts, against
-      MeSH, UBERON and Wikidata, each carrying the authority's own scope note as evidence, is in
-      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md), with
-      the rejected candidates and the reason for each. Nothing is asserted:
-      `sstim-alignments.ttl` is protected (CLAUDE.md §3.4) and needs an
-      instruction naming it. The reviewer decisions it is waiting on are the
-      predicate for the system and target-site rows (ADR 0021 says these are
-      information categories, so the recommendation is closeMatch throughout and
-      never exactMatch) and the intended sense of `targetCortex`.*
+      *Tranche 1 applied 2026-09-05 on the maintainer's instruction: 57 mappings
+      to MeSH descriptors, UBERON classes and Wikidata items across techniques,
+      neural phenomena, neural systems and neural target sites, taking the module
+      to 70 mappings over four external vocabularies. The evidence per row, the
+      three predicate rules and the rejected candidates are in
+      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md).
+      `make alignment-verify` dereferences all 70 with nothing wrong.*
+
+      *Left open on purpose. `sstim-v:targetCortex` is unmapped because UBERON's
+      "cortex" is any organ's outer layer while the intended sense is probably
+      cerebral, and the definition, "cortical tissue as a stimulation target",
+      does not exclude cerebellar cortex: a definition decision in a protected
+      file, not a mapping one. `sstim-v:techUltrasoundNeuromod` is unmapped
+      because MeSH Ultrasonic Therapy and Wikidata's high-intensity focused
+      ultrasound are both ablative. A second tranche could take delivery media,
+      body placements and the six sensory modalities, the last of which needs a
+      scheme-level decision first, since mapping them to the same anatomical
+      classes as the neural systems would say the wrong thing.*
 
 ### Wikidata contribution
 
@@ -928,16 +957,26 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [ ] Create one Wikidata item for the released SSTIM ontology after WIDOCO and
       stable landing-page publication `P1`
       *Gate met: WIDOCO output ships from CI and `w3id.org/sstim` resolves in
-      four formats. Needs a decision, not more work.*
+      four formats. `make wikidata-statements` prints the QuickStatements block,
+      with every value read from `sstim-core.ttl` and `void.ttl` and all four
+      URLs in it resolved. Needs a signed-in human under the named account, not
+      more work.*
 - [ ] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record
       `P1`
-      *Outbound candidates are now checked and tabled in
-      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md); the
-      reciprocal Wikidata statements still wait on stage 1 and on those rows
-      being asserted. That pass also found three techniques with no Wikidata
-      concept item at all (tACS, photic driving, rhythmic auditory stimulation),
-      which is stage 3 work rather than a mapping.*
+      *The outbound half is done and verified. The inbound half is measured and
+      empty: `make wikidata-inbound` read the claims of all 32 Wikidata items
+      SSTIM maps on 2026-09-05 and found **0** carrying an SSTIM IRI, so nothing
+      on Wikidata leads a reader or a reconciliation tool here.
+      `make wikidata-statements` derives the batch that fixes it, as `P2888`
+      with a `P4390` relation qualifier, inverting broad and narrow because
+      containment reads the other way round from the Wikidata side, and holding
+      back the five `relatedMatch` rows by default. Paste under the named
+      account, then re-run the inbound measurement.*
+
+      *That pass also found three techniques with no Wikidata concept item at all
+      (tACS, photic driving, rhythmic auditory stimulation), which is stage 3
+      work rather than a mapping.*
 - [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of the 551 concepts**, all
       English `P2`
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.

@@ -27,25 +27,24 @@ conflating them has left the second undone.
 
 ## 2. Current state
 
-`static/ontology/sstim-alignments.ttl` carries a small set of **outbound-only**
-mappings — SSTIM points at Wikidata, nothing points back:
+`static/ontology/sstim-alignments.ttl` carries **outbound-only** mappings: SSTIM
+points at Wikidata, nothing points back. After the 2026-09-05 alignment tranche
+there are 32 statements naming a Wikidata item, across neural oscillations,
+techniques, neural phenomena, neural systems and neural target sites. The full
+list and the reason for each predicate are in
+[ALIGNMENT_CANDIDATES.md](ALIGNMENT_CANDIDATES.md); `make alignment-verify`
+dereferences every one of them.
 
-| SSTIM term | Wikidata | Predicate |
-|---|---|---|
-| `sstim-v:alpha` | `Q2469782` alpha wave | `skos:closeMatch` |
-| `sstim-v:delta` | `Q2623205` delta wave | `skos:closeMatch` |
-| `sstim-v:theta` | `Q2370623` theta rhythm | `skos:closeMatch` |
-| `sstim-v:beta` | `Q831014` beta wave | `skos:closeMatch` |
-| `sstim-v:gamma` | `Q2623017` gamma wave | `skos:closeMatch` |
-| `sstim-v:voiceBinaural` | `Q863539` binaural beats | `skos:relatedMatch` |
-| `sstim-v:voiceSymmetry` | `Q98000061` isochronic tones | `skos:relatedMatch` |
+**Nothing on Wikidata references SSTIM.** Measured, not assumed:
+`make wikidata-inbound` reads the claims of the exact items SSTIM maps and looks
+for `P2888`, `P1709` or `P1628` values under our namespace. On 2026-09-05 it
+found **0 of 32**. There is no Wikidata item for the ontology, and no property
+for SSTIM identifiers.
 
-Totals across the file: 7 `closeMatch`, 2 `exactMatch`, 3 `relatedMatch`.
-
-Nothing on Wikidata references SSTIM. There is no Wikidata item for the ontology,
-and no property for SSTIM identifiers.
-
----
+That measurement is the point of this document. An outbound mapping is a claim
+SSTIM makes about someone else's identifier; an inbound statement is what makes
+SSTIM findable from the identifier a reader or a reconciliation tool already
+holds. The second is the half that is missing.
 
 ## 3. Staged plan
 
@@ -101,20 +100,53 @@ work. See `docs/funding/FUNDING_LANDSCAPE.md` §2.2.
 exist: WIDOCO output is generated in CI, and `w3id.org/sstim` resolves in Turtle,
 JSON-LD, RDF/XML and HTML.
 
-- [ ] Create a single Wikidata item for the SSTIM ontology, with version DOI,
-      concept DOI, licence, canonical IRI and documentation URL
+- [ ] Create a single Wikidata item for the SSTIM ontology, with the concept
+      DOI, licence, canonical IRI, repository and documentation URL
 
-Needs a decision, not further work.
+`make wikidata-statements` prints the QuickStatements block that does it. Every
+value is read from `sstim-core.ttl` and `void.ttl` rather than typed into the
+script, so it cannot drift from the ontology, and all four URLs in it were
+resolved before it was written. It asserts the **concept** DOI, not a version
+DOI: the item is about the continuing project.
+
+`P170 creator` is deliberately absent. It takes an item for the person, and an
+ORCID is not one.
+
+Needs a signed-in human, not further work. Paste it under the named account, as
+section 5 requires.
 
 ### Stage 2 — reciprocal term links · **gate: verify each identifier**
 
 `TODO.md` requires identifiers and equivalence checked against the live
 authoritative record before any mapping is published.
 
-- [ ] Re-verify all seven Wikidata targets against their current items
+- [x] Re-verify every Wikidata target against its current item — **done
+      2026-09-05 and now automated.** `make alignment-verify` resolves each QID
+      at the Wikidata API, rejects an item that does not exist, one that is a
+      scholarly article or a clinical trial rather than the subject, and one
+      whose label shares no word with SSTIM's on a strong mapping. All pass.
 - [ ] Upgrade `skos:closeMatch` → `skos:exactMatch` only where genuinely
       justified; leave the rest as they are
 - [ ] Add return statements on Wikidata referencing the released SSTIM terms
+
+The return statements are generated: `make wikidata-statements` derives them from
+the alignment module as `P2888` with a `P4390` mapping-relation qualifier, which
+is the standard pairing. Two details it gets right and a hand-written batch
+would not.
+
+**Direction inverts.** `techRepetitiveTMS skos:broadMatch wd:Q263962` says the
+Wikidata concept is broader. Written on the Wikidata item the same fact reads the
+other way round, so the qualifier there is *narrow match*. Publishing the
+uninverted form would put a false claim somewhere SSTIM cannot correct it
+silently.
+
+**`relatedMatch` rows are held back by default.** The property is named "exact
+match", and qualifying it as a related match is the weakest reading the community
+accepts. Five rows are affected and listed as comments in the output;
+`--include-related` emits them once that call is made.
+
+`make wikidata-inbound` is the check afterwards. It is also the only honest way
+to say the batch landed.
 
 Conservative by design. A wrong `exactMatch` is worse than an absent one.
 
