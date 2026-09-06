@@ -340,8 +340,11 @@ indexed, examiner-searchable records.
       the built page carries the block and it expands to 44 triples about
       `https://w3id.org/sstim` against the real schema.org context.*
 
-      *Not done, and cheap if it matters later: there is no `sitemap.xml` or
-      `robots.txt`, so crawler discovery is unassisted.*
+      *An earlier note here claimed no `sitemap.xml` or `robots.txt` existed.
+      Wrong: `scripts/gen-discovery.mjs` generates both, plus `llms.txt`, during
+      the CI build, and the deployed site serves all three, with `/namespace/`
+      among the sitemap's 18 URLs. The claim came from `ls static/` and a local
+      build log, neither of which can see a CI-generated file.*
 
 - [ ] **Decide whether BioPortal should carry SSTIM's SKOS layer at all** `P2`
       *Measured 2026-09-05 while checking whether the new alignments could be

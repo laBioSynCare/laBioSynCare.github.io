@@ -157,9 +157,17 @@ schema.org context yields 44 triples about `https://w3id.org/sstim`. Five unit
 tests in `datasetJsonLd.test.js` hold the shape, the release identity, the
 persistent-IRI rule and the script-safe serialisation.
 
-Still open on this surface: no `sitemap.xml` or `robots.txt` exists, and
-Google Dataset Search finds pages by ordinary crawling, so discovery is
-unassisted.
+**Correction, 2026-09-06.** This section first said no `sitemap.xml` or
+`robots.txt` existed and that crawler discovery was unassisted. That was wrong,
+and wrong in the way CLAUDE.md §3.6 exists to prevent: the claim came from `ls
+static/` and from a local build log line reading "discovery ... skipped", neither
+of which can see a file generated during the CI build. `scripts/gen-discovery.mjs`
+writes `robots.txt`, `sitemap.xml`, `llms.txt` and `llms-full.txt` at build time,
+skipping only when no absolute origin is available, which is exactly the local
+case. Measured on the deployed site: all three answer 200, and the sitemap lists
+18 URLs including `https://w3c-cg.github.io/sstim/namespace/`, the page carrying
+the Dataset markup. So the crawl path was already in place and the markup is what
+was missing.
 
 ### 2.6 ORCID
 
@@ -202,6 +210,32 @@ stimulation is administrative noise rather than reach. Judge per portal.
 
 ---
 
+### 2.11 The loop worth naming
+
+Every outbound mapping to a Wikidata item becomes a candidate inbound statement,
+because `make wikidata-statements` derives the reciprocal from the alignment
+module. Tranche 1 is what took the inbound count from 0 to 29. **Tranche 2 would
+raise it again**: its delivery-medium rows reach about nine more Wikidata items
+(infrared, ultraviolet, electromagnetic field, magnetic field, electric current,
+ultrasound, vibration, visible spectrum, thermal energy), each of which can then
+carry a `P2888` back. That is the cheapest remaining source of new inbound
+references, and it needs a decision on §7 of
+[ALIGNMENT_CANDIDATES.md](ALIGNMENT_CANDIDATES.md) rather than new research.
+
+### 2.12 Wikidata Mix'n'match, the multiplier
+
+Mix'n'match imports an external catalogue and lets the Wikidata community match
+its entries to items, one link at a time. A catalogue of SSTIM's 551 concepts
+would expose the whole vocabulary to that process instead of the 32 terms we
+mapped by hand, and every match made by anyone is another Wikidata item pointing
+here.
+
+The catalogue file is generated and waiting at
+`~/sstim-drafts/mixnmatch-sstim.tsv` (551 rows: local name, English preferred
+label, definition with its scheme, term IRI). Import needs a signed-in session on
+the tool, the same constraint as QuickStatements. Their API answers, so the
+catalogue can be checked afterwards from here.
+
 ## 3. Where we can request
 
 Nobody hands these out for asking well; each is a submission with its own intake
@@ -211,10 +245,10 @@ and its own review.
 |---|---|---|---|
 | **Bioregistry** | **requested 2026-09-06**, [issue #2055](https://github.com/biopragmatics/bioregistry/issues/2055); their bot opened [PR #2056](https://github.com/biopragmatics/bioregistry/pull/2056) the same minute | the issue template, which applies those labels; their curation bot selects on them, and `gh issue create` bypasses the template (that first attempt, #2054, is closed as a duplicate) | It exports its records as RDF, so an accepted entry references our namespace |
 | **identifiers.org / N2T** | not checked | prefix registration request form | A resolver entry for the `sstim` prefix |
-| **LOD Cloud** | not checked | dataset submission form | Puts SSTIM in the cloud diagram's dataset metadata |
+| **LOD Cloud** | **No** (1683 datasets in the latest dump, no SSTIM, 2026-09-06) | submission form, Google login required | Values prepared at `~/sstim-drafts/lod-cloud-submission.json`, matching the record shape in their own dump: title, description, website, doi, keywords, downloads, examples, links. The SPARQL field stays empty because there is no public endpoint |
 | **EBI OLS4** | **No** (`api/ontologies/sstim` 404, 2026-09-05) | PR, already open, see [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) | OLS then hosts and links every term |
 | **TIB Terminology Service** | **No** (API 500 "no result", 2026-09-05) | **not yet identified** | Live OLS-based service hosting third-party terminologies. Find the intake before claiming it is available |
-| **AberOWL** | **No** (971 ontologies listed, SSTIM absent, 2026-09-05) | not yet identified | Reasoning-backed ontology repository |
+| **AberOWL** | **No** (971 ontologies, SSTIM absent, 2026-09-05) | not yet identified | Reasoning-backed ontology repository. It is **not** an automatic BioPortal mirror, measured 2026-09-06: it carries HED, NEMO, UBERON and MESH but not SSTIM, CSO or SNOMEDCT, so being in BioPortal will not carry us in. Their code is at `bio-ontology-research-group/aberowl-*` if the intake is ever worth chasing |
 | **Zazuko prefix registry** | **No** (112 prefixes, `sstim` absent, 2026-09-05) | PR to `zazuko/rdf-vocabularies` | **Not worth filing yet, on measurement.** Their bar is stated as "commonly used" prefixes, and the `ontologies/` tree is maintained by the Zazuko team: every commit touching it in the last year is theirs or dependabot's, and the most recent vocabulary addition was January 2026. A four-month-old vocabulary with no external adopters does not meet that bar, and a PR that predictably sits or is declined spends goodwill we may want later. Revisit when there is adoption to point at |
 | **Wikidata Mix'n'match** | No | catalog import | Would expose SSTIM's terms for community matching to Wikidata items, which is both inbound linkage and the demonstrated external use a property proposal needs |
 | **Wikidata property proposal** | No | community proposal process | Gated on demonstrated external use. Stage 5 in [WIKIDATA_CONTRIBUTION.md](WIKIDATA_CONTRIBUTION.md) |
