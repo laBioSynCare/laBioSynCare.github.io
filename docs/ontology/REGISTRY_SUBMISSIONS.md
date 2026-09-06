@@ -1735,11 +1735,14 @@ They would not fit in any case: re3data indexes research *data repositories* and
 OpenDOAR open-access *repositories*. SSTIM is a vocabulary, published through a
 repository it does not operate.
 
-### Wikidata — deferred (Phase 4) for *publishing*; contribution is open now
+### Wikidata — PUBLISHED 2026-09-06 (item + 29 term links)
 
-One ontology item first, then conservative term-level links, only after the
-HTML landing page and registry metadata are stable. Governed by the External
-Mapping Policy in the publication plan; not part of this round.
+One ontology item first, then conservative term-level links, only after the HTML
+landing page and registry metadata are stable. Both gates were met, and both
+steps ran on 2026-09-06: item [`Q141325360`](https://www.wikidata.org/wiki/Q141325360),
+then 29 `P2888` statements on the mapped items. `make wikidata-inbound` reads 29
+of 32, the remaining three being `relatedMatch` rows held back by design.
+Governed by the External Mapping Policy in the publication plan.
 
 **This deferral covers publishing SSTIM *into* Wikidata — the ontology item,
 term-level equivalences, identifiers, a property proposal. It does not cover

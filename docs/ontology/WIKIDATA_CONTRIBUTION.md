@@ -35,16 +35,17 @@ list and the reason for each predicate are in
 [ALIGNMENT_CANDIDATES.md](ALIGNMENT_CANDIDATES.md); `make alignment-verify`
 dereferences every one of them.
 
-**Nothing on Wikidata references SSTIM.** Measured, not assumed:
-`make wikidata-inbound` reads the claims of the exact items SSTIM maps and looks
-for `P2888`, `P1709` or `P1628` values under our namespace. On 2026-09-05 it
-found **0 of 32**. There is no Wikidata item for the ontology, and no property
-for SSTIM identifiers.
+**Wikidata now references SSTIM.** Measured, not assumed: `make wikidata-inbound`
+reads the claims of the exact items SSTIM maps and looks for `P2888`, `P1709` or
+`P1628` values under our namespace. It found **0 of 32 on 2026-09-05** and **29 of
+32 on 2026-09-06**, after stages 1 and 2 were published. The ontology item is
+[`Q141325360`](https://www.wikidata.org/wiki/Q141325360). There is still no
+property for SSTIM identifiers, which is stage 5.
 
 That measurement is the point of this document. An outbound mapping is a claim
 SSTIM makes about someone else's identifier; an inbound statement is what makes
 SSTIM findable from the identifier a reader or a reconciliation tool already
-holds. The second is the half that is missing.
+holds. Re-run the measurement rather than editing its number by hand.
 
 ## 3. Staged plan
 
@@ -94,14 +95,20 @@ project**, and Stage 0 produced no organising or training experience at all. The
 fundable list is editathons, workshops, meetups, education and cultural-heritage
 work. See `docs/funding/FUNDING_LANDSCAPE.md` §2.2.
 
-### Stage 1 — one item for the SSTIM ontology · **gate met**
+### Stage 1 — one item for the SSTIM ontology · **done 2026-09-06**
 
 `TODO.md` gates this on WIDOCO documentation plus a stable landing page. Both now
 exist: WIDOCO output is generated in CI, and `w3id.org/sstim` resolves in Turtle,
 JSON-LD, RDF/XML and HTML.
 
-- [ ] Create a single Wikidata item for the SSTIM ontology, with the concept
-      DOI, licence, canonical IRI, repository and documentation URL
+- [x] Create a single Wikidata item for the SSTIM ontology, with the concept
+      DOI, licence, canonical IRI, repository and documentation URL —
+      **[`Q141325360`](https://www.wikidata.org/wiki/Q141325360), created
+      2026-09-06.** `wbsearchentities` was checked for "SSTIM" and "Sensory
+      Stimulation Ontology" first and found nothing, so the CREATE could not
+      duplicate an existing item. All eight claims landed, read back through the
+      API: P31 ontology, P856, P1324, P973, P275 CC BY 4.0, P407 English, P356
+      the concept DOI, P571 2026-04-12
 
 `make wikidata-statements` prints the QuickStatements block that does it. Every
 value is read from `sstim-core.ttl` and `void.ttl` rather than typed into the
@@ -112,8 +119,7 @@ DOI: the item is about the continuing project.
 `P170 creator` is deliberately absent. It takes an item for the person, and an
 ORCID is not one.
 
-Needs a signed-in human, not further work. Paste it under the named account, as
-section 5 requires.
+It needed a signed-in human rather than further work, and got one.
 
 #### The credential, which is what actually blocks stages 1 and 2
 
@@ -145,7 +151,7 @@ The first is faster for 30 statements and for every later tranche; the second
 keeps the credential where it already is. It is a maintainer decision, not a
 technical one, and nothing here depends on which is chosen.
 
-### Stage 2 — reciprocal term links · **gate: verify each identifier**
+### Stage 2 — reciprocal term links · **done 2026-09-06 for the strong mappings**
 
 `TODO.md` requires identifiers and equivalence checked against the live
 authoritative record before any mapping is published.
@@ -157,7 +163,11 @@ authoritative record before any mapping is published.
       whose label shares no word with SSTIM's on a strong mapping. All pass.
 - [ ] Upgrade `skos:closeMatch` → `skos:exactMatch` only where genuinely
       justified; leave the rest as they are
-- [ ] Add return statements on Wikidata referencing the released SSTIM terms
+- [x] Add return statements on Wikidata referencing the released SSTIM terms —
+      **29 published 2026-09-06**, one per exact, close, broad and narrow mapping,
+      as 87 QuickStatements commands (claim, `P4390` qualifier, reference block).
+      `make wikidata-inbound` reads 29 of 32; the three unlinked items are the
+      `relatedMatch` rows below
 
 The return statements are generated: `make wikidata-statements` derives them from
 the alignment module as `P2888` with a `P4390` mapping-relation qualifier, which
@@ -172,7 +182,9 @@ silently.
 
 **`relatedMatch` rows are held back by default.** The property is named "exact
 match", and qualifying it as a related match is the weakest reading the community
-accepts. Five rows are affected and listed as comments in the output;
+accepts. Five rows across three items are affected and listed as comments in the
+output: `Q863539` binaural beats (twice), `Q17166073` multisensory integration and
+`Q4826866` ASMR. They are the entire difference between 29 and 32.
 `--include-related` emits them once that call is made.
 
 `make wikidata-inbound` is the check afterwards. It is also the only honest way

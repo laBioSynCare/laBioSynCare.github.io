@@ -314,10 +314,11 @@ The main gaps are design and coverage gaps, not current parser failures:
 - External mappings carry per-mapping provenance and are now dereferenced at
   their own authorities. 70 mappings reach Wikidata, MeSH, UBERON and SNOMED CT
   after the 2026-09-05 tranche; `make alignment-verify` resolves each one and
-  reported none wrong. The inbound direction is the gap: measured the same day,
-  **0 of the 32 Wikidata items SSTIM maps carry a statement back**, so nothing
-  outside leads a reader or a reconciliation tool here. Continued conservative
-  review still applies to every new row. **Multilingual preferred labels are complete**: all 551 concepts carry
+  reported none wrong. The inbound direction is no longer empty: the SSTIM item
+  `Q141325360` was created on Wikidata on 2026-09-06 and **29 of the 32 mapped
+  Wikidata items now carry a `P2888` statement naming an SSTIM term**, measured by
+  `make wikidata-inbound`. The three exceptions are the `relatedMatch` rows held
+  back on purpose. Continued conservative review still applies to every new row. **Multilingual preferred labels are complete**: all 551 concepts carry
   English, Italian, Portuguese and Spanish, across all 67 concept schemes, as of
   2026-08-18. `make language-coverage` measures it and now guards against
   regression rather than tracking debt — a new scheme must ship translated or be

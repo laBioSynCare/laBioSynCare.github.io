@@ -59,7 +59,11 @@ file is the human-readable summary.
 
 - **`make wikidata-statements` and `make wikidata-inbound`.** Every mapping SSTIM
   publishes points outward, and measured on 2026-09-05, 0 of the 32 Wikidata
-  items SSTIM maps carry a statement back. The first target derives the
+  items SSTIM maps carried a statement back. On 2026-09-06 the generated batches
+  were published under the maintainer's account: Wikidata item `Q141325360` for
+  the ontology, then 29 `P2888` statements naming SSTIM term IRIs, and the same
+  measurement now reads 29 of 32. The three exceptions are the `relatedMatch`
+  rows held back by design. The first target derives the
   QuickStatements batch that fixes that, inverting broad and narrow because
   containment reads the other way round when written on the Wikidata side; the
   second measures how many items link back, by reading those items' claims rather
