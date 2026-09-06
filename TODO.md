@@ -288,8 +288,9 @@ indexed, examiner-searchable records.
       *Every candidate, with what it answered when asked, is in
       [`INBOUND_REFERENCES.md`](docs/ontology/INBOUND_REFERENCES.md). Wikidata is
       done and the site now carries schema.org Dataset markup. Bioregistry was
-      requested 2026-09-06 as issue #2054 and needs a curator to apply the `New`
-      and `Prefix` labels before their bot sees it. Still absent as of
+      requested 2026-09-06 as issue #2055, labelled and in their curation queue
+      (#2054, an unlabelled first attempt filed with `gh`, is closed as a
+      duplicate). Still absent as of
       2026-09-05: EBI OLS4, TIB Terminology Service, AberOWL and the Zazuko
       prefix registry. Unverifiable from here: SciCrunch and InterLex, which
       answer 403 to this client and would be the best domain fit of any of them.*
