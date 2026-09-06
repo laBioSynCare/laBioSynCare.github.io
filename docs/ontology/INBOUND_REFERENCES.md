@@ -45,6 +45,8 @@ What does reference SSTIM today, verified rather than assumed:
 | **OpenAlex** holds `W7167924725`, "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology", typed `software` | 2026-09-05 | `api.openalex.org/works/doi:10.5281/zenodo.21286974` |
 | **Wikidata** item `Q141325360` (SSTIM), and 29 Wikidata items carrying a `P2888` statement whose value is an SSTIM term IRI | 2026-09-06 | `make wikidata-inbound` |
 | BioPortal, BARTOC node 21154, FAIRsharing 8494, DBpedia Archivo, DBpedia KG Catalog, prefix.cc, Software Heritage | see [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) | `make registry-verify` |
+| **BioPortal LOOM mappings**, six on MeSH class pages and six on UBERON's, pointing at SSTIM. Automatic, label-based, and **two of the six MeSH ones are wrong or not SSTIM terms at all** | 2026-09-06 | `/mappings?ontologies=SSTIM,MESH` |
+| **BioPortal project SSTIMWB**, listed on the MESH and UBERON project pages | 2026-09-06 | `/ontologies/<acronym>/projects` |
 
 The asymmetry this document was created to name is half closed. The scholarly
 graph knew SSTIM through its DOI while no term-level source knew it at all; one
@@ -250,6 +252,7 @@ and its own review.
 | **TIB Terminology Service** | **No** (API 500 "no result", 2026-09-05) | **not yet identified** | Live OLS-based service hosting third-party terminologies. Find the intake before claiming it is available |
 | **AberOWL** | **No** (971 ontologies, SSTIM absent, 2026-09-05) | not yet identified | Reasoning-backed ontology repository. It is **not** an automatic BioPortal mirror, measured 2026-09-06: it carries HED, NEMO, UBERON and MESH but not SSTIM, CSO or SNOMEDCT, so being in BioPortal will not carry us in. Their code is at `bio-ontology-research-group/aberowl-*` if the intake is ever worth chasing |
 | **Zazuko prefix registry** | **No** (112 prefixes, `sstim` absent, 2026-09-05) | PR to `zazuko/rdf-vocabularies` | **Not worth filing yet, on measurement.** Their bar is stated as "commonly used" prefixes, and the `ontologies/` tree is maintained by the Zazuko team: every commit touching it in the last year is theirs or dependabot's, and the most recent vocabulary addition was January 2026. A four-month-old vocabulary with no external adopters does not meet that bar, and a PR that predictably sits or is declined spends goodwill we may want later. Revisit when there is adoption to point at |
+| **LovPortal (LIRMM)** | **No** (755 vocabularies, SSTIM absent, 2026-09-06) | account, then the OntoPortal API; payloads prepared in `~/sstim-drafts/lovportal-*` | The closest fit left: a gateway for reusable semantic vocabularies running the same software as BioPortal, so the procedure is one we have run. See [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) |
 | **Wikidata Mix'n'match** | No | catalog import | Would expose SSTIM's terms for community matching to Wikidata items, which is both inbound linkage and the demonstrated external use a property proposal needs |
 | **Wikidata property proposal** | No | community proposal process | Gated on demonstrated external use. Stage 5 in [WIKIDATA_CONTRIBUTION.md](WIKIDATA_CONTRIBUTION.md) |
 | **LOV** | No | already suggested | Tracked in the registry file |

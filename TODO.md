@@ -284,6 +284,23 @@ indexed, examiner-searchable records.
       are the `relatedMatch` rows held back by design. The rest of the surfaces
       below remain open.*
 
+- [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
+      *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same
+      software and API as BioPortal, describing itself as a gateway to reusable
+      semantic vocabularies. 755 vocabularies, SSTIM absent, and 754 of the 755
+      administered by `admin`, so the corpus is a bulk import rather than a
+      curated queue. The closest fit of any registry left, and the procedure is
+      one already run once.*
+
+      *Blocked only on an account: `/ontologies/new` redirects when logged out.
+      Create one, save the key to the gitignored `docs/credentials/lovportal.md`,
+      and the submission is three prepared commands
+      (`~/sstim-drafts/lovportal-submit.sh`). One decision first, recorded in
+      [`REGISTRY_SUBMISSIONS.md`](docs/ontology/REGISTRY_SUBMISSIONS.md): submit
+      the OWL bundle, matching BioPortal, or take the chance to submit the SKOS
+      vocabulary, which is the only form in which the 551 concepts become
+      searchable and mappable on an OntoPortal instance.*
+
 - [ ] **Keep going: the surfaces that still hold no SSTIM reference** `P1`
       *2026-09-06: BioPortal project `SSTIMWB` created, which puts a record
       naming SSTIM on the MESH and UBERON project lists (16 and 7 records

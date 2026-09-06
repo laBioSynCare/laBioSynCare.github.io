@@ -1035,6 +1035,44 @@ serialization a publication invariant:
 whitespace, statement order, or fresh blank-node identifiers are enough to
 produce another row even when the RDF graphs are isomorphic.
 
+#### BioPortal already generates inbound mappings, and two of them are wrong
+
+Measured 2026-09-06 while looking for inbound references. BioPortal computes LOOM
+mappings by label and displays them on both sides, so MeSH and UBERON class pages
+already carry links to SSTIM: six mappings against each. That is inbound linkage
+nobody asked for, and it needs reading before it is celebrated.
+
+| MeSH class | SSTIM side | verdict |
+|---|---|---|
+| `D057566` Self Report | `sstim#SelfReport` | correct |
+| `D014831` Voice | `sstim#Voice` | **wrong**. Ours is a synthesis voice, a parameter bundle; theirs is the human vocal apparatus |
+| `T052` Activity | `prov#Activity` | not an SSTIM term |
+| `D020471` Collection | `core#Collection` | not an SSTIM term |
+| `T071` Entity | `prov#Entity` | not an SSTIM term |
+| `D014825` Vocabulary | `voaf#Vocabulary` | not an SSTIM term |
+
+Four of the six match on terms the bundle merely **declares**. ADR 0054 added 57
+declaration axioms for reused SKOS, PROV, VOAF and Dublin Core terms to put every
+profile closure in OWL 2 DL; a merged bundle therefore contains those IRIs, and a
+label matcher cannot tell a declaration from a definition. The fix is not to undo
+the declarations, which are what keep the artifact in OWL 2 DL.
+
+LOOM output is computed, not curated, so it cannot be deleted from our side. What
+can be done is to publish curated mappings that sit beside it, which is the
+class-level BioPortal mapping route already described above. Worth knowing that
+`sstim#Voice` currently sits on the MeSH Voice page claiming a similarity that is
+not there.
+
+#### Metadata gaps on the current submission, found 2026-09-06
+
+Read back from `latest_submission`: `homepage` is the WIDOCO docs URL,
+`documentation` is the manifest PID, and `hasLicense` is empty. Since ADR 0055 the
+namespace IRI has a landing page of its own, so the truthful arrangement is
+`homepage: https://w3id.org/sstim`, `documentation:` the docs URL, and
+`hasLicense: CC BY 4.0`. Do not fold this into a PATCH until the release-date work
+above has had its unchanged nightly pull, since both touch the same current
+submission.
+
 #### BioPortal project SSTIMWB — created 2026-09-06
 
 Projects are BioPortal's record of who uses which ontologies, and they appear on
@@ -1280,6 +1318,36 @@ Required follow-up: In a signed-in record edit, change the homepage, Browse
                     likely counting the deliberately absent funder/collaborator
                     roles, but verify the maintainer link actually saved.
 ```
+
+### LovPortal (LIRMM) — READY TO SUBMIT, blocked on an account
+
+Measured 2026-09-06. `https://lovportal.lirmm.fr/` describes itself as "a gateway
+to reusable semantic vocabularies on the Web": an **OntoPortal instance** run by
+LIRMM, the same software and the same API as BioPortal, at
+`data.lovportal.lirmm.fr`. That makes it the closest fit of any registry left on
+the list, because SSTIM is a reusable vocabulary rather than a biomedical
+terminology, and because the submission procedure is one we have already run.
+
+- **755 vocabularies**, SSTIM absent (`/ontologies` with their published UI key).
+- **754 of the 755 are administered by `admin`** and one by `jonquet`, so the
+  corpus is a bulk import rather than a queue of user submissions. That is a
+  reason to expect an inclusive bar, not an exclusive one.
+- Submission needs an account: `/ontologies/new` redirects to the welcome page
+  when logged out. Their `latest_submission` and `/submissions` endpoints answer
+  500 to the public UI key, so some reads need a real user key too.
+
+**Prepared, so submission is three commands once a key exists**, at
+`~/sstim-drafts/lovportal-ontology.json`, `lovportal-submission.json` and
+`lovportal-submit.sh`. Save the key to `docs/credentials/lovportal.md`, which is
+gitignored like the BioPortal one, and set `administeredBy` to the account.
+
+**One decision before submitting: OWL or SKOS.** The prepared payload pulls the
+Full OWL bundle, matching the BioPortal record, so both registries describe the
+same artifact. The cost is the one measured on BioPortal: an OWL submission
+ingests the 551 SKOS concepts as individuals, where search and the class
+endpoints cannot see them. A vocabulary gateway is arguably the place where that
+matters most, and it is also the low-risk place to try a SKOS submission, since
+nothing here disturbs the established BioPortal identity.
 
 ### Bioregistry — REQUESTED 2026-09-06, issue #2055, labelled and in the queue
 
