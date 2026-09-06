@@ -1291,11 +1291,19 @@ sstim", on branch `create-pull-request/patch-2055`. Nothing is filed by hand;
 there is no PR for us to open.
 
 The record it generated carries every field as submitted, plus
-`github_request_issue: 2055`. One rough edge to expect a curator to trim: the
-whole Additional Comments text landed in the record's `comment` field, including
-the sentences addressed to the curators, where neighbouring records use one short
-line. Offer a trimmed value if they ask, and do not edit their data file
-unprompted.
+`github_request_issue: 2055`. One rough edge: the whole Additional Comments text
+landed in the record's `comment` field, including the sentences addressed to the
+curators, where neighbouring records use one short line. A trimmed value and the
+sibling-namespace question were offered on the PR
+([comment](https://github.com/biopragmatics/bioregistry/pull/2056#issuecomment-5559452796)),
+for them to take or leave. Do not edit their data file unprompted.
+
+**Editing the issue would not have fixed it, and that is the general lesson.**
+Their workflow triggers on `issues: [opened]`, so the parse happens once. After
+the PR exists the record lives there, an issue edit changes nothing without a
+manual re-run, and it would leave the issue and the PR disagreeing about what was
+submitted. Correct a bot-generated record on the pull request, not on the issue
+behind it.
 
 **What was requested.** Prefix `sstim`, URI format `https://w3id.org/sstim#$1`,
 pattern `^[A-Za-z][A-Za-z0-9]*$`, example `SensoryStimulation`, licence
