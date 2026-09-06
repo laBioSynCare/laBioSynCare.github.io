@@ -103,12 +103,23 @@ submission's metrics count it among individuals. So a SKOS-format submission of
 The open question is not whether it works but whether to run a second BioPortal
 record beside the OWL bundle for one artifact. Tracked in `TODO.md`.
 
-### 2.3 BioPortal projects
+### 2.3 BioPortal projects · **done 2026-09-06**
 
-BioPortal has a `projects` resource, 378 of them today, each declaring the
-ontologies it uses, and they surface on the ontology page. A project record for
-SSTIM Workbench declaring SSTIM (and the vocabularies it maps) is a second
-BioPortal-side reference, writable with the API key already held.
+BioPortal has a `projects` resource, 378 of them before this one, each declaring
+the ontologies it uses. Project **SSTIMWB**, "SSTIM Workbench", was created
+through the API with the key already held, declaring `SSTIM`, `MESH`, `UBERON`
+and `SNOMEDCT` as ontologies used.
+
+The point is the last three. `GET /ontologies/MESH/projects` returns 16 records
+and `GET /ontologies/UBERON/projects` returns 7, and SSTIMWB is now among both,
+so those ontologies' own pages carry a record that names SSTIM. That is an
+inbound reference on somebody else's page rather than on ours.
+
+Check it with `/ontologies/<acronym>/projects`, not `/projects?ontology=<acronym>`:
+the query parameter is ignored and returns all 379 projects, which reads as a
+pass for any ontology you ask about. The first version of this note was written
+from that endpoint and would have claimed the same result for an ontology we had
+never mentioned.
 
 ### 2.4 The W3C Community Group homepage
 
@@ -204,7 +215,7 @@ and its own review.
 | **EBI OLS4** | **No** (`api/ontologies/sstim` 404, 2026-09-05) | PR, already open, see [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) | OLS then hosts and links every term |
 | **TIB Terminology Service** | **No** (API 500 "no result", 2026-09-05) | **not yet identified** | Live OLS-based service hosting third-party terminologies. Find the intake before claiming it is available |
 | **AberOWL** | **No** (971 ontologies listed, SSTIM absent, 2026-09-05) | not yet identified | Reasoning-backed ontology repository |
-| **Zazuko prefix registry** | **No** (112 prefixes, `sstim` absent, 2026-09-05) | PR to `zazuko/rdf-vocabularies` | Small, but it ships inside RDF tooling |
+| **Zazuko prefix registry** | **No** (112 prefixes, `sstim` absent, 2026-09-05) | PR to `zazuko/rdf-vocabularies` | **Not worth filing yet, on measurement.** Their bar is stated as "commonly used" prefixes, and the `ontologies/` tree is maintained by the Zazuko team: every commit touching it in the last year is theirs or dependabot's, and the most recent vocabulary addition was January 2026. A four-month-old vocabulary with no external adopters does not meet that bar, and a PR that predictably sits or is declined spends goodwill we may want later. Revisit when there is adoption to point at |
 | **Wikidata Mix'n'match** | No | catalog import | Would expose SSTIM's terms for community matching to Wikidata items, which is both inbound linkage and the demonstrated external use a property proposal needs |
 | **Wikidata property proposal** | No | community proposal process | Gated on demonstrated external use. Stage 5 in [WIKIDATA_CONTRIBUTION.md](WIKIDATA_CONTRIBUTION.md) |
 | **LOV** | No | already suggested | Tracked in the registry file |

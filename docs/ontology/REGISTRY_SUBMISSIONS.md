@@ -1035,6 +1035,24 @@ serialization a publication invariant:
 whitespace, statement order, or fresh blank-node identifiers are enough to
 produce another row even when the RDF graphs are isomorphic.
 
+#### BioPortal project SSTIMWB — created 2026-09-06
+
+Projects are BioPortal's record of who uses which ontologies, and they appear on
+each declared ontology's page. `SSTIMWB` ("SSTIM Workbench") was created through
+`POST /projects` with the stored API key, declaring `SSTIM`, `MESH`, `UBERON` and
+`SNOMEDCT`, contact `renato@junto.space`, homepage
+`https://w3c-cg.github.io/sstim/`, institution the W3C Community Group.
+
+`creator` is required and is not inferred from the API key: the first POST failed
+`422` with "`` value cannot be nil" until
+`https://data.bioontology.org/users/rfabbri` was passed explicitly.
+
+**Verify with `/ontologies/<acronym>/projects`.** MESH returns 16 records and
+UBERON returns 7, both including SSTIMWB, which is the inbound half of this: their
+pages now carry a record naming SSTIM. Do **not** verify with
+`/projects?ontology=<acronym>` — that parameter is ignored, all 379 projects come
+back, and every ontology appears to list us.
+
 #### BioPortal indexes the classes and not the concepts — measured 2026-09-05
 
 Found while checking whether the new external mappings could be pushed to

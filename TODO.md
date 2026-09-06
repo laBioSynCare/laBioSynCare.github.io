@@ -285,6 +285,12 @@ indexed, examiner-searchable records.
       below remain open.*
 
 - [ ] **Keep going: the surfaces that still hold no SSTIM reference** `P1`
+      *2026-09-06: BioPortal project `SSTIMWB` created, which puts a record
+      naming SSTIM on the MESH and UBERON project lists (16 and 7 records
+      respectively, verified at `/ontologies/<acronym>/projects`). Zazuko was
+      measured and dropped for now: their bar is "commonly used" prefixes and
+      their `ontologies/` tree has taken no outside addition in a year.*
+
       *Every candidate, with what it answered when asked, is in
       [`INBOUND_REFERENCES.md`](docs/ontology/INBOUND_REFERENCES.md). Wikidata is
       done and the site now carries schema.org Dataset markup. Bioregistry was
@@ -975,6 +981,23 @@ Turtle files are listed in section 1. After they exist:
       the public aggregate nor its private history is committed here. The
       canonical sequence is Workstream 5
       of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
+- [ ] **Decide tranche 2 of the external alignments** `P2`
+      *Researched 2026-09-06 and tabled in
+      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md) §7,
+      nothing applied. 23 candidate rows over 16 delivery media, mostly MeSH
+      physical-agent descriptors whose scope notes decide containment rather than
+      leaving everything at closeMatch: MeSH Light spans visible, ultraviolet and
+      infrared so it is broader than `mediumVisualLight`, and MeSH Sound is the
+      audible band so `mediumAcousticEnergy` contains it. Eleven media are left
+      unmapped, `mediumAirflow` being the warning: its exact-label Wikidata hit is
+      airflow as a measurement, not moving air.*
+
+      *Two schemes are recommended against rather than tabled. Body placements
+      should get a property to UBERON classes (`sstim-ex:atAnatomicalSite`, an
+      ADR) rather than SKOS mappings, because a placement is a position category
+      and not the organ. Sensory modalities stay blocked on the scheme-level
+      question of whether a modality is the perception, the sense or the channel.*
+
 - [?] Extend external alignments only when an authoritative target is verified
       and the mapping answers an interoperability need `P2`
       *An unverified Music Ontology association and the incorrect MeSH D012910

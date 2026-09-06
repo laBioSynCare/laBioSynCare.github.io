@@ -223,3 +223,89 @@ file:
 
 Each is an item a domain expert could create with sources, which is exactly the
 contribute-before-publishing posture that document sets out.
+
+---
+
+## 7. Tranche 2 candidates: delivery media, body placements, modalities
+
+Researched 2026-09-06, **not applied**. Same rule as tranche 1: nothing enters
+`sstim-alignments.ttl` without an instruction naming the file.
+
+### 7.1 Delivery media, 27 concepts, none mapped
+
+MeSH is the right authority here, and a better fit than it was for the
+techniques. Its physical-agent descriptors classify exactly what a delivery
+medium is (light, sound, vibration, fields, radiation), and its scope notes are
+precise enough to decide containment rather than leaving everything at
+`closeMatch`. Every note below was read at the NLM SPARQL endpoint on 2026-09-06.
+
+| SSTIM term | Target | Proposed | Reason, from the authority's own scope note |
+|---|---|---|---|
+| `mediumVisualLight` | `mesh:D008027` | `broadMatch` | MeSH Light is "that portion of the electromagnetic spectrum in the **visible, ultraviolet, and infrared** range". This concept is visible light delivered by a display, lamp or projector, so the descriptor is strictly broader. A naive mapping would have called these equal. |
+| `mediumVisualLight` | `wd:Q76299` visible spectrum | `relatedMatch` | The item is a spectral band; this concept is a delivery medium. Related, not close. |
+| `mediumAcousticEnergy` | `mesh:D013016` | `narrowMatch` | MeSH Sound classifies energy above the audible range as ultrasonic and below it as infrasonic, so the descriptor is the audible band. This concept is explicitly "whether or not it is audible", so it contains the descriptor. |
+| `mediumAirConductedSound` | `mesh:D013016` | `broadMatch` | The descriptor covers transmission through solid, liquid **or** gas; this concept is the air path only. |
+| `mediumMechanicalVibration` | `mesh:D014732` | `broadMatch` | MeSH Vibration is "a continuing periodic change in displacement with respect to a fixed reference", from any source. This concept requires delivery by an actuator, transducer, surface or object. |
+| `mediumMechanicalVibration` | `wd:Q3695508` | `broadMatch` | Same containment against Wikidata's general mechanical phenomenon. |
+| `mediumFocusedUltrasound` | `mesh:D000069453` | `broadMatch` | Ultrasonic Waves is the frequency band; this concept adds spatial focusing on a target. Note this is **not** `mesh:D057086` High-Intensity Focused Ultrasound Ablation, the trap tranche 1 rejected. |
+| `mediumFocusedUltrasound` | `wd:Q162564` ultrasound | `broadMatch` | Same reasoning. |
+| `mediumInfraredRadiation` | `mesh:D007259` | `closeMatch` | Infrared Rays is the same band. The descriptor adds therapeutic-heat and food-warming usage, which this vocabulary does not, so close rather than exact. |
+| `mediumInfraredRadiation` | `wd:Q11388` | `closeMatch` | The radiation type, matching the band this concept names. |
+| `mediumUltravioletRadiation` | `mesh:D014466` | `closeMatch` | Ultraviolet Rays runs "immediately below the visible range and extending into the x-ray frequencies", so its upper reach exceeds the optical UV this concept models. Close, with the divergence recorded. |
+| `mediumUltravioletRadiation` | `wd:Q11391` | `closeMatch` | Same band, no exposure framing. |
+| `mediumElectromagneticField` | `mesh:D004574` | `closeMatch` | "Fields representing the joint interplay of electric and magnetic forces", which is what this concept models as a medium. |
+| `mediumElectromagneticField` | `wd:Q177625` | `closeMatch` | The physical field. |
+| `mediumElectromagneticRadiation` | `mesh:D060733` | `closeMatch` | Same phenomenon, described as waves of oscillating electric and magnetic fields. |
+| `mediumAppliedMagneticField` | `mesh:D060526` | `closeMatch` | Magnetic Fields is "areas of attractive or repulsive force surrounding magnets"; this concept additionally requires that the field be *applied* as the delivered medium. |
+| `mediumAppliedMagneticField` | `wd:Q11408` | `closeMatch` | Same, against the physics concept. |
+| `mediumAppliedElectricCurrent` | `mesh:D004560` Electricity | `broadMatch` | The descriptor spans "electric charges at rest and in motion", so it includes the electrostatics this concept excludes. |
+| `mediumAppliedElectricCurrent` | `wd:Q11651` electric current | `closeMatch` | Current specifically, which is what this concept delivers, minus the through-electrodes requirement. |
+| `mediumAirflow` | `mesh:D000392` Air Movements | `closeMatch` | "The motion of air currents". This concept adds the purpose, a tactile, thermal or proximity cue, which is an intension difference and not an extension one. |
+| `mediumOlfactoryChemicalExposure` | `mesh:D009812` Odorants | `relatedMatch` | The descriptor names the **substances**; this concept names an **exposure**. Different kinds of thing, the same distinction that keeps `phenomenonSynapticTransmission` at related. |
+| `mediumPharmacologicalAgent` | `mesh:D004364` | `closeMatch` | Pharmaceutical Preparations requires a finished dosage form, which this concept does not. |
+| `mediumThermalEnergy` | `wd:Q209233` | `closeMatch` | MeSH splits this across Hot Temperature and Cold Temperature, neither of which alone corresponds, so only the Wikidata row is proposed. |
+
+Eleven media are deliberately left unmapped: `mediumChemicalAgent`,
+`mediumContactAcousticVibration`, `mediumFluidMotion`,
+`mediumGustatoryChemicalExposure`, `mediumLiquidGelImmersion`,
+`mediumMechanicalForce`, `mediumRespiratoryCue`, `mediumRigidSurfaceContact`,
+`mediumStereoscopicVisualPresentation`, `mediumTextileClothingContact` and
+`mediumThermalContact`. Label search returned an album, a video game, a camping
+festival and a run of journal articles for several of them, and nothing
+defensible for the rest. `mediumAirflow` is the warning that applies to all of
+them: its exact-label Wikidata hit, `Q4698686`, is airflow **as a measurement**,
+not moving air, and the MeSH descriptor is the right target instead.
+
+### 7.2 Body placements, 15 concepts: use a property, not a mapping predicate
+
+UBERON has a clean class for nearly every placement (`ear`, `eye`, `hand`,
+`foot`, `mouth`, `nose`, `joint`, `head`, `trunk`), which makes this look like the
+easiest tranche and is the reason it should be handled differently.
+
+A body placement is **where a device or exposure is placed**, not the anatomical
+entity itself. `placementEars` is not almost the same concept as UBERON's ear; it
+is a delivery-position category that refers to the ear. `skos:closeMatch` would
+assert near-interchangeability between a position category and an organ, which is
+a weaker claim than tranche 1 made for neural systems and target sites, where the
+concept at least denotes the same thing under an information-artifact reading
+(ADR 0021).
+
+The honest construction is a property, for example `sstim-ex:atAnatomicalSite`
+with UBERON classes as values. It says the true thing (this placement is at that
+anatomical site) and leaves the mapping predicates for concept-to-concept
+relations. That is a modeling decision needing an ADR rather than a row in a
+table, and it would still not cover `placementNearbyEnvironment`,
+`placementWholeBody`, or the left/right pairs: UBERON has no `left ear` class,
+laterality being a PATO qualifier.
+
+**Recommendation: do not map this scheme with SKOS predicates. Open an ADR, or
+leave it unmapped.**
+
+### 7.3 Sensory modalities, 6 concepts: still blocked on a scheme-level decision
+
+Unchanged from §4.4. The modality concepts must not map to the same UBERON
+classes as `NeuralSystemScheme`, which already does. The available targets are
+perception concepts (`mesh:D001307` Auditory Perception, `mesh:D014796` Visual
+Perception, and the corresponding Wikidata senses), and whether a modality is the
+perception, the sense or the channel is a question about the scheme rather than
+about any one row.

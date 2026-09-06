@@ -449,11 +449,22 @@ def search_ols(text: str, ontology: str, timeout: int):
 def candidates(args) -> int:
     graph = load_modules()
     mapped = {str(subject) for subject, _p, _t in collect_mappings(graph)}
-    vocab = "https://w3id.org/sstim/vocab#"
+
+    # Resolve a scheme by local name across every namespace, not just vocab#.
+    # The first version assumed `sstim-v:` and so could not see the schemes
+    # defined in the exposure and ecosystem modules, which is most of them: it
+    # answered "no concepts found" for DeliveryMediumScheme, a scheme with 27.
+    schemes = {}
+    for subject in set(graph.subjects(SKOS.inScheme, None)):
+        for scheme_iri in graph.objects(subject, SKOS.inScheme):
+            schemes.setdefault(str(scheme_iri).split("#")[-1], set()).add(scheme_iri)
 
     report = []
     for scheme_name in args.scheme:
-        scheme = URIRef(vocab + scheme_name)
+        matches = sorted(schemes.get(scheme_name, ()), key=str)
+        if len(matches) > 1:
+            print(f"# {scheme_name} is ambiguous: {[str(m) for m in matches]}", file=sys.stderr)
+        scheme = matches[0] if matches else URIRef("https://w3id.org/sstim/vocab#" + scheme_name)
         concepts = sorted(graph.subjects(SKOS.inScheme, scheme), key=str)
         if not concepts:
             print(f"# {scheme_name}: no concepts found in the manifest modules", file=sys.stderr)
