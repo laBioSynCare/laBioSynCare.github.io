@@ -39,9 +39,10 @@ dereferences every one of them.
 reads the claims of the exact items SSTIM maps and looks for `P2888`, `P1709` or
 `P1628` values under our namespace. It found **0 of 32 on 2026-09-05**, **29 of 32
 on 2026-09-06** after stages 1 and 2 were published, **37 of 41** the same evening
-once alignment tranche 2 widened the mapped set, and **54 of 58 on 2026-09-07**
-after tranche 3, whose seventeen statements were posted from this machine rather
-than pasted. The ontology item is
+once alignment tranche 2 widened the mapped set, and **58 of 58 on 2026-09-07**,
+after tranche 3's seventeen statements and the six `relatedMatch` rows, all
+posted from this machine rather than pasted. Every Wikidata item SSTIM maps now
+points back. The ontology item is
 [`Q141325360`](https://www.wikidata.org/wiki/Q141325360). There is still no
 property for SSTIM identifiers, which is stage 5.
 
@@ -204,13 +205,16 @@ other way round, so the qualifier there is *narrow match*. Publishing the
 uninverted form would put a false claim somewhere SSTIM cannot correct it
 silently.
 
-**`relatedMatch` rows are held back by default.** The property is named "exact
-match", and qualifying it as a related match is the weakest reading the community
-accepts. Six rows across four items are affected and listed as comments in the
-output: `Q863539` binaural beats (twice), `Q17166073` multisensory integration,
-`Q4826866` ASMR and, since tranche 2, `Q76299` visible spectrum. They are the
-entire difference between 37 and 41.
-`--include-related` emits them once that call is made.
+**`relatedMatch` rows were held back by default, and released on 2026-09-07.**
+The property is named "exact match", and qualifying it as a related match is the
+weakest reading the community accepts, so the six rows waited for a maintainer's
+call rather than riding along: `Q863539` binaural beats twice, once for the
+technique and once for the voice, `Q17166073` multisensory integration,
+`Q4826866` ASMR, `Q76299` visible spectrum and `Q98000061` isochronic tones. They
+were the entire difference between 54 and 58, and they carry `P4390` = related
+match (`Q39894604`), which is what makes the weaker reading legible to a reader
+instead of implied. `--include-related` remains the flag; the default stays
+conservative so the next tranche asks again.
 
 `make wikidata-inbound` is the check afterwards. It is also the only honest way
 to say the batch landed.

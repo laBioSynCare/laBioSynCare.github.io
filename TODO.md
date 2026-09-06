@@ -1095,13 +1095,14 @@ publishing SSTIM into Wikidata, not contributing to it.*
 - [x] Add reciprocal Wikidata mappings only for released terms whose identifiers
       and equivalence have been checked against the live authoritative record —
       **29 published 2026-09-06** `P1`
-      *`make wikidata-inbound` read 0 of 32 on 2026-09-05 and 29 of 32 on
-      2026-09-06. Each statement is `P2888` with a `P4390` relation qualifier,
+      *`make wikidata-inbound` read 0 of 32 on 2026-09-05, 29 of 32 on 2026-09-06
+      and **58 of 58 on 2026-09-07**, every mapped item pointing back. Each statement is `P2888` with a `P4390` relation qualifier,
       broad and narrow inverted because containment reads the other way round
       from the Wikidata side, referenced to the ontology item, the namespace
-      document and the retrieval date. The five `relatedMatch` rows across three
-      items are still held back: `--include-related` emits them when that call is
-      made, and it is the entire difference between 29 and 32.*
+      document and the retrieval date. The six `relatedMatch` rows were held back until
+      2026-09-07 and then released on the maintainer's call; they carry P4390 =
+      related match, so the weaker reading is legible rather than implied.
+      `--include-related` stays off by default, so the next tranche asks again.*
 
       *That pass also found three techniques with no Wikidata concept item at all
       (tACS, photic driving, rhythmic auditory stimulation), which is stage 3
