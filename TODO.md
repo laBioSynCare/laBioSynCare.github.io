@@ -343,7 +343,17 @@ indexed, examiner-searchable records.
       credential to leave the machine and is a browser paste each time. Detail in
       [`WIKIDATA_CONTRIBUTION.md`](docs/ontology/WIKIDATA_CONTRIBUTION.md).*
 
-- [ ] **Publish a W3C Community Group report** `P2`
+- [~] **Publish a W3C Community Group report** `P2`
+      *Draft written 2026-09-07 at `static/reports/vocabulary/index.html`, live
+      with the site at `https://w3c-cg.github.io/sstim/reports/vocabulary/`. A
+      ReSpec document with `specStatus: CG-DRAFT` and `group: sstim`, which
+      supplies the boilerplate the W3C report requirements ask for: the CG draft
+      logo, the CLA copyright block, the group link, and the status language that
+      keeps a report from reading as a standard. Covers scope, namespace and
+      identifiers, modules and profiles, conformance, external mappings, and
+      versioning and citation. Publishing it into the W3C reports index is a
+      chair action and cannot be done from here.*
+
       *Raised 2026-09-05 while looking for inbound references. `w3c.json` already
       declares `repo-type: cg-report` and the group page states that chairs, when
       logged in, may publish draft and final reports, so the mechanism is in

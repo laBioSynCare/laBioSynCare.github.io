@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SSTIM: a vocabulary for sensory stimulation</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c" class="remove" defer></script>
+  <script class="remove">
+    // ReSpec supplies the Community Group boilerplate the report requirements ask
+    // for: the CG draft logo, the CLA copyright block, the group name and link,
+    // and the "not a standard" status language.
+    // https://www.w3.org/community/reports/reqs/
+    var respecConfig = {
+      specStatus: "CG-DRAFT",
+      shortName: "sstim-vocabulary",
+      group: "sstim",
+      editors: [{
+        name: "Renato Fabbri",
+        orcid: "0000-0002-9699-629X",
+        url: "https://orcid.org/0000-0002-9699-629X",
+      }],
+      github: "w3c-cg/sstim",
+      edDraftURI: "https://w3c-cg.github.io/sstim/reports/vocabulary/",
+      latestVersion: null,
+      license: "cc-by",
+      localBiblio: {
+        "SSTIM-ONTOLOGY": {
+          title: "Sensory Stimulation Ontology (SSTIM)",
+          href: "https://w3id.org/sstim",
+          publisher: "Sensory Stimulation Vocabulary Community Group",
+        },
+      },
+    };
+  </script>
+</head>
+<body>
+
+<section id="abstract">
+  <p>
+    SSTIM is an open vocabulary for describing <dfn>sensory stimulation</dfn>: the
+    deliberate, parameter-specified delivery of auditory, visual, tactile and
+    cross-modal stimuli, and the records and evidence that accompany it. It is
+    published as an OWL 2 ontology with a multilingual SKOS vocabulary, SHACL
+    shapes and four conformance profiles, at the persistent namespace
+    <code>https://w3id.org/sstim</code>.
+  </p>
+  <p>
+    This report describes what the vocabulary covers, how its modules and
+    profiles are organised, what an implementer must do to conform to a profile,
+    and how its identifiers are versioned, cited and mapped to external
+    vocabularies. It is a description of a published artifact rather than a
+    standard: the normative content is the RDF itself, which this document
+    points at rather than reproduces.
+  </p>
+</section>
+
+<section id="sotd">
+  <p>
+    This is a working draft of a Community Group Report. It is published to
+    invite review of the vocabulary's scope, structure and external mappings by
+    people who describe stimulation protocols and by people who build the
+    software that delivers them.
+  </p>
+  <p>
+    The vocabulary it describes is versioned and archived independently of this
+    document. Cite a release, never this draft, when an implementation depends on
+    exact term semantics.
+  </p>
+</section>
+
+<section>
+  <h2>Introduction</h2>
+  <p>
+    Sensory stimulation is described today in prose, per study and per product.
+    Two descriptions of the same 40 Hz auditory protocol, written by two groups,
+    are usually not comparable, and neither is machine-readable. What varies is
+    not only terminology but which parameters are considered worth stating: a
+    carrier frequency without a modulation depth, a session length without a
+    delivery route, an outcome without the evidence tier of the claim behind it.
+  </p>
+  <p>
+    SSTIM exists so that such a description can be written once, exchanged, and
+    read back without loss. It names the techniques, the stimuli and their
+    parameters, the media and body placements through which they are delivered,
+    the exposure and safety boundaries that constrain them, the session record
+    that results, and the evidence assessments attached to claims about them.
+  </p>
+  <p class="note">
+    SSTIM describes stimulation. It does not assert that any stimulation
+    produces any effect. Claims of effect are modelled explicitly, as evidence
+    assessments carrying a tier, a direction and a source, so that a consumer can
+    see what is asserted and on whose authority.
+  </p>
+</section>
+
+<section>
+  <h2>Scope</h2>
+  <p>In scope:</p>
+  <ul>
+    <li>stimulation techniques, from binaural beats and photic driving to
+      clinical neuromodulation methods such as transcranial direct current
+      stimulation and vagus nerve stimulation;</li>
+    <li>stimuli, their parameters, and the signal shapes and patterns that
+      define them;</li>
+    <li>delivery media, device capabilities and body placements;</li>
+    <li>exposure profiles, comfort and safety boundaries, including
+      photosensitivity limits;</li>
+    <li>session records: their timeline, clock, events and observations;</li>
+    <li>evidence assessments, their propositions, directions, tiers and study
+      designs;</li>
+    <li>the ecosystem layer: agents, qualified relationships and their
+      provenance.</li>
+  </ul>
+  <p>Out of scope, deliberately:</p>
+  <ul>
+    <li>clinical indications, diagnoses and treatment recommendations;</li>
+    <li>personal or participant data of any kind;</li>
+    <li>an event-type vocabulary that would duplicate HED, which SSTIM instead
+      maps to;</li>
+    <li>audio or video encoding formats, which SSTIM references rather than
+      redefines.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Namespace and identifiers</h2>
+  <p>
+    The vocabulary's namespace is <code>https://w3id.org/sstim</code>, which
+    content-negotiates: an RDF request returns the namespace catalogue in Turtle,
+    JSON-LD or RDF/XML, and an HTML request returns a page describing the
+    namespace. Term IRIs are hash IRIs with human-readable local names, for
+    example <code>https://w3id.org/sstim#SensoryStimulation</code> and
+    <code>https://w3id.org/sstim/vocab#techBinauralBeats</code>.
+  </p>
+  <p>Four term namespaces are in use, each dereferenceable:</p>
+  <table class="simple">
+    <thead><tr><th>Namespace</th><th>Holds</th></tr></thead>
+    <tbody>
+      <tr><td><code>https://w3id.org/sstim#</code></td><td>OWL classes and properties</td></tr>
+      <tr><td><code>https://w3id.org/sstim/vocab#</code></td><td>SKOS concepts and schemes</td></tr>
+      <tr><td><code>https://w3id.org/sstim/exposure#</code></td><td>stimulus, exposure and delivery terms</td></tr>
+      <tr><td><code>https://w3id.org/sstim/ecosystem#</code></td><td>agents and qualified relationships</td></tr>
+    </tbody>
+  </table>
+  <p>
+    An implementer should resolve a term rather than construct it from a prefix
+    registration alone. The prefix <code>sstim</code> is registered at prefix.cc
+    for <code>https://w3id.org/sstim#</code>.
+  </p>
+</section>
+
+<section>
+  <h2>Modules and profiles</h2>
+  <p>
+    SSTIM is one suite with a synchronised release version, distributed as
+    modules. A <dfn>module</dfn> owns the terms for one concern and declares its
+    direct dependencies. A <dfn>profile</dfn> names an exact, transitively closed
+    consumer contract. A consumer implements a profile, not the whole graph.
+  </p>
+  <table class="simple">
+    <thead><tr><th>Profile</th><th>Entry point</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td>Kernel</td><td><code>/sstim/profile/kernel</code></td><td>discovery and identity; the dependency-free root</td></tr>
+      <tr><td>Core</td><td><code>/sstim/profile/core</code></td><td>describing a stimulus and its channel</td></tr>
+      <tr><td>Core Plus</td><td><code>/sstim/profile/core-plus</code></td><td>Core with the shared controlled values</td></tr>
+      <tr><td>Full</td><td><code>/sstim/profile/full</code></td><td>the complete suite, including evidence, sessions and ecosystem</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The machine-readable bill of materials is the suite manifest at
+    <code>https://w3id.org/sstim/manifest</code>, which declares every module,
+    its dependencies, its profile membership, its checksums and its publication
+    locations. Where this document and the manifest disagree, the manifest is
+    authoritative.
+  </p>
+</section>
+
+<section>
+  <h2>Conformance</h2>
+  <p>
+    A graph <dfn>conforms to a profile</dfn> when it validates against that
+    profile's SHACL shape closure and uses only terms the profile's closure
+    defines. Conformance is per profile: a Core-conformant graph need not carry
+    evidence or session terms, and a consumer of Core must not require them.
+  </p>
+  <p>
+    The Core shape package is deliberately weak. A stimulus channel and a target
+    may be omitted; what is constrained is what an asserted value must be. This
+    is so that a description that knows less is still valid rather than
+    unrepresentable.
+  </p>
+  <p>
+    Every released profile ships a positive fixture and at least one executable
+    competency query. Every profile with a non-empty shape closure also ships
+    out-of-scope and adversarial fixtures, so that a claim of conformance can be
+    reproduced rather than trusted.
+  </p>
+</section>
+
+<section>
+  <h2>External mappings</h2>
+  <p>
+    SSTIM maps its terms to Wikidata, MeSH, UBERON and SNOMED CT, conservatively
+    and in one direction, using the SKOS mapping relations. Two rules govern
+    them.
+  </p>
+  <p>
+    First, an identifier is verified at the authority that mints it before it
+    enters the graph, and re-verified continuously; label similarity has never
+    been sufficient evidence, and three published mappings were withdrawn for
+    being label-alike and semantically wrong.
+  </p>
+  <p>
+    Second, containment is stated rather than flattened. Where an external
+    concept is broader or narrower, the mapping says so with
+    <code>skos:broadMatch</code> or <code>skos:narrowMatch</code> rather than
+    defaulting to <code>skos:closeMatch</code>. Every mapping carries an
+    annotated axiom naming its source, its verification date and the reason for
+    its predicate.
+  </p>
+  <p>
+    Mappings to SNOMED CT reference identifiers only and carry no SNOMED content,
+    which is a licensing constraint rather than an editorial one.
+  </p>
+</section>
+
+<section>
+  <h2>Versioning and citation</h2>
+  <p>
+    The live development line is mutable and must not be cited. Each release is
+    frozen, byte-identical, archived with a DOI, and identified by a versioned
+    IRI of the form <code>https://w3id.org/sstim/0.16.0</code>. A concept DOI
+    names the continuing project across releases; a version DOI pins one
+    release.
+  </p>
+  <p>
+    An implementation that depends on exact term semantics should import a
+    versioned profile entry point, whose closure names its exact versioned
+    siblings, rather than the mutable latest one.
+  </p>
+</section>
+
+<section id="conformance"></section>
+
+<section class="appendix">
+  <h2>Where to find the artifacts</h2>
+  <ul>
+    <li>Namespace and human-readable landing page: <a href="https://w3id.org/sstim">https://w3id.org/sstim</a></li>
+    <li>Suite manifest: <a href="https://w3id.org/sstim/manifest">https://w3id.org/sstim/manifest</a></li>
+    <li>Generated reference documentation: <a href="https://w3c-cg.github.io/sstim/ontology/docs/">OWL core</a> and <a href="https://w3c-cg.github.io/sstim/ontology/docs/vocab/">SKOS vocabulary</a></li>
+    <li>Knowledge browser and SPARQL interface: <a href="https://w3c-cg.github.io/sstim/graph/">https://w3c-cg.github.io/sstim/graph/</a></li>
+    <li>Repository: <a href="https://github.com/w3c-cg/sstim">w3c-cg/sstim</a></li>
+  </ul>
+</section>
+
+</body>
+</html>

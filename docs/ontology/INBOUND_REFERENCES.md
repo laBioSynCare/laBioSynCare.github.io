@@ -131,13 +131,15 @@ pass for any ontology you ask about. The first version of this note was written
 from that endpoint and would have claimed the same result for an ontology we had
 never mentioned.
 
-### 2.4 The W3C Community Group homepage
+### 2.4 The W3C Community Group homepage · **text drafted 2026-09-07**
 
 `https://www.w3.org/community/sstim/` is the Sensory Stimulation Vocabulary
 Community Group's page on w3.org. Measured 2026-09-05: it mentions the GitHub
 repositories and **does not mention `w3id.org/sstim` anywhere**. A w3.org page
 linking the namespace is among the highest-authority inbound references
-available, it costs one edit, and the group's own chair can make it.
+available, it costs one edit, and the group's own chair can make it. Two versions
+of the text, one paragraph and one line, are drafted at
+`~/sstim-drafts/w3c-group-page-text.md`, with every URL in them resolved.
 
 ### 2.5 Our own pages · **done 2026-09-06**
 
@@ -185,7 +187,7 @@ A works entry on the maintainer's ORCID record for the ontology, identified by
 the concept DOI, puts SSTIM in a third-party authority record that many services
 harvest. ORCID has an API; the record owner's authorisation is what it needs.
 
-### 2.7 A W3C Community Group report
+### 2.7 A W3C Community Group report · **draft written 2026-09-07, publication is a chair action**
 
 `w3c.json` already declares this repository's `repo-type` as `cg-report`, and the
 group page carries a reports section stating that chairs, when logged in, may
@@ -196,6 +198,23 @@ A published CG report is a document on `w3.org` that cites the namespace and the
 terms, under W3C's own publication process rather than ours. Of everything in
 this section it is the highest-authority reference available, and the one that
 most changes how the work reads to an outside reviewer.
+
+**The draft exists**, at `static/reports/vocabulary/index.html`, published with
+the site to `https://w3c-cg.github.io/sstim/reports/vocabulary/`. It is a ReSpec
+document with `specStatus: "CG-DRAFT"` and `group: "sstim"`, which is what
+supplies the boilerplate the
+[report requirements](https://www.w3.org/community/reports/reqs/) ask for: the
+Community Group draft logo rather than a W3C one, the CLA copyright block, the
+group name linked to its page, and the status language that keeps a report from
+reading as a standard. It covers scope, namespace and identifiers, modules and
+profiles, conformance, external mappings, and versioning and citation, and
+points at the RDF rather than restating it.
+
+What remains is a chair action and cannot be done from here: a logged-in chair
+publishes it from the group's page, which is what puts it in the W3C reports
+index. Two things to decide first, both editorial: whether the scope section
+says what you want it to say, and whether a first report should be this overview
+or something narrower.
 
 ### 2.8 bio.tools
 
