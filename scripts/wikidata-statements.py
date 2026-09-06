@@ -77,6 +77,20 @@ MAPPING_PREDICATES = [
 ]
 
 
+BARE = False
+
+
+def note(line: str = "") -> None:
+    """A comment or blank line: printed for a human, withheld from a paste.
+
+    QuickStatements V1 is a tab-separated command format and its documentation
+    does not promise that `#` lines are ignored. `--bare` emits only the commands,
+    so the file can be pasted whole without a first run failing on our prose.
+    """
+    if not BARE:
+        print(line)
+
+
 def load_modules() -> Graph:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     graph = Graph()
@@ -142,15 +156,19 @@ CONCEPT_DOI = "10.5281/zenodo.21286974"
 def emit_item(_args) -> int:
     meta = ontology_metadata()
     created = meta["created"] or "2026-04-12"
-    print("# QuickStatements v1. Paste into https://quickstatements.toolforge.org")
-    print("# Signed in as the named account, with the conflict-of-interest")
-    print("# disclosure already on the user page (WIKIDATA_CONTRIBUTION.md stage 1).")
-    print("# Every URL below was resolved before this block was written.")
+    note("# QuickStatements v1. Paste into https://quickstatements.toolforge.org")
+    note("# Signed in as the named account, with the conflict-of-interest")
+    note("# disclosure already on the user page (WIKIDATA_CONTRIBUTION.md stage 1).")
+    note("# Every URL below was resolved before this block was written.")
     print("CREATE")
     print('LAST\tLen\t"SSTIM"')
     print('LAST\tDen\t"ontology for describing sensory stimulation"')
-    print(f'LAST\tAen\t"{meta["title"]}"')
-    print('LAST\tAen\t"Sensory Stimulation Ontology"')
+    # The ontology title is "Sensory Stimulation Ontology (SSTIM)". The label is
+    # SSTIM, so the parenthetical would alias the item to its own label plus
+    # brackets; strip it and keep the expansion, which is what an alias is for.
+    expansion = re.sub(r"\s*\(SSTIM\)\s*$", "", meta["title"]).strip()
+    if expansion:
+        print(f'LAST\tAen\t"{expansion}"')
     print("LAST\tP31\tQ324254")                                   # instance of: ontology
     print('LAST\tP856\t"https://w3id.org/sstim"')                 # official website
     print('LAST\tP1324\t"https://github.com/w3c-cg/sstim"')       # source code repository
@@ -159,12 +177,12 @@ def emit_item(_args) -> int:
     print("LAST\tP407\tQ1860")                                    # language: English
     print(f'LAST\tP356\t"{CONCEPT_DOI.upper()}"')                 # DOI: the concept DOI
     print(f"LAST\tP571\t+{created}T00:00:00Z/11")                 # inception
-    print()
-    print("# Not asserted here, and why:")
-    print("#   P170 creator needs an item for the person; an ORCID alone is not one.")
-    print(f"#   The version DOI ({meta['version_doi'] or 'unknown'}) identifies one release;")
-    print("#   the concept DOI above identifies the continuing project, which is what")
-    print("#   an item about the ontology should carry.")
+    note()
+    note("# Not asserted here, and why:")
+    note("#   P170 creator needs an item for the person; an ORCID alone is not one.")
+    note(f"#   The version DOI ({meta['version_doi'] or 'unknown'}) identifies one release;")
+    note("#   the concept DOI above identifies the continuing project, which is what")
+    note("#   an item about the ontology should carry.")
     return 0
 
 
@@ -175,13 +193,13 @@ def emit_statements(args) -> int:
     graph = load_modules()
     rows = wikidata_mappings(graph, args.include_related)
     today = date.today().isoformat()
-    print("# QuickStatements v1. Paste into https://quickstatements.toolforge.org")
-    print(f"# {len(rows)} reciprocal statements, derived from sstim-alignments.ttl.")
-    print("# P2888 is the mapping property; P4390 says which SKOS relation it is,")
-    print("# read from the Wikidata side, so broad and narrow are inverted.")
+    note("# QuickStatements v1. Paste into https://quickstatements.toolforge.org")
+    note(f"# {len(rows)} reciprocal statements, derived from sstim-alignments.ttl.")
+    note("# P2888 is the mapping property; P4390 says which SKOS relation it is,")
+    note("# read from the Wikidata side, so broad and narrow are inverted.")
     if not args.stated_in:
-        print("# No --stated-in given, so the reference is the resolving SSTIM IRI alone.")
-        print("# Re-run with --stated-in Q... once the ontology item exists.")
+        note("# No --stated-in given, so the reference is the namespace document alone.")
+        note("# Re-run with --stated-in Q... once the ontology item exists.")
     for qid, relation, iri in rows:
         line = f'{qid}\tP2888\t"{iri}"\tP4390\t{RELATION[relation]}'
         if args.stated_in:
@@ -195,13 +213,13 @@ def emit_statements(args) -> int:
             row for row in wikidata_mappings(graph, True)
             if row not in set(rows)
         ]
-        print()
-        print(f"# {len(related)} relatedMatch rows are held back by default. P2888 is")
-        print("# named 'exact match', and qualifying it as a related match is the")
-        print("# weakest reading the community accepts. Add --include-related to emit")
-        print("# them once that call is made:")
+        note()
+        note(f"# {len(related)} relatedMatch rows are held back by default. P2888 is")
+        note("# named 'exact match', and qualifying it as a related match is the")
+        note("# weakest reading the community accepts. Add --include-related to emit")
+        note("# them once that call is made:")
         for qid, _relation, iri in related:
-            print(f"#   {qid} <- {iri}")
+            note(f"#   {qid} <- {iri}")
     return 0
 
 
@@ -254,6 +272,10 @@ def measure_inbound(args) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--bare", action="store_true",
+        help="commands only, no comment lines: a file that can be pasted whole",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("item", help="QuickStatements block creating the ontology item")
     statements = subparsers.add_parser("statements", help="reciprocal P2888 statements")
@@ -262,6 +284,8 @@ def main() -> int:
     inbound = subparsers.add_parser("inbound", help="measure what Wikidata references today")
     inbound.add_argument("--timeout", type=int, default=30)
     args = parser.parse_args()
+    global BARE
+    BARE = args.bare
     return {"item": emit_item, "statements": emit_statements, "inbound": measure_inbound}[
         args.command
     ](args)

@@ -135,6 +135,11 @@ is. With it, the generated batch can be submitted directly through
 
 **QuickStatements**, authorised once by the account owner in a browser. No
 credential leaves the machine, and the same generated output is pasted in.
+`--bare` emits commands with no comment lines, because QuickStatements V1 is a
+tab-separated command format and nothing documents `#` as a comment: a paste that
+includes our prose may fail on its first line. Run the item batch, read the new
+QID from the batch result, then regenerate the statements with `--stated-in Q...`
+so each one cites the ontology item as well as the namespace document.
 
 The first is faster for 30 statements and for every later tranche; the second
 keeps the credential where it already is. It is a maintainer decision, not a
