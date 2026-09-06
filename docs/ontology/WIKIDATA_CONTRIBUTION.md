@@ -37,8 +37,9 @@ dereferences every one of them.
 
 **Wikidata now references SSTIM.** Measured, not assumed: `make wikidata-inbound`
 reads the claims of the exact items SSTIM maps and looks for `P2888`, `P1709` or
-`P1628` values under our namespace. It found **0 of 32 on 2026-09-05** and **29 of
-32 on 2026-09-06**, after stages 1 and 2 were published. The ontology item is
+`P1628` values under our namespace. It found **0 of 32 on 2026-09-05**, **29 of 32
+on 2026-09-06** after stages 1 and 2 were published, and **37 of 41** the same
+evening once alignment tranche 2 widened the mapped set. The ontology item is
 [`Q141325360`](https://www.wikidata.org/wiki/Q141325360). There is still no
 property for SSTIM identifiers, which is stage 5.
 
@@ -130,14 +131,24 @@ somewhere signed in".
 
 Two ways out, and they are different in kind.
 
-**A bot password**, minted at `Special:BotPasswords` on wikidata.org. It is a
-scoped login of the form `Rfabbri@<name>` with a generated password, accepted by
-the MediaWiki Action API, and its edits appear in the account's own
+**A bot password** · **minted 2026-09-07**, and this is now the route. Read on
+for what it is; `scripts/wikidata-submit.py` and `make wikidata-submit` use it,
+dry-running unless `WRITE=1`. It is a scoped login of the form `Rfabbri@<name>` with a generated password,
+accepted by the MediaWiki Action API, and its edits appear in the account's own
 contributions. Tick **Edit existing pages** and **Create, edit, and move pages**;
 the second is what creating the ontology item needs. It belongs in
 `docs/credentials/wikidata.md`, which is gitignored exactly as the BioPortal key
 is. With it, the generated batch can be submitted directly through
 `action=login`, a CSRF token, and `wbeditentity` / `wbcreateclaim`.
+
+**The dedupe difference, which is why the submitter is more than a POST loop.**
+QuickStatements skips a statement that already exists; the API does not.
+`wbsetclaim` creates a claim on every call, so an unguarded re-run leaves two
+identical `P2888` values on an item and no clean way to tell which to remove.
+`wikidata-submit.py` therefore reads every mapped item's existing values first
+and posts only the difference. Its first real exercise proved the check rather
+than the write: run on 2026-09-07 it found 37 mappings derived and 37 already
+present, because the batch had been pasted the evening before.
 
 **QuickStatements**, authorised once by the account owner in a browser. No
 credential leaves the machine, and the same generated output is pasted in.
@@ -164,9 +175,9 @@ authoritative record before any mapping is published.
 - [ ] Upgrade `skos:closeMatch` → `skos:exactMatch` only where genuinely
       justified; leave the rest as they are
 - [x] Add return statements on Wikidata referencing the released SSTIM terms —
-      **29 published 2026-09-06**, one per exact, close, broad and narrow mapping,
+      **29 published 2026-09-06, 8 more on 2026-09-06 after alignment tranche 2**, one per exact, close, broad and narrow mapping,
       as 87 QuickStatements commands (claim, `P4390` qualifier, reference block).
-      `make wikidata-inbound` reads 29 of 32; the three unlinked items are the
+      `make wikidata-inbound` reads **37 of 41**; the four unlinked items are the
       `relatedMatch` rows below
 
 The return statements are generated: `make wikidata-statements` derives them from
@@ -182,9 +193,10 @@ silently.
 
 **`relatedMatch` rows are held back by default.** The property is named "exact
 match", and qualifying it as a related match is the weakest reading the community
-accepts. Five rows across three items are affected and listed as comments in the
-output: `Q863539` binaural beats (twice), `Q17166073` multisensory integration and
-`Q4826866` ASMR. They are the entire difference between 29 and 32.
+accepts. Six rows across four items are affected and listed as comments in the
+output: `Q863539` binaural beats (twice), `Q17166073` multisensory integration,
+`Q4826866` ASMR and, since tranche 2, `Q76299` visible spectrum. They are the
+entire difference between 37 and 41.
 `--include-related` emits them once that call is made.
 
 `make wikidata-inbound` is the check afterwards. It is also the only honest way

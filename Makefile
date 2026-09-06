@@ -83,7 +83,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -416,6 +416,19 @@ wikidata-statements:
 
 wikidata-inbound:
 	$(PYTHON) scripts/wikidata-statements.py inbound
+
+## Post the reciprocal statements from here instead of pasting them, using the
+## bot password in the gitignored docs/credentials/wikidata.md. NETWORK, opt-in,
+## and a dry run unless WRITE=1.
+##
+## The one thing it must do that QuickStatements did for us: deduplicate.
+## `wbsetclaim` adds a statement on every call, so an unguarded re-run would
+## leave two identical P2888 claims on an item. Every run reads the items first
+## and skips what is already there; the posting is the easy half.
+##
+## LIMIT=n stops after n edits, which is how a first run should be made.
+wikidata-submit:
+	$(PYTHON) scripts/wikidata-submit.py $(if $(WRITE),--write,) $(if $(LIMIT),--limit $(LIMIT),)
 
 ## Measure multilingual coverage per scheme and refuse to let it drift. SSTIM
 ## advertises four languages in BARTOC, FAIRsharing and every module title; when
@@ -931,6 +944,7 @@ help:
 	@echo "  make alignment-verify Dereference every external mapping at its own authority (network)"
 	@echo "  make wikidata-statements Emit the QuickStatements batch that makes Wikidata cite SSTIM"
 	@echo "  make wikidata-inbound Count the mapped Wikidata items that reference an SSTIM IRI (network)"
+	@echo "  make wikidata-submit  Post the reciprocal statements (dry run unless WRITE=1)"
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make validate-release-source Validate release-prepared sources before snapshot creation"
 	@echo "  make manifest-check   Validate the module/profile manifest, inventory, and digests"
