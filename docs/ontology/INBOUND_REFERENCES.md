@@ -141,6 +141,17 @@ available, it costs one edit, and the group's own chair can make it. Two version
 of the text, one paragraph and one line, are drafted at
 `~/sstim-drafts/w3c-group-page-text.md`, with every URL in them resolved.
 
+**Two slots, and they are not equivalent.** A **post** (`New → Post` on the
+group's WordPress) is dated, permanent, and syndicated through the group's RSS
+and the W3C community aggregator; that draft is at `~/sstim-drafts/w3c-cg-post.md`
+and announces the namespace, the profiles and the mapping discipline rather than
+dropping a blurb. The **group description** at the top of the page is the better
+location and the harder one: it does not scroll away, it is the first thing a
+reader sees, and it currently ends at the GitHub link without ever naming the
+namespace. It is edited through the group's own admin rather than WordPress, so
+if the chair tools do not expose it, `ij@w3.org` is the staff contact recorded in
+`w3c.json`. A **page** is the wrong tool: nothing would link to it.
+
 ### 2.5 Our own pages · **done 2026-09-06**
 
 The site emitted no `application/ld+json` at all when this file was written, so
