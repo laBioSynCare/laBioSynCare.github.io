@@ -1263,6 +1263,51 @@ Required follow-up: In a signed-in record edit, change the homepage, Browse
                     roles, but verify the maintainer link actually saved.
 ```
 
+### Bioregistry — REQUESTED 2026-09-06, issue #2054, **not yet labelled**
+
+A community registry of prefixes and identifier namespaces that exports its
+records as RDF, so an accepted entry is itself an inbound reference to the SSTIM
+namespace. `https://bioregistry.io/api/registry/sstim` answered 404 on
+2026-09-05, so SSTIM was absent when this was filed.
+
+```text
+Service:            Bioregistry (biopragmatics/bioregistry)
+Submitted URL:      https://github.com/biopragmatics/bioregistry/issues/2054
+Submitted version:  namespace-level, not release-pinned
+Release DOI:        10.5281/zenodo.21286974 (concept)
+Date:               2026-09-06
+Account/maintainer: ttm (Renato Fabbri), ORCID 0000-0002-9699-629X
+External record ID: issue #2054
+Status:             open, awaiting curation
+Required follow-up: see the label gate below
+```
+
+**What was requested.** Prefix `sstim`, URI format `https://w3id.org/sstim#$1`,
+pattern `^[A-Za-z][A-Za-z0-9]*$`, example `SensoryStimulation`, licence
+`CC-BY-4.0`, publication `doi:10.5281/zenodo.21286974`. The pattern is measured
+rather than inferred: it matches all 1,099 local names across the four term
+namespaces.
+
+**The one judgement call put to the curators.** Bioregistry mints one prefix per
+URI format and SSTIM has four term namespaces, so the comments name the siblings
+with their sizes (`vocab#` 405, `exposure#` 268, `ecosystem#` 82, core 344) and
+offer either separate prefixes (`sstim.vocab` and so on) or a different primary.
+The core namespace was requested because it is what prefix.cc already serves.
+
+**Label gate, and the reason it exists here.** Their automation
+(`.github/workflows/new_prefix_pr.yml` running `src/bioregistry/gh/new_prefix.py`)
+selects issues by the `New` and `Prefix` labels, which the issue **template**
+applies automatically. This issue was filed with `gh issue create`, which bypasses
+the template, so it carries no labels, and `gh issue edit --add-label` is refused:
+setting labels needs triage permission on their repository. The body itself is
+fine, since their parser reads the `### <label>` headings that the form would
+have produced. Until a maintainer labels it, the bot will not see it.
+
+Two ways out, whichever the maintainer prefers: wait for a curator to label it,
+or re-file through the prefilled template URL (kept at
+`~/sstim-drafts/bioregistry-prefilled-url.txt`), which labels itself, and close
+#2054 as a duplicate. **Do not file a second issue without closing the first.**
+
 ### DBpedia KG Catalog — LIVE at 0.16.0; automated updater merged
 
 A new, actively developed DBpedia catalogue (<https://kg-catalog.dbpedia.org/>),

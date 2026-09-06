@@ -198,7 +198,7 @@ and its own review.
 
 | Target | Present? | Intake | Note |
 |---|---|---|---|
-| **Bioregistry** | **No** (`/api/registry/sstim` 404, 2026-09-05) | `new-prefix.yml` issue on `biopragmatics/bioregistry` | Best of these. It exports its records as RDF, so the entry itself references our namespace, and it cross-links to OLS and BioPortal |
+| **Bioregistry** | **requested 2026-09-06**, [issue #2054](https://github.com/biopragmatics/bioregistry/issues/2054) | filed with `gh`, which bypassed the template and applied no labels; their bot selects on `New` + `Prefix` and a non-collaborator cannot set them | See [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) for the label gate and the two ways out. It exports its records as RDF, so an accepted entry references our namespace |
 | **identifiers.org / N2T** | not checked | prefix registration request form | A resolver entry for the `sstim` prefix |
 | **LOD Cloud** | not checked | dataset submission form | Puts SSTIM in the cloud diagram's dataset metadata |
 | **EBI OLS4** | **No** (`api/ontologies/sstim` 404, 2026-09-05) | PR, already open, see [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) | OLS then hosts and links every term |
