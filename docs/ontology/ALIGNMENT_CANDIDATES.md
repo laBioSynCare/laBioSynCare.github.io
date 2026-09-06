@@ -228,10 +228,11 @@ contribute-before-publishing posture that document sets out.
 
 ## 7. Tranche 2 candidates: delivery media, body placements, modalities
 
-Researched 2026-09-06, **not applied**. Same rule as tranche 1: nothing enters
-`sstim-alignments.ttl` without an instruction naming the file.
+Researched **and applied** 2026-09-06, on the maintainer's instruction naming the
+file. §7.1 is in `sstim-alignments.ttl`; §7.2 and §7.3 are deliberately not, for
+the reasons each section gives.
 
-### 7.1 Delivery media, 27 concepts, none mapped
+### 7.1 Delivery media · **applied 2026-09-06**, 23 rows over 16 concepts
 
 MeSH is the right authority here, and a better fit than it was for the
 techniques. Its physical-agent descriptors classify exactly what a delivery
@@ -264,6 +265,16 @@ precise enough to decide containment rather than leaving everything at
 | `mediumOlfactoryChemicalExposure` | `mesh:D009812` Odorants | `relatedMatch` | The descriptor names the **substances**; this concept names an **exposure**. Different kinds of thing, the same distinction that keeps `phenomenonSynapticTransmission` at related. |
 | `mediumPharmacologicalAgent` | `mesh:D004364` | `closeMatch` | Pharmaceutical Preparations requires a finished dosage form, which this concept does not. |
 | `mediumThermalEnergy` | `wd:Q209233` | `closeMatch` | MeSH splits this across Hot Temperature and Cold Temperature, neither of which alone corresponds, so only the Wikidata row is proposed. |
+
+Two consequences of applying it. The alignment module now reaches the exposure
+namespace for the first time, so it declares `https://w3id.org/sstim/exposure` in
+`dct:requires` and the manifest's `requires` for the module was extended to
+match, which `sstim-manifest check` enforces. And `make alignment-verify` now
+prints two REVIEW lines, both correct: `mediumAirflow` against "Air Movements"
+and `mediumPharmacologicalAgent` against "Pharmaceutical Preparations" share no
+word with our labels, which is exactly the check that would have caught MeSH
+D012910. They are left flagged rather than special-cased, with the reason written
+into the module.
 
 Eleven media are deliberately left unmapped: `mediumChemicalAgent`,
 `mediumContactAcousticVibration`, `mediumFluidMotion`,

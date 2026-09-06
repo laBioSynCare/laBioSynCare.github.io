@@ -71,6 +71,22 @@ file is the human-readable summary.
   signed-in human under the named account and its conflict-of-interest
   disclosure.
 
+- **23 more external mappings, over 16 delivery media (tranche 2).** MeSH
+  physical-agent descriptors and Wikidata physics concepts, taking the alignment
+  module to 93 mappings. Where a scope note settles containment the row says so
+  instead of defaulting to `closeMatch`: MeSH Light spans visible, ultraviolet
+  **and** infrared, so it is broader than `mediumVisualLight`, and MeSH Sound is
+  the audible band, so `mediumAcousticEnergy` contains it. Two exact-label
+  candidates were rejected as the wrong subject (`D057086` and `Q564897` are
+  ablative ultrasound; `Q4698686` is airflow as a measurement), and eleven media
+  in the same scheme stay unmapped.
+
+  The module reaches the exposure namespace for the first time and declares it in
+  `dct:requires`, with the manifest updated to match. Body placements were
+  deliberately **not** mapped: a placement is a delivery-position category and not
+  the organ, so it wants a property to UBERON and an ADR rather than fifteen
+  easy and slightly false `closeMatch` rows.
+
 ### Fixed
 
 - **Ten prose totals still said 545 concepts** after ADR 0025's six terms took the

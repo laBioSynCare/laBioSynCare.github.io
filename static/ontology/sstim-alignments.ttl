@@ -19,6 +19,7 @@
 
 @prefix sstim:    <https://w3id.org/sstim#> .
 @prefix sstim-v:  <https://w3id.org/sstim/vocab#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -47,14 +48,15 @@
     dct:title "SSTIM External Alignments"@en ;
     dct:description "Conservatively scoped mappings from SSTIM classes and concepts to verified Wikidata, OBO Foundry, and SNOMED CT resources."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/vocab>, <https://w3id.org/sstim/exposure> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-08-18"^^xsd:date ;
-    dct:modified "2026-09-05"^^xsd:date ;
+    dct:modified "2026-09-06"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
+    skos:historyNote "Tranche 2, 2026-09-06, maps 23 delivery media to MeSH physical-agent descriptors and Wikidata physics concepts, and is the first tranche to reach the exposure namespace, which the module now declares as a dependency. Where a scope note settles containment the row says so rather than defaulting to closeMatch: MeSH Light spans visible, ultraviolet and infrared and is broader than this vocabulary's visible-light medium, while MeSH Sound is the audible band and is contained by its acoustic energy. Eleven media in the same scheme stay unmapped, and two exact-label candidates were rejected as ablative or as a measurement."@en ;
     skos:historyNote "Tranche 1 of the reviewed external mapping pass, 2026-09-05, adds 57 mappings to MeSH descriptors, UBERON anatomical classes and Wikidata items across techniques, neural phenomena, neural systems and neural target sites, and brings the module from two external vocabularies to four. Every target was dereferenced at its own authority; the evidence, the rejected candidates and the predicate reasoning are in docs/ontology/ALIGNMENT_CANDIDATES.md."@en ;
     skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
 
@@ -1067,6 +1069,292 @@ sstim-v:targetCranialNerve skos:closeMatch mesh:D003391 .
     dct:date "2026-09-05"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     skos:editorialNote "This concept is a controlled value naming a cranial nerve as a stimulation target. ADR 0021 holds such a value to be an information category rather than the entity it classifies, while the NLM descriptor Cranial Nerves denotes the entity itself, so closeMatch is the strongest defensible relation and exactMatch is deliberately not asserted. No Wikidata mapping is asserted: no item was verified for the class as such in this pass."@en .
+
+
+###########################################################################
+# Delivery media — tranche 2 (2026-09-06)
+#
+# Reviewed candidate set from docs/ontology/ALIGNMENT_CANDIDATES.md §7.1, which
+# holds the evidence per row. MeSH carries most of this tranche because its
+# physical-agent descriptors classify exactly what a delivery medium is, and
+# because their scope notes are precise enough to decide containment instead of
+# leaving everything at closeMatch. Three rows are broadMatch and one is
+# narrowMatch for that reason, and they are the rows a label-similarity pass
+# would have got wrong:
+#
+#   MeSH Light spans visible, ultraviolet and infrared, so it is broader than
+#   this vocabulary's visible-light medium;
+#   MeSH Sound is the audible band, so acoustic energy here contains it.
+#
+# Two exact-label candidates were rejected rather than mapped, both recorded in
+# the editorial notes below: mesh:D057086 and wd:Q564897 for focused ultrasound,
+# which are ablative, and wd:Q4698686 for airflow, which is a measurement.
+#
+# Eleven media in the same scheme carry no mapping on purpose. Label search
+# returned an album, a video game, a camping festival and a run of journal
+# articles for several of them, and nothing defensible for the rest.
+#
+# Two rows below make `make alignment-verify` print REVIEW, and both are correct.
+# The gate flags a strong mapping whose target label shares no word with ours,
+# which is the check that would have caught MeSH D012910 and SNOMED 229070002.
+# Here it fires on mediumAirflow against "Air Movements" and on
+# mediumPharmacologicalAgent against "Pharmaceutical Preparations": different
+# words, same subject, confirmed against each descriptor's scope note. Leave them
+# flagged rather than special-cased, and read the note before dismissing a third.
+###########################################################################
+
+sstim-ex:mediumVisualLight skos:broadMatch mesh:D008027 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumVisualLight ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D008027 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D008027> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "MeSH Light is \"that portion of the electromagnetic spectrum in the visible, ultraviolet, and infrared range\". This concept is visible light delivered by a display, lamp, projector or environment, so the descriptor is strictly broader. Recorded because the labels invite an equality that the scope note refuses."@en .
+
+sstim-ex:mediumVisualLight skos:relatedMatch wd:Q76299 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumVisualLight ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget wd:Q76299 ;
+    dct:source <http://www.wikidata.org/entity/Q76299> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is a spectral band; this concept is a delivery medium. Associated without either containing the other."@en .
+
+sstim-ex:mediumAcousticEnergy skos:narrowMatch mesh:D013016 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAcousticEnergy ;
+    owl:annotatedProperty skos:narrowMatch ;
+    owl:annotatedTarget mesh:D013016 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D013016> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "MeSH Sound classifies energy above the audible range as ultrasonic and below it as infrasonic, so the descriptor is the audible band. This concept is explicitly \"whether or not it is audible\" and therefore contains it."@en .
+
+sstim-ex:mediumAirConductedSound skos:broadMatch mesh:D013016 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAirConductedSound ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D013016 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D013016> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The descriptor covers transmission through solid, liquid or gas; this concept is the air path before the ear or body, which is one of the three."@en .
+
+sstim-ex:mediumMechanicalVibration skos:broadMatch mesh:D014732 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumMechanicalVibration ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D014732 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D014732> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "MeSH Vibration is a continuing periodic change in displacement with respect to a fixed reference, from any source. This concept requires delivery by an actuator, transducer, surface or object."@en .
+
+sstim-ex:mediumMechanicalVibration skos:broadMatch wd:Q3695508 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumMechanicalVibration ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget wd:Q3695508 ;
+    dct:source <http://www.wikidata.org/entity/Q3695508> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Same containment against Wikidata's general mechanical phenomenon."@en .
+
+sstim-ex:mediumFocusedUltrasound skos:broadMatch mesh:D000069453 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumFocusedUltrasound ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D000069453 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D000069453> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Ultrasonic Waves is the frequency band; this concept adds spatial focusing on an identified target. Deliberately not mesh:D057086, High-Intensity Focused Ultrasound Ablation, which is the ablative technique and a different thing wearing similar words."@en .
+
+sstim-ex:mediumFocusedUltrasound skos:broadMatch wd:Q162564 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumFocusedUltrasound ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget wd:Q162564 ;
+    dct:source <http://www.wikidata.org/entity/Q162564> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is ultrasound as a frequency range. Deliberately not wd:Q564897, high-intensity focused ultrasound, which is ablative."@en .
+
+sstim-ex:mediumInfraredRadiation skos:closeMatch mesh:D007259 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumInfraredRadiation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D007259 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D007259> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Infrared Rays names the same band. The descriptor adds therapeutic-heat and food-warming usage, which this vocabulary does not, so close rather than exact."@en .
+
+sstim-ex:mediumInfraredRadiation skos:closeMatch wd:Q11388 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumInfraredRadiation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q11388 ;
+    dct:source <http://www.wikidata.org/entity/Q11388> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The radiation type matching the band this concept names, without the exposure framing."@en .
+
+sstim-ex:mediumUltravioletRadiation skos:closeMatch mesh:D014466 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumUltravioletRadiation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D014466 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D014466> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Ultraviolet Rays runs immediately below the visible range and extends into the x-ray frequencies, so its upper reach exceeds the optical ultraviolet this concept models. Close, with the divergence stated rather than smoothed."@en .
+
+sstim-ex:mediumUltravioletRadiation skos:closeMatch wd:Q11391 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumUltravioletRadiation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q11391 ;
+    dct:source <http://www.wikidata.org/entity/Q11391> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The same band, without the exposure framing."@en .
+
+sstim-ex:mediumElectromagneticField skos:closeMatch mesh:D004574 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumElectromagneticField ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D004574 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D004574> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Electromagnetic Fields is \"fields representing the joint interplay of electric and magnetic forces\", which is what this concept models as a medium."@en .
+
+sstim-ex:mediumElectromagneticField skos:closeMatch wd:Q177625 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumElectromagneticField ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q177625 ;
+    dct:source <http://www.wikidata.org/entity/Q177625> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The physical field produced by charged objects, which this concept treats as an exposure medium."@en .
+
+sstim-ex:mediumElectromagneticRadiation skos:closeMatch mesh:D060733 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumElectromagneticRadiation ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D060733 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D060733> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Described there as waves of oscillating electric and magnetic fields moving outward from the source, which is this concept's referent."@en .
+
+sstim-ex:mediumAppliedMagneticField skos:closeMatch mesh:D060526 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAppliedMagneticField ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D060526 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D060526> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Magnetic Fields is \"areas of attractive or repulsive force surrounding magnets\". This concept additionally requires that the field be applied by a coil or magnet as the delivered medium."@en .
+
+sstim-ex:mediumAppliedMagneticField skos:closeMatch wd:Q11408 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAppliedMagneticField ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q11408 ;
+    dct:source <http://www.wikidata.org/entity/Q11408> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The physics concept, without the applied-as-medium requirement."@en .
+
+sstim-ex:mediumAppliedElectricCurrent skos:broadMatch mesh:D004560 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAppliedElectricCurrent ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget mesh:D004560 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D004560> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "MeSH Electricity spans \"the physical effects involving the presence of electric charges at rest and in motion\", so it includes electrostatics that this concept, which requires current through electrodes in contact with tissue, excludes."@en .
+
+sstim-ex:mediumAppliedElectricCurrent skos:closeMatch wd:Q11651 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAppliedElectricCurrent ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q11651 ;
+    dct:source <http://www.wikidata.org/entity/Q11651> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Electric current specifically, which is what this concept delivers, minus the through-electrodes requirement."@en .
+
+sstim-ex:mediumAirflow skos:closeMatch mesh:D000392 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumAirflow ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D000392 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D000392> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Air Movements is \"the motion of air currents\". This concept adds the purpose, a tactile, thermal or proximity cue, which is an intension difference and not an extension one. Deliberately not the exact-label Wikidata item wd:Q4698686, which is airflow as a measurement rather than moving air."@en .
+
+sstim-ex:mediumOlfactoryChemicalExposure skos:relatedMatch mesh:D009812 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumOlfactoryChemicalExposure ;
+    owl:annotatedProperty skos:relatedMatch ;
+    owl:annotatedTarget mesh:D009812 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D009812> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Odorants names the volatile substances; this concept names an exposure. Different kinds of thing, the same distinction that keeps the multisensory-integration and synaptic-transmission mappings at related."@en .
+
+sstim-ex:mediumPharmacologicalAgent skos:closeMatch mesh:D004364 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumPharmacologicalAgent ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget mesh:D004364 ;
+    dct:source <http://id.nlm.nih.gov/mesh/D004364> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Pharmaceutical Preparations requires a finished dosage form, which this concept does not, while both name the substance delivered as the controlled input."@en .
+
+sstim-ex:mediumThermalEnergy skos:closeMatch wd:Q209233 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:mediumThermalEnergy ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q209233 ;
+    dct:source <http://www.wikidata.org/entity/Q209233> ;
+    dct:date "2026-09-06"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Thermal energy as internal energy due to temperature, which is what this concept applies as a stimulus. MeSH splits the same ground across Hot Temperature and Cold Temperature, neither of which alone corresponds, so no MeSH row is asserted."@en .
 
 ###########################################################################
 # Pending alignments (tracked as GitHub Issues)

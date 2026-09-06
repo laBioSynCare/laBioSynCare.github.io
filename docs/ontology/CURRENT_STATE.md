@@ -312,8 +312,8 @@ The main gaps are design and coverage gaps, not current parser failures:
   frequency-band concepts still conflate observed neural oscillations with
   stimulus targets.
 - External mappings carry per-mapping provenance and are now dereferenced at
-  their own authorities. 70 mappings reach Wikidata, MeSH, UBERON and SNOMED CT
-  after the 2026-09-05 tranche; `make alignment-verify` resolves each one and
+  their own authorities. 93 mappings reach Wikidata, MeSH, UBERON and SNOMED CT
+  after the 2026-09-05 and 2026-09-06 tranches; `make alignment-verify` resolves each one and
   reported none wrong. The inbound direction is no longer empty: the SSTIM item
   `Q141325360` was created on Wikidata on 2026-09-06 and **29 of the 32 mapped
   Wikidata items now carry a `P2888` statement naming an SSTIM term**, measured by

@@ -636,7 +636,7 @@
       "source": {
         "path": "static/ontology/sstim-alignments.ttl",
         "mediaType": "text/turtle",
-        "sha256": "4cf7f60507bc3ad82c77a08a42be1746f37baea4e3ca887d83a0ad9d2e5aa688"
+        "sha256": "c3d613f772682a3be9286bbf329ebd5ee24b9e1cfd3a19be6bd6ddd8a7b9d7a8"
       },
       "runtime": {
         "url": "sstim-alignments.ttl",
@@ -645,7 +645,8 @@
       "requires": [
         "core",
         "evidence",
-        "vocab"
+        "vocab",
+        "exposure"
       ],
       "requiresProfiles": [],
       "publication": {
@@ -903,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "a668ab2810d2f6fb74f6f654dd7ee5c761784e0e85b0dbe8ef5a63c5939d4f82"
+      "sha256": "3cf74d0eeee5ab61a197c14aff504fc9a98cab69dbd3e93ba9745a05c075410b"
     }
   ]
 }

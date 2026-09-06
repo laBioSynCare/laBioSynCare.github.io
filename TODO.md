@@ -1010,16 +1010,23 @@ Turtle files are listed in section 1. After they exist:
       the public aggregate nor its private history is committed here. The
       canonical sequence is Workstream 5
       of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
-- [ ] **Decide tranche 2 of the external alignments** `P2`
-      *Researched 2026-09-06 and tabled in
+- [x] **Tranche 2 of the external alignments — applied 2026-09-06** `P2`
+      *Researched and tabled in
       [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md) §7,
-      nothing applied. 23 candidate rows over 16 delivery media, mostly MeSH
+      then applied on instruction. 23 rows over 16 delivery media, mostly MeSH
       physical-agent descriptors whose scope notes decide containment rather than
       leaving everything at closeMatch: MeSH Light spans visible, ultraviolet and
       infrared so it is broader than `mediumVisualLight`, and MeSH Sound is the
       audible band so `mediumAcousticEnergy` contains it. Eleven media are left
       unmapped, `mediumAirflow` being the warning: its exact-label Wikidata hit is
       airflow as a measurement, not moving air.*
+
+      *`make alignment-verify` now reads 93 mappings, none wrong, two to review:
+      `mediumAirflow` against "Air Movements" and `mediumPharmacologicalAgent`
+      against "Pharmaceutical Preparations", both correct and both left flagged
+      rather than special-cased. The module reaches the exposure namespace for the
+      first time, so it declares that dependency and the manifest was updated to
+      match. `make validate` passes.*
 
       *Two schemes are recommended against rather than tabled. Body placements
       should get a property to UBERON classes (`sstim-ex:atAnatomicalSite`, an
