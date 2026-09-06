@@ -87,6 +87,15 @@ file is the human-readable summary.
   the organ, so it wants a property to UBERON and an ADR rather than fifteen
   easy and slightly false `closeMatch` rows.
 
+- **17 more external mappings (tranche 3): signal shapes, audio noise colours and
+  study designs**, taking the alignment module to 110. All to Wikidata, and the
+  reason is not shyness about MeSH: its study-design descriptors are publication
+  types, describing an article rather than the design of the study it reports,
+  which is what an evidence assessment classifies. Two rows deliberately avoid a
+  better-matching label, `shapeNoise` taking the signal-processing sense rather
+  than noise-as-sound and `shapeEnvelope` the waveform envelope rather than the
+  stationery item. Four bookkeeping or unmatched values stay unmapped.
+
 ### Fixed
 
 - **Ten prose totals still said 545 concepts** after ADR 0025's six terms took the

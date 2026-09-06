@@ -320,3 +320,42 @@ perception concepts (`mesh:D001307` Auditory Perception, `mesh:D014796` Visual
 Perception, and the corresponding Wikidata senses), and whether a modality is the
 perception, the sense or the channel is a question about the scheme rather than
 about any one row.
+
+---
+
+## 8. Tranche 3: signal shapes, audio noise colours, study designs · **applied 2026-09-07**
+
+17 rows, all to Wikidata, taking the module to 110 mappings. Researched and
+applied the same day, and published to Wikidata the same hour, which is the first
+time the loop ran end to end from this machine.
+
+| SSTIM term | Target | Proposed | Reason |
+|---|---|---|---|
+| `shapeSine` | `wd:Q207527` sine wave | `closeMatch` | The item is the mathematical curve; the concept is the controlled value naming that shape. ADR 0021 again, so not exact. |
+| `shapeSquare` | `wd:Q1136640` | `closeMatch` | Same, and the item carries no duty-cycle boundary where the definition does. |
+| `shapeTriangle` | `wd:Q1257456` | `closeMatch` | Same. |
+| `shapeSawtooth` | `wd:Q1742397` | `closeMatch` | Same; the item does not distinguish the mirrored ramp this concept admits. |
+| `shapeNoise` | `wd:Q17104942` noise (signal processing) | `closeMatch` | **Deliberately not `wd:Q179448`**, noise as unwanted sound, which matches the label better and is the wrong subject. |
+| `shapeEnvelope` | `wd:Q5380913` envelope (waves) | `closeMatch` | **Deliberately not `wd:Q170124`**, the stationery item, which the label search returned first. |
+| `audioNoiseWhite` | `wd:Q381287` | `closeMatch` | Equal intensity across frequencies. |
+| `audioNoisePink` | `wd:Q974572` | `closeMatch` | Amplitude inversely proportional to frequency. |
+| `audioNoiseBrownRed` | `wd:Q1437483` Brownian noise | `closeMatch` | Same convention under a different colour name. |
+| `audioNoiseGrey` | `wd:Q2380254` gray noise | `closeMatch` | Psychoacoustic equal-loudness contour, almost our definition word for word. |
+| `audioNoiseBlue` | `wd:Q12345729` | `closeMatch` | A thin item, no description or type: close is the strongest defensible claim, as for monaural beats. |
+| `audioNoiseVioletPurple` | `wd:Q31073746` | `closeMatch` | Typed as noise, no description; same reservation. |
+| `audioNoiseBlackSilence` | `wd:Q502261` silence | `closeMatch` | The concept additionally covers muting and deliberate absence, a stimulation-context extension. |
+| `designRandomizedControlledTrial` | `wd:Q1436668` | `closeMatch` | The experimental method. |
+| `designObservational` | `wd:Q818574` | `closeMatch` | Inference without experimenter-controlled allocation. |
+| `designControlledTrial` | `wd:Q70447452` | `broadMatch` | The item does not exclude randomised allocation; this concept is explicitly the non-randomised case, so the item is broader. |
+| `designCaseReport` | `wd:Q2782326` | `closeMatch` | The item calls itself a publication type while this is a study design. Nearly coextensive, so close, with the framing recorded. |
+
+**Why no MeSH row anywhere in this tranche.** MeSH's study-design descriptors are
+publication types: `D016449` describes an *article reporting* a randomised trial,
+not the design of the study it reports, which is what an evidence assessment
+classifies. The Wikidata method items are the right subject and the MeSH ones are
+a neighbouring one, so the whole scheme goes to Wikidata.
+
+**Not mapped:** `shapeSampled`, `designMixedDesigns` and `designUnknownDesign` are
+bookkeeping values with no external counterpart, and `designPreclinicalExperiment`
+has no defensible target: its nearest item, `wd:Q7239206`, is preclinical
+development as a stage of drug development rather than an experimental design.

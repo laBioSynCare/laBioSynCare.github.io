@@ -1010,6 +1010,17 @@ Turtle files are listed in section 1. After they exist:
       the public aggregate nor its private history is committed here. The
       canonical sequence is Workstream 5
       of [`ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md#workstream-5--stakeholder-ecosystem-rdf-module-adr-0024-implementation). Session v2 is not a dependency.*
+- [x] **Tranche 3 of the external alignments — applied and published 2026-09-07**
+      `P2`
+      *17 Wikidata rows over signal shapes, audio noise colours and study designs,
+      taking the module to 110 mappings and the inbound count to 54 of 58. All to
+      Wikidata: MeSH's study-design descriptors are publication types, describing
+      an article rather than the design of the study it reports. Two rows avoid a
+      better-matching label on purpose, `shapeNoise` taking the signal-processing
+      sense and `shapeEnvelope` the waveform one. Evidence per row in
+      [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md) §8. First
+      tranche posted from this machine rather than pasted.*
+
 - [x] **Tranche 2 of the external alignments — applied 2026-09-06** `P2`
       *Researched and tabled in
       [`ALIGNMENT_CANDIDATES.md`](docs/ontology/ALIGNMENT_CANDIDATES.md) §7,

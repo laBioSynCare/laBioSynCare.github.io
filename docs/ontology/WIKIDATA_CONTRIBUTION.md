@@ -38,8 +38,10 @@ dereferences every one of them.
 **Wikidata now references SSTIM.** Measured, not assumed: `make wikidata-inbound`
 reads the claims of the exact items SSTIM maps and looks for `P2888`, `P1709` or
 `P1628` values under our namespace. It found **0 of 32 on 2026-09-05**, **29 of 32
-on 2026-09-06** after stages 1 and 2 were published, and **37 of 41** the same
-evening once alignment tranche 2 widened the mapped set. The ontology item is
+on 2026-09-06** after stages 1 and 2 were published, **37 of 41** the same evening
+once alignment tranche 2 widened the mapped set, and **54 of 58 on 2026-09-07**
+after tranche 3, whose seventeen statements were posted from this machine rather
+than pasted. The ontology item is
 [`Q141325360`](https://www.wikidata.org/wiki/Q141325360). There is still no
 property for SSTIM identifiers, which is stage 5.
 
@@ -149,6 +151,17 @@ identical `P2888` values on an item and no clean way to tell which to remove.
 and posts only the difference. Its first real exercise proved the check rather
 than the write: run on 2026-09-07 it found 37 mappings derived and 37 already
 present, because the batch had been pasted the evening before.
+
+**The write path then failed on its first attempt, and the failure is worth
+keeping.** `wbsetclaim` cannot create a claim: it answers "GUID must be set when
+setting a claim", because it sets an existing statement rather than adding one.
+The working call is `wbeditentity` with a `claims` array, which merges what it is
+given, adds entries carrying no id, and takes the qualifier and reference block in
+the same request, so one edit does what QuickStatements does in three. The same
+run also showed `--limit` counting successes rather than attempts, so a limit of
+one tried all seventeen when every one of them failed. Both are fixed. Seventeen
+statements went out afterwards, the first alone under `--limit 1` and read back in
+full before the remaining sixteen.
 
 **QuickStatements**, authorised once by the account owner in a browser. No
 credential leaves the machine, and the same generated output is pasted in.

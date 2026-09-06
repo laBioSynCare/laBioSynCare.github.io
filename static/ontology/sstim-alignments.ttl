@@ -53,9 +53,10 @@
     dct:publisher <https://github.com/laBioSynCare> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-08-18"^^xsd:date ;
-    dct:modified "2026-09-06"^^xsd:date ;
+    dct:modified "2026-09-07"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:historyNote "0.6.0 narrows mappings that had conflated SSTIM's domain with brainwave-entrainment or therapy concepts, removes an unverified Music Ontology association, records the corrected MeSH audit, removes obsolete OBI_0000011, and limits OBI protocol alignment to the actual SSTIM protocol class."@en ;
+    skos:historyNote "Tranche 3, 2026-09-07, adds 17 Wikidata mappings across signal shapes, audio noise colours and study designs. Wikidata carries it alone because MeSH's study-design descriptors are publication types, describing an article rather than the design of the study it reports, which is what this vocabulary classifies. Two rows deliberately avoid a better-matching label: shapeNoise takes the signal-processing sense rather than noise as unwanted sound, and shapeEnvelope the waveform envelope rather than the stationery item."@en ;
     skos:historyNote "Tranche 2, 2026-09-06, maps 23 delivery media to MeSH physical-agent descriptors and Wikidata physics concepts, and is the first tranche to reach the exposure namespace, which the module now declares as a dependency. Where a scope note settles containment the row says so rather than defaulting to closeMatch: MeSH Light spans visible, ultraviolet and infrared and is broader than this vocabulary's visible-light medium, while MeSH Sound is the audible band and is contained by its acoustic energy. Eleven media in the same scheme stay unmapped, and two exact-label candidates were rejected as ablative or as a measurement."@en ;
     skos:historyNote "Tranche 1 of the reviewed external mapping pass, 2026-09-05, adds 57 mappings to MeSH descriptors, UBERON anatomical classes and Wikidata items across techniques, neural phenomena, neural systems and neural target sites, and brings the module from two external vocabularies to four. Every target was dereferenced at its own authority; the evidence, the rejected candidates and the predicate reasoning are in docs/ontology/ALIGNMENT_CANDIDATES.md."@en ;
     skos:historyNote "The 2026-08-08 Wikidata review adds a conservative close match for monaural beats and weakens the binaural-beats technique mapping because Wikidata Q863539 also represents a perceptual phenomenon and music genre."@en .
@@ -1355,6 +1356,222 @@ sstim-ex:mediumThermalEnergy skos:closeMatch wd:Q209233 .
     dct:date "2026-09-06"^^xsd:date ;
     prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
     skos:editorialNote "Thermal energy as internal energy due to temperature, which is what this concept applies as a stimulus. MeSH splits the same ground across Hot Temperature and Cold Temperature, neither of which alone corresponds, so no MeSH row is asserted."@en .
+
+
+###########################################################################
+# Signal shapes, audio noise colours and study designs — tranche 3
+# (2026-09-07)
+#
+# Wikidata carries this tranche alone, and the reason is worth stating because
+# it is not shyness about MeSH. MeSH's study-design descriptors are publication
+# types: D016449 describes an article reporting a randomised trial, not the
+# design of the study it reports. This vocabulary classifies the design of a
+# source study inside an evidence assessment, so the Wikidata method items are
+# the right subject and the MeSH ones are a neighbouring one.
+#
+# Two rows exist to avoid a better-matching label. shapeNoise maps to the
+# signal-processing sense and not to wd:Q179448, noise as unwanted sound;
+# shapeEnvelope maps to the waveform envelope and not to wd:Q170124, the
+# stationery item that a label search returns first.
+#
+# The four principal noise colours map to items Wikidata itself groups under
+# colors of noise, so the family is coherent on both sides. Blue and violet are
+# thin items with no description, and carry the same reservation already
+# recorded for monaural beats.
+#
+# Not mapped: shapeSampled, designMixedDesigns, designUnknownDesign and
+# designPreclinicalExperiment. The first three are bookkeeping values with no
+# external counterpart, and the fourth's nearest item, wd:Q7239206, is
+# preclinical development as a drug-development stage rather than an
+# experimental design.
+###########################################################################
+
+sstim-v:shapeSine skos:closeMatch wd:Q207527 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeSine ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q207527 ;
+    dct:source <http://www.wikidata.org/entity/Q207527> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is the sinusoid itself, a mathematical curve; this concept is the controlled value naming that shape as a signal's form. Under ADR 0021 a controlled value is an information category rather than the entity it classifies, so closeMatch is the strongest defensible relation here, as it was for the neural systems."@en .
+
+sstim-v:shapeSquare skos:closeMatch wd:Q1136640 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeSquare ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1136640 ;
+    dct:source <http://www.wikidata.org/entity/Q1136640> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The waveform alternating between two levels. Same category-versus-entity reasoning as the sine row; the item carries no duty-cycle boundary, which this concept's definition does."@en .
+
+sstim-v:shapeTriangle skos:closeMatch wd:Q1257456 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeTriangle ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1257456 ;
+    dct:source <http://www.wikidata.org/entity/Q1257456> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The waveform rising and falling linearly. Same reasoning as the sine and square rows."@en .
+
+sstim-v:shapeSawtooth skos:closeMatch wd:Q1742397 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeSawtooth ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1742397 ;
+    dct:source <http://www.wikidata.org/entity/Q1742397> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The waveform rising linearly and resetting sharply. Same reasoning; the item does not distinguish the mirrored ramp, which this concept admits."@en .
+
+sstim-v:shapeNoise skos:closeMatch wd:Q17104942 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeNoise ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q17104942 ;
+    dct:source <http://www.wikidata.org/entity/Q17104942> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Deliberately the signal-processing sense, \"unwanted modifications to a signal\", and not wd:Q179448, which is noise as unwanted sound. This concept is a stochastic signal occupying a frequency extent, so the acoustic sense would be the wrong subject even though its label matches better."@en .
+
+sstim-v:shapeEnvelope skos:closeMatch wd:Q5380913 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:shapeEnvelope ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q5380913 ;
+    dct:source <http://www.wikidata.org/entity/Q5380913> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is the function describing the extremes of an oscillating signal, which is what this concept names as a non-repeating contour over time. Deliberately not wd:Q170124, the stationery item, which the label search returned first."@en .
+
+sstim-ex:audioNoiseWhite skos:closeMatch wd:Q381287 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseWhite ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q381287 ;
+    dct:source <http://www.wikidata.org/entity/Q381287> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Equal intensity at different frequencies, which is this concept's flat spectrum. One of four rows whose targets Wikidata itself groups under colors of noise (P31 Q4854529), so the family is coherent on both sides."@en .
+
+sstim-ex:audioNoisePink skos:closeMatch wd:Q974572 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoisePink ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q974572 ;
+    dct:source <http://www.wikidata.org/entity/Q974572> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Amplitude inversely proportional to frequency, which is this concept's equal power per octave."@en .
+
+sstim-ex:audioNoiseBrownRed skos:closeMatch wd:Q1437483 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseBrownRed ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1437483 ;
+    dct:source <http://www.wikidata.org/entity/Q1437483> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Brownian noise, the signal noise produced by Brownian motion, which is the roughly 6 dB per octave fall this concept names. The label differs from ours, brown and red being the same colour convention."@en .
+
+sstim-ex:audioNoiseGrey skos:closeMatch wd:Q2380254 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseGrey ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2380254 ;
+    dct:source <http://www.wikidata.org/entity/Q2380254> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Noise following a psychoacoustic equal-loudness contour, which is this concept's definition almost word for word."@en .
+
+sstim-ex:audioNoiseBlue skos:closeMatch wd:Q12345729 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseBlue ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q12345729 ;
+    dct:source <http://www.wikidata.org/entity/Q12345729> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A thin item: it names the colour and carries neither description nor type, so closeMatch is the strongest defensible assertion, as it is for monaural beats."@en .
+
+sstim-ex:audioNoiseVioletPurple skos:closeMatch wd:Q31073746 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseVioletPurple ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q31073746 ;
+    dct:source <http://www.wikidata.org/entity/Q31073746> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Typed as noise on Wikidata but carrying no description, so the same reservation as the blue row applies."@en .
+
+sstim-ex:audioNoiseBlackSilence skos:closeMatch wd:Q502261 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-ex:audioNoiseBlackSilence ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q502261 ;
+    dct:source <http://www.wikidata.org/entity/Q502261> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "Silence as the lack of audible sound. This concept additionally covers muting and the deliberate absence of an intended stimulus, which is a stimulation-context extension rather than a different subject."@en .
+
+sstim-v:designRandomizedControlledTrial skos:closeMatch wd:Q1436668 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:designRandomizedControlledTrial ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q1436668 ;
+    dct:source <http://www.wikidata.org/entity/Q1436668> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is the experimental method, which is what this concept classifies. Deliberately not MeSH D016449, which is a publication type describing an article rather than the design of the study it reports; the same reason no MeSH row appears on any concept in this scheme."@en .
+
+sstim-v:designObservational skos:closeMatch wd:Q818574 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:designObservational ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q818574 ;
+    dct:source <http://www.wikidata.org/entity/Q818574> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "A study drawing inferences without experimenter-controlled allocation, which is this concept's definition."@en .
+
+sstim-v:designControlledTrial skos:broadMatch wd:Q70447452 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:designControlledTrial ;
+    owl:annotatedProperty skos:broadMatch ;
+    owl:annotatedTarget wd:Q70447452 ;
+    dct:source <http://www.wikidata.org/entity/Q70447452> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item is a controlled clinical trial with at least one control group and does not exclude randomised allocation, while this concept is explicitly the non-randomised case. The item is therefore broader, and asserting closeMatch would erase the distinction the scheme exists to draw."@en .
+
+sstim-v:designCaseReport skos:closeMatch wd:Q2782326 .
+
+[] a owl:Axiom ;
+    owl:annotatedSource sstim-v:designCaseReport ;
+    owl:annotatedProperty skos:closeMatch ;
+    owl:annotatedTarget wd:Q2782326 ;
+    dct:source <http://www.wikidata.org/entity/Q2782326> ;
+    dct:date "2026-09-07"^^xsd:date ;
+    prov:wasAttributedTo <https://orcid.org/0000-0002-9699-629X> ;
+    skos:editorialNote "The item describes itself as a publication type, while this concept is a study design in an evidence assessment. The extension is nearly the same, since a case report is reported as one, so close rather than exact, with the framing difference recorded rather than smoothed."@en .
 
 ###########################################################################
 # Pending alignments (tracked as GitHub Issues)

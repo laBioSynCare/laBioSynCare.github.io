@@ -226,14 +226,26 @@ def main() -> int:
             return 0
 
         added = 0
+        attempted = 0
         for qid, relation, iri in todo:
-            if args.limit and added >= args.limit:
+            # Counts attempts, not successes: the first --write run kept going
+            # through all seventeen because every one of them failed, which is
+            # the opposite of what a limit is for.
+            if args.limit and attempted >= args.limit:
                 print(f"stopping at --limit {args.limit}")
                 break
+            # wbeditentity, not wbsetclaim: the latter requires an existing GUID
+            # and answers "GUID must be set when setting a claim" for a new one,
+            # which is what the first --write run here discovered. wbeditentity
+            # merges the claims it is given, adding those without an id, and
+            # carries the qualifier and the reference block in the same call, so
+            # one edit does what QuickStatements does in three.
+            attempted += 1
             answer = session.post({
-                "action": "wbsetclaim", "format": "json", "token": session.csrf,
-                "maxlag": "5", "assert": "user",
-                "claim": claim_json(iri, _wds.RELATION[relation], retrieved),
+                "action": "wbeditentity", "format": "json", "token": session.csrf,
+                "id": qid, "maxlag": "5", "assert": "user",
+                "data": json.dumps({"claims": [json.loads(
+                    claim_json(iri, _wds.RELATION[relation], retrieved))]}),
                 "summary": "SSTIM mapping, derived from sstim-alignments.ttl",
             })
             if "error" in answer:
