@@ -1277,10 +1277,25 @@ Submitted version:  namespace-level, not release-pinned
 Release DOI:        10.5281/zenodo.21286974 (concept)
 Date:               2026-09-06
 Account/maintainer: ttm (Renato Fabbri), ORCID 0000-0002-9699-629X
-External record ID: issue #2055 (labels: New, Prefix)
-Status:             open, awaiting curation
-Required follow-up: watch for the curation PR; #2054 closed as a duplicate
+External record ID: issue #2055 (labels: New, Prefix) -> PR #2056
+Status:             bot PR open, awaiting a curator's merge
+Required follow-up: watch PR #2056; then /api/registry/sstim should answer 200
 ```
+
+**Their bot did the rest, within a minute.** The workflow runs on `issues:
+[opened]`, waits ten seconds for labels, and exits early without them, which is
+visible in their run history: the run for #2054 at 12:57 succeeded and did
+nothing, and the run for #2055 at 13:06 produced
+[PR #2056](https://github.com/biopragmatics/bioregistry/pull/2056), "Add prefix:
+sstim", on branch `create-pull-request/patch-2055`. Nothing is filed by hand;
+there is no PR for us to open.
+
+The record it generated carries every field as submitted, plus
+`github_request_issue: 2055`. One rough edge to expect a curator to trim: the
+whole Additional Comments text landed in the record's `comment` field, including
+the sentences addressed to the curators, where neighbouring records use one short
+line. Offer a trimmed value if they ask, and do not edit their data file
+unprompted.
 
 **What was requested.** Prefix `sstim`, URI format `https://w3id.org/sstim#$1`,
 pattern `^[A-Za-z][A-Za-z0-9]*$`, example `SensoryStimulation`, licence
