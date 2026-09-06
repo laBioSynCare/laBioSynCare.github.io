@@ -1336,6 +1336,18 @@ terminology, and because the submission procedure is one we have already run.
   when logged out. Their `latest_submission` and `/submissions` endpoints answer
   500 to the public UI key, so some reads need a real user key too.
 
+**Blocked on their side, reported 2026-09-06.** Account registration cannot be
+completed at all: the reCAPTCHA widget on `/accounts/new` renders "ERROR for site
+owner: invalid domain for site key", so there is no challenge to solve and the
+form always answers "Please fill in the proper text from the supplied image".
+The same submission also rejects a valid ORCID, `0000-0002-9699-629X`, whose
+MOD 11-2 check digit verifies and which resolves 200. Both are filed as
+[lovportal/project-management#3](https://github.com/lovportal/project-management/issues/3),
+with the vocabulary offered in the same issue in case they would rather ingest it
+directly than fix registration first. Their feedback form carries a "Vocabulary
+submissions request" tag, and `lovportal-support@lirmm.fr` is the email route if
+the issue goes unanswered.
+
 **Prepared, so submission is three commands once a key exists**, at
 `~/sstim-drafts/lovportal-ontology.json`, `lovportal-submission.json` and
 `lovportal-submit.sh`. Save the key to `docs/credentials/lovportal.md`, which is

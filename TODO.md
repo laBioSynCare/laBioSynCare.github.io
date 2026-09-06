@@ -292,7 +292,16 @@ indexed, examiner-searchable records.
       curated queue. The closest fit of any registry left, and the procedure is
       one already run once.*
 
-      *Blocked only on an account: `/ontologies/new` redirects when logged out.
+      *Blocked on their side, not ours, reported 2026-09-06 as
+      [lovportal/project-management#3](https://github.com/lovportal/project-management/issues/3):
+      the registration form's reCAPTCHA site key is not valid for
+      `lovportal.lirmm.fr`, so there is no challenge to solve and the form always
+      rejects the submission, and its ORCID validator refuses a valid ORCID whose
+      check digit verifies and which resolves 200. Nobody can register today. The
+      issue offers the vocabulary directly in case they would rather ingest it
+      than fix registration first.*
+
+      *When an account does exist: `/ontologies/new` redirects when logged out.
       Create one, save the key to the gitignored `docs/credentials/lovportal.md`,
       and the submission is three prepared commands
       (`~/sstim-drafts/lovportal-submit.sh`). One decision first, recorded in
