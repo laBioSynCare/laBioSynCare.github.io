@@ -27,6 +27,7 @@
     doiUrl,
   } from '../../ui/entrance/releaseMetadata.js'
   import { GITHUB_URL, ONTOLOGY_DOCS_URL, VOCAB_DOCS_URL, W3C_GROUP_URL, ghBlob } from '../../ui/externalLinks.js'
+  import StructuredData from '../../ui/seo/StructuredData.svelte'
 
   // Every IRI shown below is built from the shared prefix table rather than
   // retyped, so a namespace that moves cannot leave this page quietly wrong
@@ -98,6 +99,13 @@
     content="https://w3id.org/sstim is a persistent linked-data namespace: what it returns, which IRIs belong to it, and where to read the vocabulary."
   />
 </svelte:head>
+
+<!-- The machine-readable half of this page. ADR 0055 makes this route the HTML
+     branch of https://w3id.org/sstim, so a crawler following the namespace IRI
+     lands here: it is the one page whose visible content *is* the dataset
+     description, which is what schema.org Dataset markup is supposed to
+     accompany. Deliberately not on the entrance, which is about the Workbench. -->
+<StructuredData />
 
 <main class="namespace">
   <header class="masthead">

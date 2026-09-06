@@ -30,6 +30,19 @@ export const RELEASE_DATE = '2026-08-18'
 export const VERSION_DOI = '10.5281/zenodo.22003777'
 export const CONCEPT_DOI = '10.5281/zenodo.21286974'
 
+// Facts about the ontology itself rather than the deposit, added for the
+// schema.org description in `src/ui/seo/datasetJsonLd.js`. Same rule as the
+// four above: `make truth-audit` compares each against its authority, which for
+// these is `sstim-core.ttl` (title, licence, creator) and `void.ttl` (the
+// canonical namespace-catalogue download), so structured data cannot quietly
+// describe a licence or a title the ontology stopped carrying.
+export const ONTOLOGY_TITLE = 'Sensory Stimulation Ontology (SSTIM)'
+export const ONTOLOGY_LICENSE = 'https://creativecommons.org/licenses/by/4.0/'
+export const CREATOR_ORCID = 'https://orcid.org/0000-0002-9699-629X'
+export const CREATOR_NAME = 'Renato Fabbri'
+// One line on purpose: truth-audit reads these with a line-anchored regex.
+export const NAMESPACE_CATALOGUE_TTL = 'https://w3c-cg.github.io/sstim/ontology/sstim-namespace.ttl'
+
 export const NAMESPACE_IRI = 'https://w3id.org/sstim'
 export const VERSION_IRI = `${NAMESPACE_IRI}/${RELEASE_VERSION}`
 

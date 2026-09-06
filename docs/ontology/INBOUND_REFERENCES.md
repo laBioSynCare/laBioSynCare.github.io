@@ -118,14 +118,37 @@ repositories and **does not mention `w3id.org/sstim` anywhere**. A w3.org page
 linking the namespace is among the highest-authority inbound references
 available, it costs one edit, and the group's own chair can make it.
 
-### 2.5 Our own pages, which is what lets external indexes reference us
+### 2.5 Our own pages · **done 2026-09-06**
 
-Measured 2026-09-05: the deployed site emits **no** `application/ld+json` at all.
-The `namespace` route documents content negotiation and carries no schema.org
-markup. A `Dataset` or `DefinedTermSet` block on the namespace and entrance pages
-is what makes Google Dataset Search and similar crawlers hold a record that
-points at SSTIM. This is a write on our side whose whole purpose is an inbound
-reference elsewhere.
+The site emitted no `application/ld+json` at all when this file was written, so
+no crawler that reads structured data held a record of SSTIM as a dataset.
+
+`src/ui/seo/datasetJsonLd.js` now builds a schema.org `Dataset` node and
+`StructuredData.svelte` puts it in the head of `/namespace`, which ADR 0055
+makes the HTML branch of `https://w3id.org/sstim`: the one page whose visible
+content is the dataset description, which is what the markup is supposed to
+accompany. Deliberately not on the entrance, which is about the Workbench.
+
+Two properties make it safe to ship in an artifact other operators self-host.
+It describes the **ontology**, not the page, so every IRI in it is persistent:
+the w3id namespace as `@id` and `url`, the concept DOI, the ORCID, the canonical
+Turtle catalogue. A self-hosted copy therefore contributes to one `@id` instead
+of minting a rival record, which is the same reasoning that keeps `og:url` and
+`og:image` off the entrance (PORTABLE_DEPLOYMENT §1.6d). And every value is
+imported from `releaseMetadata.js`, which `make truth-audit` compares against
+`sstim-core.ttl`, `void.ttl` and `CITATION.cff`, so structured data cannot go on
+publishing a licence, title, version or distribution the ontology has moved on
+from. Four constants were added there for it and are audited the same way.
+
+Verified in the built artifact rather than in the source: `dist/namespace/index.html`
+carries the block after `npm run build`, and expanding it against the fetched
+schema.org context yields 44 triples about `https://w3id.org/sstim`. Five unit
+tests in `datasetJsonLd.test.js` hold the shape, the release identity, the
+persistent-IRI rule and the script-safe serialisation.
+
+Still open on this surface: no `sitemap.xml` or `robots.txt` exists, and
+Google Dataset Search finds pages by ordinary crawling, so discovery is
+unassisted.
 
 ### 2.6 ORCID
 

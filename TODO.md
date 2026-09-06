@@ -318,12 +318,21 @@ indexed, examiner-searchable records.
       inbound reference currently available and the one that most changes how the
       work reads to an outside reviewer.*
 
-- [ ] **Add schema.org markup to the namespace and entrance pages** `P2`
-      *Measured 2026-09-05: the deployed site emits no `application/ld+json` at
-      all, so Google Dataset Search and every other crawler that reads structured
-      data has nothing to index. A `Dataset` or `DefinedTermSet` block carrying
-      the namespace IRI, licence, concept DOI and distributions is a write on our
-      side whose whole purpose is a reference on theirs.*
+- [x] **Add schema.org markup for the ontology** — **done 2026-09-06** `P2`
+      *A schema.org `Dataset` node now ships in the head of `/namespace`, the
+      route ADR 0055 makes the HTML branch of `https://w3id.org/sstim`, and not
+      on the entrance, which is about the Workbench rather than the dataset.
+      Every IRI in it is persistent (namespace, concept DOI, ORCID, canonical
+      Turtle catalogue), so a self-hosted copy contributes to one `@id` instead
+      of minting a rival record; every value is imported from
+      `releaseMetadata.js`, and `make truth-audit` gained four comparisons
+      against `sstim-core.ttl` and `void.ttl` so the markup cannot outlive a
+      licence, title or distribution change. Verified in `dist/`, not in source:
+      the built page carries the block and it expands to 44 triples about
+      `https://w3id.org/sstim` against the real schema.org context.*
+
+      *Not done, and cheap if it matters later: there is no `sitemap.xml` or
+      `robots.txt`, so crawler discovery is unassisted.*
 
 - [ ] **Decide whether BioPortal should carry SSTIM's SKOS layer at all** `P2`
       *Measured 2026-09-05 while checking whether the new alignments could be

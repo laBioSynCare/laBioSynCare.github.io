@@ -83,8 +83,22 @@ if (releaseMeta) {
   // Workbench rename had to touch all three. The modal now imports it, so this
   // is the one comparison that keeps the next rename from half-applying.
   const citationTitle = citation?.match(/^title:\s*"(.+)"\s*$/m)?.[1]?.trim()
+  // The ontology's own identity, which the schema.org Dataset description in
+  // src/ui/seo/datasetJsonLd.js publishes to crawlers. Structured data is read
+  // by machines that will never notice a stale licence or title, so it is
+  // compared here rather than trusted.
+  const ontologyTitle = core?.match(/dct:title\s+"([^"]+)"@en/)?.[1]
+  const ontologyLicense = core?.match(/dct:license\s+<([^>]+)>/)?.[1]
+  const ontologyCreator = core?.match(/dct:creator\s+<([^>]+)>/)?.[1]
+  const catalogueTtl = voidTtl?.match(
+    /SSTIM namespace catalogue \(Turtle\)[\s\S]*?dcat:downloadURL\s+<([^>]+)>/,
+  )?.[1]
   const expected = [
     ['RELEASE_VERSION', field('RELEASE_VERSION'), RELEASE_VERSION, 'void.ttl'],
+    ['ONTOLOGY_TITLE', field('ONTOLOGY_TITLE'), ontologyTitle, 'sstim-core.ttl'],
+    ['ONTOLOGY_LICENSE', field('ONTOLOGY_LICENSE'), ontologyLicense, 'sstim-core.ttl'],
+    ['CREATOR_ORCID', field('CREATOR_ORCID'), ontologyCreator, 'sstim-core.ttl'],
+    ['NAMESPACE_CATALOGUE_TTL', field('NAMESPACE_CATALOGUE_TTL'), catalogueTtl, 'void.ttl'],
     ['VERSION_DOI', field('VERSION_DOI'), DOI, 'void.ttl'],
     ['CONCEPT_DOI', field('CONCEPT_DOI'), conceptDoi, 'sstim-core.ttl'],
     ['RELEASE_DATE', field('RELEASE_DATE'), citationDate, 'CITATION.cff'],
