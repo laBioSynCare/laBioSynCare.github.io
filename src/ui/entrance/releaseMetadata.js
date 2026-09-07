@@ -25,8 +25,8 @@
 // compares this against CITATION.cff so the next rename cannot half-apply.
 export const RELEASE_TITLE = 'SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology'
 
-export const RELEASE_VERSION = '0.16.0'
-export const RELEASE_DATE = '2026-08-18'
+export const RELEASE_VERSION = '0.17.0'
+export const RELEASE_DATE = '2026-09-07'
 export const VERSION_DOI = '10.5281/zenodo.22003777'
 export const CONCEPT_DOI = '10.5281/zenodo.21286974'
 

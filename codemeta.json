@@ -4,9 +4,9 @@
   "identifier": "https://doi.org/10.5281/zenodo.21286974",
   "name": "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology",
   "description": "SSTIM Workbench, previously developed as BSC Lab, is the open-source scientific and technical foundation for sensory stimulation. It pairs a precision multi-engine audiovisual stimulation platform (Web Audio, AudioWorklets, PixiJS, haptics) with an open RDF knowledge graph — OWL classes, SKOS vocabulary, SHACL shapes, and linked evidence chains — describing stimulation protocols, parameters, qualified evidence assessments, and ecosystem relationships. Committed ecosystem-agent fixtures are synthetic.",
-  "version": "0.16.0",
-  "softwareVersion": "0.16.0",
-  "datePublished": "2026-08-18",
+  "version": "0.17.0",
+  "softwareVersion": "0.17.0",
+  "datePublished": "2026-09-07",
   "license": [
     "https://spdx.org/licenses/Apache-2.0",
     "https://spdx.org/licenses/CC-BY-4.0"

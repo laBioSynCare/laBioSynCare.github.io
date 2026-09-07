@@ -5,7 +5,7 @@
   "synthetic": true,
   "containsPersonalData": false,
   "versions": {
-    "sstim": "0.17.0-dev",
+    "sstim": "0.17.0",
     "application": "0.1.0",
     "hedSchema": "8.4.0",
     "mapping": "0.6.0",
