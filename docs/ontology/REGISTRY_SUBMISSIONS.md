@@ -1675,7 +1675,7 @@ This row said "submit only after an eligible gateway/aggregator record exists".
 Nobody had measured whether a submission was needed at all. It is not:
 
 ```text
-$ curl "https://api.openaire.eu/search/software?doi=10.5281/zenodo.22003777"
+$ curl "https://api.openaire.eu/search/software?doi=10.5281/zenodo.22639184"
 <total>1</total>          # the 0.16.0 version DOI
    SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology
    https://zenodo.org/records/22003777
