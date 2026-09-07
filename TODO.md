@@ -343,7 +343,22 @@ indexed, examiner-searchable records.
       credential to leave the machine and is a browser paste each time. Detail in
       [`WIKIDATA_CONTRIBUTION.md`](docs/ontology/WIKIDATA_CONTRIBUTION.md).*
 
-- [~] **Publish a W3C Community Group report** `P2`
+- [x] **Publish a W3C Community Group report — done 2026-09-07** `P2`
+      *Registered as a Draft report and now listed in the W3C community reports
+      index: <https://w3c-cg.github.io/sstim/reports/vocabulary/>. Announced the
+      same day at
+      <https://www.w3.org/community/sstim/2026/09/07/sstim-vocabulary-published/>,
+      which names the namespace, the manifest, the concept DOI and the report, so
+      w3.org now carries SSTIM on two pages where it carried it on none.*
+
+      *Two things learned. The CG origin is served from the `w3c-cg/sstim` mirror,
+      which was 28 commits behind, so the report URL 404ed until it was pushed:
+      push that remote before pointing anything external at a new page there.
+      Released ontology artifacts are unaffected, since `w3id.org/sstim` resolves
+      to the latest frozen release rather than the development line. And a Final
+      report must live on a `w3.org` domain with frozen content, which is the next
+      decision rather than this one.*
+
       *Draft written 2026-09-07 at `static/reports/vocabulary/index.html`, live
       with the site at `https://w3c-cg.github.io/sstim/reports/vocabulary/`. A
       ReSpec document with `specStatus: CG-DRAFT` and `group: sstim`, which

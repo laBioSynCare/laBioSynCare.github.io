@@ -51,7 +51,8 @@ What does reference SSTIM today, verified rather than assumed:
 | **DataCite** carries seven related identifiers for the release DOI that name SSTIM, including `https://w3id.org/sstim` (`IsDocumentedBy`), `https://w3id.org/sstim/0.16.0` (`HasPart`), the BioPortal, Archivo and KG Catalog records, and the W3C group page | 2026-09-05 | `api.datacite.org/dois/10.5281/zenodo.22003777` |
 | **Zenodo** record 22003777, which is where those related identifiers are authored | 2026-09-05 | Zenodo REST record |
 | **OpenAlex** holds `W7167924725`, "SSTIM Workbench: Open Sensory Stimulation Platform and SSTIM Ontology", typed `software` | 2026-09-05 | `api.openalex.org/works/doi:10.5281/zenodo.21286974` |
-| **Wikidata** item `Q141325360` (SSTIM), and 29 Wikidata items carrying a `P2888` statement whose value is an SSTIM term IRI | 2026-09-06 | `make wikidata-inbound` |
+| **w3.org** carries SSTIM twice: the W3C community reports index lists *SSTIM: a vocabulary for sensory stimulation* under the group, and a dated post at `/community/sstim/2026/09/07/sstim-vocabulary-published/` names the namespace, the manifest, the concept DOI and the report | 2026-09-07 | fetched both pages |
+| **Wikidata** item `Q141325360` (SSTIM), and 58 Wikidata items carrying a `P2888` statement whose value is an SSTIM term IRI | 2026-09-07 | `make wikidata-inbound` |
 | BioPortal, BARTOC node 21154, FAIRsharing 8494, DBpedia Archivo, DBpedia KG Catalog, prefix.cc, Software Heritage | see [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) | `make registry-verify` |
 | **BioPortal LOOM mappings**, six on MeSH class pages and six on UBERON's, pointing at SSTIM. Automatic, label-based, and **two of the six MeSH ones are wrong or not SSTIM terms at all** | 2026-09-06 | `/mappings?ontologies=SSTIM,MESH` |
 | **BioPortal project SSTIMWB**, listed on the MESH and UBERON project pages | 2026-09-06 | `/ontologies/<acronym>/projects` |
@@ -131,7 +132,7 @@ pass for any ontology you ask about. The first version of this note was written
 from that endpoint and would have claimed the same result for an ontology we had
 never mentioned.
 
-### 2.4 The W3C Community Group homepage · **text drafted 2026-09-07**
+### 2.4 The W3C Community Group homepage · **done 2026-09-07**
 
 `https://www.w3.org/community/sstim/` is the Sensory Stimulation Vocabulary
 Community Group's page on w3.org. Measured 2026-09-05: it mentions the GitHub
@@ -198,7 +199,7 @@ A works entry on the maintainer's ORCID record for the ontology, identified by
 the concept DOI, puts SSTIM in a third-party authority record that many services
 harvest. ORCID has an API; the record owner's authorisation is what it needs.
 
-### 2.7 A W3C Community Group report · **draft written 2026-09-07, publication is a chair action**
+### 2.7 A W3C Community Group report · **published 2026-09-07**
 
 `w3c.json` already declares this repository's `repo-type` as `cg-report`, and the
 group page carries a reports section stating that chairs, when logged in, may
@@ -221,11 +222,21 @@ reading as a standard. It covers scope, namespace and identifiers, modules and
 profiles, conformance, external mappings, and versioning and citation, and
 points at the RDF rather than restating it.
 
-What remains is a chair action and cannot be done from here: a logged-in chair
-publishes it from the group's page, which is what puts it in the W3C reports
-index. Two things to decide first, both editorial: whether the scope section
-says what you want it to say, and whether a first report should be this overview
-or something narrower.
+**Registered as a Draft report on 2026-09-07** by the chair, and now listed in the
+W3C community reports index under the group. Announced the same day in a post on
+the group's site, which is the second w3.org page naming the namespace.
+
+One operational lesson from getting there. `w3c-cg.github.io/sstim` is served from
+the `w3c-cg/sstim` mirror, not from this repository, and the mirror was 28 commits
+behind when the report was first registered for review, so its URL answered 404.
+Push the `w3c-cg` remote before pointing anything external at a new page on that
+origin. Released ontology artifacts are unaffected: `w3id.org/sstim` resolves to
+`ontology/latest/`, which is the latest frozen release rather than the development
+line, so a stale mirror cannot stale a published version.
+
+Still open, and now the natural next step: this is a Draft. A **Final** report must
+be copied to a `w3.org` domain and its content must then stop changing, which is a
+decision about when the vocabulary is stable enough to freeze.
 
 ### 2.8 bio.tools
 
