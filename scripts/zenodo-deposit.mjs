@@ -173,7 +173,28 @@ async function main() {
   })()
   const treeClean =
     execFileSync('git', ['status', '--porcelain'], { cwd: ROOT, encoding: 'utf8' }).trim() === ''
-  const parentVersion = read('static/ontology/void.ttl').match(/dcat:version\s+"([^"]+)"/)?.[1]
+  // The published version, read from the record rather than from our own files.
+  //
+  // This used to be `void.ttl`'s `dcat:version`, and by the time the procedure
+  // reaches this script that value *is* the release being deposited:
+  // `release-prepare` bumps it at step 3, and the deposit is step 11. So the
+  // guard compared 0.17.0 against 0.17.0 and blocked every release it was meant
+  // to protect, which is the shape of gate the README warns about — one that is
+  // wrong for weeks and can only be found by pretending to release.
+  //
+  // `dct:hasVersion` still names the *previous* release's DOI at this point,
+  // because step 12 carries the new one in only after the deposit succeeds. That
+  // record is the parent, so ask it what version it published. A network failure
+  // leaves the check unarmed rather than blocking: the other two preflight
+  // conditions, a missing tag and a dirty tree, are the ones that must never be
+  // skipped, and both are local.
+  let parentVersion
+  try {
+    const record = await fetch(`https://zenodo.org/api/records/${parent}`)
+    if (record.ok) parentVersion = (await record.json())?.metadata?.version?.replace(/^v/, '')
+  } catch {
+    parentVersion = undefined
+  }
   const problems = preflight({ version, parentVersion, tagExists, treeClean })
 
   if (!publish) {
