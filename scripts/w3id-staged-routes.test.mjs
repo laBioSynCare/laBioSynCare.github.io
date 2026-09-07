@@ -160,8 +160,13 @@ test('every frozen release path is retargeted without changing snapshot semantic
       .toBe(`${STAGED_TARGETS.ontology}${snapshot.version}/${root}`)
   }
 
-  expect(inventory).toHaveLength(15)
-  expect(checked).toBe(204)
+  // These two numbers grow with every release, by one snapshot and by that
+  // snapshot's own route count. They are asserted rather than derived on purpose:
+  // a silent drop in coverage is the failure this test exists to catch, and a
+  // computed expectation could not tell a missing snapshot from a smaller one.
+  // Update them when cutting a release; 0.17.0 took them from 15/204 to 16/232.
+  expect(inventory).toHaveLength(16)
+  expect(checked).toBe(232)
 })
 
 test('the live smoke checks candidate targets while skipping the external projection', async () => {

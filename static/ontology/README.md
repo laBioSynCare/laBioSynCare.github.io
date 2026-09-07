@@ -589,6 +589,15 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    This generated-distribution ledger is separate from
    `static/ontology/snapshot-checksums.json`, which protects the frozen source
    files themselves.
+8b. **Run `make test`.** `make validate` does not run the Vitest suite, so a
+   release can pass every ontology gate and still break the build. It does:
+   `scripts/w3id-staged-routes.test.mjs` asserts the snapshot inventory length
+   and the number of frozen routes it checked, and both grow with every release.
+   Cutting 0.17.0 took them from 15 snapshots and 204 routes to 16 and 232, and
+   because CI's Pages job runs `make test` before publishing, the omission failed
+   the deploy rather than only the lint job. Those two numbers are asserted rather
+   than derived on purpose: a computed expectation cannot tell a missing snapshot
+   from a smaller one.
 9. **Nothing to do for w3id routes.** Since
    [ADR 0053](../../docs/decisions/0053-wildcard-snapshot-routes.md) the
    snapshot region is four patterns covering every version, so a new release
