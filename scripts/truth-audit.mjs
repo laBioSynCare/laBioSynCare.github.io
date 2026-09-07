@@ -481,7 +481,8 @@ if (!indexCounts) {
   if (!zenodo) {
     fail('.zenodo.json', 'missing; the deposit and sync both read it')
   } else {
-    const description = JSON.parse(zenodo).description ?? ''
+    const record = JSON.parse(zenodo)
+    const description = record.description ?? ''
     const stated = { classes: null, properties: null, concepts: null, modules: null }
     for (const key of Object.keys(stated)) {
       // The lookbehind is what keeps "CC BY 4.0: 18 modules" from reading the
@@ -508,7 +509,17 @@ if (!indexCounts) {
         fail('.zenodo.json', `the description names ${version}; the citable release is ${RELEASE_VERSION}`)
       }
     }
-    ok(`zenodo description describes ${RELEASE_VERSION} with current totals`)
+    // `related_identifiers` goes stale the same way and the description check
+    // cannot see it: `hasPart` names this release's own version IRI, so from the
+    // next release onward the archive of record claims to contain the previous
+    // one. Added after 0.17.0 shipped with 0.16.0 still written there.
+    for (const related of record.related_identifiers ?? []) {
+      const named = String(related.identifier ?? '').match(/w3id\.org\/sstim\/(\d+\.\d+\.\d+)\b/)?.[1]
+      if (named && named !== RELEASE_VERSION) {
+        fail('.zenodo.json', `${related.relation} names ${named}; the citable release is ${RELEASE_VERSION}`)
+      }
+    }
+    ok(`zenodo description and related identifiers describe ${RELEASE_VERSION}`)
   }
 }
 

@@ -312,7 +312,7 @@
     },
     {
       "relation": "hasPart",
-      "identifier": "https://w3id.org/sstim/0.16.0",
+      "identifier": "https://w3id.org/sstim/0.17.0",
       "scheme": "url"
     },
     {
