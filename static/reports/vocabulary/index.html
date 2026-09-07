@@ -21,7 +21,12 @@
       github: "w3c-cg/sstim",
       edDraftURI: "https://w3c-cg.github.io/sstim/reports/vocabulary/",
       latestVersion: null,
-      license: "cc-by",
+      // No `license` key: ReSpec rejects "cc-by" outright ("License \"cc-by\" is
+      // not allowed for W3C Specifications"), and specStatus CG-DRAFT already
+      // emits the CLA copyright block that
+      // https://www.w3.org/community/reports/reqs/ requires for a draft report.
+      // The vocabulary's own CC BY 4.0 licence is stated in the body instead,
+      // where it belongs: it licenses the RDF, not this document.
       localBiblio: {
         "SSTIM-ONTOLOGY": {
           title: "Sensory Stimulation Ontology (SSTIM)",
@@ -36,7 +41,7 @@
 
 <section id="abstract">
   <p>
-    SSTIM is an open vocabulary for describing <dfn>sensory stimulation</dfn>: the
+    SSTIM is an open vocabulary for describing <dfn class="lint-ignore">sensory stimulation</dfn>: the
     deliberate, parameter-specified delivery of auditory, visual, tactile and
     cross-modal stimuli, and the records and evidence that accompany it. It is
     published as an OWL 2 ontology with a multilingual SKOS vocabulary, SHACL
@@ -152,8 +157,8 @@
   <h2>Modules and profiles</h2>
   <p>
     SSTIM is one suite with a synchronised release version, distributed as
-    modules. A <dfn>module</dfn> owns the terms for one concern and declares its
-    direct dependencies. A <dfn>profile</dfn> names an exact, transitively closed
+    modules. A <dfn class="lint-ignore">module</dfn> owns the terms for one concern and declares its
+    direct dependencies. A <dfn class="lint-ignore">profile</dfn> names an exact, transitively closed
     consumer contract. A consumer implements a profile, not the whole graph.
   </p>
   <table class="simple">
@@ -177,7 +182,7 @@
 <section>
   <h2>Conformance</h2>
   <p>
-    A graph <dfn>conforms to a profile</dfn> when it validates against that
+    A graph <dfn class="lint-ignore">conforms to a profile</dfn> when it validates against that
     profile's SHACL shape closure and uses only terms the profile's closure
     defines. Conformance is per profile: a Core-conformant graph need not carry
     evidence or session terms, and a consumer of Core must not require them.
@@ -231,6 +236,13 @@
     IRI of the form <code>https://w3id.org/sstim/0.16.0</code>. A concept DOI
     names the continuing project across releases; a version DOI pins one
     release.
+  </p>
+  <p>
+    The vocabulary is published under
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. That
+    licence covers the RDF and its documentation; the copyright statement on this
+    report is the Community Group one above, which is a different thing and is
+    governed by the Contributor License Agreement.
   </p>
   <p>
     An implementation that depends on exact term semantics should import a

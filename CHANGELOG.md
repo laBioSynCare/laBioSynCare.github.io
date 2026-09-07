@@ -96,7 +96,7 @@ file is the human-readable summary.
   than noise-as-sound and `shapeEnvelope` the waveform envelope rather than the
   stationery item. Four bookkeeping or unmatched values stay unmapped.
 
-- **37 `skos:altLabel` aliases across 27 concepts**, taking alias coverage from 16
+- **37 `skos:altLabel` aliases across 30 concepts**, taking alias coverage from 16
   on 9 concepts to 53 on 39. Acronyms nothing previously resolved (tDCS, tACS,
   rTMS, DBS, VNS, ECT, ASMR, RAS, LIFU, AVE, CLAS, RCT, ANS), the plain names the
   preferred labels bury ("binaural beats" where the label is *Binaural Beat

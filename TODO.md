@@ -1134,7 +1134,7 @@ publishing SSTIM into Wikidata, not contributing to it.*
       work rather than a mapping.*
 - [~] Extend `skos:altLabel` coverage — **53 aliases on 39 concepts as of
       2026-09-07**, up from 16 on 9, all English `P2`
-      *37 added on 2026-09-07 on the maintainer's instruction: acronyms nothing
+      *37 aliases across 30 concepts added on 2026-09-07 on the maintainer's instruction: acronyms nothing
       resolved (tDCS, tACS, rTMS, DBS, VNS, ECT, ASMR, RAS, LIFU, AVE, CLAS, RCT,
       ANS), the plain names the preferred labels bury, and the `systemAutonomic`
       label divergence the alignment work exposed. Proposal and the rejected
