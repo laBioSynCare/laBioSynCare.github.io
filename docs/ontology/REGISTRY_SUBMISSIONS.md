@@ -49,7 +49,7 @@ node scripts/truth-audit.mjs      # prints citable release, version DOI, module 
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
-| Publisher declared by the 0.16.0 RDF | `https://github.com/laBioSynCare` — preserve until the publisher/steward governance question is resolved; a repository move is not authority to rewrite ontology provenance |
+| Publisher declared by the submitted 0.16.0 RDF | `https://github.com/laBioSynCare` — preserve until the publisher/steward governance question is resolved; a repository move is not authority to rewrite ontology provenance |
 | First released | 2026-04-12 |
 | Source repository | `https://github.com/w3c-cg/sstim` |
 | Issue tracker | `https://github.com/w3c-cg/sstim/issues` |
@@ -765,7 +765,7 @@ assigns its own node URI on save.
 | Identifier (row 2) | `https://doi.org/10.5281/zenodo.21286974` |
 | Abstract (English, required) | An OWL 2 ontology for describing parameter-specified delivery of structured sensory input — techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims — with a multilingual SKOS vocabulary (frequency bands, modalities, mechanisms, techniques, evidence tiers) and SHACL validation shapes. |
 | Languages | en, it, pt, es |
-| Size | `164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)` |
+| Size | `164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.17.0, 2026-09)` |
 
 *Structure:*
 
@@ -864,7 +864,7 @@ Biomedical browsing, APIs, and candidate-mapping discovery. **Account created
 the vocabulary and semantic modules. A merged OWL file is generated in CI
 (`make bioportal-bundle`; ADR-style: artifact only, never committed) from the
 manifest-defined **Full semantic profile: 16 modules, excluding SHACL shapes**.
-The ledger-matching 0.16.0 artifact has one ontology IRI
+The ledger-matching artifact submitted for 0.16.0 has one ontology IRI
 `https://w3id.org/sstim`, 11,389 triples, 234 `owl:Class` declarations, and 551
 SKOS concepts; the validated source profile is HermiT-consistent. Its publication
 target is
@@ -935,7 +935,7 @@ Required follow-up: Its transition from the previously served bytes is expected
                     2026-08-18. Historical archived duplicates remain.
 ```
 
-**Post-deploy stability and date procedure (0.16.0 and future releases):**
+**Post-deploy stability and date procedure (was written for 0.16.0; applies to every release):**
 
 1. Before deployment, record BioPortal's latest/current submission ID and row
    count. **Captured at the 2026-09-01 cutover: current ID `28`, 28 rows.**
@@ -1602,7 +1602,7 @@ recent entries:
     base_uri, reasoner, oboSlims, ontology_purl
 
 **The submitted entry pins a frozen release artifact.** PR #1351 now uses
-`https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl` and the W3C
+the submitted `https://w3c-cg.github.io/sstim/ontology/0.16.0/sstim-namespace.ttl` and the W3C
 documentation homepage. It does not consume BioPortal's generated
 `sstim-full.owl`. The ontology IRI and all base namespaces are unchanged.
 
@@ -1864,7 +1864,7 @@ FAIRsharing's own curation mail no longer reporting a missing required field.
 | Name | URL | Access method |
 |---|---|---|
 | Browse SSTIM | `https://w3c-cg.github.io/sstim/` | User interface, doc_url `https://w3c-cg.github.io/sstim/ontology/docs/` |
-| Download citable SSTIM 0.16.0 (Turtle) | `https://w3id.org/sstim/0.16.0/sstim-namespace.ttl` | Other machine-accessible method |
+| Download citable SSTIM (Turtle), as submitted at 0.16.0 | `https://w3id.org/sstim/0.16.0/sstim-namespace.ttl` | Other machine-accessible method |
 | Download latest released SSTIM via w3id | `https://w3id.org/sstim` | Other machine-accessible method |
 
 The word Browse or Download in each *name* is what satisfies the rule; the URL

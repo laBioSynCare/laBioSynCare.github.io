@@ -1,0 +1,234 @@
+###########################################################################
+#
+#  SSTIM Core Stimulus Description Module
+#
+#  Version:    0.17.0
+#  Date:       2026-09-07
+#  Author:     Renato Fabbri <renato@junto.space>
+#  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Protected ontology source. Public term IRIs remain stable across the
+#  0.13 modular redistribution (ADR 0043).
+#
+###########################################################################
+
+@prefix sstim:     <https://w3id.org/sstim#> .
+@prefix sstim-ex:  <https://w3id.org/sstim/exposure#> .
+
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+
+@prefix bfo:   <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao:   <http://purl.obolibrary.org/obo/IAO_> .
+
+
+###########################################################################
+# Module metadata
+###########################################################################
+
+<https://w3id.org/sstim/stimulus> a owl:Ontology ;
+    owl:versionInfo "0.17.0" ;
+    dct:title "SSTIM Core Stimulus Description Module"@en ;
+    dct:description "The stimulus-description half of the SSTIM Core Profile: engine-independent specifications, channels, regime, duration, and optional stimulation target."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-07-31"^^xsd:date ;
+    dct:issued "2026-09-07"^^xsd:date ;
+    dct:modified "2026-09-07"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+###########################################################################
+# Core stimulus description terms
+###########################################################################
+
+sstim:StimulusSpecification a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Specification"@en ;
+    skos:definition "An engine-independent description of a sensory stimulation, stating what reaches the subject in physical or perceptual units rather than the settings that make a particular engine produce it. Two implementations whose output matches realise the same stimulus specification, which is what makes them comparable."@en ;
+    skos:scopeNote "Not a sstim:Preset, which is engine-dependent by nature, and not a prov:Plan: a plan is something to be carried out, while this states what is or would be the case. It asserts nothing about effect — evidence, intended outcome and safety metadata are authored by a human through the gated catalog bridge and are never inferred from parameters."@en ;
+    skos:editorialNote "Most of the rendering layer this class needs already exists on sstim-ex:StimulusChannel: a delivery medium and a perceived modality held apart, and rate properties per rendering — hasFrequencyHz for a carrier or tone, hasFlickerRateHz for a visual rate, hasBeatFrequencyHz for a monaural or binaural difference frequency. What is missing is the shared signal that ties them together. When one specification targets 10 Hz through an audio channel and a visual one, each channel states its own decimal and nothing asserts they are the same 10 Hz, so a consumer must infer identity by comparing numbers — and the comparability this class exists to provide is exactly what goes unstated. hasFrequencyHz also carries two roles at once, a carrier or a tone frequency, so a 10 Hz tactile vibration and a 200 Hz audio carrier use one property for different things. When the shared signal is added, keep the physical/perceptual distinction at the rendering layer: an isochronic tone and a visual flicker put a real modulation into the world, a binaural beat does not, and evidence does not transfer freely between them. See SSTIM_DIRECTIONS.md §5."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0042-stimulus-specification.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:describesStimulation a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim:Stimulation ;
+    rdfs:label  "describes stimulation"@en ;
+    skos:definition "Links a specification, which is an information artifact, to the stimulation process it describes."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:stimulusRegime a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  xsd:string ;
+    rdfs:label  "stimulus regime"@en ;
+    skos:definition "Which kind of description this is: \"determinate\" when the stimulus is fixed in advance, \"stochastic\" when the specification describes a generating process whose realisations differ, or \"adaptive\" when the stimulus depends on the subject's measured state and what is described is a control law rather than a stimulus."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasStimulusChannel a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim-ex:StimulusChannel ;
+    rdfs:label  "has stimulus channel"@en ;
+    skos:definition "Links a specification to a channel through which stimulation reaches the subject."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim-ex:StimulusChannel a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulus Channel"@en ;
+    skos:definition "A channel within a stimulus specification or exposure profile, such as an audio, visual, haptic, respiratory, olfactory, gustatory, or electromagnetic exposure path."@en ;
+    skos:editorialNote "The paths named here are asserted by sstim-ex:perceivedModality and sstim-ex:deliveryMedium, which hold apart the sense a channel engages and the physical medium that reaches it. Note that SSTIM carries two modality vocabularies with different intensions: sstim-ex:PerceivedModality names the channel an exposure engages, twelve values including proprioceptive, gustatory, multimodal and not-directly-perceived — the last two are not senses at all — while sstim:SensoryModality names a sense, six values. The six they share are bridged by skos:closeMatch from the exposure side, deliberately close rather than exact because the intensions differ. Choose by role: a channel engages a perceived modality; a technique or an assessment scope is about a sensory modality."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:channelDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "channel duration (s)"@en ;
+    skos:definition "Duration for which a channel presents its stimulus, in seconds."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasStimulationTarget a owl:ObjectProperty ;
+    rdfs:range  [ a owl:Class ; owl:unionOf ( bfo:0000040 bfo:0000029 ) ] ;
+    rdfs:label  "has stimulation target"@en ;
+    skos:definition "What the stimulation is directed at: a person, a non-human animal, a plant, an object or material, or a place. Absence is meaningful and permitted — a stimulation characterised as present in unoccupied space has no target."@en ;
+    skos:scopeNote "Deliberately broad. SSTIM describes sensory stimulation wherever it is applied, and restricting the target to humans would exclude animal work, plant and material studies, and the characterisation of an environment independently of who is in it. Being a target carries no claim that the target perceives, responds, or benefits."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+
+###########################################################################
+# Signals and renderings (ADR 0052)
+#
+# One signal, several renderings. A specification carries signals; a channel
+# renders one. Two channels pointing at the same signal ARE two renderings of
+# one design — asserted, not inferred from two decimals that happen to match,
+# which is what a consumer had to do before these terms existed.
+###########################################################################
+
+sstim:SignalShape a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Signal Shape"@en ;
+    skos:definition "A controlled information category naming the form of a time-varying signal: the periodic shapes (sine, square, sawtooth, triangle), an envelope, noise, or a sampled recording. One vocabulary serves two roles — the shape a signal has, and the waveform a rendering presents — because they are the same fact seen from either side."@en ;
+    skos:scopeNote "Noise is a shape whose extent is wide rather than a special case: white noise is this shape across the audible range, band-limited noise the same shape bounded to an interval. A sampled shape is an asset rather than a function, so it carries a source, a licence and a checksum where a sine carries none."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:RenderingMechanism a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Rendering Mechanism"@en ;
+    skos:definition "A controlled information category naming how a signal is made to reach a subject through one channel: amplitude modulation of a carrier, a binaural or monaural beat, direct presentation, and so on. The mechanism is a property of the rendering, not of the signal."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:RenderingPresence a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Rendering Presence"@en ;
+    skos:definition "A controlled information category recording whether a rendering puts the signal physically into the world or produces it perceptually. An isochronic tone and a visual flicker are physically present; a binaural beat is not, being constructed by the auditory system from two carriers that each lack it."@en ;
+    skos:scopeNote "Load-bearing for evidence, not descriptive: a finding about a physically present 10 Hz modulation does not transfer freely to a perceptually constructed one, even within the same modality."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:RenderableParameter a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Renderable Parameter"@en ;
+    skos:definition "A controlled information category naming the parameter a signal is rendered onto — amplitude, frequency, luminance, size, spatial position, vibration intensity. Which parameters exist is modality-specific; that a signal drives one of them is not."@en ;
+    skos:scopeNote "This is also the modulation relation. A control signal driving another layer's parameter, such as a breathing oscillation driving spatial position, is a rendering onto that parameter rather than a separate mechanism."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:StimulationSignal a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Stimulation Signal"@en ;
+    skos:definition "A time-varying function with a frequency extent, a shape, and no modality: what is to be delivered, said independently of any sense it might be delivered through. A 10 Hz square wave is one signal whether it becomes an amplitude-modulated tone, a flickering light or a vibration."@en ;
+    skos:scopeNote "Deliberately modality-free. The moment a signal acquires a carrier or a luminance it has become a rendering, which is a different entity. Its identity is what makes two channels comparable, so a signal shared between them is the assertion that they deliver the same thing."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:SignalRendering a owl:Class ;
+    rdfs:subClassOf iao:0000030 ;
+    rdfs:label "Signal Rendering"@en ;
+    skos:definition "How one signal is made to reach a subject through one channel: onto which renderable parameter, by which mechanism, and whether the result is physically present or perceptually constructed. A qualified relation rather than a bare link, because all three of those are properties of the binding and not of either end."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasSignal a owl:ObjectProperty ;
+    rdfs:domain sstim:StimulusSpecification ;
+    rdfs:range  sstim:StimulationSignal ;
+    rdfs:label  "has signal"@en ;
+    skos:definition "Links a stimulus specification to a signal it describes. A specification may carry several, and several channels may render the same one."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasSignalShape a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  sstim:SignalShape ;
+    rdfs:label  "has signal shape"@en ;
+    skos:definition "The form of the signal: a periodic shape, an envelope, noise, or a sampled recording."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:signalSourceAsset a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:StimulationSignal ;
+    rdfs:range  iao:0000030 ;
+    rdfs:label  "signal source asset"@en ;
+    skos:definition "The recorded material a sampled signal is taken from — a violin note, a voice, rainfall. Required when the shape is sampled and meaningless otherwise: a sampled signal is only reproducible if the sample is identified."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasSignalRendering a owl:ObjectProperty ;
+    rdfs:domain sstim-ex:StimulusChannel ;
+    rdfs:range  sstim:SignalRendering ;
+    rdfs:label  "has signal rendering"@en ;
+    skos:definition "Links a stimulus channel to a rendering it presents."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:rendersSignal a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SignalRendering ;
+    rdfs:range  sstim:StimulationSignal ;
+    rdfs:label  "renders signal"@en ;
+    skos:definition "The single signal this rendering delivers. Two renderings naming one signal are the assertion that two channels deliver the same thing."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:rendersOntoParameter a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SignalRendering ;
+    rdfs:range  sstim:RenderableParameter ;
+    rdfs:label  "renders onto parameter"@en ;
+    skos:definition "The parameter the signal drives — amplitude, frequency, luminance, spatial position, vibration intensity. This is also how one layer modulates another: a breathing signal driving spatial position is a rendering onto that parameter, not a separate mechanism."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasRenderingMechanism a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SignalRendering ;
+    rdfs:range  sstim:RenderingMechanism ;
+    rdfs:label  "has rendering mechanism"@en ;
+    skos:definition "How the rendering produces the signal in this channel: amplitude modulation of a carrier, a binaural or monaural beat, direct presentation."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:impliesPresence a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:RenderingMechanism ;
+    rdfs:range  sstim:RenderingPresence ;
+    rdfs:label  "implies presence"@en ;
+    skos:definition "The presence a mechanism necessarily produces. Whether a signal physically reaches the subject or is constructed by the nervous system is a fact about the mechanism, not a choice a curator makes per rendering: amplitude modulation puts a real modulation into the world and a binaural beat never does."@en ;
+    skos:scopeNote "Stated on the mechanism so a rendering names only its mechanism and the presence follows, which is the pattern sstim:requiresEvidenceTierRank uses on claim levels. sstim:hasRenderingPresence may still be asserted, and a SHACL constraint rejects any rendering whose stated presence contradicts its mechanism."@en ;
+    rdfs:seeAlso <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0052-abstract-signals-and-sensory-renderings.md> ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:hasRenderingPresence a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SignalRendering ;
+    rdfs:range  sstim:RenderingPresence ;
+    rdfs:label  "has rendering presence"@en ;
+    skos:definition "Whether this rendering puts the signal physically into the world or produces it perceptually. Required on every rendering, because evidence does not transfer freely between the two."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+sstim:renderingCarrierHz a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain sstim:SignalRendering ;
+    rdfs:range  xsd:decimal ;
+    rdfs:label  "rendering carrier (Hz)"@en ;
+    skos:definition "The carrier frequency this rendering uses, where it needs one. A carrier exists because of a limitation of the sense being addressed and not because of anything about the signal: 10 Hz is below the audible range and must be carried, while a 10 Hz light flicker or vibration is presented directly and has no carrier at all."@en ;
+    skos:scopeNote "Beside sstim-ex:hasCarrierFrequencyHz, which states the same quantity one layer down. This one is a fact about a binding — what this rendering uses to carry this signal — and belongs to the specification layer; the exposure one is a fact about emission, what the channel physically puts out, and answers the generic \"what frequencies does this channel present?\" through its place in the sstim-ex:hasFrequencyHz family. A channel may carry several renderings, so the rendering-level value is the finer of the two. Where both are asserted a SHACL constraint requires them to agree."@en ;
+    rdfs:isDefinedBy <https://w3id.org/sstim/stimulus> .
+
+###########################################################################
+# End of stimulus
+###########################################################################

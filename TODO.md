@@ -187,7 +187,7 @@ indexed, examiner-searchable records.
 
 ### Registries
 - [~] **Correct BioPortal's displayed release date after bundle stability lands** `P1`
-      *The public submission list shows `0.16.0` as Released 2026-04-12 even
+      *The public submission list showed the submitted `0.16.0` as Released 2026-04-12 even
       though the frozen release declares `dct:issued 2026-08-18`. BioPortal's
       current metadata schema maps its `released` field from `dct:created` before
       `dct:issued`, and its extractor stops at the first populated mapping, so the
@@ -208,7 +208,7 @@ indexed, examiner-searchable records.
       *The portal historically retained `https://w3id.org/sstim/0.14.0` after
       development bundles correctly omitted a version IRI. The deterministic
       frozen `0.16.0` artifact carries exactly
-      `https://w3id.org/sstim/0.16.0`. **Authenticated API read-back confirmed
+      the submitted `https://w3id.org/sstim/0.16.0`. **Authenticated API read-back confirmed
       that value on current submission 28 on 2026-09-01.** After the transition
       pull and subsequent
       unchanged-pull stability check, inspect the latest/current submission in
@@ -224,7 +224,8 @@ indexed, examiner-searchable records.
       (commit `630e960b`), and the Databus version `2026.08.18` now carries that
       file at 788555 bytes with the PR's sha256. The first scheduled daily run
       after the merge (`Daily KG Release Check` 33841539799, 2026-09-04) logged
-      "SSTIM KG metadata is current at 0.16.0" and wrote nothing, so the updater
+      "SSTIM KG metadata is current at 0.16.0", the version submitted then, and wrote
+      nothing, so the updater
       is idempotent in production and not only in the pre-merge rehearsal. The
       catalog now tracks stable tags without a submission; see
       [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
@@ -680,9 +681,9 @@ indexed, examiner-searchable records.
 
       *Measured 2026-08-29 against the live routes, after the `w3c-cg` cutover.
       `Accept: text/turtle` on `/sstim` serves `sstim-namespace.ttl` built from
-      the working tree: `owl:versionInfo "0.17.0-dev"`, `mod:status "under
-      development"`, and no `owl:versionIRI` at all, where frozen `/sstim/0.16.0`
-      has one. `Accept: text/html` serves the four-door entrance, which never
+      the working tree, which on that date was a development line: it carried a
+      `-dev` version string, `mod:status "under development"` and no
+      `owl:versionIRI` at all, where the frozen snapshot of the day has one. `Accept: text/html` serves the four-door entrance, which never
       says the visitor followed a namespace IRI. Both WIDOCO (`/ontology/docs/`)
       and pyLODE (`/ontology/docs/vocab/`) answer 200 and neither is linked from
       the landing.*

@@ -1,0 +1,816 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://w3id.org/sstim/manifest-schema/1",
+  "title": "SSTIM ontology suite manifest",
+  "description": "Bill of materials for synchronized SSTIM modules, profile entrypoints, dependency closures, publication targets, and integrity metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "manifestIri",
+    "suite",
+    "integrity",
+    "inventory",
+    "namespaceDocuments",
+    "modules",
+    "profiles"
+  ],
+  "properties": {
+    "$schema": {
+      "$ref": "#/$defs/httpsUrl"
+    },
+    "schemaVersion": {
+      "const": "1.2.0"
+    },
+    "manifestIri": {
+      "$ref": "#/$defs/httpsUrl"
+    },
+    "suite": {
+      "$ref": "#/$defs/suite"
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
+    },
+    "inventory": {
+      "$ref": "#/$defs/inventory"
+    },
+    "immutableRelease": {
+      "$ref": "#/$defs/immutableRelease"
+    },
+    "namespaceDocuments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/namespaceDocument"
+      }
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/module"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "$ref": "#/$defs/profile"
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "kernel"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "core"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "core-plus"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "id": {
+                "const": "full"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "suite": {
+            "properties": {
+              "status": {
+                "const": "released"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "suite"
+        ]
+      },
+      "then": {
+        "required": [
+          "immutableRelease"
+        ],
+        "properties": {
+          "$schema": {
+            "pattern": "^https://w3id\\.org/sstim/[0-9]+\\.[0-9]+\\.[0-9]+/manifest\\.schema\\.json$"
+          },
+          "suite": {
+            "properties": {
+              "version": {
+                "not": {
+                  "pattern": "-"
+                }
+              }
+            }
+          },
+          "modules": {
+            "items": {
+              "if": {
+                "properties": {
+                  "release": {
+                    "properties": {
+                      "snapshot": {
+                        "const": true
+                      }
+                    },
+                    "required": [
+                      "snapshot"
+                    ]
+                  }
+                },
+                "required": [
+                  "release"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "publication": {
+                    "required": [
+                      "versionedUrl"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "profiles": {
+            "items": {
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "release": {
+                        "properties": {
+                          "snapshot": {
+                            "const": true
+                          }
+                        },
+                        "required": [
+                          "snapshot"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "release"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "publication": {
+                        "required": [
+                          "versionedUrl"
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "description": "A released profile always owes a positive fixture. Out-of-scope and adversarial fixtures are verdicts of a SHACL closure, so they are owed only by a profile that selects one; a shapeless profile is a discovery entry point and must not declare them (ADR 0045).",
+                  "properties": {
+                    "fixtures": {
+                      "properties": {
+                        "positive": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "shapeModules": {
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "shapeModules"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "fixtures": {
+                        "properties": {
+                          "outOfScope": {
+                            "minItems": 1
+                          },
+                          "adversarial": {
+                            "minItems": 1
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "fixtures": {
+                        "properties": {
+                          "outOfScope": {
+                            "maxItems": 0
+                          },
+                          "adversarial": {
+                            "maxItems": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "required": [
+            "immutableRelease"
+          ]
+        },
+        "properties": {
+          "$schema": {
+            "const": "https://w3id.org/sstim/manifest-schema/1"
+          },
+          "modules": {
+            "items": {
+              "properties": {
+                "publication": {
+                  "not": {
+                    "required": [
+                      "versionedUrl"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "profiles": {
+            "items": {
+              "properties": {
+                "publication": {
+                  "not": {
+                    "required": [
+                      "versionedUrl"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "httpsUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "ontologyIri",
+        "version",
+        "status",
+        "versionPolicy",
+        "defaultProfile"
+      ],
+      "properties": {
+        "id": {
+          "const": "sstim"
+        },
+        "ontologyIri": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "status": {
+          "enum": [
+            "development",
+            "released",
+            "deprecated"
+          ]
+        },
+        "versionPolicy": {
+          "const": "synchronized"
+        },
+        "defaultProfile": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "development"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "pattern": "-"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "profileDigestFormat"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "profileDigestFormat": {
+          "const": "module-id\\0module-sha256\\n"
+        }
+      }
+    },
+    "immutableRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseUrl",
+        "manifestUrl",
+        "schemaUrl"
+      ],
+      "properties": {
+        "baseUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "manifestUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "schemaUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        }
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directory",
+        "filePattern",
+        "excluded"
+      ],
+      "properties": {
+        "directory": {
+          "const": "static/ontology"
+        },
+        "filePattern": {
+          "const": "^sstim-.*\\.ttl$"
+        },
+        "excluded": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^static/ontology/sstim-[a-z0-9-]+\\.ttl$"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "mediaType",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^static/ontology/sstim-[a-z0-9-]+\\.ttl$"
+        },
+        "mediaType": {
+          "const": "text/turtle"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public",
+        "persistentUrl",
+        "distributionUrl"
+      ],
+      "properties": {
+        "public": {
+          "const": true
+        },
+        "persistentUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "distributionUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "versionedUrl": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "documentationUrl": {
+          "$ref": "#/$defs/httpsUrl",
+          "description": "Human-readable documentation for this module, when it is not the suite reference index. Generated separately from the OWL docs: the SKOS vocabulary has a pyLODE page of its own. w3id HTML negotiation for the module's route resolves here."
+        }
+      }
+    },
+    "namespaceDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "namespaceIri",
+        "modules",
+        "runtime",
+        "publication"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "namespaceIri": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "turtleUrl",
+            "jsonLdUrl",
+            "rdfXmlUrl"
+          ],
+          "properties": {
+            "turtleUrl": {
+              "type": "string",
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.ttl$"
+            },
+            "jsonLdUrl": {
+              "type": "string",
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.jsonld$"
+            },
+            "rdfXmlUrl": {
+              "type": "string",
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.rdf$"
+            }
+          }
+        },
+        "publication": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "persistentUrl"
+          ],
+          "properties": {
+            "persistentUrl": {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          }
+        }
+      }
+    },
+    "moduleRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshot",
+        "export",
+        "fullProfile"
+      ],
+      "properties": {
+        "snapshot": {
+          "type": "boolean"
+        },
+        "export": {
+          "type": "boolean"
+        },
+        "fullProfile": {
+          "type": "boolean"
+        }
+      }
+    },
+    "profileRelease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "snapshot",
+        "export"
+      ],
+      "properties": {
+        "snapshot": {
+          "type": "boolean"
+        },
+        "export": {
+          "type": "boolean"
+        }
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "roles",
+        "ontologyIri",
+        "version",
+        "source",
+        "runtime",
+        "requires",
+        "requiresProfiles",
+        "publication",
+        "release"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "semantic",
+              "core",
+              "support",
+              "bridge",
+              "validation",
+              "alignments",
+              "controlled-vocabulary",
+              "implementation-profile"
+            ]
+          }
+        },
+        "ontologyIri": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "graphIri"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+\\.ttl$"
+            },
+            "graphIri": {
+              "$ref": "#/$defs/httpsUrl"
+            }
+          }
+        },
+        "requires": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "requiresProfiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "publication": {
+          "$ref": "#/$defs/publication"
+        },
+        "release": {
+          "$ref": "#/$defs/moduleRelease"
+        }
+      }
+    },
+    "fixtures": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "positive",
+        "outOfScope",
+        "adversarial"
+      ],
+      "properties": {
+        "positive": {
+          "$ref": "#/$defs/pathList"
+        },
+        "outOfScope": {
+          "$ref": "#/$defs/pathList"
+        },
+        "adversarial": {
+          "$ref": "#/$defs/pathList"
+        }
+      }
+    },
+    "pathList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "iri",
+        "version",
+        "status",
+        "inferenceMode",
+        "source",
+        "runtime",
+        "publication",
+        "release",
+        "modules",
+        "shapeModules",
+        "fixtures",
+        "competencyQueries",
+        "sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "iri": {
+          "$ref": "#/$defs/httpsUrl"
+        },
+        "version": {
+          "$ref": "#/$defs/version"
+        },
+        "status": {
+          "enum": [
+            "development",
+            "released",
+            "deprecated"
+          ]
+        },
+        "inferenceMode": {
+          "enum": [
+            "none",
+            "rdfs",
+            "owl-rl"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^(?:/ontology/)?sstim-[a-z0-9-]+-profile\\.ttl$"
+            }
+          }
+        },
+        "publication": {
+          "$ref": "#/$defs/publication"
+        },
+        "release": {
+          "$ref": "#/$defs/profileRelease"
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "shapeModules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "fixtures": {
+          "$ref": "#/$defs/fixtures"
+        },
+        "competencyQueries": {
+          "$ref": "#/$defs/pathList"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

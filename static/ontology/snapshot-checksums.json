@@ -202,5 +202,33 @@
     "sstim-technique-exposure.ttl": "a1113c6f9c9b3d65a25dc3b23fbf5a5b6567bb06f76f402b8f15aa409f78627a",
     "sstim-technique.ttl": "1976b896346a691f5e1bb4b00ae4b04c73d116914500311861ddcd6f6669ddd1",
     "sstim-vocab.ttl": "065ef3ac3208aaa68fd0d6f9604fcbd20551df12981daff0847a87bd19d6ed3e"
+  },
+  "0.17.0": {
+    "manifest.json": "dd3b24010e01fe269232f398b1118114b3a9efc7d085e13ccaa2860815f86cd1",
+    "manifest.schema.json": "85438f56b8c39be34f3807eecd347f3614b42490c6b5410ce22d33ca4a388ad8",
+    "sstim-alignments.ttl": "f7bb3098d311006c5eaea70975a4bf5e59ac2aa1555922f3d4adc818aaaac06a",
+    "sstim-common.ttl": "03e6649eebd9885ea231f9185b840f6fbdb1a71f17afb07be7baf7d1cb030fb5",
+    "sstim-configuration.ttl": "344175634ad3a58e084bcb82b6bdb9750ac17a1de7cdb7c0153eb2be7afc3a6b",
+    "sstim-core-plus-profile.ttl": "b3517c4ae7c21e91d89d0a69711ee99e5dfd84d3f761e59ffebfad1714b3b195",
+    "sstim-core-profile.ttl": "d5e7b060448acf873e891d37db9ed7174d69be182cd013e6c4aac7a1f72be150",
+    "sstim-core-shapes.ttl": "1814ac2bf4820e908e6896fbe12da1bcca0f70b0e2d978ec6664d07d6b383bfe",
+    "sstim-core.ttl": "4041b689bc7f292b4bc7bfc8b3b4b7f776d6340d8e4b7c906d1a02b8d2b79b65",
+    "sstim-ecosystem.ttl": "173567e758bdcb25c6f5e0210b53d281524d46d693740e1fe0aadafae7414f04",
+    "sstim-evidence-exposure.ttl": "8da953523ac054ca3bfabeea51d66740a924c957b388f8f1d73cea5d620fe1bd",
+    "sstim-evidence.ttl": "f95373636cd6feb7551d59dd1a596ab89591d3eee58af8da0a91428e95b3e733",
+    "sstim-exposure-namespace.ttl": "147d1322d63f340396406b26efc5794cda49e90c5268ad0843b95e4f5bd1cbcd",
+    "sstim-exposure.ttl": "cd24a1da8958c0ca7578e08af85378874d449d149329a0cd54af11baa6deeaf2",
+    "sstim-full-profile.ttl": "7018f1d76c813b3d6974c52ec042b358cc644c189d2ab0d8a4197c960de2a94e",
+    "sstim-kernel-profile.ttl": "c301b261c0930f52331e9df8a718557f9edc1d33e3e9cf6f583128367ef24437",
+    "sstim-namespace.ttl": "cbb891f10b3348088cdc64e805a87d44a9d3c480f910e627e9f97217452a16e3",
+    "sstim-neuromodulation-evidence.ttl": "133f409b0a1ab0e7ee65a0afe15334669a4cbcef6c7d783bdfb9a474d211d1ea",
+    "sstim-neuromodulation.ttl": "2d808e40ab4b8f95f91850dacb5cee1764585b48cf44815495b9b71dd6efa14c",
+    "sstim-patch-studio.ttl": "ec68c3b36e1e0bf37b74a4c7de9cdffe663fa5e05ff3ceacb55b3a35e14e25f0",
+    "sstim-session.ttl": "efdb11ba4052bbc40abf9ba1c13fe9518b09bf1e3e327ae5e6c21cea9ef6d47b",
+    "sstim-shapes.ttl": "d8a1d731cd04b4fce4daee7b2a06ee0b3f1e48ff2b4e6a73e4241c66e10a8290",
+    "sstim-stimulus.ttl": "7e254399e901a0b98a17a4a79f2668bc00fbcf77989bde60795a9b46150d4783",
+    "sstim-technique-exposure.ttl": "84a0692563232ad47620748dccf2e9d82ecffdbaf84b97fe64a778a91e417496",
+    "sstim-technique.ttl": "331e843542711d32f415e1c21a6e31de620b2ea067f352c20a26e39b70649644",
+    "sstim-vocab.ttl": "5d9d07f4a313c3737577271686039858c4007dee89f45ce6c07ba013ea8719d2"
   }
 }

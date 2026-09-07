@@ -12,7 +12,7 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.16.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
+| What is being edited? | `0.17.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.16.0`, released 2026-08-18 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
 | Which DOI identifies that release? | `10.5281/zenodo.22003777` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
@@ -21,7 +21,7 @@ releases. Do not infer one from the other.
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
 The live line is mutable, carries no `owl:versionIRI`, and is not a citable
-release. The frozen [`0.16.0/`](../../static/ontology/0.16.0/) directory is the
+release. The frozen [`0.17.0/`](../../static/ontology/0.17.0/) directory is the
 latest immutable whole-set snapshot. Its version IRI resolves to the frozen
 namespace catalogue rather than to `sstim-core.ttl`, which is now only the
 two-class Kernel.
@@ -215,7 +215,7 @@ Its most practical uses today are:
    evidence, exposure, ecosystem, vocabulary or alignment concerns. The stable
    entry points are `/sstim/profile/kernel`, `/sstim/profile/core`,
    `/sstim/profile/core-plus`, and `/sstim/profile/full`.
-2. **Pin a release for published work.** Use the immutable `0.16.0` profile and
+2. **Pin a release for published work.** Use the immutable `0.17.0` profile and
    module URLs for a paper or dataset. Use the `-dev` line only when
    intentionally testing mutable development sources.
 3. **Keep data out of the term namespace.** Reuse SSTIM classes, properties and

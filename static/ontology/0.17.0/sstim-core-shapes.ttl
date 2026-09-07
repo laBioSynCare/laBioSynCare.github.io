@@ -1,0 +1,108 @@
+###########################################################################
+#
+#  SSTIM Core Profile SHACL shapes
+#
+#  Version: 0.17.0
+#  Date:    2026-09-07
+#  License: CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
+#
+#  Deliberately weak Core-profile validation. These shapes
+#  do not require delivery medium, perceived modality, placement, safety,
+#  evidence, technique, configuration, or session policy. Consumers wanting
+#  those policies select the corresponding extension or Full shape graph.
+#  Every constraint here is also present in the Full validation contract, so
+#  Full-conformant data remains Core-conformant.
+#
+###########################################################################
+
+@prefix sstim:      <https://w3id.org/sstim#> .
+@prefix sstim-ex:   <https://w3id.org/sstim/exposure#> .
+@prefix core-sh:    <https://w3id.org/sstim/core-shapes#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+
+<https://w3id.org/sstim/core-shapes> a owl:Ontology ;
+    owl:versionInfo "0.17.0" ;
+    dct:title "SSTIM Core Profile SHACL Shapes"@en ;
+    dct:description "Weak SHACL Core constraints for the minimal SSTIM Core Profile: labelled stimulus descriptions with a regime, optional process references, labelled declared channels, and positive channel duration when asserted."@en ;
+    dct:isPartOf <https://w3id.org/sstim> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/stimulus> ;
+    dct:creator <https://orcid.org/0000-0002-9699-629X> ;
+    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:created "2026-08-01"^^xsd:date ;
+    dct:issued "2026-09-07"^^xsd:date ;
+    dct:modified "2026-09-07"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    rdfs:seeAlso
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0043-sstim-core-profile-and-module-boundaries.md>,
+        <https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/decisions/0044-stimulus-channel-core-ownership.md> .
+
+
+###########################################################################
+# Minimal stimulus-description contract
+###########################################################################
+
+core-sh:StimulusSpecificationShape a sh:NodeShape ;
+    sh:targetClass sstim:StimulusSpecification ;
+    sh:name "Core Stimulus Specification"@en ;
+    sh:description "The weak Core contract; extension and Full profiles may add stronger delivery or governance requirements."@en ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "A Core StimulusSpecification must have at least one rdfs:label."@en
+    ] ;
+    sh:property [
+        sh:path sstim:stimulusRegime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "determinate" "stochastic" "adaptive" ) ;
+        sh:message "A Core StimulusSpecification must declare exactly one determinate, stochastic, or adaptive stimulusRegime."@en
+    ] ;
+    sh:property [
+        sh:path sstim:describesStimulation ;
+        sh:maxCount 1 ;
+        sh:class sstim:Stimulation ;
+        sh:message "describesStimulation, if present, must identify one Stimulation process."@en
+    ] ;
+    sh:property
+        core-sh:StimulusChannelLinkShape,
+        core-sh:StimulationTargetLinkShape .
+
+core-sh:StimulusChannelLinkShape a sh:PropertyShape ;
+    sh:path sstim:hasStimulusChannel ;
+    sh:class sstim-ex:StimulusChannel ;
+    sh:message "hasStimulusChannel, if present, must identify a declared StimulusChannel."@en .
+
+core-sh:StimulationTargetLinkShape a sh:PropertyShape ;
+    sh:path sstim:hasStimulationTarget ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
+    sh:message "hasStimulationTarget, if present, must identify a resource rather than a literal."@en .
+
+
+###########################################################################
+# Minimal channel semantics
+###########################################################################
+
+core-sh:StimulusChannelShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:StimulusChannel ;
+    sh:name "Core Stimulus Channel"@en ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "A declared Core StimulusChannel must have at least one rdfs:label."@en
+    ] .
+
+core-sh:ChannelDurationShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:channelDurationSeconds ;
+    sh:name "Core channel duration"@en ;
+    sh:property [
+        sh:path sstim:channelDurationSeconds ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:message "channelDurationSeconds, when asserted, must be one positive decimal value."@en
+    ] .
