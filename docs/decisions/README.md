@@ -80,6 +80,7 @@ annotations lives here.
 | [0054](0054-owl-dl-conformance-and-the-duration-datatype.md) | OWL 2 DL conformance: declare every external term, declare `xsd:date`, and remove `xsd:duration` because declaring it does not work | Accepted |
 | [0055](0055-namespace-iri-resolves-to-a-release.md) | `https://w3id.org/sstim` resolves to the latest release rather than the working tree, and tells a person in a browser what they just dereferenced | Accepted |
 | [0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md) | What readable IRIs cost, and why the OBO-ID bridge cannot be built before an IDSPACE is allocated | Accepted |
+| [0057](0057-external-mapping-predicates-and-verification.md) | How an external mapping predicate is chosen, and how its target is proved | Accepted |
 
 ## ADR lifecycle and revision policy
 

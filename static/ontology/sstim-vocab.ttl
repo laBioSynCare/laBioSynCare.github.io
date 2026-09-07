@@ -1583,6 +1583,7 @@ sstim-v:techIsochronicTones a owl:NamedIndividual, sstim:EntrainmentBasedTechniq
                    "Stimolazione con Toni Isocroni"@it,
                    "Estimulação com Tons Isócronos"@pt,
                    "Estimulación con Tonos Isócronos"@es ;
+    skos:altLabel "isochronic tones"@en ;
     skos:notation "isochronic-tones" ;
     skos:definition "A single tone switched on and off at evenly spaced intervals (a gated pulse train) at a target rate; a monaural, single-channel entrainment stimulus."@en ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonAuditorySteadyStateResponse ;
@@ -1596,6 +1597,7 @@ sstim-v:techMonauralBeats a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
                    "Stimolazione con Battimenti Monoaurali"@it,
                    "Estimulação com Batimentos Monoauriculares"@pt,
                    "Estimulación con Pulsaciones Monoaurales"@es ;
+    skos:altLabel "monaural beats"@en ;
     skos:notation "monaural-beats" ;
     skos:definition "Two close-frequency tones summed in a single channel, producing a physically present amplitude beat at their difference frequency. Distinct from binaural beats, where the beat is a neural construct from dichotic presentation."@en ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonAuditorySteadyStateResponse ;
@@ -1609,6 +1611,7 @@ sstim-v:techBinauralBeats a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
                    "Stimolazione con Battimenti Binaurali"@it,
                    "Estimulação com Batimentos Binaurais"@pt,
                    "Estimulación con Pulsaciones Binaurales"@es ;
+    skos:altLabel "binaural beats"@en ;
     skos:notation "binaural-beats" ;
     skos:definition "Two sine tones at slightly different frequencies presented dichotically (one per ear), producing a perceived beat at their difference frequency that arises centrally rather than in the air."@en ;
     skos:scopeNote "The most-studied consumer auditory-entrainment technique; effects on EEG and state are reported but mixed across studies."@en ;
@@ -1654,6 +1657,7 @@ sstim-v:techGamma40Auditory a owl:NamedIndividual, sstim:EntrainmentBasedTechniq
                    "Stimolazione Gamma Uditiva a 40 Hz"@it,
                    "Estimulação Gama Auditiva de 40 Hz"@pt,
                    "Estimulación Gamma Auditiva de 40 Hz"@es ;
+    skos:altLabel "40 Hz auditory stimulation"@en ;
     skos:notation "gamma-40-auditory" ;
     skos:definition "Auditory stimulation at 40 Hz — 40 Hz clicks, amplitude-modulated tones, or noise — delivered with the defining objective of modulating gamma-band neural oscillatory dynamics, associated with the GENUS research lineage."@en ;
     skos:scopeNote "The neural-modulation objective is definitional here, which is why this concept occupies the sensory-route neuromodulation overlap: it is both sensory stimulation and neuromodulation, entering through canonical auditory transduction. Membership asserts intent and route, never that modulation occurs. Human auditory-only evidence is limited; the stronger findings are preclinical and multisensory. Frame as gamma/auditory support or research-facing, never as a treatment for any condition."@en ;
@@ -1675,6 +1679,7 @@ sstim-v:techRhythmicAuditoryCueing a owl:NamedIndividual, sstim:EntrainmentBased
                    "Stimolazione Ritmica Uditiva"@it,
                    "Estimulação Auditiva Rítmica"@pt,
                    "Estimulación Auditiva Rítmica"@es ;
+    skos:altLabel "RAS"@en, "rhythmic auditory stimulation"@en ;
     skos:notation "rhythmic-auditory-cueing" ;
     skos:definition "A metronome, drum, footstep, or music-based beat used to entrain movement timing and cadence (rhythmic auditory stimulation, RAS)."@en ;
     skos:scopeNote "Well studied for gait, notably Parkinsonian gait; relevant to movement, walking, and rehabilitation-adjacent uses."@en ;
@@ -1758,6 +1763,7 @@ sstim-v:techClosedLoopAuditory a owl:NamedIndividual, sstim:EntrainmentBasedTech
                    "Stimolazione Uditiva a Circuito Chiuso Sincronizzata in Fase"@it,
                    "Estimulação Auditiva em Malha Fechada Sincronizada em Fase"@pt,
                    "Estimulación Auditiva en Lazo Cerrado Sincronizada en Fase"@es ;
+    skos:altLabel "CLAS"@en, "closed-loop auditory stimulation"@en ;
     skos:notation "closed-loop-auditory" ;
     skos:definition "Sounds delivered at a precise phase of a measured brain or sleep rhythm using EEG or sleep sensors, to reinforce that oscillation."@en ;
     skos:scopeNote "Strong conceptual fit for sleep slow-oscillation work; requires real-time sensing, so not a client-only lightweight feature."@en ;
@@ -1815,6 +1821,7 @@ sstim-v:techASMR a owl:NamedIndividual, sstim:NonEntrainmentTechnique, skos:Conc
                    "Stimolazione con Micro-Texture tipo ASMR"@it,
                    "Estimulação com Microtexturas tipo ASMR"@pt,
                    "Estimulación con Microtexturas tipo ASMR"@es ;
+    skos:altLabel "ASMR"@en ;
     skos:notation "asmr" ;
     skos:definition "Whisper-like textures, close foley, brushing, and tapping sounds intended to evoke an autonomous sensory meridian response."@en ;
     skos:scopeNote "High affective value, low scientific precision; suited to experiential rather than clean-entrainment contexts."@en ;
@@ -1843,6 +1850,7 @@ sstim-v:techVibroacoustic a owl:NamedIndividual, sstim:NonEntrainmentTechnique, 
                    "Stimolazione Vibroacustica"@it,
                    "Estimulação Vibroacústica"@pt,
                    "Estimulación Vibroacústica"@es ;
+    skos:altLabel "vibroacoustic therapy"@en ;
     skos:notation "vibroacoustic" ;
     skos:definition "Low-frequency sound delivered through body transducers, chairs, beds, or wearables, so it is felt as well as heard."@en ;
     skos:scopeNote "Cross-modal: auditory plus tactile-mechanical. Studied in contexts such as fibromyalgia; best treated as its own (partly somatosensory) modality, not pure audio."@en ;
@@ -1865,6 +1873,7 @@ sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NeuromodulationTechn
                    "Neuromodulazione a Ultrasuoni Focalizzati"@it,
                    "Neuromodulação por Ultrassom Focalizado"@pt,
                    "Neuromodulación por Ultrasonido Focalizado"@es ;
+    skos:altLabel "LIFU"@en, "low-intensity focused ultrasound"@en ;
     skos:notation "ultrasound-neuromodulation" ;
     skos:definition "Application of spatially focused acoustic energy to an identified neural target with the objective of altering its activity or function."@en ;
     skos:scopeNote "Defined by its intended focused neural target, not by the categorical absence of an audible percept. Auditory or somatosensory co-stimulation and confounds are protocol-dependent and belong in exposure profiles and evidence records; they do not decide the technique's primary class. Requires dedicated hardware and is not consumer web/mobile feasible. Catalogued so the ontology can describe it, never because BSC Lab delivers it."@en ;
@@ -1896,6 +1905,7 @@ sstim-v:techPhoticDriving a owl:NamedIndividual, sstim:EntrainmentBasedTechnique
                    "Stimolazione Visiva Fotica/con Sfarfallio"@it,
                    "Estimulação Visual Fótica/com Cintilação"@pt,
                    "Estimulación Visual Fótica/con Parpadeo"@es ;
+    skos:altLabel "photic driving"@en, "flicker stimulation"@en ;
     skos:notation "photic-driving" ;
     skos:definition "Periodic visual flicker — a light source or whole-screen field switched or modulated at a target rate — used to drive occipital rhythms at the flicker frequency. The visual counterpart of isochronic/amplitude-modulated auditory entrainment; at alpha rates it can also evoke stroboscopic imagery (the 'flicker' / Dreamachine phenomenon)."@en ;
     skos:scopeNote "Subject to photosensitivity exposure limits — model the flicker rate and the photosensitivity comfort boundary via the exposure module (sstim-ex:hasFlickerRateHz, sstim-ex:boundaryPhotosensitivity, ADR 0011). Avoid high-contrast full-field flicker around 15–25 Hz in unscreened users. At 40 Hz this is the GENUS visual-gamma case (preclinical-strongest, contested in humans), which additionally invokes sstim-v:mechGamma40."@en ;
@@ -1911,6 +1921,7 @@ sstim-v:techAudiovisualEntrainment a owl:NamedIndividual, sstim:EntrainmentBased
                    "Trascinamento Audiovisivo"@it,
                    "Arrastamento Audiovisual"@pt,
                    "Arrastre Audiovisual"@es ;
+    skos:altLabel "AVE"@en ;
     skos:notation "audiovisual-entrainment" ;
     skos:definition "Light and sound pulsed at the same target rate (the classic 'mind machine' / AVE configuration), so auditory and visual driving reinforce one another. Cross-modal: it engages auditory and visual steady-state responses together with multisensory integration."@en ;
     skos:scopeNote "Combines the auditory and visual flicker constraints; the visual channel is subject to photosensitivity limits. Reported effects on state and EEG are mixed across studies; frame conservatively. At 40 Hz this is the multisensory GENUS configuration."@en ;
@@ -1977,6 +1988,7 @@ sstim-v:techReferencePitchRetuning a owl:NamedIndividual, sstim:NonEntrainmentTe
                    "Riaccordatura del Diapason"@it,
                    "Reafinação do Diapasão"@pt,
                    "Reafinación del Diapasón"@es ;
+    skos:altLabel "432 Hz tuning"@en ;
     skos:notation "reference-pitch-retuning" ;
     skos:definition "Music or tones retuned so that a named reference note (commonly A4) is set to a non-standard frequency such as 432 Hz instead of the standard 440 Hz."@en ;
     skos:scopeNote "A property of the carrier / absolute pitch, orthogonal to any modulation or beat frequency — not brainwave entrainment. Parametrize a stimulus channel with sstim-ex:referencePitchNote / referencePitchHz / retunedFromReferenceHz / pitchShiftCents. Any effect claim must be modeled as music-listening / tuning-preference / psychoacoustic / expectation-mediated, with its own EvidenceAssessmentClaim kept disjoint from EntrainmentBasedTechnique and FrequencyBand evidence."@en ;
@@ -1994,6 +2006,7 @@ sstim-v:techSolfeggioTuning a owl:NamedIndividual, sstim:NonEntrainmentTechnique
                    "Stimolazione con Frequenze Solfeggio/Accordatura Mistica"@it,
                    "Estimulação com Frequências Solfeggio/Afinação Mística"@pt,
                    "Estimulación con Frecuencias Solfeggio/Afinación Mística"@es ;
+    skos:altLabel "solfeggio frequencies"@en ;
     skos:notation "solfeggio-tuning" ;
     skos:broader sstim-v:techReferencePitchRetuning ;
     skos:definition "Music or tones tuned to so-called 'Solfeggio frequencies' (e.g. 432 Hz, 528 Hz) or other arbitrary tunings claimed to carry special healing properties. A specific folk-claim case of reference-pitch retuning."@en ;
@@ -2209,6 +2222,7 @@ sstim-v:designRandomizedControlledTrial a owl:NamedIndividual, sstim:StudyDesign
                    "Studio controllato randomizzato"@it,
                    "Ensaio controlado randomizado"@pt,
                    "Ensayo controlado aleatorizado"@es ;
+    skos:altLabel "RCT"@en ;
     skos:notation "rct" ;
     skos:definition "Randomized allocation to intervention and control conditions."@en .
 
@@ -3004,6 +3018,7 @@ sstim-v:systemAutonomic a owl:NamedIndividual, sstim:NeuralSystem, skos:Concept 
                    "sistema autonomo"@it,
                    "sistema autónomo"@pt,
                    "sistema autónomo"@es ;
+    skos:altLabel "autonomic nervous system"@en, "ANS"@en ;
     skos:notation "system-autonomic" ;
     skos:definition "The autonomic nervous system as a distributed target."@en .
 
@@ -3361,6 +3376,7 @@ sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique,
                    "Stimolazione Magnetica Transcranica Ripetitiva"@it,
                    "Estimulação Magnética Transcraniana Repetitiva"@pt,
                    "Estimulación Magnética Transcraneal Repetitiva"@es ;
+    skos:altLabel "rTMS"@en ;
     skos:notation "repetitive-tms" ;
     skos:definition "Repeated magnetic pulses applied by a coil over the scalp, inducing an electric field in underlying tissue, with the objective of altering cortical activity or excitability."@en ;
     skos:scopeNote "Typed as neuromodulation because the modulation objective is definitional for the repetitive protocol. A single-pulse probe used only to elicit and measure a response is stimulation without being neuromodulation, since measuring is not modulating. The induced electric field is an established physical transformation and belongs in the exposure or device description, not in a proposed mechanism; how that field produces a neural response remains an evidence question."@en ;
@@ -3377,6 +3393,7 @@ sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Ne
                    "Stimolazione Transcranica a Corrente Continua"@it,
                    "Estimulação Transcraniana por Corrente Contínua"@pt,
                    "Estimulación Transcraneal por Corriente Continua"@es ;
+    skos:altLabel "tDCS"@en ;
     skos:notation "tdcs" ;
     skos:definition "A weak constant electric current applied through scalp electrodes with the objective of altering cortical excitability."@en ;
     skos:scopeNote "Applied electric current is not by itself brain stimulation — peripheral, muscular, and cardiac applications share the medium and are separated here by route, approach, and target."@en ;
@@ -3393,6 +3410,7 @@ sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Ne
                    "Stimolazione Transcranica a Corrente Alternata"@it,
                    "Estimulação Transcraniana por Corrente Alternada"@pt,
                    "Estimulación Transcraneal por Corriente Alterna"@es ;
+    skos:altLabel "tACS"@en ;
     skos:notation "tacs" ;
     skos:definition "An oscillating electric current applied through scalp electrodes with the objective of altering the amplitude, frequency, or phase of cortical oscillations."@en ;
     skos:scopeNote "The direct non-sensory analogue of sensory entrainment: periodic, and targeting oscillatory dynamics. Its intended route is a physical cortical interaction, but reported effects can also arise through transcutaneous peripheral-nerve stimulation. That competing account is an evidence question, recorded on an outcome concept via sstim:outcomeNeuralTargetSite, and it never rewrites this declared intended route."@en ;
@@ -3409,6 +3427,7 @@ sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Neu
                    "Stimolazione Cerebrale Profonda"@it,
                    "Estimulação Cerebral Profunda"@pt,
                    "Estimulación Cerebral Profunda"@es ;
+    skos:altLabel "DBS"@en ;
     skos:notation "dbs" ;
     skos:definition "Electrical stimulation delivered by surgically implanted intracranial electrodes to a deep brain structure with the objective of altering its activity."@en ;
     skos:scopeNote "A clinical neurosurgical method, catalogued so the ontology can describe the implanted-electrode route. It is emphatically outside any consumer or wellness context."@en ;
@@ -3425,6 +3444,7 @@ sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTe
                    "Stimolazione del Nervo Vago"@it,
                    "Estimulação do Nervo Vago"@pt,
                    "Estimulación del Nervio Vago"@es ;
+    skos:altLabel "VNS"@en ;
     skos:notation "vagus-nerve-stimulation" ;
     skos:definition "Electrical stimulation of the vagus nerve, by an implanted device or through the skin at an accessible branch, with the objective of altering autonomic neural regulation."@en ;
     skos:scopeNote "Shows why route, approach, and target must stay independent: implanted and transcutaneous variants share a target and a route while differing in approach. Targeting a cranial nerve and the autonomic system says nothing about entering through a sensory system."@en ;
@@ -3462,6 +3482,7 @@ sstim-v:techElectroconvulsiveTherapy a owl:NamedIndividual, sstim:Neuromodulatio
                    "Terapia Elettroconvulsivante"@it,
                    "Eletroconvulsoterapia"@pt,
                    "Terapia Electroconvulsiva"@es ;
+    skos:altLabel "ECT"@en ;
     skos:notation "electroconvulsive-therapy" ;
     skos:definition "Brief electrical stimulation applied through scalp electrodes to deliberately induce a generalized seizure under anaesthesia, with the objective of altering brain activity."@en ;
     skos:scopeNote "A clinical psychiatric neuromodulation method, catalogued only so the ontology can describe the convulsive branch of established brain-stimulation therapy. Emphatically outside any consumer or wellness context and not deliverable by BSC Lab. The induced seizure is the deliberate mechanism, which separates it from stimulation applied merely to probe a response; efficacy and safety remain evidence questions this catalogue does not answer."@en ;
@@ -3491,6 +3512,7 @@ sstim-v:techNeurofeedback a owl:NamedIndividual, sstim:NeuromodulationTechnique,
                    "Neurofeedback"@it,
                    "Neurofeedback"@pt,
                    "Neurofeedback"@es ;
+    skos:altLabel "EEG biofeedback"@en ;
     skos:notation "neurofeedback" ;
     skos:definition "A closed-loop practice in which a measured brain signal (typically EEG) is rendered back to the individual as sensory feedback so that they can learn to self-regulate that neural activity."@en ;
     skos:scopeNote "Self-directed neuromodulation (ADR 0036): a neuromodulation technique whose agency is the individual's own regulation, marked by the active-self-regulatory engagement mode. The feedback enters through canonical sensory transduction (its declared route) and is presented externally; the neural change itself is the intended effect, recorded on the outcome facet, not asserted as achieved here. Theo Marins (2026-07-22) placed neurofeedback closer to neuromodulation than to neurostimulation, which ADR 0036 adopts."@en ;
@@ -4244,6 +4266,7 @@ sstim-v:shapeSine a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Sinusoide"@it,
                    "Senoide"@pt,
                    "Senoide"@es ;
+    skos:altLabel "sine wave"@en, "sinusoid"@en ;
     skos:notation "sine" ;
     skos:definition "A single-frequency sinusoid. The default periodic shape, and the only one the BSC catalog ever used."@en .
 
@@ -4253,6 +4276,7 @@ sstim-v:shapeSquare a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Onda quadra"@it,
                    "Onda quadrada"@pt,
                    "Onda cuadrada"@es ;
+    skos:altLabel "square wave"@en ;
     skos:notation "square" ;
     skos:definition "A periodic shape alternating between two levels with a duty cycle. Its harmonic content makes it audibly and visually harsher than a sinusoid at the same rate."@en .
 
@@ -4262,6 +4286,7 @@ sstim-v:shapeSawtooth a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Dente di sega"@it,
                    "Dente de serra"@pt,
                    "Diente de sierra"@es ;
+    skos:altLabel "sawtooth wave"@en, "ramp wave"@en ;
     skos:notation "sawtooth" ;
     skos:definition "A periodic shape rising linearly and resetting sharply, or its mirror image."@en .
 
@@ -4271,6 +4296,7 @@ sstim-v:shapeTriangle a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Onda triangolare"@it,
                    "Onda triangular"@pt,
                    "Onda triangular"@es ;
+    skos:altLabel "triangle wave"@en ;
     skos:notation "triangle" ;
     skos:definition "A periodic shape rising and falling linearly, with weaker harmonics than a square at the same rate."@en .
 
@@ -4280,6 +4306,7 @@ sstim-v:shapeEnvelope a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Inviluppo"@it,
                    "Envelope"@pt,
                    "Envolvente"@es ;
+    skos:altLabel "amplitude envelope"@en ;
     skos:notation "envelope" ;
     skos:definition "A non-repeating contour over time, such as a period ramping from one value to another across a session. Shape and repetition are independent: an envelope may modulate a periodic signal."@en .
 
@@ -4289,6 +4316,7 @@ sstim-v:shapeNoise a owl:NamedIndividual, sstim:SignalShape, skos:Concept ;
                    "Rumore"@it,
                    "Ruído"@pt,
                    "Ruido"@es ;
+    skos:altLabel "noise signal"@en ;
     skos:notation "noise" ;
     skos:scopeNote "The clearest case for the interval model: noise cannot be described by a single frequency number, so a signal states a lower and an upper bound and relates to a band by containment or overlap rather than membership."@en ;
     skos:definition "A stochastic signal occupying a frequency extent rather than a point. White noise spans the whole audible range and band-limited noise a named interval; both are this shape with different bounds."@en .

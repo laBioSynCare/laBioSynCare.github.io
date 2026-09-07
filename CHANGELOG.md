@@ -96,6 +96,27 @@ file is the human-readable summary.
   than noise-as-sound and `shapeEnvelope` the waveform envelope rather than the
   stationery item. Four bookkeeping or unmatched values stay unmapped.
 
+- **37 `skos:altLabel` aliases across 27 concepts**, taking alias coverage from 16
+  on 9 concepts to 53 on 39. Acronyms nothing previously resolved (tDCS, tACS,
+  rTMS, DBS, VNS, ECT, ASMR, RAS, LIFU, AVE, CLAS, RCT, ANS), the plain names the
+  preferred labels bury ("binaural beats" where the label is *Binaural Beat
+  Stimulation*, "sine wave" where it is *Sine*), and the one label divergence the
+  alignment work exposed, `systemAutonomic` being labelled "autonomic system"
+  where every external authority says "autonomic nervous system".
+
+  This is the cheap half of interoperability: reconciliation tools, Wikidata
+  matching, OpenRefine and registry search all resolve on `skos:prefLabel` **and**
+  `skos:altLabel`, and until now all but nine concepts could be matched only by
+  their exact preferred label in one of four languages. Aliases are English only,
+  since the it/pt/es labels have not had native review; tVNS, VAT and PPI were
+  rejected as a narrower variant, an ambiguous initialism and a paradigm name
+  respectively.
+
+- **[ADR 0057](docs/decisions/0057-external-mapping-predicates-and-verification.md)**
+  records how an external mapping predicate is chosen and how its target is
+  proved. The rules the 110 mappings embody lived only in a working document and
+  in Turtle comments, and a release makes them citable commitments.
+
 ### Fixed
 
 - **Ten prose totals still said 545 concepts** after ADR 0025's six terms took the

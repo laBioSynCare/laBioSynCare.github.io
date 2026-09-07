@@ -1825,6 +1825,7 @@ sstim-ex:audioNoiseGrey a owl:NamedIndividual, sstim-ex:AudioNoiseColor, skos:Co
                    "rumore grigio"@it,
                    "ruído cinza"@pt,
                    "ruido gris"@es ;
+    skos:altLabel "gray noise"@en ;
     skos:definition "Noise shaped to a psychoacoustic equal-loudness contour, so it is perceived as roughly equally loud across frequency rather than being flat in power."@en ;
     skos:notation "grey" ;
     skos:scopeNote "Define by spectral slope, loudness weighting, or generation method when used in a protocol."@en .
@@ -1836,6 +1837,7 @@ sstim-ex:audioNoiseBlackSilence a owl:NamedIndividual, sstim-ex:AudioNoiseColor,
                    "nero/silenzio"@it,
                    "preto/silêncio"@pt,
                    "negro/silencio"@es ;
+    skos:altLabel "silence"@en ;
     skos:notation "black-silence" ;
     skos:definition "Silence, near-silence, muting, or absence of intended audio stimulus."@en .
 

@@ -421,7 +421,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f48a61317470613c5215bf473212c4ab4398f8798e1644590c7aedae0f700988"
+        "sha256": "3722b40479e5fa7a0c0eef7f2019500fd2037a5ab4e71a603baa8c4e73b81f14"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -460,7 +460,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "fcfef1592c671b99435f8d9029748c242b718d1cea349ed315082746314f5904"
+        "sha256": "362e29e57b5190b44bfd1c345c6841c439ff07150b676a40783403dab93a392e"
       },
       "runtime": {
         "url": "sstim-exposure.ttl",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "a14e391bcc24f312be52f1a84659cc7a43999d30fb99ca4545a5db3ec0d5a515"
+      "sha256": "9c2e134c31af99aad9360c346a76b590e09a41f151801560e9ac73c97e53e3de"
     }
   ]
 }

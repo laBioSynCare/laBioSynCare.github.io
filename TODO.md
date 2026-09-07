@@ -1132,8 +1132,15 @@ publishing SSTIM into Wikidata, not contributing to it.*
       *That pass also found three techniques with no Wikidata concept item at all
       (tACS, photic driving, rhythmic auditory stimulation), which is stage 3
       work rather than a mapping.*
-- [ ] Extend `skos:altLabel` coverage — **15 labels on 8 of the 551 concepts**, all
-      English `P2`
+- [~] Extend `skos:altLabel` coverage — **53 aliases on 39 concepts as of
+      2026-09-07**, up from 16 on 9, all English `P2`
+      *37 added on 2026-09-07 on the maintainer's instruction: acronyms nothing
+      resolved (tDCS, tACS, rTMS, DBS, VNS, ECT, ASMR, RAS, LIFU, AVE, CLAS, RCT,
+      ANS), the plain names the preferred labels bury, and the `systemAutonomic`
+      label divergence the alignment work exposed. Proposal and the rejected
+      candidates: `~/sstim-drafts/altlabel-proposal.md`. Still partial by design:
+      most of the 551 concepts have no alias worth writing, and non-English
+      aliases wait for the same native reviewer as the labels.*
       *Raised 2026-08-01 while checking how Wikidata's term fields map to RDF.
       Wikidata emits a label as `rdfs:label` + `skos:prefLabel` + `schema:name`,
       and an alias as `skos:altLabel`. SSTIM and Wikidata therefore agree exactly
