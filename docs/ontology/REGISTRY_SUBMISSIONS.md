@@ -150,7 +150,7 @@ BARTOC or FAIRsharing field edits have already landed.
 | DBpedia Archivo | ⚠️ **listed, not retrievable — measured 2026-09-02** — the record is real: `https://archivo.dbpedia.org/list` carries "Sensory Stimulation Ontology (SSTIM)" among its 94,736 entries, keyed by the stable W3ID URI, so the W3C host migration requires no record change. But nothing behind the listing can be fetched. `/download?o=https%3A//w3id.org/sstim&f=owl` answers **500** ("There seems to be an error with the DBpedia Databus") and the Databus artifact the record itself links to, `https://databus.dbpedia.org/ontologies/w3id.org/sstim`, answers **404**. This is the same Databus deployment step that failed at submission time, still failing. The ★☆☆☆ rating recorded here on 2026-08-17 could not be re-measured: the info page renders no star markup a fetch can read | no | report the download/Databus failure upstream alongside the stale updater; do not duplicate the record |
 | LOV | 🕓 **suggested 2026-07-10, still absent** — `/vocabs/sstim` is 404 while a control record resolves. LOV ingests the unchanged W3ID namespace and auto-extracts locations, so there is no host field to migrate and no accepted record to edit | no | follow up with curators; do not duplicate the suggestion |
 | BARTOC | ✅ **migrated 2026-09-02** — the curator applied every requested change and closed [issue #319](https://github.com/gbv/bartoc.org/issues/319) as completed. JSKOS verified field by field at `https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154` (`modified` 2026-09-02T06:15:49Z): `url` → `https://w3c-cg.github.io/sstim/ontology/docs/`, `subjectOf` → `https://github.com/w3c-cg/sstim` (legacy repository gone; concept DOI and the frozen 0.16.0 namespace document retained), `extent` → "164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)", which matches `TERM_INDEX.md` and a `skos:ConceptScheme` count of the frozen document exactly. Preserved as asked: node URI, `identifier` `https://w3id.org/sstim`, `namespace` `https://w3id.org/sstim#`, and the publisher field | yes (GitHub) | — |
-| BioPortal | ⚠️ **live; W3C metadata patched and deterministic bundle deployed 2026-09-01** — authenticated API verification shows submission `28` with W3C pull/home/repository/source/docs/issues and version IRI `https://w3id.org/sstim/0.16.0`. The W3C and legacy bundle URLs serve the ledger bytes (1,239,332 bytes; SHA-256 `7a2133692b6adcca6e411c79c91868954d37112545ea2c2c427e27fb6f73bb11`) | account ✓ (@rfabbri) | observe transition pull, then one unchanged pull; patch current date |
+| BioPortal | ✅ **live at 0.17.0, recovered 2026-09-08 from a parse failure that recorded no error state**: submission `31` completed the whole pipeline at version IRI `https://w3id.org/sstim/0.17.0` (181 classes, 637 individuals, 301 properties) after submission `30` stalled at `UPLOADED`. The pull URL serves the ledger bytes (1,342,715 bytes; SHA-256 `e734245b1b2478ee30e1fb7100074acd54aa4e02f19d90b141fb4c7695eb8e3b`). Incident record in section 3 | account ✓ (@rfabbri) | confirm the next pull adds no row, then PATCH `31` released to 2026-09-07 |
 | FAIRsharing | ✅ **migrated, enriched and unblocked 2026-09-04.** Homepage, six support links and the cross-reference DOI are on W3C-CG/w3id, the DOI now naming the concept record `10.5281/zenodo.21286974` rather than the 0.6.0 version it had been pinned to since July; the description lists all nine modalities; `sleep` added to domains; seven relations (IAO, BFO, OBI, PROV-O as `extends`; SKOS, OWL, HED as `related_to`); and the three required `read` data processes were added in the edit form, `updated_at` 2026-09-04T09:46:36Z. Publications and citations stay empty until a paper exists. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved | yes | await curator review; add hearing/vision domains if the controlled list has them |
 | OLS4 | 🕓 **PR open, updated for W3C-CG and 0.16.0** — [EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351), commit `258c2a51`; reviewer notified 2026-09-01 | yes (GitHub) | watch review/merge |
 | OpenAIRE | ✅ **closed 2026-09-02 — no submission needed** — `api.openaire.eu/search/software?doi=10.5281/zenodo.22003777` returns `total=1`: Zenodo is an OpenAIRE-compliant repository and the record is already harvested and indexed as software. OpenAIRE Provide is an intake for repository and aggregator *operators*, which SSTIM is not | n/a | — |
@@ -939,6 +939,7 @@ Required follow-up: Its transition from the previously served bytes is expected
 
 1. Before deployment, record BioPortal's latest/current submission ID and row
    count. **Captured at the 2026-09-01 cutover: current ID `28`, 28 rows.**
+   **Re-captured after the 0.17.0 recovery, 2026-09-08: current ID `31`, 31 rows.**
 2. Deploy, then verify that the bytes served at the pull URL have the exact
    ledger SHA-256.
 3. Let the first nightly pull finish. Capture the new latest/current submission
@@ -979,6 +980,65 @@ for an empty module list, which previously produced a valid, empty bundle rather
 than an error. The current resolver is stricter: it rejects a development
 selector before ROBOT runs, and every emitted bundle must carry the stable
 frozen release's exact version IRI.
+
+**Submission 30 (0.17.0) failed to parse with no error state, 2026-09-08 01:16 UTC.**
+The second parse failure in thirty submissions, and the same signature as
+submission 14. The notification carried the usual "was processed for use in
+BioPortal. Here are the results:" line above an empty results block, and
+submission `30` held `submissionStatus: ["UPLOADED"]` alone, with `errorMessage`
+and `parsingLog` both null. **That absence is the diagnostic.** Every other
+failed submission on the portal at the time (FLUXO, BMS-LM, ODENTIFYHUMAN, HCMO,
+DICOM and 38 more, measured from `/submissions?include_status=ANY`) carries an
+explicit `ERROR_RDF` or `ERROR_UPLOADED`. A job that rejects RDF says so; this
+one never reached a verdict.
+
+The artifact was cleared before anything was resubmitted:
+
+- the bytes BioPortal had stored, fetched back from `/submissions/30/download`,
+  are byte-identical to the served bundle and to the ledger's 0.17.0 record
+  (1,342,715 bytes, SHA-256 `e734245b…95eb8e3b`), so the pull was not truncated;
+- ROBOT 1.9.10, the OWL API family BioPortal parses with, merges and
+  re-serializes it in 0.94 seconds with no error and no missing imports;
+- rdflib reads 12,321 triples: exactly one `owl:Ontology`, the correct
+  `owl:versionIRI https://w3id.org/sstim/0.17.0`, zero illegal property punning,
+  zero ill-typed literals, zero malformed IRIs, and only `en`/`it`/`pt`/`es`
+  language tags;
+- OBOREL (2026-09-07) and DREDTO (2026-09-08) parsed normally in the same
+  window, so the portal was not down.
+
+0.17.0 is the first bundle carrying external mapping IRIs ([ADR 0057](../decisions/0057-external-mapping-predicates-and-verification.md):
+96 MeSH, 48 UBERON, 180 Wikidata and 4 SNOMED references, plus 110 reified
+`owl:Axiom` annotations against 11 in 0.16.0). That correlation is not testable
+from outside their pipeline, and the retry settled it anyway: identical bytes at
+an identical pull URL parsed completely.
+
+**Recovery is a new submission, never a new artifact.** The nightly pull creates
+a submission only when the downloaded MD5 differs from the previous upload, and
+the bundle is byte-reproducible, so nothing would have retried until 0.18.0
+shipped. Submission `31` was created through the authenticated API against the
+same `pullLocation`, mirroring submission 30's curated metadata and deliberately
+omitting the fields the parse extracts (`version`, `versionIRI`,
+`hasPriorVersion`, `hasPart`, `useImports`, `modificationDate`) so that 0.17.0's
+own values would land rather than 0.16.0's being inherited a second time:
+
+```bash
+curl -X POST "https://data.bioontology.org/ontologies/SSTIM/submissions" \
+  -H "Authorization: apikey token=$BIOPORTAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d @submission.json        # HTTP 201, returns the new submissionId
+```
+
+**The API accepts `pullLocation` without fetching it.** Submission `31` sat at
+`["UPLOADED"]` with `uploadFilePath` null and its `/download` answering 404 for
+roughly 45 minutes before their queue pulled the file and ran the pipeline. Do
+not read that gap as a second failure, and do not upload the file directly to
+force it. Final state, verified 2026-09-08 16:20 UTC: `UPLOADED, RDF,
+RDF_LABELS, OBSOLETE, INDEXED, INDEXED_PROPERTIES, METRICS, ANNOTATOR, DIFF`;
+version `0.17.0`; `hasPriorVersion https://w3id.org/sstim/0.16.0`; 181 classes,
+637 individuals, 301 properties; stored bytes at the ledger SHA-256; search
+answering. Its extracted `released` is 2026-04-12 by the `dct:created`
+precedence described next, and is owed the correction to 0.17.0's `dct:issued`,
+2026-09-07, once the stability observation completes.
 
 **Release dates — BioPortal currently prefers `dct:created`.** Re-measured from
 the public submission list on 2026-08-31 and checked against the
@@ -1361,7 +1421,7 @@ endpoints cannot see them. A vocabulary gateway is arguably the place where that
 matters most, and it is also the low-risk place to try a SKOS submission, since
 nothing here disturbs the established BioPortal identity.
 
-### Bioregistry — REQUESTED 2026-09-06, issue #2055, labelled and in the queue
+### Bioregistry — REQUESTED 2026-09-06, issue #2055; sibling prefixes cleared by a curator 2026-09-08
 
 A community registry of prefixes and identifier namespaces that exports its
 records as RDF, so an accepted entry is itself an inbound reference to the SSTIM
@@ -1376,8 +1436,11 @@ Release DOI:        10.5281/zenodo.21286974 (concept)
 Date:               2026-09-06
 Account/maintainer: ttm (Renato Fabbri), ORCID 0000-0002-9699-629X
 External record ID: issue #2055 (labels: New, Prefix) -> PR #2056
-Status:             bot PR open, awaiting a curator's merge
-Required follow-up: watch PR #2056; then /api/registry/sstim should answer 200
+Status:             bot PR open, awaiting a curator's merge; sibling prefixes
+                    cleared on the PR 2026-09-08
+Required follow-up: watch PR #2056; file sstim.vocab, sstim.exposure and
+                    sstim.ecosystem through their template URLs; then
+                    /api/registry/sstim should answer 200
 ```
 
 **Their bot did the rest, within a minute.** The workflow runs on `issues:
@@ -1409,11 +1472,39 @@ pattern `^[A-Za-z][A-Za-z0-9]*$`, example `SensoryStimulation`, licence
 rather than inferred: it matches all 1,099 local names across the four term
 namespaces.
 
-**The one judgement call put to the curators.** Bioregistry mints one prefix per
-URI format and SSTIM has four term namespaces, so the comments name the siblings
-with their sizes (`vocab#` 405, `exposure#` 268, `ecosystem#` 82, core 344) and
-offer either separate prefixes (`sstim.vocab` and so on) or a different primary.
-The core namespace was requested because it is what prefix.cc already serves.
+**The one judgement call put to the curators, answered 2026-09-08.** Bioregistry
+mints one prefix per URI format and SSTIM has four term namespaces, so the
+comments name the siblings with their sizes (`vocab#` 405, `exposure#` 268,
+`ecosystem#` 82, core 344) and offer either separate prefixes (`sstim.vocab` and
+so on) or a different primary. The core namespace was requested because it is
+what prefix.cc already serves.
+
+@cthoyt [answered](https://github.com/biopragmatics/bioregistry/pull/2056#issuecomment-5588409445)
+that extra prefix requests for the modules are fine "assuming they correspond to
+separate URI namespaces. If they're all the same, then it's not necessary."
+
+**They are not the same, and it is measurable.** The four namespaces mint
+disjoint sets of defined terms, and six local names are minted twice with
+different meanings: `sstim/vocab#modalityAuditory` is a controlled value for the
+modality of a stimulus, `sstim/exposure#modalityAuditory` is the perceived
+modality of the person, and the two are linked by `skos:closeMatch`, not
+`owl:sameAs`. Counted with rdflib over the manifest modules as distinct IRI
+subjects per namespace, which reproduces the 344/405/268/82 figures already
+quoted to the curators exactly, and also holds against the frozen 0.17.0
+snapshot. All three sibling namespaces content negotiate at w3id.org: verified
+2026-09-08, Turtle and HTML both 200 for `/sstim/vocab`, `/sstim/exposure` and
+`/sstim/ecosystem`.
+
+**So three sibling requests follow**, prefilled at
+`~/sstim-drafts/bioregistry-sibling-prefilled-urls.txt` and filed through the
+template URLs for the labelling reason below: `sstim.vocab` (example `alpha`),
+`sstim.exposure` (example `modalityAuditory`) and `sstim.ecosystem` (example
+`EcosystemAgent`), each with its own `uri_format` and the same pattern, which was
+re-checked against every local name in each namespace separately (0 violations).
+`sstim` stays on the core namespace. The fifth namespace, `shapes#` (80 terms),
+was deliberately left out as validation artifacts rather than referenced
+identifiers, and the offer to file it too was put on the PR. Fill in the issue
+and bot-PR numbers here once they exist.
 
 **Why there are two issues, and what to do next time.** Their automation
 (`.github/workflows/new_prefix_pr.yml` running `src/bioregistry/gh/new_prefix.py`)
