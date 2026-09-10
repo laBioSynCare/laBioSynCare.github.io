@@ -1,0 +1,43 @@
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/transcend-theta-drift-seed#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:        <https://w3id.org/sstim#> .
+@prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+
+# Public reference preset, claim level C0 (descriptive). See the note in
+# support-smr-focus-seed.ttl on why no evidence assessment is attached.
+#
+# The one preset here that carries a breath guide, so it is also the one that
+# exercises the breathing constraint: hasBreathGuide is true if and only if
+# exactly one voice is the breath reference, and that voice's initial period is
+# at or above 3 s (below that it is tremolo, not breathing guidance).
+
+bsclab-preset:transcend-theta-drift-seed a sstim:Preset ;
+    rdfs:label "Transcend Theta Drift Seed" ;
+    dct:description "A Martigli-binaural voice whose breathing period lengthens from 5 s to 10 s across ten minutes, over carriers of 180 Hz and 186 Hz, so the difference between the channels is 6 Hz, within the theta band. The lengthening period is the breathing reference the session paces to. This seed is not a clinical, health, or performance claim." ;
+    dct:created "2026-09-10"^^xsd:date ;
+    dct:modified "2026-09-10"^^xsd:date ;
+    sstim:targetsFrequencyBand sstim-v:theta ;
+    sstim:primaryFrequencyBand sstim-v:theta ;
+    sstim:inGroup sstim-v:groupTranscend ;
+    sstim:hasBreathGuide true ;
+    sstim:presetVersion "0.1.0" ;
+    sstim:hasPublicClaimLevel sstim-v:claimC0Descriptive ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe, sstim-v:cautionEmotionallySensitive ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:guided-breathing-observation-reference ;
+    sstim:composedOf preset-local:mb-voice .
+
+preset-local:mb-voice a sstim:Voice, sstim:MartigliBinauralVoice ;
+    rdfs:label "Transcend Theta Drift Seed Martigli-Binaural voice" ;
+    sstim:carrierFreqLeft 180.0 ;
+    sstim:carrierFreqRight 186.0 ;
+    sstim:martigliAmplitude 70.0 ;
+    sstim:martigliPeriodInitial 5.0 ;
+    sstim:martigliPeriodFinal 10.0 ;
+    sstim:martigliTransitionDuration 600.0 ;
+    sstim:isBreathReference true ;
+    sstim:initialVolume 0.25 .

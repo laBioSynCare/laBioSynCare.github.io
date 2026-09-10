@@ -1020,7 +1020,7 @@ Turtle files are listed in section 1. After they exist:
       `static/ontology/instances/references/` `P1`
       *Seven records are present; expand only with source and venue review.*
 
-- [?] Decide whether to grow the public preset catalog beyond its two seeds `P2`
+- [~] Grow the public preset catalog beyond its two seeds `P2`
       *Measured 2026-09-10 against the production build: `/presets/` renders
       "2 PUBLISHED RECORDS", from `heal-theta-breathing-seed.ttl` and
       `perform-alpha-10-seed.ttl`, the only two `sstim:Preset` instances in
@@ -1041,8 +1041,25 @@ Turtle files are listed in section 1. After they exist:
       shipped 2026-09-10 in `src/ui/creator/examplePatches.js` and answer the
       "somewhere to start" problem, not the catalog one.*
 
-      *If the answer is no, record that here and reconsider the entrance's
-      "Browse presets" wording, which currently promises a library.*
+      *Answered 2026-09-10: grown to five, one per group. Added
+      `support-smr-focus-seed` (symmetry voice, 13 Hz pulse train in SMR),
+      `indulge-alpha-warmth-seed` (binaural, 190/200 Hz for a 10 Hz alpha
+      difference) and `transcend-theta-drift-seed` (Martigli-binaural, breathing
+      period 5→10 s over ten minutes, 180/186 Hz for a 6 Hz theta difference,
+      and the only one carrying a breath guide). Registered in
+      `src/rdf/loader.js`; `void.ttl` instance count 2114 → 2187. `make
+      validate` green.*
+
+      *All three are claim level C0 (descriptive) with no evidence assessment,
+      because C0 sets `requiresEvidenceTierRank 0` and the alternative was
+      inventing evidence chains. Their descriptions state what the configuration
+      is, not what it does for a listener.*
+
+      *Still open, and the part that needs scientific review rather than
+      authoring: whether any of the five should carry an evidence assessment,
+      which means citing real records under `instances/references/` and choosing
+      a tier deliberately. Also whether five is enough, or whether the catalog
+      should cover sub-bands and non-auditory modalities.*
 
 ### Phase 2 ontology extensions
 - [ ] Record recognized **named methods / schools** (Snoezelen / MSE, Tomatis,

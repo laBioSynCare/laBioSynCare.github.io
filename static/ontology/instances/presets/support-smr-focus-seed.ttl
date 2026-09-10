@@ -1,0 +1,40 @@
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/support-smr-focus-seed#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:        <https://w3id.org/sstim#> .
+@prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+
+# Public reference preset. Claim level C0 (descriptive): the description states
+# what the configuration is, not what it does for a listener, so no evidence
+# assessment is required or asserted. Adding one later means citing a real
+# reference under instances/references/, not deriving a tier from the settings.
+
+bsclab-preset:support-smr-focus-seed a sstim:Preset ;
+    rdfs:label "Support SMR Focus Seed" ;
+    dct:description "A single isochronic voice: thirteen notes per second on a 180 Hz base, no octave span, so the pulse train runs at 13 Hz within the SMR band. Published as a reference configuration for the preset instance model. This seed is not a clinical, health, or performance claim." ;
+    dct:created "2026-09-10"^^xsd:date ;
+    dct:modified "2026-09-10"^^xsd:date ;
+    sstim:targetsFrequencyBand sstim-v:smr ;
+    sstim:primaryFrequencyBand sstim-v:smr ;
+    sstim:inGroup sstim-v:groupSupport ;
+    sstim:hasBreathGuide false ;
+    sstim:presetVersion "0.1.0" ;
+    sstim:hasPublicClaimLevel sstim-v:claimC0Descriptive ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
+    sstim:composedOf preset-local:symmetry-voice .
+
+# 13 notes over a 1 s cycle is 13 Hz, well inside the 50 Hz engine ceiling that
+# SymmetryVoiceShape enforces as noteCount / cycleDuration.
+preset-local:symmetry-voice a sstim:Voice, sstim:SymmetryVoice ;
+    rdfs:label "Support SMR Focus Seed symmetry voice" ;
+    sstim:baseFrequency 180.0 ;
+    sstim:noteCount 13 ;
+    sstim:octaveSpan 0.0 ;
+    sstim:cycleDuration 1.0 ;
+    sstim:permutationFunction 0 ;
+    sstim:initialVolume 0.13 .

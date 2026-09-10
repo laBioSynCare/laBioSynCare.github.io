@@ -109,8 +109,10 @@ test('all expanded ontology targets preserve their publication-relative path', (
   const staged = production.map((target) => retargetTarget(target))
 
   // 93 since 2026-08-23: /ontology/docs/vocab/ was this set's only sole-owner
-  // target, and vocab's HTML moved to the application.
-  expect(production).toHaveLength(93)
+  // target, and vocab's HTML moved to the application. 96 since 2026-09-10,
+  // when the preset catalog grew to one reference record per group and each
+  // new id added its own Turtle target to the audited route block.
+  expect(production).toHaveLength(96)
   expect(staged.map((target) => target.slice(STAGED_TARGETS.ontology.length)))
     .toEqual(production.map((target) => target.slice(PRODUCTION_TARGETS.ontology.length)))
   expect(staged.every((target) => target.startsWith(STAGED_TARGETS.ontology))).toBe(true)

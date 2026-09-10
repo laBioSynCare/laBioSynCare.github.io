@@ -287,7 +287,9 @@ test('every committed public preset and reference has an exact entity route', ()
   const presets = typedSubjects(INSTANCE_URLS.presets, SSTIM + 'Preset')
   const references = typedSubjects(INSTANCE_URLS.references, SSTIM + 'PublicSafeReference')
 
-  expect(presets).toHaveLength(2)
+  // Five: one reference preset per catalog group (Heal, Support, Perform,
+  // Indulge, Transcend). Grown from two on 2026-09-10 with matching routes above.
+  expect(presets).toHaveLength(5)
   // 7 + the four neural-oscillation references ADR 0049 added, each verified
   // through Crossref before being written and each given an exact route below.
   expect(references).toHaveLength(11)

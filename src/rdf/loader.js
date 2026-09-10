@@ -250,6 +250,9 @@ export const INSTANCE_URLS = {
   presets: [
     applicationAsset('/ontology/instances/presets/perform-alpha-10-seed.ttl'),
     applicationAsset('/ontology/instances/presets/heal-theta-breathing-seed.ttl'),
+    applicationAsset('/ontology/instances/presets/support-smr-focus-seed.ttl'),
+    applicationAsset('/ontology/instances/presets/indulge-alpha-warmth-seed.ttl'),
+    applicationAsset('/ontology/instances/presets/transcend-theta-drift-seed.ttl'),
   ],
   protocols: [
     applicationAsset('/ontology/instances/protocols/bsc-reference-protocols.ttl'),

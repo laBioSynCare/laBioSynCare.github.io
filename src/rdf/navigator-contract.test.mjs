@@ -70,7 +70,8 @@ describe('unified navigator source boundary', () => {
     const urls = sources.map(source => source.url)
     expect(urls.some(url => url.includes('/sessions/'))).toBe(false)
     expect(urls.some(url => url.includes('/experiments/'))).toBe(false)
-    expect(urls.filter(url => url.includes('/presets/'))).toHaveLength(2)
+    // One reference preset per catalog group since 2026-09-10.
+    expect(urls.filter(url => url.includes('/presets/'))).toHaveLength(5)
     expect(urls.filter(url => url.includes('/references/'))).toHaveLength(1)
     expect(urls.some(url => url.includes('/fixtures/'))).toBe(false)
   })

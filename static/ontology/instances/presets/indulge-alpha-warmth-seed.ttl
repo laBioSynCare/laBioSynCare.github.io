@@ -1,0 +1,33 @@
+@prefix bsclab-preset:   <https://w3id.org/sstim/implementation/bsclab/preset/> .
+@prefix bsclab-protocol: <https://w3id.org/sstim/implementation/bsclab/protocol/> .
+@prefix dct:          <http://purl.org/dc/terms/> .
+@prefix preset-local: <https://w3id.org/sstim/implementation/bsclab/preset/indulge-alpha-warmth-seed#> .
+@prefix rdfs:         <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:        <https://w3id.org/sstim#> .
+@prefix sstim-v:      <https://w3id.org/sstim/vocab#> .
+@prefix xsd:          <http://www.w3.org/2001/XMLSchema#> .
+
+# Public reference preset, claim level C0 (descriptive). See the note in
+# support-smr-focus-seed.ttl on why no evidence assessment is attached.
+
+bsclab-preset:indulge-alpha-warmth-seed a sstim:Preset ;
+    rdfs:label "Indulge Alpha Warmth Seed" ;
+    dct:description "A single binaural voice: 190 Hz in the left channel and 200 Hz in the right, so the difference between the channels is 10 Hz, within the alpha band. The beat is a product of the two channels and is not present in either on its own, so headphones are assumed. This seed is not a clinical, health, or performance claim." ;
+    dct:created "2026-09-10"^^xsd:date ;
+    dct:modified "2026-09-10"^^xsd:date ;
+    sstim:targetsFrequencyBand sstim-v:alpha ;
+    sstim:primaryFrequencyBand sstim-v:alpha ;
+    sstim:inGroup sstim-v:groupIndulge ;
+    sstim:hasBreathGuide false ;
+    sstim:presetVersion "0.1.0" ;
+    sstim:hasPublicClaimLevel sstim-v:claimC0Descriptive ;
+    sstim:hasCautionTag sstim-v:cautionDrivingUnsafe, sstim-v:cautionDrowsyUse ;
+    sstim:forImplementation <https://w3id.org/sstim/implementation/bsclab> ;
+    sstim:followsProtocol bsclab-protocol:auditory-observation-reference ;
+    sstim:composedOf preset-local:binaural-voice .
+
+preset-local:binaural-voice a sstim:Voice, sstim:BinauralVoice ;
+    rdfs:label "Indulge Alpha Warmth Seed binaural voice" ;
+    sstim:carrierFreqLeft 190.0 ;
+    sstim:carrierFreqRight 200.0 ;
+    sstim:initialVolume 0.18 .
