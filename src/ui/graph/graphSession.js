@@ -12,6 +12,10 @@ export const graphSession = {
   // the app, but a link someone else opens must show the whole scope.
   hiddenNodes: [],
   focusNodeQuery: '',
+  // Whether the reader has answered the arrival chooser on /graph, including by
+  // asking for the whole graph. Session-only like the rest of this object, so a
+  // reload asks again but an in-app return from About does not.
+  entryChosen: false,
   showSubClassOf: true,
   showObjProp: true,
   showDataProp: false,

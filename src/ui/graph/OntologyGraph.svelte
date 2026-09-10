@@ -12,6 +12,7 @@
     MIN_ZOOM, MAX_ZOOM, FOCUS_PARAM_VALUE,
   } from './deepLink.js'
   import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
+  import { GRAPH_CONCERNS } from './concerns.js'
   import LoadingPanel from '../loading/LoadingPanel.svelte'
   import { yieldToScheduler, yieldToPaint } from '../loading/renderYield.js'
   import { graphNavigation, resetGraphNavigation } from '../navigation/graphNavigation.js'
@@ -93,30 +94,6 @@
       about: 'The live stakeholder network: people, organizations and reviewed relationships. Fetched at runtime, separately approved and sourced per record, retractable, and deliberately excluded from citable releases.' },
   ]
 
-  const GRAPH_CONCERNS = [
-    { value: 'frequency', label: 'Frequency bands',
-      about: 'The frequency band vocabulary — delta through gamma, their sub-bands and single-frequency targets — with the FrequencyBand classes that govern them.' },
-    { value: 'modality', label: 'Sensory modalities',
-      about: 'Sensory modality concepts (auditory, visual, tactile and beyond) together with the perceived-modality vocabulary used by the exposure model.' },
-    { value: 'mechanism', label: 'Stimulation mechanisms',
-      about: 'The mechanisms by which a stimulus is thought to act — the StimulationMechanism class and its concept scheme.' },
-    { value: 'technique', label: 'Techniques',
-      about: 'Named stimulation techniques and the SensoryStimulationTechnique class they instantiate.' },
-    { value: 'voice', label: 'Voice types & rhythm',
-      about: 'The preset voice model: Binaural, Martigli, Martigli-Binaural and Symmetry voice types, permutation functions, and the temporal structure of a stimulus.' },
-    { value: 'group', label: 'Preset groups',
-      about: 'The five catalog groups — Heal, Support, Perform, Indulge, Transcend — and the PresetGroup class.' },
-    { value: 'evidence', label: 'Evidence & claims',
-      about: 'The evidence model: assessment claims, propositions and scope, evidence tiers and modality tags, bibliographic and public-safe references, claim and effect direction, review status.' },
-    { value: 'caution', label: 'Cautions & safety',
-      about: 'Caution tags and their severity levels — the vocabulary behind safety messaging and contraindication flags.' },
-    { value: 'exposure', label: 'Exposure & delivery',
-      about: 'How a stimulus reaches a person: delivery media, device capabilities, body placement, stimulus patterns, comfort boundaries, perceptual gains and losses, and experiment context.' },
-    { value: 'stimulation', label: 'Stimulation · neutral layer',
-      about: 'The modality-neutral stimulation layer — Stimulation, techniques, protocols and interventions — described without committing to a neural mechanism.' },
-    { value: 'neuromodulation', label: 'Neuromodulation',
-      about: 'A cross-cutting view (ADR 0034/0036): neuromodulation classes, neural access routes, delivery approaches, target sites, systems and phenomena, plus every concept that asserts one of those facets.' },
-  ]
 
   // The module axis is generated from the ADR 0043 manifest, never hand-listed.
   // The manifest is the one bill of materials — the loader already derives its

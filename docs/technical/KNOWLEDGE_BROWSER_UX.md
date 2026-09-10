@@ -19,6 +19,27 @@ The feature list is in [`CHANGELOG.md`](../../CHANGELOG.md) and the code in
 `src/ui/graph/`. What is worth carrying forward is the reasoning, because these
 are the choices a future change could quietly undo:
 
+- **Arrival asks where to start.** `/graph` opened on the whole term space:
+  749 nodes, 880 edges, about 7.5 seconds of layout, at a fit zoom where none
+  of the labels resolve. "Explore the ontology" is the first button on the
+  entrance, so that view was the project's answer to "what is SSTIM", and it
+  answered with a hairball. Measuring every concern scope showed the cost was
+  never parsing the ontology: each one loads in roughly 2.8 seconds whatever
+  its size, so the 7.5 seconds was laying out 749 nodes. Legibility has a hard
+  edge between 40 and 84 nodes, which is what decides the six entry points in
+  `entryChooser.js`. The reader chooses rather than getting a new default,
+  because SSTIM is a universal standard and BioSynCare is one audio-focused
+  application of it (`SSTIM_DIRECTIONS.md`): opening every visit on Frequency
+  bands, much the most legible of these graphs, would tell a standards reviewer
+  the opposite of what the project claims about its own scope. Two constraints
+  hold it together, both pinned in `entryChooser.test.js`. A URL that already
+  names a scope or a camera (`view`, `layer`, `module`, `hide`, `zoom`,
+  `focus`) or carries a node hash never sees the chooser, because w3id.org
+  resolves into this page and a published link has already said where it wants
+  to land. And `layerFilters` is deliberately not part of the "already scoped"
+  test: it always carries a value, so testing it would suppress the chooser on
+  every arrival and quietly restore the old behaviour.
+
 - **The scope picker has axes, not a list.** One flat list of 18 entries silently
   served three different questions, so "Core OWL classes", "Ecosystem focus" and
   "Frequency bands" read as mutually exclusive when they are not. It is now three
