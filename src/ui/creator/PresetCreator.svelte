@@ -20,6 +20,7 @@
     requiresFlashAcknowledgement,
   } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
+  import { EXAMPLE_PATCHES, getExamplePatch } from './examplePatches.js'
   import { paramLabel } from './paramLabels.js'
   import {
     FIELD_REPORT_SECTIONS,
@@ -152,6 +153,7 @@
   let currentPatchName = $state(null)
   let busyPatchId = $state(null)
   let lastPatchUid = null
+  let examplesMenuOpen = $state(false)
   let starterOffer = $state(null)
   let starterSequence = 0
 
@@ -293,6 +295,7 @@
   })
 
   const STUDIO_HELP = [
+    ['Start', 'New here? Open Examples in the header for a ready-made patch, then press Space.'],
     ['Add', 'Use the column + buttons to add control, audio, visual, and haptic tracks.'],
     ['Tune', 'Adjust each card directly; linked modulation appears under the M controls.'],
     ['Export', 'Copy or download JSON, or save signed-in patches to Firebase.'],
@@ -1011,6 +1014,7 @@
 
   onMount(() => {
     syncCreatorSession()
+    applyIncomingExample()
     // A patch may have arrived in the URL fragment. Offered, never applied.
     readIncomingLink()
     // ...and a single track may have arrived in ?add=, from the Graph
@@ -1201,6 +1205,36 @@
     } catch (e) {
       tip(`Import failed: ${e.message}`)
     }
+  }
+
+  // `/creator/?example=<id>` opens a named example on arrival, which is what
+  // lets the entrance link straight at something playable instead of at an
+  // editor. Applied on mount only, never from afterNavigate: replacing the
+  // open patch is destructive, and a fresh arrival is the one moment when
+  // there is nothing to destroy.
+  function applyIncomingExample() {
+    const token = new URL(window.location.href).searchParams.get('example')
+    if (!token) return
+    const url = new URL(window.location.href)
+    url.searchParams.delete('example')
+    replaceState(`${url.pathname}${url.search}${url.hash}`, {})
+    const example = getExamplePatch(token)
+    if (!example) {
+      tip(`Unknown example: ${token}.`)
+      return
+    }
+    openExample(example)
+  }
+
+  function openExample(example) {
+    // Same reset path as Import: an example is a patch arriving from outside
+    // the current session, not an edit to the one that was open.
+    resetLiveDraftState(example.build())
+    currentPatchId = null
+    currentPatchName = null
+    examplesMenuOpen = false
+    saveMenuOpen = false
+    tip(`Opened ${example.label}. Press Space to play.`)
   }
 
   function resetLiveDraftState(nextDraft) {
@@ -1889,6 +1923,30 @@
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
       <button class="act-btn" onclick={copyLink} disabled={hasErrors} title="Copy a link that carries this patch. Nothing is uploaded — the patch travels inside the link itself.">Share link</button>
+      <details class="cloud-menu" bind:open={examplesMenuOpen}>
+        <summary title="Open a ready-made patch">Examples</summary>
+        <div class="cloud-panel">
+          <p class="cloud-status">
+            Ready-made patches, loaded into the Studio. Nothing is uploaded and nothing you
+            have saved is touched.
+          </p>
+          <ul class="cloud-list">
+            {#each EXAMPLE_PATCHES as example (example.id)}
+              <li>
+                <div class="cloud-item-main">
+                  <span>{example.label}</span>
+                  <small>{example.blurb}{example.needs ? ` ${example.needs}.` : ''}</small>
+                </div>
+                <div class="cloud-item-actions">
+                  <button type="button" class="cloud-row-action primary" onclick={() => openExample(example)}>
+                    Open
+                  </button>
+                </div>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      </details>
       <button class="act-btn" onclick={pickImportFile} title="Load a patch JSON file exported from any SSTIM Workbench instance">Import</button>
       <input
         bind:this={importInput}

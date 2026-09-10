@@ -55,7 +55,15 @@
       eyebrow: 'Experience',
       title: 'Try a session.',
       copy: 'Audio-visual sessions in your browser — no install, start gently.',
-      primary: [{ label: 'Open Patch Studio', href: applicationRoute('/creator/') }],
+      // A ready-made patch leads, because this door's promise is "try a
+      // session" and the Studio on its own is an editor: it opened on a column
+      // of + buttons with nothing to press. `?example=` loads one of the
+      // bundled patches on arrival (src/ui/creator/examplePatches.js), so the
+      // first click now makes a sound rather than presenting a workbench.
+      primary: [
+        { label: 'Play a ready-made patch', href: applicationRoute('/creator/?example=alpha-10-isochronic') },
+        { label: 'Open Patch Studio', href: applicationRoute('/creator/') },
+      ],
       secondary: [
         { label: 'Start from a sensory template', href: applicationRoute('/creator/?starter=field') },
         { label: 'Browse presets', href: applicationRoute('/presets/') },

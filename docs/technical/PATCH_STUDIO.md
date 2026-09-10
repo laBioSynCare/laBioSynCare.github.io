@@ -49,6 +49,51 @@ this document should be corrected.
 
 ---
 
+## 0. Getting started
+
+**For a reader who has never opened the Studio.** The header carries an
+**Examples** menu with six bundled patches. Pick one, press **Space**, and the
+patch plays. That is the whole first run; everything below is what you can do
+once you want to change something.
+
+The examples exist because the Studio is an editor, and an editor with an empty
+patch and a column of `+` buttons answers none of the questions a first-time
+visitor has. They are defined in
+[`examplePatches.js`](../../src/ui/creator/examplePatches.js) and built with the
+same factories the UI uses, so an example cannot drift out of the model:
+[`examplePatches.test.js`](../../src/ui/creator/examplePatches.test.js) rebuilds
+each one, validates it, and round-trips it through the real export and import
+path.
+
+| Example | What it demonstrates |
+|---|---|
+| Alpha 10 Hz isochronic | The smallest complete patch: one carrier, one pulse rate |
+| Gamma 40 Hz isochronic | The same shape at 40 Hz, for comparison |
+| Binaural alpha beat | Two channel frequencies and the beat between them (headphones) |
+| Theta breathing pacer | A control track linked to an audio parameter |
+| Ocean and drone | A sample and a drone, with nothing modulated |
+| Colour wash and tone | A visual track and an audio track on one transport |
+
+`/creator/?example=<id>` opens one directly, which is how the entrance's
+"Play a ready-made patch" link works. It is applied on mount only, never from
+`afterNavigate`: replacing the open patch is destructive, and a fresh arrival
+is the one moment when there is nothing to destroy. An unknown id falls back to
+the default patch rather than throwing, because the value arrives from a URL.
+
+Levels are deliberately low. Modulation adds on top of a track's base gain, so
+the base alone does not bound what you hear: the breathing pacer's carrier sits
+at 0.08 precisely because a 0.2 base with a 0.6 link measured a 0.43 peak in a
+real `AudioContext`, roughly four times its siblings. The bundled patches were
+measured by tapping the audio graph in a browser, not inferred from the numbers
+in the source.
+
+**These are Patch Studio patches, not catalog presets.** The two models are
+distinct (`CLAUDE.md` §4) and the bridge between them is gated by ADR 0026, so
+nothing in the Examples menu carries a `header`, a `group`, or an evidence
+tier, and none of it appears in the `/presets/` reference library.
+
+---
+
 ## 1. The draft
 
 A patch draft is a plain object held in Svelte `$state`:
