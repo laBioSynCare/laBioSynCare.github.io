@@ -16,11 +16,12 @@
   import { defaultPatchStore } from '../../storage/patchStores.js'
   import { visualStimulationOn } from '../../ui/safety/visualSafety.js'
   import {
-    FLASH_SAFE_MAX_HZ, clampFlashRate, flashRiskLevel, flashRiskMessage,
+    FLASH_SAFE_MAX_HZ, flashRiskLevel, flashRiskMessage,
     requiresFlashAcknowledgement,
   } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
   import { createPatchTransport } from './patchTransport.js'
+  import { advanceVisualPhase, controlStateFor, visualFrameDelta } from './patchFrame.js'
   import { EXAMPLE_PATCHES, getExamplePatch } from './examplePatches.js'
   import { paramLabel } from './paramLabels.js'
   import {
@@ -42,13 +43,9 @@
   import { TREE_STORAGE_KEY } from '../field/tree/treeState.js'
   import { ABSTRACT_STORAGE_KEY } from '../field/abstract/abstractState.js'
   import { LANDSCAPE_STORAGE_KEY } from '../field/landscape/landscapeState.js'
-  import {
-    computeMartigliState,
-    computeMartigliStateFree,
-    computeSinusoidState,
-    computeSymmetryState,
-    martigliPathD,
-  } from './controlSignals.js'
+  // The four compute* signal functions moved behind patchFrame.controlStateFor;
+  // only the preview path drawing is still called from here.
+  import { martigliPathD } from './controlSignals.js'
   import {
     AUDIO_PARAM_RANGE,
     AUDIO_PARAMS,
@@ -697,20 +694,7 @@
       const values = new Map()
       for (const c of draft.controlTracks) {
         const effectiveTrack = controlTrackForTempo(c, tempoContext)
-        let st
-        if (c.type === 'LFO') {
-          st = (sessionElapsed != null)
-            ? computeMartigliState(effectiveTrack, sessionElapsed, sessionLength)
-            : computeMartigliStateFree(effectiveTrack, tNow)
-        } else if (c.type === 'Permutation') {
-          const ts = sessionElapsed != null ? sessionElapsed : tNow
-          st = computeSymmetryState(effectiveTrack, ts)
-        } else if (c.type === 'Sinusoid') {
-          const ts = sessionElapsed != null ? sessionElapsed : tNow
-          st = computeSinusoidState(effectiveTrack, ts)
-        } else {
-          st = { value: 0 }
-        }
+        const st = controlStateFor(effectiveTrack, { sessionElapsed, sessionLength, now: tNow })
         if (writeStates) controlStates[c.id] = st
         values.set(c.id, st.value)
       }
@@ -779,31 +763,21 @@
     // Advance Blink/Oscillate preview phases from a free-running clock (so they
     // animate whether or not the session is playing) using the live, modulated
     // rate. Writes __blinkOn / __oscVal into liveValues for visualStyle().
-    const vdt = lastVisualTick == null ? 0 : Math.max(0, Math.min(0.1, tNow - lastVisualTick))
+    const vdt = visualFrameDelta(lastVisualTick, tNow)
     lastVisualTick = tNow
     for (const track of draft.visualTracks) {
-      const tt = track.trackType
-      const colorBlink = tt === 'ColorField' && track.config?.blinkEnabled === true
-      if (tt !== 'Blink' && tt !== 'Oscillate' && tt !== 'Pacer' && !colorBlink) continue
-      const lv = liveValues[track.id] ?? (liveValues[track.id] = {})
-      if (tt === 'Blink' || colorBlink) {
-        const rawRate = clamp(num(lv.blinkRate ?? track.params.blinkRate?.value, 10), 0.01, 40)
-        // Photosensitivity gate: capped at the general-safe ceiling unless the
-        // author has accepted the risk for this session.
-        const rate = clampFlashRate(rawRate, { accepted: flashAccepted })
-        const duty = clamp(num(lv.duty ?? track.params.duty?.value, 0.5), 0.01, 0.99)
-        let ph = (visualPhase[track.id] ?? 0) + vdt * rate
-        ph -= Math.floor(ph)
-        visualPhase[track.id] = ph
-        lv.__blinkOn = ph < duty ? 1 : 0
-      } else {
-        // Oscillate and Pacer both breathe on oscRate (0..1 cosine).
-        const rate = clamp(num(lv.oscRate ?? track.params.oscRate?.value, 1), 0.01, 10)
-        let ph = (visualPhase[track.id] ?? 0) + vdt * rate
-        ph -= Math.floor(ph)
-        visualPhase[track.id] = ph
-        lv.__oscVal = 0.5 - 0.5 * Math.cos(2 * Math.PI * ph)
-      }
+      const cached = liveValues[track.id]
+      const advanced = advanceVisualPhase(track, {
+        phase: visualPhase[track.id] ?? 0,
+        live: cached ?? {},
+        dt: vdt,
+        flashAccepted,
+      })
+      if (!advanced) continue
+      visualPhase[track.id] = advanced.phase
+      const lv = cached ?? (liveValues[track.id] = {})
+      if (advanced.kind === 'blink') lv.__blinkOn = advanced.blinkOn
+      else lv.__oscVal = advanced.oscVal
     }
 
     // Keep direct control-track previews aligned with tempo-synced values.

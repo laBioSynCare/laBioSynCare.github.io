@@ -1391,9 +1391,20 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       the real destination: five synthesised cases bit-identical on peak,
       within 0.7% on RMS; the sample-playing case varies that much by itself.*
 
-      *`rafTick` is what remains: ~170 lines touching nine pieces of component
-      reactive state, mostly modulation application rather than transport. Do it
-      as its own change, not folded into anything else.*
+      *`rafTick` was measured 2026-09-10 and should NOT move into
+      patchTransport.js: 158 lines over twelve pieces of reactive state with
+      eleven writes, plus nine component-local helpers that exist only to inject
+      reactive reads. A seam for it needs ~21 members and relocates the coupling
+      rather than reducing it. PATCH_STUDIO.md §11.2 has been corrected.*
+
+      *Instead, the pure per-frame computations came out into
+      `src/ui/creator/patchFrame.js` (control-signal dispatch, visual phase
+      advance and its photosensitivity cap), following the rule every other
+      extraction here obeys. What is left in `rafTick` is stateful
+      orchestration: two-pass tempo evaluation, modulation write-out,
+      BinauralBeat virtual params, control-preview alignment. Shrinking that
+      further means moving state ownership, which is a rewrite and needs its own
+      decision.*
 - [~] Shared visual composition and the reusable `SceneStage` path now render the
       Field-derived track types with vector blend, first-spatial-position
       topology, and clock-gated/8-fps SIRDS behavior; a renderer registry and the
