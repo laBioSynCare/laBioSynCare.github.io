@@ -619,10 +619,32 @@ Decomposition (extract, do not rewrite behaviour):
   `sineWavePath`, `isoEnvelopeOutlinePath`, `isoWavePath`, `binauralSumPath`,
   `binauralBeatEnvelopePath`, `noisePath`, `polygonPoints`, `adaptiveSamples`,
   `binauralRowWindow` — SVG scope-preview geometry.
-- **`patchTransport.js` (controller):** `createEngine`, `togglePlay`,
-  `trackToVoiceSpec`, `startVoiceFor`, `stopVoiceFor`, `stopAllVoices`,
-  `restartVoice`, `restartSystem`, and the `rafTick` loop. Keeps the
-  `AudioContext.currentTime` clock authority (`CLAUDE.md` §3.1) in one place.
+- **`patchTransport.js` (controller) — engine and voices done, `rafTick` not.**
+  Extracted: `createEngine`, `togglePlay`, `trackToVoiceSpec`, `startVoiceFor`,
+  `stopVoiceFor`, `stopAllVoices`, `restartVoice`, `applyTremolo` and
+  `restartSystem`, plus `stopPlayback`/`beginPlayback`, which the original
+  duplicated between `togglePlay` and `restartSystem`. Every scheduling read of
+  `AudioContext.currentTime` (`CLAUDE.md` §3.1) is now in that one file, so
+  there is a single place to check that no second clock has appeared.
+
+  The component reaches the transport through a host object of **getters**, not
+  values: `draft`, `engine` and the rest are runes, and reading a rune at call
+  time is what keeps the transport attached to the UI across a module boundary.
+  Passing them by value would snapshot them once and silently detach it.
+
+  `rafTick` deliberately stays in the component for now. It is ~170 lines that
+  read and write nine pieces of component reactive state, and most of its body
+  is modulation application rather than transport, so routing all of it through
+  the same seam in one pass would be a large mechanical change with a silent
+  failure mode. It reads the clock the same way this file does.
+
+  Parity was measured rather than reasoned about: an analyser tapped onto
+  everything reaching `ctx.destination` in a real `AudioContext`, six bundled
+  examples plus the default patch, before and after. All five synthesised cases
+  came back bit-identical on peak and within 0.7% on RMS. `ocean-drone` moved
+  9.9% on peak, and repeating it on one build showed a 7.2% spread by itself,
+  because it plays a recorded sample and the measurement window lands somewhere
+  different each run.
 - **Cloud store:** ✅ **done** — extracted to
   [`../../src/storage/`](../../src/storage/) as the `PatchStore` seam.
 - **Subcomponents:** `StudioVisualStage`, `VisualStageControls`, and

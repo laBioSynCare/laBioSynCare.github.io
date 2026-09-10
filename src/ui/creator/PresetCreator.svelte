@@ -20,6 +20,7 @@
     requiresFlashAcknowledgement,
   } from '../../ui/safety/flashSafety.js'
   import { creatorSession } from './creatorSession.js'
+  import { createPatchTransport } from './patchTransport.js'
   import { EXAMPLE_PATCHES, getExamplePatch } from './examplePatches.js'
   import { paramLabel } from './paramLabels.js'
   import {
@@ -218,6 +219,42 @@
   let flashAccepted = $state(false)
   let lastVisualTick = null
   let controllerTime = $state(0)
+
+  // The transport (engine lifecycle + the voices it schedules) lives in
+  // patchTransport.js — PATCH_STUDIO.md §11.2. It reaches this component's
+  // reactive state through getters rather than by value: `draft`, `engine` and
+  // the rest are runes, and reading a rune at call time is what keeps the
+  // transport attached to the UI across the module boundary. `rafTick` is still
+  // here; see the note at the top of patchTransport.js for why.
+  const transport = createPatchTransport({
+    get draft() { return draft },
+    get engine() { return engine },
+    set engine(value) {
+      engine = value
+      // syncCreatorSession() also writes this, but the transport sets the
+      // engine at points where the sync has not happened yet.
+      creatorSession.engine = value
+    },
+    get voiceHandles() { return voiceHandles },
+    get sessionStartTime() { return sessionStartTime },
+    set sessionStartTime(value) { sessionStartTime = value },
+    clearLiveValues() { liveValues = {} },
+    readParam(track, name, fallback) { return num(getLive(track, name), fallback) },
+    tip(message) { tip(message) },
+    syncSession() { syncCreatorSession() },
+  })
+
+  const {
+    createEngine,
+    trackToVoiceSpec,
+    startVoiceFor,
+    stopVoiceFor,
+    stopAllVoices,
+    restartVoice,
+    applyTremolo,
+    togglePlay,
+    restartSystem,
+  } = transport
 
   // Visual mix window. It opens at a cross-eye-friendly size and only enters
   // true fullscreen after an explicit action inside the window.
@@ -532,126 +569,15 @@
   }
 
   // ── Transport / IO ────────────────────────────────────────────────────────────
-
-  // Build and initialise the audio engine chosen in Settings, resolving to the
-  // compatible default or the capability-free Silent engine when necessary.
-  async function createEngine() {
-    const { engine: created, id, fellBack } = createAudioEngine()
-    if (fellBack) {
-      const wanted = audioEngines.find((e) => e.id === getActiveAudioEngineId())
-      const resolved = audioEngines.find((e) => e.id === id)
-      tip(`${wanted?.name ?? 'Selected engine'} unavailable here — using ${resolved?.name ?? id}.`)
-    } else {
-      const desc = audioEngines.find((e) => e.id === id)
-      if (desc && desc.id !== 'vanilla') tip(`Audio engine: ${desc.name}.`)
-    }
-    await created.initialize()
-    return created
-  }
-
-  async function togglePlay() {
-    if (draft.playing) {
-      stopAllVoices()
-      draft.playing = false
-      sessionStartTime = null
-      liveValues = {}
-      syncCreatorSession()
-      tip('Stopped.')
-      return
-    }
-    try {
-      if (!engine) {
-        engine = await createEngine()
-        creatorSession.engine = engine
-      }
-      await engine.resume()
-    } catch (e) {
-      tip(`Audio unavailable: ${e.message ?? e}`)
-      return
-    }
-    draft.playing = true
-    sessionStartTime = engine.getAudioContext().currentTime
-    syncCreatorSession()
-    for (const track of draft.audioTracks) startVoiceFor(track)
-    tip('Playing…')
-  }
-
-  function trackToVoiceSpec(track) {
-    const gain = track.muted ? 0 : num(getLive(track, 'gain'), track.params.gain?.value ?? 0.5)
-    const spec = {
-      type: track.trackType,
-      volume: gain,
-      params: { gain },
-      tremolo: track.tremolo ? { ...track.tremolo } : null,
-    }
-    if (track.trackType === 'BinauralBeat') {
-      spec.params.leftFreq = num(getLive(track, 'leftFreq'), track.params.leftFreq.value)
-      spec.params.rightFreq = num(getLive(track, 'rightFreq'), track.params.rightFreq.value)
-    } else if (track.trackType === 'Noise') {
-      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
-      spec.params.cutoff = num(getLive(track, 'cutoff'), track.params.cutoff?.value ?? 6000)
-      spec.params.resonance = num(getLive(track, 'resonance'), track.params.resonance?.value ?? 0.707)
-      spec.noiseColor = track.noiseColor ?? 'pink'
-      spec.noiseFilter = track.noiseFilter ?? 'lowpass'
-    } else if (track.trackType === 'Drone') {
-      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
-      spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 110)
-      spec.params.detune = num(getLive(track, 'detune'), track.params.detune?.value ?? 12)
-      spec.droneVoices = track.droneVoices ?? 5
-    } else if (track.trackType === 'Sample') {
-      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
-      spec.sampleId = track.sampleId ?? 'rain'
-    } else {
-      spec.params.pan = num(getLive(track, 'pan'), track.params.pan?.value ?? 0)
-      spec.params.frequency = num(getLive(track, 'frequency'), track.params.frequency?.value ?? 200)
-      spec.params.pulseRate = num(getLive(track, 'pulseRate'), track.params.pulseRate?.value ?? 10)
-    }
-    if (track.trackType === 'IsochronicTone') spec.envelope = isoEnvSpec(track)
-    return spec
-  }
-
-  function startVoiceFor(track) {
-    if (!engine) return
-    const ctx = engine.getAudioContext()
-    const handle = engine.scheduleVoice(trackToVoiceSpec(track), ctx.currentTime + 0.05)
-    voiceHandles.set(track.id, handle)
-  }
-
-  function stopVoiceFor(trackId) {
-    if (!engine) return
-    const handle = voiceHandles.get(trackId)
-    if (!handle) return
-    engine.stopVoice(handle, engine.getAudioContext().currentTime)
-    voiceHandles.delete(trackId)
-  }
-
-  function stopAllVoices() {
-    if (!engine) return
-    const t = engine.getAudioContext().currentTime
-    for (const handle of voiceHandles.values()) engine.stopVoice(handle, t)
-    voiceHandles.clear()
-  }
-
-  // Rebuild a live voice from scratch — used when a structural choice (e.g. the
-  // noise colour) changes, which can't be applied as a smooth AudioParam ramp.
-  function restartVoice(track) {
-    if (!draft.playing || !engine) return
-    stopVoiceFor(track.id)
-    startVoiceFor(track)
-  }
+  // Engine lifecycle and voice scheduling now live in patchTransport.js and are
+  // bound to `transport` above. What remains below is the state the transport
+  // reads through that seam, plus rafTick.
 
   // ── Tremolo (per-track AM, any audio track) ─────────────────────────────────
   function toggleTremolo(track) {
     if (!track.tremolo) track.tremolo = createTremolo()
     track.tremolo.enabled = !track.tremolo.enabled
     restartVoice(track) // enabling/disabling is structural in the Vanilla engine
-  }
-
-  // Live rate/depth/mode update for an enabled tremolo (no voice restart).
-  function applyTremolo(track) {
-    if (!engine) return
-    const handle = voiceHandles.get(track.id)
-    if (handle) engine.setTremolo(handle, track.tremolo)
   }
 
   // ── rAF loop ─────────────────────────────────────────────────────────────────
@@ -913,33 +839,6 @@
     }
 
     rafId = requestAnimationFrame(rafTick)
-  }
-
-  async function restartSystem() {
-    stopAllVoices()
-    draft.playing = false
-    sessionStartTime = null
-    liveValues = {}
-    syncCreatorSession()
-    if (engine) {
-      try { await engine.dispose() } catch (_) {}
-      engine = null
-      voiceHandles.clear()
-      syncCreatorSession()
-    }
-    try {
-      engine = await createEngine()
-      await engine.resume()
-      creatorSession.engine = engine
-    } catch (e) {
-      tip(`Restart failed: ${e.message ?? e}`)
-      return
-    }
-    draft.playing = true
-    sessionStartTime = engine.getAudioContext().currentTime
-    syncCreatorSession()
-    for (const track of draft.audioTracks) startVoiceFor(track)
-    tip('Restarted.')
   }
 
   function isTypingTarget(node) {

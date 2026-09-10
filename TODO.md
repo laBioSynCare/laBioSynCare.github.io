@@ -1381,9 +1381,19 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       instance; private catalog data stays outside this repository `P2`
 
 **Decompose the monolith (PATCH_STUDIO.md §11.2)**
-- [ ] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
+- [~] Extract `src/ui/creator/patchTransport.js` (engine lifecycle + `rafTick`,
       preserving the `AudioContext.currentTime` clock authority); required by
       integration Milestone 1 `P2`
+      *Engine lifecycle and voice scheduling extracted 2026-09-10, with a
+      getter-based host seam so the runes stay reactive across the module
+      boundary. Every scheduling read of the authoritative clock is now in that
+      one file. Audio parity measured before and after through an analyser on
+      the real destination: five synthesised cases bit-identical on peak,
+      within 0.7% on RMS; the sample-playing case varies that much by itself.*
+
+      *`rafTick` is what remains: ~170 lines touching nine pieces of component
+      reactive state, mostly modulation application rather than transport. Do it
+      as its own change, not folded into anything else.*
 - [~] Shared visual composition and the reusable `SceneStage` path now render the
       Field-derived track types with vector blend, first-spatial-position
       topology, and clock-gated/8-fps SIRDS behavior; a renderer registry and the
