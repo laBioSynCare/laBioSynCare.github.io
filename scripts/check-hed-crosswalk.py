@@ -186,7 +186,7 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
     definitions in scope. Returns (failures, distinct tag count)."""
     from hed import load_schema_version
     from hed.models import HedString, DefinitionDict
-    from hed.errors import get_printable_issue_string
+    from hed.errors import ErrorHandler, ErrorSeverity, get_printable_issue_string
 
     version = spec["hedSchema"]["version"]
     schema = load_schema_version(version)
@@ -198,6 +198,7 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
     defs = [v for k, v in spec.get("definitions", {}).items() if not k.startswith("$")]
     definitions = DefinitionDict(defs, schema)
     failures: list[str] = []
+    warnings: list[str] = []
     for issue in definitions.issues:
         failures.append(f"definition: {issue}")
 
@@ -226,9 +227,20 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
         for suffix, string in variants:
             hed_string = HedString(string, schema, def_dict=definitions)
             issues = hed_string.validate(schema)
-            if issues:
-                detail = get_printable_issue_string(issues).strip().splitlines()
+            # Errors fail the gate; warnings are reported and do not. Kay
+            # Robbins ruled on 2026-09-09 that HED warnings are not stopping
+            # points: they exist so an author confirms an unusual tag was meant.
+            # The difference is not academic. An extension tag such as
+            # Perform/Report raises TAG_EXTENDED at severity WARNING, and
+            # treating that as a failure rejected the annotation she wrote for
+            # us.
+            errors = ErrorHandler.filter_issues_by_severity(issues, ErrorSeverity.ERROR)
+            if errors:
+                detail = get_printable_issue_string(errors).strip().splitlines()
                 failures.append(f"{event}{suffix}: {string} — {detail[-1].strip()}")
+            for issue in issues:
+                if issue not in errors:
+                    warnings.append(f"{event}{suffix}: {string} — {issue.get('code')}")
             tags.update(tag.short_base_tag for tag in hed_string.get_all_tags())
 
     # The definitions are validated above by DefinitionDict, which is the only
@@ -237,6 +249,8 @@ def validate_strings(spec: dict) -> tuple[list[str], int]:
     # good definition. They are parsed here for their tags alone.
     for string in defs:
         tags.update(tag.short_base_tag for tag in HedString(string, schema).get_all_tags())
+    for warning in warnings:
+        print(f"hed-crosswalk: warning (not fatal) {warning}")
     return failures, len(tags)
 
 

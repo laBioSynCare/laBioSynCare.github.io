@@ -362,8 +362,6 @@ sstim:PublicSafeReference rdfs:subClassOf iao:0000030 .
 # is granted. Withdrawing these mappings, if that ever becomes necessary, is
 # still a one-commit change.
 #
-# Full record: docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md
-#
 # Both relations follow the KR-09 extension/intension test, not label similarity.
 
 sstim:SensoryStimulation skos:narrowMatch snomed:226056003 .

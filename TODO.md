@@ -242,8 +242,8 @@ indexed, examiner-searchable records.
       *SNOMED International replied on 2026-09-04 offering a no-fee "public good"
       affiliate licence for the two mapping statements in the alignment module,
       applied for through MLDS, with a note to their Chief Digital Information
-      Officer so he can process it. Recorded at
-      [`docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md`](docs/ontology/outreach/2026-09-04-snomed-affiliate-licence-reply.md).
+      Officer so he can process it. Recorded in the
+      access-limited correspondence tree, `.private/correspondence/2026-09-04-snomed/`.
       Recommendation there was to apply and change no triples, and that is what
       happened: submitted 2026-09-04 in the name of Aeterni Anima (organisation
       type "Other / Non-formalized"), Public Good agreement, Academic /
@@ -643,6 +643,32 @@ indexed, examiner-searchable records.
       `sstim:ParticipantEngagementMode` already answers a method-level version of
       it with three values where HED is considering two.*
 
+- [ ] Decide what a resume restores, and whether SSTIM says it `P3`
+      *Raised 2026-08-31 in Kay Robbins' direct reply, recorded in
+      `.private/correspondence/2026-08-31-kay-robbins/`.
+      Freezing the output is not enough to restart where a session left off: the
+      player state has to be saved somewhere, and neither the record nor the
+      demonstrator says what that state is, how it is stored, or what is
+      displayed while paused. Distinct from the participant action question
+      above, which is about who acted; this is about what was preserved.*
+
+      *Measured 2026-09-08 against* `docs/ontology/TERM_INDEX.md`. *What exists
+      is timeline accounting and not player state:* `sstim:sessionClockOffsetSeconds`
+      *on the event,* `sstim:actualDurationSeconds` *and*
+      `sstim:deliveredDurationSeconds` *on the instance, which is what stops a
+      paused session reading as a short one.* `src/session/sessionRecorder.js`
+      *implements that and no more (*`pausedAtOffset`*,* `pausedTotal`*). No term
+      names a resume position, a saved player state, or a pause display.*
+
+      *The reference application is a step further back: the Patch Studio
+      transport is play and stop (*`togglePlay` *in*
+      `src/ui/creator/PresetCreator.svelte`*), and stopping clears the session
+      start time and live values rather than preserving them. The pause in the
+      demonstrator bundle is a modelled event type that no surface in the app
+      currently produces. Decide whether resume state is in scope for the session
+      model before adding terms for it, because the honest current answer is that
+      nothing restores anything.*
+
 - [!] Decide the shape of generated HED definition bodies `P3`
       *Blocked on the HED Working Group, asked 2026-08-21 on
       [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
@@ -974,8 +1000,8 @@ Turtle files are listed in section 1. After they exist:
       have fewer PRs; if they accept, this item disappears.*
 
 - [~] Post the ShowVoc enquiry once admitted to the VocBench group `P2`
-      *Drafted and committed at
-      [`docs/ontology/outreach/2026-08-18-showvoc-enquiry.md`](docs/ontology/outreach/2026-08-18-showvoc-enquiry.md).
+      *Drafted at
+      `.private/correspondence/2026-08-18-showvoc/enquiry.md`.
       Membership requested 2026-08-18; awaiting moderation. Must be posted by a
       human — the documented support channel is
       [`groups.google.com/g/vocbench-user`](https://groups.google.com/g/vocbench-user)
@@ -993,6 +1019,30 @@ Turtle files are listed in section 1. After they exist:
 - [~] Convert cleared public references to RDF in
       `static/ontology/instances/references/` `P1`
       *Seven records are present; expand only with source and venue review.*
+
+- [?] Decide whether to grow the public preset catalog beyond its two seeds `P2`
+      *Measured 2026-09-10 against the production build: `/presets/` renders
+      "2 PUBLISHED RECORDS", from `heal-theta-breathing-seed.ttl` and
+      `perform-alpha-10-seed.ttl`, the only two `sstim:Preset` instances in
+      `static/ontology/instances/presets/`. Door 2 on the entrance offers
+      "Browse presets" as a secondary action, so a visitor who follows it
+      arrives at a library of two.*
+
+      *This is a decision before it is a task. Catalog presets are citable
+      public reference data: each new record needs SHACL conformance under
+      `make validate`, the same source and venue review as the references item
+      above, and scientific review before publication (`CLAUDE.md` §3.4, §8).
+      Authoring them is explicitly not something an agent does unprompted.*
+
+      *The bundled Patch Studio examples do not count toward this and never
+      will. They are `patch-studio-model-3` documents with no `header`, no
+      group and no evidence tier, they are not published as RDF, and the bridge
+      between the two models is gated by ADR 0026 (`CLAUDE.md` §4, §11). They
+      shipped 2026-09-10 in `src/ui/creator/examplePatches.js` and answer the
+      "somewhere to start" problem, not the catalog one.*
+
+      *If the answer is no, record that here and reconsider the entrance's
+      "Browse presets" wording, which currently promises a library.*
 
 ### Phase 2 ontology extensions
 - [ ] Record recognized **named methods / schools** (Snoezelen / MSE, Tomatis,

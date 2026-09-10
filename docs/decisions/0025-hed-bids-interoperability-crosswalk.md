@@ -298,6 +298,23 @@ but it is the prerequisite for everything after.
    string through the crosswalk and asserts that declared loss is real, complete,
    and not overclaimed.
 
+   **Errors fail the gate, warnings are printed, and that changed on
+   2026-09-09.** Both validating sites treated every hedtools issue as a
+   failure. Kay Robbins, asked about it directly, was
+   unambiguous: HED warnings are not meant to be stopping points, they exist so
+   that you confirm you meant what you said. The cost was concrete rather than theoretical: the annotation she
+   wrote for `eventObservationCollected` uses `Perform/Report`, an extension tag
+   that raises `TAG_EXTENDED` at severity `WARNING`, and crosswalk 0.6.0 shipped
+   `(Perform, Participant-response)` instead purely because the gate could not
+   tell a warning from an error. `check-hed-crosswalk.py` and
+   `generate-hed-bundle.py` now filter with
+   `ErrorHandler.filter_issues_by_severity(issues, ErrorSeverity.ERROR)` and
+   report the rest. Measured: both gates stay green today with nothing to
+   report, and with `Perform/Report` substituted the crosswalk gate passes while
+   printing the `TAG_EXTENDED` warning. Whether to adopt it is crosswalk 0.7.0
+   and waits on the HED discussion about whether `Report` belongs in the
+   standard schema at all.
+
    **The validator earned its place immediately, and the way it did is the
    argument for decision 7.** Every temporal mapping in crosswalk 0.1.0 was
    invalid HED: `Onset`, `Offset`, `Pause` and `Inset` are scope tags that
@@ -359,7 +376,8 @@ but it is the prerequisite for everything after.
    of a BIDS continuous recording: no header row, columns named in the sidecar,
    `SamplingFrequency` and `StartTime` declared. Whether a continuous parameter is
    better carried as a trace or as placeholder-`Def/` marks is
-   [question 5 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md);
+   question 5 to the working group, in
+   [hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416);
    HED can express either, and a placeholder definition validates against 8.4.0:
 
    ```
@@ -514,7 +532,8 @@ but it is the prerequisite for everything after.
    that change **all three bundles validated with zero errors.** At that stage one
    warning remained: `CUSTOM_COLUMN_WITHOUT_DESCRIPTION` for the materialised
    `HED` column itself, because every attempted description reintroduced the
-   crash. That became [question 6 to the working group](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
+   crash. That became question 6 to the working group,
+   [hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836),
    with the reproduction table. Mapping 0.5.0 later removed the materialised
    column for the independent reason established in the 2026-08-25 review.
 
@@ -611,9 +630,10 @@ but it is the prerequisite for everything after.
 
 The six questions went upstream on 2026-08-20 under decision 9's ask, encode and
 reproduce, never endorse
-([write-up](../ontology/outreach/2026-08-18-hed-working-group-questions.md),
-[hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
-[hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836)).
+([hed-schemas#416](https://github.com/hed-standard/hed-schemas/issues/416),
+[hed-javascript#836](https://github.com/hed-standard/hed-javascript/issues/836);
+the drafting write-up is private, at
+`.private/correspondence/2026-08-18-hed-working-group/`).
 Three maintainers replied inside 48 hours. This section records what they
 settled, what it changes here, and what is still open, so that a GitHub thread is
 not the only place any of it lives.
@@ -725,12 +745,12 @@ Direction 3 confirms the existing one-way crosswalk boundary and requires no
 ontology module. Direction 4 is follow-up work; the STIM BIDS proposal remains a
 draft and does not settle item 4, item 5, or the open definition-body question.
 
-Renato sent the requested 11-event pair by email on 2026-08-28; the public
-[sent record](../ontology/outreach/2026-08-28-kay-robbins-sent-record.md)
-retains its technical summary and attachment hashes while raw correspondence
-evidence remains private under ADR 0031. The separately versioned
-[30-event expanded alternate](../ontology/outreach/2026-08-27-kay-robbins-revised-events-bundle.md)
-was not sent. Neither correspondence artifact is the generated mapping 0.5.0
+Renato sent the requested 11-event pair by email on 2026-08-28; the pair
+itself is in
+[`docs/ontology/hed/kay-robbins-2026-08-27/`](../ontology/hed/kay-robbins-2026-08-27/README.md),
+while the sent record, its attachment hashes and the separately versioned
+30-event expanded alternate, which was not sent, stay in the access-limited
+correspondence tree under ADR 0031. Neither correspondence artifact is the generated mapping 0.5.0
 demonstrator recorded here.
 
 

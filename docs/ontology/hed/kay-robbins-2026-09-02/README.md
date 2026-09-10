@@ -17,7 +17,7 @@ revisions can be read in order.
 `events.tsv` is byte identical to the file that was sent
 (`sha256 794839b0e7338e669e673cbc2bcacd6c5476d05b7dc6f23de6e6a0ec72537d7a`, the
 hash recorded in
-[the sent record](../../outreach/2026-08-28-kay-robbins-sent-record.md)). The
+the sent record, which is private under ADR 0031). The
 data model, the column layout, the `event_id` descriptions and every `TermURL`
 came back untouched.
 

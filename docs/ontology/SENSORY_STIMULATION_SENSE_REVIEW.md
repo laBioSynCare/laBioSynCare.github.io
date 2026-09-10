@@ -126,8 +126,8 @@ reference-only IRI use requires an Affiliate Licence. The draft and its reasonin
 are at `/Users/renatofabbri/sstim-drafts/snomed-licence-enquiry.md`.
 
 **SNOMED International replied on 2026-09-04**, through its Chief Digital
-Information Officer, Rory Davidson. The substance, recorded in full at
-[`outreach/2026-09-04-snomed-affiliate-licence-reply.md`](outreach/2026-09-04-snomed-affiliate-licence-reply.md):
+Information Officer, Rory Davidson. The substance, recorded in full in the
+access-limited correspondence tree at `.private/correspondence/2026-09-04-snomed/`:
 for this use case, described there as inclusion in some mapping statements,
 SNOMED would grant a **public good Affiliate Licence with no fee**, carrying
 permission to include more content later without asking again. The route is an

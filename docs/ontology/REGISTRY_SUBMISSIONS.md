@@ -1503,8 +1503,74 @@ template URLs for the labelling reason below: `sstim.vocab` (example `alpha`),
 re-checked against every local name in each namespace separately (0 violations).
 `sstim` stays on the core namespace. The fifth namespace, `shapes#` (80 terms),
 was deliberately left out as validation artifacts rather than referenced
-identifiers, and the offer to file it too was put on the PR. Fill in the issue
-and bot-PR numbers here once they exist.
+identifiers, and the offer to file it too was put on the PR.
+
+**Filed 2026-09-08:** `sstim.vocab`
+[#2057](https://github.com/biopragmatics/bioregistry/issues/2057) into PR
+[#2060](https://github.com/biopragmatics/bioregistry/pull/2060), `sstim.exposure`
+[#2058](https://github.com/biopragmatics/bioregistry/issues/2058) into PR
+[#2061](https://github.com/biopragmatics/bioregistry/pull/2061), and
+`sstim.ecosystem`
+[#2059](https://github.com/biopragmatics/bioregistry/issues/2059) into PR
+[#2062](https://github.com/biopragmatics/bioregistry/pull/2062). The bot picked
+all three up, so the template-URL rule held. The filings landed at 16:45:06,
+16:45:26 and 16:45:39 UTC, which is where the next problem came from.
+
+**The curator objected to the pace, and he was right.** @cthoyt had asked on PR
+#2056 at 16:44:13
+([comment](https://github.com/biopragmatics/bioregistry/pull/2056#issuecomment-5588653673))
+that the sibling records go "all in the same branch for this PR". Fifty three
+seconds later three separate issues existed, each spawning its own bot PR, and at
+16:49:21 he
+[replied](https://github.com/biopragmatics/bioregistry/issues/2059#issuecomment-5588716176):
+"I'm not comfortable with the LLM nature of this reaction. I'd appreciate it if
+you slowed down and interacted with me as a human, and also suggest disclosing
+LLM usage transparently."
+
+Two failures, and only one of them is about tone. The requested consolidation was
+ignored, because the sibling filings were already prepared and went out as
+prepared. The speed then made that miss read as automated rather than careless.
+
+**The reply, 2026-09-09**
+([comment](https://github.com/biopragmatics/bioregistry/issues/2059#issuecomment-5603087347)):
+LLM drafting disclosed, every message reviewed and sent by hand, and an offer to
+close #2060, #2061 and #2062 and put all three records on the #2056 branch, with
+the choice of keeping the three issues as the record or folding the discussion
+into #2055 left to him. Nothing was touched while waiting.
+
+**Resolved by the curator, and all four prefixes are LIVE, 2026-09-09.** @cthoyt
+collapsed the four PRs into #2056 and merged it as `9a4bb2d`, 13 checks passing:
+`sstim`, `sstim.vocab`, `sstim.exposure` and `sstim.ecosystem` are in
+`src/bioregistry/data/bioregistry.json` on `main`. He curated as he went, and
+the additions are worth knowing because they are the registry's own model
+rather than ours: each sibling carries `part_of: sstim`, every record carries
+him as `reviewer`, and `sstim` absorbed its external mappings, BARTOC 21154,
+BioPortal SSTIM and FAIRsharing.660ff4. Fetched and read from `main`, not from
+the API, which lags the merge.
+
+**His one request: better keyword lists.** Measured against the whole registry
+before answering. 563 of 2,831 records carry keywords, the median record has 2
+and the 90th percentile has 3. **Ours have 9, which is the maximum in the
+registry**, they are identical across all four records, and every one of the
+nine appears exactly four times in the corpus, which is to say only on our own
+records. They connect this namespace to nothing. Registry-idiomatic terms that
+already cluster: `ontology` (17 records), `registry` (14), `semantic web` (11),
+`life sciences` (7), `neuroscience` (6), `metadata` (3), `organizations` (2),
+`skos` (1), `provenance` (1). All keywords in the registry are lowercase, 563
+of 563.
+
+**Two upstream defects this review surfaced, neither of them Bioregistry's.**
+The `bioportal` block on the `sstim` record carries a description that is all 18
+module descriptions concatenated with commas, which is what our BioPortal
+submission metadata contains. The `fairsharing` block gives the repository as
+`laBioSynCare/laBioSynCare.github.io`, superseded by `w3c-cg/sstim`. Both are
+fixed where they originate, not here.
+
+**The second rule this leaves behind: a curator's process request outranks a
+prepared batch, and public registry work says up front that it is LLM-drafted.**
+A submission queue that is ready to fire is not a reason to fire it into an
+answer that just changed the shape of the request, and three issues in thirty
+three seconds is legible as automation whether or not it was.
 
 **Why there are two issues, and what to do next time.** Their automation
 (`.github/workflows/new_prefix_pr.yml` running `src/bioregistry/gh/new_prefix.py`)
@@ -1647,8 +1713,8 @@ That is a Google Group, so it cannot be posted from a script the way the GitHub
 submissions were — it needs a human with a Google account, which is why the
 message is drafted rather than sent.
 
-**Enquiry drafted 2026-08-18:**
-[`outreach/2026-08-18-showvoc-enquiry.md`](outreach/2026-08-18-showvoc-enquiry.md).
+**Enquiry drafted 2026-08-18**, held at
+`.private/correspondence/2026-08-18-showvoc/enquiry.md`.
 It asks three things: whether the Publications Office instance accepts datasets
 from outside the EU institutions, whether the in-app contribution workflow is
 the right route or the request should go to the Publications Office directly,

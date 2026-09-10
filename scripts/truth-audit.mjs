@@ -448,9 +448,12 @@ if (!indexCounts) {
 } else {
   const totals = { classes: indexCounts[1], properties: indexCounts[2], concepts: indexCounts[3] }
   const TOTAL_CLAIM = /\b(?:all|of the)\s+(\d+)\s+(concepts|classes|properties)\b/g
+  // The ShowVoc enquiry draft was scanned here until 2026-09-09, when
+  // docs/ontology/outreach/ moved to the access-limited correspondence tree.
+  // An outbound draft quoting term totals is now unchecked by this gate: read
+  // the totals off TERM_INDEX.md before sending one.
   const scanned = ['README.md', 'CHANGELOG.md', 'TODO.md', 'docs/ontology/CURRENT_STATE.md',
-    'docs/ontology/IMPROVEMENT_PLAN.md', 'docs/ontology/REGISTRY_SUBMISSIONS.md',
-    'docs/ontology/outreach/2026-08-18-showvoc-enquiry.md']
+    'docs/ontology/IMPROVEMENT_PLAN.md', 'docs/ontology/REGISTRY_SUBMISSIONS.md']
   let claims = 0
   for (const file of scanned) {
     const text = read(file)

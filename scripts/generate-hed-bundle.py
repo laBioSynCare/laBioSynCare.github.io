@@ -724,20 +724,30 @@ def inspect_bundle(bundle: dict, out: Path, tag: str) -> list[str]:
     # perfectly current and still wrong — this runs on the freshly generated
     # copy, so it is checking the generator, not the commit.
     from hed import load_schema_version
-    from hed.errors import ErrorHandler, get_printable_issue_string
+    from hed.errors import ErrorHandler, ErrorSeverity, get_printable_issue_string
     from hed.models import Sidecar, TabularInput
 
     schema = load_schema_version(spec["hedSchema"]["version"])
     sidecar = Sidecar([str(out / "events.json")])
     table = TabularInput(str(out / "events.tsv"), sidecar=sidecar)
+    # Warnings are collected and shown, and only errors fail the gate. Kay
+    # Robbins ruled on 2026-09-09 that HED warnings are not stopping points:
+    # they exist so an author confirms an unusual tag was meant. Treating them
+    # as fatal cost us a correct annotation, since Perform/Report is an
+    # extension tag and raises TAG_EXTENDED while being what she asked for.
     issues = sidecar.validate(
         schema, error_handler=ErrorHandler(check_for_warnings=True)
     )
     issues += table.validate(
         schema, error_handler=ErrorHandler(check_for_warnings=True)
     )
-    if issues:
-        rendered = get_printable_issue_string(issues, show_details=True).strip()
+    errors = ErrorHandler.filter_issues_by_severity(issues, ErrorSeverity.ERROR)
+    warnings = [issue for issue in issues if issue not in errors]
+    if warnings:
+        rendered = get_printable_issue_string(warnings, show_details=True).strip()
+        print(f"{tag}: HED validation warnings (not fatal)\n{rendered}")
+    if errors:
+        rendered = get_printable_issue_string(errors, show_details=True).strip()
         problems.append(f"{tag}: sidecar/tabular HED validation failed\n{rendered}")
     else:
         assembled = table.assemble()
