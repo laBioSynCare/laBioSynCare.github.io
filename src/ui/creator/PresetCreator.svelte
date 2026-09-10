@@ -1215,15 +1215,24 @@
   function applyIncomingExample() {
     const token = new URL(window.location.href).searchParams.get('example')
     if (!token) return
-    const url = new URL(window.location.href)
-    url.searchParams.delete('example')
-    replaceState(`${url.pathname}${url.search}${url.hash}`, {})
     const example = getExamplePatch(token)
     if (!example) {
       tip(`Unknown example: ${token}.`)
-      return
+    } else {
+      openExample(example)
     }
-    openExample(example)
+    // Native history, not SvelteKit's replaceState: this runs from onMount,
+    // before the router has initialised, and replaceState throws there
+    // ("Cannot read properties of undefined"). It threw *after* rewriting the
+    // URL, so the parameter vanished and the patch never loaded — a failure
+    // that looks exactly like success unless you check the patch name, which
+    // is why examples-check now asserts on the name rather than the track
+    // counts (the alpha example and the default patch share 1c · 1a).
+    // clearStarterQuery can keep using replaceState: it is called from
+    // afterNavigate, where the router is up.
+    const url = new URL(window.location.href)
+    url.searchParams.delete('example')
+    history.replaceState(history.state, '', url)
   }
 
   function openExample(example) {
@@ -1826,7 +1835,7 @@
   <!-- ── HEADER ── -->
   <header class="hdr">
     <div class="hdr-name">
-      <input class="patch-name" bind:value={draft.patchName} placeholder="Patch name" />
+      <input class="patch-name" aria-label="Patch name" bind:value={draft.patchName} placeholder="Patch name" />
       <span
         class="pill"
         title={`${summary.controlCount} control, ${summary.audioCount} audio, ${summary.visualCount} visual, ${summary.hapticCount} haptic ${summary.audioCount + summary.visualCount + summary.hapticCount === 1 ? 'track' : 'tracks'}, ${summary.modLinks} modulation ${summary.modLinks === 1 ? 'link' : 'links'}`}
@@ -1923,7 +1932,7 @@
       <button class="act-btn" onclick={copyJson}>Copy</button>
       <button class="act-btn" onclick={download} disabled={hasErrors}>Download</button>
       <button class="act-btn" onclick={copyLink} disabled={hasErrors} title="Copy a link that carries this patch. Nothing is uploaded — the patch travels inside the link itself.">Share link</button>
-      <details class="cloud-menu" bind:open={examplesMenuOpen}>
+      <details class="cloud-menu examples-menu" bind:open={examplesMenuOpen}>
         <summary title="Open a ready-made patch">Examples</summary>
         <div class="cloud-panel">
           <p class="cloud-status">
@@ -2106,7 +2115,7 @@
           <article class="card">
             <div class="card-head">
               <div class="card-title-line">
-                <input class="card-name" bind:value={track.name} />
+                <input class="card-name" aria-label="Control track name" bind:value={track.name} />
                 <button class="type-info-btn" type="button" title={`${track.type} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
               </div>
               <button class="x-btn" onclick={() => removeControl(track.id)} aria-label="Remove track" type="button">x</button>
@@ -2276,7 +2285,7 @@
             <div class="card-head card-head-audio">
               <div class="card-head-main">
                 <div class="card-title-line">
-                  <input class="card-name" bind:value={track.name} />
+                  <input class="card-name" aria-label="Audio track name" bind:value={track.name} />
                   <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
                 </div>
                 <div class="card-subtitle">{audioSubtitle}</div>
@@ -2582,7 +2591,7 @@
           <article class="card" class:muted={track.enabled === false}>
             <div class="card-head">
               <div class="card-title-line">
-                <input class="card-name" bind:value={track.name} />
+                <input class="card-name" aria-label="Visual track name" bind:value={track.name} />
                 <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
               </div>
               <button class="x-btn" onclick={() => removeVisual(track.id)} aria-label="Remove track" type="button">x</button>
@@ -2669,7 +2678,7 @@
           <article class="card">
             <div class="card-head">
               <div class="card-title-line">
-                <input class="card-name" bind:value={track.name} />
+                <input class="card-name" aria-label="Haptic track name" bind:value={track.name} />
                 <button class="type-info-btn" type="button" title={`${track.trackType} semantic type`} onclick={() => showTrackTypeInfo(track)}>∿</button>
               </div>
               <button class="x-btn" onclick={() => removeHaptic(track.id)} aria-label="Remove track" type="button">x</button>
@@ -3265,6 +3274,13 @@
     color: var(--txt);
     border-color: var(--acc);
     background: var(--acc-s);
+  }
+
+  /* The one control in this row a first-time visitor should find, so it does
+     not get the same neutral treatment as Copy, Import and Reset. */
+  .examples-menu summary {
+    color: var(--acc);
+    border-color: var(--acc);
   }
 
   .cloud-panel {
