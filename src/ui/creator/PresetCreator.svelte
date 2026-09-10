@@ -3349,8 +3349,14 @@
     gap: 0;
   }
   .nav-panel a {
-    display: block;
-    padding: 4px 5px;
+    /* 24px minimum, WCAG 2.5.8 (AA). These rows were 18px tall and stacked
+       18px apart, so they failed both the size rule and the spacing exception
+       that excuses the rest of the Studio's small controls. Flex rather than
+       extra padding so the 10px type stays optically centred. */
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 2px 5px;
     color: var(--txt);
     text-decoration: none;
     font-size: 10px;
@@ -3664,7 +3670,10 @@
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    height: 22px;
+    /* 24px minimum, WCAG 2.5.8 (AA). Most of these are excused by the spacing
+       exception, but not all of them at every column width, so the size is met
+       outright rather than relying on neighbours staying far enough away. */
+    height: 24px;
     transition: color .1s, border-color .1s;
   }
   .add-btn:hover { color: var(--txt); border-color: var(--acc); }
