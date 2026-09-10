@@ -5059,6 +5059,31 @@
       flex: 1 1 100%;
       min-height: 22rem;
     }
+
+    /* The header is a fixed-height, non-wrapping row of ~600px of controls.
+       The columns below it reflowed at this width but the header never did, so
+       on a phone everything past "Share link" — Examples, Import, Save / Load,
+       Clear, Reset, help and the + menu — sat off the right edge with no
+       horizontal scroll to reach it. Measured at 390px: .hdr-actions was 598px
+       wide ending at x=806 in a 390px viewport, and documentElement.scrollWidth
+       was 390, so those controls were not merely awkward, they were gone.
+
+       Wrapping rather than scrolling the row: a swipeable toolbar hides the
+       same controls behind a gesture nothing advertises, and Examples is the
+       one control a first-time visitor most needs to see. */
+    .hdr {
+      grid-template-columns: minmax(0, 1fr) auto;
+      height: auto;
+      row-gap: 8px;
+      padding: 8px 12px;
+    }
+
+    .hdr-actions {
+      grid-column: 1 / -1;
+      flex-wrap: wrap;
+      height: auto;
+      row-gap: 4px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
