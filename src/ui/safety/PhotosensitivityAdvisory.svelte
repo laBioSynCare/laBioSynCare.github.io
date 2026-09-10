@@ -1,28 +1,42 @@
 <script>
   import { onMount, onDestroy } from 'svelte'
+  import { page } from '$app/state'
   import {
     acknowledgePhotoAdvisory,
     advisoryOpen,
     applyVisualStimulation,
     photoAdvisoryAcknowledged,
+    routeRendersStimulation,
   } from './visualSafety.js'
 
-  // Hidden until mounted so the prerendered/SSR HTML never flashes the modal.
-  let show = $state(false)
+  // Hidden until mounted so the prerendered/SSR HTML never flashes the modal,
+  // and because the acknowledgement lives in localStorage, which cannot be read
+  // before then. `acknowledged` therefore starts true: the wrong way to fail on
+  // the server is to render a modal into every prerendered page.
+  let mounted = $state(false)
+  let acknowledged = $state(true)
   let forced = $state(false)
 
   const unsub = advisoryOpen.subscribe((v) => { forced = v })
   onDestroy(unsub)
 
   onMount(() => {
-    if (!photoAdvisoryAcknowledged()) show = true
+    mounted = true
+    acknowledged = photoAdvisoryAcknowledged()
   })
 
-  const visible = $derived(show || forced)
+  // Derived from the current route, not decided once on mount: this component
+  // lives in the root layout, and SvelteKit moves between routes without
+  // remounting it. A reader who lands on the entrance and then clicks into the
+  // Studio has to meet the advisory on arrival, which a mount-time check would
+  // miss entirely.
+  const visible = $derived(
+    forced || (mounted && !acknowledged && routeRendersStimulation(page.url.pathname)),
+  )
 
   function dismiss() {
     acknowledgePhotoAdvisory()
-    show = false
+    acknowledged = true
     advisoryOpen.set(false)
   }
 
