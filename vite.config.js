@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
-import { deploymentBase } from './deployment.config.js'
+import { canonicalBase, deploymentBase } from './deployment.config.js'
 
 // GitHub Pages resolves `/dir/` to `/dir/index.html`; the dev server does not,
 // so a static directory index is reachable in production and 404s locally. That
@@ -49,6 +49,7 @@ export default defineConfig({
   // repository paths while every Vite-built browser URL receives one base.
   define: {
     'globalThis.__SSTIM_DEPLOYMENT_BASE__': JSON.stringify(deploymentBase),
+    'globalThis.__SSTIM_CANONICAL_BASE__': JSON.stringify(canonicalBase),
   },
 
   // Vite loads `.env` from the project root in every mode, so unsetting

@@ -7,6 +7,12 @@ const base = typeof globalThis.__SSTIM_DEPLOYMENT_BASE__ === 'string'
   ? globalThis.__SSTIM_DEPLOYMENT_BASE__
   : ''
 
+// Likewise injected: the validated `canonicalBase`, empty unless this build is
+// one of the official publications (deployment.config.js says why).
+const canonicalBase = typeof globalThis.__SSTIM_CANONICAL_BASE__ === 'string'
+  ? globalThis.__SSTIM_CANONICAL_BASE__
+  : ''
+
 function isExternalOrFragment(value) {
   if (typeof value !== 'string') return false
   return URL_SCHEME.test(value) || value.startsWith('//') || value.startsWith('#')
@@ -47,4 +53,14 @@ export function logicalApplicationPath(value) {
   if (isExternalOrFragment(value) || !base) return value
   if (value === base) return '/'
   return value.startsWith(`${base}/`) ? value.slice(base.length) : value
+}
+
+/**
+ * The URL search engines should index for a mounted page pathname, or null when
+ * this build was given no canonical base. Every copy of a page, on whichever
+ * official origin and mount, names the same production URL.
+ */
+export function canonicalPageUrl(pathname, root = canonicalBase) {
+  if (!root) return null
+  return new URL(logicalApplicationPath(pathname).slice(1), root).href
 }

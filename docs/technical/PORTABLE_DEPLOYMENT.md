@@ -61,6 +61,14 @@ code. GitHub Pages projects share one origin, so local storage and any
 same-origin credentials remain an operator/security decision rather than being
 isolated merely by the path.
 
+`SSTIM_CANONICAL_BASE`, validated in the same file, is the other build-time
+setting, and it is empty unless set. The two official publications serve the
+same pages, so `pages.yml` sets it on both to the production URL, and every page
+then carries a `<link rel="canonical">` naming the one copy search engines
+should index. Every other build, including the Nix package, the container and a
+fork's Pages, emits no canonical link: an operator's pages are not duplicates of
+ours.
+
 ### 1.2 Firebase is genuinely optional, and the boundary is explicit
 
 Configuration comes entirely from build-time environment variables —

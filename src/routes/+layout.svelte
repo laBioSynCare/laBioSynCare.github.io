@@ -5,6 +5,7 @@
   import AppTopBar from '../ui/navigation/AppTopBar.svelte'
   import ServiceWorkerUpdate from '../ui/pwa/ServiceWorkerUpdate.svelte'
   import PhotosensitivityAdvisory from '../ui/safety/PhotosensitivityAdvisory.svelte'
+  import CanonicalLink from '../ui/seo/CanonicalLink.svelte'
   import OriginMovedModal from '../ui/transition/OriginMovedModal.svelte'
   import { initSkin } from '../ui/theme/skins.js'
   import { initVisualStimulation } from '../ui/safety/visualSafety.js'
@@ -16,6 +17,8 @@
     initVisualStimulation()
   })
 </script>
+
+<CanonicalLink />
 
 <AppTopBar />
 

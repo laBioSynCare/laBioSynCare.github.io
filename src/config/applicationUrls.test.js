@@ -4,6 +4,7 @@ import { deploymentBase } from '../../deployment.config.js'
 import {
   applicationAsset,
   applicationRoute,
+  canonicalPageUrl,
   logicalApplicationPath,
 } from './applicationUrls.js'
 
@@ -27,6 +28,14 @@ describe('central application URL resolver', () => {
   it('maps mounted browser URLs back to logical repository paths', () => {
     const mounted = `${deploymentBase}/ontology/manifest.json`
     expect(logicalApplicationPath(mounted)).toBe('/ontology/manifest.json')
+  })
+
+  it('names one production URL for every copy of a page, and none without a canonical base', () => {
+    const production = 'https://w3c-cg.github.io/sstim/'
+    expect(canonicalPageUrl(`${deploymentBase}/`, production)).toBe(production)
+    expect(canonicalPageUrl(`${deploymentBase}/about/`, production))
+      .toBe('https://w3c-cg.github.io/sstim/about/')
+    expect(canonicalPageUrl(`${deploymentBase}/graph/`, '')).toBeNull()
   })
 
   it('rejects ambiguous relative paths', () => {

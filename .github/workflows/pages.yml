@@ -79,6 +79,19 @@ jobs:
             echo "production=false" >> "$GITHUB_OUTPUT"
             echo "This deployment ($site) is not production ($expected)."
           fi
+          # Both publications serve the same pages, so both tell search engines
+          # to index the production copy. Any other site built from this
+          # workflow (a fork's Pages) is neither, and emits no canonical link:
+          # its pages are not duplicates of ours.
+          legacy="$(node --input-type=module -e "import { LEGACY_ORIGIN } from './src/config/publicationOrigins.js'; process.stdout.write(LEGACY_ORIGIN)")"
+          if [ -z "$legacy" ]; then
+            echo "Could not read LEGACY_ORIGIN from src/config/publicationOrigins.js" >&2
+            exit 1
+          fi
+          if [ "$site" = "$expected" ] || [ "$site" = "$legacy/" ]; then
+            echo "SSTIM_CANONICAL_BASE=$expected" >> "$GITHUB_ENV"
+            echo "Pages will name $expected as canonical."
+          fi
 
       # Build the deployed artifact with the same pinned flake toolchain as
       # local dev and the lint/validate workflows — one source of truth.
