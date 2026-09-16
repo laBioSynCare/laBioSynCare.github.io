@@ -1,6 +1,7 @@
 # SSTIM Current State and Next Steps
 
-**Status:** maintained current-state summary, reviewed 2026-08-18. This is the
+**Status:** maintained current-state summary, reviewed 2026-08-18; release facts
+and signal-layer limitations corrected 2026-09-15. This is the
 starting point for ontology work. Dated audits remain evidence for individual
 decisions, but they describe the repository state on their stated dates rather
 than the state summarized here.
@@ -12,11 +13,11 @@ releases. Do not infer one from the other.
 
 | Question | Current answer | Authority |
 |---|---|---|
-| What is being edited? | `0.17.0`, just frozen; the mutable line has not yet been reopened | [`manifest.json`](../../static/ontology/manifest.json) |
-| What can be cited? | `0.16.0`, released 2026-08-18 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
+| What is being edited? | `0.18.0-dev`, reopened when `0.17.0` was frozen | [`manifest.json`](../../static/ontology/manifest.json) |
+| What can be cited? | `0.17.0`, released 2026-09-07 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
 | Which DOI identifies that release? | `10.5281/zenodo.22639184` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
-| What changed? | OWL 2 DL conformance, a fully multilingual vocabulary, and the ADR 0025 HED interoperability profile | [`CHANGELOG.md`](../../CHANGELOG.md) |
+| What changed? | External alignment: 97 new mappings, reaching MeSH and UBERON as well as Wikidata and SNOMED CT, each verified at its authority under ADR 0057, and 37 aliases | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |
 | Which modules and profiles exist? | 18 manifest-owned modules and four profile entry points | [`manifest.json`](../../static/ontology/manifest.json) |
 
@@ -120,8 +121,8 @@ ecosystem projection use separate graph and storage boundaries.
 
 ## Validation and publication state
 
-The complete pinned gate passed on 2026-08-17, on the tree the `0.15.0`
-snapshot was cut from (`make validate`, and 816 tests under `make test`):
+The complete pinned gate passed on 2026-09-16, on the `0.18.0-dev` tree
+(`make validate`, and 990 tests in 73 files under `make test`):
 
 ```bash
 nix develop --command make validate
@@ -268,9 +269,16 @@ the model is going) and Phases 1.2b–1.2c, 1.5 and beyond in the
 
 The main gaps are design and coverage gaps, not current parser failures:
 
-- **Waveform and spatialisation have no SSTIM terms at all.** Both are
-  output-affecting, so KR-07's "many output-affecting parameters are not
-  captured" is only partly closed. Directions §1 and §2.
+- **Waveform and spatial position have terms; the preset contract does not use
+  them yet.** [ADR 0052](../decisions/0052-abstract-signals-and-sensory-renderings.md)
+  models both at the signal layer: `sstim:SignalShape` carries the four periodic
+  shapes, envelope, noise and sampled — the last naming its recording with
+  `sstim:signalSourceAsset` — and spatial position is
+  `sstim-v:paramSpatialPosition`, one of the parameters a rendering drives.
+  [`preset.schema.json`](../../static/schemas/preset.schema.json) names neither,
+  which is why its `breathing-oscillation` kind is still restricted to audio:
+  `centerHz` and `amplitudeHz` describe what the oscillation modulates, and the
+  schema says so on the kind itself. Directions §1 and §2.
 - **The modality scheme names six senses and disagrees with the channel list.**
   `sstim-ex:StimulusChannel` recognises gustatory and electromagnetic paths that
   no modality concept backs. Direction §4a.

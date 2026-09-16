@@ -1421,7 +1421,7 @@ endpoints cannot see them. A vocabulary gateway is arguably the place where that
 matters most, and it is also the low-risk place to try a SKOS submission, since
 nothing here disturbs the established BioPortal identity.
 
-### Bioregistry — REQUESTED 2026-09-06, issue #2055; sibling prefixes cleared by a curator 2026-09-08
+### Bioregistry — LIVE 2026-09-09, four prefixes; `download_owl` and keyword follow-up prepared, not sent
 
 A community registry of prefixes and identifier namespaces that exports its
 records as RDF, so an accepted entry is itself an inbound reference to the SSTIM
@@ -1558,6 +1558,19 @@ already cluster: `ontology` (17 records), `registry` (14), `semantic web` (11),
 `life sciences` (7), `neuroscience` (6), `metadata` (3), `organizations` (2),
 `skos` (1), `provenance` (1). All keywords in the registry are lowercase, 563
 of 563.
+
+**The follow-up, still open on 2026-09-15.** A comment on the merged PR on
+2026-09-10 proposed `download_owl` on all four records, pointing at
+`https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.ttl`, the merged
+document `https://w3id.org/sstim` negotiates to for Turtle. That one file serves
+every record: rdflib counts 344, 405, 268 and 82 subjects in it for the four
+namespaces, the same figures quoted to the curators. There has been no reply,
+and the field is unset on all four records on `main`. The API now answers 200
+for all four prefixes. A pull request adding the field, plus two keywords per
+record that already cluster in the registry (`ontology`, `neuroscience`,
+`skos`, `organizations`, `provenance`, counted on `main` on 2026-09-15), is
+prepared at `~/sstim-drafts/2026-09-15-bioregistry-sstim-followup.patch`. The
+maintainer reviews and opens it by hand, per the rule below.
 
 **Two upstream defects this review surfaced, neither of them Bioregistry's.**
 The `bioportal` block on the `sstim` record carries a description that is all 18

@@ -211,6 +211,38 @@ for (const file of PROSE) {
 
 ok('no superseded live/citable version in prose')
 
+// The authoritative-facts table in CURRENT_STATE states the release identity as
+// a claim about now, and the scan above cannot see it: its rows carry dates, so
+// they pass as dated log rows. After 0.17.0 was cut the table went on naming
+// 0.16.0 as citable, beside the 0.17.0 DOI, and said the development line had
+// not been reopened, while every gate passed. Read the rows by their questions
+// and compare them to the derived facts; a reworded question fails rather than
+// silently dropping out of the check.
+{
+  const file = 'docs/ontology/CURRENT_STATE.md'
+  const lines = read(file)?.split('\n')
+  if (lines) {
+    const row = (question) => lines.find((l) => l.startsWith(`| ${question} |`))
+    const releaseDate = citation?.match(/^date-released:\s*(.+)$/m)?.[1]?.trim()
+    const facts = [
+      ['What is being edited?', VERSION, 'manifest.json'],
+      ['What can be cited?', RELEASE_VERSION, 'void.ttl'],
+      ['Which DOI identifies that release?', DOI, 'void.ttl'],
+    ]
+    for (const [question, want, source] of facts) {
+      const line = row(question)
+      if (!line) { fail(file, `the authoritative-facts row "${question}" is missing`); continue }
+      const said = line.split('|')[2]?.match(/`([^`]+)`/)?.[1]
+      if (want && said !== want) fail(file, `"${question}" says ${said ?? '(nothing)'}; ${source} says ${want}`)
+    }
+    const citedDate = row('What can be cited?')?.match(/released (\d{4}-\d{2}-\d{2})/)?.[1]
+    if (citedDate && releaseDate && citedDate !== releaseDate) {
+      fail(file, `"What can be cited?" gives ${citedDate}; CITATION.cff says the release is ${releaseDate}`)
+    }
+    ok('CURRENT_STATE authoritative facts match the live line and the citable release')
+  }
+}
+
 // A superseded *development* line is the error the check above cannot see:
 // "0.13.0-dev" contains "0.13.0", which was a legitimate release number, so it
 // read as current for a whole release cycle while naming a line that had moved

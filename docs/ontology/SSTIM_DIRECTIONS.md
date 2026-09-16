@@ -38,8 +38,12 @@ is identified. `sstim:configurationDigest` and the reproducibility levels from
 [ADR 0048](../decisions/0048-session-events-and-qualified-observations.md)
 already exist to carry that.
 
-**Not yet designed.** Whether the four basic shapes are SKOS concepts under a
-`WaveformScheme`, and how a sampled source is identified, are open.
+**Decided 2026-08-16, in [ADR 0052](../decisions/0052-abstract-signals-and-sensory-renderings.md).**
+There is no separate waveform category. A waveform is `sstim:SignalShape`, one
+vocabulary shared by a signal and its renderings: `shapeSine`, `shapeSquare`,
+`shapeSawtooth`, `shapeTriangle`, `shapeEnvelope`, `shapeNoise` and
+`shapeSampled`. A sampled signal names its recording with
+`sstim:signalSourceAsset`.
 
 ---
 
@@ -113,6 +117,13 @@ synthesis model looks like and what "Martigli-synced panning" is a single
 instance of. That half is developed in [§5](#5-abstract-signals-and-their-sensory-renderings),
 which is where it belongs — spatial position is one of the parameters a signal
 can be rendered onto.
+
+**Decided 2026-08-16, in [ADR 0052](../decisions/0052-abstract-signals-and-sensory-renderings.md).**
+Spatial position is `sstim-v:paramSpatialPosition`, a parameter a rendering
+drives through `sstim:rendersOntoParameter`, so panning needed no mechanism of
+its own. The perceptual half stays open: the term index still has no observation
+term for *where* a participant perceived a stimulus, so localization remains
+unexpressible.
 
 ---
 
@@ -294,6 +305,15 @@ tactile. Is this covered? Should it be modelled as modulating and carrier
 signals?*
 
 **Yes to the premise, partly to the coverage, and carefully to the carrier.**
+
+**Decided 2026-08-16, in [ADR 0052](../decisions/0052-abstract-signals-and-sensory-renderings.md),
+which this section became.** It minted `sstim:StimulationSignal`,
+`sstim:SignalRendering`, the rendering mechanism and its physical-or-perceptual
+marker, and `sstim:rendersOntoParameter`. The 2026-08-17 revision made
+`sstim-ex:hasFrequencyHz` the generic parent of a carrier/tone/modulation family
+rather than deprecating it, and `sstim:specifiedBy` now joins a preset to the
+specification it realises, which was the last of the five gaps below. The
+analysis is kept as written.
 
 ### What SSTIM already has, in three disconnected pieces
 
