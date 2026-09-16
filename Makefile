@@ -83,7 +83,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -416,6 +416,14 @@ wikidata-statements:
 
 wikidata-inbound:
 	$(PYTHON) scripts/wikidata-statements.py inbound
+
+## Snapshot the GitHub traffic of this repository and w3c-cg/sstim into OUT
+## (NETWORK). GitHub keeps 14 days and nothing else keeps any, so the scheduled
+## run lives in the private laBioSynCare/sstim-traffic repository; this target
+## is for a backfill or a check by hand, using your gh login unless GH_TOKEN is set.
+traffic-snapshot:
+	@test -n "$(OUT)" || { echo "usage: make traffic-snapshot OUT=<data dir>" >&2; exit 2; }
+	GH_TOKEN="$${GH_TOKEN:-$$(gh auth token)}" node scripts/github-traffic-snapshot.mjs --out "$(OUT)"
 
 ## Post the reciprocal statements from here instead of pasting them, using the
 ## bot password in the gitignored docs/credentials/wikidata.md. NETWORK, opt-in,
@@ -944,6 +952,7 @@ help:
 	@echo "  make alignment-verify Dereference every external mapping at its own authority (network)"
 	@echo "  make wikidata-statements Emit the QuickStatements batch that makes Wikidata cite SSTIM"
 	@echo "  make wikidata-inbound Count the mapped Wikidata items that reference an SSTIM IRI (network)"
+	@echo "  make traffic-snapshot OUT=dir Save the 14 days of GitHub traffic GitHub keeps (network)"
 	@echo "  make wikidata-submit  Post the reciprocal statements (dry run unless WRITE=1)"
 	@echo "  make validate         Run the current ontology validation suite"
 	@echo "  make validate-release-source Validate release-prepared sources before snapshot creation"
