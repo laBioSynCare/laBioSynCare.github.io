@@ -85,7 +85,7 @@ export async function fetchTraffic(repository, { token, fetchImpl = fetch }) {
     if (response.ok) return response.json()
     const hint =
       response.status === 403 || response.status === 404
-        ? ' The token needs push access to the repository and "Administration: read" (fine-grained) or the repo scope (classic).'
+        ? ' The token needs push access to the repository and "Administration: read" (fine-grained) or, classic, the public_repo scope (repo for a private repository).'
         : ''
     throw new Error(`${repository}: GET traffic/${endpoint} answered ${response.status}.${hint}`)
   }
