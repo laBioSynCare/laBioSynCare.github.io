@@ -119,22 +119,42 @@ Two rough edges surfaced by walking the adopter path are recorded in
 carrier but not the signal's frequency extent, and a session specification
 cannot exist without a preset.
 
-### C. A package to install
+### C. A package to install · **built 2026-09-17, not yet published**
 
-Namespace constants, manifest-driven profile loading, SHACL validation and term
-lookup all exist here, as `src/rdf/` and as scripts under `scripts/`. None of it
-is reachable by anyone else.
+[`packages/sstim`](../../packages/sstim/), the `sstim` Python client, gated by
+`make sstim-package`. Python first because the researcher segment is the primary
+target of §6, because `pyshacl` is the validator the on-ramp already documents,
+and because the leading candidate for D is a Python tool. **No JavaScript client
+exists**, and the npm name is still unclaimed.
 
-*Done when:* one install command followed by one validate command checks a
-user's own file against a named profile at a pinned version IRI.
+*Done when* was one install command and one validate command against a named
+profile at a pinned version IRI. Met, and verified the only way it can honestly
+be: the wheel was built, unpacked somewhere with no knowledge of this
+repository, and used to resolve, fetch and validate over the live network.
 
-*Constraint:* the package must read modules, dependencies, graph IRIs and shape
-modules from `static/ontology/manifest.json`, never from a directory listing.
-Anything else teaches adopters the failure mode that
-[CURRENT_STATE.md](../ontology/CURRENT_STATE.md) warns against.
+It reads profile closures from the manifest, never a directory listing, as the
+constraint required. Two things emerged while building it that the constraint
+did not anticipate.
 
-*Secondary reason to do it early:* the names are unclaimed (§2), and a package
-name is cheap to hold and expensive to lose.
+**The stable manifest route serves the development line.**
+`https://w3id.org/sstim/manifest` answers with the mutable `-dev` line, while
+the RDF at `https://w3id.org/sstim` answers with the newest frozen release. An
+adopter who fetches the first believing they pinned something has pinned
+nothing. The client resolves the release instead, by reading `owl:versionIRI`
+from the stable IRI, so no version constant is hardcoded and the default is
+never the dev line. Worth deciding separately whether the two routes should
+disagree in kind at all.
+
+**The manifest's checksums make the fetch verifiable.** Every module carries a
+sha256, and the served bytes match it (measured across three modules at 0.17.0).
+The client verifies before parsing and refuses on mismatch, so a truncated
+download cannot quietly become a conformance result. The cache is keyed by
+checksum, which makes a stale cache entry impossible and repeat runs offline.
+
+**Publication is a separate decision and has not been taken.** `sstim` remains
+unclaimed on PyPI. Publishing is public and effectively irreversible, so it
+needs an explicit go-ahead, and probably a first release of the repository's own
+choosing rather than a 0.1.0 pushed the day it was written.
 
 ### D. An exporter for a tool researchers already run
 
@@ -244,7 +264,7 @@ individual is named in this file.
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good
    enough and the messages are not being sent.
-4. **Build C.**
+4. **Build C.** ✅ Built 2026-09-17; publication to PyPI is a separate, still-open decision.
 5. **Build D against whichever tool the first engaged lab actually uses.**
    Choosing before then is a guess with a large build attached.
 6. **Build E when there is a claimant.**

@@ -105,15 +105,39 @@ answers the same question across every place an SSTIM identifier can live.
 
 ## 6. Validate before you publish
 
+The short way, using the client in [`packages/sstim`](../packages/sstim/). It
+resolves the current release for you, checksum-verifies every module it
+fetches, and runs three checks rather than one:
+
+```bash
+pip install ./packages/sstim          # not on PyPI yet; see below
+sstim validate my-stimulus.ttl --profile core
+```
+
+```
+my-stimulus.ttl
+  profile core at https://w3id.org/sstim/0.17.0
+  ok     SHACL conformance
+  ok     every SSTIM term is defined in the core closure
+  ok     nothing minted under https://w3id.org/sstim
+```
+
+The long way, with nothing installed but `pyshacl` and the files from step 3:
+
 ```bash
 cat sstim-core.ttl sstim-stimulus.ttl my-stimulus.ttl > merged.ttl
 pyshacl -s sstim-core-shapes.ttl merged.ttl
 # Conforms: True
 ```
 
-Validate against the shapes of the profile you claim, not against Full. Full
-shapes on Core data hides the one question a profile claim raises, which is
-whether the file really fits inside the closure a consumer will load.
+Either way, validate against the shapes of the profile you claim, not against
+Full. Full shapes on Core data hides the one question a profile claim raises,
+which is whether the file really fits inside the closure a consumer will load.
+
+The long way checks conformance only. The two checks it cannot make are the
+reason the client exists: **SHACL is silent about a term it has never heard
+of**, so a file that reaches into a module your profile does not contain
+validates perfectly and breaks in somebody else's pipeline.
 
 Conformance here means the file is well formed against the model. It is not a
 statement that the stimulation is safe, effective, or ethically approved. Those
@@ -134,8 +158,9 @@ all versions; each release has its own.
 
 Stated plainly, because finding out by trying is worse:
 
-- **No package to install.** No npm or PyPI distribution exists. The validation
-  above uses `pyshacl` directly against the published Turtle.
+- **Not on PyPI yet.** The `sstim` client exists and works, but installs from
+  the repository rather than from an index: `pip install ./packages/sstim`. No
+  JavaScript client exists at all.
 - **No hosted SPARQL endpoint.** Query in-process, or load the artifacts into
   your own store. The knowledge browser runs its queries in the browser.
 - **No conformance badge or claims registry.** You can validate; there is no

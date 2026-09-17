@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sstim"
+version = "0.1.0"
+description = "Validate sensory-stimulation descriptions against a published SSTIM profile"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+keywords = [
+    "sstim", "ontology", "rdf", "shacl", "sensory stimulation",
+    "neuroscience", "reproducibility", "semantic web",
+]
+authors = [{ name = "Renato Fabbri" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+    "rdflib>=7.0",
+    "pyshacl>=0.25",
+]
+
+[project.urls]
+Homepage = "https://w3id.org/sstim"
+Documentation = "https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md"
+Source = "https://github.com/w3c-cg/sstim"
+Issues = "https://github.com/w3c-cg/sstim/issues"
+
+[project.scripts]
+sstim = "sstim.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sstim"]

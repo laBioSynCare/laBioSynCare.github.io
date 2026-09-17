@@ -83,7 +83,7 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract examples-check term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -602,6 +602,21 @@ preset-contract:
 examples-check:
 	$(PYTHON) scripts/examples-check.py
 
+## Test the `sstim` Python client in packages/sstim. Offline: it resolves the
+## frozen 0.17.0 manifest and the live one from this checkout, so a failure
+## always means the code, never the network. The client reads profile closures
+## from manifest.json, so a manifest change that would break every adopter's
+## install fails here rather than after publication.
+sstim-package:
+	PYTHONPATH=packages/sstim/src:$$PYTHONPATH $(PYTHON) packages/sstim/tests/test_sstim.py
+
+## Build the `sstim` wheel and sdist into dist/python/ (artifact only, never
+## committed). --no-isolation because the flake already pins the build backend;
+## an isolated build would silently fetch an unpinned one from PyPI.
+sstim-package-build:
+	$(PYTHON) -m build --no-isolation --outdir dist/python packages/sstim
+	@echo "sstim-package-build: wrote dist/python; inspect before any publish"
+
 ## Answer "does SSTIM define this IRI, and where?" across all five places it
 ## could live -- live modules, committed instances, frozen snapshots, and the
 ## external live ecosystem store a repository grep structurally cannot see.
@@ -770,7 +785,7 @@ validate-status:
 ## require `void.ttl`'s selected frozen directory to exist yet. This explicit
 ## phase is used after release-prepare and before `make snapshot`; the complete
 ## `validate` target remains the post-snapshot gate.
-RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
+RELEASE_SOURCE_VALIDATION_TARGETS := manifest-check module-boundaries core-profile-contract full-equivalence shacl entailment-check validate-profile band-scope-notes ecosystem-contract reason sparql-sanity export-check context-roundtrip session-contract preset-contract examples-check sstim-package term-index-check codemeta-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle-check hed-roundtrip signal-layer release-dryrun bioportal-ledger-check bioportal-metadata-test
 
 validate-release-source: $(RELEASE_SOURCE_VALIDATION_TARGETS)
 	@echo "validate-release-source: release-prepared semantic sources passed; snapshot-dependent gates remain"

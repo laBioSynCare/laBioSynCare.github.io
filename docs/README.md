@@ -10,11 +10,15 @@ the two disagree, the code and the as-built docs win.
 
 ## Start here if you want to use SSTIM
 
-- [`ADOPTING_SSTIM.md`](ADOPTING_SSTIM.md) — the on-ramp for someone outside
+- [`ADOPTING_SSTIM.md`](ADOPTING_SSTIM.md): the on-ramp for someone outside
   this project: choose a profile, fetch it pinned to a release, copy a starter
   file, change the namespace, validate. Runnable without a checkout, and it
   names what SSTIM does not do yet. The starter files it points at live in
   [`../examples/`](../examples/) and are gated by `make examples-check`.
+- [`../packages/sstim/`](../packages/sstim/), the `sstim` Python client:
+  `sstim validate my.ttl --profile core`. Resolves a profile closure from the
+  manifest, checksum-verifies what it fetches, and runs the two checks SHACL
+  cannot (containment and namespace discipline). Gated by `make sstim-package`.
 
 ## `concept/` — what the domain is and what we claim
 
@@ -114,7 +118,7 @@ of `static/favicon.svg` and `static/icons/`.
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
-- [`ADOPTION.md`](ecosystem/ADOPTION.md) — the **supply side** of that tracker:
+- [`ADOPTION.md`](ecosystem/ADOPTION.md): the **supply side** of that tracker,
   what has to exist before an outside party can adopt SSTIM, what counts as
   having adopted it (citation, tooling and data are three different things), the
   segment map with the unit of adoption per segment, and the measurement with

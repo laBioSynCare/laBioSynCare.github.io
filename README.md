@@ -107,6 +107,10 @@ about half an hour, without a checkout: pick a profile, fetch it pinned to a
 release, copy a file from [`examples/`](examples/), change the namespace,
 validate. It also states plainly what SSTIM does not do yet.
 
+There is also a Python client, [`packages/sstim`](packages/sstim/), which
+resolves a profile closure from the manifest and checks a file three ways:
+`sstim validate my.ttl --profile core`. It is not on PyPI yet.
+
 Consumers that previously merged the eight pre-modular sources should select
 the Full profile. New reusable integrations should start with Core or Core Plus and
 add concern modules through their manifest-resolved dependency closure. Shapes
