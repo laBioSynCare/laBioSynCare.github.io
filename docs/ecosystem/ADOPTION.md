@@ -73,27 +73,51 @@ doing that review first.
 Five artifacts. Three of them are only worth building once somebody is waiting,
 which is what §6 sequences.
 
-### A. An adopter on-ramp page
+### A. An adopter on-ramp page · **delivered 2026-09-17**
 
-The closest thing that exists is the "How to use it" section of
-[CURRENT_STATE.md](../ontology/CURRENT_STATE.md). It is correct, and it is
-written for a reader who has already decided to adopt, inside a long status
-document they have no reason to open.
+[ADOPTING_SSTIM.md](../ADOPTING_SSTIM.md). Seven steps from "should I bother"
+to a validated file, none of them requiring a checkout of this repository. Its
+curl commands and its `pyshacl` invocation were run against the live w3id
+routes at a pinned release before it was written, not composed from the route
+contract.
 
-*Done when:* a reader who has never heard of SSTIM can, in well under an hour,
-choose a profile, fetch it, validate one file of their own, and know which IRIs
-they may mint and which they may not.
+It also carries a "what is not here yet" section naming the four gaps below, on
+the reasoning that a stranger finding them out by trying is worse than being
+told.
 
-### B. A starter set
+Before it, the closest thing was the "How to use it" section of
+[CURRENT_STATE.md](../ontology/CURRENT_STATE.md), which is correct but written
+for a reader who has already decided to adopt, inside a long status document
+they have no reason to open.
 
-The repository is not short of encoded data: two dozen instance files, ten
+### B. A starter set · **delivered 2026-09-17**
+
+[`examples/`](../../examples/), four files, gated by `make examples-check`.
+
+The repository was never short of encoded data: two dozen instance files, ten
 exploratory protocols, reference protocols, a synthetic reference session and
-five preset seeds. What is missing is different in kind, a **minimal**
-outsider-facing trio sized for copying rather than for covering the model.
+five preset seeds. What was missing was different in kind, a **minimal**
+outsider-facing set sized for copying rather than for covering the model.
 
-*Done when:* three files exist (one protocol, one session, one preset), each
-short enough to read at a glance, each passing `make validate`, each naming in a
-comment the profile it targets and the namespace rule it obeys.
+The set that shipped is a profile ladder rather than the protocol/session/preset
+trio planned here, which was chosen before the module boundaries were read: a
+Core stimulus description, the same file one profile step up, a protocol, and a
+session. A preset is the least useful thing to hand an outsider, being
+engine-dependent by definition, and it appears inside the session example where
+it is actually load-bearing.
+
+The gate is the part worth keeping. Each file is validated against the shapes of
+the profile its own header declares, checked to use nothing outside that
+profile's closure, and refused if it mints an IRI under `https://w3id.org/sstim`.
+Containment is the check no existing gate made: SHACL says nothing about a
+predicate it has never heard of, so an example can conform perfectly while using
+terms the profile a consumer loaded does not contain. Three negative fixtures
+inside the checker prove all three checks still reject.
+
+Two rough edges surfaced by walking the adopter path are recorded in
+[`examples/README.md`](../../examples/README.md): Core states a rendering's
+carrier but not the signal's frequency extent, and a session specification
+cannot exist without a preset.
 
 ### C. A package to install
 
@@ -214,8 +238,8 @@ individual is named in this file.
    [REGISTRY_SUBMISSIONS.md](../ontology/REGISTRY_SUBMISSIONS.md). Sending an
    ontology-engineering audience to a record that returns a server error costs
    more than the record was ever going to earn.
-2. **Build A and B.** Cheap, self-contained, dependent on nobody, and they make
-   every later conversation shorter.
+2. **Build A and B.** ✅ Done 2026-09-17. Cheap, self-contained, dependent on
+   nobody, and they make every later conversation shorter.
 3. **Send the outreach that is already written.** The one data point available
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good

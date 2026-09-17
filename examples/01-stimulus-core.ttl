@@ -1,0 +1,67 @@
+# SSTIM by example, 1 of 4: describe a stimulus so someone else can reproduce it.
+#
+# sstim-profile: core
+#
+# Core is the smallest SSTIM profile that says anything useful: two modules,
+# and a shape contract that asks a stimulus description for a label and a
+# regime and nothing else. Every term below resolves inside that closure, and
+# `make examples-check` proves it rather than asking you to trust the comment.
+#
+# The point of this file is the last four blocks. One signal is rendered twice,
+# through sound and through light, and both renderings name the same signal.
+# That is an assertion that the two channels deliver the same thing. Without it
+# a consumer has to compare two decimals and guess, which is the comparability
+# problem SSTIM exists to fix.
+#
+# To reuse this: change the `ex:` prefix to a namespace you control and keep
+# every `sstim:` term exactly as it is. Minting your own term under
+# https://w3id.org/sstim is the one move that breaks interoperability, and it
+# is the only thing this file would fail you for.
+
+@prefix ex:       <https://example.org/stimuli/> .
+@prefix dct:      <http://purl.org/dc/terms/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:    <https://w3id.org/sstim#> .
+@prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+
+ex:alpha-audiovisual a sstim:StimulusSpecification ;
+    rdfs:label "Ten minutes of 10 Hz stimulation, delivered through sound and light"@en ;
+    dct:description "Engine-independent description of what reaches the subject. It states no intended effect, and asserting one would be a separate claim carrying its own evidence."@en ;
+    sstim:stimulusRegime "determinate" ;
+    sstim:hasSignal ex:alpha-signal ;
+    sstim:hasStimulusChannel ex:audio-channel, ex:visual-channel .
+
+# The signal is modality-free on purpose. It is not a sound and not a light;
+# it is the thing both of them carry. Core cannot state its frequency extent:
+# hzMin and hzMax live in the Common module, which is the Core Plus profile.
+# Example 02 is this file plus that one step. Diff them.
+ex:alpha-signal a sstim:StimulationSignal ;
+    rdfs:label "10 Hz modulation"@en .
+
+ex:audio-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Audio channel, headphones"@en ;
+    sstim:channelDurationSeconds 600.0 ;
+    sstim:hasSignalRendering ex:audio-rendering .
+
+ex:visual-channel a sstim-ex:StimulusChannel ;
+    rdfs:label "Visual channel, screen"@en ;
+    sstim:channelDurationSeconds 600.0 ;
+    sstim:hasSignalRendering ex:visual-rendering .
+
+# Carrier and modulation are different facts. The 200 Hz here is the tone being
+# modulated, not the rate: the rate is the signal's, which is the whole reason
+# the signal is a separate node.
+ex:audio-rendering a sstim:SignalRendering ;
+    rdfs:label "10 Hz amplitude modulation of a 200 Hz tone"@en ;
+    sstim:rendersSignal ex:alpha-signal ;
+    sstim:renderingCarrierHz 200.0 .
+
+# A 10 Hz visual flicker is above the 3 Hz general-safe ceiling of WCAG 2.3.1
+# and ITU-R BT.1702, and it sits below the highest-risk 15 to 25 Hz band.
+# Describing it is exactly what a description standard is for. Delivering it is
+# a different decision: see docs/technical/PHOTOSENSITIVITY_SAFETY.md, and
+# sstim-ex:limitFlickerWcag, which models that ceiling in the Full profile.
+ex:visual-rendering a sstim:SignalRendering ;
+    rdfs:label "10 Hz luminance flicker"@en ;
+    sstim:rendersSignal ex:alpha-signal .

@@ -102,6 +102,11 @@ closures. The main adoption choices are:
 | [Core Plus](static/ontology/sstim-core-plus-profile.ttl) | Core + reusable common descriptors and calibrated quantities | Core shapes; Common-specific shapes are deferred |
 | [Full](static/ontology/sstim-full-profile.ttl) | All semantic, bridge, vocabulary, alignment, ecosystem, and Patch Studio modules | [`sstim-shapes.ttl`](static/ontology/sstim-shapes.ttl) |
 
+**New here?** [Adopting SSTIM](docs/ADOPTING_SSTIM.md) walks the whole path in
+about half an hour, without a checkout: pick a profile, fetch it pinned to a
+release, copy a file from [`examples/`](examples/), change the namespace,
+validate. It also states plainly what SSTIM does not do yet.
+
 Consumers that previously merged the eight pre-modular sources should select
 the Full profile. New reusable integrations should start with Core or Core Plus and
 add concern modules through their manifest-resolved dependency closure. Shapes

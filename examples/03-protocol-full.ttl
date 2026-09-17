@@ -1,0 +1,40 @@
+# SSTIM by example, 3 of 4: say what method the stimulus belongs to.
+#
+# sstim-profile: full
+#
+# A stimulus description says what reaches the subject. A protocol says what
+# you do: which techniques, under whose method, with what written down. That
+# needs the technique and vocabulary modules, so this is the Full profile.
+#
+# Two things here surprise people, and both are deliberate.
+#
+# First, you declare your own framework. SSTIM does not hand you one, because a
+# framework is a body of method belonging to whoever authored it. Yours goes in
+# your namespace, exactly like your protocols and your records.
+#
+# Second, the technique is not yours. sstim-v:techAmplitudeModulation is a
+# published SSTIM concept, and naming it rather than minting your own is what
+# makes your protocol findable beside everyone else's. Look in
+# docs/ontology/TERM_INDEX.md before you invent a term, or run
+# `python3 scripts/locate-iri.py sstim-v:techAmplitudeModulation`.
+
+@prefix ex:      <https://example.org/stimuli/> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+ex:example-lab-method a sstim:SensoryStimulationFramework ;
+    rdfs:label "Example Lab audiovisual stimulation method"@en ;
+    dct:description "The body of method under which this lab designs and reports audiovisual stimulation. Declared here so its protocols have something to be defined by; a real one would carry its own documentation and provenance."@en ;
+    sstim:definesTechnique sstim-v:techAmplitudeModulation .
+
+ex:cross-modal-observation a sstim:SensoryStimulationProtocol ;
+    rdfs:label "Cross-modal 10 Hz observation protocol"@en ;
+    dct:description "Presents one 10 Hz signal through an auditory and a visual channel in the same session, records the exact stimulus specification delivered, and collects pre and post self-report. It describes a method for observation; it prescribes no treatment and predicts no outcome."@en ;
+    dct:creator <https://orcid.org/0000-0000-0000-0000> ;
+    dct:created "2026-09-17"^^xsd:date ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    sstim:definedByFramework ex:example-lab-method ;
+    sstim:usesTechnique sstim-v:techAmplitudeModulation .

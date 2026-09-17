@@ -8,6 +8,14 @@ Each technical document is **as-built** (describes shipped code) or **target**
 (a design the code is growing toward), stated in its own opening banner. When
 the two disagree, the code and the as-built docs win.
 
+## Start here if you want to use SSTIM
+
+- [`ADOPTING_SSTIM.md`](ADOPTING_SSTIM.md) — the on-ramp for someone outside
+  this project: choose a profile, fetch it pinned to a release, copy a starter
+  file, change the namespace, validate. Runnable without a checkout, and it
+  names what SSTIM does not do yet. The starter files it points at live in
+  [`../examples/`](../examples/) and are gated by `make examples-check`.
+
 ## `concept/` — what the domain is and what we claim
 
 - [`SENSORY_STIMULATION.md`](concept/SENSORY_STIMULATION.md) — defines the term

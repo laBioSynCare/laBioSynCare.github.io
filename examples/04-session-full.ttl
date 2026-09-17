@@ -1,0 +1,54 @@
+# SSTIM by example, 4 of 4: record that you actually delivered it.
+#
+# sstim-profile: full
+#
+# Three objects, kept apart on purpose, and the separation is the lesson.
+#
+#   Preset               how one engine was configured. Engine-dependent.
+#   SessionSpecification what was planned for this run.
+#   SessionInstance      what happened, including how it ended.
+#
+# The preset points back at the stimulus specification from examples 01 and 02
+# through sstim:specifiedBy. That link is asserted by whoever measured or
+# derived it, never inferred: what a configuration actually produces depends on
+# the engine, the transducer and the room. Asserting it is what lets two labs
+# on different hardware claim they delivered the same stimulus, and lets a
+# reader disagree with the claim.
+#
+# Note what this file does not carry: no participant identifier, no free text,
+# and nothing that could identify a person. Self-report and observation terms
+# exist in the session module; whether an identifiable observation belongs in a
+# published graph is a question this example does not answer for you.
+
+@prefix ex:      <https://example.org/stimuli/> .
+@prefix dct:     <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sstim:   <https://w3id.org/sstim#> .
+@prefix sstim-v: <https://w3id.org/sstim/vocab#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+ex:alpha-preset-webaudio a sstim:Preset ;
+    rdfs:label "Example Lab 10 Hz audiovisual preset, Web Audio build 3"@en ;
+    dct:description "One engine's configuration for the stimulus specification in examples 01 and 02. Another engine realising the same specification would be a different preset and an equally valid one."@en ;
+    sstim:specifiedBy ex:alpha-audiovisual ;
+    sstim:durationSeconds 600 .
+
+ex:run-2026-09-17-001-spec a sstim:SessionSpecification, prov:Plan ;
+    rdfs:label "Planned run 001, 17 September 2026"@en ;
+    dct:created "2026-09-17T09:00:00Z"^^xsd:dateTime ;
+    sstim:referencesPreset ex:alpha-preset-webaudio ;
+    sstim:durationSeconds 600 ;
+    sstim:masterVolume 0.20 .
+
+# completionStatus is one of completed, interrupted or abandoned, and the
+# honest value matters more than the tidy one. A run that ended early is data;
+# a run recorded as complete because the field looked better that way is not.
+ex:run-2026-09-17-001 a sstim:SessionInstance ;
+    rdfs:label "Run 001, 17 September 2026"@en ;
+    sstim:usesSpecification ex:run-2026-09-17-001-spec ;
+    sstim:actualDurationSeconds 600 ;
+    sstim:completionStatus "completed" ;
+    sstim:hasDeliveryModality sstim-v:modalityAuditory, sstim-v:modalityVisual ;
+    prov:startedAtTime "2026-09-17T09:01:00Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-09-17T09:11:00Z"^^xsd:dateTime .
