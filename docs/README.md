@@ -106,6 +106,11 @@ of `static/favicon.svg` and `static/icons/`.
 
 - [`ECOSYSTEM_INTEGRATION.md`](ecosystem/ECOSYSTEM_INTEGRATION.md) — **living
   tracker** across the five workstreams. Start here for outreach and positioning.
+- [`ADOPTION.md`](ecosystem/ADOPTION.md) — the **supply side** of that tracker:
+  what has to exist before an outside party can adopt SSTIM, what counts as
+  having adopted it (citation, tooling and data are three different things), the
+  segment map with the unit of adoption per segment, and the measurement with
+  its named instruments. Who to contact stays in `OUTREACH_TARGETS.md`.
 - [`W3C_REPOSITORY_MIGRATION.md`](ecosystem/W3C_REPOSITORY_MIGRATION.md) —
   **executed 2026-08-23; still not production-cutover authorization.** Decision
   analysis, gates and checkpointed plan for moving the complete repository and
