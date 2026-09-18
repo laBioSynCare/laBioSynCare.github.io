@@ -228,7 +228,7 @@
 
             packages = [
               pkgs.nodejs_24      # matches CI (.github/workflows) and package.json
-              (py.withPackages (ps: [ ps.rdflib ps.jsonschema ps.hatchling ps.build hedtools ]))  # RDF tooling, manifest JSON Schema validation, the sstim client's build backend, HED validation (ADR 0025)
+              (py.withPackages (ps: [ ps.rdflib ps.jsonschema ps.hatchling ps.build ps.twine hedtools ]))  # RDF tooling, manifest JSON Schema validation, the sstim client's build/publish tooling, HED validation (ADR 0025)
               pyshacl             # vendored `pyshacl` CLI — SHACL for `make validate`
               pylode              # vendored `pylode` CLI — SKOS vocab HTML docs (`make vocab-docs`)
               robot               # ROBOT + HermiT/ELK — OWL DL consistency for `make reason`

@@ -110,7 +110,7 @@ resolves the current release for you, checksum-verifies every module it
 fetches, and runs three checks rather than one:
 
 ```bash
-pip install ./packages/sstim          # not on PyPI yet; see below
+pip install sstim
 sstim validate my-stimulus.ttl --profile core
 ```
 
@@ -158,9 +158,9 @@ all versions; each release has its own.
 
 Stated plainly, because finding out by trying is worse:
 
-- **Not on PyPI yet.** The `sstim` client exists and works, but installs from
-  the repository rather than from an index: `pip install ./packages/sstim`. No
-  JavaScript client exists at all.
+- **No JavaScript client.** The Python client is on PyPI as
+  [`sstim`](https://pypi.org/project/sstim/); there is no npm equivalent, so a
+  browser or Node consumer validates by other means.
 - **No hosted SPARQL endpoint.** Query in-process, or load the artifacts into
   your own store. The knowledge browser runs its queries in the browser.
 - **No conformance badge or claims registry.** You can validate; there is no

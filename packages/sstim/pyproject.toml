@@ -30,9 +30,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://w3id.org/sstim"
-Documentation = "https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md"
-Source = "https://github.com/w3c-cg/sstim"
-Issues = "https://github.com/w3c-cg/sstim/issues"
+Documentation = "https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ADOPTING_SSTIM.md"
+Source = "https://github.com/laBioSynCare/laBioSynCare.github.io"
+Issues = "https://github.com/laBioSynCare/laBioSynCare.github.io/issues"
 
 [project.scripts]
 sstim = "sstim.cli:main"

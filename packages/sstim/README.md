@@ -107,10 +107,10 @@ reviews, and SSTIM does not perform them.
 
 ## More
 
-- [Adopting SSTIM](https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md),
+- [Adopting SSTIM](https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ADOPTING_SSTIM.md),
   the half-hour on-ramp
-- [Starter examples](https://github.com/w3c-cg/sstim/tree/main/examples)
+- [Starter examples](https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/examples)
 - [The ontology](https://w3id.org/sstim) and its
-  [term index](https://github.com/w3c-cg/sstim/blob/main/docs/ontology/TERM_INDEX.md)
+  [term index](https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ontology/TERM_INDEX.md)
 
 Apache-2.0. SSTIM itself is CC BY 4.0.

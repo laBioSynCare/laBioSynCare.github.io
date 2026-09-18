@@ -119,7 +119,7 @@ Two rough edges surfaced by walking the adopter path are recorded in
 carrier but not the signal's frequency extent, and a session specification
 cannot exist without a preset.
 
-### C. A package to install · **built 2026-09-17, not yet published**
+### C. A package to install · **published 2026-09-18**
 
 [`packages/sstim`](../../packages/sstim/), the `sstim` Python client, gated by
 `make sstim-package`. Python first because the researcher segment is the primary
@@ -151,10 +151,19 @@ The client verifies before parsing and refuses on mismatch, so a truncated
 download cannot quietly become a conformance result. The cache is keyed by
 checksum, which makes a stale cache entry impossible and repeat runs offline.
 
-**Publication is a separate decision and has not been taken.** `sstim` remains
-unclaimed on PyPI. Publishing is public and effectively irreversible, so it
-needs an explicit go-ahead, and probably a first release of the repository's own
-choosing rather than a 0.1.0 pushed the day it was written.
+**Published as [`sstim`](https://pypi.org/project/sstim/) 0.1.0 on
+2026-09-18**, on Renato's instruction. The claim was verified the only way that
+means anything: the wheel was downloaded back from files.pythonhosted.org,
+unpacked somewhere knowing nothing of this repository, and used to resolve,
+fetch and validate over the live network.
+
+Two operational notes for the next release. PyPI's JSON API answered 404 for
+several minutes after the upload while the project page and the simple index
+both served the release immediately, so read the simple index, never the JSON
+API, when confirming a publish. And the package's `Project-URL` fields point at
+the legacy origin rather than `w3c-cg/sstim`, because the documentation and
+examples they link to resolve there and 404 on the W3C CG mirror, which sits at
+the commit before this work. Repoint them once the mirror carries it.
 
 ### D. An exporter for a tool researchers already run
 
@@ -264,7 +273,7 @@ individual is named in this file.
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good
    enough and the messages are not being sent.
-4. **Build C.** ✅ Built 2026-09-17; publication to PyPI is a separate, still-open decision.
+4. **Build C.** ✅ Built 2026-09-17, published to PyPI as `sstim` 0.1.0 on 2026-09-18. No JavaScript client yet.
 5. **Build D against whichever tool the first engaged lab actually uses.**
    Choosing before then is a guess with a large build attached.
 6. **Build E when there is a claimant.**

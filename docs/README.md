@@ -18,7 +18,8 @@ the two disagree, the code and the as-built docs win.
 - [`../packages/sstim/`](../packages/sstim/), the `sstim` Python client:
   `sstim validate my.ttl --profile core`. Resolves a profile closure from the
   manifest, checksum-verifies what it fetches, and runs the two checks SHACL
-  cannot (containment and namespace discipline). Gated by `make sstim-package`.
+  cannot (containment and namespace discipline). Published on PyPI as
+  [`sstim`](https://pypi.org/project/sstim/); gated by `make sstim-package`.
 
 ## `concept/` — what the domain is and what we claim
 
