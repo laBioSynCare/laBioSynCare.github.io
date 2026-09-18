@@ -1,0 +1,43 @@
+{
+  "name": "sstim",
+  "version": "0.1.0",
+  "description": "Validate sensory-stimulation descriptions against a published SSTIM profile",
+  "keywords": [
+    "sstim",
+    "ontology",
+    "rdf",
+    "shacl",
+    "sensory-stimulation",
+    "neuroscience",
+    "reproducibility",
+    "semantic-web"
+  ],
+  "homepage": "https://w3id.org/sstim",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laBioSynCare/laBioSynCare.github.io.git",
+    "directory": "packages/sstim-js"
+  },
+  "bugs": "https://github.com/laBioSynCare/laBioSynCare.github.io/issues",
+  "author": "Renato Fabbri",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "sstim": "./src/cli.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "n3": "^1.17.3",
+    "rdf-validate-shacl": "^0.5.6"
+  }
+}

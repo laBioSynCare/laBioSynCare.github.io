@@ -20,6 +20,9 @@ the two disagree, the code and the as-built docs win.
   manifest, checksum-verifies what it fetches, and runs the two checks SHACL
   cannot (containment and namespace discipline). Published on PyPI as
   [`sstim`](https://pypi.org/project/sstim/); gated by `make sstim-package`.
+- [`../packages/sstim-js/`](../packages/sstim-js/), the same API in
+  JavaScript, gated by `make test`. Not yet on npm, and `PARTIAL` on the Full
+  profile because `rdf-validate-shacl` cannot evaluate `sh:sparql`.
 
 ## `concept/` — what the domain is and what we claim
 

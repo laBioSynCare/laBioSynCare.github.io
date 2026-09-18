@@ -121,11 +121,26 @@ cannot exist without a preset.
 
 ### C. A package to install · **published 2026-09-18**
 
-[`packages/sstim`](../../packages/sstim/), the `sstim` Python client, gated by
-`make sstim-package`. Python first because the researcher segment is the primary
-target of §6, because `pyshacl` is the validator the on-ramp already documents,
-and because the leading candidate for D is a Python tool. **No JavaScript client
-exists**, and the npm name is still unclaimed.
+Two clients, one API. [`packages/sstim`](../../packages/sstim/) is the Python
+one, gated by `make sstim-package` and published on PyPI.
+[`packages/sstim-js`](../../packages/sstim-js/) is the JavaScript one, gated by
+`make test`, **built 2026-09-18 and not yet published**: npm has no auth on this
+machine, so `npm login` and `npm publish ./packages/sstim-js` remain to be run.
+The name is still unclaimed on npm, as are `sstim-js` and `@sstim/core`.
+
+Python came first because the researcher segment is the primary target of §6 and
+`pyshacl` is the validator the on-ramp documents. JavaScript came second because
+the applications segment is the one that can adopt without anyone's permission,
+and because it lets the Workbench eventually consume its own published client,
+which is the nearest available answer to §7.
+
+**They are not equivalent, and the difference is reported rather than hidden.**
+`rdf-validate-shacl` has no SPARQL constraint component, so `sh:sparql`
+constraints cannot be evaluated in JavaScript. The Kernel, Core and Core Plus
+shape graphs contain none, so those results match pySHACL exactly. The Full
+shape graph contains 69 at 0.17.0, and the JavaScript client removes them,
+counts them, and marks the result `PARTIAL` with that number rather than
+reporting a conformance it did not establish.
 
 *Done when* was one install command and one validate command against a named
 profile at a pinned version IRI. Met, and verified the only way it can honestly
@@ -273,7 +288,7 @@ individual is named in this file.
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good
    enough and the messages are not being sent.
-4. **Build C.** ✅ Built 2026-09-17, published to PyPI as `sstim` 0.1.0 on 2026-09-18. No JavaScript client yet.
+4. **Build C.** ✅ Python built 2026-09-17 and published to PyPI as `sstim` 0.1.0 on 2026-09-18; JavaScript built 2026-09-18, awaiting an npm login to publish.
 5. **Build D against whichever tool the first engaged lab actually uses.**
    Choosing before then is a guess with a large build attached.
 6. **Build E when there is a claimant.**

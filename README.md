@@ -107,10 +107,16 @@ about half an hour, without a checkout: pick a profile, fetch it pinned to a
 release, copy a file from [`examples/`](examples/), change the namespace,
 validate. It also states plainly what SSTIM does not do yet.
 
-There is also a Python client, [`packages/sstim`](packages/sstim/), published
-as [`sstim`](https://pypi.org/project/sstim/) on PyPI. It resolves a profile
-closure from the manifest, checksum-verifies what it fetches, and checks a file
-three ways: `pip install sstim && sstim validate my.ttl --profile core`.
+There are two clients with one API. Both resolve a profile closure from the
+manifest, checksum-verify what they fetch, and check a file three ways:
+conformance, containment, and namespace discipline.
+
+- [`packages/sstim`](packages/sstim/), Python, on PyPI as
+  [`sstim`](https://pypi.org/project/sstim/):
+  `pip install sstim && sstim validate my.ttl --profile core`
+- [`packages/sstim-js`](packages/sstim-js/), JavaScript, not yet on npm.
+  `rdf-validate-shacl` cannot evaluate `sh:sparql`, so Full-profile results are
+  marked `PARTIAL` with the count skipped; Kernel, Core and Core Plus carry none.
 
 Consumers that previously merged the eight pre-modular sources should select
 the Full profile. New reusable integrations should start with Core or Core Plus and
