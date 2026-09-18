@@ -37,3 +37,9 @@ dist-browser/
 # Written by `make validate`: when the suite last passed and on which tree.
 # Local state, not a repository fact.
 .validation.log
+
+# npm auth lives here. A granular access token with 2FA bypass is a publish
+# credential, and this repository is public: an `git add -A` away from being
+# pushed. Never commit it. Publish config that is not secret belongs in
+# package.json, not here.
+.npmrc

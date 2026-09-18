@@ -158,13 +158,12 @@ all versions; each release has its own.
 
 Stated plainly, because finding out by trying is worse:
 
-- **The JavaScript client is not on npm yet.** The Python client is on PyPI as
-  [`sstim`](https://pypi.org/project/sstim/). Its JavaScript twin lives in
-  [`packages/sstim-js`](../packages/sstim-js/) and works, but installs from the
-  repository. It is also weaker on one axis: `rdf-validate-shacl` cannot
-  evaluate `sh:sparql`, so Full-profile results are marked `PARTIAL` with the
-  number of constraints skipped. Kernel, Core and Core Plus carry none and are
-  checked exactly as pySHACL would.
+- **The JavaScript client is weaker on one axis.** Both clients are published:
+  [`sstim`](https://pypi.org/project/sstim/) on PyPI and
+  [`@sstim/core`](https://www.npmjs.com/package/@sstim/core) on npm. But
+  `rdf-validate-shacl` cannot evaluate `sh:sparql`, so JavaScript Full-profile
+  results are marked `PARTIAL` with the number of constraints skipped. Kernel,
+  Core and Core Plus carry none and are checked exactly as pySHACL would.
 - **No hosted SPARQL endpoint.** Query in-process, or load the artifacts into
   your own store. The knowledge browser runs its queries in the browser.
 - **No conformance badge or claims registry.** You can validate; there is no

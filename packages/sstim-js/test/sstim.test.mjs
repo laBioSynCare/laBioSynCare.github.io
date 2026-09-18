@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { DataFactory, Parser, Store } from 'n3'
 
 import {
@@ -174,5 +177,27 @@ describe('the command line', () => {
     expect(await main(['validate', example('01-stimulus-core.ttl'),
       '--profile', 'core', '--manifest', FROZEN])).toBe(0)
     expect(await main(['modules', '--profile', 'nonsense', '--manifest', FROZEN])).toBe(2)
+  })
+
+  it('runs when invoked through a symlink, as an installed bin is', () => {
+    // 0.1.0 shipped a CLI that did nothing once installed. npm links a bin
+    // (node_modules/.bin/sstim -> ../@sstim/core/src/cli.js), so process.argv[1]
+    // is the link while import.meta.url is the resolved target, and the
+    // entry-point check compared the two directly. Calling main() from a test
+    // cannot see that, and neither can running the file from a checkout: it
+    // only appears through a link. So this reproduces the link.
+    const dir = mkdtempSync(join(tmpdir(), 'sstim-bin-'))
+    const link = join(dir, 'sstim')
+    try {
+      symlinkSync(new URL('../src/cli.js', import.meta.url).pathname, link)
+      const run = spawnSync(process.execPath, [
+        link, 'validate', example('01-stimulus-core.ttl'),
+        '--profile', 'core', '--manifest', FROZEN
+      ], { encoding: 'utf8' })
+      expect(run.stdout, 'the CLI produced no output through a symlink').toMatch(/SHACL conformance/)
+      expect(run.status).toBe(0)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })

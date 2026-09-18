@@ -114,9 +114,11 @@ conformance, containment, and namespace discipline.
 - [`packages/sstim`](packages/sstim/), Python, on PyPI as
   [`sstim`](https://pypi.org/project/sstim/):
   `pip install sstim && sstim validate my.ttl --profile core`
-- [`packages/sstim-js`](packages/sstim-js/), JavaScript, not yet on npm.
-  `rdf-validate-shacl` cannot evaluate `sh:sparql`, so Full-profile results are
-  marked `PARTIAL` with the count skipped; Kernel, Core and Core Plus carry none.
+- [`packages/sstim-js`](packages/sstim-js/), JavaScript, on npm as
+  [`@sstim/core`](https://www.npmjs.com/package/@sstim/core):
+  `npm install @sstim/core`. `rdf-validate-shacl` cannot evaluate `sh:sparql`,
+  so Full-profile results are marked `PARTIAL` with the count skipped; Kernel,
+  Core and Core Plus carry none.
 
 Consumers that previously merged the eight pre-modular sources should select
 the Full profile. New reusable integrations should start with Core or Core Plus and

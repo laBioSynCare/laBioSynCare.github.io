@@ -1,4 +1,4 @@
-# sstim
+# @sstim/core
 
 Validate sensory-stimulation descriptions against a published
 [SSTIM](https://w3id.org/sstim) profile.
@@ -9,7 +9,7 @@ This package is a client for it. The ontology, its SHACL shapes and its profiles
 are published independently, and this code only reads them.
 
 ```bash
-npm install sstim
+npm install @sstim/core
 npx sstim validate my-stimulus.ttl --profile core
 ```
 
@@ -95,7 +95,7 @@ offline and a cache entry can never be stale.
 ## As a library
 
 ```js
-import { validate, resolveProfile } from 'sstim'
+import { validate, resolveProfile } from '@sstim/core'
 
 const report = await validate('my-stimulus.ttl', { profile: 'core' })
 if (!report.ok) console.log(String(report))

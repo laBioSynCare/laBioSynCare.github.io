@@ -1,6 +1,6 @@
 {
-  "name": "sstim",
-  "version": "0.1.0",
+  "name": "@sstim/core",
+  "version": "0.1.1",
   "description": "Validate sensory-stimulation descriptions against a published SSTIM profile",
   "keywords": [
     "sstim",
@@ -35,6 +35,9 @@
   ],
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "n3": "^1.17.3",

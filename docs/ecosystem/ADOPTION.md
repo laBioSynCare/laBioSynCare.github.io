@@ -124,9 +124,17 @@ cannot exist without a preset.
 Two clients, one API. [`packages/sstim`](../../packages/sstim/) is the Python
 one, gated by `make sstim-package` and published on PyPI.
 [`packages/sstim-js`](../../packages/sstim-js/) is the JavaScript one, gated by
-`make test`, **built 2026-09-18 and not yet published**: npm has no auth on this
-machine, so `npm login` and `npm publish ./packages/sstim-js` remain to be run.
-The name is still unclaimed on npm, as are `sstim-js` and `@sstim/core`.
+`make test` and published on npm as
+[`@sstim/core`](https://www.npmjs.com/package/@sstim/core).
+
+**It is scoped because npm refused the bare name.** `sstim` is blocked by npm's
+anti-typosquatting filter as too similar to `ssri`, a very widely used package;
+the name is not taken, it is refused. There is no appeal: npm's disputes policy
+covers trademark claims only and explicitly does not resolve similarity blocks,
+and the rule itself is undocumented and cannot be tested before publishing. A
+scope bypasses the filter, so the `@sstim` npm organization was created and the
+package lives there. That is the better identity anyway: it mirrors `sstim` on
+PyPI and leaves room for further packages under one name.
 
 Python came first because the researcher segment is the primary target of §6 and
 `pyshacl` is the validator the on-ramp documents. JavaScript came second because
@@ -288,7 +296,7 @@ individual is named in this file.
    is that the HED approach produced three maintainer replies within two days, a
    meeting and a merged upstream fix. That is evidence the artifacts are good
    enough and the messages are not being sent.
-4. **Build C.** ✅ Python built 2026-09-17 and published to PyPI as `sstim` 0.1.0 on 2026-09-18; JavaScript built 2026-09-18, awaiting an npm login to publish.
+4. **Build C.** ✅ Both clients published 2026-09-18: `sstim` on PyPI, `@sstim/core` on npm.
 5. **Build D against whichever tool the first engaged lab actually uses.**
    Choosing before then is a guess with a large build attached.
 6. **Build E when there is a claimant.**

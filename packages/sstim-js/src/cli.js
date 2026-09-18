@@ -5,6 +5,9 @@
 // the shortest path from "I have a Turtle file" to "I know whether it is right"
 // is two commands, one of which is `npm install`.
 
+import { realpathSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
+
 import { SstimError, cacheDir, resolveProfile } from './resolve.js'
 import { validate } from './validate.js'
 
@@ -109,5 +112,12 @@ export async function main (argv = process.argv.slice(2)) {
   }
 }
 
-const invokedDirectly = process.argv[1] && import.meta.url === `file://${process.argv[1]}`
-if (invokedDirectly) process.exit(await main())
+// npm installs a bin as a symlink (node_modules/.bin/sstim -> ../@sstim/core/
+// src/cli.js), so process.argv[1] is the link while import.meta.url is the
+// resolved target. Comparing the two directly means the CLI does nothing at all
+// when installed, which is invisible when running the file from a checkout.
+// realpathSync collapses the link; pathToFileURL handles spaces and Windows.
+const entryUrl = process.argv[1]
+  ? pathToFileURL(realpathSync(process.argv[1])).href
+  : null
+if (entryUrl === import.meta.url) process.exit(await main())
