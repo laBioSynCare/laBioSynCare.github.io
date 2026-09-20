@@ -72,13 +72,15 @@ already shipped. Release facts are derived from
 the adopter on-ramp, the starter set and both clients shipped in September. What
 is left is repair, then recruiting, in that order.
 
-1. **Repair the two broken registry records** (§2 Registries) before sending an
-   ontology-engineering audience to them. LOV never ingested the 2026-07-10
-   suggestion, whose form no longer exists, so it needs the curators directly.
-   Archivo publishes a development snapshot as SSTIM and only its own crawler
-   can replace that, which as of 2026-09-20 is running again and working
-   towards us.
-2. **Send the outreach that is already written** (§7). Nine of the ten target
+1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
+   side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
+   to the curators by email, the only channel their site still exposes, after
+   the one metadata gap here was closed. Archivo cannot be repaired from
+   outside at all, `/add` short-circuits for an indexed ontology, but its
+   crawler resumed on 2026-09-15 and is sweeping towards us. Re-read both
+   records rather than re-sending anything.
+2. **Send the outreach that is already written** (§7), which is now the next
+   action rather than the one after it. Nine of the ten target
    rows read `not-contacted` and the outreach log is still empty. The one
    engaged target produced three maintainer replies inside 48 hours, a meeting
    and a merged upstream fix, so the artifacts are not what is blocking.
@@ -370,10 +372,14 @@ indexed, examiner-searchable records.
       deliberately does not repeat them, because `make module-boundaries`
       requires one authoritative source per subject, external ones included.*
 
-      *What is left is the message. It is drafted at
-      `/Users/renatofabbri/sstim-drafts/2026-09-20-lov-curators-email.md`, 126
-      words, and needs Renato to send it: the curators' address is the only
-      channel the site still exposes.*
+      *The message was **sent 2026-09-20** to all three curators, the only
+      channel the site still exposes: what is absent, that the form is gone,
+      what SSTIM is at 0.17.0, and one question about the current channel. The
+      dated record is in
+      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md). Nothing
+      to do until they reply; if none comes, remind `mpoveda@fi.upm.es` alone,
+      the one institutional address, and do not submit a third time through any
+      channel.*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
       *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same

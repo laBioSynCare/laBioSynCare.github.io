@@ -148,7 +148,7 @@ BARTOC or FAIRsharing field edits have already landed.
 |---|---|---|---|
 | prefix.cc | ✅ **corrected 2026-08-18** — now serves `sstim` → `https://w3id.org/sstim#` in all four serialisations (`txt`, `json`, `ttl`, `sparql`), verified by `make registry-verify`. It had served the slash form since before 2026-07-11; the hash entry was added and voted above it, and the slash form remains listed but outranked. Its TLS certificate expired 2025-12-31, so `https://` still fails certificate validation and plain `http://` is the only way to read it | yes | — |
 | DBpedia Archivo | ⚠️ **listed, serving a development snapshot; only their crawler can replace it — measured 2026-09-20** — the record holds two versions, both crawled 2026-08-17, carrying `owl:versionInfo "0.16.0-dev"` and `mod:status "under development"`, which is the state [ADR 0055](../decisions/0055-namespace-iri-resolves-to-a-release.md) predicted registries would archive and fixed on 2026-08-29. `/download?o=https%3A//w3id.org/sstim&f=owl` now answers **200** (2026-09-02 measured 500), redirecting to Archivo's Leipzig file store and serving 2043064 bytes that parse to 10436 triples. **A re-add cannot repair it:** POSTing the URI to `/add` answers "The Ontology is already part of Archivo!" and stops at the index check, as [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58) predicted. **Their crawler resumed 2026-09-15** after roughly seven months: 154 crawls between 09-15 and 09-19 across 2010 listed entries, working through `purl.obolibrary.org/obo/*`, so a sweep is in progress and ours is behind it; reported on #58 with that measurement and with the Databus artifact `https://databus.dbpedia.org/ontologies/w3id.org/sstim` still 404 against a `foaf` control at 200. The list row scores ★☆☆☆ with `Min. License` and `Good License` ✘, which FOAF and PROV-O also score, and `Consistency` ✘, which they do not; both readings come from the development snapshot and are not evidence about the release | no | wait for the sweep, re-read the row and the two ✘ checks from a release crawl, and ask again on #58 if the 2026-08-17 timestamp survives it |
-| LOV | 🕓 **suggested 2026-07-10, still absent, and the form is gone — re-measured 2026-09-20** — `/dataset/lov/vocabs/sstim` is 404 against a `skos` control at 200, 72 days on. LOV itself is working: it inserted `rcao` on 2026-09-11 and updated `oso` on 2026-09-15, five insertions in the last month, and the site now carries PIONERA (OEG UPM) project funding, so the earlier "slow, not dormant" reading is if anything too pessimistic. What changed is the channel. `https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to a metadata recommendations PDF, with no form fields and no endpoint; the only submission address the site exposes is the About page mailto carrying three curators. A suggestion sent into a form that no longer exists explains a record that never appeared, and matches what was already recorded here, that the submission was never provable from outside. One gap remains on our side: the served namespace carries every LOV-recommended field except an agent name, with `dct:creator` a bare ORCID IRI, `dct:publisher` a bare GitHub IRI, and no `foaf:name` anywhere in the document | no | add the agent names (protected file, `CLAUDE.md` §3.4), then write to the curators; do not re-post into the dead form |
+| LOV | 🕓 **suggested 2026-07-10, still absent, and the form is gone — re-measured 2026-09-20** — `/dataset/lov/vocabs/sstim` is 404 against a `skos` control at 200, 72 days on. LOV itself is working: it inserted `rcao` on 2026-09-11 and updated `oso` on 2026-09-15, five insertions in the last month, and the site now carries PIONERA (OEG UPM) project funding, so the earlier "slow, not dormant" reading is if anything too pessimistic. What changed is the channel. `https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to a metadata recommendations PDF, with no form fields and no endpoint; the only submission address the site exposes is the About page mailto carrying three curators. A suggestion sent into a form that no longer exists would explain a record that never appeared, though acknowledgement mails from July exist, so that reading is a hypothesis rather than a finding. **Both actions taken 2026-09-20:** the one gap on our side is closed, the namespace having carried every LOV-recommended field except an agent name, and the follow-up email went to the three curators, which is the only channel the site still exposes | no | awaiting a reply; if none comes, remind `mpoveda@fi.upm.es` alone and do not submit a third time |
 | BARTOC | ✅ **migrated 2026-09-02** — the curator applied every requested change and closed [issue #319](https://github.com/gbv/bartoc.org/issues/319) as completed. JSKOS verified field by field at `https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154` (`modified` 2026-09-02T06:15:49Z): `url` → `https://w3c-cg.github.io/sstim/ontology/docs/`, `subjectOf` → `https://github.com/w3c-cg/sstim` (legacy repository gone; concept DOI and the frozen 0.16.0 namespace document retained), `extent` → "164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)", which matches `TERM_INDEX.md` and a `skos:ConceptScheme` count of the frozen document exactly. Preserved as asked: node URI, `identifier` `https://w3id.org/sstim`, `namespace` `https://w3id.org/sstim#`, and the publisher field | yes (GitHub) | — |
 | BioPortal | ✅ **live at 0.17.0, recovered 2026-09-08 from a parse failure that recorded no error state**: submission `31` completed the whole pipeline at version IRI `https://w3id.org/sstim/0.17.0` (181 classes, 637 individuals, 301 properties) after submission `30` stalled at `UPLOADED`. The pull URL serves the ledger bytes (1,342,715 bytes; SHA-256 `e734245b1b2478ee30e1fb7100074acd54aa4e02f19d90b141fb4c7695eb8e3b`). Incident record in section 3 | account ✓ (@rfabbri) | confirm the next pull adds no row, then PATCH `31` released to 2026-09-07 |
 | FAIRsharing | ✅ **migrated, enriched and unblocked 2026-09-04.** Homepage, six support links and the cross-reference DOI are on W3C-CG/w3id, the DOI now naming the concept record `10.5281/zenodo.21286974` rather than the 0.6.0 version it had been pinned to since July; the description lists all nine modalities; `sleep` added to domains; seven relations (IAO, BFO, OBI, PROV-O as `extends`; SKOS, OWL, HED as `related_to`); and the three required `read` data processes were added in the edit form, `updated_at` 2026-09-04T09:46:36Z. Publications and citations stay empty until a paper exists. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved | yes | await curator review; add hearing/vision domains if the controlled list has them |
@@ -614,7 +614,7 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     until they reflect a crawl of the current graph.
 ```
 
-### LOV (Linked Open Vocabularies) — SUGGESTED; NO HOST MIGRATION
+### LOV (Linked Open Vocabularies) — SUGGESTED; FOLLOW-UP EMAILED 2026-09-20
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://lov.linkeddata.es/dataset/suggest` — no account. LOV's model is: you
@@ -641,10 +641,15 @@ service and catalog are live.
 docs live. This satisfies LOV's quality bar (URI stability, standard formats,
 quality metadata, identifiable publisher, versioning policy).
 
-- **Optional polish (not required):** the creator/publisher are bare
-  ORCID/GitHub URIs with no inline `foaf:name`. LOV can resolve the ORCID, but
-  inlining `foaf:Person`/`foaf:Organization` names would render the Agents
-  section more cleanly. Skip unless a curator asks.
+- **Optional polish — done 2026-09-20.** The creator and publisher were bare
+  ORCID/GitHub URIs with no inline `foaf:name`, and this entry said to skip it
+  unless a curator asked. It was done before writing to the curators instead,
+  on the reasoning that an Agents index with nothing to show is the one thing a
+  reviewer sees immediately and the one thing we could fix. `sstim-core.ttl`
+  now types both as `foaf:Person` / `foaf:Organization` and names them from
+  their own authorities, `void.ttl` repeats it for a dataset catalogue, and the
+  three reused FOAF terms are declared in the Kernel so all four closures stay
+  in OWL 2 DL.
 
 ```text
 Service:            LOV (Linked Open Vocabularies)
@@ -737,6 +742,42 @@ Required follow-up: **Do not silently wait, and do not resubmit** — the form
                     acknowledged but untracked; SSTIM absent; LOV has shown
                     recent curation activity; queue position and review status
                     unknown. On integration, record the LOV vocab URL.
+```
+
+**Follow-up sent by email, 2026-09-20.** The web form is gone:
+`https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to the
+metadata recommendations PDF, with no form fields and no endpoint, measured that
+day. The fallback this section already named, the three curators' addresses on
+the About page, is now the only channel the site exposes, so the follow-up went
+there rather than into a second untracked submission.
+
+```text
+Service:            LOV (Linked Open Vocabularies)
+Channel:            email to py.vandenbussche@gmail.com,
+                    ghislain.atemezing@gmail.com, mpoveda@fi.upm.es
+Date:               2026-09-20
+Sent by:            Renato Fabbri
+Content:            the 2026-07-10 suggestion produced no record; the suggest
+                    page no longer carries a form; what SSTIM is, in four lines,
+                    at 0.17.0; and one question, what the current channel for
+                    suggesting a vocabulary is
+External record ID or URL:  none — email, no ticket
+Status:             SENT, awaiting reply
+
+                    **One tension to keep straight rather than smooth over.**
+                    The mail says the suggestion may never have reached them,
+                    and that is a hypothesis, not a finding: acknowledgement
+                    mails of 2026-07-10 and 2026-07-11 exist in
+                    renato.fabbri@gmail.com, so something received it. What is
+                    measured is that the form is gone now, that SSTIM is absent
+                    while a skos control resolves, and that LOV inserted rcao on
+                    2026-09-11 and updated oso on 2026-09-15. A queue that is
+                    moving and a record that never appeared are both facts; the
+                    reason connecting them is not ours to state.
+
+                    If no reply arrives, the next step is a reminder to
+                    mpoveda@fi.upm.es alone, the one institutional address, and
+                    not a third submission through any channel.
 ```
 
 ### BARTOC — LIVE; W3C-CG update requested 2026-09-01
