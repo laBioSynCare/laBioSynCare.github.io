@@ -238,6 +238,27 @@
         [ a dcat:Distribution ; dct:title "RDF/XML" ; dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> ; dcat:downloadURL <https://w3c-cg.github.io/sstim/ontology/sstim-technique-exposure.rdf> ] .
 
 ###########################################################################
+# Agents
+###########################################################################
+
+# The same two IRIs this record names as creator and publisher, given the
+# labels a dataset catalogue needs. A harvester that reads the VoID or DCAT
+# description and not the ontology gets them from here; sstim-core.ttl carries
+# the identical statements for the namespace documents, and is the one
+# authoritative source among the modules. Each name is what its own authority
+# records (ORCID public record
+# and GitHub organization login, both checked 2026-09-20), and no mailbox is
+# published.
+
+<https://orcid.org/0000-0002-9699-629X>
+    a foaf:Person ;
+    foaf:name "Renato Fabbri" .
+
+<https://github.com/laBioSynCare>
+    a foaf:Organization ;
+    foaf:name "laBioSynCare" .
+
+###########################################################################
 # Module subsets — one void:Dataset per published module, each with Turtle
 # (master) plus JSON-LD and RDF/XML distributions.
 ###########################################################################

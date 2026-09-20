@@ -110,6 +110,28 @@
         "v0.15.0 (2026-08-17): The signal-layer release, closing the last four Phase 1 audit findings (KR-04, KR-07, KR-08, KR-09). ADR 0052 separates an abstract signal from its sensory renderings: sstim:StimulationSignal is a time-varying function with a frequency extent and a shape and no modality, and sstim:SignalRendering binds it to one stimulus channel's parameter by a named mechanism, stating whether the result is physically present or perceptually constructed — so two channels naming one signal are two renderings of one design, asserted rather than inferred from two decimals that happen to match. Carrier and modulator are a rendering rather than the universal structure, and sstim:renderingCarrierHz therefore lives on the rendering: a carrier exists because 10 Hz falls below the audible range, while a 10 Hz flicker or vibration is presented directly and has none. Perceptual presence is stated once on each rendering mechanism through sstim:impliesPresence and read from there, so a monaural beat declared perceptual no longer passes as it did under a rule naming only the binaural case. sstim-ex:hasFrequencyHz becomes the generic parent of sstim-ex:hasCarrierFrequencyHz, sstim-ex:hasToneFrequencyHz and sstim-ex:hasModulationFrequencyHz rather than being deprecated — it had carried two meanings under one name — and drops owl:FunctionalProperty, because a channel presenting a 200 Hz carrier modulated at 10 Hz has two frequencies and a functional parent would have entailed 200 = 10; each child keeps functionality, and every existing assertion stays valid while now answering the generic question by entailment. sstim:hzMin and sstim:hzMax widen from FrequencyBand to a union with StimulationSignal, since noise spans a range rather than sitting at a point, and three SHACL-SPARQL constraints now hold the signal/band interval relations to the arithmetic they assert. ADR 0049 adds sstim:NeuralOscillationType and six named rhythms, each carrying its conventional ambit, the wider range it actually occupies, the topography that identifies it alongside frequency, and the state it is observed in; outcome prose and five Wikidata mappings move off the frequency bands onto the rhythms those items describe, and nothing is deleted — three associations become evidence assessments with a tier and a citation, seven become dated knowledge-status assertions recording that a widely repeated association is unevidenced. A band is a conventional ambit and a Hz range, not the rhythm delimited by it. ADR 0050 replaces the public-claim gate's single tier test with an eight-clause applicability contract requiring supporting direction, sufficient tier, the subject as both proposition subject and scope intervention, a declared population, a modality the preset actually delivers, a public-safe citation that is also one of its own evidence bases, a confirming review decision with no contradicting decision against the same revision, and no deprecation or supersession; under it no claim in SSTIM currently authorizes C3 or C5, because no evidence review has ever been run, and that count is intended rather than a defect. ADR 0051 gives SSTIM its own preset contract, composed of modality-declaring components rather than audio voices, taking the numeric parameter ranges from the BioSynCare catalog format and none of its structure. Every published class, property and concept now carries a skos:definition — all 17 frequency bands had none, each now generated from its own bounds so the interval and the definition cannot disagree — and skos:notation uniqueness is stated per category, which is the rule controlled-value resolution had always assumed without checking. Additive and backward-compatible: no term removed or renamed, both domain widenings are unions, and the single functionality drop weakens entailment rather than invalidating any existing assertion."@en .
 
 ###########################################################################
+# Agents
+###########################################################################
+
+# A harvester reads the namespace document and indexes the agents it names.
+# Until 2026-09-20 this file gave it two bare IRIs and no label, so an agent
+# index had nothing to show without dereferencing ORCID and GitHub itself, and
+# LOV, whose Agents view is a first-class surface, is one of the registries
+# that harvests the namespace IRI. Each name is what its own authority records:
+# the ORCID public record reads "Renato Fabbri" (pub.orcid.org/v3.0, checked
+# 2026-09-20), and the GitHub organization has no display name set, so its
+# login is its name (api.github.com/orgs/laBioSynCare, same date). No mailbox
+# is published here.
+
+<https://orcid.org/0000-0002-9699-629X>
+    a foaf:Person ;
+    foaf:name "Renato Fabbri" .
+
+<https://github.com/laBioSynCare>
+    a foaf:Organization ;
+    foaf:name "laBioSynCare" .
+
+###########################################################################
 # Core process kernel
 ###########################################################################
 
@@ -141,7 +163,7 @@ sstim:SensoryStimulation a owl:Class ;
 ###########################################################################
 #
 # OWL 2 DL requires a declaration axiom for every annotation property, class
-# and datatype an ontology uses. SSTIM reuses 59 terms from SKOS, Dublin Core,
+# and datatype an ontology uses. SSTIM reuses 62 terms from SKOS, Dublin Core,
 # PROV, ORG, VOAF, VoID, VANN, FOAF, BIBO, MOD, Creative Commons and the OBO
 # upper ontologies, and declared none of them. Every profile closure was
 # therefore OWL Full rather than OWL 2 DL — 5935 profile violations, of which
@@ -185,7 +207,7 @@ sstim:SensoryStimulation a owl:Class ;
 #                 28800. No xsd:duration reference remains in any closure.
 ###########################################################################
 
-# Annotation properties (40)
+# Annotation properties (41)
 bibo:doi a owl:AnnotationProperty .
 cc:license a owl:AnnotationProperty .
 dct:created a owl:AnnotationProperty .
@@ -203,6 +225,7 @@ dct:requires a owl:AnnotationProperty .
 dct:source a owl:AnnotationProperty .
 dct:title a owl:AnnotationProperty .
 foaf:logo a owl:AnnotationProperty .
+foaf:name a owl:AnnotationProperty .
 mod:status a owl:AnnotationProperty .
 skos:altLabel a owl:AnnotationProperty .
 skos:broader a owl:AnnotationProperty .
@@ -229,12 +252,14 @@ vann:preferredNamespacePrefix a owl:AnnotationProperty .
 vann:preferredNamespaceUri a owl:AnnotationProperty .
 void:inDataset a owl:AnnotationProperty .
 
-# Classes (17)
+# Classes (19)
 bfo:0000015 a owl:Class .
 bfo:0000016 a owl:Class .
 bfo:0000029 a owl:Class .
 bfo:0000040 a owl:Class .
 dct:Standard a owl:Class .
+foaf:Organization a owl:Class .
+foaf:Person a owl:Class .
 obo:COB_0000082 a owl:Class .
 obo:IAO_0000030 a owl:Class .
 obo:OBI_0000272 a owl:Class .

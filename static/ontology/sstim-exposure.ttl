@@ -61,6 +61,16 @@
     skos:historyNote "0.6.0 — completes operational definitions for every exposure concept, materializes SKOS inverse links for non-reasoning clients, adds precise union domains and scalar cardinalities, and strengthens exposure SHACL coverage. Additive at the term level."@en .
 
 
+# The creator and publisher IRIs named above are described once, in
+# sstim-core.ttl, with foaf:Person / foaf:Organization and a foaf:name each.
+# They are not repeated here: module-boundaries requires one authoritative
+# source per subject, external ones included. The consequence is that the
+# Stimulus plus Exposure namespace catalogue names two agents it does not
+# label, and a harvester of that catalogue alone resolves them at ORCID and
+# GitHub. The Full catalogue, which is the one registries were pointed at,
+# contains the Kernel and therefore the names.
+
+
 ###########################################################################
 # Core classes
 ###########################################################################

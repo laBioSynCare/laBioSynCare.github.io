@@ -359,14 +359,21 @@ indexed, examiner-searchable records.
       record that never appeared, and it is consistent with what was already
       recorded: the submission was never provable from outside.*
 
-      *Fix one thing on our side first, since it is exactly what LOV curates on.
-      The served namespace carries every LOV-recommended field except an agent
-      name: `dct:creator` is a bare ORCID IRI, `dct:publisher` a bare GitHub
-      IRI, and the document contains no `foaf:name` at all, so LOV's Agents
-      index has nothing to extract without dereferencing. That edit touches a
-      protected file (`CLAUDE.md` §3.4) and needs an instruction naming it. Then
-      write, short, disclosing the drafting assistance the way the Bioregistry
-      exchange established.*
+      *The gap on our side is closed, 2026-09-20. The served namespace carried
+      every LOV-recommended field except an agent name: `dct:creator` was a bare
+      ORCID IRI, `dct:publisher` a bare GitHub IRI, and the document held no
+      `foaf:name` at all, so LOV's Agents index, a first-class surface there,
+      had nothing to extract without dereferencing. `sstim-core.ttl` now types
+      both and names them as their own authorities record them, and `void.ttl`
+      carries the same statements for a catalogue that reads the dataset
+      description and not the ontology. The Stimulus plus Exposure catalogue
+      deliberately does not repeat them, because `make module-boundaries`
+      requires one authoritative source per subject, external ones included.*
+
+      *What is left is the message. It is drafted at
+      `/Users/renatofabbri/sstim-drafts/2026-09-20-lov-curators-email.md`, 126
+      words, and needs Renato to send it: the curators' address is the only
+      channel the site still exposes.*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
       *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same
