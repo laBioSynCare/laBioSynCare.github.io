@@ -73,9 +73,11 @@ the adopter on-ramp, the starter set and both clients shipped in September. What
 is left is repair, then recruiting, in that order.
 
 1. **Repair the two broken registry records** (§2 Registries) before sending an
-   ontology-engineering audience to them. DBpedia Archivo publishes a
-   development snapshot as SSTIM, and LOV never ingested the 2026-07-10
-   suggestion, whose form no longer exists.
+   ontology-engineering audience to them. LOV never ingested the 2026-07-10
+   suggestion, whose form no longer exists, so it needs the curators directly.
+   Archivo publishes a development snapshot as SSTIM and only its own crawler
+   can replace that, which as of 2026-09-20 is running again and working
+   towards us.
 2. **Send the outreach that is already written** (§7). Nine of the ten target
    rows read `not-contacted` and the outreach log is still empty. The one
    engaged target produced three maintainer replies inside 48 hours, a meeting
@@ -305,8 +307,8 @@ indexed, examiner-searchable records.
       are the `relatedMatch` rows held back by design. The rest of the surfaces
       below remain open.*
 
-- [ ] **Re-crawl DBpedia Archivo: what it publishes as SSTIM is the development
-      line** `P1`
+- [~] **DBpedia Archivo publishes a development snapshot as SSTIM, and only
+      their crawler can replace it** `P1`
       *Measured 2026-09-20, and two of three readings moved since 2026-09-02.
       The download is repaired: `/download?o=https%3A//w3id.org/sstim&f=owl`
       answers 200, redirecting to Archivo's Leipzig file store, which serves
@@ -319,15 +321,29 @@ indexed, examiner-searchable records.
       with its own `owl:versionIRI`, so the public record shows a development
       snapshot as the ontology.*
 
-      *The fix is one POST, because the updater is dead upstream rather than
-      slow: [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58)
-      reports no crawl of any ontology since 2026-02-23, the code was last
-      pushed 2024-08-26, and our own 2026-08-17 versions came from a manual add.
-      Both `archivo.dbpedia.org/add` and `archivo.tools.dbpedia.org/add` answer
-      200. Re-add, confirm the new version carries 0.17.0 rather than a `-dev`
-      line, then report the Databus 404 upstream with the measurement: an
-      on-demand add that works while the updater does not is a data point #58
-      does not have. Outward-facing, so it waits for a human instruction.*
+      *Attempted 2026-09-20 and measured, rather than assumed. A re-add does
+      nothing: `/add` answers "The Ontology is already part of Archivo!" and
+      stops at the index check, which is the correct behaviour and exactly what
+      [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58)
+      predicted when we filed it on 2026-08-18. There is no user-side way to
+      request a re-crawl, so the record cannot be repaired from here.*
+
+      *What did change is the reason to wait. Archivo's crawler resumed on
+      2026-09-15 after roughly seven months: 154 crawls between 09-15 and 09-19
+      across 2010 listed entries, currently working through
+      `purl.obolibrary.org/obo/*`, so a sweep is in progress and ours sits
+      behind it. Reported on #58 with the measurement, along with the Databus
+      artifact still answering 404. Re-check the row after the sweep passes; if
+      the 2026-08-17 timestamp is still there in a few weeks, ask again.*
+
+      *Two readings to re-take from a release crawl rather than chase now. The
+      list row scores SSTIM ★☆☆☆ with `Min. License` and `Good License` at ✘,
+      which FOAF and PROV-O also score, so that check is not a verdict on us.
+      `Consistency` is ✘ where both of those are ✔, and that one is ours alone
+      among the controls checked. It was computed from a development snapshot
+      that no longer exists, so it is not evidence about the release, and
+      guessing at a cause before a fresh crawl would be exactly the kind of
+      unmeasured claim `CLAUDE.md` §3.6 exists to stop.*
 
 - [ ] **Follow up LOV by email, because the suggestion form no longer exists**
       `P1`
