@@ -332,6 +332,38 @@ It checks all five places, including the live store, and reports **INCOMPLETE**
 rather than "absent" when it cannot reach one — an unreachable instrument must
 never read as evidence of absence.
 
+### 3.7 A push reaches both remotes, or it has not happened
+
+This repository publishes to two: `origin`
+(`laBioSynCare/laBioSynCare.github.io`), the preserved legacy origin, and
+`w3c-cg` (`w3c-cg/sstim`), which serves `w3c-cg.github.io/sstim` and is the
+repository that registry records, the W3C CG report and the published `sstim`
+and `@sstim/core` packages all name as the source. `git push` updates one of
+them, so publishing here is not a one command operation.
+
+```bash
+make push     # current branch and its annotated tags to both, each read back
+```
+
+**Why this is an invariant and not a habit.** The drift is invisible from the
+machine that caused it. The legacy origin keeps answering every URL, CI stays
+green, the live site stays current, and nothing local can see that the other
+origin is behind. Only an outside reader meets the 404.
+
+It has happened twice, and prose did not stop it: the record of the arrangement
+has said "every commit reaches both repositories" since 2026-08-23. The mirror
+was 28 commits behind when the CG Draft report was registered, so the report's
+own URL answered 404 (`docs/ontology/INBOUND_REFERENCES.md` §2.7), and 6 commits
+behind when `sstim` 0.1.0 went to PyPI, which is why that release's
+`Project-URL` fields point at the legacy origin (`docs/ecosystem/ADOPTION.md`
+§3 C).
+
+Frozen releases are unaffected, and saying so is part of the rule, because it
+tells you what the failure actually costs: `w3id.org/sstim` resolves to the
+latest frozen snapshot, so a stale mirror cannot stale a published version. What
+goes stale is everything an adopter reads, meaning documentation, examples, the
+packages' own links, and any page added since.
+
 ---
 
 ## 4. Preset Format — Critical Rules
@@ -689,6 +721,7 @@ legal, regulatory, or architectural requirements.
 | Set `isOn: true` on more than one voice per preset | Exactly one voice carries the breathing reference |
 | Auto-reload the page from the service worker on update | Would kill an in-progress session; reload only on explicit user click (ADR 0009, Trap 1) |
 | Let the service worker intercept cross-origin requests | Breaks Firebase auth / Google sign-in; same-origin only (ADR 0009, Trap 2) |
+| Push to one remote and stop | `w3c-cg/sstim` is the source registry records and published packages name; a stale mirror 404s while `origin` still answers (§3.7). Use `make push` |
 
 ---
 

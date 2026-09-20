@@ -230,7 +230,8 @@ One operational lesson from getting there. `w3c-cg.github.io/sstim` is served fr
 the `w3c-cg/sstim` mirror, not from this repository, and the mirror was 28 commits
 behind when the report was first registered for review, so its URL answered 404.
 Push the `w3c-cg` remote before pointing anything external at a new page on that
-origin. Released ontology artifacts are unaffected: `w3id.org/sstim` resolves to
+origin, which `make push` has done for every push since 2026-09-20 (`CLAUDE.md`
+§3.7). Released ontology artifacts are unaffected: `w3id.org/sstim` resolves to
 `ontology/latest/`, which is the latest frozen release rather than the development
 line, so a stale mirror cannot stale a published version.
 

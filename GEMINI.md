@@ -57,6 +57,13 @@ and includes the reasoning, which matters more than the rule.
    unreachable instrument is INCOMPLETE, never absence.
 7. **Svelte 5 runes only.** `$props()`, `$state()`, `$derived()`, `onclick`,
    `{@render children()}`. Not `export let`, `$:`, `on:click`, `<slot />`.
+8. **A push reaches both remotes, or it has not happened.** This repository
+   publishes to `origin` and to `w3c-cg` (`w3c-cg/sstim`), which is the source
+   registry records and the published packages name. `make push` sends the
+   current branch and its annotated tags to both and reads each remote back.
+   A plain `git push` updates one, and the other going stale is invisible from
+   here: the legacy origin answers every URL while the mirror 404s. See
+   [`CLAUDE.md`](CLAUDE.md) §3.7.
 
 ## Where to look, by what you are touching
 
@@ -75,6 +82,9 @@ and includes the reasoning, which matters more than the rule.
 `make validate` for anything under `static/ontology/` — it is the same gate CI
 runs. `make test` and `make check` for application changes. Both take a while;
 `make -j4 -Otarget validate` is faster and equivalent.
+
+Then push with `make push`, never a bare `git push`: both remotes, or the work
+is not published.
 
 ## Note for Gemini
 

@@ -137,6 +137,15 @@ Two rules follow, and they are the whole discipline of this arrangement:
 2. Structural or release changes are made once, in the shared tree, never
    separately per host.
 
+**Rule 1 needed a mechanism, added 2026-09-20.** As prose it failed twice: the
+mirror was 28 commits behind when the CG Draft report was registered, and 6
+commits behind when `sstim` 0.1.0 was published to PyPI. Neither was visible
+locally, because the origin that answers every URL is the one a maintainer
+already pushed to. `make push` now sends the current branch and its annotated
+tags to every remote in `GIT_REMOTES` and reads each remote back before it
+reports success, so a single origin push is a failed command rather than a
+state nobody sees. The rule is stated as an invariant in `CLAUDE.md` §3.7.
+
 ### Fresh-clone preservation proof
 
 Run against a new clone of the target rather than the integration checkout, as

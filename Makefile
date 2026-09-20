@@ -83,7 +83,12 @@ PREVIEW_HOST ?= $(DEV_HOST)
 PREVIEW_PORT ?= 4174
 DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+# Every remote this repository publishes to. `git push` updates one of them and
+# a lagging w3c-cg mirror is invisible from here, so pushing goes through
+# `make push`. See CLAUDE.md 3.7.
+GIT_REMOTES ?= origin w3c-cg
+
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -123,6 +128,38 @@ truth-audit:
 ## instance. See scripts/gen-build-info.mjs for why this exists.
 verify-deploy:
 	node scripts/verify-deploy.mjs $(DEPLOY_URL) $(COMMIT)
+
+## Push the current branch and its annotated tags to every remote in
+## GIT_REMOTES, then read each remote back and prove the branch arrived.
+##
+## Plain `git push` updates one remote, and the drift it leaves cannot be seen
+## from here: the legacy origin keeps answering every URL while `w3c-cg/sstim`,
+## the repository registry records and the published packages name as the
+## source, serves 404 for anything newer. "Every commit reaches both
+## repositories" has been written down since 2026-08-23 and was violated twice,
+## so it is a command now. See CLAUDE.md 3.7.
+push:
+	@set -e; \
+	branch="$$(git rev-parse --abbrev-ref HEAD)"; \
+	head="$$(git rev-parse HEAD)"; \
+	for remote in $(GIT_REMOTES); do \
+		git remote get-url "$$remote" >/dev/null 2>&1 || { \
+			echo "push: FAILED, remote '$$remote' is not configured (see CLAUDE.md 3.7)"; \
+			exit 1; \
+		}; \
+	done; \
+	for remote in $(GIT_REMOTES); do \
+		echo "==> $$remote"; \
+		git push --follow-tags "$$remote" "$$branch"; \
+	done; \
+	for remote in $(GIT_REMOTES); do \
+		landed="$$(git ls-remote "$$remote" "refs/heads/$$branch" | cut -f1)"; \
+		[ "$$landed" = "$$head" ] || { \
+			echo "push: FAILED, $$remote/$$branch is at $${landed:-no such branch}, expected $$head"; \
+			exit 1; \
+		}; \
+	done; \
+	echo "push: $$branch at $$(git rev-parse --short HEAD) reached $(GIT_REMOTES)"
 
 ## Build the static site as an immutable Nix package (result/share/bsc-lab).
 ## Bit-reproducible: `nix build --rebuild` produces an identical output.
@@ -967,6 +1004,7 @@ help:
 	@echo "  make build            Build the production bundle"
 	@echo "  make truth-audit      Assert the docs match the repository (versions, counts, claims)"
 	@echo "  make verify-deploy    Assert DEPLOY_URL serves COMMIT (default: git HEAD)"
+	@echo "  make push             Push this branch and its tags to $(GIT_REMOTES), then verify each"
 	@echo "  make session-conformance Package a session on instance A, verify it on instance B"
 	@echo "  make check            Run SvelteKit sync and static checks"
 	@echo "  make deploy-firestore-rules Deploy firestore.rules to $(FIREBASE_PROJECT)"

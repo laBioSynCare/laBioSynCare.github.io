@@ -185,8 +185,12 @@ several minutes after the upload while the project page and the simple index
 both served the release immediately, so read the simple index, never the JSON
 API, when confirming a publish. And the package's `Project-URL` fields point at
 the legacy origin rather than `w3c-cg/sstim`, because the documentation and
-examples they link to resolve there and 404 on the W3C CG mirror, which sits at
-the commit before this work. Repoint them once the mirror carries it.
+examples they link to resolve there and 404 on the W3C CG mirror, which sat at
+the commit before this work. **Unblocked 2026-09-20:** the mirror was pushed
+current and both targets answer 200, measured with `curl` against
+`raw.githubusercontent.com/w3c-cg/sstim/main/docs/ADOPTING_SSTIM.md` and the
+same path for `examples/README.md`. Repoint the fields at the next release.
+`make push` keeps the mirror current from now on (`CLAUDE.md` §3.7).
 
 ### D. An exporter for a tool researchers already run
 
