@@ -67,8 +67,28 @@ already shipped. Release facts are derived from
 [`CHANGELOG.md`](CHANGELOG.md). Cite the concept DOI
 `10.5281/zenodo.21286974` across releases.
 
-**Immediate:** outreach — Brain Innovation Days application by **15 Sept 2026** (extended from 1 Sept; extension reported by the maintainer 2026-09-03, not independently confirmed on the organiser's site).
-Registry curation and independent human ontology review continue in parallel.
+**Immediate, set 2026-09-20.** The sequence is
+[`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §6, whose supply side is now built:
+the adopter on-ramp, the starter set and both clients shipped in September. What
+is left is repair, then recruiting, in that order.
+
+1. **Repair the two broken registry records** (§2 Registries) before sending an
+   ontology-engineering audience to them. DBpedia Archivo publishes a
+   development snapshot as SSTIM, and LOV never ingested the 2026-07-10
+   suggestion, whose form no longer exists.
+2. **Send the outreach that is already written** (§7). Nine of the ten target
+   rows read `not-contacted` and the outreach log is still empty. The one
+   engaged target produced three maintainer replies inside 48 hours, a meeting
+   and a merged upstream fix, so the artifacts are not what is blocking.
+3. **The tool exporter** that would make adoption a side effect of work somebody
+   was already doing (§7) stays gated on an engaged lab naming the tool. Picking
+   one first is a guess with a large build attached.
+
+Waiting on someone else, with nothing to do here: SNOMED's licence decision and
+BioPortal's release date and Version IRI (§2), OLS4 PR #1351 and the ShowVoc
+enquiry (§3), Zenodo linked subjects
+([w3c-cg/sstim#3](https://github.com/w3c-cg/sstim/issues/3)), and the two open
+repository issues, native label review (§3) and public-claim governance.
 
 **Standing state.** The modular ontology architecture shipped, with namespace
 catalogues, profile and schema routes, conformance contracts for Core, Core Plus,
@@ -284,6 +304,53 @@ indexed, examiner-searchable records.
       `make wikidata-inbound` went from 0 of 32 to 29 of 32; the three unlinked
       are the `relatedMatch` rows held back by design. The rest of the surfaces
       below remain open.*
+
+- [ ] **Re-crawl DBpedia Archivo: what it publishes as SSTIM is the development
+      line** `P1`
+      *Measured 2026-09-20, and two of three readings moved since 2026-09-02.
+      The download is repaired: `/download?o=https%3A//w3id.org/sstim&f=owl`
+      answers 200, redirecting to Archivo's Leipzig file store, which serves
+      2043064 bytes of RDF/XML where the 500 used to be. The Databus artifact is
+      still missing, `databus.dbpedia.org/ontologies/w3id.org/sstim` 404 against
+      a `foaf` control at 200, so the deploy step that failed at submission has
+      never succeeded. The new finding is the content. Archivo holds exactly two
+      versions, both crawled 2026-08-17 and nothing newer, and that
+      snapshot carries `owl:versionInfo "0.16.0-dev"`, a development line. `https://w3id.org/sstim` today serves `0.17.0`
+      with its own `owl:versionIRI`, so the public record shows a development
+      snapshot as the ontology.*
+
+      *The fix is one POST, because the updater is dead upstream rather than
+      slow: [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58)
+      reports no crawl of any ontology since 2026-02-23, the code was last
+      pushed 2024-08-26, and our own 2026-08-17 versions came from a manual add.
+      Both `archivo.dbpedia.org/add` and `archivo.tools.dbpedia.org/add` answer
+      200. Re-add, confirm the new version carries 0.17.0 rather than a `-dev`
+      line, then report the Databus 404 upstream with the measurement: an
+      on-demand add that works while the updater does not is a data point #58
+      does not have. Outward-facing, so it waits for a human instruction.*
+
+- [ ] **Follow up LOV by email, because the suggestion form no longer exists**
+      `P1`
+      *Measured 2026-09-20. `/dataset/lov/vocabs/sstim` is 404 against a `skos`
+      control at 200, so SSTIM is still absent 72 days after the 2026-07-10
+      suggestion. LOV is not the reason: it inserted `rcao` on 2026-09-11 and
+      updated `oso` on 2026-09-15, five insertions in the last month, and the
+      site now carries PIONERA project funding. The channel is what changed.
+      `/dataset/suggest` renders a heading and a metadata recommendations PDF
+      with no form, no fields and no endpoint, and the only address the site
+      exposes is the About page mailto carrying three curators. A suggestion
+      sent into a form that no longer exists is the simplest explanation for a
+      record that never appeared, and it is consistent with what was already
+      recorded: the submission was never provable from outside.*
+
+      *Fix one thing on our side first, since it is exactly what LOV curates on.
+      The served namespace carries every LOV-recommended field except an agent
+      name: `dct:creator` is a bare ORCID IRI, `dct:publisher` a bare GitHub
+      IRI, and the document contains no `foaf:name` at all, so LOV's Agents
+      index has nothing to extract without dereferencing. That edit touches a
+      protected file (`CLAUDE.md` §3.4) and needs an instruction naming it. Then
+      write, short, disclosing the drafting assistance the way the Bioregistry
+      exchange established.*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
       *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same
@@ -1527,16 +1594,39 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
 > Targets, asks, consent status, the 90-day sequence, and KPIs live in
 > [`docs/ecosystem/OUTREACH_TARGETS.md`](docs/ecosystem/OUTREACH_TARGETS.md) and
 > [`docs/ecosystem/ECOSYSTEM_INTEGRATION.md`](docs/ecosystem/ECOSYSTEM_INTEGRATION.md).
-- [ ] ⏰ **Brain Innovation Days 2026 (Brussels, 18–19 Nov) — apply to the
-      Innovation Hall before 15 September 2026** `P1`
-      Extended from 1 September. The extension is the maintainer's report
-      (2026-09-03); the organiser's site does not state a deadline in the pages
-      fetched that day, so **confirm the date on the application form before
-      relying on it**. The original 1 September date passed with this item still
-      open and still labelled Immediate, which is the failure the new date should
-      not repeat.
-      *Hard external deadline (~7 weeks out as of 2026-07-12). Verify exhibition
-      costs before committing. Present SSTIM/BSC Lab, not health claims (§3.5).*
+- [–] **Brain Innovation Days 2026 (Brussels, 18–19 Nov)** — dropped
+      2026-09-15 `P1`
+      *Kept so it is not re-proposed. Both dates passed with the item open: the
+      1 September deadline, then the 15 September extension, which was the
+      maintainer's report and was never confirmed on the organiser's site. The
+      failure was not the date. An item can carry a deadline, a P1 tag and the
+      word Immediate and still have no working step in it, and this one had
+      none from the day it was written.*
+
+- [ ] **Send the outreach that is already written** `P1`
+      *Nine of the ten target rows in
+      [`OUTREACH_TARGETS.md`](docs/ecosystem/OUTREACH_TARGETS.md) read
+      `not-contacted` (eight once the dropped events row is set aside), and the
+      outreach log below them still holds one placeholder line. The tenth row is
+      the entire evidence base: the HED approach drew three maintainer replies
+      inside 48 hours, a meeting on 2026-08-25, and a merged upstream fix in
+      another project's repository. The templates, the on-ramp, the starter set
+      and both clients all exist, so nothing about the artifacts explains the
+      silence.*
+
+      *Send them one at a time rather than as a batch, and pace them: the
+      2026-09-08 Bioregistry exchange is the standing reminder not to fire a
+      prepared message seconds after a maintainer answers. Lead with the ask
+      [`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §6 identifies as the cheapest,
+      which puts the labour on us: nominate a protocol and we will encode it.*
+
+- [ ] **Exporter for whichever experiment tool the first engaged lab runs**
+      (PsychoPy, jsPsych, OpenSesame, Lab Streaming Layer) `P2`
+      *[`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §3 D. The highest-leverage
+      item on that list, because it is the only one that yields data adoption as
+      a side effect of work somebody was doing anyway, and deliberately gated on
+      the outreach above. Done when a user of that tool produces a valid SSTIM
+      session file without having read any SSTIM documentation.*
 
 ---
 
@@ -1600,6 +1690,12 @@ because financial sustainability constrains everything else.
 - [ ] Dependabot configured for npm dependency updates `P1`
 - [ ] Secret scanning enabled `P1`
 - [ ] `hooks/pre-commit` — local validation mirror of CI `P1`
+
+> **GitHub traffic snapshots run twice a week**, `17 6 * * 1,4`, from the
+> private `laBioSynCare/sstim-traffic` repository. A gap of up to three days
+> between snapshots is the schedule rather than a failure: GitHub keeps 14 days,
+> so twice a week survives three missed runs before a day is lost. Checked
+> 2026-09-20, last run 2026-09-17, next 2026-09-21.
 
 ---
 

@@ -189,18 +189,19 @@ the RDF projection.
 | Entrepreneurial | **Clust-ER Health & Wellness** (Emilia-Romagna) | Regional BSC pilot (~€500 + IVA, ≤50 people) |
 | Community | **NeuroTechX** (30+ chapters) | Join + demonstrate BSC Lab (do not create a new community) |
 
-**⏰ Time-sensitive:** **Brain Innovation Days 2026 Innovation Hall** (Brussels,
-18–19 Nov) — applications open until **15 September 2026**, extended from the
-1 September date this line originally carried. The extension is the maintainer's
-report of 2026-09-03; the organiser's public pages fetched that day state no
-deadline, so confirm it on the application form. Verify exhibition costs before
-committing.
+**Dropped 2026-09-15:** **Brain Innovation Days 2026 Innovation Hall**
+(Brussels, 18–19 Nov). Both dates passed with the item open, the 1 September
+deadline and then the 15 September extension, which was the maintainer's report
+of 2026-09-03 and was never confirmed on the organiser's pages. Recorded here so
+it is not re-proposed; the live outreach sequence is in
+[`ADOPTION.md`](ADOPTION.md) §6 and the target rows in
+[`OUTREACH_TARGETS.md`](OUTREACH_TARGETS.md).
 
 ### 90-day sequence (source-proposed; adapt into `TODO.md` P2/outreach)
 
 1. **HED/BIDS bridge** — publish one end-to-end SSTIM–HED/BIDS example; request HED WG review. *(→ Workstream 2)*
 2. **External research use case** — ask Gori/ANTARES and UCL to nominate one protocol each to encode.
-3. **Brain Innovation Days** — apply before 15 Sept (extended; confirm on the form).
+3. ~~**Brain Innovation Days** — apply before 15 Sept.~~ Dropped 2026-09-15.
 4. **W3C group growth** — recruit from ≥4 constituencies (experimental neuroscience, multisensory HCI, semantic standards, device/software devs).
 5. **Regional commercialization** — Clust-ER Health 30-day BSC pilot; keep commercial-pilot evidence separate from research validation.
 6. **Governance** — preserve SSTIM (vendor-neutral) / BSC Lab (open) / BioSynCare (closed) separation; publish conflicts of interest; seek an independent co-maintainer. *(overlaps Workstream 1)*

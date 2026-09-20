@@ -39,7 +39,7 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
 | Policy | **European Brain Council** + Charter for Responsible Development of Neurotechnologies | BioSynCare *may* endorse the Charter (ethical commitment only) | not-contacted |
 | Entrepreneurial | **Clust-ER Health & Wellness** (Emilia-Romagna) | Regional BSC pilot (~€500 + IVA, ≤50 people); keep pilot evidence separate from research validation | not-contacted |
 | Community | **NeuroTechX** (30+ chapters) | Join and demonstrate BSC Lab — do **not** create a new community/moderation burden | not-contacted |
-| Events | **Brain Innovation Days 2026** (Brussels, 18–19 Nov) | ⏰ Apply to the Innovation Hall **before 1 Sept 2026** | not-contacted |
+| Events | **Brain Innovation Days 2026** (Brussels, 18–19 Nov) | Innovation Hall application | **dropped 2026-09-15** — the 1 September deadline and the unconfirmed 15 September extension both passed with the row untouched. Kept so it is not re-proposed |
 
 > **Verify before recording in RDF:** external identity IDs (ORCID / ROR /
 > Wikidata) for any named individual or org must be checked live against the
@@ -52,7 +52,7 @@ Status legend: `not-contacted` · `contacted` · `in-dialogue` · `engaged` · `
    HED WG review. *(Depends on [`HED_BIDS_INTEROP.md`](HED_BIDS_INTEROP.md) + a worked example.)*
 2. **External research use case** — ask Gori/ANTARES and UCL to nominate one
    protocol each to encode (not to endorse).
-3. **Brain Innovation Days** — apply before 1 Sept.
+3. ~~**Brain Innovation Days** — apply before 1 Sept.~~ Dropped 2026-09-15; see the target row.
 4. **W3C group growth** — recruit from ≥4 constituencies (experimental
    neuroscience, multisensory HCI, semantic standards, device/software devs).
 5. **Regional commercialization** — Clust-ER Health 30-day BSC pilot; commercial
