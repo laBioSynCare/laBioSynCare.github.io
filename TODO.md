@@ -72,6 +72,14 @@ already shipped. Release facts are derived from
 the adopter on-ramp, the starter set and both clients shipped in September. What
 is left is repair, then recruiting, in that order.
 
+0. **Check that the 0.18.0 version DOI registered.** Zenodo published
+   `10.5281/zenodo.22921183` (record 22921183) on 2026-09-23 at 15:51 UTC, the
+   concept DOI and `zenodo.org/doi/…` both resolve to it, but at 16:05 UTC
+   `doi.org` still answered 404 and DataCite had no record. 0.17.0's was
+   registered 3 seconds after its record was created, so this is not the usual
+   lag. Re-read `https://doi.org/10.5281/zenodo.22921183`; if it still 404s on
+   2026-09-24, ask Zenodo support to re-run the DataCite registration for record
+   22921183. Do not deposit again: the record is complete and correct.
 1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
    side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
    to the curators by email, the only channel their site still exposes, after
