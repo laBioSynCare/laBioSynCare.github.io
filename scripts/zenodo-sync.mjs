@@ -35,6 +35,12 @@ import { parentRecordId } from './zenodo-deposit.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const API = 'https://zenodo.org/api'
+// Zenodo's traffic filter answers writes from Node's default `User-Agent: node`
+// with a 403 page blaming "unusual traffic from your network". Measured
+// 2026-09-23: the same authenticated POST from the same machine passed from curl
+// and from Node with this header, and was refused from Node without it, which is
+// what blocked the 0.18.0 deposit three times. Say which tool is calling.
+const USER_AGENT = 'sstim-zenodo-sync (+https://github.com/w3c-cg/sstim)'
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8')
 
 /**
@@ -319,6 +325,7 @@ async function api(
       response = await fetch(url, {
         method,
         headers: {
+          'User-Agent': USER_AGENT,
           Accept: accept,
           ...(body ? { 'Content-Type': 'application/json' } : {}),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),

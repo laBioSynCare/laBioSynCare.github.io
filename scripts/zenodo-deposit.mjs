@@ -33,6 +33,12 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const API = 'https://zenodo.org/api'
+// Zenodo's traffic filter answers writes from Node's default `User-Agent: node`
+// with a 403 page blaming "unusual traffic from your network". Measured
+// 2026-09-23: the same authenticated POST from the same machine passed from curl
+// and from Node with this header, and was refused from Node without it, which is
+// what blocked the 0.18.0 deposit three times. Say which tool is calling.
+const USER_AGENT = 'sstim-zenodo-deposit (+https://github.com/w3c-cg/sstim)'
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8')
 
 /**
@@ -113,6 +119,7 @@ async function api(path, { token, method = 'GET', body, headers = {} } = {}) {
   const response = await fetch(url, {
     method,
     headers: {
+      'User-Agent': USER_AGENT,
       Authorization: `Bearer ${token}`,
       ...(body && !(body instanceof Uint8Array) ? { 'Content-Type': 'application/json' } : {}),
       ...headers,
@@ -190,7 +197,7 @@ async function main() {
   // skipped, and both are local.
   let parentVersion
   try {
-    const record = await fetch(`https://zenodo.org/api/records/${parent}`)
+    const record = await fetch(`https://zenodo.org/api/records/${parent}`, { headers: { 'User-Agent': USER_AGENT } })
     if (record.ok) parentVersion = (await record.json())?.metadata?.version?.replace(/^v/, '')
   } catch {
     parentVersion = undefined
