@@ -75,8 +75,8 @@ is left is repair, then recruiting, in that order.
 1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
    side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
    to the curators by email, the only channel their site still exposes, after
-   the one metadata gap here was closed in source (served from 0.18.0, because
-   `https://w3id.org/sstim` resolves to the newest release). Archivo cannot be repaired from
+   the one metadata gap here was closed, and 0.18.0 (2026-09-23) put the fix on
+   the served namespace. Archivo cannot be repaired from
    outside at all, `/add` short-circuits for an indexed ontology, but its
    crawler resumed on 2026-09-15 and is sweeping towards us. Re-read both
    records rather than re-sending anything.
@@ -364,12 +364,10 @@ indexed, examiner-searchable records.
       record that never appeared, and it is consistent with what was already
       recorded: the submission was never provable from outside.*
 
-      *The gap on our side is closed in source, 2026-09-20, and served from
-      0.18.0. Measured 2026-09-23: `https://w3id.org/sstim` negotiates to
-      `ontology/latest/sstim-namespace.ttl`, which is 0.17.0 and holds no
-      `foaf:name` (the dev document holds four), because the namespace resolves
-      to the newest release by design (ADR 0055). A curator reading it before the
-      release still finds two unnamed agents. The served namespace carried
+      *The gap on our side is closed, 2026-09-20 in source and served since the
+      0.18.0 release of 2026-09-23. The namespace resolves to the newest release
+      by design (ADR 0055), so until then it negotiated to a document that was
+      still 0.17.0 and held no `foaf:name`, measured 2026-09-23. The served namespace carried
       every LOV-recommended field except an agent name: `dct:creator` was a bare
       ORCID IRI, `dct:publisher` a bare GitHub IRI, and the document held no
       `foaf:name` at all, so LOV's Agents index, a first-class surface there,
@@ -382,7 +380,7 @@ indexed, examiner-searchable records.
 
       *The message was **sent 2026-09-20** to all three curators, the only
       channel the site still exposes: what is absent, that the form is gone,
-      what SSTIM is at 0.17.0, and one question about the current channel. The
+      what SSTIM was at 0.17.0, and one question about the current channel. The
       dated record is in
       [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md). Nothing
       to do until they reply; if none comes, remind `mpoveda@fi.upm.es` alone,
