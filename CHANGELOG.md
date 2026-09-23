@@ -17,6 +17,10 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+Nothing yet on the 0.19.0-dev line.
+
+## [0.18.0] - 2026-09-23
+
 ### Added
 
 - **The two agents the ontology names now have names.** The Kernel's
@@ -1431,7 +1435,8 @@ The exposure & experiment module (`sstim-exposure.ttl`), separately versioned.
   "Sensory Stimulation" adopted as the umbrella term over the coined
   "Sensory Harnessing".
 
-[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/laBioSynCare/laBioSynCare.github.io/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.18.0
 [0.17.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.17.0
 [0.16.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.16.0
 [0.15.0]: https://github.com/laBioSynCare/laBioSynCare.github.io/releases/tag/v0.15.0

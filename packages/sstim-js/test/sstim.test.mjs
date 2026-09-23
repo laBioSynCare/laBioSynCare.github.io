@@ -56,8 +56,22 @@ describe('resolving a profile', () => {
     // The guard that stops an unpinned publish. If this ever fails because the
     // live line was released in place, the default resolution path needs
     // rethinking, not this assertion deleting.
+    //
+    // One window is legitimate and designed: between release-prepare and
+    // release-open-dev the live line *is* the release being frozen, and says
+    // so. 0.18.0 was the first release this test met, and it failed there.
+    // What tells that window apart from a line released in place is what
+    // release-prepare writes: an immutable release record naming its own
+    // version, and a versioned URL under it on every module. A line merely
+    // flipped to "released" carries neither, so it still fails here.
     const closure = await resolveProfile('core', { manifest: LIVE })
-    expect(closure.isDevelopment).toBe(true)
+    if (closure.isDevelopment) return
+    const manifest = JSON.parse(readFileSync(LIVE, 'utf8'))
+    const base = manifest.immutableRelease?.baseUrl
+    expect(base).toBe(`${closure.versionIri}/`)
+    for (const module of manifest.modules) {
+      expect((module.publication?.versionedUrl ?? '').startsWith(base), module.id).toBe(true)
+    }
   })
 
   it('reports the citable version IRI', async () => {

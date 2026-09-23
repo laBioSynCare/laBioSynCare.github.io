@@ -315,9 +315,13 @@ console.log(`  ${manifest.modules.length} modules, ${manifest.profiles.length} p
 // than leaving a gate red for the person cutting it to rediscover — which is
 // what happened on 0.16.0.
 execFileSync('python3', [join(ROOT, 'scripts/generate-hed-bundle.py')], { cwd: ROOT, stdio: 'pipe' })
+// codemeta.json is derived from CITATION.cff, which this script has just moved
+// to the release, so `make codemeta-check` fails until it is regenerated. It was
+// a hand step for 0.17.0 and forgotten for 0.18.0, where the gate caught it.
+execFileSync('node', [join(ROOT, 'scripts/gen-codemeta.mjs')], { cwd: ROOT, stdio: 'pipe' })
 
 console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
-console.log('  HED demonstrator bundles regenerated for the release version')
+console.log('  HED demonstrator bundles and codemeta.json regenerated for the release version')
 console.log(`  ${changes.length} files changed`)
 console.log('  next: `node scripts/sstim-manifest.mjs sync-checksums`,')
 console.log('        `make validate-release-source`, then commit the release-prepared sources.')
@@ -332,5 +336,5 @@ console.log('        and the final `make validate`. Commit snapshot + ledger bef
 // happened without anyone doing it.
 console.log(`        Then tag, and deposit: \`make zenodo-deposit VERSION=${version}\` to see the`)
 console.log('        plan, then again with PUBLISH=1 and ZENODO_TOKEN set. Carry the DOI it')
-console.log('        prints into void.ttl, CITATION.cff and releaseMetadata.js, `make truth-audit`,')
+console.log('        prints into void.ttl, CITATION.cff and releaseMetadata.js, `make codemeta`, `make truth-audit`,')
 console.log(`        and finally \`node scripts/release-open-dev.mjs\` to reopen the mutable line.`)

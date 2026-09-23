@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import hashlib
+import json
 import sys
 import unittest
 
@@ -60,9 +61,24 @@ class ResolveTest(unittest.TestCase):
     def test_live_manifest_is_a_development_line(self):
         """The guard that stops an unpinned publish. If this ever fails because
         the live line was released in place, the default resolution path needs
-        rethinking, not this assertion deleting."""
+        rethinking, not this assertion deleting.
+
+        One window is legitimate and designed: between release-prepare and
+        release-open-dev the live line *is* the release being frozen, and says
+        so. 0.18.0 was the first release this test met, and it failed there.
+        What tells that window apart from a line released in place is what
+        release-prepare writes: an immutable release record naming its own
+        version, and a versioned URL under it on every module. A line merely
+        flipped to "released" carries neither, so it still fails here."""
         closure = sstim.resolve_profile("core", manifest=LIVE)
-        self.assertTrue(closure.is_development)
+        if closure.is_development:
+            return
+        manifest = json.loads(LIVE.read_text(encoding="utf-8"))
+        base = (manifest.get("immutableRelease") or {}).get("baseUrl")
+        self.assertEqual(base, f"{closure.version_iri}/")
+        for module in manifest["modules"]:
+            versioned = module.get("publication", {}).get("versionedUrl", "")
+            self.assertTrue(versioned.startswith(base), module["id"])
 
     def test_version_iri_is_the_citable_one(self):
         closure = sstim.resolve_profile("core", manifest=FROZEN)
