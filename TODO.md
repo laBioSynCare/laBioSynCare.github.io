@@ -75,7 +75,8 @@ is left is repair, then recruiting, in that order.
 1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
    side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
    to the curators by email, the only channel their site still exposes, after
-   the one metadata gap here was closed. Archivo cannot be repaired from
+   the one metadata gap here was closed in source (served from 0.18.0, because
+   `https://w3id.org/sstim` resolves to the newest release). Archivo cannot be repaired from
    outside at all, `/add` short-circuits for an indexed ontology, but its
    crawler resumed on 2026-09-15 and is sweeping towards us. Re-read both
    records rather than re-sending anything.
@@ -338,14 +339,16 @@ indexed, examiner-searchable records.
       artifact still answering 404. Re-check the row after the sweep passes; if
       the 2026-08-17 timestamp is still there in a few weeks, ask again.*
 
-      *Two readings to re-take from a release crawl rather than chase now. The
-      list row scores SSTIM ★☆☆☆ with `Min. License` and `Good License` at ✘,
-      which FOAF and PROV-O also score, so that check is not a verdict on us.
-      `Consistency` is ✘ where both of those are ✔, and that one is ours alone
-      among the controls checked. It was computed from a development snapshot
-      that no longer exists, so it is not evidence about the release, and
-      guessing at a cause before a fresh crawl would be exactly the kind of
-      unmeasured claim `CLAUDE.md` §3.6 exists to stop.*
+      *Both licence ✘ are explained, measured 2026-09-23 with Archivo's own
+      shapes rather than guessed at. `shacl-library/license-I.ttl` and
+      `license-II.ttl` in its repository target every `owl:Ontology` and every
+      `skos:ConceptScheme`. In the copy Archivo holds (the development
+      snapshot crawled 2026-08-17, 10436 triples), all 67 concept schemes lack `dct:license`, so both fail. Run
+      against the 0.17.0 document the namespace serves today, both conform: 16
+      ontology headers and 68 schemes, every one licensed. `Consistency` is no
+      finding either: the info page records ❔ for both snapshots, not ✘, so no
+      reasoner verdict exists. A crawl of any release should clear both licence
+      checks with no change here.*
 
 - [ ] **Follow up LOV by email, because the suggestion form no longer exists**
       `P1`
@@ -361,7 +364,12 @@ indexed, examiner-searchable records.
       record that never appeared, and it is consistent with what was already
       recorded: the submission was never provable from outside.*
 
-      *The gap on our side is closed, 2026-09-20. The served namespace carried
+      *The gap on our side is closed in source, 2026-09-20, and served from
+      0.18.0. Measured 2026-09-23: `https://w3id.org/sstim` negotiates to
+      `ontology/latest/sstim-namespace.ttl`, which is 0.17.0 and holds no
+      `foaf:name` (the dev document holds four), because the namespace resolves
+      to the newest release by design (ADR 0055). A curator reading it before the
+      release still finds two unnamed agents. The served namespace carried
       every LOV-recommended field except an agent name: `dct:creator` was a bare
       ORCID IRI, `dct:publisher` a bare GitHub IRI, and the document held no
       `foaf:name` at all, so LOV's Agents index, a first-class surface there,

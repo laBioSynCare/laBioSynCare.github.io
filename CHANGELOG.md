@@ -17,7 +17,28 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.18.0-dev line.
+### Added
+
+- **The two agents the ontology names now have names.** The Kernel's
+  `dct:creator` and `dct:publisher` were a bare ORCID IRI and a bare GitHub IRI
+  with no label anywhere in the document, so a registry that indexes agents
+  (LOV's Agents index is a first-class surface) had nothing to show without
+  dereferencing either. The Kernel now types `https://orcid.org/0000-0002-9699-629X`
+  as a `foaf:Person` named "Renato Fabbri" and `https://github.com/laBioSynCare`
+  as a `foaf:Organization` named "laBioSynCare", each name as its own authority
+  records it, and publishes no mailbox. `void.ttl` carries the same two
+  descriptions for catalogues that read the dataset description and never open
+  the ontology.
+
+  `foaf:name`, `foaf:Person` and `foaf:Organization` are declared, because
+  using them undeclared took all four profile closures out of OWL 2 DL: the
+  [ADR 0054](docs/decisions/0054-owl-dl-conformance-and-the-duration-datatype.md)
+  defect, reintroduced by three lines and caught by `validate-profile` in one run.
+  The descriptions live in the Kernel alone, since `make module-boundaries` allows
+  one authoritative source per subject, external ones included. The Stimulus
+  plus Exposure namespace catalogue therefore names the two agents without
+  labelling them; the `https://w3id.org/sstim` namespace document, which is what
+  registries read, contains the Kernel.
 
 ## [0.17.0] - 2026-09-07
 
