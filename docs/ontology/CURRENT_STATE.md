@@ -15,7 +15,7 @@ releases. Do not infer one from the other.
 |---|---|---|
 | What is being edited? | `0.19.0-dev`, reopened when `0.18.0` was frozen | [`manifest.json`](../../static/ontology/manifest.json) |
 | What can be cited? | `0.18.0`, released 2026-09-23 | [`void.ttl`](../../static/ontology/void.ttl) and [`CITATION.cff`](../../CITATION.cff) |
-| Which DOI identifies that release? | `10.5281/zenodo.22639184` | [`void.ttl`](../../static/ontology/void.ttl) |
+| Which DOI identifies that release? | `10.5281/zenodo.22921183` | [`void.ttl`](../../static/ontology/void.ttl) |
 | Which DOI identifies SSTIM across releases? | `10.5281/zenodo.21286974` | [`CITATION.cff`](../../CITATION.cff) |
 | What changed? | Agent naming: the Kernel's creator and publisher are typed and named with FOAF, so a registry indexing agents can label them; no SSTIM term was added, removed or renamed | [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Where is the model going? | Waveforms, panning/modulation, protocol namespacing, all-senses coverage | [`SSTIM_DIRECTIONS.md`](SSTIM_DIRECTIONS.md) |

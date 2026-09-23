@@ -72,22 +72,6 @@ already shipped. Release facts are derived from
 the adopter on-ramp, the starter set and both clients shipped in September. What
 is left is repair, then recruiting, in that order.
 
-0. **Finish the 0.18.0 Zenodo deposit, which Zenodo's traffic filter refused.**
-   SSTIM 0.18.0 is frozen, tagged `v0.18.0` on both remotes and deployed, but
-   `make zenodo-deposit VERSION=0.18.0 PUBLISH=1` was answered `403 Access to this
-   resource has been restricted due to unusual traffic from your network` at its
-   first write (`POST .../22639184/actions/newversion`), three times between
-   16:50 and 17:07 (UTC+2) on 2026-09-23, while authenticated reads answered 200.
-   Nothing was created on Zenodo, and the concept DOI still resolves to 0.17.0.
-   Until the deposit runs, `void.ttl`, `CITATION.cff`, `codemeta.json`, the
-   entrance citation and `CURRENT_STATE.md` pair version 0.18.0 with 0.17.0's
-   DOI. From a clean tree, on a network Zenodo accepts: `source ~/.bashrc; make
-   zenodo-deposit VERSION=0.18.0 PUBLISH=1`, carry the printed DOI into
-   `void.ttl`, `CITATION.cff`, `releaseMetadata.js`, `CURRENT_STATE.md` and the
-   OpenAIRE line of `REGISTRY_SUBMISSIONS.md`, run `make codemeta`, then `make
-   zenodo-sync` (dry run, then `PUBLISH=1`) to restore the three licences,
-   subjects and community requests a deposit cannot send, as for 0.17.0. If the
-   block persists, Zenodo support has reference `dbad4237632d675379d6d531364c87ba`.
 1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
    side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
    to the curators by email, the only channel their site still exposes, after
