@@ -148,7 +148,7 @@ BARTOC or FAIRsharing field edits have already landed.
 |---|---|---|---|
 | prefix.cc | ✅ **corrected 2026-08-18** — now serves `sstim` → `https://w3id.org/sstim#` in all four serialisations (`txt`, `json`, `ttl`, `sparql`), verified by `make registry-verify`. It had served the slash form since before 2026-07-11; the hash entry was added and voted above it, and the slash form remains listed but outranked. Its TLS certificate expired 2025-12-31, so `https://` still fails certificate validation and plain `http://` is the only way to read it | yes | — |
 | DBpedia Archivo | ⚠️ **listed, serving a development snapshot; only their crawler can replace it — measured 2026-09-20** — the record holds two versions, both crawled 2026-08-17, carrying `owl:versionInfo "0.16.0-dev"` and `mod:status "under development"`, which is the state [ADR 0055](../decisions/0055-namespace-iri-resolves-to-a-release.md) predicted registries would archive and fixed on 2026-08-29. `/download?o=https%3A//w3id.org/sstim&f=owl` now answers **200** (2026-09-02 measured 500), redirecting to Archivo's Leipzig file store and serving 2043064 bytes that parse to 10436 triples. **A re-add cannot repair it:** POSTing the URI to `/add` answers "The Ontology is already part of Archivo!" and stops at the index check, as [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58) predicted. **Their crawler resumed 2026-09-15** after roughly seven months: 154 crawls between 09-15 and 09-19 across 2010 listed entries, working through `purl.obolibrary.org/obo/*`, so a sweep is in progress and ours is behind it; reported on #58 with that measurement and with the Databus artifact `https://databus.dbpedia.org/ontologies/w3id.org/sstim` still 404 against a `foaf` control at 200. The list row scores ★☆☆☆. **Both licence ✘ explained, measured 2026-09-23** with Archivo's own `shacl-library/license-I.ttl` and `license-II.ttl`, which target every `owl:Ontology` and every `skos:ConceptScheme`: in the held 0.16.0-dev copy all 67 concept schemes lack `dct:license` and both shapes fail, while the 0.17.0 document `https://w3id.org/sstim` serves today conforms to both (16 ontology headers, 68 schemes, all licensed). `Consistency` is ❔ on the info page for both snapshots, not ✘, so no reasoner verdict exists to explain | no | wait for the sweep; a release crawl should clear both licence checks; ask again on #58 if the 2026-08-17 timestamp survives it |
-| LOV | 🕓 **suggested 2026-07-10, still absent, and the form is gone — re-measured 2026-09-20** — `/dataset/lov/vocabs/sstim` is 404 against a `skos` control at 200, 72 days on. LOV itself is working: it inserted `rcao` on 2026-09-11 and updated `oso` on 2026-09-15, five insertions in the last month, and the site now carries PIONERA (OEG UPM) project funding, so the earlier "slow, not dormant" reading is if anything too pessimistic. What changed is the channel. `https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to a metadata recommendations PDF, with no form fields and no endpoint; the only submission address the site exposes is the About page mailto carrying three curators. A suggestion sent into a form that no longer exists would explain a record that never appeared, though acknowledgement mails from July exist, so that reading is a hypothesis rather than a finding. **Both actions taken 2026-09-20:** the one gap on our side is closed in source, the namespace having carried every LOV-recommended field except an agent name; it is served since the 0.18.0 release of 2026-09-23, because `https://w3id.org/sstim` resolves to the newest release and the prior one, 0.17.0, held no `foaf:name`, and the follow-up email went to the three curators, which is the only channel the site still exposes | no | awaiting a reply; if none comes, remind `mpoveda@fi.upm.es` alone and do not submit a third time |
+| LOV | 🕓 **suggested 2026-07-10, still absent, and the form is gone — re-measured 2026-09-20** — `/dataset/lov/vocabs/sstim` is 404 against a `skos` control at 200, 72 days on. LOV itself is working: it inserted `rcao` on 2026-09-11 and updated `oso` on 2026-09-15, five insertions in the last month, and the site now carries PIONERA (OEG UPM) project funding, so the earlier "slow, not dormant" reading is if anything too pessimistic. What changed is the channel. `https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to a metadata recommendations PDF, with no form fields and no endpoint; the only submission address the site exposes is the About page mailto carrying three curators. A suggestion sent into a form that no longer exists would explain a record that never appeared, though acknowledgement mails from July exist, so that reading is a hypothesis rather than a finding. **Both actions taken 2026-09-20:** the one gap on our side is closed in source, the namespace having carried every LOV-recommended field except an agent name; it is served since the 0.18.0 release of 2026-09-23, because `https://w3id.org/sstim` resolves to the newest release and the prior one, 0.17.0, held no `foaf:name`, and the follow-up email went to the three curators, which is the only channel the site still exposes. **María Poveda-Villalón answered**, and on 2026-09-22 she and Ghislain Atemezing were sent the release as one Turtle file with a single `owl:Ontology` header. Still absent 2026-09-27 at `/dataset/vocabs/sstim` against a `skos` control at 200 | no | wait for the listing; send nothing further unless she writes back |
 | BARTOC | ✅ **migrated 2026-09-02** — the curator applied every requested change and closed [issue #319](https://github.com/gbv/bartoc.org/issues/319) as completed. JSKOS verified field by field at `https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154` (`modified` 2026-09-02T06:15:49Z): `url` → `https://w3c-cg.github.io/sstim/ontology/docs/`, `subjectOf` → `https://github.com/w3c-cg/sstim` (legacy repository gone; concept DOI and the frozen 0.16.0 namespace document retained), `extent` → "164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)", which matches `TERM_INDEX.md` and a `skos:ConceptScheme` count of the frozen document exactly. Preserved as asked: node URI, `identifier` `https://w3id.org/sstim`, `namespace` `https://w3id.org/sstim#`, and the publisher field | yes (GitHub) | — |
 | BioPortal | ✅ **live at 0.17.0, recovered 2026-09-08 from a parse failure that recorded no error state**: submission `31` completed the whole pipeline at version IRI `https://w3id.org/sstim/0.17.0` (181 classes, 637 individuals, 301 properties) after submission `30` stalled at `UPLOADED`. The pull URL serves the ledger bytes (1,342,715 bytes; SHA-256 `e734245b1b2478ee30e1fb7100074acd54aa4e02f19d90b141fb4c7695eb8e3b`). Incident record in section 3 | account ✓ (@rfabbri) | confirm the next pull adds no row, then PATCH `31` released to 2026-09-07 |
 | FAIRsharing | ✅ **migrated, enriched and unblocked 2026-09-04.** Homepage, six support links and the cross-reference DOI are on W3C-CG/w3id, the DOI now naming the concept record `10.5281/zenodo.21286974` rather than the 0.6.0 version it had been pinned to since July; the description lists all nine modalities; `sleep` added to domains; seven relations (IAO, BFO, OBI, PROV-O as `extends`; SKOS, OWL, HED as `related_to`); and the three required `read` data processes were added in the edit form, `updated_at` 2026-09-04T09:46:36Z. Publications and citations stay empty until a paper exists. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved | yes | await curator review; add hearing/vision domains if the controlled list has them |
@@ -614,7 +614,7 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     until they reflect a crawl of the current graph.
 ```
 
-### LOV (Linked Open Vocabularies) — SUGGESTED; FOLLOW-UP EMAILED 2026-09-20
+### LOV (Linked Open Vocabularies) — CURATOR REPLIED; RELEASE FILE SENT 2026-09-22
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://lov.linkeddata.es/dataset/suggest` — no account. LOV's model is: you
@@ -762,7 +762,7 @@ Content:            the 2026-07-10 suggestion produced no record; the suggest
                     at 0.17.0; and one question, what the current channel for
                     suggesting a vocabulary is
 External record ID or URL:  none — email, no ticket
-Status:             SENT, awaiting reply
+Status:             SENT; a curator replied. Superseded by the entry below
 
                     **One tension to keep straight rather than smooth over.**
                     The mail says the suggestion may never have reached them,
@@ -778,6 +778,47 @@ Status:             SENT, awaiting reply
                     If no reply arrives, the next step is a reminder to
                     mpoveda@fi.upm.es alone, the one institutional address, and
                     not a third submission through any channel.
+```
+
+**María Poveda-Villalón replied, and the release went to her as one file,
+2026-09-22.** Her message is in the private thread, not here (correspondence
+stays out of the public repository).
+
+```text
+Service:            LOV (Linked Open Vocabularies)
+Channel:            email reply to María Poveda-Villalón, copying
+                    ghislain.atemezing@gmail.com
+Date:               2026-09-22 14:28 (UTC+2)
+Sent by:            Renato Fabbri
+Content:            sstim-0.17.0-full.ttl attached: SSTIM 0.17.0 merged into
+                    one Turtle file with one owl:Ontology header (ontology IRI
+                    https://w3id.org/sstim, versionIRI .../0.17.0, namespace
+                    https://w3id.org/sstim#, prefix sstim), graph-isomorphic
+                    to the published sstim-full.owl of that release. The mail
+                    explains that the namespace IRI serves a catalogue of 16
+                    module headers, and links the RDF/XML at
+                    https://w3c-cg.github.io/sstim/ontology/sstim-full.owl
+External record ID or URL:  none yet. Expected at
+                    https://lov.linkeddata.es/dataset/vocabs/sstim
+Status:             SENT, awaiting the listing. Absent 2026-09-27 against a
+                    skos control at 200
+
+                    **The two things she holds are different releases.** The
+                    attachment is 0.17.0, sent the day before 0.18.0 froze. The
+                    linked sstim-full.owl follows the latest release and served
+                    versionIRI .../0.18.0 on 2026-09-27; that release is the one
+                    carrying foaf:name for the creator and publisher, the one
+                    LOV-recommended field 0.17.0 lacked. Both are releases, so
+                    either import is valid; only the Agents index differs.
+
+                    **LOV moved its paths.** /dataset/lov/vocabs/skos answered
+                    301 to /dataset/vocabs/skos on 2026-09-27, while
+                    /dataset/lov/vocabs/sstim answered a bare 404. Read SSTIM
+                    at the new path only; scripts/verify-registries.py was
+                    moved to it the same day.
+
+                    Next: nothing to send. If she writes back, mention 0.18.0
+                    and offer its merged file; do not open a third thread.
 ```
 
 ### BARTOC — LIVE; W3C-CG update requested 2026-09-01

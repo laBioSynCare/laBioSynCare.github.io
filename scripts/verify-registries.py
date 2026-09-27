@@ -225,9 +225,12 @@ def main() -> int:
     # ── LOV: absence, and only with a working control ────────────────────────
     # "Not in LOV" is a claim of absence, so it needs a control proving the
     # instrument can see a vocabulary that *is* there. Without it a site-wide
-    # outage reads as our vocabulary being missing.
-    ours, _b, note_a = fetch("https://lov.linkeddata.es/dataset/lov/vocabs/sstim", args.timeout)
-    control, _c, note_b = fetch("https://lov.linkeddata.es/dataset/lov/vocabs/skos", args.timeout)
+    # outage reads as our vocabulary being missing. Both use the current path:
+    # by 2026-09-27 the old /dataset/lov/vocabs/skos answered 301 here, while
+    # /dataset/lov/vocabs/sstim answered 404 with no redirect, so a control
+    # that followed its redirect could pass while ours was read at a dead path.
+    ours, _b, note_a = fetch("https://lov.linkeddata.es/dataset/vocabs/sstim", args.timeout)
+    control, _c, note_b = fetch("https://lov.linkeddata.es/dataset/vocabs/skos", args.timeout)
     if control != 200:
         incomplete.append(
             f"LOV control (skos) did not answer 200 — cannot distinguish absence "

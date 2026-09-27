@@ -76,7 +76,8 @@ is left is repair, then recruiting, in that order.
    side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
    to the curators by email, the only channel their site still exposes, after
    the one metadata gap here was closed, and 0.18.0 (2026-09-23) put the fix on
-   the served namespace. Archivo cannot be repaired from
+   the served namespace. A LOV curator answered and has held a single-file
+   release since 2026-09-22. Archivo cannot be repaired from
    outside at all, `/add` short-circuits for an indexed ontology, but its
    crawler resumed on 2026-09-15 and is sweeping towards us. Re-read both
    records rather than re-sending anything.
@@ -356,7 +357,7 @@ indexed, examiner-searchable records.
       reasoner verdict exists. A crawl of any release should clear both licence
       checks with no change here.*
 
-- [ ] **Follow up LOV by email, because the suggestion form no longer exists**
+- [~] **Follow up LOV by email, because the suggestion form no longer exists**
       `P1`
       *Measured 2026-09-20. `/dataset/lov/vocabs/sstim` is 404 against a `skos`
       control at 200, so SSTIM is still absent 72 days after the 2026-07-10
@@ -388,10 +389,14 @@ indexed, examiner-searchable records.
       channel the site still exposes: what is absent, that the form is gone,
       what SSTIM was at 0.17.0, and one question about the current channel. The
       dated record is in
-      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md). Nothing
-      to do until they reply; if none comes, remind `mpoveda@fi.upm.es` alone,
-      the one institutional address, and do not submit a third time through any
-      channel.*
+      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
+
+      ***María Poveda-Villalón replied**, and on 2026-09-22 she was sent the
+      0.17.0 release merged into one Turtle file with a single `owl:Ontology`
+      header, plus the `sstim-full.owl` link, which now serves 0.18.0. Still
+      absent 2026-09-27 at `/dataset/vocabs/sstim`, LOV's current path. Nothing
+      to send; wait for the listing, and if she writes back, offer the 0.18.0
+      file.*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
       *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same
