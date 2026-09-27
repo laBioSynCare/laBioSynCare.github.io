@@ -90,8 +90,8 @@ is left is repair, then recruiting, in that order.
    one first is a guess with a large build attached.
 
 Waiting on someone else, with nothing to do here: SNOMED's licence decision and
-BioPortal's release date and Version IRI (§2), OLS4 PR #1351 and the ShowVoc
-enquiry (§3), Zenodo linked subjects
+BioPortal's release date and Version IRI (§2), any response to the follow-up on
+closed OLS4 PR #1351 and the ShowVoc enquiry (§3), Zenodo linked subjects
 ([w3c-cg/sstim#3](https://github.com/w3c-cg/sstim/issues/3)), and the two open
 repository issues, native label review (§3) and public-claim governance.
 
@@ -1091,21 +1091,14 @@ Turtle files are listed in section 1. After they exist:
       exception. Two seconds per run versus ROBOT's eight, which is what made
       minimisation affordable.*
 
-- [~] Watch OLS4 PR #1351, then bump `ontology_purl` at every release `P2`
-      *[EBISPOT/ols4#1351](https://github.com/EBISPOT/ols4/pull/1351) adds SSTIM
-      to `ebi_ontologies.json` on `dev`. Commit `258c2a51`, pushed 2026-09-01,
-      moves its homepage to W3C-CG and bumps the frozen ontology from historical 0.15.0 to
-      0.16.0; the reviewer was notified in the PR. On merge,
-      confirm <https://www.ebi.ac.uk/ols4/ontologies/sstim> resolves and record
-      it in `REGISTRY_SUBMISSIONS.md`.*
-
-      ***Then it becomes a per-release chore.*** *The entry pins the frozen
-      snapshot — `…/ontology/0.16.0/sstim-namespace.ttl` — on purpose, because
-      the unversioned path serves the mutable `-dev` line and this project does
-      not advertise that as a release. So each release needs a one-line follow-up
-      PR bumping the version in that URL, or OLS keeps serving the previous one.
-      The PR description offers EBI a rolling URL instead if they would rather
-      have fewer PRs; if they accept, this item disappears.*
+- [!] OLS4 listing deferred after PR #1351 closed `P2`
+      *The PR closed 2026-09-17 over the shared-maintenance/community concern.
+      Renato confirmed a follow-up comment asking OLS what evidence it would
+      require before resubmission was posted 2026-09-25. Wait for any reply;
+      revisit only after stronger shared stewardship or sustained multi-party
+      review/contribution is demonstrated. The proposed `ontology_purl` bump is
+      not active while this PR is closed; first recheck OLS for any live record
+      before planning version updates.*
 
 - [~] Post the ShowVoc enquiry once admitted to the VocBench group `P2`
       *Drafted at
