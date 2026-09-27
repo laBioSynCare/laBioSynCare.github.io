@@ -105,7 +105,7 @@ def validate(
     the newest frozen release is resolved, never the development line.
     """
     if closure is None:
-        closure = resolve_profile(profile, version=version, manifest=manifest)
+        closure = resolve_profile(profile, version=version, manifest=manifest, offline=offline)
 
     graph, source = _as_graph(data)
     bodies = closure.read(offline=offline)

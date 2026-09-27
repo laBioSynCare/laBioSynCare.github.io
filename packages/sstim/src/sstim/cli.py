@@ -107,7 +107,8 @@ def main(argv: list[str] | None = None) -> int:
 
         # validate
         closure = resolve_profile(
-            args.profile, version=args.release, manifest=args.manifest
+            args.profile, version=args.release, manifest=args.manifest,
+            offline=args.offline,
         )
         failed = 0
         for path in args.file:

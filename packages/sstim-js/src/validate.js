@@ -92,7 +92,7 @@ async function asQuads (data) {
 export async function validate (data, {
   profile = 'core', version = null, manifest = null, closure = null, offline = false
 } = {}) {
-  closure ??= await resolveProfile(profile, { version, manifest })
+  closure ??= await resolveProfile(profile, { version, manifest, offline })
 
   const { quads, source } = await asQuads(data)
   const bodies = await closure.read({ offline })

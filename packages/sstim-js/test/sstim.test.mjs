@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdtempSync, readFileSync, rmSync, symlinkSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -91,6 +91,51 @@ describe('integrity', () => {
     })
     await expect(closure.read({ offline: true })).rejects.toThrow(SstimError)
   })
+})
+
+describe('offline', () => {
+  // A run pinned to a release works with no network once that release is
+  // cached: modules by checksum, and the frozen manifest by version, since a
+  // released manifest never changes. Primed from this checkout's frozen 0.18.0
+  // directory, whose files hash to what its manifest says.
+  const withCache = async (prime, body) => {
+    const dir = mkdtempSync(join(tmpdir(), 'sstim-cache-'))
+    const previous = process.env.XDG_CACHE_HOME
+    process.env.XDG_CACHE_HOME = dir
+    try {
+      if (prime) {
+        const frozen = new URL('static/ontology/0.18.0/', ROOT)
+        const document = JSON.parse(readFileSync(new URL('manifest.json', frozen), 'utf8'))
+        const base = join(dir, 'sstim')
+        mkdirSync(join(base, 'manifests'), { recursive: true })
+        writeFileSync(join(base, 'manifests', '0.18.0.json'), JSON.stringify(document))
+        for (const module of document.modules) {
+          const sha = module.source.sha256
+          mkdirSync(join(base, sha.slice(0, 2)), { recursive: true })
+          writeFileSync(join(base, sha.slice(0, 2), sha), readFileSync(new URL(module.runtime.url, frozen)))
+        }
+      }
+      await body()
+    } finally {
+      if (previous === undefined) delete process.env.XDG_CACHE_HOME
+      else process.env.XDG_CACHE_HOME = previous
+      rmSync(dir, { recursive: true, force: true })
+    }
+  }
+
+  it('says how to fix an unpinned offline run', () => withCache(false, async () => {
+    await expect(resolveProfile('core', { offline: true })).rejects.toThrow('Pass a version')
+  }))
+
+  it('refuses to fetch a pinned release that is not cached', () => withCache(false, async () => {
+    await expect(resolveProfile('core', { version: '0.18.0', offline: true })).rejects.toThrow('not cached')
+  }))
+
+  it('validates against a pinned, cached release with no network', () => withCache(true, async () => {
+    const report = await validate(example('04-session-full.ttl'), { profile: 'full', version: '0.18.0', offline: true })
+    expect(report.ok, String(report)).toBe(true)
+    expect(report.versionIri).toBe('https://w3id.org/sstim/0.18.0')
+  }))
 })
 
 describe('validating', () => {

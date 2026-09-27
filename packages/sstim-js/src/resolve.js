@@ -144,16 +144,43 @@ export class Closure {
   }
 }
 
-async function loadManifest (version, manifestPath) {
+async function loadManifest (version, manifestPath, { offline = false } = {}) {
   if (manifestPath) {
     const node = await nodeFs()
     if (!node) throw new SstimError('local manifests need a filesystem')
     const text = await node.fs.readFile(manifestPath, 'utf8')
     return { document: JSON.parse(text), source: String(manifestPath), root: node.path.dirname(manifestPath) }
   }
-  const resolved = version || await latestRelease()
-  const url = `${STABLE_IRI}/${resolved}/manifest`
-  return { document: JSON.parse(new TextDecoder().decode(await fetchBytes(url))), source: url, root: null }
+  if (!version) {
+    if (offline) {
+      throw new SstimError('offline, and no version given: which release is newest can only ' +
+                           'be read from the network. Pass a version to use a cached one.')
+    }
+    version = await latestRelease()
+  }
+  const url = `${STABLE_IRI}/${version}/manifest`
+
+  // A frozen release's manifest never changes, so it is cached by version, and
+  // a pinned run works offline once it has run online. A development line's
+  // manifest does change, so it is never cached.
+  const node = await nodeFs()
+  const dir = await cacheDir()
+  const file = dir && node ? node.path.join(dir, 'manifests', `${version}.json`) : null
+  if (file) {
+    try {
+      return { document: JSON.parse(await node.fs.readFile(file, 'utf8')), source: url, root: null }
+    } catch { /* not cached */ }
+  }
+  if (offline) throw new SstimError(`offline, and the ${version} manifest is not cached`)
+  const body = await fetchBytes(url)
+  const document = JSON.parse(new TextDecoder().decode(body))
+  if (file && document.suite?.status === 'released' && !version.endsWith('-dev')) {
+    try {
+      await node.fs.mkdir(node.path.dirname(file), { recursive: true })
+      await node.fs.writeFile(file, body)
+    } catch { /* an unwritable cache is a slow run, not a failure */ }
+  }
+  return { document, source: url, root: null }
 }
 
 /**
@@ -161,10 +188,11 @@ async function loadManifest (version, manifestPath) {
  *
  * With no version, the newest frozen release is used, never the development
  * line. Pass `manifest` to resolve against a local checkout or a frozen release
- * directory, which needs no network at all.
+ * directory, which needs no network at all. `offline` resolves a pinned version
+ * from the cache and fails rather than fetch.
  */
-export async function resolveProfile (profile = 'core', { version = null, manifest = null } = {}) {
-  const { document, source, root } = await loadManifest(version, manifest)
+export async function resolveProfile (profile = 'core', { version = null, manifest = null, offline = false } = {}) {
+  const { document, source, root } = await loadManifest(version, manifest, { offline })
   const suite = document.suite ?? {}
   const profiles = new Map((document.profiles ?? []).map(p => [p.id, p]))
   if (!profiles.has(profile)) {

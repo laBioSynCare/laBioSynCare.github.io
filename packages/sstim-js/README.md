@@ -89,8 +89,10 @@ npx sstim validate my.ttl --profile core --version 0.17.0
 Every module a manifest lists carries a sha256, and the served bytes are checked
 against it before anything is parsed. A truncated download or a substituted file
 stops the run rather than quietly validating your data against a graph that is
-not SSTIM. Verified modules are cached by checksum in Node, so repeated runs are
-offline and a cache entry can never be stale.
+not SSTIM. In Node, verified modules are cached by checksum, and a frozen
+release's manifest by version, since neither can change. So a run pinned to a
+version works with no network once it has run online, and a cache entry can
+never be stale. An unpinned run still asks the network which release is newest.
 
 ## As a library
 

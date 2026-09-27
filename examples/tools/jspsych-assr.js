@@ -14,7 +14,8 @@
 //     const jsPsych = initJsPsych()
 //     const block = assrBlock(jsPsych, jsPsychHtmlKeyboardResponse)
 //     await jsPsych.run([{ type: jsPsychHtmlKeyboardResponse, stimulus: 'Press a key to start.' }, block.trial])
-//     jsPsych.data.addProperties({ sstim: block.turtle() })   // or save it as a .ttl
+//     const file = new Blob([block.turtle()], { type: 'text/turtle' })
+//     Object.assign(document.createElement('a'), { href: URL.createObjectURL(file), download: 'assr-001.ttl' }).click()
 //   </script>
 //
 // Validate what it wrote with `npx @sstim/core validate run.ttl --profile full`,

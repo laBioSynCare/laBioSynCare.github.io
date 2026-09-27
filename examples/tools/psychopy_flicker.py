@@ -12,6 +12,8 @@ docs/technical/PHOTOSENSITIVITY_SAFETY.md.
     python psychopy_flicker.py        # writes flicker-001.ttl if it validates
 """
 
+from pathlib import Path
+
 from psychopy import core, event, visual
 
 import sstim
@@ -23,7 +25,10 @@ TARGET_HZ = 10.0
 def run():
     win = visual.Window(units="deg", monitor="testMonitor", color="black")
     disc = visual.Circle(win, radius=1.0, fillColor="white", lineColor=None)
-    refresh = win.getActualFrameRate() or 60.0
+    refresh = win.getActualFrameRate()
+    if refresh is None:  # an assumed 60 Hz would be recorded as a delivered rate
+        win.close()
+        raise SystemExit("could not measure the display's refresh rate")
     frames = max(2, round(refresh / TARGET_HZ))  # frames per flicker cycle
 
     session = sstim.Session(
@@ -53,4 +58,10 @@ def run():
 
 
 if __name__ == "__main__":
-    print(run().write("flicker-001.ttl"))
+    session = run()
+    try:
+        print(session.write("flicker-001.ttl"))
+    except sstim.SstimError as error:  # offline on first use, or a real violation
+        # A run is not free to repeat: keep it, marked, rather than lose it.
+        Path("flicker-001.unvalidated.ttl").write_text(session.to_turtle(), encoding="utf-8")
+        raise SystemExit(f"kept as flicker-001.unvalidated.ttl: {error}")

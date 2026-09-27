@@ -41,6 +41,18 @@ session.write("run-001.ttl")          # validates against Full first; writes not
 - **Nothing about the participant.** No identifier, no observation, no free
   text.
 
+## When validation cannot run
+
+`write()` validates before writing, and the first run needs the network to
+fetch the release. Later runs can be offline if they pin it:
+`session.write(path, version="0.18.0", offline=True)` reads it from the cache.
+An unpinned run always asks the network which release is newest. The PsychoPy
+example therefore keeps the record as
+`flicker-001.unvalidated.ttl` if `write()` refuses, because a run is not free
+to repeat; check it later with `sstim validate flicker-001.unvalidated.ttl
+--profile full`. The LSL converter needs no such fallback: the XDF file is
+still there.
+
 ## What these examples do not do
 
 They are examples, not plugins. A packaged plugin that writes SSTIM without its

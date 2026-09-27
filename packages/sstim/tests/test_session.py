@@ -180,6 +180,7 @@ class RefusalTest(unittest.TestCase):
             (lambda: with_channel(minimal(), carrier_hz=200.0), "no carrier"),
             (lambda: with_channel(minimal(), medium=[]), "at least one medium"),
             (lambda: with_channel(minimal(), placement="elbow"), "is not one of"),
+            (lambda: with_channel(minimal(), placement=3), "notation or a list"),
             (lambda: minimal().event("playback-pause", at=11.0), "while playback is idle"),
             (lambda: minimal().event("session-open", at=11.0), "not recorded by hand"),
             (lambda: minimal().event("parameter-changed", at=11.0, parameter="level"), "new value"),
@@ -197,6 +198,16 @@ class RefusalTest(unittest.TestCase):
         session = minimal()
         session.event("playback-start", at=20.0)
         self.refused(lambda: session.event("engine-fallback", at=15.0), "in order")
+
+    def test_a_signal_from_another_session_is_refused(self):
+        """It would compare equal to this session's own signal-1 and point the
+        rendering at a node that says something else, or nothing."""
+        foreign = minimal().signal(hz=10.0, shape="square")
+        session = minimal()
+        session.signal(hz=10.0, shape="square")
+        self.refused(lambda: session.channel(
+            "disc", modality="visual", medium="visual-light", placement="eyes", signal=foreign,
+            parameter="luminance", mechanism="direct-presentation"), "returned by this session")
 
     def test_nothing_after_close(self):
         session = minimal()
@@ -246,6 +257,24 @@ class RecordTest(unittest.TestCase):
         session.close(at=80.0, completed=True, ended_at=START + timedelta(minutes=2))
         self.assertIsNone(self.value(session.graph(), SSTIM.hasDeliveryModality))
         self.assertTrue(session.validate(manifest=MANIFEST).ok)
+
+    def test_a_whole_float_duration_is_the_same_plan(self):
+        session = minimal(duration=60.0)
+        session.close(at=80.0, completed=True, ended_at=START + timedelta(minutes=2))
+        graph = session.graph()
+        self.assertEqual(str(graph.value(next(graph.subjects(RDF.type, SSTIM.SessionSpecification)),
+                                         SSTIM.durationSeconds)), "60")
+
+    def test_write_refuses_and_writes_nothing_when_validation_fails(self):
+        """Session terms are not in the Core closure, so containment fails:
+        a real failure the builder cannot prevent, because it is the caller's
+        choice of profile."""
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "run.ttl"
+            with self.assertRaises(sstim.SstimError) as caught:
+                fixture_session().write(target, profile="core", manifest=MANIFEST)
+            self.assertIn("not written", str(caught.exception))
+            self.assertFalse(target.exists())
 
     def test_write_validates_then_writes(self):
         session = fixture_session()
@@ -304,7 +333,6 @@ class ToolExampleTest(unittest.TestCase):
         report = session.validate(manifest=MANIFEST)
         self.assertTrue(report.ok, str(report))
         graph = session.graph()
-        self.assertIn((None, SSTIM.completionStatus, None), graph)
         self.assertEqual(str(graph.value(next(graph.subjects(RDF.type, SSTIM.SessionInstance)),
                                          SSTIM.completionStatus)), "completed")
 
@@ -323,8 +351,9 @@ class ToolExampleTest(unittest.TestCase):
             [
                 {"info": {"name": ["EEG"]}, "time_stamps": [95.0, 96.0], "time_series": [[0.0], [0.0]]},
                 {"info": {"name": ["StimMarkers"]},
-                 "time_stamps": [100.0, 400.0, 410.0, 710.0],
-                 "time_series": [["stim-start"], ["stim-pause"], ["stim-resume"], ["stim-end"]]},
+                 "time_stamps": [98.0, 100.0, 400.0, 410.0, 710.0, 712.0],
+                 "time_series": [["calibration"], ["stim-start"], ["stim-pause"], ["stim-resume"],
+                                 ["stim-end"], ["recording-stop"]]},
             ],
             {"info": {"datetime": ["2026-09-17T09:01:00+0200"]}},
         )
@@ -335,7 +364,10 @@ class ToolExampleTest(unittest.TestCase):
         instance = next(graph.subjects(RDF.type, SSTIM.SessionInstance))
         self.assertEqual(str(graph.value(instance, SSTIM.deliveredDurationSeconds)), "600.0")
         self.assertEqual(int(graph.value(instance, SSTIM.actualDurationSeconds)), 610)
-        # Recording began at 09:01:00+02:00, five LSL seconds before the first marker.
+        # Foreign markers on either side are ignored: the block still reads as
+        # completed, and the session opens at stim-start, not at calibration.
+        self.assertEqual(str(graph.value(instance, SSTIM.completionStatus)), "completed")
+        # Recording began at 09:01:00+02:00, five LSL seconds before stim-start.
         self.assertEqual(str(graph.value(instance, Namespace("http://www.w3.org/ns/prov#").startedAtTime)),
                          "2026-09-17T07:01:05.000Z")
 

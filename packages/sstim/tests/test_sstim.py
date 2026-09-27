@@ -17,7 +17,9 @@ from __future__ import annotations
 from pathlib import Path
 import hashlib
 import json
+import os
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -106,6 +108,54 @@ class IntegrityTest(unittest.TestCase):
         )
         with self.assertRaises(sstim.SstimError):
             closure.read(offline=True)
+
+
+class OfflineTest(unittest.TestCase):
+    """A run pinned to a release works with no network once that release is
+    cached: modules by checksum, and the frozen manifest by version, since a
+    released manifest never changes. The cache here is primed from this
+    checkout's frozen 0.18.0 directory, whose files hash to what its manifest
+    says, so nothing is fetched."""
+
+    def setUp(self):
+        self.cache = tempfile.TemporaryDirectory()
+        self.previous = os.environ.get("XDG_CACHE_HOME")
+        os.environ["XDG_CACHE_HOME"] = self.cache.name
+
+    def tearDown(self):
+        if self.previous is None:
+            os.environ.pop("XDG_CACHE_HOME", None)
+        else:
+            os.environ["XDG_CACHE_HOME"] = self.previous
+        self.cache.cleanup()
+
+    def prime(self, version: str) -> None:
+        frozen = ROOT / "static" / "ontology" / version
+        document = json.loads((frozen / "manifest.json").read_text(encoding="utf-8"))
+        base = Path(self.cache.name) / "sstim"
+        (base / "manifests").mkdir(parents=True)
+        (base / "manifests" / f"{version}.json").write_text(json.dumps(document), encoding="utf-8")
+        for module in document["modules"]:
+            sha = module["source"]["sha256"]
+            (base / sha[:2]).mkdir(exist_ok=True)
+            (base / sha[:2] / sha).write_bytes((frozen / module["runtime"]["url"]).read_bytes())
+
+    def test_unpinned_offline_says_how_to_fix_it(self):
+        with self.assertRaises(sstim.SstimError) as caught:
+            sstim.resolve_profile("core", offline=True)
+        self.assertIn("Pass a version", str(caught.exception))
+
+    def test_pinned_but_uncached_refuses_rather_than_fetch(self):
+        with self.assertRaises(sstim.SstimError) as caught:
+            sstim.resolve_profile("core", version="0.18.0", offline=True)
+        self.assertIn("not cached", str(caught.exception))
+
+    def test_a_pinned_cached_release_validates_with_no_network(self):
+        self.prime("0.18.0")
+        report = sstim.validate(EXAMPLES / "04-session-full.ttl", profile="full",
+                                version="0.18.0", offline=True)
+        self.assertTrue(report.ok, str(report))
+        self.assertEqual(report.version_iri, "https://w3id.org/sstim/0.18.0")
 
 
 class ValidateTest(unittest.TestCase):

@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { Parser, Writer } from 'n3'
 
 import { Session, SstimError, validate } from '../src/index.js'
@@ -62,7 +64,9 @@ describe('the session builder', () => {
       [() => minimal({ duration: 30 }), '60 to 7200'],
       [() => minimal({ masterVolume: 1.5 }), '[0, 1]'],
       [() => minimal({ timing: 'wall-clock' }), 'is not one of'],
-      [() => minimal({ startedAt: '2026-09-17T09:00:00' }), 'time zone'],
+      [() => minimal({ startedAt: '2026-09-17T09:00:00' }), 'must end in Z'],
+      [() => minimal({ startedAt: '2026-09-17T09:00:00+0200' }), 'must end in Z'],
+      [() => withChannel(minimal(), { placement: 3 }), 'notation or an array'],
       [() => minimal({ digest: 'ab'.repeat(16) }), 'algorithm'],
       [() => new Session('https://w3id.org/sstim/mine/', { label: 't', duration: 60, masterVolume: 0, timing: 'audio-hardware', clock: 0 }), 'only SSTIM mints'],
       [() => minimal().signal({ hz: 10, shape: 'sampled' }), 'sampled from'],
@@ -81,6 +85,32 @@ describe('the session builder', () => {
       expect(build, fragment).toThrow(SstimError)
       expect(build, fragment).toThrow(fragment)
     }
+  })
+
+  it('writes exactly the Turtle it validated, and nothing when validation fails', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sstim-session-'))
+    try {
+      const session = fixtureSession()
+      const good = join(dir, 'run.ttl')
+      expect((await session.write(good, { manifest: MANIFEST })).ok).toBe(true)
+      expect(readFileSync(good, 'utf8')).toBe(session.toTurtle())
+      // Session terms are not in the Core closure, so containment fails.
+      const bad = join(dir, 'core.ttl')
+      await expect(session.write(bad, { profile: 'core', manifest: MANIFEST })).rejects.toThrow('not written')
+      expect(existsSync(bad)).toBe(false)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('refuses a signal that belongs to another session', () => {
+    const foreign = minimal().signal({ hz: 10, shape: 'square' })
+    const session = minimal()
+    session.signal({ hz: 10, shape: 'square' })
+    expect(() => session.channel('disc', {
+      modality: 'visual', medium: 'visual-light', placement: 'eyes', signal: foreign,
+      parameter: 'luminance', mechanism: 'direct-presentation'
+    })).toThrow('returned by this session')
   })
 
   it('rounds elapsed time up from the written offset, not the float', () => {

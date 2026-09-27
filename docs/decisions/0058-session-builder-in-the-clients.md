@@ -12,8 +12,9 @@ large build attached.
 
 Measured before this ADR, the build was larger than it needed to be. Both
 published clients could resolve a profile and validate a graph, and nothing
-else: their public functions were `resolve_profile`, `validate` and the cache
-helpers. The only code that produced an SSTIM session was
+else: a listing of every name the two packages export on 2026-09-27 found
+`resolve_profile`, `latest_release`, `validate`, the report and closure types,
+and the cache helpers. The only code that produced an SSTIM session was
 [`src/session/sessionProjection.js`](../../src/session/sessionProjection.js),
 inside the Workbench and bound to the Patch Studio's native bundle. Anyone
 outside the Workbench recording a session had to write Turtle by hand from
@@ -140,3 +141,12 @@ protected (`CLAUDE.md` §3.4), and each is a modelling question.
   JavaScript suite, and `vite.config.js` aliases `@sstim/core/session` to this
   checkout so the jsPsych example is tested before it is published.
 - The candidate tools, ranked, are tracked in ADOPTION.md §3 D.
+- **Offline validation had to be fixed first.** A recorder that validates
+  before writing is only usable on a rig with no network if validation can run
+  there, and it could not: both resolvers fetched the release manifest on every
+  call, `offline` included, although the 0.1 READMEs said repeated runs were
+  offline. A frozen release's manifest never changes, so both now cache it by
+  version, and a run pinned to a release works with no network once it has run
+  online. An unpinned run still asks the network which release is newest,
+  because that is the question. The PsychoPy example keeps an explicitly
+  unvalidated copy if `write()` refuses, since a run is not free to repeat.

@@ -200,7 +200,10 @@ function controlled (category, value, what) {
 }
 
 function several (category, value, what) {
-  const values = typeof value === 'string' ? [value] : [...(value ?? [])]
+  if (typeof value !== 'string' && !Array.isArray(value)) {
+    throw new SstimError(`${what} must be a notation or an array of them, got ${value}`)
+  }
+  const values = typeof value === 'string' ? [value] : [...value]
   if (values.length === 0) throw new SstimError(`a channel needs at least one ${what}`)
   for (const item of values) controlled(category, item, what)
   return values
@@ -227,8 +230,9 @@ const dateTime = (value) => literal(value.toISOString(), namedNode(XSD + 'dateTi
 
 function instant (value, what) {
   if (typeof value === 'string') {
-    if (!/(Z|[+-]\d{2}:?\d{2})$/.test(value)) {
-      throw new SstimError(`${what} has no time zone. A naive time cannot be placed in the calendar.`)
+    // "+02:00", not "+0200": ECMAScript parses only the extended form reliably.
+    if (!/(Z|[+-]\d{2}:\d{2})$/.test(value)) {
+      throw new SstimError(`${what} must end in Z or an offset such as +02:00. A time without a zone cannot be placed in the calendar.`)
     }
     value = new Date(value)
   }

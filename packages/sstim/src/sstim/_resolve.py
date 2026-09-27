@@ -152,16 +152,41 @@ class Closure:
         return {m.id: _cached(m.url, m.sha256, offline=offline) for m in self.modules}
 
 
-def _load_manifest(version: str | None, manifest: str | Path | None) -> tuple[dict, str, Path | None]:
+def _load_manifest(
+    version: str | None, manifest: str | Path | None, *, offline: bool = False
+) -> tuple[dict, str, Path | None]:
     if manifest is not None:
         path = Path(manifest)
         if not path.is_file():
             raise SstimError(f"no manifest at {path}")
         return json.loads(path.read_text(encoding="utf-8")), str(path), path.parent
 
-    resolved = version or latest_release()
-    url = f"{STABLE_IRI}/{resolved}/manifest"
-    return json.loads(_fetch(url).decode("utf-8")), url, None
+    if version is None:
+        if offline:
+            raise SstimError(
+                "offline, and no version given: which release is newest can only "
+                "be read from the network. Pass a version to use a cached one."
+            )
+        version = latest_release()
+    url = f"{STABLE_IRI}/{version}/manifest"
+
+    # A frozen release's manifest never changes, so it is cached by version,
+    # and a pinned run works offline once it has run online. A development
+    # line's manifest does change, so it is never cached.
+    path = cache_dir() / "manifests" / f"{version}.json"
+    if path.is_file():
+        return json.loads(path.read_text(encoding="utf-8")), url, None
+    if offline:
+        raise SstimError(f"offline, and the {version} manifest is not cached")
+    body = _fetch(url)
+    document = json.loads(body.decode("utf-8"))
+    if document.get("suite", {}).get("status") == "released" and not version.endswith("-dev"):
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+        except OSError:
+            pass  # an unwritable cache is a slow run, not a failure
+    return document, url, None
 
 
 def resolve_profile(
@@ -169,14 +194,16 @@ def resolve_profile(
     *,
     version: str | None = None,
     manifest: str | Path | None = None,
+    offline: bool = False,
 ) -> Closure:
     """Resolve one profile's closure.
 
     With no version, the newest frozen release is used, not the development
     line. Pass `manifest=` to resolve against a local checkout or a frozen
-    release directory, which needs no network at all.
+    release directory, which needs no network at all. `offline=True` resolves
+    a pinned version from the cache and fails rather than fetch.
     """
-    document, source, root = _load_manifest(version, manifest)
+    document, source, root = _load_manifest(version, manifest, offline=offline)
     suite = document.get("suite", {})
     profiles = {p["id"]: p for p in document.get("profiles", [])}
     if profile not in profiles:

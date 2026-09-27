@@ -34,12 +34,16 @@ EVENTS = {
 def convert(path, stream="StimMarkers"):
     streams, header = pyxdf.load_xdf(path)
     markers = next(s for s in streams if s["info"]["name"][0] == stream)
-    stamps = list(markers["time_stamps"])
-    labels = [sample[0] for sample in markers["time_series"]]
+    # Only this protocol's markers: a stream often carries others, and one
+    # after stim-end must not turn a completed block into an interrupted one.
+    marks = [(stamp, sample[0]) for stamp, sample in zip(markers["time_stamps"], markers["time_series"])
+             if sample[0] in EVENTS or sample[0] == "stim-end"]
+    stamps = [stamp for stamp, _ in marks]
+    labels = [label for _, label in marks]
 
     # The XDF header dates the recording, and LSL times are seconds on one
-    # monotonic clock, so the first marker's wall-clock time is the recording
-    # start plus the LSL interval between them. It places the session in the
+    # monotonic clock, so stim-start's wall-clock time is the recording start
+    # plus the LSL interval between them. It places the session in the
     # calendar; the offsets, not this, order what happened.
     recorded = datetime.strptime(header["info"]["datetime"][0], "%Y-%m-%dT%H:%M:%S%z")
     first = min(s["time_stamps"][0] for s in streams if len(s["time_stamps"]))
@@ -54,7 +58,7 @@ def convert(path, stream="StimMarkers"):
     session.channel("LED goggles, both eyes", modality="visual",
                     medium="visual-light", placement="eyes", signal=light,
                     parameter="luminance", mechanism="direct-presentation")
-    for stamp, label in zip(stamps, labels):
+    for stamp, label in marks:
         if label in EVENTS:
             session.event(EVENTS[label], at=stamp)
     session.close(at=stamps[-1], completed=labels[-1] == "stim-end",

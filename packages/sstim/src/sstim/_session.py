@@ -212,7 +212,12 @@ def _controlled(category: str, value: str, what: str) -> URIRef:
 
 
 def _several(category: str, value, what: str) -> tuple[str, ...]:
-    values = (value,) if isinstance(value, str) else tuple(value or ())
+    if isinstance(value, str):
+        values: tuple = (value,)
+    elif isinstance(value, (list, tuple)):
+        values = tuple(value)
+    else:
+        raise SstimError(f"{what} must be a notation or a list of them, got {value!r}")
     if not values:
         raise SstimError(f"a channel needs at least one {what}")
     for item in values:
@@ -221,7 +226,11 @@ def _several(category: str, value, what: str) -> tuple[str, ...]:
 
 
 def _number(value, what: str) -> float:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
+    # Numbers only: a string that happens to parse is refused, as it is in
+    # JavaScript, so the two clients accept the same calls.
+    if isinstance(value, (bool, str, bytes)):
+        raise SstimError(f"{what} must be a number, got {value!r}")
+    if not isinstance(value, (int, float)):
         try:
             number = float(value)  # numpy scalars, Decimal
         except (TypeError, ValueError):
@@ -305,6 +314,15 @@ class Session:
     from the device that rendered the audio (an AudioContext), and
     "monotonic-substitute" for any other monotonic clock, such as PsychoPy's or
     Lab Streaming Layer's.
+
+    `duration` (whole seconds, 60 to 7200) and `master_volume` (0 to 1; a
+    silent session states 0) are the plan, and the model requires both. The
+    optional arguments add to the plan (`master_brightness`,
+    `reproducibility`, a configuration `digest` with its `digest_algorithm`),
+    date it (`started_at`, defaulting to now, and the plan's `created`,
+    defaulting to `started_at`), or describe
+    the stimulus as a whole (`stimulus_label`, and `regime`, which is
+    "determinate" unless you say the stimulus is stochastic or adaptive).
     """
 
     def __init__(
@@ -336,7 +354,10 @@ class Session:
             raise SstimError(f"base must end with '/' or '#' so records can be minted under it, got {base!r}")
         if not isinstance(label, str) or not label.strip():
             raise SstimError("label must be a non-empty string")
-        if isinstance(duration, bool) or not isinstance(duration, int) or not PLANNED_MIN <= duration <= PLANNED_MAX:
+        # Whole seconds, however they are typed: 60, 60.0 and numpy.int64(60)
+        # are the same plan, and JavaScript cannot tell the first two apart.
+        planned = None if isinstance(duration, bool) else _number(duration, "duration")
+        if planned is None or not planned.is_integer() or not PLANNED_MIN <= planned <= PLANNED_MAX:
             raise SstimError(
                 f"duration is the planned length in whole seconds, {PLANNED_MIN} to "
                 f"{PLANNED_MAX} in SSTIM's session model; got {duration!r}"
@@ -366,7 +387,7 @@ class Session:
 
         self._base = base
         self._label = label
-        self._duration = duration
+        self._duration = int(planned)
         self._digest = digest
         self._digest_algorithm = digest_algorithm
         self._stimulus_label = stimulus_label or f"Stimulus delivered in {label}"
@@ -440,7 +461,9 @@ class Session:
         self._open("channel")
         if not isinstance(label, str) or not label.strip():
             raise SstimError("a channel needs a non-empty label")
-        if not isinstance(signal, Signal) or signal not in self._signals:
+        # Identity, not equality: a signal from another session with the same
+        # fields would compare equal and point at a node this record lacks.
+        if not any(signal is own for own in self._signals):
             raise SstimError("signal must be one returned by this session's signal()")
         _controlled("perceived", modality, "modality")
         media = _several("medium", medium, "medium")
