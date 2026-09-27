@@ -1,0 +1,35 @@
+{
+  "_comment": "One session, built call for call by both clients. Each suite compares its sorted N-Triples with session-parity.nt, which is what proves the Python and JavaScript builders emit the same graph. The Python suite also validates it under pySHACL with SPARQL active, which the JavaScript runtime cannot do. Regenerate only from the Python client, and only when the builder's output is meant to change.",
+  "base": "https://example.org/lab/run-001/",
+  "session": {
+    "label": "Run 001, 10 Hz audiovisual",
+    "duration": 600,
+    "masterVolume": 0.25,
+    "masterBrightness": 0.8,
+    "timing": "audio-hardware",
+    "clock": 12.5,
+    "startedAt": "2026-09-17T09:01:00Z",
+    "created": "2026-09-17T09:00:00Z",
+    "reproducibility": "equivalent-presentation",
+    "digest": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+    "digestAlgorithm": "sha256 over the canonical JSON configuration"
+  },
+  "signals": [
+    { "hz": 10, "shape": "sine" },
+    { "hzMin": 8, "hzMax": 12.5, "shape": "noise", "label": "Band-limited noise" }
+  ],
+  "channels": [
+    { "label": "Tone, headphones", "modality": "auditory", "medium": "air-conducted-sound", "placement": ["ear-left", "ear-right"], "signal": 0, "parameter": "amplitude", "mechanism": "amplitude-modulation", "carrierHz": 200 },
+    { "label": "Disc, screen", "modality": "visual", "medium": "visual-light", "placement": "eyes", "signal": 0, "parameter": "luminance", "mechanism": "direct-presentation" },
+    { "label": "Binaural pair, headphones", "modality": "auditory", "medium": "air-conducted-sound", "placement": "ears", "signal": 1, "parameter": "frequency", "mechanism": "binaural-beat", "carrierHz": 250 }
+  ],
+  "events": [
+    { "kind": "playback-start", "at": 12.6 },
+    { "kind": "playback-pause", "at": 100.1 },
+    { "kind": "playback-resume", "at": 110.1 },
+    { "kind": "parameter-changed", "at": 200.35, "parameter": "level", "before": 0.25, "after": 0.2 },
+    { "kind": "safety-limit-applied", "at": 250, "parameter": "modulation-frequency", "before": 30, "after": 12.5 },
+    { "kind": "engine-fallback", "at": 300.000000123 }
+  ],
+  "close": { "at": 622.5, "completed": true, "endedAt": "2026-09-17T09:11:30Z" }
+}

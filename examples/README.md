@@ -24,6 +24,12 @@ All four share the `https://example.org/stimuli/` namespace and read as one
 small dataset: the preset in 04 points back at the stimulus specification in 01
 and 02. Each file also validates on its own.
 
+## From the tools you already run
+
+[`tools/`](tools/) records the same kind of session from PsychoPy, jsPsych and
+Lab Streaming Layer, using the session builder in the SSTIM clients rather than
+hand-written Turtle. Three short files, each tested.
+
 ## They are checked, not just written
 
 `make examples-check` holds each file to the profile its header declares:

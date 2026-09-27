@@ -1,7 +1,7 @@
 {
   "name": "@sstim/core",
-  "version": "0.1.1",
-  "description": "Validate sensory-stimulation descriptions against a published SSTIM profile",
+  "version": "0.2.0",
+  "description": "Validate and write sensory-stimulation descriptions against a published SSTIM profile",
   "keywords": [
     "sstim",
     "ontology",
@@ -15,15 +15,16 @@
   "homepage": "https://w3id.org/sstim",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/laBioSynCare/laBioSynCare.github.io.git",
+    "url": "git+https://github.com/w3c-cg/sstim.git",
     "directory": "packages/sstim-js"
   },
-  "bugs": "https://github.com/laBioSynCare/laBioSynCare.github.io/issues",
+  "bugs": "https://github.com/w3c-cg/sstim/issues",
   "author": "Renato Fabbri",
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./session": "./src/session.js"
   },
   "bin": {
     "sstim": "./src/cli.js"

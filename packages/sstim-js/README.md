@@ -15,7 +15,7 @@ npx sstim validate my-stimulus.ttl --profile core
 
 ```
 my-stimulus.ttl
-  profile core at https://w3id.org/sstim/0.17.0
+  profile core at https://w3id.org/sstim/0.18.0
   ok     SHACL conformance
   ok     every SSTIM term is defined in the core closure
   ok     nothing minted under https://w3id.org/sstim
@@ -111,6 +111,38 @@ It runs in the browser too: pass Turtle text rather than a path, and caching is
 skipped where there is no filesystem. `manifest` resolves from a local checkout
 or a frozen release directory instead, which needs no network at all.
 
+## Writing a session
+
+`Session` records one stimulation block from any tool that has a clock. It
+computes offsets from your clock's readings, sums delivered time from the
+playback events, and refuses at the call anything the Full profile would
+reject, with the reason. That matters more here than in Python: this runtime
+cannot evaluate SHACL-SPARQL, and every such constraint that could apply to a
+session record is enforced where the value is written.
+
+```js
+import { Session } from '@sstim/core/session'   // browser-safe, depends only on n3
+
+const session = new Session('https://example.org/lab/run-001/', {
+  label: '40 Hz auditory steady-state block', duration: 60,
+  masterVolume: 0.5, timing: 'audio-hardware', clock: ctx.currentTime
+})
+const tone = session.signal({ hz: 40, shape: 'sine' })
+session.channel('Tone, headphones', {
+  modality: 'auditory', medium: 'air-conducted-sound', placement: 'ears',
+  signal: tone, parameter: 'amplitude', mechanism: 'amplitude-modulation', carrierHz: 1000
+})
+session.event('playback-start', { at: ctx.currentTime })
+session.close({ at: ctx.currentTime, completed: true })
+const turtle = session.toTurtle()
+```
+
+In Node, `await session.write('run-001.ttl')` validates first and writes nothing
+if it fails. The Python client has the same builder and emits the same triples,
+which a shared golden file in the test suites proves. Worked examples for
+PsychoPy, jsPsych and Lab Streaming Layer are in
+[examples/tools](https://github.com/w3c-cg/sstim/tree/main/examples/tools).
+
 ## What this does not do
 
 It does not tell you a stimulation is safe, effective, or ethically approved.
@@ -119,9 +151,9 @@ reviews, and SSTIM does not perform them.
 
 ## More
 
-- [Adopting SSTIM](https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ADOPTING_SSTIM.md),
+- [Adopting SSTIM](https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md),
   the half-hour on-ramp
-- [Starter examples](https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/examples)
+- [Starter examples](https://github.com/w3c-cg/sstim/tree/main/examples)
 - [`sstim` on PyPI](https://pypi.org/project/sstim/), the Python client, which
   has no SPARQL-constraint limitation
 - [The ontology](https://w3id.org/sstim)

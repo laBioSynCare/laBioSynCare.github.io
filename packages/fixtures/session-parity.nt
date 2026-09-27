@@ -1,0 +1,121 @@
+<https://example.org/lab/run-001/channel-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim/exposure#StimulusChannel> .
+<https://example.org/lab/run-001/channel-1> <http://www.w3.org/2000/01/rdf-schema#label> "Tone, headphones" .
+<https://example.org/lab/run-001/channel-1> <https://w3id.org/sstim#hasSignalRendering> <https://example.org/lab/run-001/rendering-1> .
+<https://example.org/lab/run-001/channel-1> <https://w3id.org/sstim/exposure#deliveryMedium> <https://w3id.org/sstim/exposure#mediumAirConductedSound> .
+<https://example.org/lab/run-001/channel-1> <https://w3id.org/sstim/exposure#hasBodyPlacement> <https://w3id.org/sstim/exposure#placementEarLeft> .
+<https://example.org/lab/run-001/channel-1> <https://w3id.org/sstim/exposure#hasBodyPlacement> <https://w3id.org/sstim/exposure#placementEarRight> .
+<https://example.org/lab/run-001/channel-1> <https://w3id.org/sstim/exposure#perceivedModality> <https://w3id.org/sstim/exposure#modalityAuditory> .
+<https://example.org/lab/run-001/channel-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim/exposure#StimulusChannel> .
+<https://example.org/lab/run-001/channel-2> <http://www.w3.org/2000/01/rdf-schema#label> "Disc, screen" .
+<https://example.org/lab/run-001/channel-2> <https://w3id.org/sstim#hasSignalRendering> <https://example.org/lab/run-001/rendering-2> .
+<https://example.org/lab/run-001/channel-2> <https://w3id.org/sstim/exposure#deliveryMedium> <https://w3id.org/sstim/exposure#mediumVisualLight> .
+<https://example.org/lab/run-001/channel-2> <https://w3id.org/sstim/exposure#hasBodyPlacement> <https://w3id.org/sstim/exposure#placementEyes> .
+<https://example.org/lab/run-001/channel-2> <https://w3id.org/sstim/exposure#perceivedModality> <https://w3id.org/sstim/exposure#modalityVisual> .
+<https://example.org/lab/run-001/channel-3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim/exposure#StimulusChannel> .
+<https://example.org/lab/run-001/channel-3> <http://www.w3.org/2000/01/rdf-schema#label> "Binaural pair, headphones" .
+<https://example.org/lab/run-001/channel-3> <https://w3id.org/sstim#hasSignalRendering> <https://example.org/lab/run-001/rendering-3> .
+<https://example.org/lab/run-001/channel-3> <https://w3id.org/sstim/exposure#deliveryMedium> <https://w3id.org/sstim/exposure#mediumAirConductedSound> .
+<https://example.org/lab/run-001/channel-3> <https://w3id.org/sstim/exposure#hasBodyPlacement> <https://w3id.org/sstim/exposure#placementEars> .
+<https://example.org/lab/run-001/channel-3> <https://w3id.org/sstim/exposure#perceivedModality> <https://w3id.org/sstim/exposure#modalityAuditory> .
+<https://example.org/lab/run-001/event-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-1> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventSessionOpen> .
+<https://example.org/lab/run-001/event-1> <https://w3id.org/sstim#sessionClockOffsetSeconds> "0.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-2> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventPlaybackStart> .
+<https://example.org/lab/run-001/event-2> <https://w3id.org/sstim#sessionClockOffsetSeconds> "0.1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-3> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventPlaybackPause> .
+<https://example.org/lab/run-001/event-3> <https://w3id.org/sstim#sessionClockOffsetSeconds> "87.6"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-4> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventPlaybackResume> .
+<https://example.org/lab/run-001/event-4> <https://w3id.org/sstim#sessionClockOffsetSeconds> "97.6"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-5> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-5> <https://w3id.org/sstim#hasChangedParameter> <https://w3id.org/sstim/vocab#paramLevel> .
+<https://example.org/lab/run-001/event-5> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventParameterChanged> .
+<https://example.org/lab/run-001/event-5> <https://w3id.org/sstim#parameterValueAfter> "0.2"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-5> <https://w3id.org/sstim#parameterValueBefore> "0.25"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-5> <https://w3id.org/sstim#sessionClockOffsetSeconds> "187.85"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-6> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-6> <https://w3id.org/sstim#hasChangedParameter> <https://w3id.org/sstim/vocab#paramModulationFrequency> .
+<https://example.org/lab/run-001/event-6> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventSafetyLimitApplied> .
+<https://example.org/lab/run-001/event-6> <https://w3id.org/sstim#parameterValueAfter> "12.5"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-6> <https://w3id.org/sstim#parameterValueBefore> "30.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-6> <https://w3id.org/sstim#sessionClockOffsetSeconds> "237.5"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-7> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-7> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventEngineFallback> .
+<https://example.org/lab/run-001/event-7> <https://w3id.org/sstim#sessionClockOffsetSeconds> "287.500000123"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/event-8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionEvent> .
+<https://example.org/lab/run-001/event-8> <https://w3id.org/sstim#hasEventType> <https://w3id.org/sstim/vocab#eventSessionComplete> .
+<https://example.org/lab/run-001/event-8> <https://w3id.org/sstim#sessionClockOffsetSeconds> "610.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/plan> <http://purl.org/dc/terms/created> "2026-09-17T09:00:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://example.org/lab/run-001/plan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Plan> .
+<https://example.org/lab/run-001/plan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionSpecification> .
+<https://example.org/lab/run-001/plan> <http://www.w3.org/2000/01/rdf-schema#label> "Plan for Run 001, 10 Hz audiovisual" .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#configurationDigest> "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08" .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#digestAlgorithm> "sha256 over the canonical JSON configuration" .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#durationSeconds> "600"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#hasReproducibilityLevel> <https://w3id.org/sstim/vocab#reproEquivalentPresentation> .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#masterBrightness> "0.8"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#masterVolume> "0.25"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/plan> <https://w3id.org/sstim#referencesPreset> <https://example.org/lab/run-001/preset> .
+<https://example.org/lab/run-001/preset> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#Preset> .
+<https://example.org/lab/run-001/preset> <http://www.w3.org/2000/01/rdf-schema#label> "Configuration used for Run 001, 10 Hz audiovisual" .
+<https://example.org/lab/run-001/preset> <https://w3id.org/sstim#specifiedBy> <https://example.org/lab/run-001/stimulus> .
+<https://example.org/lab/run-001/rendering-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SignalRendering> .
+<https://example.org/lab/run-001/rendering-1> <http://www.w3.org/2000/01/rdf-schema#label> "Tone, headphones: amplitude-modulation onto amplitude" .
+<https://example.org/lab/run-001/rendering-1> <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismAmplitudeModulation> .
+<https://example.org/lab/run-001/rendering-1> <https://w3id.org/sstim#hasRenderingPresence> <https://w3id.org/sstim/vocab#presencePhysical> .
+<https://example.org/lab/run-001/rendering-1> <https://w3id.org/sstim#renderingCarrierHz> "200.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/rendering-1> <https://w3id.org/sstim#rendersOntoParameter> <https://w3id.org/sstim/vocab#paramAmplitude> .
+<https://example.org/lab/run-001/rendering-1> <https://w3id.org/sstim#rendersSignal> <https://example.org/lab/run-001/signal-1> .
+<https://example.org/lab/run-001/rendering-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SignalRendering> .
+<https://example.org/lab/run-001/rendering-2> <http://www.w3.org/2000/01/rdf-schema#label> "Disc, screen: direct-presentation onto luminance" .
+<https://example.org/lab/run-001/rendering-2> <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismDirectPresentation> .
+<https://example.org/lab/run-001/rendering-2> <https://w3id.org/sstim#hasRenderingPresence> <https://w3id.org/sstim/vocab#presencePhysical> .
+<https://example.org/lab/run-001/rendering-2> <https://w3id.org/sstim#rendersOntoParameter> <https://w3id.org/sstim/vocab#paramLuminance> .
+<https://example.org/lab/run-001/rendering-2> <https://w3id.org/sstim#rendersSignal> <https://example.org/lab/run-001/signal-1> .
+<https://example.org/lab/run-001/rendering-3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SignalRendering> .
+<https://example.org/lab/run-001/rendering-3> <http://www.w3.org/2000/01/rdf-schema#label> "Binaural pair, headphones: binaural-beat onto frequency" .
+<https://example.org/lab/run-001/rendering-3> <https://w3id.org/sstim#hasRenderingMechanism> <https://w3id.org/sstim/vocab#mechanismBinauralBeat> .
+<https://example.org/lab/run-001/rendering-3> <https://w3id.org/sstim#hasRenderingPresence> <https://w3id.org/sstim/vocab#presencePerceptual> .
+<https://example.org/lab/run-001/rendering-3> <https://w3id.org/sstim#renderingCarrierHz> "250.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/rendering-3> <https://w3id.org/sstim#rendersOntoParameter> <https://w3id.org/sstim/vocab#paramFrequency> .
+<https://example.org/lab/run-001/rendering-3> <https://w3id.org/sstim#rendersSignal> <https://example.org/lab/run-001/signal-2> .
+<https://example.org/lab/run-001/session> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#SessionInstance> .
+<https://example.org/lab/run-001/session> <http://www.w3.org/2000/01/rdf-schema#label> "Run 001, 10 Hz audiovisual" .
+<https://example.org/lab/run-001/session> <http://www.w3.org/ns/prov#endedAtTime> "2026-09-17T09:11:30.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://example.org/lab/run-001/session> <http://www.w3.org/ns/prov#startedAtTime> "2026-09-17T09:01:00.000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#actualDurationSeconds> "610"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#clockOriginSeconds> "12.5"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#completionStatus> "completed" .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#deliveredDurationSeconds> "599.9"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasDeliveryModality> <https://w3id.org/sstim/vocab#modalityAuditory> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasDeliveryModality> <https://w3id.org/sstim/vocab#modalityVisual> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-1> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-2> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-3> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-4> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-5> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-6> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-7> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasSessionEvent> <https://example.org/lab/run-001/event-8> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#hasTimingAuthority> <https://w3id.org/sstim/vocab#timingAudioHardwareClock> .
+<https://example.org/lab/run-001/session> <https://w3id.org/sstim#usesSpecification> <https://example.org/lab/run-001/plan> .
+<https://example.org/lab/run-001/signal-1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#StimulationSignal> .
+<https://example.org/lab/run-001/signal-1> <http://www.w3.org/2000/01/rdf-schema#label> "10 Hz sine" .
+<https://example.org/lab/run-001/signal-1> <https://w3id.org/sstim#hasSignalShape> <https://w3id.org/sstim/vocab#shapeSine> .
+<https://example.org/lab/run-001/signal-1> <https://w3id.org/sstim#hzMax> "10.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/signal-1> <https://w3id.org/sstim#hzMin> "10.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/signal-2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#StimulationSignal> .
+<https://example.org/lab/run-001/signal-2> <http://www.w3.org/2000/01/rdf-schema#label> "Band-limited noise" .
+<https://example.org/lab/run-001/signal-2> <https://w3id.org/sstim#hasSignalShape> <https://w3id.org/sstim/vocab#shapeNoise> .
+<https://example.org/lab/run-001/signal-2> <https://w3id.org/sstim#hzMax> "12.5"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/signal-2> <https://w3id.org/sstim#hzMin> "8.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<https://example.org/lab/run-001/stimulus> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/sstim#StimulusSpecification> .
+<https://example.org/lab/run-001/stimulus> <http://www.w3.org/2000/01/rdf-schema#label> "Stimulus delivered in Run 001, 10 Hz audiovisual" .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#hasSignal> <https://example.org/lab/run-001/signal-1> .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#hasSignal> <https://example.org/lab/run-001/signal-2> .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#hasStimulusChannel> <https://example.org/lab/run-001/channel-1> .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#hasStimulusChannel> <https://example.org/lab/run-001/channel-2> .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#hasStimulusChannel> <https://example.org/lab/run-001/channel-3> .
+<https://example.org/lab/run-001/stimulus> <https://w3id.org/sstim#stimulusRegime> "determinate" .

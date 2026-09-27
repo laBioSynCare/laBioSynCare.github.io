@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
@@ -84,5 +85,11 @@ export default defineConfig({
     // that says nothing about the ontology — and, worse, moves between files, so
     // raising it per-test just relocates the flake.
     testTimeout: 30_000,
+    // examples/tools/jspsych-assr.js imports the builder the way an adopter
+    // would, by its published name. The suite runs it against this checkout's
+    // source, so the example is tested before it is published, not after.
+    alias: {
+      '@sstim/core/session': fileURLToPath(new URL('./packages/sstim-js/src/session.js', import.meta.url)),
+    },
   },
 })

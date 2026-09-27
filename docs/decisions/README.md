@@ -81,6 +81,7 @@ annotations lives here.
 | [0055](0055-namespace-iri-resolves-to-a-release.md) | `https://w3id.org/sstim` resolves to the latest release rather than the working tree, and tells a person in a browser what they just dereferenced | Accepted |
 | [0056](0056-readable-iris-accepted-costs-and-the-obo-idspace-prerequisite.md) | What readable IRIs cost, and why the OBO-ID bridge cannot be built before an IDSPACE is allocated | Accepted |
 | [0057](0057-external-mapping-predicates-and-verification.md) | How an external mapping predicate is chosen, and how its target is proved | Accepted |
+| [0058](0058-session-builder-in-the-clients.md) | A session builder in both clients, so a tool exporter only reads its own clock | Accepted |
 
 ## ADR lifecycle and revision policy
 

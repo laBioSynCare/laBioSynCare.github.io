@@ -15,7 +15,7 @@ sstim validate my-stimulus.ttl --profile core
 
 ```
 my-stimulus.ttl
-  profile core at https://w3id.org/sstim/0.17.0
+  profile core at https://w3id.org/sstim/0.18.0
   ok     SHACL conformance
   ok     every SSTIM term is defined in the core closure
   ok     nothing minted under https://w3id.org/sstim
@@ -99,6 +99,35 @@ reports = [sstim.validate(p, closure=closure) for p in paths]
 `manifest=` resolves from a local checkout or a frozen release directory
 instead, which needs no network at all.
 
+## Writing a session
+
+`sstim.Session` records one stimulation block from any tool that has a clock:
+PsychoPy, an LSL recording, your own script. It computes offsets from your
+clock's readings, sums delivered time from the playback events, and refuses at
+the call anything the Full profile would reject, with the reason.
+
+```python
+session = sstim.Session(
+    "https://example.org/lab/run-001/",        # your namespace, one per record
+    label="10 Hz flicker block", duration=60, master_volume=0.0,
+    timing="monotonic-substitute", clock=core.getTime(),
+)
+flicker = session.signal(hz=10.0, shape="square")
+session.channel("2 degree disc, screen", modality="visual", medium="visual-light",
+                placement="eyes", signal=flicker, parameter="luminance",
+                mechanism="direct-presentation")
+session.event("playback-start", at=core.getTime())
+session.close(at=core.getTime(), completed=True)
+session.write("run-001.ttl")    # validates against Full first; writes nothing if it fails
+```
+
+Controlled values are the notations SSTIM publishes (`"playback-start"`,
+`"amplitude-modulation"`, `"visual-light"`), and the builder records nothing
+about the participant. The JavaScript client has the same builder and emits the
+same triples. Three worked examples, for PsychoPy, jsPsych and Lab Streaming
+Layer, are in
+[examples/tools](https://github.com/w3c-cg/sstim/tree/main/examples/tools).
+
 ## What this does not do
 
 It does not tell you a stimulation is safe, effective, or ethically approved.
@@ -107,10 +136,10 @@ reviews, and SSTIM does not perform them.
 
 ## More
 
-- [Adopting SSTIM](https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ADOPTING_SSTIM.md),
+- [Adopting SSTIM](https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md),
   the half-hour on-ramp
-- [Starter examples](https://github.com/laBioSynCare/laBioSynCare.github.io/tree/main/examples)
+- [Starter examples](https://github.com/w3c-cg/sstim/tree/main/examples)
 - [The ontology](https://w3id.org/sstim) and its
-  [term index](https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ontology/TERM_INDEX.md)
+  [term index](https://github.com/w3c-cg/sstim/blob/main/docs/ontology/TERM_INDEX.md)
 
 Apache-2.0. SSTIM itself is CC BY 4.0.

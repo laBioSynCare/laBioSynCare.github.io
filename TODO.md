@@ -88,7 +88,10 @@ is left is repair, then recruiting, in that order.
    and a merged upstream fix, so the artifacts are not what is blocking.
 3. **The tool exporter** that would make adoption a side effect of work somebody
    was already doing (§7) stays gated on an engaged lab naming the tool. Picking
-   one first is a guess with a large build attached.
+   one first is a guess with a large build attached. Its tool-neutral half was
+   not a guess and shipped 2026-09-27: a session builder in both clients (ADR
+   0058) and three tested examples in `examples/tools/`, with the candidate
+   tools ranked in [`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §3 D.
 
 Waiting on someone else, with nothing to do here: SNOMED's licence decision and
 BioPortal's release date and Version IRI (§2), any response to the follow-up on
@@ -392,8 +395,9 @@ indexed, examiner-searchable records.
       [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
 
       ***María Poveda-Villalón replied**, and on 2026-09-22 she was sent the
-      0.17.0 release merged into one Turtle file with a single `owl:Ontology`
-      header, plus the `sstim-full.owl` link, which now serves 0.18.0. Still
+      prior release, 0.17.0, merged into one Turtle file with a single
+      `owl:Ontology` header, plus the `sstim-full.owl` link, which now serves
+      0.18.0. Still
       absent 2026-09-27 at `/dataset/vocabs/sstim`, LOV's current path. Nothing
       to send; wait for the listing, and if she writes back, offer the 0.18.0
       file.*
@@ -1659,13 +1663,26 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       [`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §6 identifies as the cheapest,
       which puts the labour on us: nominate a protocol and we will encode it.*
 
-- [ ] **Exporter for whichever experiment tool the first engaged lab runs**
+- [~] **Exporter for whichever experiment tool the first engaged lab runs**
       (PsychoPy, jsPsych, OpenSesame, Lab Streaming Layer) `P2`
       *[`ADOPTION.md`](docs/ecosystem/ADOPTION.md) §3 D. The highest-leverage
       item on that list, because it is the only one that yields data adoption as
       a side effect of work somebody was doing anyway, and deliberately gated on
       the outreach above. Done when a user of that tool produces a valid SSTIM
       session file without having read any SSTIM documentation.*
+
+      *Tool-neutral half **done 2026-09-27**
+      ([ADR 0058](docs/decisions/0058-session-builder-in-the-clients.md)):
+      `sstim.Session` and `@sstim/core/session` emit the same triples, proved by
+      a shared golden file, and refuse at the call what Full would reject.
+      Three tested examples in `examples/tools/` (PsychoPy, jsPsych, LSL). Left:
+      **publish** both clients (PyPI `sstim`, npm `@sstim/core`) at package
+      version 0.2.0, which the jsPsych example's import map already names; then
+      the packaged plugin, still gated. The ranked tool list lives in ADOPTION.md §3 D. Five model gaps the
+      builder hit are recorded in the ADR, not fixed: master volume required on a
+      visual-only session, the 60 s planned minimum, no timing authority for a
+      monotonic clock that timed audio, two modality schemes with no stated
+      relation, and the mandatory preset.*
 
 ---
 

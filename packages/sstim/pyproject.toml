@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sstim"
-version = "0.1.0"
-description = "Validate sensory-stimulation descriptions against a published SSTIM profile"
+version = "0.2.0"
+description = "Validate and write sensory-stimulation descriptions against a published SSTIM profile"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -30,9 +30,9 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://w3id.org/sstim"
-Documentation = "https://github.com/laBioSynCare/laBioSynCare.github.io/blob/main/docs/ADOPTING_SSTIM.md"
-Source = "https://github.com/laBioSynCare/laBioSynCare.github.io"
-Issues = "https://github.com/laBioSynCare/laBioSynCare.github.io/issues"
+Documentation = "https://github.com/w3c-cg/sstim/blob/main/docs/ADOPTING_SSTIM.md"
+Source = "https://github.com/w3c-cg/sstim"
+Issues = "https://github.com/w3c-cg/sstim/issues"
 
 [project.scripts]
 sstim = "sstim.cli:main"

@@ -639,13 +639,15 @@ preset-contract:
 examples-check:
 	$(PYTHON) scripts/examples-check.py
 
-## Test the `sstim` Python client in packages/sstim. Offline: it resolves the
-## frozen 0.17.0 manifest and the live one from this checkout, so a failure
-## always means the code, never the network. The client reads profile closures
+## Test the `sstim` Python client in packages/sstim, its session builder, and
+## the tool examples in examples/tools that use it. Offline: it resolves frozen
+## manifests and the live one from this checkout, so a failure always means the
+## code, never the network. The client reads profile closures
 ## from manifest.json, so a manifest change that would break every adopter's
 ## install fails here rather than after publication.
 sstim-package:
 	PYTHONPATH=packages/sstim/src:$$PYTHONPATH $(PYTHON) packages/sstim/tests/test_sstim.py
+	PYTHONPATH=packages/sstim/src:$$PYTHONPATH $(PYTHON) packages/sstim/tests/test_session.py
 
 ## Build the `sstim` wheel and sdist into dist/python/ (artifact only, never
 ## committed). --no-isolation because the flake already pins the build backend;

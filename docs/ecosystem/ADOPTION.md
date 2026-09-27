@@ -207,6 +207,35 @@ having read any SSTIM documentation.
 This is the highest-leverage item in the list, because it is the only one that
 yields data adoption as a side effect of work somebody was doing anyway.
 
+**The tool-neutral half is built, 2026-09-27.** Every exporter needs the same
+core: a stated clock, the stimulus, the events, and a graph Full accepts. That
+is not a guess about which tool, so it shipped ahead of the gate as a session
+builder in both clients
+([ADR 0058](../decisions/0058-session-builder-in-the-clients.md)), with three
+short tested examples in [`examples/tools/`](../../examples/tools/): a PsychoPy
+flicker block, a jsPsych auditory steady-state block, and an LSL marker
+converter. What stays gated is the packaged plugin. A generic toolkit knows
+*when* a stimulus appeared, not *what* it was, because the 40 Hz lives in the
+user's code; meeting the *done when* above therefore means a stimulus component
+that both presents and describes, which is the large build, and for flicker
+one that carries photosensitivity obligations.
+
+**Candidate tools, ranked by fit rather than popularity.** Fit means where
+SSTIM's domain (rhythmic and steady-state stimulation, entrainment,
+neuromodulation) meets its event-and-clock session model. Kept here so the list
+is not re-derived each time a lab names one.
+
+| Rank | Tool | Why | Cost and risk | Status |
+|---|---|---|---|---|
+| 1 | **Lab Streaming Layer** (XDF) | Tool-agnostic: PsychoPy, OpenSesame, Unity and some stimulation hardware already send marker streams, and EEG labs record XDF anyway, so one converter reaches every tool that sends markers. LSL's clock synchronisation fits the stated-clock model | Python, on the Python client. A marker cannot say what the stimulus was, so that is declared once per protocol | example: [`lsl_markers.py`](../../examples/tools/lsl_markers.py) |
+| 2 | **PsychoPy** (and PsychoJS) | The most used open experiment toolkit; steady-state visual and auditory paradigms are routine in it | Python, on the Python client. Its clock is monotonic, not the audio device's, which exposes a timing-authority gap (ADR 0058) | example: [`psychopy_flicker.py`](../../examples/tools/psychopy_flicker.py) |
+| 3 | **jsPsych** | Browser experiments, the same runtime as the Workbench and `@sstim/core`; its AudioContext gives an audio-hardware clock | JavaScript, on the JavaScript client | example: [`jspsych-assr.js`](../../examples/tools/jspsych-assr.js) |
+| 4 | **MNE-Python**, as a reader | Loading an SSTIM session as MNE annotations gives analysts a reason to ask for SSTIM files from whoever collects the data | Cheap on the Python client. An importer, not an exporter | not started |
+| 5 | **OpenSesame** | Python, runs on PsychoPy or its own backends | Covered largely by the PsychoPy and LSL routes | not started |
+| 6 | **Psychtoolbox** | Large in vision and steady-state flicker research | MATLAB, and there is no MATLAB client | not started |
+| 7 | **Audio environments** (SuperCollider, Pure Data, Max) and **Unity** | The applications and artists segments of §4 | Low evidentiary weight for a research audience | not started |
+| n/a | **Device makers** (tES, TMS, light and sound hardware) | Better served by a conformance claim in their own documentation | See E below | n/a |
+
 ### E. An externalisable conformance claim
 
 Profiles with SHACL contracts exist, and `make session-conformance` already
@@ -302,7 +331,9 @@ individual is named in this file.
    enough and the messages are not being sent.
 4. **Build C.** ✅ Both clients published 2026-09-18: `sstim` on PyPI, `@sstim/core` on npm.
 5. **Build D against whichever tool the first engaged lab actually uses.**
-   Choosing before then is a guess with a large build attached.
+   Choosing before then is a guess with a large build attached. The
+   tool-neutral half was not a guess and shipped 2026-09-27 (ADR 0058, three
+   examples); only the packaged plugin waits.
 6. **Build E when there is a claimant.**
 
 **The demand-side lever outranks all five.** Nobody adopts a vocabulary; they
