@@ -202,8 +202,29 @@ resolved 0.18.0 over the live network, validated and wrote a session in Full,
 then validated it again offline from the cache, from Python and the command
 line. PyPI was in a maintenance window: the plain HTML simple index and pip's
 view lagged for over 15 minutes while the JSON simple index was current.
-**`@sstim/core` 0.2.0 is not yet on npm**: the stored npm token answers 401
-and needs a fresh `npm login`.
+
+**Measured again at 20:17 UTC the same day, and pip still resolves 0.1.0.**
+PyPI's CDN caches the simple index per content encoding. The uncompressed
+copy lists 0.1.0 and 0.2.0; the gzip copy, which is the one pip requests,
+still lists only 0.1.0 about ten hours after the upload, with PyPI's status
+back to operational. So `pip install sstim` installs 0.1.0 until that copy
+refreshes, while installing the wheel by URL works. Recheck with
+`pip download --no-deps sstim==0.2.0`, which uses pip's own request, not
+with `curl`, which does not ask for gzip.
+
+**`@sstim/core` 0.2.0 published to npm 2026-09-28**, after two things were
+fixed on the way. The token that published 0.1.x (granular, created
+2026-09-18) had expired, and a fresh `npm login` cannot publish because the
+account has no two-factor authentication; a new granular token did. And npm
+11.20 drops a bin written `./src/cli.js` at publish time, so the first attempt
+would have shipped without its command had the 403 not stopped it; it is now
+`src/cli.js`, guarded by a test (`caf77a5`). Verified from the registry into
+an empty directory with an empty cache: the installed `sstim` command runs
+through npm's symlink, both `@sstim/core` and `@sstim/core/session` import,
+a session validates in Full over the live network (reported `PARTIAL`, 69
+SPARQL constraints unevaluated, as designed) and again offline from the cache.
+The esm.sh address the jsPsych example's import map names loads in headless
+Chrome and builds a session.
 
 ### D. An exporter for a tool researchers already run
 

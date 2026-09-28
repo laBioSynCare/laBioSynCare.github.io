@@ -74,10 +74,9 @@ record, not PsychoPy, jsPsych or pyxdf themselves.
 
 ## Versions
 
-The builder ships in `sstim` 0.2.0, on PyPI since 2026-09-28
-(`pip install "sstim>=0.2"`), and in `@sstim/core` 0.2.0. Until the latter is on
-npm, the jsPsych page's import map will not resolve; run the example from this
-repository instead.
+The builder ships in `sstim` 0.2.0 on PyPI (`pip install "sstim>=0.2"`) and
+`@sstim/core` 0.2.0 on npm, both published 2026-09-28. The jsPsych page's
+import map resolves through esm.sh.
 
 Why these three, what the builder refuses and why, and the five gaps in the
 model it ran into: [ADR 0058](../../docs/decisions/0058-session-builder-in-the-clients.md).

@@ -1,8 +1,7 @@
 # ADR 0058: A session builder in both clients, so a tool exporter only reads its own clock
 
 **Status:** Accepted · 2026-09-27 · implemented in `sstim` 0.2.0 and
-`@sstim/core` 0.2.0 (`sstim` published to PyPI 2026-09-28; `@sstim/core`
-awaiting an npm login)
+`@sstim/core` 0.2.0 (both published 2026-09-28)
 
 ## Context
 
