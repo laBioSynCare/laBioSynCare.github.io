@@ -238,6 +238,15 @@ describe('the command line', () => {
     expect(await main(['modules', '--profile', 'nonsense', '--manifest', FROZEN])).toBe(2)
   })
 
+  it('declares its bin in the form npm keeps at publish', () => {
+    // npm 11.20 drops a bin written "./src/cli.js" when publishing ("script
+    // name src/cli.js was invalid and removed") and ships the package without
+    // its command. Only `npm publish --dry-run` shows it; no unit test runs
+    // npm's own normalization. Caught on 2026-09-28, before 0.2.0 went out.
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+    for (const target of Object.values(pkg.bin)) expect(target.startsWith('./'), target).toBe(false)
+  })
+
   it('runs when invoked through a symlink, as an installed bin is', () => {
     // 0.1.0 shipped a CLI that did nothing once installed. npm links a bin
     // (node_modules/.bin/sstim -> ../@sstim/core/src/cli.js), so process.argv[1]

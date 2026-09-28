@@ -27,7 +27,7 @@
     "./session": "./src/session.js"
   },
   "bin": {
-    "sstim": "./src/cli.js"
+    "sstim": "src/cli.js"
   },
   "files": [
     "src",
