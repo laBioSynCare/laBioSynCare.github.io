@@ -72,12 +72,12 @@ one, each against a small stand-in for its tool, and validates what they write
 against the frozen Full profile. The stand-ins mean what is tested is the
 record, not PsychoPy, jsPsych or pyxdf themselves.
 
-## Before 0.2.0 is published
+## Versions
 
-The builder ships in `sstim` 0.2.0 and `@sstim/core` 0.2.0. Until those are on
-PyPI and npm, run the examples from this repository with
-`PYTHONPATH=packages/sstim/src`, and the jsPsych page's import map will not
-resolve.
+The builder ships in `sstim` 0.2.0, on PyPI since 2026-09-28
+(`pip install "sstim>=0.2"`), and in `@sstim/core` 0.2.0. Until the latter is on
+npm, the jsPsych page's import map will not resolve; run the example from this
+repository instead.
 
 Why these three, what the builder refuses and why, and the five gaps in the
 model it ran into: [ADR 0058](../../docs/decisions/0058-session-builder-in-the-clients.md).

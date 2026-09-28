@@ -1676,9 +1676,11 @@ PATCH_STUDIO.md §11.1, ADR 0026)**
       `sstim.Session` and `@sstim/core/session` emit the same triples, proved by
       a shared golden file, and refuse at the call what Full would reject.
       Three tested examples in `examples/tools/` (PsychoPy, jsPsych, LSL). Left:
-      **publish** both clients (PyPI `sstim`, npm `@sstim/core`) at package
-      version 0.2.0, which the jsPsych example's import map already names; then
-      the packaged plugin, still gated. The ranked tool list lives in ADOPTION.md §3 D. Five model gaps the
+      **publish** the JavaScript client on npm, at the package
+      version 0.2.0 that the jsPsych example's import map already names. The
+      Python client at that version went to PyPI on 2026-09-28, verified; the
+      npm token answers 401 and needs a fresh `npm login`. Then the packaged
+      plugin, still gated. The ranked tool list lives in ADOPTION.md §3 D. Five model gaps the
       builder hit are recorded in the ADR, not fixed: master volume required on a
       visual-only session, the 60 s planned minimum, no timing authority for a
       monotonic clock that timed audio, two modality schemes with no stated

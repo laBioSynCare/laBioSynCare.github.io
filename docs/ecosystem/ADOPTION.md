@@ -192,6 +192,19 @@ current and both targets answer 200, measured with `curl` against
 same path for `examples/README.md`. Repoint the fields at the next release.
 `make push` keeps the mirror current from now on (`CLAUDE.md` §3.7).
 
+**`sstim` 0.2.0 published to PyPI 2026-09-28**, on Renato's instruction, with
+the session builder of [ADR 0058](../decisions/0058-session-builder-in-the-clients.md),
+offline validation for a pinned release, and the `Project-URL` fields repointed
+at `w3c-cg/sstim` as deferred above. Verified the same way: the published
+wheel's sha256 matched the local build, and installed from
+`files.pythonhosted.org` into an empty directory with an empty cache it
+resolved 0.18.0 over the live network, validated and wrote a session in Full,
+then validated it again offline from the cache, from Python and the command
+line. PyPI was in a maintenance window: the plain HTML simple index and pip's
+view lagged for over 15 minutes while the JSON simple index was current.
+**`@sstim/core` 0.2.0 is not yet on npm**: the stored npm token answers 401
+and needs a fresh `npm login`.
+
 ### D. An exporter for a tool researchers already run
 
 [ADR 0041](../decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md)
