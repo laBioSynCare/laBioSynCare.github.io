@@ -58,6 +58,21 @@ def canonical_namespace() -> str:
     return match.group(1)
 
 
+def ontology_header() -> tuple[str, str]:
+    """The ontology IRI and its English description, read from sstim-core.ttl.
+
+    LOV displays both, and on 2026-09-28 it displayed two modules' instead.
+    """
+    text = CORE.read_text(encoding="utf-8")
+    header = re.search(r"^<([^>]+)>\s*\n\s*a owl:Ontology\b", text, re.M)
+    if not header:
+        raise SystemExit("verify-registries: no owl:Ontology header in sstim-core.ttl")
+    description = re.search(r'dct:description "([^"]+)"@en', text[header.end():])
+    if not description:
+        raise SystemExit("verify-registries: the sstim-core.ttl header has no English description")
+    return header.group(1), description.group(1)
+
+
 def term_totals() -> dict[str, str]:
     """Classes, properties and concepts, read from the generated term index.
 
@@ -222,26 +237,53 @@ def main() -> int:
             else:
                 passed.append("BARTOC extent matches the term index")
 
-    # ── LOV: absence, and only with a working control ────────────────────────
-    # "Not in LOV" is a claim of absence, so it needs a control proving the
-    # instrument can see a vocabulary that *is* there. Without it a site-wide
-    # outage reads as our vocabulary being missing. Both use the current path:
-    # by 2026-09-27 the old /dataset/lov/vocabs/skos answered 301 here, while
-    # /dataset/lov/vocabs/sstim answered 404 with no redirect, so a control
-    # that followed its redirect could pass while ours was read at a dead path.
-    ours, _b, note_a = fetch("https://lov.linkeddata.es/dataset/vocabs/sstim", args.timeout)
-    control, _c, note_b = fetch("https://lov.linkeddata.es/dataset/vocabs/skos", args.timeout)
-    if control != 200:
-        incomplete.append(
-            f"LOV control (skos) did not answer 200 — cannot distinguish absence "
-            f"from an outage ({note_b or control})"
-        )
+    # ── LOV: the listing, and the fields it holds ────────────────────────────
+    # Listed 2026-09-28 by María Poveda-Villalón with /technique as its uri and
+    # the stimulus module's description: LOV's loader offered her many candidate
+    # descriptions, which the namespace document's sixteen headers supply.
+    # Corrected 2026-09-29; both are checked so any later drift registers. The
+    # API moved with the pages (/dataset/lov/api/v2 now 404s even for skos), and
+    # an unknown prefix answers 404 here, so a 404 still needs the control
+    # before it may say "delisted": without one an outage reads as our record
+    # gone.
+    api = "https://lov.linkeddata.es/dataset/api/v2/vocabulary/info?vocab="
+    iri, description = ontology_header()
+    ours, body, note_a = fetch(api + "sstim", args.timeout, "application/json")
+    if ours is None:
+        incomplete.append(f"LOV unreachable ({note_a})")
     elif ours == 404:
-        passed.append("LOV: sstim still absent, control present — matches the tracker")
-    elif ours == 200:
-        failures.append("LOV now serves sstim — the tracker still says submitted/absent")
+        control, _c, note_b = fetch(api + "skos", args.timeout, "application/json")
+        if control == 200:
+            failures.append("LOV no longer serves sstim, control present: the 2026-09-28 listing is gone")
+        else:
+            incomplete.append(
+                f"LOV sstim 404 and control (skos) did not answer 200, so it cannot "
+                f"distinguish delisting from an outage ({note_b or control})"
+            )
+    elif ours != 200:
+        incomplete.append(f"LOV sstim answered HTTP {ours}, neither 200 nor 404")
     else:
-        incomplete.append(f"LOV sstim answered {ours or note_a}, neither 200 nor 404")
+        try:
+            record = json.loads(body)
+        except ValueError:
+            incomplete.append("LOV sstim record did not parse as JSON")
+            record = None
+
+        if record is not None:
+            english = [d.get("value") for d in record.get("descriptions", []) if d.get("lang") == "en"]
+            wrong = [
+                f"{field} {got!s:.60}, expected {want:.60}"
+                for field, got, want in (
+                    ("uri", record.get("uri"), iri),
+                    ("nsp", record.get("nsp"), namespace),
+                    ("description", english[0] if english else None, description),
+                )
+                if got != want
+            ]
+            if wrong:
+                failures.append("LOV lists sstim but holds " + "; ".join(wrong))
+            else:
+                passed.append(f"LOV lists sstim as {iri}, with the namespace and description of sstim-core.ttl")
 
     # ── report ───────────────────────────────────────────────────────────────
     for line in passed:

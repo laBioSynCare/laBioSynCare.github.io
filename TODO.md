@@ -73,14 +73,13 @@ the adopter on-ramp, the starter set and both clients shipped in September. What
 is left is repair, then recruiting, in that order.
 
 1. ~~**Repair the two broken registry records**~~ (§2 Registries) **done on our
-   side 2026-09-20, both now waiting on someone else.** The LOV follow-up went
-   to the curators by email, the only channel their site still exposes, after
-   the one metadata gap here was closed, and 0.18.0 (2026-09-23) put the fix on
-   the served namespace. A LOV curator answered and has held a single-file
-   release since 2026-09-22. Archivo cannot be repaired from
-   outside at all, `/add` short-circuits for an indexed ontology, but its
-   crawler resumed on 2026-09-15 and is sweeping towards us. Re-read both
-   records rather than re-sending anything.
+   side 2026-09-20.** The LOV follow-up went to the curators by email, the only
+   channel their site still exposes, after the one metadata gap here was
+   closed, and 0.18.0 (2026-09-23) put the fix on the served namespace. **LOV
+   listed SSTIM on 2026-09-28** and corrected the record on 2026-09-29. Archivo cannot
+   be repaired from outside at all, `/add` short-circuits for an indexed
+   ontology, but its crawler resumed on 2026-09-15 and is sweeping towards us.
+   Re-read its record rather than re-sending anything.
 2. **Send the outreach that is already written** (§7), which is now the next
    action rather than the one after it. Nine of the ten target
    rows read `not-contacted` and the outreach log is still empty. The one
@@ -360,7 +359,7 @@ indexed, examiner-searchable records.
       reasoner verdict exists. A crawl of any release should clear both licence
       checks with no change here.*
 
-- [~] **Follow up LOV by email, because the suggestion form no longer exists**
+- [x] **LOV: listed 2026-09-28, record corrected 2026-09-29**
       `P1`
       *Measured 2026-09-20. `/dataset/lov/vocabs/sstim` is 404 against a `skos`
       control at 200, so SSTIM is still absent 72 days after the 2026-07-10
@@ -398,9 +397,26 @@ indexed, examiner-searchable records.
       prior release, 0.17.0, merged into one Turtle file with a single
       `owl:Ontology` header, plus the `sstim-full.owl` link, which now serves
       0.18.0. Still
-      absent 2026-09-27 at `/dataset/vocabs/sstim`, LOV's current path. Nothing
-      to send; wait for the listing, and if she writes back, offer the 0.18.0
-      file.*
+      absent 2026-09-27 at `/dataset/vocabs/sstim`, LOV's current path.*
+
+      ***Listed 2026-09-28**, holding v0.17.0 as the single-header file that was
+      sent. Two fields are wrong: the record's `uri` is
+      `https://w3id.org/sstim/technique` and its description is the stimulus
+      module's, most likely read from the namespace document's sixteen
+      headers. `make registry-verify` reports both until they change. **Sent
+      2026-09-28:** one reply asking for those two, the W3C Community Group as
+      publisher, a homepage and a Health tag, with 0.18.0 attached as one file.
+      **All five applied 2026-09-29** and read back from the API record, with
+      v0.18.0 added byte-identical to the file sent; `make registry-verify`
+      reports 0 wrong. Loose ends, not tasks: term search not indexed yet, and
+      the publisher agent's identifier is its name rather than the group's
+      URL.*
+
+      *The publisher request settles the question for LOV only. Every release
+      still declares `https://github.com/laBioSynCare` as `dct:publisher`, so
+      LOV and the file disagree until `sstim-core.ttl` changes, which needs
+      Renato's explicit instruction under §3.4. Record in
+      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`
       *Raised 2026-09-06. `lovportal.lirmm.fr` is an OntoPortal instance, the same
@@ -887,6 +903,28 @@ indexed, examiner-searchable records.
             done. The upstream PR against `perma-id/w3id.org` is the one step
             left, and must not go up until the deploy carrying `/namespace/` and
             `latest/` is live: the rules point at both.***
+- [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
+      ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
+      LOV is the only observed case, corrected by email on 2026-09-29; the module
+      headers exist on purpose (the ADR 0043 modular split gives each module
+      its own metadata), so removing them from what the namespace serves is not
+      free. Reopen when a second harvester makes the same mistake, or before the
+      next registry submission that harvests the namespace.*
+
+      *Raised 2026-09-28, when LOV listed SSTIM with one module's IRI,
+      `https://w3id.org/sstim/technique`, and another module's description,
+      the stimulus module's. The file LOV stored has a single header and holds
+      neither value, so the likely source is what `https://w3id.org/sstim`
+      serves: the latest release's `sstim-namespace.ttl`, which on 0.18.0
+      carries sixteen `owl:Ontology` headers, the root and fifteen modules,
+      each with its own title and description. A harvester that wants one IRI
+      and one description for the vocabulary has to pick among them, and the
+      LOV curator confirmed on 2026-09-29 that its loader offered her many and
+      she was unsure which to choose.
+      [ADR 0055](docs/decisions/0055-namespace-iri-resolves-to-a-release.md)
+      settled which release the namespace serves, not how many headers it
+      carries. One candidate is serving a single-header document there, as the
+      published `sstim-full.owl` already is.*
 - [?] Decide whether the `implementation/bsclab/` IRI family stays as it is `P2`
       ***Disposition 2026-08-27: leave it as is for now.*** *Renato decided this
       after the measurements below. Nothing changes: no IRI moves, no route is

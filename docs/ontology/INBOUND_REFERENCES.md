@@ -305,7 +305,7 @@ and its own review.
 | **LovPortal (LIRMM)** | **No** (755 vocabularies, SSTIM absent, 2026-09-06) | **blocked: registration is broken on their side**, reported as [lovportal/project-management#3](https://github.com/lovportal/project-management/issues/3). Payloads prepared in `~/sstim-drafts/lovportal-*` for the moment an account exists | The closest fit left: a gateway for reusable semantic vocabularies running the same software as BioPortal, so the procedure is one we have run. See [REGISTRY_SUBMISSIONS.md](REGISTRY_SUBMISSIONS.md) |
 | **Wikidata Mix'n'match** | No | catalog import | Would expose SSTIM's terms for community matching to Wikidata items, which is both inbound linkage and the demonstrated external use a property proposal needs |
 | **Wikidata property proposal** | No | community proposal process | Gated on demonstrated external use. Stage 5 in [WIKIDATA_CONTRIBUTION.md](WIKIDATA_CONTRIBUTION.md) |
-| **LOV** | No | already suggested | Tracked in the registry file |
+| **LOV** | **Yes**, [listed 2026-09-28](https://lov.linkeddata.es/dataset/vocabs/sstim) | curator email; the suggestion form is gone | Record corrected 2026-09-29: ontology IRI, description, W3C CG as publisher, homepage, and v0.18.0 added. Tracked in the registry file |
 | **SciCrunch / InterLex** | **not verifiable from here** (both answer 403 to this client, 2026-09-05) | community term and resource submission | Neuroscience-specific and the best domain fit of any registry on this page. An RRID for SSTIM would be cited by papers rather than by machines. Check it from a browser before planning around it |
 | **UMLS Metathesaurus** | No | NLM source submission | Named for completeness. Heavy process, licence entanglement, and not recommended |
 

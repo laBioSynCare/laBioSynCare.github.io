@@ -354,11 +354,12 @@ individual is named in this file.
 
 ## 6. Sequence
 
-1. **Repair before recruiting.** LOV is still absent and the DBpedia Archivo
-   download fails, both measured and recorded in
+1. **Repair before recruiting.** LOV is repaired: it listed SSTIM on
+   2026-09-28 and corrected the record the next day. The DBpedia Archivo record
+   still holds a development snapshot, measured and recorded in
    [REGISTRY_SUBMISSIONS.md](../ontology/REGISTRY_SUBMISSIONS.md). Sending an
-   ontology-engineering audience to a record that returns a server error costs
-   more than the record was ever going to earn.
+   ontology-engineering audience to a record that names the wrong IRI or an
+   unreleased version costs more than the record was ever going to earn.
 2. **Build A and B.** ✅ Done 2026-09-17. Cheap, self-contained, dependent on
    nobody, and they make every later conversation shorter.
 3. **Send the outreach that is already written.** The one data point available

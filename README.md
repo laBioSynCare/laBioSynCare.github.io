@@ -69,8 +69,9 @@ here** — `make truth-audit` fails when prose disagrees with the sources:
   by a BARTOC editor on 2026-07-27) and in
   [FAIRsharing](https://fairsharing.org/8494) (record 8494, curated 2026-08-06,
   DOI pending) and in
-  [DBpedia Archivo](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim).
-  A LOV submission is outstanding and its queue is slow but moving. Archivo's
+  [DBpedia Archivo](https://archivo.dbpedia.org/info?o=https://w3id.org/sstim),
+  and listed in [LOV](https://lov.linkeddata.es/dataset/vocabs/sstim) since
+  2026-09-28. Archivo's
   rating is frozen at the state of first submission — its updater has not run
   since February 2026, which is
   [reported upstream](https://github.com/dbpedia/archivo/issues/58) — so treat

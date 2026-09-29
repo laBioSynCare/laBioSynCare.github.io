@@ -148,7 +148,7 @@ BARTOC or FAIRsharing field edits have already landed.
 |---|---|---|---|
 | prefix.cc | ✅ **corrected 2026-08-18** — now serves `sstim` → `https://w3id.org/sstim#` in all four serialisations (`txt`, `json`, `ttl`, `sparql`), verified by `make registry-verify`. It had served the slash form since before 2026-07-11; the hash entry was added and voted above it, and the slash form remains listed but outranked. Its TLS certificate expired 2025-12-31, so `https://` still fails certificate validation and plain `http://` is the only way to read it | yes | — |
 | DBpedia Archivo | ⚠️ **listed, serving a development snapshot; only their crawler can replace it — measured 2026-09-20** — the record holds two versions, both crawled 2026-08-17, carrying `owl:versionInfo "0.16.0-dev"` and `mod:status "under development"`, which is the state [ADR 0055](../decisions/0055-namespace-iri-resolves-to-a-release.md) predicted registries would archive and fixed on 2026-08-29. `/download?o=https%3A//w3id.org/sstim&f=owl` now answers **200** (2026-09-02 measured 500), redirecting to Archivo's Leipzig file store and serving 2043064 bytes that parse to 10436 triples. **A re-add cannot repair it:** POSTing the URI to `/add` answers "The Ontology is already part of Archivo!" and stops at the index check, as [dbpedia/archivo#58](https://github.com/dbpedia/archivo/issues/58) predicted. **Their crawler resumed 2026-09-15** after roughly seven months: 154 crawls between 09-15 and 09-19 across 2010 listed entries, working through `purl.obolibrary.org/obo/*`, so a sweep is in progress and ours is behind it; reported on #58 with that measurement and with the Databus artifact `https://databus.dbpedia.org/ontologies/w3id.org/sstim` still 404 against a `foaf` control at 200. The list row scores ★☆☆☆. **Both licence ✘ explained, measured 2026-09-23** with Archivo's own `shacl-library/license-I.ttl` and `license-II.ttl`, which target every `owl:Ontology` and every `skos:ConceptScheme`: in the held 0.16.0-dev copy all 67 concept schemes lack `dct:license` and both shapes fail, while the 0.17.0 document `https://w3id.org/sstim` serves today conforms to both (16 ontology headers, 68 schemes, all licensed). `Consistency` is ❔ on the info page for both snapshots, not ✘, so no reasoner verdict exists to explain | no | wait for the sweep; a release crawl should clear both licence checks; ask again on #58 if the 2026-08-17 timestamp survives it |
-| LOV | 🕓 **suggested 2026-07-10, still absent, and the form is gone — re-measured 2026-09-20** — `/dataset/lov/vocabs/sstim` is 404 against a `skos` control at 200, 72 days on. LOV itself is working: it inserted `rcao` on 2026-09-11 and updated `oso` on 2026-09-15, five insertions in the last month, and the site now carries PIONERA (OEG UPM) project funding, so the earlier "slow, not dormant" reading is if anything too pessimistic. What changed is the channel. `https://lov.linkeddata.es/dataset/suggest` renders a heading and a link to a metadata recommendations PDF, with no form fields and no endpoint; the only submission address the site exposes is the About page mailto carrying three curators. A suggestion sent into a form that no longer exists would explain a record that never appeared, though acknowledgement mails from July exist, so that reading is a hypothesis rather than a finding. **Both actions taken 2026-09-20:** the one gap on our side is closed in source, the namespace having carried every LOV-recommended field except an agent name; it is served since the 0.18.0 release of 2026-09-23, because `https://w3id.org/sstim` resolves to the newest release and the prior one, 0.17.0, held no `foaf:name`, and the follow-up email went to the three curators, which is the only channel the site still exposes. **María Poveda-Villalón answered**, and on 2026-09-22 she and Ghislain Atemezing were sent the release as one Turtle file with a single `owl:Ontology` header. Still absent 2026-09-27 at `/dataset/vocabs/sstim` against a `skos` control at 200 | no | wait for the listing; send nothing further unless she writes back |
+| LOV | ✅ **listed 2026-09-28, corrected 2026-09-29:** [`/dataset/vocabs/sstim`](https://lov.linkeddata.es/dataset/vocabs/sstim), added by María Poveda-Villalón 80 days after the 2026-07-10 suggestion. All five requested changes are in, read back from the API record: `uri` `https://w3id.org/sstim`, the root header's description, publisher the W3C Sensory Stimulation Vocabulary Community Group, homepage `https://w3id.org/sstim`, tags Methods and Health. It holds two versions, v0.17.0 and v0.18.0, the second byte-identical to the file sent. The first listing had carried a module's `uri` and another module's description because LOV's loader offered her many candidates from the namespace document, which carries sixteen `owl:Ontology` headers. `make registry-verify` reads `uri`, `nsp` and the description against `sstim-core.ttl`. Two loose ends, neither worth a message on its own: term search is not indexed yet (`Preset` 0 results against a `skos` `Concept` control at 2), and the publisher agent's identifier is its own name rather than `https://www.w3.org/community/sstim/` | no | re-run the `Preset` search; mention the agent URI only if there is another reason to write |
 | BARTOC | ✅ **migrated 2026-09-02** — the curator applied every requested change and closed [issue #319](https://github.com/gbv/bartoc.org/issues/319) as completed. JSKOS verified field by field at `https://bartoc.org/api/data?uri=http://bartoc.org/en/node/21154` (`modified` 2026-09-02T06:15:49Z): `url` → `https://w3c-cg.github.io/sstim/ontology/docs/`, `subjectOf` → `https://github.com/w3c-cg/sstim` (legacy repository gone; concept DOI and the frozen 0.16.0 namespace document retained), `extent` → "164 classes, 304 properties, 551 concepts, 68 concept schemes (SSTIM 0.16.0, 2026-08)", which matches `TERM_INDEX.md` and a `skos:ConceptScheme` count of the frozen document exactly. Preserved as asked: node URI, `identifier` `https://w3id.org/sstim`, `namespace` `https://w3id.org/sstim#`, and the publisher field | yes (GitHub) | — |
 | BioPortal | ✅ **live at 0.17.0, recovered 2026-09-08 from a parse failure that recorded no error state**: submission `31` completed the whole pipeline at version IRI `https://w3id.org/sstim/0.17.0` (181 classes, 637 individuals, 301 properties) after submission `30` stalled at `UPLOADED`. The pull URL serves the ledger bytes (1,342,715 bytes; SHA-256 `e734245b1b2478ee30e1fb7100074acd54aa4e02f19d90b141fb4c7695eb8e3b`). Incident record in section 3 | account ✓ (@rfabbri) | confirm the next pull adds no row, then PATCH `31` released to 2026-09-07 |
 | FAIRsharing | ✅ **migrated, enriched and unblocked 2026-09-04.** Homepage, six support links and the cross-reference DOI are on W3C-CG/w3id, the DOI now naming the concept record `10.5281/zenodo.21286974` rather than the 0.6.0 version it had been pinned to since July; the description lists all nine modalities; `sleep` added to domains; seven relations (IAO, BFO, OBI, PROV-O as `extends`; SKOS, OWL, HED as `related_to`); and the three required `read` data processes were added in the edit form, `updated_at` 2026-09-04T09:46:36Z. Publications and citations stay empty until a paper exists. DOI [10.25504/FAIRsharing.660ff4](https://doi.org/10.25504/FAIRsharing.660ff4) is assigned and must be preserved | yes | await curator review; add hearing/vision domains if the controlled list has them |
@@ -614,7 +614,7 @@ Required follow-up: **Two of the three lost stars are ours to fix, and the cause
                     until they reflect a crawl of the current graph.
 ```
 
-### LOV (Linked Open Vocabularies) — CURATOR REPLIED; RELEASE FILE SENT 2026-09-22
+### LOV (Linked Open Vocabularies): LISTED 2026-09-28, CORRECTED 2026-09-29
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
 `https://lov.linkeddata.es/dataset/suggest` — no account. LOV's model is: you
@@ -821,6 +821,121 @@ Status:             SENT, awaiting the listing. Absent 2026-09-27 against a
                     and offer its merged file; do not open a third thread.
 ```
 
+**Listed, 2026-09-28.** María Poveda-Villalón wrote that the entry is live and
+may take a while to be indexed. Everything below was measured that day, from
+the record and the file LOV stored, not from her message.
+
+```text
+Service:            LOV (Linked Open Vocabularies)
+Record:             https://lov.linkeddata.es/dataset/vocabs/sstim (200; the
+                    old /dataset/lov/vocabs/sstim now redirects to it)
+API record:         https://lov.linkeddata.es/dataset/api/v2/vocabulary/info?vocab=sstim
+                    (the /dataset/lov/api/v2 prefix answers 404 even for skos)
+Created in LOV:     2026-09-28, review "Added to LOV" by María Poveda-Villalón
+Version held:       one, v0.17.0 issued 2026-09-07, stored at
+                    /dataset/vocabs/sstim/versions/2026-09-07.n3; its single
+                    owl:Ontology header is https://w3id.org/sstim at versionIRI
+                    .../0.17.0, so it is the file sent on 2026-09-22. LOV counts
+                    120 classes and 224 properties in the sstim# namespace
+Right:              nsp https://w3id.org/sstim#, prefix sstim, title, CC BY
+                    4.0, English, Spanish, Italian and Portuguese, creator
+                    Renato Fabbri, publisher laBioSynCare
+Wrong:              uri https://w3id.org/sstim/technique, a module IRI, and
+                    the English description "The stimulus-description half of
+                    the SSTIM Core Profile...", the stimulus module's. The
+                    stored file never states that description, and names
+                    /technique only as an object of rdfs:isDefinedBy and
+                    dct:requires. Both belong to headers in the namespace document,
+                    which carries sixteen, so that is the likely source.
+                    LOV's intake is not visible from here; it stays a
+                    hypothesis
+Indexing:           vocabulary search finds sstim (1 result). Term search does
+                    not yet: Preset in sstim 0 results against a control,
+                    Concept in skos, at 2
+Status:             LISTED, two fields to correct. make registry-verify reads
+                    uri, nsp and the English description from the API record
+                    against sstim-core.ttl and reports the two above as wrong
+                    until they change
+
+                    Cite the record URL above, not the API.
+```
+
+**Five changes requested, 2026-09-28.** One reply, sent the same evening. Her
+answer stays in the private thread.
+
+```text
+Service:            LOV (Linked Open Vocabularies)
+Channel:            email reply to María Poveda-Villalón, copying
+                    ghislain.atemezing@gmail.com
+Date:               2026-09-28 22:55 (UTC+2)
+Sent by:            Renato Fabbri
+Content:            five changes. uri to https://w3id.org/sstim and the
+                    description to the root header's, the two fields read
+                    from module headers; publisher from laBioSynCare to the
+                    W3C Sensory Stimulation Vocabulary Community Group,
+                    https://www.w3.org/community/sstim/; homepage
+                    https://w3id.org/sstim, which the record lacks and the W3C
+                    entries carry; and Health for the Metadata tag
+Attachment:         sstim-0.18.0-full.ttl, offered as the latest version: the
+                    published sstim-full.owl at 0.18.0 as Turtle, one header,
+                    12331 triples, graph-isomorphic to the RDF/XML with decimal
+                    lexical forms kept
+Status:             SENT; all five applied 2026-09-29, see below
+
+                    **The publisher request runs ahead of the ontology.** It
+                    was Renato's call on 2026-09-28, and it settles the
+                    publisher question for this record only: every release,
+                    0.18.0 included, still declares
+                    https://github.com/laBioSynCare as dct:publisher, so the
+                    attached file and the requested record disagree until a
+                    release changes sstim-core.ttl. The other registries keep
+                    their current publisher until that question is settled
+                    for all of them.
+
+                    Deliberately not asked: the statistics (120 classes and
+                    224 properties are exactly the sstim# counts; the 551
+                    concepts sit in the vocab#, exposure# and ecosystem#
+                    namespaces, which one LOV entry does not cover) and the
+                    RDF/RDFS expressivity badges, which LOV computes rather
+                    than a curator entering them.
+
+                    Next: nothing to send. make registry-verify turns green on
+                    uri and description once they change; check the
+                    publisher, homepage, tags and version by reading the API
+                    record, and the term index with a Preset search.
+```
+
+**Applied, 2026-09-29.** María Poveda-Villalón answered that everything was
+updated, and that the loader had offered many metadata sets and descriptions,
+leaving her unsure which to choose. That settles the source of the first
+listing's errors: the namespace document's sixteen headers, not anything in the
+file she was sent. Read back the same morning:
+
+```text
+Service:            LOV (Linked Open Vocabularies)
+Record:             https://lov.linkeddata.es/dataset/vocabs/sstim
+                    lastModifiedInLOVAt 2026-09-29T07:05:44Z
+Applied:            uri https://w3id.org/sstim; the root header's English
+                    description; publisher W3C Sensory Stimulation Vocabulary
+                    Community Group; homepage https://w3id.org/sstim; tags
+                    Methods and Health
+Versions:           v0.17.0 (2026-09-07) and v0.18.0 (2026-09-23), both
+                    reviewed; the stored 2026-09-23.n3 is byte-identical to
+                    the sstim-0.18.0-full.ttl that was sent, one header,
+                    versionIRI .../0.18.0
+Verified by:        make registry-verify, 0 wrong: uri, nsp and description
+                    match sstim-core.ttl
+Status:             DONE
+
+                    Two loose ends. Term search is not indexed yet: Preset in
+                    sstim 0 results against Concept in skos at 2. And LOV
+                    created the publisher as an agent whose prefUri is its own
+                    name, not https://www.w3.org/community/sstim/, while the
+                    creator's is the ORCID IRI. Neither is worth a message on
+                    its own; mention the agent URI if there is ever another
+                    reason to write.
+```
+
 ### BARTOC — LIVE; W3C-CG update requested 2026-09-01
 
 **Submission mechanism (confirmed 2026-07-11).** Web form at
@@ -872,7 +987,7 @@ assigns its own node URI on save.
 | Publisher — URI | `https://github.com/laBioSynCare` |
 | Address | optional — City: Modena, Country: Italy (or leave blank) |
 | Contact | `renato.fabbri@gmail.com` |
-| Listed In | optionally add **prefix.cc**; skip LOV until it is integrated (suggestion acknowledged but untracked) |
+| Listed In | optionally add **prefix.cc**, and **LOV** since its 2026-09-28 listing |
 | Vocabulary services (URL + API type) | *(leave empty — SSTIM's SPARQL is client-side Comunica, no hosted endpoint)* |
 
 *Display + concept mapping:*
