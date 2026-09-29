@@ -412,10 +412,18 @@ indexed, examiner-searchable records.
       the publisher agent's identifier is its name rather than the group's
       URL.*
 
-      *The publisher request settles the question for LOV only. Every release
-      still declares `https://github.com/laBioSynCare` as `dct:publisher`, so
-      LOV and the file disagree until `sstim-core.ttl` changes, which needs
-      Renato's explicit instruction under §3.4. Record in
+      *The publisher request ran ahead of the files, and
+      [ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md) caught
+      them up on 2026-09-29: every header names the group from 0.19.0.*
+
+- [ ] **After 0.19.0 ships, move registry publishers to the Community Group** `P2`
+      *[ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md). Every
+      header and `void.ttl` name `https://www.w3.org/community/sstim/` from
+      0.19.0; releases up to 0.18.0 name `https://github.com/laBioSynCare`.
+      Update a registry only once it carries 0.19.0, so its publisher matches
+      the files it holds: BARTOC's publisher field, FAIRsharing's organisation
+      link, and offer LOV the 0.19.0 file. Values in
+      [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).* Record in
       [REGISTRY_SUBMISSIONS.md](docs/ontology/REGISTRY_SUBMISSIONS.md).*
 
 - [ ] **Submit SSTIM to LovPortal (LIRMM)** `P1`

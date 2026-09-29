@@ -49,7 +49,7 @@ node scripts/truth-audit.mjs      # prints citable release, version DOI, module 
 | Concept DOI (all versions) | `10.5281/zenodo.21286974` |
 | License | CC BY 4.0 — `https://creativecommons.org/licenses/by/4.0/` |
 | Creator | Renato Fabbri — ORCID `0000-0002-9699-629X` |
-| Publisher declared by the submitted 0.16.0 RDF | `https://github.com/laBioSynCare` — preserve until the publisher/steward governance question is resolved; a repository move is not authority to rewrite ontology provenance |
+| Publisher | `https://www.w3.org/community/sstim/`, the W3C Sensory Stimulation Vocabulary Community Group, from 0.19.0 ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)). Releases up to 0.18.0 declare `https://github.com/laBioSynCare`, so update a registry's publisher only once it carries 0.19.0 |
 | First released | 2026-04-12 |
 | Source repository | `https://github.com/w3c-cg/sstim` |
 | Issue tracker | `https://github.com/w3c-cg/sstim/issues` |
@@ -882,15 +882,12 @@ Attachment:         sstim-0.18.0-full.ttl, offered as the latest version: the
                     lexical forms kept
 Status:             SENT; all five applied 2026-09-29, see below
 
-                    **The publisher request runs ahead of the ontology.** It
-                    was Renato's call on 2026-09-28, and it settles the
-                    publisher question for this record only: every release,
-                    0.18.0 included, still declares
-                    https://github.com/laBioSynCare as dct:publisher, so the
-                    attached file and the requested record disagree until a
-                    release changes sstim-core.ttl. The other registries keep
-                    their current publisher until that question is settled
-                    for all of them.
+                    **The publisher request ran ahead of the ontology.** It
+                    was Renato's call on 2026-09-28; every release, 0.18.0
+                    included, still declares https://github.com/laBioSynCare
+                    as dct:publisher. ADR 0059 (2026-09-29) settled it for all
+                    of them: the group is the publisher from 0.19.0, so LOV's
+                    record and its stored files agree once 0.19.0 is added.
 
                     Deliberately not asked: the statistics (120 classes and
                     224 properties are exactly the sstim# counts; the 551
@@ -983,8 +980,8 @@ assigns its own node URI on save.
 | Additional links | `https://github.com/w3c-cg/sstim` ; `https://w3id.org/sstim` |
 | Formats | search + add **SKOS**, **RDF/XML**, **Turtle**, **JSON-LD**, **OWL** (whatever BARTOC lists) |
 | Access | **freely available** |
-| Publisher — Name | BSC Lab (Æterni Anima) — exact live value; preserve pending the separate governance decision |
-| Publisher — URI | `https://github.com/laBioSynCare` |
+| Publisher — Name | live value BSC Lab (Æterni Anima); from 0.19.0, W3C Sensory Stimulation Vocabulary Community Group ([ADR 0059](../decisions/0059-community-group-publishes-sstim.md)) |
+| Publisher — URI | live value `https://github.com/laBioSynCare`; from 0.19.0, `https://www.w3.org/community/sstim/` |
 | Address | optional — City: Modena, Country: Italy (or leave blank) |
 | Contact | `renato.fabbri@gmail.com` |
 | Listed In | optionally add **prefix.cc**, and **LOV** since its 2026-09-28 listing |

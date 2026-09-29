@@ -117,9 +117,9 @@ export function buildCodemeta({ cff, voidTtl, links }) {
     readme: `${repository}/blob/main/README.md`,
     author: cffAuthors(cff),
     maintainer: cffAuthors(cff),
-    // The Community Group produces the specification. `producer` records that
-    // without asserting W3C endorsement, which `publisher` would imply.
-    producer: {
+    // The Community Group publishes SSTIM, as the ontology's dct:publisher
+    // states (ADR 0059).
+    publisher: {
       '@type': 'Organization',
       name: 'W3C Sensory Stimulation Vocabulary Community Group',
       url: group,

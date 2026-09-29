@@ -84,7 +84,7 @@ export function sstimDataset() {
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Sensory Stimulation Vocabulary Community Group',
+      name: 'W3C Sensory Stimulation Vocabulary Community Group',
       url: W3C_GROUP_URL,
     },
     keywords: KEYWORDS,

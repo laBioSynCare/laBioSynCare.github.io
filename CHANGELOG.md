@@ -17,7 +17,17 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
-Nothing yet on the 0.19.0-dev line.
+### Changed
+
+- **The W3C Sensory Stimulation Vocabulary Community Group is the publisher.**
+  Every ontology header and `void.ttl` now state
+  `dct:publisher <https://www.w3.org/community/sstim/>`, which the Kernel
+  describes as a `foaf:Organization` named "W3C Sensory Stimulation Vocabulary
+  Community Group", replacing `https://github.com/laBioSynCare`. The group
+  publishes SSTIM from its own repository and site, and its Draft report on the
+  vocabulary; the files had not said so. The creator is unchanged, and the
+  frozen releases keep the publisher they were issued with
+  ([ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md)).
 
 ## [0.18.0] - 2026-09-23
 

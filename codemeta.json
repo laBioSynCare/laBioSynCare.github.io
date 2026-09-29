@@ -33,7 +33,7 @@
       "email": "renato.fabbri@gmail.com"
     }
   ],
-  "producer": {
+  "publisher": {
     "@type": "Organization",
     "name": "W3C Sensory Stimulation Vocabulary Community Group",
     "url": "https://www.w3.org/groups/cg/sstim/"

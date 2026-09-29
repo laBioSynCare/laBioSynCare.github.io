@@ -62,7 +62,7 @@
               "Ontología de Estimulación Sensorial (SSTIM)"@es ;
     dct:description "An OWL 2 ontology for describing parameter-specified delivery of structured sensory input, including techniques, protocols, implementations, exposure conditions, observations, safety metadata, and evidence-qualified claims."@en ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
-    dct:publisher <https://github.com/laBioSynCare> ;
+    dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
     dct:issued "2026-09-23"^^xsd:date ;
     dct:modified "2026-09-23"^^xsd:date ;
@@ -118,19 +118,23 @@
 # Until 2026-09-20 this file gave it two bare IRIs and no label, so an agent
 # index had nothing to show without dereferencing ORCID and GitHub itself, and
 # LOV, whose Agents view is a first-class surface, is one of the registries
-# that harvests the namespace IRI. Each name is what its own authority records:
-# the ORCID public record reads "Renato Fabbri" (pub.orcid.org/v3.0, checked
-# 2026-09-20), and the GitHub organization has no display name set, so its
-# login is its name (api.github.com/orgs/laBioSynCare, same date). No mailbox
-# is published here.
+# that harvests the namespace IRI. The creator's name is what the ORCID public
+# record reads (pub.orcid.org/v3.0, checked 2026-09-20). No mailbox is
+# published here.
+#
+# The publisher is the W3C Sensory Stimulation Vocabulary Community Group,
+# identified by its group page, since 2026-09-29 (ADR 0059). Releases up to
+# 0.18.0 name https://github.com/laBioSynCare, and keep doing so: they are
+# frozen. The group's page titles it without the W3C prefix; the full name is
+# the one it publishes under.
 
 <https://orcid.org/0000-0002-9699-629X>
     a foaf:Person ;
     foaf:name "Renato Fabbri" .
 
-<https://github.com/laBioSynCare>
+<https://www.w3.org/community/sstim/>
     a foaf:Organization ;
-    foaf:name "laBioSynCare" .
+    foaf:name "W3C Sensory Stimulation Vocabulary Community Group" .
 
 ###########################################################################
 # Core process kernel
