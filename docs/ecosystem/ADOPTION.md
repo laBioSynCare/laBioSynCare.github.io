@@ -210,7 +210,9 @@ still lists only 0.1.0 about ten hours after the upload, with PyPI's status
 back to operational. So `pip install sstim` installs 0.1.0 until that copy
 refreshes, while installing the wheel by URL works. Recheck with
 `pip download --no-deps sstim==0.2.0`, which uses pip's own request, not
-with `curl`, which does not ask for gzip.
+with `curl`, which does not ask for gzip. **Cleared by 2026-09-29 21:05
+UTC**, on its own: pip resolves 0.2.0, and the wheel it downloads has the
+sha256 of the one uploaded.
 
 **`@sstim/core` 0.2.0 published to npm 2026-09-28**, after two things were
 fixed on the way. The token that published 0.1.x (granular, created
