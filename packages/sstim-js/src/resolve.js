@@ -8,12 +8,13 @@
 //
 // Two traps are handled here on the caller's behalf.
 //
-// The stable manifest route serves the *development* line.
-// https://w3id.org/sstim/manifest answers with a mutable `-dev` version, while
-// the RDF at https://w3id.org/sstim answers with the newest frozen release.
-// Code that fetches the first believing it pinned something has pinned nothing,
-// so an unpinned call here resolves the release: read owl:versionIRI from the
-// stable IRI, then fetch that version's manifest.
+// An unversioned route pins nothing. Until ADR 0060 went live on 2026-10-05,
+// https://w3id.org/sstim/manifest even answered with a mutable `-dev` version
+// while the RDF at https://w3id.org/sstim answered with the newest frozen
+// release. Every unversioned route now serves that release, but it moves when
+// the next one is cut, so an unpinned call here resolves the release
+// explicitly: read owl:versionIRI from the stable IRI, then fetch that
+// version's manifest.
 //
 // And a fetch is not a guarantee. Every module the manifest lists carries a
 // sha256, and the served bytes are checked against it before anything is

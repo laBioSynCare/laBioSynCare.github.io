@@ -168,8 +168,9 @@ from the stable IRI, so no version constant is hardcoded and the default is
 never the dev line. Worth deciding separately whether the two routes should
 disagree in kind at all. *Decided 2026-10-05 in
 [ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md):
-they should not, and every unversioned route answers from the latest release
-once the matching w3id pull request merges. The client keeps resolving through
+they should not, and every unversioned route answers from the latest release,
+live since [perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822)
+merged that day. The client keeps resolving through
 `owl:versionIRI`, because a version IRI names one release while the latest
 moves.*
 

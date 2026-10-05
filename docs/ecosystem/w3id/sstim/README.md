@@ -54,9 +54,9 @@ Top-level sources are the mutable development line and must never be confused
 with a released snapshot; `void.ttl` names the latest immutable release. No
 persistent route answers from them: every unversioned RDF and JSON route
 resolves through `latest/`, the newest frozen release (ADR 0055 for `/sstim`,
-ADR 0060 for the module, profile, catalogue and manifest routes, live once
+ADR 0060 for the module, profile, catalogue and manifest routes, live since
 [perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822)
-merges). `check-w3id-route-targets` fails on any route to
+merged on 2026-10-05). `check-w3id-route-targets` fails on any route to
 a top-level ontology artifact.
 
 **Copy `.htaccess` to the registry verbatim; do not copy this README.** The

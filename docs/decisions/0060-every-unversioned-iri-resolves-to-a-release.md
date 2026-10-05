@@ -1,7 +1,8 @@
 # ADR 0060: Every unversioned SSTIM IRI resolves to a release
 
-**Status:** Accepted · 2026-10-05 · rules mirrored and gated in this repository;
-live once the matching perma-id/w3id.org pull request merges
+**Status:** Accepted · 2026-10-05 · live since
+[perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822) merged
+the same day; verified 2026-10-06
 
 ## Context
 

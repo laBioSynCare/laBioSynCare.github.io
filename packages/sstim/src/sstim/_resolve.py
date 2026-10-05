@@ -8,13 +8,13 @@ way to get this wrong, so this module has no code path that can.
 
 Two traps are handled here on the adopter's behalf.
 
-**The stable manifest route serves the development line.**
-`https://w3id.org/sstim/manifest` answers with the mutable line (a `-dev`
-version, status `development`), while the RDF at `https://w3id.org/sstim`
-answers with the newest frozen release. Someone who fetches the first and
-believes they pinned something has pinned nothing. So an unpinned call here
-resolves the release: read `owl:versionIRI` from the stable IRI, then fetch that
-version's manifest.
+**An unversioned route pins nothing.** Until ADR 0060 went live on 2026-10-05,
+`https://w3id.org/sstim/manifest` even answered with the mutable line (a `-dev`
+version, status `development`) while the RDF at `https://w3id.org/sstim`
+answered with the newest frozen release. Every unversioned route now serves that
+release, but it moves when the next one is cut. So an unpinned call here
+resolves the release explicitly: read `owl:versionIRI` from the stable IRI, then
+fetch that version's manifest.
 
 **A fetch is not a guarantee.** Every module the manifest lists carries a
 sha256, and the bytes served are checked against it. A truncated download, a

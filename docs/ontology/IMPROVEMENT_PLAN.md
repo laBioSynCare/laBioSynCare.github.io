@@ -493,7 +493,7 @@ explicit instruction naming each file.
   - *Next step:* consolidate `shacl-vocab` and `shacl-exposure`, or give each
     the distinct scope its comment describes.
   - *Done when* no two gate targets run the same command.
-- [~] **GB-12 Unversioned routes serve the development line** (found
+- [x] **GB-12 Unversioned routes serve the development line** (found
   2026-10-05; evidence in the review's addendum). Only `/sstim` answered with
   a release.
   - *Decided* in [ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md).
@@ -501,6 +501,8 @@ explicit instruction naming each file.
     [perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822).
     A protected `void.ttl` follow-up is tracked in `TODO.md`.
   - *Done when* every unversioned route answers with a release, measured live.
+    *Closed 2026-10-06: measured live after #6822 merged. The protected
+    `void.ttl` download URLs remain a separate follow-up.*
 - [ ] **GB-13 Four languages cover the vocabulary only** (found 2026-10-05).
   - *Next step:* decide whether the OWL layer is English-only by policy and say
     so wherever four languages are advertised, or translate it.
