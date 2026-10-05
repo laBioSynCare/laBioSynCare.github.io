@@ -84,6 +84,7 @@ annotations lives here.
 | [0058](0058-session-builder-in-the-clients.md) | A session builder in both clients, so a tool exporter only reads its own clock | Accepted |
 | [0059](0059-community-group-publishes-sstim.md) | The W3C Community Group publishes SSTIM | Accepted |
 | [0060](0060-every-unversioned-iri-resolves-to-a-release.md) | Every unversioned SSTIM IRI resolves to a release | Accepted |
+| [0061](0061-universal-namespaces-carry-no-framework-structure.md) | SSTIM's universal namespaces carry no framework's or implementation's structure | Accepted |
 
 ## ADR lifecycle and revision policy
 

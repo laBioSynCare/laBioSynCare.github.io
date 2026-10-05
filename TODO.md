@@ -943,6 +943,36 @@ indexed, examiner-searchable records.
             CLAUDE.md §3.4: needs "modify static/ontology/void.ttl". The quality
             audit's subset check (a download URL "ending in
             /ontology/sstim-<id>.ttl") moves with it.
+- [!] **Move BSC's structure out of the universal namespaces** `P1`
+      *[ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md),
+      accepted 2026-10-05; the term set is in
+      [Directions](docs/ontology/SSTIM_DIRECTIONS.md) §3. A 0.19.0 release gate:
+      the release is not cut before this lands. Blocked on CLAUDE.md §3.4, since
+      it needs an instruction naming the protected files:
+      `sstim-patch-studio.ttl`, `sstim-vocab.ttl`, `sstim-exposure.ttl`,
+      `sstim-shapes.ttl`, `sstim-configuration.ttl`, `sstim-common.ttl`,
+      `sstim-session.ttl`, `sstim-evidence.ttl`, `sstim-ecosystem.ttl`, and the
+      instance files under `presets/` and `experiments/` that use the moved
+      terms.*
+
+      - [ ] 1. Classify every term in `sstim-patch-studio.ttl` by ADR 0061's
+            rule (generic stays; one framework's or tool's moves).
+      - [ ] 2. Create the BSC framework vocabulary and its shapes under
+            `/sstim/framework/bsc/`, outside the manifest, importing SSTIM; load
+            it in the Workbench; teach the quality audit and term index where it
+            lives.
+      - [ ] 3. Deprecate each moved term with `dct:isReplacedBy`, record the
+            full-equivalence exception, and add the neutral breath-guide link and
+            the implementation-neutral, scoped status values.
+      - [ ] 4. Rewrite the 22 generic definitions that carry BSC remarks
+            (provenance to `skos:historyNote`; status and policy out).
+      - [ ] 5. Move the committed presets and experiments to the new terms;
+            update `preset.schema.json` (`group` loses its enum),
+            `src/rdf/presets.js` (GB-10) and every other file that names a moved
+            term (a grep of `src/`, `scripts/`, `packages/`, `test/` and
+            `static/schemas/` found fourteen more on 2026-10-05).
+      - [ ] 6. Route the BSC vocabulary namespace upstream, after ADR 0060's
+            pull request.
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module

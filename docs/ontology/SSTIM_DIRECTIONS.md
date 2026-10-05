@@ -132,7 +132,7 @@ unexpressible.
 **Direction.** SSTIM should have a way to represent specific protocols, each
 contained in its own graph and namespace. **Martigli** and **Symmetry** belong
 there — they are named, specific techniques, not universal primitives.
-Possibly not to be tackled now.
+Decided for 0.19.0; see the last paragraph of this section.
 
 **Why this matters more than it looks.** Right now `sstim:martigliCenterFreq`,
 `sstim:martigliAmplitude`, `sstim:martigliPeriodInitial`,
@@ -155,7 +155,37 @@ other seventeen.
 **Cost of doing it.** Moving terms between namespaces is an ontology migration:
 deprecation with `dct:isReplacedBy`, an exception recorded in the
 full-equivalence baseline, and a version bump. The machinery for all three is
-built and has been exercised (ADRs 0043, 0049). This is tractable, not cheap.
+built and has been exercised (ADR 0054 deprecated a term with
+`dct:isReplacedBy` and recorded the baseline exception it forced). This is
+tractable, not cheap.
+
+**Decided 2026-10-05, and wider than the parameters above
+([ADR 0061](../decisions/0061-universal-namespaces-carry-no-framework-structure.md)).**
+The 2026-09-30 review (GB-01) showed that Martigli and Symmetry were the visible
+part of a larger set. BSC's whole catalog model sits in the universal term space:
+
+- `sstim:Voice`, `sstim:VoiceType` with its four `sstim-v:voice*` concepts,
+  the four voice classes (`BinauralVoice`, `MartigliVoice`,
+  `MartigliBinauralVoice`, `SymmetryVoice`) and `sstim:composedOf`;
+- `sstim:PresetGroup`, `sstim:inGroup` and the five `sstim-v:group*` concepts;
+- `sstim:hasBreathGuide` and `sstim:isBreathReference`;
+- the parameters listed above, plus `sstim:octaveSpan`, and
+  `sstim:PermutationFunction` with its five `sstim-v:perm*` concepts;
+- four `sstim-ex:` values that record BSC Lab's own state:
+  `notCurrentlyDeliverableByBSCLab`, `notCurrentlyUsedInBSCLab`,
+  `outsideBSCLabScope` and `contextBscLabPrototype`.
+
+The home differs from the protocol namespaces sketched above. Martigli and
+Symmetry are techniques BSC originated, and their identities already live at
+`/sstim/framework/bsc/technique/`, so their parameterisations join BSC's catalog
+model in a BSC framework vocabulary under `/sstim/framework/bsc/`. That
+vocabulary sits outside the manifest, because anything the manifest owns ships
+in every snapshot the Community Group publishes. The status values become
+implementation-neutral and scoped. Where SSTIM needs the generic concept, it
+keeps or gains a neutral term: a link from a preset to the track that guides
+breathing, and §5's modulation model for an oscillating parameter. SSTIM has no
+generic permuted-sequence term (the only permutation terms in the term index are
+Symmetry's), and gains one when a second framework needs it.
 
 ---
 

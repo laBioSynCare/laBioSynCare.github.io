@@ -423,7 +423,13 @@ Items are taken one at a time, in this order, and each closes separately. An
 item marked *protected* edits files under CLAUDE.md §3.4, so it waits for an
 explicit instruction naming each file.
 
-- [ ] **GB-01 Namespace neutrality** (*protected*; decide before 0.19.0 is cut).
+- [x] **GB-01 Namespace neutrality** (*protected*; decide before 0.19.0 is cut).
+  *Decided 2026-10-05 in
+  [ADR 0061](../decisions/0061-universal-namespaces-carry-no-framework-structure.md):
+  BSC's structure moves to a BSC framework vocabulary outside the manifest, and
+  implementation status becomes neutral and scoped. [Directions](SSTIM_DIRECTIONS.md)
+  §3 names the set. The migration is a 0.19.0 release gate, tracked in
+  `TODO.md`.*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
   live in the universal namespaces.
   - *Next step:* extend [Directions](SSTIM_DIRECTIONS.md) §3 to name these
