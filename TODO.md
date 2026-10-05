@@ -930,8 +930,14 @@ indexed, examiner-searchable records.
             `check-w3id-route-targets` fail on any development-line target.
             All 142 new targets (71 on each deployment) answered 200 before
             the rules changed.
-      - [ ] 2. One upstream pull request against `perma-id/w3id.org`
+      - [~] 2. One upstream pull request against `perma-id/w3id.org`
             (`ids/sstim/`), correcting the registry README in the same change.
+            *Opened 2026-10-05 as
+            [perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822),
+            after the w3id checker (no errors; 16 pre-existing `no-406-fallback`
+            warnings) and a real-Apache before/after run of 103 requests. Note
+            that upstream moved every rule set to `ids/<id>/` (their 94ed72fc),
+            so the registry file is `ids/sstim/.htaccess` now.*
       - [ ] 3. After the merge, verify the live matrix: every module, profile,
             catalogue and the manifest carries the release's `owl:versionIRI`
             or version. Then update the two clients' notes on the manifest

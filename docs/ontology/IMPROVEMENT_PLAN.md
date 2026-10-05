@@ -497,8 +497,9 @@ explicit instruction naming each file.
   2026-10-05; evidence in the review's addendum). Only `/sstim` answered with
   a release.
   - *Decided* in [ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md).
-    The mirror, gates and tests are done; the upstream pull request and a
-    protected `void.ttl` follow-up are tracked in `TODO.md`.
+    The mirror, gates and tests are done, and the upstream change is
+    [perma-id/w3id.org#6822](https://github.com/perma-id/w3id.org/pull/6822).
+    A protected `void.ttl` follow-up is tracked in `TODO.md`.
   - *Done when* every unversioned route answers with a release, measured live.
 - [ ] **GB-13 Four languages cover the vocabulary only** (found 2026-10-05).
   - *Next step:* decide whether the OWL layer is English-only by policy and say
