@@ -66,8 +66,14 @@ catalogues and exact modules:
 - `https://w3id.org/sstim/kernel` retrieves the exact Kernel;
 - `https://w3id.org/sstim/exposure` negotiates the Stimulus + Exposure
   namespace catalogue; and
-- `https://w3id.org/sstim/module/exposure` retrieves the exact Exposure module
-  and is the mutable import endpoint.
+- `https://w3id.org/sstim/module/exposure` retrieves the exact Exposure module.
+
+Every one of these, like every other unversioned route, answers machines with
+the latest release from `latest/`, and `/sstim/{version}` pins one release
+([ADR 0055](../decisions/0055-namespace-iri-resolves-to-a-release.md) for
+`/sstim`, [ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md)
+for the rest, live once its w3id pull request merges). The development line has
+no persistent identifier.
 
 ## Semantic coverage
 

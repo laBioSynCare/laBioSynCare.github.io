@@ -136,6 +136,26 @@ export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontolo
   return problems.sort()
 }
 
+// An unversioned route must answer with a release, never with the development
+// line (ADR 0055 for the bare namespace, ADR 0060 for every other route). The
+// development line is what sits at the top of /ontology/, so a target there is
+// a graph a consumer can neither pin nor cite. Until ADR 0060 sixteen module
+// routes, four profiles, the manifest and two catalogues all answered from it,
+// and every gate passed, because publishable was the only property checked.
+// VoID and the instance files are catalogue records that no snapshot contains,
+// so they are not ontology artifacts and do not match.
+const DEVELOPMENT_LINE_ARTIFACT =
+  /^(?:sstim-[a-z0-9-]+\.(?:ttl|jsonld|rdf)|manifest(?:\.schema)?\.json)$/
+
+export function developmentLineTargets(htaccess) {
+  return [...new Set(routeTargets(htaccess))]
+    .filter((target) => {
+      const prefix = sitePrefixOf(target)
+      return Boolean(prefix) && DEVELOPMENT_LINE_ARTIFACT.test(target.slice(prefix.length))
+    })
+    .sort()
+}
+
 function main() {
   const htaccess = readFileSync(htaccessPath, 'utf8')
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
@@ -145,8 +165,20 @@ function main() {
     for (const problem of problems) console.error(`  - ${problem}`)
     process.exit(1)
   }
+  const development = developmentLineTargets(htaccess)
+  if (development.length) {
+    console.error(
+      `check-w3id-route-targets: FAIL (${development.length} target(s) serve the development ` +
+      'line; an unversioned route answers from latest/, ADR 0060)',
+    )
+    for (const target of development) console.error(`  - ${target}`)
+    process.exit(1)
+  }
   const total = new Set(routeTargets(htaccess).filter(sitePrefixOf)).size
-  console.log(`check-w3id-route-targets: PASS (${total} distinct /ontology/ targets publishable)`)
+  console.log(
+    `check-w3id-route-targets: PASS (${total} distinct /ontology/ targets publishable, ` +
+    'none on the development line)',
+  )
 }
 
 if (

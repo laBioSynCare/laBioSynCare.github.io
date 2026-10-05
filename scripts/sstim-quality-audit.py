@@ -112,7 +112,7 @@ CATALOG_HTML_ROUTES = {
 BSC_FRAMEWORK_DUMP = (
     "https://w3c-cg.github.io/sstim/ontology/instances/frameworks/bsc.ttl"
 )
-VOCAB_DUMP = "https://w3c-cg.github.io/sstim/ontology/sstim-vocab.ttl"
+VOCAB_DUMP = "https://w3c-cg.github.io/sstim/ontology/latest/sstim-vocab.ttl"
 TECHNIQUE_PUBLIC_ROUTES = {
     "framework/bsc/technique/martigli-breathing-oscillation": BSC_FRAMEWORK_DUMP,
     "framework/bsc/technique/martigli-binaural-hybrid": BSC_FRAMEWORK_DUMP,
@@ -1165,56 +1165,57 @@ else:
         "RewriteRule ^(vocab|ecosystem)$ https://w3c-cg.github.io/sstim/ [R=303,L]",
     )
     expected_manifest_directives = (
-        "RewriteRule ^manifest$ https://w3c-cg.github.io/sstim/ontology/manifest.json [R=303,L]",
-        "RewriteRule ^manifest-schema/1$ https://w3c-cg.github.io/sstim/ontology/manifest.schema.json [R=303,L]",
+        "RewriteRule ^manifest$ https://w3c-cg.github.io/sstim/ontology/latest/manifest.json [R=303,L]",
+        "RewriteRule ^manifest-schema/1$ https://w3c-cg.github.io/sstim/ontology/latest/manifest.schema.json [R=303,L]",
         *negotiated_directives(
             profile_pattern,
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1-profile.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1-profile.rdf",
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-$1-profile.ttl",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1-profile.ttl",
         ),
         *negotiated_directives(
             "^kernel$",
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-core.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-core.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-core.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-core.rdf",
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-core.ttl",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-core.ttl",
         ),
         *negotiated_directives(
             "^exposure$",
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure-namespace.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure-namespace.rdf",
             # Both namespace catalogs send HTML somewhere that can honour a term
             # fragment, which a server never sees and a generated index cannot
             # anchor. This one goes to the application directly; `^$` goes to the
             # namespace page, which forwards the fragment to the same place
             # (ADR 0055).
             html="https://w3c-cg.github.io/sstim/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-exposure-namespace.ttl",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure-namespace.ttl",
         ),
         *negotiated_directives(
             "^module/exposure$",
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure.rdf",
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-exposure.ttl",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-exposure.ttl",
         ),
         *documentation_overrides,
         *negotiated_directives(
             module_pattern,
-            json_ld="https://w3c-cg.github.io/sstim/ontology/sstim-$1.jsonld",
-            rdf_xml="https://w3c-cg.github.io/sstim/ontology/sstim-$1.rdf",
+            json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.jsonld",
+            rdf_xml="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.rdf",
             html="https://w3c-cg.github.io/sstim/ontology/docs/",
-            turtle="https://w3c-cg.github.io/sstim/ontology/sstim-$1.ttl",
+            turtle="https://w3c-cg.github.io/sstim/ontology/latest/sstim-$1.ttl",
         ),
-        # The bare ontology IRI is the one route that does not serve the working
-        # tree. RDF comes from `latest/`, the newest frozen release, so what
-        # dereferencing https://w3id.org/sstim returns carries an owl:versionIRI
-        # and a released status instead of the "0.17.0-dev" / "under development"
-        # graph it used to hand out (ADR 0055). `latest/` is a stable path
-        # written on every deploy, which is what keeps a release from costing a
-        # pull request against perma-id/w3id.org (ADR 0053).
+        # No route in this block serves the working tree. RDF and JSON come from
+        # `latest/`, the newest frozen release, so what dereferencing any
+        # unversioned SSTIM IRI returns carries an owl:versionIRI and a released
+        # status instead of a "-dev" / "under development" graph: the bare
+        # namespace since ADR 0055, the module, profile, catalogue and manifest
+        # routes since ADR 0060. `latest/` is a stable path written on every
+        # deploy, which is what keeps a release from costing a pull request
+        # against perma-id/w3id.org (ADR 0053).
         *negotiated_directives(
             "^$",
             json_ld="https://w3c-cg.github.io/sstim/ontology/latest/sstim-namespace.jsonld",

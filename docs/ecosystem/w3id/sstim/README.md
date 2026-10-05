@@ -51,7 +51,12 @@ store them in the first place. The directive stays, correct if the server ever
 permits it.
 
 Top-level sources are the mutable development line and must never be confused
-with a released snapshot; `void.ttl` names the latest immutable release.
+with a released snapshot; `void.ttl` names the latest immutable release. No
+persistent route answers from them: every unversioned RDF and JSON route
+resolves through `latest/`, the newest frozen release (ADR 0055 for `/sstim`,
+ADR 0060 for the module, profile, catalogue and manifest routes, live once its
+upstream pull request merges). `check-w3id-route-targets` fails on any route to
+a top-level ontology artifact.
 
 **Copy `.htaccess` to the registry verbatim; do not copy this README.** The
 registry's `sstim/README.md` is a trimmed version of this file. perma-id asks
@@ -65,7 +70,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim` | RDF: generated Full namespace catalogue `sstim-namespace.{ttl,jsonld,rdf}` for dereferencing `sstim:` hash terms; HTML: human documentation | Live |
 | `/sstim/kernel` | Exact small Kernel distribution `sstim-core.{ttl,jsonld,rdf}` | Live |
 | `/sstim/exposure` | Generated Stimulus + Exposure catalogue `sstim-exposure-namespace.{ttl,jsonld,rdf}`, preserving dereference of the moved `exposure#StimulusChannel` term | Live |
-| `/sstim/module/exposure` | Exact Exposure semantic module and development-profile import distribution `sstim-exposure.{ttl,jsonld,rdf}` | Live |
+| `/sstim/module/exposure` | Exact Exposure semantic module `sstim-exposure.{ttl,jsonld,rdf}` | Live |
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
 | `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned modules | Live |
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
@@ -105,8 +110,9 @@ closures. Fragment IRIs such as `/sstim#Preset` resolve to the Full catalogue
 even when another manifest-owned module owns their statements. The exact
 two-class Kernel is `/sstim/kernel`. Likewise, `/sstim/exposure` is the Exposure
 namespace catalogue, while `/sstim/module/exposure` retrieves only the exact
-Exposure semantic module and is the endpoint used by mutable development
-profile imports. Consumer closures are selected through
+Exposure semantic module. Development profiles import it, as they import every
+module route, and since ADR 0060 those imports resolve to the released module;
+the development closure is assembled from the repository through the manifest. Consumer closures are selected through
 `/sstim/profile/{kernel,core,core-plus,full}`.
 
 Each profile entry point is both an OWL ontology and a W3C Profiles Vocabulary
@@ -174,4 +180,4 @@ caches or previously downloaded copies. The mutable projection is not part of
 a Zenodo ontology snapshot and carries no archival-consent implication.
 
 Redirect issues: open an issue at
-<https://github.com/laBioSynCare/laBioSynCare.github.io/issues>.
+<https://github.com/w3c-cg/sstim/issues>.

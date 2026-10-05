@@ -83,6 +83,7 @@ annotations lives here.
 | [0057](0057-external-mapping-predicates-and-verification.md) | How an external mapping predicate is chosen, and how its target is proved | Accepted |
 | [0058](0058-session-builder-in-the-clients.md) | A session builder in both clients, so a tool exporter only reads its own clock | Accepted |
 | [0059](0059-community-group-publishes-sstim.md) | The W3C Community Group publishes SSTIM | Accepted |
+| [0060](0060-every-unversioned-iri-resolves-to-a-release.md) | Every unversioned SSTIM IRI resolves to a release | Accepted |
 
 ## ADR lifecycle and revision policy
 

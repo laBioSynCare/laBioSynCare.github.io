@@ -119,15 +119,21 @@ from the smallest ontology file:
   the Stimulus module while retaining its stable exposure-namespace IRI; and
 - `https://w3id.org/sstim/module/exposure` returns only
   `sstim-exposure.ttl` (or its negotiated serialization) and is the exact
-  mutable distribution/import endpoint for the Exposure semantic module.
+  distribution/import endpoint for the Exposure semantic module.
 
 The two Exposure URLs are not interchangeable. The live Full profile's
 `dct:requires` may identify the logical Exposure ontology as `/sstim/exposure`,
 but its retrieval-bearing `owl:imports` uses `/sstim/module/exposure` so
 importing Exposure does not silently import the Stimulus + Exposure namespace
-catalog. During release preparation that endpoint, like every other mutable
-module endpoint, is replaced by the exact immutable versioned sibling Turtle
-URL.
+catalog. During release preparation that endpoint, like every other module
+endpoint, is replaced by the exact immutable versioned sibling Turtle URL.
+
+Every unversioned route answers with the latest release from `latest/`, never
+with the development line (ADR 0055 for `/sstim`, ADR 0060 for the module,
+profile, catalogue and manifest routes). Over the network a development
+profile's imports therefore resolve to released modules; the development
+closure is assembled from the repository through the manifest, which is what
+every gate already does.
 
 The source manifest, generators, and mirrored w3id rules encode this behavior.
 A development line's catalogs, profile routes, and schema PID stay staged until

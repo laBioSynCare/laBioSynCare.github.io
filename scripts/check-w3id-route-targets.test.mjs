@@ -1,9 +1,17 @@
 import { expect, test } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { cpSync, mkdtempSync, readFileSync, renameSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { expandRule, routeTargets, unpublishableTargets } from './check-w3id-route-targets.mjs'
+import { releaseDirectories } from './publish-latest-ontology.mjs'
+
+import {
+  developmentLineTargets,
+  expandRule,
+  routeTargets,
+  unpublishableTargets,
+} from './check-w3id-route-targets.mjs'
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const htaccess = readFileSync(
@@ -16,6 +24,34 @@ const manifest = JSON.parse(
 
 test('every committed w3id ontology redirect target is publishable', () => {
   expect(unpublishableTargets({ htaccess, manifest })).toEqual([])
+})
+
+test('no committed route serves the development line (ADR 0060)', () => {
+  expect(developmentLineTargets(htaccess)).toEqual([])
+})
+
+test('a route to a top-level ontology artifact is caught, and nothing else is', () => {
+  const site = 'https://w3c-cg.github.io/sstim/ontology/'
+  const rule = (pattern, target) => `RewriteRule ^${pattern}$ ${target} [R=303,L]\n`
+  const rules = [
+    rule('vocab', `${site}sstim-vocab.ttl`),
+    rule('profile/(core|full)', `${site}sstim-$1-profile.jsonld`),
+    rule('manifest', `${site}manifest.json`),
+    rule('legacy', 'https://labiosyncare.github.io/ontology/sstim-core.rdf'),
+    rule('released', `${site}latest/sstim-vocab.ttl`),
+    rule('pinned', `${site}0.18.0/sstim-vocab.ttl`),
+    rule('void', `${site}void.ttl`),
+    rule('catalog', `${site}instances/frameworks/bsc.ttl`),
+    rule('docs', `${site}docs/`),
+  ].join('')
+
+  expect(developmentLineTargets(rules)).toEqual([
+    'https://labiosyncare.github.io/ontology/sstim-core.rdf',
+    `${site}manifest.json`,
+    `${site}sstim-core-profile.jsonld`,
+    `${site}sstim-full-profile.jsonld`,
+    `${site}sstim-vocab.ttl`,
+  ])
 })
 
 test('audited public preset and reference routes target their owning Turtle files', () => {
@@ -68,25 +104,47 @@ test('a serialization stops being publishable when its module drops the export f
   expect(problems.some((problem) => problem.endsWith('sstim-vocab.ttl'))).toBe(false)
 })
 
-test('a renamed namespace document is caught', () => {
-  // The exposure catalogue, because it is the one still served from the working
-  // tree. Its route names a generated artifact that exists only after
-  // `make export`, so a rename here is exactly the silent 404 this file exists
-  // to prevent.
-  const renamed = structuredClone(manifest)
-  const exposure = renamed.namespaceDocuments.find((document) => document.id === 'exposure')
-  exposure.runtime.turtleUrl = '/ontology/sstim-exposure-catalogue.ttl'
+test('a release that renames a namespace catalogue is caught when it becomes latest/', () => {
+  // Since ADR 0060 no route reads the working tree, so a rename in the working
+  // manifest alone reaches nothing (the next test pins that for /sstim). The
+  // rename bites when a release carrying it becomes the newest snapshot, since
+  // latest/ is then a copy of that snapshot: the silent 404 this file exists to
+  // prevent. Modelled with a scratch ontology root whose newest release first
+  // has the exposure catalogue and then does not, so the assertion cannot pass
+  // for an unrelated reason.
+  const root = mkdtempSync(join(tmpdir(), 'sstim-routes-'))
+  try {
+    const release = join(root, '9.9.9')
+    cpSync(join(repoRoot, 'static', 'ontology', releaseDirectories()[0]), release, {
+      recursive: true,
+    })
+    const exposureCaught = (problems) =>
+      problems.some((problem) => problem.includes('latest/sstim-exposure-namespace.ttl'))
 
-  const problems = unpublishableTargets({ htaccess, manifest: renamed })
+    expect(exposureCaught(unpublishableTargets({ htaccess, manifest, ontologyRoot: root })))
+      .toBe(false)
 
-  expect(problems.some((problem) => problem.includes('sstim-exposure-namespace.ttl'))).toBe(true)
+    renameSync(
+      join(release, 'sstim-exposure-namespace.ttl'),
+      join(release, 'sstim-exposure-catalogue.ttl'),
+    )
+    const renamed = structuredClone(manifest)
+    const exposure = renamed.namespaceDocuments.find((document) => document.id === 'exposure')
+    exposure.runtime.turtleUrl = '/ontology/sstim-exposure-catalogue.ttl'
+
+    expect(exposureCaught(unpublishableTargets({ htaccess, manifest: renamed, ontologyRoot: root })))
+      .toBe(true)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
 })
 
 test('renaming the sstim catalogue cannot break the bare ontology IRI', () => {
   // Not an oversight, and worth pinning so it is not "fixed" back: since ADR
   // 0055 the `^$` rules resolve through latest/, which is a copy of a frozen
-  // release. Its files are that snapshot's committed bytes, so a rename in the
-  // working manifest genuinely does not reach them. The route is still checked,
+  // release, and since ADR 0060 every other unversioned route does too. Its
+  // files are that snapshot's committed bytes, so a rename in the working
+  // manifest genuinely does not reach them. The route is still checked,
   // against the release it will actually be built from.
   const renamed = structuredClone(manifest)
   const sstim = renamed.namespaceDocuments.find((document) => document.id === 'sstim')

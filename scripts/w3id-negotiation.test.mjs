@@ -107,15 +107,15 @@ test('each namespace and module route serves the document it advertises', () => 
 
   // The two endpoints whose namespace IRI is occupied by a multi-module
   // catalogue. Confusing these is the mistake the split makes easy.
-  expect(go('kernel', 'text/turtle').doc).toBe('sstim-core.ttl')
-  expect(go('exposure', 'text/turtle').doc).toBe('sstim-exposure-namespace.ttl')
-  expect(go('module/exposure', 'text/turtle').doc).toBe('sstim-exposure.ttl')
+  expect(go('kernel', 'text/turtle').doc).toBe('latest/sstim-core.ttl')
+  expect(go('exposure', 'text/turtle').doc).toBe('latest/sstim-exposure-namespace.ttl')
+  expect(go('module/exposure', 'text/turtle').doc).toBe('latest/sstim-exposure.ttl')
 
-  expect(go('stimulus', 'text/turtle').doc).toBe('sstim-stimulus.ttl')
-  expect(go('profile/core', 'text/turtle').doc).toBe('sstim-core-profile.ttl')
-  expect(go('profile/full', 'application/rdf+xml').doc).toBe('sstim-full-profile.rdf')
-  expect(go('manifest', 'application/json').doc).toBe('manifest.json')
-  expect(go('manifest-schema/1', '*/*').doc).toBe('manifest.schema.json')
+  expect(go('stimulus', 'text/turtle').doc).toBe('latest/sstim-stimulus.ttl')
+  expect(go('profile/core', 'text/turtle').doc).toBe('latest/sstim-core-profile.ttl')
+  expect(go('profile/full', 'application/rdf+xml').doc).toBe('latest/sstim-full-profile.rdf')
+  expect(go('manifest', 'application/json').doc).toBe('latest/manifest.json')
+  expect(go('manifest-schema/1', '*/*').doc).toBe('latest/manifest.schema.json')
 })
 
 test('Turtle is the default, including for an absent or wildcard Accept', () => {
@@ -147,8 +147,8 @@ test('a namespace catalog sends HTML to the application, so a term fragment reso
   expect(go('exposure', BROWSER).doc).toBe(APPLICATION)
   expect(go('exposure', 'text/html').doc).toBe(APPLICATION)
   // Only HTML changes. Every RDF representation still serves the catalog.
-  expect(go('exposure', 'text/turtle').doc).toBe('sstim-exposure-namespace.ttl')
-  expect(go('exposure', 'application/ld+json').doc).toBe('sstim-exposure-namespace.jsonld')
+  expect(go('exposure', 'text/turtle').doc).toBe('latest/sstim-exposure-namespace.ttl')
+  expect(go('exposure', 'application/ld+json').doc).toBe('latest/sstim-exposure-namespace.jsonld')
   // A module id is not a namespace catalog: no fragment arrives, so the
   // reference index stays the right answer.
   expect(go('module/exposure', BROWSER).doc).toBe('docs/')
@@ -163,8 +163,8 @@ test('a multi-module hash namespace resolves HTML to the application', () => {
   expect(go('vocab', BROWSER).doc).toBe(APPLICATION)
   expect(go('ecosystem', BROWSER).doc).toBe(APPLICATION)
   // RDF representations are untouched.
-  expect(go('vocab', 'text/turtle').doc).toBe('sstim-vocab.ttl')
-  expect(go('ecosystem', 'application/ld+json').doc).toBe('sstim-ecosystem.jsonld')
+  expect(go('vocab', 'text/turtle').doc).toBe('latest/sstim-vocab.ttl')
+  expect(go('ecosystem', 'application/ld+json').doc).toBe('latest/sstim-ecosystem.jsonld')
 })
 
 test('shape namespaces stay on the reference index', () => {
@@ -218,7 +218,7 @@ test('the SKOS vocabulary keeps its own documentation page, one link away', () =
   // every vocabulary term in the knowledge browser links to its entry there.
   // What changed is which of the two readers the ambiguous URL serves first.
   expect(go('vocab', 'text/html').doc).toBe(APPLICATION)
-  expect(go('vocab', 'application/ld+json').doc).toBe('sstim-vocab.jsonld')
+  expect(go('vocab', 'application/ld+json').doc).toBe('latest/sstim-vocab.jsonld')
   expect(go('shapes', 'text/html').doc).toBe('docs/')
 })
 
@@ -265,7 +265,7 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   // The programme instance path and the OWL module that shares its first
   // segment are different resources; `ecosystem` is matched exactly, so the
   // module rule must never swallow /ecosystem/{id}.
-  expect(go('ecosystem', 'text/turtle').doc).toBe('sstim-ecosystem.ttl')
+  expect(go('ecosystem', 'text/turtle').doc).toBe('latest/sstim-ecosystem.ttl')
   expect(go('ecosystem/biosyncare', 'text/turtle').doc)
     .toBe('instances/programmes/biosyncare-ecosystem.ttl')
 

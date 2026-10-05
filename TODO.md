@@ -840,7 +840,7 @@ indexed, examiner-searchable records.
       [ADR 0025](docs/decisions/0025-hed-bids-interoperability-crosswalk.md).*
 
 ### Ontology namespace
-- [~] **Make `https://w3id.org/sstim` resolve to a release, and legible to a person** `P1`
+- [x] **Make `https://w3id.org/sstim` resolve to a release, and legible to a person** `P1`
       *[ADR 0055](docs/decisions/0055-namespace-iri-resolves-to-a-release.md),
       accepted 2026-08-29. Six items. The order below is normative: the w3id
       change comes last because it is the only production-visible step and it
@@ -911,6 +911,38 @@ indexed, examiner-searchable records.
             done. The upstream PR against `perma-id/w3id.org` is the one step
             left, and must not go up until the deploy carrying `/namespace/` and
             `latest/` is live: the rules point at both.***
+            *Merged as [perma-id/w3id.org#6614](https://github.com/perma-id/w3id.org/pull/6614)
+            on 2026-08-31. Measured 2026-10-05: `/sstim` answers 0.18.0, with its
+            `owl:versionIRI`, in Turtle, JSON-LD and RDF/XML. The other
+            unversioned routes did not, which is the next item.*
+- [~] **Every unversioned SSTIM IRI resolves to a release** `P1`
+      *[ADR 0060](docs/decisions/0060-every-unversioned-iri-resolves-to-a-release.md),
+      accepted 2026-10-05. ADR 0055 fixed `/sstim` alone. Measured 2026-10-05,
+      `/sstim/vocab`, `/exposure`, `/shapes`, `/ecosystem`, the other module
+      routes, the profiles and the manifest all answered `0.19.0-dev` with no
+      `owl:versionIRI`: four of the five term namespaces dereferenced to an
+      unreleased graph, through 71 targets at the top of `/ontology/`.*
+
+      - [x] 1. Retarget the mirror's unversioned RDF and JSON rules at
+            `latest/`: seventeen directives in the manifest block, and the
+            retired-technique route to the vocabulary. Update the quality
+            audit's pinned matrix and the negotiation test, and make
+            `check-w3id-route-targets` fail on any development-line target.
+            All 142 new targets (71 on each deployment) answered 200 before
+            the rules changed.
+      - [ ] 2. One upstream pull request against `perma-id/w3id.org`
+            (`ids/sstim/`), correcting the registry README in the same change.
+      - [ ] 3. After the merge, verify the live matrix: every module, profile,
+            catalogue and the manifest carries the release's `owl:versionIRI`
+            or version. Then update the two clients' notes on the manifest
+            route (`packages/sstim/src/sstim/_resolve.py`,
+            `packages/sstim-js/src/resolve.js`), which describe the old
+            behaviour.
+      - [!] 4. Point `void.ttl`'s module `dcat:downloadURL` and `void:dataDump`
+            at `latest/`, so each agrees with its `dcat:accessURL`. Blocked on
+            CLAUDE.md §3.4: needs "modify static/ontology/void.ttl". The quality
+            audit's subset check (a download URL "ending in
+            /ontology/sstim-<id>.ttl") moves with it.
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module

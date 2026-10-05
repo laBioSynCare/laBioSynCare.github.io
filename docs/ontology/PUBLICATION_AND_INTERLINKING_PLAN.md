@@ -153,9 +153,12 @@ See [ADR 0020](../decisions/0020-whole-set-snapshot-versioning.md).
 
 ## Content Negotiation and Documentation
 
-The finalized modular behavior is below. A development line's routes stay staged
-until its generated Pages artifacts and matching perma-id rules are deployed and
-verified.
+The finalized modular behavior is below. Every machine-readable answer comes
+from the latest release in `latest/`, never from the development line
+([ADR 0055](../decisions/0055-namespace-iri-resolves-to-a-release.md),
+[ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md));
+`/sstim/{version}` pins one release. Route changes stay staged until their
+targets are deployed and the matching perma-id rules are merged and verified.
 
 | Request | Machine-readable representation | HTML representation |
 |---|---|---|
@@ -164,7 +167,7 @@ verified.
 | `/sstim/exposure` | Generated Stimulus + Exposure namespace catalog in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
 | `/sstim/vocab` | Exact vocabulary module in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
 | `/sstim/ecosystem` | Exact ecosystem module in the negotiated RDF syntax | Knowledge browser; term fragments select graph nodes |
-| `/sstim/module/exposure` | Exact Exposure semantic module (`sstim-exposure`) in the negotiated RDF syntax; mutable distribution/import endpoint | WIDOCO documentation |
+| `/sstim/module/exposure` | Exact Exposure semantic module (`sstim-exposure`) in the negotiated RDF syntax | WIDOCO documentation |
 | `/sstim/profile/{kernel,core,core-plus,full}` | PROF-enabled profile entry point in the negotiated RDF syntax | WIDOCO documentation |
 | `/sstim/manifest` | JSON suite manifest | Not a separate HTML contract |
 | `/sstim/manifest-schema/1` | JSON Schema for the manifest | Not a separate HTML contract |
@@ -222,9 +225,10 @@ the documentation as well as in the browser, and it is the real fix for `shapes`
 and `core-shapes`, which cannot use the browser route at all.
 
 `/sstim/exposure` is a namespace document and must not appear as the Exposure
-module's `owl:imports` target. The live Full profile uses
-`/sstim/module/exposure`; a released Full profile uses the corresponding
-immutable versioned sibling Turtle file. A `dct:requires` reference to the
+module's `owl:imports` target. The development Full profile uses
+`/sstim/module/exposure`, which like every module route answers with the latest
+release (ADR 0060); a released Full profile uses the corresponding immutable
+versioned sibling Turtle file. A `dct:requires` reference to the
 logical `/sstim/exposure` ontology identifier is not a retrieval import.
 
 WIDOCO reference documentation is published at

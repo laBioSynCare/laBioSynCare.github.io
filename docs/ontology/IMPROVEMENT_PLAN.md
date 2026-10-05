@@ -487,6 +487,18 @@ explicit instruction naming each file.
   - *Next step:* consolidate `shacl-vocab` and `shacl-exposure`, or give each
     the distinct scope its comment describes.
   - *Done when* no two gate targets run the same command.
+- [~] **GB-12 Unversioned routes serve the development line** (found
+  2026-10-05; evidence in the review's addendum). Only `/sstim` answered with
+  a release.
+  - *Decided* in [ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md).
+    The mirror, gates and tests are done; the upstream pull request and a
+    protected `void.ttl` follow-up are tracked in `TODO.md`.
+  - *Done when* every unversioned route answers with a release, measured live.
+- [ ] **GB-13 Four languages cover the vocabulary only** (found 2026-10-05).
+  - *Next step:* decide whether the OWL layer is English-only by policy and say
+    so wherever four languages are advertised, or translate it.
+  - *Done when* the advertised claim and the files agree, and
+    `make language-coverage` measures the scope the claim covers.
 
 **Phase 1 gate:** OWL reasoning and domain/range lint pass; negative SHACL
 fixtures fail for the intended reasons; no public-claim authorization succeeds

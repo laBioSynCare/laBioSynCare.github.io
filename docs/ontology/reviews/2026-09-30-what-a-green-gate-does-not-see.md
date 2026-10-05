@@ -578,6 +578,33 @@ Each target is a full pass over the closure, inside a gate that takes 20 to 25
 minutes in CI. Either consolidate them, or give each target the distinct scope
 its comment describes.
 
+## Addendum, 2026-10-05: re-measured, and two more
+
+Re-measured on the same commit with an independent probe (N3.js rather than
+rdflib). Every count above reproduces, and the GB-02 adversarial triples still
+give pySHACL `Conforms: True`. `make validate` passes.
+
+- **GB-03 is latent so far.** A signed-out Firestore aggregation query counted
+  the `rdfAnnotations` documents whose `visibility` is `public`: 0. Nothing is
+  exposed yet. The first public annotation would be.
+- **GB-12: only `/sstim` resolved to a release.** The route check above
+  confirmed that every route answered 200 in each syntax, not which version
+  answered. `/sstim/vocab`, `/exposure`, `/shapes`, `/ecosystem`, the other
+  module routes, the profiles and the manifest served
+  `owl:versionInfo "0.19.0-dev"` with no `owl:versionIRI`, so terms in four of
+  the five term namespaces dereferenced to an unreleased graph. Decided in
+  [ADR 0060](../../decisions/0060-every-unversioned-iri-resolves-to-a-release.md).
+- **GB-13: four languages cover the vocabulary only.** Of the live terms, all
+  542 concepts carry Italian, Portuguese and Spanish labels; 21 of 162 classes
+  and none of the 273 properties do. `make language-coverage` measures SKOS
+  concepts only, so it cannot see the gap.
+- **GB-01 scope.** The four BSC voice classes in `sstim-patch-studio.ttl`
+  (`BinauralVoice`, `MartigliVoice`, `MartigliBinauralVoice`, `SymmetryVoice`)
+  are also in `sstim#`, and neither GB-01 nor Directions §3 names them.
+- **GB-02 detail.** Four live properties have no `rdfs:range`, not two. The
+  other two, `sstim-ex:knowledgeScope` and `sstim-eco:relationshipTarget`, are
+  constrained by a shape, so Appendix A does not list them.
+
 ## Appendix A: properties no shape constrains
 
 Live object and datatype properties, grouped by declaring module, with each

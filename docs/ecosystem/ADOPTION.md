@@ -166,7 +166,12 @@ adopter who fetches the first believing they pinned something has pinned
 nothing. The client resolves the release instead, by reading `owl:versionIRI`
 from the stable IRI, so no version constant is hardcoded and the default is
 never the dev line. Worth deciding separately whether the two routes should
-disagree in kind at all.
+disagree in kind at all. *Decided 2026-10-05 in
+[ADR 0060](../decisions/0060-every-unversioned-iri-resolves-to-a-release.md):
+they should not, and every unversioned route answers from the latest release
+once the matching w3id pull request merges. The client keeps resolving through
+`owl:versionIRI`, because a version IRI names one release while the latest
+moves.*
 
 **The manifest's checksums make the fetch verifiable.** Every module carries a
 sha256, and the served bytes match it (measured across three modules at 0.17.0).
