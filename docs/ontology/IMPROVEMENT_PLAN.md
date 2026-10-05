@@ -8,6 +8,9 @@ and phase numbering below is dependency order, not a version.
 
 **Primary audit:** [RDF knowledge-representation audit, 2026-07-13](reviews/2026-07-13-rdf-knowledge-representation-audit.md)
 
+**Latest review:** [What a green gate does not see, 2026-09-30](reviews/2026-09-30-what-a-green-gate-does-not-see.md),
+findings GB-01 to GB-11, sequenced in [§1.6](#16-close-what-a-green-gate-does-not-see).
+
 For the implemented baseline and the ordered work that remains after the
 `0.18.0` release, start with the maintained
 [current-state summary](CURRENT_STATE.md). This plan preserves the dependency
@@ -405,6 +408,85 @@ provenance as `owl:Axiom` annotations.
 - Represent notification, response, amendment, and withdrawal as append-only
   PROV activities in the private operational audit rather than overwritten
   strings; publish only the retractable approved current-state projection.
+
+> **Re-measured 2026-09-30 (GB-03 below).** The RDF export separates the
+> authentication ID, but the stored public annotation does not: the ID is
+> world-readable in Firestore, and it reverses the export's pseudonym.
+
+#### 1.6 Close what a green gate does not see
+
+Source: the [2026-09-30 review](reviews/2026-09-30-what-a-green-gate-does-not-see.md),
+which holds the evidence and reproduction for each item. Every finding is present
+on a commit that passes `make validate`.
+
+Items are taken one at a time, in this order, and each closes separately. An
+item marked *protected* edits files under CLAUDE.md §3.4, so it waits for an
+explicit instruction naming each file.
+
+- [ ] **GB-01 Namespace neutrality** (*protected*; decide before 0.19.0 is cut).
+  BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
+  live in the universal namespaces.
+  - *Next step:* extend [Directions](SSTIM_DIRECTIONS.md) §3 to name these
+    terms, then an ADR choosing between moving them and keeping them with an
+    explicit statement that they are an implementation profile.
+  - *Done when* the decision is recorded; the migration may follow in a later
+    release.
+- [ ] **GB-02 SHACL coverage** (*protected*: `sstim-shapes.ttl`,
+  `sstim-evidence.ttl`). 83 of 273 live properties and 6 instantiated classes
+  have no constraint.
+  - *Next step:* a coverage gate with a reasoned allowlist; baseline
+    constraints taken from each declared range and reviewed by hand; the
+    review's adversarial triples as a negative fixture; ranges for
+    `independencePolicy` and `reviewRubric`.
+  - *Done when* the gate is in `make validate`, and the fixture fails for all
+    four of its reasons.
+- [ ] **GB-03 Annotation identity.** Completes the KR-12 bullet on
+  authentication IDs (§1.5).
+  - *Next step:* take the authentication ID out of world-readable fields; drop
+    the email-derived public name; label what "Public" shows; decide how the
+    pseudonym is derived; migrate existing documents; deploy the rules.
+  - *Done when* a signed-out reader can obtain neither the ID nor the email
+    local part.
+- [ ] **GB-04 Default-graph SPARQL in the Workbench.**
+  - *Next step:* a union view over the authoritative graphs only, excluding
+    annotation graphs and with an explicit decision on the live ecosystem
+    projection; correct CLAUDE.md §5.3.
+  - *Done when* a test runs the CLAUDE.md queries and checks their row counts.
+- [ ] **GB-05 Neuromodulation exclusions** (*protected*:
+  `sstim-neuromodulation.ttl`, `sstim-shapes.ttl`).
+  - *Next step:* decide which ADR 0036 and 0037 exclusions are true
+    disjointness. Assert them in OWL at the process layer, and as a SHACL rule
+    on `participantEngagementMode` at the technique layer. Add entailment
+    fixtures in both directions. Probably an ADR amendment.
+  - *Done when* HermiT rejects a process typed on both sides of the split.
+- [ ] **GB-06 Deprecation hygiene** (*protected*).
+  - *Next step:* `dct:isReplacedBy` for every deprecated term that has a
+    replacement, and a stated "no replacement" for the rest. Decide whether the
+    public data keeps asserting `supportsRelation`, and correct its "during
+    0.7.x" wording.
+  - *Done when* no deprecated term is silent about its successor.
+- [ ] **GB-07 Documentation drift** (partly *protected*: `sstim-core.ttl`).
+  - *Next step:* correct the CURRENT_STATE instance totals, CLAUDE.md §4.3, and
+    the Kernel's declaration counts and history-note order; settle the
+    `dct:modified` question.
+  - *Done when* the truth audit also checks the CURRENT_STATE instance totals.
+- [ ] **GB-08 Source links** (*protected*; 20 files).
+  - *Next step:* on the development line, point at `w3c-cg/sstim`, pinned to a
+    tag or a persistent route rather than `main`.
+  - *Done when* no live module links to a moving branch.
+- [ ] **GB-09 Frozen serializations.**
+  - *Next step:* derived JSON-LD and RDF/XML for every frozen snapshot at
+    deploy; version-route negotiation (an upstream w3id pull request); a route
+    and a coverage check for `context.jsonld`.
+  - *Done when* `/sstim/<version>` negotiates like `/sstim`.
+- [ ] **GB-10 Presets page neutrality** (after GB-01).
+  - *Next step:* make the BSC-specific patterns in `src/rdf/presets.js`
+    optional.
+  - *Done when* a modality-neutral preset that satisfies `PresetShape` is listed.
+- [ ] **GB-11 Duplicate gate targets.**
+  - *Next step:* consolidate `shacl-vocab` and `shacl-exposure`, or give each
+    the distinct scope its comment describes.
+  - *Done when* no two gate targets run the same command.
 
 **Phase 1 gate:** OWL reasoning and domain/range lint pass; negative SHACL
 fixtures fail for the intended reasons; no public-claim authorization succeeds

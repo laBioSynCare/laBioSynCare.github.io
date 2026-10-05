@@ -41,6 +41,17 @@ Describing a protocol or claim does not establish efficacy.
   and what verifies the ontology: the CLAUDE.md §5.5 named-graph invariant has
   no test at all, four of six runtime RDF emitters are unverified, and phase 0.1
   carries a finding recorded as closed on partial evidence.
+- [What a green gate does not see, 2026-09-30](reviews/2026-09-30-what-a-green-gate-does-not-see.md)
+  covers eleven findings (GB-01 to GB-11), each present on a commit that passes
+  `make validate`:
+  - BSC implementation terms in the universal namespaces;
+  - 83 of 273 properties with no SHACL constraint;
+  - a reversible annotation pseudonym;
+  - plain SPARQL returning nothing in the Workbench;
+  - neuromodulation exclusions stated only in prose;
+  - smaller hygiene, drift and publication items.
+
+  They are sequenced in improvement plan §1.6.
 - [Design directions](SSTIM_DIRECTIONS.md) — standing directions rather than
   decisions: waveforms as a vocabulary including sampled sources; panning
   modelled as spatial position plus an explicit modulation relation; Martigli
