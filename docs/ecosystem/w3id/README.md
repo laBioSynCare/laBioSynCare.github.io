@@ -58,22 +58,32 @@ by an earlier one, a module inheriting the wrong documentation page.
 ## Updating the registry rules
 
 1. Fork [`perma-id/w3id.org`](https://github.com/perma-id/w3id.org).
-2. Create or update the directory `sstim/` at the repository root.
-3. Copy [`sstim/.htaccess`](sstim/.htaccess) from this folder into it, keeping
-   any already-live rules that are still valid. Copy the trimmed README, not
-   this file.
-4. Run `make w3id-routes`.
-5. Open a PR scoped strictly to the `sstim/` directory — the maintainers reject
-   PRs that touch other namespaces.
-6. Write the description on top of the upstream template
+2. Update `ids/sstim/`. Upstream moved every identifier under `ids/` in their
+   commit 94ed72fc, so the registry file is `ids/sstim/.htaccess`, not
+   `sstim/.htaccess`; their `AGENTS.md` states the rules for a change there.
+3. Copy [`sstim/.htaccess`](sstim/.htaccess) from this folder to
+   `ids/sstim/.htaccess`, keeping any already-live rules that are still valid.
+   Copy the trimmed README to `ids/sstim/README.md`, not this file.
+4. Run `make w3id-routes` here.
+5. In the w3id clone, run their checker:
+   `(cd tools/check && npm ci) && node tools/check/bin/w3id-check.js`. Expect
+   no errors. The per-route `406` rules draw `htaccess/no-406-fallback`
+   warnings, which are deliberate.
+6. Exercise the rules on a real Apache, and compare against production. On
+   macOS the system Apache works:
+   `W3ID_ALLOW_SYSTEM_HTTPD=1 W3ID_MODDIR=/usr/libexec/apache2 W3ID_MIMETYPES=/private/etc/apache2/mime.types W3ID_PORT=8089 tools/server/bin/run-server start`,
+   and `run-server stop` afterwards. Their maintainer guide asks for the list of
+   requested URLs in the pull request.
+7. Open a PR scoped strictly to `ids/sstim/`; the maintainers reject PRs that
+   touch other namespaces.
+8. Write the description on the current upstream template
    (`.github/PULL_REQUEST_TEMPLATE.md`); the maintainers expect its structure
    (requested by @dgarijo on
-   [PR #6378](https://github.com/perma-id/w3id.org/pull/6378)). Keep its
-   sections and tick the applicable checklists: **Brief Description**, the
-   **General Checklist** (tested, minimal/squashed commits, redirects only), and
-   the **New**/**Update ID Directory Checklist** (maintainer GitHub usernames
-   present in `.htaccess` or `README.md`; the submitting account is one of them).
-7. In the Brief Description, state the redirect targets and that the namespace
+   [PR #6378](https://github.com/perma-id/w3id.org/pull/6378)). Its headings
+   changed after that request, so read it fresh each time: in October 2026 they
+   were **Brief description**, **Checklist**, **Automated checks** and
+   **Requests**.
+9. In the Brief description, state the redirect targets and that the namespace
    is for an OWL/SKOS ontology under CC BY 4.0.
 
 **Prerequisite for every route: GitHub Pages must serve the redirect target
