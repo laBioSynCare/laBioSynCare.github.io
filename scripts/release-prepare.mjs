@@ -24,9 +24,9 @@
 // misleading Released field is corrected on the stable submission rather than
 // by falsifying SSTIM's creation provenance.
 //
-// Beyond the ontology itself it carries the release into the four places that
-// describe it: the changelog section, CITATION.cff, the entrance metadata, and
-// void.ttl's version and counts. It also regenerates the ADR 0025 HED bundles,
+// Beyond the ontology itself it carries the release into the five places that
+// describe it: the changelog section, CITATION.cff, the entrance metadata,
+// void.ttl's version and counts, and .zenodo.json's version and totals. It also regenerates the ADR 0025 HED bundles,
 // which embed the suite version and therefore go stale on every release. Each
 // was previously a hand edit, and each mistake was caught by a later gate rather
 // than prevented — which works, but costs a full validation cycle and leaves the
@@ -38,7 +38,7 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { prepareReleaseManifest } from './release-dryrun.mjs'
+import { prepareReleaseManifest, prepareZenodoMetadata } from './release-dryrun.mjs'
 import { pinSourceLinks, treeHasPath } from './source-links.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -307,6 +307,8 @@ const rootStart = voidText.indexOf('<https://w3id.org/sstim/void>')
 if (rootStart < 0) throw new Error(`${VOID_PATH}: no root dataset block`)
 const rootEnd = voidText.indexOf('\n\n<', rootStart)
 const rootBlock = voidText.slice(rootStart, rootEnd < 0 ? undefined : rootEnd)
+// The release VoID described until now: the one .zenodo.json still names.
+const previousRelease = rootBlock.match(/dcat:version "([^"]*)"/)?.[1]
 
 let updatedRoot = rootBlock
 for (const [pattern, replacement, what] of [
@@ -319,6 +321,19 @@ for (const [pattern, replacement, what] of [
 }
 writeFileSync(join(ROOT, VOID_PATH), voidText.replace(rootBlock, updatedRoot), 'utf8')
 changes.push(VOID_PATH)
+
+// .zenodo.json names the release and quotes its totals, and the truth audit
+// holds both to the frozen release. The totals come from the term index's own
+// counter over the live modules, which the snapshot is about to freeze.
+const ZENODO_PATH = '.zenodo.json'
+const totals = JSON.parse(execFileSync('python3', [join(ROOT, 'scripts/generate-term-index.py'), '--counts', 'live'], { cwd: ROOT }).toString())
+const zenodo = prepareZenodoMetadata(JSON.parse(readFileSync(join(ROOT, ZENODO_PATH), 'utf8')), {
+  previous: previousRelease,
+  version,
+  totals,
+})
+writeFileSync(join(ROOT, ZENODO_PATH), `${JSON.stringify(zenodo, null, 2)}\n`, 'utf8')
+changes.push(ZENODO_PATH)
 
 console.log(`release-prepare: ${current} → ${version}, issued ${releaseDate}`)
 console.log(`  ${manifest.modules.length} modules, ${manifest.profiles.length} profile entry points, 1 manifest`)
@@ -334,6 +349,7 @@ execFileSync('python3', [join(ROOT, 'scripts/generate-hed-bundle.py')], { cwd: R
 execFileSync('node', [join(ROOT, 'scripts/gen-codemeta.mjs')], { cwd: ROOT, stdio: 'pipe' })
 
 console.log(`  changelog, CITATION.cff, entrance metadata, void.ttl (${counts.triples} triples, ${counts.classes} classes, ${counts.properties} properties)`)
+console.log(`  .zenodo.json: ${previousRelease} → ${version}, ${totals.classes} classes, ${totals.properties} properties, ${totals.concepts} concepts`)
 console.log('  HED demonstrator bundles and codemeta.json regenerated for the release version')
 console.log(`  ${pinnedLinks} links into the repository pinned to ${releaseTag}`)
 console.log(`  ${changes.length} files changed`)

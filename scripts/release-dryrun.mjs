@@ -61,6 +61,39 @@ export function prepareReleaseManifest(manifest, version) {
   return prepared
 }
 
+/**
+ * The Zenodo deposit metadata for `version`, from the metadata describing
+ * `previous`. Only the release-specific facts move: the version, wherever the
+ * description or a related identifier names it, and the four totals the truth
+ * audit reads, written back in the form it reads them. The prose stays a
+ * person's job. Both were hand edits at every cut until 0.19.0; 0.17.0 shipped
+ * with the previous version IRI still in `related_identifiers`.
+ *
+ * Throws, rather than leave a stale figure, when the description never names
+ * `previous` or states a total other than exactly once.
+ */
+export function prepareZenodoMetadata(zenodo, { previous, version, totals }) {
+  const named = () => new RegExp(`(?<![\\d.])${previous.replace(/\./g, '\\.')}(?![\\d.])`, 'g')
+  if (!named().test(zenodo.description ?? '')) {
+    throw new Error(`.zenodo.json: the description never names ${previous}, the release it should describe`)
+  }
+  let description = zenodo.description.replace(named(), version)
+  for (const key of ['modules', 'classes', 'properties', 'concepts']) {
+    const claim = new RegExp(`(?<![\\d.])(\\d+)((?:\\s+[A-Za-z]+){0,2}\\s+${key}\\b)`, 'g')
+    const found = [...description.matchAll(claim)].length
+    if (found !== 1) throw new Error(`.zenodo.json: expected one "<n> ${key}" total in the description, found ${found}`)
+    description = description.replace(claim, `${totals[key]}$2`)
+  }
+  return {
+    ...zenodo,
+    description,
+    related_identifiers: (zenodo.related_identifiers ?? []).map((related) => ({
+      ...related,
+      identifier: String(related.identifier).replace(named(), version),
+    })),
+  }
+}
+
 /** The frozen inventory `make snapshot` would produce for `version`. */
 export function modelSnapshotInventory(manifest, version) {
   const turtle = [
@@ -138,6 +171,20 @@ export function dryRunProblems({ manifest, version }) {
     } catch (error) {
       problems.push(`source links: ${error.message}`)
     }
+  }
+
+  // 5. Preparation also moves .zenodo.json to the release: its version and the
+  //    four totals the truth audit reads. Rehearse that against the live counts.
+  try {
+    const voidText = readFileSync(join(repoRoot, 'static/ontology/void.ttl'), 'utf8')
+    const previous = voidText.match(/dcat:version "([^"]+)"/)?.[1]
+    const totals = JSON.parse(execFileSync('python3', [join(here, 'generate-term-index.py'), '--counts', 'live'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+    }))
+    prepareZenodoMetadata(JSON.parse(readFileSync(join(repoRoot, '.zenodo.json'), 'utf8')), { previous, version, totals })
+  } catch (error) {
+    problems.push(`zenodo metadata: ${error.message.split('\n')[0]}`)
   }
 
   return problems

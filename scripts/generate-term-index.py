@@ -18,6 +18,9 @@ concluding a term is missing.
 
     scripts/generate-term-index.py --counts 0.18.0
                              the same totals for a frozen release, as JSON
+    scripts/generate-term-index.py --counts live
+                             the same totals for the live modules, which
+                             release preparation writes into .zenodo.json
 
 The release totals exist for text that describes a release rather than the
 development line, `.zenodo.json` above all; the truth audit reads them here so
@@ -192,13 +195,17 @@ def collect(sources: list[tuple[str, Path]]) -> tuple[list, list, list, int]:
 
 
 def release_counts(version: str) -> int:
-    """Print a frozen release's totals, counted exactly as the index counts."""
-    frozen = ONTOLOGY / version
-    manifest_path = frozen / "manifest.json"
-    if not manifest_path.is_file():
-        raise SystemExit(f"term-index: {frozen.relative_to(ROOT)} has no frozen manifest")
-    modules = json.loads(manifest_path.read_text(encoding="utf-8"))["modules"]
-    sources = [(m["id"], frozen / Path(m["source"]["path"]).name) for m in modules]
+    """Print a frozen release's totals, or the live modules', counted as the index counts."""
+    if version == "live":
+        modules = json.loads((ONTOLOGY / "manifest.json").read_text(encoding="utf-8"))["modules"]
+        sources = [(m["id"], ROOT / m["source"]["path"]) for m in modules]
+    else:
+        frozen = ONTOLOGY / version
+        manifest_path = frozen / "manifest.json"
+        if not manifest_path.is_file():
+            raise SystemExit(f"term-index: {frozen.relative_to(ROOT)} has no frozen manifest")
+        modules = json.loads(manifest_path.read_text(encoding="utf-8"))["modules"]
+        sources = [(m["id"], frozen / Path(m["source"]["path"]).name) for m in modules]
     classes, properties, concepts, deprecated = collect(sources)
     print(json.dumps({
         "version": version,

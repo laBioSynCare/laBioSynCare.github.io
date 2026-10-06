@@ -10,6 +10,7 @@ import {
   modelSnapshotInventory,
   nextVersion,
   prepareReleaseManifest,
+  prepareZenodoMetadata,
 } from './release-dryrun.mjs'
 
 const manifest = loadManifest(DEFAULT_MANIFEST_PATH)
@@ -74,4 +75,39 @@ test('a -dev line rehearses the release it is already numbered for', () => {
   // repository is actually working towards.
   expect(nextVersion('0.14.0-dev')).toBe('0.14.0')
   expect(nextVersion('0.13.0')).toBe('0.14.0')
+})
+
+test('release preparation moves the deposit metadata to the release, and only that', () => {
+  const zenodo = {
+    title: 'SSTIM Workbench',
+    description: '<p>This release freezes SSTIM 1.2.3: 18 modules holding 100 OWL classes and 200 properties ' +
+      'labelled in English, and 300 SKOS concepts. The version IRI https://w3id.org/sstim/1.2.3 resolves to it. ' +
+      'Licensed CC BY 4.0.</p>',
+    related_identifiers: [
+      { identifier: 'https://w3id.org/sstim/1.2.3', relation: 'hasPart' },
+      { identifier: 'https://github.com/w3c-cg/sstim', relation: 'isSupplementTo' },
+    ],
+  }
+  const next = prepareZenodoMetadata(zenodo, {
+    previous: '1.2.3',
+    version: '1.3.0',
+    totals: { modules: 19, classes: 101, properties: 202, concepts: 303 },
+  })
+  expect(next.description).toBe('<p>This release freezes SSTIM 1.3.0: 19 modules holding 101 OWL classes and 202 ' +
+    'properties labelled in English, and 303 SKOS concepts. The version IRI https://w3id.org/sstim/1.3.0 resolves ' +
+    'to it. Licensed CC BY 4.0.</p>')
+  expect(next.related_identifiers.map((r) => r.identifier))
+    .toEqual(['https://w3id.org/sstim/1.3.0', 'https://github.com/w3c-cg/sstim'])
+  expect(next.title).toBe(zenodo.title)
+})
+
+test('the deposit metadata refuses to move from a release it does not describe', () => {
+  const zenodo = { description: '<p>SSTIM 1.2.3 with 1 modules, 2 classes, 3 properties and 4 concepts.</p>' }
+  const totals = { modules: 1, classes: 2, properties: 3, concepts: 4 }
+  expect(() => prepareZenodoMetadata(zenodo, { previous: '1.2.2', version: '1.3.0', totals }))
+    .toThrow(/never names 1\.2\.2/)
+  // A total stated twice cannot be updated without guessing which one is meant.
+  const doubled = { description: `${zenodo.description} Also 9 classes.` }
+  expect(() => prepareZenodoMetadata(doubled, { previous: '1.2.3', version: '1.3.0', totals }))
+    .toThrow(/expected one "<n> classes" total/)
 })

@@ -529,11 +529,12 @@ SSTIM versions the manifest-owned modules as one synchronized citable set:
    manifest-owned module and profile entry point**, the `owl:versionIRI` and
    `mod:status "released"` in the root Kernel, the frozen import and artifact
    IRIs on every profile, the manifest's immutable release URLs, every link into
-   the repository pinned to the release's own tag (GB-08), and the four
+   the repository pinned to the release's own tag (GB-08), and the five
    documents that describe the release — the changelog section, `CITATION.cff`,
-   the entrance metadata, and `void.ttl`'s version and counts. Those four were
-   hand edits for 0.14.0 and each was caught by a gate failing afterwards rather
-   than by being done. Pass the same date to `make snapshot` below: it defaults
+   the entrance metadata, `void.ttl`'s version and counts, and `.zenodo.json`'s
+   version and totals. The first four were hand edits for 0.14.0 and each was
+   caught by a gate failing afterwards rather than by being done; `.zenodo.json`
+   was a hand edit until 0.19.0. Pass the same date to `make snapshot` below: it defaults
    to today and refuses a module set dated otherwise. What it deliberately does
    not touch is prose — `truth-audit` still catches a `TODO.md` line naming the
    previous release as current, and a script should not guess at wording. Populate every profile's
