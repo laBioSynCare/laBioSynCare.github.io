@@ -154,6 +154,19 @@ TECHNIQUE_HTML_ROUTES = {
         "https://w3c-cg.github.io/sstim/graph/#techVibrotactileEntrainment"
     ),
 }
+# The BSC framework's own vocabulary and shapes (ADR 0061), served from the
+# framework's static directory because no SSTIM release carries them. A browser
+# asking for the vocabulary goes to the knowledge browser with the namespace in
+# ?ns=, since its local names repeat those of the SSTIM terms it replaced.
+BSC_FRAMEWORK_DIRECTORY = "https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/"
+FRAMEWORK_VOCABULARY_PUBLIC_ROUTES = {
+    "framework/bsc/vocab": f"{BSC_FRAMEWORK_DIRECTORY}bsc-vocab.ttl",
+    "framework/bsc/shapes": f"{BSC_FRAMEWORK_DIRECTORY}bsc-shapes.ttl",
+}
+FRAMEWORK_VOCABULARY_HTML_ROUTES = {
+    "framework/bsc/vocab": "https://w3c-cg.github.io/sstim/graph/?ns=bsc-v",
+    "framework/bsc/shapes": f"{BSC_FRAMEWORK_DIRECTORY}bsc-shapes.ttl",
+}
 
 # Canonical Accept matching for every staged content-negotiated route. Explicit
 # RDF types win in JSON-LD, RDF/XML order, then HTML, then Turtle/wildcard.
@@ -1510,6 +1523,11 @@ check_exact_w3id_route_block(
 )
 check_exact_w3id_route_block(
     "BSC technique", TECHNIQUE_PUBLIC_ROUTES, TECHNIQUE_HTML_ROUTES
+)
+check_exact_w3id_route_block(
+    "BSC framework vocabulary",
+    FRAMEWORK_VOCABULARY_PUBLIC_ROUTES,
+    FRAMEWORK_VOCABULARY_HTML_ROUTES,
 )
 
 # Fixture identities deliberately use the production IRI grammar required by

@@ -280,6 +280,55 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   expect(go('specialist/synthetic-someone', 'text/turtle').status).toBe(404)
 })
 
+test('the BSC framework vocabulary routes outside SSTIM, and a browser keeps its namespace', () => {
+  // ADR 0061 moved BSC's catalog model out of SSTIM. Its vocabulary repeats the
+  // local names of the SSTIM terms it replaced, and the knowledge browser
+  // resolves a bare name into SSTIM first, so a browser sent to .../vocab#Voice
+  // with a bare fragment would land on the deprecated sstim:Voice. The route
+  // names the namespace instead, and the graph qualifies the fragment the
+  // browser re-attaches (qualifyArrivalHash in src/ui/graph/deepLink.js).
+  expect(go('framework/bsc/vocab', BROWSER).doc).toBe(APPLICATION + 'graph/?ns=bsc-v')
+  expect(PREFIXES).toHaveProperty('bsc-v')
+  for (const accept of ['text/turtle', 'application/x-turtle', '*/*', '']) {
+    expect(go('framework/bsc/vocab', accept).doc).toBe('frameworks/bsc/bsc-vocab.ttl')
+    expect(go('framework/bsc/shapes', accept).doc).toBe('frameworks/bsc/bsc-shapes.ttl')
+  }
+  // Shapes are not drawable nodes, so a browser gets the Turtle as well.
+  expect(go('framework/bsc/shapes', BROWSER).doc).toBe('frameworks/bsc/bsc-shapes.ttl')
+  // No release carries either file, so there is no JSON-LD or RDF/XML export.
+  expect(go('framework/bsc/vocab', 'application/ld+json').status).toBe(406)
+  expect(go('framework/bsc/shapes', 'application/rdf+xml').status).toBe(406)
+  // The framework record keeps its own route; the vocabulary is not a part of it.
+  expect(go('framework/bsc', 'text/turtle').doc).toBe('instances/frameworks/bsc.ttl')
+})
+
+test('every BSC replacement of a deprecated SSTIM term dereferences to its declaration', () => {
+  // ADR 0061's ordering: 0.19.0 is not cut until every dct:isReplacedBy target
+  // dereferences. This holds the BSC half to it, from the modules themselves.
+  const manifest = JSON.parse(readFileSync(join(repoRoot, 'static/ontology/manifest.json'), 'utf8'))
+  const IS_REPLACED_BY = 'http://purl.org/dc/terms/isReplacedBy'
+  const targets = new Set()
+  for (const module of manifest.modules) {
+    const quads = new Parser().parse(readFileSync(join(repoRoot, module.source.path), 'utf8'))
+    for (const quad of quads) {
+      if (quad.predicate.value === IS_REPLACED_BY && quad.object.value.startsWith(PREFIXES['bsc-v'])) {
+        targets.add(quad.object.value)
+      }
+    }
+  }
+  expect(targets.size).toBeGreaterThanOrEqual(30)
+  const declared = new Map()
+  for (const target of targets) {
+    const { status, doc } = go(sstimPath(target.split('#')[0]), 'text/turtle')
+    expect(status, target).toBe(303)
+    if (!declared.has(doc)) {
+      const quads = new Parser().parse(readFileSync(join(repoRoot, 'static/ontology', doc), 'utf8'))
+      declared.set(doc, new Set(quads.map((quad) => quad.subject.value)))
+    }
+    expect(declared.get(doc).has(target), `${target} is not declared in ${doc}`).toBe(true)
+  }
+})
+
 test('every committed public preset and reference has an exact entity route', () => {
   // Derive the inventory from the same committed source map the app loads.
   // Adding a public Preset or PublicSafeReference without adding an audited

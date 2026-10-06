@@ -59,15 +59,16 @@ test('every production target belongs to an explicit reviewed category', () => {
   // Deliberately a second copy of EXPECTED_RULE_COUNTS rather than an import:
   // adding a W3ID rule is a public-contract change, and having to update the
   // number in two places is the point. +2 application routes on 2026-08-27 for
-  // the preset and session JSON Schema `$id` values.
+  // the preset and session JSON Schema `$id` values. +6 on 2026-10-06 for the
+  // BSC framework vocabulary and shapes (ADR 0061): two HTML, two Turtle, two 406.
   expect(ruleCounts(productionRules)).toEqual({
-    total: 78,
-    ontology: 37,
-    graph: 16,
+    total: 84,
+    ontology: 40,
+    graph: 17,
     application: 6,
     external: 2,
     pinnedOntology: 1,
-    statusOnly: 16,
+    statusOnly: 18,
   })
   expect(productionRules.filter(({ target }) => classifyTarget(target) === 'external'))
     .toHaveLength(2)
@@ -111,8 +112,9 @@ test('all expanded ontology targets preserve their publication-relative path', (
   // 93 since 2026-08-23: /ontology/docs/vocab/ was this set's only sole-owner
   // target, and vocab's HTML moved to the application. 96 since 2026-09-10,
   // when the preset catalog grew to one reference record per group and each
-  // new id added its own Turtle target to the audited route block.
-  expect(production).toHaveLength(96)
+  // new id added its own Turtle target to the audited route block. 98 since
+  // 2026-10-06: the BSC framework vocabulary and shapes files (ADR 0061).
+  expect(production).toHaveLength(98)
   expect(staged.map((target) => target.slice(STAGED_TARGETS.ontology.length)))
     .toEqual(production.map((target) => target.slice(PRODUCTION_TARGETS.ontology.length)))
   expect(staged.every((target) => target.startsWith(STAGED_TARGETS.ontology))).toBe(true)

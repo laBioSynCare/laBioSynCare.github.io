@@ -40,6 +40,46 @@ export function parseViewParams(search) {
   return { zoom, neighborhoodFocus: params.get('focus') === FOCUS_PARAM_VALUE }
 }
 
+// ── Namespace-qualified arrival ─────────────────────────────────────────────
+// A server never sees a URL fragment, so the w3id route for a hash namespace
+// can only name the namespace, and the browser re-attaches the fragment it
+// never sent. A bare `#Voice` is then ambiguous wherever two namespaces share a
+// local name, and the BSC framework vocabulary shares one with every SSTIM term
+// it replaced (ADR 0061): a bare name resolves into SSTIM first, so
+// `.../framework/bsc/vocab#Voice` would select the deprecated `sstim:Voice`.
+// Such a route therefore redirects to `?ns=<prefix>`, and this turns the bare
+// fragment into `#<prefix>:Voice` before anything resolves it.
+export const NAMESPACE_PARAM = 'ns'
+
+/**
+ * The arrival hash a namespace route means, and the query to keep.
+ *
+ * The parameter is always dropped from the returned query: once the hash names
+ * its prefix the parameter has done its work, and left in the address it would
+ * qualify the next bare hash the reader navigates to, as well as every link
+ * they copy.
+ *
+ * @param {string} search `window.location.search`
+ * @param {string} hash `window.location.hash`
+ * @param {Record<string, string>} prefixes registered prefix to base IRI
+ * @returns {{ hash: string, search: string }}
+ */
+export function qualifyArrivalHash(search, hash, prefixes) {
+  const params = new URLSearchParams(search ?? '')
+  const prefix = params.get(NAMESPACE_PARAM)
+  if (prefix === null) return { hash: hash ?? '', search: search ?? '' }
+  params.delete(NAMESPACE_PARAM)
+  const query = params.toString()
+  const kept = query ? `?${query}` : ''
+  const local = (hash ?? '').replace(/^#/, '')
+  // Only a registered prefix qualifies, and only a bare name needs it: a hash
+  // that already names its prefix says more than the route could.
+  if (!Object.hasOwn(prefixes, prefix) || !local || local.includes(':')) {
+    return { hash: hash ?? '', search: kept }
+  }
+  return { hash: `#${prefix}:${local}`, search: kept }
+}
+
 /**
  * The `?zoom=` value for a live camera scale. Three decimals is finer than the
  * eye can tell apart and keeps the address bar readable.

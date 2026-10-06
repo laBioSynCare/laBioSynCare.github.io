@@ -51,14 +51,21 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 // dcat:downloadURL, which pairs with an accessURL PURL beside it), so it is the
 // one place a persistent URI replaces rather than duplicates. Total 76 -> 78,
 // application 4 -> 6.
+//
+// 2026-10-06, the BSC framework vocabulary (ADR 0061): framework/bsc/vocab and
+// framework/bsc/shapes, which left SSTIM's namespaces and no release carries.
+// Each has an HTML rule, a Turtle rule and a 406. The vocabulary's HTML goes to
+// the knowledge browser with ?ns=bsc-v; the shapes' HTML, like their Turtle,
+// goes to the file. Total 78 -> 84: ontology 37 -> 40, graph 16 -> 17,
+// statusOnly 16 -> 18.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 78,
-  ontology: 37,
+  total: 84,
+  ontology: 40,
   pinnedOntology: 1,
-  graph: 16,
+  graph: 17,
   application: 6,
   external: 2,
-  statusOnly: 16,
+  statusOnly: 18,
 })
 
 export const BROWSER_ACCEPT =

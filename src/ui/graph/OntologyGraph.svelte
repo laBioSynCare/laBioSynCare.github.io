@@ -8,7 +8,7 @@
   import AnnotationPanel from '../annotation/AnnotationPanel.svelte'
   import { graphSession, saveGraphSession } from './graphSession.js'
   import {
-    parseViewParams, formatZoomParam, pulseSchedule,
+    parseViewParams, formatZoomParam, pulseSchedule, qualifyArrivalHash,
     MIN_ZOOM, MAX_ZOOM, FOCUS_PARAM_VALUE,
   } from './deepLink.js'
   import { isVisualStimulationOn, prefersReducedMotion } from '../safety/visualSafety.js'
@@ -182,7 +182,12 @@
   // The framing half of the deep link — `?zoom=` and `?focus=neighborhood` —
   // parsed by deepLink.js, which owns that contract and its tests.
   const urlView = parseViewParams(typeof window === 'undefined' ? '' : window.location.search)
-  const initialUrlHash = typeof window === 'undefined' ? '' : window.location.hash
+  // A namespace route's `?ns=` names the namespace a bare fragment belongs to
+  // (deepLink.js); the address loses the parameter on mount.
+  const arrival = typeof window === 'undefined'
+    ? { hash: '', search: '' }
+    : qualifyArrivalHash(window.location.search, window.location.hash, PREFIXES)
+  const initialUrlHash = arrival.hash
 
   // Each axis is a Set. Within an axis the members union; across axes they
   // intersect. An empty module/concern/hiddenKinds axis imposes no constraint;
@@ -1993,6 +1998,9 @@
   }
 
   onMount(async () => {
+    if (arrival.search !== window.location.search || arrival.hash !== window.location.hash) {
+      replaceState(window.location.pathname + arrival.search + arrival.hash, {})
+    }
     window.addEventListener('keydown', handleGraphKeydown)
     window.addEventListener('hashchange', handleHashChange)
     try {

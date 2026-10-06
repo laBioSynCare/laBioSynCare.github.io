@@ -10,7 +10,46 @@ import {
   MIN_ZOOM,
   MAX_ZOOM,
   FLASH_SAFE_MAX_HZ,
+  qualifyArrivalHash,
 } from './deepLink.js'
+import { PREFIXES } from '../../rdf/namespaces.js'
+
+describe('qualifyArrivalHash', () => {
+  it('qualifies the bare fragment a namespace route delivers, and drops the parameter', () => {
+    // What a browser holds after w3id answers .../framework/bsc/vocab#Voice
+    // with /graph/?ns=bsc-v and re-attaches the fragment it never sent.
+    expect(qualifyArrivalHash('?ns=bsc-v', '#Voice', PREFIXES))
+      .toEqual({ hash: '#bsc-v:Voice', search: '' })
+  })
+
+  it('keeps every other parameter', () => {
+    expect(qualifyArrivalHash('?zoom=1.5&ns=bsc-v&focus=neighborhood', '#groupHeal', PREFIXES))
+      .toEqual({ hash: '#bsc-v:groupHeal', search: '?zoom=1.5&focus=neighborhood' })
+  })
+
+  it('leaves a hash that already names its prefix alone', () => {
+    expect(qualifyArrivalHash('?ns=bsc-v', '#sstim-v:alpha', PREFIXES))
+      .toEqual({ hash: '#sstim-v:alpha', search: '' })
+  })
+
+  it('does not invent a prefix it does not know', () => {
+    expect(qualifyArrivalHash('?ns=nonsense', '#Voice', PREFIXES))
+      .toEqual({ hash: '#Voice', search: '' })
+  })
+
+  it('opens the namespace itself without a hash when no fragment arrived', () => {
+    expect(qualifyArrivalHash('?ns=bsc-v', '', PREFIXES)).toEqual({ hash: '', search: '' })
+  })
+
+  it('changes nothing without the parameter', () => {
+    expect(qualifyArrivalHash('?zoom=2', '#Preset', PREFIXES))
+      .toEqual({ hash: '#Preset', search: '?zoom=2' })
+  })
+
+  it('knows the prefix the BSC vocabulary route sends', () => {
+    expect(PREFIXES['bsc-v']).toBe('https://w3id.org/sstim/framework/bsc/vocab#')
+  })
+})
 
 describe('parseViewParams', () => {
   it('reads a zoom level and the neighborhood focus flag', () => {
