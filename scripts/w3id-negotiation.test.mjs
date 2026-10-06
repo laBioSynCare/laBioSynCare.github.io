@@ -281,6 +281,26 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   expect(go('specialist/synthetic-someone', 'text/turtle').status).toBe(404)
 })
 
+test('a version IRI negotiates like the namespace, and refuses no client', () => {
+  // GB-09. JSON-LD and RDF/XML get the release's version document in those
+  // formats and a browser gets the release's page, all derived at deploy by
+  // publish-release-serializations.py; anything else gets the Turtle it always
+  // got. A permanent identifier that started answering 406 would break a client
+  // that worked yesterday, so the last rule is unconditional.
+  for (const [version, stem] of [['0.18.0', 'sstim-namespace'], ['0.12.0', 'sstim-core'], ['0.1.0', 'sstim-core']]) {
+    for (const path of [version, `${version}/`]) {
+      expect(go(path, 'application/ld+json').doc, path).toBe(`${version}/${stem}.jsonld`)
+      expect(go(path, 'application/rdf+xml').doc, path).toBe(`${version}/${stem}.rdf`)
+      expect(go(path, BROWSER).doc, path).toBe(`${version}/`)
+      for (const accept of ['text/turtle', '*/*', '', 'application/n-triples', 'application/ld+json;q=0']) {
+        expect(go(path, accept), `${path} ${accept}`).toEqual({ status: 302, doc: `${version}/${stem}.ttl` })
+      }
+    }
+  }
+  // A frozen file named by path is still that file, whatever the client asks for.
+  expect(go('0.18.0/sstim-vocab.ttl', 'application/ld+json').doc).toBe('0.18.0/sstim-vocab.ttl')
+})
+
 test('every version IRI resolves to the document its release publishes in every format', () => {
   // publish-release-serializations.py derives JSON-LD and RDF/XML for exactly
   // one file per frozen release: the namespace catalogue when the release has a

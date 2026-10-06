@@ -9,6 +9,7 @@ import { releaseDirectories } from './publish-latest-ontology.mjs'
 import {
   developmentLineTargets,
   expandRule,
+  isDerivedReleaseArtifact,
   routeTargets,
   unpublishableTargets,
 } from './check-w3id-route-targets.mjs'
@@ -153,4 +154,22 @@ test('renaming the sstim catalogue cannot break the bare ontology IRI', () => {
   const problems = unpublishableTargets({ htaccess, manifest: renamed })
 
   expect(problems.some((problem) => problem.includes('latest/'))).toBe(false)
+})
+
+test('a frozen release\'s page and version document formats count as published, and nothing else does', () => {
+  // GB-09: publish-release-serializations.py derives these at deploy, so they
+  // are never committed. The rule is the script's: the namespace catalogue for a
+  // release with a manifest, the Kernel file before that, and only for a
+  // release that exists.
+  expect(isDerivedReleaseArtifact('0.18.0/')).toBe(true)
+  expect(isDerivedReleaseArtifact('0.18.0/sstim-namespace.jsonld')).toBe(true)
+  expect(isDerivedReleaseArtifact('0.18.0/sstim-namespace.rdf')).toBe(true)
+  expect(isDerivedReleaseArtifact('0.1.0/sstim-core.jsonld')).toBe(true)
+  // Not the Kernel of a modular release, which is two classes, not the release.
+  expect(isDerivedReleaseArtifact('0.18.0/sstim-core.jsonld')).toBe(false)
+  // Not a module, which stays Turtle in a frozen release.
+  expect(isDerivedReleaseArtifact('0.18.0/sstim-vocab.jsonld')).toBe(false)
+  // Not a release that was never cut.
+  expect(isDerivedReleaseArtifact('9.9.9/sstim-namespace.jsonld')).toBe(false)
+  expect(isDerivedReleaseArtifact('9.9.9/')).toBe(false)
 })

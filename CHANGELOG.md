@@ -65,8 +65,10 @@ file is the human-readable summary.
   to, is now published in JSON-LD and RDF/XML beside its Turtle (for example
   `https://w3c-cg.github.io/sstim/ontology/0.18.0/sstim-namespace.jsonld`).
   They are derived at deploy and verified isomorphic, and the frozen Turtle is
-  untouched. Content negotiation on the version IRI itself still needs a w3id
-  change.
+  untouched. Each release also gets a page at its directory
+  (`https://w3c-cg.github.io/sstim/ontology/0.18.0/`), rendered from the
+  snapshot's own README. The version IRI will negotiate between all four once a
+  w3id change merges; until then it answers in Turtle, as before.
 
 ### Deprecated
 

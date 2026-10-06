@@ -525,8 +525,18 @@ explicit instruction naming each file.
   unchanged (`make publish-releases`, rehearsed in `make validate`). Deriving
   all 428 files took 51 minutes, nearly all of it isomorphism proofs for the
   shapes files; the version documents take half a minute.*
-  - *Next step:* version-route negotiation (an upstream w3id pull request); a
-    route and a coverage check for `context.jsonld`.
+  *Step 2 staged the same day: the generated snapshot region negotiates the
+  version IRI (JSON-LD, RDF/XML, an HTML release page rendered from the
+  snapshot's own README, and Turtle for anything else, so no 406 is added), and
+  its self-check now executes the conditions under seven Accept values per
+  release. Upstream after perma-id/w3id.org#6827 merges.*
+  *The context's coverage check already existed: the quality audit fails on any
+  local OWL term, deprecated or not, without a compact term ("no compact term
+  for"), and it fired on a test removal. The review missed it; only the route
+  remains.*
+  - *Next step:* the upstream pull request for step 2; a route for
+    `context.jsonld`, which is a decision: the live context, or one frozen into
+    each release from 0.19.0 and served from `latest/`.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
 - [ ] **GB-10 Presets page neutrality** (after GB-01).
   *The GB-01 migration made the group and the breath guide optional and reads

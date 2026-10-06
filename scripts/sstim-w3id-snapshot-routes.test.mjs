@@ -82,6 +82,17 @@ test('the simulation catches a generator that drops the legacy rule', () => {
   expect(failures.join('\n')).toContain('sstim-core.ttl')
 })
 
+test('the simulation catches a version route that stops negotiating', () => {
+  // GB-09. Deleting one condition turns its rule unconditional, so every client
+  // of the version IRI gets that format, Turtle readers included.
+  const region = generatedRegion()
+  const cut = region.split('\n')
+  cut.splice(cut.findIndex((line) => line.includes('application/ld\\+json')), 1)
+  const { failures } = simulate(snapshotInventory(), cut.join('\n'))
+  expect(failures.length).toBeGreaterThan(0)
+  expect(failures.join('\n')).toContain('[text/turtle]')
+})
+
 test('the simulation catches a file pattern that excludes hyphens', () => {
   const region = generatedRegion().replace('sstim-[a-z0-9-]+', 'sstim-[a-z0-9]+')
   const { failures } = simulate(snapshotInventory(), region)

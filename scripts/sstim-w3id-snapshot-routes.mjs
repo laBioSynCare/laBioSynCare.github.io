@@ -25,6 +25,8 @@ import { existsSync, readFileSync, readdirSync, realpathSync, writeFileSync } fr
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { parseRules as parseNegotiatedRules, resolveRoute } from './w3id-negotiation.mjs'
+
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
 const ontologyDir = join(repoRoot, 'static', 'ontology')
@@ -92,6 +94,34 @@ export function snapshotInventory(directory = ontologyDir) {
 // whole-ontology namespace catalogue for its version IRI to resolve to.
 const MODULAR_ROOT_ARTIFACT = 'sstim-namespace.ttl'
 const LEGACY_ROOT_ARTIFACT = 'sstim-core.ttl'
+
+// A version IRI negotiates (GB-09). JSON-LD and RDF/XML clients get the
+// release's version document in those formats and a browser gets the release's
+// page, all derived at deploy by publish-release-serializations.py. Anything
+// else gets the Turtle it always got, so no client that worked before is
+// refused: a permanent identifier must not start answering 406. The conditions
+// are the ones every other negotiated SSTIM route uses, verbatim, in the same
+// precedence: JSON-LD, then RDF/XML, then HTML.
+const Q_ZERO_GUARD = String.raw`(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$))`
+export const ACCEPT_CONDITIONS = {
+  jsonld: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
+  rdfxml: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
+  html: String.raw`RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)` + `${Q_ZERO_GUARD} [NC]`,
+}
+
+/** The negotiated rules for one version-IRI pattern whose document is `turtle`. */
+function versionIriRules(pattern, turtle) {
+  const stem = turtle.replace(/\.ttl$/, '')
+  return [
+    ACCEPT_CONDITIONS.jsonld,
+    `RewriteRule ${pattern} ${SITE}$1/${stem}.jsonld [R=302,L]`,
+    ACCEPT_CONDITIONS.rdfxml,
+    `RewriteRule ${pattern} ${SITE}$1/${stem}.rdf [R=302,L]`,
+    ACCEPT_CONDITIONS.html,
+    `RewriteRule ${pattern} ${SITE}$1/ [R=302,L]`,
+    `RewriteRule ${pattern} ${SITE}$1/${turtle} [R=302,L]`,
+  ]
+}
 
 /**
  * The pre-modular snapshots, whose version IRI resolves to the Kernel file
@@ -162,7 +192,9 @@ export function generatedRegion(inventory = snapshotInventory()) {
     lines.push(
       '# Pre-modular snapshots, a closed set: their version IRI resolves to the',
       '# Kernel file, which was the whole ontology before ADR 0043 split it.',
-      `RewriteRule ^(${legacy})/?$ ${SITE}$1/${LEGACY_ROOT_ARTIFACT} [R=302,L]`,
+      '# Every version IRI negotiates: JSON-LD, RDF/XML, the release page for a',
+      '# browser, and Turtle for anything else, as it always answered (GB-09).',
+      ...versionIriRules(`^(${legacy})/?$`, LEGACY_ROOT_ARTIFACT),
     )
   }
   const rootAbsolute = rootAbsoluteManifestVersions(inventory).map(regexLiteral).join('|')
@@ -177,42 +209,36 @@ export function generatedRegion(inventory = snapshotInventory()) {
   }
   lines.push(
     '# Every snapshot, including releases not yet cut. Four patterns rather than',
-    '# four rules per release (ADR 0053).',
+    '# four rules per release (ADR 0053); the version IRI\'s pattern negotiates.',
     `RewriteRule ^(\\d+\\.\\d+\\.\\d+)/(sstim-[a-z0-9-]+\\.ttl)$ ${SITE}$1/$2 [R=302,L]`,
     `RewriteRule ^(\\d+\\.\\d+\\.\\d+)/manifest$ ${SITE}$1/manifest.json [R=302,L]`,
     `RewriteRule ^(\\d+\\.\\d+\\.\\d+)/manifest\\.schema\\.json$ ${SITE}$1/manifest.schema.json [R=302,L]`,
-    `RewriteRule ^(\\d+\\.\\d+\\.\\d+)/?$ ${SITE}$1/${MODULAR_ROOT_ARTIFACT} [R=302,L]`,
+    ...versionIriRules('^(\\d+\\.\\d+\\.\\d+)/?$', MODULAR_ROOT_ARTIFACT),
   )
   lines.push(END)
   return lines.join('\n')
 }
 
 /**
- * Parse `RewriteRule <pattern> <target> [flags]` lines out of a region.
+ * Parse the region's rules, `RewriteCond` chains included.
  *
  * The simulation runs the rules that ship, not a second model of them. A
  * parallel reimplementation would drift from the file and pass while the file
- * was wrong, which is the failure this check exists to prevent.
+ * was wrong, which is the failure this check exists to prevent. Since the
+ * version IRI negotiates, that means the mod_rewrite model the negotiation
+ * tests use, which reads conditions: one that ignored them would answer every
+ * client with the first conditional rule.
  */
 export function parseRules(region) {
-  return region
-    .split('\n')
-    .filter((line) => line.startsWith('RewriteRule '))
-    .map((line) => {
-      const [, pattern, target] = line.split(/\s+/)
-      return { pattern: new RegExp(pattern), target, source: line }
-    })
+  return parseNegotiatedRules(region)
 }
 
-/** Apply the rules in order, first match wins, as Apache does with [L]. */
-export function resolvePath(path, rules) {
-  for (const rule of rules) {
-    const match = path.match(rule.pattern)
-    if (!match) continue
-    return rule.target.replace(/\$(\d)/g, (_, index) => match[Number(index)] ?? '')
-  }
-  return null
+/** Apply the rules in order for `accept`, first match wins, as Apache does with [L]. */
+export function resolvePath(path, rules, accept = 'text/turtle') {
+  return resolveRoute(path, accept, rules).location
 }
+
+const BROWSER_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 
 /**
  * Every file in every frozen snapshot must resolve to its own URL, and every
@@ -242,14 +268,28 @@ export function simulate(inventory = snapshotInventory(), region = generatedRegi
         `${SITE}${snapshot.version}/manifest.schema.json`,
       ])
     }
-    // Both spellings of the version IRI, with and without the trailing slash.
+    // Both spellings of the version IRI, with and without the trailing slash,
+    // under every Accept the route distinguishes, and one it does not.
+    const stem = rootArtifact.replace(/\.ttl$/, '')
     for (const bare of [snapshot.version, `${snapshot.version}/`]) {
-      expectations.push([bare, `${SITE}${snapshot.version}/${rootArtifact}`])
+      for (const [accept, document] of [
+        ['text/turtle', rootArtifact],
+        ['*/*', rootArtifact],
+        ['', rootArtifact],
+        ['application/n-triples', rootArtifact],
+        ['application/ld+json', `${stem}.jsonld`],
+        ['application/rdf+xml', `${stem}.rdf`],
+        [BROWSER_ACCEPT, ''],
+      ]) {
+        expectations.push([bare, `${SITE}${snapshot.version}/${document}`, accept])
+      }
     }
-    for (const [path, expected] of expectations) {
+    for (const [path, expected, accept = 'text/turtle'] of expectations) {
       checked += 1
-      const actual = resolvePath(path, rules)
-      if (actual !== expected) failures.push(`${path} → ${actual ?? 'no rule matched'} (expected ${expected})`)
+      const actual = resolvePath(path, rules, accept)
+      if (actual !== expected) {
+        failures.push(`${path} [${accept || 'no Accept'}] → ${actual ?? 'no rule matched'} (expected ${expected})`)
+      }
     }
   }
   return { checked, failures, snapshots: inventory.length }

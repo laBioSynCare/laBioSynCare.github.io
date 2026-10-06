@@ -88,7 +88,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/specialist/{id}` and `/sstim/organization/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/ecosystem-record/{relationship,activity,role}/{id}` namespaces (`synthetic-*` excluded) | Mutable live-only ecosystem projection | Staged locally |
 | `/sstim/void` | VoID + DCAT dataset description (Turtle only) | Live |
-| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files | Live |
+| `/sstim/{major.minor.patch}` and `/sstim/{major.minor.patch}/{file.ttl}` | Versioned immutable snapshot root and Turtle files. The version IRI also negotiates (GB-09): JSON-LD and RDF/XML of the release's version document, and an HTML page for a browser; any other request gets Turtle | Files live; negotiation staged locally, to be submitted after [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
 | `/sstim/{major.minor.patch}/manifest` | The manifest frozen with a modular release | Generated only for snapshots containing `manifest.json`; absent from `0.12.0` and earlier |
 | `/sstim/{major.minor.patch}/manifest.schema.json` | The schema frozen beside a modular release manifest | Generated only for snapshots containing `manifest.schema.json`; absent from `0.12.0` and earlier |
 
@@ -100,7 +100,11 @@ requests with no acceptable supported range receive `406 Not Acceptable`. The
 precedence is deterministic server ordering, not full ranking by positive `q`
 magnitude; clients that require one representation should request that media
 type alone. The manifest and schema are JSON; VoID and frozen Turtle files are
-not multi-format. `Header always set Vary "Accept"` is present but does not take
+not multi-format. A version IRI negotiates too, but never refuses: JSON-LD and
+RDF/XML get the release's version document in those formats, a browser gets the
+release's page, and every other request gets the Turtle it always got, because a
+permanent identifier must not start answering `406`. Those three are derived at
+deploy (`make publish-releases`), never committed. `Header always set Vary "Accept"` is present but does not take
 effect on w3id.org redirects; see the note above for why that is bounded rather
 than ignored. HTML requests go to human-facing documentation or the
 application.

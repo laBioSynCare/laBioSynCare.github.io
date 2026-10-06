@@ -33,6 +33,14 @@ RewriteEngine On
 # BEGIN generated SSTIM snapshot routes
 # Pre-modular snapshots, a closed set: their version IRI resolves to the
 # Kernel file, which was the whole ontology before ADR 0043 split it.
+# Every version IRI negotiates: JSON-LD, RDF/XML, the release page for a
+# browser, and Turtle for anything else, as it always answered (GB-09).
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\.10\.0|0\.11\.0|0\.12\.0)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-core.jsonld [R=302,L]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\.10\.0|0\.11\.0|0\.12\.0)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-core.rdf [R=302,L]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\.10\.0|0\.11\.0|0\.12\.0)/?$ https://w3c-cg.github.io/sstim/ontology/$1/ [R=302,L]
 RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\.10\.0|0\.11\.0|0\.12\.0)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-core.ttl [R=302,L]
 # These frozen manifests state root-absolute paths, so they only resolve
 # their own references from an origin-root deployment. They are immutable;
@@ -40,10 +48,16 @@ RewriteRule ^(0\.1\.0|0\.2\.0|0\.3\.0|0\.5\.0|0\.6\.0|0\.7\.0|0\.8\.0|0\.9\.0|0\
 # snapshots, so a future release that regressed would be pinned too.
 RewriteRule ^(0\.13\.0|0\.14\.0|0\.15\.0|0\.16\.0)/manifest$ https://labiosyncare.github.io/ontology/$1/manifest.json [R=302,L]
 # Every snapshot, including releases not yet cut. Four patterns rather than
-# four rules per release (ADR 0053).
+# four rules per release (ADR 0053); the version IRI's pattern negotiates.
 RewriteRule ^(\d+\.\d+\.\d+)/(sstim-[a-z0-9-]+\.ttl)$ https://w3c-cg.github.io/sstim/ontology/$1/$2 [R=302,L]
 RewriteRule ^(\d+\.\d+\.\d+)/manifest$ https://w3c-cg.github.io/sstim/ontology/$1/manifest.json [R=302,L]
 RewriteRule ^(\d+\.\d+\.\d+)/manifest\.schema\.json$ https://w3c-cg.github.io/sstim/ontology/$1/manifest.schema.json [R=302,L]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/ld\+json\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(\d+\.\d+\.\d+)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-namespace.jsonld [R=302,L]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*application/rdf\+xml\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(\d+\.\d+\.\d+)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-namespace.rdf [R=302,L]
+RewriteCond %{HTTP_ACCEPT} (?:^|,)\s*(?:text/html|application/xhtml\+xml)\s*(?=;|,|$)(?![^,]*;\s*q\s*=\s*0(?:\.0*)?\s*(?:;|,|$)) [NC]
+RewriteRule ^(\d+\.\d+\.\d+)/?$ https://w3c-cg.github.io/sstim/ontology/$1/ [R=302,L]
 RewriteRule ^(\d+\.\d+\.\d+)/?$ https://w3c-cg.github.io/sstim/ontology/$1/sstim-namespace.ttl [R=302,L]
 # END generated SSTIM snapshot routes
 

@@ -30,7 +30,7 @@ import {
   loadManifest,
   validateManifest,
 } from './sstim-manifest.mjs'
-import { generatedRegion } from './sstim-w3id-snapshot-routes.mjs'
+import { generatedRegion, parseRules, resolvePath } from './sstim-w3id-snapshot-routes.mjs'
 import { pinSourceLinks, treeHasPath } from './source-links.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -146,12 +146,14 @@ export function dryRunProblems({ manifest, version }) {
   //    release rather than to whichever file happens to be called core.
   const inventory = modelSnapshotInventory(prepared, version)
   try {
-    const region = generatedRegion([inventory])
-    const bare = region.split('\n').find((line) => line.includes(`/?$ `))
-    if (!bare?.includes('sstim-namespace.ttl')) {
+    // Resolved through the rules, conditions included, as an RDF client asking
+    // for Turtle would be: the version route negotiates (GB-09), so the first
+    // line that mentions it is a JSON-LD rule, not the answer.
+    const resolved = resolvePath(version, parseRules(generatedRegion([inventory])))
+    if (!resolved?.endsWith(`/${version}/sstim-namespace.ttl`)) {
       problems.push(
         `bare version route for ${version} would resolve to ` +
-        `${bare?.split('/').pop() ?? '(nothing)'}, not the whole release`,
+        `${resolved?.split('/').pop() ?? '(nothing)'}, not the whole release`,
       )
     }
   } catch (error) {

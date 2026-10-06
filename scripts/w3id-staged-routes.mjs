@@ -58,9 +58,15 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 // the knowledge browser with ?ns=bsc-v; the shapes' HTML, like their Turtle,
 // goes to the file. Total 78 -> 84: ontology 37 -> 40, graph 16 -> 17,
 // statusOnly 16 -> 18.
+//
+// 2026-10-06, version IRIs negotiate (GB-09): each of the two version-IRI
+// patterns, the pre-modular closed set and the wildcard, gains a JSON-LD, an
+// RDF/XML and a browser rule ahead of its Turtle default, all on the ontology
+// site. Total 84 -> 90, ontology 40 -> 46. No 406 is added: a client the routes
+// served before still gets Turtle.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 84,
-  ontology: 40,
+  total: 90,
+  ontology: 46,
   pinnedOntology: 1,
   graph: 17,
   application: 6,

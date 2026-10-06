@@ -103,6 +103,23 @@ function publishableArtifacts(manifest) {
   return artifacts
 }
 
+// What publish-release-serializations.py derives at deploy for every frozen
+// release (GB-09): the release's page, and its version document in JSON-LD and
+// RDF/XML. The version document is chosen as the script and the snapshot routes
+// choose it: the namespace catalogue where the release froze a manifest, the
+// Kernel file before that. Only for a release that exists, so a route to a
+// version never cut still fails here.
+const RELEASE_PATH = /^(\d+\.\d+\.\d+)\/(.*)$/
+
+export function isDerivedReleaseArtifact(relative, ontologyRoot = ontologyDir) {
+  const release = RELEASE_PATH.exec(relative)
+  if (!release) return false
+  const directory = join(ontologyRoot, release[1])
+  if (!existsSync(directory) || !statSync(directory).isDirectory()) return false
+  const stem = existsSync(join(directory, 'manifest.json')) ? 'sstim-namespace' : 'sstim-core'
+  return ['', `${stem}.jsonld`, `${stem}.rdf`].includes(release[2])
+}
+
 export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontologyDir }) {
   const generated = publishableArtifacts(manifest)
   const newestRelease = releaseDirectories(ontologyRoot)[0] ?? null
@@ -126,6 +143,7 @@ export function unpublishableTargets({ htaccess, manifest, ontologyRoot = ontolo
 
     if (generated.has(relative.split('/').pop()) && relative.startsWith(`${newestRelease}/`)) continue
     if (generated.has(relative)) continue
+    if (isDerivedReleaseArtifact(relative, ontologyRoot)) continue
     const committed = join(ontologyRoot, relative)
     if (existsSync(committed) && statSync(committed).isFile()) continue
     problems.push(
