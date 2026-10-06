@@ -436,7 +436,9 @@ explicit instruction naming each file.
   §3 names the set. The migration is a 0.19.0 release gate, tracked in
   `TODO.md`. Migrated 2026-10-06 on the 0.19.0-dev line, with every moved term
   deprecated in place; Directions §3 records what moved and what stayed. The
-  upstream route for the BSC vocabulary is the one step left before 0.19.0.*
+  upstream route for the BSC vocabulary,
+  [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827), is
+  the one step left before 0.19.0.*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
   live in the universal namespaces.
   - *Next step:* extend [Directions](SSTIM_DIRECTIONS.md) §3 to name these

@@ -79,8 +79,8 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
 | `/sstim/ecosystem/biosyncare` | The BioSynCare Ecosystem programme catalog record. Distinct from `/sstim/ecosystem` (the OWL module, matched exactly) and `/sstim/ecosystem-record/...` (live records) | Staged locally |
 | `/sstim/framework/bsc` | BSC framework catalog record | Staged locally |
-| `/sstim/framework/bsc/vocab` | The BSC framework's own vocabulary, which no SSTIM release carries (ADR 0061). RDF: Turtle only. HTML: the knowledge browser with `?ns=bsc-v`, so a term fragment selects the `bsc-v:` term, not the SSTIM term of the same local name it replaced | Staged locally |
-| `/sstim/framework/bsc/shapes` | The BSC framework's catalog shapes, Turtle for every client | Staged locally |
+| `/sstim/framework/bsc/vocab` | The BSC framework's own vocabulary, which no SSTIM release carries (ADR 0061). RDF: Turtle only. HTML: the knowledge browser with `?ns=bsc-v`, so a term fragment selects the `bsc-v:` term, not the SSTIM term of the same local name it replaced | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
+| `/sstim/framework/bsc/shapes` | The BSC framework's catalog shapes, Turtle for every client | Submitted in [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
 | `/sstim/implementation/{bsclab,biosyncare}` | Application catalog records | Staged locally |
 | `/sstim/implementation/bsclab/component/patch-studio` | Patch Studio software-component catalog record | Staged locally |
 | `/sstim/implementation/bsclab/preset/{heal-theta-breathing-seed,perform-alpha-10-seed}` | Exact public BSC Lab preset records; HTML deep-links to the requested graph node and RDF returns its owning preset Turtle file | Staged locally |

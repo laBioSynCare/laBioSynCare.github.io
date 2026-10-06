@@ -999,11 +999,15 @@ indexed, examiner-searchable records.
             closed by this: the presets page still requires a version and a
             band.*
       - [ ] 6. Route the BSC vocabulary namespace upstream, after ADR 0060's
-            pull request. *#6822 merged 2026-10-06. Wait until the deploy
-            serves `ontology/frameworks/bsc/bsc-vocab.ttl`, then route
-            `framework/bsc/vocab` and `framework/bsc/shapes` in the mirror and
-            upstream. ADR 0061's ordering: 0.19.0 is not cut until every
-            `dct:isReplacedBy` target dereferences.*
+            pull request. *Staged in the mirror on 2026-10-06 (6952ddf) and
+            submitted as
+            [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827)
+            the same day, after the deploy served both files. A browser goes to
+            `/graph/?ns=bsc-v`, because the vocabulary's local names repeat the
+            SSTIM terms it replaced. After the merge, measure the routes live and
+            set the route contract's registry state to Live. ADR 0061's ordering:
+            0.19.0 is not cut until every `dct:isReplacedBy` target
+            dereferences.*
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module
