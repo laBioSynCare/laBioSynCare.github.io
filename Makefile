@@ -93,7 +93,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -221,19 +221,14 @@ shacl-core:
 	cat $(CORE_PROFILE_MODULES) > "$$tmp"; \
 	$(PYSHACL) -s $(CORE_SHAPES) "$$tmp"
 
-## Validate the vocabulary against shapes, in its dependency closure.
-## ADR 0034: technique identity/type is vocabulary-owned while characteristic
-## delivery media are exposure-owned, so the vocabulary cannot be validated in
-## isolation. The manifest-defined Full semantic closure supplies every direct
-## and transitive dependency; `shacl-modules` remains the whole-set authority.
-shacl-vocab:
-	@tmp="$$(mktemp)"; \
-	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(FULL_SEMANTIC_MODULES) > "$$tmp"; \
-	$(PYSHACL) -s $(SHAPES) "$$tmp"
-
-## Validate Exposure constraints in the manifest-defined Full closure
-shacl-exposure:
+## Validate the manifest-defined Full semantic closure against the Full shapes.
+## This was two targets, shacl-vocab and shacl-exposure, running the identical
+## command (GB-11). Neither scope can be narrower: the vocabulary cannot be
+## validated in isolation (ADR 0034: technique identity is vocabulary-owned while
+## characteristic delivery media are exposure-owned), and Exposure's constraints
+## need the same closure. `shacl-modules` adds the shape modules themselves and
+## remains the whole-set authority.
+shacl-full:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
 	cat $(FULL_SEMANTIC_MODULES) > "$$tmp"; \
@@ -581,7 +576,7 @@ entailment-check:
 	echo "entailment-check: passed ($$count queries, no unintended type inferred)"
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-vocab shacl-exposure shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061
+shacl: shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
@@ -1077,8 +1072,7 @@ help:
 	@echo "  make shacl            Run all SHACL validations"
 	@echo "  make reason           Run ROBOT OWL DL consistency over ontology modules (REASONER=)"
 	@echo "  make shacl-core       Validate the Core profile closure against Core shapes"
-	@echo "  make shacl-vocab      Validate Vocabulary in the Full semantic closure"
-	@echo "  make shacl-exposure   Validate Exposure constraints in the Full closure"
+	@echo "  make shacl-full       Validate the Full semantic closure against the Full shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
 	@echo "  make ecosystem-contract Validate ecosystem fixtures or an external candidate (PUBLIC_ECOSYSTEM=/external/public.ttl, PRIVATE_LEDGER=/external/audit.ttl, SHACL_WORKERS=N)"

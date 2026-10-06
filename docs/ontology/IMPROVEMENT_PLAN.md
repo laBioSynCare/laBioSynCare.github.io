@@ -456,10 +456,17 @@ explicit instruction naming each file.
   - *Done when* the gate is in `make validate`, and the fixture fails for all
     four of its reasons.
 - [ ] **GB-03 Annotation identity.** Completes the KR-12 bullet on
-  authentication IDs (§1.5).
+  authentication IDs (§1.5). *A Workbench item, not SSTIM, so it waits until
+  0.19.0 is out.*
+  - *Decided 2026-10-06 (Renato):* the author of a public comment chooses
+    whether it shows their name; if not, it shows "anonymous". No pseudonym
+    scheme is needed. Either way the public copy carries neither the account ID
+    nor a name derived from the email address.
   - *Next step:* take the authentication ID out of world-readable fields; drop
-    the email-derived public name; label what "Public" shows; decide how the
-    pseudonym is derived; migrate existing documents; deploy the rules.
+    the email-derived public name; add the name-or-anonymous choice and label
+    what "Public" shows; migrate existing documents; deploy the rules in an
+    order the live app survives (both shapes accepted, then the app, then the
+    stricter rules).
   - *Done when* a signed-out reader can obtain neither the ID nor the email
     local part.
 - [ ] **GB-04 Default-graph SPARQL in the Workbench.**
@@ -523,7 +530,10 @@ explicit instruction naming each file.
   - *Next step:* make the BSC-specific patterns in `src/rdf/presets.js`
     optional.
   - *Done when* a modality-neutral preset that satisfies `PresetShape` is listed.
-- [ ] **GB-11 Duplicate gate targets.**
+- [x] **GB-11 Duplicate gate targets.** *Closed 2026-10-06: `shacl-vocab` and
+  `shacl-exposure` became one `shacl-full`, since neither scope could be
+  narrower than the Full semantic closure; `shacl-modules` still adds the shape
+  modules.*
   - *Next step:* consolidate `shacl-vocab` and `shacl-exposure`, or give each
     the distinct scope its comment describes.
   - *Done when* no two gate targets run the same command.
