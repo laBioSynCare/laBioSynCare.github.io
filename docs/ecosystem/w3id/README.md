@@ -35,6 +35,14 @@ changed exact-route region. Snapshot redirects are generated from the files
 actually present under `static/ontology/<version>/`, so unknown versions and
 filenames stay 404.
 
+Frozen releases are committed in Turtle only. At deploy, `make publish-releases`
+(`scripts/publish-release-serializations.py`) writes the JSON-LD and RDF/XML of
+each release's version document beside it: the namespace catalogue for a modular
+release, and for the twelve that predate the manifest the Kernel file, which is
+what the version route names.
+It verifies each one isomorphic and proves every frozen Turtle file unchanged.
+`make validate` rehearses it with `publish-releases-check`.
+
 ## Guarding them
 
 `make w3id-routes` (part of `make validate`) checks two independent things:

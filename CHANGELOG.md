@@ -61,6 +61,12 @@ file is the human-readable summary.
   `sstim-ex:contextImplementationPrototype`. The new
   `sstim-sh:DeliveryStatusScopeShape` accepts the three statuses only inside a
   `KnowledgeStatusAssertion` whose `knowledgeScope` is the implementation's IRI.
+- Every frozen release's version document, the file its version IRI resolves
+  to, is now published in JSON-LD and RDF/XML beside its Turtle (for example
+  `https://w3c-cg.github.io/sstim/ontology/0.18.0/sstim-namespace.jsonld`).
+  They are derived at deploy and verified isomorphic, and the frozen Turtle is
+  untouched. Content negotiation on the version IRI itself still needs a w3id
+  change.
 
 ### Deprecated
 

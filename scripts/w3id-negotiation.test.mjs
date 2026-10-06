@@ -1,11 +1,12 @@
 import { expect, test } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { Parser } from 'n3'
 
 import { expandRule } from './check-w3id-route-targets.mjs'
 import { loadRules, resolveRoute } from './w3id-negotiation.mjs'
+import { releaseDirectories } from './publish-latest-ontology.mjs'
 // The deep-link targets are graph-browser hashes, so the prefixes they use have
 // to be the ones the browser resolves against — assert against the real table
 // rather than restating it.
@@ -278,6 +279,21 @@ test('an entity IRI deep-links to that entity, never to the entrance', () => {
   // representations — a synthetic record must not resolve at all.
   expect(go('specialist/synthetic-someone', BROWSER).status).toBe(404)
   expect(go('specialist/synthetic-someone', 'text/turtle').status).toBe(404)
+})
+
+test('every version IRI resolves to the document its release publishes in every format', () => {
+  // publish-release-serializations.py derives JSON-LD and RDF/XML for exactly
+  // one file per frozen release: the namespace catalogue when the release has a
+  // manifest, the Kernel file before 0.13.0. The routes choose the same file
+  // independently, so the two rules are held together here; if they drifted, a
+  // version IRI would negotiate to a file the deploy never made.
+  const releases = releaseDirectories(join(repoRoot, 'static', 'ontology'))
+  expect(releases.length).toBeGreaterThanOrEqual(17)
+  for (const version of releases) {
+    const modular = existsSync(join(repoRoot, 'static', 'ontology', version, 'manifest.json'))
+    expect(go(version, 'text/turtle').doc, version)
+      .toBe(`${version}/${modular ? 'sstim-namespace.ttl' : 'sstim-core.ttl'}`)
+  }
 })
 
 test('the BSC framework vocabulary routes outside SSTIM, and a browser keeps its namespace', () => {

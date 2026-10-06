@@ -519,9 +519,14 @@ explicit instruction naming each file.
     tag or a persistent route rather than `main`.
   - *Done when* no live module links to a moving branch.
 - [ ] **GB-09 Frozen serializations.**
-  - *Next step:* derived JSON-LD and RDF/XML for every frozen snapshot at
-    deploy; version-route negotiation (an upstream w3id pull request); a route
-    and a coverage check for `context.jsonld`.
+  *Step 1 done 2026-10-06, narrowed: each frozen release's version document
+  (its namespace catalogue, or the Kernel file before 0.13.0) gets JSON-LD and
+  RDF/XML at deploy, verified isomorphic, with every frozen Turtle file proved
+  unchanged (`make publish-releases`, rehearsed in `make validate`). Deriving
+  all 428 files took 51 minutes, nearly all of it isomorphism proofs for the
+  shapes files; the version documents take half a minute.*
+  - *Next step:* version-route negotiation (an upstream w3id pull request); a
+    route and a coverage check for `context.jsonld`.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
 - [ ] **GB-10 Presets page neutrality** (after GB-01).
   *The GB-01 migration made the group and the breath guide optional and reads

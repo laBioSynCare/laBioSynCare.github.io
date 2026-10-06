@@ -93,7 +93,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -862,7 +862,7 @@ validate-release-source: $(RELEASE_SOURCE_VALIDATION_TARGETS)
 ## BioPortal distribution. The required RDF workflow runs the two-build
 ## reproducibility gate only when its actual inputs changed; Pages restores or
 ## builds one exact ledger-bound artifact and verifies it independently.
-validate: $(RELEASE_SOURCE_VALIDATION_TARGETS) quality-audit verify-snapshots w3id-routes truth-audit
+validate: $(RELEASE_SOURCE_VALIDATION_TARGETS) quality-audit verify-snapshots publish-releases-check w3id-routes truth-audit
 	@tree="$$($(TREE_HASH))" || { \
 		echo "validate: could not hash the passing working tree" >&2; \
 		exit 1; \
@@ -891,6 +891,20 @@ publish-latest:
 	node scripts/publish-latest-ontology.mjs $(EXPORT_DIR)
 	$(PYTHON) scripts/export-ontology.py $(EXPORT_DIR)/latest --source-dir $(EXPORT_DIR)/latest
 	node scripts/publish-latest-ontology.mjs $(EXPORT_DIR) --verify
+
+## Give every frozen release's version IRI document its JSON-LD and RDF/XML in
+## the deployed site, verified isomorphic, and prove the frozen Turtle beside it
+## unchanged (GB-09). Deploy artifact only, never committed, like latest/.
+publish-releases:
+	$(PYTHON) scripts/publish-release-serializations.py $(EXPORT_DIR)
+
+## Rehearse publish-releases against a temporary copy of the frozen releases, so
+## a release the deploy step could not serialize fails here rather than on Pages.
+publish-releases-check:
+	@tmpdir="$$(mktemp -d)"; \
+	trap 'rm -rf "$$tmpdir"' EXIT; \
+	for dir in static/ontology/[0-9]*.[0-9]*.[0-9]*; do cp -R "$$dir" "$$tmpdir"/; done; \
+	$(PYTHON) scripts/publish-release-serializations.py "$$tmpdir"
 
 ## Merge the manifest-defined Full semantic profile (excluding SHACL shapes)
 ## into one RDF/XML OWL file for BioPortal ingest.

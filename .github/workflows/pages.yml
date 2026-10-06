@@ -294,6 +294,13 @@ jobs:
       - name: Publish the latest release at a stable path
         run: nix develop --command make publish-latest EXPORT_DIR=dist/ontology
 
+      # Every frozen release's version IRI document, the one a citation names,
+      # in JSON-LD and RDF/XML beside its Turtle (GB-09), verified isomorphic,
+      # with every frozen Turtle file proved unchanged. Derived per build like
+      # latest/, never committed. About half a minute for every release.
+      - name: Publish each frozen release's version document in every format
+        run: nix develop --command make publish-releases EXPORT_DIR=dist/ontology
+
       # WIDOCO reference documentation is generated into the artifact only —
       # never committed to main (ADR 0023). It owns /ontology/docs/; the app
       # keeps the site root and all existing routes.
