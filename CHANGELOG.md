@@ -69,6 +69,10 @@ file is the human-readable summary.
   (`https://w3c-cg.github.io/sstim/ontology/0.18.0/`), rendered from the
   snapshot's own README. The version IRI will negotiate between all four once a
   w3id change merges; until then it answers in Turtle, as before.
+- A persistent IRI for the JSON-LD context, `https://w3id.org/sstim/context.jsonld`,
+  serving the live context (with the same w3id change). It is the one
+  unversioned SSTIM IRI that does not serve a release: terms are deprecated,
+  never deleted, so the context only grows.
 
 ### Deprecated
 

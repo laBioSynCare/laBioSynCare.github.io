@@ -534,9 +534,11 @@ explicit instruction naming each file.
   local OWL term, deprecated or not, without a compact term ("no compact term
   for"), and it fired on a test removal. The review missed it; only the route
   remains.*
-  - *Next step:* the upstream pull request for step 2; a route for
-    `context.jsonld`, which is a decision: the live context, or one frozen into
-    each release from 0.19.0 and served from `latest/`.
+  *Step 3 decided 2026-10-06 (Renato): `/sstim/context.jsonld` serves the live
+  context, recorded as ADR 0060's one exception, and is staged in the mirror.*
+  - *Next step:* one upstream pull request for steps 2 and 3, after
+    perma-id/w3id.org#6827 merges; then measure it live, and drop the interim
+    "until then use the site copy" note from static/ontology/README.md.
   - *Done when* `/sstim/<version>` negotiates like `/sstim`.
 - [ ] **GB-10 Presets page neutrality** (after GB-01).
   *The GB-01 migration made the group and the breath guide optional and reads

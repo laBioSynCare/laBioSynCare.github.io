@@ -301,6 +301,16 @@ test('a version IRI negotiates like the namespace, and refuses no client', () =>
   expect(go('0.18.0/sstim-vocab.ttl', 'application/ld+json').doc).toBe('0.18.0/sstim-vocab.ttl')
 })
 
+test('the JSON-LD context resolves to the live context, whatever the client asks for', () => {
+  // Decided 2026-10-06: the one unversioned route that serves the live line
+  // rather than a release (ADR 0060's exception). A JSON document, so no
+  // negotiation and no refusal.
+  for (const accept of ['application/ld+json', 'application/json', '*/*', '', BROWSER]) {
+    expect(go('context.jsonld', accept), accept).toEqual({ status: 303, doc: 'context.jsonld' })
+  }
+  expect(go('context.json', 'application/ld+json').status).toBe(404)
+})
+
 test('every version IRI resolves to the document its release publishes in every format', () => {
   // publish-release-serializations.py derives JSON-LD and RDF/XML for exactly
   // one file per frozen release: the namespace catalogue when the release has a

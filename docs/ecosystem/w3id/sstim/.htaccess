@@ -207,6 +207,16 @@ RewriteRule ^schemas/preset\.schema\.json$ https://w3c-cg.github.io/sstim/schema
 RewriteRule ^schemas/session\.schema\.json$ https://w3c-cg.github.io/sstim/schemas/session.schema.json [R=303,L]
 
 # -------------------------------------------------------------------------
+# SSTIM's JSON-LD context, so a document can declare
+# "@context": "https://w3id.org/sstim/context.jsonld". This serves the live
+# context, not a release's. Every other unversioned route answers with a
+# release (ADR 0060), and this is the one decided exception (2026-10-06): terms
+# are deprecated, never deleted, so the context grows rather than changes, and
+# a document written against any release still compacts and expands as it did.
+# -------------------------------------------------------------------------
+RewriteRule ^context\.jsonld$ https://w3c-cg.github.io/sstim/ontology/context.jsonld [R=303,L]
+
+# -------------------------------------------------------------------------
 # Stable BSC catalog identities. Programme, framework, application, and
 # component IRIs resolve to their owning static RDF documents; the Patch Studio
 # component is intentionally distinct from the /sstim/patch-studio ontology

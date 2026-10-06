@@ -75,6 +75,7 @@ describe how BSC Lab produces the targets rather than how the redirects behave.
 | `/sstim/{vocab,shapes,alignments,patch-studio,ecosystem}` | Previously published module distributions | Live |
 | `/sstim/{stimulus,core-shapes,common,technique,configuration,session,evidence,neuromodulation,neuromodulation-evidence,evidence-exposure,technique-exposure}` | Manifest-owned modules | Live |
 | `/sstim/manifest` | Authoritative JSON bill of materials | Live |
+| `/sstim/context.jsonld` | SSTIM's JSON-LD context. The live context, the one decided exception to ADR 0060: terms are deprecated, never deleted, so it grows rather than changes | Staged locally, to be submitted with the version negotiation after [#6827](https://github.com/perma-id/w3id.org/pull/6827) |
 | `/sstim/manifest-schema/1` | Version 1 JSON Schema, with identity `https://w3id.org/sstim/manifest-schema/1` | Live |
 | `/sstim/profile/{kernel,core,core-plus,full}` | OWL entry points with W3C PROF metadata for manifest and applicable-shape discovery | Live |
 | `/sstim/ecosystem/biosyncare` | The BioSynCare Ecosystem programme catalog record. Distinct from `/sstim/ecosystem` (the OWL module, matched exactly) and `/sstim/ecosystem-record/...` (live records) | Staged locally |

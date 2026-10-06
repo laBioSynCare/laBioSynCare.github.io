@@ -91,6 +91,19 @@ were the development profiles' physical import endpoints.
 - **The clients keep their behaviour.** Resolving through `owl:versionIRI` names
   the exact release, whatever the routes serve.
 
+## Exception: the JSON-LD context (2026-10-06)
+
+`https://w3id.org/sstim/context.jsonld` serves the live `context.jsonld`, not a
+release's, decided by the maintainer when GB-09 gave the context its first
+route. Freezing the context into each release from 0.19.0 and serving
+`latest/context.jsonld` was the alternative; it would have changed what a
+snapshot contains on the eve of a release. The exception is safe because terms
+are deprecated, never deleted: the context grows rather than changes, so a
+document written against any release compacts and expands as it did. It is the
+only unversioned route that serves the development line, and
+`check-w3id-route-targets` still fails on any route to a top-level ontology
+artifact.
+
 ## See also
 
 - [ADR 0043](0043-sstim-core-profile-and-module-boundaries.md): module

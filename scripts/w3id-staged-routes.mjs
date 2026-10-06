@@ -64,9 +64,12 @@ export const PINNED_ROOT_ONTOLOGY = 'https://labiosyncare.github.io/ontology/'
 // RDF/XML and a browser rule ahead of its Turtle default, all on the ontology
 // site. Total 84 -> 90, ontology 40 -> 46. No 406 is added: a client the routes
 // served before still gets Turtle.
+//
+// 2026-10-06, the JSON-LD context: one route to the live context.jsonld, the
+// decided exception to ADR 0060. Total 90 -> 91, ontology 46 -> 47.
 export const EXPECTED_RULE_COUNTS = Object.freeze({
-  total: 90,
-  ontology: 46,
+  total: 91,
+  ontology: 47,
   pinnedOntology: 1,
   graph: 17,
   application: 6,

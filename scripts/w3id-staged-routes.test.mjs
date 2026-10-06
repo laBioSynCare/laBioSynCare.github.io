@@ -61,10 +61,11 @@ test('every production target belongs to an explicit reviewed category', () => {
   // number in two places is the point. +2 application routes on 2026-08-27 for
   // the preset and session JSON Schema `$id` values. +6 on 2026-10-06 for the
   // BSC framework vocabulary and shapes (ADR 0061): two HTML, two Turtle, two 406.
-  // +6 the same day for negotiating version IRIs (GB-09), all ontology targets.
+  // +6 the same day for negotiating version IRIs (GB-09), all ontology targets,
+  // and +1 for the live JSON-LD context.
   expect(ruleCounts(productionRules)).toEqual({
-    total: 90,
-    ontology: 46,
+    total: 91,
+    ontology: 47,
     graph: 17,
     application: 6,
     external: 2,
@@ -117,8 +118,8 @@ test('all expanded ontology targets preserve their publication-relative path', (
   // 2026-10-06: the BSC framework vocabulary and shapes files (ADR 0061). 131
   // the same day: each of the 11 pre-modular releases gained its page and its
   // version document in JSON-LD and RDF/XML (GB-09); the wildcard's targets are
-  // not expanded here.
-  expect(production).toHaveLength(131)
+  // not expanded here. 132 with the live JSON-LD context.
+  expect(production).toHaveLength(132)
   expect(staged.map((target) => target.slice(STAGED_TARGETS.ontology.length)))
     .toEqual(production.map((target) => target.slice(PRODUCTION_TARGETS.ontology.length)))
   expect(staged.every((target) => target.startsWith(STAGED_TARGETS.ontology))).toBe(true)

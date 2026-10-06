@@ -697,7 +697,10 @@ declares neither negative category
 
 Generated JSON-LD and RDF/XML are distributions; Turtle remains the editable
 master. `context.jsonld` is a hand-maintained compaction context, not a generated
-serialization.
+serialization. Its persistent IRI is `https://w3id.org/sstim/context.jsonld`,
+which serves the live context, the one decided exception to ADR 0060 (once that
+route is merged upstream; until then use the site copy at
+`https://w3c-cg.github.io/sstim/ontology/context.jsonld`).
 
 ## Extension Checklist
 
