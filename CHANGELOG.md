@@ -17,17 +17,22 @@ file is the human-readable summary.
 
 ## [Unreleased]
 
+**Upgrading from 0.18.0.** Nothing is removed. 40 terms are deprecated, and
+each still resolves and names its successor with `dct:isReplacedBy`, or says in
+a `skos:historyNote` why it has none.
+[Migrating to 0.19.0](docs/ontology/MIGRATING_TO_0.19.0.md) lists every one and
+shows what to change:
+
+- if you use the BSC catalog's terms (voice classes, preset groups, Martigli
+  parameters, permutation coding), they keep their local names in the BSC
+  framework's own vocabulary;
+- if you state breath guidance, a delivery status or what a preset is composed
+  of, each now has one pattern, shown before and after;
+- validation is stricter, so validate your data against 0.19.0's shapes before
+  you switch.
+
 ### Changed
 
-- **The W3C Sensory Stimulation Vocabulary Community Group is the publisher.**
-  Every ontology header and `void.ttl` now state
-  `dct:publisher <https://www.w3.org/community/sstim/>`, which the Kernel
-  describes as a `foaf:Organization` named "W3C Sensory Stimulation Vocabulary
-  Community Group", replacing `https://github.com/laBioSynCare`. The group
-  publishes SSTIM from its own repository and site, and its Draft report on the
-  vocabulary; the files had not said so. The creator is unchanged, and the
-  frozen releases keep the publisher they were issued with
-  ([ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md)).
 - **SSTIM's universal namespaces carry no framework's structure**
   ([ADR 0061](docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md)).
   A term belongs in `sstim#`, `sstim/vocab#`, `sstim/exposure#`, `sstim/shapes#`
@@ -37,8 +42,31 @@ file is the human-readable summary.
   and moved to the BSC framework's own vocabulary and shapes
   (`https://w3id.org/sstim/framework/bsc/vocab#`, files in
   `static/ontology/frameworks/bsc/`), which belong to no SSTIM profile or
-  snapshot. The sstim-patch-studio module is now titled "SSTIM Track
-  Parameter Module".
+  release. The sstim-patch-studio module is now titled "SSTIM Track Parameter
+  Module".
+- **Validation holds every property to its declared range.** 84 current
+  properties appeared in no shape, so any value validated: a frequency band as
+  a caution tag, a string as an effect direction, a preset derived from itself.
+  Each now has a shape that checks its range wherever the property is used. A
+  vocabulary concept must be of the range's class, and a `prov:Agent` or
+  `prov:Plan` value must be an IRI. A record (a preset, a stimulus
+  specification, a protocol, a descriptor, a track) must be of the range's
+  class if the graph describes it, and may otherwise be an IRI for a record
+  described in another graph, so a preset can be specified by another lab's
+  specification. A functional property takes at most one value, and
+  `sstim:derivedFrom` is irreflexive.
+- **Records that no shape reached now have one.** The instances of 13 classes
+  were validated by nothing: the evidence descriptors, the activities that
+  generate assessments and knowledge statuses, and the exposure statement
+  roles, whose rules
+  [ADR 0027](docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md)
+  described and no shape carried. Each shape asks only for what the definition
+  already says: an activity's time, what it used, and the agent and role
+  responsible; a statement's label and description, and no evidence tier or
+  basis; a descriptor's IRI and label. `sstim-ex:concernsEffectDimension` and
+  `sstim-ex:hasKnowledgeStatus` are limited to the subjects ADR 0027 names.
+- `sstim:independencePolicy` and `sstim:reviewRubric` take a `prov:Plan`. They
+  had no range.
 - 25 definitions are rewritten: those that took their meaning from BSC or
   carried its remarks, and the track parameters whose domains widened. Where a
   remark was provenance it moved to `skos:historyNote`; implementation status
@@ -51,6 +79,15 @@ file is the human-readable summary.
   tracks, an initial breathing period of at least 3 s) and hosts the
   public-claim gate. `ExposureProfileShape` accepts a status given through a
   `KnowledgeStatusAssertion`. The preset contract's `group` is a free string.
+- **The W3C Sensory Stimulation Vocabulary Community Group is the publisher.**
+  Every ontology header and `void.ttl` now state
+  `dct:publisher <https://www.w3.org/community/sstim/>`, which the Kernel
+  describes as a `foaf:Organization` named "W3C Sensory Stimulation Vocabulary
+  Community Group", replacing `https://github.com/laBioSynCare`. The group
+  publishes SSTIM from its own repository and site, and its Draft report on the
+  vocabulary; the files had not said so. The creator is unchanged, and the
+  frozen releases keep the publisher they were issued with
+  ([ADR 0059](docs/decisions/0059-community-group-publishes-sstim.md)).
 
 ### Added
 
@@ -76,16 +113,17 @@ file is the human-readable summary.
 
 ### Deprecated
 
-- 39 terms, each still resolvable and pointing at its replacement with
-  `dct:isReplacedBy`: 8 classes, 10 properties, 18 concepts and 3 schemes.
-  The catalog's voice classes, `VoiceType`, `PresetGroup`, `inGroup`,
-  `PermutationFunction`, `permutationFunction`, the five Martigli parameters
-  and their concepts are replaced by the BSC vocabulary's terms;
-  `composedOf` by `sstim:composedOfTrack`; `hasBreathGuide` and
-  `isBreathReference` by `sstim:breathGuideTrack`; the four BSC Lab status and
-  context values by the neutral ones above.
-- `sstim:hapticPattern`, with no replacement: it indexed one engine's pattern
-  list.
+- 40 terms, each still resolvable; the
+  [migration guide](docs/ontology/MIGRATING_TO_0.19.0.md) lists them all. 39
+  point at their replacement with `dct:isReplacedBy`: 8 classes, 10
+  properties, 18 concepts and 3 schemes. The catalog's voice classes,
+  `VoiceType`, `PresetGroup`, `inGroup`, `PermutationFunction`,
+  `permutationFunction`, the five Martigli parameters and their concepts are
+  replaced by the BSC vocabulary's terms; `composedOf` by
+  `sstim:composedOfTrack`; `hasBreathGuide` and `isBreathReference` by
+  `sstim:breathGuideTrack`; the four BSC Lab status and context values by the
+  neutral ones above. `sstim:hapticPattern` has no replacement: it indexed one
+  engine's pattern list.
 
 ### Removed
 
@@ -94,41 +132,41 @@ file is the human-readable summary.
 
 ### Fixed
 
-- **The Kernel's own record is accurate (GB-07).** Its declaration comments now
-  count what it declares (63 reused terms: 43 annotation properties, 19 classes
-  and 1 datatype, not 62, 41 and 2). Its release history notes run newest first,
-  and 0.8.0, which shipped without one, has its note.
-- **The four-language claim names its scope.** SSTIM's vocabulary is in English,
-  Italian, Portuguese and Spanish; its class and property labels are English,
-  with the other three on 21 of 154 current classes. The README and the Zenodo
-  description read as though everything were translated, and now say which
-  part is. `make language-coverage` reports the OWL layer without gating it.
-- **VoID's downloads name the release it describes.** Every module and
-  catalogue `dcat:downloadURL` and `void:dataDump` in `void.ttl` named the
-  top-level development files, while its `dcat:accessURL` resolved to the
-  release (ADR 0060), so a catalogue that downloads would have fetched
-  unreleased content. All 73 now name `ontology/latest/`, as does the dataset
-  description the Workbench publishes for search engines.
-- **The ontology cites its source repository at fixed versions (GB-08).** 152
-  links in the modules, profiles, framework vocabulary and instances named the
-  legacy repository at its moving `main` branch. They now name
-  `https://github.com/w3c-cg/sstim` at the `v0.18.0` tag, or at a published
-  commit for a document no release holds yet. Release preparation re-pins them
-  to the release being cut, so a frozen release cites the repository as it was
-  released. The three `void.ttl` landing pages for the public instance datasets
-  stay on `main`, since those datasets change between releases.
-- **Every deprecated term says what replaced it (GB-06).** Of the 25 deprecated
-  terms with no `dct:isReplacedBy`, 12 now name their successors, which their
-  definitions already pointed to in prose. The other
-  13 say in a `skos:historyNote` that nothing replaces them, and why: the nine
-  evidence modality tags were never authoritative, and ADR 0031 keeps the three
-  ecosystem fields out of public data on purpose.
 - **Assessments no longer have to assert the deprecated `sstim:supportsRelation`.**
   Its alias rule used `sh:equals`, which compares both value sets, on every
   `EvidenceAssessmentClaim`, so a claim without the alias failed validation. The
   rule now lives in `sstim-sh:SupportsRelationAliasShape` and applies only where
   the alias is asserted. SSTIM's own data stopped asserting it on 11 claims; its
   range never admitted the neural oscillation types ADR 0049 made assessable.
+- **Every deprecated term says what replaced it.** Of the 25 deprecated terms
+  with no `dct:isReplacedBy`, 12 now name their successors, which their
+  definitions already pointed to in prose. The other 13 say in a
+  `skos:historyNote` that nothing replaces them, and why: the nine evidence
+  modality tags were never authoritative, and ADR 0031 keeps the three
+  ecosystem fields out of public data on purpose.
+- **VoID's downloads name the release it describes.** Every module and
+  catalogue `dcat:downloadURL` and `void:dataDump` in `void.ttl` named the
+  top-level development files, while its `dcat:accessURL` resolved to the
+  release (ADR 0060), so a catalogue that downloads would have fetched
+  unreleased content. All 73 now name `ontology/latest/`, as does the dataset
+  description the Workbench publishes for search engines.
+- **The ontology cites its source repository at fixed versions.** 152 links in
+  the modules, profiles, framework vocabulary and instances named the legacy
+  repository at its moving `main` branch. They now name
+  `https://github.com/w3c-cg/sstim` at the `v0.18.0` tag, or at a published
+  commit for a document no release holds yet. Release preparation re-pins them
+  to the release being cut, so a frozen release cites the repository as it was
+  released. The three `void.ttl` landing pages for the public instance datasets
+  stay on `main`, since those datasets change between releases.
+- **The Kernel's own record is accurate.** Its declaration comments now count
+  what it declares (63 reused terms: 43 annotation properties, 19 classes and 1
+  datatype, not 62, 41 and 2). Its release history notes run newest first, and
+  0.8.0, which shipped without one, has its note.
+- **The four-language claim names its scope.** SSTIM's vocabulary is in English,
+  Italian, Portuguese and Spanish; its class and property labels are English,
+  with the other three on 21 of 154 current classes. The README and the Zenodo
+  description read as though everything were translated, and now say which
+  part is.
 
 ## [0.18.0] - 2026-09-23
 
