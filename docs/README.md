@@ -104,6 +104,9 @@ indexes the module architecture, improvement and publication plans, registry
 submissions, and the dated audits.
 Ontology design itself is documented at
 [`../static/ontology/README.md`](../static/ontology/README.md).
+[`ontology/MIGRATING_TO_0.19.0.md`](ontology/MIGRATING_TO_0.19.0.md) tells
+adopters what to change for 0.19.0, with a generated table of every term it
+deprecates and what replaces each.
 
 ## `gallery/` — selected captures
 
