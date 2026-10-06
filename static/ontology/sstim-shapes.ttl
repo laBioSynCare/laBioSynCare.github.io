@@ -45,7 +45,7 @@
     dct:title "SSTIM SHACL Validation Shapes"@en ;
     dct:description "SHACL Core and SHACL-SPARQL constraints for SSTIM ontology metadata, controlled vocabularies, presets, techniques, evidence claims, safety tags, exposure models, protocols, sessions, references, and qualified public ecosystem records."@en ;
     dct:isPartOf <https://w3id.org/sstim> ;
-    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/ecosystem>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
+    dct:requires <https://w3id.org/sstim>, <https://w3id.org/sstim/common>, <https://w3id.org/sstim/configuration>, <https://w3id.org/sstim/ecosystem>, <https://w3id.org/sstim/evidence>, <https://w3id.org/sstim/exposure>, <https://w3id.org/sstim/neuromodulation>, <https://w3id.org/sstim/neuromodulation-evidence>, <https://w3id.org/sstim/patch-studio>, <https://w3id.org/sstim/session>, <https://w3id.org/sstim/stimulus>, <https://w3id.org/sstim/technique>, <https://w3id.org/sstim/vocab> ;
     dct:creator <https://orcid.org/0000-0002-9699-629X> ;
     dct:publisher <https://www.w3.org/community/sstim/> ;
     dct:created "2026-04-12"^^xsd:date ;
@@ -3241,6 +3241,949 @@ sstim-sh:SessionLibertiesShape a sh:NodeShape ;
         sh:path sstim:scheduledStart ;
         sh:maxCount 1 ; sh:datatype xsd:dateTime ;
         sh:message "scheduledStart, if present, must be a single xsd:dateTime."@en ;
+    ] .
+
+
+###########################################################################
+# Declared ranges (GB-02)
+###########################################################################
+#
+# Every current SSTIM object and datatype property is held to its declared
+# rdfs:range wherever it is used. Until 0.19.0, 84 of them appeared in no
+# shape at all, so a frequency band given as a safety caution, or a literal
+# where an effect direction belongs, validated: OWL's open world simply infers
+# the band to be a caution. (The review counted 83. sstim:hasSignal's IRI is a
+# prefix of sstim:hasSignalShape's, which a query mentions, so a substring
+# match counted it as covered.) `make shacl-coverage` now fails on any property
+# no shape mentions, and `make shacl-gb-02` holds these rules to the review's
+# own reproduction.
+#
+# Each shape targets the subjects of its property rather than a domain class,
+# because 34 of the 84 have no rdfs:domain and 11 have a union. A range that is
+# an SSTIM class is checked with sh:class, which the vocabulary's dual-typed
+# concepts satisfy; a range outside SSTIM (prov:Agent, prov:Plan) only as an
+# IRI, because OWL's range already types the value and requiring adopters to
+# restate that would fail data the ontology accepts. A functional property
+# takes at most one value. sstim:derivedFrom is also irreflexive.
+#
+# A range whose members are records rather than vocabulary concepts (a preset,
+# a stimulus specification, a protocol, a descriptor, a track) takes either a
+# node typed as that class or an IRI the graph does not type. The modules carry
+# every concept, so a concept value is always checkable; a record is often
+# described in another graph, as when a preset is specified by another lab's
+# stimulus specification or a session names a track of its configuration.
+# Requiring a typed stub would fail that data, and a track's stub could not
+# even be typed correctly without knowing its kind. A record the graph does
+# describe must be the right kind, so a caution tag, which the vocabulary
+# types, is still rejected as a study population.
+###########################################################################
+
+sstim-sh:RecordDescribedElsewhereShape a sh:NodeShape ;
+    sh:name "Record described elsewhere"@en ;
+    sh:description "An IRI this graph says nothing about the type of: a reference to a record described in another graph."@en ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:maxCount 0 ;
+    ] .
+
+# ── stimulus ──────────────────────────────────────────────────────────
+sstim-sh:HasSignalRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasSignal ;
+    sh:property [
+        sh:path sstim:hasSignal ;
+        sh:or ( [ sh:class sstim:StimulationSignal ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:hasSignal takes sstim:StimulationSignal values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+# ── common ────────────────────────────────────────────────────────────
+sstim-sh:ExtendedHzMaxRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:extendedHzMax ;
+    sh:property [
+        sh:path sstim:extendedHzMax ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:extendedHzMax takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:ExtendedHzMinRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:extendedHzMin ;
+    sh:property [
+        sh:path sstim:extendedHzMin ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:extendedHzMin takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:HasCorticalTopographyRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasCorticalTopography ;
+    sh:property [
+        sh:path sstim:hasCorticalTopography ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:hasCorticalTopography takes xsd:string values."@en ;
+    ] .
+
+sstim-sh:HasOscillationStateContextRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasOscillationStateContext ;
+    sh:property [
+        sh:path sstim:hasOscillationStateContext ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:hasOscillationStateContext takes xsd:string values."@en ;
+    ] .
+
+sstim-sh:HasTypicalFrequencyBandRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasTypicalFrequencyBand ;
+    sh:property [
+        sh:path sstim:hasTypicalFrequencyBand ;
+        sh:class sstim:FrequencyBand ;
+        sh:message "sstim:hasTypicalFrequencyBand takes sstim:FrequencyBand values."@en ;
+    ] .
+
+sstim-sh:PlatformDeliverableRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:platformDeliverable ;
+    sh:property [
+        sh:path sstim:platformDeliverable ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:message "sstim:platformDeliverable takes at most one xsd:boolean value."@en ;
+    ] .
+
+
+# ── configuration ─────────────────────────────────────────────────────
+sstim-sh:DerivedFromRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:derivedFrom ;
+    sh:property [
+        sh:path sstim:derivedFrom ;
+        sh:or ( [ sh:class sstim:Preset ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:derivedFrom takes sstim:Preset values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "A preset cannot be derived from itself: sstim:derivedFrom is irreflexive."@en ;
+        sh:select """
+            SELECT $this WHERE { $this <https://w3id.org/sstim#derivedFrom> $this . }
+        """ ;
+    ] .
+
+sstim-sh:HasCautionTagRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasCautionTag ;
+    sh:property [
+        sh:path sstim:hasCautionTag ;
+        sh:class sstim:CautionTag ;
+        sh:message "sstim:hasCautionTag takes sstim:CautionTag values."@en ;
+    ] .
+
+sstim-sh:HasIntendedEffectRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasIntendedEffect ;
+    sh:property [
+        sh:path sstim:hasIntendedEffect ;
+        sh:or ( [ sh:class sstim:IntendedEffect ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:hasIntendedEffect takes sstim:IntendedEffect values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:SpecifiedByRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:specifiedBy ;
+    sh:property [
+        sh:path sstim:specifiedBy ;
+        sh:or ( [ sh:class sstim:StimulusSpecification ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:specifiedBy takes sstim:StimulusSpecification values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+
+# ── technique ─────────────────────────────────────────────────────────
+sstim-sh:ImplementsProtocolRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:implementsProtocol ;
+    sh:property [
+        sh:path sstim:implementsProtocol ;
+        sh:or ( [ sh:class sstim:SensoryStimulationProtocol ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:implementsProtocol takes sstim:SensoryStimulationProtocol values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:IncorporatesTechniqueRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:incorporatesTechnique ;
+    sh:property [
+        sh:path sstim:incorporatesTechnique ;
+        sh:class sstim:SensoryStimulationTechnique ;
+        sh:message "sstim:incorporatesTechnique takes sstim:SensoryStimulationTechnique values."@en ;
+    ] .
+
+sstim-sh:ParticipantEngagementModeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:participantEngagementMode ;
+    sh:property [
+        sh:path sstim:participantEngagementMode ;
+        sh:class sstim:ParticipantEngagementMode ;
+        sh:message "sstim:participantEngagementMode takes sstim:ParticipantEngagementMode values."@en ;
+    ] .
+
+sstim-sh:ProposedMechanismRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:proposedMechanism ;
+    sh:property [
+        sh:path sstim:proposedMechanism ;
+        sh:class sstim:StimulationMechanism ;
+        sh:message "sstim:proposedMechanism takes sstim:StimulationMechanism values."@en ;
+    ] .
+
+
+# ── session ───────────────────────────────────────────────────────────
+sstim-sh:BreathingTransitionDurationRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:breathingTransitionDuration ;
+    sh:property [
+        sh:path sstim:breathingTransitionDuration ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:breathingTransitionDuration takes at most one xsd:decimal value."@en ;
+    ] .
+
+# A session names a track of a configuration it does not describe, and cannot
+# type it: TrackShape would then require the track's kind, which only the
+# configuration knows.
+sstim-sh:DisablesTrackRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:disablesTrack ;
+    sh:property [
+        sh:path sstim:disablesTrack ;
+        sh:or ( [ sh:class sstim:Track ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:disablesTrack takes sstim:Track values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasDeliveryModalityRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:hasDeliveryModality ;
+    sh:property [
+        sh:path sstim:hasDeliveryModality ;
+        sh:class sstim:SensoryModality ;
+        sh:message "sstim:hasDeliveryModality takes sstim:SensoryModality values."@en ;
+    ] .
+
+sstim-sh:PromptIdentifierRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:promptIdentifier ;
+    sh:property [
+        sh:path sstim:promptIdentifier ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:message "sstim:promptIdentifier takes at most one xsd:string value."@en ;
+    ] .
+
+sstim-sh:PromptTextRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:promptText ;
+    sh:property [
+        sh:path sstim:promptText ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:promptText takes xsd:string values."@en ;
+    ] .
+
+sstim-sh:ScaleMaximumLabelRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:scaleMaximumLabel ;
+    sh:property [
+        sh:path sstim:scaleMaximumLabel ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:scaleMaximumLabel takes xsd:string values."@en ;
+    ] .
+
+sstim-sh:ScaleMinimumLabelRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:scaleMinimumLabel ;
+    sh:property [
+        sh:path sstim:scaleMinimumLabel ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:scaleMinimumLabel takes xsd:string values."@en ;
+    ] .
+
+
+# ── evidence ──────────────────────────────────────────────────────────
+sstim-sh:AccessClassificationRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:accessClassification ;
+    sh:property [
+        sh:path sstim:accessClassification ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:message "sstim:accessClassification takes at most one xsd:string value."@en ;
+    ] .
+
+sstim-sh:BasisComparatorRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisComparator ;
+    sh:property [
+        sh:path sstim:basisComparator ;
+        sh:or ( [ sh:class sstim:ComparatorDescriptor ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:basisComparator takes sstim:ComparatorDescriptor values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:BasisComparatorNoteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisComparatorNote ;
+    sh:property [
+        sh:path sstim:basisComparatorNote ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:basisComparatorNote takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:BasisInterventionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisIntervention ;
+    sh:property [
+        sh:path sstim:basisIntervention ;
+        sh:or ( [ sh:class sstim:StimulationTechnique ] [ sh:class sstim:StimulationProtocol ] [ sh:class sstim:StimulationIntervention ] [ sh:class sstim-ex:ExposureProfile ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:basisIntervention takes sstim:StimulationTechnique, sstim:StimulationProtocol, sstim:StimulationIntervention or sstim-ex:ExposureProfile values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:BasisObservedEffectDirectionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisObservedEffectDirection ;
+    sh:property [
+        sh:path sstim:basisObservedEffectDirection ;
+        sh:class sstim:EffectDirection ;
+        sh:message "sstim:basisObservedEffectDirection takes sstim:EffectDirection values."@en ;
+    ] .
+
+sstim-sh:BasisObservedOutcomeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisObservedOutcome ;
+    sh:property [
+        sh:path sstim:basisObservedOutcome ;
+        sh:class sstim:EvidenceOutcomeConcept ;
+        sh:message "sstim:basisObservedOutcome takes sstim:EvidenceOutcomeConcept values."@en ;
+    ] .
+
+sstim-sh:BasisOutcomeNoteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisOutcomeNote ;
+    sh:property [
+        sh:path sstim:basisOutcomeNote ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:basisOutcomeNote takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:BasisPopulationNoteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisPopulationNote ;
+    sh:property [
+        sh:path sstim:basisPopulationNote ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:basisPopulationNote takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:BasisStudyDesignRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisStudyDesign ;
+    sh:property [
+        sh:path sstim:basisStudyDesign ;
+        sh:class sstim:StudyDesign ;
+        sh:message "sstim:basisStudyDesign takes sstim:StudyDesign values."@en ;
+    ] .
+
+sstim-sh:BasisStudyModelRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisStudyModel ;
+    sh:property [
+        sh:path sstim:basisStudyModel ;
+        sh:class sstim:StudyModel ;
+        sh:message "sstim:basisStudyModel takes sstim:StudyModel values."@en ;
+    ] .
+
+sstim-sh:BasisStudyPopulationRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisStudyPopulation ;
+    sh:property [
+        sh:path sstim:basisStudyPopulation ;
+        sh:or ( [ sh:class sstim:PopulationDescriptor ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim:basisStudyPopulation takes sstim:PopulationDescriptor values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:BasisSynthesisTypeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:basisSynthesisType ;
+    sh:property [
+        sh:path sstim:basisSynthesisType ;
+        sh:class sstim:EvidenceSynthesisType ;
+        sh:message "sstim:basisSynthesisType takes sstim:EvidenceSynthesisType values."@en ;
+    ] .
+
+sstim-sh:ConflictDisclosureRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:conflictDisclosure ;
+    sh:property [
+        sh:path sstim:conflictDisclosure ;
+        sh:class sstim:ConflictDisclosure ;
+        sh:message "sstim:conflictDisclosure takes sstim:ConflictDisclosure values."@en ;
+    ] .
+
+sstim-sh:ConsentBasisNoteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:consentBasisNote ;
+    sh:property [
+        sh:path sstim:consentBasisNote ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:consentBasisNote takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:CustodianRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:custodian ;
+    sh:property [
+        sh:path sstim:custodian ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        sh:message "sstim:custodian takes at most one value, an IRI identifying a prov:Agent."@en ;
+    ] .
+
+sstim-sh:GovernedSourceDigestRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:governedSourceDigest ;
+    sh:property [
+        sh:path sstim:governedSourceDigest ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:message "sstim:governedSourceDigest takes at most one xsd:string value."@en ;
+    ] .
+
+sstim-sh:GovernedSourceVersionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:governedSourceVersion ;
+    sh:property [
+        sh:path sstim:governedSourceVersion ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:message "sstim:governedSourceVersion takes at most one xsd:string value."@en ;
+    ] .
+
+sstim-sh:IndependencePolicyRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:independencePolicy ;
+    sh:property [
+        sh:path sstim:independencePolicy ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        sh:message "sstim:independencePolicy takes at most one value, an IRI identifying a prov:Plan."@en ;
+    ] .
+
+sstim-sh:PermittedUseScopeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:permittedUseScope ;
+    sh:property [
+        sh:path sstim:permittedUseScope ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:permittedUseScope takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:ReviewRubricRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:reviewRubric ;
+    sh:property [
+        sh:path sstim:reviewRubric ;
+        sh:nodeKind sh:IRI ;
+        sh:maxCount 1 ;
+        sh:message "sstim:reviewRubric takes at most one value, an IRI identifying a prov:Plan."@en ;
+    ] .
+
+sstim-sh:SearchCoverageStartRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:searchCoverageStart ;
+    sh:property [
+        sh:path sstim:searchCoverageStart ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:message "sstim:searchCoverageStart takes at most one xsd:date value."@en ;
+    ] .
+
+sstim-sh:SearchDigestRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:searchDigest ;
+    sh:property [
+        sh:path sstim:searchDigest ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:message "sstim:searchDigest takes at most one xsd:string value."@en ;
+    ] .
+
+sstim-sh:SearchEligibilityCriteriaRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:searchEligibilityCriteria ;
+    sh:property [
+        sh:path sstim:searchEligibilityCriteria ;
+        sh:datatype rdf:langString ;
+        sh:message "sstim:searchEligibilityCriteria takes language-tagged string values."@en ;
+    ] .
+
+sstim-sh:SearchResultCountRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:searchResultCount ;
+    sh:property [
+        sh:path sstim:searchResultCount ;
+        sh:datatype xsd:integer ;
+        sh:maxCount 1 ;
+        sh:message "sstim:searchResultCount takes at most one xsd:integer value."@en ;
+    ] .
+
+sstim-sh:SearchSourceRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:searchSource ;
+    sh:property [
+        sh:path sstim:searchSource ;
+        sh:datatype xsd:string ;
+        sh:message "sstim:searchSource takes xsd:string values."@en ;
+    ] .
+
+
+# ── neuromodulation ───────────────────────────────────────────────────
+sstim-sh:IntendedNeuralPhenomenonRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:intendedNeuralPhenomenon ;
+    sh:property [
+        sh:path sstim:intendedNeuralPhenomenon ;
+        sh:class sstim:NeuralPhenomenon ;
+        sh:message "sstim:intendedNeuralPhenomenon takes sstim:NeuralPhenomenon values."@en ;
+    ] .
+
+sstim-sh:IntendedNeuralSystemRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:intendedNeuralSystem ;
+    sh:property [
+        sh:path sstim:intendedNeuralSystem ;
+        sh:class sstim:NeuralSystem ;
+        sh:message "sstim:intendedNeuralSystem takes sstim:NeuralSystem values."@en ;
+    ] .
+
+sstim-sh:MechanismNeuralAccessRouteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:mechanismNeuralAccessRoute ;
+    sh:property [
+        sh:path sstim:mechanismNeuralAccessRoute ;
+        sh:class sstim:NeuralAccessRoute ;
+        sh:message "sstim:mechanismNeuralAccessRoute takes sstim:NeuralAccessRoute values."@en ;
+    ] .
+
+sstim-sh:MechanismNeuralPhenomenonRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:mechanismNeuralPhenomenon ;
+    sh:property [
+        sh:path sstim:mechanismNeuralPhenomenon ;
+        sh:class sstim:NeuralPhenomenon ;
+        sh:message "sstim:mechanismNeuralPhenomenon takes sstim:NeuralPhenomenon values."@en ;
+    ] .
+
+sstim-sh:MechanismNeuralSystemRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:mechanismNeuralSystem ;
+    sh:property [
+        sh:path sstim:mechanismNeuralSystem ;
+        sh:class sstim:NeuralSystem ;
+        sh:message "sstim:mechanismNeuralSystem takes sstim:NeuralSystem values."@en ;
+    ] .
+
+sstim-sh:MechanismNeuralTargetSiteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:mechanismNeuralTargetSite ;
+    sh:property [
+        sh:path sstim:mechanismNeuralTargetSite ;
+        sh:class sstim:NeuralTargetSite ;
+        sh:message "sstim:mechanismNeuralTargetSite takes sstim:NeuralTargetSite values."@en ;
+    ] .
+
+
+# ── neuromodulation-evidence ──────────────────────────────────────────
+sstim-sh:OutcomeNeuralAccessRouteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:outcomeNeuralAccessRoute ;
+    sh:property [
+        sh:path sstim:outcomeNeuralAccessRoute ;
+        sh:class sstim:NeuralAccessRoute ;
+        sh:message "sstim:outcomeNeuralAccessRoute takes sstim:NeuralAccessRoute values."@en ;
+    ] .
+
+sstim-sh:OutcomeNeuralPhenomenonRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:outcomeNeuralPhenomenon ;
+    sh:property [
+        sh:path sstim:outcomeNeuralPhenomenon ;
+        sh:class sstim:NeuralPhenomenon ;
+        sh:message "sstim:outcomeNeuralPhenomenon takes sstim:NeuralPhenomenon values."@en ;
+    ] .
+
+sstim-sh:OutcomeNeuralSystemRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:outcomeNeuralSystem ;
+    sh:property [
+        sh:path sstim:outcomeNeuralSystem ;
+        sh:class sstim:NeuralSystem ;
+        sh:message "sstim:outcomeNeuralSystem takes sstim:NeuralSystem values."@en ;
+    ] .
+
+sstim-sh:OutcomeNeuralTargetSiteRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:outcomeNeuralTargetSite ;
+    sh:property [
+        sh:path sstim:outcomeNeuralTargetSite ;
+        sh:class sstim:NeuralTargetSite ;
+        sh:message "sstim:outcomeNeuralTargetSite takes sstim:NeuralTargetSite values."@en ;
+    ] .
+
+
+# ── exposure ──────────────────────────────────────────────────────────
+sstim-sh:AffordsDeliveryMediumRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:affordsDeliveryMedium ;
+    sh:property [
+        sh:path sstim-ex:affordsDeliveryMedium ;
+        sh:class sstim-ex:PhysicalDeliveryMedium ;
+        sh:message "sstim-ex:affordsDeliveryMedium takes sstim-ex:PhysicalDeliveryMedium values."@en ;
+    ] .
+
+sstim-sh:ChannelRoleRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:channelRole ;
+    sh:property [
+        sh:path sstim-ex:channelRole ;
+        sh:class sstim-ex:StimulusChannelRole ;
+        sh:message "sstim-ex:channelRole takes sstim-ex:StimulusChannelRole values."@en ;
+    ] .
+
+sstim-sh:ConcernsEffectDimensionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:concernsEffectDimension ;
+    # Its subjects too, which ADR 0027 left to SHACL when it removed the domain.
+    sh:or (
+        [ sh:class sstim-ex:ExposureHypothesis ]
+        [ sh:class sstim-ex:ResearchQuestion ]
+        [ sh:class sstim-ex:ExposureDesignObjective ]
+        [ sh:class sstim-ex:PlannedOutcomeSpecification ]
+    ) ;
+    sh:message "sstim-ex:concernsEffectDimension is stated by a hypothesis, research question, design objective or planned-outcome specification (ADR 0027)."@en ;
+    sh:property [
+        sh:path sstim-ex:concernsEffectDimension ;
+        sh:class sstim-ex:EffectDimension ;
+        sh:message "sstim-ex:concernsEffectDimension takes sstim-ex:EffectDimension values."@en ;
+    ] .
+
+sstim-sh:HasDesignObjectiveRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasDesignObjective ;
+    sh:property [
+        sh:path sstim-ex:hasDesignObjective ;
+        sh:or ( [ sh:class sstim-ex:ExposureDesignObjective ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim-ex:hasDesignObjective takes sstim-ex:ExposureDesignObjective values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasExperimentContextRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasExperimentContext ;
+    sh:property [
+        sh:path sstim-ex:hasExperimentContext ;
+        sh:class sstim-ex:ExperimentContext ;
+        sh:message "sstim-ex:hasExperimentContext takes sstim-ex:ExperimentContext values."@en ;
+    ] .
+
+sstim-sh:HasHypothesisRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasHypothesis ;
+    sh:property [
+        sh:path sstim-ex:hasHypothesis ;
+        sh:or ( [ sh:class sstim-ex:ExposureHypothesis ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim-ex:hasHypothesis takes sstim-ex:ExposureHypothesis values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasModulationFrequencyHzRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasModulationFrequencyHz ;
+    sh:property [
+        sh:path sstim-ex:hasModulationFrequencyHz ;
+        sh:datatype xsd:decimal ;
+        sh:message "sstim-ex:hasModulationFrequencyHz takes xsd:decimal values."@en ;
+    ] .
+
+sstim-sh:HasPerceptualGainRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasPerceptualGain ;
+    sh:property [
+        sh:path sstim-ex:hasPerceptualGain ;
+        sh:class sstim-ex:PerceptualGain ;
+        sh:message "sstim-ex:hasPerceptualGain takes sstim-ex:PerceptualGain values."@en ;
+    ] .
+
+sstim-sh:HasPerceptualLossRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasPerceptualLoss ;
+    sh:property [
+        sh:path sstim-ex:hasPerceptualLoss ;
+        sh:class sstim-ex:PerceptualLoss ;
+        sh:message "sstim-ex:hasPerceptualLoss takes sstim-ex:PerceptualLoss values."@en ;
+    ] .
+
+sstim-sh:HasPlannedOutcomeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasPlannedOutcome ;
+    sh:property [
+        sh:path sstim-ex:hasPlannedOutcome ;
+        sh:or ( [ sh:class sstim-ex:PlannedOutcomeSpecification ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim-ex:hasPlannedOutcome takes sstim-ex:PlannedOutcomeSpecification values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasProtocolRequirementRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasProtocolRequirement ;
+    sh:property [
+        sh:path sstim-ex:hasProtocolRequirement ;
+        sh:or ( [ sh:class sstim-ex:ProtocolRequirement ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim-ex:hasProtocolRequirement takes sstim-ex:ProtocolRequirement values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasResearchQuestionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasResearchQuestion ;
+    sh:property [
+        sh:path sstim-ex:hasResearchQuestion ;
+        sh:or ( [ sh:class sstim-ex:ResearchQuestion ] sstim-sh:RecordDescribedElsewhereShape ) ;
+        sh:message "sstim-ex:hasResearchQuestion takes sstim-ex:ResearchQuestion values: a node typed as one, or an IRI for a record described elsewhere."@en ;
+    ] .
+
+sstim-sh:HasToneFrequencyHzRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasToneFrequencyHz ;
+    sh:property [
+        sh:path sstim-ex:hasToneFrequencyHz ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim-ex:hasToneFrequencyHz takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:LimitAveragingTimeSecondsRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:limitAveragingTimeSeconds ;
+    sh:property [
+        sh:path sstim-ex:limitAveragingTimeSeconds ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim-ex:limitAveragingTimeSeconds takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:PitchShiftCentsRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:pitchShiftCents ;
+    sh:property [
+        sh:path sstim-ex:pitchShiftCents ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim-ex:pitchShiftCents takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:RequiresDeviceCapabilityRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:requiresDeviceCapability ;
+    sh:property [
+        sh:path sstim-ex:requiresDeviceCapability ;
+        sh:class sstim-ex:DeviceCapability ;
+        sh:message "sstim-ex:requiresDeviceCapability takes sstim-ex:DeviceCapability values."@en ;
+    ] .
+
+sstim-sh:RetunedFromReferenceHzRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:retunedFromReferenceHz ;
+    sh:property [
+        sh:path sstim-ex:retunedFromReferenceHz ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim-ex:retunedFromReferenceHz takes at most one xsd:decimal value."@en ;
+    ] .
+
+
+# ── patch-studio ──────────────────────────────────────────────────────
+sstim-sh:BaseFrequencyRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:baseFrequency ;
+    sh:property [
+        sh:path sstim:baseFrequency ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:baseFrequency takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:BeatHzRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:beatHz ;
+    sh:property [
+        sh:path sstim:beatHz ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:beatHz takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:BeatsPerBarRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:beatsPerBar ;
+    sh:property [
+        sh:path sstim:beatsPerBar ;
+        sh:datatype xsd:integer ;
+        sh:maxCount 1 ;
+        sh:message "sstim:beatsPerBar takes at most one xsd:integer value."@en ;
+    ] .
+
+sstim-sh:BreathingAmplitudeRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:breathingAmplitude ;
+    sh:property [
+        sh:path sstim:breathingAmplitude ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:breathingAmplitude takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:CycleDurationRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:cycleDuration ;
+    sh:property [
+        sh:path sstim:cycleDuration ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:cycleDuration takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:NoteCountRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:noteCount ;
+    sh:property [
+        sh:path sstim:noteCount ;
+        sh:datatype xsd:integer ;
+        sh:maxCount 1 ;
+        sh:message "sstim:noteCount takes at most one xsd:integer value."@en ;
+    ] .
+
+sstim-sh:NoteDurationFractionRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:noteDurationFraction ;
+    sh:property [
+        sh:path sstim:noteDurationFraction ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:noteDurationFraction takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:OctaveSpanRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:octaveSpan ;
+    sh:property [
+        sh:path sstim:octaveSpan ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:octaveSpan takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:RotationSpeedRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:rotationSpeed ;
+    sh:property [
+        sh:path sstim:rotationSpeed ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:rotationSpeed takes at most one xsd:decimal value."@en ;
+    ] .
+
+sstim-sh:VisualDensityRangeShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:visualDensity ;
+    sh:property [
+        sh:path sstim:visualDensity ;
+        sh:datatype xsd:decimal ;
+        sh:maxCount 1 ;
+        sh:message "sstim:visualDensity takes at most one xsd:decimal value."@en ;
+    ] .
+
+
+###########################################################################
+# Instances no shape reached (GB-02)
+###########################################################################
+#
+# Every instance in SSTIM's public data is now targeted by a shape for one of
+# its classes, and `make shacl-coverage` fails on one that is not. Until 0.19.0
+# the instances of thirteen classes were not: the descriptors and activities ADR
+# 0027 introduced, and the exposure statement roles it split
+# ExposureEffectClaim into, whose role rules it described and nobody wrote.
+# Each shape below asks only for what the class's definition or ADR 0027
+# already says the instance has.
+###########################################################################
+
+# ── The descriptors and intervention an evidence basis names ──────────
+
+sstim-sh:EvidenceDescriptorShape a sh:NodeShape ;
+    sh:targetClass sstim:ComparatorDescriptor, sstim:PopulationDescriptor, sstim:EvidenceOutcomeConcept ;
+    sh:name "Evidence descriptor"@en ;
+    # Controlled outcome categories include the exposure effect dimensions,
+    # which are SKOS concepts and carry skos:prefLabel instead.
+    sh:nodeKind sh:IRI ;
+    sh:or (
+        [ sh:path rdfs:label ; sh:minCount 1 ]
+        [ sh:path skos:prefLabel ; sh:minCount 1 ]
+    ) ;
+    sh:message "A comparator, population or outcome descriptor is an identified description: an IRI with a human-readable rdfs:label or skos:prefLabel (ADR 0027)."@en .
+
+sstim-sh:SensoryStimulationInterventionShape a sh:NodeShape ;
+    sh:targetClass sstim:SensoryStimulationIntervention ;
+    sh:name "SensoryStimulationIntervention"@en ;
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "SensoryStimulationIntervention must have a human-readable rdfs:label."@en ;
+    ] .
+
+# ── The activities that generate assessments and statuses (ADR 0027) ──
+
+sstim-sh:ResponsibleAssociationShape a sh:NodeShape ;
+    sh:name "Responsible agent and role"@en ;
+    sh:property [
+        sh:path prov:agent ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "A qualified association must name exactly one responsible agent, by IRI."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:hadRole ; sh:minCount 1 ; sh:nodeKind sh:IRI ;
+        sh:message "A qualified association must name the role its agent acted in, by IRI."@en ;
+    ] .
+
+sstim-sh:EvidenceAssessmentActivityShape a sh:NodeShape ;
+    sh:targetClass sstim:EvidenceAssessmentActivity ;
+    sh:name "EvidenceAssessmentActivity"@en ;
+    sh:property [
+        sh:path prov:endedAtTime ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "EvidenceAssessmentActivity must record when the assessment was made: exactly one xsd:dateTime prov:endedAtTime (ADR 0027)."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:qualifiedAssociation ; sh:minCount 1 ; sh:node sstim-sh:ResponsibleAssociationShape ;
+        sh:message "EvidenceAssessmentActivity must carry a qualified association naming the responsible agent and role (ADR 0027)."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:used ; sh:minCount 1 ;
+        sh:message "EvidenceAssessmentActivity must record with prov:used what it used: each qualified basis, its source, and the method or rubric revision applied (ADR 0027)."@en ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "EvidenceAssessmentActivity must have used every evidence basis of the assessment it generated, and each basis's source (ADR 0027)."@en ;
+        sh:select """
+            SELECT $this ?value WHERE {
+                {
+                    ?assessment <http://www.w3.org/ns/prov#wasGeneratedBy> $this ;
+                                <https://w3id.org/sstim#hasEvidenceBasis> ?value .
+                } UNION {
+                    ?assessment <http://www.w3.org/ns/prov#wasGeneratedBy> $this ;
+                                <https://w3id.org/sstim#hasEvidenceBasis> ?basis .
+                    ?basis <https://w3id.org/sstim#basisSource> ?value .
+                }
+                FILTER NOT EXISTS { $this <http://www.w3.org/ns/prov#used> ?value . }
+            }
+        """ ;
+    ] .
+
+sstim-sh:KnowledgeStatusActivityShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:KnowledgeStatusActivity ;
+    sh:name "KnowledgeStatusActivity"@en ;
+    sh:property [
+        sh:path prov:endedAtTime ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ;
+        sh:message "KnowledgeStatusActivity must record when the status was determined: exactly one xsd:dateTime prov:endedAtTime (ADR 0027)."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:qualifiedAssociation ; sh:minCount 1 ; sh:node sstim-sh:ResponsibleAssociationShape ;
+        sh:message "KnowledgeStatusActivity must carry a qualified association naming the responsible agent and role (ADR 0027)."@en ;
+    ] ;
+    sh:property [
+        sh:path prov:used ; sh:minCount 1 ;
+        sh:message "KnowledgeStatusActivity must record with prov:used the method or corpus revision it applied (ADR 0027)."@en ;
+    ] .
+
+# ── The exposure statement roles (ADR 0027) ───────────────────────────
+
+sstim-sh:ExposureStatementShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:ExposureHypothesis, sstim-ex:ResearchQuestion, sstim-ex:ExposureDesignObjective,
+        sstim-ex:PlannedOutcomeSpecification, sstim-ex:ProtocolRequirement, sstim-ex:BoundaryApplicabilityStatement ;
+    sh:name "Exposure statement"@en ;
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "An exposure statement (hypothesis, research question, design objective, planned outcome, protocol requirement or boundary applicability) must have a human-readable rdfs:label."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "An exposure statement must say what it states in a dct:description."@en ;
+    ] ;
+    # Not evidence: none of what makes an evidence assessment one.
+    sh:not [ sh:class sstim:EvidenceClaim ] ;
+    sh:message "An exposure statement is not evidence (ADR 0027), so it cannot also be an sstim:EvidenceClaim."@en ;
+    sh:property [
+        sh:path sstim:hasEvidenceTier ; sh:maxCount 0 ;
+        sh:message "An exposure statement is not evidence (ADR 0027): it carries no evidence tier."@en ;
+    ] ;
+    sh:property [
+        sh:path sstim:hasEvidenceBasis ; sh:maxCount 0 ;
+        sh:message "An exposure statement is not evidence (ADR 0027): it carries no evidence basis."@en ;
+    ] .
+
+# ADR 0027 took the OWL domains off these two properties so that using one
+# could not infer the deprecated ExposureEffectClaim, and said SHACL would
+# name their subjects instead.
+sstim-sh:KnowledgeStatusSubjectShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim-ex:hasKnowledgeStatus ;
+    sh:name "What a knowledge status describes"@en ;
+    sh:or (
+        [ sh:class sstim:StimulationProtocol ]
+        [ sh:class sstim-ex:ExploratoryProtocol ]
+        [ sh:class sstim-ex:ExposureProfile ]
+        [ sh:class sstim-ex:StimulusChannel ]
+        [ sh:class sstim-ex:DeviceCapability ]
+        [ sh:class sstim-ex:ExposureHypothesis ]
+        [ sh:class sstim-ex:ResearchQuestion ]
+        [ sh:class sstim-ex:ExposureDesignObjective ]
+        [ sh:class sstim-ex:PlannedOutcomeSpecification ]
+        [ sh:class sstim-ex:ProtocolRequirement ]
+        [ sh:class sstim-ex:BoundaryApplicabilityStatement ]
+        [ sh:class sstim-ex:KnowledgeStatusAssertion ]
+    ) ;
+    sh:message "sstim-ex:hasKnowledgeStatus describes a protocol, exposure profile, stimulus channel, device capability, exposure statement or KnowledgeStatusAssertion (ADR 0027). Anything else states its status through a KnowledgeStatusAssertion."@en .
+
+# ── Exploratory protocols ─────────────────────────────────────────────
+# Most are also typed sstim:SensoryStimulationProtocol and held to that shape.
+# One that is not stimulation (a baseline, a mere-exposure idea) still needs
+# a name and a scope (ADR 0034 §7).
+
+sstim-sh:ExploratoryProtocolShape a sh:NodeShape ;
+    sh:targetClass sstim-ex:ExploratoryProtocol ;
+    sh:name "ExploratoryProtocol"@en ;
+    sh:property [
+        sh:path rdfs:label ; sh:minCount 1 ;
+        sh:message "ExploratoryProtocol must have at least one rdfs:label."@en ;
+    ] ;
+    sh:property [
+        sh:path dct:description ; sh:minCount 1 ;
+        sh:message "ExploratoryProtocol must have a scoped dct:description."@en ;
     ] .
 
 

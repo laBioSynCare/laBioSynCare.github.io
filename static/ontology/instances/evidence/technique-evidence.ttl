@@ -37,6 +37,11 @@
     dct:description "Initial migration method: the legacy BSC Lab editorial tier and direction are carried forward as the initial migration assessment, explicitly pending re-assessment under a dedicated evidence rubric. This method revision is immutable."@en ;
     dct:created "2026-07-13"^^xsd:date .
 
+<https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0061-delivery-status-migration/1>
+    rdfs:label "ADR 0061 delivery-status migration method, revision 1"@en ;
+    dct:description "Re-expresses a BSC Lab delivery status that an implementation-named vocabulary value used to carry as a KnowledgeStatusAssertion scoped to BSC Lab, keeping the record's own as-of date. Nothing is re-assessed. Used by the experiment records; this method revision is immutable."@en ;
+    dct:created "2026-10-06"^^xsd:date .
+
 <https://w3id.org/sstim/implementation/bsclab/evidence/role/migration-editor>
     a prov:Role ;
     rdfs:label "Migration editor"@en .

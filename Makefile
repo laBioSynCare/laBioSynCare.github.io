@@ -43,6 +43,11 @@ MANIFEST_CLI := node scripts/sstim-manifest.mjs
 CORE_PROFILE_MODULES := $(shell $(MANIFEST_CLI) files core)
 FULL_SEMANTIC_MODULES := $(shell $(MANIFEST_CLI) files full)
 ONTOLOGY_MODULES := $(shell $(MANIFEST_CLI) files full --with-shapes)
+# The manifest CLI lists nothing when a module's checksum is stale, and `cat`
+# given no files then waits on stdin for ever: shacl-full hung that way twice on
+# 2026-10-06. A recipe reads a module list through this, so an empty list stops
+# that target with the fix instead.
+modules = $(or $(strip $($(1))),$(error $(1) is empty: the manifest listed no modules, probably because a checksum is stale. Run `node scripts/sstim-manifest.mjs sync-checksums`))
 # BioPortal ingests a single root file and does not follow dct:isPartOf, so the
 # browsable term modules are merged into one OWL file. SHACL shapes are excluded
 # (validation constraints, not browsable terms). The RDF closure is unioned
@@ -93,7 +98,7 @@ DEPLOY_URL   ?= https://w3c-cg.github.io/sstim
 # `make push`. See CLAUDE.md 3.7.
 GIT_REMOTES ?= origin w3c-cg
 
-.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
+.PHONY: build check migrate-test session-conformance truth-audit verify-deploy push deploy-firestore-rules dev ecosystem-contract ecosystem-publish export export-check publish-latest publish-releases publish-releases-check context-roundtrip verify-snapshots bioportal-bundle bioportal-bundle-candidate bioportal-bundle-verify bioportal-ledger-check bioportal-metadata-test bioportal-reproducible ontology-docs vocab-docs preview quality-audit reason shacl shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage source-links entailment-check validate-profile preset-contract examples-check sstim-package sstim-package-build term-index term-index-check migration-guide-check adr-index definition-coverage language-coverage hed-crosswalk hed-bundle hed-bundle-check hed-roundtrip registry-verify alignment-verify wikidata-statements wikidata-inbound traffic-snapshot wikidata-submit signal-layer sparql-sanity snapshot test validate validate-release-source wasm help manifest-check module-boundaries core-profile-contract full-equivalence w3id-routes release-dryrun studio-browser-check
 
 ## Build the production bundle
 build:
@@ -218,7 +223,7 @@ preview: build
 shacl-core:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(CORE_PROFILE_MODULES) > "$$tmp"; \
+	cat $(call modules,CORE_PROFILE_MODULES) > "$$tmp"; \
 	$(PYSHACL) -s $(CORE_SHAPES) "$$tmp"
 
 ## Validate the manifest-defined Full semantic closure against the Full shapes.
@@ -231,14 +236,14 @@ shacl-core:
 shacl-full:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(FULL_SEMANTIC_MODULES) > "$$tmp"; \
+	cat $(call modules,FULL_SEMANTIC_MODULES) > "$$tmp"; \
 	$(PYSHACL) -s $(SHAPES) "$$tmp"
 
 ## Validate the complete ontology module set, including module metadata
 shacl-modules:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(ONTOLOGY_MODULES) > "$$tmp"; \
+	cat $(call modules,ONTOLOGY_MODULES) > "$$tmp"; \
 	$(PYSHACL) -s $(SHAPES) "$$tmp"
 
 ## Validate RDF instances against shapes with ontology + vocabulary context
@@ -248,7 +253,7 @@ shacl-instances:
 	else \
 		tmp="$$(mktemp)"; shapes="$$(mktemp)"; \
 		trap 'rm -f "$$tmp" "$$shapes"' EXIT; \
-		cat $(FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmp"; \
+		cat $(call modules,FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmp"; \
 		cat $(SHAPES) $(BSC_SHAPES) > "$$shapes"; \
 		$(PYSHACL) -s "$$shapes" "$$tmp"; \
 	fi
@@ -257,7 +262,7 @@ shacl-instances:
 shacl-private-ecosystem:
 	@tmp="$$(mktemp)"; \
 	trap 'rm -f "$$tmp"' EXIT; \
-	cat $(FULL_SEMANTIC_MODULES) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
+	cat $(call modules,FULL_SEMANTIC_MODULES) $(PRIVATE_ECOSYSTEM_FIXTURE) > "$$tmp"; \
 	$(PYSHACL) -s $(PRIVATE_ECOSYSTEM_SHAPES) -i rdfs "$$tmp"
 
 ## Assert the session SHACL-SPARQL constraints reject what they claim to. The
@@ -280,6 +285,19 @@ shacl-public-claim-gate:
 shacl-adr-0061:
 	$(PYTHON) scripts/adr-0061-negative.py
 
+## GB-02: every current SSTIM property is mentioned by a shape, and every
+## instance in SSTIM's data is targeted by a shape for its class, or excused
+## with a reason. Until 0.19.0, 84 properties and the instances of 13 classes
+## were neither, and no gate measured it.
+shacl-coverage:
+	$(PYTHON) scripts/shacl-coverage.py
+
+## GB-02's rules, made to fail: the review's own reproduction against the real
+## data (five triples, each rejected for its own reason, and nothing else), and
+## one synthetic record per rule written for the instances no shape targeted.
+shacl-gb-02:
+	$(PYTHON) scripts/gb-02-negative.py
+
 ## Validate the RDF the session projection actually emits, with SHACL-SPARQL
 ## active. The vitest harness beside the producer strips sh:sparql and
 ## shacl-instances only covers committed files, so without this the projection's
@@ -293,7 +311,7 @@ shacl-session-projection:
 	count=0; \
 	for graph in "$$tmpdir"/graphs/*.ttl; do \
 		[ -f "$$graph" ] || continue; \
-		cat $(FULL_SEMANTIC_MODULES) "$$graph" > "$$tmpdir/merged.ttl"; \
+		cat $(call modules,FULL_SEMANTIC_MODULES) "$$graph" > "$$tmpdir/merged.ttl"; \
 		$(PYSHACL) -s $(SHAPES) "$$tmpdir/merged.ttl" | grep -q "Conforms: True" \
 			|| { echo "FAILED: $$(basename "$$graph")"; $(PYSHACL) -s $(SHAPES) "$$tmpdir/merged.ttl"; exit 1; }; \
 		count=$$((count + 1)); \
@@ -557,7 +575,7 @@ entailment-check:
 		echo "entailment-check: no modules — the manifest query failed, and reasoning over instances alone infers nothing and passes" >&2; \
 		exit 1; \
 	fi; \
-	cat $(FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmpdir/merged.ttl"; \
+	cat $(call modules,FULL_SEMANTIC_MODULES) $(BSC_VOCAB) $(INSTANCE_FILES) > "$$tmpdir/merged.ttl"; \
 	$(ROBOT) reason --input "$$tmpdir/merged.ttl" --reasoner $(REASONER) \
 		--axiom-generators "ClassAssertion" --output "$$tmpdir/reasoned.owl" > "$$tmpdir/robot.log" 2>&1 \
 		|| { cat "$$tmpdir/robot.log"; exit 1; }; \
@@ -576,14 +594,14 @@ entailment-check:
 	echo "entailment-check: passed ($$count queries, no unintended type inferred)"
 
 ## Run all SHACL validations
-shacl: shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061
+shacl: shacl-core shacl-full shacl-modules shacl-instances shacl-private-ecosystem shacl-session-negative shacl-session-projection shacl-public-claim-gate shacl-adr-0061 shacl-gb-02 shacl-coverage
 
 ## Run ROBOT OWL DL consistency over the merged ontology term-space modules
 reason:
 	@set -e; \
 	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
-	cat $(FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	cat $(call modules,FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
 	if ! $(ROBOT) reason --input "$$tmpdir/sstim-full.ttl" \
 		--reasoner $(REASONER) --output "$$tmpdir/sstim-reasoned.owl" \
 		> "$$tmpdir/robot.log" 2>&1; then \
@@ -1016,7 +1034,7 @@ ontology-docs:
 	@set -e; \
 	tmpdir="$$(mktemp -d)"; \
 	trap 'rm -rf "$$tmpdir"' EXIT; \
-	cat $(FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
+	cat $(call modules,FULL_SEMANTIC_MODULES) > "$$tmpdir/sstim-full.ttl"; \
 	if ! $(ROBOT) merge --input "$$tmpdir/sstim-full.ttl" \
 		annotate --ontology-iri https://w3id.org/sstim \
 		--output "$$tmpdir/sstim-full.owl" > "$$tmpdir/robot.log" 2>&1; then \
@@ -1094,6 +1112,7 @@ help:
 	@echo "  make shacl-full       Validate the Full semantic closure against the Full shapes"
 	@echo "  make shacl-modules    Validate the merged term-module ontology set"
 	@echo "  make shacl-instances  Validate static/ontology/instances/**/*.ttl (skipped if empty)"
+	@echo "  make shacl-coverage   Fail on a property or instance no SSTIM shape covers (GB-02)"
 	@echo "  make ecosystem-contract Validate ecosystem fixtures or an external candidate (PUBLIC_ECOSYSTEM=/external/public.ttl, PRIVATE_LEDGER=/external/audit.ttl, SHACL_WORKERS=N)"
 	@echo "  make ecosystem-publish Validate and publish an external aggregate (PUBLIC_ECOSYSTEM=, PRIVATE_LEDGER=, DRY_RUN=1)"
 	@echo "  make quality-audit    Run semantic integrity and competency thresholds"

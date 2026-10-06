@@ -316,7 +316,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "db10615584fca7acb26f5e7f72a575dc241cfad7ace4cdbf3693845e1315da7d"
+        "sha256": "b9f84d61aa12ae737164d2af2c3cad56a146b06ad792fdc68a8317239e208a40"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -671,7 +671,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "e9f44bc0abeb37a0c770dd8aae671a573b9f309afbd920b9dde43ff6907bc810"
+        "sha256": "64e604e7811925e4f8957aec7be69efbcb06018dff269617f53b1d57a7ae6734"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -685,6 +685,7 @@
         "evidence",
         "exposure",
         "neuromodulation",
+        "neuromodulation-evidence",
         "patch-studio",
         "session",
         "stimulus",
@@ -903,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "826853b8d44e1779adbdeec915aeebfd5f1fd77d5d3841fa194ea5a59a1da03f"
+      "sha256": "25f16f7158dee22ae9f1112151efd908777f8f4e053adb5233e27a7524844c0d"
     }
   ]
 }

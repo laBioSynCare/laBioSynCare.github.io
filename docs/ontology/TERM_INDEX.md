@@ -383,7 +383,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:impliesPresence` | object | stimulus | sstim:RenderingMechanism → sstim:RenderingPresence | The presence a mechanism necessarily produces. Whether a signal physically reaches the subject or is constructed by the nervous system is a fact… |
 | `sstim:inGroup` | object | patch-studio | sstim:Preset → sstim:PresetGroup | **deprecated** → `bsc-v:inGroup`. Links a preset to its group classification. Each preset belongs to exactly one group. |
 | `sstim:incorporatesTechnique` | object | technique | sstim:SensoryStimulationFramework → sstim:SensoryStimulationTechnique | Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from… |
-| `sstim:independencePolicy` | object | evidence | — → — | The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations. |
+| `sstim:independencePolicy` | object | evidence | — → prov:Plan | The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations. |
 | `sstim:initialVolume` | data | patch-studio | sstim:AudioTrack → XMLSchema:decimal | Initial output gain or amplitude for a voice. |
 | `sstim:instrumentVersion` | data | session | sstim:ObservationInstrument → XMLSchema:string | Version of the instrument as administered. Answers collected under different versions are not directly comparable. |
 | `sstim:intendedNeuralPhenomenon` | object | neuromodulation | — → sstim:NeuralPhenomenon | Links a stimulation process, technique, protocol, or intervention to the functional neural phenomenon it is intended to affect. Records target… |
@@ -443,7 +443,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:reportedConfidence` | data | session | sstim:ParticipantObservation → XMLSchema:decimal | How confident the participant said they were in their own answer, from 0 to 1, where the instrument collects it. |
 | `sstim:reportsUnwantedExperience` | object | session | sstim:ParticipantObservation → sstim:UnwantedExperienceObservation | Links the observation that asked about unwanted experiences to the experiences the participant described. The asking is an observation with its own… |
 | `sstim:requiresEvidenceTierRank` | data | evidence | sstim:PublicClaimLevel → XMLSchema:integer | Minimum sstim:tierRank of supporting evidence required to assert at this claim level on a public surface. 0 = no evidence required… |
-| `sstim:reviewRubric` | object | evidence | — → — | The immutable rubric or policy revision a review decision was made under. |
+| `sstim:reviewRubric` | object | evidence | — → prov:Plan | The immutable rubric or policy revision a review decision was made under. |
 | `sstim:reviewedBy` | data | evidence | — → XMLSchema:string | **deprecated** → `http://www.w3.org/ns/prov#qualifiedAssociation`. Deprecated ADR 0027: reviewer identity and role live on the review activity's prov:qualifiedAssociation as agent IRIs, not name literals. A… |
 | `sstim:reviewsAssessment` | object | evidence | — → sstim:EvidenceAssessmentClaim | The single assessment revision an evidence review decision is about; must equal the revision its generating review activity used. |
 | `sstim:rotationSpeed` | data | patch-studio | sstim:SessionSpecification | sstim:VisualTrack → XMLSchema:decimal | Visual rotation rate or angular speed. |

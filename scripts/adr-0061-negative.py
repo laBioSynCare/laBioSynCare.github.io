@@ -41,6 +41,7 @@ PREAMBLE = """
 @prefix sstim-ex: <https://w3id.org/sstim/exposure#> .
 @prefix bsc-v:    <https://w3id.org/sstim/framework/bsc/vocab#> .
 @prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:      <http://purl.org/dc/terms/> .
 @prefix prov:     <http://www.w3.org/ns/prov#> .
 @prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
 """
@@ -50,6 +51,7 @@ PREAMBLE = """
 SCOPED_STATUS = """
 ex:protocol a sstim-ex:ExploratoryProtocol ;
     rdfs:label "ADR 0061 fixture protocol"@en ;
+    dct:description "A protocol whose delivery status the fixture scopes."@en ;
     sstim-ex:hasKnowledgeStatusAssertion ex:status .
 ex:status a sstim-ex:KnowledgeStatusAssertion ;
     rdfs:label "ADR 0061 fixture status"@en ;
@@ -57,7 +59,10 @@ ex:status a sstim-ex:KnowledgeStatusAssertion ;
     sstim-ex:knowledgeAsOfDate "2026-10-06"^^xsd:date ;
     sstim-ex:knowledgeScope ex:implementation ;
     prov:wasGeneratedBy ex:activity .
-ex:activity a sstim-ex:KnowledgeStatusActivity .
+ex:activity a sstim-ex:KnowledgeStatusActivity ;
+    prov:used ex:method ;
+    prov:endedAtTime "2026-10-06T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ; prov:agent ex:curator ; prov:hadRole ex:editor ] .
 """
 
 # A preset whose breath guide is one of its own tracks, at a breathing period.
@@ -83,6 +88,7 @@ NEGATIVES = [
         """
 ex:protocol a sstim-ex:ExploratoryProtocol ;
     rdfs:label "ADR 0061 fixture protocol"@en ;
+    dct:description "A protocol that states a delivery status directly."@en ;
     sstim-ex:hasKnowledgeStatus sstim-ex:notCurrentlyDeliverable .
 """,
         DELIVERY_SCOPE,

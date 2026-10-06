@@ -446,9 +446,21 @@ explicit instruction naming each file.
     explicit statement that they are an implementation profile.
   - *Done when* the decision is recorded; the migration may follow in a later
     release.
-- [ ] **GB-02 SHACL coverage** (*protected*: `sstim-shapes.ttl`,
+- [x] **GB-02 SHACL coverage** (*protected*: `sstim-shapes.ttl`,
   `sstim-evidence.ttl`). 83 of 273 live properties and 6 instantiated classes
-  have no constraint.
+  have no constraint. *Closed 2026-10-06 on the 0.19.0-dev line. Measured again
+  by `make shacl-coverage`, it was 84 properties and 13 classes: the review
+  matched IRIs as substrings, so `sstim:hasSignal` passed as a prefix of
+  `sstim:hasSignalShape`, and it counted a class as constrained when a shape
+  merely named it, as `sh:not [ sh:class X ]` does. Every current property now
+  has a range shape (a record-valued range also accepts an IRI the graph does
+  not type, since records are often described in another graph; example 04
+  needs exactly that), and the 13 classes have shapes taken from their
+  definitions and ADR 0027, including the role rules for exposure statements
+  that ADR 0027 described and nobody wrote. `make shacl-gb-02` rejects all five
+  of the review's triples on the real data, each for its own reason, and one
+  synthetic record per new rule. Both gates are in `make validate`, with no
+  allowlist entries. `independencePolicy` and `reviewRubric` take `prov:Plan`.*
   - *Next step:* a coverage gate with a reasoned allowlist; baseline
     constraints taken from each declared range and reviewed by hand; the
     review's adversarial triples as a negative fixture; ranges for

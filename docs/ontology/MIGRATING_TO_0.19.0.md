@@ -49,12 +49,52 @@ ex:protocol-status a sstim-ex:KnowledgeStatusAssertion ;
     sstim-ex:knowledgeAsOfDate "2026-10-06"^^xsd:date ;
     sstim-ex:knowledgeScope <https://example.org/your-implementation> ;
     prov:wasGeneratedBy ex:status-review .
-ex:status-review a sstim-ex:KnowledgeStatusActivity .
+ex:status-review a sstim-ex:KnowledgeStatusActivity ;
+    prov:used ex:release-checklist ;
+    prov:endedAtTime "2026-10-06T12:00:00Z"^^xsd:dateTime ;
+    prov:qualifiedAssociation [ a prov:Association ;
+        prov:agent ex:maintainer ;
+        prov:hadRole ex:release-editor ] .
 ```
 
 **Composition has one relation.** `sstim:composedOf` gives way to
 `sstim:composedOfTrack`, whose range is any `sstim:Track`, so a preset can be
 composed of visual, haptic and control tracks as well as audio ones.
+
+## Validation is stricter
+
+`sstim-shapes.ttl` now holds every SSTIM property to its declared range,
+wherever it is used. Data that put a value of the wrong kind in an SSTIM
+property, such as a frequency band as a caution tag or a string where an effect
+direction belongs, validated against 0.18.0 and fails against 0.19.0. A
+functional property takes at most one value, and `sstim:derivedFrom` is
+irreflexive.
+
+A value that is a record rather than a vocabulary concept, such as a preset, a
+stimulus specification, a protocol, a descriptor or a track, may be described
+in another graph. An IRI your graph does not type is accepted as a reference to
+such a record; a node your graph does type must be of the range's class.
+
+Records that no shape reached before now have one, which asks only for what the
+class's definition or ADR 0027 already says:
+
+- an evidence assessment activity or a knowledge status activity records one
+  `prov:endedAtTime`, what it `prov:used`, and a `prov:qualifiedAssociation`
+  naming an agent and a role. An assessment activity used every basis of its
+  assessment, and each basis's source;
+- an exposure statement (hypothesis, research question, design objective,
+  planned outcome, protocol requirement or boundary applicability) has a label
+  and a description, and carries no evidence tier or basis;
+- an exploratory protocol has a label and a description;
+- a comparator, population or outcome descriptor is an IRI with a label;
+- `sstim-ex:concernsEffectDimension` is stated only by a hypothesis, research
+  question, design objective or planned-outcome specification, and
+  `sstim-ex:hasKnowledgeStatus` only by the kinds of record ADR 0027 lists.
+
+Two properties gained a range: `sstim:independencePolicy` and
+`sstim:reviewRubric` take a `prov:Plan`, so a reasoner now infers that their
+values are plans. Nothing else here changes what a term means. Validate your
+data against 0.19.0's shapes before you switch.
 
 ## If you use the BSC catalog terms
 

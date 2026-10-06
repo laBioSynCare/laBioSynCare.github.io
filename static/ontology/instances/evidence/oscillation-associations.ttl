@@ -47,10 +47,12 @@
     dct:description "Curator role for the ADR 0049 association pass."@en .
 
 <https://w3id.org/sstim/implementation/bsclab/evidence/population/human-scalp-eeg>
+    a sstim:PopulationDescriptor ;
     rdfs:label "Human scalp-EEG cognitive studies"@en ;
     dct:description "Adult human participants studied with scalp EEG in cognitive and memory paradigms."@en .
 
 <https://w3id.org/sstim/implementation/bsclab/evidence/comparator/other-band-activity>
+    a sstim:ComparatorDescriptor ;
     rdfs:label "Activity in other frequency bands"@en ;
     dct:description "Comparison against activity outside the band under assessment, or against a task-free baseline."@en .
 

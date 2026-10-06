@@ -117,6 +117,7 @@ this:status-device-taste-channel-outside-implementation-scope a sstim-ex:Knowled
 this:status-migration a sstim-ex:KnowledgeStatusActivity ;
     rdfs:label "ADR 0061 delivery-status migration"@en ;
     rdfs:comment "Re-expressed this record's BSC Lab delivery statuses as scoped assertions when ADR 0061 removed the implementation-named status values from the vocabulary. The statuses were not re-assessed."@en ;
+    prov:used <https://w3id.org/sstim/implementation/bsclab/evidence/method/adr-0061-delivery-status-migration/1> ;
     prov:endedAtTime "2026-10-06T12:00:00Z"^^xsd:dateTime ;
     prov:qualifiedAssociation [ a prov:Association ;
         prov:agent <https://orcid.org/0000-0002-9699-629X> ;

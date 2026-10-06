@@ -397,7 +397,10 @@ That command runs:
    statements intersect rather than union, and redistribution puts a property's
    declaration and its domain in different modules by design;
 2. pySHACL over the Core profile with Core shapes, the Full closure with Full
-   shapes, and all public instances;
+   shapes, and all public instances; `make shacl-coverage`, which fails on a
+   current property no shape mentions or an instance no shape targets for its
+   class; and `make shacl-gb-02`, which requires the range and role rules to
+   reject the 2026-09-30 review's reproduction and one bad record per rule;
 3. the isolated ecosystem contract: JSON-LD graph isomorphism, 34 adversarial
    public SHACL overlays, six file-profile leakage overlays, six private-ledger
    adversarial cases, a self-publication positive scenario, complete-history
