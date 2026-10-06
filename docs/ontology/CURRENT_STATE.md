@@ -345,7 +345,11 @@ The main gaps are design and coverage gaps, not current parser failures:
   recorded deliberately. The 276 labels added that day were written by the
   maintainers and have **not yet had native review**, and neither have the twelve
   added for ADR 0061's neutral status values; see the review request in the
-  repository issues. `skos:definition` remains English-only for all 555
+  repository issues. The four languages are the vocabulary's: class and property
+  labels are English while translating them waits for native review, and
+  `make language-coverage` reports that layer without gating it (21 of 154
+  current classes carry the other three languages, none of the 266 current
+  properties does; GB-13). `skos:definition` remains English-only for all 555
   concepts, deliberately, and alias coverage (`skos:altLabel`) is thin rather
   than absent: 52 alternate labels on 38 of the 555 concepts, all English, 47 of
   them in the vocabulary module, which includes the oscillation aliases

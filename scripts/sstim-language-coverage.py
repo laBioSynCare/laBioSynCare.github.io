@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Measure multilingual coverage per scheme, and stop it regressing.
 
-SSTIM advertises four languages. BARTOC records `en | it | es | pt`, FAIRsharing
-lists the same four, and every module title is translated. Measured against the
+SSTIM advertises four languages for its vocabulary. BARTOC records
+`en | it | es | pt` and FAIRsharing lists the same four. Measured against the
 concepts on 2026-08-18, that claim was half true: 269 of 545 concepts carried all
 four languages and 276 carried English alone. 33 of the 67 schemes were complete
 and 34 were untranslated.
@@ -58,8 +58,16 @@ with nothing measuring aliases, four documents stated that alias coverage was
 zero, and by the time they said it the graph already carried fifteen. A number
 nothing prints is a number that gets remembered wrongly — CLAUDE.md §3.6.
 
-All 545 `skos:definition` values are English only, and translating them is a
-larger job and a separate decision.
+Every `skos:definition` is English only, and translating them is a larger job
+and a separate decision.
+
+The OWL layer is **reported and not gated** too (GB-13). The four-language claim
+is made for the vocabulary; class and property labels are English while
+translating them waits for native review, and only a few classes carry the other
+three. Until 2026-10-06 the README and the Zenodo description read as though the
+whole ontology were translated, and this script, which measured concepts only,
+could not have said otherwise. Module titles are not translated either, which
+this docstring used to claim they were.
 """
 
 from __future__ import annotations
@@ -67,8 +75,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from rdflib import Graph
-from rdflib.namespace import RDF, SKOS
+from rdflib import Graph, URIRef
+from rdflib.namespace import OWL, RDF, RDFS, SKOS
 
 ROOT = Path(__file__).resolve().parents[1]
 ONTOLOGY = ROOT / "static" / "ontology"
@@ -239,6 +247,39 @@ def main() -> int:
         f"language-coverage: aliases (not gated) — {len(alias_labels)} "
         f"skos:altLabel on {len(alias_concepts)}/{concepts_total} concepts, "
         f"{'/'.join(alias_langs) if alias_langs else 'none'}"
+    )
+
+    # The OWL layer: reported, never gated (GB-13; see the module docstring).
+    # Current terms only, in SSTIM's own namespaces.
+    def current_sstim_term(term) -> bool:
+        return (
+            isinstance(term, URIRef)
+            and str(term).startswith("https://w3id.org/sstim")
+            and "#" in str(term)
+            and not any(str(v).lower() == "true" for v in graph.objects(term, OWL.deprecated))
+        )
+
+    def translated(term) -> bool:
+        languages = {
+            label.language
+            for predicate in (RDFS.label, SKOS.prefLabel)
+            for label in graph.objects(term, predicate)
+            if getattr(label, "language", None)
+        }
+        return all(code in languages for code in REQUIRED)
+
+    classes = {c for c in graph.subjects(RDF.type, OWL.Class) if current_sstim_term(c)}
+    properties = {
+        p
+        for kind in (OWL.ObjectProperty, OWL.DatatypeProperty, OWL.AnnotationProperty)
+        for p in graph.subjects(RDF.type, kind)
+        if current_sstim_term(p)
+    }
+    print(
+        f"language-coverage: OWL layer (not gated) — "
+        f"{sum(map(translated, classes))}/{len(classes)} current classes and "
+        f"{sum(map(translated, properties))}/{len(properties)} current properties carry "
+        f"{'/'.join(REQUIRED)}; the four-language claim covers the vocabulary only"
     )
     return 0
 

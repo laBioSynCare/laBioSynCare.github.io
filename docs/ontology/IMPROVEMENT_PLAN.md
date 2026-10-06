@@ -528,7 +528,14 @@ explicit instruction naming each file.
   - *Done when* every unversioned route answers with a release, measured live.
     *Closed 2026-10-06: measured live after #6822 merged. The `void.ttl`
     download URLs followed the same day: every one now names `latest/`.*
-- [ ] **GB-13 Four languages cover the vocabulary only** (found 2026-10-05).
+- [x] **GB-13 Four languages cover the vocabulary only** (found 2026-10-05).
+  *Closed 2026-10-06 by stating the scope rather than translating: the claim is
+  the vocabulary's, and class and property labels stay English until a
+  translation can be reviewed natively. The README and the Zenodo description,
+  which read as though the whole ontology were translated, now say so, and so
+  does the coverage script, whose docstring claimed every module title was
+  translated (one of 18 is). `make language-coverage` reports the OWL layer
+  without gating it: 21 of 154 current classes, 0 of 266 current properties.*
   - *Next step:* decide whether the OWL layer is English-only by policy and say
     so wherever four languages are advertised, or translate it.
   - *Done when* the advertised claim and the files agree, and

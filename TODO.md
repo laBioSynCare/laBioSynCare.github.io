@@ -591,9 +591,11 @@ indexed, examiner-searchable records.
       it. That is probably why nobody checked.*
 
 - [ ] Get native review of the Italian, Portuguese and Spanish labels `P2`
-      *All 551 concepts carry four languages, but the 276 labels written on
-      2026-08-18 and the 6 written on 2026-08-19 were written by the maintainers
-      and no native speaker has read any of them.*
+      *All 555 concepts carry four languages, but the 276 labels written on
+      2026-08-18, the 6 written on 2026-08-19 and the twelve ADR 0061 added on
+      2026-10-06 were written by the maintainers and no native speaker has read
+      any of them. Class and property labels are English (GB-13); they are not
+      part of this request.*
 
       *`make language-coverage` now gates one mechanical property — a
       translation must not give two concepts the same label where English

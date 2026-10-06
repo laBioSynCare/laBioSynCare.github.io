@@ -82,6 +82,11 @@ file is the human-readable summary.
 
 ### Fixed
 
+- **The four-language claim names its scope.** SSTIM's vocabulary is in English,
+  Italian, Portuguese and Spanish; its class and property labels are English,
+  with the other three on 21 of 154 current classes. The README and the Zenodo
+  description read as though everything were translated, and now say which
+  part is. `make language-coverage` reports the OWL layer without gating it.
 - **VoID's downloads name the release it describes.** Every module and
   catalogue `dcat:downloadURL` and `void:dataDump` in `void.ttl` named the
   top-level development files, while its `dcat:accessURL` resolved to the

@@ -489,13 +489,17 @@ wikidata-submit:
 	$(PYTHON) scripts/wikidata-submit.py $(if $(WRITE),--write,) $(if $(LIMIT),--limit $(LIMIT),)
 
 ## Measure multilingual coverage per scheme and refuse to let it drift. SSTIM
-## advertises four languages in BARTOC, FAIRsharing and every module title; when
+## advertises four languages for its vocabulary in BARTOC and FAIRsharing; when
 ## first measured, 269 of 545 concepts carried all four and 276 carried English
 ## alone. The useful shape is that no scheme is *partially* translated, so the
 ## gate locks that property in, requires any new scheme to ship translated, and
 ## keeps the list of English-only schemes honest in both directions — a scheme
 ## that gets translated must leave the list. Closes the metric gap KR-16 was
 ## missing.
+##
+## It also *reports*, without gating, how much of the OWL layer carries the four
+## languages: the claim is the vocabulary's, and class and property labels are
+## English until translating them can be reviewed natively (GB-13).
 ##
 ## It also *reports* skos:altLabel coverage without gating it: how many aliases a
 ## concept deserves is an ontology decision, not this gate's. It is printed
