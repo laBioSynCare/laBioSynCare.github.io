@@ -1611,6 +1611,40 @@ for record in ecosystem_relationships | engagement_activities:
         fail(f"{record}: qualified ecosystem record must be owned by a real or fixture ecosystem file")
 
 
+# Deprecation hygiene (GB-06). A deprecated term names what replaces it with
+# dct:isReplacedBy, or says in a skos:historyNote that nothing does and why; a
+# replacement is itself current; and SSTIM's own public data uses no deprecated
+# term. A deprecation that names no successor leaves every consumer to guess,
+# and data that keeps using a retired term goes on teaching it: until 0.19.0 the
+# public evidence asserted sstim:supportsRelation on every assessment, because a
+# shape required it.
+NO_REPLACEMENT = re.compile(r"\bno (?:single )?replacement\b", re.IGNORECASE)
+deprecated_terms = {
+    subject
+    for subject, value in modules.subject_objects(OWL.deprecated)
+    if isinstance(subject, URIRef) and str(value).lower() == "true"
+}
+for term in sorted(deprecated_terms, key=str):
+    successors = list(modules.objects(term, DCTERMS.isReplacedBy))
+    if not successors and not any(
+        NO_REPLACEMENT.search(str(note)) for note in modules.objects(term, SKOS.historyNote)
+    ):
+        fail(
+            f"{term}: deprecated without dct:isReplacedBy or a skos:historyNote "
+            "saying it has no replacement"
+        )
+    for successor in successors:
+        if successor in deprecated_terms:
+            fail(f"{term}: dct:isReplacedBy names {successor}, which is deprecated too")
+deprecated_uses: dict[URIRef, int] = defaultdict(int)
+for _, predicate, obj in instances:
+    for term in (predicate, obj):
+        if term in deprecated_terms:
+            deprecated_uses[term] += 1
+for term, count in sorted(deprecated_uses.items(), key=lambda item: str(item[0])):
+    fail(f"public instances use the deprecated term {term} {count} time(s)")
+
+
 # Local object IRIs should resolve to a declared resource in the graph set.
 declared_subjects = {subject for subject in all_graph.subjects() if isinstance(subject, URIRef)}
 for _, _, obj in all_graph:

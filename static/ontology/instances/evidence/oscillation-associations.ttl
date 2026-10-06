@@ -62,7 +62,6 @@
     rdfs:label "Alpha oscillation and attentional access to stored information (assessment revision 1)" ;
     dct:description "Alpha-band activity covaries with attentional control and with access to stored information. An electrophysiological and cognitive-performance association observed in human scalp EEG — not a wellness outcome, and not a claim about stimulating at alpha frequencies." ;
     sstim:evaluatesSubject sstim-v:alphaOscillation ;
-    sstim:supportsRelation sstim-v:alphaOscillation ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/alpha-attention-memory/revision/1/proposition> ;
@@ -117,7 +116,6 @@
     rdfs:label "Theta oscillation and memory performance (assessment revision 1)" ;
     dct:description "Theta-band activity covaries with cognitive and memory performance in human scalp EEG. An observed association in the endogenous rhythm, not an outcome of stimulation." ;
     sstim:evaluatesSubject sstim-v:thetaOscillation ;
-    sstim:supportsRelation sstim-v:thetaOscillation ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/theta-memory-performance/revision/1/proposition> ;
@@ -172,7 +170,6 @@
     rdfs:label "Gamma oscillation and cortical processing (assessment revision 1)" ;
     dct:description "Gamma-band synchronization is proposed as a mechanism of communication and computation between cortical populations. A mechanistic proposal with substantial supporting work, not a wellness outcome." ;
     sstim:evaluatesSubject sstim-v:gammaOscillation ;
-    sstim:supportsRelation sstim-v:gammaOscillation ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/gamma-cortical-processing/revision/1/proposition> ;

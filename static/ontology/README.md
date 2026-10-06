@@ -712,6 +712,12 @@ Do not add an `exactMatch` from label similarity alone, treat an intended effect
 as an observed outcome, attach evidence globally to a technique family, put
 private/user data in public instance files, or edit a frozen version directory.
 
+To retire a term, deprecate it rather than delete it: `owl:deprecated true`,
+and either `dct:isReplacedBy` naming the current term or terms that supplant it,
+or a `skos:historyNote` saying it has no replacement and why. Then stop using it
+in the public instances. The quality audit enforces all three, including that a
+replacement is not itself deprecated (GB-06).
+
 ## Citation
 
 To cite a specific release, use [`CITATION.cff`](../../CITATION.cff) — it names

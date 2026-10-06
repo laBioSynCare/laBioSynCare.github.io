@@ -138,11 +138,6 @@ sstim-sh:EvidenceAssessmentClaimShape a sh:NodeShape ;
         ) ;
         sh:message "EvidenceAssessmentClaim must evaluate exactly one Preset, Technique or NeuralOscillationType (ADR 0013 range, widened by ADR 0049)."@en ;
     ] ;
-    # supportsRelation, when present as the 0.7 compatibility alias, must equal evaluatesSubject.
-    sh:property [
-        sh:path sstim:supportsRelation ; sh:equals sstim:evaluatesSubject ;
-        sh:message "Deprecated supportsRelation must materialize the same object as evaluatesSubject."@en ;
-    ] ;
     sh:property [
         sh:path sstim:hasEvidenceTier ; sh:minCount 1 ; sh:maxCount 1 ; sh:class sstim:EvidenceTierValue ;
         sh:message "EvidenceAssessmentClaim must have exactly one evidence tier."@en ;
@@ -200,6 +195,18 @@ sstim-sh:EvidenceAssessmentClaimShape a sh:NodeShape ;
                 FILTER( ?subject != ?psubject )
             }
         """ ;
+    ] .
+
+# The deprecated sstim:supportsRelation alias, where a claim still asserts it,
+# must agree with sstim:evaluatesSubject. Its own target is what makes the rule
+# conditional: sh:equals compares both value sets, so on the claim shape it
+# rejected every claim that omitted the alias, which made a deprecated term
+# mandatory (GB-06).
+sstim-sh:SupportsRelationAliasShape a sh:NodeShape ;
+    sh:targetSubjectsOf sstim:supportsRelation ;
+    sh:property [
+        sh:path sstim:supportsRelation ; sh:equals sstim:evaluatesSubject ;
+        sh:message "Deprecated supportsRelation, where asserted, must name the same object as evaluatesSubject."@en ;
     ] .
 
 sstim-sh:AssessmentPropositionShape a sh:NodeShape ;

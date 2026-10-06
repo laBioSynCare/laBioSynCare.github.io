@@ -316,7 +316,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "9151ed63d18858c5f312244761afbe3f0c600f2dd62214ae45af1e5b458641ea"
+        "sha256": "edab3123b17d7fc1e033db77dd42bae3894961f1cb8f010d6053559ee425fc10"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -420,7 +420,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "07d629d73089de4536427f80f7a4800d8a2e808b68c00b4d79f923241775c530"
+        "sha256": "963b26c888b4a643d781fcdb00733d684c2dc5c739abc187c77d82908a138537"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -459,7 +459,7 @@
       "source": {
         "path": "static/ontology/sstim-exposure.ttl",
         "mediaType": "text/turtle",
-        "sha256": "db9b10165863cfa78d15459477905c0d2e756f046d15168ee484747b55e5845f"
+        "sha256": "f3d496fa0880974456b11c0c50a593b5165c3f799828e829a5fe39e50637e4e7"
       },
       "runtime": {
         "url": "sstim-exposure.ttl",
@@ -496,7 +496,7 @@
       "source": {
         "path": "static/ontology/sstim-ecosystem.ttl",
         "mediaType": "text/turtle",
-        "sha256": "5eca6e40b35fb4a24268950050eeaa546ecc7ecf1cb95489ce3dc20a1672497d"
+        "sha256": "758255dbe7ef6180d04bab70e41cdaed64001ed273d3e0364a65ab4e72da7912"
       },
       "runtime": {
         "url": "sstim-ecosystem.ttl",
@@ -671,7 +671,7 @@
       "source": {
         "path": "static/ontology/sstim-shapes.ttl",
         "mediaType": "text/turtle",
-        "sha256": "01f24d0b2f7f8c56a00352ca6a858266b4c7647075bfaba45edc9109409f4877"
+        "sha256": "2f3393f2f5edf3ce789b431070ae40928f3eedfa9953eb91b405b8f4e5cb1d16"
       },
       "runtime": {
         "url": "sstim-shapes.ttl",
@@ -903,7 +903,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "ac8a0f6bbf67316e5e6ac1a4b7cc63e43b92cfea2bd1c146b3e6e6e25e6bcd35"
+      "sha256": "31720d929d7e32b5d9bbc762046578a7aacf8fabac9c7f5ec4b145ec823e359b"
     }
   ]
 }

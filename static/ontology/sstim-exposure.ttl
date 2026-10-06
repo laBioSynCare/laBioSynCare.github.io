@@ -114,6 +114,10 @@ sstim-ex:ComfortBoundary a owl:Class ;
 
 sstim-ex:ExposureEffectClaim a owl:Class ;
     owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:ExposureHypothesis, sstim-ex:ResearchQuestion,
+        sstim-ex:BoundaryApplicabilityStatement, sstim-ex:ProtocolRequirement,
+        sstim-ex:ExposureDesignObjective, sstim-ex:PlannedOutcomeSpecification,
+        sstim-ex:KnowledgeStatusAssertion ;
     rdfs:subClassOf sstim:EvidenceClaim ;
     rdfs:label "Exposure Effect Claim (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: this class mixed hypotheses, questions, boundary applicability, requirements, design objectives, planned outcomes, and status assertions under evidence semantics. Its instances migrate to the role-specific statement classes; removed no earlier than 1.0."@en ;
@@ -301,6 +305,10 @@ sstim-ex:hasPerceptualLoss a owl:ObjectProperty ;
 
 sstim-ex:hasEffectClaim a owl:ObjectProperty ;
     owl:deprecated true ;
+    dct:isReplacedBy sstim-ex:hasHypothesis, sstim-ex:hasResearchQuestion,
+        sstim-ex:hasBoundaryApplicability, sstim-ex:hasProtocolRequirement,
+        sstim-ex:hasDesignObjective, sstim-ex:hasPlannedOutcome,
+        sstim-ex:hasKnowledgeStatusAssertion ;
     rdfs:range sstim-ex:ExposureEffectClaim ;
     rdfs:label "has effect claim (deprecated)"@en ;
     skos:definition "Deprecated ADR 0027: the single link mixed hypotheses, questions, boundary applicability, requirements, design objectives, and planned outcomes. Use the role-specific hasHypothesis, hasResearchQuestion, hasBoundaryApplicability, hasProtocolRequirement, hasDesignObjective, hasPlannedOutcome, or hasKnowledgeStatusAssertion; removed no earlier than 1.0."@en ;

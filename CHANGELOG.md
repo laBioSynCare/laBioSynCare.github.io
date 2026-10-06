@@ -80,6 +80,21 @@ file is the human-readable summary.
 - `sstim-sh:BscCatalogPresetShape` and the five voice shapes. Their rules are in
   the BSC framework's shapes.
 
+### Fixed
+
+- **Every deprecated term says what replaced it (GB-06).** Of the 25 deprecated
+  terms with no `dct:isReplacedBy`, 12 now name their successors, which their
+  definitions already pointed to in prose. The other
+  13 say in a `skos:historyNote` that nothing replaces them, and why: the nine
+  evidence modality tags were never authoritative, and ADR 0031 keeps the three
+  ecosystem fields out of public data on purpose.
+- **Assessments no longer have to assert the deprecated `sstim:supportsRelation`.**
+  Its alias rule used `sh:equals`, which compares both value sets, on every
+  `EvidenceAssessmentClaim`, so a claim without the alias failed validation. The
+  rule now lives in `sstim-sh:SupportsRelationAliasShape` and applies only where
+  the alias is asserted. SSTIM's own data stopped asserting it on 11 claims; its
+  range never admitted the neural oscillation types ADR 0049 made assessable.
+
 ## [0.18.0] - 2026-09-23
 
 ### Added

@@ -117,7 +117,6 @@
     rdfs:label "Auditory steady-state response to isochronic / amplitude-modulated auditory stimulation (assessment revision 1)" ;
     dct:description "Periodic auditory stimulation (isochronic tones, amplitude-modulated tones, click trains) reliably evokes a phase-locked auditory steady-state response (ASSR), most robust near 40 Hz. A measurable electrophysiological response — not a wellness outcome." ;
     sstim:evaluatesSubject sstim-v:techIsochronicTones ;
-    sstim:supportsRelation sstim-v:techIsochronicTones ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/assr-isochronic-response/revision/1/proposition> ;
@@ -178,7 +177,6 @@ bsclab-evidence:assr-isochronic-response
     rdfs:label "Subcortical frequency-following response to acoustically periodic stimuli (assessment revision 1)" ;
     dct:description "Stimuli that carry a physical acoustic periodicity (monaural beats, isochronic tones) evoke a subcortical frequency-following response (FFR) that tracks the stimulus envelope. A measurable brainstem response; downstream cognitive or wellness effects are not asserted here." ;
     sstim:evaluatesSubject sstim-v:techMonauralBeats ;
-    sstim:supportsRelation sstim-v:techMonauralBeats ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/ffr-monaural-response/revision/1/proposition> ;
@@ -239,7 +237,6 @@ bsclab-evidence:ffr-monaural-response
     rdfs:label "Binaural-beat effects on EEG oscillatory activity and psychological state are mixed (assessment revision 1)" ;
     dct:description "A systematic review finds the effects of binaural-beat stimulation on brain oscillatory activity and on psychological/cognitive state to be inconsistent across studies. The perceived beat is a central construct with no acoustic periodicity, so the subcortical FFR does not straightforwardly transfer." ;
     sstim:evaluatesSubject sstim-v:techBinauralBeats ;
-    sstim:supportsRelation sstim-v:techBinauralBeats ;
     sstim:hasEvidenceTier sstim-v:tierPreliminary ;
     sstim:hasClaimDirection sstim-v:claimMixed ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/binaural-beats-state-mixed/revision/1/proposition> ;
@@ -300,7 +297,6 @@ bsclab-evidence:binaural-beats-state-mixed
     rdfs:label "Slow breathing is associated with measurable psychophysiological correlates (assessment revision 1)" ;
     dct:description "Conditional, indirect component-applicability assessment: a systematic review of slow breathing in healthy participants reports measurable cardiorespiratory and central correlates. The source studies breathing behavior; it is not evidence about the Martigli auditory cue itself." ;
     sstim:evaluatesSubject bsc-fw-tech:martigli-breathing-oscillation ;
-    sstim:supportsRelation bsc-fw-tech:martigli-breathing-oscillation ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/slow-breathing-physiology-review/revision/1/proposition> ;
@@ -362,7 +358,6 @@ bsclab-evidence:slow-breathing-physiology-review
     rdfs:label "Periodic visual stimulation evokes a steady-state visual response (assessment revision 1)" ;
     dct:description "Periodic luminance or contrast stimulation can evoke a frequency-tagged steady-state visual response. A measurable electrophysiological response; no downstream cognitive, wellness, or clinical effect is established." ;
     sstim:evaluatesSubject sstim-v:techPhoticDriving ;
-    sstim:supportsRelation sstim-v:techPhoticDriving ;
     sstim:hasEvidenceTier sstim-v:tierStrong ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/ssvep-photic-response/revision/1/proposition> ;
@@ -423,7 +418,6 @@ bsclab-evidence:ssvep-photic-response
     rdfs:label "Periodic vibrotactile stimulation evokes a steady-state somatosensory response (assessment revision 1)" ;
     dct:description "A literature review of EEG-based interfaces documents phase-locked steady-state somatosensory responses to sustained periodic skin stimulation. The claim is limited to measurability of the response." ;
     sstim:evaluatesSubject sstim-v:techVibrotactileEntrainment ;
-    sstim:supportsRelation sstim-v:techVibrotactileEntrainment ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/sssep-vibrotactile-response/revision/1/proposition> ;
@@ -484,7 +478,6 @@ bsclab-evidence:sssep-vibrotactile-response
     rdfs:label "Convergent processing supports a multisensory integration mechanism (assessment revision 1)" ;
     dct:description "Conditional, indirect mechanism-applicability assessment: a neuroscience review supports integrative neural processing across sensory channels under context- and timing-dependent conditions. It does not establish audiovisual entrainment or a wellness benefit." ;
     sstim:evaluatesSubject sstim-v:techAudiovisualEntrainment ;
-    sstim:supportsRelation sstim-v:techAudiovisualEntrainment ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/multisensory-integration-mechanism/revision/1/proposition> ;

@@ -269,7 +269,7 @@ await assertRows(store, 'cited evidence trails with responsible agent', `${prefi
 SELECT DISTINCT ?claim ?subject ?tier ?reference ?agent WHERE {
   GRAPH ?claimGraph {
     ?claim a sstim:EvidenceClaim ;
-      sstim:supportsRelation ?subject ;
+      sstim:evaluatesSubject ?subject ;
       sstim:hasEvidenceTier ?tier ;
       sstim:citesReference ?reference ;
       prov:wasAttributedTo ?agent ;

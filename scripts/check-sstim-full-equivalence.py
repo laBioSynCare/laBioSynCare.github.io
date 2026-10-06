@@ -428,6 +428,13 @@ ADR_0061_MIGRATION_FIELDS = {
     (SSTIM_V.modalityAuditory, SKOS.definition),
     (SSTIM_V.temporalAdaptive, SKOS.definition),
 }
+# GB-06 (2026-10-06): sstim:supportsRelation's definition no longer says the
+# alias is "retained as a materialized compatibility alias during 0.7.x". SSTIM's
+# own data stopped materializing it in 0.19.0, and that status moved to a
+# skos:historyNote; the term, its deprecation and its replacement are unchanged.
+GB_06_DEFINITION_FIELDS = {
+    (SSTIM.supportsRelation, SKOS.definition),
+}
 ADR_0061_REWRITTEN_ROOTS = (
     *((prop, RDFS.domain) for prop in (
         SSTIM.carrierFreqLeft, SSTIM.carrierFreqRight, SSTIM.initialVolume,
@@ -567,6 +574,8 @@ def normalized(
         if (subject, predicate) in ADR_0061_MIGRATION_FIELDS:
             continue
         if (subject, predicate) in ADR_0061_REWRITTEN_ROOTS:
+            continue
+        if (subject, predicate) in GB_06_DEFINITION_FIELDS:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue

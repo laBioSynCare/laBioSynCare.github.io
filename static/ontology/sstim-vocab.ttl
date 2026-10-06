@@ -404,6 +404,7 @@ sstim-v:EvidenceModalityScheme a skos:ConceptScheme ;
 
 sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Auditory"@en, "Uditivo"@it, "Auditivo"@pt, "Auditivo"@es ;
     skos:notation "AUD" ;
@@ -411,6 +412,7 @@ sstim-v:modalityAUD a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Conce
 
 sstim-v:modalityAV a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Audiovisual"@en, "Audiovisivo"@it, "Audiovisual"@pt, "Audiovisual"@es ;
     skos:notation "AV" ;
@@ -418,6 +420,7 @@ sstim-v:modalityAV a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concep
 
 sstim-v:modalityBREATH a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Breathing"@en, "Respirazione"@it, "Respiração"@pt, "Respiración"@es ;
     skos:notation "BREATH" ;
@@ -425,6 +428,7 @@ sstim-v:modalityBREATH a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
 
 sstim-v:modalityGENERAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "General / Mixed"@en, "Generale / Misto"@it, "Geral / Misto"@pt, "General / Mixto"@es ;
     skos:notation "GENERAL" ;
@@ -432,6 +436,7 @@ sstim-v:modalityGENERAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:C
 
 sstim-v:modalityPRECLINICAL a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Preclinical"@en, "Preclinico"@it, "Pré-clínico"@pt, "Preclínico"@es ;
     skos:notation "PRECLINICAL" ;
@@ -439,6 +444,7 @@ sstim-v:modalityPRECLINICAL a owl:NamedIndividual, sstim:EvidenceModalityTag, sk
 
 sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Review"@en, "Revisione"@it, "Revisão"@pt, "Revisión"@es ;
     skos:notation "REVIEW" ;
@@ -450,6 +456,7 @@ sstim-v:modalityREVIEW a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Co
 # directly to any single modality.
 sstim-v:modalityVIS a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Visual"@en, "Visivo"@it, "Visual"@pt, "Visual"@es ;
     skos:notation "VIS" ;
@@ -457,6 +464,7 @@ sstim-v:modalityVIS a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Conce
 
 sstim-v:modalityTACTILE a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Tactile"@en, "Tattile"@it, "Tátil"@pt, "Táctil"@es ;
     skos:notation "TACTILE" ;
@@ -464,6 +472,7 @@ sstim-v:modalityTACTILE a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:C
 
 sstim-v:modalityMULTISENSORY a owl:NamedIndividual, sstim:EvidenceModalityTag, skos:Concept ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0027, with no replacement: the tag was a migration clue, never authoritative source metadata, because it mixed sensory modality, intervention, study model and synthesis type. Classify each source on the basis axes instead (sstim:basisSensoryModality, sstim:basisModalityApplicability, sstim:basisStudyModel, sstim:basisSynthesisType, sstim:basisIntervention)."@en ;
     skos:inScheme sstim-v:EvidenceModalityScheme ;
     skos:prefLabel "Multisensory"@en, "Multisensoriale"@it, "Multissensorial"@pt, "Multisensorial"@es ;
     skos:notation "MULTISENSORY" ;

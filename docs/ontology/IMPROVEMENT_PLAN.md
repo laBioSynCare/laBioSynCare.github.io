@@ -474,7 +474,13 @@ explicit instruction naming each file.
     on `participantEngagementMode` at the technique layer. Add entailment
     fixtures in both directions. Probably an ADR amendment.
   - *Done when* HermiT rejects a process typed on both sides of the split.
-- [ ] **GB-06 Deprecation hygiene** (*protected*).
+- [x] **GB-06 Deprecation hygiene** (*protected*). *Closed 2026-10-06 on the
+  0.19.0-dev line: of the 25 deprecated terms without `dct:isReplacedBy`, 12 now
+  name a successor and 13 say they have none and why (`hapticPattern` already
+  did), the public data no longer asserts `supportsRelation`, and the
+  quality audit fails on any of the three regressing. The alias had stayed in the
+  data because the shape that checked it used `sh:equals` on every claim, which
+  made the deprecated term mandatory.*
   - *Next step:* `dct:isReplacedBy` for every deprecated term that has a
     replacement, and a stated "no replacement" for the rest. Decide whether the
     public data keeps asserting `supportsRelation`, and correct its "during

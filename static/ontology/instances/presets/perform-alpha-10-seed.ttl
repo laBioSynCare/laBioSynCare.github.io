@@ -43,7 +43,6 @@ preset-local:binaural-voice a sstim:AudioTrack, bsc-v:Voice, bsc-v:BinauralVoice
     rdfs:label "Perform Alpha 10 Seed auditory applicability assessment (revision 1)" ;
     dct:description "Preset applicability assessment: cites a systematic review to keep the preset connected to public-safe literature. It is an applicability assessment, not an authorized public outcome claim." ;
     sstim:evaluatesSubject bsclab-preset:perform-alpha-10-seed ;
-    sstim:supportsRelation bsclab-preset:perform-alpha-10-seed ;
     sstim:hasEvidenceTier sstim-v:tierSpeculative ;
     sstim:hasClaimDirection sstim-v:claimInconclusive ;
     sstim:assessesProposition <https://w3id.org/sstim/implementation/bsclab/evidence/perform-alpha-10-seed-auditory-review/revision/1/proposition> ;

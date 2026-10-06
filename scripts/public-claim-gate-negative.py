@@ -96,7 +96,6 @@ ex:claim a sstim:EvidenceAssessmentClaim, sstim:EvidenceClaim ;
     rdfs:label "KR-04 fixture assessment"@en ;
     dct:description "Synthetic assessment used only to test the public-claim gate." ;
     sstim:evaluatesSubject ex:preset ;
-    sstim:supportsRelation ex:preset ;
     sstim:hasEvidenceTier sstim-v:tierModerate ;
     sstim:hasClaimDirection sstim-v:claimSupports ;
     sstim:assessesProposition ex:proposition ;
@@ -310,6 +309,15 @@ CASES = [
         "vocabulary integrity",
     ),
     (
+        # Not a gate clause. The baseline omits the deprecated alias, and before
+        # GB-06 that alone failed it: sh:equals compared both value sets on every
+        # claim, which made the alias mandatory. Asserted, it must still agree.
+        "a deprecated supportsRelation alias naming another subject",
+        "sstim:evaluatesSubject ex:preset ;",
+        "sstim:evaluatesSubject ex:preset ;\n    sstim:supportsRelation ex:other-preset ;",
+        "deprecated alias",
+    ),
+    (
         "a medical claim backed by the strongest possible evidence",
         "sstim:hasPublicClaimLevel sstim-v:claimC3StructureFunction",
         "sstim:hasPublicClaimLevel sstim-v:claimC4Medical",
@@ -424,6 +432,12 @@ def main() -> int:
                 failures.append(
                     f"{label}: not rejected by the vocabulary shape — the gate can "
                     f"still be disabled by omitting a triple (ADR 0050)"
+                )
+        elif clause == "deprecated alias":
+            if not any("must name the same object as evaluatesSubject" in m for m in hits):
+                failures.append(
+                    f"{label}: not rejected by SupportsRelationAliasShape — a deprecated "
+                    f"alias can contradict the property that replaced it (GB-06)"
                 )
         elif not any(GATE in m for m in hits):
             failures.append(

@@ -295,6 +295,7 @@ sstim-eco:hasContributedTo a owl:ObjectProperty ;
 
 sstim-eco:couldContributeTo a owl:ObjectProperty ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0031, with no replacement: a guess about what a person could contribute is not migrated as a public fact. A qualified sstim-eco:EcosystemRelationship records what an agent has actually done."@en ;
     rdfs:label "could contribute to"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     skos:definition "An SSTIM area to which the agent could plausibly contribute."@en ;
@@ -364,6 +365,7 @@ sstim-eco:notifiedOn a owl:DatatypeProperty ;
 
 sstim-eco:notificationChannel a owl:DatatypeProperty ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0031, with no replacement: a sstim-eco:NotificationActivity records that a notification was sent, and the channel stays private by design."@en ;
     rdfs:label "notification channel"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;
@@ -390,6 +392,7 @@ sstim-eco:respondedOn a owl:DatatypeProperty ;
 
 sstim-eco:responseNote a owl:DatatypeProperty ;
     owl:deprecated true ;
+    skos:historyNote "Deprecated by ADR 0031, with no replacement: a sstim-eco:ResponseActivity records a controlled outcome, and the text of a response stays private by design."@en ;
     rdfs:label "response note"@en ;
     rdfs:domain sstim-eco:EcosystemAgent ;
     rdfs:range xsd:string ;

@@ -546,7 +546,8 @@ Always use `src/rdf/query.js` for SPARQL execution. Standard patterns:
 // Evidence tiers live on sstim:EvidenceAssessmentClaim (ADR 0027; the concrete
 // evidence-bearing subtype of sstim:EvidenceClaim), linked to its subject via
 // sstim:evaluatesSubject — the neutral relation that replaced the directionally
-// misleading sstim:supportsRelation (kept as a deprecated 0.7.x alias). Tiers
+// misleading sstim:supportsRelation (deprecated; SSTIM's own data stopped
+// asserting it in 0.19.0). Tiers
 // are not on the preset; preset rdfs:labels carry no language tag.
 const PRESET_QUERY = `
 PREFIX sstim: <https://w3id.org/sstim#>
