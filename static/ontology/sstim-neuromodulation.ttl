@@ -184,7 +184,7 @@ sstim:NeuromodulationTechnique a owl:Class ;
                "Técnica de Neuromodulação"@pt,
                "Técnica de Neuromodulación"@es ;
     skos:definition "A stimulation technique whose defining intervention objective is to alter activity or function at an identified neural target, with anatomical site and distributed neural system recorded separately. Membership does not assert successful modulation, benefit, or safety."@en ;
-    skos:scopeNote "Cataloguing a neuromodulation technique states that SSTIM can describe it, not that BSC Lab delivers it or that it is effective. A proposed neural mechanism or an evoked response is not by itself a neuromodulation objective (ADR 0034 §2)."@en ;
+    skos:scopeNote "Cataloguing a neuromodulation technique states that SSTIM can describe it, not that any implementation delivers it or that it is effective. A proposed neural mechanism or an evoked response is not by itself a neuromodulation objective (ADR 0034 §2)."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0034-neuromodulation-relation-and-neural-target-axis.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/neuromodulation> .
 

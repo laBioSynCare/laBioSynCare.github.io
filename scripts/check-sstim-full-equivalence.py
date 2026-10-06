@@ -69,13 +69,12 @@ OLD_TRACK_SCOPE_NOTE = Literal(
     "name covers both an audible layer and a silent one.",
     lang="en",
 )
+# ADR 0061 rewrote it again in 0.19.0, when sstim:Voice moved to the BSC
+# framework's vocabulary; the 0.13 wording is in its skos:historyNote.
 NEW_TRACK_SCOPE_NOTE = Literal(
-    "The generic superclass for audio, visual, haptic, and control layers. The "
-    "optional Patch Studio profile specializes sstim:Voice under sstim:AudioTrack; "
-    "other configuration schemas may define their own Track subclasses. ADR 0041 "
-    "renamed the former Patch Studio control voices to LFO and Permutation before "
-    "adding that Voice subsumption, removing the earlier audible-versus-control "
-    "ambiguity.",
+    "The generic superclass for audio, visual, haptic, and control layers. A "
+    "configuration schema may define its own Track subclasses; the BSC framework's "
+    "catalog voice, for example, specialises sstim:AudioTrack.",
     lang="en",
 )
 VALIDATION_HARDENING_NODES = {
@@ -337,7 +336,7 @@ def public_claim_gate_nodes(graph: Graph) -> set:
         raise ValueError(
             f"expected exactly one public-claim gate constraint on "
             f"sstim-sh:BscCatalogPresetShape or sstim-sh:PresetShape, found "
-            f"{len(matched)} — the gate was renamed, duplicated or deleted, and this "
+            f"{len(matched)}: the gate was renamed, duplicated or deleted, and this "
             f"exception no longer describes it"
         )
     reachable: set[BNode] = set()
@@ -435,6 +434,46 @@ ADR_0061_MIGRATION_FIELDS = {
 # skos:historyNote; the term, its deprecation and its replacement are unchanged.
 GB_06_DEFINITION_FIELDS = {
     (SSTIM.supportsRelation, SKOS.definition),
+}
+# ADR 0061, completed in the 0.19.0 release review (2026-10-07). The migration
+# rewrote the definitions the ADR's census counted, and this review found the
+# rest of the same thing by searching every current term's annotations:
+#
+#   - five definitions still depended on the catalog. Two generic audio-track
+#     parameters were defined "for a voice", sstim:referenceKey by the catalog's
+#     techDesc field, sstim:ControlTrack named the catalog's signals as "the
+#     current kinds", and sstim-v:mechAutonomic was "used for" the Martigli
+#     oscillation, which is now its example;
+#   - two scope notes named one implementation's pipeline or claimed BSC Lab as
+#     the thing a catalogue entry does not promise, and now say "any
+#     implementation";
+#   - thirteen notes recorded BSC Lab's delivery status, platform support or
+#     scope ("not deliverable by BSC Lab", "outside current BSC scope"), which
+#     ADR 0061 rule 3 makes scoped data rather than term annotation.
+#
+# Every term keeps its IRI and meaning. Where a definition lost a dependence,
+# its old wording is in a skos:historyNote.
+ADR_0061_COMPLETION_FIELDS = {
+    (SSTIM.ControlTrack, SKOS.definition),
+    (SSTIM.baseFrequency, SKOS.definition),
+    (SSTIM.initialVolume, SKOS.definition),
+    (SSTIM.referenceKey, SKOS.definition),
+    (SSTIM_V.mechAutonomic, SKOS.definition),
+    (SSTIM.NeuromodulationTechnique, SKOS.scopeNote),
+    (SSTIM.StimulusSpecification, SKOS.scopeNote),
+    (SSTIM_V.modalityOlfactory, SKOS.scopeNote),
+    (SSTIM_V.modalitySomatosensory, SKOS.scopeNote),
+    (SSTIM_V.modalityVestibular, SKOS.scopeNote),
+    (SSTIM_V.techAudioTactile, SKOS.scopeNote),
+    (SSTIM_V.techElectroconvulsiveTherapy, SKOS.scopeNote),
+    (SSTIM_V.techUltrasoundNeuromod, SKOS.scopeNote),
+    (SSTIM_V.techDBS, SKOS.editorialNote),
+    (SSTIM_V.techElectroconvulsiveTherapy, SKOS.editorialNote),
+    (SSTIM_V.techIntrathecalNeuromodulatoryAgentDelivery, SKOS.editorialNote),
+    (SSTIM_V.techRepetitiveTMS, SKOS.editorialNote),
+    (SSTIM_V.techTACS, SKOS.editorialNote),
+    (SSTIM_V.techTDCS, SKOS.editorialNote),
+    (SSTIM_V.techVagusNerveStimulation, SKOS.editorialNote),
 }
 ADR_0061_REWRITTEN_ROOTS = (
     *((prop, RDFS.domain) for prop in (
@@ -597,6 +636,8 @@ def normalized(
         if (subject, predicate) in ADR_0061_REWRITTEN_ROOTS:
             continue
         if (subject, predicate) in GB_06_DEFINITION_FIELDS:
+            continue
+        if (subject, predicate) in ADR_0061_COMPLETION_FIELDS:
             continue
         if triple == (SSTIM_EX.StimulusChannel, SKOS.definition, channel_definition):
             continue

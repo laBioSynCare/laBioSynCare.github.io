@@ -995,6 +995,11 @@ indexed, examiner-searchable records.
             own rules.*
       - [x] 4. Rewrite the 22 generic definitions that carry BSC remarks
             (provenance to `skos:historyNote`; status and policy out).
+            *The migration rewrote 27. The release review on 2026-10-07
+            searched every current term's annotations and found five more
+            definitions that depended on the catalog and the notes of 14 terms
+            that recorded BSC Lab's delivery status; ADR 0061's implementation
+            note lists them.*
       - [x] 5. Move the committed presets and experiments to the new terms;
             update `preset.schema.json` (`group` loses its enum),
             `src/rdf/presets.js` (GB-10) and every other file that names a moved
@@ -1013,6 +1018,29 @@ indexed, examiner-searchable records.
             set the route contract's registry state to Live. ADR 0061's ordering:
             0.19.0 is not cut until every `dct:isReplacedBy` target
             dereferences.*
+- [ ] **Cut 0.19.0** `P1`
+      *Waits on perma-id/w3id.org#6827 (step 6 above). The generic procedure is
+      in [`static/ontology/README.md`](static/ontology/README.md); these are the
+      steps particular to this release.*
+
+      1. When #6827 merges, measure `framework/bsc/vocab` and
+         `framework/bsc/shapes` live (Turtle `200`, a browser to `?ns=bsc-v`,
+         `406` otherwise) and set their route-contract rows to Live.
+      2. Add the approved 0.19.0 Kernel history note, dated for the cut. It was
+         revised on 2026-10-07 to cover the stricter validation and the release
+         review, and is kept outside the repository until then.
+      3. Prepare, snapshot, validate (`make validate` and `make test`), tag,
+         `make push`, publish the GitHub release from the changelog section,
+         and confirm the Zenodo DOI.
+      4. After the cut: the BSC vocabulary's `dct:requires <https://w3id.org/sstim>`
+         becomes `owl:imports <https://w3id.org/sstim/0.19.0>`; the development
+         line reopens for the next release; the registry publishers move to the
+         Community Group (the item above); the Community Group announcement,
+         drafted, goes out.
+      5. Not a gate: one upstream w3id PR for the staged version-IRI
+         negotiation and the `context.jsonld` route (mirror since 3ddffd8 and
+         f078ceb). Until it merges, a version IRI answers Turtle as before. Once
+         live, measure it and drop the README's "use the site copy" note.
 - [?] Decide whether the namespace IRI should serve one `owl:Ontology` header `P2`
       ***Disposition 2026-09-28: record it, change nothing yet.*** *Renato agreed.
       LOV is the only observed case, corrected by email on 2026-09-29; the module

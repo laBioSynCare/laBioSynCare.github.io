@@ -200,7 +200,7 @@ sstim:initialVolume a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "initial volume"@en ;
-    skos:definition "Initial output gain or amplitude for a voice."@en ;
+    skos:definition "Initial output gain or amplitude of an audio track."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:panPosition a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -214,7 +214,7 @@ sstim:baseFrequency a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:AudioTrack ;
     rdfs:range xsd:decimal ;
     rdfs:label "base frequency"@en ;
-    skos:definition "Base, carrier, or center frequency for a voice, in Hz."@en ;
+    skos:definition "Base, carrier, or center frequency of an audio track, in Hz."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/patch-studio> .
 
 sstim:beatHz a owl:DatatypeProperty, owl:FunctionalProperty ;

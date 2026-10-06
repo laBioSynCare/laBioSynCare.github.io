@@ -149,6 +149,7 @@ sstim:breathingPeriodFinal a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:range  xsd:decimal ;
     rdfs:label  "final breathing period (s)"@en ;
     skos:definition "Final period of a breathing-shaped oscillation after its transition, in seconds. On a track it is the configured value; on a session specification it overrides the configuration's value for that session, and absence means the configured value holds."@en ;
+    skos:historyNote "Until 0.19.0 a session-only override. ADR 0061 widened it to the tracks themselves, so a generic configuration states it without the BSC catalog's vocabulary."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty ;
@@ -156,6 +157,7 @@ sstim:breathingTransitionDuration a owl:DatatypeProperty, owl:FunctionalProperty
     rdfs:range  xsd:decimal ;
     rdfs:label  "breathing transition duration (s)"@en ;
     skos:definition "Duration in seconds over which a breathing-shaped oscillation moves from its initial to its final period. On a track it is the configured value; on a session specification it overrides the configuration's value for that session, and absence means the configured value holds."@en ;
+    skos:historyNote "Until 0.19.0 a session-only override. ADR 0061 widened it to the tracks themselves, so a generic configuration states it without the BSC catalog's vocabulary."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/session> .
 
 sstim:actualDurationSeconds a owl:DatatypeProperty, owl:FunctionalProperty ;

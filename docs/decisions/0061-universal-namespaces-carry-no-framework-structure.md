@@ -145,6 +145,18 @@ stayed; the points below are what the decision text did not settle.
   rewritten definitions, the 16 rewritten domains and the retired shapes as
   exceptions. The term index marks every deprecated term and names its
   replacement.
+- **Completed in the release review (2026-10-07).** The census above counted
+  definitions, and the migration rewrote 27 of them. Searching every current
+  term's annotations found the rest: five more definitions that depended on
+  the catalog (two audio-track parameters defined "for a voice",
+  `sstim:referenceKey` defined by the catalog's `techDesc` field,
+  `sstim:ControlTrack` naming the catalog's signals as "the current kinds", and
+  `sstim-v:mechAutonomic` "used for" the Martigli oscillation, now its
+  example), and the notes of 14 terms recording BSC Lab's delivery status,
+  platform support or pipeline. Rule 1 lets a definition name a framework as an
+  example, so examples stayed; status left, as rule 3 requires. The note on
+  `sstim:Track` still named `sstim:Voice` as the Patch Studio specialisation.
+  `full-equivalence` records the 20 baseline fields this changed.
 - **Still open.** No w3id route for `framework/bsc/vocab` or
   `framework/bsc/shapes` yet. It follows the deploy, and under this ADR's
   ordering 0.19.0 waits for it.

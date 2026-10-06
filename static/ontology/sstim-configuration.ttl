@@ -162,7 +162,8 @@ sstim:Track a owl:Class ;
     rdfs:subClassOf iao:0000030 ;
     rdfs:label "Track"@en ;
     skos:definition "A single layer within an engine configuration, carrying the parameters that specify what that layer contributes to the arrangement. A track is exactly one of audio, visual, haptic or control."@en ;
-    skos:scopeNote "The generic superclass for audio, visual, haptic, and control layers. The optional Patch Studio profile specializes sstim:Voice under sstim:AudioTrack; other configuration schemas may define their own Track subclasses. ADR 0041 renamed the former Patch Studio control voices to LFO and Permutation before adding that Voice subsumption, removing the earlier audible-versus-control ambiguity."@en ;
+    skos:scopeNote "The generic superclass for audio, visual, haptic, and control layers. A configuration schema may define its own Track subclasses; the BSC framework's catalog voice, for example, specialises sstim:AudioTrack."@en ;
+    skos:historyNote "Until 0.19.0 this note said the optional Patch Studio profile specialised sstim:Voice under sstim:AudioTrack, a subsumption ADR 0041 added after renaming the former Patch Studio control voices to LFO and Permutation. ADR 0061 moved the catalog voice to the BSC framework's vocabulary as bsc-v:Voice."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0041-stimulus-description-layers-and-the-canonical-schema-gap.md> ;
     rdfs:isDefinedBy <https://w3id.org/sstim/configuration> .
 
@@ -188,7 +189,8 @@ sstim:HapticTrack a owl:Class ;
 sstim:ControlTrack a owl:Class ;
     rdfs:subClassOf sstim:Track ;
     rdfs:label "Control Track"@en ;
-    skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks. Breathing-guidance (Martigli) and symmetry-derived control signals are the current kinds."@en ;
+    skos:definition "A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks, such as a breathing-guidance oscillation."@en ;
+    skos:historyNote "Until 0.19.0 the definition named the BSC catalog's Martigli breathing guidance and its symmetry-derived signals as the current kinds of control track; ADR 0061 removed the dependence."@en ;
     skos:editorialNote "The modulation this definition describes is prose the graph cannot state: no property links a control track to the track and parameter it modulates. Two consequences follow. A configuration cannot be read to discover what drives what, and the control signal is not separable from the preset that contains it, so no shared signal object exists for two channels or two studies to be compared by. This is the abstract-signal half of SSTIM_DIRECTIONS.md §5: a time-varying function with a period or envelope and no modality, which a rendering then binds to a renderable parameter of some sensory channel. Carrier and modulator describe one audio rendering of such a signal, not the general structure — a carrier is needed because 10 Hz falls below the audible range, while a 10 Hz light flicker or vibration is presented directly."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0012-martigli-voice-parameters.md> ,
         <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/ontology/SSTIM_DIRECTIONS.md> ;

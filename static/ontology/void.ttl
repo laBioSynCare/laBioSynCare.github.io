@@ -356,7 +356,7 @@
     dct:title "BSC Lab public SSTIM instance data"@en ;
     dct:description "Public, non-clinical BSC Lab programme, framework, implementation, protocol, preset, evidence, reference, experiment, synthetic session, and synthetic ecosystem contract records, the BSC framework's own vocabulary and shapes, plus a separately hosted mutable reviewed ecosystem subset. The void:triples value counts only the version-controlled static files, the framework vocabulary included; the mutable subset deliberately omits volatile counts. Private BioSynCare catalog data, real participant records, correspondence, contact channels, and raw consent evidence are excluded."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 2925 ;
+    void:triples 2942 ;
     void:uriSpace "https://w3id.org/sstim/implementation/bsclab/",
         "https://w3id.org/sstim/framework/",
         "https://w3id.org/sstim/ecosystem/",
@@ -394,7 +394,7 @@
     dct:title "BSC framework vocabulary and shapes"@en ;
     dct:description "The BSC framework's catalog voice classes, preset groups, voice types, Martigli oscillation parameters and Symmetry permutation coding, with the SHACL shapes that enforce its catalog rules. It imports SSTIM, is versioned by the framework's maintainers, and belongs to no SSTIM profile or snapshot."@en ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
-    void:triples 615 ;
+    void:triples 632 ;
     void:dataDump <https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-vocab.ttl>,
         <https://w3c-cg.github.io/sstim/ontology/frameworks/bsc/bsc-shapes.ttl> ;
     void:uriSpace "https://w3id.org/sstim/framework/bsc/vocab#",

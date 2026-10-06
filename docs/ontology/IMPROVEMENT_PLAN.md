@@ -438,7 +438,9 @@ explicit instruction naming each file.
   deprecated in place; Directions §3 records what moved and what stayed. The
   upstream route for the BSC vocabulary,
   [perma-id/w3id.org#6827](https://github.com/perma-id/w3id.org/pull/6827), is
-  the one step left before 0.19.0.*
+  the one step left before 0.19.0. The release review on 2026-10-07 found five
+  more definitions and the notes of 14 terms that still depended on BSC or
+  recorded its status, now neutral too (ADR 0061's implementation note).*
   BSC preset groups, `hasBreathGuide` and four "BSC Lab" knowledge-status values
   live in the universal namespaces.
   - *Next step:* extend [Directions](SSTIM_DIRECTIONS.md) §3 to name these

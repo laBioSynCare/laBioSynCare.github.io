@@ -251,7 +251,8 @@ sstim:referenceKey a owl:DatatypeProperty, owl:FunctionalProperty ;
     rdfs:domain sstim:PublicSafeReference ;
     rdfs:range  xsd:string ;
     rdfs:label  "reference key"@en ;
-    skos:definition "Short uppercase key (e.g. 'INGENDOH_2023') matching citation keys in preset techDesc fields."@en ;
+    skos:definition "Short uppercase key (e.g. 'INGENDOH_2023') by which running text, such as a preset's description, cites the reference."@en ;
+    skos:historyNote "Until 0.19.0 defined by the citation keys of the BSC catalog's techDesc field; ADR 0061 removed the dependence."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
 sstim:evidenceNotes a owl:AnnotationProperty ;
@@ -559,7 +560,7 @@ sstim:reviewsAssessment a owl:ObjectProperty, owl:FunctionalProperty ;
 sstim:reviewRubric a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:label "review rubric"@en ;
     rdfs:range prov:Plan ;
-    skos:historyNote "Range prov:Plan added in 0.19.0 (GB-02); until then it had none. A rubric or policy revision is the plan the review followed, as PROV's qualified association names it with prov:hadPlan."@en ;
+    skos:historyNote "Range prov:Plan added in 0.19.0; until then it had none. A rubric or policy revision is the plan the review followed, as PROV's qualified association names it with prov:hadPlan."@en ;
     skos:definition "The immutable rubric or policy revision a review decision was made under."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 
@@ -584,7 +585,7 @@ sstim:hasReviewDecision a owl:ObjectProperty, owl:FunctionalProperty ;
 sstim:independencePolicy a owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:label "independence policy"@en ;
     rdfs:range prov:Plan ;
-    skos:historyNote "Range prov:Plan added in 0.19.0 (GB-02); until then it had none. A rubric or policy revision is the plan the review followed, as PROV's qualified association names it with prov:hadPlan."@en ;
+    skos:historyNote "Range prov:Plan added in 0.19.0; until then it had none. A rubric or policy revision is the plan the review followed, as PROV's qualified association names it with prov:hadPlan."@en ;
     skos:definition "The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations."@en ;
     rdfs:isDefinedBy <https://w3id.org/sstim/evidence> .
 

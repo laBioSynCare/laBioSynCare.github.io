@@ -1063,7 +1063,7 @@ sstim-v:modalitySomatosensory a owl:NamedIndividual, sstim:SensoryModality, skos
     skos:notation "somatosensory" ;
     skos:definition "The somatosensory modality: body-perceived sensation including touch, pressure, vibration, and related cutaneous and deep-tissue sensation. In SSTIM this is the superordinate body-sense channel — the tactile percept is a sub-modality, the haptic actuator (e.g. the Web Vibration API) is the device-delivery path, and vibrotactile is the driving mechanism (P5.5 convention; ADR 0019)."@en ;
     sstim:platformDeliverable "true"^^xsd:boolean ;
-    skos:scopeNote "BSC delivers somatosensory stimulation through the haptic actuator path (Web Vibration API on Android; unavailable on iOS Safari). Device capability, perceived modality, and mechanism are modeled separately in the exposure module (ADR 0010)."@en ;
+    skos:scopeNote "Device capability, perceived modality, and mechanism are modeled separately in the exposure module (ADR 0010)."@en ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/v0.18.0/docs/decisions/0019-modality-nomenclature-cleanup.md> .
 
 sstim-v:modalityInteroceptive a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
@@ -1080,7 +1080,7 @@ sstim-v:modalityVestibular a owl:NamedIndividual, sstim:SensoryModality, skos:Co
     skos:definition "The sense of head orientation, linear acceleration and rotation, arising in the inner ear. Distinguished from proprioception, which reports limb and body position rather than motion of the head in space."@en ;
     skos:notation "vestibular" ;
     sstim:platformDeliverable "false"^^xsd:boolean ;
-    skos:scopeNote "Requires dedicated hardware (e.g. galvanic vestibular stimulation). Outside current BSC scope."@en .
+    skos:scopeNote "Requires dedicated hardware (e.g. galvanic vestibular stimulation)."@en .
 
 sstim-v:modalityOlfactory a owl:NamedIndividual, sstim:SensoryModality, skos:Concept ;
     skos:inScheme sstim-v:SensoryModalityScheme ;
@@ -1088,7 +1088,7 @@ sstim-v:modalityOlfactory a owl:NamedIndividual, sstim:SensoryModality, skos:Con
     skos:definition "The chemical sense responding to airborne volatile compounds. Distinguished from gustatory perception, which responds to compounds in solution, though the two combine in flavour."@en ;
     skos:notation "olfactory" ;
     sstim:platformDeliverable "false"^^xsd:boolean ;
-    skos:scopeNote "Requires dedicated hardware. Outside current BSC scope."@en .
+    skos:scopeNote "Requires dedicated hardware."@en .
 
 
 ###########################################################################
@@ -1132,7 +1132,7 @@ sstim-v:mechAutonomic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Co
                    "Arrastamento Respiratório Autonômico"@pt,
                    "Arrastre Respiratorio Autonómico"@es ;
     skos:notation "AUTONOMIC" ;
-    skos:definition "Proposed mechanism category for paced-breathing protocols that coordinate respiratory timing with respiratory sinus arrhythmia, heart-rate variability, and baroreflex dynamics. Used for Martigli breathing oscillation; protocol-specific effects require separate evidence claims."@en .
+    skos:definition "Proposed mechanism category for paced-breathing protocols, such as a Martigli breathing oscillation, that coordinate respiratory timing with respiratory sinus arrhythmia, heart-rate variability, and baroreflex dynamics. Protocol-specific effects require separate evidence claims."@en .
 
 sstim-v:mechStochastic a owl:NamedIndividual, sstim:StimulationMechanism, skos:Concept ;
     skos:inScheme sstim-v:StimulationMechanismScheme ;
@@ -1937,7 +1937,7 @@ sstim-v:techUltrasoundNeuromod a owl:NamedIndividual, sstim:NeuromodulationTechn
     skos:altLabel "LIFU"@en, "low-intensity focused ultrasound"@en ;
     skos:notation "ultrasound-neuromodulation" ;
     skos:definition "Application of spatially focused acoustic energy to an identified neural target with the objective of altering its activity or function."@en ;
-    skos:scopeNote "Defined by its intended focused neural target, not by the categorical absence of an audible percept. Auditory or somatosensory co-stimulation and confounds are protocol-dependent and belong in exposure profiles and evidence records; they do not decide the technique's primary class. Requires dedicated hardware and is not consumer web/mobile feasible. Catalogued so the ontology can describe it, never because BSC Lab delivers it."@en ;
+    skos:scopeNote "Defined by its intended focused neural target, not by the categorical absence of an audible percept. Auditory or somatosensory co-stimulation and confounds are protocol-dependent and belong in exposure profiles and evidence records; they do not decide the technique's primary class. Requires dedicated hardware and is not feasible on consumer web or mobile platforms. Catalogued so the ontology can describe it, not because any implementation delivers it."@en ;
     sstim:proposedMechanism sstim-v:mechUltrasonic ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
     sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
@@ -2029,7 +2029,7 @@ sstim-v:techAudioTactile a owl:NamedIndividual, sstim:EntrainmentBasedTechnique,
                    "Arrastre Audio-Táctil"@es ;
     skos:notation "audio-tactile" ;
     skos:definition "An auditory pulse train (isochronic, monaural, or binaural) and a vibrotactile pulse delivered in phase at the same target rate, so hearing and touch are driven together. Cross-modal: auditory and somatosensory steady-state responses plus multisensory integration."@en ;
-    skos:scopeNote "A natural pairing for the BSC breathing/haptic pulse — the isOn breathing-reference voice already drives both the visual breathing animation and the haptic pulse. The tactile channel is Android-only via the Web Vibration API."@en ;
+    skos:scopeNote "Pairs naturally with breathing guidance, where one breathing oscillation can drive an auditory, a visual and a haptic pulse together."@en ;
     sstim:proposedMechanism sstim-v:mechMultisensory ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonFrequencyFollowingResponse, sstim-v:phenomenonSomatosensorySteadyStateResponse ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPeriodic ;
@@ -3446,7 +3446,7 @@ sstim-v:techRepetitiveTMS a owl:NamedIndividual, sstim:NeuromodulationTechnique,
     sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscranial ;
     sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
-    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and not consumer-platform feasible."@en .
+    skos:editorialNote "Catalogued for domain completeness. Not feasible on a consumer platform."@en .
 
 sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3463,7 +3463,7 @@ sstim-v:techTDCS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Ne
     sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
     sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
-    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+    skos:editorialNote "Catalogued for domain completeness."@en .
 
 sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3480,7 +3480,7 @@ sstim-v:techTACS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Ne
     sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
     sstim:intendedNeuralTargetSite sstim-v:targetBrain, sstim-v:targetCortex ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonOscillatoryDynamics ;
-    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+    skos:editorialNote "Catalogued for domain completeness."@en .
 
 sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3497,7 +3497,7 @@ sstim-v:techDBS a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:Neu
     sstim:stimulationDeliveryApproach sstim-v:approachImplanted, sstim-v:approachIntracranial ;
     sstim:intendedNeuralTargetSite sstim-v:targetDeepBrainStructure ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
-    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab and outside its scope entirely."@en .
+    skos:editorialNote "Catalogued for domain completeness."@en .
 
 sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTechnique, sstim:NeurostimulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3515,7 +3515,7 @@ sstim-v:techVagusNerveStimulation a owl:NamedIndividual, sstim:NeuromodulationTe
     sstim:intendedNeuralTargetSite sstim-v:targetCranialNerve ;
     sstim:intendedNeuralSystem sstim-v:systemAutonomic ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonAutonomicNeuralRegulation ;
-    skos:editorialNote "Catalogued for domain completeness. Not deliverable by BSC Lab."@en .
+    skos:editorialNote "Catalogued for domain completeness."@en .
 
 sstim-v:techIntrathecalNeuromodulatoryAgentDelivery a owl:NamedIndividual, sstim:NeuromodulationTechnique, skos:Concept ;
     skos:inScheme sstim-v:TechniqueScheme ;
@@ -3531,7 +3531,7 @@ sstim-v:techIntrathecalNeuromodulatoryAgentDelivery a owl:NamedIndividual, sstim
     sstim:stimulationDeliveryApproach sstim-v:approachTargetedLocalInfusion, sstim-v:approachIntrathecal ;
     sstim:intendedNeuralTargetSite sstim-v:targetCentralNervousSystem, sstim-v:targetSpinalCord ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonNeurochemicalSignaling ;
-    skos:editorialNote "Catalogued for domain completeness. A clinical method, not deliverable by BSC Lab."@en .
+    skos:editorialNote "Catalogued for domain completeness. A clinical method."@en .
 
 # ADR 0035: electroconvulsive therapy, added at the suggestion of Theo Marins
 # (2026-07-22). It completes the contrast set's coverage of the established
@@ -3546,14 +3546,14 @@ sstim-v:techElectroconvulsiveTherapy a owl:NamedIndividual, sstim:Neuromodulatio
     skos:altLabel "ECT"@en ;
     skos:notation "electroconvulsive-therapy" ;
     skos:definition "Brief electrical stimulation applied through scalp electrodes to deliberately induce a generalized seizure under anaesthesia, with the objective of altering brain activity."@en ;
-    skos:scopeNote "A clinical psychiatric neuromodulation method, catalogued only so the ontology can describe the convulsive branch of established brain-stimulation therapy. Emphatically outside any consumer or wellness context and not deliverable by BSC Lab. The induced seizure is the deliberate mechanism, which separates it from stimulation applied merely to probe a response; efficacy and safety remain evidence questions this catalogue does not answer."@en ;
+    skos:scopeNote "A clinical psychiatric neuromodulation method, catalogued only so the ontology can describe the convulsive branch of established brain-stimulation therapy. Emphatically outside any consumer or wellness context. The induced seizure is the deliberate mechanism, which separates it from stimulation applied merely to probe a response; efficacy and safety remain evidence questions this catalogue does not answer."@en ;
     sstim:hasStimulusTemporalStructure sstim-v:temporalPulseTrainOrBurst ;
     sstim:neuralAccessRoute sstim-v:routePhysicalNeuralInteraction ;
     sstim:stimulationDeliveryApproach sstim-v:approachExternal, sstim-v:approachTranscutaneous, sstim-v:approachTranscranial ;
     sstim:intendedNeuralTargetSite sstim-v:targetBrain ;
     sstim:intendedNeuralPhenomenon sstim-v:phenomenonExcitabilityOrFiring ;
     sstim:participantEngagementMode sstim-v:engagementPassiveReceptive ;
-    skos:editorialNote "Catalogued for domain completeness at the suggestion of Theo Marins (2026-07-22 interview, ADR 0035). Not deliverable by BSC Lab and outside its scope entirely."@en .
+    skos:editorialNote "Catalogued for domain completeness at the suggestion of Theo Marins (2026-07-22 interview, ADR 0035)."@en .
 
 
 # ── ADR 0035: closed-loop self-regulation techniques ────────────────────

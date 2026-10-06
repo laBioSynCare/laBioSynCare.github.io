@@ -67,7 +67,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:ClaimDirection` | evidence |  | Whether a body of evidence supports, is mixed on, is inconclusive about, or refutes the asserted relation. |
 | `sstim:ComparatorDescriptor` | evidence |  | An identified description of the comparison condition (for example sham, no-stimulus, baseline, or alternative frequency) referenced by an… |
 | `sstim:ConflictDisclosure` | evidence |  | A record of declared conflicts of interest for a review, including the explicit declaration that no conflict was declared. |
-| `sstim:ControlTrack` | configuration | sstim:Track | A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks.… |
+| `sstim:ControlTrack` | configuration | sstim:Track | A track that produces no sensory output of its own and instead supplies a time-varying control signal modulating parameters of other tracks, such as… |
 | `sstim:DeliberateSelfRegulation` | neuromodulation |  | A deliberate process in which an individual attempts to regulate their own neural, physiological, or affective state, whether or not an external… |
 | `sstim:EffectDirection` | evidence |  | The direction of the measured outcome (increase, decrease, or no change). Wellness-neutral; describes what was measured, not a health claim. |
 | `sstim:EntrainmentBasedTechnique` | technique | sstim:SensoryStimulationTechnique | A Sensory Stimulation technique whose primary proposed mechanism involves frequency-following responses, phase-locking, or oscillatory coupling… |
@@ -265,7 +265,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:actualDurationSeconds` | data | session | sstim:SessionInstance → XMLSchema:integer | Observed playback duration of a recorded session instance in whole seconds. |
 | `sstim:affectedPopulation` | data | common | sstim:CautionTag → XMLSchema:string | Conservative plain-language description of the users or contexts to which a caution is especially relevant; not a diagnostic classification. |
 | `sstim:assessesProposition` | object | evidence | — → sstim:AssessmentProposition | Links an evidence assessment to the single atomic bounded proposition it evaluates. |
-| `sstim:baseFrequency` | data | patch-studio | sstim:AudioTrack → XMLSchema:decimal | Base, carrier, or center frequency for a voice, in Hz. |
+| `sstim:baseFrequency` | data | patch-studio | sstim:AudioTrack → XMLSchema:decimal | Base, carrier, or center frequency of an audio track, in Hz. |
 | `sstim:basisComparator` | object | evidence | — → sstim:ComparatorDescriptor | A comparator the basis source used, as source-level metadata. |
 | `sstim:basisComparatorNote` | data | evidence | — → 22-rdf-syntax-ns:langString | Supplementary human-readable note on a basis source's comparator. Never a substitute for the identified comparator descriptor. |
 | `sstim:basisIntervention` | object | evidence | — → — | The studied technique, protocol, intervention, or exposure profile this basis source is about (for example paced breathing rather than an auditory… |
@@ -384,7 +384,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:inGroup` | object | patch-studio | sstim:Preset → sstim:PresetGroup | **deprecated** → `bsc-v:inGroup`. Links a preset to its group classification. Each preset belongs to exactly one group. |
 | `sstim:incorporatesTechnique` | object | technique | sstim:SensoryStimulationFramework → sstim:SensoryStimulationTechnique | Links a sensory stimulation framework to a pre-existing, vendor-neutral technique that it uses but did not originate. Distinct from… |
 | `sstim:independencePolicy` | object | evidence | — → prov:Plan | The named policy whose criteria an independence determination applied. Required for independent and not-independent determinations. |
-| `sstim:initialVolume` | data | patch-studio | sstim:AudioTrack → XMLSchema:decimal | Initial output gain or amplitude for a voice. |
+| `sstim:initialVolume` | data | patch-studio | sstim:AudioTrack → XMLSchema:decimal | Initial output gain or amplitude of an audio track. |
 | `sstim:instrumentVersion` | data | session | sstim:ObservationInstrument → XMLSchema:string | Version of the instrument as administered. Answers collected under different versions are not directly comparable. |
 | `sstim:intendedNeuralPhenomenon` | object | neuromodulation | — → sstim:NeuralPhenomenon | Links a stimulation process, technique, protocol, or intervention to the functional neural phenomenon it is intended to affect. Records target… |
 | `sstim:intendedNeuralSystem` | object | neuromodulation | — → sstim:NeuralSystem | Links a stimulation process, technique, protocol, or intervention to the distributed neural system it is intended to engage. Independent of the… |
@@ -435,7 +435,7 @@ A deprecated term is still listed, marked, with what replaces it. Terms ADR 0061
 | `sstim:propositionText` | data | evidence | — → 22-rdf-syntax-ns:langString | The exact language-tagged text of an atomic assessment proposition. |
 | `sstim:pulseRateHz` | data | patch-studio | sstim:AudioTrack | sstim:ControlTrack → XMLSchema:decimal | Rhythmic pulse or sequence step rate in Hz. |
 | `sstim:recommendedAction` | data | common | sstim:CautionTag → XMLSchema:string | Plain-language action an interface should present when a caution applies, such as reduce intensity, disable a channel, stop, or avoid the context. |
-| `sstim:referenceKey` | data | evidence | sstim:PublicSafeReference → XMLSchema:string | Short uppercase key (e.g. 'INGENDOH_2023') matching citation keys in preset techDesc fields. |
+| `sstim:referenceKey` | data | evidence | sstim:PublicSafeReference → XMLSchema:string | Short uppercase key (e.g. 'INGENDOH_2023') by which running text, such as a preset's description, cites the reference. |
 | `sstim:referencesPreset` | object | session | sstim:SessionSpecification → sstim:Preset | Links a session specification to the preset it executes. |
 | `sstim:renderingCarrierHz` | data | stimulus | sstim:SignalRendering → XMLSchema:decimal | The carrier frequency this rendering uses, where it needs one. A carrier exists because of a limitation of the sense being addressed and not because… |
 | `sstim:rendersOntoParameter` | object | stimulus | sstim:SignalRendering → sstim:RenderableParameter | The parameter the signal drives — amplitude, frequency, luminance, spatial position, vibration intensity. This is also how one layer modulates… |

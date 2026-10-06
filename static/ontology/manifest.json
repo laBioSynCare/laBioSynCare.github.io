@@ -85,7 +85,7 @@
       "source": {
         "path": "static/ontology/sstim-core.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d0fc03aae4f17034fb1a17a6d970c791eaaf1b0a40995b5b1f938685c526e840"
+        "sha256": "fe290663778a7c00961788310a131d3212b9f025c854a8c81dd66076ee41e710"
       },
       "runtime": {
         "url": "sstim-core.ttl",
@@ -116,7 +116,7 @@
       "source": {
         "path": "static/ontology/sstim-stimulus.ttl",
         "mediaType": "text/turtle",
-        "sha256": "c7d0ce8b0992729c740ecd54a09b5937a85efd164c84f56466d9de336409c5f2"
+        "sha256": "bf43c1f1fa3db9b30eed7722bb9b28bd68712b61d0bfd94f2c4ef28189b5b201"
       },
       "runtime": {
         "url": "sstim-stimulus.ttl",
@@ -247,7 +247,7 @@
       "source": {
         "path": "static/ontology/sstim-configuration.ttl",
         "mediaType": "text/turtle",
-        "sha256": "fc6b2446b3c9515c537f92250c45df2f94ebf16ac056add9b2a719219f99a311"
+        "sha256": "7e210d01ecbb72f2f7cb9fa0793fa72e8708219226de3ac551d19bbf228ef204"
       },
       "runtime": {
         "url": "sstim-configuration.ttl",
@@ -281,7 +281,7 @@
       "source": {
         "path": "static/ontology/sstim-session.ttl",
         "mediaType": "text/turtle",
-        "sha256": "7fc253f16b7e9e537c9e151e24733c9500c31ff4f4eb4e1084cf2b37596710c9"
+        "sha256": "712df7606d6aac9069d573e21f293a3428a53d8fa8dc3b721811b8777b1d9d83"
       },
       "runtime": {
         "url": "sstim-session.ttl",
@@ -316,7 +316,7 @@
       "source": {
         "path": "static/ontology/sstim-evidence.ttl",
         "mediaType": "text/turtle",
-        "sha256": "b9f84d61aa12ae737164d2af2c3cad56a146b06ad792fdc68a8317239e208a40"
+        "sha256": "fe2755011068f8679fac7e17dc4b9f42b7b62ac5062a09183915974f7889d9b4"
       },
       "runtime": {
         "url": "sstim-evidence.ttl",
@@ -350,7 +350,7 @@
       "source": {
         "path": "static/ontology/sstim-neuromodulation.ttl",
         "mediaType": "text/turtle",
-        "sha256": "f053f331b6fa223e941013a9553378ccb40f586d048e0163e67b3e4c64eb5284"
+        "sha256": "c98b3ff57b9cf9a06eecb5b758f48653311f902b15e223f9aa75fb7adee4b539"
       },
       "runtime": {
         "url": "sstim-neuromodulation.ttl",
@@ -385,7 +385,7 @@
       "source": {
         "path": "static/ontology/sstim-patch-studio.ttl",
         "mediaType": "text/turtle",
-        "sha256": "d591f0a8336ec96c67c2b11b2d8f7e32b52ad793276ad46617feb7671d469954"
+        "sha256": "c8841d1daa0ded7b4e494cdaf9648379996f1e786835aae77681565cc3f53f92"
       },
       "runtime": {
         "url": "sstim-patch-studio.ttl",
@@ -420,7 +420,7 @@
       "source": {
         "path": "static/ontology/sstim-vocab.ttl",
         "mediaType": "text/turtle",
-        "sha256": "508f8fb76394697ccff7297727ab9428393f160dab25f2a718c6e40e5bb5be65"
+        "sha256": "a08bb16cf07ffae9c9cc3b80ccf7a83397db0fc1e7903e8c44ae870ff9bc08f6"
       },
       "runtime": {
         "url": "sstim-vocab.ttl",
@@ -744,7 +744,7 @@
       "competencyQueries": [
         "test/competency/kernel.rq"
       ],
-      "sha256": "cd22e9a2bd1ae085a6837c21532a7661e380fd2a827bc2a4ce21f8c24a8fb3f1"
+      "sha256": "f2f0620064dce57353677734e21814ed32e7b0755dd9d990d9ff9b3b5af78437"
     },
     {
       "id": "core",
@@ -793,7 +793,7 @@
       "competencyQueries": [
         "test/competency/core.rq"
       ],
-      "sha256": "0694062464c2e6372f78e6cf2cd5ceb5aa15d56aa7612601b1dd05fbdc891fcc"
+      "sha256": "d0a0a924902584b71aff801ca2d6cfe9c8e3f8df650e3ca7e933c32eaac1dc47"
     },
     {
       "id": "core-plus",
@@ -841,7 +841,7 @@
       "competencyQueries": [
         "test/competency/core-plus.rq"
       ],
-      "sha256": "50cbca1ddbcd7ad31f9c32a010e636a1aed0409cfd6651120d4f46750f69b6e8"
+      "sha256": "b31164b24505072f8ee22658a70780df5fe544f6f1a372a2c545fadc2d5eda1d"
     },
     {
       "id": "full",
@@ -904,7 +904,7 @@
         "test/competency/full.rq",
         "test/competency/full-session-timeline.rq"
       ],
-      "sha256": "25f16f7158dee22ae9f1112151efd908777f8f4e053adb5233e27a7524844c0d"
+      "sha256": "8fbe06b62cc702d92033f8ffa38bbeb33f010e46cca7b6a23df435ca0b3ce892"
     }
   ]
 }

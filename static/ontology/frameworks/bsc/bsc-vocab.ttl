@@ -3,7 +3,7 @@
 #  BSC Framework Vocabulary
 #
 #  Version:    1.0.0
-#  Date:       2026-10-06
+#  Date:       2026-10-07
 #  Author:     Renato Fabbri <renato@junto.space>
 #  License:    CC BY 4.0 <https://creativecommons.org/licenses/by/4.0/>
 #
@@ -57,7 +57,7 @@
     dct:publisher <https://orcid.org/0000-0002-9699-629X> ;
     dct:created "2026-10-06"^^xsd:date ;
     dct:issued "2026-10-06"^^xsd:date ;
-    dct:modified "2026-10-06"^^xsd:date ;
+    dct:modified "2026-10-07"^^xsd:date ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     rdfs:seeAlso <https://github.com/w3c-cg/sstim/blob/6421fe84843f8b506201ef5df65ead31a4e803a8/docs/decisions/0061-universal-namespaces-carry-no-framework-structure.md> .
 
@@ -221,6 +221,7 @@ bsc-v:PresetGroupScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Preset Group Vocabulary"@en ;
     skos:definition "The BSC framework's five catalog groups, by intended design character and use context."@en ;
+    skos:historyNote "Formerly sstim-v:PresetGroupScheme, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
     skos:hasTopConcept bsc-v:groupHeal, bsc-v:groupSupport, bsc-v:groupPerform,
         bsc-v:groupIndulge, bsc-v:groupTranscend .
 
@@ -228,6 +229,7 @@ bsc-v:VoiceTypeScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Voice Type Vocabulary"@en ;
     skos:definition "The four BSC catalog voice types used by preset parameter bundles."@en ;
+    skos:historyNote "Formerly sstim-v:VoiceTypeScheme, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
     skos:hasTopConcept bsc-v:voiceBinaural, bsc-v:voiceMartigli,
         bsc-v:voiceMartigliBinaural, bsc-v:voiceSymmetry .
 
@@ -235,6 +237,7 @@ bsc-v:PermutationFunctionScheme a skos:ConceptScheme ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     skos:prefLabel "BSC Symmetry Permutation Function Vocabulary"@en ;
     skos:definition "Reordering functions available to cyclic BSC Symmetry note sequences, with the catalog's integer coding as notation."@en ;
+    skos:historyNote "Formerly sstim-v:PermutationFunctionScheme, deprecated in SSTIM 0.19.0 by ADR 0061."@en ;
     skos:hasTopConcept bsc-v:permShuffle, bsc-v:permRotateForward,
         bsc-v:permRotateBackward, bsc-v:permReverse, bsc-v:permIdentity .
 
@@ -248,70 +251,80 @@ bsc-v:groupHeal a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
     skos:topConceptOf bsc-v:PresetGroupScheme ;
     skos:prefLabel "Heal"@en, "Heal"@it, "Heal"@pt, "Heal"@es ;
     skos:notation "Heal" ;
-    skos:definition "Wellness goals with comparatively stronger evidence and conservative design. Guided breathing often appropriate. Warm, lower-complexity character."@en .
+    skos:definition "Wellness goals with comparatively stronger evidence and conservative design. Guided breathing often appropriate. Warm, lower-complexity character."@en ;
+    skos:historyNote "Formerly sstim-v:groupHeal, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:groupSupport a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
     skos:inScheme bsc-v:PresetGroupScheme ;
     skos:topConceptOf bsc-v:PresetGroupScheme ;
     skos:prefLabel "Support"@en, "Support"@it, "Support"@pt, "Support"@es ;
     skos:notation "Support" ;
-    skos:definition "Meaningful user needs where evidence is promising but limited, mixed, indirect, or modality-mismatched. Explicit limitation statements required in techDesc."@en .
+    skos:definition "Meaningful user needs where evidence is promising but limited, mixed, indirect, or modality-mismatched. Explicit limitation statements required in techDesc."@en ;
+    skos:historyNote "Formerly sstim-v:groupSupport, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:groupPerform a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
     skos:inScheme bsc-v:PresetGroupScheme ;
     skos:topConceptOf bsc-v:PresetGroupScheme ;
     skos:prefLabel "Perform"@en, "Perform"@it, "Perform"@pt, "Perform"@es ;
     skos:notation "Perform" ;
-    skos:definition "Cognitive performance, focus, work, creativity. Background (minimal, no breathing) and Active (engaging, breathing may apply) sub-types."@en .
+    skos:definition "Cognitive performance, focus, work, creativity. Background (minimal, no breathing) and Active (engaging, breathing may apply) sub-types."@en ;
+    skos:historyNote "Formerly sstim-v:groupPerform, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:groupIndulge a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
     skos:inScheme bsc-v:PresetGroupScheme ;
     skos:topConceptOf bsc-v:PresetGroupScheme ;
     skos:prefLabel "Indulge"@en, "Indulge"@it, "Indulge"@pt, "Indulge"@es ;
     skos:notation "Indulge" ;
-    skos:definition "Experiential, playful, intense, or recreational sonic worlds. High personality, diverse design, bloom intentional. No medical implication."@en .
+    skos:definition "Experiential, playful, intense, or recreational sonic worlds. High personality, diverse design, bloom intentional. No medical implication."@en ;
+    skos:historyNote "Formerly sstim-v:groupIndulge, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:groupTranscend a owl:NamedIndividual, bsc-v:PresetGroup, skos:Concept ;
     skos:inScheme bsc-v:PresetGroupScheme ;
     skos:topConceptOf bsc-v:PresetGroupScheme ;
     skos:prefLabel "Transcend"@en, "Transcend"@it, "Transcend"@pt, "Transcend"@es ;
     skos:notation "Transcend" ;
-    skos:definition "Meditation, contemplative, altered-state, and perceptual exploration. May progressively reduce grounding. Claims remain conservative."@en .
+    skos:definition "Meditation, contemplative, altered-state, and perceptual exploration. May progressively reduce grounding. Claims remain conservative."@en ;
+    skos:historyNote "Formerly sstim-v:groupTranscend, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:voiceBinaural a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
     skos:inScheme bsc-v:VoiceTypeScheme ;
     skos:topConceptOf bsc-v:VoiceTypeScheme ;
     skos:prefLabel "Binaural"@en, "Binaurale"@it, "Binaural"@pt, "Binaural"@es ;
     skos:notation "Binaural" ;
-    skos:definition "Two dichotic sine tones producing a binaural beat at |fr - fl| Hz."@en .
+    skos:definition "Two dichotic sine tones producing a binaural beat at |fr - fl| Hz."@en ;
+    skos:historyNote "Formerly sstim-v:voiceBinaural, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:voiceMartigli a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
     skos:inScheme bsc-v:VoiceTypeScheme ;
     skos:topConceptOf bsc-v:VoiceTypeScheme ;
     skos:prefLabel "Martigli"@en, "Martigli"@it, "Martigli"@pt, "Martigli"@es ;
     skos:notation "Martigli" ;
-    skos:definition "Single tone with sinusoidal frequency oscillation following a decelerating breathing arc."@en .
+    skos:definition "Single tone with sinusoidal frequency oscillation following a decelerating breathing arc."@en ;
+    skos:historyNote "Formerly sstim-v:voiceMartigli, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:voiceMartigliBinaural a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
     skos:inScheme bsc-v:VoiceTypeScheme ;
     skos:topConceptOf bsc-v:VoiceTypeScheme ;
     skos:prefLabel "Martigli-Binaural"@en, "Martigli-Binaurale"@it, "Martigli-Binaural"@pt, "Martigli-Binaural"@es ;
     skos:notation "Martigli-Binaural" ;
-    skos:definition "Binaural beat combined with Martigli oscillation. Constant beat frequency despite sweeping carriers."@en .
+    skos:definition "Binaural beat combined with Martigli oscillation. Constant beat frequency despite sweeping carriers."@en ;
+    skos:historyNote "Formerly sstim-v:voiceMartigliBinaural, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:voiceSymmetry a owl:NamedIndividual, bsc-v:VoiceType, skos:Concept ;
     skos:inScheme bsc-v:VoiceTypeScheme ;
     skos:topConceptOf bsc-v:VoiceTypeScheme ;
     skos:prefLabel "Symmetry"@en, "Simmetria"@it, "Simetria"@pt, "Simetría"@es ;
     skos:notation "Symmetry" ;
-    skos:definition "Log-distributed pitch sequence with algebraic group permutation at each cycle. Includes the isochronic special case (noctaves = 0)."@en .
+    skos:definition "Log-distributed pitch sequence with algebraic group permutation at each cycle. Includes the isochronic special case (noctaves = 0)."@en ;
+    skos:historyNote "Formerly sstim-v:voiceSymmetry, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:permShuffle a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
     skos:inScheme bsc-v:PermutationFunctionScheme ;
     skos:topConceptOf bsc-v:PermutationFunctionScheme ;
     skos:prefLabel "Shuffle"@en, "Shuffle"@it, "Shuffle"@pt, "Shuffle"@es ;
     skos:notation "0" ;
-    skos:definition "Uniform random permutation (Fisher-Yates) at each cycle boundary. Maximum cross-cycle unpredictability. Highest cognitive engagement."@en .
+    skos:definition "Uniform random permutation (Fisher-Yates) at each cycle boundary. Maximum cross-cycle unpredictability. Highest cognitive engagement."@en ;
+    skos:historyNote "Formerly sstim-v:permShuffle, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:permRotateForward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
     skos:inScheme bsc-v:PermutationFunctionScheme ;
@@ -319,7 +332,8 @@ bsc-v:permRotateForward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:C
     skos:prefLabel "Rotate Forward"@en, "Rotazione in Avanti"@it,
                    "Rotação para Frente"@pt, "Rotación hacia Adelante"@es ;
     skos:notation "1" ;
-    skos:definition "Cyclic left shift at each cycle boundary. Systematic upward pitch drift over N cycles."@en .
+    skos:definition "Cyclic left shift at each cycle boundary. Systematic upward pitch drift over N cycles."@en ;
+    skos:historyNote "Formerly sstim-v:permRotateForward, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:permRotateBackward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
     skos:inScheme bsc-v:PermutationFunctionScheme ;
@@ -327,18 +341,21 @@ bsc-v:permRotateBackward a owl:NamedIndividual, bsc-v:PermutationFunction, skos:
     skos:prefLabel "Rotate Backward"@en, "Rotazione all'Indietro"@it,
                    "Rotação para Trás"@pt, "Rotación hacia Atrás"@es ;
     skos:notation "2" ;
-    skos:definition "Cyclic right shift. Systematic downward pitch drift over N cycles."@en .
+    skos:definition "Cyclic right shift. Systematic downward pitch drift over N cycles."@en ;
+    skos:historyNote "Formerly sstim-v:permRotateBackward, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:permReverse a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
     skos:inScheme bsc-v:PermutationFunctionScheme ;
     skos:topConceptOf bsc-v:PermutationFunctionScheme ;
     skos:prefLabel "Reverse"@en, "Inversione"@it, "Inversão"@pt, "Inversión"@es ;
     skos:notation "3" ;
-    skos:definition "Alternating reversal: ascending and descending passes alternate with a period of two cycles."@en .
+    skos:definition "Alternating reversal: ascending and descending passes alternate with a period of two cycles."@en ;
+    skos:historyNote "Formerly sstim-v:permReverse, deprecated in SSTIM 0.19.0 by ADR 0061."@en .
 
 bsc-v:permIdentity a owl:NamedIndividual, bsc-v:PermutationFunction, skos:Concept ;
     skos:inScheme bsc-v:PermutationFunctionScheme ;
     skos:topConceptOf bsc-v:PermutationFunctionScheme ;
     skos:prefLabel "Identity"@en, "Identità"@it, "Identidade"@pt, "Identidad"@es ;
     skos:notation "4" ;
-    skos:definition "No permutation. Pure repetition. Lowest cognitive engagement; habituation risk for long sessions."@en .
+    skos:definition "No permutation. Pure repetition. Lowest cognitive engagement; habituation risk for long sessions."@en ;
+    skos:historyNote "Formerly sstim-v:permIdentity, deprecated in SSTIM 0.19.0 by ADR 0061."@en .

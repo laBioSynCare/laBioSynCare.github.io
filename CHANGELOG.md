@@ -56,21 +56,25 @@ shows what to change:
   specification. A functional property takes at most one value, and
   `sstim:derivedFrom` is irreflexive.
 - **Records that no shape reached now have one.** The instances of 13 classes
-  were validated by nothing: the evidence descriptors, the activities that
-  generate assessments and knowledge statuses, and the exposure statement
-  roles, whose rules
+  were validated by nothing: the evidence descriptors and the intervention an
+  evidence basis names, the activities that generate assessments and knowledge
+  statuses, exploratory protocols, and the exposure statement roles, whose
+  rules
   [ADR 0027](docs/decisions/0027-evidence-claim-family-and-public-claim-gate.md)
   described and no shape carried. Each shape asks only for what the definition
   already says: an activity's time, what it used, and the agent and role
-  responsible; a statement's label and description, and no evidence tier or
-  basis; a descriptor's IRI and label. `sstim-ex:concernsEffectDimension` and
-  `sstim-ex:hasKnowledgeStatus` are limited to the subjects ADR 0027 names.
+  responsible; a statement's or a protocol's label and description, and no
+  evidence tier or basis on a statement; a descriptor's IRI and label.
+  `sstim-ex:concernsEffectDimension` and `sstim-ex:hasKnowledgeStatus` are
+  limited to the subjects ADR 0027 names.
 - `sstim:independencePolicy` and `sstim:reviewRubric` take a `prov:Plan`. They
   had no range.
-- 25 definitions are rewritten: those that took their meaning from BSC or
+- 32 definitions are rewritten: those that took their meaning from BSC or
   carried its remarks, and the track parameters whose domains widened. Where a
   remark was provenance it moved to `skos:historyNote`; implementation status
-  and policy left the definition.
+  and policy left the definition. The notes of 14 more terms no longer record
+  BSC Lab's delivery status, platform support or pipeline, and the note on
+  `sstim:Track` no longer names the deprecated `sstim:Voice`.
 - Domains that named the catalog's `sstim:Voice` now name `sstim:AudioTrack`.
   The breathing-period and transition properties also apply to an audio or
   control track, so a track's own oscillation needs no catalog term.
